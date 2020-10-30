@@ -110,7 +110,7 @@
                             {
                               "name": "Ch 123 (Basal Forebrain)",
                               "status": "right hemisphere",
-                              "labelIndex": 76,
+                              "labelIndex": 77,
                               "rgb": [
                                 200,
                                 200,
@@ -134,7 +134,7 @@
                                 "xml": {
                                   "name": "Ch 123 (Basal Forebrain)",
                                   "id": "286",
-                                  "grayvalue": "76"
+                                  "grayvalue": "77"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -142,9 +142,9 @@
                                 }
                               },
                               "position": [
-                                40821429,
-                                147059,
-                                -8210084
+                                1319527,
+                                5215976,
+                                -6062130
                               ]
                             }
                           ],
@@ -582,7 +582,7 @@
                             {
                               "name": "SF (Amygdala)",
                               "status": "left hemisphere",
-                              "labelIndex": 110,
+                              "labelIndex": 111,
                               "rgb": [
                                 200,
                                 200,
@@ -606,7 +606,7 @@
                                 "xml": {
                                   "name": "SF (Amygdala)",
                                   "id": "185",
-                                  "grayvalue": "110"
+                                  "grayvalue": "111"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -614,9 +614,9 @@
                                 }
                               },
                               "position": [
-                                -7921093,
-                                41993859,
-                                -25200491
+                                -17670130,
+                                -2203896,
+                                -20833766
                               ]
                             },
                             {
@@ -702,7 +702,7 @@
                             {
                               "name": "VTM (Amygdala)",
                               "status": "left hemisphere",
-                              "labelIndex": 80,
+                              "labelIndex": 81,
                               "rgb": [
                                 200,
                                 200,
@@ -726,7 +726,7 @@
                                 "xml": {
                                   "name": "VTM (Amygdala)",
                                   "id": "228",
-                                  "grayvalue": "80"
+                                  "grayvalue": "81"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -734,9 +734,9 @@
                                 }
                               },
                               "position": [
-                                -41121409,
-                                -13186284,
-                                18914736
+                                -24721774,
+                                -11375000,
+                                -15447581
                               ]
                             },
                             {
@@ -807,7 +807,7 @@
                             {
                               "name": "IF (Amygdala)",
                               "status": "left hemisphere",
-                              "labelIndex": 59,
+                              "labelIndex": 58,
                               "rgb": [
                                 200,
                                 200,
@@ -831,7 +831,7 @@
                                 "xml": {
                                   "name": "IF (Amygdala)",
                                   "id": "237",
-                                  "grayvalue": "59"
+                                  "grayvalue": "58"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -839,15 +839,15 @@
                                 }
                               },
                               "position": [
-                                -45606245,
-                                27725872,
-                                3845093
+                                -28353448,
+                                -3146552,
+                                -17741379
                               ]
                             },
                             {
                               "name": "IF (Amygdala)",
                               "status": "right hemisphere",
-                              "labelIndex": 59,
+                              "labelIndex": 58,
                               "rgb": [
                                 200,
                                 200,
@@ -871,7 +871,7 @@
                                 "xml": {
                                   "name": "IF (Amygdala)",
                                   "id": "237",
-                                  "grayvalue": "59"
+                                  "grayvalue": "58"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -879,9 +879,9 @@
                                 }
                               },
                               "position": [
-                                41261099,
-                                27558315,
-                                3895410
+                                27403509,
+                                -2061404,
+                                -17201754
                               ]
                             }
                           ],
@@ -1094,7 +1094,7 @@
                             {
                               "name": "Area 5L (SPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 95,
+                              "labelIndex": 94,
                               "rgb": [
                                 184,
                                 185,
@@ -1118,7 +1118,7 @@
                                 "xml": {
                                   "name": "Area 5L (SPL)",
                                   "id": "130",
-                                  "grayvalue": "95"
+                                  "grayvalue": "94"
                                 },
                                 "dat": {
                                   "colors": "130 184 185 58",
@@ -1126,9 +1126,9 @@
                                 }
                               },
                               "position": [
-                                -7510805,
-                                -41242373,
-                                57328814
+                                -18573126,
+                                -44544826,
+                                66972564
                               ]
                             },
                             {
@@ -1304,7 +1304,7 @@
                             {
                               "name": "Area 5M (SPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 94,
+                              "labelIndex": 95,
                               "rgb": [
                                 225,
                                 245,
@@ -1328,7 +1328,7 @@
                                 "xml": {
                                   "name": "Area 5M (SPL)",
                                   "id": "131",
-                                  "grayvalue": "94"
+                                  "grayvalue": "95"
                                 },
                                 "dat": {
                                   "colors": "131 225 245 76",
@@ -1336,9 +1336,9 @@
                                 }
                               },
                               "position": [
-                                -18573126,
-                                -44544826,
-                                66972564
+                                -7510805,
+                                -41242373,
+                                57328814
                               ]
                             },
                             {
@@ -1409,7 +1409,7 @@
                             {
                               "name": "Area 7P (SPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 34,
+                              "labelIndex": 33,
                               "rgb": [
                                 52,
                                 20,
@@ -1433,7 +1433,7 @@
                                 "xml": {
                                   "name": "Area 7P (SPL)",
                                   "id": "208",
-                                  "grayvalue": "34"
+                                  "grayvalue": "33"
                                 },
                                 "dat": {
                                   "colors": "208 52 20 106",
@@ -1441,15 +1441,15 @@
                                 }
                               },
                               "position": [
-                                -28646971,
-                                -74294837,
-                                37691734
+                                -7158537,
+                                -74213611,
+                                51986625
                               ]
                             },
                             {
                               "name": "Area 7P (SPL)",
                               "status": "right hemisphere",
-                              "labelIndex": 35,
+                              "labelIndex": 34,
                               "rgb": [
                                 52,
                                 20,
@@ -1473,7 +1473,7 @@
                                 "xml": {
                                   "name": "Area 7P (SPL)",
                                   "id": "208",
-                                  "grayvalue": "35"
+                                  "grayvalue": "34"
                                 },
                                 "dat": {
                                   "colors": "208 52 20 106",
@@ -1481,9 +1481,9 @@
                                 }
                               },
                               "position": [
-                                19351336,
-                                -13259267,
-                                68228468
+                                14242854,
+                                -73944690,
+                                54732745
                               ]
                             }
                           ],
@@ -1739,7 +1739,7 @@
                             {
                               "name": "Area OP3 (POperc)",
                               "status": "left hemisphere",
-                              "labelIndex": 81,
+                              "labelIndex": 80,
                               "rgb": [
                                 58,
                                 122,
@@ -1763,7 +1763,7 @@
                                 "xml": {
                                   "name": "Area OP3 (POperc)",
                                   "id": "75",
-                                  "grayvalue": "81"
+                                  "grayvalue": "80"
                                 },
                                 "dat": {
                                   "colors": "75 58 122 80",
@@ -1771,9 +1771,9 @@
                                 }
                               },
                               "position": [
-                                -24721774,
-                                -11375000,
-                                -15447581
+                                -41121409,
+                                -13186284,
+                                18914736
                               ]
                             },
                             {
@@ -1949,7 +1949,7 @@
                             {
                               "name": "Area OP2 (POperc)",
                               "status": "left hemisphere",
-                              "labelIndex": 15,
+                              "labelIndex": 16,
                               "rgb": [
                                 36,
                                 47,
@@ -1973,7 +1973,7 @@
                                 "xml": {
                                   "name": "Area OP2 (POperc)",
                                   "id": "74",
-                                  "grayvalue": "15"
+                                  "grayvalue": "16"
                                 },
                                 "dat": {
                                   "colors": "74 36 47 221",
@@ -1981,15 +1981,15 @@
                                 }
                               },
                               "position": [
-                                -15815206,
-                                -57796576,
-                                -38406344
+                                -35254642,
+                                -24285146,
+                                19855438
                               ]
                             },
                             {
                               "name": "Area OP2 (POperc)",
                               "status": "right hemisphere",
-                              "labelIndex": 16,
+                              "labelIndex": 15,
                               "rgb": [
                                 36,
                                 47,
@@ -2013,7 +2013,7 @@
                                 "xml": {
                                   "name": "Area OP2 (POperc)",
                                   "id": "74",
-                                  "grayvalue": "16"
+                                  "grayvalue": "15"
                                 },
                                 "dat": {
                                   "colors": "74 36 47 221",
@@ -2021,9 +2021,9 @@
                                 }
                               },
                               "position": [
-                                49901515,
-                                -12228355,
-                                5840909
+                                35365408,
+                                -21336175,
+                                19533496
                               ]
                             }
                           ],
@@ -2054,7 +2054,7 @@
                             {
                               "name": "Area OP1 (POperc)",
                               "status": "left hemisphere",
-                              "labelIndex": 54,
+                              "labelIndex": 55,
                               "rgb": [
                                 250,
                                 182,
@@ -2078,7 +2078,7 @@
                                 "xml": {
                                   "name": "Area OP1 (POperc)",
                                   "id": "73",
-                                  "grayvalue": "54"
+                                  "grayvalue": "55"
                                 },
                                 "dat": {
                                   "colors": "73 250 182 34",
@@ -2086,9 +2086,9 @@
                                 }
                               },
                               "position": [
-                                -30109187,
-                                -27834683,
-                                -14711254
+                                -51505442,
+                                -23359475,
+                                18992185
                               ]
                             },
                             {
@@ -2714,7 +2714,7 @@
                             {
                               "name": "Area PFcm (IPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 31,
+                              "labelIndex": 32,
                               "rgb": [
                                 98,
                                 128,
@@ -2738,7 +2738,7 @@
                                 "xml": {
                                   "name": "Area PFcm (IPL)",
                                   "id": "113",
-                                  "grayvalue": "31"
+                                  "grayvalue": "32"
                                 },
                                 "dat": {
                                   "colors": "113 98 128 120",
@@ -2746,9 +2746,9 @@
                                 }
                               },
                               "position": [
-                                -8964794,
-                                -28310868,
-                                31724659
+                                -53358213,
+                                -38688791,
+                                23011364
                               ]
                             },
                             {
@@ -2924,7 +2924,7 @@
                             {
                               "name": "Area PFt (IPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 25,
+                              "labelIndex": 26,
                               "rgb": [
                                 120,
                                 135,
@@ -2948,7 +2948,7 @@
                                 "xml": {
                                   "name": "Area PFt (IPL)",
                                   "id": "109",
-                                  "grayvalue": "25"
+                                  "grayvalue": "26"
                                 },
                                 "dat": {
                                   "colors": "109 120 135 232",
@@ -2956,15 +2956,15 @@
                                 }
                               },
                               "position": [
-                                -46825193,
-                                -467866,
-                                -11853470
+                                -56881167,
+                                -27253408,
+                                39098099
                               ]
                             },
                             {
                               "name": "Area PFt (IPL)",
                               "status": "right hemisphere",
-                              "labelIndex": 26,
+                              "labelIndex": 27,
                               "rgb": [
                                 120,
                                 135,
@@ -2988,7 +2988,7 @@
                                 "xml": {
                                   "name": "Area PFt (IPL)",
                                   "id": "109",
-                                  "grayvalue": "26"
+                                  "grayvalue": "27"
                                 },
                                 "dat": {
                                   "colors": "109 120 135 232",
@@ -2996,9 +2996,9 @@
                                 }
                               },
                               "position": [
-                                2347606,
-                                39643186,
-                                7158379
+                                55481649,
+                                -22639096,
+                                40566223
                               ]
                             }
                           ],
@@ -3069,7 +3069,7 @@
                             {
                               "name": "Area PFm (IPL)",
                               "status": "right hemisphere",
-                              "labelIndex": 89,
+                              "labelIndex": 88,
                               "rgb": [
                                 53,
                                 76,
@@ -3093,7 +3093,7 @@
                                 "xml": {
                                   "name": "Area PFm (IPL)",
                                   "id": "112",
-                                  "grayvalue": "89"
+                                  "grayvalue": "88"
                                 },
                                 "dat": {
                                   "colors": "112 53 76 145",
@@ -3101,9 +3101,9 @@
                                 }
                               },
                               "position": [
-                                22372168,
-                                -24867314,
-                                -10800971
+                                57404585,
+                                -43563586,
+                                40761133
                               ]
                             }
                           ],
@@ -3239,7 +3239,7 @@
                             {
                               "name": "Area PFop (IPL)",
                               "status": "left hemisphere",
-                              "labelIndex": 114,
+                              "labelIndex": 115,
                               "rgb": [
                                 146,
                                 153,
@@ -3263,7 +3263,7 @@
                                 "xml": {
                                   "name": "Area PFop (IPL)",
                                   "id": "111",
-                                  "grayvalue": "114"
+                                  "grayvalue": "115"
                                 },
                                 "dat": {
                                   "colors": "111 146 153 177",
@@ -3271,15 +3271,15 @@
                                 }
                               },
                               "position": [
-                                -27403876,
-                                -79901844,
-                                -13455142
+                                -62172586,
+                                -25179439,
+                                24910903
                               ]
                             },
                             {
                               "name": "Area PFop (IPL)",
                               "status": "right hemisphere",
-                              "labelIndex": 115,
+                              "labelIndex": 114,
                               "rgb": [
                                 146,
                                 153,
@@ -3303,7 +3303,7 @@
                                 "xml": {
                                   "name": "Area PFop (IPL)",
                                   "id": "111",
-                                  "grayvalue": "115"
+                                  "grayvalue": "114"
                                 },
                                 "dat": {
                                   "colors": "111 146 153 177",
@@ -3311,9 +3311,9 @@
                                 }
                               },
                               "position": [
-                                32199541,
-                                -77237038,
-                                -12393916
+                                58871842,
+                                -18665434,
+                                26862600
                               ]
                             }
                           ],
@@ -3584,7 +3584,7 @@
                             {
                               "name": "Area hIP7 (IPS)",
                               "status": "left hemisphere",
-                              "labelIndex": 121,
+                              "labelIndex": 119,
                               "rgb": [
                                 71,
                                 196,
@@ -3608,7 +3608,7 @@
                                 "xml": {
                                   "name": "Area hIP7 (IPS)",
                                   "id": "296",
-                                  "grayvalue": "121"
+                                  "grayvalue": "119"
                                 },
                                 "dat": {
                                   "colors": "296 71 196 218",
@@ -3616,15 +3616,15 @@
                                 }
                               },
                               "position": [
-                                -9486943,
-                                13924731,
-                                -5101382
+                                -23840521,
+                                -80659886,
+                                28766477
                               ]
                             },
                             {
                               "name": "Area hIP7 (IPS)",
                               "status": "right hemisphere",
-                              "labelIndex": 121,
+                              "labelIndex": 120,
                               "rgb": [
                                 71,
                                 196,
@@ -3648,7 +3648,7 @@
                                 "xml": {
                                   "name": "Area hIP7 (IPS)",
                                   "id": "296",
-                                  "grayvalue": "121"
+                                  "grayvalue": "120"
                                 },
                                 "dat": {
                                   "colors": "296 71 196 218",
@@ -3656,9 +3656,9 @@
                                 }
                               },
                               "position": [
-                                54886364,
-                                -22812851,
-                                10787318
+                                30190021,
+                                -79147558,
+                                27902335
                               ]
                             }
                           ],
@@ -3689,7 +3689,7 @@
                             {
                               "name": "Area hIP3 (IPS)",
                               "status": "left hemisphere",
-                              "labelIndex": 42,
+                              "labelIndex": 41,
                               "rgb": [
                                 113,
                                 172,
@@ -3713,7 +3713,7 @@
                                 "xml": {
                                   "name": "Area hIP3 (IPS)",
                                   "id": "133",
-                                  "grayvalue": "42"
+                                  "grayvalue": "41"
                                 },
                                 "dat": {
                                   "colors": "133 113 172 229",
@@ -3721,15 +3721,15 @@
                                 }
                               },
                               "position": [
-                                -39343548,
-                                57251613,
-                                -9394355
+                                -31036490,
+                                -54099216,
+                                48519300
                               ]
                             },
                             {
                               "name": "Area hIP3 (IPS)",
                               "status": "right hemisphere",
-                              "labelIndex": 42,
+                              "labelIndex": 41,
                               "rgb": [
                                 113,
                                 172,
@@ -3753,7 +3753,7 @@
                                 "xml": {
                                   "name": "Area hIP3 (IPS)",
                                   "id": "133",
-                                  "grayvalue": "42"
+                                  "grayvalue": "41"
                                 },
                                 "dat": {
                                   "colors": "133 113 172 229",
@@ -3761,9 +3761,9 @@
                                 }
                               },
                               "position": [
-                                40049076,
-                                57032505,
-                                -7439771
+                                33496397,
+                                -49069738,
+                                50816264
                               ]
                             }
                           ],
@@ -4004,7 +4004,7 @@
                             {
                               "name": "Area hIP5 (IPS)",
                               "status": "left hemisphere",
-                              "labelIndex": 33,
+                              "labelIndex": 34,
                               "rgb": [
                                 217,
                                 87,
@@ -4028,7 +4028,7 @@
                                 "xml": {
                                   "name": "Area hIP5 (IPS)",
                                   "id": "295",
-                                  "grayvalue": "33"
+                                  "grayvalue": "34"
                                 },
                                 "dat": {
                                   "colors": "295 217 87 210",
@@ -4036,9 +4036,9 @@
                                 }
                               },
                               "position": [
-                                -7158537,
-                                -74213611,
-                                51986625
+                                -28646971,
+                                -74294837,
+                                37691734
                               ]
                             },
                             {
@@ -4559,7 +4559,7 @@
                             {
                               "name": "Area hOc3d (Cuneus)",
                               "status": "left hemisphere",
-                              "labelIndex": 78,
+                              "labelIndex": 79,
                               "rgb": [
                                 105,
                                 191,
@@ -4583,7 +4583,7 @@
                                 "xml": {
                                   "name": "Area hOc3d (Cuneus)",
                                   "id": "120",
-                                  "grayvalue": "78"
+                                  "grayvalue": "79"
                                 },
                                 "dat": {
                                   "colors": "120 105 191 48",
@@ -4591,9 +4591,9 @@
                                 }
                               },
                               "position": [
-                                -41031325,
-                                -2667470,
-                                -8274699
+                                -13544164,
+                                -91128381,
+                                22701240
                               ]
                             },
                             {
@@ -4784,7 +4784,7 @@
                             {
                               "name": "Area hOc4v (LingG)",
                               "status": "left hemisphere",
-                              "labelIndex": 115,
+                              "labelIndex": 114,
                               "rgb": [
                                 222,
                                 77,
@@ -4808,7 +4808,7 @@
                                 "xml": {
                                   "name": "Area hOc4v (LingG)",
                                   "id": "9",
-                                  "grayvalue": "115"
+                                  "grayvalue": "114"
                                 },
                                 "dat": {
                                   "colors": "9 222 77 155",
@@ -4816,15 +4816,15 @@
                                 }
                               },
                               "position": [
-                                -62172586,
-                                -25179439,
-                                24910903
+                                -27403876,
+                                -79901844,
+                                -13455142
                               ]
                             },
                             {
                               "name": "Area hOc4v (LingG)",
                               "status": "right hemisphere",
-                              "labelIndex": 114,
+                              "labelIndex": 115,
                               "rgb": [
                                 222,
                                 77,
@@ -4848,7 +4848,7 @@
                                 "xml": {
                                   "name": "Area hOc4v (LingG)",
                                   "id": "9",
-                                  "grayvalue": "114"
+                                  "grayvalue": "115"
                                 },
                                 "dat": {
                                   "colors": "9 222 77 155",
@@ -4856,9 +4856,9 @@
                                 }
                               },
                               "position": [
-                                58871842,
-                                -18665434,
-                                26862600
+                                32199541,
+                                -77237038,
+                                -12393916
                               ]
                             }
                           ],
@@ -5844,7 +5844,7 @@
                             {
                               "name": "Area 6d1 (PreCG)",
                               "status": "right hemisphere",
-                              "labelIndex": 34,
+                              "labelIndex": 35,
                               "rgb": [
                                 45,
                                 33,
@@ -5868,7 +5868,7 @@
                                 "xml": {
                                   "name": "Area 6d1 (PreCG)",
                                   "id": "287",
-                                  "grayvalue": "34"
+                                  "grayvalue": "35"
                                 },
                                 "dat": {
                                   "colors": "287 45 33 27",
@@ -5876,9 +5876,9 @@
                                 }
                               },
                               "position": [
-                                14242854,
-                                -73944690,
-                                54732745
+                                19351336,
+                                -13259267,
+                                68228468
                               ]
                             }
                           ],
@@ -6044,7 +6044,7 @@
                             {
                               "name": "Area 6d3 (SFS)",
                               "status": "left hemisphere",
-                              "labelIndex": 62,
+                              "labelIndex": 61,
                               "rgb": [
                                 55,
                                 239,
@@ -6068,7 +6068,7 @@
                                 "xml": {
                                   "name": "Area 6d3 (SFS)",
                                   "id": "289",
-                                  "grayvalue": "62"
+                                  "grayvalue": "61"
                                 },
                                 "dat": {
                                   "colors": "289 55 239 21",
@@ -6076,9 +6076,9 @@
                                 }
                               },
                               "position": [
-                                -13337004,
-                                -58068282,
-                                -31416300
+                                -24818719,
+                                5121182,
+                                52665271
                               ]
                             },
                             {
@@ -6734,7 +6734,7 @@
                             {
                               "name": "Area Fo1 (OFC)",
                               "status": "left hemisphere",
-                              "labelIndex": 111,
+                              "labelIndex": 110,
                               "rgb": [
                                 7,
                                 255,
@@ -6758,7 +6758,7 @@
                                 "xml": {
                                   "name": "Area Fo1 (OFC)",
                                   "id": "3",
-                                  "grayvalue": "111"
+                                  "grayvalue": "110"
                                 },
                                 "dat": {
                                   "colors": "3 7 255 179",
@@ -6766,9 +6766,9 @@
                                 }
                               },
                               "position": [
-                                -17670130,
-                                -2203896,
-                                -20833766
+                                -7921093,
+                                41993859,
+                                -25200491
                               ]
                             },
                             {
@@ -6839,7 +6839,7 @@
                             {
                               "name": "Area Fo3 (OFC)",
                               "status": "left hemisphere",
-                              "labelIndex": 124,
+                              "labelIndex": 125,
                               "rgb": [
                                 182,
                                 189,
@@ -6863,7 +6863,7 @@
                                 "xml": {
                                   "name": "Area Fo3 (OFC)",
                                   "id": "5",
-                                  "grayvalue": "124"
+                                  "grayvalue": "125"
                                 },
                                 "dat": {
                                   "colors": "5 182 189 250",
@@ -6871,9 +6871,9 @@
                                 }
                               },
                               "position": [
-                                -49286996,
-                                -4921525,
-                                -3737668
+                                -22991533,
+                                32489047,
+                                -20444026
                               ]
                             },
                             {
@@ -7169,7 +7169,7 @@
                             {
                               "name": "Area OP8 (Frontal Operculum)",
                               "status": "left hemisphere",
-                              "labelIndex": 84,
+                              "labelIndex": 83,
                               "rgb": [
                                 29,
                                 76,
@@ -7188,7 +7188,7 @@
                                 "xml": {
                                   "name": "Area OP8 (Frontal Operculum)",
                                   "id": "273",
-                                  "grayvalue": "84"
+                                  "grayvalue": "83"
                                 },
                                 "dat": {
                                   "colors": "273 29 76 168",
@@ -7196,15 +7196,15 @@
                                 }
                               },
                               "position": [
-                                -22817596,
-                                -25512188,
-                                -19013729
+                                -42160819,
+                                18165497,
+                                5718713
                               ]
                             },
                             {
                               "name": "Area OP8 (Frontal Operculum)",
                               "status": "right hemisphere",
-                              "labelIndex": 83,
+                              "labelIndex": 84,
                               "rgb": [
                                 29,
                                 76,
@@ -7223,7 +7223,7 @@
                                 "xml": {
                                   "name": "Area OP8 (Frontal Operculum)",
                                   "id": "273",
-                                  "grayvalue": "83"
+                                  "grayvalue": "84"
                                 },
                                 "dat": {
                                   "colors": "273 29 76 168",
@@ -7231,9 +7231,9 @@
                                 }
                               },
                               "position": [
-                                20881943,
-                                -24490092,
-                                -18674295
+                                42879898,
+                                17786201,
+                                5095400
                               ]
                             }
                           ],
@@ -7292,7 +7292,7 @@
                             {
                               "name": "Area OP5 (Frontal Operculum)",
                               "status": "right hemisphere",
-                              "labelIndex": 88,
+                              "labelIndex": 87,
                               "rgb": [
                                 222,
                                 78,
@@ -7311,7 +7311,7 @@
                                 "xml": {
                                   "name": "Area OP5 (Frontal Operculum)",
                                   "id": "348",
-                                  "grayvalue": "88"
+                                  "grayvalue": "87"
                                 },
                                 "dat": {
                                   "colors": "348 222 78 253",
@@ -7319,9 +7319,9 @@
                                 }
                               },
                               "position": [
-                                57404585,
-                                -43563586,
-                                40761133
+                                45445769,
+                                88586,
+                                9553095
                               ]
                             }
                           ],
@@ -7345,7 +7345,7 @@
                             {
                               "name": "Area OP9 (Frontal Operculum)",
                               "status": "left hemisphere",
-                              "labelIndex": 58,
+                              "labelIndex": 59,
                               "rgb": [
                                 175,
                                 123,
@@ -7364,7 +7364,7 @@
                                 "xml": {
                                   "name": "Area OP9 (Frontal Operculum)",
                                   "id": "274",
-                                  "grayvalue": "58"
+                                  "grayvalue": "59"
                                 },
                                 "dat": {
                                   "colors": "274 175 123 34",
@@ -7372,15 +7372,15 @@
                                 }
                               },
                               "position": [
-                                -28353448,
-                                -3146552,
-                                -17741379
+                                -45606245,
+                                27725872,
+                                3845093
                               ]
                             },
                             {
                               "name": "Area OP9 (Frontal Operculum)",
                               "status": "right hemisphere",
-                              "labelIndex": 58,
+                              "labelIndex": 59,
                               "rgb": [
                                 175,
                                 123,
@@ -7399,7 +7399,7 @@
                                 "xml": {
                                   "name": "Area OP9 (Frontal Operculum)",
                                   "id": "274",
-                                  "grayvalue": "58"
+                                  "grayvalue": "59"
                                 },
                                 "dat": {
                                   "colors": "274 175 123 34",
@@ -7407,9 +7407,9 @@
                                 }
                               },
                               "position": [
-                                27403509,
-                                -2061404,
-                                -17201754
+                                41261099,
+                                27558315,
+                                3895410
                               ]
                             }
                           ],
@@ -7553,7 +7553,7 @@
                             {
                               "name": "Area Fo5 (OFC)",
                               "status": "left hemisphere",
-                              "labelIndex": 41,
+                              "labelIndex": 42,
                               "rgb": [
                                 219,
                                 11,
@@ -7577,7 +7577,7 @@
                                 "xml": {
                                   "name": "Area Fo5 (OFC)",
                                   "id": "325",
-                                  "grayvalue": "41"
+                                  "grayvalue": "42"
                                 },
                                 "dat": {
                                   "colors": "325 219 11 91",
@@ -7585,15 +7585,15 @@
                                 }
                               },
                               "position": [
-                                -31036490,
-                                -54099216,
-                                48519300
+                                -39343548,
+                                57251613,
+                                -9394355
                               ]
                             },
                             {
                               "name": "Area Fo5 (OFC)",
                               "status": "right hemisphere",
-                              "labelIndex": 41,
+                              "labelIndex": 42,
                               "rgb": [
                                 219,
                                 11,
@@ -7617,7 +7617,7 @@
                                 "xml": {
                                   "name": "Area Fo5 (OFC)",
                                   "id": "325",
-                                  "grayvalue": "41"
+                                  "grayvalue": "42"
                                 },
                                 "dat": {
                                   "colors": "325 219 11 91",
@@ -7625,9 +7625,9 @@
                                 }
                               },
                               "position": [
-                                33496397,
-                                -49069738,
-                                50816264
+                                40049076,
+                                57032505,
+                                -7439771
                               ]
                             }
                           ],
@@ -8333,7 +8333,7 @@
                             {
                               "name": "Area Ia (Insula)",
                               "status": "left hemisphere",
-                              "labelIndex": 77,
+                              "labelIndex": 78,
                               "rgb": [
                                 71,
                                 217,
@@ -8357,7 +8357,7 @@
                                 "xml": {
                                   "name": "Area Ia (Insula)",
                                   "id": "339",
-                                  "grayvalue": "77"
+                                  "grayvalue": "78"
                                 },
                                 "dat": {
                                   "colors": "339 71 217 62",
@@ -8365,15 +8365,15 @@
                                 }
                               },
                               "position": [
-                                -54768876,
-                                -17571758,
-                                5811527
+                                -41031325,
+                                -2667470,
+                                -8274699
                               ]
                             },
                             {
                               "name": "Area Ia (Insula)",
                               "status": "right hemisphere",
-                              "labelIndex": 77,
+                              "labelIndex": 76,
                               "rgb": [
                                 71,
                                 217,
@@ -8397,7 +8397,7 @@
                                 "xml": {
                                   "name": "Area Ia (Insula)",
                                   "id": "339",
-                                  "grayvalue": "77"
+                                  "grayvalue": "76"
                                 },
                                 "dat": {
                                   "colors": "339 71 217 62",
@@ -8405,9 +8405,9 @@
                                 }
                               },
                               "position": [
-                                1319527,
-                                5215976,
-                                -6062130
+                                40821429,
+                                147059,
+                                -8210084
                               ]
                             }
                           ],
@@ -8783,7 +8783,7 @@
                             {
                               "name": "Area Id5 (Insula)",
                               "status": "left hemisphere",
-                              "labelIndex": 72,
+                              "labelIndex": 71,
                               "rgb": [
                                 112,
                                 6,
@@ -8807,7 +8807,7 @@
                                 "xml": {
                                   "name": "Area Id5 (Insula)",
                                   "id": "338",
-                                  "grayvalue": "72"
+                                  "grayvalue": "71"
                                 },
                                 "dat": {
                                   "colors": "338 112 6 50",
@@ -8815,9 +8815,9 @@
                                 }
                               },
                               "position": [
-                                -51920507,
-                                -5887097,
-                                3718894
+                                -39267956,
+                                -4039595,
+                                609576
                               ]
                             },
                             {
@@ -9603,7 +9603,7 @@
                             {
                               "name": "Area TE 2.2 (STG)",
                               "status": "right hemisphere",
-                              "labelIndex": 120,
+                              "labelIndex": 121,
                               "rgb": [
                                 58,
                                 104,
@@ -9627,7 +9627,7 @@
                                 "xml": {
                                   "name": "Area TE 2.2 (STG)",
                                   "id": "34",
-                                  "grayvalue": "120"
+                                  "grayvalue": "121"
                                 },
                                 "dat": {
                                   "colors": "34 58 104 125",
@@ -9635,9 +9635,9 @@
                                 }
                               },
                               "position": [
-                                30190021,
-                                -79147558,
-                                27902335
+                                54886364,
+                                -22812851,
+                                10787318
                               ]
                             }
                           ],
@@ -9668,7 +9668,7 @@
                             {
                               "name": "Area TE 2.1 (STG)",
                               "status": "left hemisphere",
-                              "labelIndex": 79,
+                              "labelIndex": 77,
                               "rgb": [
                                 67,
                                 254,
@@ -9692,7 +9692,7 @@
                                 "xml": {
                                   "name": "Area TE 2.1 (STG)",
                                   "id": "28",
-                                  "grayvalue": "79"
+                                  "grayvalue": "77"
                                 },
                                 "dat": {
                                   "colors": "28 67 254 44",
@@ -9700,9 +9700,9 @@
                                 }
                               },
                               "position": [
-                                -13544164,
-                                -91128381,
-                                22701240
+                                -54768876,
+                                -17571758,
+                                5811527
                               ]
                             },
                             {
@@ -9788,7 +9788,7 @@
                             {
                               "name": "Area TI (STG)",
                               "status": "left hemisphere",
-                              "labelIndex": 26,
+                              "labelIndex": 25,
                               "rgb": [
                                 86,
                                 101,
@@ -9812,7 +9812,7 @@
                                 "xml": {
                                   "name": "Area TI (STG)",
                                   "id": "243",
-                                  "grayvalue": "26"
+                                  "grayvalue": "25"
                                 },
                                 "dat": {
                                   "colors": "243 86 101 22",
@@ -9820,9 +9820,9 @@
                                 }
                               },
                               "position": [
-                                -56881167,
-                                -27253408,
-                                39098099
+                                -46825193,
+                                -467866,
+                                -11853470
                               ]
                             },
                             {
@@ -9893,7 +9893,7 @@
                             {
                               "name": "Area TeI (STG)",
                               "status": "left hemisphere",
-                              "labelIndex": 125,
+                              "labelIndex": 124,
                               "rgb": [
                                 23,
                                 78,
@@ -9917,7 +9917,7 @@
                                 "xml": {
                                   "name": "Area TeI (STG)",
                                   "id": "242",
-                                  "grayvalue": "125"
+                                  "grayvalue": "124"
                                 },
                                 "dat": {
                                   "colors": "242 23 78 92",
@@ -9925,9 +9925,9 @@
                                 }
                               },
                               "position": [
-                                -22991533,
-                                32489047,
-                                -20444026
+                                -49286996,
+                                -4921525,
+                                -3737668
                               ]
                             },
                             {
@@ -10013,7 +10013,7 @@
                             {
                               "name": "Area TE 1.2 (HESCHL)",
                               "status": "left hemisphere",
-                              "labelIndex": 71,
+                              "labelIndex": 72,
                               "rgb": [
                                 202,
                                 251,
@@ -10037,7 +10037,7 @@
                                 "xml": {
                                   "name": "Area TE 1.2 (HESCHL)",
                                   "id": "30",
-                                  "grayvalue": "71"
+                                  "grayvalue": "72"
                                 },
                                 "dat": {
                                   "colors": "30 202 251 192",
@@ -10045,9 +10045,9 @@
                                 }
                               },
                               "position": [
-                                -39267956,
-                                -4039595,
-                                609576
+                                -51920507,
+                                -5887097,
+                                3718894
                               ]
                             },
                             {
@@ -10263,7 +10263,7 @@
                             {
                               "name": "Area TE 1.0 (HESCHL)",
                               "status": "right hemisphere",
-                              "labelIndex": 17,
+                              "labelIndex": 16,
                               "rgb": [
                                 252,
                                 84,
@@ -10287,7 +10287,7 @@
                                 "xml": {
                                   "name": "Area TE 1.0 (HESCHL)",
                                   "id": "27",
-                                  "grayvalue": "17"
+                                  "grayvalue": "16"
                                 },
                                 "dat": {
                                   "colors": "27 252 84 222",
@@ -10295,9 +10295,9 @@
                                 }
                               },
                               "position": [
-                                12705098,
-                                -60050985,
-                                -37468714
+                                49901515,
+                                -12228355,
+                                5840909
                               ]
                             }
                           ],
@@ -10448,7 +10448,7 @@
                             {
                               "name": "Area FG3 (FusG)",
                               "status": "left hemisphere",
-                              "labelIndex": 96,
+                              "labelIndex": 97,
                               "rgb": [
                                 120,
                                 147,
@@ -10472,7 +10472,7 @@
                                 "xml": {
                                   "name": "Area FG3 (FusG)",
                                   "id": "239",
-                                  "grayvalue": "96"
+                                  "grayvalue": "97"
                                 },
                                 "dat": {
                                   "colors": "239 120 147 37",
@@ -10480,9 +10480,9 @@
                                 }
                               },
                               "position": [
-                                -29247059,
-                                9116550,
-                                -10597562
+                                -30496805,
+                                -45938179,
+                                -15680831
                               ]
                             },
                             {
@@ -11043,7 +11043,7 @@
                             {
                               "name": "Area p24ab (pACC)",
                               "status": "right hemisphere",
-                              "labelIndex": 27,
+                              "labelIndex": 26,
                               "rgb": [
                                 153,
                                 195,
@@ -11067,7 +11067,7 @@
                                 "xml": {
                                   "name": "Area p24ab (pACC)",
                                   "id": "231",
-                                  "grayvalue": "27"
+                                  "grayvalue": "26"
                                 },
                                 "dat": {
                                   "colors": "231 153 195 229",
@@ -11075,9 +11075,9 @@
                                 }
                               },
                               "position": [
-                                55481649,
-                                -22639096,
-                                40566223
+                                2347606,
+                                39643186,
+                                7158379
                               ]
                             }
                           ],
@@ -11108,7 +11108,7 @@
                             {
                               "name": "Area s32 (sACC)",
                               "status": "left hemisphere",
-                              "labelIndex": 102,
+                              "labelIndex": 103,
                               "rgb": [
                                 193,
                                 94,
@@ -11132,7 +11132,7 @@
                                 "xml": {
                                   "name": "Area s32 (sACC)",
                                   "id": "46",
-                                  "grayvalue": "102"
+                                  "grayvalue": "103"
                                 },
                                 "dat": {
                                   "colors": "46 193 94 250",
@@ -11140,9 +11140,9 @@
                                 }
                               },
                               "position": [
-                                -3670061,
-                                -54148676,
-                                -30472505
+                                -6317136,
+                                36087468,
+                                -15024552
                               ]
                             },
                             {
@@ -11793,7 +11793,7 @@
                             {
                               "name": "CA3 (Hippocampus)",
                               "status": "right hemisphere",
-                              "labelIndex": 87,
+                              "labelIndex": 89,
                               "rgb": [
                                 39,
                                 0,
@@ -11817,7 +11817,7 @@
                                 "xml": {
                                   "name": "CA3 (Hippocampus)",
                                   "id": "59",
-                                  "grayvalue": "87"
+                                  "grayvalue": "89"
                                 },
                                 "dat": {
                                   "colors": "59 39 0 250",
@@ -11825,9 +11825,9 @@
                                 }
                               },
                               "position": [
-                                45445769,
-                                88586,
-                                9553095
+                                22372168,
+                                -24867314,
+                                -10800971
                               ]
                             }
                           ],
@@ -11858,7 +11858,7 @@
                             {
                               "name": "CA1 (Hippocampus)",
                               "status": "left hemisphere",
-                              "labelIndex": 55,
+                              "labelIndex": 54,
                               "rgb": [
                                 250,
                                 89,
@@ -11882,7 +11882,7 @@
                                 "xml": {
                                   "name": "CA1 (Hippocampus)",
                                   "id": "66",
-                                  "grayvalue": "55"
+                                  "grayvalue": "54"
                                 },
                                 "dat": {
                                   "colors": "66 250 89 0",
@@ -11890,9 +11890,9 @@
                                 }
                               },
                               "position": [
-                                -51505442,
-                                -23359475,
-                                18992185
+                                -30109187,
+                                -27834683,
+                                -14711254
                               ]
                             },
                             {
@@ -12173,7 +12173,7 @@
                             {
                               "name": "Subiculum (Hippocampus)",
                               "status": "left hemisphere",
-                              "labelIndex": 83,
+                              "labelIndex": 84,
                               "rgb": [
                                 255,
                                 10,
@@ -12197,7 +12197,7 @@
                                 "xml": {
                                   "name": "Subiculum (Hippocampus)",
                                   "id": "192",
-                                  "grayvalue": "83"
+                                  "grayvalue": "84"
                                 },
                                 "dat": {
                                   "colors": "192 255 10 10",
@@ -12205,15 +12205,15 @@
                                 }
                               },
                               "position": [
-                                -42160819,
-                                18165497,
-                                5718713
+                                -22817596,
+                                -25512188,
+                                -19013729
                               ]
                             },
                             {
                               "name": "Subiculum (Hippocampus)",
                               "status": "right hemisphere",
-                              "labelIndex": 84,
+                              "labelIndex": 83,
                               "rgb": [
                                 255,
                                 10,
@@ -12237,7 +12237,7 @@
                                 "xml": {
                                   "name": "Subiculum (Hippocampus)",
                                   "id": "192",
-                                  "grayvalue": "84"
+                                  "grayvalue": "83"
                                 },
                                 "dat": {
                                   "colors": "192 255 10 10",
@@ -12245,9 +12245,9 @@
                                 }
                               },
                               "position": [
-                                42879898,
-                                17786201,
-                                5095400
+                                20881943,
+                                -24490092,
+                                -18674295
                               ]
                             }
                           ],
@@ -12709,7 +12709,7 @@
                             {
                               "name": "Area i29 (retrosplenial)",
                               "status": "left hemisphere",
-                              "labelIndex": 119,
+                              "labelIndex": 121,
                               "rgb": [
                                 216,
                                 143,
@@ -12733,7 +12733,7 @@
                                 "xml": {
                                   "name": "Area i29 (retrosplenial)",
                                   "id": "265",
-                                  "grayvalue": "119"
+                                  "grayvalue": "121"
                                 },
                                 "dat": {
                                   "colors": "265 216 143 142",
@@ -12741,9 +12741,9 @@
                                 }
                               },
                               "position": [
-                                -23840521,
-                                -80659886,
-                                28766477
+                                -9486943,
+                                13924731,
+                                -5101382
                               ]
                             },
                             {
@@ -13097,7 +13097,7 @@
                             {
                               "name": "Dorsal Dentate Nucleus (Cerebellum)",
                               "status": "left hemisphere",
-                              "labelIndex": 16,
+                              "labelIndex": 15,
                               "rgb": [
                                 200,
                                 200,
@@ -13121,7 +13121,7 @@
                                 "xml": {
                                   "name": "Dorsal Dentate Nucleus (Cerebellum)",
                                   "id": "240",
-                                  "grayvalue": "16"
+                                  "grayvalue": "15"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -13129,15 +13129,15 @@
                                 }
                               },
                               "position": [
-                                -35254642,
-                                -24285146,
-                                19855438
+                                -15815206,
+                                -57796576,
+                                -38406344
                               ]
                             },
                             {
                               "name": "Dorsal Dentate Nucleus (Cerebellum)",
                               "status": "right hemisphere",
-                              "labelIndex": 15,
+                              "labelIndex": 17,
                               "rgb": [
                                 200,
                                 200,
@@ -13161,7 +13161,7 @@
                                 "xml": {
                                   "name": "Dorsal Dentate Nucleus (Cerebellum)",
                                   "id": "240",
-                                  "grayvalue": "15"
+                                  "grayvalue": "17"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -13169,9 +13169,9 @@
                                 }
                               },
                               "position": [
-                                35365408,
-                                -21336175,
-                                19533496
+                                12705098,
+                                -60050985,
+                                -37468714
                               ]
                             }
                           ],
@@ -13202,7 +13202,7 @@
                             {
                               "name": "Ventral Dentate Nucleus (Cerebellum)",
                               "status": "left hemisphere",
-                              "labelIndex": 61,
+                              "labelIndex": 62,
                               "rgb": [
                                 200,
                                 200,
@@ -13226,7 +13226,7 @@
                                 "xml": {
                                   "name": "Ventral Dentate Nucleus (Cerebellum)",
                                   "id": "241",
-                                  "grayvalue": "61"
+                                  "grayvalue": "62"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -13234,9 +13234,9 @@
                                 }
                               },
                               "position": [
-                                -24818719,
-                                5121182,
-                                52665271
+                                -13337004,
+                                -58068282,
+                                -31416300
                               ]
                             },
                             {
@@ -13322,7 +13322,7 @@
                             {
                               "name": "Fastigial Nucleus (Cerebellum)",
                               "status": "left hemisphere",
-                              "labelIndex": 103,
+                              "labelIndex": 102,
                               "rgb": [
                                 200,
                                 200,
@@ -13346,7 +13346,7 @@
                                 "xml": {
                                   "name": "Fastigial Nucleus (Cerebellum)",
                                   "id": "219",
-                                  "grayvalue": "103"
+                                  "grayvalue": "102"
                                 },
                                 "dat": {
                                   "colors": false,
@@ -13354,9 +13354,9 @@
                                 }
                               },
                               "position": [
-                                -6317136,
-                                36087468,
-                                -15024552
+                                -3670061,
+                                -54148676,
+                                -30472505
                               ]
                             },
                             {
@@ -13536,7 +13536,7 @@
             {
               "name": "GapMap Frontal-to-Occipital (GapMap)",
               "status": "left hemisphere",
-              "labelIndex": 32,
+              "labelIndex": 31,
               "ngId": "ICBM152_V24_LEFT_NG",
               "rgb": [
                 104,
@@ -13554,7 +13554,7 @@
                 "xml": {
                   "name": "GapMap Frontal-to-Occipital (GapMap)",
                   "id": "504",
-                  "grayvalue": "32"
+                  "grayvalue": "31"
                 },
                 "dat": {
                   "colors": "504 104 161 93",
@@ -13562,9 +13562,9 @@
                 }
               },
               "position": [
-                -53358213,
-                -38688791,
-                23011364
+                -8964794,
+                -28310868,
+                31724659
               ]
             },
             {
@@ -13638,7 +13638,7 @@
             {
               "name": "GapMap Frontal-to-Temporal (GapMap)",
               "status": "left hemisphere",
-              "labelIndex": 97,
+              "labelIndex": 96,
               "ngId": "ICBM152_V24_LEFT_NG",
               "rgb": [
                 161,
@@ -13656,7 +13656,7 @@
                 "xml": {
                   "name": "GapMap Frontal-to-Temporal (GapMap)",
                   "id": "502",
-                  "grayvalue": "97"
+                  "grayvalue": "96"
                 },
                 "dat": {
                   "colors": "502 161 24 74",
@@ -13664,9 +13664,9 @@
                 }
               },
               "position": [
-                -30496805,
-                -45938179,
-                -15680831
+                -29247059,
+                9116550,
+                -10597562
               ]
             },
             {
@@ -13843,7 +13843,7 @@
         }
       ],
       "_": {
-        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_ontology/src/c8ac30617efffe5494a17a5e21a735c30dde22bf/output/nehuba-ui/julich-brain-v2_4-icbm152.json"
+        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_ontology/src/fdfca63e85a1fbea4df916cb604b8b1bc2ab0a28/output/nehuba-ui/julich-brain-v2_4-icbm152.json"
       }
     },{
       "@id": "juelich/iav/atlas/v1.0.0/5",
