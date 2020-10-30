@@ -214,10 +214,10 @@ export const regionInOtherTemplateSelector = createSelector(
     // const regionOfInterestHemisphere = regionOfInterest.status
 
     const regionOfInterestHemisphere = (regionOfInterest.name.includes('- right hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('right hemisphere')))
-    ? 'right hemisphere'
-    : (regionOfInterest.name.includes('- left hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('left hemisphere')))
-      ? 'left hemisphere'
-      : null
+      ? 'right hemisphere'
+      : (regionOfInterest.name.includes('- left hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('left hemisphere')))
+        ? 'left hemisphere'
+        : null
 
     const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
     const { fetchedTemplates, templateSelected } = viewerState
@@ -233,10 +233,10 @@ export const regionInOtherTemplateSelector = createSelector(
           const id = getIdFromFullId(region.fullId)
           if (!!id) {
             const regionHemisphere = (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
-            ? 'right hemisphere'
-            : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
-              ? 'left hemisphere'
-              : null
+              ? 'right hemisphere'
+              : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+                ? 'left hemisphere'
+                : null
             if (id === regionOfInterestId) {
               /**
                * if both hemisphere metadatas are defined
@@ -245,14 +245,14 @@ export const regionInOtherTemplateSelector = createSelector(
                 !!regionOfInterestHemisphere &&
                 !!regionHemisphere
               ) {
-                  if (regionHemisphere === regionOfInterestHemisphere) {
-                    returnArr.push({
-                      template,
-                      parcellation,
-                      region,
-                    })
-                  }
-                } else {
+                if (regionHemisphere === regionOfInterestHemisphere) {
+                  returnArr.push({
+                    template,
+                    parcellation,
+                    region,
+                  })
+                }
+              } else {
                 returnArr.push({
                   template,
                   parcellation,
