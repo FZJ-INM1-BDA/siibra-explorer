@@ -27,8 +27,7 @@ const mr0wrong = {
 
 const mr1lh = {
   labelIndex: 1,
-  name: 'mr1',
-  status: 'left hemisphere',
+  name: 'mr1 - left hemisphere',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -39,8 +38,7 @@ const mr1lh = {
 
 const mr1rh = {
   labelIndex: 1,
-  name: 'mr1',
-  status: 'right hemisphere',
+  name: 'mr1 - right hemisphere',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -51,8 +49,7 @@ const mr1rh = {
 
 const mr0lh = {
   labelIndex: 1,
-  name: 'mr0',
-  status: 'left hemisphere',
+  name: 'mr0 - left hemisphere',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -63,8 +60,7 @@ const mr0lh = {
 
 const mr0rh = {
   labelIndex: 1,
-  name: 'mr0 hemisphere',
-  status: 'right hemisphere',
+  name: 'mr0 - right hemisphere',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -76,7 +72,6 @@ const mr0rh = {
 const mr1 = {
   labelIndex: 1,
   name: 'mr1',
-  status: 'interpolated',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -88,7 +83,6 @@ const mr1 = {
 const mr0 = {
   labelIndex: 1,
   name: 'mr0',
-  status: 'interpolated',
   fullId: {
     kg: {
       kgSchema: 'fzj/mock/pr',
@@ -101,7 +95,7 @@ const mr0 = {
 
 const mp1h = {
   name: 'mp1h',
-  regions: [ mr1lh, mr0lh,  mr0rh, mr1rh, mr0 ]
+  regions: [ mr1lh, mr0lh,  mr0rh, mr1rh ]
 }
 
 const mpWrong = {
@@ -159,7 +153,7 @@ describe('> region.base.ts', () => {
       })
 
       it('> length checks out', () => {
-        expect(result.length).toEqual(7)
+        expect(result.length).toEqual(5)
       })
 
       it('> does not contain itself', () => {
@@ -231,7 +225,7 @@ describe('> region.base.ts', () => {
       })
 
       it('> length checks out', () => {
-        expect(result.length).toEqual(4)
+        expect(result.length).toEqual(3)
       })
 
       it('> does not select wrong hemisphere (right hemisphere)', () => {
