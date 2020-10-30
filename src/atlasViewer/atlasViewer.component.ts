@@ -123,7 +123,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     map(arr => arr.map(item => {
       const overwrittenName = item['@version'] && item['@version']['name']
       return overwrittenName
-        ? { ...item, name: overwrittenName }
+        ? { ...item, displayName: overwrittenName }
         : item
     }))
   )

@@ -13,6 +13,10 @@
           "name": "Cytoarchitectonic maps"
         },
         {
+          "@id": "juelich/iav/atlas/v1.0.0/8",
+          "name": "Cytoarchitectonic Maps - v1.18"
+        },
+        {
           "name": "Long Bundle",
           "@id": "juelich/iav/atlas/v1.0.0/5"
         },
@@ -50,6 +54,10 @@
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
           "name": "Cytoarchitectonic maps"
+        },
+        {
+          "@id": "juelich/iav/atlas/v1.0.0/8",
+          "name": "Cytoarchitectonic Maps - v1.18"
         }
       ]
     },
@@ -74,13 +82,40 @@
   ],
   "parcellations": [
     {
+      "@id": "juelich/iav/atlas/v1.0.0/8",
+      "name": "Cytoarchitectonic Maps - v1.18",
+      "baseLayer": true,
+      "@version": {
+        "@next": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
+        "this": "juelich/iav/atlas/v1.0.0/8",
+        "name": "v1.18",
+        "@previous": null
+      },
+      "availableIn": [
+        {
+          "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        },
+        {
+          "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
+          "name": "MNI Colin 27",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        }
+      ]
+    },
+    {
       "@id": "juelich/iav/atlas/v1.0.0/7",
-      "name": "Cytoarchitectonic maps",
+      "name": "Cytoarchitectonic maps - v2.4",
       "baseLayer": true,
       "@version": {
         "@next": null,
         "this": "juelich/iav/atlas/v1.0.0/7",
-        "name": "v2.4",
+        "name": "current",
         "@previous": null
       },
       "availableIn": [
@@ -98,7 +133,7 @@
         "@next": null,
         "this": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
         "name": "v2.4",
-        "@previous": null
+        "@previous": "juelich/iav/atlas/v1.0.0/8"
       },
       "availableIn": [
         {

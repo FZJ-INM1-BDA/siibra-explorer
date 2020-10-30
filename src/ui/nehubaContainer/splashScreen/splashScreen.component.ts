@@ -77,6 +77,9 @@ export class SplashScreen implements AfterViewInit {
      * if yes, it is interpreted as a click
      * if no, user may want to select a text
      */
+    /**
+     * TODO change to onclick listener
+     */
     this.subscriptions.push(
       fromEvent(this.parentContainer.nativeElement, 'mousedown').pipe(
         filter((ev: MouseEvent) => ev.which === 1),

@@ -28,7 +28,7 @@ const fetchedTemplateRootState = {
 }
 
 // TODO finish writing tests
-describe('atlasViewer.urlService.service.ts', () => {
+describe('atlasViewer.urlUtil.ts', () => {
   describe('cvtSearchParamToState', () => {
 
     it('> convert empty search param to empty state', () => {
@@ -176,9 +176,9 @@ describe('atlasViewer.urlService.service.ts', () => {
     })
   })
 
-  describe('cvtStateToSearchParam', () => {
+  describe('> cvtStateToSearchParam', () => {
 
-    it('should convert template selected', () => {
+    it('> should convert template selected', () => {
       const { viewerState } = defaultRootState
       const searchParam = cvtStateToSearchParam({
         ...defaultRootState,
@@ -191,7 +191,7 @@ describe('atlasViewer.urlService.service.ts', () => {
       const stringified = searchParam.toString()
       expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29')
     })
-    it('should convert template selected and parcellation selected', () => {
+    it('> should convert template selected and parcellation selected', () => {
   
       const { viewerState } = defaultRootState
       const searchParam = cvtStateToSearchParam({
@@ -204,7 +204,7 @@ describe('atlasViewer.urlService.service.ts', () => {
       })
   
       const stringified = searchParam.toString()
-      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
+      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps+-+v2.4')
     })
   })
 })
