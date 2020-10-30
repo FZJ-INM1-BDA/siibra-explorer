@@ -52,14 +52,15 @@ describe('viewerState/selector.ts', () => {
 
 
     it('> if atlas has basic layer, should return non empty array, if non basic layer is selected', () => {
+      const parc = humanAtlasJson.parcellations.find(p => !p['baseLayer'])
       const multihumanParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
         fetchedAtlases,
         selectedAtlasId: humanAtlasJson['@id']
       }, {
-        parcellationSelected: humanAtlasJson.parcellations[1]
+        parcellationSelected: parc
       })
       expect(multihumanParcs.length).toEqual(1)
-      expect(multihumanParcs[0]['@id']).toEqual(humanAtlasJson.parcellations[1]['@id'])
+      expect(multihumanParcs[0]['@id']).toEqual(parc['@id'])
     })
 
     it('> if atlas has basic layer, but has basic layer selected, should return empty array', () => {
