@@ -154,6 +154,68 @@
           "_": {
             "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20200926_JulichBrain-V2_4-Colin_MPM_mesh/raw/745a37f64b6995a661f5a61287b4067df01687cb/output/nehuba-ui/right_config.json"
           }
+        },
+        "jubrain colin v18 left": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/left",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -128500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -148500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -110500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "jubrain colin v18 right": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/right",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -128500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -148500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -110500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
         }
       },
       "navigation": {

@@ -17,7 +17,8 @@
     {
       "@id": "juelich/iav/atlas/v1.0.0/7",
       "fullId": "juelich/iav/atlas/v1.0.0/7",
-      "name": "Cytoarchitectonic Maps",
+      "name": "Cytoarchitectonic Maps - v2.4",
+      "displayName": "Cytoarchitectonic Maps",
       "properties": {
         "name": "Cytoarchitectonic Maps",
         "description": "This dataset contains cytoarchitectonic maps of brain regions in the BigBrain space [Amunts et al. 2013]. The mappings were created using the semi-automatic method presented in Schleicher et al. 1999, based on coronal histological sections on 1 micron resolution. Mappings are available on approximately every 100th section for each region. They were then transformed to the sections of the 3D reconstructed BigBrain space using the transformations used in Amunts et al. 2013, which were provided by Claude Lepage (McGill). Only a few cytoarchitectonic maps in the Big Brain are currently **fully mapped**, based on a workflow that automatically fills in missing sections based on expert annotations. Other 3D maps are available in a preliminary version, in which the expert annotations in the Big Brain space were simply **interpolated**."
