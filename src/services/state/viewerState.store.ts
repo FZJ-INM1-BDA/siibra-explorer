@@ -99,13 +99,14 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     const templateTobeSelected = atlas.templateSpaces[0]
     const templateSpaceId = templateTobeSelected['@id']
     
-    const parcellationId = (atlas.parcellations.find(p => !!p.baseLayer) ||
+    const parcellationId = (
       templateTobeSelected.availableIn.find(p => !!p.baseLayer) ||
-      templateTobeSelected.availableIn[0])['@id']
+      templateTobeSelected.availableIn[0]
+    )['@id']
       
     const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
     const parcellationSelected = templateSelected.parcellations.find(p => p['@id'] === parcellationId)
-
+    
     return {
       ...prevState,
       templateSelected,

@@ -258,6 +258,26 @@ class WdLayoutPage extends WdBase{
     return visibility
   }
 
+  /**
+   * Cards
+   */
+
+  async _getAllCards(){
+    return await this._browser.findElements(
+      By.css('mat-card')
+    )
+  }
+
+  async getAllCardsText(){
+    const allCardsEl = await this._getAllCards()
+    const txtArr = []
+    for (const el of allCardsEl) {
+      txtArr.push(
+        await _getTextFromWebElement(el)
+      )
+    }
+    return txtArr
+  }
 
   /**
    * Other
@@ -329,6 +349,7 @@ class WdLayoutPage extends WdBase{
        * if not at title screen
        * select from dropdown
        */
+      console.log(e)
       await this.selectDropdownOption(`[aria-label="${ARIA_LABELS.SELECT_ATLAS}"]`, atlasName)
     }
 
@@ -344,7 +365,13 @@ class WdLayoutPage extends WdBase{
       await this.changeParc(parcellationName)
     }
 
-    await this._setAtlasSelectorExpanded(false)
+    try {
+      await this._setAtlasSelectorExpanded(false)
+    } catch (e) {
+      /**
+       * atlas selector may not be found
+       */
+    }
   }
 
   /**

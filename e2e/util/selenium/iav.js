@@ -17,6 +17,7 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async waitUntilAllChunksLoaded(){
+    await this.waitForCss(`ui-nehuba-container`)
     await this._browser.wait(async () => {
       const els = await this._browser.findElements(
         By.css('div.loadingIndicator')
