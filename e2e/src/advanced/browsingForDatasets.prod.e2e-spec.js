@@ -52,24 +52,7 @@ const newShouldHaveReceptor = [
   ["CA2 (Hippocampus)", 0, 0, 1],
   ["CA1 (Hippocampus)", 0, 0, 1],
   ["Area PGa (IPL)", 0, 0, 1],
-].filter(
-  ([ name ]) =>
-    /**
-     * somehow CA2 CA3 is a repeat of CA1 ???
-     */
-    name !== 'CA2 (Hippocampus)' && name !== 'CA3 (Hippocampus)'
-    /**
-     * not yet in dev branch
-     */
-    && name !== 'Area TE 2.1 (STG)'
-).map(
-  /**
-   * change remaining CA1 Hippocampus to searchable name
-   */
-  ([ name, ...rest ]) => name === 'CA1 (Hippocampus)'
-    ? [ 'CA (Hippocampus)', ...rest ]
-    : [ name, ...rest ]
-).reduce((acc, curr) => {
+].reduce((acc, curr) => {
   const [ name, pr, ar, fp ] = curr
   const foundIdx = acc.findIndex(([ accName ]) => name === accName )
   return foundIdx >= 0
