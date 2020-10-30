@@ -65,7 +65,7 @@ describe('atlasviewer.history.service.ts', () => {
       })
       
       const expected = cold('(a)', {
-        a: 'templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps'
+        a: 'templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps+-+v2.4'
       })
       
       expect(effect.currentStateSearchParam$).toBeObservable(expected)
