@@ -5,7 +5,7 @@ import { distinctUntilChanged, switchMap, filter, map, tap } from "rxjs/operator
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 import { intToRgb, verifyPositionArg } from 'common/util'
 
@@ -125,14 +125,13 @@ export class RegionBase {
      * TODO use createAction in future
      * for now, not importing const because it breaks tests
      */
-    this.store$.dispatch({
-      type: `NEWVIEWER`,
+    this.store$.dispatch(viewerStateNewViewer ({
       selectTemplate: template,
       selectParcellation: parcellation,
       navigation: {
         position
       },
-    })
+    }))
   }
 
   public GO_TO_REGION_CENTROID = ARIA_LABELS.GO_TO_REGION_CENTROID
@@ -212,9 +211,11 @@ export const regionInOtherTemplateSelector = createSelector(
   (viewerState, prop) => {
     const { region: regionOfInterest } = prop
     const returnArr = []
-    const regionOfInterestHemisphere = regionOfInterest.name.includes('- right hemisphere')
+    // const regionOfInterestHemisphere = regionOfInterest.status
+
+    const regionOfInterestHemisphere = (regionOfInterest.name.includes('- right hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('right hemisphere')))
       ? 'right hemisphere'
-      : regionOfInterest.name.includes('- left hemisphere')
+      : (regionOfInterest.name.includes('- left hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('left hemisphere')))
         ? 'left hemisphere'
         : null
 
@@ -231,12 +232,11 @@ export const regionInOtherTemplateSelector = createSelector(
         for (const region of selectableRegions) {
           const id = getIdFromFullId(region.fullId)
           if (!!id) {
-            const regionHemisphere = region.name.includes('- right hemisphere')
+            const regionHemisphere = (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
               ? 'right hemisphere'
-              : region.name.includes('- left hemisphere')
+              : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
                 ? 'left hemisphere'
                 : null
-            
             if (id === regionOfInterestId) {
               /**
                * if both hemisphere metadatas are defined
