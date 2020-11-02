@@ -251,7 +251,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public addNewColorMap() {
-      this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
+      !this.defaultColorMap? this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap()) : null
 
       const existingMap: Map<string, Map<number, {red: number, green: number, blue: number}>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
       const colorMap = new Map(existingMap)
