@@ -13,6 +13,7 @@ import { NmToMm } from "./pipes/numbers.pipe";
 import { SwitchDirective } from "./directives/switch.directive";
 import { MediaQueryDirective } from './directives/mediaQuery.directive'
 import { LayoutModule } from "@angular/cdk/layout";
+import { TmpParcNamePipe } from "./pipes/_tmpParcName.pipe";
 
 @NgModule({
   imports:[
@@ -30,7 +31,8 @@ import { LayoutModule } from "@angular/cdk/layout";
     AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
-    MediaQueryDirective
+    MediaQueryDirective,
+    TmpParcNamePipe,
   ],
   exports: [
     FilterNullPipe,
@@ -44,7 +46,8 @@ import { LayoutModule } from "@angular/cdk/layout";
     AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
-    MediaQueryDirective
+    MediaQueryDirective,
+    TmpParcNamePipe,
   ]
 })
 
