@@ -90,7 +90,10 @@ export class RegionBase {
           const filteredRsInOtherTmpls = []
           for (const bundledObj of regionsInOtherTemplates) {
             const { template, parcellation, region } = bundledObj
-            const idx = filteredRsInOtherTmpls.findIndex(({ template: _template }) => _template['@id'] === template['@id'])
+            const idx = filteredRsInOtherTmpls.findIndex(({ template: _template, region: _region }) => {
+              return _template['@id'] === template['@id']
+                && getRegionHemisphere(_region) !== getRegionHemisphere(region)
+            })
             if ( idx < 0 ) {
               filteredRsInOtherTmpls.push(bundledObj)
             } else {
@@ -254,11 +257,7 @@ export const regionInOtherTemplateSelector = createSelector(
     const returnArr = []
     // const regionOfInterestHemisphere = regionOfInterest.status
 
-    const regionOfInterestHemisphere = (regionOfInterest.name.includes('- right hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('right hemisphere')))
-      ? EnumHemisphere.RIGHT_HEMISPHERE
-      : (regionOfInterest.name.includes('- left hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('left hemisphere')))
-        ? EnumHemisphere.LEFT_HEMISPHERE
-        : null
+    const regionOfInterestHemisphere = getRegionHemisphere(regionOfInterest)
 
     const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
     if (!templateSelected) return []
@@ -271,35 +270,29 @@ export const regionInOtherTemplateSelector = createSelector(
 
         for (const region of selectableRegions) {
           const id = getIdFromFullId(region.fullId)
-          if (!!id) {
-            const regionHemisphere = (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
-              ? EnumHemisphere.RIGHT_HEMISPHERE
-              : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
-                ? EnumHemisphere.LEFT_HEMISPHERE
-                : null
-            if (id === regionOfInterestId) {
-              /**
-               * if both hemisphere metadatas are defined
-               */
-              if (
-                !!regionOfInterestHemisphere &&
-                !!regionHemisphere
-              ) {
-                if (regionHemisphere === regionOfInterestHemisphere) {
-                  returnArr.push({
-                    template,
-                    parcellation,
-                    region,
-                  })
-                }
-              } else {
+          if (!!id && id === regionOfInterestId) {
+            const regionHemisphere = getRegionHemisphere(region)
+            /**
+             * if both hemisphere metadatas are defined
+             */
+            if (
+              !!regionOfInterestHemisphere &&
+              !!regionHemisphere
+            ) {
+              if (regionHemisphere === regionOfInterestHemisphere) {
                 returnArr.push({
                   template,
                   parcellation,
                   region,
-                  hemisphere: regionHemisphere
                 })
               }
+            } else {
+              returnArr.push({
+                template,
+                parcellation,
+                region,
+                hemisphere: regionHemisphere
+              })
             }
           }
         }
@@ -308,3 +301,11 @@ export const regionInOtherTemplateSelector = createSelector(
     return returnArr
   }
 )
+
+export function getRegionHemisphere(region: any):EnumHemisphere{
+  return (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+    ? EnumHemisphere.RIGHT_HEMISPHERE
+    : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+      ? EnumHemisphere.LEFT_HEMISPHERE
+      : null
+}
