@@ -5,7 +5,7 @@ import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeM
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector } from "src/services/state/viewerState/selectors";
 import { ARIA_LABELS } from 'common/constants'
 
 @Component({
@@ -47,25 +47,8 @@ export class AtlasLayerSelector implements OnInit {
         shareReplay(1)
       )
 
-      this.availableTemplates$ = combineLatest(
-        this.selectedAtlas$.pipe(
-          filter(v => !!v)
-        ),
-        this.store$.pipe(
-          select('viewerState'),
-          select('fetchedTemplates')
-        )
-      ).pipe(
-        map(([ { templateSpaces }, fetchedTemplates ]) => {
-          return templateSpaces.map(templateSpace => {
-            const fullTemplateInfo = fetchedTemplates.find(t => t['@id'] === templateSpace['@id'])
-            return {
-              ...templateSpace,
-              ...(fullTemplateInfo || {}),
-              darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
-            }
-          })
-        }),
+      this.availableTemplates$ = this.store$.pipe(
+        select(viewerStateSelectedTemplateFullInfoSelector)
       )
 
       this.selectedTemplate$ = this.store$.pipe(

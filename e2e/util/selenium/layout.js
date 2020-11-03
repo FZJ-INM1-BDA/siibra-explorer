@@ -337,6 +337,10 @@ class WdLayoutPage extends WdBase{
     throw new Error(`changeParc NYI`)
   }
 
+  async changeParcVersion(parcVerion) {
+    throw new Error(`changeParcVersion NYI`)
+  }
+
   async selectAtlasTemplateParcellation(atlasName, templateName, parcellationName, parcVersion) {
     if (!atlasName) throw new Error(`atlasName needs to be provided`)
     try {
@@ -363,6 +367,12 @@ class WdLayoutPage extends WdBase{
       await this.wait(1000)
       await this.waitUntilAllChunksLoaded()
       await this.changeParc(parcellationName)
+    }
+
+    if (parcVersion) {
+      await this.wait(1000)
+      await this.waitUntilAllChunksLoaded()
+      await this.changeParcVersion(parcVersion)
     }
 
     try {

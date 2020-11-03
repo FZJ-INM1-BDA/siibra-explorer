@@ -9,6 +9,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { By } from "@angular/platform-browser"
 import { Directive, Input } from "@angular/core"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
+import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors"
 
 const mt0 = {
   name: 'mt0'
@@ -113,6 +114,13 @@ describe('> regionMenu.component.ts', () => {
     })
     
     describe('> regionInOtherTemplatesTmpl', () => {
+      beforeEach(() => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(
+          viewerStateGetSelectedAtlas,
+          { parcellations: [] }
+        )
+      })
 
       it('> if selector returns empty array, data-available-in-tmpl-count == 0', () => {
 

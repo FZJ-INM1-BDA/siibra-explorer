@@ -148,3 +148,51 @@ export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionRe
 }
 
 export const defaultState = initialState
+
+interface IVersion{
+  "@next": string
+  "@this": string
+  "name": string
+  "@previous": string
+}
+
+interface IHasVersion{
+  ['@version']: IVersion
+}
+
+interface IHasId{
+  ['@id']: string
+}
+
+export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId): boolean {
+
+  function* GenNewerVersions(flag){
+    let it = 0
+    const newest =  arr.find((v => v['@version'] && v['@version']['@this'] === srcObj['@id']))
+    if (!newest) throw new Error(`GenNewerVersions error newest element isn't found`)
+    yield newest
+    let currPreviousId = newest['@version'][ flag ? '@next' : '@previous' ]
+    while (currPreviousId) {
+      it += 1
+      if (it>100) throw new Error(`iteration excced 100, did you include a loop?`)
+      
+      const curr = arr.find(v => v['@version']['@this'] === currPreviousId)
+      if (!curr) throw new Error(`GenNewerVersions error, version id ${currPreviousId} not found`)
+      currPreviousId = curr['@version'][ flag ? '@next' : '@previous' ]
+      yield curr
+    }
+  }
+  for (const obj of GenNewerVersions(true)) {
+    if (obj['@version']['@this'] === compObj['@id']) {
+      return false
+    }
+  }
+
+  for (const obj of GenNewerVersions(false)) {
+    if (obj['@version']['@this'] === compObj['@id']) {
+      return true
+    } 
+  }
+  
+  throw new Error(`isNewerThan error, neither srcObj nor compObj exist in array`)
+}

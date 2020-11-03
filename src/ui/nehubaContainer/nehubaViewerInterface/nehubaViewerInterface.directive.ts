@@ -1,4 +1,4 @@
-import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter } from "@angular/core";
+import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
@@ -13,6 +13,7 @@ import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/acti
 import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
 import { viewerStateStandAloneVolumes, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
+import { LoggingService } from "src/logging";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -272,6 +273,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
     private store$: Store<IavRootStoreInterface>,
+    @Optional() private log: LoggingService,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
 
@@ -313,7 +315,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       ).subscribe(flag =>{
         const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
         if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
-        else console.warn(`showPerspectiveSliceViews not defined`)
+        else {
+          this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
+        }
       })
     )
 

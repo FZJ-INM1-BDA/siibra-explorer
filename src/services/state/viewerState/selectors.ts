@@ -1,5 +1,4 @@
 import { createSelector } from "@ngrx/store"
-import { create } from "domain"
 import { viewerStateHelperStoreName } from "../viewerState.store.helper"
 
 export const viewerStateSelectedRegionsSelector = createSelector(
@@ -173,4 +172,18 @@ export const viewerStateParcVersionSelector = createSelector(
     traverseParc(foundParc)
     return returnParc
   }
+)
+
+
+export const viewerStateSelectedTemplateFullInfoSelector = createSelector(
+  viewerStateGetSelectedAtlas,
+  viewerStateFetchedTemplatesSelector,
+  ({ templateSpaces }, fetchedTemplates) => templateSpaces.map(templateSpace => {
+    const fullTemplateInfo = fetchedTemplates.find(t => t['@id'] === templateSpace['@id'])
+    return {
+      ...templateSpace,
+      ...(fullTemplateInfo || {}),
+      darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
+    }
+  })
 )
