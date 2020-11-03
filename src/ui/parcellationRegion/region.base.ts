@@ -302,7 +302,7 @@ export const regionInOtherTemplateSelector = createSelector(
   }
 )
 
-export function getRegionHemisphere(region: any):EnumHemisphere{
+export function getRegionHemisphere(region: any): EnumHemisphere{
   return (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
     ? EnumHemisphere.RIGHT_HEMISPHERE
     : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
