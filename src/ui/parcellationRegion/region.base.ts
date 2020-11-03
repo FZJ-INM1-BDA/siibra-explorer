@@ -1,12 +1,12 @@
 import { EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { distinctUntilChanged, switchMap, filter, map, tap } from "rxjs/operators";
+import { distinctUntilChanged, switchMap, filter, map, withLatestFrom } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer } from "src/services/state/viewerState.store.helper";
-import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
+import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { intToRgb, verifyPositionArg } from 'common/util'
 
 export class RegionBase {
@@ -58,10 +58,19 @@ export class RegionBase {
   public sameRegionTemplate: any[] = []
   public regionInOtherTemplates$: Observable<any[]>
   public regionOriginDatasetLabels$: Observable<{ name: string }[]>
+  public selectedAtlas$: Observable<any> = this.store$.pipe(
+    select(viewerStateGetSelectedAtlas)
+  )
+
+  public selectedTemplateFullInfo$: Observable<any[]>
 
   constructor(
     private store$: Store<any>,
   ) {
+
+    this.selectedTemplateFullInfo$ = this.store$.pipe(
+      select(viewerStateSelectedTemplateFullInfoSelector),
+    )
 
     this.regionInOtherTemplates$ = this.region$.pipe(
       distinctUntilChanged(),
@@ -70,7 +79,33 @@ export class RegionBase {
         select(
           regionInOtherTemplateSelector,
           { region }
-        )
+        ),
+        withLatestFrom(
+          this.store$.pipe(
+            select(viewerStateGetSelectedAtlas)
+          )
+        ),
+        map(([ regionsInOtherTemplates, selectedatlas ]) => {
+          const { parcellations } = selectedatlas
+          const filteredRsInOtherTmpls = []
+          for (const bundledObj of regionsInOtherTemplates) {
+            const { template, parcellation, region } = bundledObj
+            const idx = filteredRsInOtherTmpls.findIndex(({ template: _template }) => _template['@id'] === template['@id'])
+            if ( idx < 0 ) {
+              filteredRsInOtherTmpls.push(bundledObj)
+            } else {
+              const { parcellation: currentParc } = filteredRsInOtherTmpls[idx]
+              /**
+               * if the new element is newer than existing item
+               */
+              if (isNewerThan(parcellations, parcellation, currentParc)) {
+                filteredRsInOtherTmpls.splice(idx, 1)
+                filteredRsInOtherTmpls.push(bundledObj)
+              }
+            }
+          }
+          return filteredRsInOtherTmpls
+        })
       ))
     )
 
@@ -193,6 +228,11 @@ export const getRegionParentParcRefSpace = createSelector(
   }
 )
 
+enum EnumHemisphere{
+  LEFT_HEMISPHERE = 'left hemisphere',
+  RIGHT_HEMISPHERE = 'right hemisphere',
+}
+
 @Pipe({
   name: 'renderViewOriginDatasetlabel'
 })
@@ -207,20 +247,20 @@ export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
 }
 
 export const regionInOtherTemplateSelector = createSelector(
-  (state: any) => state.viewerState,
-  (viewerState, prop) => {
+  viewerStateFetchedTemplatesSelector,
+  viewerStateSelectedTemplateSelector,
+  (fetchedTemplates, templateSelected, prop) => {
     const { region: regionOfInterest } = prop
     const returnArr = []
     // const regionOfInterestHemisphere = regionOfInterest.status
 
     const regionOfInterestHemisphere = (regionOfInterest.name.includes('- right hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('right hemisphere')))
-      ? 'right hemisphere'
+      ? EnumHemisphere.RIGHT_HEMISPHERE
       : (regionOfInterest.name.includes('- left hemisphere') || (!!regionOfInterest.status && regionOfInterest.status.includes('left hemisphere')))
-        ? 'left hemisphere'
+        ? EnumHemisphere.LEFT_HEMISPHERE
         : null
 
     const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
-    const { fetchedTemplates, templateSelected } = viewerState
     if (!templateSelected) return []
     const selectedTemplateId = getIdFromFullId(templateSelected.fullId)
     const otherTemplates = fetchedTemplates.filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
@@ -233,9 +273,9 @@ export const regionInOtherTemplateSelector = createSelector(
           const id = getIdFromFullId(region.fullId)
           if (!!id) {
             const regionHemisphere = (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
-              ? 'right hemisphere'
+              ? EnumHemisphere.RIGHT_HEMISPHERE
               : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
-                ? 'left hemisphere'
+                ? EnumHemisphere.LEFT_HEMISPHERE
                 : null
             if (id === regionOfInterestId) {
               /**

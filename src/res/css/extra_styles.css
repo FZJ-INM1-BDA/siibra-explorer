@@ -306,6 +306,10 @@ markdown-dom pre code
 {
   width: 10em!important;
 }
+.w-20em
+{
+  width: 20em!important;
+}
 
 .mw-100
 {
@@ -397,6 +401,11 @@ markdown-dom pre code
 .h-20em
 {
   height:20em!important;
+}
+
+.overflow-x-scroll
+{
+  overflow-x: scroll;
 }
 
 .overflow-x-hidden

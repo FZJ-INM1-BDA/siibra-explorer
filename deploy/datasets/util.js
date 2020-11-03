@@ -11,7 +11,8 @@ const KG_IDS = {
   PARCELLATIONS: {
     LONG_BUNDLE: 'juelich/iav/atlas/v1.0.0/5',
     SHORT_BUNDLE: 'juelich/iav/atlas/v1.0.0/6',
-    JULICH_BRAIN: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
+    JULICH_BRAIN: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579',
+    JULICH_BRAIN_V24_BIGBRAIN: 'juelich/iav/atlas/v1.0.0/7'
   }
 }
 
@@ -147,7 +148,7 @@ initPrArray.push(
       for (const p of json.parcellations) {
         processParc(json, p)
       }
-      const bigbrainCyto = flattenRegions(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
+      const bigbrainCyto = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.JULICH_BRAIN_V24_BIGBRAIN).regions)
       bigbrainCytoSet = populateSet(bigbrainCyto)
     })
     .catch(console.error)
