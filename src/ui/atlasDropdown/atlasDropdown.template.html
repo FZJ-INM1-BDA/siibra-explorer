@@ -4,7 +4,7 @@
   </mat-label>
   <mat-select
     [aria-label]="SELECT_ATLAS_ARIA_LABEL"
-    [value]="selectedAtlas$ | async | mapToProperty"
+    [value]="selectedAtlas$ | async | getProperty"
     (selectionChange)="handleChangeAtlas($event)">
     <mat-option
       *ngFor="let atlas of (fetchedAtlases$ | async)"

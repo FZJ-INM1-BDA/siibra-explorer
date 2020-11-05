@@ -5,7 +5,7 @@ import { combineLatest, merge, Observable } from "rxjs";
 import { distinctUntilChanged, filter, map, scan, shareReplay, startWith, withLatestFrom } from "rxjs/operators";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { LoggingService } from "src/logging";
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
+import { uiStateMouseOverSegmentsSelector, uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 /**
@@ -53,8 +53,7 @@ export class MouseHoverDirective {
     // can potentially net better performance
 
     const onHoverUserLandmark$ = this.store$.pipe(
-      select('uiState'),
-      select('mouseOverUserLandmark'),
+      select(uiStateMouseoverUserLandmark)
     )
 
     const onHoverLandmark$ = combineLatest(

@@ -527,7 +527,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     const appendConditional = (frag, idx) => frag && `if (label > ${idx - 0.01} && label < ${idx + 0.01}) { ${frag} }`
 
     if (landmarks.some(parseLmColor)) {
-      this.userLandmarkShader = `void main(){ ${landmarks.map(parseLmColor).map(appendConditional).filter(v => !!v).join('else ')} else {${FRAGMENT_EMIT_RED}} }`
+      this.userLandmarkShader = `void main(){ ${landmarks.map(parseLmColor).map(appendConditional).filter(v => !!v).join('else ')} else {${FRAGMENT_EMIT_WHITE}} }`
     } else {
       this.userLandmarkShader = FRAGMENT_MAIN_WHITE  
     }

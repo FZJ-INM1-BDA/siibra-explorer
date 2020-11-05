@@ -61,6 +61,7 @@ import {
   viewerStateFetchedTemplatesSelector,
   viewerStateNavigationStateSelector,
 } from './viewerState/selectors'
+import { IHasId } from "src/util/interfaces";
 
 export {
   viewerStateSelectedRegionsSelector,
@@ -158,10 +159,6 @@ interface IVersion{
 
 interface IHasVersion{
   ['@version']: IVersion
-}
-
-interface IHasId{
-  ['@id']: string
 }
 
 export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId): boolean {

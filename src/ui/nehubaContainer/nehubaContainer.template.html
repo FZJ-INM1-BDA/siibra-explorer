@@ -459,12 +459,15 @@
     </ng-container>
 
     <!--  regional features-->
-    <ng-template #regionalFeaturesTmpl>
-      <data-browser [template]="templateSelected$ | async"
-        [parcellation]="selectedParcellation"
-        [disableVirtualScroll]="true"
-        [regions]="[region]">
-      </data-browser>
+    <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
+      <regional-features *ngIf="expansionPanel.expanded"
+        [region]="region">
+        <data-browser [template]="templateSelected$ | async"
+          [parcellation]="selectedParcellation"
+          [disableVirtualScroll]="true"
+          [regions]="[region]">
+        </data-browser>
+      </regional-features>
     </ng-template>
 
     <div class="hidden" iav-databrowser-directive
@@ -576,8 +579,8 @@
   <layout-floating-container *ngIf="panelIndex < 3" landmarkContainer>
 
     <!-- customLandmarks -->
-    <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async)"
-    (mouseenter)="handleMouseEnterCustomLandmark(lm)"
+    <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
+      (mouseenter)="handleMouseEnterCustomLandmark(lm)"
       (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
       fasClass="fa-chevron-down"
       [color]="lm.color || [255, 255, 255]"

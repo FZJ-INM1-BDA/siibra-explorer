@@ -10,8 +10,6 @@ import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaCo
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
 import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
 
-import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
-
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
@@ -87,6 +85,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
 import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.base";
 import { RegionAccordionTooltipTextPipe } from './util'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
+import { RegionalFeaturesModule } from "./regionalFeatures";
 
 @NgModule({
   imports : [
@@ -105,6 +104,7 @@ import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
     StateModule,
     AuthModule,
     FabSpeedDialModule,
+    RegionalFeaturesModule,
   ],
   declarations : [
     NehubaContainer,
@@ -150,7 +150,6 @@ import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
     /* pipes */
     GroupDatasetByRegion,
     FilterRegionDataEntries,
-    GetUniquePipe,
     FlatmapArrayPipe,
     SafeStylePipe,
     GetLayerNameFromDatasets,
