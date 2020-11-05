@@ -7,6 +7,8 @@ const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 
+const { router: regionalFeaturesRouter, regionalFeaturesIsReady } = require('./regionalFeatures')
+
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
 if (process.env.NODE_ENV !== 'production') {
@@ -164,8 +166,10 @@ app.use('/logo', require('./logo'))
 
 app.get('/ready', async (req, res) => {
   const authIsReady = await authReady()
+  const regionalFeatureReady = await regionalFeaturesIsReady()
   const allReady = [ 
-    authIsReady
+    authIsReady,
+    regionalFeatureReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -214,6 +218,7 @@ app.use('/atlases', setResLocalMiddleWare('atlases'), atlasesRouter)
 app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
 app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
 app.use('/datasets', jsonMiddleware, datasetRouter)
+app.use('/regionalFeatures', jsonMiddleware, regionalFeaturesRouter)
 app.use('/plugins', jsonMiddleware, pluginRouter)
 app.use('/preview', jsonMiddleware, previewRouter)
 

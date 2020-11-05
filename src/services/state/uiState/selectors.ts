@@ -21,3 +21,8 @@ export const uiStateMouseOverSegmentsSelector = createSelector(
       })
   }
 )
+
+export const uiStateMouseoverUserLandmark = createSelector(
+  state => state['uiState'],
+  uiState => uiState['mouseOverUserLandmark']
+)

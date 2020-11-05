@@ -14,10 +14,14 @@ import { SwitchDirective } from "./directives/switch.directive";
 import { MediaQueryDirective } from './directives/mediaQuery.directive'
 import { LayoutModule } from "@angular/cdk/layout";
 import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
-import {ClickOutsideDirective} from "src/util/directives/clickOutside.directive";
+import { ClickOutsideDirective } from "src/util/directives/clickOutside.directive";
 import { CounterDirective } from "./directives/counter.directive";
 import { GetNthElementPipe } from "./pipes/getNthElement.pipe";
 import { ParseAsNumberPipe } from "./pipes/parseAsNumber.pipe";
+import { GetUniquePipe } from "./pipes/getUnique.pipe";
+import { GetPropertyPipe } from "./pipes/getProperty.pipe";
+import { FilterArrayPipe } from "./pipes/filterArray.pipe";
+import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
 
 @NgModule({
   imports:[
@@ -41,6 +45,10 @@ import { ParseAsNumberPipe } from "./pipes/parseAsNumber.pipe";
     CounterDirective,
     GetNthElementPipe,
     ParseAsNumberPipe,
+    GetUniquePipe,
+    GetPropertyPipe,
+    FilterArrayPipe,
+    FilterByPropertyPipe,
   ],
   exports: [
     FilterNullPipe,
@@ -60,6 +68,10 @@ import { ParseAsNumberPipe } from "./pipes/parseAsNumber.pipe";
     CounterDirective,
     GetNthElementPipe,
     ParseAsNumberPipe,
+    GetUniquePipe,
+    GetPropertyPipe,
+    FilterArrayPipe,
+    FilterByPropertyPipe,
   ]
 })
 

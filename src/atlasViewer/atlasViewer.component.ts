@@ -35,8 +35,6 @@ import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS, CONST } from 'common/constants'
 
-export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> = new InjectionToken('NEHUBA_CLICK_OVERRIDE')
-
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
@@ -45,6 +43,7 @@ import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersion
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
+import { ClickInterceptorService } from "src/glue";
 
 /**
  * TODO
@@ -149,8 +148,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
-    @Optional() @Inject(NEHUBA_CLICK_OVERRIDE) private nehubaClickOverride: Function,
-    private slService: SlServiceService
+    private slService: SlServiceService,
+    private clickIntService: ClickInterceptorService
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -249,6 +248,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
+    this.clickIntService.addInterceptor(this.selectHoveredRegion.bind(this), true)
 
     if (KIOSK_MODE) {
 
@@ -388,6 +388,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
+    this.clickIntService.removeInterceptor(this.selectHoveredRegion.bind(this))
+  }
+
+  private selectHoveredRegion(ev: any, next: Function){
+    if (!this.onhoverSegments) return
+      
+    this.store.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: this.onhoverSegments.slice(0, 1)
+      })
+    )
+    next()
   }
 
   public unsetClearViewByKey(key: string){
@@ -431,18 +443,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   public mouseClickDocument(_event: MouseEvent) {
-
-    const next = () => {
-      if (!this.onhoverSegments) return
-      this.store.dispatch(
-        viewerStateSetSelectedRegions({
-          selectRegions: this.onhoverSegments.slice(0, 1)
-        })
-      )
-    }
-
-    this.nehubaClickOverride(next)
-
+    this.clickIntService.run(_event)
   }
 
   /**

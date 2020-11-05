@@ -720,3 +720,39 @@ export const gluActionSetFavDataset = createAction(
   '[glue] favDataset',
   props<{dataentries: Partial<IKgDataEntry>[]}>()
 )
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class ClickInterceptorService{
+  private clickInterceptorStack: Function[] = []
+
+  removeInterceptor(fn: Function) {
+    const idx = this.clickInterceptorStack.findIndex(int => int === fn)
+    if (idx < 0) {
+      console.warn(`clickInterceptorService could not remove the function. Did you pass the EXACT reference? 
+      Anonymouse functions such as () => {}  or .bind will create a new reference! 
+      You may want to assign .bind to a ref, and pass it to register and unregister functions`)
+    } else {
+      this.clickInterceptorStack.splice(idx, 1)
+    }
+  }
+  addInterceptor(fn: Function, atTheEnd?: boolean) {
+    if (atTheEnd) {
+      this.clickInterceptorStack.push(fn)
+    } else {
+      this.clickInterceptorStack.unshift(fn)
+    }
+  }
+
+  run(ev: any){
+    for (const clickInc of this.clickInterceptorStack) {
+      let runNext = false
+      clickInc(ev, () => {
+        runNext = true
+      })
+      if (!runNext) break
+    }
+  }
+}

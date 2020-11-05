@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 })
 
 export class MapToPropertyPipe implements PipeTransform{
-  public transform(input, property = '@id') {
-    return input && input[property]
+  public transform(arr: any[], prop: string){
+    return arr.map(item => prop ? item[prop] : item)
   }
 }

@@ -1,0 +1,38 @@
+<ng-container *ngIf="!dataIsLoading; else loadingTmpl">
+  
+  <mat-accordion
+    regional-feature-interactiviity
+    (rf-interact-onclick-3d-landmark)="handleLandmarkClick($event)"
+    #interactDir="regionalFeatureInteractivity">
+    <mat-expansion-panel *ngFor="let datum of (data$ | async)"
+      [expanded]="(exploreElectrode$ | async | getProperty : '_' | getProperty : 'electrodeId') === datum['@id']"
+      (opened)="handleDatumExpansion(datum['@id'], true)"
+      (closed)="handleDatumExpansion(datum['@id'], false)"
+      hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Electrode
+        </mat-panel-title>
+        <mat-panel-description class="text-nowrap">
+          {{ datum['@id'] }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <span>
+        contact points
+      </span>
+      <mat-list>
+        <mat-list-item *ngFor="let contactPt of datum['contactPoints']">
+          {{ contactPt.position | addUnitAndJoin : '' }}
+        </mat-list-item>
+      </mat-list>
+  
+    </mat-expansion-panel>
+  </mat-accordion>
+
+</ng-container>
+
+<!-- loading template -->
+<ng-template #loadingTmpl>
+  <div class="spinnerAnimationCircle"></div>
+</ng-template>

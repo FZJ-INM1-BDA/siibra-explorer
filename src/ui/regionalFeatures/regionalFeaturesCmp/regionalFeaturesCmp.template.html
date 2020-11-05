@@ -1,0 +1,76 @@
+<mat-tab-group *ngIf="!isLoading; else loadingTmpl">
+  <mat-tab *ngFor="let featureType of features | mapToProperty : 'type' | getUniquePipe">
+    <ng-template mat-tab-label>
+      {{ featureType }}
+    </ng-template>
+
+    <!-- lazy loading feature content -->
+    <ng-template matTabContent>
+
+      <!-- selector -->
+      <div>
+        <ng-container *ngTemplateOutlet="selectorTmpl; context: {
+          label: 'Dataset',
+          options: features | filterRegionalFeaturesBytype : featureType
+        }">
+        </ng-container>
+  
+      </div>
+
+      <!-- content -->
+      <ng-template [ngIf]="showingRegionFeatureId">
+        <ng-container *ngTemplateOutlet="featureContentTmpl; context: {
+          region: region,
+          feature: features | findRegionFeaturebyId : showingRegionFeatureId
+        }">
+        </ng-container>
+      </ng-template>
+    </ng-template>
+  </mat-tab>
+
+  <!-- transcluded content -->
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Other
+    </ng-template>
+
+    <!-- lazy loading transcluded content -->
+    <ng-template matTabContent>
+      <ng-content></ng-content>
+    </ng-template>
+  </mat-tab>
+
+</mat-tab-group>
+
+<!-- feature selector -->
+<ng-template #selectorTmpl
+  let-label="label"
+  let-options="options">
+
+  <mat-form-field>
+    <mat-label>
+      {{ label }}
+    </mat-label>
+    <mat-select [(value)]="showingRegionFeatureId">
+      <mat-option *ngFor="let option of options"
+        [value]="option['@id']">
+        {{ option.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<!-- feature content template -->
+<ng-template #featureContentTmpl
+  let-region="region"
+  let-feature="feature">
+  <feature-explorer
+    [region]="region"
+    [feature]="feature">
+  </feature-explorer>
+</ng-template>
+
+<!-- loading tmpl -->
+<ng-template #loadingTmpl>
+  <div class="spinnerAnimationCircle"></div>
+</ng-template>

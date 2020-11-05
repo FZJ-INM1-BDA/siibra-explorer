@@ -1206,4 +1206,70 @@ describe('> glue.ts', () => {
     })
 
   })
+
+  describe('> ClickInterceptorService', () => {
+    /**
+     * TODO finish writing the test for ClickInterceptorService
+     */
+
+    it('can obtain override fn', () => {
+
+    })
+
+    describe('> if getUserToSelectRegion.length === 0', () => {
+
+      it('by default, next fn will be called', () => {
+
+      })
+  
+      it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
+
+      })
+    })
+    describe('> if getUserToSelectRegion.length > 0', () => {
+      it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
+        
+      })
+      it('if multiple getUserToSelectRegion handler exists, it resolves in a LIFO manner', () => {
+
+      })
+
+      describe('> if spec is not set (defaults to parcellation region mode)', () => {
+
+        it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
+
+        })
+      })
+
+      describe('> if spec is set', () => {
+        describe('> if spec is set to PARCELLATION_REGION', () => {
+
+          it('> mouseoversegment.length === 0, will not call next, will not rs, will not call rj', () => {
+
+          })
+          
+          it('> mouseoversegment.length > 0, will not call next, will call rs', () => {
+
+          })
+        })
+
+        describe('> if spec is set to POINT', () => {
+          it('> rs is called if mouseoversegment.length === 0', () => {
+
+          })
+          it('> rs is called with correct arg if mouseoversegment.length > 0', () => {
+
+          })
+        })
+
+        describe('> if multiple getUserToSelectRegion exist', () => {
+          it('> only the last Promise will be evaluated', () => {
+
+      
+          })
+        })
+      })
+    })
+
+  })
 })

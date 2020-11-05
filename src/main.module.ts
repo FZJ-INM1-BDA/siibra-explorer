@@ -4,7 +4,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule, InjectionToken } from "@angular/core"
 import { FormsModule } from "@angular/forms";
 import { StoreModule, Store, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { AtlasViewer, NEHUBA_CLICK_OVERRIDE } from "./atlasViewer/atlasViewer.component";
+import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
@@ -14,7 +14,7 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, overrideNehubaClickFactory, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
@@ -33,7 +33,7 @@ import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./atlasViewer/mouseOver.directive";
@@ -53,7 +53,7 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { take } from 'rxjs/operators';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
@@ -67,8 +67,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     return reducer(state, action);
   };
 }
-
-export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_TOKEN')
 
 @NgModule({
   imports : [
@@ -154,37 +152,7 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
     DialogService,
     UIService,
     TemplateCoordinatesTransformation,
-    {
-      provide: NEHUBA_CLICK_OVERRIDE,
-      useFactory: overrideNehubaClickFactory,
-      deps: [
-        AtlasViewerAPIServices,
-        GET_STATE_SNAPSHOT_TOKEN
-      ]
-    },
-    {
-      provide: GET_STATE_SNAPSHOT_TOKEN,
-      useFactory: (store: Store<any>) => {
-        return () => {
-          const other: any = {}
-          let state
-          // rather than commiting mousePositionReal in state via action, do a single subscription instead.
-          // otherwise, the state gets updated way too often
-          if (window && (window as any).nehubaViewer) {
-            (window as any).nehubaViewer.mousePosition.inRealSpace
-              .take(1)
-              .subscribe(floatArr => {
-                other.mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
-              })
-          }
-          store.pipe(
-            take(1)
-          ).subscribe(v => state = v)
-          return { state, other }
-        }
-      },
-      deps: [ Store ]
-    },
+    ClickInterceptorService,
     {
       provide: GET_TOAST_HANDLER_TOKEN,
       useFactory: (uiService: UIService) => {
@@ -263,6 +231,18 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
       useFactory: setViewerHandleFactory,
       deps: [ AtlasViewerAPIServices ]
     },
+    {
+      provide: CLICK_INTERCEPTOR_INJECTOR,
+      useFactory: (clickIntService: ClickInterceptorService) => {
+        return {
+          deregister: clickIntService.removeInterceptor.bind(clickIntService),
+          register: clickIntService.addInterceptor.bind(clickIntService)
+        } as ClickInterceptor
+      },
+      deps: [
+        ClickInterceptorService
+      ]
+    }
   ],
   bootstrap : [
     AtlasViewer,
