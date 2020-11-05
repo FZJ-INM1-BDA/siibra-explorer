@@ -7,7 +7,7 @@ const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 
-const { router: regionalFeaturesRouter, regionalFeaturesIsReady } = require('./regionalFeatures')
+const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -166,7 +166,7 @@ app.use('/logo', require('./logo'))
 
 app.get('/ready', async (req, res) => {
   const authIsReady = await authReady()
-  const regionalFeatureReady = await regionalFeaturesIsReady()
+  const regionalFeatureReady = await regionalFeatureIsReady()
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
@@ -176,7 +176,7 @@ app.get('/ready', async (req, res) => {
      */
   ].every(f => !!f)
   if (allReady) return res.status(200).end()
-  else return res.status(400).end()
+  else return res.status(500).end()
 })
 
 /**

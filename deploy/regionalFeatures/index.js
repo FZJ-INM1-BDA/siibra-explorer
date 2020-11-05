@@ -18,12 +18,15 @@ const regionIdToDataIdMap = new Map()
 const datasetIdToDataMap = new Map()
 const datasetIdDetailMap = new Map()
 
+let isReady = false
+
 const ITERABLE_KEY_SYMBOL = Symbol('ITERABLE_KEY_SYMBOL')
 
 /**
  * this pattern allows all of the special data to be fetched in parallel
  * async await would mean it is fetched one at a time
  */
+
 const init = Promise.all(
   arrayToFetch.map(url =>
     new Promise((rs, rj) => {
@@ -70,7 +73,7 @@ const init = Promise.all(
       })
     })
   )
-)
+).then(() => isReady = true)
 
 const getFeatureMiddleware = (req, res, next) => {
   const { featureFullId } = req.params
@@ -213,10 +216,7 @@ router.get(
   sendFeatureDataResponse,
 )
 
-const regionalFeatureIsReady = () => Promise.race([
-  init.then(() => true),
-  new Promise(rs => setTimeout(() => rs(false), 500))
-])
+const regionalFeatureIsReady = async () => isReady
 
 module.exports = {
   router,
