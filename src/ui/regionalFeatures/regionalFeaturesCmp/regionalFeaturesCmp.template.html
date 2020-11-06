@@ -1,76 +1,54 @@
-<mat-tab-group *ngIf="!isLoading; else loadingTmpl">
-  <mat-tab *ngFor="let featureType of features | mapToProperty : 'type' | getUniquePipe">
-    <ng-template mat-tab-label>
-      {{ featureType }}
-    </ng-template>
+<mat-sidenav-container>
+  <mat-sidenav #sideNav class="w-100">
+    <button mat-button
+      (click)="sideNav.close()">
+      <i class="fas fa-chevron-left"></i>
+      <span>
+        Back
+      </span>
+    </button>
 
-    <!-- lazy loading feature content -->
-    <ng-template matTabContent>
+    <!-- TODO fix single dataset view bug
+    does not change render content unless rerender -->
+    <mat-tab-group *ngIf="sideNav.opened">
 
-      <!-- selector -->
-      <div>
-        <ng-container *ngTemplateOutlet="selectorTmpl; context: {
-          label: 'Dataset',
-          options: features | filterRegionalFeaturesBytype : featureType
-        }">
-        </ng-container>
-  
-      </div>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Overview
+        </ng-template>
 
-      <!-- content -->
-      <ng-template [ngIf]="showingRegionFeatureId">
-        <ng-container *ngTemplateOutlet="featureContentTmpl; context: {
-          region: region,
-          feature: features | findRegionFeaturebyId : showingRegionFeatureId
-        }">
-        </ng-container>
-      </ng-template>
-    </ng-template>
-  </mat-tab>
+        <ng-template matTabContent>
+          <single-dataset-view *ngIf="showDatafeatureInfo$ | async as featureEl"
+            class="m-2 d-inline-block"
+            [fullId]="featureEl.fullId"
+            [name]="featureEl.name"
+            [description]="featureEl.description"
+            [useSmallIcon]="true">
+          </single-dataset-view>
+        </ng-template>
+      </mat-tab>
 
-  <!-- transcluded content -->
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Other
-    </ng-template>
+      <mat-tab *ngFor="let feature of features">
+        <ng-template mat-tab-label>
+          {{ feature.type }}
+        </ng-template>
+        <ng-template matTabContent>
+          <feature-explorer
+            [region]="region"
+            [feature]="feature">
+          </feature-explorer>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
 
-    <!-- lazy loading transcluded content -->
-    <ng-template matTabContent>
-      <ng-content></ng-content>
-    </ng-template>
-  </mat-tab>
+  </mat-sidenav>
 
-</mat-tab-group>
-
-<!-- feature selector -->
-<ng-template #selectorTmpl
-  let-label="label"
-  let-options="options">
-
-  <mat-form-field>
-    <mat-label>
-      {{ label }}
-    </mat-label>
-    <mat-select [(value)]="showingRegionFeatureId">
-      <mat-option *ngFor="let option of options"
-        [value]="option['@id']">
-        {{ option.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-</ng-template>
-
-<!-- feature content template -->
-<ng-template #featureContentTmpl
-  let-region="region"
-  let-feature="feature">
-  <feature-explorer
-    [region]="region"
-    [feature]="feature">
-  </feature-explorer>
-</ng-template>
-
-<!-- loading tmpl -->
-<ng-template #loadingTmpl>
-  <div class="spinnerAnimationCircle"></div>
-</ng-template>
+  <mat-sidenav-content>
+    <mat-card class="p-0">
+      <data-browser
+        [disableVirtualScroll]="true"
+        [regions]="[region]">
+      </data-browser>
+    </mat-card>
+  </mat-sidenav-content>
+</mat-sidenav-container>

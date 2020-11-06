@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId } from 'common/util'
-import { forkJoin, Subscription } from "rxjs";
+import { forkJoin, Subject, Subscription } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
@@ -119,4 +119,6 @@ export class RegionalFeaturesService implements OnDestroy{
       })
     )
   }
+
+  showDatafeatureInfo$ = new Subject<{ fullId: string } | { name: string, description: string }>()
 }

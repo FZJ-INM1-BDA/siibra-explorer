@@ -355,16 +355,15 @@
 
       <!--  regional features-->
       <ng-template #regionalFeaturesTmpl>
-        <data-browser [template]="templateSelected$ | async"
+        <data-browser
           [parcellation]="selectedParcellation"
           [disableVirtualScroll]="true"
           [regions]="regions">
         </data-browser>
       </ng-template>
 
-      <div class="hidden" iav-databrowser-directive
-        [template]="templateSelected$ | async"
-        [parcellation]="selectedParcellation"
+      <div class="hidden"
+        iav-databrowser-directive
         [regions]="regions"
         #iavDbDirective="iavDatabrowserDirective">
       </div>
@@ -460,19 +459,11 @@
 
     <!--  regional features-->
     <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
-      <regional-features *ngIf="expansionPanel.expanded"
-        [region]="region">
-        <data-browser [template]="templateSelected$ | async"
-          [parcellation]="selectedParcellation"
-          [disableVirtualScroll]="true"
-          [regions]="[region]">
-        </data-browser>
+      <regional-features *ngIf="expansionPanel.expanded" [region]="region">
       </regional-features>
     </ng-template>
 
     <div class="hidden" iav-databrowser-directive
-      [template]="templateSelected$ | async"
-      [parcellation]="selectedParcellation"
       [regions]="[region]"
       #iavDbDirective="iavDatabrowserDirective">
     </div>

@@ -42,4 +42,7 @@ export class SingleDatasetView extends SingleDatasetBase {
 
   @Input()
   hideDownloadBtn = false
+
+  @Input()
+  useSmallIcon = false
 }

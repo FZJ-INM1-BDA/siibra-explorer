@@ -20,7 +20,7 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DataBrowser extends DatabrowserBase implements OnChanges, OnDestroy, OnInit {
+export class DataBrowser extends DatabrowserBase implements OnDestroy, OnInit {
 
   @Input()
   disableVirtualScroll: boolean = false
@@ -57,10 +57,6 @@ export class DataBrowser extends DatabrowserBase implements OnChanges, OnDestroy
     log: LoggingService,
   ) {
     super(dataService, log)
-  }
-
-  public ngOnChanges() {
-    super.ngOnChanges()
   }
 
   public ngOnInit() {
@@ -100,6 +96,7 @@ export class DataBrowser extends DatabrowserBase implements OnChanges, OnDestroy
   }
 
   public ngOnDestroy() {
+    super.ngOnDestroy()
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 

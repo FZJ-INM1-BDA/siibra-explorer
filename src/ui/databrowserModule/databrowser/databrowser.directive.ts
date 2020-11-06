@@ -1,4 +1,4 @@
-import { Directive } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { DatabrowserBase } from "./databrowser.base";
 import { DatabrowserService } from "../singleDataset/singleDataset.base";
 import { LoggingService } from "src/logging";
@@ -8,11 +8,15 @@ import { LoggingService } from "src/logging";
   exportAs: 'iavDatabrowserDirective'
 })
 
-export class DatabrowserDirective extends DatabrowserBase{
+export class DatabrowserDirective extends DatabrowserBase implements OnDestroy{
   constructor(
     dataService: DatabrowserService,
     log: LoggingService,
   ){
     super(dataService, log)
+  }
+
+  ngOnDestroy(){
+    super.ngOnDestroy()
   }
 }

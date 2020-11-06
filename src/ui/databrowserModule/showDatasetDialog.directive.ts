@@ -1,6 +1,7 @@
-import { Directive, Input, HostListener, Inject } from "@angular/core";
+import { Directive, Input, HostListener, Inject, InjectionToken, Optional } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
 
 export const IAV_DATASET_SHOW_DATASET_DIALOG_CMP = 'IAV_DATASET_SHOW_DATASET_DIALOG_CMP'
 export const IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG = `IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG`
@@ -34,29 +35,35 @@ export class ShowDatasetDialogDirective{
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
-    @Inject(IAV_DATASET_SHOW_DATASET_DIALOG_CMP) private dialogCmp: any
+    @Inject(IAV_DATASET_SHOW_DATASET_DIALOG_CMP) private dialogCmp: any,
+    @Optional() @Inject(OVERWRITE_SHOW_DATASET_DIALOG_TOKEN) private overwriteFn: TOverwriteShowDatasetDialog
   ){ }
 
   @HostListener('click')
   onClick(){
-
-    if (this.fullId || (this.kgSchema && this.kgId)) {
-
-      this.matDialog.open(this.dialogCmp, {
-        ...ShowDatasetDialogDirective.defaultDialogConfig,
-        data: {
+    const data = (() => {
+      if (this.fullId || (this.kgSchema && this.kgId)) {
+        return {
           fullId: this.fullId || `${this.kgSchema}/${this.kgId}`
         }
-      })
+      }
+      if (this.name || this.description) {
+        const { name, description } = this
+        return { name, description }
+      }
+    })()
 
-    } else if (this.name || this.description) {
-      const { name, description } = this
-      this.matDialog.open(this.dialogCmp, {
-        ...ShowDatasetDialogDirective.defaultDialogConfig,
-        data: { name, description }
-      })
-    } else {
-      this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
+    if (!data) {
+      return this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
     }
+
+    if (this.overwriteFn) {
+      return this.overwriteFn(data)
+    }
+
+    this.matDialog.open(this.dialogCmp, {
+      ...ShowDatasetDialogDirective.defaultDialogConfig,
+      data
+    })
   }
 }

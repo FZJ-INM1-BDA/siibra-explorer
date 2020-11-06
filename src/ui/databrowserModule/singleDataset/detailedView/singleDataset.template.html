@@ -56,7 +56,9 @@
 
 <!-- footer -->
 <mat-card-actions iav-media-query #iavMediaQuery="iavMediaQuery">
-  <ng-container *ngTemplateOutlet="actionBtns; context: { $implicit: (iavMediaQuery.mediaBreakPoint$ | async) }" >
+  <ng-container *ngTemplateOutlet="actionBtns; context: {
+    $implicit: useSmallIcon || (iavMediaQuery.mediaBreakPoint$ | async) > 1
+  }" >
   </ng-container>
 </mat-card-actions>
 
@@ -70,7 +72,7 @@
 </ng-template>
 
 <!-- using ng template for context binding of media breakpoints -->
-<ng-template #actionBtns let-mediaBreakPoint>
+<ng-template #actionBtns let-useSmallIcon>
 
   <!-- explore -->
   <ng-container *ngIf="!strictLocal && !hideExplore">
@@ -79,10 +81,10 @@
       [href]="kgRef | doiParserPipe"
       target="_blank">
       <iav-dynamic-mat-button
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-raised-button' : 'mat-icon-button'"
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-raised-button'"
         iav-dynamic-mat-button-color="primary">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           Explore
         </span>
         <i class="fas fa-external-link-alt"></i>
@@ -102,10 +104,10 @@
         (click)="isFav ? undoableRemoveFav() : undoableAddFav()"
         iav-stop="click mousedown"
         [iav-dynamic-mat-button-aria-label]="PIN_DATASET_ARIA_LABEL"
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'"
         [iav-dynamic-mat-button-color]="isFav ? 'primary' : 'basic'">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           {{ isFav ? 'Unpin this dataset' : 'Pin this dataset' }}
         </span>
         <i class="fas fa-thumbtack"></i>
@@ -122,9 +124,9 @@
       <iav-dynamic-mat-button
         [matTooltip]="tooltipText"
         [disabled]="downloadInProgress"
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'">
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           Download Zip
         </span>
         <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
@@ -149,11 +151,11 @@
     <iav-dynamic-mat-button
       *ngIf="hasPreview"
       mat-dialog-close
-      [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+      [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'"
       [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
       (click)="showPreviewList(previewFilesListTemplate)">
 
-      <span *ngIf="mediaBreakPoint < 2">
+      <span *ngIf="!useSmallIcon">
         Preview
       </span>
       <i class="ml-1 far fa-eye"></i>
