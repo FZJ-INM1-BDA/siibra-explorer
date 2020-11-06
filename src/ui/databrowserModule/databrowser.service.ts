@@ -64,7 +64,7 @@ export class DatabrowserService implements OnDestroy {
     })
   }
   public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
-  public getDataByRegion: ({ regions, parcellation, template }: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => 
+  public getDataByRegion: (arg: {regions: any[] }) => Observable<IDataEntry[]> = ({ regions }) => 
     forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
       map(
         (arrOfArr: IDataEntry[][]) => arrOfArr.reduce(
@@ -81,7 +81,7 @@ export class DatabrowserService implements OnDestroy {
           []
         )
       )
-    ).toPromise()
+    )
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
   private dataentries: IDataEntry[] = []

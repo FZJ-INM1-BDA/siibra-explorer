@@ -13,6 +13,22 @@
     }
   }
 
+  const setsContain = (set1, set2) => {
+    for (const el of set2){
+      if (!set1.has(el)) return false
+    }
+    return true
+  }
+
+  exports.setsContain = setsContain
+
+  exports.setsEql = (set1, set2) => {
+    if (set1.size !== set2.size) return false
+    if (!setsContain(set1, set2)) return false
+    if (!setsContain(set2, set1)) return false
+    return true
+  }
+
   /**
    *
    * https://stackoverflow.com/a/16348977/6059235

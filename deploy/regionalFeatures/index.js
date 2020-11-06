@@ -18,6 +18,8 @@ const regionIdToDataIdMap = new Map()
 const datasetIdToDataMap = new Map()
 const datasetIdDetailMap = new Map()
 
+let additionalDatasets = []
+const returnAdditionalDatasets = async () => additionalDatasets
 let isReady = false
 
 const ITERABLE_KEY_SYMBOL = Symbol('ITERABLE_KEY_SYMBOL')
@@ -27,7 +29,7 @@ const ITERABLE_KEY_SYMBOL = Symbol('ITERABLE_KEY_SYMBOL')
  * async await would mean it is fetched one at a time
  */
 
-const init = Promise.all(
+Promise.all(
   arrayToFetch.map(url =>
     new Promise((rs, rj) => {
       request.get(url, (err, _resp, body) => {
@@ -73,7 +75,24 @@ const init = Promise.all(
       })
     })
   )
-).then(() => isReady = true)
+).then(() => {
+  const map = new Map()
+  for (const [regionId, regionObj] of regionIdToDataIdMap.entries()) {
+    for (const datasetId of regionObj[ITERABLE_KEY_SYMBOL]) {
+      const newArr = (map.get(datasetId) || []).concat(regionId)
+      map.set(datasetId, newArr)
+    }
+  }
+
+  for (const [ datasetId, arrRegionIds ] of map.entries()) {
+    additionalDatasets = additionalDatasets.concat({
+      fullId: datasetId,
+      parcellationRegion: arrRegionIds.map(id => ({ fullId: id }))
+    })
+  }
+
+  isReady = true
+})
 
 const getFeatureMiddleware = (req, res, next) => {
   const { featureFullId } = req.params
@@ -221,4 +240,5 @@ const regionalFeatureIsReady = async () => isReady
 module.exports = {
   router,
   regionalFeatureIsReady,
+  returnAdditionalDatasets,
 }

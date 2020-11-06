@@ -6,6 +6,7 @@ const archiver = require('archiver')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets, filterDatasetsByRegion } = require('./util')
 const ibc = require('./importIBS')
+const { returnAdditionalDatasets } = require('../regionalFeatures')
 
 let cachedData = null
 
@@ -108,9 +109,16 @@ const getPublicDs = async () => {
 }
 
 
-const getDs = ({ user }) => user
-  ? fetchDatasetFromKg({ user }).then(({ results }) => results)
-  : getPublicDs()
+const getDs = ({ user }) => (user
+    ? fetchDatasetFromKg({ user }).then(({ results }) => results)
+    : getPublicDs()
+  ).then(async datasets => {
+    
+    return [
+      ...datasets,
+      ...(await returnAdditionalDatasets()),
+    ]
+  })
 
 const getExternalSchemaDatasets = (kgId, kgSchema) => {
   if (kgSchema === ibc.IBC_SCHEMA) {

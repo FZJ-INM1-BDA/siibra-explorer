@@ -1,23 +1,32 @@
-import { Input, Output, EventEmitter } from "@angular/core"
+import { Input, Output, EventEmitter, OnDestroy } from "@angular/core"
 import { LoggingService } from "src/logging"
 import { DatabrowserService } from "../singleDataset/singleDataset.base"
-import { Observable } from "rxjs"
+import { Observable, Subject, Subscription } from "rxjs"
 import { IDataEntry } from "src/services/stateStore.service"
-import { getUniqueRegionId } from 'common/util'
+import { getIdFromFullId, setsEql } from 'common/util'
+import { switchMap, tap } from "rxjs/operators"
 
-export class DatabrowserBase{
+export class DatabrowserBase implements OnDestroy{
+
+  private _subscriptions: Subscription[] = []
 
   @Output()
   public dataentriesUpdated: EventEmitter<IDataEntry[]> = new EventEmitter()
 
+  private _regions: any[] = []
+  
+  public regions$ = new Subject<any[]>()
+  get regions(){
+    return this._regions
+  }
   @Input()
-  regions: any[] = []
-
-  @Input()
-  public template: any
-
-  @Input()
-  public parcellation: any
+  set regions(arr: any[]){
+    const currentSet = new Set(this._regions.map(r => getIdFromFullId(r.fullId)))
+    const newSet = new Set(arr.map(r => getIdFromFullId(r.fullId)).filter(v => !!v))
+    if (setsEql(newSet, currentSet)) return
+    this._regions = arr.filter(r => !!getIdFromFullId(r.fullId))
+    this.regions$.next(this._regions)
+  }
 
   public fetchError: boolean = false
   public fetchingFlag = false
@@ -32,47 +41,27 @@ export class DatabrowserBase{
   ){
 
     this.favDataentries$ = this.dbService.favedDataentries$
+    
+    this._subscriptions.push(
+      this.regions$.pipe(
+        tap(() => this.fetchingFlag = true),
+        switchMap(regions => this.dbService.getDataByRegion({ regions })),
+      ).subscribe(
+        de => {
+          this.fetchingFlag = false
+          this.dataentries = de
+          this.dataentriesUpdated.emit(de)
+        },
+        e => {
+          this.log.error(e)
+          this.fetchError = true
+        }
+      )
+    )
   }
 
-  ngOnChanges(){
-
-    const { regions, parcellation, template } = this
-    this.regions = this.regions.map(r => {
-      /**
-       * TODO to be replaced with properly region UUIDs from KG
-       */
-      const uniqueRegionId = getUniqueRegionId(template, parcellation, r)
-      return {
-        fullId: uniqueRegionId,
-        id: uniqueRegionId,
-        ...r,
-      }
-    })
-    this.fetchingFlag = true
-
-    // input may be undefined/null
-    if (!parcellation) { return }
-
-    /**
-     * reconstructing parcellation region is async (done on worker thread)
-     * if parcellation region is not yet defined, return.
-     * parccellation will eventually be updated with the correct region
-     */
-    if (!parcellation.regions) { return }
-
-    this.dbService.getDataByRegion({ regions, parcellation, template })
-      .then(de => {
-        this.dataentries = de
-        return de
-      })
-      .catch(e => {
-        this.log.error(e)
-        this.fetchError = true
-      })
-      .finally(() => {
-        this.fetchingFlag = false
-        this.dataentriesUpdated.emit(this.dataentries)
-      })
+  ngOnDestroy(){
+    while(this._subscriptions.length > 0) this._subscriptions.pop().unsubscribe()
   }
 
   public retryFetchData(event: MouseEvent) {
