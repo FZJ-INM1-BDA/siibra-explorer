@@ -87,7 +87,11 @@ Promise.all(
   for (const [ datasetId, arrRegionIds ] of map.entries()) {
     additionalDatasets = additionalDatasets.concat({
       fullId: datasetId,
-      parcellationRegion: arrRegionIds.map(id => ({ fullId: id }))
+      parcellationRegion: arrRegionIds.map(id => ({ fullId: id })),
+      species: [],
+      kgReference: [
+        `https://kg.ebrains.eu/search/instances/Dataset/${datasetId}`
+      ]
     })
   }
 

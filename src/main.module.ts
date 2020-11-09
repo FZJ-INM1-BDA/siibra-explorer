@@ -55,9 +55,10 @@ import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
-import { take } from 'rxjs/operators';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from './util/interfaces';
+import { uiActionShowDatasetWtihId } from './services/state/uiState/actions';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -241,6 +242,23 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       },
       deps: [
         ClickInterceptorService
+      ]
+    },
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useFactory: (store: Store<any>) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
+          if (arg.fullId) {
+            store.dispatch(
+              uiActionShowDatasetWtihId({
+                id: arg.fullId
+              })
+            )
+          }
+        } as TOverwriteShowDatasetDialog
+      },
+      deps: [
+        Store
       ]
     }
   ],

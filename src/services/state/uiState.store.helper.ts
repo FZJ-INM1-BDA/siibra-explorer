@@ -7,7 +7,9 @@ import {
   uiStateCollapseSidePanel,
   uiStateExpandSidePanel,
   uiStateOpenSidePanel,
-  uiStateShowBottomSheet
+  uiStateShowBottomSheet,
+  uiActionHideDatasetWithId,
+  uiActionShowDatasetWtihId,
 } from './uiState/actions'
 
 export {
@@ -17,15 +19,23 @@ export {
   uiStateCollapseSidePanel,
   uiStateExpandSidePanel,
   uiStateOpenSidePanel,
-  uiStateShowBottomSheet
+  uiStateShowBottomSheet,
+  uiActionHideDatasetWithId,
+  uiActionShowDatasetWtihId,
 }
 
 import {
-  uiStatePreviewingDatasetFilesSelector
+  uiStatePreviewingDatasetFilesSelector,
+  uiStateMouseOverSegmentsSelector,
+  uiStateMouseoverUserLandmark,
+  uiStateShownDatasetIdSelector,
 } from './uiState/selectors'
 
 export {
-  uiStatePreviewingDatasetFilesSelector
+  uiStatePreviewingDatasetFilesSelector,
+  uiStateMouseOverSegmentsSelector,
+  uiStateMouseoverUserLandmark,
+  uiStateShownDatasetIdSelector,
 }
 
 export enum EnumWidgetTypes{

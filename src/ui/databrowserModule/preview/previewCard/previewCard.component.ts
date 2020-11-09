@@ -2,6 +2,8 @@ import { Component, Optional, Inject } from "@angular/core";
 import { PreviewBase } from "../preview.base";
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../../pure";
 
+// TODO deprecate in favour of datafeature/region feature
+
 @Component({
   selector: 'preview-card',
   templateUrl: './previewCard.template.html',

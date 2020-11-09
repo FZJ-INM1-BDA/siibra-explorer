@@ -1,0 +1,95 @@
+<mat-card class="mat-elevation-z4">
+  <div class="header-container">
+    <mat-card-title>
+      <span>
+        {{ name }}
+      </span>
+    </mat-card-title>
+
+    <mat-card-subtitle class="d-inline-flex align-items-center">
+      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+      <span>
+        Dataset
+      </span>
+
+      <mat-divider [vertical]="true" class="ml-2 h-2rem"></mat-divider>
+
+      <!-- explore btn -->
+      <a *ngFor="let kgRef of kgReference"
+        [href]="kgRef | doiParserPipe"
+        class="color-inherit"
+        target="_blank">
+        <button mat-icon-button
+          [matTooltip]="EXPLORE_DATASET_IN_KG_ARIA_LABEL">
+          <i class="fas fa-external-link-alt"></i>
+        </button>
+      </a>
+
+      <!-- fav btn -->
+      <ng-container *ngTemplateOutlet="favDatasetBtn">
+      </ng-container>
+      
+    </mat-card-subtitle>
+  </div>
+</mat-card>
+
+<mat-card class="mt-4">
+  <mat-card-content>
+    <mat-tab-group>
+
+      <!-- details -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Details
+        </ng-template>
+        <ng-template matTabContent>
+          <small class="m-1">
+            <markdown-dom [markdown]="description">
+            </markdown-dom>
+          </small>
+        </ng-template>
+      </mat-tab>
+
+      <!-- features -->
+      <div class="hidden"
+        [region]="region$ | async"
+        (loadingStateChanged)="detectChange()"
+        region-get-all-features-directive
+        #rfGetAllFeatures="rfGetAllFeatures">
+      </div>
+
+      <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            {{ feature.type }}
+          </ng-template>
+          <ng-template matTabContent>
+            <feature-explorer [feature]="feature">
+
+            </feature-explorer>
+          </ng-template>
+        </mat-tab>
+      </ng-container>
+
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
+
+
+<ng-template #favDatasetBtn>
+  <ng-container *ngTemplateOutlet="isFavCtxTmpl; context: {
+    isFav: (favedDataentries$ | async | datasetIsFaved : ({ fullId: fullId }))
+  }">
+  </ng-container>
+
+  <ng-template #isFavCtxTmpl let-isFav="isFav">
+    <button mat-icon-button
+      (click)="isFav ? undoableRemoveFav() : undoableAddFav()"
+      [attr.aria-label]="PIN_DATASET_ARIA_LABEL"
+      [matTooltip]="PIN_DATASET_ARIA_LABEL"
+      [color]="isFav ? 'primary' : 'basic'">
+      <i class="fas fa-thumbtack"></i>
+    </button>
+  </ng-template>
+</ng-template>
+

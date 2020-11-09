@@ -1,9 +1,8 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { BehaviorSubject, forkJoin, Observable, Subject, Subscription } from "rxjs";
-import { filter, shareReplay, switchMap, switchMapTo, tap } from "rxjs/operators";
+import { shareReplay, switchMap, tap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { IFeature, RegionalFeaturesService } from "../regionalFeature.service";
-import { RegionFeatureBase } from "../regionFeature.base";
 
 const selectedColor = [ 255, 0, 0 ]
 
@@ -15,7 +14,7 @@ const selectedColor = [ 255, 0, 0 ]
   ]
 })
 
-export class FeatureExplorer extends RegionFeatureBase implements OnChanges, OnInit, OnDestroy{
+export class FeatureExplorer implements OnInit, OnDestroy{
 
   private landmarksLoaded: IHasId[] = []
   private onDestroyCb: Function[] = []
@@ -29,19 +28,19 @@ export class FeatureExplorer extends RegionFeatureBase implements OnChanges, OnI
     this.feature$.next(val)
   }
 
+  @Input()
+  private region: any
+
   public data$: Observable<IHasId[]>
 
   constructor(
     private regionFeatureService: RegionalFeaturesService,
   ){
-    super(regionFeatureService)
     /**
     * once feature stops loading, watch for input feature
     */
-    this.data$ = this.isLoading$.pipe(
-      filter(v => !v),
+    this.data$ = this.feature$.pipe(
       tap(() => this.dataIsLoading = true),
-      switchMapTo(this.feature$),
       switchMap((feature: IFeature) => forkJoin(
         feature.data.map(datum => this.regionFeatureService.getFeatureData(this.region, feature, datum)))
       ),
@@ -93,10 +92,6 @@ export class FeatureExplorer extends RegionFeatureBase implements OnChanges, OnI
   }
   get dataIsLoading(){
     return this._dataIsLoading
-  }
-
-  ngOnChanges(changes: SimpleChanges){
-    super.ngOnChanges(changes)
   }
 
   ngOnDestroy(){
