@@ -131,30 +131,51 @@
 
       <div class="position-relative d-flex flex-column h-100">
 
-        <!-- region search autocomplete  -->
+        <!-- TODO dataset preview will become deprecated in the future.
+        Regional feature/data feature will replace it -->
 
-        <div class="h-0 w-100 region-text-search-autocomplete-position"
-          [@openCloseAnchor]="sideNavSwitch.switchState ? 'open' : 'closed'">
-          <ng-container *ngTemplateOutlet="autocompleteTmpl">
-          </ng-container>
+        <div class="hidden"
+          iav-shown-dataset
+          #iavShownDataset="iavShownDataset">
         </div>
-
+      
         <div class="hidden"
           iav-shown-previews
           (emitter)="iavAdditionalLayers$.next($event)"
           #previews="iavShownPreviews">
         </div>
 
-        <!-- preview volumes -->
-        <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
-          <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
-            <ng-container *ngFor="let vPreview of volumePreviews">
-              <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
-
-              </ng-container>
-            </ng-container>
+        <!-- sidenav datasets -->
+        <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
+          <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
+            <!-- backbtn -->
+            <button mat-button class="position-fixed mt-4 z-index-10"
+              (click)="clearPreviewingDataset()">
+              <i class="fas fa-chevron-left"></i>
+              <span>
+                Back
+              </span>
+            </button>
+            <!-- single dataset side nav panel -->
+            <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
+              [fullId]="id"
+              class="side-nav-cover">
+            </single-dataset-sidenav-view>
           </ng-template>
         </ng-container>
+
+        <!-- preview volumes -->
+        <ng-template #sideNavVolumePreview>
+          <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
+            <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
+              <ng-container *ngFor="let vPreview of volumePreviews">
+                <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
+  
+                </ng-container>
+              </ng-container>
+            </ng-template>
+          </ng-container>
+        </ng-template>
 
       </div>
     </mat-drawer>
@@ -191,6 +212,14 @@
 
 <!-- region sidenav tmpl -->
 <ng-template #sidenavRegionTmpl>
+
+  <!-- region search autocomplete  -->
+
+  <div class="h-0 w-100 region-text-search-autocomplete-position"
+    [@openCloseAnchor]="sideNavSwitch.switchState ? 'open' : 'closed'">
+    <ng-container *ngTemplateOutlet="autocompleteTmpl">
+    </ng-container>
+  </div>
 
   <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
     [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
@@ -459,8 +488,12 @@
 
     <!--  regional features-->
     <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
-      <regional-features *ngIf="expansionPanel.expanded" [region]="region">
-      </regional-features>
+
+      <data-browser
+        *ngIf="expansionPanel.expanded" 
+        [disableVirtualScroll]="true"
+        [regions]="[region]">
+      </data-browser>
     </ng-template>
 
     <div class="hidden" iav-databrowser-directive

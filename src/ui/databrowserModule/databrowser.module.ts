@@ -45,6 +45,9 @@ import { LayerBrowserModule } from "../layerbrowser";
 import { DatabrowserDirective } from "./databrowser/databrowser.directive";
 import { ContributorModule } from "./contributor";
 import { DatabrowserService } from "./databrowser.service";
+import { ShownDatasetDirective } from "./shownDataset.directive";
+import { SingleDatasetSideNavView } from "./singleDataset/sideNavView/sDsSideNavView.component";
+import { RegionalFeaturesModule } from "../regionalFeatures";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -62,6 +65,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     AngularMaterialModule,
     LayerBrowserModule,
     ContributorModule,
+    RegionalFeaturesModule,
   ],
   declarations: [
     DataBrowser,
@@ -72,6 +76,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewComponentWrapper,
     BulkDownloadBtn,
     PreviewCardComponent,
+    SingleDatasetSideNavView,
 
     /**
      * Directives
@@ -80,6 +85,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewDatasetFile,
     ShownPreviewsDirective,
     DatabrowserDirective,
+    ShownDatasetDirective,
 
     /**
      * pipes
@@ -120,6 +126,8 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FilterPreviewByType,
     PreviewCardComponent,
     DatabrowserDirective,
+    ShownDatasetDirective,
+    SingleDatasetSideNavView,
   ],
   entryComponents: [
     DataBrowser,

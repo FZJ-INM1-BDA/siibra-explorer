@@ -1,42 +1,44 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
-import { DatabrowserModule } from "../databrowserModule";
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
 import { FeatureExplorer } from "./featureExplorer/featureExplorer.component";
 import { RegionalFeatureInteractivity } from "./interactivity.directive";
 import { FilterRegionalFeaturesByTypePipe } from "./pipes/filterRegionalFeaturesByType.pipe";
+import { FilterRegionFeaturesById } from "./pipes/filterRegionFeaturesById.pipe";
 import { FindRegionFEatureById } from "./pipes/findRegionFeatureById.pipe";
 import { RegionalFeaturesService } from "./regionalFeature.service";
-import { RegionalFeaturesCmp } from "./regionalFeaturesCmp/regionalFeaturesCmp.component";
+import { RegionGetAllFeaturesDirective } from "./regionGetAllFeatures.directive";
 
 @NgModule({
   imports: [
     CommonModule,
     UtilModule,
     AngularMaterialModule,
-    DatabrowserModule,
   ],
   declarations: [
     /**
      * components
      */
-    RegionalFeaturesCmp,
     FeatureExplorer,
 
     /**
      * Directives
      */
     RegionalFeatureInteractivity,
+    RegionGetAllFeaturesDirective,
 
     /**
      * pipes
      */
     FilterRegionalFeaturesByTypePipe,
     FindRegionFEatureById,
+    FilterRegionFeaturesById,
   ],
   exports: [
-    RegionalFeaturesCmp,
+    FeatureExplorer,
+    RegionGetAllFeaturesDirective,
+    FilterRegionFeaturesById,
   ],
   providers: [
     RegionalFeaturesService,

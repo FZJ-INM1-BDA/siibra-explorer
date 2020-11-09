@@ -37,10 +37,10 @@ import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RegionAccordionTooltipTextPipe } from '../util'
 import { hot } from 'jasmine-marbles'
-import { of } from 'rxjs'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
 import { PANELS } from 'src/services/state/ngViewerState/constants'
+import { RegionalFeaturesModule } from '../regionalFeatures'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -81,6 +81,7 @@ describe('> nehubaContainer.component.ts', () => {
           ReactiveFormsModule,
           HttpClientModule,
           CommonModule,
+          RegionalFeaturesModule,
 
           /**
            * because the change done to pureconstant service, need to intercept http call to avoid crypto error message
@@ -117,7 +118,6 @@ describe('> nehubaContainer.component.ts', () => {
             useValue: importNehubaSpy
           },
           PureContantService,
-
         ],
         schemas: [
           CUSTOM_ELEMENTS_SCHEMA

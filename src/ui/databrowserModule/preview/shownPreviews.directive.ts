@@ -2,7 +2,7 @@ import { Directive, Optional, Inject, Output, EventEmitter, OnDestroy } from "@a
 import { Store, select } from "@ngrx/store";
 import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors";
 import { EnumPreviewFileTypes } from "../pure";
-import { switchMap, map, startWith, withLatestFrom } from "rxjs/operators";
+import { switchMap, map, startWith } from "rxjs/operators";
 import { forkJoin, of, Subscription } from "rxjs";
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../pure";
 import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";

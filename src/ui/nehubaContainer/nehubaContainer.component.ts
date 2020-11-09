@@ -39,6 +39,8 @@ import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
 import { ngViewerSelectorNehubaReady, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
+import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -144,6 +146,18 @@ const {
     ]),
   ],
   exportAs: 'uiNehubaContainer',
+  providers: [
+    {
+      provide: REGION_OF_INTEREST,
+      useFactory: (store: Store<any>) => store.pipe(
+        select(viewerStateSelectedRegionsSelector),
+        map(rs => rs[0] || null)
+      ),
+      deps: [
+        Store
+      ]
+    }
+  ]
 })
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
@@ -1097,5 +1111,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     } else {
       ngviewer.perspectiveNavigationState.zoomBy(factor)
     }
+  }
+
+  public clearPreviewingDataset(){
+    /**
+     * clear all preview
+     */
+    this.store.dispatch(
+      uiActionHideAllDatasets()
+    )
   }
 }

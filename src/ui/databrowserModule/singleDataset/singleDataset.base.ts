@@ -42,7 +42,13 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
 
   @Input()
   set fullId(val){
-    this._fullId = val
+    if (val === this._fullId) return
+    const re = getKgSchemaIdFromFullId(val)
+    if (re) {
+      this._fullId = val
+      this.kgSchema = re[0]
+      this.kgId = re[1]
+    }
   }
 
   get fullId(){
@@ -125,31 +131,35 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
           this.cdr.markForCheck()
           return this.singleDatasetService.getInfoFromKg({ kgSchema, kgId })
         })
-      ).subscribe(dataset => {
-        if (!dataset) return
-        const { kgSchema, kgId } = this
+      ).subscribe(
+        dataset => {
+          if (!dataset) return
 
-        const { name, description, publications, fullId, kgReference, files, contributors, ...rest } = dataset
-        this.name = name
-        this.description = description
-        this.publications = publications
-        this.contributors = contributors
-        this.files = files
-        this.fullId = fullId
+          const { kgSchema, kgId } = this
 
-        this.kgReference = kgReference
+          const { name, description, publications, fullId, kgReference, files, contributors, ...rest } = dataset
+          this.name = name
+          this.description = description
+          this.publications = publications
+          this.contributors = contributors
+          this.files = files
+          this.fullId = fullId
 
-        this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
-        
-        this.fetchFlag = false
-        this.cdr.markForCheck()
-      },
-      err => {
-        this.fetchFlag = false
-        this.name = `[This dataset cannot be fetched right now]`
-        this.description = ` `
-        this.cdr.markForCheck()
-      })
+          this.kgReference = kgReference
+
+          this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
+          
+          this.fetchFlag = false
+          this.cdr.markForCheck()
+        },
+        err => {
+          this.fetchFlag = false
+          
+          this.name = `[This dataset cannot be fetched right now]`
+          this.description = ` `
+          this.cdr.markForCheck()
+        }
+      )
     )
     
     /**
