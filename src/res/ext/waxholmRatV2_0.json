@@ -13,6 +13,8 @@
   "parcellations": [
     {
       "ngId": "WHS_SD_rat_atlas_v4_beta",
+      "@id": "juelich/iav/atlas/v1.0.0/9",
+      "fullId": "juelich/iav/atlas/v1.0.0/9",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v4 beta",
       "regions": [

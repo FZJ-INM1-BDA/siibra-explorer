@@ -258,6 +258,20 @@ class WdLayoutPage extends WdBase{
     return visibility
   }
 
+  async clickChip(search, cssSelector) {
+    const allChips = await this._getChips()
+    const idx = await _getIndexFromArrayOfWebElements(search, allChips)
+    if (idx < 0) throw new Error(`clickChip ${search.toString()} not found`)
+    if (!cssSelector) {
+      return await allChips[idx].click()
+    }
+    const el = await allChips[idx].findElement(
+      By.css(cssSelector)
+    )
+    if (!el) throw new Error(`clickChip css selector ${cssSelector} not found`)
+    return await el.click()
+  }
+
   /**
    * Cards
    */
@@ -297,7 +311,7 @@ class WdLayoutPage extends WdBase{
   }
 
   async selectTitleTemplateParcellation(templateName, parcellationName){
-    throw new Error(`selectTitleTemplateParcellation has been deprecated. use selectAtlasTemplateParcellation`)
+    throw new Error(`selectTitleTemplateParcellation has been deprecated. use setAtlasSpecifications`)
   }
 
   /**
@@ -320,17 +334,15 @@ class WdLayoutPage extends WdBase{
     }
   }
 
-  async changeTemplate(templateName){
-    if (!templateName) throw new Error(`templateName needs to be provided`)
+  async selectTile(tileName){
+    if (!tileName) throw new Error(`tileName needs to be provided`)
     await this._setAtlasSelectorExpanded(true)
     await this.wait(1000)
-    const allTiles = await this._browser
-      .findElement( By.css('atlas-layer-selector') )
-      .findElements( By.css(`mat-grid-tile`) )
+    const allTiles = await this._browser.findElements( By.css(`mat-grid-tile`) )
 
-    const idx = await _getIndexFromArrayOfWebElements(templateName, allTiles)
+    const idx = await _getIndexFromArrayOfWebElements(tileName, allTiles)
     if (idx >= 0) await allTiles[idx].click()
-    else throw new Error(`#changeTemplate: templateName ${templateName} cannot be found.`)
+    else throw new Error(`#selectTile: tileName ${tileName} cannot be found.`)
   }
 
   async changeParc(parcName) {
@@ -341,7 +353,7 @@ class WdLayoutPage extends WdBase{
     throw new Error(`changeParcVersion NYI`)
   }
 
-  async selectAtlasTemplateParcellation(atlasName, templateName, parcellationName, parcVersion) {
+  async setAtlasSpecifications(atlasName, atlasSpecifications = [], parcVersion = null) {
     if (!atlasName) throw new Error(`atlasName needs to be provided`)
     try {
       /**
@@ -357,16 +369,10 @@ class WdLayoutPage extends WdBase{
       await this.selectDropdownOption(`[aria-label="${ARIA_LABELS.SELECT_ATLAS}"]`, atlasName)
     }
 
-    if (templateName) {
+    for (const spec of atlasSpecifications) {
       await this.wait(1000)
       await this.waitUntilAllChunksLoaded()
-      await this.changeTemplate(templateName)
-    }
-    
-    if (parcellationName) {
-      await this.wait(1000)
-      await this.waitUntilAllChunksLoaded()
-      await this.changeParc(parcellationName)
+      await this.selectTile(spec)
     }
 
     if (parcVersion) {

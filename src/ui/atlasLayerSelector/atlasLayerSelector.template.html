@@ -171,12 +171,11 @@
     hasBackdrop="false">
 
     <ng-template matMenuContent let-layerGroupItems="layerGroupItems">
-
-        <div iav-stop="click"
-            class="d-flex flex-column align-items-center"
+        <mat-grid-list cols="1"
+            rowHeight="1:1"
+            iav-stop="click"
             (iav-outsideClick)="collapseExpandedGroup()">
-
-            <div class="single-column-tile" *ngFor="let layer of layerGroupItems">
+            <mat-grid-tile *ngFor="let layer of layerGroupItems">
 
                 <ng-container *ngTemplateOutlet="tileTmpl; context: {
                     tileSrc: layer,
@@ -186,7 +185,8 @@
                 } ">
 
                 </ng-container>
-            </div>
-        </div>
+            </mat-grid-tile>
+        </mat-grid-list>
+
     </ng-template>
 </mat-menu>

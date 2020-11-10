@@ -1,6 +1,6 @@
 // TODO merge with viewerstate.store.ts when refactor is done
-import { createReducer, on, ActionReducer, createSelector, Store, select } from "@ngrx/store";
-import { generalApplyState } from "../stateStore.helper";
+import { createReducer, on, ActionReducer, Store, select } from "@ngrx/store";
+import { generalActionError, generalApplyState } from "../stateStore.helper";
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable } from "rxjs";
 import { withLatestFrom, map } from "rxjs/operators";
@@ -112,11 +112,26 @@ export class ViewerStateHelperEffect{
   @Effect()
   selectParcellationWithId$: Observable<any> = this.actions$.pipe(
     ofType(viewerStateRemoveAdditionalLayer.type),
-    withLatestFrom(this.store$.pipe(
-      select(viewerStateGetSelectedAtlas)
-    )),
-    map(([ { payload }, selectedAtlas ]) => {
-      const baseLayer = selectedAtlas['parcellations'].find(p => p['baseLayer'])
+    withLatestFrom(
+      this.store$.pipe(
+        select(viewerStateGetSelectedAtlas)
+      ),
+      this.store$.pipe(
+        select(viewerStateSelectedTemplateSelector)
+      )
+    ),
+    map(([ { payload }, selectedAtlas, selectedTemplate ]) => {
+      const tmpl = selectedAtlas['templateSpaces'].find(t => t['@id'] === selectedTemplate['@id'])
+      if (!tmpl) {
+        return generalActionError({
+          message: `templateSpace with id ${selectedTemplate['@id']} cannot be found in atlas with id ${selectedAtlas['@id']}`
+        })
+      }
+
+      const eligibleParcIdSet = new Set(
+        tmpl.availableIn.map(p => p['@id'])
+      )
+      const baseLayer = selectedAtlas['parcellations'].find(fullP => fullP['baseLayer'] && eligibleParcIdSet.has(fullP['@id']))
       return viewerStateHelperSelectParcellationWithId({ payload: baseLayer })
     })
   )

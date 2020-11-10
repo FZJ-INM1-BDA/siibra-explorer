@@ -75,7 +75,7 @@ describe('> dataset browser', () => {
     describe(`> in template: ${template}`, () => {
       beforeAll(async () => {
         await iavPage.goto()
-        await iavPage.selectAtlasTemplateParcellation(atlasName, template)
+        await iavPage.setAtlasSpecifications(atlasName, [ template ])
 
         // account for linear template translation backend
         await iavPage.wait(5000)
