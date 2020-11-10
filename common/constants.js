@@ -8,7 +8,7 @@
     COLLAPSE: 'Collapse',
 
     // dataset specific
-    EXPLORE_DATASET_IN_KG: `Explore dataset in Knowledge`,
+    EXPLORE_DATASET_IN_KG: `Explore dataset in Knowledge Graph`,
     SHOW_DATASET_PREVIEW: 'Show dataset preview',
     TOGGLE_EXPLORE_PANEL: `Toggle explore panel`,
     MODALITY_FILTER: `Toggle dataset modality filter`,
