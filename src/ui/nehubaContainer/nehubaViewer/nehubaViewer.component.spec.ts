@@ -1,4 +1,4 @@
-import { TestBed, async } from "@angular/core/testing"
+import { TestBed, async, fakeAsync, tick } from "@angular/core/testing"
 import { CommonModule, DOCUMENT } from "@angular/common"
 import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaViewer.component"
 import { importNehubaFactory } from "../util"
@@ -73,6 +73,22 @@ describe('nehubaViewer.component,ts', () => {
 
         expect(onInitSpy).toHaveBeenCalled()
       })
+    })
+
+    describe('> loading meshes', () => {
+      it('> on loadMeshes$ emit, calls nehubaViewer.setMeshesToLoad', fakeAsync(() => {
+
+        const fixture = TestBed.createComponent(NehubaViewerUnit)
+        fixture.componentInstance.nehubaViewer = {
+          setMeshesToLoad: jasmine.createSpy('setMeshesToLoad').and.returnValue(null),
+          dispose: () => {}
+        }
+
+        fixture.detectChanges()
+        fixture.componentInstance['loadMeshes']([1,2,3], { name: 'foo-bar' })
+        tick(1000)
+        expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
+      }))
     })
   })
 })

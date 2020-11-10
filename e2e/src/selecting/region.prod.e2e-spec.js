@@ -14,7 +14,7 @@ describe('> selecting regions', () => {
       const newPage = new AtlasPage()
       await newPage.init()
       await newPage.goto()
-      await newPage.selectAtlasTemplateParcellation(duplicatedRegion.atlas, duplicatedRegion.template)
+      await newPage.setAtlasSpecifications(duplicatedRegion.atlas, [ duplicatedRegion.template ])
       await newPage.wait(500)
       await newPage.waitForAsync()
       await newPage.execScript(`interactiveViewer.viewerHandle.setNavigationLoc(${JSON.stringify(duplicatedRegion.position.map(v => v*1e6))}, true)`)
@@ -64,7 +64,7 @@ describe('> selecting regions', () => {
     })
 
     it('> on change atlas, multi region panel are dismissed', async () => {
-      await newPage.selectAtlasTemplateParcellation(humanAtlasName)
+      await newPage.setAtlasSpecifications(humanAtlasName)
       await newPage.wait(500)
       await newPage.waitForAsync()
 

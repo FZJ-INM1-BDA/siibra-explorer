@@ -39,7 +39,7 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async selectDropdownTemplate(title) {
-    throw new Error(`selectDropdownTemplate has been deprecated. use changeTemplate instead`)
+    throw new Error(`selectDropdownTemplate has been deprecated. use setAtlasSpecifications instead`)
   }
 
   async _getSearchRegionInput(){

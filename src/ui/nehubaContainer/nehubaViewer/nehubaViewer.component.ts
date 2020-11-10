@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, debounce } from "rxjs/operators";
+import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer } from 'rxjs'
+import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
@@ -406,9 +406,25 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.loadMeshes$.pipe(
         scan(scanFn, []),
         debounceTime(100),
-        debounce(() => this.sliceviewLoading$.pipe(
-          filter(flag => !flag),
-        ))
+        switchMap(layerLabelIdx => 
+          /**
+           * sometimes (e.g. when all slice views are minimised), sliceviewlaoding will not emit
+           * so if sliceviewloading does not emit another value (except the initial true value)
+           * force start loading of mesh
+           */
+          race(
+            this.sliceviewLoading$.pipe(
+              skip(1)
+            ),
+            timer(500).pipe(
+              mapTo(false)
+            )
+          ).pipe(
+            filter(flag => !flag),
+            take(1),
+            mapTo(layerLabelIdx),
+          ) 
+        ),
       ).subscribe(layersLabelIndex => {
         let totalMeshes = 0
         for (const layerLayerIndex of layersLabelIndex) {
