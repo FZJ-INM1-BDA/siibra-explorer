@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnChanges, OnDestroy, Optional, SimpleChange, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnChanges, OnDestroy, Optional, Output, EventEmitter } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Observable } from "rxjs";
 import { REGION_OF_INTEREST, TRegionOfInterest } from "src/util/interfaces";
@@ -17,6 +17,9 @@ import { SingleDatasetBase } from "../singleDataset.base";
 })
 
 export class SingleDatasetSideNavView extends SingleDatasetBase implements OnChanges, OnDestroy{
+
+  @Output()
+  clear: EventEmitter<null> = new EventEmitter()
 
   constructor(
     dbService: DatabrowserService,

@@ -1,9 +1,19 @@
+<button mat-button
+  class="position-absolute z-index-10 m-2"
+  (click)="clear.emit()">
+  <i class="fas fa-chevron-left"></i>
+  <span class="ml-1">
+    Back
+  </span>
+</button>
+
 <mat-card class="mat-elevation-z4">
   <div class="header-container">
     <mat-card-title>
-      <span>
+      <ng-content select="[region-of-interest]"></ng-content>
+      <div>
         {{ name }}
-      </span>
+      </div>
     </mat-card-title>
 
     <mat-card-subtitle class="d-inline-flex align-items-center">
@@ -31,9 +41,6 @@
       
     </mat-card-subtitle>
   </div>
-</mat-card>
-
-<mat-card class="mt-4">
   <mat-card-content>
     <mat-tab-group>
 
@@ -74,7 +81,6 @@
     </mat-tab-group>
   </mat-card-content>
 </mat-card>
-
 
 <ng-template #favDatasetBtn>
   <ng-container *ngTemplateOutlet="isFavCtxTmpl; context: {

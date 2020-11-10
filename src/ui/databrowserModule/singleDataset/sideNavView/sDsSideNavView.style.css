@@ -1,3 +1,8 @@
+:host
+{
+  position: relative;
+}
+
 .header-container
 {
   padding: 16px;
