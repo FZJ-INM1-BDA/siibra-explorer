@@ -2,9 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 const asyncReadfile = promisify(fs.readFile)
-const { expect } = require('chai')
-const { pid } = require('process')
-const { assert } = require('console')
+const { expect, assert } = require('chai')
 
 const templateFiles = [
   'bigbrain.json',
