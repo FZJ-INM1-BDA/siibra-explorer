@@ -148,18 +148,26 @@
         <!-- sidenav datasets -->
         <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
           <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
-            <!-- backbtn -->
-            <button mat-button class="position-fixed mt-4 z-index-10"
-              (click)="clearPreviewingDataset()">
-              <i class="fas fa-chevron-left"></i>
-              <span>
-                Back
-              </span>
-            </button>
+            
             <!-- single dataset side nav panel -->
             <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
+              (clear)="clearPreviewingDataset(id)"
               [fullId]="id"
               class="side-nav-cover">
+              <mat-chip *ngIf="regionOfInterest$ && regionOfInterest$ | async as region"
+                region-of-interest
+                iav-region
+                [region]="region"
+                [ngClass]="{
+                  'darktheme':regionDirective.rgbDarkmode === true,
+                  'lighttheme': regionDirective.rgbDarkmode === false
+                }"
+                [style.backgroundColor]="regionDirective.rgbString"
+                #regionDirective="iavRegion">
+                <span class="iv-custom-comp text text-truncate d-inline">
+                  {{ region.name }}
+                </span>
+              </mat-chip>
             </single-dataset-sidenav-view>
           </ng-template>
         </ng-container>

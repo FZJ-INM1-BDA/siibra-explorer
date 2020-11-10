@@ -310,7 +310,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     private store: Store<any>,
     private elementRef: ElementRef,
     private log: LoggingService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ) {
 
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
@@ -1113,12 +1114,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  public clearPreviewingDataset(){
+  public clearPreviewingDataset(id: string){
     /**
      * clear all preview
      */
     this.store.dispatch(
-      uiActionHideAllDatasets()
+      id
+        ? uiActionHideDatasetWithId({ id })
+        : uiActionHideAllDatasets()
     )
   }
 }
