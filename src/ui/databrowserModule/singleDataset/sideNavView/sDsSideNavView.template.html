@@ -29,12 +29,22 @@
       <a *ngFor="let kgRef of kgReference"
         [href]="kgRef | doiParserPipe"
         class="color-inherit"
+        mat-icon-button
+        [matTooltip]="EXPLORE_DATASET_IN_KG_ARIA_LABEL"
         target="_blank">
-        <button mat-icon-button
-          [matTooltip]="EXPLORE_DATASET_IN_KG_ARIA_LABEL">
-          <i class="fas fa-external-link-alt"></i>
-        </button>
+        <i class="fas fa-external-link-alt"></i>
       </a>
+
+      <!-- in case no doi is available, directly link to KG -->
+      <ng-template [ngIf]="kgReference.length === 0">
+        <a [href]="directLinkToKg"
+          class="color-inherit"
+          mat-icon-button
+          [matTooltip]="EXPLORE_DATASET_IN_KG_ARIA_LABEL"
+          target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </ng-template>
 
       <!-- fav btn -->
       <ng-container *ngTemplateOutlet="favDatasetBtn">
