@@ -15,12 +15,18 @@ const bodyParser = require('body-parser')
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
+let readyFlag = false
 init()
-  .then(() => console.log(`dataset init success`))
+  .then(() => {
+    console.log(`dataset init success`)
+    readyFlag = true
+  })
   .catch(e => {
     console.warn(`dataset init failed`, e)
     retry(() => init())
   })
+
+const ready = async () => readyFlag
 
 const cacheMaxAge24Hr = (_req, res, next) => {
   const oneDay = 24 * 60 * 60
@@ -243,4 +249,7 @@ datasetsRouter.post('/bulkDownloadKgFiles', bodyParser.urlencoded({ extended: fa
   }
 })
 
-module.exports = datasetsRouter
+module.exports = {
+  router: datasetsRouter,
+  ready
+}
