@@ -92,7 +92,8 @@
 
           <ng-template matExpansionPanelContent>
             <feature-explorer [feature]="feature"
-              [region]="region$ | async">
+              [region]="region$ | async"
+              (feature-explorer-is-loading)="detectChange()">
   
             </feature-explorer>
           </ng-template>

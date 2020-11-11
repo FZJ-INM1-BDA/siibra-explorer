@@ -34,18 +34,16 @@ try {
 
 const defaultAllowedSites = [
   "'self'",
-  '*.apps.hbp.eu',
-  '*.apps-dev.hbp.eu',
   'stats.humanbrainproject.eu',
   'stats-dev.humanbrainproject.eu'
 ]
 
 const dataSource = [
   "'self'",
-  '*.humanbrainproject.org',
-  '*.humanbrainproject.eu',
-  '*.fz-juelich.de',
-  '*.kfa-juelich.de',
+  "blob:",
+  'neuroglancer.humanbrainproject.org',
+  'neuroglancer.humanbrainproject.eu',
+  'connectivity-query-v1-1-connectivity.apps-dev.hbp.eu',
   'object.cscs.ch',
   ...DATA_SRC
 ]
@@ -64,14 +62,14 @@ module.exports = (app) => {
       ],
       styleSrc: [
         ...defaultAllowedSites,
-        '*.bootstrapcdn.com',
-        '*.fontawesome.com',
+        'stackpath.bootstrapcdn.com/bootstrap/4.3.1/',
+        'use.fontawesome.com/releases/v5.8.1/',
         "'unsafe-inline'", // required for angular [style.xxx] bindings
         ...WHITE_LIST_SRC
       ],
       fontSrc: [
         "'self'",
-        '*.fontawesome.com',
+        'use.fontawesome.com/releases/v5.8.1/',
         ...WHITE_LIST_SRC
       ],
       connectSrc: [
@@ -81,13 +79,13 @@ module.exports = (app) => {
       ],
       scriptSrc:[
         "'self'",
-        '*.apps.hbp.eu',
-        '*.apps-dev.hbp.eu',
-        '*.jquery.com',
-        '*.cloudflare.com',
-        'unpkg.com',
-        '*.unpkg.com',
-        '*.jsdelivr.net',
+        'code.jquery.com', // plugin load external library -> jquery v2 and v3
+        'cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/', // plugin load external library -> web components
+        'cdnjs.cloudflare.com/ajax/libs/d3/', // plugin load external lib -> d3
+        'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
+        'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
+        'unpkg.com/react@16/umd/', // plugin load external lib -> react
+        'unpkg.com/kg-dataset-previewer@1.0.6/', // preview component
         (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC,

@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { BehaviorSubject, forkJoin, Observable, Subject, Subscription } from "rxjs";
-import { shareReplay, switchMap, tap } from "rxjs/operators";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { BehaviorSubject, forkJoin, merge, Observable, Subject, Subscription } from "rxjs";
+import { debounceTime, map, scan, shareReplay, switchMap, tap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { IFeature, RegionalFeaturesService } from "../regionalFeature.service";
 
@@ -32,6 +32,9 @@ export class FeatureExplorer implements OnInit, OnDestroy{
   private region: any
 
   public data$: Observable<IHasId[]>
+
+  @Output('feature-explorer-is-loading')
+  public dataIsLoadingEventEmitter: EventEmitter<boolean> = new EventEmitter()
 
   constructor(
     private regionFeatureService: RegionalFeaturesService,
@@ -81,6 +84,25 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     this.onDestroyCb.push(() => {
       if (this.landmarksLoaded.length > 0) this.regionFeatureService.removeLandmarks(this.landmarksLoaded)
     })
+
+    this.sub.push(
+      this.openElectrodeId$.pipe(
+        debounceTime(200)
+      ).subscribe(arr => {
+
+        if (this.landmarksLoaded.length > 0) {
+          this.regionFeatureService.removeLandmarks(this.landmarksLoaded)
+          this.regionFeatureService.addLandmarks(this.landmarksLoaded.map(lm => {
+            const selected = arr.some(id => id === lm['_']['electrodeId'])
+            return {
+              ...lm,
+              color: selected ? selectedColor : null,
+              showInSliceView: selected
+            }
+          }))
+        }
+      })
+    )
   }
 
   public dataIsLoading$ = new BehaviorSubject(false)
@@ -89,6 +111,7 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     if (val === this._dataIsLoading) return
     this._dataIsLoading = val
     this.dataIsLoading$.next(val)
+    this.dataIsLoadingEventEmitter.next(val)
   }
   get dataIsLoading(){
     return this._dataIsLoading
@@ -103,23 +126,34 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     /**
      * TODO either debounce call here, or later down stream
      */
-    if (this.landmarksLoaded.length > 0) this.regionFeatureService.removeLandmarks(this.landmarksLoaded)
-    if (this.landmarksLoaded.length > 0) {
-      this.regionFeatureService.addLandmarks(this.landmarksLoaded.map(lm => {
-        if (lm['_']['electrodeId'] === electrodeId) {
-          return {
-            ...lm,
-            color: open ? selectedColor : null,
-            showInSliceView: open
-          }
-        } else {
-          return lm
-        }
-      }))
-    }
+    if (open) this.exploreElectrode$.next(electrodeId)
+    else this.unExploreElectrode$.next(electrodeId)
   }
 
-  public exploreElectrode$ = new Subject()
+  private unExploreElectrode$ = new Subject<string>()
+  private exploreElectrode$ = new Subject<string>()
+  public openElectrodeId$ = merge(
+    this.unExploreElectrode$.pipe(
+      map(id => ({
+        add: null,
+        remove: id
+      }))
+    ),
+    this.exploreElectrode$.pipe(
+      map(id => ({
+        add: id,
+        remove: null
+      }))
+    )
+  ).pipe(
+    scan((acc, curr) => {
+      const { add, remove } = curr
+      const set = new Set(acc)
+      if (add) set.add(add)
+      if (remove) set.delete(remove)
+      return Array.from(set)
+    }, [])
+  )
 
   handleLandmarkClick(arg: { landmark: any, next: Function }) {
     const { landmark, next } = arg
@@ -133,7 +167,7 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     })
 
     if (isOne) {
-      this.exploreElectrode$.next(landmark)
+      this.exploreElectrode$.next(landmark['_']['electrodeId'])
     } else {
       next()
     }

@@ -6,7 +6,7 @@
     (rf-interact-onclick-3d-landmark)="handleLandmarkClick($event)"
     #interactDir="regionalFeatureInteractivity">
     <mat-expansion-panel *ngFor="let datum of (data$ | async)"
-      [expanded]="(exploreElectrode$ | async | getProperty : '_' | getProperty : 'electrodeId') === datum['@id']"
+      [expanded]="openElectrodeId$ | async | arrayContains : datum['@id']"
       (opened)="handleDatumExpansion(datum['@id'], true)"
       (closed)="handleDatumExpansion(datum['@id'], false)"
       togglePosition="before">

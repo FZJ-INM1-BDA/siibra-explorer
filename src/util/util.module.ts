@@ -22,6 +22,7 @@ import { GetUniquePipe } from "./pipes/getUnique.pipe";
 import { GetPropertyPipe } from "./pipes/getProperty.pipe";
 import { FilterArrayPipe } from "./pipes/filterArray.pipe";
 import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
+import { ArrayContainsPipe } from "./pipes/arrayContains.pipe";
 
 @NgModule({
   imports:[
@@ -49,6 +50,7 @@ import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
     GetPropertyPipe,
     FilterArrayPipe,
     FilterByPropertyPipe,
+    ArrayContainsPipe,
   ],
   exports: [
     FilterNullPipe,
@@ -72,6 +74,7 @@ import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
     GetPropertyPipe,
     FilterArrayPipe,
     FilterByPropertyPipe,
+    ArrayContainsPipe,
   ]
 })
 

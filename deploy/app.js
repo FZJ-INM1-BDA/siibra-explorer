@@ -8,6 +8,7 @@ const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
+const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -167,9 +168,11 @@ app.use('/logo', require('./logo'))
 app.get('/ready', async (req, res) => {
   const authIsReady = await authReady()
   const regionalFeatureReady = await regionalFeatureIsReady()
+  const datasetReady = await datasetRouteIsReady()
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
+    datasetReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -205,7 +208,6 @@ const jsonMiddleware = (req, res, next) => {
 const atlasesRouter = require('./atlas')
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
-const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
