@@ -153,7 +153,7 @@
             <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
               (clear)="clearPreviewingDataset(id)"
               [fullId]="id"
-              class="side-nav-cover">
+              class="bs-border-box ml-15px-n mr-15px-n">
               <mat-chip *ngIf="regionOfInterest$ && regionOfInterest$ | async as region"
                 region-of-interest
                 iav-region
@@ -272,7 +272,7 @@
 <ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
   <div class="w-100 flex-grow-1 d-flex flex-column">
 
-    <preview-card class="d-block side-nav-cover flex-grow-1"
+    <preview-card class="d-block bs-border-box ml-15px-n mr-15px-n flex-grow-1"
       [attr.aria-label]="ARIA_LABEL_ADDITIONAL_VOLUME_CONTROL"
       [datasetId]="datasetId"
       [filename]="filename">
@@ -329,7 +329,7 @@
 
 <!-- region tmpl placeholder -->
 <ng-template #regionPlaceholderTmpl>
-  <div class="placeholder-region-detail side-nav-cover mat-elevation-z4">
+  <div class="placeholder-region-detail bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
     <span class="text-muted">
       Select a region by clicking on the viewer or search from above
     </span>
@@ -384,11 +384,11 @@
       [region]="{
         name: CONST.MULTI_REGION_SELECTION
       }"
-      class="side-nav-cover mat-elevation-z4">
+      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
     </region-menu>
 
     <!-- other regions detail accordion -->
-    <mat-accordion class="side-nav-cover mt-2">
+    <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
 
       <!--  regional features-->
       <ng-template #regionalFeaturesTmpl>
@@ -455,13 +455,13 @@
     <region-menu
       [showRegionInOtherTmpl]="false"
       [region]="region"
-      class="side-nav-cover mat-elevation-z4">
+      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
     </region-menu>
   </ng-container>
 
   <!-- other region detail accordion -->
   <mat-accordion *ngIf="region"
-    class="side-nav-cover mt-2"
+    class="bs-border-box ml-15px-n mr-15px-n mt-2"
     iav-region
     [region]="region"
     #iavRegion="iavRegion">

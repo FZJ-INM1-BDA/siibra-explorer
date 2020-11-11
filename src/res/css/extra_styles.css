@@ -403,6 +403,11 @@ markdown-dom pre code
   height:20em!important;
 }
 
+.overflow-x-auto
+{
+  overflow-x: auto;
+}
+
 .overflow-x-scroll
 {
   overflow-x: scroll;
@@ -437,6 +442,11 @@ markdown-dom pre code
 .w-1em
 {
   width: 1em;
+}
+
+.bs-border-box
+{
+  box-sizing: border-box;
 }
 
 .bs-content-box
@@ -717,6 +727,26 @@ kg-dataset-previewer > img
 {
   cursor: grab;
   opacity: 1.0;
+}
+
+.ml-15px-n
+{
+  margin-left: -15px!important;
+}
+
+.mr-15px-n
+{
+  margin-right: -15px!important;
+}
+
+.ml-24px-n
+{
+  margin-left: -24px!important;
+}
+
+.mr-24px-n
+{
+  margin-right: -24px!important;
 }
 
 .ml-4-n

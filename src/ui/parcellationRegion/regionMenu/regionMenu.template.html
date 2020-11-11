@@ -68,7 +68,6 @@
 <!-- template for switching template -->
 <mat-menu #regionInOtherTemplatesMenu="matMenu"
   [aria-label]="SHOW_IN_OTHER_REF_SPACE">
-  hello world
   <ng-template matMenuContent let-regionInOtherTemplates="regionInOtherTemplates">
 
     <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"

@@ -13,6 +13,12 @@ import { ARIA_LABELS } from 'common/constants'
 import { switchMap, distinctUntilChanged, filter } from "rxjs/operators";
 import { IContributor } from "../contributor";
 
+const getDirectLinkToKg = (dataset: { fullId: string, id: string }) => {
+  const { id } = dataset
+  if (id) return `https://kg.ebrains.eu/search/instances/Dataset/${encodeURIComponent(id)}`
+  return null
+}
+
 export {
   DatabrowserService,
   KgSingleDatasetService,
@@ -94,6 +100,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
    * sic!
    */
   public kgReference: string[] = []
+  public directLinkToKg: string
   public files: IFile[] = []
   private methods: string[] = []
 
@@ -146,6 +153,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
           this.fullId = fullId
 
           this.kgReference = kgReference
+          this.directLinkToKg = getDirectLinkToKg(dataset)
 
           this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
           

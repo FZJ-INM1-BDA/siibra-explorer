@@ -3,15 +3,16 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
 import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, startWith } from "rxjs/operators";
-import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
+import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState.store.helper";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
 import { verifyPositionArg } from 'common/util'
+import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -112,6 +113,17 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         fetchedTemplate,
       }
     }),
+  )
+
+  /**
+   * on region selected change (clear, select, or change selection), clear selected dataset ids
+   */
+  @Effect()
+  public clearShownDatasetIdOnRegionClear: Observable<any> = this.store$.pipe(
+    select(viewerStateSelectedRegionsSelector),
+    mapTo(
+      uiActionHideAllDatasets()
+    )
   )
 
   @Effect()
