@@ -7,7 +7,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { intToRgb, verifyPositionArg } from 'common/util'
+import { intToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
 
 export class RegionBase {
 
@@ -231,11 +231,6 @@ export const getRegionParentParcRefSpace = createSelector(
   }
 )
 
-enum EnumHemisphere{
-  LEFT_HEMISPHERE = 'left hemisphere',
-  RIGHT_HEMISPHERE = 'right hemisphere',
-}
-
 @Pipe({
   name: 'renderViewOriginDatasetlabel'
 })
@@ -255,7 +250,6 @@ export const regionInOtherTemplateSelector = createSelector(
   (fetchedTemplates, templateSelected, prop) => {
     const { region: regionOfInterest } = prop
     const returnArr = []
-    // const regionOfInterestHemisphere = regionOfInterest.status
 
     const regionOfInterestHemisphere = getRegionHemisphere(regionOfInterest)
 
@@ -301,11 +295,3 @@ export const regionInOtherTemplateSelector = createSelector(
     return returnArr
   }
 )
-
-export function getRegionHemisphere(region: any): EnumHemisphere{
-  return (region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
-    ? EnumHemisphere.RIGHT_HEMISPHERE
-    : (region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
-      ? EnumHemisphere.LEFT_HEMISPHERE
-      : null
-}

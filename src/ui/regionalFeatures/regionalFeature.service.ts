@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { PureContantService } from "src/util";
-import { getIdFromFullId } from 'common/util'
+import { getIdFromFullId, getRegionHemisphere } from 'common/util'
 import { forkJoin, Subject, Subscription } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
@@ -48,7 +48,11 @@ export class RegionalFeaturesService implements OnDestroy{
     if (!region.fullId) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
     const regionFullId = getIdFromFullId(region.fullId)
 
-    const hemisphereObj =  region['status'] ? { hemisphere: region['status'] } : {}
+    const hemisphereObj = (() => {
+      const hemisphere = getRegionHemisphere(region)
+      return hemisphere ? { hemisphere } : {}
+    })()
+
     const refSpaceObj = this.templateSelected && this.templateSelected.fullId
       ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
       : {}
@@ -59,7 +63,6 @@ export class RegionalFeaturesService implements OnDestroy{
         params: {
           ...hemisphereObj,
           ...refSpaceObj,
-          
         },
         responseType: 'json'
       }
@@ -87,10 +90,20 @@ export class RegionalFeaturesService implements OnDestroy{
     const refSpaceObj = this.templateSelected && this.templateSelected.fullId
       ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
       : {}
+    const hemisphereObj = (() => {
+      const hemisphere = getRegionHemisphere(region)
+      return hemisphere ? { hemisphere } : {}
+    })()
+
+    const regionId = getIdFromFullId(region && region.fullId)
+    const url = regionId
+      ? `${this.pureConstantService.backendUrl}regionalFeatures/byRegion/${encodeURIComponent(regionId)}/${encodeURIComponent(feature['@id'])}/${encodeURIComponent(data['@id'])}`
+      : `${this.pureConstantService.backendUrl}regionalFeatures/byFeature/${encodeURIComponent(feature['@id'])}/${encodeURIComponent(data['@id'])}`
     return this.http.get<IHasId>(
-      `${this.pureConstantService.backendUrl}regionalFeatures/byFeature/${encodeURIComponent(feature['@id'])}/${encodeURIComponent(data['@id'])}`,
+      url,
       {
         params: {
+          ...hemisphereObj,
           ...refSpaceObj,
         },
         responseType: 'json'

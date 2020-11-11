@@ -20,6 +20,20 @@
     return true
   }
 
+  const HEMISPHERE = {
+    LEFT_HEMISPHERE: `left hemisphere`,
+    RIGHT_HEMISPHERE: `right hemisphere`
+  }
+
+  exports.getRegionHemisphere = region => {
+    if (!region) return null
+    return (region.name && region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+      ? HEMISPHERE.RIGHT_HEMISPHERE
+      : (region.name && region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+        ? HEMISPHERE.LEFT_HEMISPHERE
+        : null
+  }
+
   exports.setsContain = setsContain
 
   exports.setsEql = (set1, set2) => {

@@ -114,6 +114,7 @@ const sendFeatureResponse = (req, res) => {
   const fullIdMap = res.locals['getFeatureMiddleware_cache_0']
   const featureDetail = res.locals['getFeatureMiddleware_cache_1'] || {}
   const dataKeys = Array.from(fullIdMap.keys())
+  if (dataKeys.length === 0) return res.status(404).end()
   return res.status(200).json({
     ...featureDetail,
     data: dataKeys.map(dataId => {
@@ -219,7 +220,14 @@ router.get(
 
     const returnMap = res.locals['byRegionMiddleware_cache_0']
     return res.status(200).json({
-      features: Array.from(returnMap.keys()).map(id => ({ ['@id']: id }))
+      features: Array.from(
+        returnMap.keys()
+      ).filter(id => {
+        /**
+         * do not return where there are no datas
+         */
+        return returnMap.get(id).size || 0 > 0
+      }).map(id => ({ ['@id']: id }))
     })
   }
 )
