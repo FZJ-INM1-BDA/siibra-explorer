@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
 import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, startWith } from "rxjs/operators";
-import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
+import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
@@ -116,12 +116,11 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   )
 
   /**
-   * on clear of region selected, also clear selected dataset ids
+   * on region selected change (clear, select, or change selection), clear selected dataset ids
    */
   @Effect()
   public clearShownDatasetIdOnRegionClear: Observable<any> = this.store$.pipe(
     select(viewerStateSelectedRegionsSelector),
-    filter(r => r.length === 0),
     mapTo(
       uiActionHideAllDatasets()
     )

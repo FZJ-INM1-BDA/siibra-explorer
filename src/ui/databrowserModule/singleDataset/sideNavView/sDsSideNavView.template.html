@@ -52,21 +52,27 @@
       
     </mat-card-subtitle>
   </div>
-  <mat-card-content class="mt-2">
-    <mat-tab-group>
 
-      <!-- details -->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          Details
-        </ng-template>
-        <ng-template matTabContent>
+  <mat-card-content class="mt-2 ml-15px-n mr-15px-n">
+    <mat-accordion>
+
+      <!-- Details -->
+      <mat-expansion-panel hideToggle
+        [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Details
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+
+        <ng-template matExpansionPanelContent>
           <small class="m-1">
             <markdown-dom [markdown]="description">
             </markdown-dom>
           </small>
         </ng-template>
-      </mat-tab>
+      </mat-expansion-panel>
 
       <!-- features -->
       <div class="hidden"
@@ -77,20 +83,23 @@
       </div>
 
       <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
-        <mat-tab>
-          <ng-template mat-tab-label>
-            {{ feature.type }}
-          </ng-template>
-          <ng-template matTabContent>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ feature.type }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <ng-template matExpansionPanelContent>
             <feature-explorer [feature]="feature"
               [region]="region$ | async">
-
+  
             </feature-explorer>
           </ng-template>
-        </mat-tab>
+        </mat-expansion-panel>
       </ng-container>
+    </mat-accordion>
 
-    </mat-tab-group>
   </mat-card-content>
 </mat-card>
 

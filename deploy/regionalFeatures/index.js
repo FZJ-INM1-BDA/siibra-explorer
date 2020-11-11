@@ -64,11 +64,12 @@ Promise.all(
         const dataIdToDataMap = new Map()
         datasetIdToDataMap.set(datasetId, dataIdToDataMap)
 
-        for (const { ['@id']: dataId, contact_points: contactPoints, referenceSpaces } of data) {
+        for (const { ['@id']: dataId, contact_points: contactPoints, referenceSpaces, ...rest } of data) {
           dataIdToDataMap.set(dataId, {
             ['@id']: dataId,
             contactPoints,
             referenceSpaces,
+            ...rest
           })
         }
         rs()
