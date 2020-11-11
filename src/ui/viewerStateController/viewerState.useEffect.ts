@@ -7,11 +7,12 @@ import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, NEWVIEWER, 
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState.store.helper";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
 import { verifyPositionArg } from 'common/util'
+import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -112,6 +113,18 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         fetchedTemplate,
       }
     }),
+  )
+
+  /**
+   * on clear of region selected, also clear selected dataset ids
+   */
+  @Effect()
+  public clearShownDatasetIdOnRegionClear: Observable<any> = this.store$.pipe(
+    select(viewerStateSelectedRegionsSelector),
+    filter(r => r.length === 0),
+    mapTo(
+      uiActionHideAllDatasets()
+    )
   )
 
   @Effect()

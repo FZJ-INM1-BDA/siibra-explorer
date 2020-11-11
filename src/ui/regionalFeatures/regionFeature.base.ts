@@ -1,5 +1,5 @@
 import { Input, SimpleChanges } from "@angular/core"
-import { BehaviorSubject } from "rxjs"
+import { BehaviorSubject, of } from "rxjs"
 import { IFeature, RegionalFeaturesService } from "./regionalFeature.service"
 
 export class RegionFeatureBase{
@@ -29,7 +29,11 @@ export class RegionFeatureBase{
     if (changes.region && changes.region.previousValue !== changes.region.currentValue) {
       this.isLoading = true
       this.features = []
-      this._regionalFeatureService.getAllFeaturesByRegion(changes.region.currentValue).pipe(
+      
+      const _ = (changes.region.currentValue
+        ? this._regionalFeatureService.getAllFeaturesByRegion(changes.region.currentValue)
+        : of([])
+      ).pipe(
 
       ).subscribe({
         next: features => this.features = features,
