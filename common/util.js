@@ -80,6 +80,27 @@
     return `${kgSchema}/${kgId}`
   }
 
+  const getIdsObj = fullId => {
+    const returnArray = []
+    if (!fullId) return returnArray
+    const legacyFullId = getIdObj(fullId)
+    if (legacyFullId) returnArray.push(`${legacyFullId['kgSchema']}/${legacyFullId['kgId']}`)
+
+    const { ['minds/core/parcellationregion/v1.0.0']: uniMindsParcRegScheIds} = fullId
+    for (const key in uniMindsParcRegScheIds || {}) {
+      returnArray.push(`minds/core/parcellationregion/v1.0.0/${key}`)
+    }
+    return returnArray
+  }
+
+  exports.getStringIdsFromRegion = region => {
+    const { fullId } = region
+    /**
+     * other ways of getting id?
+     */
+    return getIdsObj(fullId)
+  }
+
   const defaultConfig = {
     timeout: 5000,
     retries: 3
@@ -107,6 +128,8 @@
   )
 
   exports.flattenRegions = flattenRegions
+
+  exports.flattenReducer = (acc, curr) => acc.concat(curr)
 
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 

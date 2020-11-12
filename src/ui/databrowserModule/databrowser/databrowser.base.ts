@@ -3,8 +3,9 @@ import { LoggingService } from "src/logging"
 import { DatabrowserService } from "../singleDataset/singleDataset.base"
 import { Observable, Subject, Subscription } from "rxjs"
 import { IDataEntry } from "src/services/stateStore.service"
-import { getIdFromFullId, setsEql } from 'common/util'
+import { setsEql } from 'common/util'
 import { switchMap, tap } from "rxjs/operators"
+import { getStringIdsFromRegion, flattenReducer } from 'common/util'
 
 export class DatabrowserBase implements OnDestroy{
 
@@ -21,10 +22,10 @@ export class DatabrowserBase implements OnDestroy{
   }
   @Input()
   set regions(arr: any[]){
-    const currentSet = new Set(this._regions.map(r => getIdFromFullId(r.fullId)))
-    const newSet = new Set(arr.map(r => getIdFromFullId(r.fullId)).filter(v => !!v))
+    const currentSet = new Set(this._regions.map(r => getStringIdsFromRegion(r)).reduce(flattenReducer, []))
+    const newSet = new Set(arr.map(r => getStringIdsFromRegion(r)).reduce(flattenReducer, []).filter(v => !!v))
     if (setsEql(newSet, currentSet)) return
-    this._regions = arr.filter(r => !!getIdFromFullId(r.fullId))
+    this._regions = arr.filter(r => !getStringIdsFromRegion(r).every(id => !id))
     this.regions$.next(this._regions)
   }
 
