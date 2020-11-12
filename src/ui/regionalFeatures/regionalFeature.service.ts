@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { PureContantService } from "src/util";
-import { getIdFromFullId, getRegionHemisphere } from 'common/util'
+import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
 import { forkJoin, Subject, Subscription } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
 import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
@@ -47,7 +47,7 @@ export class RegionalFeaturesService implements OnDestroy{
   public getAllFeaturesByRegion(region: {['fullId']: string}){
     if (!region.fullId) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
     const regionFullId = getIdFromFullId(region.fullId)
-
+    const regionFullIds = getStringIdsFromRegion(region)
     const hemisphereObj = (() => {
       const hemisphere = getRegionHemisphere(region)
       return hemisphere ? { hemisphere } : {}
@@ -56,31 +56,35 @@ export class RegionalFeaturesService implements OnDestroy{
     const refSpaceObj = this.templateSelected && this.templateSelected.fullId
       ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
       : {}
-
-    return this.http.get<{features: IHasId[]}>(
-      `${this.pureConstantService.backendUrl}regionalFeatures/byRegion/${encodeURIComponent( regionFullId )}`,
-      {
-        params: {
-          ...hemisphereObj,
-          ...refSpaceObj,
-        },
-        responseType: 'json'
-      }
-    ).pipe(
-      switchMap(({ features }) => forkJoin(
-        features.map(({ ['@id']: featureId }) => 
-          this.http.get<IFeature>(
-            `${this.pureConstantService.backendUrl}regionalFeatures/byRegion/${encodeURIComponent( regionFullId )}/${encodeURIComponent( featureId )}`,
-            {
-              params: {
-                ...hemisphereObj,
-                ...refSpaceObj,
-              },
-              responseType: 'json'
-            }
+    
+    return forkJoin(
+      regionFullIds.map(regionFullId => this.http.get<{features: IHasId[]}>(
+        `${this.pureConstantService.backendUrl}regionalFeatures/byRegion/${encodeURIComponent( regionFullId )}`,
+        {
+          params: {
+            ...hemisphereObj,
+            ...refSpaceObj,
+          },
+          responseType: 'json'
+        }
+      ).pipe(
+        switchMap(({ features }) => forkJoin(
+          features.map(({ ['@id']: featureId }) => 
+            this.http.get<IFeature>(
+              `${this.pureConstantService.backendUrl}regionalFeatures/byRegion/${encodeURIComponent( regionFullId )}/${encodeURIComponent( featureId )}`,
+              {
+                params: {
+                  ...hemisphereObj,
+                  ...refSpaceObj,
+                },
+                responseType: 'json'
+              }
+            )
           )
-        )
-      )),
+        )),
+      ))
+    ).pipe(
+      map((arr: IFeature[][]) => arr.reduce(flattenReducer, []))
     )
   }
 

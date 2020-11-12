@@ -26,6 +26,10 @@
           "@id": "juelich/iav/atlas/v1.0.0/6"
         },
         {
+          "ngId": "superficial-white-bundle-HCP",
+          "@id": "juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c"
+        },
+        {
           "name": "64 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721"
         },
@@ -190,6 +194,20 @@
       "ngId": "fibre bundle short",
       "name": "Short Bundle",
       "@id": "juelich/iav/atlas/v1.0.0/6",
+      "groupName": "Fibre tracts",
+      "availableIn": [
+        {
+          "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        }
+      ]
+    },
+    {
+      "ngId": "superficial-white-bundle-HCP",
+      "@id": "juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c",
       "groupName": "Fibre tracts",
       "availableIn": [
         {

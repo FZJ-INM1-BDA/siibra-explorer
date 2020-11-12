@@ -17,7 +17,7 @@ import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
-import { getIdFromFullId } from 'common/util'
+import { getStringIdsFromRegion } from 'common/util'
 import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 
 const noMethodDisplayName = 'No methods described'
@@ -271,21 +271,34 @@ export class DatabrowserService implements OnDestroy {
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
-  private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry>>()
-  private getDatasetsByRegion(region: { fullId: string }){
-    const fullId = getIdFromFullId(region.fullId)
-    if (this.memoizedDatasetByRegion.has(fullId)) return this.memoizedDatasetByRegion.get(fullId)
-    const obs$ =  this.http.get<IDataEntry>(
-      `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
-      {
-        headers: this.constantService.getHttpHeader(),
-        responseType: 'json'
+  private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry[]>>()
+  private getDatasetsByRegion(region: { fullId: any }){
+    const fullIds = getStringIdsFromRegion(region) as string[]
+
+    for (const fullId of fullIds) {
+      if (!this.memoizedDatasetByRegion.has(fullId)) {
+        const obs$ =  this.http.get<IDataEntry[]>(
+          `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
+          {
+            headers: this.constantService.getHttpHeader(),
+            responseType: 'json'
+          }
+        ).pipe(
+          shareReplay(1),
+        )
+        this.memoizedDatasetByRegion.set(fullId, obs$)
       }
+    }
+
+    return forkJoin(
+      fullIds.map(fullId => this.memoizedDatasetByRegion.get(fullId))
     ).pipe(
-      shareReplay(1),
+      map(array => array.reduce((acc, currArr) => {
+        return acc.concat(
+          currArr.filter(ds => !new Set(acc.map(ds => ds['fullId'])).has(ds['fullId']))
+        )
+      }, []))
     )
-    this.memoizedDatasetByRegion.set(fullId, obs$)
-    return obs$
   }
 
   private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {

@@ -3,7 +3,7 @@ const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
-const { getIdFromFullId, retry, flattenRegions, getUniqueRegionId } = require('../../common/util')
+const { getIdFromFullId, retry, flattenRegions, getUniqueRegionId, getStringIdsFromRegion, flattenReducer } = require('../../common/util')
 
 let getPublicAccessToken
 
@@ -87,34 +87,28 @@ const regionMap = new Map()
 
 const getParseRegion = (template, parcellation) => {
 
-  const getRegionIdFromRegion = region => {
-    return region.fullId
-      ? getIdFromFullId(region.fullId)
-      : getUniqueRegionId(template, parcellation, region)
+  const getRegionIdsFromRegion = region => {
+    return [
+      ...getStringIdsFromRegion(region),
+      getUniqueRegionId(template, parcellation, region)
+    ]
   }
   
   const parseRegion = (region, parent) => {
-    const regionId = getRegionIdFromRegion(region)
+    const regionIds = getRegionIdsFromRegion(region)
+    const regionId = regionIds[0] 
     const { children, relatedAreas } = region
-    const childrenIds = [
-      ...(children || []).map(getRegionIdFromRegion)
-    ]
+    const childrenIds = (children || []).map(getRegionIdsFromRegion).reduce(flattenReducer, [])
+    const alternateIds = (relatedAreas || []).map(getRegionIdsFromRegion).reduce(flattenReducer, [])
 
-    const alternateIds = [
-      ...(relatedAreas || []).map(getRegionIdFromRegion)
-    ]
-
-    regionMap.set(regionId, {
+    const regionObj = {
       parent,
-      self: [ regionId, ...alternateIds ],
+      self: [ ...regionIds.slice(1), ...alternateIds ],
       children: childrenIds
-    })
+    }
+    regionMap.set(regionId, regionObj)
     for (const altId of alternateIds) {
-      regionMap.set(altId, {
-        parent,
-        self: [ regionId, ...alternateIds ],
-        children: childrenIds
-      })
+      regionMap.set(altId, regionObj)
     }
     for (const c of (children || [])) {
       parseRegion(c, regionId)
