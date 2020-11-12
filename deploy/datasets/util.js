@@ -103,7 +103,7 @@ const getParseRegion = (template, parcellation) => {
 
     const regionObj = {
       parent,
-      self: [ ...regionIds.slice(1), ...alternateIds ],
+      self: [ ...regionIds, ...alternateIds ],
       children: childrenIds
     }
     regionMap.set(regionId, regionObj)
@@ -278,6 +278,7 @@ const traverseRegionMap = regionSchemaId => {
 }
 
 const filterDatasetsByRegion = async (datasets = [], regionSchemaId) => {
+  await Promise.all(initPrArray)
   const allRelevantSchemaSet = new Set(traverseRegionMap(regionSchemaId))
   return datasets.filter(ds => ds['parcellationRegion'].some(pr => allRelevantSchemaSet.has(getIdFromFullId(pr.fullId))))
 }
