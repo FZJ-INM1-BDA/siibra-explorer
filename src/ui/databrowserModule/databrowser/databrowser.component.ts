@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
-import { merge, Observable, Subscription } from "rxjs";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Subscription } from "rxjs";
 import { LoggingService } from "src/logging";
 import { IDataEntry } from "src/services/state/dataStore.store";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
@@ -7,6 +7,9 @@ import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 import { ARIA_LABELS } from 'common/constants.js'
 import { DatabrowserBase } from "./databrowser.base";
 import { debounceTime } from "rxjs/operators";
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
+import { Store } from "@ngrx/store";
+import { uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
 
 const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 
@@ -18,6 +21,27 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
   ],
   exportAs: 'dataBrowser',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useFactory: (store: Store<any>) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
+          if (arg.fullId) {
+            store.dispatch(
+              uiActionShowDatasetWtihId({
+                id: arg.fullId
+              })
+            )
+          }
+        } as TOverwriteShowDatasetDialog
+      },
+      deps: [
+        Store
+      ]
+    }
+  ]
+  
 })
 
 export class DataBrowser extends DatabrowserBase implements OnDestroy, OnInit {
@@ -74,18 +98,6 @@ export class DataBrowser extends DatabrowserBase implements OnDestroy, OnInit {
      * TODO gets init'ed everytime when appends to ngtemplateoutlet
      */
     this.dataService.dbComponentInit(this)
-    this.subscriptions.push(
-      merge(
-        // this.dataService.selectedRegions$,
-        this.dataService.fetchDataObservable$,
-      ).subscribe(() => {
-        /**
-         * Only reset modality picker
-         * resetting all creates infinite loop
-         */
-        this.clearAll()
-      }),
-    )
 
     /**
      * TODO fix

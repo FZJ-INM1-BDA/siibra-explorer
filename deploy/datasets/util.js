@@ -1,4 +1,4 @@
-const kgQueryUtil = require('./../auth/util')
+const { getPublicAccessToken: getPublic } = require('./../auth/util')
 const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
@@ -378,7 +378,6 @@ const init = async () => {
     else console.warn(`ACCESS_TOKEN environmental variable is set! All queries will be made made with ACCESS_TOKEN!`)
   }
   if (getPublicAccessToken) return
-  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
 }
 
