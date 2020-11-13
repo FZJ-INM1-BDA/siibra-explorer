@@ -36,6 +36,8 @@ export class RegionalFeaturesService implements OnDestroy{
     )
   }
 
+  public mapFeatToCmp = new Map<string, any>()
+
   ngOnDestroy(){
     while (this.subs.length > 0) this.subs.pop().unsubscribe()
   }
@@ -46,7 +48,6 @@ export class RegionalFeaturesService implements OnDestroy{
 
   public getAllFeaturesByRegion(region: {['fullId']: string}){
     if (!region.fullId) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
-    const regionFullId = getIdFromFullId(region.fullId)
     const regionFullIds = getStringIdsFromRegion(region)
     const hemisphereObj = (() => {
       const hemisphere = getRegionHemisphere(region)

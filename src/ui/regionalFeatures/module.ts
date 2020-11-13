@@ -2,30 +2,32 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
-import { FeatureExplorer } from "./featureExplorer/featureExplorer.component";
-import { RegionalFeatureInteractivity } from "./interactivity.directive";
+import { FeatureContainer } from "./featureContainer/featureContainer.component";
 import { FilterRegionalFeaturesByTypePipe } from "./pipes/filterRegionalFeaturesByType.pipe";
 import { FilterRegionFeaturesById } from "./pipes/filterRegionFeaturesById.pipe";
 import { FindRegionFEatureById } from "./pipes/findRegionFeatureById.pipe";
 import { RegionalFeaturesService } from "./regionalFeature.service";
 import { RegionGetAllFeaturesDirective } from "./regionGetAllFeatures.directive";
+import { FeatureIEEGRecordings } from "./singleFeatures/iEEGRecordings/module";
+import { ReceptorDensityModule } from "./singleFeatures/receptorDensity/module";
 
 @NgModule({
   imports: [
     CommonModule,
     UtilModule,
     AngularMaterialModule,
+    FeatureIEEGRecordings,
+    ReceptorDensityModule,
   ],
   declarations: [
     /**
      * components
      */
-    FeatureExplorer,
+    FeatureContainer,
 
     /**
      * Directives
      */
-    RegionalFeatureInteractivity,
     RegionGetAllFeaturesDirective,
 
     /**
@@ -36,9 +38,9 @@ import { RegionGetAllFeaturesDirective } from "./regionGetAllFeatures.directive"
     FilterRegionFeaturesById,
   ],
   exports: [
-    FeatureExplorer,
     RegionGetAllFeaturesDirective,
     FilterRegionFeaturesById,
+    FeatureContainer,
   ],
   providers: [
     RegionalFeaturesService,

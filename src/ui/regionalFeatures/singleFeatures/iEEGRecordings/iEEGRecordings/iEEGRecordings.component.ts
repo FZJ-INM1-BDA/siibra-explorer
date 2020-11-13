@@ -1,58 +1,44 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
-import { BehaviorSubject, forkJoin, merge, Observable, Subject, Subscription } from "rxjs";
-import { debounceTime, map, scan, shareReplay, switchMap, tap } from "rxjs/operators";
+import { Component, Inject, Optional, EventEmitter } from "@angular/core";
+import { merge, Subject, Subscription } from "rxjs";
+import { debounceTime, map, scan, take } from "rxjs/operators";
+import { RegionalFeaturesService } from "src/ui/regionalFeatures/regionalFeature.service";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { IHasId } from "src/util/interfaces";
-import { IFeature, RegionalFeaturesService } from "../regionalFeature.service";
+import { RegionFeatureBase } from "../../base/regionFeature.base";
+import { ISingleFeature } from '../../interfaces'
 
 const selectedColor = [ 255, 0, 0 ]
 
 @Component({
-  selector: 'feature-explorer',
-  templateUrl: './featureExplorer.template.html',
+  templateUrl: './iEEGRecordings.template.html',
   styleUrls: [
-    './featureExplorer.style.css'
+    './iEEGRecordings.style.css'
   ]
 })
 
-export class FeatureExplorer implements OnInit, OnDestroy{
-
+export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeature{
   private landmarksLoaded: IHasId[] = []
   private onDestroyCb: Function[] = []
   private sub: Subscription[] = []
-  private _feature: IFeature
-
-  private feature$ = new BehaviorSubject(null)
-  @Input()
-  set feature(val) {
-    this._feature = val
-    this.feature$.next(val)
-  }
-
-  @Input()
-  private region: any
-
-  public data$: Observable<IHasId[]>
-
-  @Output('feature-explorer-is-loading')
-  public dataIsLoadingEventEmitter: EventEmitter<boolean> = new EventEmitter()
 
   constructor(
     private regionFeatureService: RegionalFeaturesService,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) private regClickIntp: ClickInterceptor,
   ){
-    /**
-    * once feature stops loading, watch for input feature
-    */
-    this.data$ = this.feature$.pipe(
-      tap(() => this.dataIsLoading = true),
-      switchMap((feature: IFeature) => forkJoin(
-        feature.data.map(datum => this.regionFeatureService.getFeatureData(this.region, feature, datum)))
-      ),
-      tap(() => this.dataIsLoading = false),
-      shareReplay(1),
-    )
+    super(regionFeatureService)
   }
 
+  public viewChanged = new EventEmitter<null>()
+
   ngOnInit(){
+    if (this.regClickIntp) {
+      const { deregister, register } = this.regClickIntp
+      const clickIntp = this.clickIntp.bind(this)
+      register(clickIntp)
+      this.onDestroyCb.push(() => {
+        deregister(clickIntp)
+      })
+    }
     this.sub.push(
       this.data$.subscribe(data => {
         const landmarksTobeLoaded: IHasId[] = []
@@ -105,17 +91,6 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     )
   }
 
-  public dataIsLoading$ = new BehaviorSubject(false)
-  private _dataIsLoading = false
-  set dataIsLoading(val) {
-    if (val === this._dataIsLoading) return
-    this._dataIsLoading = val
-    this.dataIsLoading$.next(val)
-    this.dataIsLoadingEventEmitter.next(val)
-  }
-  get dataIsLoading(){
-    return this._dataIsLoading
-  }
 
   ngOnDestroy(){
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
@@ -155,21 +130,18 @@ export class FeatureExplorer implements OnInit, OnDestroy{
     }, [])
   )
 
-  handleLandmarkClick(arg: { landmark: any, next: Function }) {
-    const { landmark, next } = arg
-
-    /**
-     * there may be other custom landmarks
-     * so check if the landmark clicked is one that's managed by this cmp
-     */
-    const isOne = this.landmarksLoaded.some(lm => {
-      return lm['_']['electrodeId'] === landmark['_']['electrodeId']
+  private clickIntp(ev: any, next: Function) {
+    let hoveredLandmark = null
+    this.regionFeatureService.onHoverLandmarks$.pipe(
+      take(1)
+    ).subscribe(val => {
+      hoveredLandmark = val
     })
-
-    if (isOne) {
-      this.exploreElectrode$.next(landmark['_']['electrodeId'])
-    } else {
-      next()
-    }
+    if (!hoveredLandmark) return next()
+    const isOne = this.landmarksLoaded.some(lm => {
+      return lm['_']['electrodeId'] === hoveredLandmark['_']['electrodeId']
+    })
+    if (!isOne) return next()
+    this.exploreElectrode$.next(hoveredLandmark['_']['electrodeId'])
   }
 }

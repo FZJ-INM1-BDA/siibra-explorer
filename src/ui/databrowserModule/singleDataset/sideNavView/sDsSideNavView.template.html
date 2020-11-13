@@ -74,7 +74,7 @@
         </ng-template>
       </mat-expansion-panel>
 
-      <!-- features -->
+      <!-- Features -->
       <div class="hidden"
         [region]="region$ | async"
         (loadingStateChanged)="detectChange()"
@@ -83,19 +83,19 @@
       </div>
 
       <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel hideToggle
+          #matExpansionPanel>
           <mat-expansion-panel-header>
             <mat-panel-title>
               {{ feature.type }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
-          <ng-template matExpansionPanelContent>
-            <feature-explorer [feature]="feature"
-              [region]="region$ | async"
-              (feature-explorer-is-loading)="detectChange()">
-  
-            </feature-explorer>
+          <ng-template [ngIf]="matExpansionPanel.expanded">
+            <feature-container
+              [feature]="feature"
+              [region]="region$ | async">
+            </feature-container>
           </ng-template>
         </mat-expansion-panel>
       </ng-container>

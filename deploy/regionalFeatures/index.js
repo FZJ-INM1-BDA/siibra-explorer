@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { parse } = require('path')
 const request = require('request')
 
 /**
@@ -29,49 +30,69 @@ const ITERABLE_KEY_SYMBOL = Symbol('ITERABLE_KEY_SYMBOL')
  * async await would mean it is fetched one at a time
  */
 
+const processRegionalFeatureObj = ({ regions, data, ['@id']: datasetId, type, name }) => {
+  
+  datasetIdDetailMap.set(datasetId, {
+    ['@id']: datasetId,
+    type,
+    name
+  })
+  for (const { status, ['@id']: regionId, name, files } of regions) {
+    if (regionIdToDataIdMap.has(regionId)) {
+      const existingObj = regionIdToDataIdMap.get(regionId)
+      /**
+       * existingObj[datasetId] may be undefined
+       */
+      if (!existingObj[datasetId]) {
+        existingObj[datasetId] = {
+          type,
+        }
+        existingObj[ITERABLE_KEY_SYMBOL] = existingObj[ITERABLE_KEY_SYMBOL].concat(datasetId)
+      }
+      existingObj[datasetId][status] = (existingObj[datasetId][status] || []).concat(files)
+      existingObj[datasetId][ITERABLE_KEY_SYMBOL] = (existingObj[datasetId][ITERABLE_KEY_SYMBOL] || []).concat(status)
+    } else {
+      const datasetObj = {
+        [status]: files,
+        type,
+      }
+      datasetObj[ITERABLE_KEY_SYMBOL] = [status]
+      const obj = {
+        name,
+        '@id': regionId,
+        [datasetId]: datasetObj
+      }
+      obj[ITERABLE_KEY_SYMBOL] = [datasetId]
+      regionIdToDataIdMap.set(regionId, obj)
+    }
+  }
+  
+  const dataIdToDataMap = new Map()
+  datasetIdToDataMap.set(datasetId, dataIdToDataMap)
+
+  for (const { ['@id']: dataId, contact_points: contactPoints, referenceSpaces, ...rest } of data) {
+    dataIdToDataMap.set(dataId, {
+      ['@id']: dataId,
+      contactPoints,
+      referenceSpaces,
+      ...rest
+    })
+  }
+}
+
 Promise.all(
   arrayToFetch.map(url =>
     new Promise((rs, rj) => {
       request.get(url, (err, _resp, body) => {
         if (err) return rj(err)
-        const { regions, data, ['@id']: datasetId, type, name } = JSON.parse(body)
-        datasetIdDetailMap.set(datasetId, {
-          ['@id']: datasetId,
-          type,
-          name
-        })
-        for (const { status, ['@id']: regionId, name, files } of regions) {
-          if (regionIdToDataIdMap.has(regionId)) {
-            const existingObj = regionIdToDataIdMap.get(regionId)
-            existingObj[datasetId][status] = (existingObj[datasetId][status] || []).concat(files)
-            existingObj[datasetId][ITERABLE_KEY_SYMBOL] = existingObj[datasetId][ITERABLE_KEY_SYMBOL].concat(status)
-          } else {
-            const datasetObj = {
-              [status]: files,
-              type,
-            }
-            datasetObj[ITERABLE_KEY_SYMBOL] = [status]
-            const obj = {
-              name,
-              '@id': regionId,
-              [datasetId]: datasetObj
-            }
-            obj[ITERABLE_KEY_SYMBOL] = [datasetId]
-            regionIdToDataIdMap.set(regionId, obj)
-          }
-        }
-        
-        const dataIdToDataMap = new Map()
-        datasetIdToDataMap.set(datasetId, dataIdToDataMap)
+        const parsedObj = JSON.parse(body)
 
-        for (const { ['@id']: dataId, contact_points: contactPoints, referenceSpaces, ...rest } of data) {
-          dataIdToDataMap.set(dataId, {
-            ['@id']: dataId,
-            contactPoints,
-            referenceSpaces,
-            ...rest
-          })
+        if (Array.isArray(parsedObj)) {
+          parsedObj.map(processRegionalFeatureObj)
+        } else {
+          processRegionalFeatureObj(parsedObj)
         }
+
         rs()
       })
     })
@@ -195,7 +216,7 @@ const byRegionMiddleware = (req, res, next) => {
           if (
             !!referenceSpaceId
             && !! dataObj['referenceSpaces']
-            && dataObj['referenceSpaces'].every(rs => rs['fullId'] !== referenceSpaceId)
+            && dataObj['referenceSpaces'].every(rs => rs['fullId'] !== '*' && rs['fullId'] !== referenceSpaceId)
           ) {
             continue
           }

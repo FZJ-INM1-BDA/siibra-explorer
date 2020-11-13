@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, OnDestroy, OnInit, Output } from "@angular/core";
 import { Subscription } from "rxjs";
 import { RegionalFeaturesService } from "./regionalFeature.service";
-import { RegionFeatureBase } from "./regionFeature.base";
+import { RegionFeatureBase } from "./singleFeatures/base/regionFeature.base";
 
 @Directive({
   selector: '[region-get-all-features-directive]',
