@@ -9,15 +9,20 @@ let isReady = false
 const ready = async () => isReady
 
 const configureAuth = async (app) => {
+  console.log('configure Auth')
   const hbpOidc = require('./hbp-oidc')
   const hbpOidc2 = require('./hbp-oidc-v2')
   
-  const obj = await require('./util')()
-  const { initPassportJs, objStoreDb } = obj
+  const { initPassportJs, objStoreDb } = require('./util')
+
   initPassportJs(app)
 
-  await retry(() => hbpOidc(app), { timeout: 1000, retries: 3 })
-  await retry(() => hbpOidc2(app), { timeout: 1000, retries: 3 })
+  await retry(async () => {
+    await hbpOidc(app)
+  }, { timeout: 1000, retries: 3 })
+  await retry(async () => {
+    await hbpOidc2(app)
+  }, { timeout: 1000, retries: 3 })
   isReady = true
 
   app.get('/logout', (req, res) => {

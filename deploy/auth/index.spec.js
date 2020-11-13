@@ -1,8 +1,6 @@
 const sinon = require('sinon')
 const { assert, expect } = require('chai')
 const initPassportJsStub = sinon.stub()
-const utilStub = sinon.stub()
-utilStub.returns(new Promise(rs => rs({ initPassportJs: initPassportJsStub })))
 
 const hbpOidcStub = sinon.stub()
 const hbpOidcV2Stub = sinon.stub()
@@ -12,7 +10,7 @@ const appGetStub = sinon.stub()
 describe('auth/index.js', () => {
   before(() => {
     require.cache[require.resolve('./util')] = {
-      exports: utilStub
+      exports: { initPassportJs: initPassportJsStub }
     }
     require.cache[require.resolve('./hbp-oidc')] = {
       exports: hbpOidcStub

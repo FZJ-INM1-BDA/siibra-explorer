@@ -16,15 +16,12 @@ datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
 let readyFlag = false
-init()
-  .then(() => {
-    console.log(`dataset init success`)
-    readyFlag = true
-  })
-  .catch(e => {
-    console.warn(`dataset init failed`, e)
-    retry(() => init())
-  })
+
+retry(async () => {
+  await init()
+  console.log(`data init success`)
+  readyFlag = true
+}, { timeout: 1000, retries: 5 })
 
 const ready = async () => readyFlag
 

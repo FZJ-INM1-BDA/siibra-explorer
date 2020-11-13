@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, forkJoin, from, fromEvent, Observable, of, Subscription } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, forkJoin, from, fromEvent, Observable, of, Subscription } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
@@ -18,7 +18,7 @@ import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
 import { getStringIdsFromRegion } from 'common/util'
-import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
+import { viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -87,7 +87,6 @@ export class DatabrowserService implements OnDestroy {
   private dataentries: IDataEntry[] = []
 
   private subscriptions: Subscription[] = []
-  public fetchDataObservable$: Observable<any>
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
   public spatialDatasets$: Observable<any>
@@ -146,8 +145,7 @@ export class DatabrowserService implements OnDestroy {
 
     this.spatialDatasets$ = this.viewportBoundingBox$.pipe(
       withLatestFrom(this.store.pipe(
-        select('viewerState'),
-        select('templateSelected'),
+        select(viewerStateSelectedTemplateSelector),
         distinctUntilChanged(),
         filter(v => !!v),
       )),
@@ -165,23 +163,6 @@ export class DatabrowserService implements OnDestroy {
       }),
     )
 
-    this.fetchDataObservable$ = combineLatest(
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('templateSelected'),
-        tap(({templateSelected}) => this.darktheme = templateSelected.useTheme === 'dark'),
-        map(({templateSelected}) => (templateSelected.name)),
-        distinctUntilChanged(),
-      ),
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('parcellationSelected'),
-        map(({parcellationSelected}) => (parcellationSelected.name)),
-        distinctUntilChanged(),
-      ),
-      this.manualFetchDataset$,
-    )
-
     this.subscriptions.push(
       this.spatialDatasets$.subscribe(arr => {
         this.store.dispatch({
@@ -189,12 +170,6 @@ export class DatabrowserService implements OnDestroy {
           fetchedDataEntries: arr,
         })
       }),
-    )
-
-    this.subscriptions.push(
-      this.fetchDataObservable$.pipe(
-        debounceTime(16),
-      ).subscribe((param: [string, string, null] ) => this.fetchData(param[0], param[1])),
     )
 
     this.subscriptions.push(

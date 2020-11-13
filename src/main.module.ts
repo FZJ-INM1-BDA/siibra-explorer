@@ -243,23 +243,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       deps: [
         ClickInterceptorService
       ]
-    },
-    {
-      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
-      useFactory: (store: Store<any>) => {
-        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
-          if (arg.fullId) {
-            store.dispatch(
-              uiActionShowDatasetWtihId({
-                id: arg.fullId
-              })
-            )
-          }
-        } as TOverwriteShowDatasetDialog
-      },
-      deps: [
-        Store
-      ]
     }
   ],
   bootstrap : [

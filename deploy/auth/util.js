@@ -31,9 +31,27 @@ const refreshToken = async () => {
   return true
 }
 
+const getClient = async () => {
+  const { client } = await configureAuth({
+    clientId,
+    clientSecret,
+    discoveryUrl,
+    redirectUri,
+    clientConfig: {
+      redirect_uris: [ redirectUri ],
+      response_types: [ 'code' ]
+    }
+  })
+
+  __client = client
+}
+
+getClient()
+
 const getPublicAccessToken = async () => {
-  if (!__client)
-    throw new Error(CLIENT_NOT_INIT)
+  if (!__client) {
+    await getClient()
+  }
   
   if (!__publicAccessToken) {
     await refreshToken()
@@ -70,31 +88,8 @@ const initPassportJs = app => {
   })
 }
 
-module.exports = async () => {
-
-  /**
-   * this configuration is required to acquire valid
-   * access tokens using refresh token
-   * 
-   * This is so that datasets can be retrieved when user
-   * is not authenticated
-   */
-  const { client } = await configureAuth({
-    clientId,
-    clientSecret,
-    discoveryUrl,
-    redirectUri,
-    clientConfig: {
-      redirect_uris: [ redirectUri ],
-      response_types: [ 'code' ]
-    }
-  })
-
-  __client = client
-
-  return {
-    initPassportJs,
-    objStoreDb,
-    getPublicAccessToken: async () => await getPublicAccessToken()
-  }
+module.exports = {
+  initPassportJs,
+  objStoreDb,
+  getPublicAccessToken: async () => await getPublicAccessToken(),
 }

@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
-import { filter } from "rxjs/operators";
+import { Observable, Subscription } from "rxjs";
+import { filter, shareReplay } from "rxjs/operators";
 import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { BACKENDURL } from "src/util/constants";
@@ -36,12 +36,20 @@ export class KgSingleDatasetService implements OnDestroy {
     }
   }
 
+  private memoizedDatasetFromKg: Map<string, Observable<any>> = new Map()
+
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
+    const key = `${kgSchema}/${kgId}`
+    if (this.memoizedDatasetFromKg.has(key)) return this.memoizedDatasetFromKg.get(key)
     const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/kgInfo`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
-    return this.http.get<any>(_url.toString(), { responseType: 'json' })
+    const query$ = this.http.get<any>(_url.toString(), { responseType: 'json' }).pipe(
+      shareReplay(1)
+    )
+    this.memoizedDatasetFromKg.set(key, query$)
+    return query$
   }
 
   public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }) {
