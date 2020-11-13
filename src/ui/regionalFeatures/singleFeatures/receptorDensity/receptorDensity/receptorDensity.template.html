@@ -1,0 +1,50 @@
+<label for="fingerprint-cmp" class="d-block mat-h4 mt-4 text-muted">
+  Fingerprint
+</label>
+<kg-dataset-previewer
+  *ngFor="let datum of (data$ | async | filterReceptorByType : '_fp_')"
+  id="fingerprint-cmp"
+  (renderEvent)="viewChanged.emit()"
+  [backendUrl]="DS_PREVIEW_URL"
+  [kgId]="feature['@id'] | getId"
+  [filename]="datum['@id']">
+</kg-dataset-previewer>
+
+<mat-form-field class="mt-2">
+  <mat-label>
+    Select a receptor
+  </mat-label>
+  <mat-select [(value)]="selectedReceptor">
+    <mat-option
+      *ngFor="let receptor of (data$ | async | getAllReceptors)"
+      [value]="receptor">
+      {{ receptor }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<ng-template [ngIf]="selectedReceptor">
+  <ng-container *ngTemplateOutlet="prArTmpl; context: { filter: '_pr_', label: 'Profile' }">
+  </ng-container>
+  <ng-container *ngTemplateOutlet="prArTmpl; context: { filter: '_ar_', label: 'Autoradiograph' }">
+  </ng-container>
+</ng-template>
+
+<!-- ar/pr template -->
+<ng-template #prArTmpl let-label="label" let-filter="filter">
+  <ng-container *ngFor="let datum of (data$ | async | filterReceptorByType : selectedReceptor | filterReceptorByType : filter); let first = first">
+    <ng-template [ngIf]="first">
+      <label [attr.for]="label + '-cmp'" class="d-block mat-h4 mt-4 text-muted">
+        {{ label }}
+      </label>
+    </ng-template>
+
+    <kg-dataset-previewer
+      [attr.id]="label + '-cmp'"
+      (renderEvent)="viewChanged.emit()"
+      [backendUrl]="DS_PREVIEW_URL"
+      [kgId]="feature['@id'] | getId"
+      [filename]="datum['@id']">
+    </kg-dataset-previewer>
+  </ng-container>
+</ng-template>

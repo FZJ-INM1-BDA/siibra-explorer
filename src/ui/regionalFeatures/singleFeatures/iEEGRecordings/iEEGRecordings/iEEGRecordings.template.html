@@ -1,10 +1,7 @@
 <ng-container *ngIf="!dataIsLoading; else loadingTmpl">
   
   <mat-accordion
-    class="ml-24px-n mr-24px-n d-block"
-    regional-feature-interactiviity
-    (rf-interact-onclick-3d-landmark)="handleLandmarkClick($event)"
-    #interactDir="regionalFeatureInteractivity">
+    class="ml-24px-n mr-24px-n d-block">
     <mat-expansion-panel *ngFor="let datum of (data$ | async)"
       [expanded]="openElectrodeId$ | async | arrayContains : datum['@id']"
       (opened)="handleDatumExpansion(datum['@id'], true)"
