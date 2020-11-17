@@ -85,7 +85,8 @@ module.exports = (app) => {
         'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
         'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
         'unpkg.com/react@16/umd/', // plugin load external lib -> react
-        'unpkg.com/kg-dataset-previewer@1.0.6/', // preview component
+        'unpkg.com/kg-dataset-previewer@1.1.4/', // preview component
+        'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
         (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC,
