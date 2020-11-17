@@ -46,12 +46,12 @@ export class RegionalFeaturesService implements OnDestroy{
 
     this.depScriptLoaded$ = this.appendScript
       ? from(
-          libraries.map(this.appendScript)
-        ).pipe(
-          mapTo(true),
-          catchError(() => of(false)),
-          shareReplay(1),
-        )
+        libraries.map(this.appendScript)
+      ).pipe(
+        mapTo(true),
+        catchError(() => of(false)),
+        shareReplay(1),
+      )
       : of(false)
   }
 
