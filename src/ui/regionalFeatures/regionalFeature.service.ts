@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
-import { forkJoin, from, of, Subject, Subscription } from "rxjs";
+import { forkJoin, from, Observable, of, Subject, Subscription } from "rxjs";
 import { catchError, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
@@ -28,14 +28,7 @@ export interface IFeature extends IHasId{
 
 export class RegionalFeaturesService implements OnDestroy{
 
-  public depScriptLoaded$ = from(
-    libraries.map(this.appendScript)
-  ).pipe(
-    mapTo(true),
-    catchError(() => of(false)),
-    shareReplay(1),
-  )
-  private depScriptsLoaded = false
+  public depScriptLoaded$: Observable<boolean>
 
   private subs: Subscription[] = []
   private templateSelected: any
@@ -50,15 +43,16 @@ export class RegionalFeaturesService implements OnDestroy{
         select(viewerStateSelectedTemplateSelector)
       ).subscribe(val => this.templateSelected = val)
     )
-  }
 
-  async appendD3MathJax(){
-    if (!this.appendScript) throw new Error(`APPEND_SCRIPT_TOKEN not injected`)
-    if (this.depScriptsLoaded) return true
-
-    return Promise.all(
-      libraries.map(this.appendScript)
-    ).then(() => this.depScriptsLoaded = true)
+    this.depScriptLoaded$ = this.appendScript
+      ? from(
+          libraries.map(this.appendScript)
+        ).pipe(
+          mapTo(true),
+          catchError(() => of(false)),
+          shareReplay(1),
+        )
+      : of(false)
   }
 
   public mapFeatToCmp = new Map<string, any>()
