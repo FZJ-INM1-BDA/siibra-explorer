@@ -24,6 +24,9 @@ export const SUPPORT_LIBRARY_MAP: Map<string, Map<string, string>> = new Map([
   ['d3', new Map([
     ['5.7.0', 'https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js']
   ])],
+  ['mathjax', new Map([
+    ['3.1.2', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.1.2/es5/tex-svg.js']
+  ])]
 ])
 
 export const parseLibrary = (libVer: string) => {

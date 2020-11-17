@@ -1,14 +1,20 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnDestroy } from "@angular/core";
+import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
-import { forkJoin, Subject, Subscription } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { forkJoin, from, Observable, of, Subject, Subscription } from "rxjs";
+import { catchError, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
 import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
 import { uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors";
+import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
+
+const libraries = [
+  'https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.1.2/es5/tex-svg.js'
+]
 
 export interface IFeature extends IHasId{
   type: string
@@ -22,18 +28,31 @@ export interface IFeature extends IHasId{
 
 export class RegionalFeaturesService implements OnDestroy{
 
+  public depScriptLoaded$: Observable<boolean>
+
   private subs: Subscription[] = []
   private templateSelected: any
   constructor(
     private http: HttpClient,
     private pureConstantService: PureContantService,
-    private store$: Store<any>
+    private store$: Store<any>,
+    @Optional() @Inject(APPEND_SCRIPT_TOKEN) private appendScript: (src: string) => Promise<HTMLScriptElement>
   ){
     this.subs.push(
       this.store$.pipe(
         select(viewerStateSelectedTemplateSelector)
       ).subscribe(val => this.templateSelected = val)
     )
+
+    this.depScriptLoaded$ = this.appendScript
+      ? from(
+        libraries.map(this.appendScript)
+      ).pipe(
+        mapTo(true),
+        catchError(() => of(false)),
+        shareReplay(1),
+      )
+      : of(false)
   }
 
   public mapFeatToCmp = new Map<string, any>()

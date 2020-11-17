@@ -1,14 +1,16 @@
 <label for="fingerprint-cmp" class="d-block mat-h4 mt-4 text-muted">
   Fingerprint
 </label>
-<kg-dataset-previewer
-  *ngFor="let datum of (data$ | async | filterReceptorByType : '_fp_')"
-  id="fingerprint-cmp"
-  (renderEvent)="viewChanged.emit()"
-  [backendUrl]="DS_PREVIEW_URL"
-  [kgId]="feature['@id'] | getId"
-  [filename]="datum['@id']">
-</kg-dataset-previewer>
+
+<ng-container *ngFor="let datum of (data$ | async | filterReceptorByType : '_fp_')">
+  <ng-container *ngTemplateOutlet="datasetPreviewTmpl; context: {
+    id: 'fingerprint-cmp',
+    kgId: (feature['@id'] | getId),
+    filename: datum['@id']
+  }">
+  
+  </ng-container>
+</ng-container>
 
 <mat-form-field class="mt-2">
   <mat-label>
@@ -39,12 +41,33 @@
       </label>
     </ng-template>
 
+    <ng-container *ngTemplateOutlet="datasetPreviewTmpl; context: {
+      id: label + '-cmp',
+      kgId: (feature['@id'] | getId),
+      filename: datum['@id']
+    }">
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #datasetPreviewTmpl let-id="id" let-kgId="kgId" let-filename="filename">
+  <kg-ds-prv-regional-feature-view
+    *ngIf="depScriptLoaded$ | async; else fallbackTmpl"
+    [attr.id]="id"
+    [darkmode]="darktheme$ | async"
+    (renderEvent)="viewChanged.emit()"
+    [backendUrl]="DS_PREVIEW_URL"
+    [kgId]="kgId"
+    [filename]="filename">
+  </kg-ds-prv-regional-feature-view>
+
+  <ng-template #fallbackTmpl>
     <kg-dataset-previewer
-      [attr.id]="label + '-cmp'"
+      [attr.id]="id"
       (renderEvent)="viewChanged.emit()"
       [backendUrl]="DS_PREVIEW_URL"
-      [kgId]="feature['@id'] | getId"
-      [filename]="datum['@id']">
+      [kgId]="kgId"
+      [filename]="filename">
     </kg-dataset-previewer>
-  </ng-container>
+  </ng-template>
 </ng-template>
