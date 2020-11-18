@@ -82,7 +82,7 @@ export class SplashScreen implements AfterViewInit {
      */
     this.subscriptions.push(
       fromEvent(this.parentContainer.nativeElement, 'mousedown').pipe(
-        filter((ev: MouseEvent) => ev.which === 1),
+        filter((ev: MouseEvent) => ev.button === 0),
         switchMap(() => fromEvent(this.parentContainer.nativeElement, 'mouseup').pipe(
           bufferTime(200),
           take(1),

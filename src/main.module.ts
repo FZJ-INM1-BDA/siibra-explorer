@@ -1,8 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, InjectionToken } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, Store, ActionReducer } from "@ngrx/store";
+import { StoreModule, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -57,8 +57,6 @@ import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, Glu
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
-import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from './util/interfaces';
-import { uiActionShowDatasetWtihId } from './services/state/uiState/actions';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
