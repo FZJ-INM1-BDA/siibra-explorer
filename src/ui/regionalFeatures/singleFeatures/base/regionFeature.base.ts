@@ -49,7 +49,7 @@ export class RegionFeatureBase{
     if (val === this._dataIsLoading) return
     this._dataIsLoading = val
     this.dataIsLoading$.next(val)
-    this.dataIsLoadingEventEmitter.next(val)
+    this.dataIsLoadingEventEmitter.emit(val)
   }
   get dataIsLoading(){
     return this._dataIsLoading

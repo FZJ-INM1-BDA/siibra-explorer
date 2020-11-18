@@ -67,6 +67,10 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
       })
     )
 
+    this.sub.push(
+      this.dataIsLoading$.subscribe(() => this.viewChanged.emit(null))
+    )
+
     this.onDestroyCb.push(() => {
       if (this.landmarksLoaded.length > 0) this.regionFeatureService.removeLandmarks(this.landmarksLoaded)
     })
