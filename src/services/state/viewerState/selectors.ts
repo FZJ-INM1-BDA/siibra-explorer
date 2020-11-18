@@ -40,6 +40,7 @@ export const viewerStateSelectedTemplatePureSelector = createSelector(
   viewerStateFetchedTemplatesSelector,
   viewerStateSelectedTemplateSelector,
   (fetchedTemplates, selectedTemplate) => {
+    if (!selectedTemplate) return null
     return fetchedTemplates.find(t => t['@id'] === selectedTemplate['@id'])
   }
 )
@@ -104,6 +105,7 @@ export const viewerStateGetSelectedAtlas = createSelector(
   helperState => {
     if (!helperState) return null
     const { selectedAtlasId, fetchedAtlases } = helperState
+    if (!selectedAtlasId) return null
     return selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
   }
 )
@@ -132,7 +134,7 @@ export const viewerStateAtlasParcellationSelector = createSelector(
 
 export const viewerStateAtlasLatestParcellationSelector = createSelector(
   viewerStateAtlasParcellationSelector,
-  parcs => parcs.filter( p => !p['@version'] || !p['@version']['@next'])
+  parcs => (parcs && parcs.filter( p => !p['@version'] || !p['@version']['@next']) || [])
 )
 
 export const viewerStateParcVersionSelector = createSelector(
@@ -178,12 +180,16 @@ export const viewerStateParcVersionSelector = createSelector(
 export const viewerStateSelectedTemplateFullInfoSelector = createSelector(
   viewerStateGetSelectedAtlas,
   viewerStateFetchedTemplatesSelector,
-  ({ templateSpaces }, fetchedTemplates) => templateSpaces.map(templateSpace => {
-    const fullTemplateInfo = fetchedTemplates.find(t => t['@id'] === templateSpace['@id'])
-    return {
-      ...templateSpace,
-      ...(fullTemplateInfo || {}),
-      darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
-    }
-  })
+  (selectedAtlas, fetchedTemplates) => {
+    if (!selectedAtlas) return null
+    const { templateSpaces } = selectedAtlas
+    return templateSpaces.map(templateSpace => {
+      const fullTemplateInfo = fetchedTemplates.find(t => t['@id'] === templateSpace['@id'])
+      return {
+        ...templateSpace,
+        ...(fullTemplateInfo || {}),
+        darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
+      }
+    })
+  } 
 )
