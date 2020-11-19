@@ -5,6 +5,7 @@ import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
+import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
@@ -197,9 +198,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
     }
 
     this.loadedTemplates$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('fetchedTemplates'),
-      map(state => state.fetchedTemplates),
+      select(viewerStateFetchedTemplatesSelector)
     )
 
     this.selectParcellation$ = this.store.pipe(

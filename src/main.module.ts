@@ -1,8 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, InjectionToken } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, Store, ActionReducer } from "@ngrx/store";
+import { StoreModule, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -54,7 +54,7 @@ import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService } from './glue';
-import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
+import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
@@ -115,7 +115,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
         // debug,
         ...viewerStateMetaReducers,
         datasetPreviewMetaReducer,
-        viewerStateFleshOutDetail
       ]
     }),
     HttpClientModule,
