@@ -7,12 +7,14 @@ import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, SELECT_PARC
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName, viewerStateSelectedRegionsSelector, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
 import { verifyPositionArg } from 'common/util'
+import { CONST } from 'common/constants'
 import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
+import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -113,6 +115,52 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         fetchedTemplate,
       }
     }),
+  )
+
+  @Effect()
+  public onSelectAtlasSelectTmplParc$ = this.actions$.pipe(
+    ofType(viewerStateSelectAtlas.type),
+    withLatestFrom(
+      this.store$.pipe(
+        select(viewerStateFetchedTemplatesSelector),
+        startWith([])
+      ),
+      this.store$.pipe(
+        select(viewerStateFetchedAtlasesSelector),
+        startWith([])
+      )
+    ),
+    map(([action, fetchedTemplates, fetchedAtlases ])=> {
+
+      const atlas = fetchedAtlases.find(a => a['@id'] === (action as any).atlas['@id'])
+      if (!atlas) {
+        return generalActionError({
+          message: CONST.ATLAS_NOT_FOUND
+        })
+      }
+      /**
+       * selecting atlas means selecting the first available templateSpace
+       */
+      const templateTobeSelected = atlas.templateSpaces[0]
+      const templateSpaceId = templateTobeSelected['@id']
+      
+      const parcellationId = (
+        templateTobeSelected.availableIn.find(p => !!p.baseLayer) ||
+        templateTobeSelected.availableIn[0]
+      )['@id']
+        
+      const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
+      if (!templateSelected) {
+        return generalActionError({
+          message: CONST.TEMPLATE_NOT_FOUND
+        })
+      }
+      const parcellationSelected = templateSelected.parcellations.find(p => p['@id'] === parcellationId)
+      return viewerStateNewViewer({
+        selectTemplate: templateSelected,
+        selectParcellation: parcellationSelected
+      })
+    })
   )
 
   /**

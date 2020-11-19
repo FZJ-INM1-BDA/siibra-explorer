@@ -153,16 +153,6 @@ export const viewerStateHelperReducer = createReducer(
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
 
-export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionReducer<any> {
-  return (state, action) => {
-    if (action.type === viewerStateSelectAtlas.type) {
-      const reconstitutedAtlas = state[viewerStateHelperStoreName].fetchedAtlases.find(a => a['@id'] === (action as any).atlas['@id'])
-      return reducer(state, { type: action.type, atlas: reconstitutedAtlas } as any)
-    }
-    return reducer(state, action)
-  }
-}
-
 export const defaultState = initialState
 
 interface IVersion{

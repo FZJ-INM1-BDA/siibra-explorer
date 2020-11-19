@@ -40,7 +40,7 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
     )),
   ).pipe(
     withLatestFrom(this.store$),
-    map(([searchUrl, storeState]: [string, IavRootStoreInterface] ) => {
+    map(([searchUrl, storeState]: [string, any] ) => {
       const search = new URLSearchParams(searchUrl)
       try {
         if (Array.from(search.keys()).length === 0) {
@@ -75,6 +75,10 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
               ...defaultRootState.viewerState,
               fetchedTemplates: storeState.viewerState.fetchedTemplates,
             },
+            viewerStateHelper: {
+              ...defaultRootState.viewerStateHelper,
+              fetchedAtlases: storeState.viewerStateHelper.fetchedAtlases
+            }
           },
         }
       }

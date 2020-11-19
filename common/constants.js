@@ -62,6 +62,10 @@
   exports.CONST = {
     MULTI_REGION_SELECTION: `Multi region selection`,
     REGIONAL_FEATURES: 'Regional features',
-    NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`
+    NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
+
+    ATLAS_NOT_FOUND: `Atlas not found. Maybe it is still loading. Try again in a few seconds?`,
+    TEMPLATE_NOT_FOUND: `Template not found. Maybe it is still loading. Try again in a few seconds?`,
+    PARC_NOT_FOUND: ``
   }
 })(typeof exports === 'undefined' ? module.exports : exports)
