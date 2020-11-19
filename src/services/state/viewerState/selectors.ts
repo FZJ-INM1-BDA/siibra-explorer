@@ -99,6 +99,10 @@ export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
   }
 )
 
+export const viewerStateFetchedAtlasesSelector = createSelector(
+  state => state[viewerStateHelperStoreName],
+  helperState => helperState['fetchedAtlases']
+)
 
 export const viewerStateGetSelectedAtlas = createSelector(
   state => state[viewerStateHelperStoreName],
