@@ -57,6 +57,7 @@ import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, Glu
 import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
+import { MesssagingModule } from './messaging/module';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -83,6 +84,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     PluginModule,
     LoggingModule,
     ShareModule,
+    MesssagingModule,
 
     SpotLightModule,
     
