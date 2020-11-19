@@ -29,43 +29,43 @@ export class MesssagingModule{
       if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
       const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
       switch (strippedMethod) {
-        case 'ping': {
-          window.opener.postMessage({
-            id,
-            result: 'pong',
-            jsonrpc: '2.0'
-          }, origin)
+      case 'ping': {
+        window.opener.postMessage({
+          id,
+          result: 'pong',
+          jsonrpc: '2.0'
+        }, origin)
 
-          break
-        }
-        case 'dummyMethod': {
-          try {
-            const result = await this.dummyMethod({ data, origin })
-            src.postMessage({
-              id,
-              result
-            }, origin)
-          } catch (e) {
-
-            src.postMessage({
-              id,
-              error: e.code
-                ? e
-                : { code: 500, message: e.toString() }
-            }, origin)
-          }
-            
-          break;
-        }
-        default: {
+        break
+      }
+      case 'dummyMethod': {
+        try {
+          const result = await this.dummyMethod({ data, origin })
           src.postMessage({
             id,
-            error: {
-              code: 404,
-              message: 'Method not found'
-            }
+            result
+          }, origin)
+        } catch (e) {
+
+          src.postMessage({
+            id,
+            error: e.code
+              ? e
+              : { code: 500, message: e.toString() }
           }, origin)
         }
+            
+        break;
+      }
+      default: {
+        src.postMessage({
+          id,
+          error: {
+            code: 404,
+            message: 'Method not found'
+          }
+        }, origin)
+      }
       }
     })
   }
