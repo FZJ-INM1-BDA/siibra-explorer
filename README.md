@@ -96,7 +96,7 @@ It is recommended to manage your environments with `.env` file.
 | `CSP_REPORT_URI` | report uri for csp violations | `/report-violation` |
 | `NODE_ENV` | set to `production` to disable [`reportOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) | `null` |
 | `SCRIPT_SRC` | `JSON.stringify`'ed array of allowed scriptSrc | `[]` |
-| `DATA_SRC` | `JSON.stringify`'ed array of allowed dataSrc | `[]` |
+| `CSP_CONNECT_SRC` | `JSON.stringify`'ed array of allowed dataSrc | `[]` |
 | `WHITE_LIST_SRC` | `JSON.stringify`'ed array of allowed src | `[]` |
 | `PROXY_HOSTNAME_WHITELIST` |
 

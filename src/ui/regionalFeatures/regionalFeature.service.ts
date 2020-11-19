@@ -3,7 +3,7 @@ import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
 import { forkJoin, from, Observable, of, Subject, Subscription } from "rxjs";
-import { catchError, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
+import { catchError, map, mapTo, shareReplay, switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
 import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
@@ -12,7 +12,7 @@ import { uiStateMouseoverUserLandmark } from "src/services/state/uiState/selecto
 import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
 
 const libraries = [
-  'https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.1.2/es5/tex-svg.js'
 ]
 
