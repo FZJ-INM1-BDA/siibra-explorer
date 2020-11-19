@@ -107,7 +107,7 @@ Promise.all(
 
   for (const [ datasetId, arrRegionIds ] of map.entries()) {
     additionalDatasets = additionalDatasets.concat({
-      fullId: datasetId,
+      fullId: `https://nexus.humanbrainproject.org/v0/data/${datasetId}`,
       parcellationRegion: arrRegionIds.map(id => ({ fullId: id })),
       species: [],
       kgReference: [

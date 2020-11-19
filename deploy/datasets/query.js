@@ -114,10 +114,22 @@ const getDs = ({ user }) => (user
     : getPublicDs()
   ).then(async datasets => {
     
+    /**
+     * populate the manually inserted dataset first
+     * this allows inserted dataset to overwrite the KG dataset (if needed)
+     */
     return [
-      ...datasets,
       ...(await returnAdditionalDatasets()),
+      ...datasets,
     ]
+    .reduce((acc, curr) => {
+      /**
+       * remove duplicates
+       */
+      const currSet = new Set(acc.map(v => v['fullId']))
+      if (currSet.has(curr['fullId'])) return [...acc]
+      else return acc.concat(curr)
+    }, [])
   })
 
 const getExternalSchemaDatasets = (kgId, kgSchema) => {
