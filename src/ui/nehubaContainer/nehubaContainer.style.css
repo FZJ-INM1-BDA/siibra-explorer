@@ -37,7 +37,7 @@ div.loadingIndicator
   flex-direction: row-reverse;
 }
 
-div.loadingIndicator div.spinnerAnimationCircle
+div.loadingIndicator >>> div.spinnerAnimationCircle
 {
   font-size:150%;
 }

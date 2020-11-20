@@ -43,11 +43,9 @@
 </ng-content>
 
 <ng-template #loadingSpinner>
-  <mat-card-content class="h-100">
-    <div class="m-2 d-flex flex-row align-items-center justify-content star">
-      <div class="d-inline-block mr-2 spinnerAnimationCircle"></div>
-      <span>Fetching datasets...</span>
-    </div>
+  <mat-card-content class="h-100 d-flex justify-content-start p-2">
+    <spinner-cmp class="mr-2"></spinner-cmp>
+    <span>Fetching datasets...</span>
   </mat-card-content>
 </ng-template>
 

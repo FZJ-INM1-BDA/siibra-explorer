@@ -12,7 +12,7 @@
     [style.backgroundColor]="'rgba(128,128,128, 0.2)'">
     <mat-card-title>
       <ng-content select="[region-of-interest]"></ng-content>
-      <div>
+      <div *ngIf="!fetchFlag; else isLoadingTmpl">
         {{ name }}
       </div>
     </mat-card-title>
@@ -56,20 +56,48 @@
   <mat-card-content class="mt-2 ml-15px-n mr-15px-n">
     <mat-accordion>
 
-      <!-- Details -->
+      <!-- Description -->
       <mat-expansion-panel hideToggle
         [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            Details
+            Description
           </mat-panel-title>
         </mat-expansion-panel-header>
-
-
         <ng-template matExpansionPanelContent>
-          <small class="m-1">
+          <small *ngIf="!fetchFlag; else isLoadingTmpl" class="m-1">
+
+            <!-- desc -->
             <markdown-dom [markdown]="description">
             </markdown-dom>
+
+            <mat-divider></mat-divider>
+
+            <!-- citations -->
+            <div class="d-block mb-2 "
+              [ngClass]="{'mt-2': first}"
+              *ngFor="let publication of publications; let first = first">
+              <a *ngIf="publication.doi; else plainText"
+                iav-stop="click mousedown"
+                [href]="publication.doi | doiParserPipe"
+                target="_blank">
+                {{ publication.cite }}
+              </a>
+              <ng-template #plainText>
+                {{ publication.cite }}
+              </ng-template>
+            </div>
+
+            <!-- contributors, if publications not available -->
+            <ng-container *ngIf="publications && publications.length == 0 && contributors && contributors.length > 0">
+              <ng-container *ngFor="let contributor of contributors; let lastFlag = last;">
+                <a [href]="contributor | getContributorKgLink" class="iv-custom-comp" target="_blank">
+                  {{ contributor['schema.org/shortName'] || contributor['shortName'] || contributor['name'] }}
+                </a>
+                <span *ngIf="!lastFlag">,</span>
+              </ng-container>
+            </ng-container>
+
           </small>
         </ng-template>
       </mat-expansion-panel>
@@ -82,23 +110,33 @@
         #rfGetAllFeatures="rfGetAllFeatures">
       </div>
 
-      <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
-        <mat-expansion-panel hideToggle
-          #matExpansionPanel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{ feature.type }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
+      <!-- loading tmpl -->
+      <ng-template [ngIf]="rfGetAllFeatures.isLoading$ | async" [ngIfElse]="featureTmpl">
+        <div class="d-flex justify-content-center">
+          <ng-container *ngTemplateOutlet="isLoadingTmpl"></ng-container>
+        </div>
+      </ng-template>
 
-          <ng-template [ngIf]="matExpansionPanel.expanded">
-            <feature-container
-              [feature]="feature"
-              [region]="region$ | async">
-            </feature-container>
-          </ng-template>
-        </mat-expansion-panel>
-      </ng-container>
+      <!-- feature tmpl -->
+      <ng-template #featureTmpl>
+        <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
+          <mat-expansion-panel hideToggle
+            #matExpansionPanel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ feature.type }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+  
+            <ng-template [ngIf]="matExpansionPanel.expanded">
+              <feature-container
+                [feature]="feature"
+                [region]="region$ | async">
+              </feature-container>
+            </ng-template>
+          </mat-expansion-panel>
+        </ng-container>
+      </ng-template>
     </mat-accordion>
 
   </mat-card-content>
@@ -121,3 +159,6 @@
   </ng-template>
 </ng-template>
 
+<ng-template #isLoadingTmpl>
+  <spinner-cmp></spinner-cmp>
+</ng-template>

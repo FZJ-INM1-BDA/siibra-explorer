@@ -1,12 +1,9 @@
 
 <!-- title -->
 <mat-card-subtitle *ngIf="!hideTitle">
-  <span *ngIf="name; else nameLoading">
+  <span *ngIf="name; else isLoadingTmpl">
     {{ name }}
   </span>
-  <ng-template #nameLoading>
-    <div class="spinnerAnimationCircle"></div>
-  </ng-template>
 </mat-card-subtitle>
 
 <mat-card-content mat-dialog-content>
@@ -14,15 +11,11 @@
   <!-- description -->
   <small>
     <markdown-dom
-      *ngIf="description; else descriptionLoading"
+      *ngIf="description; else isLoadingTmpl"
       class="d-block"
       [markdown]="description">
 
     </markdown-dom>
-
-    <ng-template #descriptionLoading>
-      <div class="d-inline-block spinnerAnimationCircle"></div>
-    </ng-template>
   </small>
 
   <!-- publications -->
@@ -162,4 +155,8 @@
     </iav-dynamic-mat-button>
   </ng-template>
 
+</ng-template>
+
+<ng-template #isLoadingTmpl>
+  <spinner-cmp></spinner-cmp>
 </ng-template>
