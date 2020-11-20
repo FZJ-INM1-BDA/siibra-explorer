@@ -6,7 +6,7 @@
 
 </kg-dataset-list>
 
-<div *ngIf="loadingDatasetPreviewList; else datasetList" class="spinnerAnimationCircle"></div>
+<spinner-cmp *ngIf="loadingDatasetPreviewList; else datasetList"></spinner-cmp>
 
 <ng-template #datasetList>
 

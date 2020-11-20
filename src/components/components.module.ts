@@ -33,6 +33,7 @@ import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
 import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
+import { SpinnerCmp } from './spinner/spinner.component';
 
 @NgModule({
   imports : [
@@ -60,6 +61,7 @@ import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.comp
     ConfirmDialogComponent,
     IAVVerticalButton,
     DynamicMaterialBtn,
+    SpinnerCmp,
 
     /* directive */
     HoverableBlockDirective,
@@ -94,6 +96,7 @@ import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.comp
     ConfirmDialogComponent,
     IAVVerticalButton,
     DynamicMaterialBtn,
+    SpinnerCmp,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

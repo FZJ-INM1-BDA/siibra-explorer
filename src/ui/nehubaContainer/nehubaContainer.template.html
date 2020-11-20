@@ -509,13 +509,25 @@
       #iavDbDirective="iavDatabrowserDirective">
     </div>
 
-    <!-- place holder content, if no regional features or connectivity or change ref space options are available -->
-    <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0
-      && !(selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'))">
-      <div class="p-4">
-        {{ CONST.NO_ADDIONTAL_INFO_AVAIL }}
+    <!-- if dataset is loading -->
+    <ng-template [ngIf]="iavDbDirective?.fetchingFlag" [ngIfElse]="featureLoadedTmpl">
+      <div class="d-flex justify-content-center">
+        <spinner-cmp></spinner-cmp>
       </div>
     </ng-template>
+
+    <ng-template #featureLoadedTmpl>
+
+      <!-- place holder content, if no regional features or connectivity or change ref space options are available -->
+      <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0
+        && !(selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'))">
+        <div class="p-4">
+          {{ CONST.NO_ADDIONTAL_INFO_AVAIL }}
+        </div>
+      </ng-template>
+
+    </ng-template>
+
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: CONST.REGIONAL_FEATURES,
@@ -576,8 +588,9 @@
       [attr.id]="ID_MESH_LOADING_STATUS"
       role="status">
 
-      <div [ngClass]="{spinnerAnimationCircle: !!(showPerpsectiveScreen$ | async)}">
-      </div>
+      <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
+      </spinner-cmp>
+      
       <mat-list>
         <mat-list-item>
           {{ showPerpsectiveScreen$ | async }}
@@ -595,7 +608,7 @@
     <!-- mesh loading is still weird -->
     <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
     <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
-      <div class="spinnerAnimationCircle"></div>
+      <spinner-cmp></spinner-cmp>
 
       <div *ngIf="false" perspectiveLoadingText>
         {{ perspectiveViewLoading$ | async }}
@@ -642,9 +655,7 @@
     </ng-container>
 
     <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]" class="loadingIndicator">
-      <div class="spinnerAnimationCircle">
-
-      </div>
+      <spinner-cmp></spinner-cmp>
     </div>
   </layout-floating-container>
 </ng-template>
