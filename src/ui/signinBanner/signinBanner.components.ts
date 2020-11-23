@@ -103,15 +103,16 @@ export class SigninBanner {
   private keyListenerConfigBase = {
     type: 'keydown',
     stop: true,
-    prevent: true,
     target: 'document',
   }
 
   public keyListenerConfig = [{
     key: 'h',
+    capture: true,
     ...this.keyListenerConfigBase,
   }, {
     key: 'H',
+    capture: true,
     ...this.keyListenerConfigBase,
   }, {
     key: '?',
