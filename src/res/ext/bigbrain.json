@@ -716,9 +716,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                157,
-                                34,
-                                194
+                                255,
+                                255,
+                                74
                               ],
                               "children": [],
                               "fullId": {
@@ -736,9 +736,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                13,
-                                230,
-                                120
+                                222,
+                                74,
+                                173
                               ],
                               "children": [],
                               "fullId": {
@@ -756,9 +756,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                191,
-                                134,
-                                194
+                                132,
+                                90,
+                                173
                               ],
                               "children": [],
                               "fullId": {
@@ -776,9 +776,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                161,
-                                95,
-                                93
+                                41,
+                                123,
+                                198
                               ],
                               "children": [],
                               "fullId": {
@@ -796,9 +796,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                231,
-                                31,
-                                98
+                                82,
+                                214,
+                                222
                               ],
                               "children": [],
                               "fullId": {
@@ -816,9 +816,9 @@
                               "labelIndex": 1,
                               "position": [],
                               "rgb": [
-                                65,
-                                61,
-                                16
+                                99,
+                                231,
+                                66
                               ],
                               "children": [],
                               "fullId": {
