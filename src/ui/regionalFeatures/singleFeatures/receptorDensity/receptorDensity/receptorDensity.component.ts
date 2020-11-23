@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnDestroy, Optional } from "@angular/core";
-import { Observable, of, Subscription } from "rxjs";
+import { Component, ElementRef, EventEmitter, HostListener, OnDestroy, Optional } from "@angular/core";
+import { fromEvent, Observable, of, Subscription } from "rxjs";
 import { RegionalFeaturesService } from "src/ui/regionalFeatures/regionalFeature.service";
 import { PureContantService } from "src/util";
 import { RegionFeatureBase } from "../../base/regionFeature.base";
@@ -16,12 +16,18 @@ export class ReceptorDensityFeatureCmp extends RegionFeatureBase implements ISin
   public DS_PREVIEW_URL = DATASET_PREVIEW_URL
   viewChanged: EventEmitter<null> = new EventEmitter()
 
+  private WEB_COMPONENT_MOUSEOVER_EVENT_NAME = 'kg-ds-prv-regional-feature-mouseover'
+  private webComponentOnHover: string = null
+
+  public selectedReceptor: string
+
   public darktheme$: Observable<boolean>
 
   private subs: Subscription[] = []
   public depScriptLoaded$: Observable<boolean>
   constructor(
     regService: RegionalFeaturesService,
+    el: ElementRef,
     @Optional() pureConstantService: PureContantService
   ){
     super(regService)
@@ -31,9 +37,20 @@ export class ReceptorDensityFeatureCmp extends RegionFeatureBase implements ISin
     } else {
       this.darktheme$ = of(false)
     }
+
+    this.subs.push(
+      fromEvent(el.nativeElement, this.WEB_COMPONENT_MOUSEOVER_EVENT_NAME).subscribe((ev: CustomEvent) => {
+        this.webComponentOnHover = ev.detail?.data?.receptor?.label
+      })
+    )
   }
 
-  public selectedReceptor: string
+  @HostListener('click')
+  onClick(){
+    if (this.webComponentOnHover) {
+      this.selectedReceptor = this.webComponentOnHover
+    }
+  }
 
   ngOnDestroy(){
     while(this.subs.length > 0) this.subs.pop().unsubscribe()

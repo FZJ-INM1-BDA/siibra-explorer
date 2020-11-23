@@ -12,18 +12,26 @@
   </ng-container>
 </ng-container>
 
-<mat-form-field class="mt-2 w-100">
-  <mat-label>
-    Select a receptor
-  </mat-label>
-  <mat-select [(value)]="selectedReceptor">
-    <mat-option
-      *ngFor="let receptor of (data$ | async | getAllReceptors)"
-      [value]="receptor">
-      {{ receptor }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+<ng-container *ngIf="data$ | async | getAllReceptors as allReceptors; else selectPlaceHolderTmpl">
+
+  <mat-form-field class="mt-2 w-100" *ngIf="allReceptors.length > 0; else selectPlaceHolderTmpl">
+    <mat-label>
+      Select a receptor
+    </mat-label>
+    <mat-select [(value)]="selectedReceptor">
+      <mat-option
+        *ngFor="let receptor of allReceptors"
+        [value]="receptor">
+        {{ receptor }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+</ng-container>
+
+<ng-template #selectPlaceHolderTmpl>
+  <span class="text-muted">No profile or autoradiographs available.</span>
+</ng-template>
 
 <ng-template [ngIf]="selectedReceptor">
   <ng-container *ngTemplateOutlet="prArTmpl; context: { filter: '_pr_', label: 'Profile' }">
