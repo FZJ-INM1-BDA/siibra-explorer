@@ -88,7 +88,7 @@
   <!-- pin data -->
   <ng-container *ngIf="downloadEnabled && kgId">
 
-    <ng-container *ngTemplateOutlet="favDatasetBtn; context: { $implicit: (favedDataentries$ | async | datasetIsFaved : dataset) }">
+    <ng-container *ngTemplateOutlet="favDatasetBtn; context: { $implicit: (favedDataentries$ | async | datasetIsFaved : ({ fullId: fullId })) }">
     </ng-container>
 
     <ng-template #favDatasetBtn let-isFav>
