@@ -67,6 +67,8 @@
 
     ATLAS_NOT_FOUND: `Atlas not found. Maybe it is still loading. Try again in a few seconds?`,
     TEMPLATE_NOT_FOUND: `Template not found. Maybe it is still loading. Try again in a few seconds?`,
-    PARC_NOT_FOUND: ``
+    PARC_NOT_FOUND: ``,
+
+    PINNED_DATASETS_BADGE_DESC: `Number of pinned datasets`
   }
 })(typeof exports === 'undefined' ? module.exports : exports)

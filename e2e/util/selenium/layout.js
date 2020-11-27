@@ -294,6 +294,34 @@ class WdLayoutPage extends WdBase{
   }
 
   /**
+   * Badge
+   */
+  async getBadgeContentByDesc(description){
+    const els = await this._browser.findElements(
+      By.css(`.mat-badge-content`)
+    )
+    for (const el of els) {
+      const descById = await el.getAttribute('aria-describedby')
+      if (!!descById) {
+        const descEl = await this._browser.findElement(
+          By.id(`${descById}`)
+        )
+        /**
+         * getText() will not return elements that are hidden
+         * which aria descriptions are.
+         * so use getInnerHtml instead
+         */
+        const descElText = await descEl.getAttribute('innerHTML')
+        if (descElText === description) {
+          const elText = await el.getText()
+          return elText
+        }
+      }
+    }
+    return null
+  }
+
+  /**
    * Other
    */
   async _findTitleCard(title) {

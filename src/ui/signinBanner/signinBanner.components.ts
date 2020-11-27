@@ -12,8 +12,9 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
-import {MatBottomSheet} from "@angular/material/bottom-sheet";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { CONST } from 'common/constants'
 
 @Component({
   selector: 'signin-banner',
@@ -26,6 +27,8 @@ import {MatBottomSheet} from "@angular/material/bottom-sheet";
 })
 
 export class SigninBanner {
+
+  public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
 
   public matBtnStyle = ''
   public matBtnColor = 'primary'

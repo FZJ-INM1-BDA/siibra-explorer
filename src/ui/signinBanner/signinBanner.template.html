@@ -106,6 +106,7 @@
     [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
     matBadgeColor="accent"
     matBadgePosition="above after"
+    [matBadgeDescription]="PINNED_DATASETS_BADGE_DESC"
     matTooltip="Pinned datasets">
     <iav-dynamic-mat-button
       [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
