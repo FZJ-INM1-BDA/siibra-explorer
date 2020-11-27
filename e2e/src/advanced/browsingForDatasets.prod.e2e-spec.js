@@ -1,5 +1,5 @@
 const { AtlasPage } = require('../util')
-const { CONST } = require('../../../common/constants')
+const { CONST, ARIA_LABELS } = require('../../../common/constants')
 const { retry } = require('../../../common/util')
 
 const atlasName = `Multilevel Human Atlas`
@@ -107,4 +107,36 @@ describe('> dataset browser', () => {
       }
     })
   }
+
+  describe('> modality filter', () => {
+    beforeAll(async () => {
+      await iavPage.goto()
+      await iavPage.setAtlasSpecifications(atlasName, [ templates[0] ])
+
+      await iavPage.wait(5000)
+      await iavPage.waitUntilAllChunksLoaded()
+      await iavPage.searchRegionWithText(newShouldHaveReceptor[0][0])
+      await iavPage.wait(2000)
+      await iavPage.selectSearchRegionAutocompleteWithText()
+      await retry(async () => {
+        await iavPage.dismissModal()
+        await iavPage.toggleExpansionPanelState(`${CONST.REGIONAL_FEATURES}`, true)
+      }, {
+        timeout: 2000,
+        retries: 10
+      })
+      await iavPage.dismissModal()
+      await iavPage.wait(2000)
+      await iavPage.waitUntilAllChunksLoaded()
+    })
+
+    it('> should be populated', async () => {
+      await iavPage.click(`[aria-label="${ARIA_LABELS.MODALITY_FILTER}"]`)
+      const text = await iavPage.getText(`[aria-label="${ARIA_LABELS.LIST_OF_MODALITIES}"]`)
+      const re = /\(\d+\)/.exec(text)
+      expect(
+        re
+      ).toBeTruthy()
+    })
+  })
 })
