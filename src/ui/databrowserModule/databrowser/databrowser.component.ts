@@ -85,6 +85,11 @@ export class DataBrowser extends DatabrowserBase implements OnDestroy, OnInit {
 
   public ngOnInit() {
 
+    /**
+     * in the event that dataentries are updated before ngInit lifecycle hook
+     */
+    this.countedDataM = this.dataService.getModalityFromDE(this.dataentries)
+
     this.subscriptions.push(
       this.dataentriesUpdated.pipe(
         debounceTime(60)
