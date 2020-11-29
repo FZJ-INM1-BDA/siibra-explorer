@@ -1,5 +1,6 @@
-import { NgModule } from "@angular/core";
+import { NgModule, Optional } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ComponentsModule } from "src/components";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
@@ -19,55 +20,86 @@ export class MesssagingModule{
   private pendingRequests: Map<string, Promise<boolean>> = new Map()
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    @Optional() private apiService: AtlasViewerAPIServices
   ){
 
     window.addEventListener('message', async ({ data, origin, source }) => {
-      const { method, id } = data
+      const { method, id, param } = data
       const src = source as Window
       if (!method) return
       if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
       const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
-      switch (strippedMethod) {
-      case 'ping': {
+
+      /**
+       * if ping method, respond pong method
+       */
+      if (strippedMethod === 'ping') {
         window.opener.postMessage({
           id,
           result: 'pong',
           jsonrpc: '2.0'
         }, origin)
-
-        break
+        return
       }
-      case 'dummyMethod': {
-        try {
-          const result = await this.dummyMethod({ data, origin })
-          src.postMessage({
-            id,
-            result
-          }, origin)
-        } catch (e) {
 
+      /**
+       * otherwise, check permission
+       */
+
+      try {
+        const allow = await this.checkOrigin({ origin })
+        if (!allow) {
           src.postMessage({
+            jsonrpc: '2.0',
             id,
-            error: e.code
-              ? e
-              : { code: 500, message: e.toString() }
+            error: {
+              code: 403,
+              message: 'User declined'
+            }
           }, origin)
+          return
         }
-            
-        break;
-      }
-      default: {
+        const result = await this.processMessage({ method: strippedMethod, param })
+
         src.postMessage({
+          jsonrpc: '2.0',
           id,
-          error: {
-            code: 404,
-            message: 'Method not found'
-          }
+          result
+        }, origin)
+
+      } catch (e) {
+
+        src.postMessage({
+          jsonrpc: '2.0',
+          id,
+          error: e.code
+            ? e
+            : { code: 500, message: e.toString() }
         }, origin)
       }
-      }
+
     })
+  }
+
+  async processMessage({ method, param }){
+    console.log({ method, param })
+
+    if (method === 'dummyMethod') {
+      return 'OK'
+    }
+
+    if (method === 'viewerHandle:add3DLandmarks') {
+      this.apiService.interactiveViewer.viewerHandle.add3DLandmarks(param)
+      return 'OK'
+    }
+
+    if (method === 'viewerHandle:remove3DLandmarks') {
+      this.apiService.interactiveViewer.viewerHandle.remove3DLandmarks(param)
+      return 'OK'
+    }
+
+    throw ({ code: 404, message: 'Method not found' })
   }
 
   async checkOrigin({ origin }){
@@ -88,11 +120,5 @@ export class MesssagingModule{
     this.pendingRequests.delete(origin)
     if (response) this.whiteListedOrigins.add(origin)
     return response
-  }
-
-  async dummyMethod({ data, origin }){
-    const allow = await this.checkOrigin({ origin })
-    if (!allow) throw ({ code: 403, message: 'User declined' })
-    return 'OK'
   }
 }
