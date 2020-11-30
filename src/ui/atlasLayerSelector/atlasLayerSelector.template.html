@@ -11,7 +11,7 @@
             </mat-card-subtitle>
             <mat-grid-list cols="3" rowHeight="3:4">
                 <!-- template tiles -->
-                <mat-grid-tile *ngFor="let template of availableTemplates$ | async">
+                <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: template,
                         selected: selectedTemplateSpaceId === template['@id'],
@@ -31,7 +31,7 @@
             <mat-grid-list cols="3" rowHeight="3:4">
 
                 <!-- non grouped layers -->
-                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async)">
+                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async); trackBy: trackbyAtId">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: layer,
                         selected: selectedLayersIncludes(layer['@id']),
@@ -43,7 +43,7 @@
                 </mat-grid-tile>
 
                 <!-- grouped layers -->
-                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async)">
+                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async); trackBy: trackbyName">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: group,
                         selected: selectedOneOfTheLayers(group.parcellations),

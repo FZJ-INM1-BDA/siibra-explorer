@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChildren, QueryList, HostBinding } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { safeFilter } from "src/services/stateStore.service";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
 import { ARIA_LABELS } from 'common/constants'
 
 @Component({
@@ -52,9 +51,7 @@ export class AtlasLayerSelector implements OnInit {
       )
 
       this.selectedTemplate$ = this.store$.pipe(
-        select('viewerState'),
-        safeFilter('templateSelected'),
-        map(state => state.templateSelected),
+        select(viewerStateSelectedTemplatePureSelector),
         withLatestFrom(this.selectedAtlas$),
         map(([templateSelected, templateFromAtlas]) => {
           return {
@@ -64,9 +61,7 @@ export class AtlasLayerSelector implements OnInit {
         })
       )
       this.selectedParcellation$ = this.store$.pipe(
-        select('viewerState'),
-        safeFilter('parcellationSelected'),
-        map(state => state.parcellationSelected),
+        select(viewerStateSelectedParcellationSelector)
       )
 
       const layersGroupBy$ = this.selectedAtlas$.pipe(
@@ -204,5 +199,13 @@ export class AtlasLayerSelector implements OnInit {
       }
       
       return layer.name
+    }
+
+    trackbyAtId(t){
+      return t['@id']
+    }
+
+    trackbyName(t) {
+      return t['name']
     }
 }
