@@ -530,6 +530,11 @@ markdown-dom pre code
   background: none!important;
 }
 
+.bg-50-grey-20
+{
+  background-color: rgba(128,128,128, 0.2);
+}
+
 .dot
 {
   width: 0.5rem;
