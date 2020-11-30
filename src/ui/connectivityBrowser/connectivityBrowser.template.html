@@ -76,6 +76,7 @@
         </div>
         <div slot="exportslot">
             <button mat-icon-button
+                    [disabled]="noDataReceived"
                     (click)="exportConnectivityProfile()"
                     matTooltip="Export connectivity profile">
                 <i class="fas fa-download mb-2"></i>
