@@ -33,7 +33,7 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this._region)
-    this.position = val.position
+    this.position = val && val.position
     if (!this._region) return
 
     const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
