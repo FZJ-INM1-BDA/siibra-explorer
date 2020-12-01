@@ -91,8 +91,7 @@ const parseLmToVtk = (landmarks, scale) => {
 
   const reduce = landmarks.reduce((acc,curr,idx) => {
     //curr : null | [number,number,number] | [ [number,number,number], [number,number,number], [number,number,number] ][]
-    if(curr === null)
-      return acc
+    if(curr === null) return acc
     if(!isNaN(curr[0]))
       /**
        * point primitive, render icosahedron
@@ -162,12 +161,10 @@ const getLandmarksVtk = (action) => {
 
   const vtk = parseLmToVtk(landmarks, scale)
   
-  if(!vtk)
-    return
+  if(!vtk) return
 
   // when new set of landmarks are to be displayed, the old landmarks will be discarded
-  if(landmarkVtkUrl)
-    URL.revokeObjectURL(landmarkVtkUrl)
+  if(landmarkVtkUrl) URL.revokeObjectURL(landmarkVtkUrl)
 
   landmarkVtkUrl = URL.createObjectURL(new Blob( [encoder.encode(vtk)], {type : 'application/octet-stream'} ))
   postMessage({
@@ -201,8 +198,7 @@ const getuserLandmarksVtk = (action) => {
   }
 
   const vtk = parseLmToVtk(landmarks, scale)
-  if(!vtk)
-    return
+  if(!vtk) return
 
   if(userLandmarkVtkUrl)
     URL.revokeObjectURL(userLandmarkVtkUrl)

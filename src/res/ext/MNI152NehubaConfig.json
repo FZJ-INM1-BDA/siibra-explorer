@@ -23,7 +23,7 @@
       "mesh": {
         "removeBasedOnNavigation": true,
         "flipRemovedOctant": true,
-        "surfaceParcellation": false
+        "surfaceParcellation": true
       },
       "removePerspectiveSlicesBackground": {
         "mode": "<",

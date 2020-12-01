@@ -189,6 +189,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   @Output()
   public nehubaViewerLoaded: EventEmitter<boolean> = new EventEmitter()
 
+  @Output()
+  public forceUI$: Observable<{ target: 'perspective:octantRemoval', mode: boolean,  message?: string }>
+
+  public disableOctantRemoval$: Observable<{ message?: string, mode: boolean }>
+
   public handleViewerLoadedEvent(flag: boolean){
     this.viewerLoaded = flag
     this.nehubaViewerLoaded.emit(flag)
@@ -363,6 +368,30 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.userLandmarks$ = this.store.pipe(
       select(viewerStateCustomLandmarkSelector),
       distinctUntilChanged(),
+    )
+
+    /**
+     * in future, perhaps add other force UI optinos here
+     */
+    this.forceUI$ = this.userLandmarks$.pipe(
+      map(lm => {
+        if (lm.length > 0) {
+          return {
+            target: 'perspective:octantRemoval',
+            mode: false,
+            message: `octant control disabled: showing landmarks.`
+          }
+        } else {
+          return {
+            target: 'perspective:octantRemoval',
+            mode: null
+          }
+        }
+      })
+    )
+
+    this.disableOctantRemoval$ = this.forceUI$.pipe(
+      filter(({ target }) => target === 'perspective:octantRemoval'),
     )
 
     this.sliceRenderEvent$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
@@ -554,6 +583,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       }),
     )
 
+    /**
+     * TODO deprecate, but document the method
+     */
     this.subscriptions.push(
       combineLatest(
         this.fetchedSpatialDatasets$,
@@ -586,7 +618,16 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(
-      this.userLandmarks$.subscribe(landmarks => {
+      this.userLandmarks$.pipe(
+        withLatestFrom(
+          this.nehubaViewerPerspectiveOctantRemoval$
+        )
+      ).subscribe(([landmarks, flag]) => {
+        if (this.nehubaContainerDirective) {
+          this.nehubaContainerDirective.toggleOctantRemoval(
+            landmarks.length > 0 ? false : flag
+          )
+        }
         if (this.nehubaViewer) {
           this.nehubaViewer.updateUserLandmarks(landmarks)
         }
