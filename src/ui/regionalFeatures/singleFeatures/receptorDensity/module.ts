@@ -5,6 +5,7 @@ import { RegionalFeaturesService } from "../../regionalFeature.service";
 import { FilterReceptorByType } from "./filterReceptorBytype.pipe";
 import { GetAllReceptorsPipe } from "./getAllReceptors.pipe";
 import { GetIdPipe } from "./getId.pipe";
+import { GetUrlsPipe } from "./getUrl.pipe";
 import { ReceptorDensityFeatureCmp } from "./receptorDensity/receptorDensity.component";
 
 @NgModule({
@@ -17,6 +18,7 @@ import { ReceptorDensityFeatureCmp } from "./receptorDensity/receptorDensity.com
     FilterReceptorByType,
     GetIdPipe,
     GetAllReceptorsPipe,
+    GetUrlsPipe,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

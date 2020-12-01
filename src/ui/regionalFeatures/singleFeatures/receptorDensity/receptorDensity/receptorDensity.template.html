@@ -6,10 +6,11 @@
   <ng-container *ngTemplateOutlet="datasetPreviewTmpl; context: {
     id: 'fingerprint-cmp',
     kgId: (feature['@id'] | getId),
-    filename: datum['@id']
+    filename: datum['@id'],
+    datum: datum
   }">
-  
   </ng-container>
+
 </ng-container>
 
 <ng-container *ngIf="data$ | async | getAllReceptors as allReceptors; else selectPlaceHolderTmpl">
@@ -52,13 +53,22 @@
     <ng-container *ngTemplateOutlet="datasetPreviewTmpl; context: {
       id: label + '-cmp',
       kgId: (feature['@id'] | getId),
-      filename: datum['@id']
+      filename: datum['@id'],
+      datum: datum
     }">
     </ng-container>
   </ng-container>
 </ng-template>
 
-<ng-template #datasetPreviewTmpl let-id="id" let-kgId="kgId" let-filename="filename">
+
+<!-- display preview tmpl -->
+<ng-template #datasetPreviewTmpl
+  let-id="id"
+  let-kgId="kgId"
+  let-filename="filename"
+  let-datum="datum">
+
+  <!-- render preview -->
   <kg-ds-prv-regional-feature-view
     *ngIf="depScriptLoaded$ | async; else fallbackTmpl"
     [attr.id]="id"
@@ -69,6 +79,16 @@
     [filename]="filename">
   </kg-ds-prv-regional-feature-view>
 
+  <!-- download btns -->
+  <ng-container *ngFor="let urlObj of datum | getUrls">
+    <ng-container *ngTemplateOutlet="downloadBtnTmpl; context: {
+      url: urlObj.url,
+      filename: urlObj.filename,
+      tooltip: 'download ' + urlObj.filename
+    }">
+    </ng-container>
+  </ng-container>
+
   <ng-template #fallbackTmpl>
     <kg-dataset-previewer
       [attr.id]="id"
@@ -78,4 +98,17 @@
       [filename]="filename">
     </kg-dataset-previewer>
   </ng-template>
+</ng-template>
+
+<ng-template #downloadBtnTmpl
+  let-url="url"
+  let-filename="filename"
+  let-tooltip="tooltip">
+  <a [href]="url"
+    [download]="filename"
+    [matTooltip]="tooltip">
+    <button mat-icon-button>
+      <i class="fas fa-download"></i>
+    </button>
+  </a>
 </ng-template>
