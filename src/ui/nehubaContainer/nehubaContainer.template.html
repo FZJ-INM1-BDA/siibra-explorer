@@ -20,13 +20,13 @@
 
 <current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none">
   <div class="w-100 h-100 position-relative" cell-i>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 0 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-ii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 1 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 2 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iv>
     <ng-content *ngTemplateOutlet="overlayPerspectiveTmpl"></ng-content>
