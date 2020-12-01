@@ -313,11 +313,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerPerspectiveOctantRemoval$.pipe(
         distinctUntilChanged()
       ).subscribe(flag =>{
-        const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
-        if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
-        else {
-          this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
-        }
+        this.toggleOctantRemoval(flag)
       })
     )
 
@@ -371,6 +367,14 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   ngOnDestroy(){
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe()
+    }
+  }
+
+  public toggleOctantRemoval(flag: boolean){
+    const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+    if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
+    else {
+      this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
     }
   }
 

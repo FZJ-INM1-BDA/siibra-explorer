@@ -87,7 +87,7 @@
     "@ngrx/effects": "^9.1.1",
     "@ngrx/store": "^9.1.1",
     "@types/node": "12.12.39",
-    "export-nehuba": "0.0.2",
+    "export-nehuba": "0.0.4",
     "hbp-connectivity-component": "^0.3.14",
     "zone.js": "^0.10.2"
   }
