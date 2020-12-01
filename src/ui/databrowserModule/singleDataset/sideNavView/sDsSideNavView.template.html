@@ -56,8 +56,7 @@
     <mat-accordion>
 
       <!-- Description -->
-      <mat-expansion-panel hideToggle
-        [expanded]="true">
+      <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
             Description
@@ -119,8 +118,7 @@
       <!-- feature tmpl -->
       <ng-template #featureTmpl>
         <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
-          <mat-expansion-panel hideToggle
-            #matExpansionPanel>
+          <mat-expansion-panel #matExpansionPanel>
             <mat-expansion-panel-header>
               <mat-panel-title>
                 {{ feature.type }}
