@@ -29,7 +29,7 @@
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iv>
-    <ng-content *ngTemplateOutlet="overlayPerspectiveTmpl"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
   </div>
 </current-layout>
 
@@ -579,49 +579,49 @@
 
 <!-- overlay templates -->
 
-<!-- perspective view tmpl -->
-<ng-template #overlayPerspectiveTmpl>
-  <layout-floating-container class="tmp" landmarkContainer>
-
-    <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
-      [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
-      [attr.id]="ID_MESH_LOADING_STATUS"
-      role="status">
-
-      <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
-      </spinner-cmp>
-      
-      <mat-list>
-        <mat-list-item>
-          {{ showPerpsectiveScreen$ | async }}
-        </mat-list-item>
-      </mat-list>
-    </div>
-
-    <!-- maximise/minimise button -->
-    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
-      panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber,
-      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === 3
-    }">
-    </ng-container>
-
-    <!-- mesh loading is still weird -->
-    <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
-    <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
-      <spinner-cmp></spinner-cmp>
-
-      <div *ngIf="false" perspectiveLoadingText>
-        {{ perspectiveViewLoading$ | async }}
-      </div>
-    </div>
-  </layout-floating-container>
-</ng-template>
-
 <!-- slice view overlay tmpl -->
 <ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
 
+  <!-- perspective view tmpl -->
+  <ng-template #overlayPerspectiveTmpl>
+    <layout-floating-container class="tmp" landmarkContainer>
+
+      <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
+        [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
+        [attr.id]="ID_MESH_LOADING_STATUS"
+        role="status">
+
+        <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
+        </spinner-cmp>
+        
+        <mat-list>
+          <mat-list-item>
+            {{ showPerpsectiveScreen$ | async }}
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- maximise/minimise button -->
+      <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+        panelIndex: panelIndex,
+        visible: (hoveredPanelIndices$ | async) === panelIndex
+      }">
+      </ng-container>
+
+      <!-- mesh loading is still weird -->
+      <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
+      <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
+        <spinner-cmp></spinner-cmp>
+
+        <div *ngIf="false" perspectiveLoadingText>
+          {{ perspectiveViewLoading$ | async }}
+        </div>
+      </div>
+    </layout-floating-container>
+  </ng-template>
+
   <!-- nb this slice view is not suitable for perspective view! -->
-  <layout-floating-container *ngIf="panelIndex < 3" landmarkContainer>
+  <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl" landmarkContainer>
 
     <!-- customLandmarks -->
     <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
@@ -649,8 +649,8 @@
 
     <!-- maximise/minimise button -->
     <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
-      panelIndex: panelOrder$ | async | getNthElement : panelIndex | parseAsNumber,
-      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === panelIndex
+      panelIndex: panelIndex,
+      visible: (hoveredPanelIndices$ | async) === panelIndex
     }">
     </ng-container>
 
@@ -658,6 +658,7 @@
       <spinner-cmp></spinner-cmp>
     </div>
   </layout-floating-container>
+
 </ng-template>
 
 <!-- panel control template -->

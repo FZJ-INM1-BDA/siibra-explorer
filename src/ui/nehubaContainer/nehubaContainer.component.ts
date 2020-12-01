@@ -437,7 +437,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         }),
         distinctUntilChanged(),
         startWith('Loading ...'),
-        throttleTime(100, asyncScheduler, { leading: true, trailing: true })
+        throttleTime(100, asyncScheduler, { leading: true, trailing: true }),
+        shareReplay(1),
       ))
     )
 
