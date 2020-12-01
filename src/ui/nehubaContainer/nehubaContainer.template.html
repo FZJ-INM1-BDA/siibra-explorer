@@ -344,7 +344,7 @@
   let-iconTooltip="iconTooltip"
   let-iavNgIf="iavNgIf"
   let-content="content">
-  <mat-expansion-panel class="mt-1 mb-1"
+  <mat-expansion-panel
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
     hideToggle
@@ -564,17 +564,17 @@
     }">
     </ng-container>
 
-  </mat-accordion>
-  <div class="w-0 h-0"
-    iav-counter
-    #connectedCounterDir="iavCounter">
+    <div class="w-0 h-0"
+      iav-counter
+      #connectedCounterDir="iavCounter">
 
-    <hbp-connectivity-matrix-row [region]="region.name"
-      (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
-      class="invisible d-block h-0 w-0"
-      loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">
-    </hbp-connectivity-matrix-row>
-  </div>
+      <hbp-connectivity-matrix-row [region]="region.name"
+        (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
+        class="invisible d-block h-0 w-0"
+        loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">
+      </hbp-connectivity-matrix-row>
+    </div>
+  </mat-accordion>
 </ng-template>
 
 <!-- overlay templates -->
