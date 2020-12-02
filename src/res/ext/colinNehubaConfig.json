@@ -87,10 +87,10 @@
             ]
           ]
         },
-        "COLIN_V24_LEFT_NG": {
+        "COLIN_V25_LEFT_NG": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20200926_JulichBrain-V2_4-Colin_MPM_mesh/precomputed/left",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201202_JulichBrainV2_5_colin_MPM/precomputed/JulichBrain_MPMAtlas_l_N10_nlin2Stdcolin27_publicDOI_37fdd19c7ce06ca709a34e21d8ec0886",
           "transform": [
             [
               1,
@@ -121,10 +121,10 @@
             "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20200926_JulichBrain-V2_4-Colin_MPM_mesh/raw/745a37f64b6995a661f5a61287b4067df01687cb/output/nehuba-ui/left_config.json"
           }
         },
-        "COLIN_V24_RIGHT_NG": {
+        "COLIN_V25_RIGHT_NG": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20200926_JulichBrain-V2_4-Colin_MPM_mesh/precomputed/right",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201202_JulichBrainV2_5_colin_MPM/precomputed/JulichBrain_MPMAtlas_r_N10_nlin2Stdcolin27_publicDOI_387941812ac0807aa1c7050b109ce623",
           "transform": [
             [
               1,
