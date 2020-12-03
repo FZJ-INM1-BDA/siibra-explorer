@@ -10,7 +10,7 @@ import { defaultRootState } from '../stateStore.service'
 
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
-const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG`
+const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V24_LEFT_NG`
 
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {

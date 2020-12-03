@@ -279,6 +279,74 @@
             ]
           ]
         },
+        "ICBM152_V24_LEFT_NG": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201002_JulichBrain-V2_4-ICBM152_MPM_mesh/precomputed/left",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -132500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -78500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ],
+          "_":{
+            "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_MPM_mesh/src/a282b9077713c0a0fe8abd1cf695bd3490cf9fbb/output/nehuba-ui/left_config.json"
+          }
+        },
+        "ICBM152_V24_RIGHT_NG": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201002_JulichBrain-V2_4-ICBM152_MPM_mesh/precomputed/right",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -132500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -78500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ],
+          "_": {
+            "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_MPM_mesh/src/a282b9077713c0a0fe8abd1cf695bd3490cf9fbb/output/nehuba-ui/right_config.json"
+          }
+        },
         "fibre bundle long": {
           "type": "segmentation",
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/long-bundles_maxprob",
