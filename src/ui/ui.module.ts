@@ -11,12 +11,10 @@ import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.
 import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
 
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
-import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
 import { CitationsContainer } from "./citation/citations.component";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
-import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 
 import { ScrollingModule } from "@angular/cdk/scrolling"
@@ -86,6 +84,7 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
 import { RegionAccordionTooltipTextPipe } from './util'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import { RegionalFeaturesModule } from "./regionalFeatures";
+import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
 
 @NgModule({
   imports : [
@@ -105,12 +104,12 @@ import { RegionalFeaturesModule } from "./regionalFeatures";
     AuthModule,
     FabSpeedDialModule,
     RegionalFeaturesModule,
+    Landmark2DModule,
   ],
   declarations : [
     NehubaContainer,
     
     SplashScreen,
-    LandmarkUnit,
     PluginBannerUI,
     CitationsContainer,
     KgEntryViewer,
@@ -151,7 +150,6 @@ import { RegionalFeaturesModule } from "./regionalFeatures";
     GroupDatasetByRegion,
     FilterRegionDataEntries,
     FlatmapArrayPipe,
-    SafeStylePipe,
     GetLayerNameFromDatasets,
     SortDataEntriesToRegion,
     SpatialLandmarksToDataBrowserItemPipe,
