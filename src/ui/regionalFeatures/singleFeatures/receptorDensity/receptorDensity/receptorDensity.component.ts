@@ -4,7 +4,13 @@ import { RegionalFeaturesService } from "src/ui/regionalFeatures/regionalFeature
 import { PureContantService } from "src/util";
 import { RegionFeatureBase } from "../../base/regionFeature.base";
 import { ISingleFeature } from "../../interfaces";
+import { CONST } from 'common/constants'
 
+const {
+  RECEPTOR_FP_CAPTION,
+  RECEPTOR_PR_CAPTION,
+  RECEPTOR_AR_CAPTION,
+} = CONST
 @Component({
   templateUrl: './receptorDensity.template.html',
   styleUrls: [
@@ -13,6 +19,11 @@ import { ISingleFeature } from "../../interfaces";
 })
 
 export class ReceptorDensityFeatureCmp extends RegionFeatureBase implements ISingleFeature, OnDestroy{
+
+  public RECEPTOR_FP_CAPTION = RECEPTOR_FP_CAPTION
+  public RECEPTOR_PR_CAPTION = RECEPTOR_PR_CAPTION
+  public RECEPTOR_AR_CAPTION = RECEPTOR_AR_CAPTION
+
   public DS_PREVIEW_URL = DATASET_PREVIEW_URL
   viewChanged: EventEmitter<null> = new EventEmitter()
 

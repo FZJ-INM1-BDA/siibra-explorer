@@ -71,6 +71,10 @@
 
     PINNED_DATASETS_BADGE_DESC: `Number of pinned datasets`,
 
-    GDPR_TEXT: `This dataset is currently reviewed by the EBRAINS Data Protection Office regarding GDPR compliance. Therefore the atlas does not provide access to the underlying data files yet. The data will be available after this review.`
+    GDPR_TEXT: `This dataset is currently reviewed by the EBRAINS Data Protection Office regarding GDPR compliance. Therefore the atlas does not provide access to the underlying data files yet. The data will be available after this review.`,
+
+    RECEPTOR_FP_CAPTION: `The receptor densities are visualized as fingerprints (fp), which provide the mean density and standard deviation for each of the analyzed receptor types, averaged across samples.`,
+    RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
+    RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
   }
 })(typeof exports === 'undefined' ? module.exports : exports)
