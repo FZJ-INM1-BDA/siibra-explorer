@@ -621,31 +621,31 @@
   </ng-template>
 
   <!-- nb this slice view is not suitable for perspective view! -->
-  <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl" landmarkContainer>
+  <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl"
+    landmarkContainer
+    class="overflow-hidden">
 
     <!-- customLandmarks -->
-    <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
+    <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
       (mouseenter)="handleMouseEnterCustomLandmark(lm)"
       (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
-      fasClass="fa-chevron-down"
       [color]="lm.color || [255, 255, 255]"
       [positionX]="getPositionX(panelIndex, lm)"
       [positionY]="getPositionY(panelIndex, lm)"
       [positionZ]="getPositionZ(panelIndex, lm)">
 
-    </nehuba-2dlandmark-unit>
+    </landmark-2d-flat-cmp>
 
     <!-- only show landmarks in slice views -->
 
-    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+    <landmark-2d-flat-cmp *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
       (mouseenter)="handleMouseEnterLandmark(spatialData)"
       (mouseleave)="handleMouseLeaveLandmark(spatialData)"
       [highlight]="spatialData.highlight ? spatialData.highlight : false"
-      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
       [positionX]="getPositionX(panelIndex, spatialData)"
       [positionY]="getPositionY(panelIndex, spatialData)"
       [positionZ]="getPositionZ(panelIndex, spatialData)">
-    </nehuba-2dlandmark-unit>
+    </landmark-2d-flat-cmp>
 
     <!-- maximise/minimise button -->
     <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {

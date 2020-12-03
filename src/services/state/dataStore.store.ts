@@ -6,6 +6,7 @@ import { Action } from '@ngrx/store'
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { LOCAL_STORAGE_CONST } from 'src/util/constants'
 import { datastateActionUpdateFavDataset } from './dataState/actions'
+import { IHasId } from 'src/util/interfaces'
 
 /**
  * TODO merge with databrowser.usereffect.ts
@@ -114,7 +115,7 @@ export interface IDataEntry {
   referenceSpaces: IReferenceSpace[]
   files: File[]
   publications: IPublication[]
-  embargoStatus: string[]
+  embargoStatus: IHasId[]
 
   methods: string[]
   protocols: string[]

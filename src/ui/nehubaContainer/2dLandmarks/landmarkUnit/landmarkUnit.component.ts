@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, HostBinding, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { LandmarkUnitBase } from "../landmark.base";
 
 @Component({
-  selector : 'nehuba-2dlandmark-unit',
+  selector : 'landmark-2d-stalk-cmp',
   templateUrl : './landmarkUnit.template.html',
   styleUrls : [
     `./landmarkUnit.style.css`,
@@ -9,15 +10,12 @@ import { ChangeDetectionStrategy, Component, HostBinding, Input, OnChanges, Simp
   changeDetection : ChangeDetectionStrategy.OnPush,
 })
 
-export class LandmarkUnit implements OnChanges {
-  @Input() public positionX: number = 0
-  @Input() public positionY: number = 0
-  @Input() public positionZ: number = 0
+export class LandmarkUnit extends LandmarkUnitBase implements OnChanges {
 
   @Input() public color: [number, number, number]
 
   @Input() public highlight: boolean = false
-  @Input() public flatProjection: boolean = false
+  @Input() public flatProjection: boolean = true
 
   @Input() public fasClass: string = 'fa-map-marker'
 
@@ -135,6 +133,10 @@ export class LandmarkUnit implements OnChanges {
         'border-left-color' : `rgba(${highlight.currentValue ? HOVER_COLOR.join(',') : NORMAL_COLOR.join(',')}, 0.8)`,
       }
     }
+  }
+
+  constructor(){
+    super()
   }
 }
 

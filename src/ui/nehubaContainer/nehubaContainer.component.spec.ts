@@ -6,7 +6,6 @@ import { defaultRootState } from 'src/services/stateStore.service'
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module"
 import { TouchSideClass } from "./touchSideClass.directive"
 import { MaximmisePanelButton } from "./maximisePanelButton/maximisePanelButton.component"
-import { LandmarkUnit } from './landmarkUnit/landmarkUnit.component'
 import { LayoutModule } from 'src/layouts/layout.module'
 import { PureContantService, UtilModule } from "src/util"
 import { AtlasLayerSelector } from "../atlasLayerSelector/atlasLayerSelector.component"
@@ -21,7 +20,6 @@ import { RegionDirective } from 'src/ui/parcellationRegion/region.directive'
 import { RegionTextSearchAutocomplete } from "../viewerStateController/regionSearch/regionSearch.component"
 import { MobileControlNubStylePipe } from './pipes/mobileControlNubStyle.pipe'
 import { ReorderPanelIndexPipe } from './reorderPanelIndex.pipe'
-import { SafeStylePipe } from 'src/util/pipes/safeStyle.pipe'
 import { AuthModule } from 'src/auth'
 import { StateModule } from 'src/state'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
@@ -41,6 +39,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
 import { PANELS } from 'src/services/state/ngViewerState/constants'
 import { RegionalFeaturesModule } from '../regionalFeatures'
+import { Landmark2DModule } from './2dLandmarks/module'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -88,12 +87,12 @@ describe('> nehubaContainer.component.ts', () => {
            * so and so components needs to be compiled first. make sure you call compileComponents
            */
           HttpClientTestingModule,
+          Landmark2DModule,
         ],
         declarations: [
           NehubaContainer,
           TouchSideClass,
           MaximmisePanelButton,
-          LandmarkUnit,
           AtlasLayerSelector,
           StatusCardComponent,
           NehubaViewerTouchDirective,
@@ -107,7 +106,6 @@ describe('> nehubaContainer.component.ts', () => {
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
-          SafeStylePipe,
           RenderViewOriginDatasetLabelPipe,
           RegionAccordionTooltipTextPipe,
         ],
