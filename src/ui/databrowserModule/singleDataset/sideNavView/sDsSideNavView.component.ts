@@ -5,7 +5,7 @@ import { REGION_OF_INTEREST, TRegionOfInterest } from "src/util/interfaces";
 import { DatabrowserService } from "../../databrowser.service";
 import { KgSingleDatasetService } from "../../kgSingleDatasetService.service";
 import { SingleDatasetBase } from "../singleDataset.base";
-
+import { CONST } from 'common/constants'
 
 @Component({
   selector: 'single-dataset-sidenav-view',
@@ -20,6 +20,8 @@ export class SingleDatasetSideNavView extends SingleDatasetBase implements OnCha
 
   @Output()
   clear: EventEmitter<null> = new EventEmitter()
+
+  public GDPR_TEXT = CONST.GDPR_TEXT
 
   constructor(
     dbService: DatabrowserService,

@@ -22,6 +22,12 @@
         Dataset
       </span>
 
+      <button *ngIf="isGdprProtected"
+        [matTooltip]="GDPR_TEXT"
+        mat-icon-button color="warn">
+        <i class="fas fa-exclamation-triangle"></i>
+      </button>
+
       <mat-divider [vertical]="true" class="ml-2 h-2rem"></mat-divider>
 
       <!-- explore btn -->
