@@ -9,8 +9,12 @@
       "displayName": "ICBM 152 2009c Nonlinear Asymmetric",
       "availableIn": [
         {
+          "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
+          "name": "Cytoarchitectonic maps - v2.5"
+        },
+        {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Cytoarchitectonic maps"
+          "name": "Cytoarchitectonic maps - v2.4"
         },
         {
           "@id": "juelich/iav/atlas/v1.0.0/8",
@@ -56,8 +60,12 @@
       "name": "MNI Colin 27",
       "availableIn": [
         {
+          "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
+          "name": "Cytoarchitectonic maps - v2.5"
+        },
+        {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Cytoarchitectonic maps"
+          "name": "Cytoarchitectonic maps - v2.4"
         },
         {
           "@id": "juelich/iav/atlas/v1.0.0/8",
@@ -114,7 +122,7 @@
     },
     {
       "@id": "juelich/iav/atlas/v1.0.0/7",
-      "name": "Cytoarchitectonic maps - v2.5",
+      "name": "Cytoarchitectonic maps - v2.4",
       "baseLayer": true,
       "@version": {
         "@next": null,
@@ -130,13 +138,40 @@
       ]
     },
     {
-      "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
+      "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
       "name": "Cytoarchitectonic maps",
       "baseLayer": true,
       "@version": {
         "@next": null,
         "@this": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
         "name": "v2.5",
+        "@previous": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579"
+      },
+      "availableIn": [
+        {
+          "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        },
+        {
+          "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
+          "name": "MNI Colin 27",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        }
+      ]
+    },
+    {
+      "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
+      "name": "Cytoarchitectonic maps",
+      "baseLayer": true,
+      "@version": {
+        "@next": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
+        "@this": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
+        "name": "v2.4",
         "@previous": "juelich/iav/atlas/v1.0.0/8"
       },
       "availableIn": [
