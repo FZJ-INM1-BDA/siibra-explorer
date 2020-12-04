@@ -87,6 +87,68 @@
             ]
           ]
         },
+        "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201204_JulichBrainV3_0_hemisphereSplit/precomputed/JuBrain_Map_colin_v30_r_fixed",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -90500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -126500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -72500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/20201204_JulichBrainV3_0_hemisphereSplit/precomputed/JuBrain_Map_colin_v30_l_fixed",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -90500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -126500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -72500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
         "COLIN_V25_LEFT_NG": {
           "type": "segmentation",
           "visible": true,

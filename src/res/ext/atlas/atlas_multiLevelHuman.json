@@ -64,6 +64,10 @@
       "name": "MNI Colin 27",
       "availableIn": [
         {
+          "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25-1",
+          "name": "Cytoarchitectonic maps - v2.5.1"
+        },
+        {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
           "name": "Cytoarchitectonic maps - v2.5"
         },
@@ -155,6 +159,13 @@
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
+        },
+        {
+          "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
+          "name": "MNI Colin 27",
           "originalDatasetFormats": [{
             "name": "probability map"
           }]

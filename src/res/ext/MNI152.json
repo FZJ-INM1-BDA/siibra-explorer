@@ -59,7 +59,7 @@
                             {
                               "name": "Ch 123 (Basal Forebrain)",
                               "labelIndex": 62,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 123 (Basal Forebrain)",
@@ -71,7 +71,7 @@
                             {
                               "name": "Ch 123 (Basal Forebrain)",
                               "labelIndex": 62,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 123 (Basal Forebrain)",
@@ -113,7 +113,7 @@
                             {
                               "name": "Ch 4 (Basal Forebrain)",
                               "labelIndex": 97,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 4 (Basal Forebrain)",
@@ -125,7 +125,7 @@
                             {
                               "name": "Ch 4 (Basal Forebrain)",
                               "labelIndex": 97,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 4 (Basal Forebrain)",
@@ -167,7 +167,7 @@
                             {
                               "name": "Ch 123 (Basal Forebrain)",
                               "labelIndex": 62,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 123 (Basal Forebrain)",
@@ -179,7 +179,7 @@
                             {
                               "name": "Ch 123 (Basal Forebrain)",
                               "labelIndex": 62,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ch 123 (Basal Forebrain)",
@@ -235,7 +235,7 @@
                             {
                               "name": "LB (Amygdala)",
                               "labelIndex": 41,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "LB (Amygdala)",
@@ -247,7 +247,7 @@
                             {
                               "name": "LB (Amygdala)",
                               "labelIndex": 41,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "LB (Amygdala)",
@@ -289,7 +289,7 @@
                             {
                               "name": "CM (Amygdala)",
                               "labelIndex": 85,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CM (Amygdala)",
@@ -301,7 +301,7 @@
                             {
                               "name": "CM (Amygdala)",
                               "labelIndex": 85,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CM (Amygdala)",
@@ -329,7 +329,7 @@
                             {
                               "name": "SF (Amygdala)",
                               "labelIndex": 5,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "SF (Amygdala)",
@@ -341,7 +341,7 @@
                             {
                               "name": "SF (Amygdala)",
                               "labelIndex": 5,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "SF (Amygdala)",
@@ -383,7 +383,7 @@
                             {
                               "name": "VTM (Amygdala)",
                               "labelIndex": 109,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "VTM (Amygdala)",
@@ -395,7 +395,7 @@
                             {
                               "name": "VTM (Amygdala)",
                               "labelIndex": 109,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "VTM (Amygdala)",
@@ -423,7 +423,7 @@
                             {
                               "name": "IF (Amygdala)",
                               "labelIndex": 46,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "IF (Amygdala)",
@@ -435,7 +435,7 @@
                             {
                               "name": "IF (Amygdala)",
                               "labelIndex": 46,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "IF (Amygdala)",
@@ -463,7 +463,7 @@
                             {
                               "name": "MF (Amygdala)",
                               "labelIndex": 123,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "MF (Amygdala)",
@@ -475,7 +475,7 @@
                             {
                               "name": "MF (Amygdala)",
                               "labelIndex": 123,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "MF (Amygdala)",
@@ -517,7 +517,7 @@
                             {
                               "name": "CM (Amygdala)",
                               "labelIndex": 85,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CM (Amygdala)",
@@ -529,7 +529,7 @@
                             {
                               "name": "CM (Amygdala)",
                               "labelIndex": 85,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CM (Amygdala)",
@@ -599,7 +599,7 @@
                             {
                               "name": "Area 5L (SPL)",
                               "labelIndex": 83,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5L (SPL)",
@@ -611,7 +611,7 @@
                             {
                               "name": "Area 5L (SPL)",
                               "labelIndex": 83,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5L (SPL)",
@@ -639,7 +639,7 @@
                             {
                               "name": "Area 7M (SPL)",
                               "labelIndex": 124,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7M (SPL)",
@@ -651,7 +651,7 @@
                             {
                               "name": "Area 7M (SPL)",
                               "labelIndex": 124,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7M (SPL)",
@@ -679,7 +679,7 @@
                             {
                               "name": "Area 7PC (SPL)",
                               "labelIndex": 4,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7PC (SPL)",
@@ -691,7 +691,7 @@
                             {
                               "name": "Area 7PC (SPL)",
                               "labelIndex": 4,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7PC (SPL)",
@@ -719,7 +719,7 @@
                             {
                               "name": "Area 5M (SPL)",
                               "labelIndex": 26,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5M (SPL)",
@@ -731,7 +731,7 @@
                             {
                               "name": "Area 5M (SPL)",
                               "labelIndex": 26,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5M (SPL)",
@@ -759,7 +759,7 @@
                             {
                               "name": "Area 7P (SPL)",
                               "labelIndex": 24,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7P (SPL)",
@@ -771,7 +771,7 @@
                             {
                               "name": "Area 7P (SPL)",
                               "labelIndex": 24,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7P (SPL)",
@@ -799,7 +799,7 @@
                             {
                               "name": "Area 5Ci (SPL)",
                               "labelIndex": 88,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5Ci (SPL)",
@@ -811,7 +811,7 @@
                             {
                               "name": "Area 5Ci (SPL)",
                               "labelIndex": 88,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 5Ci (SPL)",
@@ -839,7 +839,7 @@
                             {
                               "name": "Area 7A (SPL)",
                               "labelIndex": 17,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7A (SPL)",
@@ -851,7 +851,7 @@
                             {
                               "name": "Area 7A (SPL)",
                               "labelIndex": 17,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 7A (SPL)",
@@ -893,7 +893,7 @@
                             {
                               "name": "Area OP3 (POperc)",
                               "labelIndex": 22,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP3 (POperc)",
@@ -905,7 +905,7 @@
                             {
                               "name": "Area OP3 (POperc)",
                               "labelIndex": 22,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP3 (POperc)",
@@ -933,7 +933,7 @@
                             {
                               "name": "Area OP4 (POperc)",
                               "labelIndex": 14,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP4 (POperc)",
@@ -945,7 +945,7 @@
                             {
                               "name": "Area OP4 (POperc)",
                               "labelIndex": 14,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP4 (POperc)",
@@ -973,7 +973,7 @@
                             {
                               "name": "Area OP2 (POperc)",
                               "labelIndex": 122,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP2 (POperc)",
@@ -985,7 +985,7 @@
                             {
                               "name": "Area OP2 (POperc)",
                               "labelIndex": 122,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP2 (POperc)",
@@ -1013,7 +1013,7 @@
                             {
                               "name": "Area OP1 (POperc)",
                               "labelIndex": 1,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP1 (POperc)",
@@ -1025,7 +1025,7 @@
                             {
                               "name": "Area OP1 (POperc)",
                               "labelIndex": 1,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP1 (POperc)",
@@ -1067,7 +1067,7 @@
                             {
                               "name": "Area 3b (PostCG)",
                               "labelIndex": 37,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 3b (PostCG)",
@@ -1079,7 +1079,7 @@
                             {
                               "name": "Area 3b (PostCG)",
                               "labelIndex": 37,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 3b (PostCG)",
@@ -1107,7 +1107,7 @@
                             {
                               "name": "Area 1 (PostCG)",
                               "labelIndex": 116,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 1 (PostCG)",
@@ -1119,7 +1119,7 @@
                             {
                               "name": "Area 1 (PostCG)",
                               "labelIndex": 116,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 1 (PostCG)",
@@ -1147,7 +1147,7 @@
                             {
                               "name": "Area 2 (PostCS)",
                               "labelIndex": 49,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 2 (PostCS)",
@@ -1159,7 +1159,7 @@
                             {
                               "name": "Area 2 (PostCS)",
                               "labelIndex": 49,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 2 (PostCS)",
@@ -1187,7 +1187,7 @@
                             {
                               "name": "Area 3a (PostCG)",
                               "labelIndex": 121,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 3a (PostCG)",
@@ -1199,7 +1199,7 @@
                             {
                               "name": "Area 3a (PostCG)",
                               "labelIndex": 121,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 3a (PostCG)",
@@ -1241,7 +1241,7 @@
                             {
                               "name": "Area PF (IPL)",
                               "labelIndex": 12,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PF (IPL)",
@@ -1253,7 +1253,7 @@
                             {
                               "name": "Area PF (IPL)",
                               "labelIndex": 12,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PF (IPL)",
@@ -1281,7 +1281,7 @@
                             {
                               "name": "Area PFcm (IPL)",
                               "labelIndex": 103,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFcm (IPL)",
@@ -1293,7 +1293,7 @@
                             {
                               "name": "Area PFcm (IPL)",
                               "labelIndex": 103,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFcm (IPL)",
@@ -1321,7 +1321,7 @@
                             {
                               "name": "Area PGa (IPL)",
                               "labelIndex": 81,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PGa (IPL)",
@@ -1333,7 +1333,7 @@
                             {
                               "name": "Area PGa (IPL)",
                               "labelIndex": 81,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PGa (IPL)",
@@ -1361,7 +1361,7 @@
                             {
                               "name": "Area PFt (IPL)",
                               "labelIndex": 20,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFt (IPL)",
@@ -1373,7 +1373,7 @@
                             {
                               "name": "Area PFt (IPL)",
                               "labelIndex": 20,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFt (IPL)",
@@ -1401,7 +1401,7 @@
                             {
                               "name": "Area PFm (IPL)",
                               "labelIndex": 102,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFm (IPL)",
@@ -1413,7 +1413,7 @@
                             {
                               "name": "Area PFm (IPL)",
                               "labelIndex": 102,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFm (IPL)",
@@ -1441,7 +1441,7 @@
                             {
                               "name": "Area PGp (IPL)",
                               "labelIndex": 65,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PGp (IPL)",
@@ -1453,7 +1453,7 @@
                             {
                               "name": "Area PGp (IPL)",
                               "labelIndex": 65,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PGp (IPL)",
@@ -1481,7 +1481,7 @@
                             {
                               "name": "Area PFop (IPL)",
                               "labelIndex": 94,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFop (IPL)",
@@ -1493,7 +1493,7 @@
                             {
                               "name": "Area PFop (IPL)",
                               "labelIndex": 94,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area PFop (IPL)",
@@ -1535,7 +1535,7 @@
                             {
                               "name": "Area hPO1 (POS)",
                               "labelIndex": 69,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hPO1 (POS)",
@@ -1547,7 +1547,7 @@
                             {
                               "name": "Area hPO1 (POS)",
                               "labelIndex": 69,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hPO1 (POS)",
@@ -1589,7 +1589,7 @@
                             {
                               "name": "Area hIP1 (IPS)",
                               "labelIndex": 32,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP1 (IPS)",
@@ -1601,7 +1601,7 @@
                             {
                               "name": "Area hIP1 (IPS)",
                               "labelIndex": 32,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP1 (IPS)",
@@ -1629,7 +1629,7 @@
                             {
                               "name": "Area hIP7 (IPS)",
                               "labelIndex": 35,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP7 (IPS)",
@@ -1641,7 +1641,7 @@
                             {
                               "name": "Area hIP7 (IPS)",
                               "labelIndex": 35,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP7 (IPS)",
@@ -1669,7 +1669,7 @@
                             {
                               "name": "Area hIP3 (IPS)",
                               "labelIndex": 75,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP3 (IPS)",
@@ -1681,7 +1681,7 @@
                             {
                               "name": "Area hIP3 (IPS)",
                               "labelIndex": 75,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP3 (IPS)",
@@ -1709,7 +1709,7 @@
                             {
                               "name": "Area hIP2 (IPS)",
                               "labelIndex": 59,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP2 (IPS)",
@@ -1721,7 +1721,7 @@
                             {
                               "name": "Area hIP2 (IPS)",
                               "labelIndex": 59,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP2 (IPS)",
@@ -1749,7 +1749,7 @@
                             {
                               "name": "Area hIP4 (IPS)",
                               "labelIndex": 115,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP4 (IPS)",
@@ -1761,7 +1761,7 @@
                             {
                               "name": "Area hIP4 (IPS)",
                               "labelIndex": 115,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP4 (IPS)",
@@ -1789,7 +1789,7 @@
                             {
                               "name": "Area hIP5 (IPS)",
                               "labelIndex": 7,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP5 (IPS)",
@@ -1801,7 +1801,7 @@
                             {
                               "name": "Area hIP5 (IPS)",
                               "labelIndex": 7,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP5 (IPS)",
@@ -1829,7 +1829,7 @@
                             {
                               "name": "Area hIP6 (IPS)",
                               "labelIndex": 95,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP6 (IPS)",
@@ -1841,7 +1841,7 @@
                             {
                               "name": "Area hIP6 (IPS)",
                               "labelIndex": 95,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP6 (IPS)",
@@ -1869,7 +1869,7 @@
                             {
                               "name": "Area hIP8 (IPS)",
                               "labelIndex": 50,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP8 (IPS)",
@@ -1881,7 +1881,7 @@
                             {
                               "name": "Area hIP8 (IPS)",
                               "labelIndex": 50,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hIP8 (IPS)",
@@ -1937,7 +1937,7 @@
                             {
                               "name": "Area hOc6 (POS)",
                               "labelIndex": 72,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc6 (POS)",
@@ -1949,7 +1949,7 @@
                             {
                               "name": "Area hOc6 (POS)",
                               "labelIndex": 72,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc6 (POS)",
@@ -1977,7 +1977,7 @@
                             {
                               "name": "Area hOc4d (Cuneus)",
                               "labelIndex": 44,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4d (Cuneus)",
@@ -1989,7 +1989,7 @@
                             {
                               "name": "Area hOc4d (Cuneus)",
                               "labelIndex": 44,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4d (Cuneus)",
@@ -2017,7 +2017,7 @@
                             {
                               "name": "Area hOc3d (Cuneus)",
                               "labelIndex": 106,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc3d (Cuneus)",
@@ -2029,7 +2029,7 @@
                             {
                               "name": "Area hOc3d (Cuneus)",
                               "labelIndex": 106,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc3d (Cuneus)",
@@ -2071,7 +2071,7 @@
                             {
                               "name": "Area hOc3v (LingG)",
                               "labelIndex": 77,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc3v (LingG)",
@@ -2083,7 +2083,7 @@
                             {
                               "name": "Area hOc3v (LingG)",
                               "labelIndex": 77,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc3v (LingG)",
@@ -2111,7 +2111,7 @@
                             {
                               "name": "Area hOc4v (LingG)",
                               "labelIndex": 58,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4v (LingG)",
@@ -2123,7 +2123,7 @@
                             {
                               "name": "Area hOc4v (LingG)",
                               "labelIndex": 58,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4v (LingG)",
@@ -2165,7 +2165,7 @@
                             {
                               "name": "Area hOc2 (V2, 18)",
                               "labelIndex": 21,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc2 (V2, 18)",
@@ -2177,7 +2177,7 @@
                             {
                               "name": "Area hOc2 (V2, 18)",
                               "labelIndex": 21,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc2 (V2, 18)",
@@ -2205,7 +2205,7 @@
                             {
                               "name": "Area hOc1 (V1, 17, CalcS)",
                               "labelIndex": 120,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc1 (V1, 17, CalcS)",
@@ -2217,7 +2217,7 @@
                             {
                               "name": "Area hOc1 (V1, 17, CalcS)",
                               "labelIndex": 120,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc1 (V1, 17, CalcS)",
@@ -2259,7 +2259,7 @@
                             {
                               "name": "Area hOc4lp (LOC)",
                               "labelIndex": 51,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4lp (LOC)",
@@ -2271,7 +2271,7 @@
                             {
                               "name": "Area hOc4lp (LOC)",
                               "labelIndex": 51,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4lp (LOC)",
@@ -2299,7 +2299,7 @@
                             {
                               "name": "Area hOc5 (LOC)",
                               "labelIndex": 16,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc5 (LOC)",
@@ -2311,7 +2311,7 @@
                             {
                               "name": "Area hOc5 (LOC)",
                               "labelIndex": 16,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc5 (LOC)",
@@ -2339,7 +2339,7 @@
                             {
                               "name": "Area hOc4la (LOC)",
                               "labelIndex": 29,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4la (LOC)",
@@ -2351,7 +2351,7 @@
                             {
                               "name": "Area hOc4la (LOC)",
                               "labelIndex": 29,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area hOc4la (LOC)",
@@ -2407,7 +2407,7 @@
                             {
                               "name": "Area 44 (IFG)",
                               "labelIndex": 92,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 44 (IFG)",
@@ -2419,7 +2419,7 @@
                             {
                               "name": "Area 44 (IFG)",
                               "labelIndex": 92,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 44 (IFG)",
@@ -2447,7 +2447,7 @@
                             {
                               "name": "Area 45 (IFG)",
                               "labelIndex": 112,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 45 (IFG)",
@@ -2459,7 +2459,7 @@
                             {
                               "name": "Area 45 (IFG)",
                               "labelIndex": 112,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 45 (IFG)",
@@ -2501,7 +2501,7 @@
                             {
                               "name": "Area 6d2 (PreCG)",
                               "labelIndex": 82,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d2 (PreCG)",
@@ -2513,7 +2513,7 @@
                             {
                               "name": "Area 6d2 (PreCG)",
                               "labelIndex": 82,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d2 (PreCG)",
@@ -2541,7 +2541,7 @@
                             {
                               "name": "Area 6d1 (PreCG)",
                               "labelIndex": 90,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d1 (PreCG)",
@@ -2553,7 +2553,7 @@
                             {
                               "name": "Area 6d1 (PreCG)",
                               "labelIndex": 90,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d1 (PreCG)",
@@ -2595,7 +2595,7 @@
                             {
                               "name": "Area 6ma (preSMA, mesial SFG)",
                               "labelIndex": 70,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6ma (preSMA, mesial SFG)",
@@ -2607,7 +2607,7 @@
                             {
                               "name": "Area 6ma (preSMA, mesial SFG)",
                               "labelIndex": 70,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6ma (preSMA, mesial SFG)",
@@ -2649,7 +2649,7 @@
                             {
                               "name": "Area 6d3 (SFS)",
                               "labelIndex": 68,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d3 (SFS)",
@@ -2661,7 +2661,7 @@
                             {
                               "name": "Area 6d3 (SFS)",
                               "labelIndex": 68,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6d3 (SFS)",
@@ -2703,7 +2703,7 @@
                             {
                               "name": "Area Fp1 (FPole)",
                               "labelIndex": 107,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fp1 (FPole)",
@@ -2715,7 +2715,7 @@
                             {
                               "name": "Area Fp1 (FPole)",
                               "labelIndex": 107,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fp1 (FPole)",
@@ -2743,7 +2743,7 @@
                             {
                               "name": "Area Fp2 (FPole)",
                               "labelIndex": 101,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fp2 (FPole)",
@@ -2755,7 +2755,7 @@
                             {
                               "name": "Area Fp2 (FPole)",
                               "labelIndex": 101,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fp2 (FPole)",
@@ -2797,7 +2797,7 @@
                             {
                               "name": "Area 4p (PreCG)",
                               "labelIndex": 9,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 4p (PreCG)",
@@ -2809,7 +2809,7 @@
                             {
                               "name": "Area 4p (PreCG)",
                               "labelIndex": 9,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 4p (PreCG)",
@@ -2837,7 +2837,7 @@
                             {
                               "name": "Area 4a (PreCG)",
                               "labelIndex": 100,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 4a (PreCG)",
@@ -2849,7 +2849,7 @@
                             {
                               "name": "Area 4a (PreCG)",
                               "labelIndex": 100,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 4a (PreCG)",
@@ -2891,7 +2891,7 @@
                             {
                               "name": "Area 6mp (SMA, mesial SFG)",
                               "labelIndex": 108,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6mp (SMA, mesial SFG)",
@@ -2903,7 +2903,7 @@
                             {
                               "name": "Area 6mp (SMA, mesial SFG)",
                               "labelIndex": 108,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 6mp (SMA, mesial SFG)",
@@ -2945,7 +2945,7 @@
                             {
                               "name": "Area Fo1 (OFC)",
                               "labelIndex": 47,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo1 (OFC)",
@@ -2957,7 +2957,7 @@
                             {
                               "name": "Area Fo1 (OFC)",
                               "labelIndex": 47,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo1 (OFC)",
@@ -2985,7 +2985,7 @@
                             {
                               "name": "Area Fo3 (OFC)",
                               "labelIndex": 48,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo3 (OFC)",
@@ -2997,7 +2997,7 @@
                             {
                               "name": "Area Fo3 (OFC)",
                               "labelIndex": 48,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo3 (OFC)",
@@ -3025,7 +3025,7 @@
                             {
                               "name": "Area Fo2 (OFC)",
                               "labelIndex": 67,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo2 (OFC)",
@@ -3037,7 +3037,7 @@
                             {
                               "name": "Area Fo2 (OFC)",
                               "labelIndex": 67,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo2 (OFC)",
@@ -3079,7 +3079,7 @@
                             {
                               "name": "Area OP6 (Frontal Operculum)",
                               "labelIndex": 31,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP6 (Frontal Operculum)",
@@ -3091,7 +3091,7 @@
                             {
                               "name": "Area OP6 (Frontal Operculum)",
                               "labelIndex": 31,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP6 (Frontal Operculum)",
@@ -3119,7 +3119,7 @@
                             {
                               "name": "Area OP8 (Frontal Operculum)",
                               "labelIndex": 40,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP8 (Frontal Operculum)",
@@ -3131,7 +3131,7 @@
                             {
                               "name": "Area OP8 (Frontal Operculum)",
                               "labelIndex": 40,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP8 (Frontal Operculum)",
@@ -3159,7 +3159,7 @@
                             {
                               "name": "Area OP5 (Frontal Operculum)",
                               "labelIndex": 43,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP5 (Frontal Operculum)",
@@ -3171,7 +3171,7 @@
                             {
                               "name": "Area OP5 (Frontal Operculum)",
                               "labelIndex": 43,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP5 (Frontal Operculum)",
@@ -3199,7 +3199,7 @@
                             {
                               "name": "Area OP9 (Frontal Operculum)",
                               "labelIndex": 117,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP9 (Frontal Operculum)",
@@ -3211,7 +3211,7 @@
                             {
                               "name": "Area OP9 (Frontal Operculum)",
                               "labelIndex": 117,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP9 (Frontal Operculum)",
@@ -3239,7 +3239,7 @@
                             {
                               "name": "Area OP7 (Frontal Operculum)",
                               "labelIndex": 60,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP7 (Frontal Operculum)",
@@ -3251,7 +3251,7 @@
                             {
                               "name": "Area OP7 (Frontal Operculum)",
                               "labelIndex": 60,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area OP7 (Frontal Operculum)",
@@ -3293,7 +3293,7 @@
                             {
                               "name": "Area Fo6 (OFC)",
                               "labelIndex": 36,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo6 (OFC)",
@@ -3305,7 +3305,7 @@
                             {
                               "name": "Area Fo6 (OFC)",
                               "labelIndex": 36,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo6 (OFC)",
@@ -3333,7 +3333,7 @@
                             {
                               "name": "Area Fo5 (OFC)",
                               "labelIndex": 76,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo5 (OFC)",
@@ -3345,7 +3345,7 @@
                             {
                               "name": "Area Fo5 (OFC)",
                               "labelIndex": 76,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo5 (OFC)",
@@ -3373,7 +3373,7 @@
                             {
                               "name": "Area Fo7 (OFC)",
                               "labelIndex": 52,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo7 (OFC)",
@@ -3385,7 +3385,7 @@
                             {
                               "name": "Area Fo7 (OFC)",
                               "labelIndex": 52,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo7 (OFC)",
@@ -3413,7 +3413,7 @@
                             {
                               "name": "Area Fo4 (OFC)",
                               "labelIndex": 80,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo4 (OFC)",
@@ -3425,7 +3425,7 @@
                             {
                               "name": "Area Fo4 (OFC)",
                               "labelIndex": 80,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Fo4 (OFC)",
@@ -3481,7 +3481,7 @@
                             {
                               "name": "Area Ig3 (Insula)",
                               "labelIndex": 105,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig3 (Insula)",
@@ -3493,7 +3493,7 @@
                             {
                               "name": "Area Ig3 (Insula)",
                               "labelIndex": 105,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig3 (Insula)",
@@ -3521,7 +3521,7 @@
                             {
                               "name": "Area Ig1 (Insula)",
                               "labelIndex": 25,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig1 (Insula)",
@@ -3533,7 +3533,7 @@
                             {
                               "name": "Area Ig1 (Insula)",
                               "labelIndex": 25,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig1 (Insula)",
@@ -3561,7 +3561,7 @@
                             {
                               "name": "Area Ig2 (Insula)",
                               "labelIndex": 45,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig2 (Insula)",
@@ -3573,7 +3573,7 @@
                             {
                               "name": "Area Ig2 (Insula)",
                               "labelIndex": 45,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ig2 (Insula)",
@@ -3615,7 +3615,7 @@
                             {
                               "name": "Area Ia (Insula)",
                               "labelIndex": 118,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ia (Insula)",
@@ -3627,7 +3627,7 @@
                             {
                               "name": "Area Ia (Insula)",
                               "labelIndex": 118,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Ia (Insula)",
@@ -3669,7 +3669,7 @@
                             {
                               "name": "Area Id7 (Insula)",
                               "labelIndex": 18,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id7 (Insula)",
@@ -3681,7 +3681,7 @@
                             {
                               "name": "Area Id7 (Insula)",
                               "labelIndex": 18,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id7 (Insula)",
@@ -3723,7 +3723,7 @@
                             {
                               "name": "Area Id2 (Insula)",
                               "labelIndex": 99,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id2 (Insula)",
@@ -3735,7 +3735,7 @@
                             {
                               "name": "Area Id2 (Insula)",
                               "labelIndex": 99,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id2 (Insula)",
@@ -3763,7 +3763,7 @@
                             {
                               "name": "Area Id1 (Insula)",
                               "labelIndex": 78,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id1 (Insula)",
@@ -3775,7 +3775,7 @@
                             {
                               "name": "Area Id1 (Insula)",
                               "labelIndex": 78,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id1 (Insula)",
@@ -3803,7 +3803,7 @@
                             {
                               "name": "Area Id5 (Insula)",
                               "labelIndex": 104,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id5 (Insula)",
@@ -3815,7 +3815,7 @@
                             {
                               "name": "Area Id5 (Insula)",
                               "labelIndex": 104,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id5 (Insula)",
@@ -3843,7 +3843,7 @@
                             {
                               "name": "Area Id6 (Insula)",
                               "labelIndex": 11,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id6 (Insula)",
@@ -3855,7 +3855,7 @@
                             {
                               "name": "Area Id6 (Insula)",
                               "labelIndex": 11,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id6 (Insula)",
@@ -3883,7 +3883,7 @@
                             {
                               "name": "Area Id4 (Insula)",
                               "labelIndex": 53,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id4 (Insula)",
@@ -3895,7 +3895,7 @@
                             {
                               "name": "Area Id4 (Insula)",
                               "labelIndex": 53,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id4 (Insula)",
@@ -3923,7 +3923,7 @@
                             {
                               "name": "Area Id3 (Insula)",
                               "labelIndex": 54,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id3 (Insula)",
@@ -3935,7 +3935,7 @@
                             {
                               "name": "Area Id3 (Insula)",
                               "labelIndex": 54,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area Id3 (Insula)",
@@ -3991,7 +3991,7 @@
                             {
                               "name": "Area STS2 (STS)",
                               "labelIndex": 98,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area STS2 (STS)",
@@ -4003,7 +4003,7 @@
                             {
                               "name": "Area STS2 (STS)",
                               "labelIndex": 98,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area STS2 (STS)",
@@ -4031,7 +4031,7 @@
                             {
                               "name": "Area STS1 (STS)",
                               "labelIndex": 114,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area STS1 (STS)",
@@ -4043,7 +4043,7 @@
                             {
                               "name": "Area STS1 (STS)",
                               "labelIndex": 114,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area STS1 (STS)",
@@ -4085,7 +4085,7 @@
                             {
                               "name": "Area TE 3 (STG)",
                               "labelIndex": 15,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 3 (STG)",
@@ -4097,7 +4097,7 @@
                             {
                               "name": "Area TE 3 (STG)",
                               "labelIndex": 15,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 3 (STG)",
@@ -4125,7 +4125,7 @@
                             {
                               "name": "Area TE 2.2 (STG)",
                               "labelIndex": 93,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 2.2 (STG)",
@@ -4137,7 +4137,7 @@
                             {
                               "name": "Area TE 2.2 (STG)",
                               "labelIndex": 93,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 2.2 (STG)",
@@ -4165,7 +4165,7 @@
                             {
                               "name": "Area TE 2.1 (STG)",
                               "labelIndex": 19,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 2.1 (STG)",
@@ -4177,7 +4177,7 @@
                             {
                               "name": "Area TE 2.1 (STG)",
                               "labelIndex": 19,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 2.1 (STG)",
@@ -4219,7 +4219,7 @@
                             {
                               "name": "Area TI (STG)",
                               "labelIndex": 13,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TI (STG)",
@@ -4231,7 +4231,7 @@
                             {
                               "name": "Area TI (STG)",
                               "labelIndex": 13,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TI (STG)",
@@ -4259,7 +4259,7 @@
                             {
                               "name": "Area TeI (STG)",
                               "labelIndex": 79,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TeI (STG)",
@@ -4271,7 +4271,7 @@
                             {
                               "name": "Area TeI (STG)",
                               "labelIndex": 79,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TeI (STG)",
@@ -4313,7 +4313,7 @@
                             {
                               "name": "Area TE 1.2 (HESCHL)",
                               "labelIndex": 86,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.2 (HESCHL)",
@@ -4325,7 +4325,7 @@
                             {
                               "name": "Area TE 1.2 (HESCHL)",
                               "labelIndex": 86,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.2 (HESCHL)",
@@ -4353,7 +4353,7 @@
                             {
                               "name": "Area TE 1.1 (HESCHL)",
                               "labelIndex": 39,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.1 (HESCHL)",
@@ -4365,7 +4365,7 @@
                             {
                               "name": "Area TE 1.1 (HESCHL)",
                               "labelIndex": 39,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.1 (HESCHL)",
@@ -4393,7 +4393,7 @@
                             {
                               "name": "Area TE 1.0 (HESCHL)",
                               "labelIndex": 34,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.0 (HESCHL)",
@@ -4405,7 +4405,7 @@
                             {
                               "name": "Area TE 1.0 (HESCHL)",
                               "labelIndex": 34,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area TE 1.0 (HESCHL)",
@@ -4447,7 +4447,7 @@
                             {
                               "name": "Area FG2 (FusG)",
                               "labelIndex": 28,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG2 (FusG)",
@@ -4459,7 +4459,7 @@
                             {
                               "name": "Area FG2 (FusG)",
                               "labelIndex": 28,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG2 (FusG)",
@@ -4487,7 +4487,7 @@
                             {
                               "name": "Area FG3 (FusG)",
                               "labelIndex": 42,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG3 (FusG)",
@@ -4499,7 +4499,7 @@
                             {
                               "name": "Area FG3 (FusG)",
                               "labelIndex": 42,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG3 (FusG)",
@@ -4527,7 +4527,7 @@
                             {
                               "name": "Area FG1 (FusG)",
                               "labelIndex": 84,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG1 (FusG)",
@@ -4539,7 +4539,7 @@
                             {
                               "name": "Area FG1 (FusG)",
                               "labelIndex": 84,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG1 (FusG)",
@@ -4567,7 +4567,7 @@
                             {
                               "name": "Area FG4 (FusG)",
                               "labelIndex": 55,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG4 (FusG)",
@@ -4579,7 +4579,7 @@
                             {
                               "name": "Area FG4 (FusG)",
                               "labelIndex": 55,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area FG4 (FusG)",
@@ -4635,7 +4635,7 @@
                             {
                               "name": "Frontal-to-Occipital (GapMap)",
                               "labelIndex": 33,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-to-Occipital (GapMap)",
@@ -4647,7 +4647,7 @@
                             {
                               "name": "Frontal-to-Occipital (GapMap)",
                               "labelIndex": 33,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-to-Occipital (GapMap)",
@@ -4675,7 +4675,7 @@
                             {
                               "name": "Temporal-to-Parietal (GapMap)",
                               "labelIndex": 2,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Temporal-to-Parietal (GapMap)",
@@ -4687,7 +4687,7 @@
                             {
                               "name": "Temporal-to-Parietal (GapMap)",
                               "labelIndex": 2,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Temporal-to-Parietal (GapMap)",
@@ -4715,7 +4715,7 @@
                             {
                               "name": "Frontal-I (GapMap)",
                               "labelIndex": 71,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-I (GapMap)",
@@ -4727,7 +4727,7 @@
                             {
                               "name": "Frontal-I (GapMap)",
                               "labelIndex": 71,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-I (GapMap)",
@@ -4755,7 +4755,7 @@
                             {
                               "name": "Frontal-to-Temporal (GapMap)",
                               "labelIndex": 110,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-to-Temporal (GapMap)",
@@ -4767,7 +4767,7 @@
                             {
                               "name": "Frontal-to-Temporal (GapMap)",
                               "labelIndex": 110,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-to-Temporal (GapMap)",
@@ -4795,7 +4795,7 @@
                             {
                               "name": "Frontal-II (GapMap)",
                               "labelIndex": 27,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-II (GapMap)",
@@ -4807,7 +4807,7 @@
                             {
                               "name": "Frontal-II (GapMap)",
                               "labelIndex": 27,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Frontal-II (GapMap)",
@@ -4863,7 +4863,7 @@
                             {
                               "name": "Area p24c (pACC)",
                               "labelIndex": 57,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p24c (pACC)",
@@ -4875,7 +4875,7 @@
                             {
                               "name": "Area p24c (pACC)",
                               "labelIndex": 57,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p24c (pACC)",
@@ -4903,7 +4903,7 @@
                             {
                               "name": "Area 25 (sACC)",
                               "labelIndex": 3,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 25 (sACC)",
@@ -4915,7 +4915,7 @@
                             {
                               "name": "Area 25 (sACC)",
                               "labelIndex": 3,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 25 (sACC)",
@@ -4943,7 +4943,7 @@
                             {
                               "name": "Area p24ab (pACC)",
                               "labelIndex": 63,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p24ab (pACC)",
@@ -4955,7 +4955,7 @@
                             {
                               "name": "Area p24ab (pACC)",
                               "labelIndex": 63,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p24ab (pACC)",
@@ -4983,7 +4983,7 @@
                             {
                               "name": "Area s32 (sACC)",
                               "labelIndex": 74,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area s32 (sACC)",
@@ -4995,7 +4995,7 @@
                             {
                               "name": "Area s32 (sACC)",
                               "labelIndex": 74,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area s32 (sACC)",
@@ -5023,7 +5023,7 @@
                             {
                               "name": "Area 33 (ACC)",
                               "labelIndex": 96,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 33 (ACC)",
@@ -5035,7 +5035,7 @@
                             {
                               "name": "Area 33 (ACC)",
                               "labelIndex": 96,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area 33 (ACC)",
@@ -5063,7 +5063,7 @@
                             {
                               "name": "Area p32 (pACC)",
                               "labelIndex": 113,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p32 (pACC)",
@@ -5075,7 +5075,7 @@
                             {
                               "name": "Area p32 (pACC)",
                               "labelIndex": 113,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area p32 (pACC)",
@@ -5103,7 +5103,7 @@
                             {
                               "name": "Area s24 (sACC)",
                               "labelIndex": 73,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area s24 (sACC)",
@@ -5115,7 +5115,7 @@
                             {
                               "name": "Area s24 (sACC)",
                               "labelIndex": 73,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Area s24 (sACC)",
@@ -5157,7 +5157,7 @@
                             {
                               "name": "HC-Presubiculum (Hippocampus)",
                               "labelIndex": 87,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Presubiculum (Hippocampus)",
@@ -5169,7 +5169,7 @@
                             {
                               "name": "HC-Presubiculum (Hippocampus)",
                               "labelIndex": 87,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Presubiculum (Hippocampus)",
@@ -5197,7 +5197,7 @@
                             {
                               "name": "HATA (Hippocampus)",
                               "labelIndex": 56,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HATA (Hippocampus)",
@@ -5209,7 +5209,7 @@
                             {
                               "name": "HATA (Hippocampus)",
                               "labelIndex": 56,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HATA (Hippocampus)",
@@ -5237,7 +5237,7 @@
                             {
                               "name": "Entorhinal Cortex",
                               "labelIndex": 64,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Entorhinal Cortex",
@@ -5249,7 +5249,7 @@
                             {
                               "name": "Entorhinal Cortex",
                               "labelIndex": 64,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Entorhinal Cortex",
@@ -5277,7 +5277,7 @@
                             {
                               "name": "CA3 (Hippocampus)",
                               "labelIndex": 119,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA3 (Hippocampus)",
@@ -5289,7 +5289,7 @@
                             {
                               "name": "CA3 (Hippocampus)",
                               "labelIndex": 119,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA3 (Hippocampus)",
@@ -5317,7 +5317,7 @@
                             {
                               "name": "HC-Transsubiculum (Hippocampus)",
                               "labelIndex": 66,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Transsubiculum (Hippocampus)",
@@ -5329,7 +5329,7 @@
                             {
                               "name": "HC-Transsubiculum (Hippocampus)",
                               "labelIndex": 66,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Transsubiculum (Hippocampus)",
@@ -5357,7 +5357,7 @@
                             {
                               "name": "HC-Subiculum (Hippocampus)",
                               "labelIndex": 10,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Subiculum (Hippocampus)",
@@ -5369,7 +5369,7 @@
                             {
                               "name": "HC-Subiculum (Hippocampus)",
                               "labelIndex": 10,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Subiculum (Hippocampus)",
@@ -5397,7 +5397,7 @@
                             {
                               "name": "HC-Prosubiculum (Hippocampus)",
                               "labelIndex": 6,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Prosubiculum (Hippocampus)",
@@ -5409,7 +5409,7 @@
                             {
                               "name": "HC-Prosubiculum (Hippocampus)",
                               "labelIndex": 6,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Prosubiculum (Hippocampus)",
@@ -5437,7 +5437,7 @@
                             {
                               "name": "HC-Parasubiculum (Hippocampus)",
                               "labelIndex": 8,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Parasubiculum (Hippocampus)",
@@ -5449,7 +5449,7 @@
                             {
                               "name": "HC-Parasubiculum (Hippocampus)",
                               "labelIndex": 8,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "HC-Parasubiculum (Hippocampus)",
@@ -5477,7 +5477,7 @@
                             {
                               "name": "DG (Hippocampus)",
                               "labelIndex": 91,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "DG (Hippocampus)",
@@ -5489,7 +5489,7 @@
                             {
                               "name": "DG (Hippocampus)",
                               "labelIndex": 91,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "DG (Hippocampus)",
@@ -5517,7 +5517,7 @@
                             {
                               "name": "CA2 (Hippocampus)",
                               "labelIndex": 23,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA2 (Hippocampus)",
@@ -5529,7 +5529,7 @@
                             {
                               "name": "CA2 (Hippocampus)",
                               "labelIndex": 23,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA2 (Hippocampus)",
@@ -5557,7 +5557,7 @@
                             {
                               "name": "CA1 (Hippocampus)",
                               "labelIndex": 61,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA1 (Hippocampus)",
@@ -5569,7 +5569,7 @@
                             {
                               "name": "CA1 (Hippocampus)",
                               "labelIndex": 61,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "CA1 (Hippocampus)",
@@ -5653,7 +5653,7 @@
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
                               "labelIndex": 30,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Interposed Nucleus (Cerebellum)",
@@ -5665,7 +5665,7 @@
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
                               "labelIndex": 30,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Interposed Nucleus (Cerebellum)",
@@ -5707,7 +5707,7 @@
                             {
                               "name": "Dorsal Dentate Nucleus (Cerebellum)",
                               "labelIndex": 111,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Dorsal Dentate Nucleus (Cerebellum)",
@@ -5719,7 +5719,7 @@
                             {
                               "name": "Dorsal Dentate Nucleus (Cerebellum)",
                               "labelIndex": 111,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Dorsal Dentate Nucleus (Cerebellum)",
@@ -5747,7 +5747,7 @@
                             {
                               "name": "Ventral Dentate Nucleus (Cerebellum)",
                               "labelIndex": 38,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ventral Dentate Nucleus (Cerebellum)",
@@ -5759,7 +5759,7 @@
                             {
                               "name": "Ventral Dentate Nucleus (Cerebellum)",
                               "labelIndex": 38,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Ventral Dentate Nucleus (Cerebellum)",
@@ -5801,7 +5801,7 @@
                             {
                               "name": "Fastigial Nucleus (Cerebellum)",
                               "labelIndex": 89,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Fastigial Nucleus (Cerebellum)",
@@ -5813,7 +5813,7 @@
                             {
                               "name": "Fastigial Nucleus (Cerebellum)",
                               "labelIndex": 89,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Fastigial Nucleus (Cerebellum)",
@@ -5855,7 +5855,7 @@
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
                               "labelIndex": 30,
-                              "ngId": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Interposed Nucleus (Cerebellum)",
@@ -5867,7 +5867,7 @@
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
                               "labelIndex": 30,
-                              "ngId": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+                              "ngId": "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE",
                               "_": {
                                 "xml": {
                                   "name": "Interposed Nucleus (Cerebellum)",
