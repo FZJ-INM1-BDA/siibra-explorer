@@ -5,6 +5,14 @@ const validTypes = [
   'PROPAGATE_PARC_REGION_ATTR'
 ]
 
+const VALID_METHOD = {
+  PROCESS_PLOTLY: `PROCESS_PLOTLY`
+}
+
+const VALID_METHODS = [
+  VALID_METHOD.PROCESS_PLOTLY
+]
+
 const validOutType = [
   'ASSEMBLED_LANDMARKS_VTK',
   'ASSEMBLED_USERLANDMARKS_VTK',
@@ -284,7 +292,55 @@ const processParcRegionAttr = (payload) => {
   })
 }
 
+let plotyVtkUrl
+
 onmessage = (message) => {
+  if (message.data.method && VALID_METHODS.indexOf(message.data.method) >= 0) {
+    const { id } = message.data
+    if (message.data.method === VALID_METHOD.PROCESS_PLOTLY) {
+      /**
+       * units in mm --> convert to nm
+       */
+      const plotyMultiple=1e6
+      try {
+        const { data: plotlyData } = message.data.param
+        const { x, y, z } = plotlyData.traces[0]
+        const lm = []
+        for (const idx in x) {
+          if (typeof x !== 'undefined' && x !== null) {
+            lm.push([x[idx]*plotyMultiple, y[idx]*plotyMultiple, z[idx]*plotyMultiple])
+          }
+        }
+        if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
+        const vtkString = parseLmToVtk(lm, 1e-1)
+        plotyVtkUrl = URL.createObjectURL(
+          new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
+        )
+        postMessage({
+          id,
+          result: {
+            objectUrl: plotyVtkUrl
+          }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `malformed plotly param: ${e.toString()}`
+          }
+        })
+      }
+    }
+    postMessage({
+      id,
+      error: {
+        code: 404,
+        message: `worker method not found`
+      }
+    })
+    return
+  }
   
   if(validTypes.findIndex(type => type === message.data.type) >= 0){
     switch(message.data.type){

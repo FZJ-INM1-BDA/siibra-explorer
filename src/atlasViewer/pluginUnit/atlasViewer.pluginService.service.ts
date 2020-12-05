@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http'
-import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef, Inject } from "@angular/core";
+import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef, Inject, InjectionToken } from "@angular/core";
 import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
 import { PluginUnit } from "./pluginUnit.component";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, merge, Observable, of, zip } from "rxjs";
+import { BehaviorSubject, merge, Observable, of, Subject, zip } from "rxjs";
 import { filter, map, shareReplay, switchMap, catchError } from "rxjs/operators";
 import { LoggingService } from 'src/logging';
 import { PluginHandler } from 'src/util/pluginHandler';
