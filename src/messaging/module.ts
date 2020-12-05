@@ -1,6 +1,9 @@
-import { NgModule, Optional } from "@angular/core";
+import { Inject, NgModule, Optional } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { LOAD_MESH_TOKEN, ILoadMesh } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ComponentsModule } from "src/components";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
@@ -21,7 +24,10 @@ export class MesssagingModule{
 
   constructor(
     private dialog: MatDialog,
-    @Optional() private apiService: AtlasViewerAPIServices
+    private snackbar: MatSnackBar,
+    private worker: AtlasWorkerService,
+    @Optional() private apiService: AtlasViewerAPIServices,
+    @Optional() @Inject(LOAD_MESH_TOKEN) private loadMesh: (loadMeshParam: ILoadMesh) => void
   ){
 
     window.addEventListener('message', async ({ data, origin, source }) => {
@@ -83,7 +89,6 @@ export class MesssagingModule{
   }
 
   async processMessage({ method, param }){
-    console.log({ method, param })
 
     if (method === 'dummyMethod') {
       return 'OK'
@@ -96,6 +101,27 @@ export class MesssagingModule{
 
     if (method === 'viewerHandle:remove3DLandmarks') {
       this.apiService.interactiveViewer.viewerHandle.remove3DLandmarks(param)
+      return 'OK'
+    }
+
+    if (method === '_tmp:plotly') {
+      const isLoadingSnack = this.snackbar.open(`Loading plotly mesh ...`)
+      const resp = await this.worker.sendMessage({
+        method: `PROCESS_PLOTLY`,
+        param
+      })
+      isLoadingSnack?.dismiss()
+      const meshId = 'bobby'
+      if (this.loadMesh) {
+        const { objectUrl } = resp.result || {}
+        this.loadMesh({
+          type: 'VTK',
+          id: meshId,
+          url: objectUrl
+        })
+      } else {
+        this.snackbar.open(`Error: loadMesh method not injected.`)
+      }
       return 'OK'
     }
 
