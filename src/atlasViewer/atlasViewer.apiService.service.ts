@@ -37,11 +37,11 @@ export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
 export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
 
 export interface ILoadMesh {
-  type: 'VTK',
-  id: string,
+  type: 'VTK'
+  id: string
   url: string
 }
-export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam:ILoadMesh)=>void>('LOAD_MESH_TOKEN')
+export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
 
 @Injectable({
   providedIn : 'root'
