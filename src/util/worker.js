@@ -312,7 +312,7 @@ onmessage = (message) => {
           }
         }
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
-        const vtkString = parseLmToVtk(lm, 1e-1)
+        const vtkString = parseLmToVtk(lm, 3e-2)
         plotyVtkUrl = URL.createObjectURL(
           new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
         )
