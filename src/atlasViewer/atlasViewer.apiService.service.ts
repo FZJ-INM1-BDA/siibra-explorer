@@ -13,6 +13,7 @@ import {
   IavRootStoreInterface,
   safeFilter
 } from "src/services/stateStore.service";
+import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
@@ -387,7 +388,8 @@ export class AtlasViewerAPIServices implements OnDestroy{
         this.interactiveViewer.viewerHandle?.loadLayer({
           [id]: {
             type: 'mesh',
-            source: `vtk://${url}`
+            source: `vtk://${url}`,
+            shader: `void main(){${FRAGMENT_EMIT_RED};}`
           }
         })
       })
