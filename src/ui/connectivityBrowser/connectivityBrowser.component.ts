@@ -15,7 +15,7 @@ import {distinctUntilChanged, map} from "rxjs/operators";
 import {
   CLEAR_CONNECTIVITY_REGION,
   SELECT_REGIONS,
-  SET_CONNECTIVITY_VISIBLE
+  SET_OVERRITEN_COLOR_MAP
 } from "src/services/state/viewerState.store";
 import {safeFilter} from "src/services/stateStore.service";
 import {viewerStateNavigateToRegion} from "src/services/state/viewerState.store.helper";
@@ -46,6 +46,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies'
 
+    private accordionIsExpanded = false
+
     @Input()
     set accordionExpanded(flag: boolean) {
       /**
@@ -55,16 +57,17 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this._isFirstUpdate = false
         return
       }
-      // this.store$.dispatch(
-      //   ngViewerActionClearView({
-      //     payload: {
-      //       [CONNECTIVITY_NAME_PLATE]: flag
-      //     }
-      //   })
-      // )
+      this.accordionIsExpanded = flag
+      this.store$.dispatch(
+        ngViewerActionClearView({
+          payload: {
+            [CONNECTIVITY_NAME_PLATE]: flag && !this.noDataReceived
+          }
+        })
+      )
       this.store$.dispatch({
-        type: SET_CONNECTIVITY_VISIBLE,
-        payload: 'connectivity',
+        type: SET_OVERRITEN_COLOR_MAP,
+        payload: flag? CONNECTIVITY_NAME_PLATE : false,
       })
     }
 
@@ -82,7 +85,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       if (!val) {
         this.store$.dispatch({
-          type: SET_CONNECTIVITY_VISIBLE,
+          type: SET_OVERRITEN_COLOR_MAP,
           payload: false,
         })
         return
@@ -150,9 +153,17 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.store$.pipe(
           select(viewerStateOverwrittenColorMapSelector),
         ).subscribe(value => {
-          this.setColorMap$.next(!!value)
+          if (this.accordionIsExpanded) {
+            this.setColorMap$.next(!!value)
+          }
         })
       )
+
+      this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
+        if (this.accordionIsExpanded && !ocm) {
+          this.setOpenState.emit(false)
+        }
+      }))
 
       this.subscriptions.push(
         this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
@@ -174,18 +185,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           )
         ).subscribe(([flag, connectedAreas]) => {
           if (connectedAreas === 'No data') {
-            this.store$.dispatch(
-              ngViewerActionClearView({
-                payload: {
-                  [CONNECTIVITY_NAME_PLATE]: false
-                }
-              })
-            )
-            this.connectedAreas = []
-            this.noDataReceived = true
-            this.connectivityNumberReceived.emit('0')
-
-            return this.restoreDefaultColormap()
+            return this.clearViewer()
           } else {
             this.store$.dispatch(
               ngViewerActionClearView({
@@ -202,13 +202,13 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
             if (flag) {
               this.addNewColorMap()
               this.store$.dispatch({
-                type: SET_CONNECTIVITY_VISIBLE,
+                type: SET_OVERRITEN_COLOR_MAP,
                 payload: 'connectivity',
               })
             } else {
               this.restoreDefaultColormap()
 
-              this.store$.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
+              this.store$.dispatch({type: SET_OVERRITEN_COLOR_MAP, payload: null})
 
               /**
                          * TODO
@@ -239,6 +239,21 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public ngOnDestroy(): void {
       this.restoreDefaultColormap()
       this.subscriptions.forEach(s => s.unsubscribe())
+    }
+    
+    clearViewer() {
+      this.store$.dispatch(
+        ngViewerActionClearView({
+          payload: {
+            [CONNECTIVITY_NAME_PLATE]: false
+          }
+        })
+      )
+      this.connectedAreas = []
+      this.noDataReceived = true
+      this.connectivityNumberReceived.emit('0')
+
+      return this.restoreDefaultColormap()
     }
 
     // ToDo Affect on component

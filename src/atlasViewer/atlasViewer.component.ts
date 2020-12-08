@@ -44,6 +44,7 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { ClickInterceptorService } from "src/glue";
+import {SET_OVERRITEN_COLOR_MAP} from "src/services/state/viewerState.store";
 
 /**
  * TODO
@@ -403,6 +404,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   public unsetClearViewByKey(key: string){
+    // ToDo - In some cases (e.g. connectivity) expanded panel is not directly connected to the viewer
+    //  There are cases when panel is expanded but view is not affected, but when we close connectivity chip
+    //  sidebar panel should be collapse anyways. That's why additional store dispatch is added here.
+    this.store.dispatch({
+      type: SET_OVERRITEN_COLOR_MAP,
+      payload: false
+    })
     this.store.dispatch(
       ngViewerActionClearView({ payload: {
         [key]: false
