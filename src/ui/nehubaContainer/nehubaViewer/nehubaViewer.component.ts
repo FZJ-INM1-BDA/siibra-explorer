@@ -250,7 +250,19 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         /**
          * url may be null if user removes all landmarks
          */
-        if (!url) { return }
+        if (!url) {
+          /**
+           * remove transparency from meshes in current layer(s)
+           */
+          for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+            if (layer) {
+              layer.layer.displayState.objectAlpha.restoreState(1.0)
+            }
+          }
+  
+          return
+        }
         const _ = {}
         _[NG_USER_LANDMARK_LAYER_NAME] = {
           type: 'mesh',
@@ -258,6 +270,16 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           shader: this.userLandmarkShader,
         }
         this.loadLayer(_)
+
+        /**
+         * adding transparency to meshes in current layer(s)
+         */
+        for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+          if (layer) {
+            layer.layer.displayState.objectAlpha.restoreState(0.2)
+          }
+        }
       }),
     )
   }

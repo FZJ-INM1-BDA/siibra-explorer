@@ -35,8 +35,11 @@
       <section class="d-flex align-items-center mt-1">
         <section id="contact-points-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
           <div role="list" class="ws-no-wrap">
-            <mat-chip *ngFor="let contactPt of datum['contactPoints']" class="ml-1">
-              {{ contactPt.position | addUnitAndJoin : '' }}
+            <mat-chip *ngFor="let contactPt of datum['contactPoints']"
+              [matTooltip]="contactPt['position']"
+              (click)="handleContactPtClk(contactPt)"
+              class="ml-1">
+              {{ contactPt['@id'] }}
             </mat-chip>
           </div>
         </section>

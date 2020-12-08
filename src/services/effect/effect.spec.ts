@@ -11,6 +11,7 @@ import { defaultRootState } from '../stateStore.service'
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
 const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V24_LEFT_NG`
+const COLIN_V24_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
 
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {
@@ -18,7 +19,7 @@ describe('effect.ts', () => {
 
       const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({
         parcellation: {
-          ...colinsJson.parcellations[0],
+          ...colinsJson.parcellations.find(p => p['@id'] === COLIN_V24_ID),
           updated: true,
         },
       })

@@ -1,6 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, InjectionToken, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { StoreModule, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -14,7 +14,7 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory, LOAD_MESH_TOKEN, ILoadMesh } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
@@ -241,6 +241,15 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       },
       deps: [
         ClickInterceptorService
+      ]
+    },
+    {
+      provide: LOAD_MESH_TOKEN,
+      useFactory: (apiService: AtlasViewerAPIServices) => {
+        return (loadMeshParam: ILoadMesh) => apiService.loadMesh$.next(loadMeshParam)
+      },
+      deps: [
+        AtlasViewerAPIServices
       ]
     }
   ],

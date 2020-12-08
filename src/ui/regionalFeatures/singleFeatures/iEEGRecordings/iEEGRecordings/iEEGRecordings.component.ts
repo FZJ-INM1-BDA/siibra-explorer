@@ -1,6 +1,8 @@
 import { Component, Inject, Optional, EventEmitter } from "@angular/core";
+import { Store } from "@ngrx/store";
 import { merge, Subject, Subscription } from "rxjs";
 import { debounceTime, map, scan, take } from "rxjs/operators";
+import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { RegionalFeaturesService } from "src/ui/regionalFeatures/regionalFeature.service";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { IHasId } from "src/util/interfaces";
@@ -23,6 +25,7 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
 
   constructor(
     private regionFeatureService: RegionalFeaturesService,
+    private store: Store<any>,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) private regClickIntp: ClickInterceptor,
   ){
     super(regionFeatureService)
@@ -99,6 +102,19 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
   ngOnDestroy(){
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     while(this.sub.length > 0) this.sub.pop().unsubscribe()
+  }
+
+  handleContactPtClk(contactPt: IHasId & { position: number[] }){
+    const { position } = contactPt
+    this.store.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          position: position.map(v => v * 1e6),
+          positionReal: true,
+          animation: {}
+        },
+      })
+    )
   }
 
   handleDatumExpansion(electrodeId: string, open: boolean){

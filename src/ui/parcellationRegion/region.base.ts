@@ -33,7 +33,7 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this._region)
-    this.position = val.position
+    this.position = val && val.position
     if (!this._region) return
 
     const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
@@ -90,19 +90,31 @@ export class RegionBase {
           const filteredRsInOtherTmpls = []
           for (const bundledObj of regionsInOtherTemplates) {
             const { template, parcellation, region } = bundledObj
-            const idx = filteredRsInOtherTmpls.findIndex(({ template: _template, region: _region }) => {
+
+            /**
+             * trying to find duplicate region
+             * with same templateId, and same hemisphere
+             */
+            const sameEntityIdx = filteredRsInOtherTmpls.findIndex(({ template: _template, region: _region }) => {
               return _template['@id'] === template['@id']
-                && getRegionHemisphere(_region) !== getRegionHemisphere(region)
+                && getRegionHemisphere(_region) === getRegionHemisphere(region)
             })
-            if ( idx < 0 ) {
+            /**
+             * if doesn't exist, just push to output
+             */
+            if ( sameEntityIdx < 0 ) {
               filteredRsInOtherTmpls.push(bundledObj)
             } else {
-              const { parcellation: currentParc } = filteredRsInOtherTmpls[idx]
+
+              /**
+               * if exists, only append the latest version
+               */
+              const { parcellation: currentParc } = filteredRsInOtherTmpls[sameEntityIdx]
               /**
                * if the new element is newer than existing item
                */
               if (isNewerThan(parcellations, parcellation, currentParc)) {
-                filteredRsInOtherTmpls.splice(idx, 1)
+                filteredRsInOtherTmpls.splice(sameEntityIdx, 1)
                 filteredRsInOtherTmpls.push(bundledObj)
               }
             }

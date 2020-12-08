@@ -73,8 +73,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public spatialResultsPerPage = 10
   public spatialWidth = 600
 
-  public landmarkFlatProjection: boolean = false
-
   public chartBaseStyle = {
     fill : 'origin',
   }

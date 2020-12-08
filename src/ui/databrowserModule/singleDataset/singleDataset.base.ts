@@ -12,6 +12,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ARIA_LABELS } from 'common/constants'
 import { switchMap, distinctUntilChanged, filter } from "rxjs/operators";
 import { IContributor } from "../contributor";
+import { UNDER_REVIEW } from "../constants";
 
 const getDirectLinkToKg = (dataset: { fullId: string, id: string }) => {
   const { id } = dataset
@@ -96,6 +97,8 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   public DS_PREVIEW_URL = DS_PREVIEW_URL
   public strictLocal: boolean = STRICT_LOCAL
 
+  public isGdprProtected: boolean = false
+
   /**
    * sic!
    */
@@ -144,13 +147,15 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
 
           const { kgSchema, kgId } = this
 
-          const { name, description, publications, fullId, kgReference, files, contributors, ...rest } = dataset
+          const { name, description, publications, fullId, kgReference, files, contributors, embargoStatus, ...rest } = dataset
           this.name = name
           this.description = description
           this.publications = publications
           this.contributors = contributors
           this.files = files
           this.fullId = fullId
+
+          this.isGdprProtected = embargoStatus.some(s => s['@id'] === UNDER_REVIEW['@id'])
 
           this.kgReference = kgReference
           this.directLinkToKg = getDirectLinkToKg(dataset)

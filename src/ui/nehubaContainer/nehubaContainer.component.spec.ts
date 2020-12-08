@@ -6,7 +6,6 @@ import { defaultRootState } from 'src/services/stateStore.service'
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module"
 import { TouchSideClass } from "./touchSideClass.directive"
 import { MaximmisePanelButton } from "./maximisePanelButton/maximisePanelButton.component"
-import { LandmarkUnit } from './landmarkUnit/landmarkUnit.component'
 import { LayoutModule } from 'src/layouts/layout.module'
 import { PureContantService, UtilModule } from "src/util"
 import { AtlasLayerSelector } from "../atlasLayerSelector/atlasLayerSelector.component"
@@ -21,7 +20,6 @@ import { RegionDirective } from 'src/ui/parcellationRegion/region.directive'
 import { RegionTextSearchAutocomplete } from "../viewerStateController/regionSearch/regionSearch.component"
 import { MobileControlNubStylePipe } from './pipes/mobileControlNubStyle.pipe'
 import { ReorderPanelIndexPipe } from './reorderPanelIndex.pipe'
-import { SafeStylePipe } from 'src/util/pipes/safeStyle.pipe'
 import { AuthModule } from 'src/auth'
 import { StateModule } from 'src/state'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
@@ -30,7 +28,7 @@ import { WidgetModule } from 'src/widget'
 import { NehubaModule } from './nehuba.module'
 import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
-import { viewerStateHelperStoreName } from 'src/services/state/viewerState.store.helper'
+import { viewerStateCustomLandmarkSelector, viewerStateHelperStoreName } from 'src/services/state/viewerState.store.helper'
 import { RenderViewOriginDatasetLabelPipe } from '../parcellationRegion/region.base'
 import { By } from '@angular/platform-browser'
 import { ARIA_LABELS } from 'common/constants'
@@ -38,9 +36,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RegionAccordionTooltipTextPipe } from '../util'
 import { hot } from 'jasmine-marbles'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
+import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
 import { PANELS } from 'src/services/state/ngViewerState/constants'
 import { RegionalFeaturesModule } from '../regionalFeatures'
+import { Landmark2DModule } from './2dLandmarks/module'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -88,12 +87,12 @@ describe('> nehubaContainer.component.ts', () => {
            * so and so components needs to be compiled first. make sure you call compileComponents
            */
           HttpClientTestingModule,
+          Landmark2DModule,
         ],
         declarations: [
           NehubaContainer,
           TouchSideClass,
           MaximmisePanelButton,
-          LandmarkUnit,
           AtlasLayerSelector,
           StatusCardComponent,
           NehubaViewerTouchDirective,
@@ -107,7 +106,6 @@ describe('> nehubaContainer.component.ts', () => {
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
-          SafeStylePipe,
           RenderViewOriginDatasetLabelPipe,
           RegionAccordionTooltipTextPipe,
         ],
@@ -634,6 +632,67 @@ describe('> nehubaContainer.component.ts', () => {
           expect(args[1]).toBeGreaterThan(1)
         })
       
+      })
+    })
+  
+    describe('> on userLandmarks change', () => {
+      const lm1 = {
+        id: 'test-1',
+        position: [0, 0, 0]
+      }
+      const lm2 = {
+        id: 'test-2',
+        position: [1, 1,1 ]
+      }
+      it('> calls nehubaViewer.updateUserLandmarks', () => {
+        const fixture = TestBed.createComponent(NehubaContainer)
+
+        fixture.componentInstance.nehubaViewer = {
+          updateUserLandmarks: () => {}
+        } as any
+
+        const updateUserLandmarksSpy = spyOn(
+          fixture.componentInstance.nehubaViewer,
+          'updateUserLandmarks'
+        )
+
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [
+          lm1, 
+          lm2
+        ])
+        fixture.detectChanges()
+        expect(
+          updateUserLandmarksSpy
+        ).toHaveBeenCalledWith([
+          lm1, lm2
+        ])
+      })
+    
+      it('> calls togglecotantREmoval', () => {
+        
+        const fixture = TestBed.createComponent(NehubaContainer)
+
+        fixture.componentInstance.nehubaContainerDirective = {
+          toggleOctantRemoval: () => {},
+          clear: () => {}
+        } as any
+
+        const toggleOctantRemovalSpy = spyOn(
+          fixture.componentInstance.nehubaContainerDirective,
+          'toggleOctantRemoval'
+        )
+
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [
+          lm1, 
+          lm2
+        ])
+        mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
+        fixture.detectChanges()
+        expect(
+          toggleOctantRemovalSpy
+        ).toHaveBeenCalledWith(false)
       })
     })
   })

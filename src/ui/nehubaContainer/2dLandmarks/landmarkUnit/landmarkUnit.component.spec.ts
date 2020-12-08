@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core"
 import { async, TestBed } from "@angular/core/testing"
-import { SafeStylePipe } from "src/util/pipes/safeStyle.pipe"
+import { Landmark2DModule } from "../module"
 import { HOVER_COLOR, LandmarkUnit, NORMAL_COLOR } from "./landmarkUnit.component"
 
 
@@ -27,15 +27,16 @@ describe('> landmarkUnit.component.ts', () => {
   describe('> LandmarkUnit', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
+        imports: [
+          Landmark2DModule
+        ],
         declarations: [
-          DummyCmp,
-          LandmarkUnit,
-          SafeStylePipe
+          DummyCmp
         ]
       }).overrideComponent(DummyCmp, {
         set: {
           template: `
-          <nehuba-2dlandmark-unit
+          <landmark-2d-stalk-cmp
             [positionX]="positionX"
             [positionY]="positionY"
             [positionZ]="positionZ"
@@ -44,7 +45,7 @@ describe('> landmarkUnit.component.ts', () => {
             [flatProjection]="flatProjection"
             [fasClass]="fasClass" 
             >
-          </nehuba-2dlandmark-unit>
+          </landmark-2d-stalk-cmp>
           `
         }
       }).compileComponents()

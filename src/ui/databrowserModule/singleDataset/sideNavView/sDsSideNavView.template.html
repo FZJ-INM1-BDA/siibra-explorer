@@ -8,8 +8,7 @@
 </button>
 
 <mat-card class="mat-elevation-z4">
-  <div class="header-container"
-    [style.backgroundColor]="'rgba(128,128,128, 0.2)'">
+  <div class="header-container bg-50-grey-20">
     <mat-card-title>
       <ng-content select="[region-of-interest]"></ng-content>
       <div *ngIf="!fetchFlag; else isLoadingTmpl">
@@ -22,6 +21,12 @@
       <span>
         Dataset
       </span>
+
+      <button *ngIf="isGdprProtected"
+        [matTooltip]="GDPR_TEXT"
+        mat-icon-button color="warn">
+        <i class="fas fa-exclamation-triangle"></i>
+      </button>
 
       <mat-divider [vertical]="true" class="ml-2 h-2rem"></mat-divider>
 
@@ -53,12 +58,11 @@
     </mat-card-subtitle>
   </div>
 
-  <mat-card-content class="mt-2 ml-15px-n mr-15px-n">
+  <mat-card-content class="mt-2 ml-15px-n mr-15px-n pb-4">
     <mat-accordion>
 
       <!-- Description -->
-      <mat-expansion-panel hideToggle
-        [expanded]="true">
+      <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
             Description
@@ -120,8 +124,7 @@
       <!-- feature tmpl -->
       <ng-template #featureTmpl>
         <ng-container *ngFor="let feature of (rfGetAllFeatures.features | filterRegionFeaturesById : fullId)">
-          <mat-expansion-panel hideToggle
-            #matExpansionPanel>
+          <mat-expansion-panel #matExpansionPanel>
             <mat-expansion-panel-header>
               <mat-panel-title>
                 {{ feature.type }}

@@ -20,16 +20,16 @@
 
 <current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none">
   <div class="w-100 h-100 position-relative" cell-i>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 0 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-ii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 1 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 2 }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iv>
-    <ng-content *ngTemplateOutlet="overlayPerspectiveTmpl"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
   </div>
 </current-layout>
 
@@ -344,7 +344,7 @@
   let-iconTooltip="iconTooltip"
   let-iavNgIf="iavNgIf"
   let-content="content">
-  <mat-expansion-panel class="mt-1 mb-1"
+  <mat-expansion-panel
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
     hideToggle
@@ -563,93 +563,93 @@
     }">
     </ng-container>
 
-  </mat-accordion>
-  <div class="w-0 h-0"
-    iav-counter
-    #connectedCounterDir="iavCounter">
+    <div class="w-0 h-0"
+      iav-counter
+      #connectedCounterDir="iavCounter">
 
-    <hbp-connectivity-matrix-row *ngIf="region && region.name" [region]="region.name"
-      (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
-      class="invisible d-block h-0 w-0"
-      loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">
-    </hbp-connectivity-matrix-row>
-  </div>
+      <hbp-connectivity-matrix-row *ngIf="region && region.name" [region]="region.name"
+        (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
+        class="invisible d-block h-0 w-0"
+        loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">
+      </hbp-connectivity-matrix-row>
+    </div>
+  </mat-accordion>
 </ng-template>
 
 <!-- overlay templates -->
 
-<!-- perspective view tmpl -->
-<ng-template #overlayPerspectiveTmpl>
-  <layout-floating-container class="tmp" landmarkContainer>
-
-    <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
-      [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
-      [attr.id]="ID_MESH_LOADING_STATUS"
-      role="status">
-
-      <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
-      </spinner-cmp>
-      
-      <mat-list>
-        <mat-list-item>
-          {{ showPerpsectiveScreen$ | async }}
-        </mat-list-item>
-      </mat-list>
-    </div>
-
-    <!-- maximise/minimise button -->
-    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
-      panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber,
-      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === 3
-    }">
-    </ng-container>
-
-    <!-- mesh loading is still weird -->
-    <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
-    <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
-      <spinner-cmp></spinner-cmp>
-
-      <div *ngIf="false" perspectiveLoadingText>
-        {{ perspectiveViewLoading$ | async }}
-      </div>
-    </div>
-  </layout-floating-container>
-</ng-template>
-
 <!-- slice view overlay tmpl -->
 <ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
 
+  <!-- perspective view tmpl -->
+  <ng-template #overlayPerspectiveTmpl>
+    <layout-floating-container class="tmp" landmarkContainer>
+
+      <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
+        [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
+        [attr.id]="ID_MESH_LOADING_STATUS"
+        role="status">
+
+        <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
+        </spinner-cmp>
+        
+        <mat-list>
+          <mat-list-item>
+            {{ showPerpsectiveScreen$ | async }}
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- maximise/minimise button -->
+      <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+        panelIndex: panelIndex,
+        visible: (hoveredPanelIndices$ | async) === panelIndex
+      }">
+      </ng-container>
+
+      <!-- mesh loading is still weird -->
+      <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
+      <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
+        <spinner-cmp></spinner-cmp>
+
+        <div *ngIf="false" perspectiveLoadingText>
+          {{ perspectiveViewLoading$ | async }}
+        </div>
+      </div>
+    </layout-floating-container>
+  </ng-template>
+
   <!-- nb this slice view is not suitable for perspective view! -->
-  <layout-floating-container *ngIf="panelIndex < 3" landmarkContainer>
+  <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl"
+    landmarkContainer
+    class="overflow-hidden">
 
     <!-- customLandmarks -->
-    <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
+    <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
       (mouseenter)="handleMouseEnterCustomLandmark(lm)"
       (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
-      fasClass="fa-chevron-down"
       [color]="lm.color || [255, 255, 255]"
       [positionX]="getPositionX(panelIndex, lm)"
       [positionY]="getPositionY(panelIndex, lm)"
       [positionZ]="getPositionZ(panelIndex, lm)">
 
-    </nehuba-2dlandmark-unit>
+    </landmark-2d-flat-cmp>
 
     <!-- only show landmarks in slice views -->
 
-    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+    <landmark-2d-flat-cmp *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
       (mouseenter)="handleMouseEnterLandmark(spatialData)"
       (mouseleave)="handleMouseLeaveLandmark(spatialData)"
       [highlight]="spatialData.highlight ? spatialData.highlight : false"
-      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
       [positionX]="getPositionX(panelIndex, spatialData)"
       [positionY]="getPositionY(panelIndex, spatialData)"
       [positionZ]="getPositionZ(panelIndex, spatialData)">
-    </nehuba-2dlandmark-unit>
+    </landmark-2d-flat-cmp>
 
     <!-- maximise/minimise button -->
     <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
-      panelIndex: panelOrder$ | async | getNthElement : panelIndex | parseAsNumber,
-      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === panelIndex
+      panelIndex: panelIndex,
+      visible: (hoveredPanelIndices$ | async) === panelIndex
     }">
     </ng-container>
 
@@ -657,6 +657,7 @@
       <spinner-cmp></spinner-cmp>
     </div>
   </layout-floating-container>
+
 </ng-template>
 
 <!-- panel control template -->
@@ -672,7 +673,10 @@
 
     <!-- perspective specific control -->
     <ng-container *ngIf="panelIndex === 3">
-      <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: { state: (nehubaViewerPerspectiveOctantRemoval$ | async) }">
+      <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: {
+        state: (nehubaViewerPerspectiveOctantRemoval$ | async),
+        disableOctantRemoval: disableOctantRemoval$ | async
+      }">
 
       </ng-container>
     </ng-container>
@@ -700,23 +704,27 @@
 </ng-template>
 
 
-<ng-template #perspectiveOctantRemovalTmpl let-state="state">
-  <button
-    (click)="setOctantRemoval(!state)"
-    mat-icon-button
-    [attr.aria-label]="ARIA_LABEL_TOGGLE_FRONTAL_OCTANT"
-    color="primary">
+<ng-template #perspectiveOctantRemovalTmpl let-state="state" let-disableOctantRemoval="disableOctantRemoval">
+  <div class="d-inline-block"
+    [matTooltip]="disableOctantRemoval?.mode !== null ? disableOctantRemoval.message : null">
+    <button
+      (click)="setOctantRemoval(!state)"
+      mat-icon-button
+      [disabled]="disableOctantRemoval?.mode !== null"
+      [attr.aria-label]="ARIA_LABEL_TOGGLE_FRONTAL_OCTANT"
+      color="primary">
 
-    <!-- octant removal is true -->
-    <ng-template [ngIf]="nehubaViewerPerspectiveOctantRemoval$ | async" [ngIfElse]="octantRemovalOffTmpl">
-      <i class="fas fa-eye-slash"></i>
-    </ng-template>
+      <!-- octant removal is true -->
+      <ng-template [ngIf]="disableOctantRemoval?.mode !== null ? disableOctantRemoval.mode : state" [ngIfElse]="octantRemovalOffTmpl">
+        <i class="fas fa-eye-slash"></i>
+      </ng-template>
 
-    <!-- octant removal is false -->
-    <ng-template #octantRemovalOffTmpl>
-      <i class="fas fa-eye"></i>
-    </ng-template>
-  </button>
+      <!-- octant removal is false -->
+      <ng-template #octantRemovalOffTmpl>
+        <i class="fas fa-eye"></i>
+      </ng-template>
+    </button>
+  </div>
 </ng-template>
 
 

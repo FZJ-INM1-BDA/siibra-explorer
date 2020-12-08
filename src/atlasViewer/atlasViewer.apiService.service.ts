@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {Injectable, NgZone, Optional, Inject, OnDestroy, InjectionToken} from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
@@ -12,6 +13,7 @@ import {
   IavRootStoreInterface,
   safeFilter
 } from "src/services/stateStore.service";
+import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
@@ -35,11 +37,20 @@ interface IGetUserSelectRegionPr{
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
 export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
 
+export interface ILoadMesh {
+  type: 'VTK'
+  id: string
+  url: string
+}
+export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
+
 @Injectable({
-  providedIn : 'root',
+  providedIn : 'root'
 })
 
 export class AtlasViewerAPIServices implements OnDestroy{
+
+  public loadMesh$ = new Subject<ILoadMesh>()
 
   private onDestoryCb: Function[] = []
   private loadedTemplates$: Observable<any>
@@ -146,6 +157,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
   constructor(
     private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
+    private snackbar: MatSnackBar,
     private zone: NgZone,
     private pluginService: PluginServices,
     @Optional() @Inject(CANCELLABLE_DIALOG) openCancellableDialog: (message: string, options: any) => () => void,
@@ -367,6 +379,21 @@ export class AtlasViewerAPIServices implements OnDestroy{
       this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
       this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
     })
+
+    this.s.push(
+      this.loadMesh$.subscribe(({ url, id, type }) => {
+        if (!this.interactiveViewer.viewerHandle) {
+          this.snackbar.open('No atlas loaded! Loading mesh failed!', 'Dismiss')
+        }
+        this.interactiveViewer.viewerHandle?.loadLayer({
+          [id]: {
+            type: 'mesh',
+            source: `vtk://${url}`,
+            shader: `void main(){${FRAGMENT_EMIT_RED};}`
+          }
+        })
+      })
+    )
   }
 
   ngOnDestroy(){
