@@ -126,8 +126,18 @@ const getDs = ({ user }) => (user
       /**
        * remove duplicates
        */
-      const currSet = new Set(acc.map(v => v['fullId']))
-      if (currSet.has(curr['fullId'])) return [...acc]
+      const existingEntryIdx = acc.findIndex(v => v['fullId'] === curr['fullId'])
+      if (existingEntryIdx >= 0) {
+        const returnArr = [...acc].splice(existingEntryIdx, 1, {
+          ...acc[existingEntryIdx],
+          ...curr,
+          parcellationRegion: [
+            ...(curr['parcellationRegion'] || []),
+            ...(acc[existingEntryIdx]['parcellationRegion'] || [])
+          ]
+        })
+        return returnArr
+      }
       else return acc.concat(curr)
     }, [])
   })
