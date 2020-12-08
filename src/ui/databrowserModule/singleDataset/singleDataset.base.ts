@@ -155,7 +155,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
           this.files = files
           this.fullId = fullId
 
-          this.isGdprProtected = embargoStatus.some(s => s['@id'] === UNDER_REVIEW['@id'])
+          this.isGdprProtected = embargoStatus && embargoStatus.some(s => s['@id'] === UNDER_REVIEW['@id'])
 
           this.kgReference = kgReference
           this.directLinkToKg = getDirectLinkToKg(dataset)
