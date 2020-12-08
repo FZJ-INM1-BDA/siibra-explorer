@@ -71,7 +71,7 @@ export const viewerStateAllRegionsFlattenedRegionSelector = createSelector(
   }
 )
 
-export const viewerStateOverwrittenColorMap = createSelector(
+export const viewerStateOverwrittenColorMapSelector = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['overwrittenColorMap']
 )

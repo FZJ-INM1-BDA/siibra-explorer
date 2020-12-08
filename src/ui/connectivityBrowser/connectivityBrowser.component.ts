@@ -23,7 +23,7 @@ import {ngViewerActionClearView} from "src/services/state/ngViewerState/actions"
 import {ngViewerSelectorClearViewEntries} from "src/services/state/ngViewerState/selectors";
 import {
   viewerStateAllRegionsFlattenedRegionSelector,
-  viewerStateOverwrittenColorMap
+  viewerStateOverwrittenColorMapSelector
 } from "src/services/state/viewerState/selectors";
 import {HttpClient} from "@angular/common/http";
 
@@ -148,7 +148,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.store$.pipe(
-          select(viewerStateOverwrittenColorMap),
+          select(viewerStateOverwrittenColorMapSelector),
         ).subscribe(value => {
           this.setColorMap$.next(!!value)
         })
