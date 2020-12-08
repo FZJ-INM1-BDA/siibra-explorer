@@ -3,13 +3,11 @@ import { RegionMenuComponent } from "./regionMenu.component"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
-import { provideMockStore, MockStore } from "@ngrx/store/testing"
-import { regionInOtherTemplateSelector, RenderViewOriginDatasetLabelPipe } from '../region.base'
-import { ARIA_LABELS } from 'common/constants'
-import { By } from "@angular/platform-browser"
+import { provideMockStore } from "@ngrx/store/testing"
+import { RenderViewOriginDatasetLabelPipe } from '../region.base'
 import { Directive, Input } from "@angular/core"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
-import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors"
+import { ComponentsModule } from "src/components"
 
 const mt0 = {
   name: 'mt0'
@@ -82,6 +80,19 @@ class MockPrvDsFileDirective {
 
 }
 
+@Directive({
+  selector: '[single-dataset-directive]',
+  exportAs: 'singleDatasetDirective'
+})
+
+class DummySingleDatasetDirective{
+  @Input()
+  kgId: string
+
+  @Input()
+  kgSchema: string
+}
+
 describe('> regionMenu.component.ts', () => {
   describe('> RegionMenuComponent', () => {
     beforeEach(async(() => {
@@ -92,6 +103,7 @@ describe('> regionMenu.component.ts', () => {
           AngularMaterialModule,
           CommonModule,
           NoopAnimationsModule,
+          ComponentsModule,
         ],
         declarations: [
           RegionMenuComponent,
@@ -100,6 +112,7 @@ describe('> regionMenu.component.ts', () => {
            * Used by regionMenu.template.html to show region preview
            */
           MockPrvDsFileDirective,
+          DummySingleDatasetDirective,
         ],
         providers: [
           provideMockStore({ initialState: {} })
