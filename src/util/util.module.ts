@@ -23,6 +23,7 @@ import { GetPropertyPipe } from "./pipes/getProperty.pipe";
 import { FilterArrayPipe } from "./pipes/filterArray.pipe";
 import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
 import { ArrayContainsPipe } from "./pipes/arrayContains.pipe";
+import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 
 @NgModule({
   imports:[
@@ -51,6 +52,7 @@ import { ArrayContainsPipe } from "./pipes/arrayContains.pipe";
     FilterArrayPipe,
     FilterByPropertyPipe,
     ArrayContainsPipe,
+    DoiParserPipe,
   ],
   exports: [
     FilterNullPipe,
@@ -75,6 +77,7 @@ import { ArrayContainsPipe } from "./pipes/arrayContains.pipe";
     FilterArrayPipe,
     FilterByPropertyPipe,
     ArrayContainsPipe,
+    DoiParserPipe,
   ]
 })
 

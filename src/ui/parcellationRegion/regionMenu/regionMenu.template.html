@@ -26,6 +26,55 @@
         <span>
           {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
         </span>
+
+        <span
+          aria-hidden="true"
+          [kgSchema]="originDataset.kgSchema"
+          [kgId]="originDataset.kgId"
+          single-dataset-directive
+          #sdDirective="singleDatasetDirective">
+        </span>
+
+        <ng-template [ngIf]="sdDirective.fetchFlag" [ngIfElse]="contentTmpl">
+          <spinner-cmp></spinner-cmp>
+        </ng-template>
+
+        <ng-template #contentTmpl>
+
+          <!-- fall back if no kg ref is available -->
+          <a *ngIf="sdDirective.kgReference.length === 0"
+            [href]="sdDirective.directLinkToKg"
+            target="_blank">
+            <button mat-icon-button
+              color="primary">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+          </a>
+
+          <!-- kg ref, normally doi -->
+          <a *ngFor="let kgRef of sdDirective.kgReference"
+            [href]="kgRef | doiParserPipe"
+            target="_blank">
+            <button mat-icon-button
+              color="primary">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+          </a>
+
+          <!-- pin/unpin -->
+          <ng-container *ngTemplateOutlet="pinTmpl; context: { $implicit: sdDirective.isFav$ | async }">
+          </ng-container>
+
+          <ng-template #pinTmpl let-isFav>
+
+            <button mat-icon-button
+              (click)="isFav ? sdDirective.undoableRemoveFav() : sdDirective.undoableAddFav()"
+              [color]="isFav ? 'primary' : 'default'">
+              <i class="fas fa-thumbtack"></i>
+            </button>
+          </ng-template>
+
+        </ng-template>
       </div>
 
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>

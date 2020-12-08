@@ -3,7 +3,6 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Optional } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { UtilModule } from "src/util";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
@@ -48,6 +47,7 @@ import { DatabrowserService } from "./databrowser.service";
 import { ShownDatasetDirective } from "./shownDataset.directive";
 import { SingleDatasetSideNavView } from "./singleDataset/sideNavView/sDsSideNavView.component";
 import { RegionalFeaturesModule } from "../regionalFeatures";
+import { SingleDatasetDirective } from "./singleDataset/singleDataset.directive";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -71,6 +71,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     DataBrowser,
     ModalityPicker,
     SingleDatasetView,
+    SingleDatasetDirective,
     SingleDatasetListView,
     DatasetPreviewList,
     PreviewComponentWrapper,
@@ -95,7 +96,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FilterDataEntriesbyMethods,
     FilterDataEntriesByRegion,
     AggregateArrayIntoRootPipe,
-    DoiParserPipe,
     DatasetIsFavedPipe,
     RegionBackgroundToRgbPipe,
     GetKgSchemaIdFromFullIdPipe,
@@ -113,6 +113,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   exports: [
     DataBrowser,
     SingleDatasetView,
+    SingleDatasetDirective,
     SingleDatasetListView,
     ModalityPicker,
     FilterDataEntriesbyMethods,
