@@ -466,6 +466,30 @@
     [region]="region"
     #iavRegion="iavRegion">
 
+    <!-- desc -->
+    <ng-container *ngFor="let ods of (region.originDatasets || [])">
+      <ng-template #regionDescTmpl>
+        <single-dataset-view
+          [hideTitle]="true"
+          [hideExplore]="true"
+          [hidePreview]="true"
+          [hidePinBtn]="true"
+          [hideDownloadBtn]="true"
+          [kgSchema]="ods.kgSchema"
+          [kgId]="ods.kgId">
+
+        </single-dataset-view>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Description',
+        iconClass: 'fas fa-info',
+        iavNgIf: true,
+        content: regionDescTmpl
+      }">
+
+      </ng-container>
+    </ng-container>
+
     <!-- Explore in other template -->
     <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
 

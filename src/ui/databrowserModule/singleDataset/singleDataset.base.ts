@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Input, TemplateRef, OnChanges, OnDestroy } from "@angular/core";
-import { Observable, Subject, Subscription, combineLatest } from "rxjs";
+import { Observable, Subject, Subscription, combineLatest, BehaviorSubject } from "rxjs";
 import { IDataEntry, IFile, IPublication } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
@@ -10,9 +10,10 @@ import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { ARIA_LABELS } from 'common/constants'
-import { switchMap, distinctUntilChanged, filter } from "rxjs/operators";
+import { switchMap, distinctUntilChanged, filter, map, shareReplay, startWith } from "rxjs/operators";
 import { IContributor } from "../contributor";
 import { UNDER_REVIEW } from "../constants";
+import { DatasetIsFavedPipe } from "../util/datasetIsFaved.pipe";
 
 const getDirectLinkToKg = (dataset: { fullId: string, id: string }) => {
   const { id } = dataset
@@ -63,7 +64,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   }
   
   private _kgSchema: string = 'minds/core/dataset/v1.0.0'
-  private kgSchema$: Subject<string> = new Subject()
+  private kgSchema$: Subject<string> = new BehaviorSubject(null)
 
   @Input() 
   set kgSchema(val) {
@@ -76,7 +77,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   }
 
   private _kgId: string
-  private kgId$: Subject<string> = new Subject()
+  private kgId$: Subject<string> = new BehaviorSubject(null)
 
   @Input()
   set kgId(val){
@@ -116,6 +117,10 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   public selectedTemplateSpace$: Observable<any>
 
   public favedDataentries$: Observable<Partial<IDataEntry>[]>
+
+  public isFav$: Observable<boolean>
+  private dsIsFavPipe = new DatasetIsFavedPipe()
+
   constructor(
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
@@ -125,6 +130,15 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   ) {
     this.favedDataentries$ = this.dbService.favedDataentries$
 
+    this.isFav$ = combineLatest([
+      this.favedDataentries$,
+      this.kgSchema$,
+      this.kgId$,
+    ]).pipe(
+      map(([ favDs, kgSchema, kgId ]) => this.dsIsFavPipe.transform(favDs, { fullId: `${kgSchema}/${kgId}` })),
+      startWith(false),
+      shareReplay(1),
+    )
     this.subscriptions.push(
       combineLatest([
         this.kgSchema$.pipe(
