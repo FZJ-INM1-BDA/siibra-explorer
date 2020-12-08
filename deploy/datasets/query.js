@@ -128,14 +128,16 @@ const getDs = ({ user }) => (user
        */
       const existingEntryIdx = acc.findIndex(v => v['fullId'] === curr['fullId'])
       if (existingEntryIdx >= 0) {
-        const returnArr = [...acc].splice(existingEntryIdx, 1, {
+        const itemToReturn = {
           ...acc[existingEntryIdx],
           ...curr,
           parcellationRegion: [
             ...(curr['parcellationRegion'] || []),
             ...(acc[existingEntryIdx]['parcellationRegion'] || [])
           ]
-        })
+        }
+        const returnArr = [...acc]
+        returnArr.splice(existingEntryIdx, 1, itemToReturn)
         return returnArr
       }
       else return acc.concat(curr)
