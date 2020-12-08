@@ -21,7 +21,7 @@
       </label>
       <section class="d-flex align-items-center mt-1">
         <section id="task-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
-          <div role="list" class="ws-no-wrap">
+          <div role="list">
             <mat-chip *ngFor="let task of datum['tasks']" class="ml-1">
               {{ task }}
             </mat-chip>
@@ -34,7 +34,7 @@
       </label>
       <section class="d-flex align-items-center mt-1">
         <section id="contact-points-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
-          <div role="list" class="ws-no-wrap">
+          <div role="list">
             <mat-chip *ngFor="let contactPt of datum['contactPoints']"
               [matTooltip]="contactPt['position']"
               (click)="handleContactPtClk(contactPt)"
