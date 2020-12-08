@@ -146,12 +146,42 @@ const init = async () => {
   return await getPublicDs()
 }
 
+const dsNamesToExclude = [
+  'DiFuMo atlas',
+  'Whole-brain parcellation',
+  'Probabilistic cytoarchitectonic map',
+  'Automated Anatomical Labeling (AAL1) atlas',
+  'Maximum probability map',
+  'Interpolated 3D map',
+  'Corrected 3-D reconstruction and surface parcellation',
+  'Probability map',
+  'Probabilistic map',
+  'Reference delineations',
+  'Atlas of the short fiber bundles ',
+  'Desikan-Killiany Atlas',
+  'GapMap',
+  'Cytoarchitectonic areas',
+  'Co-activation based parcellation',
+  'CEREBRUM-7T',
+  'Filter Activations of Convolutional Neuronal Networks'
+]
+
 const getDatasetsByRegion = async ({ regionId, user }) => {
   /**
    * potentially add other sources of datasets
    */
   const kgDatasets = await getDs({ user })
-  return filterDatasetsByRegion(kgDatasets, regionId)
+  const excludedDatasets = kgDatasets.filter(({ name }) => {
+    if (!name) return true
+    return !dsNamesToExclude.some(n => name.indexOf(n) === 0)
+  })
+  return filterDatasetsByRegion([
+    ...excludedDatasets,
+    /**
+     * other datasets, such ibc
+     */
+    ...ibc.getIBCData(),
+  ], regionId)
 }
 
 const getDatasets = ({ templateName, parcellationName, user }) => {

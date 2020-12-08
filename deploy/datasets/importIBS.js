@@ -6,18 +6,6 @@ const julichBrainNameToNexusId = require('./supplements/data/julich_brain_name_t
 const IBC_DATA_DIR = path.join(__dirname, './supplements/data/ibc/')
 const IBC_SCHEMA = '//ibc/ibc_schema'
 
-
-const getIBCData = () => {
-  const ibcData = []
-
-  const files = fs.readdirSync(IBC_DATA_DIR)
-  files.forEach((file) => {
-    ibcData.push(getIbcDatasetByFileName(file))
-  })
-
-  return ibcData
-}
-
 const getIbcDatasetByFileName = (file) => {
   const str = fs.readFileSync(path.join(IBC_DATA_DIR, file), "utf8");
 
@@ -64,6 +52,18 @@ const getIbcDatasetByFileName = (file) => {
     ],
   }
 }
+
+const ibcData = []
+
+const ibcDataFiles = fs.readdirSync(IBC_DATA_DIR)
+ibcDataFiles.forEach((file) => {
+  ibcData.push(getIbcDatasetByFileName(file))
+})
+
+const getIBCData = () => {
+  return ibcData
+}
+
 
 module.exports = {
   getIBCData,
