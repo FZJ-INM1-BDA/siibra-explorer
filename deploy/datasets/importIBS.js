@@ -50,6 +50,9 @@ const getIbcDatasetByFileName = (file) => {
         fullId: regionFullId
       }
     ],
+    embargoStatus: [{
+      '@id': 'https://nexus.humanbrainproject.org/v0/data/minds/core/embargostatus/v1.0.0/1d726b76-b176-47ed-96f0-b4f2e17d5f19'
+    }]
   }
 }
 

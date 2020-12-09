@@ -50,6 +50,9 @@ module.exports = {
       fullId: 'https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/7722c71f-fe84-4deb-8f6b-98e2aecf2e31'
     }
   ],
+  embargoStatus: [{
+    '@id': 'https://nexus.humanbrainproject.org/v0/data/minds/core/embargostatus/v1.0.0/1d726b76-b176-47ed-96f0-b4f2e17d5f19'
+  }]
 }
 
 
