@@ -47,43 +47,51 @@ class WdBase{
     return this._browser.driver
   }
 
-  // without image header
-  // output as b64 png
-  async takeScreenshot(cssSelector){
-    
-    if(cssSelector) {
-      await this._browser.executeAsyncScript(async () => {
-        const cb = arguments[arguments.length - 1]
-        const moduleUrl = arguments[0]
-        const cssSelector = arguments[1]
+  async highlightElement(cssSelector) {
 
-        const el = document.querySelector(cssSelector)
-        if (!el) throw new Error(`css selector not fetching anything`)
-        import(moduleUrl)
-          .then(async m => {
-            m.citruslight(el)
-            cb()
-          })
-      }, CITRUS_LIGHT_URL, cssSelector)
-    }
-    
+    await this._browser.executeAsyncScript(async () => {
+      const cb = arguments[arguments.length - 1]
+      const moduleUrl = arguments[0]
+      const cssSelector = arguments[1]
+
+      const el = document.querySelector(cssSelector)
+      if (!el) throw new Error(`css selector not fetching anything`)
+      import(moduleUrl)
+        .then(async m => {
+          m.citruslight(el)
+          cb()
+        })
+    }, CITRUS_LIGHT_URL, cssSelector)
+
     await this.wait(1000)
-    const result = await this._browser.takeScreenshot()
 
-    if (cssSelector) {
+    return async () => {
       await this._browser.executeAsyncScript(async () => {
         const cb = arguments[arguments.length - 1]
         const moduleUrl = arguments[0]
-        const cssSelector = arguments[1]
 
-        const el = document.querySelector(cssSelector)
-        if (!el) throw new Error(`css selector not fetching anything`)
         import(moduleUrl)
           .then(async m => {
             m.clearAll()
             cb()
           })
-      }, CITRUS_LIGHT_URL, cssSelector)
+      }, CITRUS_LIGHT_URL)
+    }
+  }
+
+  // without image header
+  // output as b64 png
+  async takeScreenshot(cssSelector){
+    
+    let cleanUp
+    if(cssSelector) {
+      cleanUp= await this.highlightElement(cssSelector)
+    }
+    
+    const result = await this._browser.takeScreenshot()
+
+    if (cleanUp) {
+      await cleanUp()
     }
     
     await this.wait(1000)
