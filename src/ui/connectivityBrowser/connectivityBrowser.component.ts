@@ -15,7 +15,7 @@ import {distinctUntilChanged, filter, map} from "rxjs/operators";
 import {
   CLEAR_CONNECTIVITY_REGION,
   SELECT_REGIONS,
-  SET_OVERRITEN_COLOR_MAP
+  SET_OVERWRITTEN_COLOR_MAP
 } from "src/services/state/viewerState.store";
 import {safeFilter} from "src/services/stateStore.service";
 import {viewerStateNavigateToRegion} from "src/services/state/viewerState.store.helper";
@@ -66,7 +66,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         })
       )
       this.store$.dispatch({
-        type: SET_OVERRITEN_COLOR_MAP,
+        type: SET_OVERWRITTEN_COLOR_MAP,
         payload: flag? CONNECTIVITY_NAME_PLATE : false,
       })
     }
@@ -85,7 +85,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       if (!val) {
         this.store$.dispatch({
-          type: SET_OVERRITEN_COLOR_MAP,
+          type: SET_OVERWRITTEN_COLOR_MAP,
           payload: false,
         })
         return
@@ -224,13 +224,13 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
             if (flag) {
               this.addNewColorMap()
               this.store$.dispatch({
-                type: SET_OVERRITEN_COLOR_MAP,
+                type: SET_OVERWRITTEN_COLOR_MAP,
                 payload: 'connectivity',
               })
             } else {
               this.restoreDefaultColormap()
 
-              this.store$.dispatch({type: SET_OVERRITEN_COLOR_MAP, payload: null})
+              this.store$.dispatch({type: SET_OVERWRITTEN_COLOR_MAP, payload: null})
 
               /**
                          * TODO

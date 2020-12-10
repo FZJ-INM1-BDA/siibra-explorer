@@ -219,7 +219,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       connectivityRegion: '',
     }
-  case SET_OVERRITEN_COLOR_MAP:
+  case SET_OVERWRITTEN_COLOR_MAP:
     return {
       ...prevState,
       overwrittenColorMap: action.payload || '',
@@ -264,7 +264,7 @@ export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
-export const SET_OVERRITEN_COLOR_MAP = `SET_OVERRITEN_COLOR_MAP`
+export const SET_OVERWRITTEN_COLOR_MAP = `SET_OVERWRITTEN_COLOR_MAP`
 export const CLEAR_STANDALONE_VOLUMES = `CLEAR_STANDALONE_VOLUMES`
 
 @Injectable({
