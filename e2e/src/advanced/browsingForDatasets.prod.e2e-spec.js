@@ -2,6 +2,10 @@ const { AtlasPage } = require('../util')
 const { CONST, ARIA_LABELS } = require('../../../common/constants')
 const { retry } = require('../../../common/util')
 
+const {
+  RECORDING_FLAG
+} = process.env
+
 const atlasName = `Multilevel Human Atlas`
 
 const templates = [
@@ -83,7 +87,11 @@ describe('> dataset browser', () => {
       })
 
       afterEach(async () => {
-        
+        try {
+          await iavPage.click(`[aria-label="${ARIA_LABELS.CLOSE}"]`)
+        } catch (e) {
+
+        }
       })
       for (const [ area, ...rest ] of newShouldHaveReceptor) {
         it(`> receptor data ${area} should be able to be found`, async () => {
@@ -99,10 +107,17 @@ describe('> dataset browser', () => {
           })
           await iavPage.wait(2000)
           await iavPage.waitUntilAllChunksLoaded()
+          await iavPage.dismissModal()
           const datasets = await iavPage.getVisibleDatasets()
-          const filteredDs = datasets.filter(ds => ds.toLowerCase().indexOf('receptor') >= 0)
-          expect(filteredDs.length).toBeGreaterThan(0)
-          
+          const receptorDsIdx = datasets.findIndex(ds => ds.toLowerCase().indexOf('receptor') >= 0)
+          expect(receptorDsIdx).toBeGreaterThanOrEqual(0)
+
+          if (RECORDING_FLAG) {
+            await iavPage.clickNthDataset(receptorDsIdx)
+            await iavPage.wait(1000)
+            await iavPage.toggleExpansionPanelState(/receptor/i, true)
+            await iavPage.wait(5000)
+          }
         })
       }
     })

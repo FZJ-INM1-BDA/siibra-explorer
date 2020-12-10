@@ -5,7 +5,7 @@ import { REGION_OF_INTEREST, TRegionOfInterest } from "src/util/interfaces";
 import { DatabrowserService } from "../../databrowser.service";
 import { KgSingleDatasetService } from "../../kgSingleDatasetService.service";
 import { SingleDatasetBase } from "../singleDataset.base";
-import { CONST } from 'common/constants'
+import { CONST, ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'single-dataset-sidenav-view',
@@ -17,7 +17,7 @@ import { CONST } from 'common/constants'
 })
 
 export class SingleDatasetSideNavView extends SingleDatasetBase implements OnChanges, OnDestroy{
-
+  public BACK_BTN_ARIA_TXT = ARIA_LABELS.CLOSE
   @Output()
   clear: EventEmitter<null> = new EventEmitter()
 
