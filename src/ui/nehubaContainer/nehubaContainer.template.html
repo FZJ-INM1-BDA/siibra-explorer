@@ -571,8 +571,7 @@
             [region]="region"
             (setOpenState)="expansionPanel.expanded = $event"
             (connectivityNumberReceived)="connectivityNumber = $event"
-            [accordionExpanded]="expansionPanel.expanded"
-            #connectivityComponent>
+            [accordionExpanded]="expansionPanel.expanded">
           </connectivity-browser>
         </ng-container>
       </mat-card-content>
@@ -592,7 +591,7 @@
       iav-counter
       #connectedCounterDir="iavCounter">
 
-      <hbp-connectivity-matrix-row [region]="region.name"
+      <hbp-connectivity-matrix-row *ngIf="region && region.name" [region]="region.name"
         (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
         class="invisible d-block h-0 w-0"
         loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">

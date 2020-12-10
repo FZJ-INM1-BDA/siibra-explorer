@@ -42,7 +42,7 @@ export interface StateInterface {
 
   loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
-  overwrittenColorMap: boolean
+  overwrittenColorMap: string | null
 
   standaloneVolumes: any[]
 }
@@ -81,7 +81,7 @@ export const defaultState: StateInterface = {
   parcellationSelected: null,
   templateSelected: null,
   connectivityRegion: '',
-  overwrittenColorMap: false,
+  overwrittenColorMap: null,
   standaloneVolumes: []
 }
 
@@ -219,7 +219,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       connectivityRegion: '',
     }
-  case SET_CONNECTIVITY_VISIBLE:
+  case SET_OVERWRITTEN_COLOR_MAP:
     return {
       ...prevState,
       overwrittenColorMap: action.payload || '',
@@ -264,7 +264,7 @@ export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
-export const SET_CONNECTIVITY_VISIBLE = `SET_CONNECTIVITY_VISIBLE`
+export const SET_OVERWRITTEN_COLOR_MAP = `SET_OVERWRITTEN_COLOR_MAP`
 export const CLEAR_STANDALONE_VOLUMES = `CLEAR_STANDALONE_VOLUMES`
 
 @Injectable({

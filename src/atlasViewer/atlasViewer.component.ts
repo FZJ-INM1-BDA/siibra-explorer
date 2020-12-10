@@ -44,6 +44,7 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { ClickInterceptorService } from "src/glue";
+import {SET_OVERWRITTEN_COLOR_MAP} from "src/services/state/viewerState.store";
 
 /**
  * TODO
