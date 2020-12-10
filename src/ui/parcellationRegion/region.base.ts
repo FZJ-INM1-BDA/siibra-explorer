@@ -39,7 +39,7 @@ export class RegionBase {
     const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
     this.rgbString = `rgb(${rgb.join(',')})`
     const [_h, _s, l] = rgbToHsl(...rgb)
-    this.rgbDarkmode = l < 0.5
+    this.rgbDarkmode = l < 0.4
   }
 
   get region(){
