@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
-import {distinctUntilChanged, map} from "rxjs/operators";
+import {distinctUntilChanged, filter, map} from "rxjs/operators";
 import {
   CLEAR_CONNECTIVITY_REGION,
   SELECT_REGIONS,
@@ -158,6 +158,27 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           }
         })
       )
+        
+      /** 
+       * Listen to of clear view entries 
+       * can come from within the component (when connectivity is not available for the dataset)
+       * --> do not collapse
+       * or outside (user clicks x in chip)
+       * --> collapse
+       */
+      this.subscriptions.push(
+        this.store$.pipe(
+          select(ngViewerSelectorClearViewEntries),
+          map(arr => arr.filter(v => v === CONNECTIVITY_NAME_PLATE)),
+          filter(arr => arr.length ===0),
+          distinctUntilChanged()
+        ).subscribe(() => {
+          if (!this.noDataReceived) {
+            this.setOpenState.emit(false)
+          }
+        })
+      )
+        
 
       this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
         if (this.accordionIsExpanded && !ocm) {
@@ -185,6 +206,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           )
         ).subscribe(([flag, connectedAreas]) => {
           if (connectedAreas === 'No data') {
+            this.noDataReceived = true
             return this.clearViewer()
           } else {
             this.store$.dispatch(
@@ -250,7 +272,6 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         })
       )
       this.connectedAreas = []
-      this.noDataReceived = true
       this.connectivityNumberReceived.emit('0')
 
       return this.restoreDefaultColormap()
