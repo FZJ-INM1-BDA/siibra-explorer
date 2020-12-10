@@ -17,7 +17,7 @@ import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
-import { getStringIdsFromRegion } from 'common/util'
+import { getStringIdsFromRegion, getRegionHemisphere, getIdFromFullId } from 'common/util'
 import { viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 
 const noMethodDisplayName = 'No methods described'
@@ -92,6 +92,8 @@ export class DatabrowserService implements OnDestroy {
   public spatialDatasets$: Observable<any>
   public viewportBoundingBox$: Observable<[Point, Point]>
 
+  private templateSelected: any
+
   constructor(
     private workerService: AtlasWorkerService,
     private constantService: AtlasViewerConstantsServices,
@@ -124,6 +126,14 @@ export class DatabrowserService implements OnDestroy {
       ).subscribe(de => {
         this.dataentries = de
       }),
+    )
+
+    this.subscriptions.push(
+      this.store.pipe(
+        select(viewerStateSelectedTemplateSelector)
+      ).subscribe(tmpl => {
+        this.templateSelected = tmpl
+      })
     )
 
     this.viewportBoundingBox$ = this.store.pipe(
@@ -248,6 +258,15 @@ export class DatabrowserService implements OnDestroy {
 
   private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry[]>>()
   private getDatasetsByRegion(region: { fullId: any }){
+
+    const hemisphereObj = (() => {
+      const hemisphere = getRegionHemisphere(region)
+      return hemisphere ? { hemisphere } : {}
+    })()
+
+    const refSpaceObj = this.templateSelected && this.templateSelected.fullId
+    ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
+    : {}
     const fullIds = getStringIdsFromRegion(region) as string[]
 
     for (const fullId of fullIds) {
@@ -255,6 +274,10 @@ export class DatabrowserService implements OnDestroy {
         const obs$ =  this.http.get<IDataEntry[]>(
           `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
           {
+            params: {
+              ...hemisphereObj,
+              ...refSpaceObj
+            },
             headers: this.constantService.getHttpHeader(),
             responseType: 'json'
           }
