@@ -265,8 +265,8 @@ export class DatabrowserService implements OnDestroy {
     })()
 
     const refSpaceObj = this.templateSelected && this.templateSelected.fullId
-    ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
-    : {}
+      ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
+      : {}
     const fullIds = getStringIdsFromRegion(region) as string[]
 
     for (const fullId of fullIds) {
