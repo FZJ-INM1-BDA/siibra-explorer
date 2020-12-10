@@ -11,6 +11,7 @@ const { getHandleErrorFn } = require('../util/streamHandleError')
 const { IBC_SCHEMA } = require('./importIBS')
 
 const bodyParser = require('body-parser')
+const { getIdFromFullId } = require('../../common/util')
 
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
@@ -76,10 +77,22 @@ datasetsRouter.get('/templateNameParcellationName/:templateName/:parcellationNam
 })
 
 datasetsRouter.get('/byRegion/:regionId', noCacheMiddleWare, async (req, res) => {
+  const { query } = req
+  const refSpcId = query && query.referenceSpaceId
+  
   const { regionId } = req.params
   const { user } = req
   const ds = await getDatasetsByRegion({ regionId, user })
-  res.status(200).json(ds)
+  const filteredDs = ds.filter(d => {
+    /**
+     * filter by reference space
+     */
+    if (!d['referenceSpaces'] || d['referenceSpaces'].length === 0 || !refSpcId) {
+      return true
+    }
+    return d['referenceSpaces'].some(refSpc => getIdFromFullId(refSpc['fullId']) === refSpcId)
+  })
+  res.status(200).json(filteredDs)
 })
 
 const deprecatedNotice = (_req, res) => {

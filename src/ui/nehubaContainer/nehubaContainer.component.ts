@@ -195,7 +195,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public disableOctantRemoval$: Observable<{ message?: string, mode: boolean }>
 
   public handleViewerLoadedEvent(flag: boolean){
-    console.log('viewer laoded ev', flag)
     this.viewerLoaded = flag
     this.nehubaViewerLoaded.emit(flag)
   }

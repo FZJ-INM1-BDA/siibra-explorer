@@ -5,6 +5,6 @@ Human Brain Project Knowledge Graph is a metadata database consisting of dataset
 !!! note
     v2.3.0 changed the way datasets are fetched from the knowledge graph.
 
-Datasets are now fetched from the knowledge graph on a region of interest basis.
+Datasets are now fetched from the knowledge graph on a region of interest basis. The fetched datasets are then filtered only on the reference space basis.
 
 Currently, only parcellation regions are supported.
