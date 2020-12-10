@@ -58,7 +58,7 @@ const getFile = async name => {
   return value
 }
 
-router.get('/:name', DISABLE_LIMITER ? passthrough : limiter, async (req, res) => {
+router.get('/:name', async (req, res) => {
   const { name } = req.params
   const { headers } = req
   
