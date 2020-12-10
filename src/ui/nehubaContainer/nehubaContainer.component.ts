@@ -195,6 +195,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public disableOctantRemoval$: Observable<{ message?: string, mode: boolean }>
 
   public handleViewerLoadedEvent(flag: boolean){
+    console.log('viewer laoded ev', flag)
     this.viewerLoaded = flag
     this.nehubaViewerLoaded.emit(flag)
   }
@@ -467,6 +468,20 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       map(state => isDefined(state)
         ? state.layers?.findIndex(l => l.mixability === 'nonmixable') >= 0
         : false),
+    )
+
+    /**
+     * fixes 
+     * https://github.com/HumanBrainProject/interactive-viewer/issues/800
+     */
+    this.subscriptions.push(
+      this.nehubaViewerLoaded.pipe(
+        debounceTime(500),
+        filter(v => !v),
+      ).subscribe(() => {
+        this.matDrawerMain.close()
+        this.matDrawerMinor.close()
+      })
     )
   }
 
