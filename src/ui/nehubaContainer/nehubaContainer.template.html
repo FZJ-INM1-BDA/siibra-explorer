@@ -569,8 +569,10 @@
         <ng-container *ngFor="let region of selectedRegions$ | async">
           <connectivity-browser class="pe-all flex-shrink-1"
             [region]="region"
+            [parcellationId]="selectedParcellation['@id']"
             (setOpenState)="expansionPanel.expanded = $event"
             (connectivityNumberReceived)="connectivityNumber = $event"
+            (connectivityLoadUrl)="connectivityLoadUrl = $event"
             [accordionExpanded]="expansionPanel.expanded">
           </connectivity-browser>
         </ng-container>
@@ -591,10 +593,11 @@
       iav-counter
       #connectedCounterDir="iavCounter">
 
-      <hbp-connectivity-matrix-row *ngIf="region && region.name" [region]="region.name"
+      <hbp-connectivity-matrix-row *ngIf="region && region.name"
+        [region]="region.name + (region.status? ' - ' + region.status : '')"
         (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
         class="invisible d-block h-0 w-0"
-        loadurl="https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies/1345998a08539dc24bda8817c7d5804558d83b1c">
+        [loadurl]="connectivityLoadUrl">
       </hbp-connectivity-matrix-row>
     </div>
   </mat-accordion>

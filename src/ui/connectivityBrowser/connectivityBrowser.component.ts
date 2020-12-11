@@ -94,13 +94,21 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       if (newRegionName !== this.regionName && this.defaultColorMap) {
         this.restoreDefaultColormap()
       }
+
+      if (val.status
+          && !val.name.includes('left hemisphere')
+          && !val.name.includes('right hemisphere')) {
+        this.regionHemisphere = val.status
+      }
+
       this.regionName = newRegionName
 
       // TODO may not be necessary
       this.changeDetectionRef.detectChanges()
     }
-
+    @Input() parcellationId: any
     public regionName: string
+    public regionHemisphere: string = null
     public datasetList: any[] = []
     public selectedDataset: any
     public selectedDatasetDescription: string = ''
@@ -140,7 +148,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     ngOnInit(): void {
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
-        this.datasetList = res
+        this.datasetList = res.filter(dl => dl['parcellation id'] === this.parcellationId)
         this.selectedDataset = this.datasetList[0].name
         this.selectedDatasetDescription = this.datasetList[0].description
 
@@ -259,6 +267,14 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public ngOnDestroy(): void {
+      this.connectivityNumberReceived.emit(null)
+      this.store$.dispatch(
+        ngViewerActionClearView({
+          payload: {
+            [CONNECTIVITY_NAME_PLATE]: false
+          }
+        })
+      )
       this.restoreDefaultColormap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
@@ -309,7 +325,22 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     getRegionWithName(region) {
-      return this.allRegions.find(ar => ar.name === region)
+      return this.allRegions.find(ar => {
+        if (this.regionHemisphere) {
+          let regionName = region
+          let regionStatus = null
+          if (regionName.includes('left hemisphere')) {
+            regionStatus = 'left hemisphere'
+            regionName = regionName.replace(' - left hemisphere', '');
+          } else if (regionName.includes('right hemisphere')) {
+            regionStatus = 'right hemisphere'
+            regionName = regionName.replace(' - right hemisphere', '');
+          }
+          return ar.name === regionName && ar.status === regionStatus
+        }
+
+        return ar.name === region
+      })
     }
 
     public restoreDefaultColormap() {
@@ -324,7 +355,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       const existingMap: Map<string, Map<number, { red: number, green: number, blue: number }>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
       const colorMap = new Map(existingMap)
-
+        
       this.allRegions.forEach(r => {
         if (r.ngId) {
           colorMap.get(r.ngId).set(r.labelIndex, {red: 255, green: 255, blue: 255})
@@ -333,7 +364,23 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       this.connectedAreas.forEach(area => {
         const areaAsRegion = this.allRegions
-          .filter(r => r.name === area.name)
+          .filter(r => {
+              
+            if (this.regionHemisphere) {
+              let regionName = area.name
+              let regionStatus = null
+              if (regionName.includes('left hemisphere')) {
+                regionStatus = 'left hemisphere'
+                regionName = regionName.replace(' - left hemisphere', '');
+              } else if (regionName.includes('right hemisphere')) {
+                regionStatus = 'right hemisphere'
+                regionName = regionName.replace(' - right hemisphere', '');
+              }
+              return r.name === regionName && r.status === regionStatus
+            }
+              
+            return r.name === area.name
+          })
           .map(r => r)
 
         if (areaAsRegion && areaAsRegion.length && areaAsRegion[0].ngId) {

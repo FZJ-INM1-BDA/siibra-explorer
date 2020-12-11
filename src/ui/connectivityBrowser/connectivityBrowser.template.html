@@ -2,7 +2,7 @@
     <hbp-connectivity-matrix-row
             #connectivityComponent
             *ngIf="regionName"
-            [region]="regionName"
+            [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
             theme="dark"
             [loadurl]="loadUrl"
             show-export="true"
