@@ -168,7 +168,7 @@ const dsNamesToExclude = [
   'Corrected 3-D reconstruction and surface parcellation',
   'Probability map',
   'Probabilistic map',
-  'Reference delineations',
+  // 'Reference delineations',
   'Atlas of the short fiber bundles ',
   'Desikan-Killiany Atlas',
   'GapMap',
