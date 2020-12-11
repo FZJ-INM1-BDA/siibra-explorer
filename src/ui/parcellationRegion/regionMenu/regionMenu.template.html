@@ -23,9 +23,15 @@
       <div *ngFor="let originDataset of (region.originDatasets || []); let index = index"
         class="ml-2">
         <i>&#183;</i>
-        <span>
-          {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+
+        <span *ngIf="originDataset?.format?.name as regionOrDsFormatName; else fallbackODsnameTmpl">
+          {{ regionOrDsFormatName }}
         </span>
+        <ng-template #fallbackODsnameTmpl>
+          <span>
+            {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+          </span>
+        </ng-template>
 
         <span
           aria-hidden="true"
