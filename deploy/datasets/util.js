@@ -213,11 +213,11 @@ const filterDataset = async (dataset = null, { templateName, parcellationName })
   switch (parcellationName) {
     case 'Cytoarchitectonic Maps':
       useSet = bigbrainCytoSet
-      overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+      overwriteParcellationName = 'Julich-Brain Atlas'
       break;
     case 'JuBrain Cytoarchitectonic Atlas': 
       useSet = juBrainSet
-      overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+      overwriteParcellationName = 'Julich-Brain Atlas'
       break;
     case 'Fibre Bundle Atlas - Short Bundle':
       useSet = shortBundleSet

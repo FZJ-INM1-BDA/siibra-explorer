@@ -86,7 +86,7 @@
           <mat-option
             *ngFor="let parcellation of (templateSelected.parcellations | appendTooltipTextPipe)"
             [value]="parcellation.name">
-            {{ parcellation.displayName || parcellation.name }}
+            {{ (parcellation.displayName || parcellation.name) | tmpParcNamePipe }}
           </mat-option>
         </mat-select>
       </mat-form-field>
