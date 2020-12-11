@@ -1,15 +1,19 @@
-import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter } from "@angular/core";
+import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
-import { Subscription, Observable } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
+import { Subscription, Observable, fromEvent } from "rxjs";
+import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
 import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
-import { getNavigationStateFromConfig } from "../util";
-import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
+import { getNavigationStateFromConfig, takeOnePipe } from "../util";
+import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { timedValues } from "src/util/generator";
 import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiState.store";
+import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
+import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
+import { viewerStateStandAloneVolumes, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
+import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
+import { LoggingService } from "src/logging";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -258,6 +262,8 @@ const accumulatorFn: (
 
 export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
+  public viewportToDatas: [any, any, any] = [null, null, null]
+
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
@@ -267,6 +273,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
     private store$: Store<IavRootStoreInterface>,
+    @Optional() private log: LoggingService,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
 
@@ -278,18 +285,18 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
        */
       distinctUntilChanged(),
     )
-
-    const viewerState$ = this.store$.pipe(
-      select('viewerState'),
-      shareReplay(1)
+    
+    this.navigationChanges$ = this.store$.pipe(
+      select(viewerStateSelectorNavigation),
+      filter(v => !!v),
     )
 
-    this.navigationChanges$ = viewerState$.pipe(
-      select('navigation'),
-      filter(v => !!v)
+    this.nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
+      select(ngViewerSelectorOctantRemoval),
     )
   }
 
+  private nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
   private navigationChanges$: Observable<any>
 
   private viewerPerformanceConfig$: Observable<ViewerConfigStateInterface>
@@ -303,9 +310,16 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   ngOnInit(){
     this.subscriptions.push(
+      this.nehubaViewerPerspectiveOctantRemoval$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag =>{
+        this.toggleOctantRemoval(flag)
+      })
+    )
+
+    this.subscriptions.push(
       this.store$.pipe(
-        select('viewerState'),
-        select('standaloneVolumes'),
+        select(viewerStateStandAloneVolumes),
         filter(v => v && Array.isArray(v) && v.length > 0),
         distinctUntilChanged()
       ).subscribe(async volumes => {
@@ -353,6 +367,14 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   ngOnDestroy(){
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe()
+    }
+  }
+
+  public toggleOctantRemoval(flag: boolean){
+    const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+    if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
+    else {
+      this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
     }
   }
 
@@ -406,10 +428,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         /**
          * TODO when user selects new template, window.viewer
          */
-        this.store$.dispatch({
-          type: NEHUBA_READY,
-          nehubaReady: true,
-        })
+        this.store$.dispatch(
+          ngViewerActionNehubaReady({
+            nehubaReady: true,
+          })
+        )
       }),
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(
@@ -441,12 +464,18 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
         throttleTime(160),
       ).subscribe(label => {
-        this.store$.dispatch({
-          type: VIEWERSTATE_ACTION_TYPES.MOUSEOVER_USER_LANDMARK_LABEL,
-          payload: {
-            label,
-          },
-        })
+        this.store$.dispatch(
+          viewerStateMouseOverCustomLandmarkInPerspectiveView({
+            payload: { label }
+          })
+        )
+      }),
+
+      this.nehubaViewerInstance.nehubaReady.pipe(
+        switchMapTo(fromEvent(this.nehubaViewerInstance.elementRef.nativeElement, 'viewportToData')),
+        takeOnePipe()
+      ).subscribe((events: CustomEvent[]) => {
+        [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       }),
     )
   }
@@ -455,6 +484,13 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     while(this.nehubaViewerSubscriptions.length > 0) {
       this.nehubaViewerSubscriptions.pop().unsubscribe()
     }
+
+    this.store$.dispatch(
+      ngViewerActionNehubaReady({
+        nehubaReady: false,
+      })
+    )
+
     this.iavNehubaViewerContainerViewerLoading.emit(false)
     if(this.cr) this.cr.destroy()
     this.el.clear()

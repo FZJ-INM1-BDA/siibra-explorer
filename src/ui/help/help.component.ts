@@ -12,26 +12,20 @@ import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.consta
 
 export class HelpComponent {
 
-  public generalHelp
-  public sliceviewHelp
-  public perspectiveviewHelp
-  public supportText
+  public generalHelp = this.constantService.showHelpGeneralMap
+  public sliceviewHelp = this.constantService.showHelpSliceViewMap
+  public perspectiveviewHelp = this.constantService.showHelpPerspectiveViewMap
+  public supportText = this.sanitizer.bypassSecurityTrustHtml(this.constantService.showHelpSupportText)
 
-  public contactEmailHref: string
-  public contactEmail: string
+  public contactEmailHref: string = `mailto:${this.constantService.supportEmailAddress}?Subject=[InteractiveAtlasViewer]%20Queries`
+  public supportEmailAddress: string = this.constantService.supportEmailAddress
 
-  public userDoc: string = `docs/`
+  public userDoc: string = this.constantService.docUrl
+  public repoUrl = this.constantService.repoUrl
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private sanitizer: DomSanitizer,
   ) {
-    this.generalHelp = this.constantService.showHelpGeneralMap
-    this.sliceviewHelp = this.constantService.showHelpSliceViewMap
-    this.perspectiveviewHelp = this.constantService.showHelpPerspectiveViewMap
-    this.supportText = this.sanitizer.bypassSecurityTrustHtml(this.constantService.showHelpSupportText)
-
-    this.contactEmailHref = `mailto:${this.constantService.supportEmailAddress}?Subject=[InteractiveAtlasViewer]%20Queries`
-    this.contactEmail = this.constantService.supportEmailAddress
   }
 }

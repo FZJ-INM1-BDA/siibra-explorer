@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, Pipe, PipeTransform } from "@angular/core";
 import { CountedDataModality } from "../databrowser.service";
+import { ARIA_LABELS } from 'common/constants'
+
 
 @Component({
   selector: 'modality-picker',
@@ -7,6 +9,9 @@ import { CountedDataModality } from "../databrowser.service";
   styleUrls: [
     './modalityPicker.style.css',
   ],
+  host:{
+    'aria-label': ARIA_LABELS.LIST_OF_MODALITIES
+  }
 })
 
 export class ModalityPicker implements OnChanges {
@@ -62,7 +67,7 @@ export class ModalityPicker implements OnChanges {
   }
 }
 
-const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').charCodeAt(0) - (b.name || '0').charCodeAt(0) 
+const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').toLowerCase().charCodeAt(0) - (b.name || '0').toLowerCase().charCodeAt(0) 
 
 @Pipe({
   name: 'sortModalityAlphabetically',

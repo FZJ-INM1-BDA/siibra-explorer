@@ -2,7 +2,7 @@
 
 import {} from 'jasmine'
 import { defaultRootState } from 'src/services/stateStore.service'
-import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR, cvtStateToSearchParam } from './atlasViewer.urlUtil'
+import { cvtSearchParamToState, cvtStateToSearchParam } from './atlasViewer.urlUtil'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colin = require('!json-loader!src/res/ext/colin.json')
@@ -10,6 +10,9 @@ const mni152 = require('!json-loader!src/res/ext/MNI152.json')
 const mni152Nehubaconfig = require('!json-loader!src/res/ext/MNI152NehubaConfig.json')
 const allen = require('!json-loader!src/res/ext/allenMouse.json')
 const waxholm = require('!json-loader!src/res/ext/waxholmRatV2_0.json')
+const atlasHumanMultilevel = require('!json-loader!src/res/ext/atlas/atlas_multiLevelHuman.json')
+
+const { defaultState: viewerHelperDefaultState,viewerStateHelperStoreName } = require('src/services/state/viewerState.store.helper')
 
 const { viewerState, ...rest } = defaultRootState
 const fetchedTemplateRootState = {
@@ -18,17 +21,63 @@ const fetchedTemplateRootState = {
     ...viewerState,
     fetchedTemplates: [ bigbrainJson, colin, mni152, allen, waxholm ],
   },
+  [viewerStateHelperStoreName]: {
+    ...viewerHelperDefaultState,
+    fetchedAtlases: [ atlasHumanMultilevel ]
+  }
 }
 
 // TODO finish writing tests
-describe('atlasViewer.urlService.service.ts', () => {
+describe('atlasViewer.urlUtil.ts', () => {
   describe('cvtSearchParamToState', () => {
-    it('convert empty search param to empty state', () => {
+
+    it('> convert empty search param to empty state', () => {
       const searchparam = new URLSearchParams()
       expect(() => cvtSearchParamToState(searchparam, defaultRootState)).toThrow()
     })
 
-    it('successfully converts with only template defined', () => {
+    it('> parses template into atlasId properly', () => {
+      const searchparam = new URLSearchParams()
+      searchparam.set('templateSelected', bigbrainJson.name)
+      
+      const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
+      expect(
+        newState[viewerStateHelperStoreName]['selectedAtlasId']
+      ).toEqual(
+        atlasHumanMultilevel['@id']
+      )
+    })
+
+    describe('> parses parcellation selected into overlayingAdditionalParcellations properly', () => {
+      it('> if the selected layer is base layer, it should not populate overlayingAdditionalParcellations', () => {
+        const searchparam = new URLSearchParams()
+
+        searchparam.set('templateSelected', bigbrainJson.name)
+        searchparam.set('parcellationSelected', bigbrainJson.parcellations[0].name)
+
+        const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
+        expect(
+          newState[viewerStateHelperStoreName]['overlayingAdditionalParcellations']
+        ).toEqual([])
+      })
+
+      it('> if the selected layer is non base layer, it should be populated', () => {
+        const searchparam = new URLSearchParams()
+
+        searchparam.set('templateSelected', bigbrainJson.name)
+        searchparam.set('parcellationSelected', bigbrainJson.parcellations[1].name)
+
+        const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
+        expect(
+          newState[viewerStateHelperStoreName]['overlayingAdditionalParcellations'].length
+        ).toEqual(1)
+        expect(
+          newState[viewerStateHelperStoreName]['overlayingAdditionalParcellations'][0]['@id']
+        ).toEqual(bigbrainJson.parcellations[1]['@id'])
+      })
+    })
+
+    it('> successfully converts with only template defined', () => {
       const searchparam = new URLSearchParams('?templateSelected=Big+Brain+%28Histology%29')
 
       const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
@@ -127,9 +176,9 @@ describe('atlasViewer.urlService.service.ts', () => {
     })
   })
 
-  describe('cvtStateToSearchParam', () => {
+  describe('> cvtStateToSearchParam', () => {
 
-    it('should convert template selected', () => {
+    it('> should convert template selected', () => {
       const { viewerState } = defaultRootState
       const searchParam = cvtStateToSearchParam({
         ...defaultRootState,
@@ -142,7 +191,7 @@ describe('atlasViewer.urlService.service.ts', () => {
       const stringified = searchParam.toString()
       expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29')
     })
-    it('should convert template selected and parcellation selected', () => {
+    it('> should convert template selected and parcellation selected', () => {
   
       const { viewerState } = defaultRootState
       const searchParam = cvtStateToSearchParam({
@@ -155,7 +204,7 @@ describe('atlasViewer.urlService.service.ts', () => {
       })
   
       const stringified = searchParam.toString()
-      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
+      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps+-+v2.4')
     })
   })
 })

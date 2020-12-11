@@ -1,28 +1,63 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { merge, Observable, Subscription } from "rxjs";
-import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo } from "rxjs/operators";
+import { merge, Observable, Subscription, combineLatest } from "rxjs";
+import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
 import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
 })
 export class UseEffects implements OnDestroy {
 
+  @Effect()
+  setRegionsSelected$: Observable<any> 
+
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
     private log: LoggingService,
   ) {
+
     this.regionsSelected$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
       shareReplay(1),
     )
 
+    this.setRegionsSelected$ = combineLatest(
+      this.actions$.pipe(
+        ofType(viewerStateSetSelectedRegionsWithIds),
+        map(action => {
+          const { selectRegionIds } = action
+          return selectRegionIds
+        })
+      ),
+      this.store$.pipe(
+        select('viewerState'),
+        select('parcellationSelected'),
+        filter(v => !!v),
+        distinctUntilChanged()
+      ),
+    ).pipe(
+      map(([ids, parcellation]) => {
+        const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({ parcellation })
+        const selectRegions = !!ids && Array.isArray(ids)
+          ? ids.map(id => getRegionFromlabelIndexId({ labelIndexId: id })).filter(v => !!v)
+          : []
+          /**
+           * only allow 1 selection at a time
+           */
+        return {
+          type: SELECT_REGIONS,
+          selectRegions: selectRegions.slice(0,1)
+        }
+      })
+    )
+    
     this.onDeselectRegions = this.actions$.pipe(
       ofType(DESELECT_REGIONS),
       withLatestFrom(this.regionsSelected$),
@@ -178,10 +213,16 @@ export class UseEffects implements OnDestroy {
    * side effect of selecting a parcellation means deselecting all regions
    */
   @Effect()
-  public onParcellationSelected$ = merge(
+  public onParcChange$ = merge(
+    this.actions$.pipe(
+      ofType(viewerStateToggleLayer.type)
+    ),
     this.parcellationSelected$,
     this.actions$.pipe(
       ofType(NEWVIEWER)
+    ),
+    this.actions$.pipe(
+      ofType(viewerStateSelectAtlas)
     )
   ).pipe(
     mapTo({

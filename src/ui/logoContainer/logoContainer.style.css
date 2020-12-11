@@ -1,44 +1,12 @@
-:host-context([darktheme="true"]) [uselogo="ebrains"][hbpLogoContainer]
-{
-  background-image:url('res/image/ebrains-logo-light.svg')
-}
-
-:host-context([darktheme="false"]) [uselogo="ebrains"][hbpLogoContainer]
-{
-  background-image:url('res/image/ebrains-logo-dark.svg')
-}
-
-:host-context([darktheme="true"]) [uselogo="hbp"][hbpLogoContainer]
-{
-  background-image:url('res/image/HBP_Primary_RGB_WhiteText.png')
-}
-
-:host-context([darktheme="false"]) [uselogo="hbp"][hbpLogoContainer]
-{
-  background-image:url('res/image/HBP_Primary_RGB_BlackText.png')
-}
-
-:host-context([darktheme="true"]) [uselogo="fzj"][hbpLogoContainer]
-{
-  background-image:url('res/image/fzj_white_transparent_svg.svg')
-}
-
-:host-context([darktheme="false"]) [uselogo="fzj"][hbpLogoContainer]
-{
-  background-image:url('res/image/fzj_black_transparent_svg.svg')
-}
-
 [hbpLogoContainer]
 {
   display:inline-block;
   background-size: cover;
-  pointer-events: none;
-  height:80px;
+  height: 100%;
 }
 
 [hbpLogoContainer] > img
 {
   visibility: hidden;
-  height:80px;
-  pointer-events: none;
+  height: 100%;
 }

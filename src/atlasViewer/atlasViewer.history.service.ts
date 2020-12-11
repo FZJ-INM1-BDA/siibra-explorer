@@ -6,7 +6,8 @@ import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, 
 import { defaultRootState, GENERAL_ACTION_TYPES, IavRootStoreInterface } from "src/services/stateStore.service";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { cvtSearchParamToState, cvtStateToSearchParam } from "./atlasViewer.urlUtil";
-
+import { viewerStateHelperStoreName } from '../services/state/viewerState.store.helper'
+import { PureContantService } from "src/util";
 const getSearchParamStringFromState = state => {
   try {
     return cvtStateToSearchParam(state).toString()
@@ -24,7 +25,10 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
   // ensure that fetchedTemplates are all populated
   @Effect()
   public parsingSearchUrlToState$ = this.store$.pipe(
-    filter(state => state.viewerState.fetchedTemplates.length === this.constantService.totalTemplates),
+    filter(state => {
+      return state.viewerState.fetchedTemplates.length === this.constantService.totalTemplates &&
+        state[viewerStateHelperStoreName].fetchedAtlases.length === this.pureConstantSErvice.totalAtlasesLength
+    }),
     take(1),
     switchMapTo(merge(
       // parsing state can occur via 2 ways:
@@ -36,7 +40,7 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
     )),
   ).pipe(
     withLatestFrom(this.store$),
-    map(([searchUrl, storeState]: [string, IavRootStoreInterface] ) => {
+    map(([searchUrl, storeState]: [string, any] ) => {
       const search = new URLSearchParams(searchUrl)
       try {
         if (Array.from(search.keys()).length === 0) {
@@ -45,6 +49,7 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
             type: GENERAL_ACTION_TYPES.APPLY_STATE,
             state: {
               ...defaultRootState,
+              ...storeState,
               viewerState: {
                 ...defaultRootState.viewerState,
                 fetchedTemplates: storeState.viewerState.fetchedTemplates,
@@ -70,6 +75,10 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
               ...defaultRootState.viewerState,
               fetchedTemplates: storeState.viewerState.fetchedTemplates,
             },
+            viewerStateHelper: {
+              ...defaultRootState.viewerStateHelper,
+              fetchedAtlases: storeState.viewerStateHelper.fetchedAtlases
+            }
           },
         }
       }
@@ -121,7 +130,8 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private actions$: Actions,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
+    private pureConstantSErvice: PureContantService
   ) {
 
     this.setNewSearchString$.subscribe(newSearchString => {

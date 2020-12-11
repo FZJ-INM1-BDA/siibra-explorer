@@ -1,5 +1,6 @@
 {
   "name": "Big Brain (Histology)",
+  "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
   "fullId": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
   "type": "template",
   "species": "Human",
@@ -14,8 +15,12 @@
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {
-      "name": "Cytoarchitectonic Maps",
+      "@id": "juelich/iav/atlas/v1.0.0/7",
+      "fullId": "juelich/iav/atlas/v1.0.0/7",
+      "name": "Cytoarchitectonic Maps - v2.4",
+      "displayName": "Cytoarchitectonic Maps",
       "properties": {
+        "name": "Cytoarchitectonic Maps",
         "description": "This dataset contains cytoarchitectonic maps of brain regions in the BigBrain space [Amunts et al. 2013]. The mappings were created using the semi-automatic method presented in Schleicher et al. 1999, based on coronal histological sections on 1 micron resolution. Mappings are available on approximately every 100th section for each region. They were then transformed to the sections of the 3D reconstructed BigBrain space using the transformations used in Amunts et al. 2013, which were provided by Claude Lepage (McGill). Only a few cytoarchitectonic maps in the Big Brain are currently **fully mapped**, based on a workflow that automatically fills in missing sections based on expert annotations. Other 3D maps are available in a preliminary version, in which the expert annotations in the Big Brain space were simply **interpolated**."
       },
       "regions": [
@@ -63,6 +68,15 @@
                                 }
                               }
                             }
+                          ],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "bfa7f344-016e-48da-bc34-9cd2f7f19148",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
                           ]
                         },
                         {
@@ -87,7 +101,16 @@
                               "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "49b5857e-7498-4fe9-8dbe-1cc0fa153091",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area TE 1.2 (HESCHL)",
@@ -111,7 +134,16 @@
                               "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "57ace487-2266-43a2-ad04-597ede6400d8",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -140,7 +172,16 @@
                               "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "45689ca2-df48-4260-a908-56a9d4eb344e",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -164,7 +205,16 @@
                               "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "319f7185-736e-432f-a783-d0f5bb2f533b",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area STS2 (STS)",
@@ -183,7 +233,16 @@
                               "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "298e8a4e-33ab-4c01-bd7f-9f9174a48604",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     }
@@ -211,7 +270,16 @@
                               "kgSchema": "minds/core/parcellationregion/v1.0.0",
                               "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
                             }
-                          }
+                          },
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "9ac6674e-2d6f-4831-ab25-8af17acca232",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area 6d2 (PreCG)",
@@ -229,7 +297,16 @@
                               "kgSchema": "minds/core/parcellationregion/v1.0.0",
                               "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
                             }
-                          }
+                          },
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "c7647341-25de-4a1f-9302-fbe8932deda0",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area 6ma (preSMA, mesial SFG)",
@@ -248,7 +325,16 @@
                               "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "0e7d4830-9125-490b-bdf6-1840a5a99933",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area 6mp (SMA, mesial SFG)",
@@ -267,7 +353,16 @@
                               "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "56022472-cfc5-47dc-8bd5-c58839b335cd",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -291,7 +386,16 @@
                               "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "72bf4008-78a6-41e0-9337-61ec53c39c27",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -315,7 +419,16 @@
                               "kgId": "a6a83284-829b-4385-9f83-7f1bc832c5a5"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "412a639b-63a6-448d-a387-272488458501",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area ifj2 (IFS/PreCS)",
@@ -327,6 +440,15 @@
                             -26787581,
                             30975651,
                             16855869
+                          ],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "5079e40f-7274-4348-9939-2a852644d230",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
                           ]
                         },
                         {
@@ -346,7 +468,16 @@
                               "kgId": "d687d385-98d9-4b31-85db-4bc682cd0a31"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "ea4ce6db-9adf-4080-9d6d-c3d455673feb",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area ifs2 (IFS)",
@@ -365,7 +496,16 @@
                               "kgId": "658a67d8-60c2-4bb4-8eaf-e54725eda261"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "df2c8de3-370c-4fc0-b822-c7cf7268b4bc",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area ifs3 (IFS)",
@@ -384,7 +524,16 @@
                               "kgId": "e555881e-7082-4ac0-b6cc-cd096f30d3dc"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "6290eaf9-69df-4c44-883a-678c0395b187",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area ifs4 (IFS)",
@@ -403,7 +552,16 @@
                               "kgId": "472dacc9-c27d-49c2-9e6f-a1cc3309c4ab"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "762b8ed5-8467-4bd6-ac3c-0aa0e1815cd3",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     }
@@ -437,7 +595,16 @@
                               "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "cdd4e615-dfbf-4109-8042-8a20e6bcbf2e",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     }
@@ -466,7 +633,16 @@
                               "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "2416cc4c-be1e-4b87-be2e-caf13abd453b",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area hIP5 (IPS)",
@@ -485,7 +661,16 @@
                               "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "7ef95e2f-860f-4411-abfe-1b1d18458e3d",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area hIP6 (IPS)",
@@ -504,7 +689,16 @@
                               "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "d7270c0b-9294-4cf9-addf-052be3a62da7",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area hIP7 (IPS)",
@@ -523,7 +717,16 @@
                               "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "d3c4e8f8-d8b7-4cc8-8dfb-744dc41473f3",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -547,7 +750,16 @@
                               "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "7dae93bd-cea1-44f6-ae5b-1992bb15a732",
+                              "format": {
+                                "name": "3D interpolated map"
+                              }
+                            }
+                          ]
                         }
                       ]
                     }
@@ -591,6 +803,15 @@
                                 }
                               }
                             }
+                          ],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "696d6062-3b86-498f-9ca6-e4d67b433396",
+                              "format": {
+                                "name": "Full 3D map"
+                              }
+                            }
                           ]
                         },
                         {
@@ -615,7 +836,16 @@
                               "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [],
+                          "originDatasets":[
+                            {
+                              "kgSchema": "minds/core/dataset/v1.0.0",
+                              "kgId": "63093617-9b72-45f5-88e6-f648ad05ae79",
+                              "format": {
+                                "name": "Full 3D map"
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area hOc3v (LingG)",
@@ -657,7 +887,249 @@
                                   "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
                                 }
                               },
-                              "relatedAreas": []
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "c8e23d85-909c-4efc-a2f4-fb3ed2a5c01f",
+                                  "format": {
+                                    "name": "3D interpolated map"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "lateral occipital cortex",
+                          "children": [
+                            {
+                              "name": "Area hOc5 (LOC)",
+                              "ngId": "v5",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                255,
+                                0,
+                                0
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "ea8fb74b-0ecc-4801-9522-b4c2cb2a2a5c",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "diencephalon",
+          "children": [
+            {
+              "name": "cerebral nuclei",
+              "children": [
+                {
+                  "name": "thalamus",
+                  "children": [
+                    {
+                      "name": "metathalamus",
+                      "children": [
+                        {
+                          "name": "lateral geniculate body",
+                          "children": [
+                            {
+                              "name": "LGB-lam1 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam1",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                255,
+                                255,
+                                74
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "LGB-lam2 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam2",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                222,
+                                74,
+                                173
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "LGB-lam3 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam3",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                132,
+                                90,
+                                173
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "LGB-lam4 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam4",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                41,
+                                123,
+                                198
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "LGB-lam5 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam5",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                82,
+                                214,
+                                222
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "LGB-lam6 (CGL, Metathalamus)",
+                              "ngId": "LGB-lam6",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "position": [],
+                              "rgb": [
+                                99,
+                                231,
+                                66
+                              ],
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
                             }
                           ]
                         },
@@ -842,9 +1314,18 @@
       ]
     },
     {
-      "name": "BigBrain Cortical Layers Segmentation",
+      "@id": "juelich/iav/atlas/v1.0.0/3",
+      "name": "Cortical Layers Segmentation",
+      "displayName": "Cortical layers",
       "ngId": "cortical layers",
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9"
+        }
+      ],
       "properties": {
+        "name": "Cortical Layers Segmentation",
         "description": "The cerebral isocortex has six cytoarchitectonic layers that vary depending on cortical area and local morphology. This datasets provides a 3D segmentation of all cortical and laminar surfaces in the BigBrain, a high-resolution, 3D histological model of the human brain. The segmentation has been computed automatically based on histological intensities along 3D cortical profiles which were sampled between the pial and white matter throughout the dataset. These cortical profiles were segmented into layers using a convolutional neural network. Training profiles were generated from examples of manually segmented layers on cortical regions from 2D histological sections of the BigBrain. From the segmented intensity profiles, surface meshes and voxel masks of all six cortical layers in the space of the Big Brain have been computed.",
         "publications": [
           {
@@ -865,7 +1346,16 @@
                 128,
                 0
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
               "name": "cortical layer 2",
@@ -875,7 +1365,16 @@
                 190,
                 190
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
               "name": "cortical layer 3",
@@ -885,7 +1384,16 @@
                 215,
                 180
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
               "name": "cortical layer 4",
@@ -895,7 +1403,16 @@
                 250,
                 200
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
               "name": "cortical layer 5",
@@ -905,7 +1422,16 @@
                 128,
                 128
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
               "name": "cortical layer 6",
@@ -915,30 +1441,50 @@
                 190,
                 255
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             },
             {
-              "name": "non-cortical structures",
+              "name": "Non-isocortical structures",
               "labelIndex": 7,
               "rgb": [
                 255,
                 255,
                 255
               ],
-              "children": []
+              "children": [],
+              "originDatasets":[
+                {
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "13e6ec48-4fec-4e9a-9bcf-45036d3c8ef9",
+                  "format": {
+                    "name": "Cortical layer"
+                  }
+                }
+              ]
             }
           ]
         }
       ]
     },
     {
+      "@id": "juelich/iav/atlas/v1.0.0/4",
       "name": "Grey/White matter",
+      "displayName": "Isocortex",
       "type": "parcellation",
       "ngData": null,
       "ngId": " tissue type: ",
       "regions": [
         {
-          "name": "Grey matter",
+          "name": "Isocortex",
           "labelIndex": 100,
           "rgb": [
             200,
@@ -948,7 +1494,7 @@
           "children": []
         },
         {
-          "name": "White matter",
+          "name": "Non-isocortical structures",
           "labelIndex": 200,
           "rgb": [
             255,

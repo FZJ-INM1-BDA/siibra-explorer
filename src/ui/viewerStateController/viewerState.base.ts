@@ -5,21 +5,14 @@ import { distinctUntilChanged, filter, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
-import {MatSelectChange} from "@angular/material/select";
-import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
+import { MatSelectChange } from "@angular/material/select";
+import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
+import { viewerStateSelectTemplateWithName } from "src/services/state/viewerState/actions";
 
 const ACTION_TYPES = {
-  SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',
-  DOUBLE_CLICK_ON_REGIONHIERARCHY: 'DOUBLE_CLICK_ON_REGIONHIERARCHY',
-  SELECT_TEMPLATE_WITH_NAME: 'SELECT_TEMPLATE_WITH_NAME',
   SELECT_PARCELLATION_WITH_NAME: 'SELECT_PARCELLATION_WITH_NAME',
 
-  NAVIGATETO_REGION: 'NAVIGATETO_REGION',
 }
-
-const compareWith = (o, n) => !o || !n
-  ? false
-  : o.name === n.name
 
 export class ViewerStateBase implements OnInit {
 
@@ -39,8 +32,6 @@ export class ViewerStateBase implements OnInit {
   public regionsSelected$: Observable<any>
 
   public savedRegionsSelections$: Observable<any[]>
-
-  public compareWith = compareWith
 
   private savedRegionBottomSheetRef: MatBottomSheetRef
 
@@ -103,13 +94,11 @@ export class ViewerStateBase implements OnInit {
   }
 
   public handleTemplateChange(event: MatSelectChange) {
-
-    this.store$.dispatch({
-      type: ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME,
-      payload: {
-        name: event.value,
-      },
-    })
+    this.store$.dispatch(
+      viewerStateSelectTemplateWithName({
+        payload: { name: event.value }
+      })
+    )
   }
 
   public handleParcellationChange(event: MatSelectChange) {
@@ -209,3 +198,4 @@ export class ViewerStateBase implements OnInit {
 }
 
 export const VIEWERSTATE_CONTROLLER_ACTION_TYPES = ACTION_TYPES
+

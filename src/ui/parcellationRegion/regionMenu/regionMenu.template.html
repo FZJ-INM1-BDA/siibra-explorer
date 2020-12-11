@@ -1,102 +1,111 @@
 <mat-card>
-  <mat-card-title>
-    <div class="position-relative region-name">
-      {{ region.name }}
-      <small *ngIf="region.status"> ({{region.status}})</small>
-    </div>
-  </mat-card-title>
-  <mat-card-subtitle>
-    <i class="fas fa-brain"></i>
-    <span>
-      Brain region
-    </span>
-  </mat-card-subtitle>
+  <!-- rgbDarkmode must be checked for strict equality to true/false 
+  as if rgb is undefined, rgbDarkmode will be null/undefined
+  which is falsy -->
+  <div class="header-container"
+    [ngClass]="{'darktheme': rgbDarkmode === true, 'lighttheme': rgbDarkmode === false}"
+    [style.backgroundColor]="rgbString">
+    <mat-card-title>
+      <div class="position-relative region-name iv-custom-comp text">
+        {{ region.name }}
+        <small *ngIf="region.status"> ({{region.status}})</small>
+      </div>
+    </mat-card-title>
 
-  <mat-card-content>
-    <mat-divider></mat-divider>
+    <!-- subtitle on what it is -->
+    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+      <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+      <span>
+        Brain region
+      </span>
 
-    <!-- region desc -->
-    <ng-container *ngIf="region?.description?.length > 0">
-      <mat-divider></mat-divider>
-      <div>
-        {{ region.description }}
-    </div>
-    </ng-container>
+      <!-- origin datas format -->
+      <div *ngFor="let originDataset of (region.originDatasets || []); let index = index"
+        class="ml-2">
+        <i>&#183;</i>
 
-    <mat-divider></mat-divider>
+        <span *ngIf="originDataset?.format?.name as regionOrDsFormatName; else fallbackODsnameTmpl">
+          {{ regionOrDsFormatName }}
+        </span>
+        <ng-template #fallbackODsnameTmpl>
+          <span>
+            {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+          </span>
+        </ng-template>
 
-    <mat-list class="action-list sm">
+        <span
+          aria-hidden="true"
+          [kgSchema]="originDataset.kgSchema"
+          [kgId]="originDataset.kgId"
+          single-dataset-directive
+          #sdDirective="singleDatasetDirective">
+        </span>
 
-      <!-- selected -->
-      <mat-list-item
-        mat-ripple
-        iv-custom-comp
-        [attr.primary]="isSelected || null"
-        (click)="toggleRegionSelected()">
-        <mat-icon scaled-down="" fontSet="far" [fontIcon]="isSelected ? 'fa-check-square' : 'fa-square'"  mat-list-icon></mat-icon>
-        <div mat-line>
-          Select
-        </div>
-      </mat-list-item>
+        <ng-template [ngIf]="sdDirective.fetchFlag" [ngIfElse]="contentTmpl">
+          <spinner-cmp></spinner-cmp>
+        </ng-template>
 
-      <!-- position -->
-      <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
-        <mat-icon scaled-down fontSet="fas" fontIcon="fa-map-marked-alt" mat-list-icon></mat-icon>
-        <div mat-line>
-          {{ region.position | nmToMm | addUnitAndJoin : 'mm' }}
-        </div>
-      </mat-list-item>
+        <ng-template #contentTmpl>
 
-      <!-- originData -->
-      <mat-list-item *ngFor="let originDataset of (region.originDatasets || [])"
-        iav-dataset-preview-dataset-file
-        [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-        [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-        #previewDirective="iavDatasetPreviewDatasetFile"
-        iv-custom-comp
-        [attr.primary]="previewDirective.active || null"
-        role="switch"
-        [attr.aria-checked]="previewDirective.active"
-        [attr.aria-label]="SHOW_ORIGIN_DATASET"
-        mat-ripple>
-        <mat-icon fontSet="fas" fontIcon="fa-eye" mat-list-icon></mat-icon>
-        <div mat-line>
-          View probability map
-        </div>
-      </mat-list-item>
+          <!-- fall back if no kg ref is available -->
+          <a *ngIf="sdDirective.kgReference.length === 0"
+            [href]="sdDirective.directLinkToKg"
+            target="_blank">
+            <button mat-icon-button
+              color="primary">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+          </a>
 
-      <!-- connectivity -->
-      <div *ngIf="hasConnectivity" iav-switch #connectivitySwitch="iavSwitch">
+          <!-- kg ref, normally doi -->
+          <a *ngFor="let kgRef of sdDirective.kgReference"
+            [href]="kgRef | doiParserPipe"
+            target="_blank">
+            <button mat-icon-button
+              color="primary">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+          </a>
 
-        <mat-list-item mat-ripple
-          (click)="connectivitySwitch.toggle()"
-          [attr.aria-label]="SHOW_CONNECTIVITY_DATA">
-          <mat-icon fontSet="fab" fontIcon="fa-connectdevelop" mat-list-icon></mat-icon >
-          <div mat-line>
-            <span>
-              Connectivity
-            </span>
-            <span class="muted">
-             ({{ 1 }})
-            </span>
-          </div>
-          <mat-icon fontSet="fas" [fontIcon]="connectivitySwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
-        </mat-list-item>
+          <!-- pin/unpin -->
+          <ng-container *ngTemplateOutlet="pinTmpl; context: { $implicit: sdDirective.isFav$ | async }">
+          </ng-container>
 
-        <!-- connectivity -->
-        <mat-list-item *ngIf="connectivitySwitch.switchState" mat-ripple (click)="showConnectivity(region.name)">
-          <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-          <div mat-line>1000 Brain Study - DTI connectivity</div>
-        </mat-list-item>
+          <ng-template #pinTmpl let-isFav>
 
+            <button mat-icon-button
+              (click)="isFav ? sdDirective.undoableRemoveFav() : sdDirective.undoableAddFav()"
+              [color]="isFav ? 'primary' : 'default'">
+              <i class="fas fa-thumbtack"></i>
+            </button>
+          </ng-template>
+
+        </ng-template>
       </div>
 
-      <!-- change template -->
-      <ng-container *ngTemplateOutlet="regionInOtherTemplatesTmpl; context: { regionInOtherTemplates: regionInOtherTemplates$ | async }">
-      </ng-container>
+      <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
-    </mat-list>
-  </mat-card-content>
+      <!-- position -->
+      <button mat-icon-button *ngIf="position"
+        (click)="navigateToRegion()"
+        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | nmToMm | addUnitAndJoin : 'mm')">
+        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
+        </mat-icon>
+      </button>
+
+      <!-- region in other templates -->
+      <button mat-icon-button
+        *ngIf="showRegionInOtherTmpl"
+        [attr.data-available-in-tmpl-count]="(regionInOtherTemplates$ | async).length"
+        [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE"
+        [matMenuTriggerFor]="regionInOtherTemplatesMenu"
+        [matMenuTriggerData]="{ regionInOtherTemplates: regionInOtherTemplates$ | async }">
+        <i class="fas fa-globe"></i>
+      </button>
+
+    </mat-card-subtitle>
+
+  </div>
 </mat-card>
 
 <!-- ToDo make dynamic with AVAILABLE CONNECTIVITY DATASETS data - get info from atlas viewer core -->
@@ -112,43 +121,23 @@
 </mat-menu>
 
 <!-- template for switching template -->
-<ng-template #regionInOtherTemplatesTmpl let-regionInOtherTemplates="regionInOtherTemplates">
+<mat-menu #regionInOtherTemplatesMenu="matMenu"
+  [aria-label]="SHOW_IN_OTHER_REF_SPACE">
+  <ng-template matMenuContent let-regionInOtherTemplates="regionInOtherTemplates">
 
-  <div iav-switch #changeTmplSwitch="iavSwitch">
-
-    <mat-list-item *ngIf="regionInOtherTemplates.length"
+    <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
+      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
+      (click)="changeView(sameRegion)"
       mat-ripple
-      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE"
-      (click)="changeTmplSwitch && changeTmplSwitch.toggle()">
-      <mat-icon fontSet="fas" fontIcon="fa-brain" mat-list-icon></mat-icon>
+      [attr.role]="'button'">
+      <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
       <div mat-line>
-        <span>
-          Explore in other templates
-        </span>
-        <span class="muted">
-          ({{ regionInOtherTemplates.length }})
-        </span>
+        <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
+        </ng-container>
       </div>
-      <mat-icon fontSet="fas" [fontIcon]="changeTmplSwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
     </mat-list-item>
-
-    <!-- change template items -->
-    <div *ngIf="changeTmplSwitch.switchState"
-      [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE">
-      <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
-        [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
-        (click)="changeView(sameRegion)"
-        mat-ripple
-        [attr.role]="'button'">
-        <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-        <div mat-line>
-          <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
-          </ng-container>
-        </div>
-      </mat-list-item>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
+</mat-menu>
 
 <!-- template for rendering template name and template hemisphere -->
 <ng-template #regionInOtherTemplate let-template="template" let-hemisphere="hemisphere">

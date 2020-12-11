@@ -1,0 +1,192 @@
+<div class="position-relative d-flex flex-column justify-content-start">
+
+    <!-- selector panel when expanded -->
+
+    <mat-card class="selector-container position-absolute" [ngClass]="selectorExpanded ? 'scale-up-bl pe-all' : 'scale-down-bl pe-none'">
+        <mat-card-content>
+
+            <!-- templates -->
+            <mat-card-subtitle>
+                Templates
+            </mat-card-subtitle>
+            <mat-grid-list cols="3" rowHeight="3:4">
+                <!-- template tiles -->
+                <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: template,
+                        selected: selectedTemplateSpaceId === template['@id'],
+                        onClick: getTileTmplClickFnAsCtx(selectTemplateWithName, template)
+                    }">
+                    </ng-container>
+                </mat-grid-tile>
+            </mat-grid-list>
+
+            <mat-divider></mat-divider>
+
+            <!-- levels/maps/segregations -->
+            <mat-card-subtitle class="mt-2">
+                Levels
+            </mat-card-subtitle>
+
+            <mat-grid-list cols="3" rowHeight="3:4">
+
+                <!-- non grouped layers -->
+                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async); trackBy: trackbyAtId">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: layer,
+                        selected: selectedLayersIncludes(layer['@id']),
+                        onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
+                        disabled: !currentTemplateIncludesLayer(layer)
+                    }">
+
+                    </ng-container>
+                </mat-grid-tile>
+
+                <!-- grouped layers -->
+                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async); trackBy: trackbyName">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: group,
+                        selected: selectedOneOfTheLayers(group.parcellations),
+                        disabled: !templateIncludesGroup(group),
+                        menuTriggerFor: layerGroupMenu,
+                        menuTriggerData: { layerGroupItems: group.parcellations },
+                        isDirectory: true
+                    }">
+
+                    </ng-container>
+                </mat-grid-tile>
+            </mat-grid-list>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- place holder when not expanded -->
+    <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all">
+        <button color="primary"
+                matTooltip="Select layer"
+                mat-mini-fab
+                *ngIf="((availableTemplates$ | async).length > 1) || ((groupedLayers$ | async).length + (nonGroupedLayers$ | async).length > 1)"
+                [attr.aria-label]="TOGGLE_ATLAS_LAYER_SELECTOR"
+                (click)="selectorExpanded = !selectorExpanded">
+            <i class="fas fa-layer-group"></i>
+        </button>
+    </div>
+
+</div>
+
+<!-- image tile tmpl -->
+<ng-template #tileTmpl
+    let-tileSrc="tileSrc"
+    let-selected="selected"
+    let-onClick="onClick"
+    let-disabled="disabled"
+    let-isDirectory="isDirectory"
+    let-menuTriggerFor="menuTriggerFor"
+    let-menuTriggerData="menuTriggerData">
+    <div *ngIf="menuTriggerFor; else noMatMenuTriggerTmpl"
+        iav-stop="click"
+        class="d-flex flex-column justify-content-start w-100 h-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
+        [matMenuTriggerFor]="menuTriggerFor"
+        [matMenuTriggerData]="menuTriggerData">
+
+        <ng-container *ngTemplateOutlet="tileContent">
+        </ng-container>
+    </div>
+
+    <ng-template #noMatMenuTriggerTmpl>
+        <div class="d-flex flex-column justify-content-start w-100 h-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer">
+            <ng-container *ngTemplateOutlet="tileContent">
+            </ng-container>
+        </div>
+    </ng-template>
+
+    <ng-template #tileContent>
+        <div class="d-flex flex-column justify-content-start w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
+            [matTooltip]="getTooltipText(tileSrc)"
+            matTooltipPosition="above"
+            (click)="onClick && onClick()"
+            [ngStyle]="{opacity: disabled ? '0.2': '1' }">
+
+            <div class="position-relative d-flex flex-column align-items-center">
+                <div class="position-relative">
+                <!-- info icon btn -->
+                <div class="position-absolute top-0 right-0 info-container"
+                    [ngClass]="{ 'darktheme': tileSrc.darktheme, 'lighttheme': !tileSrc.darktheme }">
+                    <ng-container *ngTemplateOutlet="infoBtn; context: { tileSrc: tileSrc}">
+
+                    </ng-container>
+                </div>
+
+                <!-- preview image -->
+                <img [src]="tileSrc.previewUrl"
+                    alt="Preview of this tile"
+                    class="layer-image align-self-center"
+                    [ngClass]="{ 'selectedLayerBorder': selected }"
+                    draggable="false">
+
+                <!-- if is directory, show directory icon -->
+                <div *ngIf="isDirectory" class="position-absolute bottom-0 right-0">
+                    <i class="fas fa-folder folder-container fa-2x"></i>
+                </div>
+                </div>
+            </div>
+
+            <!-- text container -->
+            <div class="d-flex justify-content-center">
+                <small class="iv-custom-comp text ml-1 mr-1 mt-2 text-break text-center">{{ tileSrc.displayName || tileSrc.name }}</small>
+            </div>
+        </div>
+    </ng-template>
+</ng-template>
+
+<ng-template #infoBtn let-tileSrc="tileSrc">
+    <div *ngIf="tileSrc.originDatasets?.length > 0; else plainBtn"
+        mat-icon-button
+        iav-stop="click"
+        class="iv-custom-comp d-flex justify-content-center infoButton"
+        [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-kgid]="tileSrc.originDatasets[0].kgId"
+        [iav-dataset-show-dataset-dialog-kgschema]="tileSrc.originDatasets[0].kgSchema">
+        <small><i class="fas fa-info"></i></small>
+    </div>
+
+    <ng-template #plainBtn>
+        <div *ngIf="tileSrc.properties?.name || tileSrc.properties?.description"
+            mat-icon-button
+            iav-stop="click"
+            class="iv-custom-comp d-flex justify-content-center align-items-center infoButton"
+            [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
+            iav-dataset-show-dataset-dialog
+            [iav-dataset-show-dataset-dialog-name]="tileSrc.properties.name"
+            [iav-dataset-show-dataset-dialog-description]="tileSrc.properties.description">
+            <small><i class="fas fa-info"></i></small>
+        </div>
+    </ng-template>
+</ng-template>
+
+<!-- mat menu for grouped layer -->
+<mat-menu
+    #layerGroupMenu="matMenu"
+    class="layerGroupMenu"
+    hasBackdrop="false">
+
+    <ng-template matMenuContent let-layerGroupItems="layerGroupItems">
+        <mat-grid-list cols="1"
+            rowHeight="1:1"
+            iav-stop="click"
+            (iav-outsideClick)="collapseExpandedGroup()">
+            <mat-grid-tile *ngFor="let layer of layerGroupItems">
+
+                <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                    tileSrc: layer,
+                    onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
+                    selected: selectedLayersIncludes(layer['@id']),
+                    disabled: !currentTemplateIncludesLayer(layer)
+                } ">
+
+                </ng-container>
+            </mat-grid-tile>
+        </mat-grid-list>
+
+    </ng-template>
+</mat-menu>

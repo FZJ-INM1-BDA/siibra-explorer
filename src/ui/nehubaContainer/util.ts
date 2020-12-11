@@ -1,4 +1,7 @@
-import { FOUR_PANEL, H_ONE_THREE, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
+import { pipe } from 'rxjs'
+import { filter, scan, take } from 'rxjs/operators'
+import { PANELS } from 'src/services/state/ngViewerState.store.helper'
+import { getViewer } from 'src/util/fn'
 
 const flexContCmnCls = ['w-100', 'h-100', 'd-flex', 'justify-content-center', 'align-items-stretch']
 
@@ -34,28 +37,28 @@ const bottom = true
 
 const mapModeIdxClass = new Map()
 
-mapModeIdxClass.set(FOUR_PANEL, new Map([
+mapModeIdxClass.set(PANELS.FOUR_PANEL, new Map([
   [0, { top, left }],
   [1, { top, right }],
   [2, { bottom, left }],
   [3, { right, bottom }],
 ]))
 
-mapModeIdxClass.set(SINGLE_PANEL, new Map([
+mapModeIdxClass.set(PANELS.SINGLE_PANEL, new Map([
   [0, { top, left, right, bottom }],
   [1, {}],
   [2, {}],
   [3, {}],
 ]))
 
-mapModeIdxClass.set(H_ONE_THREE, new Map([
+mapModeIdxClass.set(PANELS.H_ONE_THREE, new Map([
   [0, { top, left, bottom }],
   [1, { top, right }],
   [2, { right }],
   [3, { bottom, right }],
 ]))
 
-mapModeIdxClass.set(V_ONE_THREE, new Map([
+mapModeIdxClass.set(PANELS.V_ONE_THREE, new Map([
   [0, { top, left, right }],
   [1, { bottom, left }],
   [2, { bottom }],
@@ -98,7 +101,7 @@ export const addTouchSideClasses = (panel: HTMLElement, actualOrderIndex: number
 export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
   washPanels(panels)
 
-  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, H_ONE_THREE))
+  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.H_ONE_THREE))
 
   const majorContainer = makeCol(panels[0])
   const minorContainer = makeCol(panels[1], panels[2], panels[3])
@@ -112,7 +115,7 @@ export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEle
 export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
   washPanels(panels)
 
-  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, V_ONE_THREE))
+  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.V_ONE_THREE))
 
   const majorContainer = makeRow(panels[0])
   const minorContainer = makeRow(panels[1], panels[2], panels[3])
@@ -126,7 +129,7 @@ export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEleme
 export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
   washPanels(panels)
 
-  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, FOUR_PANEL))
+  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.FOUR_PANEL))
 
   const majorContainer = makeRow(panels[0], panels[1])
   const minorContainer = makeRow(panels[2], panels[3])
@@ -140,7 +143,7 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
 export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
   washPanels(panels)
 
-  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, SINGLE_PANEL))
+  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.SINGLE_PANEL))
 
   const majorContainer = makeRow(panels[0])
   const minorContainer = makeRow(panels[1], panels[2], panels[3])
@@ -213,4 +216,72 @@ export const importNehubaFactory = appendSrc => {
 
     return pr
   }
+}
+
+
+export const isFirstRow = (cell: HTMLElement) => {
+  const { parentElement: row } = cell
+  const { parentElement: container } = row
+  return container.firstElementChild === row
+}
+
+export const isFirstCell = (cell: HTMLElement) => {
+  const { parentElement: row } = cell
+  return row.firstElementChild === cell
+}
+
+export const scanSliceViewRenderFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean, boolean, boolean] = (acc, curr) => {
+  
+  const target = curr.target as HTMLElement
+  const targetIsFirstRow = isFirstRow(target)
+  const targetIsFirstCell = isFirstCell(target)
+  const idx = targetIsFirstRow
+    ? targetIsFirstCell
+      ? 0
+      : 1
+    : targetIsFirstCell
+      ? 2
+      : null
+
+  const returnAcc = [...acc]
+  const num1 = typeof curr.detail.missingChunks === 'number' ? curr.detail.missingChunks : 0
+  const num2 = typeof curr.detail.missingImageChunks === 'number' ? curr.detail.missingImageChunks : 0
+  if (num1 < 0 && num2 < 0) {
+    returnAcc[idx] = true
+  } else {
+    returnAcc[idx] = Math.max(num1, num2) > 0
+  }
+  return returnAcc as [boolean, boolean, boolean]
+}
+
+export const takeOnePipe = () => {
+
+  return pipe(
+    scan((acc: Event[], event: Event) => {
+      const target = (event as Event).target as HTMLElement
+      /**
+       * 0 | 1
+       * 2 | 3
+       *
+       * 4 ???
+       */
+      const panels = getViewer()['display']['panels']
+      const panelEls = Array.from(panels).map(({ element }) => element)
+
+      const identifySrcElement = (element: HTMLElement) => {
+        const idx = panelEls.indexOf(element)
+        return idx
+      }
+
+      const key = identifySrcElement(target)
+      const _ = {}
+      _[key] = event
+      return Object.assign({}, acc, _)
+    }, []),
+    filter(v => {
+      const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+      return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
+    }),
+    take(1),
+  )
 }

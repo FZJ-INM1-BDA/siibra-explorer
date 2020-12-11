@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {Injectable, NgZone, Optional, Inject, OnDestroy} from "@angular/core";
+import {Injectable, NgZone, Optional, Inject, OnDestroy, InjectionToken} from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, Subscription, from, race, of, interval } from "rxjs";
-import { distinctUntilChanged, map, filter, startWith, take, switchMap, catchError, mapTo, tap } from "rxjs/operators";
+import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
+import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
+import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
+import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
   IavRootStoreInterface,
   safeFilter
 } from "src/services/stateStore.service";
+import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest, PluginServices } from "./pluginUnit";
@@ -24,6 +29,7 @@ interface IRejectUserInput{
 interface IGetUserSelectRegionPr{
   message: string
   promise: Promise<any>
+  spec?: ICustomRegionSpec
   rs: (region: any) => void
   rj: (reject: IRejectUserInput) => void
 }
@@ -31,12 +37,22 @@ interface IGetUserSelectRegionPr{
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
 export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
 
+export interface ILoadMesh {
+  type: 'VTK'
+  id: string
+  url: string
+}
+export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
+
 @Injectable({
-  providedIn : 'root',
+  providedIn : 'root'
 })
 
 export class AtlasViewerAPIServices implements OnDestroy{
 
+  public loadMesh$ = new Subject<ILoadMesh>()
+
+  private onDestoryCb: Function[] = []
   private loadedTemplates$: Observable<any>
   private selectParcellation$: Observable<any>
   public interactiveViewer: IInteractiveViewerInterface
@@ -60,25 +76,100 @@ export class AtlasViewerAPIServices implements OnDestroy{
   public getUserToSelectRegion: IGetUserSelectRegionPr[] = []
   public getUserToSelectRegionUI$: Subject<IGetUserSelectRegionPr[]> = new Subject()
 
-  public getUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
+  public getNextUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
     if (this.getUserToSelectRegion.length > 0) {
-      const handler =  this.getUserToSelectRegion.pop()
-      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
-      return handler
+      return this.getUserToSelectRegion[this.getUserToSelectRegion.length - 1]
     } 
     else return null
   }
 
+  public popUserRegionSelectHandler = () => {
+    if (this.getUserToSelectRegion.length > 0) {
+      this.getUserToSelectRegion.pop()
+      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+    } 
+  }
+
   private s: Subscription[] = []
+
+  private onMouseClick(ev: any, next){
+    const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
+    if (!!rs) {
+      
+      let moSegments
+      this.store.pipe(
+        select(uiStateMouseOverSegmentsSelector),
+        take(1)
+      ).subscribe(val => moSegments = val)
+
+      /**
+       * getROI api
+       */
+      if (spec) {
+        /**
+         * if spec of overwrite click is for a point
+         */
+        if (spec.type === EnumCustomRegion.POINT) {
+          this.popUserRegionSelectHandler()
+          let mousePositionReal
+          // rather than commiting mousePositionReal in state via action, do a single subscription instead.
+          // otherwise, the state gets updated way too often
+          if (window && (window as any).nehubaViewer) {
+            (window as any).nehubaViewer.mousePosition.inRealSpace
+              .take(1)
+              .subscribe(floatArr => {
+                mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
+              })
+          }
+          return rs({
+            type: spec.type,
+            payload: mousePositionReal
+          })
+        }
+
+        /**
+         * if spec of overwrite click is for a point
+         */
+        if (spec.type === EnumCustomRegion.PARCELLATION_REGION) {
+
+          if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
+            this.popUserRegionSelectHandler()
+            return rs({
+              type: spec.type,
+              payload: moSegments
+            })
+          }
+        }
+      } else {
+        /**
+         * selectARegion API
+         * TODO deprecate
+         */
+        if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
+          this.popUserRegionSelectHandler()
+          return rs(moSegments[0])
+        }
+      }
+    }
+    next()
+  }
 
   constructor(
     private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
+    private snackbar: MatSnackBar,
     private zone: NgZone,
     private pluginService: PluginServices,
     @Optional() @Inject(CANCELLABLE_DIALOG) openCancellableDialog: (message: string, options: any) => () => void,
     @Optional() @Inject(GET_TOAST_HANDLER_TOKEN) private getToastHandler: Function,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
   ) {
+    if (clickInterceptor) {
+      const { register, deregister } = clickInterceptor
+      const onMouseClick = this.onMouseClick.bind(this)
+      register(onMouseClick)
+      this.onDestoryCb.push(() => deregister(onMouseClick))
+    }
     if (openCancellableDialog) {
       this.s.push(
         this.getUserToSelectRegionUI$.pipe(
@@ -119,9 +210,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
     }
 
     this.loadedTemplates$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('fetchedTemplates'),
-      map(state => state.fetchedTemplates),
+      select(viewerStateFetchedTemplatesSelector)
     )
 
     this.selectParcellation$ = this.store.pipe(
@@ -217,8 +306,32 @@ export class AtlasViewerAPIServices implements OnDestroy{
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
         getUserToSelectARegion: message => {
+          console.warn(`interactiveViewer.uiHandle.getUserToSelectARegion is becoming deprecated. Use getUserToSelectRoi instead`)
           const obj = {
             message,
+            promise: null,
+            rs: null,
+            rj: null
+          }
+          const pr = new Promise((rs, rj) => {
+            obj.rs = rs
+            obj.rj = rj
+          })
+
+          obj.promise = pr
+
+          this.getUserToSelectRegion.push(obj)
+          this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+          this.zone.run(() => {
+
+          })
+          return pr
+        },
+        getUserToSelectRoi: (message: string, spec: ICustomRegionSpec) => {
+          if (!spec || !spec.type) throw new Error(`spec.type must be defined for getUserToSelectRoi`)
+          const obj = {
+            message,
+            spec,
             promise: null,
             rs: null,
             rj: null
@@ -266,9 +379,25 @@ export class AtlasViewerAPIServices implements OnDestroy{
       this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
       this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
     })
+
+    this.s.push(
+      this.loadMesh$.subscribe(({ url, id, type }) => {
+        if (!this.interactiveViewer.viewerHandle) {
+          this.snackbar.open('No atlas loaded! Loading mesh failed!', 'Dismiss')
+        }
+        this.interactiveViewer.viewerHandle?.loadLayer({
+          [id]: {
+            type: 'mesh',
+            source: `vtk://${url}`,
+            shader: `void main(){${FRAGMENT_EMIT_RED};}`
+          }
+        })
+      })
+    )
   }
 
   ngOnDestroy(){
+    while (this.onDestoryCb.length > 0) this.onDestoryCb.pop()()
     while(this.s.length > 0){
       this.s.pop().unsubscribe()
     }
@@ -316,11 +445,8 @@ export interface IInteractiveViewerInterface {
 
     mouseEvent: Observable<{eventName: string, event: MouseEvent}>
     mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
-    /**
-     * TODO add to documentation
-     */
     mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-
+    mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
     getNgHash: () => string
   }
 
@@ -331,7 +457,8 @@ export interface IInteractiveViewerInterface {
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
     getUserToSelectARegion: (selectingMessage: any) => Promise<any>
-    cancelPromise: (pr) => void
+    getUserToSelectRoi: (selectingMessage: string, spec?: ICustomRegionSpec) => Promise<any>
+    cancelPromise: (pr: Promise<any>) => void
   }
 
   pluginControl: {
@@ -356,17 +483,20 @@ export interface IUserLandmark {
   position: [number, number, number]
   id: string /* probably use the it to track and remove user landmarks */
   highlight: boolean
+  color?: [number, number, number]
 }
 
-export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, getMouseoverSegments: () => any [] ) => {
-  return (next: () => void) => {
-    const moSegments = getMouseoverSegments()
-    if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
-      const { rs } = apiService.getUserRegionSelectHandler() || {}
-      if (!!rs) {
-        return rs(moSegments[0])
-      }
-    }
-    next()
-  }
+export enum EnumCustomRegion{
+  POINT = 'POINT',
+  PARCELLATION_REGION = 'PARCELLATION_REGION',
+}
+
+export interface ICustomRegionSpec{
+  type: string // type of EnumCustomRegion
+}
+
+export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle) => void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
+
+export const setViewerHandleFactory = (apiService: AtlasViewerAPIServices) => {
+  return viewerHandle => apiService.interactiveViewer.viewerHandle = viewerHandle
 }

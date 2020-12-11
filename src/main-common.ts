@@ -2,6 +2,7 @@
 import '!!file-loader?context=third_party&name=vanilla.html!third_party/vanilla.html'
 import '!!file-loader?context=third_party&name=vanilla_styles.css!third_party/styles.css'
 import '!!file-loader?context=third_party&name=vanilla_nehuba.js!third_party/vanilla_nehuba.js'
+import '!!file-loader?context=third_party&name=preinit_vanilla.html!third_party/preinit_vanilla.html'
 
 /**
 * Catching Safari 10 bug:
@@ -11,6 +12,11 @@ import '!!file-loader?context=third_party&name=vanilla_nehuba.js!third_party/van
 */
 import '!!file-loader?context=third_party&name=catchSyntaxError.js!third_party/catchSyntaxError.js'
 import '!!file-loader?context=third_party&name=syntaxError.js!third_party/syntaxError.js'
+
+import '!!file-loader?context=src/res&name=icons/iav-icons.css!src/res/icons/iav-icons.css'
+import '!!file-loader?context=src/res&name=icons/iav-icons.ttf!src/res/icons/iav-icons.ttf'
+import '!!file-loader?context=src/res&name=icons/iav-icons.woff!src/res/icons/iav-icons.woff'
+import '!!file-loader?context=src/res&name=icons/iav-icons.svg!src/res/icons/iav-icons.svg'
 
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
@@ -24,6 +30,7 @@ if (PRODUCTION) { console.log(`Interactive Atlas Viewer: ${VERSION}`) }
 
 const requireAll = (r: any) => {r.keys().forEach(r)}
 requireAll(require.context('./res/ext', false, /\.json$/))
+requireAll(require.context('./res/ext/atlas', false, /\.json$/))
 requireAll(require.context('./res/images', true, /\.jpg$|\.png$|\.svg$/))
 requireAll(require.context(`./plugin_examples`, true))
 

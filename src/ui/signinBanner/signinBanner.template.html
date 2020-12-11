@@ -1,44 +1,77 @@
-<div class="d-flex" #signInBanner
-  [iav-key-listener]="keyListenerConfig"
-  (iav-key-event)="openTmplWithDialog(helpComponent)">
-
-  <!-- pinned datasets -->
-
-  <div class="btnWrapper">
-    <button mat-icon-button
-      aria-label="Show pinned datasets"
-      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
-      (click)="bottomSheet.open(savedDatasets)"
-      [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
-      matBadgeColor="accent"
-      matBadgePosition="above after"
-      matTooltip="Pinned datasets"
-      color="primary">
-
-      <i class="fas fa-thumbtack"></i>
+<ng-template [ngIf]="ismobile" [ngIfElse]="fullTmpl">
+  <div iav-fab-speed-dial-container
+    #fab="iavFabSpeedDialContainer">
+    <button mat-fab
+      iav-fab-speed-dial-trigger
+      [color]="fab.isOpen ? 'basic' : 'accent'">
+      <i class="fas" [ngClass]="fab.isOpen ? 'fa-times' : 'fa-bars'"></i>
     </button>
-  </div>
 
-  <!-- plugin and tools -->
-  <div class="btnWrapper" #pluginsAndToolsDiv>
-    <button mat-icon-button
-      aria-label="Show tools and plugins"
-      matTooltipPosition="below"
-      [matTooltip]="pluginTooltipText"
-      [matMenuTriggerFor]="pluginDropdownMenu"
-      color="primary">
-      <i class="fas fa-th"></i>
-    </button>
-  </div>
+    <!-- signin -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="signinBtnTmpl">
+      </ng-container>
+    </div>
 
-  <!-- signin -->
-  <div class="btnWrapper">
-    <button
-      [matTooltip]="userBtnTooltip$ | async"
-      matTooltipPosition="below"
-      mat-icon-button
-      [matMenuTriggerFor]="userDropdownMenu"
-      color="primary">
+    <!-- plugin and tools -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
+      </ng-container>
+    </div>
+
+    <!-- pinned dataset -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+      </ng-container>
+    </div>
+
+    <!-- help one pager -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="helpBtnTmpl">
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<!-- help one pager -->
+<ng-template #helperOnePager>
+  <help-one-pager></help-one-pager>
+</ng-template>
+
+<ng-template #fullTmpl>
+
+  <div class="d-flex flex-row-reverse"
+    [iav-key-listener]="keyListenerConfig"
+    (iav-key-event)="openTmplWithDialog(helperOnePager)">
+
+    <!-- signin -->
+    <ng-container *ngTemplateOutlet="signinBtnTmpl">
+    </ng-container>
+
+    <!-- plugin and tools -->
+    <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
+    </ng-container>
+
+    <!-- pinned dataset -->
+    <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+    </ng-container>
+
+    <!-- help one pager -->
+    <ng-container *ngTemplateOutlet="helpBtnTmpl">
+    </ng-container>
+  </div>
+</ng-template>
+
+<!-- signin btn -->
+<ng-template #signinBtnTmpl>
+  <div class="btnWrapper"
+    [matTooltip]="userBtnTooltip$ | async"
+    matTooltipPosition="below"
+    [matMenuTriggerFor]="userDropdownMenu">
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor">
+
       <ng-template [ngIf]="user$ | async" [ngIfElse]="notLoggedInTmpl" let-user="ngIf">
         {{ (user && user.name || 'Unnamed User').slice(0,1) }}
       </ng-template>
@@ -46,9 +79,60 @@
       <ng-template #notLoggedInTmpl>
         <i class="fas fa-user"></i>
       </ng-template>
-    </button>
+    </iav-dynamic-mat-button>
   </div>
-</div>
+</ng-template>
+
+<!-- plugin and tools tmpl -->
+<ng-template #pluginAndToolsTmpl>
+  <div class="btnWrapper"
+    [matMenuTriggerFor]="pluginDropdownMenu"
+    matTooltipPosition="below"
+    [matTooltip]="pluginTooltipText">
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show tools and plugins">
+
+      <i class="fas fa-th"></i>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
+<!-- pinned dataset btn -->
+<ng-template #pinnedDatasetBtnTmpl>
+  <div class="btnWrapper"
+    (click)="bottomSheet.open(savedDatasets)"
+    [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
+    matBadgeColor="accent"
+    matBadgePosition="above after"
+    [matBadgeDescription]="PINNED_DATASETS_BADGE_DESC"
+    matTooltip="Pinned datasets">
+    <iav-dynamic-mat-button
+      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show pinned datasets">
+
+      <i class="fas fa-thumbtack"></i>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
+<ng-template #helpBtnTmpl>
+
+  <div class="btnWrapper"
+    (click)="openTmplWithDialog(helperOnePager)"
+    matTooltip="Quickstart">
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show help dialog">
+
+      <i class="far fa-question-circle"></i>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
 
 <!-- plugin dropdownmenu -->
 <mat-menu #pluginDropdownMenu
@@ -82,17 +166,17 @@
   </button>
 
   <button mat-menu-item
-    (click)="openTmplWithDialog(helpComponent)">
+    (click)="openTmplWithDialog(aboutComponent)">
     <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
     About
   </button>
 </mat-menu>
 
-<ng-template #helpComponent>
+<ng-template #aboutComponent>
   <h2 mat-dialog-title>About Interactive Viewer</h2>
   <mat-dialog-content>
     <mat-tab-group>
-      <mat-tab label="Help">
+      <mat-tab label="About">
         <help-component>
         </help-component>
       </mat-tab>

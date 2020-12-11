@@ -2,7 +2,7 @@ const csp = require('helmet-csp')
 const bodyParser = require('body-parser')
 const crypto = require('crypto')
 
-let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
+let WHITE_LIST_SRC, CSP_CONNECT_SRC, SCRIPT_SRC
 
 // TODO bandaid solution
 // OKD/nginx reverse proxy seems to strip csp header
@@ -26,28 +26,27 @@ try {
 }
 
 try {
-  DATA_SRC = JSON.parse(process.env.DATA_SRC || '[]')
+  CSP_CONNECT_SRC = JSON.parse(process.env.CSP_CONNECT_SRC || '[]')
 } catch (e) {
-  console.warn(`parsing DATA_SRC error ${process.env.DATA_SRC}`, e)
-  DATA_SRC = []
+  console.warn(`parsing CSP_CONNECT_SRC error ${process.env.CSP_CONNECT_SRC}`, e)
+  CSP_CONNECT_SRC = []
 }
 
 const defaultAllowedSites = [
   "'self'",
-  '*.apps.hbp.eu',
-  '*.apps-dev.hbp.eu',
   'stats.humanbrainproject.eu',
   'stats-dev.humanbrainproject.eu'
 ]
 
-const dataSource = [
+const connectSrc = [
   "'self'",
-  '*.humanbrainproject.org',
-  '*.humanbrainproject.eu',
-  '*.fz-juelich.de',
-  '*.kfa-juelich.de',
+  "blob:",
+  'neuroglancer.humanbrainproject.org',
+  'neuroglancer.humanbrainproject.eu',
+  'connectivity-query-v1-1-connectivity.apps-dev.hbp.eu',
   'object.cscs.ch',
-  ...DATA_SRC
+  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/', // required for dataset previews
+  ...CSP_CONNECT_SRC
 ]
 
 module.exports = (app) => {
@@ -64,35 +63,39 @@ module.exports = (app) => {
       ],
       styleSrc: [
         ...defaultAllowedSites,
-        '*.bootstrapcdn.com',
-        '*.fontawesome.com',
+        'stackpath.bootstrapcdn.com/bootstrap/4.3.1/',
+        'use.fontawesome.com/releases/v5.8.1/',
         "'unsafe-inline'", // required for angular [style.xxx] bindings
         ...WHITE_LIST_SRC
       ],
       fontSrc: [
-        '*.fontawesome.com',
+        "'self'",
+        'use.fontawesome.com/releases/v5.8.1/',
         ...WHITE_LIST_SRC
       ],
       connectSrc: [
         ...defaultAllowedSites,
-        ...dataSource,
+        ...connectSrc,
         ...WHITE_LIST_SRC
+      ],
+      imgSrc: [
+        "'self'",
+        "hbp-kg-dataset-previewer.apps.hbp.eu/v2/"
       ],
       scriptSrc:[
         "'self'",
-        '*.apps.hbp.eu',
-        '*.apps-dev.hbp.eu',
-        '*.jquery.com',
-        '*.cloudflare.com',
-        'unpkg.com',
-        '*.unpkg.com',
-        '*.jsdelivr.net',
-
-        // Catching Safari 10 bug unsafe-eval
-        "'sha256-yEVCaeeaeg6koloXfx+6DuFnP7SnjOwYZiWBTRFurJw='",
+        'code.jquery.com', // plugin load external library -> jquery v2 and v3
+        'cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/', // plugin load external library -> web components
+        'cdnjs.cloudflare.com/ajax/libs/d3/', // plugin load external lib -> d3
+        'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
+        'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
+        'unpkg.com/react@16/umd/', // plugin load external lib -> react
+        'unpkg.com/kg-dataset-previewer@1.1.5/', // preview component
+        'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
         (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
         ...SCRIPT_SRC,
-        ...WHITE_LIST_SRC
+        ...WHITE_LIST_SRC,
+        ...defaultAllowedSites
       ],
       reportUri: CSP_REPORT_URI || '/report-violation'
     },

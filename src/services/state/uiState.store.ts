@@ -1,5 +1,5 @@
 import { Injectable, TemplateRef, OnDestroy } from '@angular/core';
-import { Action, select, Store, createAction, props } from '@ngrx/store'
+import { Action, select, Store } from '@ngrx/store'
 
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable, Subscription } from "rxjs";
@@ -8,8 +8,12 @@ import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/co
 import { IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
+import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
+import { IUiState } from './uiState/common'
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from './uiState/actions';
+export const defaultState: IUiState = {
+  shownDatasetId: [],
 
-export const defaultState: StateInterface = {
   previewingDatasetFiles: [],
 
   mouseOverSegments: [],
@@ -19,8 +23,7 @@ export const defaultState: StateInterface = {
   mouseOverUserLandmark: null,
 
   focusedSidePanel: null,
-  sidePanelIsOpen: true,
-  sidePanelCurrentViewContent: 'Dataset',
+  sidePanelIsOpen: false,
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
@@ -32,8 +35,30 @@ export const defaultState: StateInterface = {
   agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
+export { IUiState }
+
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiState = state, action: ActionInterface) => {
   switch (action.type) {
+  case uiActionHideDatasetWithId.type:{
+    return {
+      ...prevState,
+      shownDatasetId: prevState.shownDatasetId.filter(id => id !== (action as any).id)
+    }
+  }
+  case uiActionHideAllDatasets.type:{
+    return {
+      ...prevState,
+      shownDatasetId: []
+    }
+  }
+  case uiActionShowDatasetWtihId.type: {
+    return {
+      ...prevState,
+      shownDatasetId: prevState.shownDatasetId.concat(
+        (action as any).id
+      )
+    }
+  }
   
   case uiActionSetPreviewingDatasetFiles.type: {
     const { previewingDatasetFiles } = action as any
@@ -54,7 +79,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       mouseOverSegment : action.segment,
     }
-  case MOUSEOVER_USER_LANDMARK: {
+  case viewerStateMouseOverCustomLandmark.type: {
     const { payload = {} } = action
     const { userLandmark: mouseOverUserLandmark = null } = payload
     return {
@@ -89,6 +114,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       sidePanelIsOpen: false,
     }
+  case uiActionShowSidePanelConnectivity.type:
   case uiStateExpandSidePanel.type:
   case EXPAND_SIDE_PANEL_CURRENT_VIEW:
     return {
@@ -100,24 +126,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
     return {
       ...prevState,
       sidePanelExploreCurrentViewIsOpen: false,
-    }
-
-  case SHOW_SIDE_PANEL_DATASET_LIST:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Dataset',
-    }
-
-  case uiActionShowSidePanelConnectivity.type:
-  case SHOW_SIDE_PANEL_CONNECTIVITY:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Connectivity',
-    }
-  case HIDE_SIDE_PANEL_CONNECTIVITY:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Dataset',
     }
 
   case AGREE_COOKIE: {
@@ -161,31 +169,6 @@ export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
-export interface StateInterface {
-  previewingDatasetFiles: {datasetId: string, filename: string}[]
-
-  mouseOverSegments: Array<{
-    layer: {
-      name: string
-    }
-    segment: any | null
-  }>
-  sidePanelIsOpen: boolean
-  sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
-  sidePanelExploreCurrentViewIsOpen: boolean
-  mouseOverSegment: any | number
-
-  mouseOverLandmark: any
-  mouseOverUserLandmark: any
-
-  focusedSidePanel: string | null
-
-  snackbarMessage: string
-
-  agreedCookies: boolean
-  agreedKgTos: boolean
-}
-
 export interface ActionInterface extends Action {
   segment: any | number
   landmark: any
@@ -201,20 +184,6 @@ export interface ActionInterface extends Action {
   bottomSheetTemplate: TemplateRef<any>
 
   payload: any
-}
-
-export const GET_MOUSEOVER_SEGMENTS_TOKEN = `GET_MOUSEOVER_SEGMENTS_TOKEN`
-
-export const getMouseoverSegmentsFactory = (store: Store<IavRootStoreInterface>) => {
-  return () => {
-    let moSegments
-    store.pipe(
-      select('uiState'),
-      select('mouseOverSegments'),
-      take(1)
-    ).subscribe(v => moSegments = v)
-    return moSegments
-  }
 }
 
 @Injectable({
@@ -291,13 +260,9 @@ export class UiStateUseEffect implements OnDestroy{
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
-export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
-export const SHOW_SIDE_PANEL_DATASET_LIST = `SHOW_SIDE_PANEL_DATASET_LIST`
-export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
-export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 

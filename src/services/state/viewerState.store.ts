@@ -9,8 +9,23 @@ import { getViewer } from 'src/util/fn';
 import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
-import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
-import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion } from './viewerState.store.helper';
+import { CLOSE_SIDE_PANEL } from './uiState.store';
+import { 
+  viewerStateSetSelectedRegions,
+  viewerStateSetConnectivityRegion,
+  viewerStateSelectAtlas,
+  viewerStateSelectParcellation,
+  viewerStateSelectRegionWithIdDeprecated,
+  viewerStateCustomLandmarkSelector,
+  viewerStateDblClickOnViewer,
+  viewerStateAddUserLandmarks,
+  viewreStateRemoveUserLandmarks,
+  viewerStateMouseOverCustomLandmark,
+  viewerStateMouseOverCustomLandmarkInPerspectiveView,
+  viewerStateNewViewer
+} from './viewerState.store.helper';
+import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
+import { viewerStateChangeNavigation } from './viewerState/actions';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -27,6 +42,7 @@ export interface StateInterface {
 
   loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
+  overwrittenColorMap: string | null
 
   standaloneVolumes: any[]
 }
@@ -65,7 +81,7 @@ export const defaultState: StateInterface = {
   parcellationSelected: null,
   templateSelected: null,
   connectivityRegion: '',
-
+  overwrittenColorMap: null,
   standaloneVolumes: []
 }
 
@@ -97,17 +113,22 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     }
   case NEWVIEWER: {
 
-    const { selectParcellation: parcellation } = action
+    const {
+      selectParcellation: parcellation,
+      navigation,
+      selectTemplate,
+    } = action
+    const navigationFromTemplateSelected = cvtNehubaConfigToNavigationObj(selectTemplate?.nehubaConfig?.dataset?.initialNgState)
     return {
       ...prevState,
-      templateSelected : action.selectTemplate,
+      templateSelected : selectTemplate,
       parcellationSelected : parcellation,
       // taken care of by effect.ts
       // regionsSelected : [],
 
       // taken care of by effect.ts
       // landmarksSelected : [],
-      navigation : action.navigation,
+      navigation : navigation || navigationFromTemplateSelected,
       dedicatedView : null,
     }
   }
@@ -117,12 +138,14 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate),
     }
   }
+  case viewerStateChangeNavigation.type:
   case CHANGE_NAVIGATION : {
     return {
       ...prevState,
       navigation : action.navigation,
     }
   }
+  case viewerStateSelectParcellation.type:
   case SELECT_PARCELLATION : {
     const { selectParcellation } = action
     return {
@@ -196,6 +219,11 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       connectivityRegion: '',
     }
+  case SET_OVERWRITTEN_COLOR_MAP:
+    return {
+      ...prevState,
+      overwrittenColorMap: action.payload || '',
+    }  
   default :
     return prevState
   }
@@ -217,16 +245,16 @@ export function stateStore(state, action) {
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
-export const NEWVIEWER = 'NEWVIEWER'
+export const NEWVIEWER = viewerStateNewViewer.type
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
-export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
+export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
 
-export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
+export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
-export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
+export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
@@ -236,6 +264,7 @@ export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
+export const SET_OVERWRITTEN_COLOR_MAP = `SET_OVERWRITTEN_COLOR_MAP`
 export const CLEAR_STANDALONE_VOLUMES = `CLEAR_STANDALONE_VOLUMES`
 
 @Injectable({
@@ -253,8 +282,8 @@ export class ViewerStateUseEffect {
       select('viewerState'),
       shareReplay(1)
     )
-    this.currentLandmarks$ = viewerState$.pipe(
-      select('userLandmarks'),
+    this.currentLandmarks$ = this.store$.pipe(
+      select(viewerStateCustomLandmarkSelector),
       shareReplay(1),
     )
 
@@ -276,7 +305,7 @@ export class ViewerStateUseEffect {
     )
 
     this.addUserLandmarks$ = this.actions$.pipe(
-      ofType(ACTION_TYPES.ADD_USERLANDMARKS),
+      ofType(viewerStateAddUserLandmarks.type),
       withLatestFrom(this.currentLandmarks$),
       map(([action, currentLandmarks]) => {
         const { landmarks } = action as ActionInterface
@@ -302,36 +331,31 @@ export class ViewerStateUseEffect {
     )
 
     this.mouseoverUserLandmarks = this.actions$.pipe(
-      ofType(ACTION_TYPES.MOUSEOVER_USER_LANDMARK_LABEL),
+      ofType(viewerStateMouseOverCustomLandmarkInPerspectiveView.type),
       withLatestFrom(this.currentLandmarks$),
       map(([ action, currentLandmarks ]) => {
         const { payload } = action as any
         const { label } = payload
-        if (!label) { return {
-          type: MOUSEOVER_USER_LANDMARK,
-          payload: {
-            userLandmark: null,
-          },
-        }
+        if (!label) {
+          return viewerStateMouseOverCustomLandmark({
+            payload: {
+              userLandmark: null
+            }
+          })
         }
 
         const idx = Number(label.replace('label=', ''))
         if (isNaN(idx)) {
           this.log.warn(`Landmark index could not be parsed as a number: ${idx}`)
-          return {
-            type: MOUSEOVER_USER_LANDMARK,
-            payload: {
-              userLandmark: null,
-            },
-          }
+          return viewerStateMouseOverCustomLandmark({
+            payload: { userLandmark: null }
+          })
         }
-
-        return {
-          type: MOUSEOVER_USER_LANDMARK,
+        return viewerStateMouseOverCustomLandmark({
           payload: {
-            userLandmark: currentLandmarks[idx],
-          },
-        }
+            userLandmark: currentLandmarks[idx]
+          }
+        })
       }),
 
     )
@@ -429,12 +453,10 @@ export class ViewerStateUseEffect {
 }
 
 const ACTION_TYPES = {
-  ADD_USERLANDMARKS: `ADD_USERLANDMARKS`,
-  REMOVE_USER_LANDMARKS: 'REMOVE_USER_LANDMARKS',
-  MOUSEOVER_USER_LANDMARK_LABEL: 'MOUSEOVER_USER_LANDMARK_LABEL',
+  REMOVE_USER_LANDMARKS: viewreStateRemoveUserLandmarks.type,
 
   SINGLE_CLICK_ON_VIEWER: 'SINGLE_CLICK_ON_VIEWER',
-  DOUBLE_CLICK_ON_VIEWER: 'DOUBLE_CLICK_ON_VIEWER',
+  DOUBLE_CLICK_ON_VIEWER: viewerStateDblClickOnViewer.type
 }
 
 export const VIEWERSTATE_ACTION_TYPES = ACTION_TYPES

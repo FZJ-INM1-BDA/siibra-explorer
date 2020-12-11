@@ -2,9 +2,10 @@ import { Component, Input, OnChanges, Pipe, PipeTransform, ChangeDetectionStrate
 import { BACKENDURL } from 'src/util/constants'
 import { IDataEntry } from "src/services/stateStore.service";
 import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
+import { ARIA_LABELS } from 'common/constants'
 
-const ARIA_LABEL_HAS_DOWNLOAD = `Bulk download all favourited datasets`
-const ARIA_LABEL_HAS_NO_DOWNLOAD = `No favourite datasets to download`
+const ARIA_LABEL_HAS_DOWNLOAD = ARIA_LABELS.BULK_DOWNLOAD
+const ARIA_LABEL_HAS_NO_DOWNLOAD = ARIA_LABELS.NO_BULK_DOWNLOAD
 
 @Component({
   selector: 'iav-datamodule-bulkdownload-cmp',

@@ -2,6 +2,7 @@ import { Directive, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, tap } from "rxjs/operators";
+import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { addTouchSideClasses, removeTouchSideClasses } from "./util";
 
@@ -25,8 +26,7 @@ export class TouchSideClass implements OnDestroy, OnInit {
   ) {
 
     this.panelMode$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
       tap(mode => this.panelMode = mode),
     )

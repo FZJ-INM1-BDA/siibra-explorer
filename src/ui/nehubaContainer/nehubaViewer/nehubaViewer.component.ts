@@ -1,17 +1,17 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, Optional, Inject } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject } from 'rxjs'
-import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { debounceTime, filter, map, scan } from "rxjs/operators";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject } from "@angular/core";
+import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer } from 'rxjs'
+import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
-import { takeOnePipe } from "../nehubaContainer.component";
 
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
+import { scanSliceViewRenderFn } from "../util";
+import { intToRgb as intToColour } from 'common/util'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -63,6 +63,8 @@ const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex
 
 export class NehubaViewerUnit implements OnInit, OnDestroy {
 
+  private sliceviewLoading$: Observable<boolean>
+
   public overrideShowLayers: string[] = []
   get showLayersName() {
     return [
@@ -97,7 +99,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       }
     }> = new EventEmitter()
   @Output() public mouseoverLandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
-  @Output() public mouseoverUserlandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
+  @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public regionSelectionEmitter: EventEmitter<{segment: number, layer: {name?: string, url?: string}}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()
 
@@ -117,15 +119,15 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       : [1.5e9, 1.5e9, 1.5e9]
   }
 
-  public _s1$: any
-  public _s2$: any
-  public _s3$: any
-  public _s4$: any
-  public _s5$: any
-  public _s6$: any
-  public _s7$: any
-  public _s8$: any
-  public _s9$: any
+  public _s1$: any = null
+  public _s2$: any = null
+  public _s3$: any = null
+  public _s4$: any = null
+  public _s5$: any = null
+  public _s6$: any = null
+  public _s7$: any = null
+  public _s8$: any = null
+  public _s9$: any = null
 
   public _s$: any[] = [
     this._s1$,
@@ -248,14 +250,36 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         /**
          * url may be null if user removes all landmarks
          */
-        if (!url) { return }
+        if (!url) {
+          /**
+           * remove transparency from meshes in current layer(s)
+           */
+          for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+            if (layer) {
+              layer.layer.displayState.objectAlpha.restoreState(1.0)
+            }
+          }
+  
+          return
+        }
         const _ = {}
         _[NG_USER_LANDMARK_LAYER_NAME] = {
-          type : 'mesh',
-          source : `vtk://${url}`,
-          shader : FRAGMENT_MAIN_WHITE,
+          type: 'mesh',
+          source: `vtk://${url}`,
+          shader: this.userLandmarkShader,
         }
         this.loadLayer(_)
+
+        /**
+         * adding transparency to meshes in current layer(s)
+         */
+        for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+          if (layer) {
+            layer.layer.displayState.objectAlpha.restoreState(0.2)
+          }
+        }
       }),
     )
   }
@@ -351,8 +375,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public mouseOverSegment: number | null
   public mouseOverLayer: {name: string, url: string}| null
 
-  public viewportToDatas: [any, any, any] = [null, null, null]
-
   public getNgHash: () => string = () => this.exportNehuba
     ? this.exportNehuba.getNgHash()
     : null
@@ -393,30 +415,38 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     setNehubaViewer(this.nehubaViewer)
 
     this.onDestroyCb.push(() => setNehubaViewer(null))
-
-    /**
-     * TODO
-     * move this to nehubaContainer
-     * do NOT use position logic to determine idx
-     */
-    this.ondestroySubscriptions.push(
-      // fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
-      //   ...takeOnePipe
-      // ).subscribe((events:CustomEvent[]) => {
-      //   [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-      // })
-      pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'viewportToData'))
-        .subscribe((events: CustomEvent[]) => {
-          [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-        }),
-    )
   }
 
   public ngOnInit() {
+    this.sliceviewLoading$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+      scan(scanSliceViewRenderFn, [ null, null, null ]),
+      map(arrOfFlags => arrOfFlags.some(flag => flag)),
+      startWith(true),
+    )
+
     this.subscriptions.push(
       this.loadMeshes$.pipe(
         scan(scanFn, []),
-        debounceTime(100)
+        debounceTime(100),
+        switchMap(layerLabelIdx => 
+          /**
+           * sometimes (e.g. when all slice views are minimised), sliceviewlaoding will not emit
+           * so if sliceviewloading does not emit another value (except the initial true value)
+           * force start loading of mesh
+           */
+          race(
+            this.sliceviewLoading$.pipe(
+              skip(1)
+            ),
+            timer(500).pipe(
+              mapTo(false)
+            )
+          ).pipe(
+            filter(flag => !flag),
+            take(1),
+            mapTo(layerLabelIdx),
+          ) 
+        ),
       ).subscribe(layersLabelIndex => {
         let totalMeshes = 0
         for (const layerLayerIndex of layersLabelIndex) {
@@ -425,7 +455,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
         }
         // TODO implement total mesh to be loaded and mesh loading UI
-        // this.numMeshesToBeLoaded = totalMeshes
+        this.numMeshesToBeLoaded = totalMeshes
       }),
     )
 
@@ -508,16 +538,37 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     )
   }
 
+  private userLandmarkShader: string = FRAGMENT_MAIN_WHITE
+  
   // TODO single landmark for user landmark
   public updateUserLandmarks(landmarks: any[]) {
     if (!this.nehubaViewer) {
       return
     }
+    
     this.workerService.worker.postMessage({
       type : 'GET_USERLANDMARKS_VTK',
       scale: Math.min(...this.dim.map(v => v * NG_LANDMARK_CONSTANT)),
       landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6)),
     })
+
+    const parseLmColor = lm => {
+      if (!lm) return null
+      const { color } = lm
+      if (!color) return null
+      if (!Array.isArray(color)) return null
+      if (color.length !== 3) return null
+      const parseNum = num => (num >= 0 && num <= 255 ? num / 255 : 1).toFixed(3)
+      return `emitRGB(vec3(${color.map(parseNum).join(',')}));`
+    }
+  
+    const appendConditional = (frag, idx) => frag && `if (label > ${idx - 0.01} && label < ${idx + 0.01}) { ${frag} }`
+
+    if (landmarks.some(parseLmColor)) {
+      this.userLandmarkShader = `void main(){ ${landmarks.map(parseLmColor).map(appendConditional).filter(v => !!v).join('else ')} else {${FRAGMENT_EMIT_WHITE}} }`
+    } else {
+      this.userLandmarkShader = FRAGMENT_MAIN_WHITE  
+    }
   }
 
   public removeSpatialSearch3DLandmarks() {
@@ -964,27 +1015,6 @@ const patchSliceViewPanel = (sliceViewPanel: any) => {
 
     originalDraw.call(this)
   }
-}
-
-/**
- *
- * https://stackoverflow.com/a/16348977/6059235
- */
-const intToColour = function(int) {
-  if (int >= 65500) {
-    return [255, 255, 255]
-  }
-  const str = String(int * 65535)
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const returnV = []
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xFF;
-    returnV.push(value)
-  }
-  return returnV
 }
 
 export interface ViewerState {

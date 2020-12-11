@@ -1,12 +1,9 @@
 
 <!-- title -->
-<mat-card-subtitle>
-  <span *ngIf="name; else nameLoading">
+<mat-card-subtitle *ngIf="!hideTitle">
+  <span *ngIf="name; else isLoadingTmpl">
     {{ name }}
   </span>
-  <ng-template #nameLoading>
-    <div class="spinnerAnimationCircle"></div>
-  </ng-template>
 </mat-card-subtitle>
 
 <mat-card-content mat-dialog-content>
@@ -14,15 +11,11 @@
   <!-- description -->
   <small>
     <markdown-dom
-      *ngIf="description; else descriptionLoading"
+      *ngIf="description; else isLoadingTmpl"
       class="d-block"
       [markdown]="description">
 
     </markdown-dom>
-
-    <ng-template #descriptionLoading>
-      <div class="d-inline-block spinnerAnimationCircle"></div>
-    </ng-template>
   </small>
 
   <!-- publications -->
@@ -41,12 +34,24 @@
       </ng-template>
     </small>
   </ng-container>
+
+  <!-- contributors, if publications not available -->
+  <ng-container *ngIf="publications && publications.length == 0 && contributors && contributors.length > 0">
+    <ng-container *ngFor="let contributor of contributors; let lastFlag = last;">
+      <a [href]="contributor | getContributorKgLink" class="iv-custom-comp" target="_blank">
+        {{ contributor['schema.org/shortName'] || contributor['shortName'] || contributor['name'] }}
+      </a>
+      <span *ngIf="!lastFlag">,</span>
+    </ng-container>
+  </ng-container>
 </mat-card-content>
 
 
 <!-- footer -->
 <mat-card-actions iav-media-query #iavMediaQuery="iavMediaQuery">
-  <ng-container *ngTemplateOutlet="actionBtns; context: { $implicit: (iavMediaQuery.mediaBreakPoint$ | async) }" >
+  <ng-container *ngTemplateOutlet="actionBtns; context: {
+    $implicit: useSmallIcon || (iavMediaQuery.mediaBreakPoint$ | async) > 1
+  }" >
   </ng-container>
 </mat-card-actions>
 
@@ -60,19 +65,19 @@
 </ng-template>
 
 <!-- using ng template for context binding of media breakpoints -->
-<ng-template #actionBtns let-mediaBreakPoint>
+<ng-template #actionBtns let-useSmallIcon>
 
   <!-- explore -->
-  <ng-container *ngIf="!strictLocal">
+  <ng-container *ngIf="!strictLocal && !hideExplore">
 
     <a *ngFor="let kgRef of kgReference"
       [href]="kgRef | doiParserPipe"
       target="_blank">
       <iav-dynamic-mat-button
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-raised-button' : 'mat-icon-button'"
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-raised-button'"
         iav-dynamic-mat-button-color="primary">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           Explore
         </span>
         <i class="fas fa-external-link-alt"></i>
@@ -83,18 +88,19 @@
   <!-- pin data -->
   <ng-container *ngIf="downloadEnabled && kgId">
 
-    <ng-container *ngTemplateOutlet="favDatasetBtn; context: { $implicit: (favedDataentries$ | async | datasetIsFaved : dataset) }">
+    <ng-container *ngTemplateOutlet="favDatasetBtn; context: { $implicit: (favedDataentries$ | async | datasetIsFaved : ({ fullId: fullId })) }">
     </ng-container>
 
     <ng-template #favDatasetBtn let-isFav>
       <iav-dynamic-mat-button
+        *ngIf="!hidePinBtn"
         (click)="isFav ? undoableRemoveFav() : undoableAddFav()"
         iav-stop="click mousedown"
         [iav-dynamic-mat-button-aria-label]="PIN_DATASET_ARIA_LABEL"
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'"
         [iav-dynamic-mat-button-color]="isFav ? 'primary' : 'basic'">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           {{ isFav ? 'Unpin this dataset' : 'Pin this dataset' }}
         </span>
         <i class="fas fa-thumbtack"></i>
@@ -103,7 +109,7 @@
   </ng-container>
 
   <!-- download -->
-  <ng-container *ngIf="!strictLocal">
+  <ng-container *ngIf="!strictLocal && !hideDownloadBtn">
 
     <a *ngIf="files && files.length > 0"
       [href]="dlFromKgHref"
@@ -111,9 +117,9 @@
       <iav-dynamic-mat-button
         [matTooltip]="tooltipText"
         [disabled]="downloadInProgress"
-        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'">
+        [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'">
 
-        <span *ngIf="mediaBreakPoint < 2">
+        <span *ngIf="!useSmallIcon">
           Download Zip
         </span>
         <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
@@ -123,26 +129,34 @@
 
 
   <!-- check if has preview -->
-  <kg-dataset-list
-    class="d-none"
-    [backendUrl]="DS_PREVIEW_URL"
-    *ngIf="kgId"
-    (kgDsPrvUpdated)="handleKgDsPrvUpdate($event)"
-    [kgId]="kgId">
 
-  </kg-dataset-list>
+  <ng-template [ngIf]="!hidePreview">
 
-  <iav-dynamic-mat-button
-    *ngIf="hasPreview"
-    mat-dialog-close
-    [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
-    [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
-    (click)="showPreviewList(previewFilesListTemplate)">
+    <kg-dataset-list
+      class="d-none"
+      [backendUrl]="DS_PREVIEW_URL"
+      *ngIf="kgId"
+      (kgDsPrvUpdated)="handleKgDsPrvUpdate($event)"
+      [kgId]="kgId">
 
-    <span *ngIf="mediaBreakPoint < 2">
-      Preview
-    </span>
-    <i class="ml-1 far fa-eye"></i>
-  </iav-dynamic-mat-button>
+    </kg-dataset-list>
 
+    <iav-dynamic-mat-button
+      *ngIf="hasPreview"
+      mat-dialog-close
+      [iav-dynamic-mat-button-style]="useSmallIcon ? 'mat-icon-button' : 'mat-button'"
+      [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
+      (click)="showPreviewList(previewFilesListTemplate)">
+
+      <span *ngIf="!useSmallIcon">
+        Preview
+      </span>
+      <i class="ml-1 far fa-eye"></i>
+    </iav-dynamic-mat-button>
+  </ng-template>
+
+</ng-template>
+
+<ng-template #isLoadingTmpl>
+  <spinner-cmp></spinner-cmp>
 </ng-template>

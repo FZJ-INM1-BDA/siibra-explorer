@@ -5,71 +5,22 @@
   position:relative;
 }
 
-
-input[navigateInput]
+atlas-layer-container
 {
-  background:none;
-  width : 16em;
-  padding-left: 0.5em;
-  font-size:85%;
-  box-shadow: inset 0px 2px 2px 2px rgba(0,0,0,0.05);
+  margin-bottom: 1em;
+  margin-left: 1em;
+  width: 30em;
+  height: 50em;
 }
 
 current-layout
 {
   top: 0;
   left: 0;
+  /** z index of current layout has to be higher than that of layout-floating-container, or status container will cover panel control */
+  /** TODO decide which behaviour is more nature */
+  z-index: 6;
 }
-
-div[landmarkMasterContainer]
-{
-  background:none;
-  position: absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-wrap: wrap;
-  pointer-events: none;
-}
-
-div[landmarkMasterContainer] > div
-{
-  flex: 0 0 50%;
-  height:50%;
-  overflow:hidden;
-  pointer-events: none;
-  position : relative;
-  border: 1 px solid blue;
-}
-
-
-div[landmarkMasterContainer] > div > [landmarkContainer] > div
-{
-  position : absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  margin-left:-0.5em;
-  margin-top:-1em;
-}
-
-
-[citationContainer]
-{
-  display:inline-block;
-  max-width:300px;
-  box-sizing: border-box;
-  padding: 0.5em 1em;
-}
-
-hr
-{
-  margin : 0.2em 2em;
-}
-
 
 div.loadingIndicator
 {
@@ -86,7 +37,7 @@ div.loadingIndicator
   flex-direction: row-reverse;
 }
 
-div.loadingIndicator div.spinnerAnimationCircle
+div.loadingIndicator >>> div.spinnerAnimationCircle
 {
   font-size:150%;
 }
@@ -111,42 +62,121 @@ div#scratch-pad
   pointer-events: none;
 }
 
-.load-fav-dataentries-fab
+.overlay-btn-container
 {
-  right: 0;
-  bottom: 0;
-}
-
-maximise-panel-button
-{
-  transition: opacity 170ms ease-in-out,
-    transform 250ms ease-in-out;
-
   position: absolute;
   bottom: 0;
   right: 0;
 }
 
 /* if not mobile, then show on hover */
-maximise-panel-button
+
+.opacity-crossfade
 {
+  transition: opacity 170ms ease-in-out,
+    transform 250ms ease-in-out;
+}
+
+.opacity-crossfade
+{
+
   opacity: 0.0;
   pointer-events: none;
 }
 
-maximise-panel-button.onHover,
-maximise-panel-button:hover,
-:host-context([ismobile="true"]) maximise-panel-button
+.opacity-crossfade.onHover,
+.opacity-crossfade:hover,
+:host-context([ismobile="true"]) .opacity-crossfade.always-show-touchdevice
 {
   opacity: 1.0 !important;
   pointer-events: all !important;
 }
 
-.status-card-container
+.screen-overlay
 {
-  position:absolute;
-  left:1em;
-  bottom:1em;
-  width : 20em;
-  pointer-events: all;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+:host-context([darktheme="true"]) .screen-overlay
+{
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.feature-card
+{
+
+  height: 20em;
+  max-height: 20em;
+  flex: 0 0 20em;
+  align-items: flex-start;
+}
+
+.region-populated .feature-card
+{
+  height: 25em;
+  max-height: 25em;
+  flex: 0 0 25em;
+  align-items: flex-start;
+}
+
+.region-text-search-autocomplete-position
+{
+  z-index: 10;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.collapse-position
+{
+  z-index: 10;
+  position: sticky;
+  bottom: 0.5rem;
+}
+
+.placeholder-region-detail
+{
+  padding: 6rem 1rem 1rem 1rem;
+}
+
+.explore-btn
+{
+  margin-top: 4.5rem;
+  width: 100%;
+}
+
+.modality-card-container
+{
+  overflow-x: scroll;
+}
+
+.modality-card
+{
+  width: 10em;
+}
+
+.spacer
+{
+  height: 6rem;
+}
+
+.content-transclusion-top-left
+{
+  margin-left: 3.5rem;
+}
+
+.tab-toggle
+{
+  margin-left: -2rem;
+  padding-right: 0.75rem;
+  margin-right: 1rem;
+  text-align: right;
+}
+
+.accordion-icon
+{
+  width:1.5rem;
+}
+.tab-toggle-container
+{
+  margin-top: 1.5rem;
 }

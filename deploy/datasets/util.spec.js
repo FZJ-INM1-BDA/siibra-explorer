@@ -1,4 +1,4 @@
-const { populateSet, datasetBelongToParcellation, retry, datasetBelongsInTemplate, filterDatasets, datasetRegionExistsInParcellationRegion, _getParcellations } = require('./util')
+const { populateSet, datasetBelongToParcellation, retry, datasetBelongsInTemplate, filterDatasets, datasetRegionExistsInParcellationRegion, _getParcellations, filterDatasetsByRegion } = require('./util')
 const { fake } = require('sinon')
 const { assert, expect } = require('chai')
 const waxholmv2 = require('./testData/waxholmv2')
@@ -287,6 +287,83 @@ describe('datasets/util.js', () => {
         'minds/core/parcellationregion/v1.0.0/8aeae833-81c8-4e27-a8d6-deee339d6052',
         'minds/core/parcellationregion/v1.0.0/8a6be82c-5947-4fff-8348-cf9bf73e4f40',
       ])
+    })
+  })
+
+  describe('filterDatasetsByRegion', () => {
+
+    const idHumanTe1 = `minds/core/parcellationregion/v1.0.0/13e21153-2ba8-4212-b172-8894f1012225`
+    const idHumanTe1Alt = `minds/core/parcellationregion/v1.0.0/f424643e-9baf-4c50-9417-db1ac33dcd3e`
+    const idHumanArea7ASPL = 'minds/core/parcellationregion/v1.0.0/e26e999f-77ad-4934-9569-8290ed05ebda'
+    const idHumanArea7A = `minds/core/parcellationregion/v1.0.0/811f4adb-4a7c-45c1-8034-4afa9edf586a`
+    const idMouseWholeBrain = `minds/core/parcellationregion/v1.0.0/be45bc91-8db5-419f-9471-73a320f44e06`
+    const idMousePrimaryMotor = `minds/core/parcellationregion/v1.0.0/a07b4390-62db-451b-b211-a45f67c6b18e`
+    const idMousePrimarySomatosensory = `minds/core/parcellationregion/v1.0.0/f99995b6-a3d0-42be-88c3-eff8a83e60ea`
+
+    const dataHumanArea7ASPL = {
+      name: 'dataHumanArea7ASPL',
+      parcellationRegion: [{
+        fullId: idHumanArea7ASPL
+      }]
+    }
+    const dataHumanTe1 = {
+      name: 'dataHumanTe1',
+      parcellationRegion: [{
+        fullId: idHumanTe1
+      }]
+    }
+    const dataMouseWholeBrain = {
+      name: 'dataMouseWholeBrain',
+      parcellationRegion: [{
+        fullId: idMouseWholeBrain
+      }]
+    }
+
+    const dataMousePrimaryMotor = {
+      name: 'dataMousePrimaryMotor',
+      parcellationRegion: [{
+        // Mouse Primary motor area (2017)
+        fullId: idMousePrimaryMotor
+      }]
+    }
+
+    describe('human parc regions', () => {
+      it('should leave in data with matching reference space', async () => {
+        const result = await filterDatasetsByRegion([dataHumanArea7ASPL], idHumanArea7ASPL)
+        expect(result).to.deep.equal([dataHumanArea7ASPL])
+      })
+      it('should filter out data with no matching reference space', async () => {
+        const result = await filterDatasetsByRegion([dataMouseWholeBrain], idHumanArea7ASPL)
+        expect(result).to.deep.equal([])
+      })
+      it('if query region is relatedAreas, should also leave in dataset', async () => {
+        const result = await filterDatasetsByRegion([dataHumanTe1], idHumanTe1Alt)
+        expect(result).to.deep.equal([dataHumanTe1])
+      })
+    })
+
+    describe('mouse parc regions', () => {
+      
+      it('should leave in data with matchin reference space', async () => {
+        const result = await filterDatasetsByRegion([dataMouseWholeBrain], idMouseWholeBrain)
+        expect(result).to.deep.equal([dataMouseWholeBrain])
+
+        const result2 = await filterDatasetsByRegion([dataMousePrimaryMotor], idMousePrimaryMotor)
+        expect(result2).to.deep.equal([dataMousePrimaryMotor])
+      })
+      it('should filter out data with no matching referene space', async () => {
+        const result = await filterDatasetsByRegion([dataHumanArea7ASPL], idMouseWholeBrain)
+        expect(result).to.deep.equal([])
+      })
+      it('should filter out data if sup region is selected', async () => {
+        // example: whole brain is selected, but dataset in primary motor area will be FILTERED OUT
+        const result = await filterDatasetsByRegion([dataMousePrimaryMotor], idMouseWholeBrain)
+        expect(result).to.deep.equal([])
+      })
+      it('should leave in data when sub region is selected', async () => {
+        const result = await filterDatasetsByRegion([dataMouseWholeBrain], idMousePrimaryMotor)
+        expect(result).to.deep.equal([dataMouseWholeBrain])
+      })
     })
   })
 })

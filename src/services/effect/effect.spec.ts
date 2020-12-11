@@ -10,31 +10,8 @@ import { defaultRootState } from '../stateStore.service'
 
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
-
-const hoc1 = {
-  name: "Area hOc1 (V1, 17, CalcS) - left hemisphere",
-  rgb: [
-    190,
-    132,
-    147,
-  ],
-  labelIndex: 8,
-  ngId: "jubrain colin v18 left",
-  children: [],
-  status: "publicP",
-  position: [
-    -8533787,
-    -84646549,
-    1855106,
-  ],
-  originDatasets: [
-    {
-      kgSchema: "minds/core/dataset/v1.0.0",
-      kgId: "5c669b77-c981-424a-858d-fe9f527dbc07",
-      filename: "Area hOc1 (V1, 17, CalcS) [v2.4, Colin 27, left hemisphere]"
-    }
-  ],
-}
+const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
+const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25'
 
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {
@@ -42,12 +19,14 @@ describe('effect.ts', () => {
 
       const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({
         parcellation: {
-          ...colinsJson.parcellations[0],
+          ...colinsJson.parcellations.find(p => p['@id'] === COLIN_V25_ID),
           updated: true,
         },
       })
-      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: 'jubrain colin v18 left#8' })
-      expect(fetchedRegion).toEqual(hoc1)
+      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: `${COLIN_JULICHBRAIN_LAYER_NAME}#116` })
+      expect(fetchedRegion).toBeTruthy()
+      expect(fetchedRegion.fullId.kg.kgId).toEqual('c9753e82-80ca-4074-a704-9dd2c4c0d58b')
+      
     })
   })
 
@@ -74,7 +53,7 @@ describe('effect.ts', () => {
         }
       )
       expect(
-        useEffectsInstance.onParcellationSelected$
+        useEffectsInstance.onParcChange$
       ).toBeObservable(
         hot(
           'aa',

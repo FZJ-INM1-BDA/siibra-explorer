@@ -39,6 +39,7 @@ export class FabSpeedDialChild implements OnDestroy{
     const delta = Math.atan(_index * INDEX_FACTOR) / (Math.PI / 2) * MAX_CHANGE
     this.transitionDelay = flag ? `${delta}ms` : `${MAX_CHANGE - delta}ms`
     this.transformProp = `scale(${flag ? 1 : 0})`
+    this.pointerEvents = flag ? 'all' : 'none'
   }
 
   @HostBinding('style.transitionDelay')
@@ -52,4 +53,7 @@ export class FabSpeedDialChild implements OnDestroy{
 
   @HostBinding('style.transformOrigin')
   transformOrigin = 'center'
+
+  @HostBinding('style.pointer-events')
+  pointerEvents = 'none'
 }

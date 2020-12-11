@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscription } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, forkJoin, from, fromEvent, Observable, of, Subscription } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
@@ -10,13 +10,15 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { WidgetUnit } from "src/widget";
 
 import { LoggingService } from "src/logging";
-import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
-import { regionFlattener } from "src/util/regionFlattener";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
+import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
+
+import { getStringIdsFromRegion, getRegionHemisphere, getIdFromFullId } from 'common/util'
+import { viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -62,22 +64,35 @@ export class DatabrowserService implements OnDestroy {
     })
   }
   public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
-  public getDataByRegion: ({regions, parcellation, template}: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
-    this.lowLevelQuery(template.name, parcellation.name)
-      .then(de => this.filterDEByRegion.transform(de, regions, parcellation.regions.map(regionFlattener).reduce((acc, item) => acc.concat(item), [])))
-      .then(resolve)
-      .catch(reject)
-  })
+  public getDataByRegion: (arg: {regions: any[] }) => Observable<IDataEntry[]> = ({ regions }) => 
+    forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
+      map(
+        (arrOfArr: IDataEntry[][]) => arrOfArr.reduce(
+          (acc, curr) => {
+            /**
+             * In the event of multi region selection
+             * It is entirely possibly that different regions can fetch the same dataset
+             * If that's the case, filter by fullId attribute
+             */
+            const existSet = new Set(acc.map(v => v['fullId']))
+            const filteredCurr = curr.filter(v => !existSet.has(v['fullId']))
+            return acc.concat(filteredCurr)
+          },
+          []
+        )
+      )
+    )
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
   private dataentries: IDataEntry[] = []
 
   private subscriptions: Subscription[] = []
-  public fetchDataObservable$: Observable<any>
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
   public spatialDatasets$: Observable<any>
   public viewportBoundingBox$: Observable<[Point, Point]>
+
+  private templateSelected: any
 
   constructor(
     private workerService: AtlasWorkerService,
@@ -113,9 +128,16 @@ export class DatabrowserService implements OnDestroy {
       }),
     )
 
+    this.subscriptions.push(
+      this.store.pipe(
+        select(viewerStateSelectedTemplateSelector)
+      ).subscribe(tmpl => {
+        this.templateSelected = tmpl
+      })
+    )
+
     this.viewportBoundingBox$ = this.store.pipe(
-      select('viewerState'),
-      select('navigation'),
+      select(viewerStateSelectorNavigation),
       distinctUntilChanged(),
       debounceTime(SPATIAL_SEARCH_DEBOUNCE),
       filter(v => !!v && !!v.position && !!v.zoom),
@@ -133,8 +155,7 @@ export class DatabrowserService implements OnDestroy {
 
     this.spatialDatasets$ = this.viewportBoundingBox$.pipe(
       withLatestFrom(this.store.pipe(
-        select('viewerState'),
-        select('templateSelected'),
+        select(viewerStateSelectedTemplateSelector),
         distinctUntilChanged(),
         filter(v => !!v),
       )),
@@ -152,23 +173,6 @@ export class DatabrowserService implements OnDestroy {
       }),
     )
 
-    this.fetchDataObservable$ = combineLatest(
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('templateSelected'),
-        tap(({templateSelected}) => this.darktheme = templateSelected.useTheme === 'dark'),
-        map(({templateSelected}) => (templateSelected.name)),
-        distinctUntilChanged(),
-      ),
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('parcellationSelected'),
-        map(({parcellationSelected}) => (parcellationSelected.name)),
-        distinctUntilChanged(),
-      ),
-      this.manualFetchDataset$,
-    )
-
     this.subscriptions.push(
       this.spatialDatasets$.subscribe(arr => {
         this.store.dispatch({
@@ -176,12 +180,6 @@ export class DatabrowserService implements OnDestroy {
           fetchedDataEntries: arr,
         })
       }),
-    )
-
-    this.subscriptions.push(
-      this.fetchDataObservable$.pipe(
-        debounceTime(16),
-      ).subscribe((param: [string, string, null] ) => this.fetchData(param[0], param[1])),
     )
 
     this.subscriptions.push(
@@ -206,24 +204,33 @@ export class DatabrowserService implements OnDestroy {
   }
 
   public toggleFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionToggleFav({
+        payload: {
+          fullId: dataentry.fullId || null
+        }
+      })
+    )
   }
 
   public saveToFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionFavDataset({
+        payload: {
+          fullId: dataentry?.fullId || null
+        }
+      })
+    )
   }
 
   public removeFromFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionUnfavDataset({
+        payload: {
+          fullId: dataentry.fullId || null
+        }
+      })
+    )
   }
 
   // TODO deprecate
@@ -248,6 +255,49 @@ export class DatabrowserService implements OnDestroy {
   public fetchError: string
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
+
+  private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry[]>>()
+  private getDatasetsByRegion(region: { fullId: any }){
+
+    const hemisphereObj = (() => {
+      const hemisphere = getRegionHemisphere(region)
+      return hemisphere ? { hemisphere } : {}
+    })()
+
+    const refSpaceObj = this.templateSelected && this.templateSelected.fullId
+      ? { referenceSpaceId: getIdFromFullId(this.templateSelected.fullId) }
+      : {}
+    const fullIds = getStringIdsFromRegion(region) as string[]
+
+    for (const fullId of fullIds) {
+      if (!this.memoizedDatasetByRegion.has(fullId)) {
+        const obs$ =  this.http.get<IDataEntry[]>(
+          `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
+          {
+            params: {
+              ...hemisphereObj,
+              ...refSpaceObj
+            },
+            headers: this.constantService.getHttpHeader(),
+            responseType: 'json'
+          }
+        ).pipe(
+          shareReplay(1),
+        )
+        this.memoizedDatasetByRegion.set(fullId, obs$)
+      }
+    }
+
+    return forkJoin(
+      fullIds.map(fullId => this.memoizedDatasetByRegion.get(fullId))
+    ).pipe(
+      map(array => array.reduce((acc, currArr) => {
+        return acc.concat(
+          currArr.filter(ds => !new Set(acc.map(ds => ds['fullId'])).has(ds['fullId']))
+        )
+      }, []))
+    )
+  }
 
   private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {
     const encodedTemplateName = encodeURIComponent(templateName)
@@ -319,7 +369,7 @@ export class DatabrowserService implements OnDestroy {
 }
 
 export function reduceDataentry(accumulator: Array<{name: string, occurance: number}>, dataentry: IDataEntry) {
-  const methods = dataentry.methods
+  const methods = (dataentry.methods || [])
     .reduce((acc, item) => acc.concat(
       item.length > 0
         ? item

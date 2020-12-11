@@ -1,11 +1,21 @@
-const kgQueryUtil = require('./../auth/util')
+const { getPublicAccessToken: getPublic } = require('./../auth/util')
 const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
-const { getIdFromFullId, retry, flattenRegions } = require('../../common/util')
+const { getIdFromFullId, retry, flattenRegions, getUniqueRegionId, getStringIdsFromRegion, flattenReducer } = require('../../common/util')
 
 let getPublicAccessToken
+
+const KG_IDS = {
+  PARCELLATIONS: {
+    LONG_BUNDLE: 'juelich/iav/atlas/v1.0.0/5',
+    SHORT_BUNDLE: 'juelich/iav/atlas/v1.0.0/6',
+    JULICH_BRAIN: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579',
+    JULICH_BRAIN_V25: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25',
+    JULICH_BRAIN_V24_BIGBRAIN: 'juelich/iav/atlas/v1.0.0/7'
+  }
+}
 
 const getUserKGRequestParam = async ({ user }) => {
   let publicAccessToken
@@ -71,6 +81,51 @@ const populateSet = (flattenedRegions, set = new Set()) => {
 
 const initPrArray = []
 
+/**
+ * regionMap maps schema/id to { parent, children }
+ */
+const regionMap = new Map()
+
+const getParseRegion = (template, parcellation) => {
+
+  const getRegionIdsFromRegion = region => {
+    return [
+      ...getStringIdsFromRegion(region),
+      getUniqueRegionId(template, parcellation, region)
+    ]
+  }
+  
+  const parseRegion = (region, parent) => {
+    const regionIds = getRegionIdsFromRegion(region)
+    const regionId = regionIds[0] 
+    const { children, relatedAreas } = region
+    const childrenIds = (children || []).map(getRegionIdsFromRegion).reduce(flattenReducer, [])
+    const alternateIds = (relatedAreas || []).map(getRegionIdsFromRegion).reduce(flattenReducer, [])
+
+    const regionObj = {
+      parent,
+      self: [ ...regionIds, ...alternateIds ],
+      children: childrenIds
+    }
+    regionMap.set(regionId, regionObj)
+    for (const altId of alternateIds) {
+      regionMap.set(altId, regionObj)
+    }
+    for (const c of (children || [])) {
+      parseRegion(c, regionId)
+    }
+  }
+  return parseRegion  
+}
+
+const processParc = (t, p) => {
+  const parseRegion = getParseRegion(t, p)
+  const { regions } = p
+  for (const r of regions) {
+    parseRegion(r)
+  }
+}
+
 let juBrainSet = new Set(),
   bigbrainCytoSet = new Set()
   shortBundleSet = new Set(),
@@ -85,7 +140,10 @@ initPrArray.push(
   readConfigFile('bigbrain.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const bigbrainCyto = flattenRegions(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
+      const bigbrainCyto = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.JULICH_BRAIN_V24_BIGBRAIN).regions)
       bigbrainCytoSet = populateSet(bigbrainCyto)
     })
     .catch(console.error)
@@ -95,9 +153,12 @@ initPrArray.push(
   readConfigFile('MNI152.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const longBundle = flattenRegions(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
-      const shortBundle = flattenRegions(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
-      const jubrain = flattenRegions(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
+      const longBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.LONG_BUNDLE).regions)
+      const shortBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) =>  id === KG_IDS.PARCELLATIONS.SHORT_BUNDLE).regions)
+      const jubrain = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.JULICH_BRAIN_V25).regions)
       longBundleSet = populateSet(longBundle)
       shortBundleSet = populateSet(shortBundle)
       juBrainSet = populateSet(jubrain)
@@ -109,6 +170,9 @@ initPrArray.push(
   readConfigFile('waxholmRatV2_0.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const waxholm3 = flattenRegions(json.parcellations[0].regions)
       const waxholm2 = flattenRegions(json.parcellations[1].regions)
       const waxholm1 = flattenRegions(json.parcellations[2].regions)
@@ -124,6 +188,9 @@ initPrArray.push(
   readConfigFile('allenMouse.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const flattenedAllen2017 = flattenRegions(json.parcellations[0].regions)
       allen2017Set = populateSet(flattenedAllen2017)
 
@@ -188,6 +255,34 @@ const datasetBelongsInTemplate = ({ templateName }) => ({ referenceSpaces }) => 
 const datasetBelongToParcellation = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
   ? true
   : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
+
+const relatedRegionsCache = new Map()
+const traverseRegionMap = regionSchemaId => {
+  if (relatedRegionsCache.has(regionSchemaId)) return relatedRegionsCache.get(regionSchemaId)
+  const out = regionMap.get(regionSchemaId)
+  if (!out) {
+    return []
+  }
+  const { parent, self, children } = out
+
+  /**
+   * how to determine how to traverse the tree to determine related regions?
+   * for now, will traverse towards the parents
+   * ie, when selecting a leaf node, all nodes up to the root will be considered important
+   */
+
+  const relatedSchemaIds = self.concat(
+    parent ? traverseRegionMap(parent) : []
+  )
+  relatedRegionsCache.set(regionSchemaId, relatedSchemaIds)
+  return relatedSchemaIds
+}
+
+const filterDatasetsByRegion = async (datasets = [], regionSchemaId) => {
+  await Promise.all(initPrArray)
+  const allRelevantSchemaSet = new Set(traverseRegionMap(regionSchemaId))
+  return datasets.filter(ds => ds['parcellationRegion'].some(pr => allRelevantSchemaSet.has(getIdFromFullId(pr.fullId))))
+}
 
 /**
  * NB: if changed, also change ~/docs/advanced/dataset.md
@@ -284,7 +379,6 @@ const init = async () => {
     else console.warn(`ACCESS_TOKEN environmental variable is set! All queries will be made made with ACCESS_TOKEN!`)
   }
   if (getPublicAccessToken) return
-  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
 }
 
@@ -301,6 +395,7 @@ module.exports = {
   datasetBelongToParcellation,
   datasetRegionExistsInParcellationRegion,
   datasetBelongsInTemplate,
+  filterDatasetsByRegion,
   _getParcellations: async () => {
     await Promise.all(initPrArray)
     return {

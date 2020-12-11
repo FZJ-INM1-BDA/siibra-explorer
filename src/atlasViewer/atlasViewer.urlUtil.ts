@@ -4,6 +4,7 @@ import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
+import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
   TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
@@ -12,6 +13,7 @@ export const PARSING_SEARCHPARAM_ERROR = {
 const PARSING_SEARCHPARAM_WARNING = {
   UNKNOWN_PARCELLATION: 'UNKNOWN_PARCELLATION',
   DECODE_CIPHER_ERROR: 'DECODE_CIPHER_ERROR',
+  ID_ERROR: 'ID_ERROR'
 }
 
 export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
@@ -88,7 +90,7 @@ export const cvtStateToSearchParam = (state: any): URLSearchParams => {
 }
 
 const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR
-const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR } = PARSING_SEARCHPARAM_WARNING
+const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR, ID_ERROR } = PARSING_SEARCHPARAM_WARNING
 
 const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchParams, state: IavRootStoreInterface, cb?: (arg: any) => void) => {
 
@@ -170,7 +172,13 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
             selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
           }
         }
-        return selectRegionIds.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
+        return selectRegionIds
+          .map(labelIndexId => {
+            const region = getRegionFromlabelIndexId({ labelIndexId })
+            if (!region) cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
+            return region
+          })
+          .filter(r => !!r)
 
       } catch (e) {
         /**
@@ -305,6 +313,25 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
   } catch (e) {
     // parsing previewingDatasetFiles
   }
-  
+
+  /**
+   * parsing template to get atlasId
+   */
+  (() => {
+
+    const viewreHelperState = returnState[viewerStateHelperStoreName]
+    const { templateSelected, parcellationSelected } = returnState['viewerState']
+    const { fetchedAtlases, ...rest } = viewreHelperState
+    
+    const selectedAtlas = fetchedAtlases.find(a => a['templateSpaces'].find(t => t['@id'] === (templateSelected && templateSelected['@id'])))
+    
+    const overlayLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
+
+    viewreHelperState['selectedAtlasId'] = selectedAtlas && selectedAtlas['@id']
+    viewreHelperState['overlayingAdditionalParcellations'] = (overlayLayer && !overlayLayer['baseLayer'])
+      ? [ overlayLayer ]
+      : []
+  })()
+
   return returnState
 }

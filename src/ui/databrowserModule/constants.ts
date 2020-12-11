@@ -1,6 +1,11 @@
 import { InjectionToken } from "@angular/core";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
-export { DatasetPreview } from "./databrowser.module";
+import { Observable } from "rxjs";
+import { IHasId } from "src/util/interfaces";
+
+export const UNDER_REVIEW = {
+  ['@id']: "https://nexus.humanbrainproject.org/v0/data/minds/core/embargostatus/v1.0.0/1d726b76-b176-47ed-96f0-b4f2e17d5f19"
+}
 
 export const OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN = new InjectionToken<(file: any, dataset: any) => void>('OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN')
 export const DATASTORE_DEFAULT_STATE = {
@@ -74,7 +79,7 @@ export interface IKgDataEntry {
   referenceSpaces: IKgReferenceSpace[]
   files: File[]
   publications: IKgPublication[]
-  embargoStatus: string[]
+  embargoStatus: IHasId[]
 
   methods: string[]
   protocols: string[]
@@ -89,3 +94,10 @@ export interface IKgDataEntry {
   id: string
   fullId: string
 }
+
+export interface DatasetPreview {
+  datasetId: string
+  filename: string
+}
+
+export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME = new InjectionToken<({ datasetSchema, datasetId, filename }) => Observable<any|null>>('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')

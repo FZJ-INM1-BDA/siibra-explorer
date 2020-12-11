@@ -67,7 +67,7 @@ describe('origin dataset pmap', () => {
             await iavPage.wait(5000)
             await iavPage.waitForAsync()
 
-            const additionalLayerControlIsShown = await iavPage.additionalLayerControlIsVisible()
+            const additionalLayerControlIsShown = await iavPage.isVisible(`[aria-label="${ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL}"]`)
             expect(additionalLayerControlIsShown).toEqual(false)
             
             const checked = await iavPage.switchIsChecked(cssSelector)

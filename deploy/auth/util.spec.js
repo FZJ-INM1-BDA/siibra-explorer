@@ -114,8 +114,7 @@ describe('util.js', async () => {
     })
 
     it('> configureAuth and refresh called with correct param', async () => {
-      const util = require('./util')
-      const { getPublicAccessToken } = await util()
+      const { getPublicAccessToken } = require('./util')
       const token = await getPublicAccessToken()
 
       const {
@@ -130,7 +129,10 @@ describe('util.js', async () => {
       const { HBP_CLIENTID, HBP_CLIENTSECRET, HOSTNAME, HOST_PATHNAME, REFRESH_TOKEN } = env
       
       // configuAuthStub
-      assert(configureAuthStub.calledOnce)
+      assert(
+        configureAuthStub.called,
+        'expect configureAuthStub to have been called once'
+      )
       const { args } = configureAuthStub.firstCall
       const arg = args[0]
       expect(arg).to.include({
@@ -183,8 +185,7 @@ describe('util.js', async () => {
     })
 
     it('> refresh getPublicAccessToken will reject', async () => {
-      const util = require('./util')
-      const { getPublicAccessToken } = await util()
+      const { getPublicAccessToken } = require('./util')
 
       try {
         await getPublicAccessToken()

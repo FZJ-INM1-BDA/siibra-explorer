@@ -13,6 +13,64 @@
     }
   }
 
+  const setsContain = (set1, set2) => {
+    for (const el of set2){
+      if (!set1.has(el)) return false
+    }
+    return true
+  }
+
+  const HEMISPHERE = {
+    LEFT_HEMISPHERE: `left hemisphere`,
+    RIGHT_HEMISPHERE: `right hemisphere`
+  }
+
+  exports.getRegionHemisphere = region => {
+    if (!region) return null
+    return (region.name && region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+      ? HEMISPHERE.RIGHT_HEMISPHERE
+      : (region.name && region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+        ? HEMISPHERE.LEFT_HEMISPHERE
+        : null
+  }
+
+  exports.setsContain = setsContain
+
+  exports.setsEql = (set1, set2) => {
+    if (set1.size !== set2.size) return false
+    if (!setsContain(set1, set2)) return false
+    if (!setsContain(set2, set1)) return false
+    return true
+  }
+
+  /**
+   *
+   * https://stackoverflow.com/a/16348977/6059235
+   */
+  exports.intToRgb = int => {
+    if (int >= 65500) {
+      return [255, 255, 255]
+    }
+    const str = String(int * 65535)
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const returnV = []
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xFF;
+      returnV.push(value)
+    }
+    return returnV
+  }
+
+  exports.getUniqueRegionId = (template, parcellation, region) => {
+    const templateId = template ? (template['@id'] || template['name']) : `untitled-template`
+    const parcId = parcellation ? (parcellation['@id'] || parcellation['name']) : `untitled-parcellation`
+    const regionId = region ? region['name'] : `untitled-region`
+    return `${templateId}/${parcId}/${regionId}`
+  }
+
   exports.getIdObj = getIdObj
 
   exports.getIdFromFullId = fullId => {
@@ -20,6 +78,27 @@
     if (!idObj) return null
     const { kgSchema, kgId } = idObj
     return `${kgSchema}/${kgId}`
+  }
+
+  const getIdsObj = fullId => {
+    const returnArray = []
+    if (!fullId) return returnArray
+    const legacyFullId = getIdObj(fullId)
+    if (legacyFullId) returnArray.push(`${legacyFullId['kgSchema']}/${legacyFullId['kgId']}`)
+
+    const { ['minds/core/parcellationregion/v1.0.0']: uniMindsParcRegScheIds} = fullId
+    for (const key in uniMindsParcRegScheIds || {}) {
+      returnArray.push(`minds/core/parcellationregion/v1.0.0/${key}`)
+    }
+    return returnArray
+  }
+
+  exports.getStringIdsFromRegion = region => {
+    const { fullId } = region
+    /**
+     * other ways of getting id?
+     */
+    return getIdsObj(fullId)
   }
 
   const defaultConfig = {
@@ -50,5 +129,47 @@
 
   exports.flattenRegions = flattenRegions
 
+  exports.flattenReducer = (acc, curr) => acc.concat(curr)
+
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
+
+  /**
+   * No license defined
+   * https://gist.github.com/mjackson/5311256#file-color-conversion-algorithms-js
+   */
+  exports.rgbToHsl = (r, g, b) => {
+
+    r /= 255, g /= 255, b /= 255;
+
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if (max == min) {
+      h = s = 0; // achromatic
+    } else {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+
+      h /= 6;
+    }
+
+    return [ h, s, l ];
+  }
+
+  exports.verifyPositionArg = val => {
+    return (
+      Array.isArray(val) &&
+      val.length === 3 &&
+      val.every(n =>
+        typeof n === 'number' &&
+        !Number.isNaN(n)
+      )
+    )
+  }
 })(typeof exports === 'undefined' ? module.exports : exports)

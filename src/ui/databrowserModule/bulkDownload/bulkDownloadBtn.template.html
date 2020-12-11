@@ -13,7 +13,7 @@
     <button mat-icon-button
       [attr.aria-label]="ariaLabel"
       [ngClass]="{'text-muted': kgIds.length === 0}"
-      [matTooltip]="kgIds.length === 0 ? 'No favourite datasets to download' : 'Bulk download all favourited datasets'"
+      [matTooltip]="ariaLabel"
       (click)="kgIds.length === 0 ? null : bulkDlForm.submit()">
       <i class="fas fa-download"></i>
     </button>

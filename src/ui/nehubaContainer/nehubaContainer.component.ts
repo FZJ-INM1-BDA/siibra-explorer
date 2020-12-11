@@ -1,67 +1,111 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer } from "rxjs";
-import { pipeFromArray } from "rxjs/internal/util/pipe";
-import {
-  buffer,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  map,
-  mapTo,
-  scan,
-  shareReplay,
-  skip,
-  startWith,
-  switchMap,
-  switchMapTo,
-  take,
-  tap,
-  withLatestFrom,
-  delayWhen,
-} from "rxjs/operators";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, Subject } from "rxjs";
+import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime } from "rxjs/operators";
+import { trigger, state, style, animate, transition } from '@angular/animations'
+import { MatDrawer } from "@angular/material/sidenav";
+
 import { LoggingService } from "src/logging";
-import { FOUR_PANEL, H_ONE_THREE, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
-import { SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
+import {
+  CHANGE_NAVIGATION,
+  generateLabelIndexId,
+  getMultiNgIdsRegionsLabelIndexMap,
+  getNgIds,
+  ILandmark,
+  IOtherLandmarkGeometry,
+  IPlaneLandmarkGeometry,
+  IPointLandmarkGeometry,
+  isDefined,
+  MOUSE_OVER_LANDMARK,
+  NgViewerStateInterface
+} from "src/services/stateStore.service";
+
 import { getExportNehuba, isSame } from "src/util/fn";
-import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor } from "./util";
+import { compareLandmarksChanged } from "src/util/constants";
+import { PureContantService } from "src/util";
+import { ARIA_LABELS, IDS, CONST } from 'common/constants'
+import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
+import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedRegionsSelector } from 'src/services/state/viewerState.store.helper'
+import { SwitchDirective } from "src/util/directives/switch.directive";
+import {
+  viewerStateDblClickOnViewer,
+} from "src/services/state/viewerState.store.helper";
+
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, takeOnePipe } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
+import { ngViewerSelectorNehubaReady, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
+import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
 
-const isFirstRow = (cell: HTMLElement) => {
-  const { parentElement: row } = cell
-  const { parentElement: container } = row
-  return container.firstElementChild === row
+const { MESH_LOADING_STATUS } = IDS
+
+const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
+
+  const getLayerName = ({layer} = {layer: {}}) => {
+    const { name } = layer as any
+    return name
+  }
+
+  const newEntries = (curr && curr.filter(entry => {
+    const name = getLayerName(entry)
+    return acc.map(getLayerName).indexOf(name) < 0
+  })) || []
+
+  const entryChanged: (itemPrevState, newArr) => boolean = (itemPrevState, newArr) => {
+    const layerName = getLayerName(itemPrevState)
+    const { segment } = itemPrevState
+    const foundItem = newArr?.find((_item) =>
+      getLayerName(_item) === layerName)
+
+    if (foundItem) {
+      const { segment: foundSegment } = foundItem
+      return segment !== foundSegment
+    } else {
+      /**
+       * if item was not found in the new array, meaning hovering nothing
+       */
+      return segment !== null
+    }
+  }
+
+  const getItemFromLayerName = (item, arr) => {
+    const foundItem = arr?.find(i => getLayerName(i) === getLayerName(item))
+    return foundItem
+      ? foundItem
+      : {
+        layer: item.layer,
+        segment: null,
+      }
+  }
+
+  const getReduceExistingLayers = (newArr) => ([changed, unchanged], _curr) => {
+    const changedFlag = entryChanged(_curr, newArr)
+    return changedFlag
+      ? [ changed.concat( getItemFromLayerName(_curr, newArr) ), unchanged ]
+      : [ changed, unchanged.concat(_curr) ]
+  }
+
+  /**
+   * now, for all the previous layers, separate into changed and unchanged layers
+   */
+  const [changed, unchanged] = acc.reduce(getReduceExistingLayers(curr), [[], []])
+  return [...newEntries, ...changed, ...unchanged]
 }
 
-const isFirstCell = (cell: HTMLElement) => {
-  const { parentElement: row } = cell
-  return row.firstElementChild === cell
-}
-
-const scanFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean, boolean, boolean] = (acc, curr) => {
-
-  const target = curr.target as HTMLElement
-  const targetIsFirstRow = isFirstRow(target)
-  const targetIsFirstCell = isFirstCell(target)
-  const idx = targetIsFirstRow
-    ? targetIsFirstCell
-      ? 0
-      : 1
-    : targetIsFirstCell
-      ? 2
-      : null
-
-  const returnAcc = [...acc]
-  const num1 = typeof curr.detail.missingChunks === 'number' ? curr.detail.missingChunks : 0
-  const num2 = typeof curr.detail.missingImageChunks === 'number' ? curr.detail.missingImageChunks : 0
-  returnAcc[idx] = Math.max(num1, num2) > 0
-  return returnAcc as [boolean, boolean, boolean]
-}
+const {
+  ZOOM_IN,
+  ZOOM_OUT,
+  TOGGLE_FRONTAL_OCTANT,
+  TOGGLE_SIDE_PANEL,
+  EXPAND,
+  COLLAPSE,
+  ADDITIONAL_VOLUME_CONTROL,
+} = ARIA_LABELS
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -69,16 +113,86 @@ const scanFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean,
   styleUrls : [
     `./nehubaContainer.style.css`,
   ],
+  animations: [
+    trigger('openClose', [
+      state('open', style({
+        transform: 'translateY(0)',
+        opacity: 1
+      })),
+      state('closed', style({
+        transform: 'translateY(-100vh)',
+        opacity: 0
+      })),
+      transition('open => closed', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ]),
+      transition('closed => open', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ])
+    ]),
+    trigger('openCloseAnchor', [
+      state('open', style({
+        transform: 'translateY(0)'
+      })),
+      state('closed', style({
+        transform: 'translateY(100vh)'
+      })),
+      transition('open => closed', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ]),
+      transition('closed => open', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ])
+    ]),
+  ],
   exportAs: 'uiNehubaContainer',
+  providers: [
+    {
+      provide: REGION_OF_INTEREST,
+      useFactory: (store: Store<any>) => store.pipe(
+        select(viewerStateSelectedRegionsSelector),
+        map(rs => rs[0] || null)
+      ),
+      deps: [
+        Store
+      ]
+    }
+  ]
 })
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
+  public CONST = CONST
+  public ARIA_LABEL_ZOOM_IN = ZOOM_IN
+  public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+  public ARIA_LABEL_TOGGLE_FRONTAL_OCTANT = TOGGLE_FRONTAL_OCTANT
+  public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL
+  public ARIA_LABEL_EXPAND = EXPAND
+  public ARIA_LABEL_COLLAPSE = COLLAPSE
+  public ARIA_LABEL_ADDITIONAL_VOLUME_CONTROL = ADDITIONAL_VOLUME_CONTROL
+  
+  public ID_MESH_LOADING_STATUS = MESH_LOADING_STATUS
+
   @ViewChild(NehubaViewerContainerDirective,{static: true})
   public nehubaContainerDirective: NehubaViewerContainerDirective
 
+  @ViewChild('sideNavMasterSwitch', { static: true })
+  public navSideDrawerMainSwitch: SwitchDirective
+  @ViewChild('sideNavSwitch', { static: true })
+  public navSideDrawerMinorSwitch: SwitchDirective
+
+  @ViewChild('matDrawerMaster', {static: true})
+  public matDrawerMain: MatDrawer
+  @ViewChild('matDrawerMinor', { static: true })
+  public matDrawerMinor: MatDrawer
+
   @Output()
   public nehubaViewerLoaded: EventEmitter<boolean> = new EventEmitter()
+
+  @Output()
+  public forceUI$: Observable<{ target: 'perspective:octantRemoval', mode: boolean,  message?: string }>
+
+  public disableOctantRemoval$: Observable<{ message?: string, mode: boolean }>
 
   public handleViewerLoadedEvent(flag: boolean){
     this.viewerLoaded = flag
@@ -87,32 +201,84 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public viewerLoaded: boolean = false
 
-  private sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
-  public sliceViewLoading0$: Observable<boolean>
-  public sliceViewLoading1$: Observable<boolean>
-  public sliceViewLoading2$: Observable<boolean>
+  private sliceRenderEvent$: Observable<CustomEvent>
+  public sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public perspectiveViewLoading$: Observable<string|null>
+  public showPerpsectiveScreen$: Observable<string>
 
-  private templateSelected$: Observable<any>
-  private newViewer$: Observable<any>
-  private selectedParcellation$: Observable<any>
-  private selectedRegions$: Observable<any[]>
+  public templateSelected$: Observable<any> = this.store.pipe(
+    select(viewerStateSelectedTemplateSelector),
+    distinctUntilChanged(isSame),
+  )
+
+  private newViewer$: Observable<any> = this.templateSelected$.pipe(
+    filter(v => !!v),
+  )
+
+  private selectedParcellation$: Observable<any> = this.store.pipe(
+    select(viewerStateSelectedParcellationSelector),
+    distinctUntilChanged(),
+    filter(v => !!v)
+  )
+  public selectedRegions: any[] = []
+  public selectedRegions$: Observable<any[]> = this.store.pipe(
+    select(viewerStateSelectedRegionsSelector),
+    filter(rs => !!rs),
+  )
+
   public selectedLandmarks$: Observable<any[]>
   public selectedPtLandmarks$: Observable<any[]>
+  public customLandmarks$: Observable<any> = this.store.pipe(
+    select(viewerStateCustomLandmarkSelector),
+    map(lms => lms.map(lm => ({
+      ...lm,
+      geometry: {
+        position: lm.position
+      }
+    })))
+  )
   private hideSegmentations$: Observable<boolean>
 
   private fetchedSpatialDatasets$: Observable<ILandmark[]>
   private userLandmarks$: Observable<IUserLandmark[]>
 
-  public onHoverSegment$: Observable<any>
+  public nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
 
   @Input()
   private currentOnHover: {segments: any, landmark: any, userLandmark: any}
 
   @Input()
-  private currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
+  currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
 
-  public onHoverSegments$: Observable<any[]>
+  public iavAdditionalLayers$ = new Subject<any[]>()
+
+  public alwaysHideMinorPanel$: Observable<boolean> = combineLatest(
+    this.selectedRegions$,
+    this.iavAdditionalLayers$.pipe(
+      startWith([])
+    )
+  ).pipe(
+    map(([ regions, layers ]) => regions.length === 0 && layers.length === 0)
+  )
+
+  public onHoverSegments$: BehaviorSubject<any[]> = new BehaviorSubject([])
+  public onHoverSegment$: Observable<any> = this.onHoverSegments$.pipe(
+    scan(sortByFreshness, []),
+    /**
+     * take the first element after sort by freshness
+     */
+    map(arr => arr[0]),
+    /**
+     * map to the older interface
+     */
+    filter(v => !!v),
+    map(({ segment }) => {
+      return {
+        labelIndex: (isNaN(segment) && Number(segment.labelIndex)) || null,
+        foundRegion: (isNaN(segment) && segment) || null,
+      }
+    }),
+  )
 
   public selectedTemplate: any | null
   private selectedRegionIndexSet: Set<string> = new Set()
@@ -123,7 +289,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public selectedParcellation: any | null
 
-  public nehubaViewer: NehubaViewerUnit
+  public nehubaViewer: NehubaViewerUnit = null
   private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>> = new Map()
   private landmarksLabelIndexMap: Map<number, any> = new Map()
   private landmarksNameMap: Map<string, number> = new Map()
@@ -135,76 +301,55 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   public panelMode$: Observable<string>
 
-  private panelOrder: string
   public panelOrder$: Observable<string>
   private redrawLayout$: Observable<[string, string]>
 
   public hoveredPanelIndices$: Observable<number>
 
+  public connectivityNumber: string
+  public connectivityLoadUrl: string
+
   constructor(
-    private constantService: AtlasViewerConstantsServices,
-    private apiService: AtlasViewerAPIServices,
-    private store: Store<IavRootStoreInterface>,
+    private pureConstantService: PureContantService,
+    @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) private setViewerHandle: (arg) => void,
+    private store: Store<any>,
     private elementRef: ElementRef,
     private log: LoggingService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
+
+    this.nehubaViewerPerspectiveOctantRemoval$ = this.store.pipe(
+      select(ngViewerSelectorOctantRemoval),
+    )
 
     this.panelMode$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
       shareReplay(1),
     )
 
     this.panelOrder$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
       shareReplay(1),
-      tap(panelOrder => this.panelOrder = panelOrder),
     )
 
     this.redrawLayout$ = this.store.pipe(
-      select('ngViewerState'),
-      select('nehubaReady'),
+      select(ngViewerSelectorNehubaReady),
       distinctUntilChanged(),
       filter(v => !!v),
-      switchMapTo(combineLatest(
+      switchMapTo(combineLatest([
         this.panelMode$,
         this.panelOrder$,
-      )),
-    )
-
-    this.templateSelected$ = this.store.pipe(
-      select('viewerState'),
-      select('templateSelected'),
-      distinctUntilChanged(isSame),
-    )
-
-    this.newViewer$ = this.templateSelected$.pipe(
-      filter(v => !!v),
-    )
-
-    this.selectedParcellation$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
-      distinctUntilChanged(),
-    )
-
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      select('regionsSelected'),
-      filter(rs => !!rs),
+      ])),
     )
 
     this.selectedLandmarks$ = this.store.pipe(
       select('viewerState'),
-      safeFilter('landmarksSelected'),
-      map(state => state.landmarksSelected),
+      select('landmarksSelected'),
     )
 
     this.selectedPtLandmarks$ = this.selectedLandmarks$.pipe(
@@ -213,37 +358,89 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.fetchedSpatialDatasets$ = this.store.pipe(
       select('dataStore'),
-      safeFilter('fetchedSpatialData'),
-      map(state => state.fetchedSpatialData),
-      distinctUntilChanged(this.constantService.testLandmarksChanged),
+      select('fetchedSpatialData'),
+      distinctUntilChanged(compareLandmarksChanged),
+      filter(v => !!v),
+      startWith([]),
       debounceTime(300),
     )
 
     this.userLandmarks$ = this.store.pipe(
-      select('viewerState'),
-      select('userLandmarks'),
+      select(viewerStateCustomLandmarkSelector),
       distinctUntilChanged(),
     )
 
-    this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+    /**
+     * in future, perhaps add other force UI optinos here
+     */
+    this.forceUI$ = this.userLandmarks$.pipe(
+      map(lm => {
+        if (lm.length > 0) {
+          return {
+            target: 'perspective:octantRemoval',
+            mode: false,
+            message: `octant control disabled: showing landmarks.`
+          }
+        } else {
+          return {
+            target: 'perspective:octantRemoval',
+            mode: null
+          }
+        }
+      })
+    )
+
+    this.disableOctantRemoval$ = this.forceUI$.pipe(
+      filter(({ target }) => target === 'perspective:octantRemoval'),
+    )
+
+    this.sliceRenderEvent$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+      map(ev => ev as CustomEvent)
+    )
+
+    this.sliceViewLoadingMain$ = this.sliceRenderEvent$.pipe(
       scan(scanFn, [null, null, null]),
+      startWith([true, true, true] as [boolean, boolean, boolean]),
       shareReplay(1),
     )
 
-    this.sliceViewLoading0$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[0]),
-      )
+    this.showPerpsectiveScreen$ = this.newViewer$.pipe(
+      switchMapTo(this.sliceRenderEvent$.pipe(
+        scan((acc, curr) => {
 
-    this.sliceViewLoading1$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[1]),
-      )
-
-    this.sliceViewLoading2$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[2]),
-      )
+          /**
+           * if at any point, all chunks have been loaded, always return loaded state
+           */
+          if (acc.every(v => v === 0)) return [0, 0, 0]
+          const { detail = {}, target } = curr || {}
+          const { missingChunks = -1, missingImageChunks = -1 } = detail
+          const idx = this.findPanelIndex(target as HTMLElement)
+          const returnAcc = [...acc]
+          if (idx >= 0) {
+            returnAcc[idx] = missingChunks + missingImageChunks
+          }
+          return returnAcc
+        }, [-1, -1, -1]),
+        map(arr => {
+          let sum = 0
+          let uncertain = false
+          for (const num of arr) {
+            if (num < 0) {
+              uncertain = true
+            } else {
+              sum += num
+            }
+          }
+          return sum > 0
+            ? `Loading ${sum}${uncertain ? '+' : ''} chunks ...`
+            : null
+        }),
+        distinctUntilChanged(),
+        startWith('Loading ...'),
+        throttleTime(100, asyncScheduler, { leading: true, trailing: true }),
+        shareReplay(1),
+      ))
+    )
 
     /* missing chunk perspective view */
     this.perspectiveViewLoading$ = fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent')
@@ -251,22 +448,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         filter(event => isDefined(event) && isDefined((event as any).detail) && isDefined((event as any).detail.lastLoadedMeshId) ),
         map(event => {
 
-          const e = (event as any)
-          const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
-          const lastLoadedIdNum = Number(lastLoadedIdString)
           /**
            * TODO dig into event detail to see if the exact mesh loaded
            */
-          return e.detail.meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
+          const { meshesLoaded, meshFragmentsLoaded, lastLoadedMeshId } = (event as any).detail
+          return meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
             ? null
-            : isNaN(lastLoadedIdNum)
-              ? 'Loading unknown chunk'
-              : lastLoadedIdNum >= 65500
-                ? 'Loading auxiliary chunk'
-                // : this.regionsLabelIndexMap.get(lastLoadedIdNum)
-                //   ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
-                : 'Loading meshes ...'
+            : 'Loading meshes ...'
         }),
+        distinctUntilChanged()
       )
 
     this.ngLayers$ = this.store.pipe(
@@ -275,8 +465,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.hideSegmentations$ = this.ngLayers$.pipe(
       map(state => isDefined(state)
-        ? state.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+        ? state.layers?.findIndex(l => l.mixability === 'nonmixable') >= 0
         : false),
+    )
+
+    /**
+     * fixes 
+     * https://github.com/HumanBrainProject/interactive-viewer/issues/800
+     */
+    this.subscriptions.push(
+      this.nehubaViewerLoaded.pipe(
+        debounceTime(500),
+        filter(v => !v),
+      ).subscribe(() => {
+        this.matDrawerMain.close()
+        this.matDrawerMinor.close()
+      })
     )
   }
 
@@ -290,7 +494,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     return element
   }
 
-  private findPanelIndex = (panel: HTMLElement) => this.viewPanels.findIndex(p => p === panel)
+  private findPanelIndex = (panel: HTMLElement) => this.viewPanels?.findIndex(p => p === panel)
 
   private _exportNehuba: any
   get exportNehuba() {
@@ -301,7 +505,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   public ngOnInit() {
-
     this.hoveredPanelIndices$ = fromEvent(this.elementRef.nativeElement, 'mouseover').pipe(
       switchMap((ev: MouseEvent) => merge(
         of(this.findPanelIndex(ev.target as HTMLElement)),
@@ -317,7 +520,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.subscriptions.push(
       this.newViewer$.pipe(
-        switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent'))),
+        switchMapTo(this.sliceRenderEvent$.pipe(
+          takeOnePipe()
+        ))
       ).subscribe((events) => {
         for (const idx in [0, 1, 2]) {
           const ev = events[idx] as CustomEvent
@@ -349,25 +554,25 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         if (!viewPanels.every(v => !!v)) { return }
 
         switch (mode) {
-        case H_ONE_THREE: {
+        case PANELS.H_ONE_THREE: {
           const element = this.removeExistingPanels()
           const newEl = getHorizontalOneThree(viewPanels)
           element.appendChild(newEl)
           break;
         }
-        case V_ONE_THREE: {
+        case PANELS.V_ONE_THREE: {
           const element = this.removeExistingPanels()
           const newEl = getVerticalOneThree(viewPanels)
           element.appendChild(newEl)
           break;
         }
-        case FOUR_PANEL: {
+        case PANELS.FOUR_PANEL: {
           const element = this.removeExistingPanels()
           const newEl = getFourPanel(viewPanels)
           element.appendChild(newEl)
           break;
         }
-        case SINGLE_PANEL: {
+        case PANELS.SINGLE_PANEL: {
           const element = this.removeExistingPanels()
           const newEl = getSinglePanel(viewPanels)
           element.appendChild(newEl)
@@ -393,13 +598,16 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       }),
     )
 
+    /**
+     * TODO deprecate, but document the method
+     */
     this.subscriptions.push(
       combineLatest(
         this.fetchedSpatialDatasets$,
       ).subscribe(([fetchedSpatialData]) => {
         this.fetchedSpatialData = fetchedSpatialData
 
-        if (this.fetchedSpatialData && this.fetchedSpatialData.length > 0) {
+        if (this.fetchedSpatialData?.length > 0) {
           this.nehubaViewer.addSpatialSearch3DLandmarks(
             this.fetchedSpatialData
               .map(data => data.geometry.type === 'point'
@@ -425,7 +633,16 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(
-      this.userLandmarks$.subscribe(landmarks => {
+      this.userLandmarks$.pipe(
+        withLatestFrom(
+          this.nehubaViewerPerspectiveOctantRemoval$
+        )
+      ).subscribe(([landmarks, flag]) => {
+        if (this.nehubaContainerDirective) {
+          this.nehubaContainerDirective.toggleOctantRemoval(
+            landmarks.length > 0 ? false : flag
+          )
+        }
         if (this.nehubaViewer) {
           this.nehubaViewer.updateUserLandmarks(landmarks)
         }
@@ -440,15 +657,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         /* on selecting of new template, remove additional nglayers */
         const baseLayerNames = Object.keys(this.selectedTemplate.nehubaConfig.dataset.initialNgState.layers)
         this.ngLayersRegister.layers
-          .filter(layer => baseLayerNames.findIndex(l => l === layer.name) < 0)
+          .filter(layer => baseLayerNames?.findIndex(l => l === layer.name) < 0)
           .map(l => l.name)
           .forEach(layerName => {
-            this.store.dispatch({
-              type : REMOVE_NG_LAYER,
-              layer : {
-                name : layerName,
-              },
-            })
+            this.store.dispatch(ngViewerActionRemoveNgLayer({
+              layer: {
+                name: layerName
+              }
+            }))
           })
       }),
     )
@@ -480,7 +696,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         this.selectedTemplate = templateSelected
         this.createNewNehuba(templateSelected)
         const foundParcellation = parcellationSelected
-          && templateSelected.parcellations.find(parcellation => parcellationSelected.name === parcellation.name)
+          && templateSelected?.parcellations?.find(parcellation => parcellationSelected.name === parcellation.name)
         this.handleParcellation(foundParcellation || templateSelected.parcellations[0])
 
         const nehubaConfig = templateSelected.nehubaConfig
@@ -505,22 +721,17 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           return layer
         })
 
-        this.store.dispatch({
-          type : ADD_NG_LAYER,
-          layer : dispatchLayers,
-        })
+        this.store.dispatch(ngViewerActionAddNgLayer({
+          layer: dispatchLayers
+        }))
       })
-    )
-
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe((this.handleParcellation).bind(this)),
     )
 
     let prevParcellation = null
 
     this.subscriptions.push(
 
-      combineLatest(
+      combineLatest([
         this.selectedRegions$.pipe(
           distinctUntilChanged(),
         ),
@@ -532,9 +743,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           distinctUntilChanged(),
         ),
         this.selectedParcellation$,
-      ).pipe(
+        this.store.pipe(
+          select('viewerState'),
+          select('overwrittenColorMap'),
+          distinctUntilChanged()
+        )
+      ]).pipe(
         delayWhen(() => timer())
-      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation]) => {
+      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, overwrittenColorMap]) => {
         if (!this.nehubaViewer) { return }
 
         const { ngId: defaultNgId } = selectedParcellation
@@ -548,11 +764,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           return
         }
 
-        prevParcellation = selectedParcellation
-
-        this.selectedRegionIndexSet.size > 0
+        this.selectedRegionIndexSet.size > 0 && !overwrittenColorMap
           ? this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
           : this.nehubaViewer.showAllSeg()
+
+        prevParcellation = selectedParcellation
       }),
     )
 
@@ -560,10 +776,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       this.ngLayers$.subscribe(ngLayersInterface => {
         if (!this.nehubaViewer) { return }
 
-        const newLayers = ngLayersInterface.layers.filter(l => this.ngLayersRegister.layers.findIndex(ol => ol.name === l.name) < 0)
-        const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayersInterface.layers.findIndex(nl => nl.name === l.name) < 0)
+        const newLayers = ngLayersInterface.layers.filter(l => this.ngLayersRegister.layers?.findIndex(ol => ol.name === l.name) < 0)
+        const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayersInterface.layers?.findIndex(nl => nl.name === l.name) < 0)
 
-        if (newLayers.length > 0) {
+        if (newLayers?.length > 0) {
           const newLayersObj: any = {}
           newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
             ...rest,
@@ -580,7 +796,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
         }
 
-        if (removeLayers.length > 0) {
+        if (removeLayers?.length > 0) {
           removeLayers.forEach(l => {
             if (this.nehubaViewer.removeLayer({
               name : l.name,
@@ -592,13 +808,41 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       }),
     )
 
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe(this.handleParcellation.bind(this))
+    )
+
     /* setup init view state */
-    
-    this.selectedRegions$.pipe(
-      filter(() => !!this.nehubaViewer),
-    ).subscribe(regions => {
-      this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
-    })
+
+    this.subscriptions.push(
+      this.selectedRegions$.pipe(
+        filter(() => !!this.nehubaViewer),
+      ).subscribe(regions => {
+        this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
+      })
+    )
+
+    this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
+      this.selectedRegions = sr
+    }))
+
+    /** switch side nav */
+    this.subscriptions.push(
+      this.alwaysHideMinorPanel$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag => {
+        if (!flag) {
+          this.matDrawerMinor && this.matDrawerMinor.open()
+          this.navSideDrawerMainSwitch && this.navSideDrawerMainSwitch.open()
+        }
+      })
+    )
+
+    this.subscriptions.push(
+      this.selectedRegions$.subscribe(regions => {
+        this.selectedRegions = regions
+      })
+    )
 
     /* handler to open/select landmark */
     const clickObs$ = fromEvent(this.elementRef.nativeElement, 'click')
@@ -610,14 +854,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
             debounceTime(200),
           ),
         ),
-        filter(arr => arr.length >= 2),
+        filter(arr => arr?.length >= 2),
       )
         .subscribe(() => {
           const { currentOnHover } = this
-          this.store.dispatch({
-            type : VIEWERSTATE_ACTION_TYPES.DOUBLE_CLICK_ON_VIEWER,
-            payload: { ...currentOnHover },
-          })
+          this.store.dispatch(viewerStateDblClickOnViewer({
+            payload: { ...currentOnHover }
+          }))
         }),
     )
 
@@ -639,84 +882,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public showObliqueSelection$: Observable<boolean>
   public showObliqueRotate$: Observable<boolean>
 
+  private currOnHoverObsSub: Subscription
   public ngOnChanges() {
+    this.currOnHoverObsSub && this.currOnHoverObsSub.unsubscribe()
     if (this.currentOnHoverObs$) {
-      this.onHoverSegments$ = this.currentOnHoverObs$.pipe(
-        map(({ segments }) => segments),
-      )
-
-      const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
-
-        const getLayerName = ({layer} = {layer: {}}) => {
-          const { name } = layer as any
-          return name
-        }
-
-        const newEntries = (curr && curr.filter(entry => {
-          const name = getLayerName(entry)
-          return acc.map(getLayerName).indexOf(name) < 0
-        })) || []
-
-        const entryChanged: (itemPrevState, newArr) => boolean = (itemPrevState, newArr) => {
-          const layerName = getLayerName(itemPrevState)
-          const { segment } = itemPrevState
-          const foundItem = newArr.find((_item) =>
-            getLayerName(_item) === layerName)
-
-          if (foundItem) {
-            const { segment: foundSegment } = foundItem
-            return segment !== foundSegment
-          } else {
-            /**
-             * if item was not found in the new array, meaning hovering nothing
-             */
-            return segment !== null
-          }
-        }
-
-        const getItemFromLayerName = (item, arr) => {
-          const foundItem = arr.find(i => getLayerName(i) === getLayerName(item))
-          return foundItem
-            ? foundItem
-            : {
-              layer: item.layer,
-              segment: null,
-            }
-        }
-
-        const getReduceExistingLayers = (newArr) => ([changed, unchanged], _curr) => {
-          const changedFlag = entryChanged(_curr, newArr)
-          return changedFlag
-            ? [ changed.concat( getItemFromLayerName(_curr, newArr) ), unchanged ]
-            : [ changed, unchanged.concat(_curr) ]
-        }
-
-        /**
-         * now, for all the previous layers, separate into changed and unchanged layers
-         */
-        const [changed, unchanged] = acc.reduce(getReduceExistingLayers(curr), [[], []])
-        return [...newEntries, ...changed, ...unchanged]
-      }
-
-      // TODO to be deprected soon
-
-      this.onHoverSegment$ = this.onHoverSegments$.pipe(
-        scan(sortByFreshness, []),
-        /**
-         * take the first element after sort by freshness
-         */
-        map(arr => arr[0]),
-        /**
-         * map to the older interface
-         */
-        filter(v => !!v),
-        map(({ segment }) => {
-          return {
-            labelIndex: (isNaN(segment) && Number(segment.labelIndex)) || null,
-            foundRegion: (isNaN(segment) && segment) || null,
-          }
-        }),
-      )
+      this.currOnHoverObsSub = this.currentOnHoverObs$.subscribe(({ segments }) => this.onHoverSegments$.next(segments))
     }
   }
 
@@ -724,30 +894,23 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public test(){
-    console.log('test')
-  }
-
   public toggleMaximiseMinimise(index: number) {
-    this.store.dispatch({
-      type: NG_VIEWER_ACTION_TYPES.TOGGLE_MAXIMISE,
-      payload: {
-        index,
-      },
-    })
+    this.store.dispatch(ngViewerActionToggleMax({
+      payload: { index }
+    }))
   }
 
   public tunableMobileProperties: ITunableProp[] = []
 
-  
+
   public selectedProp = null
 
   public returnTruePos(quadrant: number, data: any) {
-    const pos = quadrant > 2 ?
-      [0, 0, 0] :
-      this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant] ?
-        this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n => n * 1e6)) :
-        [0, 0, 0]
+    const pos = quadrant > 2
+      ? [0, 0, 0]
+      : this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant]
+        ? this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n => n * 1e6))
+        : [0, 0, 0]
     return pos
   }
 
@@ -759,6 +922,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
   public getPositionZ(quadrant: number, data: any) {
     return this.returnTruePos(quadrant, data)[2]
+  }
+
+  public handleMouseEnterCustomLandmark(lm) {
+    this.store.dispatch(
+      viewerStateMouseOverCustomLandmark({
+        payload: { userLandmark: lm }
+      })
+    )
+  }
+
+  public handleMouseLeaveCustomLandmark(lm) {
+    this.store.dispatch(
+      viewerStateMouseOverCustomLandmark({
+        payload: { userLandmark: null }
+      })
+    )
   }
 
   // handles mouse enter/leave landmarks in 2D
@@ -812,7 +991,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
      * TODO if plugin subscribes to viewerHandle, and then new template is selected, changes willl not be be sent
      * could be considered as a bug.
      */
-    this.apiService.interactiveViewer.viewerHandle = null
+    this.setViewerHandle && this.setViewerHandle(null)
     this.nehubaContainerDirective.clear()
 
     this.nehubaViewer = null
@@ -829,16 +1008,21 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   private setupViewerHandleApi() {
-    this.apiService.interactiveViewer.viewerHandle = {
+    const viewerHandle = {
       setNavigationLoc : (coord, realSpace?) => this.nehubaViewer.setNavigationState({
         position : coord,
         positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
       }),
       /* TODO introduce animation */
-      moveToNavigationLoc : (coord, realSpace?) => this.nehubaViewer.setNavigationState({
-        position : coord,
-        positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
-      }),
+      moveToNavigationLoc : (coord, realSpace?) => {
+        this.store.dispatch({
+          type: CHANGE_NAVIGATION,
+          navigation: {
+            position: coord,
+            animation: {},
+          },
+        })
+      },
       setNavigationOri : (quat) => this.nehubaViewer.setNavigationState({
         orientation : quat,
       }),
@@ -869,18 +1053,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         if (!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3)) {
           throw new Error('position needs to be a length 3 tuple of numbers ')
         }
-        this.store.dispatch({
-          type: VIEWERSTATE_ACTION_TYPES.ADD_USERLANDMARKS,
-          landmarks,
-        })
+
+        this.store.dispatch(viewerStateAddUserLandmarks({
+          landmarks
+        }))
       },
       remove3DLandmarks : landmarkIds => {
-        this.store.dispatch({
-          type: VIEWERSTATE_ACTION_TYPES.REMOVE_USER_LANDMARKS,
-          payload: {
-            landmarkIds,
-          },
-        })
+        this.store.dispatch(viewreStateRemoveUserLandmarks({
+          payload: { landmarkIds }
+        }))
       },
       hideSegment : (_labelIndex) => {
         /**
@@ -902,19 +1083,28 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
             selectRegionIds.push(generateLabelIndexId({ ngId, labelIndex }))
           })
         })
-        this.store.dispatch({
-          type : SELECT_REGIONS_WITH_ID,
-          selectRegionIds,
-        })
+        this.store.dispatch(viewerStateSelectRegionWithIdDeprecated({
+          selectRegionIds
+        }))
       },
       hideAllSegments : () => {
-        this.store.dispatch({
-          type : SELECT_REGIONS_WITH_ID,
-          selectRegions : [],
-        })
+        this.store.dispatch(viewerStateSelectRegionWithIdDeprecated({
+          selectRegionIds: []
+        }))
       },
       segmentColourMap : new Map(),
-      getLayersSegmentColourMap: () => this.nehubaViewer.multiNgIdColorMap,
+      getLayersSegmentColourMap: () => {
+        const newMainMap = new Map()
+        for (const [key, colormap] of this.nehubaViewer.multiNgIdColorMap.entries()) {
+          const newColormap = new Map()
+          newMainMap.set(key, newColormap)
+
+          for (const [lableIndex, entry] of colormap.entries()) {
+            newColormap.set(lableIndex, JSON.parse(JSON.stringify(entry)))
+          }
+        }
+        return newMainMap
+      },
       applyColourMap : (_map) => {
         throw new Error(`apply color map has been deprecated. use applyLayersColourMap instead`)
       },
@@ -942,47 +1132,52 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         ),
       ) ,
       mouseOverNehuba : this.onHoverSegment$.pipe(
-        tap(() => this.log.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.')),
+        tap(() => console.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.')),
       ),
       mouseOverNehubaLayers: this.onHoverSegments$,
+      mouseOverNehubaUI: this.currentOnHoverObs$.pipe(
+        map(({ landmark, segments, userLandmark: customLandmark }) => ({ segments, landmark, customLandmark })),
+        shareReplay(1),
+      ),
       getNgHash : this.nehubaViewer.getNgHash,
+    }
+
+    this.setViewerHandle && this.setViewerHandle(viewerHandle)
+  }
+
+  public setOctantRemoval(octantRemovalFlag: boolean) {
+    this.store.dispatch(
+      ngViewerActionSetPerspOctantRemoval({
+        octantRemovalFlag
+      })
+    )
+  }
+
+  public zoomNgView(panelIndex: number, factor: number) {
+    const ngviewer = this.nehubaViewer?.nehubaViewer?.ngviewer
+    if (!ngviewer) throw new Error(`ngviewer not defined!`)
+
+    /**
+     * panelIndex < 3 === slice view
+     */
+    if (panelIndex < 3) {
+      /**
+       * factor > 1 === zoom out
+       */
+      ngviewer.navigationState.zoomBy(factor)
+    } else {
+      ngviewer.perspectiveNavigationState.zoomBy(factor)
     }
   }
 
-}
-
-export const identifySrcElement = (element: HTMLElement) => {
-  const elementIsFirstRow = isFirstRow(element)
-  const elementIsFirstCell = isFirstCell(element)
-
-  return elementIsFirstCell && elementIsFirstRow
-    ? 0
-    : !elementIsFirstCell && elementIsFirstRow
-      ? 1
-      : elementIsFirstCell && !elementIsFirstRow
-        ? 2
-        : !elementIsFirstCell && !elementIsFirstRow
-          ? 3
-          : 4
-}
-
-export const takeOnePipe = [
-  scan((acc: Event[], event: Event) => {
-    const target = (event as Event).target as HTMLElement
+  public clearPreviewingDataset(id: string){
     /**
-     * 0 | 1
-     * 2 | 3
-     *
-     * 4 ???
+     * clear all preview
      */
-    const key = identifySrcElement(target)
-    const _ = {}
-    _[key] = event
-    return Object.assign({}, acc, _)
-  }, []),
-  filter(v => {
-    const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-    return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
-  }),
-  take(1),
-]
+    this.store.dispatch(
+      id
+        ? uiActionHideDatasetWithId({ id })
+        : uiActionHideAllDatasets()
+    )
+  }
+}

@@ -2,8 +2,14 @@ import { Component, Input } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
-import { SINGLE_PANEL } from "src/services/state/ngViewerState.store";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
+import { PANELS } from 'src/services/state/ngViewerState.store.helper'
+import { ARIA_LABELS } from 'common/constants'
+import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
+
+const {
+  MAXIMISE_VIEW,
+  UNMAXIMISE_VIEW,
+} = ARIA_LABELS
 
 @Component({
   selector: 'maximise-panel-button',
@@ -15,6 +21,9 @@ import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 export class MaximmisePanelButton {
 
+  public ARIA_LABEL_MAXIMISE_VIEW = MAXIMISE_VIEW
+  public ARIA_LABEL_UNMAXIMISE_VIEW = UNMAXIMISE_VIEW
+
   @Input() public panelIndex: number
 
   private panelMode$: Observable<string>
@@ -23,22 +32,20 @@ export class MaximmisePanelButton {
   public isMaximised$: Observable<boolean>
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
   ) {
     this.panelMode$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
     )
 
     this.panelOrder$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
     )
 
     this.isMaximised$ = this.panelMode$.pipe(
-      map(panelMode => panelMode === SINGLE_PANEL),
+      map(panelMode => panelMode === PANELS.SINGLE_PANEL),
     )
   }
 }

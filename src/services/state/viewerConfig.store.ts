@@ -1,11 +1,8 @@
 import { Action } from "@ngrx/store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 
-export interface StateInterface {
-  gpuLimit: number
-  animation: boolean
-  useMobileUI: boolean
-}
+import { IViewerConfigState as StateInterface } from './viewerConfig.store.helper'
+export { StateInterface }
 
 interface ViewerConfigurationAction extends Action {
   config: Partial<StateInterface>

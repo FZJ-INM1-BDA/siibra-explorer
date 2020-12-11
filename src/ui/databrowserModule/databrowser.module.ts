@@ -3,8 +3,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Optional } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
-import { UtilModule } from "src/util/util.module";
+import { UtilModule } from "src/util";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
 import { ModalityPicker, SortModalityAlphabeticallyPipe } from "./modalityPicker/modalityPicker.component";
@@ -25,25 +24,31 @@ import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
 import { GetKgSchemaIdFromFullIdPipe, getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
-import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
+import { DatasetPreviewList, UnavailableTooltip } from "./preview/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
-import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
-import { StoreModule } from "@ngrx/store";
+import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./preview/previewDatasetFile.directive";
 
 import {
-  stateStore,
   DatasetPreview
 } from 'src/services/state/dataStore.store'
 
 import {
   OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
 } from './constants'
-import { EffectsModule } from "@ngrx/effects";
-import { DataBrowserUseEffect } from "./databrowser.useEffect";
+import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
+import { FilterPreviewByType } from "./preview/filterPreview.pipe";
+import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
+import { LayerBrowserModule } from "../layerbrowser";
+import { DatabrowserDirective } from "./databrowser/databrowser.directive";
+import { ContributorModule } from "./contributor";
+import { DatabrowserService } from "./databrowser.service";
+import { ShownDatasetDirective } from "./shownDataset.directive";
+import { SingleDatasetSideNavView } from "./singleDataset/sideNavView/sDsSideNavView.component";
+import { RegionalFeaturesModule } from "../regionalFeatures";
+import { SingleDatasetDirective } from "./singleDataset/singleDataset.directive";
 
-export const DATESTORE_FEATURE_KEY = `dataStore`
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   if (overrideFn) return overrideFn
@@ -58,23 +63,30 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FormsModule,
     UtilModule,
     AngularMaterialModule,
-    StoreModule.forFeature(DATESTORE_FEATURE_KEY, stateStore),
-    EffectsModule.forFeature([ DataBrowserUseEffect ])
+    LayerBrowserModule,
+    ContributorModule,
+    RegionalFeaturesModule,
   ],
   declarations: [
     DataBrowser,
     ModalityPicker,
     SingleDatasetView,
+    SingleDatasetDirective,
     SingleDatasetListView,
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
+    PreviewCardComponent,
+    SingleDatasetSideNavView,
 
     /**
      * Directives
      */
     ShowDatasetDialogDirective,
     PreviewDatasetFile,
+    ShownPreviewsDirective,
+    DatabrowserDirective,
+    ShownDatasetDirective,
 
     /**
      * pipes
@@ -84,7 +96,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FilterDataEntriesbyMethods,
     FilterDataEntriesByRegion,
     AggregateArrayIntoRootPipe,
-    DoiParserPipe,
     DatasetIsFavedPipe,
     RegionBackgroundToRgbPipe,
     GetKgSchemaIdFromFullIdPipe,
@@ -95,11 +106,14 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
     TransformDatasetToIdPipe,
-    SortModalityAlphabeticallyPipe
+    SortModalityAlphabeticallyPipe,
+    PreviewFileTypePipe,
+    FilterPreviewByType,
   ],
   exports: [
     DataBrowser,
     SingleDatasetView,
+    SingleDatasetDirective,
     SingleDatasetListView,
     ModalityPicker,
     FilterDataEntriesbyMethods,
@@ -108,6 +122,13 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     TransformDatasetToIdPipe,
     ShowDatasetDialogDirective,
     PreviewDatasetFile,
+    PreviewFileTypePipe,
+    ShownPreviewsDirective,
+    FilterPreviewByType,
+    PreviewCardComponent,
+    DatabrowserDirective,
+    ShownDatasetDirective,
+    SingleDatasetSideNavView,
   ],
   entryComponents: [
     DataBrowser,
@@ -116,6 +137,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   ],
   providers: [
     KgSingleDatasetService,
+    DatabrowserService,
     {
       provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
       useValue: SingleDatasetView

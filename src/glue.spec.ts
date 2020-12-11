@@ -1,15 +1,22 @@
-import { TestBed, tick, fakeAsync } from "@angular/core/testing"
-import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview } from "./glue"
+import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/testing"
+import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
-import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles } from "./services/state/uiState.store.helper"
+import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
-import * as DATABROWSER_MODULE_EXPORTS from 'src/ui/databrowserModule'
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
 import { getIdObj } from 'common/util'
 import { DS_PREVIEW_URL } from 'src/util/constants'
+import { NgLayersService } from "./ui/layerbrowser/ngLayerService.service"
+import { EnumColorMapName } from "./util/colorMaps"
+import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
+import { tap, ignoreElements } from "rxjs/operators"
+import { merge, of } from "rxjs"
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./ui/databrowserModule/pure"
+import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
+import { generalActionError } from "./services/stateStore.helper"
 
 const mockActionOnSpyReturnVal0 = { 
   id: getRandomHex(),
@@ -32,7 +39,14 @@ let actionOnWidgetSpy
 const nifti = {
   mimetype: "application/nifti",
   url: "http://abc.xyz",
-  referenceSpaces: []
+  referenceSpaces: [],
+  volumeMetadata: {
+    min: 0.1,
+    max: 0.45,
+    colormap: 'viridis'
+  },
+  name: 'helloworld',
+  filename: 'foobar'
 }
 
 const chart = {
@@ -43,6 +57,24 @@ const chart = {
     }
   },
   referenceSpaces: []
+}
+
+const region0 = {
+  name: 'region0',
+  originDatasets: [{
+    kgId: getRandomHex(),
+    kgSchema: 'minds/core/dataset/v1.0.0',
+    filename: getRandomHex()
+  }]
+}
+
+const region1 = {
+  name: 'name',
+  originDatasets: [{
+    kgId: getRandomHex(),
+    kgSchema: 'minds/core/dataset/v1.0.0',
+    filename: getRandomHex()
+  }]
 }
 
 const file1 = {
@@ -66,6 +98,15 @@ const dataset1 = {
 
 describe('> glue.ts', () => {
   describe('> DatasetPreviewGlue', () => {
+
+    const initialState = {
+      uiState: {
+        previewingDatasetFiles: []
+      },
+      viewerState: {
+        regionsSelected: []
+      }
+    }
     beforeEach(() => {
       actionOnWidgetSpy = jasmine.createSpy('actionOnWidget').and.returnValues(
         mockActionOnSpyReturnVal0,
@@ -79,16 +120,13 @@ describe('> glue.ts', () => {
         providers: [
           DatasetPreviewGlue,
           provideMockStore({
-            initialState: {
-              uiState: {
-                previewingDatasetFiles: []
-              }
-            }
+            initialState
           }),
           {
             provide: ACTION_TO_WIDGET_TOKEN,
             useValue: actionOnWidgetSpy
-          }
+          },
+          NgLayersService
         ]
       })
     })
@@ -227,6 +265,8 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
         ctrl.expectNone({})
+
+        discardPeriodicTasks()
       }))
       it('> on set state, calls end point to fetch full data', fakeAsync(() => {
 
@@ -244,8 +284,64 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
 
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
+        discardPeriodicTasks()
+      }))
+
+      it('> on previewing nifti, thresholds, colormap and remove bg flag set properly', fakeAsync(() => {
+        const store = TestBed.inject(MockStore)
+        const ctrl = TestBed.inject(HttpTestingController)
+
+        const layerService = TestBed.inject(NgLayersService)
+
+        const highThresholdMapSpy = spyOn(layerService.highThresholdMap, 'set').and.callThrough()
+        const lowThresholdMapSpy = spyOn(layerService.lowThresholdMap, 'set').and.callThrough()
+        const colorMapMapSpy = spyOn(layerService.colorMapMap, 'set').and.callThrough()
+        const bgFlagSpy = spyOn(layerService.removeBgMap, 'set').and.callThrough()
+
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        store.setState({
+          uiState: {
+            previewingDatasetFiles: [ file1 ]
+          }
+        })
+
+        const { datasetId, filename } = file1
+        // debounce at 100ms
+        tick(200)
+
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
+        req.flush(nifti)
+
+        tick(200)
+        const { name, volumeMetadata } = nifti
+        const { min, max } = volumeMetadata
+        expect(highThresholdMapSpy).toHaveBeenCalledWith(name, max)
+        expect(lowThresholdMapSpy).toHaveBeenCalledWith(name, min)
+        expect(colorMapMapSpy).toHaveBeenCalledWith(name, EnumColorMapName.VIRIDIS)
+        expect(bgFlagSpy).toHaveBeenCalledWith(name, true)
+        discardPeriodicTasks()
+      }))
+
+      it('> if returns 404, should be handled gracefully', fakeAsync(() => {
+
+        const ctrl = TestBed.inject(HttpTestingController)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        const { datasetId, filename } = file3
+
+        const obs$ = glue.getDatasetPreviewFromId({ datasetId, filename })
+        let expectedVal = 'defined'
+        obs$.subscribe(val => expectedVal = val)
+        tick(200)
+
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${encodeURIComponent(datasetId)}/${encodeURIComponent(filename)}`)
+        req.flush(null, { status: 404, statusText: 'Not found' })
+
+        expect(expectedVal).toBeNull()
+        discardPeriodicTasks()
       }))
     })
 
@@ -264,6 +360,7 @@ describe('> glue.ts', () => {
         })
         tick(200)
         expect(actionOnWidgetSpy).not.toHaveBeenCalled()
+        discardPeriodicTasks()
       }))
 
       it('> correctly calls actionOnWidgetSpy on create', fakeAsync(() => {
@@ -290,7 +387,7 @@ describe('> glue.ts', () => {
 
         const [ type, cmp, option, ...rest ] = args[0]
         expect(type).toEqual(EnumActionToWidget.OPEN)
-
+        discardPeriodicTasks()
       }))
   
       it('> correctly calls actionOnWidgetSpy twice when needed', fakeAsync(() => {
@@ -336,6 +433,7 @@ describe('> glue.ts', () => {
 
         expect(cmp0).toBeTruthy()
         expect(cmp0).toBe(cmp1)
+        discardPeriodicTasks()
       }))
 
       it('> correctly calls actionOnWidgetSpy on change of state', fakeAsync(() => {
@@ -385,6 +483,7 @@ describe('> glue.ts', () => {
         expect(type1).toEqual(EnumActionToWidget.CLOSE)
         expect(cmp1).toBe(null)
         expect(option1.id).toEqual(mockActionOnSpyReturnVal1.id)
+        discardPeriodicTasks()
       }))
 
 
@@ -406,8 +505,332 @@ describe('> glue.ts', () => {
         req.flush(nifti)
 
         expect(actionOnWidgetSpy).not.toHaveBeenCalled()
+        discardPeriodicTasks()
       }))
       
+    })
+    
+    describe('> selectedRegionPreview$', () => {
+      it('> when one region with origindataset is selected, emits correctly', fakeAsync(() => {
+
+        const store = TestBed.inject(MockStore)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+        const ctrl = TestBed.inject(HttpTestingController)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [region1]
+          }
+        })
+        
+        const { kgSchema, kgId, filename } = region1.originDatasets[0]
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
+        req.flush(nifti)
+        tick(200)
+        expect(glue.selectedRegionPreview$).toBeObservable(
+          hot('a', {
+            a: region1.originDatasets
+          })
+        )
+
+        discardPeriodicTasks()
+      }))
+
+      it('> when regions are selected without originDatasets, emits empty array', () => {
+
+        const store = TestBed.inject(MockStore)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [{
+              ...region0,
+              originDatasets: []
+            }, {
+              ...region1,
+              originDatasets: []
+            }]
+          }
+        })
+        
+        expect(glue.selectedRegionPreview$).toBeObservable(
+          hot('a', {
+            a: []
+          })
+        )
+      })
+
+      it('> if multiple region, each with origin datasets are selected, emit array', fakeAsync(() => {
+
+        const store = TestBed.inject(MockStore)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+        const ctrl = TestBed.inject(HttpTestingController)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [region0, region1]
+          }
+        })
+        
+        const expectedOriginDatasets = [
+          ...region0.originDatasets,
+          ...region1.originDatasets,
+        ]
+
+        for (const { kgSchema, kgId, filename } of expectedOriginDatasets) {
+          const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
+          req.flush(nifti)
+        }
+        tick(200)
+        expect(glue.selectedRegionPreview$).toBeObservable(
+          hot('a', {
+            a: expectedOriginDatasets
+          })
+        )
+
+        discardPeriodicTasks()
+      }))
+
+      it('> if regions with multiple originDatasets are selected, emit array containing all origindatasets', fakeAsync(() => {
+
+        const store = TestBed.inject(MockStore)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+        const ctrl = TestBed.inject(HttpTestingController)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+        const originDatasets0 = [
+          ...region0.originDatasets,
+          {
+            kgId: getRandomHex(),
+            kgSchema: 'minds/core/dataset/v1.0.0',
+            filename: getRandomHex()
+          }
+        ]
+        const origindataset1 = [
+          ...region1.originDatasets,
+          {
+            kgSchema: 'minds/core/dataset/v1.0.0',
+            kgId: getRandomHex(),
+            filename: getRandomHex()
+          }
+        ]
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [{
+              ...region0,
+              originDatasets: originDatasets0
+            }, {
+              ...region1,
+              originDatasets: origindataset1
+            }]
+          }
+        })
+        
+        const expectedOriginDatasets = [
+          ...originDatasets0,
+          ...origindataset1,
+        ]
+
+        for (const { kgSchema, kgId, filename } of expectedOriginDatasets) {
+          const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
+          req.flush(nifti)
+        }
+        tick(200)
+        expect(glue.selectedRegionPreview$).toBeObservable(
+          hot('a', {
+            a: expectedOriginDatasets
+          })
+        )
+        discardPeriodicTasks()
+      }))
+    })
+
+    describe('> onRegionSelectChangeShowPreview$', () => {
+      it('> calls getDatasetPreviewFromId for each of the selectedRegion', fakeAsync(() => {
+
+        /**
+         * Testing Store observable 
+         * https://stackoverflow.com/a/61871144/6059235
+         */
+        const store = TestBed.inject(MockStore)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+        const ctrl = TestBed.inject(HttpTestingController)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+
+        const getDatasetPreviewFromIdSpy = spyOn(glue, 'getDatasetPreviewFromId').and.callThrough()
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [region1]
+          }
+        })
+        
+        const { kgSchema, kgId, filename } = region1.originDatasets[0]
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
+        req.flush(nifti)
+        tick(200)
+
+        for (const { kgId, kgSchema, filename } of region1.originDatasets) {
+          expect(getDatasetPreviewFromIdSpy).toHaveBeenCalledWith({
+            datasetId: kgId,
+            datasetSchema: kgSchema,
+            filename
+          })
+        }
+
+        expect(glue.onRegionSelectChangeShowPreview$).toBeObservable(
+          hot('a', {
+            a: [ {
+              ...nifti,
+              filename: region1.originDatasets[0].filename,
+              datasetId: region1.originDatasets[0].kgId,
+              datasetSchema: kgSchema,
+            } ]
+          })
+        )
+
+        discardPeriodicTasks()
+      }))
+    })
+
+    describe('> onRegionDeselectRemovePreview$', () => {
+      it('> on region selected [ region ] > [], emits', fakeAsync(() => {
+
+        const store = TestBed.inject(MockStore)
+        store.overrideSelector(ngViewerSelectorClearView, false)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        const regionsSelected$ = hot('bab', {
+          a: [region1],
+          b: []
+        })
+
+        const spy = spyOn(glue, 'getDatasetPreviewFromId')
+        spy.and.returnValue(of({
+          ...nifti,
+          filename: region1.originDatasets[0].filename,
+          datasetId: region1.originDatasets[0].kgId,
+        }))
+
+        const src$ = merge(
+          regionsSelected$.pipe(
+            tap(regionsSelected => store.setState({
+              ...initialState,
+              viewerState: {
+                regionsSelected
+              }
+            })),
+            ignoreElements()
+          ),
+          glue.onRegionDeselectRemovePreview$
+        )
+
+        src$.subscribe()
+
+        expect(glue.onRegionDeselectRemovePreview$).toBeObservable(
+          hot('bba', {
+            a: [{
+              ...nifti,
+              filename: region1.originDatasets[0].filename,
+              datasetId: region1.originDatasets[0].kgId,
+            }],
+            b: []
+          })
+        )
+
+        tick(200)
+        discardPeriodicTasks()
+      }))
+    })
+
+    describe('> onClearviewRemovePreview$', () => {
+      it('> on regions selected [ region ] > clear view selector returns true, emits ', fakeAsync(() => {
+        const store = TestBed.inject(MockStore)
+        store.overrideSelector(ngViewerSelectorClearView, true)
+
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        const spy = spyOn(glue, 'getDatasetPreviewFromId')
+        spy.and.returnValue(of({
+          ...nifti,
+          filename: region1.originDatasets[0].filename,
+          datasetId: region1.originDatasets[0].kgId,
+        }))
+
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [region1]
+          }
+        })
+
+        expect(glue.onClearviewRemovePreview$).toBeObservable(
+          hot('a', {
+            a: [{
+              ...nifti,
+              filename: region1.originDatasets[0].filename,
+              datasetId: region1.originDatasets[0].kgId,
+            }],
+            b: []
+          })
+        )
+
+        tick(200)
+        discardPeriodicTasks()
+      }))
+    })
+
+    describe('> onClearviewAddPreview$', () => {
+      it('> on region selected [ region ] > clear view selector returns false, emits', fakeAsync(() => {
+        const store = TestBed.inject(MockStore)
+        const overridenSelector = store.overrideSelector(ngViewerSelectorClearView, true)
+
+        /**
+         * skips first false
+         */
+        const overridenSelector$ = hot('bab', {
+          a: true,
+          b: false
+        })
+
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        const spy = spyOn(glue, 'getDatasetPreviewFromId')
+        spy.and.returnValue(of({
+          ...nifti,
+          filename: region1.originDatasets[0].filename,
+          datasetId: region1.originDatasets[0].kgId,
+        }))
+
+        store.setState({
+          ...initialState,
+          viewerState: {
+            regionsSelected: [region1]
+          }
+        })
+
+        overridenSelector$.subscribe(flag => {
+          overridenSelector.setResult(flag)
+          store.refreshState()
+        })
+
+        expect(glue.onClearviewAddPreview$).toBeObservable(
+          hot('--a', {
+            a: [{
+              ...nifti,
+              filename: region1.originDatasets[0].filename,
+              datasetId: region1.originDatasets[0].kgId,
+            }],
+            b: []
+          })
+        )
+
+        tick(200)
+        discardPeriodicTasks()
+      }))
     })
   })
 
@@ -486,5 +909,367 @@ describe('> glue.ts', () => {
         expect(args[1].previewingDatasetFiles).toEqual([ ])
       })
     })
+  })
+
+  describe('> GlueEffects', () => {
+
+    /**
+     * related to previews
+     */
+    const mockTemplate = {
+      fullId: 'bar'
+    }
+    const mockPreviewFileIds = {
+      datasetId: 'foo',
+      filename: 'bar'
+    }
+    const mockPreviewFileIds2 = {
+      datasetId: 'foo2',
+      filename: 'bar2'
+    }
+    const mockPreviewFileIds3 = {
+      datasetId: 'foo3',
+      filename: 'bar3'
+    }
+    const mockPreviewFileIds4 = {
+      datasetId: 'foo4',
+      filename: 'bar4'
+    }
+    const previewFileNoRefSpace = {
+      name: 'bla bla 4',
+      datasetId: 'foo4',
+      filename: 'bar4'
+    }
+    const fittingMockPreviewFile = {
+      name: 'bla bla2',
+      datasetId: 'foo2',
+      filename: 'bar2',
+      referenceSpaces: [{
+        fullId: 'bar'
+      }]
+    }
+    const mockPreviewFile = {
+      name: 'bla bla',
+      datasetId: 'foo',
+      filename: 'bar',
+      referenceSpaces: [{
+        fullId: 'hello world'
+      }]
+    }
+
+    const defaultState = {
+      viewerState: {
+        templateSelected: null,
+        parcellationSelected: null,
+        regionsSelected: []
+      },
+      uiState: {
+        previewingDatasetFiles: []
+      }
+    }
+
+    const mockGetDatasetPreviewFromId = jasmine.createSpy('getDatasetPreviewFromId')
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          GlueEffects,
+          provideMockStore({
+            initialState: defaultState
+          }),
+          {
+            provide: GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
+            useValue: mockGetDatasetPreviewFromId
+          }
+        ]
+      })
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds2).and.returnValue(
+        hot('(a|)', {
+          a: fittingMockPreviewFile
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs({ datasetId: 'foo', filename: 'bar' }).and.returnValue(
+        hot('(a|)', {
+          a: mockPreviewFile
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds3).and.returnValue(
+        hot('(a|)', {
+          a: null
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds4).and.returnValue(
+        hot('(a|)', {
+          a: previewFileNoRefSpace
+        })
+      )
+    })
+
+    afterEach(() => {
+      mockGetDatasetPreviewFromId.calls.reset()
+    })
+
+    describe('> regionTemplateParcChange$', () => {
+
+      const copiedState0 = JSON.parse(JSON.stringify(defaultState))
+      copiedState0.viewerState.regionsSelected = [{ name: 'coffee' }]
+      copiedState0.viewerState.parcellationSelected = { name: 'chicken' }
+      copiedState0.viewerState.templateSelected = { name: 'spinach' }
+
+      const generateTest = (m1, m2) => {
+
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.setState(copiedState0)
+        const glueEffects = TestBed.inject(GlueEffects)
+        /**
+         * couldn't get jasmine-marble to coopoerate
+         * TODO test proper with jasmine marble (?)
+         */
+        let numOfEmit = 0
+        const sub = glueEffects.regionTemplateParcChange$.subscribe(() => {
+          numOfEmit += 1
+        })
+
+        const copiedState1 = JSON.parse(JSON.stringify(copiedState0))
+        m1(copiedState1)
+        mockStore.setState(copiedState1)
+        expect(numOfEmit).toEqual(1)
+
+        const copiedState2 = JSON.parse(JSON.stringify(copiedState0))
+        m2(copiedState2)
+        mockStore.setState(copiedState2)
+        expect(numOfEmit).toEqual(2)
+
+        sub.unsubscribe()
+      }
+      
+      it('> on change of region, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.regionsSelected = [{ name: 'cake' }],
+          copiedState2 => copiedState2.viewerState.regionsSelected = [{ name: 't bone' }]
+        )
+      })
+
+      it('> on change of parcellation, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.parcellationSelected = { name: 'pizza' },
+          copiedState2 => copiedState2.viewerState.parcellationSelected = { name: 'pizza on pineapple' }
+        )
+      })
+
+      it('> on change of template, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.templateSelected = { name: 'calzone' },
+          copiedState2 => copiedState2.viewerState.templateSelected = { name: 'calzone on pineapple' }
+        )
+      })
+    })
+    
+  
+    describe('> unsuitablePreviews$', () => {
+
+      it('> calls injected getDatasetPreviewFromId', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds2])
+
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.unsuitablePreviews$).toBeObservable(
+          hot('')
+        )
+        /**
+         * calling twice, once to check if the dataset preview can be retrieved, the other to check the referenceSpace
+         */
+        expect(mockGetDatasetPreviewFromId).toHaveBeenCalledTimes(2)
+        expect(mockGetDatasetPreviewFromId).toHaveBeenCalledWith(mockPreviewFileIds2)
+      })
+
+      it('> if getDatasetPreviewFromId throws in event stream, handles gracefully', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds3])
+
+        const glueEffects = TestBed.inject(GlueEffects)
+        
+        expect(glueEffects.unsuitablePreviews$).toBeObservable(
+          hot('a', {
+            a: [ mockPreviewFileIds3 ]
+          })
+        )
+      })
+
+      describe('> filtering out dataset previews that do not satisfy reference space requirements', () => {
+        it('> if reference spaces does not match the selected reference template, will emit', () => {
+          const mockStore = TestBed.inject(MockStore)
+
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('a', {
+              a: [ mockPreviewFile ]
+            })
+          )
+        })
+      })
+
+      describe('> keeping dataset previews that satisfy reference space criteria', () => {
+        it('> if ref space is undefined, keep preview', () => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds4])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('')
+          )
+        })
+
+        it('> if ref space is defined, and matches, keep preview', () => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds2])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('')
+          )
+        })
+      })  
+    
+    })
+
+    describe('> uiRemoveUnsuitablePreviews$', () => {
+      it('> emits whenever unsuitablePreviews$ emits', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.uiRemoveUnsuitablePreviews$).toBeObservable(
+          hot('a', {
+            a: generalActionError({
+              message: `Dataset previews ${mockPreviewFile.name} cannot be displayed.`
+            })
+          })
+        )
+      })
+    })
+    
+    describe('> filterDatasetPreviewByTemplateSelected$', () => {
+
+      it('> remove 1 preview datasetfile depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [  ]
+            })
+          })
+        )
+
+      })
+      it('> remove 1 preview datasetfile (get preview info fail) depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds3])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [  ]
+            })
+          })
+        )
+
+      })
+      it('> remove 2 preview datasetfile depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds, mockPreviewFileIds2, mockPreviewFileIds4])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [ mockPreviewFileIds2, mockPreviewFileIds4 ]
+            })
+          })
+        )
+
+      })
+      
+    })
+
+  })
+
+  describe('> ClickInterceptorService', () => {
+    /**
+     * TODO finish writing the test for ClickInterceptorService
+     */
+
+    it('can obtain override fn', () => {
+
+    })
+
+    describe('> if getUserToSelectRegion.length === 0', () => {
+
+      it('by default, next fn will be called', () => {
+
+      })
+  
+      it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
+
+      })
+    })
+    describe('> if getUserToSelectRegion.length > 0', () => {
+      it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
+        
+      })
+      it('if multiple getUserToSelectRegion handler exists, it resolves in a LIFO manner', () => {
+
+      })
+
+      describe('> if spec is not set (defaults to parcellation region mode)', () => {
+
+        it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
+
+        })
+      })
+
+      describe('> if spec is set', () => {
+        describe('> if spec is set to PARCELLATION_REGION', () => {
+
+          it('> mouseoversegment.length === 0, will not call next, will not rs, will not call rj', () => {
+
+          })
+          
+          it('> mouseoversegment.length > 0, will not call next, will call rs', () => {
+
+          })
+        })
+
+        describe('> if spec is set to POINT', () => {
+          it('> rs is called if mouseoversegment.length === 0', () => {
+
+          })
+          it('> rs is called with correct arg if mouseoversegment.length > 0', () => {
+
+          })
+        })
+
+        describe('> if multiple getUserToSelectRegion exist', () => {
+          it('> only the last Promise will be evaluated', () => {
+
+      
+          })
+        })
+      })
+    })
+
   })
 })

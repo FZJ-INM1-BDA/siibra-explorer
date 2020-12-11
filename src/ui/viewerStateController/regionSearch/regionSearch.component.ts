@@ -1,21 +1,22 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { combineLatest, Observable, Subject, merge } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap, withLatestFrom } from "rxjs/operators";
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { PureContantService } from "src/util";
+import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
+import { ARIA_LABELS, CONST } from 'common/constants'
 
-const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
+const filterRegionBasedOnText = searchTerm => region => `${region.name.toLowerCase()}${region.status? ' (' + region.status + ')' : null}`.includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
 
-const compareFn = (it, item) => it.name === item.name
+const compareFn = (it, item) => it.name === item.name && it.status === item.status
 
 @Component({
   selector: 'region-text-search-autocomplete',
@@ -28,13 +29,23 @@ const compareFn = (it, item) => it.name === item.name
 
 export class RegionTextSearchAutocomplete {
 
+  public renderInputText(regionsSelected: any[]){
+    if (!regionsSelected) return ''
+    if (regionsSelected.length === 0) return ''
+    if (regionsSelected.length === 1) return regionsSelected[0].name || ''
+    return CONST.MULTI_REGION_SELECTION
+  }
+
+  public manualRenderList$: Subject<any> = new Subject()
+
   public compareFn = compareFn
 
-  @Input() public ariaLabel: string = `Search for any region of interest in the atlas selected`
+  public CLEAR_SELECTED_REGION = ARIA_LABELS.CLEAR_SELECTED_REGION
+
+  @Input() public ariaLabel: string = ARIA_LABELS.TEXT_INPUT_SEARCH_REGION
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
 
-  @ViewChild('autoTrigger', {read: ElementRef}) public autoTrigger: ElementRef
   @ViewChild('regionHierarchyDialog', {read: TemplateRef}) public regionHierarchyDialogTemplate: TemplateRef<any>
 
   public useMobileUI$: Observable<boolean>
@@ -44,11 +55,11 @@ export class RegionTextSearchAutocomplete {
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private log: LoggingService
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -82,20 +93,6 @@ export class RegionTextSearchAutocomplete {
       shareReplay(1),
     )
 
-    this.autocompleteList$ = combineLatest(
-      this.formControl.valueChanges.pipe(
-        startWith(''),
-        distinctUntilChanged(),
-        debounceTime(200),
-      ),
-      this.regionsWithLabelIndex$.pipe(
-        startWith([]),
-      ),
-    ).pipe(
-      map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
-      map(arr => arr.slice(0, 5)),
-    )
-
     this.regionsSelected$ = viewerState$.pipe(
       select('regionsSelected'),
       distinctUntilChanged(),
@@ -105,6 +102,27 @@ export class RegionTextSearchAutocomplete {
       }),
       startWith([]),
       shareReplay(1),
+    )
+
+    this.autocompleteList$ = combineLatest(
+      merge(
+        this.manualRenderList$.pipe(
+          withLatestFrom(this.regionsSelected$),
+          map(([_, selectedRegions]) => this.renderInputText(selectedRegions)),
+          startWith('')
+        ),
+        this.formControl.valueChanges.pipe(
+          startWith(''),
+          distinctUntilChanged(),
+          debounceTime(200),
+        )
+      ),
+      this.regionsWithLabelIndex$.pipe(
+        startWith([]),
+      ),
+    ).pipe(
+      map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
+      map(arr => arr.slice(0, 5)),
     )
 
     this.parcellationSelected$ = viewerState$.pipe(
@@ -138,8 +156,12 @@ export class RegionTextSearchAutocomplete {
     })
   }
 
-  public optionSelected(_ev: MatAutocompleteSelectedEvent) {
-    this.autoTrigger.nativeElement.value = ''
+  public optionSelected(_ev?: MatAutocompleteSelectedEvent) {
+    this.store$.dispatch(
+      viewerStateSetSelectedRegionsWithIds({
+        selectRegionIds: _ev ? [ _ev.option.value ] : []
+      })
+    )
   }
 
   private regionsWithLabelIndex$: Observable<any[]>
@@ -170,15 +192,20 @@ export class RegionTextSearchAutocomplete {
 
   // TODO handle mobile
   public handleRegionClick({ mode = null, region = null } = {}) {
-    const type = mode === 'single'
-      ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY
-      : mode === 'double'
-        ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY
-        : ''
-    this.store$.dispatch({
-      type,
-      payload: { region },
-    })
+    if (mode === 'single') {
+      this.store$.dispatch(
+        viewerStateToggleRegionSelect({
+          payload: { region }
+        })
+      )
+    }
+    if (mode === 'double') {
+      this.store$.dispatch(
+        viewerStateNavigateToRegion({
+          payload: { region }
+        })
+      )
+    }
   }
 
   public showHierarchy(_event: MouseEvent) {
@@ -208,4 +235,11 @@ export class RegionTextSearchAutocomplete {
     ).subscribe(() => this.focused = false)
   }
 
+  public deselectAndSelectRegion(region: any) {
+    this.store$.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: [ region ]
+      })
+    )
+  }
 }
