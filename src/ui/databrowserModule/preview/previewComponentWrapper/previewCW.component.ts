@@ -5,6 +5,7 @@ import { Observable, fromEvent, Subscription, of, throwError } from "rxjs";
 import { switchMapTo, catchError, take, concatMap, map, retryWhen, delay } from "rxjs/operators";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ARIA_LABELS } from 'common/constants'
+import { DS_PREVIEW_URL } from 'src/util/constants'
 
 const { 
   DOWNLOAD_PREVIEW,
@@ -78,6 +79,8 @@ export class PreviewComponentWrapper{
       this.backendUrl = backendUrl
       this.datasetName = datasetName
     }
+
+    this.backendUrl = this.backendUrl || DS_PREVIEW_URL
   }
 
   public downloadHref: SafeResourceUrl
