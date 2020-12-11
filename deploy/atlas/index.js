@@ -5,11 +5,12 @@ const path = require('path')
 const { detEncoding } = require('nomiseco')
 const { getAllAtlases, getAtlasById, isReady } = require('./query')
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
-
+const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 const { getTemplate } = require('../templates/query')
 const { getHandleErrorFn } = require('../util/streamHandleError')
 
 const getPreviewFn = ({ res, lastpart }) => HOSTNAME.replace(/\/$/, '') + '/' +
+  HOST_PATHNAME +
   (res.locals.routePathname
     ? url.resolve(`${res.locals.routePathname}/`, lastpart)
     : lastpart)
