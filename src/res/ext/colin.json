@@ -22,7 +22,7 @@
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
-          "kgId": "5249afa7-5e04-4ffd-8039-c3a9231f717c"
+          "kgId": "ef48c5e9-6b3c-4d5a-a9a9-e678fe10bdf6"
         }
       ],
       "properties": {
@@ -86,7 +86,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
                                 }
-                              }
+                              },
+                              "position": [
+                                -3548701,
+                                4529221,
+                                -7727273
+                              ]
                             },
                             {
                               "name": "Ch 123 (Basal Forebrain)",
@@ -116,7 +121,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
                                 }
-                              }
+                              },
+                              "position": [
+                                1930233,
+                                5279070,
+                                -7418605
+                              ]
                             }
                           ],
                           "_": {
@@ -167,7 +177,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
                                 }
-                              }
+                              },
+                              "position": [
+                                -17881226,
+                                -2647510,
+                                -12038314
+                              ]
                             },
                             {
                               "name": "Ch 4 (Basal Forebrain)",
@@ -197,7 +212,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
                                 }
-                              }
+                              },
+                              "position": [
+                                15376682,
+                                -771300,
+                                -11695067
+                              ]
                             }
                           ],
                           "_": {
@@ -248,7 +268,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
                                 }
-                              }
+                              },
+                              "position": [
+                                -3548701,
+                                4529221,
+                                -7727273
+                              ]
                             },
                             {
                               "name": "Ch 123 (Basal Forebrain)",
@@ -278,7 +303,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
                                 }
-                              }
+                              },
+                              "position": [
+                                1930233,
+                                5279070,
+                                -7418605
+                              ]
                             }
                           ],
                           "_": {
@@ -334,7 +364,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
                                 }
-                              }
+                              },
+                              "position": [
+                                -25100381,
+                                -4922490,
+                                -26100381
+                              ]
                             },
                             {
                               "name": "LB (Amygdala)",
@@ -364,7 +399,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
                                 }
-                              }
+                              },
+                              "position": [
+                                22325243,
+                                -2907767,
+                                -26996764
+                              ]
                             }
                           ],
                           "_": {
@@ -415,7 +455,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
                                 }
-                              }
+                              },
+                              "position": [
+                                -21063197,
+                                -6026022,
+                                -12613383
+                              ]
                             },
                             {
                               "name": "CM (Amygdala)",
@@ -445,7 +490,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
                                 }
-                              }
+                              },
+                              "position": [
+                                20000000,
+                                -4055556,
+                                -13007937
+                              ]
                             }
                           ],
                           "_": {
@@ -491,7 +541,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
                                 }
-                              }
+                              },
+                              "position": [
+                                -18454806,
+                                -2391679,
+                                -21770445
+                              ]
                             },
                             {
                               "name": "SF (Amygdala)",
@@ -521,7 +576,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
                                 }
-                              }
+                              },
+                              "position": [
+                                17345733,
+                                -361050,
+                                -22356674
+                              ]
                             }
                           ],
                           "_": {
@@ -572,7 +632,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
                                 }
-                              }
+                              },
+                              "position": [
+                                -24168067,
+                                -12798319,
+                                -15966387
+                              ]
                             },
                             {
                               "name": "VTM (Amygdala)",
@@ -602,7 +667,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
                                 }
-                              }
+                              },
+                              "position": [
+                                22257310,
+                                -11573099,
+                                -18643275
+                              ]
                             }
                           ],
                           "_": {
@@ -648,7 +718,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
                                 }
-                              }
+                              },
+                              "position": [
+                                -29457627,
+                                -1203390,
+                                -20045198
+                              ]
                             },
                             {
                               "name": "IF (Amygdala)",
@@ -678,7 +753,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
                                 }
-                              }
+                              },
+                              "position": [
+                                26575949,
+                                -151899,
+                                -19898734
+                              ]
                             }
                           ],
                           "_": {
@@ -724,7 +804,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
                                 }
-                              }
+                              },
+                              "position": [
+                                -18340206,
+                                -10082474,
+                                -17391753
+                              ]
                             },
                             {
                               "name": "MF (Amygdala)",
@@ -754,7 +839,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
                                 }
-                              }
+                              },
+                              "position": [
+                                16858586,
+                                -9585859,
+                                -16070707
+                              ]
                             }
                           ],
                           "_": {
@@ -805,7 +895,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
                                 }
-                              }
+                              },
+                              "position": [
+                                -21063197,
+                                -6026022,
+                                -12613383
+                              ]
                             },
                             {
                               "name": "CM (Amygdala)",
@@ -835,7 +930,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
                                 }
-                              }
+                              },
+                              "position": [
+                                20000000,
+                                -4055556,
+                                -13007937
+                              ]
                             }
                           ],
                           "_": {
@@ -896,7 +996,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
                                 }
-                              }
+                              },
+                              "position": [
+                                -16762327,
+                                -41316321,
+                                68790187
+                              ]
                             },
                             {
                               "name": "Area 5L (SPL)",
@@ -926,7 +1031,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
                                 }
-                              }
+                              },
+                              "position": [
+                                15716382,
+                                -44364480,
+                                70735550
+                              ]
                             }
                           ],
                           "_": {
@@ -966,7 +1076,12 @@
                               "fullId": {
                                 "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                 "kgId": "0aacea5c-bc9e-483f-8376-25f176ada158"
-                              }
+                              },
+                              "position": [
+                                -2850467,
+                                -75740988,
+                                37453939
+                              ]
                             },
                             {
                               "name": "Area 7M (SPL)",
@@ -990,7 +1105,12 @@
                               "fullId": {
                                 "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                 "kgId": "0aacea5c-bc9e-483f-8376-25f176ada158"
-                              }
+                              },
+                              "position": [
+                                4023734,
+                                -73276899,
+                                39651899
+                              ]
                             }
                           ],
                           "_": {
@@ -1036,7 +1156,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
                                 }
-                              }
+                              },
+                              "position": [
+                                -35596984,
+                                -42564085,
+                                63449623
+                              ]
                             },
                             {
                               "name": "Area 7PC (SPL)",
@@ -1066,7 +1191,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
                                 }
-                              }
+                              },
+                              "position": [
+                                30532242,
+                                -40516873,
+                                62561644
+                              ]
                             }
                           ],
                           "_": {
@@ -1112,7 +1242,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
                                 }
-                              }
+                              },
+                              "position": [
+                                -8972477,
+                                -37947821,
+                                56074828
+                              ]
                             },
                             {
                               "name": "Area 5M (SPL)",
@@ -1142,7 +1277,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
                                 }
-                              }
+                              },
+                              "position": [
+                                8475623,
+                                -39437291,
+                                61261630
+                              ]
                             }
                           ],
                           "_": {
@@ -1188,7 +1328,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
                                 }
-                              }
+                              },
+                              "position": [
+                                -7101277,
+                                -72388375,
+                                53470277
+                              ]
                             },
                             {
                               "name": "Area 7P (SPL)",
@@ -1218,7 +1363,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
                                 }
-                              }
+                              },
+                              "position": [
+                                15445219,
+                                -71023306,
+                                56556704
+                              ]
                             }
                           ],
                           "_": {
@@ -1264,7 +1414,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
                                 }
-                              }
+                              },
+                              "position": [
+                                -15564571,
+                                -32831643,
+                                43702502
+                              ]
                             },
                             {
                               "name": "Area 5Ci (SPL)",
@@ -1294,7 +1449,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
                                 }
-                              }
+                              },
+                              "position": [
+                                13800771,
+                                -31751238,
+                                46691249
+                              ]
                             }
                           ],
                           "_": {
@@ -1340,7 +1500,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
                                 }
-                              }
+                              },
+                              "position": [
+                                -19560190,
+                                -58240642,
+                                63200951
+                              ]
                             },
                             {
                               "name": "Area 7A (SPL)",
@@ -1370,7 +1535,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
                                 }
-                              }
+                              },
+                              "position": [
+                                22538150,
+                                -57960909,
+                                62806573
+                              ]
                             }
                           ],
                           "_": {
@@ -1421,7 +1591,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -41675325,
+                                -13328386,
+                                19757885
+                              ]
                             },
                             {
                               "name": "Area OP3 (POperc)",
@@ -1451,7 +1626,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
                                 }
-                              }
+                              },
+                              "position": [
+                                41527624,
+                                -7609807,
+                                19346685
+                              ]
                             }
                           ],
                           "_": {
@@ -1497,7 +1677,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
                                 }
-                              }
+                              },
+                              "position": [
+                                -58730749,
+                                -10453747,
+                                14528165
+                              ]
                             },
                             {
                               "name": "Area OP4 (POperc)",
@@ -1527,7 +1712,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
                                 }
-                              }
+                              },
+                              "position": [
+                                60631753,
+                                -4514227,
+                                12763299
+                              ]
                             }
                           ],
                           "_": {
@@ -1573,7 +1763,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
                                 }
-                              }
+                              },
+                              "position": [
+                                -35591700,
+                                -23669344,
+                                20382865
+                              ]
                             },
                             {
                               "name": "Area OP2 (POperc)",
@@ -1603,7 +1798,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
                                 }
-                              }
+                              },
+                              "position": [
+                                35754745,
+                                -19481752,
+                                20559124
+                              ]
                             }
                           ],
                           "_": {
@@ -1649,7 +1849,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -51070766,
+                                -23619901,
+                                19641842
+                              ]
                             },
                             {
                               "name": "Area OP1 (POperc)",
@@ -1679,7 +1884,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
                                 }
-                              }
+                              },
+                              "position": [
+                                50824579,
+                                -16587711,
+                                20076974
+                              ]
                             }
                           ],
                           "_": {
@@ -1730,7 +1940,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
                                 }
-                              }
+                              },
+                              "position": [
+                                -39331764,
+                                -22079161,
+                                51235630
+                              ]
                             },
                             {
                               "name": "Area 3b (PostCG)",
@@ -1760,7 +1975,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
                                 }
-                              }
+                              },
+                              "position": [
+                                39586892,
+                                -17580721,
+                                49239200
+                              ]
                             }
                           ],
                           "_": {
@@ -1806,7 +2026,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -39608240,
+                                -26841131,
+                                62746858
+                              ]
                             },
                             {
                               "name": "Area 1 (PostCG)",
@@ -1836,7 +2061,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
                                 }
-                              }
+                              },
+                              "position": [
+                                45540989,
+                                -19197478,
+                                58369067
+                              ]
                             }
                           ],
                           "_": {
@@ -1882,7 +2112,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
                                 }
-                              }
+                              },
+                              "position": [
+                                -42405956,
+                                -30530669,
+                                53781878
+                              ]
                             },
                             {
                               "name": "Area 2 (PostCS)",
@@ -1912,7 +2147,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
                                 }
-                              }
+                              },
+                              "position": [
+                                38882924,
+                                -28232212,
+                                54965502
+                              ]
                             }
                           ],
                           "_": {
@@ -1958,7 +2198,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -33214509,
+                                -21812565,
+                                44128775
+                              ]
                             },
                             {
                               "name": "Area 3a (PostCG)",
@@ -1988,7 +2233,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
                                 }
-                              }
+                              },
+                              "position": [
+                                36932856,
+                                -16667034,
+                                39960925
+                              ]
                             }
                           ],
                           "_": {
@@ -2039,7 +2289,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
                                 }
-                              }
+                              },
+                              "position": [
+                                -59998971,
+                                -38257202,
+                                34907922
+                              ]
                             },
                             {
                               "name": "Area PF (IPL)",
@@ -2069,7 +2324,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
                                 }
-                              }
+                              },
+                              "position": [
+                                64324820,
+                                -29257367,
+                                29041585
+                              ]
                             }
                           ],
                           "_": {
@@ -2115,7 +2375,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
                                 }
-                              }
+                              },
+                              "position": [
+                                -53340430,
+                                -38762592,
+                                24208333
+                              ]
                             },
                             {
                               "name": "Area PFcm (IPL)",
@@ -2145,7 +2410,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
                                 }
-                              }
+                              },
+                              "position": [
+                                53963238,
+                                -26476731,
+                                27000391
+                              ]
                             }
                           ],
                           "_": {
@@ -2191,7 +2461,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
                                 }
-                              }
+                              },
+                              "position": [
+                                -48030444,
+                                -61459553,
+                                39523050
+                              ]
                             },
                             {
                               "name": "Area PGa (IPL)",
@@ -2221,7 +2496,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
                                 }
-                              }
+                              },
+                              "position": [
+                                55611674,
+                                -51145578,
+                                33405278
+                              ]
                             }
                           ],
                           "_": {
@@ -2267,7 +2547,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
                                 }
-                              }
+                              },
+                              "position": [
+                                -55131927,
+                                -26529330,
+                                39001623
+                              ]
                             },
                             {
                               "name": "Area PFt (IPL)",
@@ -2297,7 +2582,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
                                 }
-                              }
+                              },
+                              "position": [
+                                54425254,
+                                -20076615,
+                                43272290
+                              ]
                             }
                           ],
                           "_": {
@@ -2343,7 +2633,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -53703835,
+                                -51539528,
+                                41387611
+                              ]
                             },
                             {
                               "name": "Area PFm (IPL)",
@@ -2373,7 +2668,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
                                 }
-                              }
+                              },
+                              "position": [
+                                57107508,
+                                -39637650,
+                                39924266
+                              ]
                             }
                           ],
                           "_": {
@@ -2419,7 +2719,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -44190711,
+                                -72664625,
+                                30472727
+                              ]
                             },
                             {
                               "name": "Area PGp (IPL)",
@@ -2449,7 +2754,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
                                 }
-                              }
+                              },
+                              "position": [
+                                48192355,
+                                -67774199,
+                                32883940
+                              ]
                             }
                           ],
                           "_": {
@@ -2495,7 +2805,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
                                 }
-                              }
+                              },
+                              "position": [
+                                -61353391,
+                                -25001433,
+                                25925979
+                              ]
                             },
                             {
                               "name": "Area PFop (IPL)",
@@ -2525,7 +2840,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
                                 }
-                              }
+                              },
+                              "position": [
+                                58420700,
+                                -15860086,
+                                28316243
+                              ]
                             }
                           ],
                           "_": {
@@ -2576,7 +2896,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
                                 }
-                              }
+                              },
+                              "position": [
+                                -15691673,
+                                -80478397,
+                                36770621
+                              ]
                             },
                             {
                               "name": "Area hPO1 (POS)",
@@ -2606,7 +2931,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
                                 }
-                              }
+                              },
+                              "position": [
+                                22585376,
+                                -80211613,
+                                38339355
+                              ]
                             }
                           ],
                           "_": {
@@ -2657,7 +2987,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
                                 }
-                              }
+                              },
+                              "position": [
+                                -37827533,
+                                -49504862,
+                                41958547
+                              ]
                             },
                             {
                               "name": "Area hIP1 (IPS)",
@@ -2687,7 +3022,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
                                 }
-                              }
+                              },
+                              "position": [
+                                41438928,
+                                -45900695,
+                                41333002
+                              ]
                             }
                           ],
                           "_": {
@@ -2733,7 +3073,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
                                 }
-                              }
+                              },
+                              "position": [
+                                -24776602,
+                                -80732421,
+                                29276914
+                              ]
                             },
                             {
                               "name": "Area hIP7 (IPS)",
@@ -2763,7 +3108,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
                                 }
-                              }
+                              },
+                              "position": [
+                                30860438,
+                                -77690504,
+                                30099577
+                              ]
                             }
                           ],
                           "_": {
@@ -2809,7 +3159,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -32517052,
+                                -50024569,
+                                49912725
+                              ]
                             },
                             {
                               "name": "Area hIP3 (IPS)",
@@ -2839,7 +3194,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
                                 }
-                              }
+                              },
+                              "position": [
+                                34211221,
+                                -47165211,
+                                50998059
+                              ]
                             }
                           ],
                           "_": {
@@ -2885,7 +3245,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
                                 }
-                              }
+                              },
+                              "position": [
+                                -48052549,
+                                -41322353,
+                                45270588
+                              ]
                             },
                             {
                               "name": "Area hIP2 (IPS)",
@@ -2915,7 +3280,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
                                 }
-                              }
+                              },
+                              "position": [
+                                45136585,
+                                -36684756,
+                                47735976
+                              ]
                             }
                           ],
                           "_": {
@@ -2961,7 +3331,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
                                 }
-                              }
+                              },
+                              "position": [
+                                -31699836,
+                                -81300711,
+                                26303991
+                              ]
                             },
                             {
                               "name": "Area hIP4 (IPS)",
@@ -2991,7 +3366,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
                                 }
-                              }
+                              },
+                              "position": [
+                                37816098,
+                                -75780000,
+                                25218537
+                              ]
                             }
                           ],
                           "_": {
@@ -3037,7 +3417,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
                                 }
-                              }
+                              },
+                              "position": [
+                                -28765674,
+                                -74300507,
+                                37834072
+                              ]
                             },
                             {
                               "name": "Area hIP5 (IPS)",
@@ -3067,7 +3452,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
                                 }
-                              }
+                              },
+                              "position": [
+                                34477500,
+                                -68099583,
+                                36289583
+                              ]
                             }
                           ],
                           "_": {
@@ -3113,7 +3503,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -31303173,
+                                -66671379,
+                                49390512
+                              ]
                             },
                             {
                               "name": "Area hIP6 (IPS)",
@@ -3143,7 +3538,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
                                 }
-                              }
+                              },
+                              "position": [
+                                38183132,
+                                -61417339,
+                                46713374
+                              ]
                             }
                           ],
                           "_": {
@@ -3189,7 +3589,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
                                 }
-                              }
+                              },
+                              "position": [
+                                -18383189,
+                                -72034199,
+                                43922950
+                              ]
                             },
                             {
                               "name": "Area hIP8 (IPS)",
@@ -3219,7 +3624,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
                                 }
-                              }
+                              },
+                              "position": [
+                                25661684,
+                                -69598348,
+                                42112116
+                              ]
                             }
                           ],
                           "_": {
@@ -3275,7 +3685,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -16982642,
+                                -72671167,
+                                15432015
+                              ]
                             },
                             {
                               "name": "Area hOc6 (POS)",
@@ -3305,7 +3720,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
                                 }
-                              }
+                              },
+                              "position": [
+                                18571084,
+                                -67711647,
+                                19470683
+                              ]
                             }
                           ],
                           "_": {
@@ -3351,7 +3771,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
                                 }
-                              }
+                              },
+                              "position": [
+                                -16990627,
+                                -88268584,
+                                26660633
+                              ]
                             },
                             {
                               "name": "Area hOc4d (Cuneus)",
@@ -3381,7 +3806,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
                                 }
-                              }
+                              },
+                              "position": [
+                                19818624,
+                                -85974133,
+                                29038649
+                              ]
                             }
                           ],
                           "_": {
@@ -3427,7 +3857,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
                                 }
-                              }
+                              },
+                              "position": [
+                                -12537617,
+                                -90512920,
+                                23986508
+                              ]
                             },
                             {
                               "name": "Area hOc3d (Cuneus)",
@@ -3457,7 +3892,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
                                 }
-                              }
+                              },
+                              "position": [
+                                15898575,
+                                -86919134,
+                                25085526
+                              ]
                             }
                           ],
                           "_": {
@@ -3508,7 +3948,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
                                 }
-                              }
+                              },
+                              "position": [
+                                -18256879,
+                                -86255748,
+                                -9910856
+                              ]
                             },
                             {
                               "name": "Area hOc3v (LingG)",
@@ -3538,7 +3983,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
                                 }
-                              }
+                              },
+                              "position": [
+                                23218143,
+                                -83244600,
+                                -9240641
+                              ]
                             }
                           ],
                           "_": {
@@ -3584,7 +4034,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
                                 }
-                              }
+                              },
+                              "position": [
+                                -26507202,
+                                -81176270,
+                                -11729151
+                              ]
                             },
                             {
                               "name": "Area hOc4v (LingG)",
@@ -3614,7 +4069,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
                                 }
-                              }
+                              },
+                              "position": [
+                                32530833,
+                                -78471250,
+                                -11235000
+                              ]
                             }
                           ],
                           "_": {
@@ -3665,7 +4125,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
                                 }
-                              }
+                              },
+                              "position": [
+                                -9586688,
+                                -86336554,
+                                3770370
+                              ]
                             },
                             {
                               "name": "Area hOc2 (V2, 18)",
@@ -3695,7 +4160,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
                                 }
-                              }
+                              },
+                              "position": [
+                                13584297,
+                                -84367377,
+                                3936329
+                              ]
                             }
                           ],
                           "_": {
@@ -3741,7 +4211,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
                                 }
-                              }
+                              },
+                              "position": [
+                                -10620384,
+                                -83575553,
+                                3523105
+                              ]
                             },
                             {
                               "name": "Area hOc1 (V1, 17, CalcS)",
@@ -3771,7 +4246,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
                                 }
-                              }
+                              },
+                              "position": [
+                                14599640,
+                                -80103304,
+                                4385960
+                              ]
                             }
                           ],
                           "_": {
@@ -3822,7 +4302,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
                                 }
-                              }
+                              },
+                              "position": [
+                                -32179701,
+                                -91388675,
+                                7224145
+                              ]
                             },
                             {
                               "name": "Area hOc4lp (LOC)",
@@ -3852,7 +4337,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
                                 }
-                              }
+                              },
+                              "position": [
+                                37111992,
+                                -86215064,
+                                7005699
+                              ]
                             }
                           ],
                           "_": {
@@ -3898,7 +4388,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -43221799,
+                                -74435976,
+                                2711128
+                              ]
                             },
                             {
                               "name": "Area hOc5 (LOC)",
@@ -3928,7 +4423,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
                                 }
-                              }
+                              },
+                              "position": [
+                                48679932,
+                                -65066046,
+                                5809483
+                              ]
                             }
                           ],
                           "_": {
@@ -3974,7 +4474,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "94365b82-6204-4937-8b86-fe0433287938"
                                 }
-                              }
+                              },
+                              "position": [
+                                -45070742,
+                                -80549345,
+                                731295
+                              ]
                             },
                             {
                               "name": "Area hOc4la (LOC)",
@@ -4004,7 +4509,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "94365b82-6204-4937-8b86-fe0433287938"
                                 }
-                              }
+                              },
+                              "position": [
+                                48124209,
+                                -73920857,
+                                1913780
+                              ]
                             }
                           ],
                           "_": {
@@ -4060,7 +4570,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
                                 }
-                              }
+                              },
+                              "position": [
+                                -53630706,
+                                14196758,
+                                13779206
+                              ]
                             },
                             {
                               "name": "Area 44 (IFG)",
@@ -4090,7 +4605,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
                                 }
-                              }
+                              },
+                              "position": [
+                                52946561,
+                                18579611,
+                                10780214
+                              ]
                             }
                           ],
                           "_": {
@@ -4136,7 +4656,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
                                 }
-                              }
+                              },
+                              "position": [
+                                -53738935,
+                                28243105,
+                                13056446
+                              ]
                             },
                             {
                               "name": "Area 45 (IFG)",
@@ -4166,7 +4691,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
                                 }
-                              }
+                              },
+                              "position": [
+                                51475262,
+                                31085157,
+                                11847158
+                              ]
                             }
                           ],
                           "_": {
@@ -4217,7 +4747,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -14520362,
+                                4868082,
+                                67607727
+                              ]
                             },
                             {
                               "name": "Area 6d2 (PreCG)",
@@ -4247,7 +4782,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
                                 }
-                              }
+                              },
+                              "position": [
+                                14317128,
+                                7590098,
+                                67421945
+                              ]
                             }
                           ],
                           "_": {
@@ -4293,7 +4833,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -20067756,
+                                -11031665,
+                                67739871
+                              ]
                             },
                             {
                               "name": "Area 6d1 (PreCG)",
@@ -4323,7 +4868,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
                                 }
-                              }
+                              },
+                              "position": [
+                                18136695,
+                                -10160740,
+                                67869280
+                              ]
                             }
                           ],
                           "_": {
@@ -4374,7 +4924,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
                                 }
-                              }
+                              },
+                              "position": [
+                                -6727533,
+                                7410727,
+                                57793802
+                              ]
                             },
                             {
                               "name": "Area 6ma (preSMA, mesial SFG)",
@@ -4404,7 +4959,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
                                 }
-                              }
+                              },
+                              "position": [
+                                6794685,
+                                8078166,
+                                56590151
+                              ]
                             }
                           ],
                           "_": {
@@ -4455,7 +5015,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
                                 }
-                              }
+                              },
+                              "position": [
+                                -24245445,
+                                4776349,
+                                53464452
+                              ]
                             },
                             {
                               "name": "Area 6d3 (SFS)",
@@ -4485,7 +5050,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
                                 }
-                              }
+                              },
+                              "position": [
+                                24075356,
+                                5586857,
+                                55091566
+                              ]
                             }
                           ],
                           "_": {
@@ -4536,7 +5106,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
                                 }
-                              }
+                              },
+                              "position": [
+                                -20297002,
+                                63376660,
+                                -2094433
+                              ]
                             },
                             {
                               "name": "Area Fp1 (FPole)",
@@ -4566,7 +5141,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
                                 }
-                              }
+                              },
+                              "position": [
+                                17333243,
+                                65041111,
+                                -3286142
+                              ]
                             }
                           ],
                           "_": {
@@ -4612,7 +5192,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
                                 }
-                              }
+                              },
+                              "position": [
+                                -7415640,
+                                61441994,
+                                -4867373
+                              ]
                             },
                             {
                               "name": "Area Fp2 (FPole)",
@@ -4642,7 +5227,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
                                 }
-                              }
+                              },
+                              "position": [
+                                6276730,
+                                63568457,
+                                -2251089
+                              ]
                             }
                           ],
                           "_": {
@@ -4693,7 +5283,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -36026446,
+                                -18998072,
+                                49610468
+                              ]
                             },
                             {
                               "name": "Area 4p (PreCG)",
@@ -4723,7 +5318,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
                                 }
-                              }
+                              },
+                              "position": [
+                                36088744,
+                                -14927417,
+                                47977601
+                              ]
                             }
                           ],
                           "_": {
@@ -4769,7 +5369,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
                                 }
-                              }
+                              },
+                              "position": [
+                                -21743555,
+                                -20802503,
+                                64479572
+                              ]
                             },
                             {
                               "name": "Area 4a (PreCG)",
@@ -4799,7 +5404,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
                                 }
-                              }
+                              },
+                              "position": [
+                                19700505,
+                                -21279275,
+                                65322522
+                              ]
                             }
                           ],
                           "_": {
@@ -4850,7 +5460,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
                                 }
-                              }
+                              },
+                              "position": [
+                                -6051915,
+                                -9624255,
+                                58136596
+                              ]
                             },
                             {
                               "name": "Area 6mp (SMA, mesial SFG)",
@@ -4880,7 +5495,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
                                 }
-                              }
+                              },
+                              "position": [
+                                6012455,
+                                -9297710,
+                                55927682
+                              ]
                             }
                           ],
                           "_": {
@@ -4931,7 +5551,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
                                 }
-                              }
+                              },
+                              "position": [
+                                -10985563,
+                                39681424,
+                                -23859480
+                              ]
                             },
                             {
                               "name": "Area Fo1 (OFC)",
@@ -4961,7 +5586,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
                                 }
-                              }
+                              },
+                              "position": [
+                                8616111,
+                                39667778,
+                                -23714444
+                              ]
                             }
                           ],
                           "_": {
@@ -5007,7 +5637,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
                                 }
-                              }
+                              },
+                              "position": [
+                                -23312951,
+                                31583200,
+                                -20098837
+                              ]
                             },
                             {
                               "name": "Area Fo3 (OFC)",
@@ -5037,7 +5672,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
                                 }
-                              }
+                              },
+                              "position": [
+                                20391198,
+                                36338905,
+                                -19445177
+                              ]
                             }
                           ],
                           "_": {
@@ -5083,7 +5723,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -11171064,
+                                20344255,
+                                -21093617
+                              ]
                             },
                             {
                               "name": "Area Fo2 (OFC)",
@@ -5113,7 +5758,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
                                 }
-                              }
+                              },
+                              "position": [
+                                8516533,
+                                20857214,
+                                -20438377
+                              ]
                             }
                           ],
                           "_": {
@@ -5164,7 +5814,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "af208413-1233-4512-9395-8ac2c4533875"
                                 }
-                              }
+                              },
+                              "position": [
+                                -51891963,
+                                4022837,
+                                4707510
+                              ]
                             },
                             {
                               "name": "Area OP6 (Frontal Operculum)",
@@ -5194,7 +5849,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "af208413-1233-4512-9395-8ac2c4533875"
                                 }
-                              }
+                              },
+                              "position": [
+                                52807895,
+                                7888158,
+                                4111842
+                              ]
                             }
                           ],
                           "_": {
@@ -5235,7 +5895,12 @@
                                 76,
                                 168
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                -41772296,
+                                18902593,
+                                5057559
+                              ]
                             },
                             {
                               "name": "Area OP8 (Frontal Operculum)",
@@ -5260,7 +5925,12 @@
                                 76,
                                 168
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                42090110,
+                                19219048,
+                                5112821
+                              ]
                             }
                           ],
                           "_": {
@@ -5301,7 +5971,12 @@
                                 78,
                                 253
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                -45589049,
+                                -4545126,
+                                14179904
+                              ]
                             },
                             {
                               "name": "Area OP5 (Frontal Operculum)",
@@ -5326,7 +6001,12 @@
                                 78,
                                 253
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                44914992,
+                                2209380,
+                                10469430
+                              ]
                             }
                           ],
                           "_": {
@@ -5367,7 +6047,12 @@
                                 123,
                                 34
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                -45722344,
+                                27978094,
+                                2607338
+                              ]
                             },
                             {
                               "name": "Area OP9 (Frontal Operculum)",
@@ -5392,7 +6077,12 @@
                                 123,
                                 34
                               ],
-                              "fullId": {}
+                              "fullId": {},
+                              "position": [
+                                40487508,
+                                30337610,
+                                1191087
+                              ]
                             }
                           ],
                           "_": {
@@ -5438,7 +6128,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c7fca306-e515-40bc-a61e-8014ddd45ddc"
                                 }
-                              }
+                              },
+                              "position": [
+                                -40036545,
+                                8523810,
+                                9121816
+                              ]
                             },
                             {
                               "name": "Area OP7 (Frontal Operculum)",
@@ -5468,7 +6163,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c7fca306-e515-40bc-a61e-8014ddd45ddc"
                                 }
-                              }
+                              },
+                              "position": [
+                                36300662,
+                                16079470,
+                                10785430
+                              ]
                             }
                           ],
                           "_": {
@@ -5519,7 +6219,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
                                 }
-                              }
+                              },
+                              "position": [
+                                -43984615,
+                                44280000,
+                                -14087179
+                              ]
                             },
                             {
                               "name": "Area Fo6 (OFC)",
@@ -5549,7 +6254,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
                                 }
-                              }
+                              },
+                              "position": [
+                                46085903,
+                                42789097,
+                                -14029736
+                              ]
                             }
                           ],
                           "_": {
@@ -5595,7 +6305,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -39085450,
+                                56408776,
+                                -10568129
+                              ]
                             },
                             {
                               "name": "Area Fo5 (OFC)",
@@ -5625,7 +6340,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
                                 }
-                              }
+                              },
+                              "position": [
+                                38494860,
+                                57555066,
+                                -9088106
+                              ]
                             }
                           ],
                           "_": {
@@ -5671,7 +6391,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
                                 }
-                              }
+                              },
+                              "position": [
+                                -37804921,
+                                39697715,
+                                -13179848
+                              ]
                             },
                             {
                               "name": "Area Fo7 (OFC)",
@@ -5701,7 +6426,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
                                 }
-                              }
+                              },
+                              "position": [
+                                35208489,
+                                42781523,
+                                -13541199
+                              ]
                             }
                           ],
                           "_": {
@@ -5747,7 +6477,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -29718519,
+                                52777037,
+                                -14560741
+                              ]
                             },
                             {
                               "name": "Area Fo4 (OFC)",
@@ -5777,7 +6512,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
                                 }
-                              }
+                              },
+                              "position": [
+                                30402742,
+                                54808912,
+                                -14593830
+                              ]
                             }
                           ],
                           "_": {
@@ -5833,7 +6573,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10dba769-4f6c-40f9-8ffd-e0cce71c5adb"
                                 }
-                              }
+                              },
+                              "position": [
+                                -38178368,
+                                -14493359,
+                                14464896
+                              ]
                             },
                             {
                               "name": "Area Ig3 (Insula)",
@@ -5863,7 +6608,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "10dba769-4f6c-40f9-8ffd-e0cce71c5adb"
                                 }
-                              }
+                              },
+                              "position": [
+                                37532824,
+                                -12032061,
+                                14906870
+                              ]
                             }
                           ],
                           "_": {
@@ -5909,7 +6659,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -33429542,
+                                -25786078,
+                                9609508
+                              ]
                             },
                             {
                               "name": "Area Ig1 (Insula)",
@@ -5939,7 +6694,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
                                 }
-                              }
+                              },
+                              "position": [
+                                33928302,
+                                -22864151,
+                                9894340
+                              ]
                             }
                           ],
                           "_": {
@@ -5985,7 +6745,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -37490395,
+                                -19916384,
+                                6461017
+                              ]
                             },
                             {
                               "name": "Area Ig2 (Insula)",
@@ -6015,7 +6780,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
                                 }
-                              }
+                              },
+                              "position": [
+                                37249491,
+                                -16741344,
+                                6854379
+                              ]
                             }
                           ],
                           "_": {
@@ -6066,7 +6836,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
                                 }
-                              }
+                              },
+                              "position": [
+                                -41536585,
+                                -4217073,
+                                -8356098
+                              ]
                             },
                             {
                               "name": "Area Ia (Insula)",
@@ -6096,7 +6871,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
                                 }
-                              }
+                              },
+                              "position": [
+                                39639604,
+                                -188119,
+                                -8358416
+                              ]
                             }
                           ],
                           "_": {
@@ -6147,7 +6927,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -32824247,
+                                24831570,
+                                2187958
+                              ]
                             },
                             {
                               "name": "Area Id7 (Insula)",
@@ -6177,7 +6962,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
                                 }
-                              }
+                              },
+                              "position": [
+                                32245944,
+                                26382579,
+                                2374893
+                              ]
                             }
                           ],
                           "_": {
@@ -6228,7 +7018,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cf9dea67-649d-4034-ae57-ec389f339277"
                                 }
-                              }
+                              },
+                              "position": [
+                                -41535168,
+                                -12691131,
+                                5934251
+                              ]
                             },
                             {
                               "name": "Area Id2 (Insula)",
@@ -6258,7 +7053,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cf9dea67-649d-4034-ae57-ec389f339277"
                                 }
-                              }
+                              },
+                              "position": [
+                                40766881,
+                                -9432476,
+                                4760450
+                              ]
                             }
                           ],
                           "_": {
@@ -6304,7 +7104,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c22055c1-514f-4096-906b-abf57286053b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -41006472,
+                                -20493528,
+                                -4694175
+                              ]
                             },
                             {
                               "name": "Area Id1 (Insula)",
@@ -6334,7 +7139,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "c22055c1-514f-4096-906b-abf57286053b"
                                 }
-                              }
+                              },
+                              "position": [
+                                38913043,
+                                -16869565,
+                                -4777778
+                              ]
                             }
                           ],
                           "_": {
@@ -6380,7 +7190,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
                                 }
-                              }
+                              },
+                              "position": [
+                                -40065245,
+                                -4782936,
+                                1373902
+                              ]
                             },
                             {
                               "name": "Area Id5 (Insula)",
@@ -6410,7 +7225,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
                                 }
-                              }
+                              },
+                              "position": [
+                                38101000,
+                                -1718000,
+                                1389000
+                              ]
                             }
                           ],
                           "_": {
@@ -6456,7 +7276,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
                                 }
-                              }
+                              },
+                              "position": [
+                                -36913985,
+                                9618783,
+                                2710064
+                              ]
                             },
                             {
                               "name": "Area Id6 (Insula)",
@@ -6486,7 +7311,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
                                 }
-                              }
+                              },
+                              "position": [
+                                35099655,
+                                11839655,
+                                3893793
+                              ]
                             }
                           ],
                           "_": {
@@ -6532,7 +7362,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
                                 }
-                              }
+                              },
+                              "position": [
+                                -37901252,
+                                -4670376,
+                                11835883
+                              ]
                             },
                             {
                               "name": "Area Id4 (Insula)",
@@ -6562,7 +7397,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
                                 }
-                              }
+                              },
+                              "position": [
+                                36554419,
+                                -1692093,
+                                12138605
+                              ]
                             }
                           ],
                           "_": {
@@ -6608,7 +7448,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3dcfcfc2-035c-4785-a820-a671f2104ac3"
                                 }
-                              }
+                              },
+                              "position": [
+                                -41390293,
+                                -10302326,
+                                -8498483
+                              ]
                             },
                             {
                               "name": "Area Id3 (Insula)",
@@ -6638,7 +7483,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3dcfcfc2-035c-4785-a820-a671f2104ac3"
                                 }
-                              }
+                              },
+                              "position": [
+                                38751944,
+                                -6059876,
+                                -10113530
+                              ]
                             }
                           ],
                           "_": {
@@ -6694,7 +7544,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
                                 }
-                              }
+                              },
+                              "position": [
+                                -57592826,
+                                -7986993,
+                                -16739653
+                              ]
                             },
                             {
                               "name": "Area STS2 (STS)",
@@ -6724,7 +7579,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
                                 }
-                              }
+                              },
+                              "position": [
+                                55016082,
+                                -7455774,
+                                -16234159
+                              ]
                             }
                           ],
                           "_": {
@@ -6770,7 +7630,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
                                 }
-                              }
+                              },
+                              "position": [
+                                -55258779,
+                                -18378691,
+                                -6910615
+                              ]
                             },
                             {
                               "name": "Area STS1 (STS)",
@@ -6800,7 +7665,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
                                 }
-                              }
+                              },
+                              "position": [
+                                52705153,
+                                -16203244,
+                                -5240935
+                              ]
                             }
                           ],
                           "_": {
@@ -6851,7 +7721,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
                                 }
-                              }
+                              },
+                              "position": [
+                                -63445943,
+                                -11664971,
+                                -790130
+                              ]
                             },
                             {
                               "name": "Area TE 3 (STG)",
@@ -6881,7 +7756,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
                                 }
-                              }
+                              },
+                              "position": [
+                                63181686,
+                                -7852289,
+                                -438575
+                              ]
                             }
                           ],
                           "_": {
@@ -6927,7 +7807,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9ecfd5e0-dc37-4303-894d-a897faa51d61"
                                 }
-                              }
+                              },
+                              "position": [
+                                -54912346,
+                                -30433687,
+                                9611859
+                              ]
                             },
                             {
                               "name": "Area TE 2.2 (STG)",
@@ -6957,7 +7842,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9ecfd5e0-dc37-4303-894d-a897faa51d61"
                                 }
-                              }
+                              },
+                              "position": [
+                                55021858,
+                                -20868852,
+                                11677883
+                              ]
                             }
                           ],
                           "_": {
@@ -7003,7 +7893,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3332ad65-a5e6-436f-95f0-c634fbcb075c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -55134625,
+                                -18498305,
+                                5725908
+                              ]
                             },
                             {
                               "name": "Area TE 2.1 (STG)",
@@ -7033,7 +7928,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "3332ad65-a5e6-436f-95f0-c634fbcb075c"
                                 }
-                              }
+                              },
+                              "position": [
+                                56565440,
+                                -10330266,
+                                1611452
+                              ]
                             }
                           ],
                           "_": {
@@ -7084,7 +7984,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "80dfab1a-cbdc-4ef1-9e7a-804a4c0a7e43"
                                 }
-                              }
+                              },
+                              "position": [
+                                -47546463,
+                                -2255895,
+                                -12341886
+                              ]
                             },
                             {
                               "name": "Area TI (STG)",
@@ -7114,7 +8019,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "80dfab1a-cbdc-4ef1-9e7a-804a4c0a7e43"
                                 }
-                              }
+                              },
+                              "position": [
+                                45039847,
+                                1295785,
+                                -14623755
+                              ]
                             }
                           ],
                           "_": {
@@ -7160,7 +8070,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0eff5159-a136-4b42-b591-f17fbc82ae8a"
                                 }
-                              }
+                              },
+                              "position": [
+                                -49284180,
+                                -6644953,
+                                -3729420
+                              ]
                             },
                             {
                               "name": "Area TeI (STG)",
@@ -7190,7 +8105,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0eff5159-a136-4b42-b591-f17fbc82ae8a"
                                 }
-                              }
+                              },
+                              "position": [
+                                47198795,
+                                -3030120,
+                                -4697935
+                              ]
                             }
                           ],
                           "_": {
@@ -7241,7 +8161,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
                                 }
-                              }
+                              },
+                              "position": [
+                                -52068966,
+                                -6006466,
+                                4226293
+                              ]
                             },
                             {
                               "name": "Area TE 1.2 (HESCHL)",
@@ -7271,7 +8196,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
                                 }
-                              }
+                              },
+                              "position": [
+                                53780172,
+                                -174569,
+                                -825431
+                              ]
                             }
                           ],
                           "_": {
@@ -7317,7 +8247,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
                                 }
-                              }
+                              },
+                              "position": [
+                                -39696607,
+                                -29506986,
+                                12510978
+                              ]
                             },
                             {
                               "name": "Area TE 1.1 (HESCHL)",
@@ -7347,7 +8282,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
                                 }
-                              }
+                              },
+                              "position": [
+                                41275022,
+                                -23095735,
+                                12500435
+                              ]
                             }
                           ],
                           "_": {
@@ -7393,7 +8333,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
                                 }
-                              }
+                              },
+                              "position": [
+                                -47472291,
+                                -19781638,
+                                8928040
+                              ]
                             },
                             {
                               "name": "Area TE 1.0 (HESCHL)",
@@ -7423,7 +8368,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
                                 }
-                              }
+                              },
+                              "position": [
+                                49841502,
+                                -11226277,
+                                6325339
+                              ]
                             }
                           ],
                           "_": {
@@ -7474,7 +8424,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
                                 }
-                              }
+                              },
+                              "position": [
+                                -43565263,
+                                -69015091,
+                                -14836908
+                              ]
                             },
                             {
                               "name": "Area FG2 (FusG)",
@@ -7504,7 +8459,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
                                 }
-                              }
+                              },
+                              "position": [
+                                43867911,
+                                -63765058,
+                                -15663262
+                              ]
                             }
                           ],
                           "_": {
@@ -7550,7 +8510,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -32840338,
+                                -48887750,
+                                -14858790
+                              ]
                             },
                             {
                               "name": "Area FG3 (FusG)",
@@ -7580,7 +8545,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
                                 }
-                              }
+                              },
+                              "position": [
+                                32063677,
+                                -46162616,
+                                -15439233
+                              ]
                             }
                           ],
                           "_": {
@@ -7626,7 +8596,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
                                 }
-                              }
+                              },
+                              "position": [
+                                -30085944,
+                                -69372566,
+                                -12423793
+                              ]
                             },
                             {
                               "name": "Area FG1 (FusG)",
@@ -7656,7 +8631,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
                                 }
-                              }
+                              },
+                              "position": [
+                                32570126,
+                                -65627877,
+                                -11029092
+                              ]
                             }
                           ],
                           "_": {
@@ -7702,7 +8682,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
                                 }
-                              }
+                              },
+                              "position": [
+                                -44220151,
+                                -49083172,
+                                -17879198
+                              ]
                             },
                             {
                               "name": "Area FG4 (FusG)",
@@ -7732,7 +8717,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
                                 }
-                              }
+                              },
+                              "position": [
+                                42831284,
+                                -44658698,
+                                -20318534
+                              ]
                             }
                           ],
                           "_": {
@@ -7783,7 +8773,12 @@
                                 161,
                                 93
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                -8803708,
+                                -28673386,
+                                31871349
+                              ]
                             },
                             {
                               "name": "Frontal-to-Occipital (GapMap)",
@@ -7808,7 +8803,12 @@
                                 161,
                                 93
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                9180865,
+                                -31226075,
+                                33220053
+                              ]
                             }
                           ],
                           "_": {
@@ -7849,7 +8849,12 @@
                                 90,
                                 161
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                -48575201,
+                                -33483993,
+                                -12047349
+                              ]
                             },
                             {
                               "name": "Temporal-to-Parietal (GapMap)",
@@ -7874,7 +8879,12 @@
                                 90,
                                 161
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                46635586,
+                                -28799197,
+                                -13056716
+                              ]
                             }
                           ],
                           "_": {
@@ -7915,7 +8925,12 @@
                                 255,
                                 25
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                -27450603,
+                                37871747,
+                                31251002
+                              ]
                             },
                             {
                               "name": "Frontal-I (GapMap)",
@@ -7940,7 +8955,12 @@
                                 255,
                                 25
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                25548298,
+                                41342322,
+                                29143319
+                              ]
                             }
                           ],
                           "_": {
@@ -7981,7 +9001,12 @@
                                 24,
                                 74
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                -33177054,
+                                5295574,
+                                -13555156
+                              ]
                             },
                             {
                               "name": "Frontal-to-Temporal (GapMap)",
@@ -8006,7 +9031,12 @@
                                 24,
                                 74
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                27911513,
+                                5714253,
+                                -11534403
+                              ]
                             }
                           ],
                           "_": {
@@ -8047,7 +9077,12 @@
                                 135,
                                 15
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                -44379997,
+                                4955605,
+                                38805811
+                              ]
                             },
                             {
                               "name": "Frontal-II (GapMap)",
@@ -8072,7 +9107,12 @@
                                 135,
                                 15
                               ],
-                              "fullId": null
+                              "fullId": null,
+                              "position": [
+                                42376801,
+                                9588781,
+                                37531489
+                              ]
                             }
                           ],
                           "_": {
@@ -8128,7 +9168,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
                                 }
-                              }
+                              },
+                              "position": [
+                                -10825126,
+                                43029672,
+                                10527146
+                              ]
                             },
                             {
                               "name": "Area p24c (pACC)",
@@ -8158,7 +9203,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
                                 }
-                              }
+                              },
+                              "position": [
+                                9078674,
+                                45984824,
+                                10376198
+                              ]
                             }
                           ],
                           "_": {
@@ -8204,7 +9254,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
                                 }
-                              }
+                              },
+                              "position": [
+                                -5939929,
+                                13075972,
+                                -13213781
+                              ]
                             },
                             {
                               "name": "Area 25 (sACC)",
@@ -8234,7 +9289,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
                                 }
-                              }
+                              },
+                              "position": [
+                                3868421,
+                                12855263,
+                                -12717105
+                              ]
                             }
                           ],
                           "_": {
@@ -8280,7 +9340,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
                                 }
-                              }
+                              },
+                              "position": [
+                                -4902062,
+                                39805530,
+                                2777882
+                              ]
                             },
                             {
                               "name": "Area p24ab (pACC)",
@@ -8310,7 +9375,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
                                 }
-                              }
+                              },
+                              "position": [
+                                3695853,
+                                40761137,
+                                6277266
+                              ]
                             }
                           ],
                           "_": {
@@ -8356,7 +9426,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
                                 }
-                              }
+                              },
+                              "position": [
+                                -6861488,
+                                35903313,
+                                -16267789
+                              ]
                             },
                             {
                               "name": "Area s32 (sACC)",
@@ -8386,7 +9461,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
                                 }
-                              }
+                              },
+                              "position": [
+                                3823917,
+                                37152542,
+                                -15404896
+                              ]
                             }
                           ],
                           "_": {
@@ -8432,7 +9512,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
                                 }
-                              }
+                              },
+                              "position": [
+                                -5717994,
+                                18708555,
+                                12548673
+                              ]
                             },
                             {
                               "name": "Area 33 (ACC)",
@@ -8462,7 +9547,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
                                 }
-                              }
+                              },
+                              "position": [
+                                4582585,
+                                23288874,
+                                13302695
+                              ]
                             }
                           ],
                           "_": {
@@ -8508,7 +9598,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
                                 }
-                              }
+                              },
+                              "position": [
+                                -9037820,
+                                51596480,
+                                9075949
+                              ]
                             },
                             {
                               "name": "Area p32 (pACC)",
@@ -8538,7 +9633,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
                                 }
-                              }
+                              },
+                              "position": [
+                                6996567,
+                                53005531,
+                                7124547
+                              ]
                             }
                           ],
                           "_": {
@@ -8584,7 +9684,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
                                 }
-                              }
+                              },
+                              "position": [
+                                -5525140,
+                                25297486,
+                                -11801676
+                              ]
                             },
                             {
                               "name": "Area s24 (sACC)",
@@ -8614,7 +9719,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
                                 }
-                              }
+                              },
+                              "position": [
+                                2577911,
+                                26147260,
+                                -11761986
+                              ]
                             }
                           ],
                           "_": {
@@ -8659,7 +9769,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "81b982fa-ad21-4791-a075-d671c0aff5dc"
-                              }
+                              },
+                              "position": [
+                                -17972906,
+                                -29539409,
+                                -15454433
+                              ]
                             },
                             {
                               "name": "HC-Presubiculum (Hippocampus)",
@@ -8683,7 +9798,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "81b982fa-ad21-4791-a075-d671c0aff5dc"
-                              }
+                              },
+                              "position": [
+                                19631847,
+                                -26812739,
+                                -15327389
+                              ]
                             }
                           ],
                           "_": {
@@ -8729,7 +9849,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -15278302,
+                                -12320755,
+                                -19603774
+                              ]
                             },
                             {
                               "name": "HATA (Hippocampus)",
@@ -8759,7 +9884,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
                                 }
-                              }
+                              },
+                              "position": [
+                                13226519,
+                                -11734807,
+                                -18348066
+                              ]
                             }
                           ],
                           "_": {
@@ -8805,7 +9935,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
                                 }
-                              }
+                              },
+                              "position": [
+                                -25718416,
+                                -7637964,
+                                -35465745
+                              ]
                             },
                             {
                               "name": "Entorhinal Cortex",
@@ -8835,7 +9970,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
                                 }
-                              }
+                              },
+                              "position": [
+                                24670382,
+                                -4351115,
+                                -35970541
+                              ]
                             }
                           ],
                           "_": {
@@ -8881,7 +10021,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "73d8e689-9485-4796-b2b2-47181fc45323"
                                 }
-                              }
+                              },
+                              "position": [
+                                -25287879,
+                                -24984848,
+                                -11976768
+                              ]
                             },
                             {
                               "name": "CA3 (Hippocampus)",
@@ -8911,7 +10056,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "73d8e689-9485-4796-b2b2-47181fc45323"
                                 }
-                              }
+                              },
+                              "position": [
+                                25177725,
+                                -24122038,
+                                -9994076
+                              ]
                             }
                           ],
                           "_": {
@@ -8951,7 +10101,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "12bd1841-e54c-4afa-82d0-8c2f650bf653"
-                              }
+                              },
+                              "position": [
+                                -16804545,
+                                -41515909,
+                                -9172727
+                              ]
                             },
                             {
                               "name": "HC-Transsubiculum (Hippocampus)",
@@ -8975,7 +10130,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "12bd1841-e54c-4afa-82d0-8c2f650bf653"
-                              }
+                              },
+                              "position": [
+                                17705993,
+                                -38076779,
+                                -9709738
+                              ]
                             }
                           ],
                           "_": {
@@ -9015,7 +10175,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "a5ac430c-2622-4f62-84ce-ff3fbda9c50d"
-                              }
+                              },
+                              "position": [
+                                -24055914,
+                                -22583513,
+                                -21612903
+                              ]
                             },
                             {
                               "name": "HC-Subiculum (Hippocampus)",
@@ -9039,7 +10204,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "a5ac430c-2622-4f62-84ce-ff3fbda9c50d"
-                              }
+                              },
+                              "position": [
+                                23027473,
+                                -23041601,
+                                -18857143
+                              ]
                             }
                           ],
                           "_": {
@@ -9079,7 +10249,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "221592ff-41c4-4c2f-b37c-468b7a22dc1b"
-                              }
+                              },
+                              "position": [
+                                -26093865,
+                                -25690798,
+                                -18879755
+                              ]
                             },
                             {
                               "name": "HC-Prosubiculum (Hippocampus)",
@@ -9103,7 +10278,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "221592ff-41c4-4c2f-b37c-468b7a22dc1b"
-                              }
+                              },
+                              "position": [
+                                25520764,
+                                -24782392,
+                                -16617110
+                              ]
                             }
                           ],
                           "_": {
@@ -9143,7 +10323,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "ac7bc35a-a0a5-4692-afe6-dbf25a087055"
-                              }
+                              },
+                              "position": [
+                                -19596010,
+                                -19349127,
+                                -26548628
+                              ]
                             },
                             {
                               "name": "HC-Parasubiculum (Hippocampus)",
@@ -9167,7 +10352,12 @@
                               "fullId": {
                                 "kgSchema": "julich/tmp/parellationregion/v0.0.1",
                                 "kgId": "ac7bc35a-a0a5-4692-afe6-dbf25a087055"
-                              }
+                              },
+                              "position": [
+                                17088889,
+                                -20577778,
+                                -26711111
+                              ]
                             }
                           ],
                           "_": {
@@ -9213,7 +10403,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
                                 }
-                              }
+                              },
+                              "position": [
+                                -28120166,
+                                -28550414,
+                                -12081492
+                              ]
                             },
                             {
                               "name": "DG (Hippocampus)",
@@ -9243,7 +10438,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
                                 }
-                              }
+                              },
+                              "position": [
+                                27935801,
+                                -26456193,
+                                -11184290
+                              ]
                             }
                           ],
                           "_": {
@@ -9289,7 +10489,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cf4b3fad-2d45-458b-8bc7-1095983ed1dd"
                                 }
-                              }
+                              },
+                              "position": [
+                                -24795094,
+                                -22568543,
+                                -12173160
+                              ]
                             },
                             {
                               "name": "CA2 (Hippocampus)",
@@ -9319,7 +10524,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "cf4b3fad-2d45-458b-8bc7-1095983ed1dd"
                                 }
-                              }
+                              },
+                              "position": [
+                                27074423,
+                                -24622642,
+                                -8104822
+                              ]
                             }
                           ],
                           "_": {
@@ -9365,7 +10575,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bfc0beb7-310c-4c57-b810-2adc464bd02c"
                                 }
-                              }
+                              },
+                              "position": [
+                                -28581199,
+                                -29211509,
+                                -12884604
+                              ]
                             },
                             {
                               "name": "CA1 (Hippocampus)",
@@ -9395,7 +10610,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "bfc0beb7-310c-4c57-b810-2adc464bd02c"
                                 }
-                              }
+                              },
+                              "position": [
+                                28002211,
+                                -26908402,
+                                -11620973
+                              ]
                             }
                           ],
                           "_": {
@@ -9461,7 +10681,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
                                 }
-                              }
+                              },
+                              "position": [
+                                -8809798,
+                                -58152738,
+                                -32533141
+                              ]
                             },
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
@@ -9491,7 +10716,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
                                 }
-                              }
+                              },
+                              "position": [
+                                5167910,
+                                -56895522,
+                                -32011194
+                              ]
                             }
                           ],
                           "_": {
@@ -9542,7 +10772,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "58095aef-da69-43d4-887c-009c095cecce"
                                 }
-                              }
+                              },
+                              "position": [
+                                -16330120,
+                                -60001606,
+                                -38141365
+                              ]
                             },
                             {
                               "name": "Dorsal Dentate Nucleus (Cerebellum)",
@@ -9572,7 +10807,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "58095aef-da69-43d4-887c-009c095cecce"
                                 }
-                              }
+                              },
+                              "position": [
+                                12907023,
+                                -60335312,
+                                -37022750
+                              ]
                             }
                           ],
                           "_": {
@@ -9618,7 +10858,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
                                 }
-                              }
+                              },
+                              "position": [
+                                -13468591,
+                                -59707980,
+                                -32857385
+                              ]
                             },
                             {
                               "name": "Ventral Dentate Nucleus (Cerebellum)",
@@ -9648,7 +10893,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
                                 }
-                              }
+                              },
+                              "position": [
+                                9732710,
+                                -58514019,
+                                -32345794
+                              ]
                             }
                           ],
                           "_": {
@@ -9699,7 +10949,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
                                 }
-                              }
+                              },
+                              "position": [
+                                -3443548,
+                                -56262097,
+                                -30592742
+                              ]
                             },
                             {
                               "name": "Fastigial Nucleus (Cerebellum)",
@@ -9729,7 +10984,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
                                 }
-                              }
+                              },
+                              "position": [
+                                1692683,
+                                -55541463,
+                                -31146341
+                              ]
                             }
                           ],
                           "_": {
@@ -9780,7 +11040,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
                                 }
-                              }
+                              },
+                              "position": [
+                                -8809798,
+                                -58152738,
+                                -32533141
+                              ]
                             },
                             {
                               "name": "Interposed Nucleus (Cerebellum)",
@@ -9810,7 +11075,12 @@
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
                                   "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
                                 }
-                              }
+                              },
+                              "position": [
+                                5167910,
+                                -56895522,
+                                -32011194
+                              ]
                             }
                           ],
                           "_": {
@@ -9833,9 +11103,10 @@
             }
           ]
         }
-      ],
+      ]
+      ,
       "_": {
-        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201204_JulichBrainV3_0_hemisphereSplit_metadata/src/eebf8ef90078fb722456eb5e77eb000ae09db776/output/nehubaUI/julich-brain-v3.0-colin.json"
+        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201204_JulichBrainV3_0_hemisphereSplit_metadata/src/58efbff4f6599cd66246945eb1ffbbb239840295/output/nehubaUI/julich-brain-v3.0-colin-pos.json"
       }
     },{
       "fullId": "juelich/iav/atlas/v1.0.0/8",
