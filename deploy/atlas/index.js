@@ -10,7 +10,7 @@ const { getTemplate } = require('../templates/query')
 const { getHandleErrorFn } = require('../util/streamHandleError')
 
 const getPreviewFn = ({ res, lastpart }) => HOSTNAME.replace(/\/$/, '') + '/' +
-  HOST_PATHNAME +
+  HOST_PATHNAME.replace(/\/$/, '') + '/' +
   (res.locals.routePathname
     ? url.resolve(`${res.locals.routePathname}/`, lastpart)
     : lastpart)
