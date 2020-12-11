@@ -307,6 +307,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public hoveredPanelIndices$: Observable<number>
 
   public connectivityNumber: string
+  public connectivityLoadUrl: string
 
   constructor(
     private pureConstantService: PureContantService,

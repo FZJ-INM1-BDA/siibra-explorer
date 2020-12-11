@@ -17,7 +17,9 @@
       "auxillaryMeshIndices": [
         65535
       ],
-      "hasAdditionalViewMode": [],
+      "hasAdditionalViewMode": [
+        "connectivity"
+      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
