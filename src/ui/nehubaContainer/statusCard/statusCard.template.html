@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card class="expandedContainer p-2 pt-1" *ngIf="showFull; else showMin">
   <mat-card-content>
 
     <!-- reset -->
@@ -13,21 +13,29 @@
         mat-icon-button
         (click)="resetNavigation({position:true})"
         matTooltip="Reset position">
-        <i class="fas fa-crosshairs"></i>
+        <i class="iavic iavic-translation"></i>
       </button>
 
       <button
         mat-icon-button
         (click)="resetNavigation({rotation:true})"
         matTooltip="Reset rotation">
-        <i class="fas fa-compass"></i>
+        <i class="iavic iavic-rotation"></i>
       </button>
 
       <button
         mat-icon-button
         (click)="resetNavigation({zoom:true})"
         matTooltip="Reset zoom">
-        <i class="fas fa-search-plus"></i>
+        <i class="iavic iavic-scaling"></i>
+      </button>
+
+      <mat-divider [vertical]="true"></mat-divider>
+
+      <button mat-icon-button
+        [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
+        (click)="showFull = false">
+        <i class="fas fa-angle-up"></i>
       </button>
     </div>
 
@@ -75,7 +83,7 @@
     </div>
 
     <!-- cursor pos -->
-    <mat-form-field *ngIf="!isMobile"
+    <mat-form-field *ngIf="!(useTouchInterface$ | async)"
       class="w-100">
       <mat-label>
         Cursor Position
@@ -88,6 +96,38 @@
 
   </mat-card-content>
 </mat-card>
+
+<!-- minimised status bar -->
+<ng-template #showMin>
+  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center m-1 mt-3"
+    iav-media-query
+    #media="iavMediaQuery">
+    
+    <i aria-label="viewer navigation" class="fas fa-compass"></i>
+    <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="pl-2">
+      {{ navVal$ | async }}
+    </span>
+
+    <!-- only show cursor if touch interface is not on -->
+    <span *ngIf="false && !(useTouchInterface$ | async)">
+      <!-- padding -->
+      <span class="pl-4"></span>
+
+      <i aria-label="cursor location" class="fas fa-mouse-pointer"></i>
+      <span class="pl2">
+        {{ mouseVal$ | async }}
+      </span>
+    </span>
+
+    <mat-divider [vertical]="true"></mat-divider>
+
+    <button mat-icon-button
+      [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
+      (click)="showFull = true">
+      <i class="fas fa-angle-down"></i>
+    </button>
+  </div>
+</ng-template>
 
 <!-- share template -->
 <ng-template #shareTmpl>

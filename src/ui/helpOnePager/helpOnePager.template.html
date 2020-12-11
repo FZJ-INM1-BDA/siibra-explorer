@@ -1,0 +1,19 @@
+<markdown-dom mat-dialog-content [markdown]="QUICK_STARTER_MD">
+</markdown-dom>
+
+<div mat-dialog-actions align="center">
+
+  <a *ngIf="extQuickStarter"
+    [href]="extQuickStarter"
+    target="_blank">
+    <button mat-raised-button
+      color="primary">
+      <span iav-media-query #iavMediaQuery="iavMediaQuery">
+        Open <ng-template [ngIf]="(iavMediaQuery.mediaBreakPoint$ | async) < 3">in new window</ng-template>
+      </span>
+      <i class = "fas fa-external-link-alt"></i>
+    </button>
+  </a>
+
+  <button mat-button mat-dialog-close cdkFocusInitial>close</button>
+</div>

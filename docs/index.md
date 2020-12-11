@@ -8,4 +8,4 @@ The interactive atlas viewer is a browser based viewer of brain atlases. Tight i
 
 - production: <https://interactive-viewer.apps.hbp.eu>
 - production: <https://atlases.ebrains.eu/viewer/>
-- contact us: [inm1-bda@fz-juelich.de](mailto:inm1-bda@fz-juelich.de?subject=[IAV]%20Queries)
+- support: [support@ebrains.eu](mailto:support@ebrains.eu?subject=[interactive%20atlas%20viewer]%20queries)

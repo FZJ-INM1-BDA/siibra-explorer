@@ -5,8 +5,8 @@ import { provideMockStore } from '@ngrx/store/testing'
 import { Observable, of, Subscription } from 'rxjs'
 import { Action, Store } from '@ngrx/store'
 import { defaultRootState } from '../services/stateStore.service'
-import { HttpClientModule } from '@angular/common/http'
 import { cold } from 'jasmine-marbles'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 
@@ -16,7 +16,7 @@ describe('atlasviewer.history.service.ts', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientModule
+        HttpClientTestingModule
       ],
       providers: [
         AtlasViewerHistoryUseEffect,
@@ -65,7 +65,7 @@ describe('atlasviewer.history.service.ts', () => {
       })
       
       const expected = cold('(a)', {
-        a: 'templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps'
+        a: 'templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps+-+v2.4'
       })
       
       expect(effect.currentStateSearchParam$).toBeObservable(expected)

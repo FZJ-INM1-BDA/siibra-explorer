@@ -5,7 +5,8 @@ import { combineLatest, merge, Observable } from "rxjs";
 import { distinctUntilChanged, filter, map, scan, shareReplay, startWith, withLatestFrom } from "rxjs/operators";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { LoggingService } from "src/logging";
-import { getNgIdLabelIndexFromId, IavRootStoreInterface } from "src/services/stateStore.service";
+import { uiStateMouseOverSegmentsSelector, uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors";
+import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 /**
  * Scan function which prepends newest positive (i.e. defined) value
@@ -44,7 +45,7 @@ export class MouseHoverDirective {
   public currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
     private log: LoggingService,
   ) {
 
@@ -52,8 +53,7 @@ export class MouseHoverDirective {
     // can potentially net better performance
 
     const onHoverUserLandmark$ = this.store$.pipe(
-      select('uiState'),
-      select('mouseOverUserLandmark'),
+      select(uiStateMouseoverUserLandmark)
     )
 
     const onHoverLandmark$ = combineLatest(
@@ -85,8 +85,7 @@ export class MouseHoverDirective {
     )
 
     const onHoverSegments$ = this.store$.pipe(
-      select('uiState'),
-      select('mouseOverSegments'),
+      select(uiStateMouseOverSegmentsSelector),
       filter(v => !!v),
       withLatestFrom(
         this.store$.pipe(
@@ -144,14 +143,22 @@ export class MouseHoverDirective {
 
     this.currentOnHoverObs$ = mergeObs.pipe(
       scan(temporalPositveScanFn, []),
-      map(arr => arr[0]),
-      map(val => {
-        return {
+      map(arr => {
+
+        let returnObj = {
           segments: null,
           landmark: null,
           userLandmark: null,
-          ...val,
         }
+
+        for (const val of arr) {
+          returnObj = {
+            ...returnObj,
+            ...val
+          }
+        }
+
+        return returnObj
       }),
       shareReplay(1),
     )
@@ -185,7 +192,7 @@ export class MouseOverTextPipe implements PipeTransform {
     case 'segments':
       return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
     case 'userLandmark':
-      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.id)]
+      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.name)]
     default:
       // ts-lint:disable-next-line
       console.warn(`mouseOver.directive.ts#mouseOverTextPipe: Cannot be displayed: label: ${label}`)

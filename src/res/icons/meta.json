@@ -1,0 +1,13 @@
+[{
+  "content": "t",
+  "class": "translation",
+  "svg": "./translation/glyph.svg"
+},{
+  "content": "s",
+  "class": "scaling",
+  "svg": "./scaling/glyph.svg"
+},{
+  "content": "r",
+  "class": "rotation",
+  "svg": "./rotation/glyph.svg"
+}]

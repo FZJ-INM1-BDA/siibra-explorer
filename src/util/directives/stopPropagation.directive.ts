@@ -11,7 +11,7 @@ const VALID_EVENTNAMES = new Set([
   'touchend',
 ])
 
-const stopPropagation = ev => ev.stopPropagation()
+const stopPropagation = (ev: Event) => ev.stopPropagation()
 
 @Directive({
   selector: '[iav-stop]',

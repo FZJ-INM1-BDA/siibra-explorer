@@ -1,5 +1,7 @@
 import { filter } from 'rxjs/operators';
 
+export { getNgIds } from 'src/util/fn'
+
 import {
   ActionInterface as NgViewerActionInterface,
   defaultState as ngViewerDefaultState,
@@ -14,7 +16,7 @@ import {
 import {
   ActionInterface as UIActionInterface,
   defaultState as uiDefaultState,
-  StateInterface as UIStateInterface,
+  IUiState,
   stateStore as uiState,
 } from './state/uiState.store'
 import {
@@ -35,23 +37,24 @@ import {
   stateStore as viewerState,
 } from './state/viewerState.store'
 
+import { 
+  defaultState as defaultViewerHelperState,
+  viewerStateHelperStoreName
+} from './state/viewerState.store.helper'
+
 export { pluginState }
 export { viewerConfigState }
 export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
 export { ViewerStateInterface, ViewerActionInterface, viewerState }
-export { UIStateInterface, UIActionInterface, uiState }
+export { IUiState, UIActionInterface, uiState }
 export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
-export { ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
 export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
 export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, IProperty, IPublication, IReferenceSpace, IFile, IFileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, SHOW_SIDE_PANEL_CONNECTIVITY, HIDE_SIDE_PANEL_CONNECTIVITY, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
-export const GENERAL_ACTION_TYPES = {
-  ERROR: 'ERROR',
-  APPLY_STATE: 'APPLY_STATE',
-}
+export { GENERAL_ACTION_TYPES, generalActionError } from './stateStore.helper'
 
 // TODO deprecate
 export function safeFilter(key: string) {
@@ -137,15 +140,6 @@ export function getLabelIndexMap(regions: any[]): Map<number, any> {
  * @param regions regions to deep iterate to find all ngId 's, filtering out falsy values
  * n.b. returns non unique list
  */
-export function getNgIds(regions: any[]): string[] {
-  return regions && regions.map
-    ? regions
-      .map(r => [r.ngId, ...getNgIds(r.children)])
-      .reduce((acc, item) => acc.concat(item), [])
-      .filter(ngId => !!ngId)
-    : []
-}
-
 export interface DedicatedViewState {
   dedicatedView: string | null
 }
@@ -196,13 +190,13 @@ export interface IavRootStoreInterface {
   ngViewerState: NgViewerStateInterface
   viewerState: ViewerStateInterface
   dataStore: any
-  uiState: UIStateInterface
+  uiState: IUiState
   userConfigState: UserConfigStateInterface
 }
 
 import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
 
-export const defaultRootState: IavRootStoreInterface = {
+export const defaultRootState: any = {
   pluginState: pluginDefaultState,
   dataStore: DATASTORE_DEFAULT_STATE,
   ngViewerState: ngViewerDefaultState,
@@ -210,4 +204,5 @@ export const defaultRootState: IavRootStoreInterface = {
   userConfigState: userConfigDefaultState,
   viewerConfigState: viewerConfigDefaultState,
   viewerState: viewerDefaultState,
+  [viewerStateHelperStoreName]: defaultViewerHelperState
 }

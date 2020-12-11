@@ -1,10 +1,15 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
-import { merge, Observable, Subscription } from "rxjs";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Subscription } from "rxjs";
 import { LoggingService } from "src/logging";
-import { IDataEntry } from "src/services/stateStore.service";
+import { IDataEntry } from "src/services/state/dataStore.store";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 import { ARIA_LABELS } from 'common/constants.js'
+import { DatabrowserBase } from "./databrowser.base";
+import { debounceTime } from "rxjs/operators";
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
+import { Store } from "@ngrx/store";
+import { uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
 
 const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 
@@ -16,28 +21,41 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
   ],
   exportAs: 'dataBrowser',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useFactory: (store: Store<any>) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
+          if (arg.fullId) {
+            store.dispatch(
+              uiActionShowDatasetWtihId({
+                id: arg.fullId
+              })
+            )
+          }
+        } as TOverwriteShowDatasetDialog
+      },
+      deps: [
+        Store
+      ]
+    }
+  ]
+  
 })
 
-export class DataBrowser implements OnChanges, OnDestroy, OnInit {
+export class DataBrowser extends DatabrowserBase implements OnDestroy, OnInit {
+
+  @Input()
+  disableVirtualScroll: boolean = false
+
+  @Input()
+  showList: boolean = true
 
   public MODALITY_FILTER_ARIA_LABEL = MODALITY_FILTER
   public LIST_OF_DATASETS_ARIA_LABEL = LIST_OF_DATASETS
-  @Input()
-  public regions: any[] = []
 
-  @Input()
-  public template: any
 
-  @Input()
-  public parcellation: any
-
-  @Output()
-  public dataentriesUpdated: EventEmitter<IDataEntry[]> = new EventEmitter()
-
-  public dataentries: IDataEntry[] = []
-
-  public fetchingFlag: boolean = false
-  public fetchError: boolean = false
   /**
    * TODO filter types
    */
@@ -48,7 +66,6 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   @ViewChild(ModalityPicker)
   public modalityPicker: ModalityPicker
 
-  public favDataentries$: Observable<Partial<IDataEntry>[]>
 
   /**
    * TODO
@@ -59,75 +76,33 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   public gemoetryFilter: any
 
   constructor(
-    private dbService: DatabrowserService,
+    private dataService: DatabrowserService,
     private cdr: ChangeDetectorRef,
-    private log: LoggingService,
+    log: LoggingService,
   ) {
-    this.favDataentries$ = this.dbService.favedDataentries$
-  }
-
-  public ngOnChanges() {
-
-    this.regions = this.regions.map(r => {
-      /**
-       * TODO to be replaced with properly region UUIDs from KG
-       */
-      return {
-        id: `${this.parcellation.name}/${r.name}`,
-        ...r,
-      }
-    })
-    const { regions, parcellation, template } = this
-    this.fetchingFlag = true
-
-    // input may be undefined/null
-    if (!parcellation) { return }
-
-    /**
-     * reconstructing parcellation region is async (done on worker thread)
-     * if parcellation region is not yet defined, return.
-     * parccellation will eventually be updated with the correct region
-     */
-    if (!parcellation.regions) { return }
-
-    this.dbService.getDataByRegion({ regions, parcellation, template })
-      .then(de => {
-        this.dataentries = de
-        return de
-      })
-      .then(this.dbService.getModalityFromDE)
-      .then(modalities => {
-        this.countedDataM = modalities
-      })
-      .catch(e => {
-        this.log.error(e)
-        this.fetchError = true
-      })
-      .finally(() => {
-        this.fetchingFlag = false
-        this.dataentriesUpdated.emit(this.dataentries)
-        this.cdr.markForCheck()
-      })
-
+    super(dataService, log)
   }
 
   public ngOnInit() {
+
+    /**
+     * in the event that dataentries are updated before ngInit lifecycle hook
+     */
+    this.countedDataM = this.dataService.getModalityFromDE(this.dataentries)
+
+    this.subscriptions.push(
+      this.dataentriesUpdated.pipe(
+        debounceTime(60)
+      ).subscribe(() => {
+        this.countedDataM = this.dataService.getModalityFromDE(this.dataentries)
+        this.cdr.markForCheck()
+      })
+    )
+    
     /**
      * TODO gets init'ed everytime when appends to ngtemplateoutlet
      */
-    this.dbService.dbComponentInit(this)
-    this.subscriptions.push(
-      merge(
-        // this.dbService.selectedRegions$,
-        this.dbService.fetchDataObservable$,
-      ).subscribe(() => {
-        /**
-         * Only reset modality picker
-         * resetting all creates infinite loop
-         */
-        this.clearAll()
-      }),
-    )
+    this.dataService.dbComponentInit(this)
 
     /**
      * TODO fix
@@ -138,6 +113,7 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   }
 
   public ngOnDestroy() {
+    super.ngOnDestroy()
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
@@ -155,23 +131,6 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
     this.cdr.markForCheck()
-  }
-
-  public retryFetchData(event: MouseEvent) {
-    event.preventDefault()
-    this.dbService.manualFetchDataset$.next(null)
-  }
-
-  public toggleFavourite(dataset: IDataEntry) {
-    this.dbService.toggleFav(dataset)
-  }
-
-  public saveToFavourite(dataset: IDataEntry) {
-    this.dbService.saveToFav(dataset)
-  }
-
-  public removeFromFavourite(dataset: IDataEntry) {
-    this.dbService.removeFromFav(dataset)
   }
 
   public showParcellationList: boolean = false

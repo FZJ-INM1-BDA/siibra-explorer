@@ -1,4 +1,5 @@
 const { configureAuth, jwtDecode } = require('./oidc')
+const objStoreDb = new Map()
 
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
@@ -30,9 +31,27 @@ const refreshToken = async () => {
   return true
 }
 
+const getClient = async () => {
+  const { client } = await configureAuth({
+    clientId,
+    clientSecret,
+    discoveryUrl,
+    redirectUri,
+    clientConfig: {
+      redirect_uris: [ redirectUri ],
+      response_types: [ 'code' ]
+    }
+  })
+
+  __client = client
+}
+
+getClient()
+
 const getPublicAccessToken = async () => {
-  if (!__client)
-    throw new Error(CLIENT_NOT_INIT)
+  if (!__client) {
+    await getClient()
+  }
   
   if (!__publicAccessToken) {
     await refreshToken()
@@ -49,22 +68,28 @@ const getPublicAccessToken = async () => {
   return __publicAccessToken
 }
 
-module.exports = async () => {
+const initPassportJs = app => {
+  console.log('init passport js')
+  const passport = require('passport')
+  
+  app.use(passport.initialize())
+  app.use(passport.session())
 
-  const { client } = await configureAuth({
-    clientId,
-    clientSecret,
-    discoveryUrl,
-    redirectUri,
-    clientConfig: {
-      redirect_uris: [ redirectUri ],
-      response_types: [ 'code' ]
-    }
+  passport.serializeUser((user, done) => {
+    const { tokenset, rest } = user
+    objStoreDb.set(user.id, user)
+    done(null, user.id)
   })
 
-  __client = client
+  passport.deserializeUser((id, done) => {
+    const user = objStoreDb.get(id)
+    if (user) return done(null, user)
+    else return done(null, false)
+  })
+}
 
-  return {
-    getPublicAccessToken: async () => await getPublicAccessToken()
-  }
+module.exports = {
+  initPassportJs,
+  objStoreDb,
+  getPublicAccessToken: async () => await getPublicAccessToken(),
 }

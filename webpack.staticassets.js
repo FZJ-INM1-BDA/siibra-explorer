@@ -31,7 +31,10 @@ module.exports = {
         use : [{
           loader : 'file-loader',
           options : {
-            name : '[name].[ext]',
+            name (resourcePath, resourceQuery) {
+              const appendAtlas = /res\/ext\/atlas\//.test(resourcePath)
+              return `${appendAtlas ? 'atlas/' : ''}[name].[ext]`
+            },
             outputPath : 'res/json'
           }
         }]
@@ -55,16 +58,8 @@ module.exports = {
       filename: 'theme.css'
     }),
     new webpack.DefinePlugin({
-      // TODO deprecate
-      PLUGINDEV : process.env.PLUGINDEV
-        ? JSON.stringify(process.env.PLUGINDEV)
-        : false,
 
-      // TODO deprecate
-      BUNDLEDPLUGINS : process.env.BUNDLEDPLUGINS
-        ? JSON.stringify(process.env.BUNDLEDPLUGINS.split(','))
-        : JSON.stringify([]),
-      VERSION : process.env.VERSION 
+      VERSION: process.env.VERSION 
         ? JSON.stringify(process.env.VERSION) 
         : process.env.GIT_HASH
           ? JSON.stringify(process.env.GIT_HASH)
@@ -75,7 +70,6 @@ module.exports = {
       SPATIAL_TRANSFORM_BACKEND: JSON.stringify(process.env.SPATIAL_TRANSFORM_BACKEND || 'https://hbp-spatial-backend.apps.hbp.eu'),
       MATOMO_URL: JSON.stringify(process.env.MATOMO_URL || null),
       MATOMO_ID: JSON.stringify(process.env.MATOMO_ID || null),
-      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' || 'fzj'),
 
       // strick local hides "explore" and "download" btns, which requires internet
       STRICT_LOCAL: process.env.STRICT_LOCAL === 'true' ? 'true' : 'false',

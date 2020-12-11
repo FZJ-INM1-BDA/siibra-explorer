@@ -1,0 +1,10 @@
+:host
+{
+  position: absolute;
+  color: rgba(201, 54, 38, 1.0)
+}
+
+:host > div
+{
+  transform: translate(-50%, -50%);
+}

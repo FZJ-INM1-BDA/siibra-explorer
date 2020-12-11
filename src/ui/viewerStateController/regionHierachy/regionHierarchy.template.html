@@ -10,76 +10,10 @@
     [placeholder]="placeHolderText"/>
 </mat-form-field>
 
-<ng-template #noRegionSelected>
-  <small class="text-muted">
-    No region selected
-  </small>
-</ng-template>
-
-<ng-template #regionSelectedText>
-  <ng-template [ngIf]="selectedRegions.length > 0" [ngIfElse]="noRegionSelected">
-    <div class="d-flex flex-row align-items-center">
-      <small class="text-muted">
-        {{ (selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch).length }} regions selected ({{ selectedRegions.length }} visible)
-      </small>
-
-      <div class="position-relative d-flex align-items-center">
-        <button mat-icon-button
-          class="position-absolute"
-          (click)="clearRegions($event)"
-          matTooltip="Clear all regions"
-          color="primary">
-          <i class="fas fa-times-circle"></i>
-        </button>
-      </div>
-    </div>
-  </ng-template>
-</ng-template>
-
 <div
   [ngClass]="{'flex-column': useMobileUI, 'flex-row': !useMobileUI}"
   class="d-flex flex-grow-1 flex-shrink-1">
 
-  <!-- selected regions -->
-  <div
-    [ngClass]="{'flex-basis-33-pc': !useMobileUI, 'flex-basis-auto': useMobileUI}"
-    class="d-flex flex-column flex-grow-0 flex-shrink-0">
-
-    <div class="flex-grow-0 flex-shrink-0 d-flex flex-row align-items-center p-1">
-      <ng-container *ngTemplateOutlet="regionSelectedText">
-      </ng-container>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <div *ngIf="(selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch).length > 0"
-      class="mt-2 flex-grow-1 flex-shrink-1 overflow-hidden cdk-virtual-scroll-viewport-container"
-      [ngClass]="{'horizontal-mode': useMobileUI}">
-      <cdk-virtual-scroll-viewport
-        [orientation]="useMobileUI ? 'horizontal' : 'vertical'"
-        class="w-100 h-100 d-block"
-        [itemSize]="useMobileUI ? 200 : 32">
-
-        <!-- required without resorting to viewencapsulation.None or global stylesheet -->
-        <div class="cdk-viewport-wrapper">
-          <ng-container *cdkVirtualFor="let region of selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch; let first = first">
-            <mat-divider
-              class="m-2"
-              *ngIf="!first"
-              [vertical]="useMobileUI">
-            </mat-divider>
-            <region-list-simple-view
-              class="position-relative d-inline-block"
-              [region]="region"
-              [isSelected]="true">
-    
-            </region-list-simple-view>
-          </ng-container>
-        </div>
-
-      </cdk-virtual-scroll-viewport>
-    </div>
-  </div>
 
   <!-- region tree -->
   <div class="flex-grow-1 flex-shrink-1 overflow-hidden">

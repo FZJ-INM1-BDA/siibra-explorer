@@ -1,14 +1,18 @@
-import { Component, Input, OnInit, OnChanges, TemplateRef } from "@angular/core";
+import { Component, Input, OnInit, OnChanges, TemplateRef, HostBinding } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
-import { CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface } from "src/services/stateStore.service";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subscription, of, combineLatest, BehaviorSubject } from "rxjs";
-import { distinctUntilChanged, shareReplay, map, filter, startWith } from "rxjs/operators";
+import { Observable, Subscription, of, combineLatest } from "rxjs";
+import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
+import { PureContantService } from "src/util";
 import { FormControl } from "@angular/forms";
+import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
+import { getNavigationStateFromConfig } from "../util";
+import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 
 @Component({
   selector : 'ui-status-card',
@@ -18,49 +22,54 @@ import { FormControl } from "@angular/forms";
 export class StatusCardComponent implements OnInit, OnChanges{
 
   @Input() public selectedTemplateName: string;
-  @Input() public isMobile: boolean;
   @Input() public nehubaViewer: NehubaViewerUnit;
 
-  private selectedTemplateRoot$: Observable<any>
-  private selectedTemplateRoot: any
+  @HostBinding('attr.aria-label')
+  public arialabel = ARIA_LABELS.STATUS_PANEL
+  public showFull = false
+
+  private selectedTemplatePure: any
+  private currentNavigation: any
   private subscriptions: Subscription[] = []
 
   public navVal$: Observable<string>
   public mouseVal$: Observable<string>
 
+  public useTouchInterface$: Observable<boolean>
+
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
   public SHARE_CUSTOM_URL_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL
   public SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL_DIALOG
-
+  public SHOW_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.SHOW_FULL_STATUS_PANEL
+  public HIDE_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.HIDE_FULL_STATUS_PANEL
   constructor(
-    private store: Store<ViewerStateInterface>,
-    private log: LoggingService,
     private store$: Store<IavRootStoreInterface>,
+    private log: LoggingService,
     private bottomSheet: MatBottomSheet,
     private dialog: MatDialog,
+    private pureConstantService: PureContantService
   ) {
-    const viewerState$ = this.store$.pipe(
-      select('viewerState'),
-      shareReplay(1),
-    )
-    this.selectedTemplateRoot$ = viewerState$.pipe(
-      select('fetchedTemplates'),
-      distinctUntilChanged(),
-    )
+    this.useTouchInterface$ = this.pureConstantService.useTouchUI$
   }
 
   ngOnInit(): void {
     this.subscriptions.push(
-      this.selectedTemplateRoot$.subscribe(template => {
-        this.selectedTemplateRoot = template.find(t => t.name === this.selectedTemplateName)
+      this.statusPanelFormCtrl.valueChanges.subscribe(val => {
+        this.statusPanelRealSpace = val
       })
     )
 
     this.subscriptions.push(
-      this.statusPanelFormCtrl.valueChanges.subscribe(val => {
-        this.statusPanelRealSpace = val
-      })
+      this.store$.pipe(
+        select(viewerStateSelectedTemplatePureSelector)
+      ).subscribe(n => this.selectedTemplatePure = n)
+    )
+
+    this.subscriptions.push(
+      this.store$.pipe(
+        select(viewerStateNavigationStateSelector)
+      ).subscribe(nav => this.currentNavigation = nav)
     )
   }
 
@@ -70,7 +79,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
       this.mouseVal$ = of(`neubaViewer is undefined`)
       return
     }
-    this.navVal$ = combineLatest(
+    this.navVal$ = combineLatest([
       this.statusPanelRealSpace$,
       this.nehubaViewer.viewerPosInReal$.pipe(
         filter(v => !!v)
@@ -78,14 +87,14 @@ export class StatusCardComponent implements OnInit, OnChanges{
       this.nehubaViewer.viewerPosInVoxel$.pipe(
         filter(v => !!v)
       )
-    ).pipe(
+    ]).pipe(
       map(([realFlag, real, voxel]) => realFlag
         ? real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', ')
         : voxel.map(v => v.toFixed(3)).join(', ') ),
       startWith(`nehubaViewer initialising`)
     )
 
-    this.mouseVal$ = combineLatest(
+    this.mouseVal$ = combineLatest([
       this.statusPanelRealSpace$,
       this.nehubaViewer.mousePosInReal$.pipe(
         filter(v => !!v)
@@ -93,15 +102,15 @@ export class StatusCardComponent implements OnInit, OnChanges{
       this.nehubaViewer.mousePosInVoxel$.pipe(
         filter(v => !!v)
       )
-    ).pipe(
+    ]).pipe(
       map(([realFlag, real, voxel]) => realFlag
         ? real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', ')
-        : voxel.map(v => v.toFixed(3)).join(', s')),
+        : voxel.map(v => v.toFixed(3)).join(', ')),
       startWith(``)
     )
   }
 
-  statusPanelFormCtrl = new FormControl(true, [])
+  public statusPanelFormCtrl = new FormControl(true, [])
   public statusPanelRealSpace = true
   public statusPanelRealSpace$ = this.statusPanelFormCtrl.valueChanges.pipe(
     startWith(true)
@@ -133,44 +142,26 @@ export class StatusCardComponent implements OnInit, OnChanges{
    * the info re: nehubaViewer can stay there, too
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
-    const initialNgState = this.selectedTemplateRoot.nehubaConfig.dataset.initialNgState // d sa dsa
+    const {
+      orientation,
+      perspectiveOrientation,
+      perspectiveZoom,
+      position,
+      zoom
+    } = getNavigationStateFromConfig(this.selectedTemplatePure.nehubaConfig)
 
-    const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
-    const perspectiveOrientation = initialNgState ? initialNgState.perspectiveOrientation : undefined
-    const zoom = (zoomFlag
-      && initialNgState
-      && initialNgState.navigation
-      && initialNgState.navigation.zoomFactor)
-      || undefined
-
-    const position = (positionFlag
-      && initialNgState
-      && initialNgState.navigation
-      && initialNgState.navigation.pose
-      && initialNgState.navigation.pose.position.voxelCoordinates
-      && initialNgState.navigation.pose.position.voxelCoordinates)
-      || undefined
-
-    const orientation = rotationFlag
-      ? [0, 0, 0, 1]
-      : undefined
-
-    this.store.dispatch({
-      type : CHANGE_NAVIGATION,
-      navigation : {
-        ...{
-          perspectiveZoom,
-          perspectiveOrientation,
-          zoom,
-          position,
-          orientation,
-        },
-        ...{
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          ...this.currentNavigation,
+          ...(rotationFlag ? { orientation: orientation } : {}),
+          ...(positionFlag ? { position: position } : {}),
+          ...(zoomFlag ? { zoom: zoom } : {}),
           positionReal : false,
           animation : {},
-        },
-      },
-    })
+        }
+      })
+    )
   }
 
   openDialog(tmpl: TemplateRef<any>, options) {

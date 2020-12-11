@@ -10,7 +10,8 @@ import { defaultRootState } from '../stateStore.service'
 
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
-const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V24_LEFT_NG`
+const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
+const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25'
 
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {
@@ -18,13 +19,13 @@ describe('effect.ts', () => {
 
       const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({
         parcellation: {
-          ...colinsJson.parcellations[0],
+          ...colinsJson.parcellations.find(p => p['@id'] === COLIN_V25_ID),
           updated: true,
         },
       })
       const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: `${COLIN_JULICHBRAIN_LAYER_NAME}#116` })
       expect(fetchedRegion).toBeTruthy()
-      expect(fetchedRegion.fullId.kg.kgId).toEqual('b09aaa77-f41b-4008-b8b9-f984b0417cf3')
+      expect(fetchedRegion.fullId.kg.kgId).toEqual('c9753e82-80ca-4074-a704-9dd2c4c0d58b')
       
     })
   })
@@ -52,7 +53,7 @@ describe('effect.ts', () => {
         }
       )
       expect(
-        useEffectsInstance.onParcellationSelected$
+        useEffectsInstance.onParcChange$
       ).toBeObservable(
         hot(
           'aa',

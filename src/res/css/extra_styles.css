@@ -1,3 +1,27 @@
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); 
+}
+
 html
 {
   width:100%;
@@ -13,6 +37,11 @@ body
 
   /* required for fas tooltip directives */
   overflow:hidden;
+}
+
+.d-none
+{
+  display: none;
 }
 
 .touch-bottom.touch-left > .scale-bar-container
@@ -113,15 +142,6 @@ label.perspective-panel-show-slice-views:hover
 [darktheme="true"] a
 {
   color:#d7e6f4;
-}
-
-label.perspective-panel-show-slice-views:before
-{
-  margin-left: .2em;
-  content: "toggle frontal octant";
-  visibility: visible;
-  pointer-events: all;
-  color: #337ab7;
 }
 
 [darktheme="true"] label.perspective-panel-show-slice-views:before
@@ -286,10 +306,9 @@ markdown-dom pre code
 {
   width: 10em!important;
 }
-
-.mw-400px
+.w-20em
 {
-  max-width: 400px!important;
+  width: 20em!important;
 }
 
 .mw-100
@@ -354,7 +373,12 @@ markdown-dom pre code
 
 .pe-none
 {
-  pointer-events: none;
+  pointer-events: none!important;
+}
+
+.h-2rem
+{
+  height: 2rem!important;
 }
 
 .h-5em
@@ -377,6 +401,16 @@ markdown-dom pre code
 .h-20em
 {
   height:20em!important;
+}
+
+.overflow-x-auto
+{
+  overflow-x: auto;
+}
+
+.overflow-x-scroll
+{
+  overflow-x: scroll;
 }
 
 .overflow-x-hidden
@@ -408,6 +442,11 @@ markdown-dom pre code
 .w-1em
 {
   width: 1em;
+}
+
+.bs-border-box
+{
+  box-sizing: border-box;
 }
 
 .bs-content-box
@@ -451,6 +490,16 @@ markdown-dom pre code
   top: 0!important;
 }
 
+.right-0
+{
+  right: 0!important;
+}
+
+.bottom-0
+{
+  bottom: 0!important;
+}
+
 .outline-none {
     outline: none;
 }
@@ -459,11 +508,18 @@ markdown-dom pre code
     cursor: pointer!important;
 }
 
-cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .cdk-virtual-scroll-content-wrapper
+.z-index-1
 {
-  width: 100%;
+  z-index: 1!important;
 }
-
+.z-index-2
+{
+  z-index: 2!important;
+}
+.z-index-6
+{
+  z-index: 6!important;
+}
 .z-index-10
 {
   z-index: 10!important;
@@ -471,7 +527,12 @@ cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .c
 
 .bg-none
 {
-  background:none!important;
+  background: none!important;
+}
+
+.bg-50-grey-20
+{
+  background-color: rgba(128,128,128, 0.2);
 }
 
 .dot
@@ -611,10 +672,11 @@ body::after
 {
   content: '';
   position: fixed;
-  bottom: 1rem;
-  right: 2rem;
+  bottom: 3rem;
+  width: 100%;
+  text-align: center;
   font-size: 200%;
-  color: rgba(128, 128, 128, 0.5);
+  color: rgba(128, 128, 128, 0.2);
   pointer-events: none;
   z-index: 99999;
 }
@@ -622,11 +684,6 @@ body::after
 .flex-grow-3
 {
   flex-grow: 3!important;
-}
-
-.flex-grow-5
-{
-  flex-grow: 5!important;
 }
 
 .layerBrowserContainer
@@ -665,19 +722,6 @@ kg-dataset-previewer > img
   width: 100%;
 }
 
-/*
-  TODO, this really should be in searchSideNav.style.css. But karma tests does not seem to like to include style.css
-  figure out why
-*/
-/* exactly 1.5 line height */
-
-.h-117px
-{
-  min-height:117px!important;
-  max-height:117px!important;
-  flex-basis: 117px!important;
-}
-
 .hover-grab
 {
   opacity: 0.5;
@@ -690,6 +734,26 @@ kg-dataset-previewer > img
   opacity: 1.0;
 }
 
+.ml-15px-n
+{
+  margin-left: -15px!important;
+}
+
+.mr-15px-n
+{
+  margin-right: -15px!important;
+}
+
+.ml-24px-n
+{
+  margin-left: -24px!important;
+}
+
+.mr-24px-n
+{
+  margin-right: -24px!important;
+}
+
 .ml-4-n
 {
   margin-left: -1rem!important;
@@ -697,6 +761,30 @@ kg-dataset-previewer > img
 .mr-4-n
 {
   margin-right: -1rem!important;
+}
+
+.ml-5-n
+{
+  margin-left: -1.25rem!important;
+}
+
+.ml-8-n
+{
+  margin-left: -2rem!important;
+}
+
+.mr-5-n
+{
+  margin-right: -1.25rem!important;
+}
+.mt-4-n
+{
+  margin-top: -1rem!important;
+}
+
+.mb-6
+{
+  margin-bottom: 3rem!important;
 }
 
 .mat-card-sm > mat-dialog-container
@@ -709,4 +797,25 @@ kg-dataset-previewer > img
 .fixed-bottom
 {
   top: unset!important;
+}
+
+.fixed-top
+{
+  bottom: unset!important;
+}
+
+.layerGroupMenu > .mat-menu-content
+{
+  width: 100%;
+}
+
+mat-list.sm mat-list-item
+{
+  height:2rem!important;
+  font-size: 0.8rem!important;
+}
+
+.color-inherit
+{
+  color: inherit!important;
 }

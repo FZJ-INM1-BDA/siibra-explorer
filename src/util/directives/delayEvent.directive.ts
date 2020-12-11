@@ -22,7 +22,7 @@ export class DelayEventDirective implements OnChanges, OnDestroy {
   @Input('iav-delay-event')
   public delayEvent: string = ''
 
-  @Output()
+  @Output('iav-delay-event-emit')
   public delayedEmit: EventEmitter<any> = new EventEmitter()
 
   constructor(

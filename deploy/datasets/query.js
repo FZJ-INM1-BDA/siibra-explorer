@@ -4,8 +4,9 @@ const URL = require('url')
 const path = require('path')
 const archiver = require('archiver')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
+const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets, filterDatasetsByRegion } = require('./util')
 const ibc = require('./importIBS')
+const { returnAdditionalDatasets } = require('../regionalFeatures')
 
 let cachedData = null
 
@@ -32,7 +33,7 @@ fs.readFile(CACHE_DATASET_FILENAME, 'utf-8', (err, data) => {
 
 const { KG_ROOT, KG_SEARCH_VOCAB } = constants
 
-const KG_DATASET_SEARCH_QUERY_NAME = process.env.KG_DATASET_SEARCH_QUERY_NAME || 'interactiveViewerKgQuery-v0_3'
+const KG_DATASET_SEARCH_QUERY_NAME = process.env.KG_DATASET_SEARCH_QUERY_NAME || 'interactiveViewerKgQuery-v1_0'
 const KG_DATASET_SEARCH_PATH = process.env.KG_DATASET_SEARCH_PATH || '/minds/core/dataset/v1.0.0'
 
 const kgDatasetSearchFullString = `${KG_DATASET_SEARCH_PATH}/${KG_DATASET_SEARCH_QUERY_NAME}`
@@ -108,9 +109,40 @@ const getPublicDs = async () => {
 }
 
 
-const getDs = ({ user }) => user
-  ? fetchDatasetFromKg({ user }).then(({ results }) => results)
-  : getPublicDs()
+const getDs = ({ user }) => (user
+    ? fetchDatasetFromKg({ user }).then(({ results }) => results)
+    : getPublicDs()
+  ).then(async datasets => {
+    
+    /**
+     * populate the manually inserted dataset first
+     * this allows inserted dataset to overwrite the KG dataset (if needed)
+     */
+    return [
+      ...(await returnAdditionalDatasets()),
+      ...datasets,
+    ]
+    .reduce((acc, curr) => {
+      /**
+       * remove duplicates
+       */
+      const existingEntryIdx = acc.findIndex(v => v['fullId'] === curr['fullId'])
+      if (existingEntryIdx >= 0) {
+        const itemToReturn = {
+          ...acc[existingEntryIdx],
+          ...curr,
+          parcellationRegion: [
+            ...(curr['parcellationRegion'] || []),
+            ...(acc[existingEntryIdx]['parcellationRegion'] || [])
+          ]
+        }
+        const returnArr = [...acc]
+        returnArr.splice(existingEntryIdx, 1, itemToReturn)
+        return returnArr
+      }
+      else return acc.concat(curr)
+    }, [])
+  })
 
 const getExternalSchemaDatasets = (kgId, kgSchema) => {
   if (kgSchema === ibc.IBC_SCHEMA) {
@@ -126,6 +158,44 @@ const init = async () => {
   return await getPublicDs()
 }
 
+const dsNamesToExclude = [
+  'DiFuMo atlas',
+  'Whole-brain parcellation',
+  'Probabilistic cytoarchitectonic map',
+  'Automated Anatomical Labeling (AAL1) atlas',
+  'Maximum probability map',
+  'Interpolated 3D map',
+  'Corrected 3-D reconstruction and surface parcellation',
+  'Probability map',
+  'Probabilistic map',
+  // 'Reference delineations',
+  'Atlas of the short fiber bundles ',
+  'Desikan-Killiany Atlas',
+  'GapMap',
+  'Cytoarchitectonic areas',
+  'Co-activation based parcellation',
+  'CEREBRUM-7T',
+  'Filter Activations of Convolutional Neuronal Networks'
+]
+
+const getDatasetsByRegion = async ({ regionId, user }) => {
+  /**
+   * potentially add other sources of datasets
+   */
+  const kgDatasets = await getDs({ user })
+  const excludedDatasets = kgDatasets.filter(({ name }) => {
+    if (!name) return true
+    return !dsNamesToExclude.some(n => name.indexOf(n) === 0)
+  })
+  return filterDatasetsByRegion([
+    ...excludedDatasets,
+    /**
+     * other datasets, such ibc
+     */
+    ...ibc.getIBCData(),
+  ], regionId)
+}
+
 const getDatasets = ({ templateName, parcellationName, user }) => {
   // Get Local datasets
   const localDatasets = [
@@ -136,7 +206,6 @@ const getDatasets = ({ templateName, parcellationName, user }) => {
   // Get all datasets and merge local ones
   return getDs({ user })
     .then(json => {
-      // console.log(json.map(j=> j.parcellationRegion))
       json = [...json, ...localDatasets]
       return filterDatasets(json, { templateName, parcellationName })
     })
@@ -233,6 +302,7 @@ module.exports = {
   getPreview,
   hasPreview,
   getTos,
-  getExternalSchemaDatasets
+  getExternalSchemaDatasets,
+  getDatasetsByRegion,
 }
 

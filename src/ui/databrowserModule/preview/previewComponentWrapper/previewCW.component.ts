@@ -1,11 +1,11 @@
 import { Component, Input, Inject, ViewChild, ElementRef } from "@angular/core";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { Observable, fromEvent, Subscription, of, throwError } from "rxjs";
 import { switchMapTo, catchError, take, concatMap, map, retryWhen, delay } from "rxjs/operators";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ARIA_LABELS } from 'common/constants'
 import { DS_PREVIEW_URL } from 'src/util/constants'
+import { PureContantService } from "src/util";
 
 const { 
   DOWNLOAD_PREVIEW,
@@ -40,6 +40,7 @@ const fromPromiseRetry = ({ retries = 10, timeout = 100 } = {}) => {
 
 export class PreviewComponentWrapper{
 
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
   public touched: boolean = false
   public untouchedIndex: number = 0
 
@@ -67,11 +68,11 @@ export class PreviewComponentWrapper{
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data: any,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private sanitizer: DomSanitizer
   ){
 
-    this.darktheme$ = this.constantService.darktheme$
+    this.darktheme$ = this.pureConstantService.darktheme$
     if (data) {
       const { filename, kgId, backendUrl, datasetName } = data
       this.filename = filename

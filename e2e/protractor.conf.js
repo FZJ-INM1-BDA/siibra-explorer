@@ -4,16 +4,16 @@
 const chromeOpts = require('./chromeOpts')
 const SELENIUM_ADDRESS = process.env.SELENIUM_ADDRESS
 
-const bsTestname = process.env.BROWSERSTACK_TEST_NAME
-const bsUsername = process.env.BROWSERSTACK_USERNAME
-const bsAccessKey = process.env.BROWSERSTACK_ACCESS_KEY
+const {
+  BROWSERSTACK_TEST_NAME,
+  BROWSERSTACK_USERNAME,
+  BROWSERSTACK_ACCESS_KEY,
+} = process.env
 const directConnect = !!process.env.DIRECT_CONNECT
 
 const PROTRACTOR_SPECS = process.env.PROTRACTOR_SPECS
 
-const localConfig = bsUsername && bsAccessKey
-  ? {}
-  : {
+const localConfig = {
   ...(SELENIUM_ADDRESS
     ? { seleniumAddress: SELENIUM_ADDRESS }
     : { directConnect: true } 
@@ -45,55 +45,55 @@ let bsLocal
  * MIT licensed
  */
 const bsConfig = {
-  'browserstackUser': bsUsername,
-  'browserstackKey': bsAccessKey,
+  'browserstackUser': BROWSERSTACK_USERNAME,
+  'browserstackKey': BROWSERSTACK_ACCESS_KEY,
   
   'capabilities': {
     'build': 'protractor-browserstack',
-    'name': bsTestname || 'iav_e2e',
+    'name': BROWSERSTACK_TEST_NAME || 'iav_e2e',
     "os" : "Windows",
     "osVersion" : "10",
     'browserName': 'chrome',
-    // 'browserstack.local': false,
+    'browserstack.local': true,
     "seleniumVersion" : "4.0.0-alpha-2",
     'browserstack.debug': 'true'
   },
   "browserName" : "Chrome",
   "browserVersion" : "83.0",
 
-  // // Code to start browserstack local before start of test
-  // beforeLaunch: function(){
-  //   console.log("Connecting local");
-  //   return new Promise(function(resolve, reject){
-  //     bsLocal = new Local();
-  //     bsLocal.start({'key': bsAccessKey }, function(error) {
-  //       if (error) return reject(error);
-  //       console.log('Connected. Now testing...');
+  // Code to start browserstack local before start of test
+  beforeLaunch: function(){
+    console.log("Connecting local");
+    return new Promise(function(resolve, reject){
+      bsLocal = new Local();
+      bsLocal.start({'key': BROWSERSTACK_ACCESS_KEY }, function(error) {
+        if (error) return reject(error);
+        console.log('Connected. Now testing...');
 
-  //       resolve();
-  //     });
-  //   });
-  // },
+        resolve();
+      });
+    });
+  },
 
-  // // Code to stop browserstack local after end of test
-  // afterLaunch: function(){
-  //   return new Promise(function(resolve, reject){
-  //     if (bsLocal) bsLocal.stop(resolve)
-  //     else resolve()
-  //   });
-  // }
+  // Code to stop browserstack local after end of test
+  afterLaunch: function(){
+    return new Promise(function(resolve, reject){
+      if (bsLocal) bsLocal.stop(resolve)
+      else resolve()
+    });
+  }
 }
 
 exports.config = {
   specs: [
-    (PROTRACTOR_SPECS && PROTRACTOR_SPECS) || './src/**/*.prod.e2e-spec.js'
+    PROTRACTOR_SPECS || './src/**/*.prod.e2e-spec.js'
   ],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 1000 * 60 * 10
   },
   
   ...(
-    bsAccessKey && bsUsername
+    BROWSERSTACK_ACCESS_KEY && BROWSERSTACK_USERNAME
     ? bsConfig
     : localConfig
   ),

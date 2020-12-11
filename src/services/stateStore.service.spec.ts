@@ -103,7 +103,6 @@ describe('stateStore.service.ts', () => {
 
       it('left top level should map 15 => region1', () => {
         const leftMap = map.get('left')
-        console.log(leftMap.get(15), region1)
         expect(leftMap.get(15)).toEqual(region1)
       })
 
@@ -136,7 +135,6 @@ describe('stateStore.service.ts', () => {
         }
         
         for (const r of regions) {
-          console.log(r)
           expect(r.dummyattr).toEqual('p dummy attr')
         }
       })

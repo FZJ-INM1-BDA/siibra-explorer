@@ -7,6 +7,9 @@ const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 
+const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
+const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
+
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
 if (process.env.NODE_ENV !== 'production') {
@@ -19,6 +22,7 @@ const DOC_PUBLIC_PATH = process.env.NODE_ENV === 'production'
   : path.join(__dirname, '..', 'site')
 
 app.use('/docs', express.static(DOC_PUBLIC_PATH))
+app.use('/quickstart', require('./quickstart'))
 
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')
 
@@ -40,11 +44,20 @@ app.use((req, _, next) => {
  * load env first, then load other modules
  */
 
-const configureAuth = require('./auth')
+const { configureAuth, ready: authReady } = require('./auth')
 
-const store = new MemoryStore({
-  checkPeriod: 86400000
-})
+/**
+ * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
+ * this causes problems during tests
+ * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
+ * see app.spec.js
+ */
+const { USE_DEFAULT_MEMORY_STORE } = process.env
+const store = USE_DEFAULT_MEMORY_STORE
+  ? (console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`), null)
+  : new MemoryStore({
+      checkPeriod: 86400000
+    })
 
 const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
 
@@ -67,14 +80,15 @@ if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
   require('./csp')(app)
 }
 
-
 /**
  * configure Auth
  * async function, but can start server without
  */
-configureAuth(app)
-  .then(() => console.log('configure auth properly'))
-  .catch(e => console.error('configure auth failed', e))
+
+(async () => {
+  await configureAuth(app)
+  app.use('/user', require('./user'))
+})()
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
@@ -128,10 +142,7 @@ app.use(require('./devBanner'))
 /**
  * populate nonce token
  */
-const indexTemplate = require('fs').readFileSync(
-  path.join(PUBLIC_PATH, 'index.html'),
-  'utf-8'
-)
+const { indexTemplate } = require('./constants')
 app.get('/', cookieParser(), (req, res) => {
   const iavError = req.cookies && req.cookies['iav-error']
   
@@ -151,10 +162,25 @@ app.get('/', cookieParser(), (req, res) => {
   }
 })
 
-/**
- * User route, for user profile/management
- */
-app.use('/user', require('./user'))
+
+app.use('/logo', require('./logo'))
+
+app.get('/ready', async (req, res) => {
+  const authIsReady = await authReady()
+  const regionalFeatureReady = await regionalFeatureIsReady()
+  const datasetReady = await datasetRouteIsReady()
+  const allReady = [ 
+    authIsReady,
+    regionalFeatureReady,
+    datasetReady,
+    /**
+     * add other ready endpoints here
+     * call sig is await fn(): boolean
+     */
+  ].every(f => !!f)
+  if (allReady) return res.status(200).end()
+  else return res.status(500).end()
+})
 
 /**
  * only use compression for production
@@ -179,9 +205,9 @@ const jsonMiddleware = (req, res, next) => {
 /**
  * resources endpoints
  */
+const atlasesRouter = require('./atlas')
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
-const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
@@ -190,9 +216,11 @@ const setResLocalMiddleWare = routePathname => (req, res, next) => {
   next()
 }
 
+app.use('/atlases', setResLocalMiddleWare('atlases'), atlasesRouter)
 app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
 app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
 app.use('/datasets', jsonMiddleware, datasetRouter)
+app.use('/regionalFeatures', jsonMiddleware, regionalFeaturesRouter)
 app.use('/plugins', jsonMiddleware, pluginRouter)
 app.use('/preview', jsonMiddleware, previewRouter)
 

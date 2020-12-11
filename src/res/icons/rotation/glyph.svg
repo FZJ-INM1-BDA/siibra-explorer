@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (6e3e5246a0, 2020-05-07)"
+   sodipodi:docname="rotate-path.svg"
+   id="svg859"
+   version="1.1"
+   viewBox="0 0 256 256"
+   height="967.55908"
+   width="967.55908">
+  <defs
+     id="defs853" />
+  <sodipodi:namedview
+     inkscape:window-maximized="0"
+     inkscape:window-y="27"
+     inkscape:window-x="167"
+     inkscape:window-height="1023"
+     inkscape:window-width="1454"
+     units="px"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="927.73926"
+     inkscape:cx="773.00854"
+     inkscape:zoom="0.41362181"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata856">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <path
+       transform="scale(0.26458333)"
+       d="M 364.51953 79.835938 L 349.40039 106.02148 L 303.59961 185.34766 L 373.42969 185.34766 L 386.6543 162.44141 L 402.36719 171.51367 L 426.32812 185.34766 L 547.27344 185.34766 L 432.60352 119.14453 L 416.89062 110.07227 L 406.41797 104.02539 L 364.51953 79.835938 z M 206.83984 188.32617 L 176.60352 218.5625 C 176.32726 329.65197 176.54241 440.59812 176.58789 550.83398 L 176.60938 550.83398 L 176.60938 734.01562 L 176.60938 737.79688 L 176.60352 737.79688 L 176.60352 750.92188 L 206.83984 781.1582 L 393.5957 781.1582 L 555.32812 874.53516 L 596.63281 863.4668 L 621.01758 821.23047 L 636.13672 795.04492 L 612.08398 781.1582 L 739.19336 781.1582 L 769.42969 750.92188 L 769.42969 564.17383 L 862.80859 402.4375 L 851.74219 361.13281 L 851.56836 361.0332 L 825.38281 345.91602 L 795.14648 398.28711 L 795.32031 398.38672 L 769.42969 443.23047 L 769.42969 321.88672 L 773.01367 315.67969 L 769.42969 313.60938 L 769.42969 218.5625 L 739.19336 188.32617 C 635.4233 188.61216 525.11776 188.45039 426.32812 188.36914 L 426.32812 188.61914 L 239.36719 188.61914 L 239.36719 188.32617 L 206.83984 188.32617 z M 237.07617 248.79883 L 266.9668 248.79883 L 261.32422 258.57422 L 313.69531 288.81055 L 328.8125 262.625 L 336.79492 248.79883 L 536.22852 248.79883 L 705.68555 346.63477 L 705.68555 276.80664 L 657.17383 248.79883 L 705.68555 248.79883 L 708.95703 248.79883 L 708.95703 278.69531 L 708.95703 348.52344 L 708.95703 435.75977 L 708.95703 547.97266 L 708.89258 548.08398 L 708.89258 669.02539 L 708.95703 668.91406 L 708.95703 717.41406 L 708.95703 720.68555 L 679.06641 720.68555 L 628.28711 720.68555 L 521.99609 720.68555 L 449.73828 720.68555 L 449.73828 720.87109 L 262.77734 720.87109 L 262.77734 720.68555 L 237.07617 720.68555 L 237.07617 421.51758 L 268.33984 367.36719 L 283.45898 341.18164 L 237.07617 314.40234 L 237.07617 248.79883 z M 173.10938 411.36523 L 171.70117 413.80469 L 83.224609 567.05078 L 94.291016 608.35547 L 173.33789 653.99219 L 173.33789 584.16406 L 150.71289 571.10156 L 172.01367 534.20898 L 173.10938 532.31055 L 173.10938 411.36523 z M 705.62109 553.75 L 629.12109 686.25195 L 614.00195 712.4375 L 622.62109 717.41406 L 680.95508 717.41406 L 681.49023 716.48828 L 705.62109 674.69141 L 705.62109 553.75 z M 287.38672 650.01172 L 257.15039 702.38086 L 283.33594 717.5 L 283.50586 717.59766 L 404.45117 717.59766 L 313.57227 665.12891 L 287.38672 650.01172 z M 514.54102 781.1582 L 574.32617 781.1582 L 568.64844 790.99414 L 559.37891 807.04492 L 514.54102 781.1582 z "
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:60.4724;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       id="path2731" />
+    <g
+       transform="matrix(0.41458666,0,0,1,39.693876,10.077571)"
+       style="opacity:1"
+       id="g2770" />
+    <g
+       id="g2770-3"
+       style="opacity:1"
+       transform="matrix(0,0.41458666,-1,0,277.19345,183.70791)" />
+    <g
+       transform="matrix(0,0.41458666,-1,0,202.41455,42.932035)"
+       style="opacity:1"
+       id="g2770-3-9" />
+    <g
+       transform="matrix(-0.41458666,0,0,-1,52.835984,284.82378)"
+       style="opacity:1"
+       id="g2770-3-7" />
+    <g
+       transform="matrix(0,0.41458666,-1,0,208.60837,183.75677)"
+       style="opacity:1"
+       id="g2770-3-3" />
+  </g>
+</svg>

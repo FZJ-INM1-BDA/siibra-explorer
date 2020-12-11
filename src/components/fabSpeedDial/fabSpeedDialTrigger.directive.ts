@@ -1,4 +1,4 @@
-import { Directive, HostListener } from "@angular/core";
+import { Directive, HostListener, HostBinding } from "@angular/core";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 
 @Directive({
@@ -14,4 +14,7 @@ export class FabSpeedDialTrigger{
   triggerClicked(){
     this.fabService.toggle()
   }
+  
+  @HostBinding('style.pointer-events')
+  pointerEvents = 'all'
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (6e3e5246a0, 2020-05-07)"
+   sodipodi:docname="rotate.svg"
+   id="svg859"
+   version="1.1"
+   viewBox="0 0 256 256"
+   height="967.55908"
+   width="967.55908">
+  <defs
+     id="defs853" />
+  <sodipodi:namedview
+     inkscape:window-maximized="0"
+     inkscape:window-y="27"
+     inkscape:window-x="167"
+     inkscape:window-height="1023"
+     inkscape:window-width="1454"
+     units="px"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="524.86583"
+     inkscape:cx="475.38605"
+     inkscape:zoom="0.80867634"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata856">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <rect
+       y="57.82893"
+       x="54.726311"
+       height="140.85201"
+       width="140.85201"
+       id="rect1422"
+       style="fill:none;stroke:#000000;stroke-width:16;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:bevel;stroke-linecap:square" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:16.00000045;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:96.00000267,32.00000089;stroke-dashoffset:115.2000032;paint-order:normal"
+       id="rect1422-3"
+       width="140.85202"
+       height="140.85202"
+       x="102.08652"
+       y="-21.93014"
+       transform="rotate(30)" />
+  </g>
+</svg>

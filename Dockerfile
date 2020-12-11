@@ -3,14 +3,8 @@ FROM node:12 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
-ARG USE_LOGO
-ENV USE_LOGO=${USE_LOGO:-hbp}
-
 ARG DATASET_PREVIEW_URL
 ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
-
-ARG USE_LOGO
-ENV USE_LOGO=${USE_LOGO:-hbp}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}
@@ -28,7 +22,7 @@ RUN npm i
 RUN npm run build-aot
 
 # gzipping container
-FROM ubuntu:19.10 as compressor
+FROM ubuntu:20.10 as compressor
 RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv

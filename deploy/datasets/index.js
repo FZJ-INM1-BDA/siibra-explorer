@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getExternalSchemaDatasets, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getExternalSchemaDatasets, getDatasetFileAsZip, getTos, hasPreview, getDatasetsByRegion } = require('./query')
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
@@ -11,16 +11,20 @@ const { getHandleErrorFn } = require('../util/streamHandleError')
 const { IBC_SCHEMA } = require('./importIBS')
 
 const bodyParser = require('body-parser')
+const { getIdFromFullId } = require('../../common/util')
 
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
-init()
-  .then(() => console.log(`dataset init success`))
-  .catch(e => {
-    console.warn(`dataset init failed`, e)
-    retry(() => init())
-  })
+let readyFlag = false
+
+retry(async () => {
+  await init()
+  console.log(`data init success`)
+  readyFlag = true
+}, { timeout: 1000, retries: 5 })
+
+const ready = async () => readyFlag
 
 const cacheMaxAge24Hr = (_req, res, next) => {
   const oneDay = 24 * 60 * 60
@@ -70,6 +74,25 @@ datasetsRouter.get('/templateNameParcellationName/:templateName/:parcellationNam
         trace: 'templateName'
       })
     })
+})
+
+datasetsRouter.get('/byRegion/:regionId', noCacheMiddleWare, async (req, res) => {
+  const { query } = req
+  const refSpcId = query && query.referenceSpaceId
+  
+  const { regionId } = req.params
+  const { user } = req
+  const ds = await getDatasetsByRegion({ regionId, user })
+  const filteredDs = ds.filter(d => {
+    /**
+     * filter by reference space
+     */
+    if (!d['referenceSpaces'] || d['referenceSpaces'].length === 0 || !refSpcId) {
+      return true
+    }
+    return d['referenceSpaces'].some(refSpc => getIdFromFullId(refSpc['fullId']) === refSpcId)
+  })
+  res.status(200).json(filteredDs)
 })
 
 const deprecatedNotice = (_req, res) => {
@@ -172,9 +195,16 @@ datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) =>
   const { kgId } = req.query
   const { kgSchema } = req.query
   const { user } = req
+
+  const tokenInRequest = req.headers['authorization'] && req.headers['authorization'].replace(/bearer\s+/i, '')
+  const reqUser = tokenInRequest && ({
+    tokenset: {
+      access_token: tokenInRequest
+    }
+  })
   try{
     if (kgSchema === 'minds/core/dataset/v1.0.0') {
-      const stream = await getDatasetFromId({user, kgId, returnAsStream: true})
+      const stream = await getDatasetFromId({user: reqUser || user, kgId, returnAsStream: true})
       stream.on('error', getHandleErrorFn(req, res)).pipe(res)
     } else {
       const data = getExternalSchemaDatasets(kgId, kgSchema)
@@ -229,4 +259,7 @@ datasetsRouter.post('/bulkDownloadKgFiles', bodyParser.urlencoded({ extended: fa
   }
 })
 
-module.exports = datasetsRouter
+module.exports = {
+  router: datasetsRouter,
+  ready
+}

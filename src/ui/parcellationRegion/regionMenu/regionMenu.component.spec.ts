@@ -3,11 +3,11 @@ import { RegionMenuComponent } from "./regionMenu.component"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
-import { PreviewDatasetFile } from "src/ui/databrowserModule/singleDataset/datasetPreviews/previewDatasetFile.directive"
-import { provideMockStore, MockStore } from "@ngrx/store/testing"
-import { regionInOtherTemplateSelector } from '../region.base'
-import { ARIA_LABELS } from 'common/constants'
-import { By } from "@angular/platform-browser"
+import { provideMockStore } from "@ngrx/store/testing"
+import { RenderViewOriginDatasetLabelPipe } from '../region.base'
+import { Directive, Input } from "@angular/core"
+import { NoopAnimationsModule } from "@angular/platform-browser/animations"
+import { ComponentsModule } from "src/components"
 
 const mt0 = {
   name: 'mt0'
@@ -55,6 +55,44 @@ const hemisphereMrms = [ {
 
 const nohemisphereHrms = [mrm0, mrm1]
 
+@Directive({
+  selector: '[iav-dataset-preview-dataset-file]',
+  exportAs: 'iavDatasetPreviewDatasetFile'
+})
+class MockPrvDsFileDirective {
+  @Input('iav-dataset-preview-dataset-file') 
+  file
+
+  @Input('iav-dataset-preview-dataset-file-filename') 
+  filefilename
+
+  @Input('iav-dataset-preview-dataset-file-dataset') 
+  filedataset
+
+  @Input('iav-dataset-preview-dataset-file-kgid') 
+  filekgid
+
+  @Input('iav-dataset-preview-dataset-file-kgschema') 
+  filekgschema
+
+  @Input('iav-dataset-preview-dataset-file-fullid') 
+  filefullid
+
+}
+
+@Directive({
+  selector: '[single-dataset-directive]',
+  exportAs: 'singleDatasetDirective'
+})
+
+class DummySingleDatasetDirective{
+  @Input()
+  kgId: string
+
+  @Input()
+  kgSchema: string
+}
+
 describe('> regionMenu.component.ts', () => {
   describe('> RegionMenuComponent', () => {
     beforeEach(async(() => {
@@ -64,14 +102,17 @@ describe('> regionMenu.component.ts', () => {
           UtilModule,
           AngularMaterialModule,
           CommonModule,
+          NoopAnimationsModule,
+          ComponentsModule,
         ],
         declarations: [
           RegionMenuComponent,
-
+          RenderViewOriginDatasetLabelPipe,
           /**
            * Used by regionMenu.template.html to show region preview
            */
-          PreviewDatasetFile,
+          MockPrvDsFileDirective,
+          DummySingleDatasetDirective,
         ],
         providers: [
           provideMockStore({ initialState: {} })
@@ -83,137 +124,6 @@ describe('> regionMenu.component.ts', () => {
     it('> init just fine', () => {
       const fixture = TestBed.createComponent(RegionMenuComponent)
       expect(fixture).toBeTruthy()
-    })
-    
-    describe('> regionInOtherTemplatesTmpl', () => {
-
-      it('> toggleBtn does not exists if selector returns empty array', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          []
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        expect(toggleBtn).toBeFalsy()
-      })
-
-      it('> toggleBtn exists if selector returns non empty array', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          nohemisphereHrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        expect(toggleBtn).toBeTruthy()
-      })
-
-      it('> even if toggleBtn exists, list should be hidden by default', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          nohemisphereHrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-        expect(listContainer).toBeFalsy()
-      })
-
-      it('> on click of toggle btn, list to become visible', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          nohemisphereHrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        toggleBtn.triggerEventHandler('click', null)
-        fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-        expect(listContainer).toBeTruthy()
-      })
-
-      it('> once list becomes available, there should be 2 items on the list', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          nohemisphereHrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        toggleBtn.triggerEventHandler('click', null)
-        fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-        expect(listContainer.nativeElement.children.length).toEqual(2)
-      })
-
-      it('> the text (no hemisphere metadata) on the list is as expected', () => {
-
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          nohemisphereHrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        toggleBtn.triggerEventHandler('click', null)
-        fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-
-        // trim white spaces before and after
-        const texts = Array.from(listContainer.nativeElement.children).map((c: HTMLElement) => c.textContent.replace(/^\s+/, '').replace(/\s+$/, ''))
-        expect(texts).toContain(mt0.name)
-        expect(texts).toContain(mt1.name)
-      })
-
-      it('> the text (with hemisphere metadata) on the list is as expected', () => {
-        
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(
-          regionInOtherTemplateSelector,
-          hemisphereMrms
-        )
-
-        const fixture = TestBed.createComponent(RegionMenuComponent)
-        fixture.componentInstance.region = mr1
-        fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        toggleBtn.triggerEventHandler('click', null)
-        fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-
-        // trim white spaces before and after, and middle white spaces into a single white space
-        const texts = Array.from(listContainer.nativeElement.children).map((c: HTMLElement) => c.textContent.replace(/^\s+/, '').replace(/\s+$/, '').replace(/\s+/g, ' '))
-        expect(texts).toContain(`${mt0.name} (left hemisphere)`)
-        expect(texts).toContain(`${mt1.name} (left hemisphere)`)
-      })
     })
   })
 })

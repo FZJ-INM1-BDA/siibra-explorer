@@ -1,0 +1,56 @@
+<ng-container *ngIf="!dataIsLoading; else loadingTmpl">
+  
+  <mat-accordion
+    class="ml-24px-n mr-24px-n d-block">
+    <mat-expansion-panel *ngFor="let datum of (data$ | async)"
+      [expanded]="openElectrodeId$ | async | arrayContains : datum['@id']"
+      (opened)="handleDatumExpansion(datum['@id'], true)"
+      (closed)="handleDatumExpansion(datum['@id'], false)"
+      togglePosition="before">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Electrode
+        </mat-panel-title>
+        <mat-panel-description class="text-nowrap">
+          {{ datum['@id'] }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <label for="task-list" class="d-block mat-h4 mt-4 text-muted">
+        Tasks
+      </label>
+      <section class="d-flex align-items-center mt-1">
+        <section id="task-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+          <div role="list">
+            <mat-chip *ngFor="let task of datum['tasks']" class="ml-1">
+              {{ task }}
+            </mat-chip>
+          </div>
+        </section>
+      </section>
+
+      <label for="contact-points-list" class="d-block mat-h4 mt-4 text-muted">
+        Contact Points
+      </label>
+      <section class="d-flex align-items-center mt-1">
+        <section id="contact-points-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+          <div role="list">
+            <mat-chip *ngFor="let contactPt of datum['contactPoints']"
+              [matTooltip]="contactPt['position']"
+              (click)="handleContactPtClk(contactPt)"
+              class="ml-1">
+              {{ contactPt['@id'] }}
+            </mat-chip>
+          </div>
+        </section>
+      </section>
+  
+    </mat-expansion-panel>
+  </mat-accordion>
+
+</ng-container>
+
+<!-- loading template -->
+<ng-template #loadingTmpl>
+  <spinner-cmp></spinner-cmp>
+</ng-template>

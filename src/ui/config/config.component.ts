@@ -2,13 +2,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
-import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
+import { SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
+import { ngViewerActionSetPanelOrder } from 'src/services/state/ngViewerState.store.helper';
 import { VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 import { IavRootStoreInterface } from 'src/services/stateStore.service';
 import { isIdentityQuat } from '../nehubaContainer/util';
 import {MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {MatSliderChange} from "@angular/material/slider";
+import { PureContantService } from 'src/util';
+import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
+import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
+import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors';
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -53,10 +57,10 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     this.gpuLimit$ = this.store.pipe(
       select('viewerConfigState'),
@@ -71,19 +75,16 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
 
     this.panelMode$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       startWith(SUPPORTED_PANEL_MODES[0]),
     )
 
     this.panelOrder$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
     )
 
     this.viewerObliqueRotated$ = this.store.pipe(
-      select('viewerState'),
-      select('navigation'),
+      select(viewerStateSelectorNavigation),
       map(navigation => (navigation && navigation.orientation) || [0, 0, 0, 1]),
       debounceTime(100),
       map(isIdentityQuat),
@@ -91,12 +92,12 @@ export class ConfigComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
     )
 
-    this.panelTexts$ = combineLatest(
+    this.panelTexts$ = combineLatest([
       this.panelOrder$.pipe(
         map(string => string.split('').map(s => Number(s))),
       ),
       this.viewerObliqueRotated$,
-    ).pipe(
+    ]).pipe(
       map(([arr, isObliqueRotated]) => arr.map(idx => (isObliqueRotated ? OBLIQUE_ROOT_TEXT_ORDER : ROOT_TEXT_ORDER)[idx]) as [string, string, string, string]),
       startWith(ROOT_TEXT_ORDER),
     )
@@ -141,10 +142,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
     })
   }
   public usePanelMode(panelMode: string) {
-    this.store.dispatch({
-      type: NG_VIEWER_ACTION_TYPES.SWITCH_PANEL_MODE,
-      payload: { panelMode },
-    })
+    this.store.dispatch(
+      ngViewerActionSwitchPanelMode({
+        payload: { panelMode }
+      })
+    )
   }
 
   public handleDrop(event: DragEvent) {
@@ -157,10 +159,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
     const arr = this.panelOrder.split('');
 
     [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]]
-    this.store.dispatch({
-      type: NG_VIEWER_ACTION_TYPES.SET_PANEL_ORDER,
-      payload: { panelOrder: arr.join('') },
-    })
+    this.store.dispatch(
+      ngViewerActionSetPanelOrder({
+        payload: { panelOrder: arr.join('') }
+      })
+    )
   }
   public handleDragOver(event: DragEvent) {
     event.preventDefault()

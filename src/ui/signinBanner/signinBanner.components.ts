@@ -12,8 +12,9 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {MatBottomSheet} from "@angular/material/bottom-sheet";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { CONST } from 'common/constants'
 
 @Component({
   selector: 'signin-banner',
@@ -26,6 +27,22 @@ import {MatBottomSheet} from "@angular/material/bottom-sheet";
 })
 
 export class SigninBanner {
+
+  public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
+
+  public matBtnStyle = ''
+  public matBtnColor = 'primary'
+
+  private _ismobile = false
+  @Input()
+  set ismobile(val) {
+    this._ismobile = val
+    this.matBtnStyle = this._ismobile ? 'mat-mini-fab' : 'mat-icon-button'
+    this.matBtnColor = this._ismobile ? 'accent' : 'primary'
+  }
+  get ismobile(){
+    return this._ismobile
+  }
 
   @Input() public darktheme: boolean
   @Input() public parcellationIsSelected: boolean
@@ -63,13 +80,15 @@ export class SigninBanner {
 
   private dialogRef: MatDialogRef<any>
 
-  public openTmplWithDialog(tmpl: TemplateRef<any>) {
+  public openTmplWithDialog(tmpl: TemplateRef<any>, overwriteConfig?: Partial<MatDialogConfig>) {
     this.dialogRef && this.dialogRef.close()
 
-    if (tmpl) { this.dialogRef = this.dialog.open(tmpl, {
-      autoFocus: false,
-      panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
-    })
+    if (tmpl) {
+      this.dialogRef = this.dialog.open(tmpl, {
+        autoFocus: false,
+        panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
+        ...overwriteConfig
+      })
     }
   }
 
@@ -87,15 +106,16 @@ export class SigninBanner {
   private keyListenerConfigBase = {
     type: 'keydown',
     stop: true,
-    prevent: true,
     target: 'document',
   }
 
   public keyListenerConfig = [{
     key: 'h',
+    capture: true,
     ...this.keyListenerConfigBase,
   }, {
     key: 'H',
+    capture: true,
     ...this.keyListenerConfigBase,
   }, {
     key: '?',

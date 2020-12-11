@@ -15,7 +15,7 @@ script: skip
 
 jobs:
   include:
-    - stage: Unit tests and Lint
+    - stage: Unit tests, Lint & test build
       if: |
         type = push AND \
         branch NOT IN (master, staging, dev)
@@ -25,6 +25,7 @@ jobs:
       script:
       - npm run lint
       - npm test
+      - npm run build-aot
       env:
       - NODE_ENV=test
 
@@ -42,50 +43,6 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
-    - stage: Check version numbers and release notes
-      name: Check version number advanced (package.json)
-      if: |
-        (type = pull_request AND branch = staging) OR \
-        (type = pull_request AND branch = master AND NOT head_branch = staging)
-      script:
-      - MASTER_VERSION=$(git show origin/master:package.json | jq '.version')
-      - THIS_VERSION=$(jq '.version' < package.json)
-      - test "$MASTER_VERSION" == "$THIS_VERSION" && exit 1 || exit 0
-
-    - name: Check release notes authored (docs/releases/v?.?.?.md)
-      if: |
-        (type = pull_request AND branch = staging) OR \
-        (type = pull_request AND branch = master AND NOT head_branch = staging)
-      script:
-      - |
-        VERSION_NUM=$(jq '.version' < package.json) && \
-        VERSION_NUM=${VERSION_NUM#\"} && \
-        VERSION_NUM=${VERSION_NUM%\"} && \
-        test -f docs/releases/v$VERSION_NUM.md && exit 0 || exit 1
-
-    - name: Release notes linked in mkdocs.yml
-      if: |
-        (type = pull_request AND branch = staging) OR \
-        (type = pull_request AND branch = master AND NOT head_branch = staging)
-      script:
-      - VERSION_NUM=$(jq '.version' < package.json)
-      - VERSION_NUM=${VERSION_NUM#\"} 
-      - VERSION_NUM=${VERSION_NUM%\"} 
-      - 'echo "VERSION_NUM: $VERSION_NUM"'
-      - cat mkdocs.yml
-      - GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
-      - 'echo GREP_VERSION_NUM: $GREP_VERSION_NUM'
-      - test -z "$GREP_VERSION_NUM" && exit 1 || exit 0
-
-    - stage: Create github release
-      if: |
-        type = push AND \
-        branch = master
-      before_script:
-      - chmod ugo+x ./release.sh
-      script: ./release.sh
-      env:
-      - secure: "mERkfztriSCECF/liheC4zFmq4h+MxausY8N0soTytOWUuTmz+NfxObsQ8w8Zl0h3XVe0BZdueJ15zeoipNBDisHZ2kbfLYnCJ8nsym+0O7mpYUSEiT5nDVE0Yj/9a+ZOAW0h0mvWNOwQZId0uTPr8rEst4IvCr+HkLZEUOM06lnftz1edYN3EsVih6MuTymXNLUaYkMBCErq2AFGvgOy6oP6Mq/D2QkBvM+RUNIxcJ2SrM9lMw4i5L/PeOnxbm0MBUndFhR/P0rJ7qz0j4kRP3DvgXfeW+hQsYcECGsnxMgC+Q59ULTBrRGuD03PnHI+7H8CrX+8maHYy+yf7S/iblaCcr0E5gZq/U0mUJbicymBhw4Ygu76X2Rj6E4jUeoC60MqDZovSisV6xuRXXFDqbfYxlBgFSsSS4Ozbl/RUA5MtLx/N4LwAKv5kafktFwZih/ZfQMAOZQfUDB60y4Mvh1Eg6XK4HhnRxdBE8GWP1tQLq/3n8NLr9KBIR4ceHUNEFXjWw3nPIAujnCqUoxSJotfDEnFUpV6KMgZxiC9vv/vq7IgnzzTXRGdvFfjzBbFmYv4+nqYzZhqKb7BI9y++0v+4Jdu9eHGdYVIpiYzzEKhqImK6I4CsUdcakXiPecdxlwA1zc/yET8qyBNGPGnXvYAw1hBt1VbtP8Rf3PKfo="
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
@@ -101,6 +58,13 @@ jobs:
     #   - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
     #   - BROWSERSTACK_USERNAME=xiao33
     #   - secure: "YD2hDBnWzcMs9mTJCsKkJimd+mYKP8V1lTaCnxNvspJUxTuBWFmr8cvryIs9G9DhwgxkC3YL7hugsGkwMg6OIq27vLlo8mgoKS7/qrkWAJApGvDW4jc4CHpI2iE/ryrwG1bI3u9TuG0kSw+2sN/786LBgArlf5NbmwB9zmW4zyzjXXzSME34cwYdfEP96L2cob/uGiIj9YdaA1k3zfBhQQlp328i/xzYbIAcwfIia1AKYh/wgCzj+yfWDQ0Rtg9VcI2JiNfcbzMCgvDEBzshgeXuubFd9GPqPsc8zJhYqAi/15ge+WiB8R50MnZsYHO39JJihQzKz6WxIZQDeOQ2xd600NhFFLg6WPdE3jxAyENouTAd+0zJgXEeUU71YBDBl6RViagf8k7eOe9oMPW5ZlevdD3vcI8BC/qUL6Evye8QDDNi0s8gbIvcnJl5QMRBpeYcm/QaRUow1YeJobpccj/3tb7qTbc7T4Rha/NRBNhbhp/WzDSO/BUSEtpgJ3YwSEPTiEeSocTRT8ylnhEtBB70h4vQSClV73lW4vn7WjdZUTRACdxFNJ1MteQJ+3bgzyWMhDtdQo6BSz2UxF0mQFayAu2p9j0+MbB7x2zW9tksSw+6B6EjzPhQw6eOs2K0+syxWg09MTW1Fy6n0Zgchn0RWSnEPqPvss6kB2pkAR4="
+
+env:
+  global:
+    - CHROMIUM_VERSION=80.0.3987.106
+    - PPTR_VERSION=2.1.0
+    - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
+
 
 # addons:
 #   browserstack:

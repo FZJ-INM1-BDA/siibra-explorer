@@ -1,38 +1,42 @@
 // TODO merge with uiState.store.ts after refactor completes
 
-import { createAction, props } from '@ngrx/store'
-import { TemplateRef } from '@angular/core'
-import { MatBottomSheetConfig } from '@angular/material/bottom-sheet'
+import {
+  uiActionSetPreviewingDatasetFiles,
+  uiActionShowSidePanelConnectivity,
+  uiStateCloseSidePanel,
+  uiStateCollapseSidePanel,
+  uiStateExpandSidePanel,
+  uiStateOpenSidePanel,
+  uiStateShowBottomSheet,
+  uiActionHideDatasetWithId,
+  uiActionShowDatasetWtihId,
+} from './uiState/actions'
 
-export const uiStateCloseSidePanel = createAction(
-  '[uiState] closeSidePanel'
-)
+export {
+  uiActionSetPreviewingDatasetFiles,
+  uiActionShowSidePanelConnectivity,
+  uiStateCloseSidePanel,
+  uiStateCollapseSidePanel,
+  uiStateExpandSidePanel,
+  uiStateOpenSidePanel,
+  uiStateShowBottomSheet,
+  uiActionHideDatasetWithId,
+  uiActionShowDatasetWtihId,
+}
 
-export const uiStateOpenSidePanel = createAction(
-  '[uiState] openSidePanel'
-)
+import {
+  uiStatePreviewingDatasetFilesSelector,
+  uiStateMouseOverSegmentsSelector,
+  uiStateMouseoverUserLandmark,
+  uiStateShownDatasetIdSelector,
+} from './uiState/selectors'
 
-export const uiStateCollapseSidePanel = createAction(
-  '[uiState] collapseSidePanelCurrentView'
-)
-
-export const uiStateExpandSidePanel = createAction(
-  '[uiState] expandSidePanelCurrentView'
-)
-
-export const uiStateShowBottomSheet = createAction(
-  '[uiState] showBottomSheet',
-  props<{ bottomSheetTemplate: TemplateRef<unknown>, config?: MatBottomSheetConfig }>()
-)
-
-export const uiActionSetPreviewingDatasetFiles = createAction(
-  `[uiState] setDatasetPreviews`,
-  props<{previewingDatasetFiles: {datasetId: string, filename: string}[]}>()
-)
-
-export const uiActionShowSidePanelConnectivity = createAction(
-  `[uiState] showSidePanelConnectivity`
-)
+export {
+  uiStatePreviewingDatasetFilesSelector,
+  uiStateMouseOverSegmentsSelector,
+  uiStateMouseoverUserLandmark,
+  uiStateShownDatasetIdSelector,
+}
 
 export enum EnumWidgetTypes{
   DATASET_PREVIEW,
