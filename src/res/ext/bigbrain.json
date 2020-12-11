@@ -425,7 +425,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "412a639b-63a6-448d-a387-272488458501",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
@@ -446,7 +446,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "5079e40f-7274-4348-9939-2a852644d230",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
@@ -474,7 +474,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "ea4ce6db-9adf-4080-9d6d-c3d455673feb",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
@@ -502,7 +502,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "df2c8de3-370c-4fc0-b822-c7cf7268b4bc",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
@@ -530,7 +530,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "6290eaf9-69df-4c44-883a-678c0395b187",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
@@ -558,7 +558,7 @@
                               "kgSchema": "minds/core/dataset/v1.0.0",
                               "kgId": "762b8ed5-8467-4bd6-ac3c-0aa0e1815cd3",
                               "format": {
-                                "name": "reference delineations"
+                                "name": "3D interpolated map"
                               }
                             }
                           ]
