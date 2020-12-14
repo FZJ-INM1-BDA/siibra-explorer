@@ -12,7 +12,7 @@ const templates = [
 const area = 'Area hOc1 (V1, 17, CalcS)'
 
 const receptorName = `Density measurements of different receptors for Area hOc1 (V1, 17, CalcS) [human, v1.0]`
-const pmapName = `Probabilistic cytoarchitectonic map of Area hOc1 (V1, 17, CalcS) (v2.4)`
+const ieegDatasetName = `Human Intracranial EEG Database (HID) [cohort I]`
 
 // TODO finish writing tests
 describe(`fav'ing dataset`, () => {
@@ -56,7 +56,7 @@ describe(`fav'ing dataset`, () => {
     const datasets = await iavPage.getVisibleDatasets()
 
     const receptorIndex = datasets.indexOf(receptorName)
-    const probMap = datasets.indexOf(pmapName)
+    const probMap = datasets.indexOf(ieegDatasetName)
     expect(receptorIndex).toBeGreaterThanOrEqual(0)
     expect(probMap).toBeGreaterThanOrEqual(0)
 
@@ -68,7 +68,7 @@ describe(`fav'ing dataset`, () => {
     await iavPage.togglePinNthDataset(probMap)
     await iavPage.wait(500)
     const txt2 = await iavPage.getSnackbarMessage()
-    expect(txt2).toEqual(`Pinned dataset: ${pmapName}`)
+    expect(txt2).toEqual(`Pinned dataset: ${ieegDatasetName}`)
   })
 
   describe('> fav dataset list', () => {
@@ -77,7 +77,7 @@ describe(`fav'ing dataset`, () => {
       const datasets = await iavPage.getVisibleDatasets()
 
       const receptorIndex = datasets.indexOf(receptorName)
-      const probMap = datasets.indexOf(pmapName)
+      const probMap = datasets.indexOf(ieegDatasetName)
 
       await iavPage.togglePinNthDataset(receptorIndex)
       await iavPage.togglePinNthDataset(probMap)
@@ -190,7 +190,7 @@ describe(`fav'ing dataset`, () => {
       const datasets = await iavPage.getVisibleDatasets()
 
       const receptorIndex = datasets.indexOf(receptorName)
-      const probMap = datasets.indexOf(pmapName)
+      const probMap = datasets.indexOf(ieegDatasetName)
 
       await iavPage.togglePinNthDataset(receptorIndex)
       await iavPage.togglePinNthDataset(probMap)
@@ -204,7 +204,7 @@ describe(`fav'ing dataset`, () => {
       
       expect(textsArr.length).toEqual(2)
       expect(textsArr).toContain(receptorName)
-      expect(textsArr).toContain(pmapName)
+      expect(textsArr).toContain(ieegDatasetName)
     })
 
     it('> dataset detail can be launched via collection', async () => {
