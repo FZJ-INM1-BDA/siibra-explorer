@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ComponentRef, Input, OnChanges, SimpleChanges, ViewContainerRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ComponentRef, Input, OnChanges, Output, SimpleChanges, ViewContainerRef, EventEmitter } from "@angular/core";
 import { Subscription } from "rxjs";
 import { IFeature, RegionalFeaturesService } from "../regionalFeature.service";
 import { ISingleFeature } from "../singleFeatures/interfaces";
@@ -16,13 +16,15 @@ export class FeatureContainer implements OnChanges{
   @Input()
   region: any
 
+  @Output()
+  viewChanged: EventEmitter<boolean> = new EventEmitter()
+
   private cr: ComponentRef<ISingleFeature>
   
   constructor(
     private vCRef: ViewContainerRef,
     private rService: RegionalFeaturesService,
     private cfr: ComponentFactoryResolver,
-    private cdr: ChangeDetectorRef
   ){
   }
 
@@ -33,15 +35,22 @@ export class FeatureContainer implements OnChanges{
     const { currentValue, previousValue } = simpleChanges.feature
     if (currentValue === previousValue) return
     this.clear()
+
+    /**
+     * catching instances where currentValue for feature is falsy
+     */
+    if (!currentValue) return
+
     /**
      * TODO catch if map is undefined
      */
     const comp = this.rService.mapFeatToCmp.get(currentValue.type)
+    if (!comp) throw new Error(`mapFeatToCmp for ${currentValue.type} not defined`)
     const cf = this.cfr.resolveComponentFactory<ISingleFeature>(comp)
     this.cr = this.vCRef.createComponent(cf)
     this.cr.instance.feature = this.feature
     this.cr.instance.region = this.region
-    this.viewChangedSub = this.cr.instance.viewChanged.subscribe(() => this.cdr.detectChanges())
+    this.viewChangedSub = this.cr.instance.viewChanged.subscribe(() => this.viewChanged.emit(true))
   }
 
   clear(){
