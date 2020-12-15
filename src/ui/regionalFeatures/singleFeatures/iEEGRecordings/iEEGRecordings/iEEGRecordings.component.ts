@@ -31,7 +31,7 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
     super(regionFeatureService)
   }
 
-  public viewChanged = new EventEmitter<null>()
+  public viewChanged = new EventEmitter<boolean>()
 
   ngOnInit(){
     if (this.regClickIntp) {
@@ -71,7 +71,7 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
     )
 
     this.sub.push(
-      this.dataIsLoading$.subscribe(() => this.viewChanged.emit(null))
+      this.dataIsLoading$.subscribe(() => this.viewChanged.emit(true))
     )
 
     this.onDestroyCb.push(() => {
