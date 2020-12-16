@@ -41,6 +41,8 @@ pages:
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
     - v2.4.0: 'releases/v2.4.0.md'
+    - v2.3.2: 'releases/v2.3.2.md'
+    - v2.3.1: 'releases/v2.3.1.md'
     - v2.3.0: 'releases/v2.3.0.md'
     - v2.2.7: 'releases/v2.2.7.md'
     - v2.2.6: 'releases/v2.2.6.md'
