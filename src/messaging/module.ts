@@ -7,6 +7,7 @@ import { LOAD_MESH_TOKEN, ILoadMesh } from "src/atlasViewer/atlasViewer.apiServi
 import { ComponentsModule } from "src/components";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { getRandomHex } from 'common/util'
 
 const IAV_POSTMESSAGE_NAMESPACE = `ebrains:iav:`
 
@@ -21,6 +22,7 @@ export class MesssagingModule{
 
   private whiteListedOrigins = new Set()
   private pendingRequests: Map<string, Promise<boolean>> = new Map()
+  private windowName: string
 
   constructor(
     private dialog: MatDialog,
@@ -29,6 +31,27 @@ export class MesssagingModule{
     @Optional() private apiService: AtlasViewerAPIServices,
     @Optional() @Inject(LOAD_MESH_TOKEN) private loadMesh: (loadMeshParam: ILoadMesh) => void
   ){
+
+    if (window.opener){
+      this.windowName = window.name
+      window.opener.postMessage({
+        id: getRandomHex(),
+        method: `${IAV_POSTMESSAGE_NAMESPACE}onload`,
+        param: {
+          'window.name': this.windowName
+        }
+      }, '*')
+
+      window.addEventListener('beforeunload', () => {
+        window.opener.postMessage({
+          id: getRandomHex(),
+          method: `${IAV_POSTMESSAGE_NAMESPACE}beforeunload`,
+          param: {
+            'window.name': this.windowName
+          }
+        }, '*')
+      })
+    }
 
     window.addEventListener('message', async ({ data, origin, source }) => {
       const { method, id, param } = data
@@ -41,7 +64,7 @@ export class MesssagingModule{
        * if ping method, respond pong method
        */
       if (strippedMethod === 'ping') {
-        window.opener.postMessage({
+        src.postMessage({
           id,
           result: 'pong',
           jsonrpc: '2.0'
