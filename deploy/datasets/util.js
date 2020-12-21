@@ -21,8 +21,9 @@ const getUserKGRequestParam = async ({ user }) => {
   let publicAccessToken
   /**
    * n.b. ACCESS_TOKEN env var is usually only set during dev
+   * user.type any other than 'hbp-oidc' (v1 of oidc) will result in timeout/error
    */
-  const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
+  const accessToken = (user && user.type === 'hbp-oidc' && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
   const releasedOnly = !accessToken
   if (!accessToken && getPublicAccessToken) {
     publicAccessToken = await getPublicAccessToken()
