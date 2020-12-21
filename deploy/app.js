@@ -3,43 +3,8 @@ const path = require('path')
 const express = require('express')
 const app = express.Router()
 const session = require('express-session')
-const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
-
-/**
- * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
- * this causes problems during tests
- * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
- * see app.spec.js
- */
-const { USE_DEFAULT_MEMORY_STORE } = process.env
-const store = USE_DEFAULT_MEMORY_STORE
-  ? (console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`), null)
-  : new MemoryStore({
-      checkPeriod: 86400000
-    })
-
-const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
-
-/**
- * passport application of oidc requires session
- */
-app.use(session({
-  secret: SESSIONSECRET,
-  resave: true,
-  saveUninitialized: true,
-  store,
-}))
-
-/**
- * configure CSP
- */
-if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
-  console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
-} else {
-  require('./csp')(app)
-}
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
 const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
@@ -81,12 +46,66 @@ app.use((req, _, next) => {
 const { configureAuth, ready: authReady } = require('./auth')
 
 
+const store = (() => {
+
+  const { USE_DEFAULT_MEMORY_STORE } = process.env
+  if (!!USE_DEFAULT_MEMORY_STORE) {
+    console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`)
+    return null
+  } 
+
+  const { redisURL } = require('./lruStore')
+  if (!!redisURL) {
+    const redis = require('redis')
+    const RedisStore = require('connect-redis')(session)
+    const client = redis.createClient({
+      url: redisURL
+    })
+    return new RedisStore({
+      client
+    })
+  }
+  
+  /**
+   * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
+   * this causes problems during tests
+   * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
+   * see app.spec.js
+   */
+  const MemoryStore = require('memorystore')(session)
+  return new MemoryStore({
+    checkPeriod: 86400000
+  })
+  
+})() 
+
+const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
+
+/**
+ * passport application of oidc requires session
+ */
+app.use(session({
+  secret: SESSIONSECRET,
+  resave: true,
+  saveUninitialized: false,
+  store
+}))
+
+/**
+ * configure CSP
+ */
+if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
+  console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
+} else {
+  require('./csp')(app)
+}
+
 /**
  * configure Auth
  * async function, but can start server without
  */
 
-const _ = (async () => {
+(async () => {
   await configureAuth(app)
   app.use('/user', require('./user'))
 })()

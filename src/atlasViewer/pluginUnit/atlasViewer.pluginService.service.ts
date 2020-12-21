@@ -15,7 +15,7 @@ import { DialogService } from 'src/services/dialogService.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-const requiresReloadMd = `\n\n***\n\n**warning**: interactive atlas viewer needs to be reloaded for the change to take effect.`
+const requiresReloadMd = `\n\n***\n\n**warning**: interactive atlas viewer **will** be reloaded in order for the change to take effect.`
 
 export const registerPluginFactoryDirectiveFactory = (pSer: PluginServices) => {
   return (pFactoryDirective: PluginFactoryDirective) => {

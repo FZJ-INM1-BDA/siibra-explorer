@@ -20,9 +20,20 @@ const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP
 const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
 const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
 
-const userPass = `${REDIS_USERNAME || ''}${( REDIS_PASSWORD && (':' + REDIS_PASSWORD)) || ''}${ (REDIS_USERNAME || REDIS_PASSWORD) && '@'}`
+const userPass = (() => {
+  let returnString = ''
+  if (REDIS_USERNAME) {
+    returnString += REDIS_USERNAME
+  }
+  if (REDIS_PASSWORD) {
+    returnString += `:${REDIS_PASSWORD}`
+  }
+  return returnString === ''
+    ? ''
+    : `${returnString}@`
+})()
 
-const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
+const redisURL = redisAddr && `${redisProto || ''}://${userPass}${redisAddr}:${redisPort}`
 
 const crypto = require('crypto')
 
@@ -82,6 +93,7 @@ if (redisURL) {
   }
 
   exports.StoreType = `redis`
+  exports.redisURL = redisURL
   console.log(`redis`)
 
 } else {
