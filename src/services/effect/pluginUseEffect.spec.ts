@@ -6,7 +6,8 @@ import { Action } from "@ngrx/store";
 import { provideMockActions } from "@ngrx/effects/testing";
 import { provideMockStore } from "@ngrx/store/testing";
 import { defaultRootState } from "../stateStore.service";
-import { PLUGINSTORE_CONSTANTS, PLUGINSTORE_ACTION_TYPES } from '../state/pluginState.store'
+import { PLUGINSTORE_CONSTANTS } from '../state/pluginState.store'
+import { PLUGINSTORE_ACTION_TYPES } from '../state/pluginState.helper'
 import { Injectable } from "@angular/core";
 import { getRandomHex } from 'common/util'
 import { PluginServices } from "src/atlasViewer/pluginUnit";

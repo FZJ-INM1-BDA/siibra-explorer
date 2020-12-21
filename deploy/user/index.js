@@ -23,6 +23,49 @@ router.get('/config', loggedInOnlyMiddleware, async (req, res) => {
   }
 })
 
+router.get('/pluginPermissions', async (req, res) => {
+  const { user } = req
+  /**
+   * only using session to store user csp for now
+   * in future, if use is logged in, look for **signed** config file, and verify the signature
+   */
+  const permittedCsp = req.session.permittedCsp || {}
+  res.status(200).json(permittedCsp)
+})
+
+router.post('/pluginPermissions', bodyParser.json(), async (req, res) => {
+  const { user, body } = req
+  /**
+   * only using session to store user csp for now
+   * in future, if use is logged in, **signed** config file, and store in user space
+   */
+  
+  const newPermittedCsp = req.session.permittedCsp || {}
+  for (const key in body) {
+    newPermittedCsp[key] = body[key]
+  }
+  req.session.permittedCsp = newPermittedCsp
+  res.status(200).json({ ok: true })
+})
+
+router.delete('/pluginPermissions/:pluginKey', async (req, res) => {
+  const { user, params } = req
+  const { pluginKey } = params
+  /**
+    * only using session to store user csp for now
+    * in future, if use is logged in, **signed** config file, and store in user space
+    */
+  const newPermission = {}
+  const permittedCsp = req.session.permittedCsp || {}
+  for (const key in permittedCsp) {
+    if (!pluginKey !== key) {
+      newPermission[key] = permittedCsp[key]
+    }
+  }
+  req.session.permittedCsp = newPermission
+  res.status(200).json({ ok: true })
+})
+
 router.post('/config', loggedInOnlyMiddleware, bodyParser.json(), async (req, res) => {
   const { user, body } = req
   try {

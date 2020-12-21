@@ -58,11 +58,14 @@ if (redisURL) {
 
   const keys = []
 
+  /**
+   * maxage in milli seconds
+   */
   exports.store = {
-    set: async (key, val) => {
+    set: async (key, val, { maxAge } = {}) => {
       ensureString(key)
       ensureString(val)
-      asyncSet(key, val)
+      asyncSet(key, val, ...( maxAge ? [ 'PX', maxAge ] : [] ))
       keys.push(key)
     },
     get: async (key) => {
@@ -90,10 +93,13 @@ if (redisURL) {
   })
 
   exports.store = {
-    set: async (key, val) => {
+    /**
+     * maxage in milli seconds
+     */
+    set: async (key, val, { maxAge } = {}) => {
       ensureString(key)
       ensureString(val)
-      store.set(key, val)
+      store.set(key, val, ...( maxAge ? [ maxAge ] : [] ))
     },
     get: async (key) => {
       ensureString(key)

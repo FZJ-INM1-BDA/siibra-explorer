@@ -295,7 +295,9 @@ describe('> nehubaContainer.component.ts', () => {
               templateSelected: bigbrainJson,
               parcellationSelected: bigbrainJson.parcellations[0],
               regionsSelected: [{
-                name: "foobar"
+                name: "foobar",
+                ngId: 'untitled',
+                labelIndex: 15
               }]
             },
             [viewerStateHelperStoreName]: {

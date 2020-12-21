@@ -109,3 +109,8 @@ export const viewerStateChangeNavigation = createAction(
   `[viewerState] changeNavigation`,
   props<{ navigation: any }>()
 )
+
+export const actionSetMobileUi = createAction(
+  `[viewerState] setMobileUi`,
+  props<{ payload: { useMobileUI: boolean } }>()
+)

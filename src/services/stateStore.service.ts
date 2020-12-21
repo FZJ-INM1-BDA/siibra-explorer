@@ -1,4 +1,12 @@
 import { filter } from 'rxjs/operators';
+export {
+  serialiseParcellationRegion as generateLabelIndexId,
+  deserialiseParcRegionId as getNgIdLabelIndexFromId,
+
+} from 'common/util'
+export {
+  recursiveFindRegionWithLabelIndexId
+} from 'src/util/fn'
 
 export { getNgIds } from 'src/util/fn'
 
@@ -23,7 +31,7 @@ import {
   ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
   defaultState as userConfigDefaultState,
   StateInterface as UserConfigStateInterface,
-  stateStore as userConfigState,
+  userConfigReducer as userConfigState,
 } from './state/userConfigState.store'
 import {
   defaultState as viewerConfigDefaultState,
@@ -147,41 +155,6 @@ export interface DedicatedViewState {
 // @TODO deprecate
 export function isDefined(obj) {
   return typeof obj !== 'undefined' && obj !== null
-}
-
-export function generateLabelIndexId({ ngId, labelIndex }) {
-  return `${ngId}#${labelIndex}`
-}
-
-export function getNgIdLabelIndexFromId({ labelIndexId } = {labelIndexId: ''}) {
-  const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
-  const ngId = _.length > 1
-    ? _[0]
-    : null
-  const labelIndex = _.length > 1
-    ? Number(_[1])
-    : _.length === 0
-      ? null
-      : Number(_[0])
-  return { ngId, labelIndex }
-}
-
-const recursiveFlatten = (region, {ngId}) => {
-  return [{
-    ngId,
-    ...region,
-  }].concat(
-    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
-  )
-}
-
-export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId: string}) {
-  const { ngId, labelIndex } = getNgIdLabelIndexFromId({ labelIndexId })
-  const fr1 = regions.map(r => recursiveFlatten(r, { ngId: inheritedNgId }))
-  const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
-  const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
-  if (found) { return found }
-  return null
 }
 
 export interface IavRootStoreInterface {

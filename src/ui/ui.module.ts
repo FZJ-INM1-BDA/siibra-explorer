@@ -85,6 +85,7 @@ import { RegionAccordionTooltipTextPipe } from './util'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import { RegionalFeaturesModule } from "./regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
+import { PluginCspCtrlCmp } from "./config/pluginCsp/pluginCsp.component";
 
 @NgModule({
   imports : [
@@ -123,6 +124,7 @@ import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
     AtlasDropdownSelector,
     AtlasLayerSelector,
     AtlasDropdownSelector,
+    PluginCspCtrlCmp,
 
     StatusCardComponent,
     CookieAgreement,
