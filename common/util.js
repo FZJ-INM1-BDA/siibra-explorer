@@ -172,4 +172,36 @@
       )
     )
   }
+
+  exports.serialiseParcellationRegion = ({ ngId, labelIndex }) => {
+    if (!ngId) {
+      throw new Error(`#serialiseParcellationRegion error: ngId must be defined`)
+    }
+
+    if (!labelIndex) {
+      throw new Error(`#serialiseParcellationRegion error labelIndex must be defined`)
+    }
+
+    return `${ngId}#${labelIndex}`
+  }
+
+  const deserialiseParcRegionId = labelIndexId => {
+    const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
+    const ngId = _.length > 1
+      ? _[0]
+      : null
+    const labelIndex = _.length > 1
+      ? Number(_[1])
+      : _.length === 0
+        ? null
+        : Number(_[0])
+    return { labelIndex, ngId }
+  }
+
+  exports.deserialiseParcRegionId = deserialiseParcRegionId
+
+  exports.deserialiseParcellationRegion = ({ region, labelIndexId, inheritedNgId = 'root' }) => {
+    const { labelIndex, ngId } = deserialiseParcRegionId(labelIndexId)
+  }
+
 })(typeof exports === 'undefined' ? module.exports : exports)

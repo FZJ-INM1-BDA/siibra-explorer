@@ -2,6 +2,7 @@ import { Action } from "@ngrx/store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 
 import { IViewerConfigState as StateInterface } from './viewerConfig.store.helper'
+import { actionSetMobileUi } from "./viewerState/actions";
 export { StateInterface }
 
 interface ViewerConfigurationAction extends Action {
@@ -23,7 +24,7 @@ export const VIEWER_CONFIG_ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
   CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`,
-  SET_MOBILE_UI: 'SET_MOBILE_UI',
+  SET_MOBILE_UI: actionSetMobileUi.type,
 }
 
 // get gpu limit

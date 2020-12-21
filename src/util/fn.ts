@@ -1,3 +1,5 @@
+import { deserialiseParcRegionId } from 'common/util'
+
 export function isSame(o, n) {
   if (!o) { return !n }
   return o === n || (o && n && o.name === n.name)
@@ -30,4 +32,22 @@ export function getNgIds(regions: any[]): string[] {
       .reduce((acc, item) => acc.concat(item), [])
       .filter(ngId => !!ngId)
     : []
+}
+
+const recursiveFlatten = (region, {ngId}) => {
+  return [{
+    ngId,
+    ...region,
+  }].concat(
+    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
+  )
+}
+
+export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId: string}) {
+  const { ngId, labelIndex } = deserialiseParcRegionId( labelIndexId )
+  const fr1 = regions.map(r => recursiveFlatten(r, { ngId: inheritedNgId }))
+  const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
+  const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
+  if (found) { return found }
+  return null
 }

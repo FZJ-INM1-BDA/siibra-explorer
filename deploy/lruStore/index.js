@@ -20,9 +20,20 @@ const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP
 const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
 const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
 
-const userPass = `${REDIS_USERNAME || ''}${( REDIS_PASSWORD && (':' + REDIS_PASSWORD)) || ''}${ (REDIS_USERNAME || REDIS_PASSWORD) && '@'}`
+const userPass = (() => {
+  let returnString = ''
+  if (REDIS_USERNAME) {
+    returnString += REDIS_USERNAME
+  }
+  if (REDIS_PASSWORD) {
+    returnString += `:${REDIS_PASSWORD}`
+  }
+  return returnString === ''
+    ? ''
+    : `${returnString}@`
+})()
 
-const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
+const redisURL = redisAddr && `${redisProto || ''}://${userPass}${redisAddr}:${redisPort}`
 
 const crypto = require('crypto')
 
@@ -58,11 +69,14 @@ if (redisURL) {
 
   const keys = []
 
+  /**
+   * maxage in milli seconds
+   */
   exports.store = {
-    set: async (key, val) => {
+    set: async (key, val, { maxAge } = {}) => {
       ensureString(key)
       ensureString(val)
-      asyncSet(key, val)
+      asyncSet(key, val, ...( maxAge ? [ 'PX', maxAge ] : [] ))
       keys.push(key)
     },
     get: async (key) => {
@@ -79,6 +93,7 @@ if (redisURL) {
   }
 
   exports.StoreType = `redis`
+  exports.redisURL = redisURL
   console.log(`redis`)
 
 } else {
@@ -90,10 +105,13 @@ if (redisURL) {
   })
 
   exports.store = {
-    set: async (key, val) => {
+    /**
+     * maxage in milli seconds
+     */
+    set: async (key, val, { maxAge } = {}) => {
       ensureString(key)
       ensureString(val)
-      store.set(key, val)
+      store.set(key, val, ...( maxAge ? [ maxAge ] : [] ))
     },
     get: async (key) => {
       ensureString(key)
