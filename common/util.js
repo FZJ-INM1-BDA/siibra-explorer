@@ -204,4 +204,26 @@
     const { labelIndex, ngId } = deserialiseParcRegionId(labelIndexId)
   }
 
+  const getPad = ({ length, pad }) => {
+    if (pad.length !== 1) throw new Error(`pad needs to be precisely 1 character`)
+    return input => {
+      const padNum = Math.max(input.toString().length - length, 0)
+      const padString = Array(padNum).fill(pad).join('')
+      return `${padString}${input}`
+    }
+  }
+
+  exports.getDateString = () => {
+    const d = new Date()
+    const pad2 = getPad({ pad: '0', length: 2 })
+
+    const year = d.getFullYear()
+    const month = d.getMonth() + 1
+    const date = d.getDate()
+
+    const hr = d.getHours()
+    const min = d.getMinutes()
+    return `${year}${pad2(month)}${pad2(date)}_${pad2(hr)}${pad2(min)}`
+  }
+
 })(typeof exports === 'undefined' ? module.exports : exports)

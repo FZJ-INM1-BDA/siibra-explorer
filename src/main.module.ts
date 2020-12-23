@@ -1,6 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, InjectionToken, NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { StoreModule, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -14,9 +14,8 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory, LOAD_MESH_TOKEN, ILoadMesh } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory, LOAD_MESH_TOKEN, ILoadMesh } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
-import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
@@ -121,7 +120,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   ],
   declarations : [
     AtlasViewer,
-    ModalUnit,
     TryMeComponent,
 
     /* directives */
@@ -140,7 +138,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     MouseOverIconPipe,
   ],
   entryComponents : [
-    ModalUnit,
     DialogComponent,
     ConfirmDialogComponent,
   ],
@@ -153,13 +150,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     UIService,
     TemplateCoordinatesTransformation,
     ClickInterceptorService,
-    {
-      provide: GET_TOAST_HANDLER_TOKEN,
-      useFactory: (uiService: UIService) => {
-        return () => uiService.getToastHandler()
-      },
-      deps: [ UIService ]
-    },
     {
       provide: OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
       useFactory: (glue: IDatasetPreviewGlue) => glue.displayDatasetPreview.bind(glue),

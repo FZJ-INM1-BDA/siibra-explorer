@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   Input,
   TemplateRef,
-  ViewChild
 } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -47,15 +45,12 @@ export class SigninBanner {
   @Input() public darktheme: boolean
   @Input() public parcellationIsSelected: boolean
 
-  @ViewChild('takeScreenshotElement', {read: ElementRef}) takeScreenshotElement: ElementRef
-
   public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
   public favDataEntries$: Observable<Partial<IDataEntry>[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
-  public takingScreenshot: boolean = false
 
   constructor(
     private store$: Store<IavRootStoreInterface>,
@@ -90,17 +85,6 @@ export class SigninBanner {
         ...overwriteConfig
       })
     }
-  }
-
-  resetScreenshotTaking() {
-    this.takingScreenshot = true
-    //ToDo find out better way to detect changes
-    setTimeout(() => this.changeDetectionRef.detectChanges())
-  }
-
-  disableScreenshotTaking() {
-    this.takingScreenshot = false
-    this.changeDetectionRef.detectChanges()
   }
 
   private keyListenerConfigBase = {
