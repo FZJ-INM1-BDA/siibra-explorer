@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { fromEvent } from "rxjs";
 import { filter, take } from "rxjs/operators";
-import { getUuid } from "src/util/fn.js";
+import { getUuid } from "src/util/fn";
 
 /* telling webpack to pack the worker file */
 import '../util/worker.js'
