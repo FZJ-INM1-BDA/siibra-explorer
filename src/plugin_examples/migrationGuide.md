@@ -49,16 +49,4 @@ Plugin APIs have changed drastically from v0.1.0 to v0.2.0. Here is a list of pl
   - ~~*onParcellationSelection(callback)* : Function that attach a callback function to user selecting a different parcellation~~ removed. use **window.interactiveViewer.metadata.selectedParcellationBSubject** instead.
   - ~~*afterParcellationSelection(callback)* : Function that attach a callback function to be called after the parcellation selection process is complete and *selectedParcellation* is updated.~~ removed
   - *modalControl*
-    - *getModalHandler()* : Function returning a handler to change/show/hide/listen to a Modal. 
-    - *modalHander* methods:
-      - *hide()* : Dynamically hides the modal
-      - *show()* : Shows the modal
-      - *onHide(callback(reason)=>void)* : Attaches an onHide callback. 
-      - *onHidden(callback(reason)=>void)* : Attaches an onHidden callback. 
-      - *onShow(callback(reason)=>void)* : Attaches an onShow callback. 
-      - *onShown(callback(reason)=>void)* : Attaches an onShown callback.
-    - *modalHandler* properties:
-      - title : title of the modal (String)
-      - body : body of the modal shown (JSON, Array, String)
-      - footer : footer of the modal (String)
-      - config : config of the modal
+    - ~~*getModalHandler()* : Function returning a handler to change/show/hide/listen to a Modal.~~ removed

@@ -222,34 +222,6 @@ whether the modal is dismissable on click backdrop/esc key (Boolean)
 
 *n.b. if true, users will not be able to interact with the viewer unless you specifically call `handler.hide()`*
 
-#### getToastHandler()
-
-returns a toastHandler objectm, which has the following methods/properties:
-
-##### show()
-
-Show the toast
-
-##### hide()
-
-Dynamically hides the toast
-
-##### message
-
-message on the toast
-
-##### htmlMessage
-
-HTML message. If used to display user content, beware of script injection. Angular strips `style` attribute, so use `class` and bootstrap for styling.
-
-##### dismissable
-
-allow user dismiss the toast via x 
-
-##### timeout
-
-auto hide (in ms). set to 0 for not auto hide.
-
 #### launchNewWidget(manifest)
 
 returns a Promise. expects a JSON object, with the same key value as a plugin manifest. the *name* key must be unique, or the promise will be rejected. 

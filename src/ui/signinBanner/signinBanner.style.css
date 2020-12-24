@@ -10,11 +10,6 @@
   pointer-events: all;
 }
 
-take-screenshot
-{
-  z-index: 1509;
-}
-
 .btnWrapper
 {
   margin: 0.5rem 0;

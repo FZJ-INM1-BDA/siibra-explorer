@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { fromEvent } from "rxjs";
 import { filter, take } from "rxjs/operators";
+import { getUuid } from "src/util/fn";
 
 /* telling webpack to pack the worker file */
 import '../util/worker.js'
@@ -24,7 +25,7 @@ export class AtlasWorkerService {
 
   async sendMessage(data: IWorkerMessage){
 
-    const newUuid = crypto.getRandomValues(new Uint32Array(1))[0].toString(16)
+    const newUuid = getUuid()
     this.worker.postMessage({
       id: newUuid,
       ...data

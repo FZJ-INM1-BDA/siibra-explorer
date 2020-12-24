@@ -139,11 +139,13 @@
   [aria-label]="'Tools and plugins menu'">
   <button mat-menu-item
     [disabled]="!parcellationIsSelected"
-    (click)="takingScreenshot = true;"
+    screenshot-switch
     [matTooltip]="screenshotTooltipText">
     <mat-icon fontSet="fas" fontIcon="fa-camera">
     </mat-icon>
-    Screenshot
+    <span>
+      Screenshot
+    </span>
   </button>
   <plugin-banner></plugin-banner>
 </mat-menu>
@@ -254,11 +256,3 @@
     </mat-list-item>
   </mat-list>
 </ng-template>
-
-<take-screenshot
-  #takeScreenshotElement
-  *ngIf="takingScreenshot"
-  class="position-fixed fixed-top"
-  (screenshotTaking)="disableScreenshotTaking()"
-  (resetScreenshot)="$event? resetScreenshotTaking() : disableScreenshotTaking()">
-</take-screenshot>

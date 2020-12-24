@@ -56,7 +56,6 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
 import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 
-import { TakeScreenshotComponent } from "src/ui/takeScreenshot/takeScreenshot.component";
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHierarchy.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
@@ -86,6 +85,7 @@ import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import { RegionalFeaturesModule } from "./regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
 import { PluginCspCtrlCmp } from "./config/pluginCsp/pluginCsp.component";
+import { ScreenshotModule, HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "./screenshot";
 
 @NgModule({
   imports : [
@@ -106,6 +106,7 @@ import { PluginCspCtrlCmp } from "./config/pluginCsp/pluginCsp.component";
     FabSpeedDialModule,
     RegionalFeaturesModule,
     Landmark2DModule,
+    ScreenshotModule,
   ],
   declarations : [
     NehubaContainer,
@@ -138,7 +139,6 @@ import { PluginCspCtrlCmp } from "./config/pluginCsp/pluginCsp.component";
     RegionHierarchy,
     MaximmisePanelButton,
     RegionTextSearchAutocomplete,
-    TakeScreenshotComponent,
     RegionMenuComponent,
     ConnectivityBrowserComponent,
     SimpleRegionComponent,
@@ -189,6 +189,60 @@ import { PluginCspCtrlCmp } from "./config/pluginCsp/pluginCsp.component";
       provide: APPEND_SCRIPT_TOKEN,
       useFactory: appendScriptFactory,
       deps: [ DOCUMENT ]
+    },
+    {
+      provide: HANDLE_SCREENSHOT_PROMISE,
+      useValue: ((param) => {
+        const canvas: HTMLCanvasElement = document.querySelector('#neuroglancer-container canvas')
+        if (!canvas) return Promise.reject(`element '#neuroglancer-container canvas' not found`)
+        const _ = (window as any).viewer.display.draw()
+        if (!param) {
+          return new Promise(rs => {
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob)
+              rs({
+                url,
+                revoke: () => URL.revokeObjectURL(url)
+              })
+            }, 'image/png')
+          })
+        }
+        const { x, y, width, height } = param
+        const { devicePixelRatio: dpr } = window
+        return new Promise(rs => {
+          const subCanvas = document.createElement('canvas')
+          subCanvas.width = width * dpr
+          subCanvas.height = height * dpr
+          const context = subCanvas.getContext('2d')
+          context.drawImage(
+            canvas,
+
+            /**
+             * from
+             */
+            x * dpr,
+            y * dpr,
+            width * dpr,
+            height * dpr,
+
+            /**
+             * to
+             */
+            0,
+            0,
+            width * dpr,
+            height * dpr
+          )
+
+          subCanvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob)
+            rs({
+              url,
+              revoke: () => URL.revokeObjectURL(url)
+            })
+          }, 'image/png')
+        })
+      }) as TypeHandleScrnShotPromise
     }
   ],
   entryComponents : [

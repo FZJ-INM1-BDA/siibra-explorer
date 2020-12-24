@@ -15,8 +15,6 @@ import {
 } from "src/services/stateStore.service";
 import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
-import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest, PluginServices } from "./pluginUnit";
 
 declare let window
@@ -35,7 +33,6 @@ interface IGetUserSelectRegionPr{
 }
 
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
-export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
 
 export interface ILoadMesh {
   type: 'VTK'
@@ -161,7 +158,6 @@ export class AtlasViewerAPIServices implements OnDestroy{
     private zone: NgZone,
     private pluginService: PluginServices,
     @Optional() @Inject(CANCELLABLE_DIALOG) openCancellableDialog: (message: string, options: any) => () => void,
-    @Optional() @Inject(GET_TOAST_HANDLER_TOKEN) private getToastHandler: Function,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
   ) {
     if (clickInterceptor) {
@@ -255,39 +251,12 @@ export class AtlasViewerAPIServices implements OnDestroy{
       },
       uiHandle : {
         getModalHandler : () => {
-          const handler = new ModalHandler()
-          let modalRef
-          handler.show = () => {
-            /**
-             * TODO enable
-             * temporarily disabled
-             */
-            // modalRef = this.modalService.show(ModalUnit, {
-            //   initialState : {
-            //     title : handler.title,
-            //     body : handler.body
-            //       ? handler.body
-            //       : 'handler.body has yet been defined ...',
-            //     footer : handler.footer
-            //   },
-            //   class : this.darktheme ? 'darktheme' : 'not-darktheme',
-            //   backdrop : handler.dismissable ? true : 'static',
-            //   keyboard : handler.dismissable
-            // })
-          }
-          handler.hide = () => {
-            if (modalRef) {
-              modalRef.hide()
-              modalRef = null
-            }
-          }
-          return handler
+          throw new Error(`uihandle.getModalHandler has been deprecated`)
         },
 
         /* to be overwritten by atlasViewer.component.ts */
         getToastHandler : () => {
-          if (this.getToastHandler) return this.getToastHandler()
-          else throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
+          throw new Error('uiHandle.getToastHandler has been deprecated')
         },
 
         /**
@@ -451,8 +420,8 @@ export interface IInteractiveViewerInterface {
   }
 
   uiHandle: {
-    getModalHandler: () => ModalHandler
-    getToastHandler: () => ToastHandler
+    getModalHandler: () => void
+    getToastHandler: () => void
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
