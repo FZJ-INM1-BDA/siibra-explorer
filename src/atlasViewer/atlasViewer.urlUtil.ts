@@ -1,10 +1,11 @@
 import { getGetRegionFromLabelIndexId } from "src/services/effect/effect";
 import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
+import { getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
+import { serialiseParcellationRegion } from "common/util"
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
   TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
@@ -169,7 +170,7 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
             }
           }).filter(v => !!v)
           for (const labelIndex of labelIndicies) {
-            selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
+            selectRegionIds.push( serialiseParcellationRegion({ ngId, labelIndex }) )
           }
         }
         return selectRegionIds

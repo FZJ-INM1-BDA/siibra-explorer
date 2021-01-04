@@ -6,7 +6,7 @@ import { distinctUntilChanged, filter, map, scan, shareReplay, startWith, withLa
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { LoggingService } from "src/logging";
 import { uiStateMouseOverSegmentsSelector, uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors";
-import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
+import { deserialiseParcRegionId } from "common/util"
 
 /**
  * Scan function which prepends newest positive (i.e. defined) value
@@ -98,7 +98,7 @@ export class MouseHoverDirective {
         ? arr.filter(({ segment }) => {
           // if segment is not a string (i.e., not labelIndexId) return true
           if (typeof segment !== 'string') { return true }
-          const { labelIndex } = getNgIdLabelIndexFromId({ labelIndexId: segment })
+          const { labelIndex } = deserialiseParcRegionId(segment)
           return parcellationSelected.auxillaryMeshIndices.indexOf(labelIndex) < 0
         })
         : arr),

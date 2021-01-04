@@ -19,7 +19,6 @@ import { CONST } from 'common/constants'
   templateUrl: './signinBanner.template.html',
   styleUrls: [
     './signinBanner.style.css',
-    '../btnShadow.style.css',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

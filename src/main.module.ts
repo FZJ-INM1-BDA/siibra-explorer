@@ -25,8 +25,8 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/ui/databrowserModule";
-import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
+import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/atlasComponents/databrowserModule";
+import { ViewerStateControllerUseEffect } from "src/state";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
 import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
@@ -46,7 +46,7 @@ import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { ShareModule } from './share';
 import { AuthService } from './auth'
-import { IAV_DATASET_PREVIEW_ACTIVE } from 'src/ui/databrowserModule'
+import { IAV_DATASET_PREVIEW_ACTIVE } from 'src/atlasComponents/databrowserModule'
 
 import 'hammerjs'
 import 'src/res/css/extra_styles.css'
@@ -57,6 +57,8 @@ import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEff
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
+import { ParcellationRegionModule } from './atlasComponents/parcellationRegion';
+import { AtlasCmpUiSelectorsModule } from './atlasComponents/uiSelectors';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -86,6 +88,8 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     MesssagingModule,
 
     SpotLightModule,
+    ParcellationRegionModule,
+    AtlasCmpUiSelectorsModule,
     
     EffectsModule.forRoot([
       UseEffects,
