@@ -8,7 +8,6 @@ import { MatDrawer } from "@angular/material/sidenav";
 import { LoggingService } from "src/logging";
 import {
   CHANGE_NAVIGATION,
-  generateLabelIndexId,
   getMultiNgIdsRegionsLabelIndexMap,
   getNgIds,
   ILandmark,
@@ -26,6 +25,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS, CONST } from 'common/constants'
+import { serialiseParcellationRegion } from "common/util"
 import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
 import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedRegionsSelector } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
@@ -36,7 +36,6 @@ import {
 import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, takeOnePipe } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
-import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
 import { ngViewerSelectorNehubaReady, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
 import { REGION_OF_INTEREST } from "src/util/interfaces";
@@ -307,7 +306,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public hoveredPanelIndices$: Observable<number>
 
   public connectivityNumber: string
-  public connectivityLoadUrl: string
 
   constructor(
     private pureConstantService: PureContantService,
@@ -757,7 +755,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
         /* selectedregionindexset needs to be updated regardless of forceshowsegment */
         this.selectedRegionIndexSet = !prevParcellation || prevParcellation === selectedParcellation?
-          new Set(regions.map(({ngId = defaultNgId, labelIndex}) => generateLabelIndexId({ ngId, labelIndex }))) : new Set()
+          new Set(regions.map(({ngId = defaultNgId, labelIndex}) => serialiseParcellationRegion({ ngId, labelIndex }))) : new Set()
 
         if ( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ) {
           this.nehubaViewer.hideAllSeg()
@@ -818,7 +816,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       this.selectedRegions$.pipe(
         filter(() => !!this.nehubaViewer),
       ).subscribe(regions => {
-        this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
+        this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => serialiseParcellationRegion({ ngId, labelIndex }))
       })
     )
 
@@ -1080,7 +1078,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         const selectRegionIds = []
         this.multiNgIdsRegionsLabelIndexMap.forEach((map, ngId) => {
           Array.from(map.keys()).forEach(labelIndex => {
-            selectRegionIds.push(generateLabelIndexId({ ngId, labelIndex }))
+            selectRegionIds.push(serialiseParcellationRegion({ ngId, labelIndex }))
           })
         })
         this.store.dispatch(viewerStateSelectRegionWithIdDeprecated({

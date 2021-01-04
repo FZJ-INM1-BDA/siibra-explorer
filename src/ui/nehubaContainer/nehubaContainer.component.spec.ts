@@ -8,16 +8,14 @@ import { TouchSideClass } from "./touchSideClass.directive"
 import { MaximmisePanelButton } from "./maximisePanelButton/maximisePanelButton.component"
 import { LayoutModule } from 'src/layouts/layout.module'
 import { PureContantService, UtilModule } from "src/util"
-import { AtlasLayerSelector } from "../atlasLayerSelector/atlasLayerSelector.component"
+import { AtlasLayerSelector } from "../../atlasComponents/uiSelectors/atlasLayerSelector/atlasLayerSelector.component"
 import { StatusCardComponent } from './statusCard/statusCard.component'
 import { NehubaViewerTouchDirective } from './nehubaViewerInterface/nehubaViewerTouch.directive'
 import { MobileOverlay } from "./mobileOverlay/mobileOverlay.component"
-import { RegionMenuComponent } from "../parcellationRegion/regionMenu/regionMenu.component"
-import { DatabrowserModule } from "../databrowserModule"
+
+import { DatabrowserModule } from "../../atlasComponents/databrowserModule"
 import { SplashScreen } from "./splashScreen/splashScreen.component"
 import { CurrentLayout } from 'src/ui/config/currentLayout/currentLayout.component'
-import { RegionDirective } from 'src/ui/parcellationRegion/region.directive'
-import { RegionTextSearchAutocomplete } from "../viewerStateController/regionSearch/regionSearch.component"
 import { MobileControlNubStylePipe } from './pipes/mobileControlNubStyle.pipe'
 import { ReorderPanelIndexPipe } from './reorderPanelIndex.pipe'
 import { AuthModule } from 'src/auth'
@@ -29,7 +27,6 @@ import { NehubaModule } from './nehuba.module'
 import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
 import { viewerStateCustomLandmarkSelector, viewerStateHelperStoreName } from 'src/services/state/viewerState.store.helper'
-import { RenderViewOriginDatasetLabelPipe } from '../parcellationRegion/region.base'
 import { By } from '@angular/platform-browser'
 import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
@@ -38,8 +35,10 @@ import { hot } from 'jasmine-marbles'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
 import { PANELS } from 'src/services/state/ngViewerState/constants'
-import { RegionalFeaturesModule } from '../regionalFeatures'
+import { RegionalFeaturesModule } from '../../atlasComponents/regionalFeatures'
 import { Landmark2DModule } from './2dLandmarks/module'
+import { ParcellationRegionModule } from 'src/atlasComponents/parcellationRegion'
+import { AtlasCmpParcellationModule } from 'src/atlasComponents/parcellation'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -81,6 +80,8 @@ describe('> nehubaContainer.component.ts', () => {
           HttpClientModule,
           CommonModule,
           RegionalFeaturesModule,
+          ParcellationRegionModule,
+          AtlasCmpParcellationModule,
 
           /**
            * because the change done to pureconstant service, need to intercept http call to avoid crypto error message
@@ -97,16 +98,14 @@ describe('> nehubaContainer.component.ts', () => {
           StatusCardComponent,
           NehubaViewerTouchDirective,
           MobileOverlay,
-          RegionMenuComponent,
+          
           SplashScreen,
           CurrentLayout,
-          RegionDirective,
-          RegionTextSearchAutocomplete,
   
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
-          RenderViewOriginDatasetLabelPipe,
+          
           RegionAccordionTooltipTextPipe,
         ],
         providers: [

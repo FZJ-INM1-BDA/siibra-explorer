@@ -3,7 +3,6 @@ import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, ra
 import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
@@ -11,7 +10,7 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
 import { scanSliceViewRenderFn } from "../util";
-import { intToRgb as intToColour } from 'common/util'
+import { intToRgb as intToColour, deserialiseParcRegionId } from 'common/util'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -681,9 +680,13 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     const reduceFn: (acc: Map<string, number[]>, curr: string) => Map<string, number[]> = (acc, curr) => {
 
       const newMap = new Map(acc)
-      const { ngId, labelIndex } = getNgIdLabelIndexFromId({ labelIndexId: curr })
+      const { ngId, labelIndex } = deserialiseParcRegionId(curr)
       const exist = newMap.get(ngId)
-      if (!exist) { newMap.set(ngId, [Number(labelIndex)]) } else { newMap.set(ngId, [...exist, Number(labelIndex)]) }
+      if (!exist) {
+        newMap.set(ngId, [Number(labelIndex)])
+      } else {
+        newMap.set(ngId, [...exist, Number(labelIndex)])
+      }
       return newMap
     }
 
