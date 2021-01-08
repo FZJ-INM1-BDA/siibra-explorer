@@ -33,7 +33,7 @@ type TViewerEventMOAnno = {
 }
 
 type TViewerEventViewerLoaded = {
-  type: "VIEWERLOADED",
+  type: "VIEWERLOADED"
   data: boolean
 }
 

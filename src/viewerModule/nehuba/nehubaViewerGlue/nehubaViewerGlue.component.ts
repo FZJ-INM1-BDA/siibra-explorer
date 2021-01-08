@@ -707,7 +707,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     next()
   }
 
-  private waitForNehuba(arg:unknown) {
+  private waitForNehuba(arg: unknown) {
     return interval(16).pipe(
       filter(() => !!(this.nehubaContainerDirective?.isReady())),
       take(1),
