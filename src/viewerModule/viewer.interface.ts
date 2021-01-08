@@ -39,7 +39,7 @@ type TViewerEventViewerLoaded = {
 
 export type TViewerEvent = TViewerEventMOAnno | TViewerEventViewerLoaded
 
-export interface IViewer{
+export type IViewer = {
   
   selectedTemplate: any
   selectedParcellation: any

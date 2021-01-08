@@ -67,12 +67,6 @@ export function safeFilter(key: string) {
     typeof state[key] !== 'undefined' && state[key] !== null)
 }
 
-export function getNgIdLabelIndexFromRegion({ region }) {
-  const { ngId, labelIndex } = region
-  if (ngId && labelIndex) { return { ngId, labelIndex } }
-  throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
-}
-
 export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
   const map: Map<string, Map<number, any>> = new Map()
   

@@ -2,8 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
-import { SNACKBAR_MESSAGE } from './uiState.store';
-import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
+import { getNgIds } from 'src/util/fn';
 import { Action, select, Store, createReducer, on } from '@ngrx/store'
 import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +12,7 @@ import { PANELS } from './ngViewerState.store.helper'
 import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady } from './ngViewerState/actions';
 import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
+import { uiActionSnackbarMessage } from './uiState/actions';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -181,7 +181,7 @@ export class NgViewerUseEffect implements OnDestroy {
 
   constructor(
     private actions: Actions,
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
     private pureConstantService: PureContantService,
     private http: HttpClient,
   ){
@@ -215,16 +215,14 @@ export class NgViewerUseEffect implements OnDestroy {
       withLatestFrom(this.store$),
       map(([{ngViewerState: fetchedNgViewerState}, state]) => {
         const { ngViewerState } = state
-        return {
-          type: GENERAL_ACTION_TYPES.APPLY_STATE,
+        return generalApplyState({
           state: {
             ...state,
             ngViewerState: {
               ...ngViewerState,
               ...fetchedNgViewerState
-            }
-          }
-        }
+            }}
+        })
       })
     )
 
@@ -335,10 +333,9 @@ export class NgViewerUseEffect implements OnDestroy {
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === PANELS.SINGLE_PANEL),
-      mapTo({
-        type: SNACKBAR_MESSAGE,
-        snackbarMessage: CYCLE_PANEL_MESSAGE,
-      }),
+      mapTo(uiActionSnackbarMessage({
+        snackbarMessage: CYCLE_PANEL_MESSAGE
+      })),
     )
 
     this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(

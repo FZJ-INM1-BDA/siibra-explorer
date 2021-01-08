@@ -2,8 +2,8 @@
 // Generated on Mon Aug 06 2018 12:37:42 GMT+0200 (CEST)
 
 const merge = require('webpack-merge')
-const webpackTest = require('../webpack.test')
-const webpackConfig = require('../webpack.dev')
+const webpackTest = require('../webpack/webpack.test')
+const webpackConfig = require('../webpack/webpack.dev')
 const fullWebpack = merge(webpackTest, webpackConfig)
 
 const singleRun = process.env.NODE_ENV === 'test'

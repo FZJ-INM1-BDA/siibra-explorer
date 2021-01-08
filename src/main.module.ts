@@ -1,6 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { StoreModule, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -16,7 +16,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory, LOAD_MESH_TOKEN, ILoadMesh } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
-import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
+
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
@@ -35,16 +35,14 @@ import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctVie
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
-import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./atlasViewer/mouseOver.directive";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
 import { WidgetModule } from 'src/widget';
-import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
+import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
-import { ShareModule } from './share';
 import { AuthService } from './auth'
 import { IAV_DATASET_PREVIEW_ACTIVE } from 'src/atlasComponents/databrowserModule'
 
@@ -54,11 +52,14 @@ import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService } from './glue';
 import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
-import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
+import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
 import { ParcellationRegionModule } from './atlasComponents/parcellationRegion';
-import { AtlasCmpUiSelectorsModule } from './atlasComponents/uiSelectors';
+import { ViewerModule } from './viewerModule';
+import { CookieModule } from './ui/cookieAgreement/module';
+import { KgTosModule } from './ui/kgtos/module';
+import { MouseoverModule } from './mouseoverModule/mouseover.module';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -84,12 +85,13 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     WidgetModule,
     PluginModule,
     LoggingModule,
-    ShareModule,
     MesssagingModule,
-
+    ViewerModule,
     SpotLightModule,
     ParcellationRegionModule,
-    AtlasCmpUiSelectorsModule,
+    CookieModule,
+    KgTosModule,
+    MouseoverModule,
     
     EffectsModule.forRoot([
       UseEffects,
@@ -131,15 +133,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     FloatingContainerDirective,
     FloatingMouseContextualContainerDirective,
     DragDropDirective,
-    MouseHoverDirective, 
 
     /* pipes */
     GetNamesPipe,
     GetNamePipe,
-    TransformOnhoverSegmentPipe,
     NewViewerDisctinctViewToLayer,
-    MouseOverTextPipe,
-    MouseOverIconPipe,
   ],
   entryComponents : [
     DialogComponent,
@@ -249,9 +247,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   ],
   bootstrap : [
     AtlasViewer,
-  ],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA,
   ],
 })
 

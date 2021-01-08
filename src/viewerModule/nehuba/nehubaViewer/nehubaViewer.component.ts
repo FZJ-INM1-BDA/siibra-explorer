@@ -636,6 +636,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   public hideAllSeg() {
+    // console.log('hideallseg')
+    // debugger
     if (!this.nehubaViewer) { return }
     Array.from(this.multiNgIdsLabelIndexMap.keys()).forEach(ngId => {
 

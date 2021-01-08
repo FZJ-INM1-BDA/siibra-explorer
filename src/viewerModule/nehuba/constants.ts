@@ -1,4 +1,4 @@
-
+export { getNgIds } from 'src/util/fn'
 export const NEHUBA_VIEWER_FEATURE_KEY = 'ngViewerFeature'
 
 export interface INgLayerInterface {
@@ -10,16 +10,6 @@ export interface INgLayerInterface {
   visible?: boolean
   shader?: string
   transform?: any
-}
-
-
-export function getNgIds(regions: any[]): string[] {
-  return regions && regions.map
-    ? regions
-      .map(r => [r.ngId, ...getNgIds(r.children)])
-      .reduce((acc, item) => acc.concat(item), [])
-      .filter(ngId => !!ngId)
-    : []
 }
 
 export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {

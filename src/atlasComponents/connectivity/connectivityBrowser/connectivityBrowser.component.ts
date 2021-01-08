@@ -152,8 +152,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     ngOnInit(): void {
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res.filter(dl => dl['parcellation id'] === this.parcellationId)
-        this.selectedDataset = this.datasetList[0].name
-        this.selectedDatasetDescription = this.datasetList[0].description
+        this.selectedDataset = this.datasetList[0]?.name
+        this.selectedDatasetDescription = this.datasetList[0]?.description
 
         this.changeDataset()
       })

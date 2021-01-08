@@ -437,7 +437,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(
         scan(accumulatorFn, new Map()),
-        map(map => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId)),
+        map((map: Map<string, any>) => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId)),
       ).subscribe(arrOfArr => {
         this.store$.dispatch({
           type: MOUSE_OVER_SEGMENTS,
@@ -499,6 +499,10 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   get nehubaViewerInstance(){
     return this.cr && this.cr.instance
+  }
+
+  isReady() {
+    return !!(this.cr?.instance?.nehubaViewer?.ngviewer)
   }
 
   /* because the navigation can be changed from two sources,

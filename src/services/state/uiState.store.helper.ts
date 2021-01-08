@@ -1,17 +1,5 @@
 // TODO merge with uiState.store.ts after refactor completes
 
-import {
-  uiActionSetPreviewingDatasetFiles,
-  uiActionShowSidePanelConnectivity,
-  uiStateCloseSidePanel,
-  uiStateCollapseSidePanel,
-  uiStateExpandSidePanel,
-  uiStateOpenSidePanel,
-  uiStateShowBottomSheet,
-  uiActionHideDatasetWithId,
-  uiActionShowDatasetWtihId,
-} from './uiState/actions'
-
 export {
   uiActionSetPreviewingDatasetFiles,
   uiActionShowSidePanelConnectivity,
@@ -22,21 +10,15 @@ export {
   uiStateShowBottomSheet,
   uiActionHideDatasetWithId,
   uiActionShowDatasetWtihId,
-}
+  uiActionSnackbarMessage,
+} from './uiState/actions'
 
-import {
+export {
   uiStatePreviewingDatasetFilesSelector,
   uiStateMouseOverSegmentsSelector,
   uiStateMouseoverUserLandmark,
   uiStateShownDatasetIdSelector,
 } from './uiState/selectors'
-
-export {
-  uiStatePreviewingDatasetFilesSelector,
-  uiStateMouseOverSegmentsSelector,
-  uiStateMouseoverUserLandmark,
-  uiStateShownDatasetIdSelector,
-}
 
 export enum EnumWidgetTypes{
   DATASET_PREVIEW,

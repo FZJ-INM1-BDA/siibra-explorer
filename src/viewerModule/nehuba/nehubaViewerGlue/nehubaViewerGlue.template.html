@@ -1,5 +1,161 @@
-<div
+<div class="d-block"
   iav-nehuba-viewer-container
+  iav-mouse-hover
   (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
 
 </div>
+
+<current-layout *ngIf="viewerLoaded$ | async" class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
+  <div class="w-100 h-100 position-relative" cell-i>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="w-100 h-100 position-relative" cell-ii>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="w-100 h-100 position-relative" cell-iii>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="w-100 h-100 position-relative" cell-iv>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
+  </div>
+</current-layout>
+
+<!-- slice view overlay tmpl -->
+<ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
+
+  <!-- perspective view tmpl -->
+  <ng-template #overlayPerspectiveTmpl>
+    <layout-floating-container landmarkContainer>
+
+      <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
+        [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
+        [attr.id]="IDS.MESH_LOADING_STATUS"
+        role="status">
+
+        <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
+        </spinner-cmp>
+        
+        <mat-list>
+          <mat-list-item>
+            {{ showPerpsectiveScreen$ | async }}
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <!-- mesh loading is still weird -->
+      <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
+      <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
+        <spinner-cmp></spinner-cmp>
+
+        <div *ngIf="false" perspectiveLoadingText>
+          {{ perspectiveViewLoading$ | async }}
+        </div>
+      </div>
+    </layout-floating-container>
+  </ng-template>
+
+  <iav-layout-fourcorners class="w-100 h-100 d-block">
+    <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl"
+      class="overflow-hidden"
+      iavLayoutFourCornersContent>
+      <!-- TODO add landmarks here -->
+
+
+      <!-- customLandmarks -->
+      <!-- only show landmarks in slice views -->
+      <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
+        (mouseenter)="handleMouseEnterCustomLandmark(lm)"
+        (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
+        [color]="lm.color || [255, 255, 255]"
+        [positionX]="getPositionX(panelIndex, lm)"
+        [positionY]="getPositionY(panelIndex, lm)"
+        [positionZ]="getPositionZ(panelIndex, lm)">
+
+      </landmark-2d-flat-cmp>
+    </layout-floating-container>
+
+    <!-- panel controller -->
+    <div iavLayoutFourCornersBottomRight>
+
+      <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+        panelIndex: panelIndex,
+        visible: (hoveredPanelIndices$ | async) === panelIndex
+      }">
+      </ng-container>
+
+      <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]">
+        <spinner-cmp></spinner-cmp>
+      </div>
+    </div>
+  </iav-layout-fourcorners>
+
+</ng-template>
+
+<!-- panel control template -->
+<ng-template
+  #panelCtrlTmpl
+  let-panelIndex="panelIndex"
+  let-visible="visible">
+
+  <div class="opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
+    [ngClass]="{ onHover: visible }"
+    [attr.data-viewer-controller-visible]="visible"
+    [attr.data-viewer-controller-index]="panelIndex">
+
+    <!-- perspective specific control -->
+    <ng-container *ngIf="panelIndex === 3">
+      <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: {
+        state: (nehubaViewerPerspectiveOctantRemoval$ | async),
+        disableOctantRemovalCtrl: disableOctantRemovalCtrl$ | async
+      }">
+
+      </ng-container>
+    </ng-container>
+
+    <!-- factor < 1.0 === zoom in -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 0.9)"
+      [attr.aria-label]="ARIA_LABELS.ZOOM_IN">
+      <i class="fas fa-search-plus"></i>
+    </button>
+
+    <!-- factor > 1.0 === zoom out -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 1.1)"
+      [attr.aria-label]="ARIA_LABELS.ZOOM_OUT">
+      <i class="fas fa-search-minus"></i>
+    </button>
+
+    <maximise-panel-button
+      (click)="toggleMaximiseMinimise(panelIndex)"
+      [touch-side-class]="panelIndex">
+    </maximise-panel-button>
+  </div>
+
+</ng-template>
+
+<!-- tmpl for toggling perspective frontal octant -->
+<ng-template #perspectiveOctantRemovalTmpl
+  let-state="state"
+  let-disableOctantRemovalCtrl="disableOctantRemovalCtrl">
+  <div class="d-inline-block"
+    [matTooltip]="disableOctantRemovalCtrl?.mode !== null ? disableOctantRemovalCtrl.message : null">
+    <button
+      (click)="setOctantRemoval(!state)"
+      mat-icon-button
+      [disabled]="disableOctantRemovalCtrl?.mode !== null"
+      [attr.aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
+      color="primary">
+
+      <!-- octant removal is true -->
+      <ng-template [ngIf]="disableOctantRemovalCtrl?.mode !== null ? disableOctantRemovalCtrl.mode : state" [ngIfElse]="octantRemovalOffTmpl">
+        <i class="fas fa-eye-slash"></i>
+      </ng-template>
+
+      <!-- octant removal is false -->
+      <ng-template #octantRemovalOffTmpl>
+        <i class="fas fa-eye"></i>
+      </ng-template>
+    </button>
+  </div>
+</ng-template>

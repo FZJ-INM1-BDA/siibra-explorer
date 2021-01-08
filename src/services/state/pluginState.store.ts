@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store'
-import { GENERAL_ACTION_TYPES } from '../stateStore.service'
+import { generalApplyState } from '../stateStore.helper'
 import { PLUGINSTORE_ACTION_TYPES } from './pluginState.helper'
 export const defaultState: StateInterface = {
   initManifests: []
@@ -41,7 +41,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       initManifests: newManifests,
     }
   }
-  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+  case generalApplyState.type: {
     const { pluginState } = (action as any).state
     return pluginState
   }

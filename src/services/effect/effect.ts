@@ -8,6 +8,7 @@ import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_
 import { IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
 import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
 import { deserialiseParcRegionId, serialiseParcellationRegion } from "common/util"
+import { getGetRegionFromLabelIndexId } from 'src/util/fn'
 
 @Injectable({
   providedIn: 'root',
@@ -245,13 +246,6 @@ export class UseEffects implements OnDestroy {
       landmarks: []
     })
   )
-}
-
-export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
-  const { ngId: defaultNgId, regions } = parcellation
-  // if (!updated) throw new Error(`parcellation not yet updated`)
-  return ({ labelIndexId }) =>
-    recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
 }
 
 export const compareRegions: (r1: any, r2: any) => boolean = (r1, r2) => {

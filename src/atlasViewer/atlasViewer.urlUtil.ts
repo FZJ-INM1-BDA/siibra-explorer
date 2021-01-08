@@ -1,8 +1,6 @@
-import { getGetRegionFromLabelIndexId } from "src/services/effect/effect";
+import { getGetRegionFromLabelIndexId } from 'src/util/fn'
 import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
-import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
 import { serialiseParcellationRegion } from "common/util"
@@ -20,6 +18,107 @@ const PARSING_SEARCHPARAM_WARNING = {
 export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
   TEMPLATE_NOT_SELECTED: 'TEMPLATE_NOT_SELECTED',
 }
+
+/**
+ * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)
+ * The constraint is that the cipher needs to be commpatible with URI encoding
+ * and a URI compatible separator is required.
+ *
+ * The implementation below came from
+ * https://stackoverflow.com/a/6573119/6059235
+ *
+ * While a faster solution exist in the same post, this operation is expected to be done:
+ * - once per 1 sec frequency
+ * - on < 1000 numbers
+ *
+ * So performance is not really that important (Also, need to learn bitwise operation)
+ */
+
+const cipher = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-'
+export const separator = "."
+const negString = '~'
+
+const encodeInt = (number: number) => {
+  if (number % 1 !== 0) { throw new Error('cannot encodeInt on a float. Ensure float flag is set') }
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) { throw new Error('The input is not valid') }
+
+  let rixit // like 'digit', only in some non-decimal radix
+  let residual
+  let result = ''
+
+  if (number < 0) {
+    result += negString
+    residual = Math.floor(number * -1)
+  } else {
+    residual = Math.floor(number)
+  }
+
+  /* eslint-disable-next-line no-constant-condition */
+  while (true) {
+    rixit = residual % 64
+    // this.log.log("rixit : " + rixit)
+    // this.log.log("result before : " + result)
+    result = cipher.charAt(rixit) + result
+    // this.log.log("result after : " + result)
+    // this.log.log("residual before : " + residual)
+    residual = Math.floor(residual / 64)
+    // this.log.log("residual after : " + residual)
+
+    if (residual === 0) {
+      break;
+    }
+  }
+  return result
+}
+
+interface IB64EncodingOption {
+  float: boolean
+}
+
+const defaultB64EncodingOption = {
+  float: false,
+}
+
+export const encodeNumber:
+  (number: number, option?: IB64EncodingOption) => string =
+  (number: number, { float = false }: IB64EncodingOption = defaultB64EncodingOption) => {
+    if (!float) { return encodeInt(number) } else {
+      const floatArray = new Float32Array(1)
+      floatArray[0] = number
+      const intArray = new Uint32Array(floatArray.buffer)
+      const castedInt = intArray[0]
+      return encodeInt(castedInt)
+    }
+  }
+
+const decodetoInt = (encodedString: string) => {
+  let _encodedString
+  let negFlag = false
+  if (encodedString.slice(-1) === negString) {
+    negFlag = true
+    _encodedString = encodedString.slice(0, -1)
+  } else {
+    _encodedString = encodedString
+  }
+  return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc, curr) => {
+    const index = cipher.indexOf(curr)
+    if (index < 0) { throw new Error(`Poisoned b64 encoding ${encodedString}`) }
+    return acc * 64 + index
+  }, 0)
+}
+
+export const decodeToNumber:
+  (encodedString: string, option?: IB64EncodingOption) => number =
+  (encodedString: string, {float = false} = defaultB64EncodingOption) => {
+    if (!float) { return decodetoInt(encodedString) } else {
+      const _int = decodetoInt(encodedString)
+      const intArray = new Uint32Array(1)
+      intArray[0] = _int
+      const castedFloat = new Float32Array(intArray.buffer)
+      return castedFloat[0]
+    }
+  }
+
 
 export const cvtStateToSearchParam = (state: any): URLSearchParams => {
   const searchParam = new URLSearchParams()
@@ -39,7 +138,7 @@ export const cvtStateToSearchParam = (state: any): URLSearchParams => {
     // encoding selected regions
     const accumulatorMap = new Map<string, number[]>()
     for (const region of regionsSelected) {
-      const { ngId, labelIndex } = getNgIdLabelIndexFromRegion({ region })
+      const { ngId, labelIndex } = region
       const existingEntry = accumulatorMap.get(ngId)
       if (existingEntry) { existingEntry.push(labelIndex) } else { accumulatorMap.set(ngId, [ labelIndex ]) }
     }
@@ -93,7 +192,7 @@ export const cvtStateToSearchParam = (state: any): URLSearchParams => {
 const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR
 const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR, ID_ERROR } = PARSING_SEARCHPARAM_WARNING
 
-const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchParams, state: IavRootStoreInterface, cb?: (arg: any) => void) => {
+const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchParams, state: any, cb?: (arg: any) => void) => {
 
 
   /**
@@ -198,9 +297,9 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
   }
 }
 
-export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavRootStoreInterface, callback?: (error: any) => void): IavRootStoreInterface => {
+export const cvtSearchParamToState = (searchparams: URLSearchParams, state: any, callback?: (error: any) => void): any => {
 
-  const returnState = JSON.parse(JSON.stringify(state)) as IavRootStoreInterface
+  const returnState = JSON.parse(JSON.stringify(state)) as any
 
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   const warningCb = callback || (() => {})

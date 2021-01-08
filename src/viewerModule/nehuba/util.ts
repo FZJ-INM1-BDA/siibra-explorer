@@ -1,7 +1,9 @@
-import { pipe } from 'rxjs'
+import { InjectionToken } from '@angular/core'
+import { Observable, pipe } from 'rxjs'
 import { filter, scan, take } from 'rxjs/operators'
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { getViewer } from 'src/util/fn'
+import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 
 const flexContCmnCls = ['w-100', 'h-100', 'd-flex', 'justify-content-center', 'align-items-stretch']
 
@@ -285,3 +287,5 @@ export const takeOnePipe = () => {
     take(1),
   )
 }
+
+export const NEHUBA_INSTANCE_INJTKN = new InjectionToken<Observable<NehubaViewerUnit>>('NEHUBA_INSTANCE_INJTKN')

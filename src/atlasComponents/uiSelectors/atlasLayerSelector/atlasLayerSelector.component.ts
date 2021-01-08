@@ -20,35 +20,94 @@ export class AtlasLayerSelector implements OnInit {
     @ViewChildren(MatMenuTrigger) matMenuTriggers: QueryList<MatMenuTrigger>
     public atlas: any
 
-    public nonGroupedLayers$: Observable<any[]>
-    public groupedLayers$: Observable<any[]>
+    public selectedAtlas$: Observable<any> = this.store$.pipe(
+      select(viewerStateGetSelectedAtlas),
+      distinctUntilChanged(),
+      shareReplay(1)
+    )
+    private layersGroupBy$ = this.selectedAtlas$.pipe(
+      switchMap(selectedAtlas => from((selectedAtlas?.parcellations) || []).pipe(
+        /**
+         * do not show base layers
+         */
+        filter(p => !(p as any).baseLayer),
+        groupBy((parcellation: any) => parcellation.groupName, p => p),
+        mergeMap(group => zip(
+          of(group.key),
+          group.pipe(toArray()))
+        ),
+        scan((acc, curr) => acc.concat([ curr ]), []),
+        shareReplay(1),
+      ))
+    )
 
+
+    private atlasLayersLatest$ = this.store$.pipe(
+      select(viewerStateAtlasLatestParcellationSelector),
+      shareReplay(1),
+    )
+
+    public nonGroupedLayers$: Observable<any[]> = this.atlasLayersLatest$.pipe(
+      map(allParcellations => 
+        allParcellations
+          .filter(p => !p['groupName'])
+          .filter(p => !p['baseLayer'])
+      ),
+    )
+
+    public groupedLayers$: Observable<any[]> = combineLatest([
+      this.atlasLayersLatest$.pipe(
+        map(allParcellations => 
+          allParcellations.filter(p => !p['baseLayer'])
+        ),
+      ),
+      this.layersGroupBy$
+    ]).pipe(
+      map(([ allParcellations, arr]) => arr
+        .filter(([ key ]) => !!key )
+        .map(([key, parcellations]) => ({
+          name: key,
+          previewUrl: parcellations[0].previewUrl,
+          parcellations: parcellations.map(p => {
+            const fullInfo = allParcellations.find(fullP => fullP['@id'] === p['@id']) || {}
+            return {
+              ...fullInfo,
+              ...p,
+              darktheme: (fullInfo || {}).useTheme === 'dark'
+            }
+          })
+        }))
+      ),
+    )
     public selectedTemplateSpaceId: string
     public selectedLayers = []
 
     public selectedTemplate$: Observable<any>
     private selectedParcellation$: Observable<any>
-    public selectedAtlas$: Observable<any>
+
     private subscriptions: Subscription[] = []
 
     @HostBinding('attr.data-opened')
     public selectorExpanded: boolean = false
     public selectedTemplatePreviewUrl: string = ''
 
-    public availableTemplates$: Observable<any[]>
+    public availableTemplates$ = this.store$.pipe<any[]>(
+      select(viewerStateSelectedTemplateFullInfoSelector)
+    )
 
     public containerMaxWidth: number
 
-    constructor(private store$: Store<any>) {
-      this.selectedAtlas$ = this.store$.pipe(
-        select(viewerStateGetSelectedAtlas),
-        distinctUntilChanged(),
-        shareReplay(1)
-      )
+    public shouldShowRenderPlaceHolder$ = combineLatest([
+      this.availableTemplates$,
+      this.groupedLayers$,
+      this.nonGroupedLayers$,
+    ]).pipe(
+      map(([ availTmpl, grpL, ungrpL ]) => {
+        return availTmpl?.length > 0 || (grpL?.length || 0) + (ungrpL?.length || 0) > 0
+      })
+    )
 
-      this.availableTemplates$ = this.store$.pipe(
-        select(viewerStateSelectedTemplateFullInfoSelector)
-      )
+    constructor(private store$: Store<any>) {
 
       this.selectedTemplate$ = this.store$.pipe(
         select(viewerStateSelectedTemplatePureSelector),
@@ -64,59 +123,6 @@ export class AtlasLayerSelector implements OnInit {
         select(viewerStateSelectedParcellationSelector)
       )
 
-      const layersGroupBy$ = this.selectedAtlas$.pipe(
-        switchMap(selectedAtlas => from((selectedAtlas?.parcellations) || []).pipe(
-          /**
-           * do not show base layers
-           */
-          filter(p => !(p as any).baseLayer),
-          groupBy((parcellation: any) => parcellation.groupName, p => p),
-          mergeMap(group => zip(
-            of(group.key),
-            group.pipe(toArray()))
-          ),
-          scan((acc, curr) => acc.concat([ curr ]), []),
-          shareReplay(1),
-        ))
-      )
-
-      const atlasLayersLatest$ = this.store$.pipe(
-        select(viewerStateAtlasLatestParcellationSelector),
-        shareReplay(1),
-      )
-
-      this.nonGroupedLayers$ = atlasLayersLatest$.pipe(
-        map(allParcellations => 
-          allParcellations
-            .filter(p => !p['groupName'])
-            .filter(p => !p['baseLayer'])
-        ),
-      )
-
-      this.groupedLayers$ = combineLatest(
-        atlasLayersLatest$.pipe(
-          map(allParcellations => 
-            allParcellations.filter(p => !p['baseLayer'])
-          ),
-        ),
-        layersGroupBy$
-      ).pipe(
-        map(([ allParcellations, arr]) => arr
-          .filter(([ key ]) => !!key )
-          .map(([key, parcellations]) => ({
-            name: key,
-            previewUrl: parcellations[0].previewUrl,
-            parcellations: parcellations.map(p => {
-              const fullInfo = allParcellations.find(fullP => fullP['@id'] === p['@id']) || {}
-              return {
-                ...fullInfo,
-                ...p,
-                darktheme: (fullInfo || {}).useTheme === 'dark'
-              }
-            })
-          }))
-        ),
-      )
     }
 
     ngOnInit(): void {
@@ -183,6 +189,7 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     getTooltipText(layer) {
+      if (!this.atlas) return
       if (this.atlas.templateSpaces.map(tmpl => tmpl['@id']).includes(layer['@id'])) return layer.name
       if (layer.availableIn) {
         if (this.currentTemplateIncludesLayer(layer)) return layer.name
