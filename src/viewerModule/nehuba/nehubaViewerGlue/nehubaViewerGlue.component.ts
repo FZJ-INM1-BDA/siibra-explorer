@@ -18,7 +18,7 @@ import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { calculateSliceZoomFactor, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
-import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, IUserLandmark, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
+import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 
 interface INgLayerInterface {
@@ -80,7 +80,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   public perspectiveViewLoading$: Observable<string|null>
   public hoveredPanelIndices$: Observable<number>
   private viewPanelWeakMap = new WeakMap<HTMLElement, number>()
-  private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
+  public viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   private findPanelIndex = (panel: HTMLElement) => this.viewPanelWeakMap.get(panel)
   public nanometersToOffsetPixelsFn: Array<(...arg) => any> = []
 

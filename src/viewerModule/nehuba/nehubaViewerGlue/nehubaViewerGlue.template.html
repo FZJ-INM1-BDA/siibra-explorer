@@ -1,8 +1,18 @@
-<div class="d-block"
-  iav-nehuba-viewer-container
-  iav-mouse-hover
-  (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+<div class="d-block w-100 h-100"
+  (touchmove)="$event.preventDefault()"
+  iav-viewer-touch-interface
+  [iav-viewer-touch-interface-v-panels]="viewPanels"
+  [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
+  [iav-viewer-touch-interface-ngviewer]="iavContainer?.nehubaViewerInstance?.nehubaViewer?.ngviewer"
+  [iav-viewer-touch-interface-nehuba-config]="selectedTemplate?.nehubaConfig">
 
+  <div class="d-block"
+    iav-nehuba-viewer-container
+    #iavContainer="iavNehubaViewerContainer"
+    iav-mouse-hover
+    (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+
+  </div>
 </div>
 
 <current-layout *ngIf="viewerLoaded$ | async" class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
