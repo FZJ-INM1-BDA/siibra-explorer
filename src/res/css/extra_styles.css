@@ -381,6 +381,11 @@ markdown-dom pre code
   height: 2rem!important;
 }
 
+.h-50vh
+{
+  height: 50vh!important;
+}
+
 .h-5em
 {
   height: 5em!important;

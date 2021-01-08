@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { KgSingleDatasetService } from "src/ui/databrowserModule/kgSingleDatasetService.service";
 import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 import { IavRootStoreInterface } from "./stateStore.service";
 import { DATASETS_ACTIONS_TYPES } from "./state/dataStore.store";
@@ -19,12 +18,11 @@ export class LocalFileService {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private singleDsService: KgSingleDatasetService,
   ) {
 
   }
 
-  private niiUrl
+  private niiUrl: string
 
   public handleFileDrop(files: File[]) {
     try {

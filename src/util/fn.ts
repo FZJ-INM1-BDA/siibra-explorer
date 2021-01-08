@@ -55,3 +55,10 @@ export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inh
 export function getUuid(){
   return crypto.getRandomValues(new Uint32Array(1))[0].toString(16)
 }
+
+export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
+  const { ngId: defaultNgId, regions } = parcellation
+  // if (!updated) throw new Error(`parcellation not yet updated`)
+  return ({ labelIndexId }) =>
+    recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
+}

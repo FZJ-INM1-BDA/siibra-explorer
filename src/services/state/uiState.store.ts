@@ -10,7 +10,7 @@ import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-shee
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
 import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
 import { IUiState } from './uiState/common'
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from './uiState/actions';
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId, uiActionSnackbarMessage } from './uiState/actions';
 export const defaultState: IUiState = {
   shownDatasetId: [],
 
@@ -92,6 +92,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiS
       ...prevState,
       mouseOverLandmark : action.landmark,
     }
+  case uiActionSnackbarMessage.type:
   case SNACKBAR_MESSAGE: {
     const { snackbarMessage } = action
     /**
@@ -270,5 +271,5 @@ export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`
 export const SHOW_KG_TOS = `SHOW_KG_TOS`
 
-export const SNACKBAR_MESSAGE = `SNACKBAR_MESSAGE`
+export const SNACKBAR_MESSAGE = uiActionSnackbarMessage.type
 export const SHOW_BOTTOM_SHEET = `SHOW_BOTTOM_SHEET`

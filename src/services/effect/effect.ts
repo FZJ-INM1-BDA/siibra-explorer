@@ -5,8 +5,10 @@ import { merge, Observable, Subscription, combineLatest } from "rxjs";
 import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
-import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
 import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
+import { deserialiseParcRegionId, serialiseParcellationRegion } from "common/util"
+import { getGetRegionFromLabelIndexId } from 'src/util/fn'
 
 @Injectable({
   providedIn: 'root',
@@ -85,7 +87,7 @@ export class UseEffects implements OnDestroy {
         return {
           type: SELECT_REGIONS,
           selectRegions: alreadySelectedRegions
-            .filter(({ ngId, labelIndex }) => !deselectSet.has(generateLabelIndexId({ ngId, labelIndex }))),
+            .filter(({ ngId, labelIndex }) => !deselectSet.has(serialiseParcellationRegion({ ngId, labelIndex }))),
         }
       }),
     )
@@ -143,10 +145,10 @@ export class UseEffects implements OnDestroy {
   private convertRegionIdsToRegion = ([selectRegionIds, parcellation]) => {
     const { ngId: defaultNgId } = parcellation
     return (selectRegionIds as any[])
-      .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
+      .map(labelIndexId => deserialiseParcRegionId(labelIndexId))
       .map(({ ngId, labelIndex }) => {
         return {
-          labelIndexId: generateLabelIndexId({
+          labelIndexId: serialiseParcellationRegion({
             ngId: ngId || defaultNgId,
             labelIndex,
           }),
@@ -244,13 +246,6 @@ export class UseEffects implements OnDestroy {
       landmarks: []
     })
   )
-}
-
-export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
-  const { ngId: defaultNgId, regions } = parcellation
-  // if (!updated) throw new Error(`parcellation not yet updated`)
-  return ({ labelIndexId }) =>
-    recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
 }
 
 export const compareRegions: (r1: any, r2: any) => boolean = (r1, r2) => {

@@ -46,3 +46,8 @@ export const uiActionHideDatasetWithId = createAction(
 export const uiActionHideAllDatasets = createAction(
   `[uiState] hideAllDatasets`
 )
+
+export const uiActionSnackbarMessage = createAction(
+  `[uiState] snackbarMessage`,
+  props<{snackbarMessage: string}>()
+)

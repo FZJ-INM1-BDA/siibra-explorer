@@ -1,9 +1,5 @@
 import { filter } from 'rxjs/operators';
-export {
-  serialiseParcellationRegion as generateLabelIndexId,
-  deserialiseParcRegionId as getNgIdLabelIndexFromId,
 
-} from 'common/util'
 export {
   recursiveFindRegionWithLabelIndexId
 } from 'src/util/fn'
@@ -69,12 +65,6 @@ export function safeFilter(key: string) {
   return filter((state: any) =>
     (typeof state !== 'undefined' && state !== null) &&
     typeof state[key] !== 'undefined' && state[key] !== null)
-}
-
-export function getNgIdLabelIndexFromRegion({ region }) {
-  const { ngId, labelIndex } = region
-  if (ngId && labelIndex) { return { ngId, labelIndex } }
-  throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
 }
 
 export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
@@ -167,7 +157,7 @@ export interface IavRootStoreInterface {
   userConfigState: UserConfigStateInterface
 }
 
-import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
+import { DATASTORE_DEFAULT_STATE } from 'src/atlasComponents/databrowserModule'
 
 export const defaultRootState: any = {
   pluginState: pluginDefaultState,

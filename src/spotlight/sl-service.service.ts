@@ -21,6 +21,9 @@ export class SlServiceService implements OnDestroy{
     this.cf = cfr.resolveComponentFactory(SpotlightBackdropComponent)
   }
 
+  /**
+   * TODO use angular cdk overlay
+   */
   public showBackdrop(tmp?: TemplateRef<any>){
     this.hideBackdrop()
 

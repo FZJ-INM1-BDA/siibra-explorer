@@ -7,13 +7,12 @@ import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { getViewer } from 'src/util/fn';
 import { LoggingService } from 'src/logging';
-import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
+import { IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { CLOSE_SIDE_PANEL } from './uiState.store';
 import { 
   viewerStateSetSelectedRegions,
   viewerStateSetConnectivityRegion,
-  viewerStateSelectAtlas,
   viewerStateSelectParcellation,
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateCustomLandmarkSelector,
@@ -24,8 +23,9 @@ import {
   viewerStateMouseOverCustomLandmarkInPerspectiveView,
   viewerStateNewViewer
 } from './viewerState.store.helper';
-import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
+import { cvtNehubaConfigToNavigationObj } from 'src/state';
 import { viewerStateChangeNavigation } from './viewerState/actions';
+import { serialiseParcellationRegion } from "common/util"
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -378,8 +378,8 @@ export class ViewerStateUseEffect {
         startWith([]),
       )),
       map(([{ segments }, regionsSelected]) => {
-        const selectedSet = new Set(regionsSelected.map(generateLabelIndexId))
-        const toggleArr = segments.map(({ segment, layer }) => generateLabelIndexId({ ngId: layer.name, ...segment }))
+        const selectedSet = new Set(regionsSelected.map(serialiseParcellationRegion))
+        const toggleArr = segments.map(({ segment, layer }) => serialiseParcellationRegion({ ngId: layer.name, ...segment }))
 
         const deleteFlag = toggleArr.some(id => selectedSet.has(id))
 

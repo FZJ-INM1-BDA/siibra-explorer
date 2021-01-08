@@ -2,7 +2,6 @@ import { Directive } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, debounceTime, shareReplay } from "rxjs/operators";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { cvtStateToSearchParam } from "src/atlasViewer/atlasViewer.urlUtil";
 
 const jsonVersion = '0.0.1'
@@ -21,7 +20,7 @@ export class StateAggregator{
 
   public jsonifiedSstate$: Observable<IJsonifiedState>
   constructor(
-    private store$: Store<IavRootStoreInterface>
+    private store$: Store<any>
   ){
     this.jsonifiedSstate$ = this.store$.pipe(
       debounceTime(100),

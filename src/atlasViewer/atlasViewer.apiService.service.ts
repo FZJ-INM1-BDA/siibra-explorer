@@ -13,9 +13,9 @@ import {
   IavRootStoreInterface,
   safeFilter
 } from "src/services/stateStore.service";
-import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { IPluginManifest, PluginServices } from "./pluginUnit";
+import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
+import { IPluginManifest, PluginServices } from "src/plugin";
 
 declare let window
 
@@ -385,39 +385,7 @@ export interface IInteractiveViewerInterface {
     datasetsBSubject: Observable<any[]>
   }
 
-  viewerHandle?: {
-    setNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
-    moveToNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
-    setNavigationOri: (quat: [number, number, number, number]) => void
-    moveToNavigationOri: (quat: [number, number, number, number]) => void
-    showSegment: (labelIndex: number) => void
-    hideSegment: (labelIndex: number) => void
-    showAllSegments: () => void
-    hideAllSegments: () => void
-
-    // TODO deprecate
-    segmentColourMap: Map<number, {red: number, green: number, blue: number}>
-
-    getLayersSegmentColourMap: () => Map<string, Map<number, {red: number, green: number, blue: number}>>
-
-    // TODO deprecate
-    applyColourMap: (newColourMap: Map<number, {red: number, green: number, blue: number}>) => void
-
-    applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red: number, green: number, blue: number}>>) => void
-
-    loadLayer: (layerobj: any) => any
-    removeLayer: (condition: {name: string | RegExp}) => string[]
-    setLayerVisibility: (condition: {name: string|RegExp}, visible: boolean) => void
-
-    add3DLandmarks: (landmarks: IUserLandmark[]) => void
-    remove3DLandmarks: (ids: string[]) => void
-
-    mouseEvent: Observable<{eventName: string, event: MouseEvent}>
-    mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
-    mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-    mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
-    getNgHash: () => string
-  }
+  viewerHandle?: IVIewerHandle
 
   uiHandle: {
     getModalHandler: () => void
@@ -464,8 +432,45 @@ export interface ICustomRegionSpec{
   type: string // type of EnumCustomRegion
 }
 
-export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle) => void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
+export interface IVIewerHandle {
+
+  setNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
+  moveToNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
+  setNavigationOri: (quat: [number, number, number, number]) => void
+  moveToNavigationOri: (quat: [number, number, number, number]) => void
+  showSegment: (labelIndex: number) => void
+  hideSegment: (labelIndex: number) => void
+  showAllSegments: () => void
+  hideAllSegments: () => void
+
+  // TODO deprecate
+  segmentColourMap: Map<number, {red: number, green: number, blue: number}>
+
+  getLayersSegmentColourMap: () => Map<string, Map<number, {red: number, green: number, blue: number}>>
+
+  // TODO deprecate
+  applyColourMap: (newColourMap: Map<number, {red: number, green: number, blue: number}>) => void
+
+  applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red: number, green: number, blue: number}>>) => void
+
+  loadLayer: (layerobj: any) => any
+  removeLayer: (condition: {name: string | RegExp}) => string[]
+  setLayerVisibility: (condition: {name: string|RegExp}, visible: boolean) => void
+
+  add3DLandmarks: (landmarks: IUserLandmark[]) => void
+  remove3DLandmarks: (ids: string[]) => void
+
+  mouseEvent: Observable<{eventName: string, event: MouseEvent}>
+  mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
+  mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
+  mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
+  getNgHash: () => string
+}
+
+export type TSetViewerHandle = (viewerHandle: IVIewerHandle) => void
+
+export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<TSetViewerHandle>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
 
 export const setViewerHandleFactory = (apiService: AtlasViewerAPIServices) => {
-  return viewerHandle => apiService.interactiveViewer.viewerHandle = viewerHandle
+  return (viewerHandle: IVIewerHandle) => apiService.interactiveViewer.viewerHandle = viewerHandle
 }

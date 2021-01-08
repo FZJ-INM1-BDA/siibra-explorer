@@ -14,7 +14,7 @@ import { EnumColorMapName } from "./util/colorMaps"
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { tap, ignoreElements } from "rxjs/operators"
 import { merge, of } from "rxjs"
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./ui/databrowserModule/pure"
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
 import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
 import { generalActionError } from "./services/stateStore.helper"
 

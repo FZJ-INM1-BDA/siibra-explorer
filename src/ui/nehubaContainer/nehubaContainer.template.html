@@ -393,7 +393,6 @@
       <!--  regional features-->
       <ng-template #regionalFeaturesTmpl>
         <data-browser
-          [parcellation]="selectedParcellation"
           [disableVirtualScroll]="true"
           [regions]="regions">
         </data-browser>
@@ -572,7 +571,6 @@
             [parcellationId]="selectedParcellation['@id']"
             (setOpenState)="expansionPanel.expanded = $event"
             (connectivityNumberReceived)="connectivityNumber = $event"
-            (connectivityLoadUrl)="connectivityLoadUrl = $event"
             [accordionExpanded]="expansionPanel.expanded">
           </connectivity-browser>
         </ng-container>
@@ -592,13 +590,16 @@
     <div class="w-0 h-0"
       iav-counter
       #connectedCounterDir="iavCounter">
-
-      <hbp-connectivity-matrix-row *ngIf="region && region.name"
-        [region]="region.name + (region.status? ' - ' + region.status : '')"
-        (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
-        class="invisible d-block h-0 w-0"
-        [loadurl]="connectivityLoadUrl">
-      </hbp-connectivity-matrix-row>
+      <!-- TODO figure out why conn browser does not work here -->
+      <!-- @fsdavid, can you take a look why this component is not emitting connectivityNumberReceived event? -->
+      <connectivity-browser *ngIf="region && region.name"
+        class="d-block h-0 w-0 overflow-hidden"
+        [region]="region"
+        [parcellationId]="selectedParcellation['@id']"
+        [accordionExpanded]="true"
+        (connectivityNumberReceived)="connectedCounterDir.value = $event">
+        
+      </connectivity-browser>
     </div>
   </mat-accordion>
 </ng-template>
@@ -667,7 +668,7 @@
     <landmark-2d-flat-cmp *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
       (mouseenter)="handleMouseEnterLandmark(spatialData)"
       (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-      [highlight]="spatialData.highlight ? spatialData.highlight : false"
+      [color]="spatialData.highlight ? [255, 0, 0] : [255, 255, 255]"
       [positionX]="getPositionX(panelIndex, spatialData)"
       [positionY]="getPositionY(panelIndex, spatialData)"
       [positionZ]="getPositionZ(panelIndex, spatialData)">

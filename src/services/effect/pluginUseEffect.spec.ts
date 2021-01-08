@@ -10,7 +10,7 @@ import { PLUGINSTORE_CONSTANTS } from '../state/pluginState.store'
 import { PLUGINSTORE_ACTION_TYPES } from '../state/pluginState.helper'
 import { Injectable } from "@angular/core";
 import { getRandomHex } from 'common/util'
-import { PluginServices } from "src/atlasViewer/pluginUnit";
+import { PluginServices } from "src/plugin";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { hot } from "jasmine-marbles";
 

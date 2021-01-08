@@ -1,0 +1,946 @@
+<div class="position-absolute w-100 h-100">
+  <ng-container *ngTemplateOutlet="viewerTmpl">
+  </ng-container>
+</div>
+
+<layout-floating-container [zIndex]="10">
+
+  <!-- top drawer -->
+  <mat-drawer-container
+    [iav-switch-initstate]="false"
+    iav-switch
+    #sideNavTopSwitch="iavSwitch"
+    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    [hasBackdrop]="false">
+
+    <!-- sidenav-content -->
+
+    <!-- (closedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.close()"
+    (openedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.open()" -->
+    <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
+      mode="side"
+      [attr.data-mat-drawer-top-open]="matDrawerTop.opened"
+      [opened]="sideNavTopSwitch.switchState"
+      [autoFocus]="false"
+      [disableClose]="true"
+      #matDrawerTop="matDrawer">
+
+      <div class="h-0 w-100 region-text-search-autocomplete-position">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl">
+        </ng-container>
+      </div>
+
+      <button mat-raised-button
+        *ngIf="!(alwaysHideMinorPanel$ | async)"
+        [attr.aria-label]="ARIA_LABELS.EXPAND"
+        (click)="sideNavFullLeftSwitch && sideNavFullLeftSwitch.open()"
+        class="explore-btn pe-all w-100"
+        [ngClass]="{
+          'darktheme': iavRegion.rgbDarkmode === true,
+          'lighttheme': iavRegion.rgbDarkmode === false
+        }"
+        [style.backgroundColor]="iavRegion?.rgbString || 'accent'">
+        <span class="text iv-custom-comp">
+          Explore
+        </span>
+
+        <div class="hidden"
+          iav-region
+          [region]="(selectedRegions$ | async) && (selectedRegions$ | async)[0]"
+          #iavRegion="iavRegion">
+        </div>
+
+      </button>
+    </mat-drawer>
+
+    <mat-drawer-content class="visible position-relative pe-none">
+      
+      <iav-layout-fourcorners>
+
+        <!-- pullable tab top right corner -->
+        <div iavLayoutFourCornersTopLeft class="d-inline-flex">
+
+          <div *ngIf="viewerLoaded"
+            class="pe-all tab-toggle-container"
+            (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()">
+            <ng-container *ngTemplateOutlet="tabTmpl; context: {
+              isOpen: sideNavTopSwitch.switchState,
+              regionSelected: selectedRegions$ | async,
+              iavAdditionallayers: iavAdditionalLayers$ | async
+            }">
+            </ng-container>
+          </div>
+
+          <iav-cmp-viewer-nehuba-status *ngIf="viewerLoaded"
+            class="pe-all mt-2 muted-7">
+          </iav-cmp-viewer-nehuba-status>
+        </div>
+
+        <!-- signin banner at top right corner -->
+        <div iavLayoutFourCornersTopRight
+          class="d-inline-flex align-items-start">
+
+          <top-menu-cmp class="mt-3 mr-2 d-inline-block"
+            [ismobile]="ismobile"
+            [viewerLoaded]="viewerLoaded">
+          </top-menu-cmp>
+
+          <div *ngIf="viewerLoaded"
+            class="iv-custom-comp bg card m-2 mat-elevation-z2">
+            <atlas-dropdown-selector class="pe-all mt-2">
+            </atlas-dropdown-selector>
+          </div>
+        </div>
+      </iav-layout-fourcorners>
+
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+  <!-- full left drawer -->
+  <mat-drawer-container
+    [iav-switch-initstate]="!(alwaysHideMinorPanel$ | async)"
+    iav-switch
+    #sideNavFullLeftSwitch="iavSwitch"
+    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    [hasBackdrop]="false">
+
+    <!-- sidenav-content -->
+    <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
+      mode="push"
+      [opened]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState"
+      [attr.data-mat-drawer-fullleft-open]="matDrawerLeft.opened"
+      [autoFocus]="false"
+      #matDrawerLeft="matDrawer"
+      (openedChange)="$event && sideNavFullLeftSwitch.open()"
+      [@openClose]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState ? 'open' : 'closed'"
+      (@openClose.done)="$event.toState === 'closed' && matDrawerLeft.close()"
+      [disableClose]="true">
+
+      <div class="position-relative d-flex flex-column h-100">
+
+        <!-- TODO dataset preview will become deprecated in the future.
+        Regional feature/data feature will replace it -->
+
+        <div class="hidden"
+          iav-shown-dataset
+          #iavShownDataset="iavShownDataset">
+        </div>
+      
+        <div class="hidden"
+          iav-shown-previews
+          (emitter)="iavAdditionalLayers$.next($event)"
+          #previews="iavShownPreviews">
+        </div>
+
+        <!-- sidenav datasets -->
+        <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
+          <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
+            
+            <!-- single dataset side nav panel -->
+            <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
+              (clear)="clearPreviewingDataset(id)"
+              [fullId]="id"
+              class="bs-border-box ml-15px-n mr-15px-n">
+              <mat-chip *ngIf="regionOfInterest$ && regionOfInterest$ | async as region"
+                region-of-interest
+                iav-region
+                [region]="region"
+                [ngClass]="{
+                  'darktheme':regionDirective.rgbDarkmode === true,
+                  'lighttheme': regionDirective.rgbDarkmode === false
+                }"
+                [style.backgroundColor]="regionDirective.rgbString"
+                #regionDirective="iavRegion">
+                <span class="iv-custom-comp text text-truncate d-inline">
+                  {{ region.name }}
+                </span>
+              </mat-chip>
+            </single-dataset-sidenav-view>
+          </ng-template>
+        </ng-container>
+
+        <!-- preview volumes -->
+        <ng-template #sideNavVolumePreview>
+          <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
+            <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
+              <ng-container *ngFor="let vPreview of volumePreviews">
+                <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
+
+                </ng-container>
+              </ng-container>
+            </ng-template>
+          </ng-container>
+        </ng-template>
+
+      </div>
+    </mat-drawer>
+
+    <!-- main-content -->
+    <mat-drawer-content class="visible position-relative">
+
+      <iav-layout-fourcorners>
+    
+        <!-- bottom left corner (atlas selector and currently selected) -->
+        <div iavLayoutFourCornersBottomLeft class="d-inline-flex align-items-center mb-4 ml-2">
+    
+          <!-- atlas selector -->
+          <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
+            #alSelector="atlasLayerSelector"
+            (iav-outsideClick)="alSelector.selectorExpanded = false">
+          </atlas-layer-selector>
+    
+          <!-- chips -->
+          <mat-chip-list>
+            <!-- additional layer -->
+    
+            <ng-container>
+              <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: (parcellationSelected$ | async) }">
+              </ng-container>
+            </ng-container>
+    
+            <!-- any selected region(s) -->
+            <ng-container>
+              <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+              </ng-container>
+            </ng-container>
+    
+            <!-- controls for iav volumes -->
+            <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
+            <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
+            </ng-container>
+    
+          </mat-chip-list>
+        </div>
+    
+      </iav-layout-fourcorners>
+
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+</layout-floating-container>
+
+<!-- viewer tmpl -->
+<ng-template #viewerTmpl>
+
+  <iav-layout-fourcorners>
+    <div iavLayoutFourCornersContent
+      class="w-100 h-100 position-absolute">
+      <ui-splashscreen *ngIf="!viewerLoaded"
+        class="position-absolute left-0 top-0">
+      </ui-splashscreen>
+      <div class="h-100 w-100 overflow-hidden position-relative"
+        [ngClass]="{'pe-none': !viewerLoaded}">
+        <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
+          [selectedTemplate]="templateSelected$ | async"
+          [selectedParcellation]="parcellationSelected$ | async"
+          #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
+        </iav-cmp-viewer-nehuba-glue>
+      
+      </div>
+    </div>
+  </iav-layout-fourcorners>
+</ng-template>
+
+<!-- parcellation chip / region chip -->
+<!-- TODO maybe migrate to atlas cmp... later? -->
+<ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
+  <div [matMenuTriggerFor]="layerVersionMenu"
+    [matMenuTriggerData]="{ layerVersionMenuTrigger: layerVersionMenuTrigger }"
+    #layerVersionMenuTrigger="matMenuTrigger">
+
+    <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
+      <ng-container *ngFor="let p of addParc">
+        <ng-container *ngTemplateOutlet="chipTmpl; context: {
+          parcel: p,
+          selected: true,
+          dismissable: true,
+          onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
+        }">
+        </ng-container>
+      </ng-container>
+    </ng-template>
+    <ng-template #defaultParcTmpl>
+      <ng-container *ngTemplateOutlet="chipTmpl; context: {
+        parcel: parc,
+        selected: false,
+        dismissable: false,
+        onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
+      }">
+      </ng-container>
+    </ng-template>
+  </div>
+</ng-template>
+
+
+<!-- layer version selector -->
+<mat-menu #layerVersionMenu
+  class="bg-none box-shadow-none"
+  [hasBackdrop]="false">
+  <ng-template matMenuContent let-layerVersionMenuTrigger="layerVersionMenuTrigger">
+    <div (iav-outsideClick)="layerVersionMenuTrigger.closeMenu()">
+      <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
+        <ng-container *ngIf="parcellationSelected$ | async as selectedParcellation">
+
+          <ng-container *ngTemplateOutlet="chipTmpl; context: {
+            parcel: parcVer,
+            selected: selectedParcellation['@id'] === parcVer['@id'],
+            dismissable: false,
+            class: 'w-100',
+            onclick: bindFns([
+              [ selectParcellation.bind(this), parcVer ],
+              [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
+            ])
+          }">
+          </ng-container>
+        </ng-container>
+        <div class="mt-1"></div>
+      </ng-container>
+    </div>
+  </ng-template>
+</mat-menu>
+
+<!-- chip tmpl -->
+<ng-template #chipTmpl
+  let-parcel="parcel"
+  let-selected="selected"
+  let-dismissable="dismissable"
+  let-chipClass="class"
+  let-onclick="onclick">
+  <mat-chip class="pe-all position-relative z-index-2 d-inline-flex justify-content-between"
+    [ngClass]="chipClass"
+    (click)="onclick && onclick()"
+    [selected]="selected">
+
+    <span>
+      {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel && (parcel.displayName || parcel.name) }}
+    </span>
+
+    <!-- info icon -->
+    <ng-template [ngIf]="parcel?.originDatasets?.length > 0" [ngIfElse]="infoIconBasic">
+
+      <mat-icon
+        *ngFor="let ds of parcel.originDatasets"
+        fontSet="fas"
+        fontIcon="fa-info-circle"
+        iav-stop="click"
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
+        [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
+        [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
+        [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
+      </mat-icon>
+
+    </ng-template>
+
+    <ng-template #infoIconBasic>
+      <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
+        fontSet="fas"
+        fontIcon="fa-info-circle"
+        iav-stop="click"
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
+        [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
+
+      </mat-icon>
+    </ng-template>
+
+    <!-- dismiss icon -->
+    <mat-icon
+      *ngIf="dismissable"
+      (click)="clearAdditionalLayer(parcel); $event.stopPropagation()"
+      fontSet="fas"
+      fontIcon="fa-times">
+    </mat-icon>
+  </mat-chip>
+</ng-template>
+
+
+<ng-template #selectedRegionTmpl>
+
+  <!-- regions chip -->
+  <ng-template [ngIf]="selectedRegions$ | async" let-selectedRegions="ngIf">
+    <!-- if regions.length > 1 -->
+    <!-- use group chip -->
+    <ng-template [ngIf]="selectedRegions.length > 1" [ngIfElse]="singleRegionChipTmpl">
+      <mat-chip
+        color="primary"
+        selected
+        (click)="handleChipClick()"
+        class="pe-all position-relative z-index-1 ml-8-n">
+        <span class="iv-custom-comp text text-truncate d-inline pl-4">
+          {{ CONST.MULTI_REGION_SELECTION }}
+        </span>
+        <mat-icon
+          (click)="clearSelectedRegions()"
+          fontSet="fas"
+          iav-stop="click"
+          fontIcon="fa-times">
+        </mat-icon>
+      </mat-chip>
+    </ng-template>
+
+    <!-- if reginos.lengt === 1 -->
+    <!-- use single region chip -->
+    <ng-template #singleRegionChipTmpl>
+      <ng-container *ngFor="let r of selectedRegions">
+
+        <!-- region chip for discrete map -->
+        <mat-chip
+          iav-region
+          (click)="handleChipClick()"
+          [region]="r"
+          class="pe-all position-relative z-index-1 ml-8-n"
+          [ngClass]="{
+            'darktheme':regionDirective.rgbDarkmode === true,
+            'lighttheme': regionDirective.rgbDarkmode === false
+          }"
+          [style.backgroundColor]="regionDirective.rgbString"
+          #regionDirective="iavRegion">
+          <span class="iv-custom-comp text text-truncate d-inline pl-4">
+            {{ r.name }}
+          </span>
+          <mat-icon
+            class="iv-custom-comp text"
+            (click)="clearSelectedRegions()"
+            fontSet="fas"
+            iav-stop="click"
+            fontIcon="fa-times">
+          </mat-icon>
+        </mat-chip>
+
+        <!-- chips for previewing origin datasets/continous map -->
+        <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
+          <div class="hidden"
+            iav-dataset-preview-dataset-file
+            [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+            [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+            #previewDirective="iavDatasetPreviewDatasetFile">
+          </div>
+          <mat-chip *ngIf="previewDirective.active"
+            (click)="handleChipClick()"
+            class="pe-all position-relative ml-8-n">
+            <span class="pl-4">
+              {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+            </span>
+            <mat-icon (click)="previewDirective.onClick()"
+              fontSet="fas"
+              iav-stop="click"
+              fontIcon="fa-times">
+            </mat-icon>
+          </mat-chip>
+
+          <mat-chip *ngFor="let key of clearViewKeys$ | async"
+            (click)="handleChipClick()"
+            class="pe-all position-relative ml-8-n">
+            <span class="pl-4">
+              {{ key }}
+            </span>
+            <mat-icon (click)="unsetClearViewByKey(key)"
+              fontSet="fas"
+              iav-stop="click"
+              fontIcon="fa-times">
+
+            </mat-icon>
+          </mat-chip>
+        </ng-container>
+
+      </ng-container>
+    </ng-template>
+  </ng-template>
+
+</ng-template>
+
+
+<ng-template #selectedDatasetPreview let-layers="layers">
+
+  <ng-container *ngFor="let layer of layers">
+    <div class="hidden"
+      iav-dataset-preview-dataset-file
+      [iav-dataset-preview-dataset-file-kgid]="layer.datasetId"
+      [iav-dataset-preview-dataset-file-filename]="layer.filename"
+      #preview="iavDatasetPreviewDatasetFile">
+
+    </div>
+    <mat-chip class="pe-all"
+      (click)="handleChipClick()">
+      {{ layer.file?.name || layer.filename || 'Unknown data preview' }}
+      <mat-icon fontSet="fas" fontIcon="fa-times"
+        (click)="preview.onClick()"
+        iav-stop="click">
+      </mat-icon>
+    </mat-chip>
+  </ng-container>
+</ng-template>
+
+<!-- auto complete search box -->
+
+<ng-template #autocompleteTmpl>
+  <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
+    <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
+    </region-text-search-autocomplete>
+  </div>
+</ng-template>
+
+
+<!-- template for rendering tab -->
+<ng-template #tabTmpl
+  let-isOpen="isOpen"
+  let-regionSelected="regionSelected"
+  let-iavAdditionallayers="iavAdditionallayers">
+
+  <!-- if mat drawer is open -->
+  <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
+    <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+      matColor: 'basic',
+      fontIcon: 'fa-chevron-left'
+    }">
+    </ng-container>
+  </ng-template>
+
+  <!-- if matdrawer is closed -->
+  <ng-template #tabTmpl_closedTmpl>
+
+    <!-- if additional layers are being shown -->
+    <ng-template [ngIf]="iavAdditionallayers?.length > 0" [ngIfElse]="tabTmpl_noAdditionalLayers">
+      <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+        matColor: 'accent',
+        fontIcon: 'fa-database',
+        tooltip: 'Explore dataset preview'
+      }">
+      </ng-container>
+    </ng-template>
+
+    <!-- if additional layers not not being shown -->
+    <ng-template #tabTmpl_noAdditionalLayers>
+
+      <!-- if region selected > 0 -->
+      <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
+        <div class="hidden"
+          iav-region
+          [region]="regionSelected[0]"
+          #tabTmpl_iavRegion="iavRegion">
+        </div>
+
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'accent',
+          customColor: tabTmpl_iavRegion.rgbString,
+          customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
+          fontIcon: 'fa-brain',
+          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name
+        }">
+
+        </ng-container>
+      </ng-template>
+
+      <!-- nothing is selected -->
+      <ng-template #tabTmpl_nothingSelected>
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'primary',
+          fontIcon: 'fa-sitemap',
+          tooltip: 'Explore regions'
+        }">
+        </ng-container>
+      </ng-template>
+    </ng-template>
+  </ng-template>
+
+  <ng-template #tabTmpl_defaultTmpl
+    let-matColor="matColor"
+    let-fontIcon="fontIcon"
+    let-customColor="customColor"
+    let-customColorDarkmode="customColorDarkmode"
+    let-tooltip="tooltip">
+    <!-- (click)="sideNavMasterSwitch.toggle()" -->
+    <button mat-raised-button
+      [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
+      [matTooltip]="tooltip"
+      class="pe-all tab-toggle"
+      [ngClass]="{
+        'darktheme': customColorDarkmode === true,
+        'lighttheme': customColorDarkmode === false
+      }"
+      [style.backgroundColor]="customColor"
+      
+      [color]="(!customColor && matColor) ? matColor : null">
+
+      <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+        <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
+      </span>
+    </button>
+  </ng-template>
+</ng-template>
+
+
+<!-- region sidenav tmpl -->
+<ng-template #sidenavRegionTmpl>
+
+  <!-- region search autocomplete  -->
+  <!-- [@openCloseAnchor]="sideNavFullLeftSwitch.switchState ? 'open' : 'closed'" -->
+  <div class="h-0 w-100 region-text-search-autocomplete-position">
+    <ng-container *ngTemplateOutlet="autocompleteTmpl">
+    </ng-container>
+  </div>
+
+  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
+    [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
+    <!-- region detail -->
+    <ng-container *ngIf="selectedRegions$ | async as selectedRegions; else selectRegionErrorTmpl">
+
+      <!-- single-region-wrapper -->
+      <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
+        <!-- a series of bugs result in requiring this hacky -->
+        <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
+        <ng-container *ngFor="let region of selectedRegions">
+          <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: region }">
+          </ng-container>
+        </ng-container>
+      </ng-template>
+      
+      <!-- multi region wrapper -->
+      <ng-template #multiRegionWrapperTmpl>
+        <ng-container *ngTemplateOutlet="multiRegionTmpl; context: {
+          regions: selectedRegions
+        }">
+        </ng-container>
+        <!-- This is a wrapper for multiregion consisting of {{ selectedRegions.length }} regions -->
+      </ng-template>
+
+      <!-- place holder if length === 0 -->
+      <ng-container *ngIf="selectedRegions.length === 0">
+        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: false }">
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+    <div class="spacer">
+    </div>
+  </div>
+
+  <!-- collapse btn -->
+  <ng-container *ngTemplateOutlet="collapseBtn">
+  </ng-container>
+</ng-template>
+
+
+<!-- single region tmpl -->
+<ng-template #singleRegionTmpl let-region="region">
+  <!-- region detail -->
+  <ng-container *ngIf="region; else regionPlaceholderTmpl">
+    <region-menu
+      [showRegionInOtherTmpl]="false"
+      [region]="region"
+      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
+    </region-menu>
+  </ng-container>
+
+  <!-- other region detail accordion -->
+  <mat-accordion *ngIf="region"
+    class="bs-border-box ml-15px-n mr-15px-n mt-2"
+    iav-region
+    [region]="region"
+    #iavRegion="iavRegion">
+
+    <!-- desc -->
+    <ng-container *ngFor="let ods of (region.originDatasets || [])">
+      <ng-template #regionDescTmpl>
+        <single-dataset-view
+          [hideTitle]="true"
+          [hideExplore]="true"
+          [hidePreview]="true"
+          [hidePinBtn]="true"
+          [hideDownloadBtn]="true"
+          [kgSchema]="ods.kgSchema"
+          [kgId]="ods.kgId">
+
+        </single-dataset-view>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Description',
+        iconClass: 'fas fa-info',
+        iavNgIf: true,
+        content: regionDescTmpl
+      }">
+
+      </ng-container>
+    </ng-container>
+
+    <!-- Explore in other template -->
+    <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
+
+      <ng-template #exploreInOtherTmpl>
+        <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
+          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer" 
+          (click)="iavRegion.changeView(sameRegion)"
+          [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
+          mat-ripple>
+          <small>
+            {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
+          </small>
+        </mat-card>
+      </ng-template>
+
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Explore in other templates',
+        desc: regionInOtherTemplates.length,
+        iconClass: 'fas fa-brain',
+        iconTooltip: regionInOtherTemplates.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
+        iavNgIf: regionInOtherTemplates.length,
+        content: exploreInOtherTmpl
+      }">
+
+
+      </ng-container>
+    </ng-container>
+
+    <!--  regional features-->
+    <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
+
+      <data-browser
+        *ngIf="expansionPanel.expanded" 
+        [disableVirtualScroll]="true"
+        [regions]="[region]">
+      </data-browser>
+    </ng-template>
+
+    <div class="hidden" iav-databrowser-directive
+      [regions]="[region]"
+      #iavDbDirective="iavDatabrowserDirective">
+    </div>
+
+    <!-- if dataset is loading -->
+    <ng-template
+      [ngIf]="iavDbDirective?.fetchingFlag"
+      [ngIfElse]="featureLoadedTmpl">
+      <div class="d-flex justify-content-center">
+        <spinner-cmp></spinner-cmp>
+      </div>
+    </ng-template>
+
+    <ng-template #featureLoadedTmpl>
+
+      <!-- place holder content, if no regional features or connectivity or change ref space options are available -->
+      <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0">
+        <ng-container *ngIf="parcellationSelected$ | async as selectedParcellation">
+          <ng-template [ngIf]="selectedParcellation?.hasAdditionalViewMode?.includes('connectivity')">
+            <div class="p-4">
+              {{ CONST.NO_ADDIONTAL_INFO_AVAIL }}
+            </div>
+          </ng-template>
+        </ng-container>
+      </ng-template>
+
+    </ng-template>
+
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: CONST.REGIONAL_FEATURES,
+      desc: iavDbDirective?.dataentries?.length,
+      iconClass: 'fas fa-database',
+      iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
+      iavNgIf: iavDbDirective?.dataentries?.length,
+      content: regionalFeaturesTmpl
+    }">
+    </ng-container>
+
+    <!-- Connectivity -->
+    <ng-container  *ngIf="parcellationSelected$ | async as selectedParcellation">
+
+      <ng-template #connectivityContentTmpl let-expansionPanel="expansionPanel">
+        <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
+          <ng-container *ngFor="let region of selectedRegions$ | async">
+            <connectivity-browser class="pe-all flex-shrink-1"
+              [region]="region"
+              [parcellationId]="selectedParcellation['@id']"
+              (setOpenState)="expansionPanel.expanded = $event"
+              [accordionExpanded]="expansionPanel.expanded">
+            </connectivity-browser>
+          </ng-container>
+        </mat-card-content>
+      </ng-template>
+  
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Connectivity',
+        desc: connectedCounterDir.value,
+        iconClass: 'fas fa-braille',
+        iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
+        iavNgIf: selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'),
+        content: connectivityContentTmpl
+      }">
+      </ng-container>
+
+      <div class="w-0 h-0"
+        iav-counter
+        #connectedCounterDir="iavCounter">
+        <!-- TODO figure out why conn browser does not work here -->
+        <!-- @fsdavid, can you take a look why this component is not emitting connectivityNumberReceived event? -->
+        <connectivity-browser *ngIf="region && region.name"
+          class="d-block h-0 w-0 overflow-hidden"
+          [region]="region"
+          [parcellationId]="selectedParcellation['@id']"
+          [accordionExpanded]="true"
+          (connectivityNumberReceived)="connectedCounterDir.value = $event">
+          
+        </connectivity-browser>
+      </div>
+    </ng-container>
+
+  </mat-accordion>
+</ng-template>
+
+
+<!-- expansion tmpl -->
+<ng-template #ngMatAccordionTmpl
+  let-title="title"
+  let-desc="desc"
+  let-iconClass="iconClass"
+  let-iconTooltip="iconTooltip"
+  let-iavNgIf="iavNgIf"
+  let-content="content">
+  <mat-expansion-panel
+    [attr.data-opened]="expansionPanel.expanded"
+    [attr.data-mat-expansion-title]="title"
+    hideToggle
+    *ngIf="iavNgIf"
+    #expansionPanel="matExpansionPanel">
+
+    <mat-expansion-panel-header>
+
+      <!-- title -->
+      <mat-panel-title>
+        {{ title }}
+      </mat-panel-title>
+
+      <!-- desc + icon -->
+      <mat-panel-description class="d-flex align-items-center justify-content-end"
+        [matTooltip]="iconTooltip">
+        <span class="mr-3">{{ desc }}</span>
+        <span class="accordion-icon d-inline-flex justify-content-center">
+          <i [class]="iconClass"></i>
+        </span>
+      </mat-panel-description>
+
+    </mat-expansion-panel-header>
+
+    <!-- content -->
+    <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
+    </ng-container>
+  </mat-expansion-panel>
+</ng-template>
+
+<!-- TODO deprecate in favour of dedicated dataset preview side nav -->
+<ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
+  <div class="w-100 flex-grow-1 d-flex flex-column">
+
+    <preview-card class="d-block bs-border-box ml-15px-n mr-15px-n flex-grow-1"
+      [attr.aria-label]="ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL"
+      [datasetId]="datasetId"
+      [filename]="filename">
+    </preview-card>
+
+    <!-- collapse btn -->
+    <ng-container *ngTemplateOutlet="collapseBtn">
+    </ng-container>
+  </div>
+</ng-template>
+
+<!-- select region error... for whatever reason -->
+<ng-template #selectRegionErrorTmpl>
+  SELECT REGION ERROR
+</ng-template>
+
+
+<!-- multi region tmpl -->
+<ng-template #multiRegionTmpl let-regions="regions">
+  <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
+    <region-menu
+      [showRegionInOtherTmpl]="false"
+      [region]="{
+        name: CONST.MULTI_REGION_SELECTION
+      }"
+      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
+    </region-menu>
+
+    <!-- other regions detail accordion -->
+    <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
+
+      <!--  regional features-->
+      <ng-template #regionalFeaturesTmpl>
+        <data-browser
+          [disableVirtualScroll]="true"
+          [regions]="regions">
+        </data-browser>
+      </ng-template>
+
+      <div class="hidden"
+        iav-databrowser-directive
+        [regions]="regions"
+        #iavDbDirective="iavDatabrowserDirective">
+      </div>
+  
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: CONST.REGIONAL_FEATURES,
+        desc: iavDbDirective?.dataentries?.length,
+        iconClass: 'fas fa-database',
+        iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
+        iavNgIf: iavDbDirective?.dataentries?.length,
+        content: regionalFeaturesTmpl
+      }">
+      </ng-container>
+
+      <!-- Multi regions include -->
+      <ng-template #multiRegionInclTmpl>
+        <mat-chip-list>
+          <mat-chip *ngFor="let r of regions"
+            iav-region
+            [region]="r"
+            [ngClass]="{
+              'darktheme':regionDirective.rgbDarkmode === true,
+              'lighttheme': regionDirective.rgbDarkmode === false
+            }"
+            [style.backgroundColor]="regionDirective.rgbString"
+            #regionDirective="iavRegion">
+            <span class="iv-custom-comp text text-truncate d-inline pl-4">
+              {{ r.name }}
+            </span>
+          </mat-chip>
+        </mat-chip-list>
+      </ng-template>
+      
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Brain regions',
+        desc: regions.length,
+        iconClass: 'fas fa-brain',
+        iavNgIf: true,
+        content: multiRegionInclTmpl
+      }">
+      </ng-container>
+
+    </mat-accordion>
+  </ng-template>
+</ng-template>
+
+<!-- collapse btn -->
+<ng-template #collapseBtn>
+
+  <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
+    
+    <button mat-raised-button class="mat-elevation-z8"
+      [attr.aria-label]="ARIA_LABELS.COLLAPSE"
+      (click)="sideNavFullLeftSwitch.close()"  
+      color="basic">
+      <i class="fas fa-chevron-up"></i>
+      <span>
+        collapse
+      </span>
+    </button>
+  </div>
+</ng-template>
+
+<!-- region tmpl placeholder -->
+<ng-template #regionPlaceholderTmpl>
+  <div class="placeholder-region-detail bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
+    <span class="text-muted">
+      Select a region by clicking on the viewer or search from above
+    </span>
+  </div>
+</ng-template>
