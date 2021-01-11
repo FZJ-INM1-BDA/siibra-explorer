@@ -423,24 +423,24 @@ class WdLayoutPage extends WdBase{
    */
   _getSideNavPrimary(){
     return this._browser.findElement(
-      By.css('mat-drawer[data-mat-drawer-primary-open]')
+      By.css('mat-drawer[data-mat-drawer-top-open]')
     )
   }
 
   async _getSideNavPrimaryExpanded(){
     return (await this._getSideNavPrimary()
-      .getAttribute('data-mat-drawer-primary-open')) === 'true'
+      .getAttribute('data-mat-drawer-top-open')) === 'true'
   }
 
   _getSideNavSecondary(){
     return this._browser.findElement(
-      By.css('mat-drawer[data-mat-drawer-secondary-open]')
+      By.css('mat-drawer[data-mat-drawer-fullleft-open]')
     )
   }
 
   async _getSideNavSecondaryExpanded(){
     return (await this._getSideNavSecondary()
-      .getAttribute('data-mat-drawer-secondary-open')) === 'true'
+      .getAttribute('data-mat-drawer-fullleft-open')) === 'true'
   }
 
   async _setSideNavPrimaryExpanded(flag) {
