@@ -185,10 +185,10 @@
     <!-- main-content -->
     <mat-drawer-content class="visible position-relative">
 
-      <iav-layout-fourcorners>
+      <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
     
         <!-- bottom left corner (atlas selector and currently selected) -->
-        <div iavLayoutFourCornersBottomLeft class="d-inline-flex align-items-center mb-4 ml-2">
+        <div iavLayoutFourCornersBottomLeft class="d-inline-flex align-items-center mb-4 ml-2 w-100">
     
           <!-- atlas selector -->
           <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
@@ -197,26 +197,29 @@
           </atlas-layer-selector>
     
           <!-- chips -->
-          <mat-chip-list>
-            <!-- additional layer -->
-    
-            <ng-container>
-              <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: (parcellationSelected$ | async) }">
+          <div class="flex-grow-1 flex-shrink-1 overflow-x-scroll">
+
+            <mat-chip-list class="d-inline-block">
+              <!-- additional layer -->
+      
+              <ng-container>
+                <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: (parcellationSelected$ | async) }">
+                </ng-container>
               </ng-container>
-            </ng-container>
-    
-            <!-- any selected region(s) -->
-            <ng-container>
-              <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+      
+              <!-- any selected region(s) -->
+              <ng-container>
+                <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+                </ng-container>
               </ng-container>
-            </ng-container>
-    
-            <!-- controls for iav volumes -->
-            <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
-            <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
-            </ng-container>
-    
-          </mat-chip-list>
+      
+              <!-- controls for iav volumes -->
+              <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
+              <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
+              </ng-container>
+      
+            </mat-chip-list>
+          </div>
         </div>
     
       </iav-layout-fourcorners>
@@ -318,7 +321,7 @@
     (click)="onclick && onclick()"
     [selected]="selected">
 
-    <span>
+    <span class="ws-no-wrap">
       {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel && (parcel.displayName || parcel.name) }}
     </span>
 
