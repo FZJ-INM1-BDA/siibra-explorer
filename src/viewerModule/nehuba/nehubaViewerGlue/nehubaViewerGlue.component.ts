@@ -130,12 +130,17 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       selectedParcellation,
       selectedTemplate
     } = sc
-    if (selectedTemplate?.previousValue) {
-      this.unloadTmpl(selectedTemplate?.previousValue)
-    }
-    if (selectedTemplate && selectedTemplate.currentValue !== selectedTemplate.previousValue) {
-      this.loadTmpl(selectedTemplate.currentValue, selectedParcellation.currentValue)
-    } else if (selectedParcellation && selectedParcellation.currentValue !== selectedParcellation.previousValue) {
+    if (selectedTemplate) {
+      if (selectedTemplate?.currentValue?.['@id'] !== selectedTemplate?.previousValue?.['@id']) {
+
+        if (selectedTemplate?.previousValue) {
+          this.unloadTmpl(selectedTemplate?.previousValue)
+        }
+        if (selectedTemplate?.currentValue?.['@id']) {
+          this.loadTmpl(selectedTemplate.currentValue, selectedParcellation.currentValue)
+        }
+      }
+    }else if (selectedParcellation && selectedParcellation.currentValue !== selectedParcellation.previousValue) {
       this.loadParc(selectedParcellation.currentValue)
     }
   }
