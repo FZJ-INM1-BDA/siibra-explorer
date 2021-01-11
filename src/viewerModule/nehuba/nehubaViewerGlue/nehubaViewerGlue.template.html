@@ -85,7 +85,7 @@
     </layout-floating-container>
 
     <!-- panel controller -->
-    <div iavLayoutFourCornersBottomRight>
+    <div iavLayoutFourCornersBottomRight class="position-relative">
 
       <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
         panelIndex: panelIndex,
@@ -93,7 +93,8 @@
       }">
       </ng-container>
 
-      <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]">
+      <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]"
+        class="position-absolute bottom-0 right-0">
         <spinner-cmp></spinner-cmp>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 
 @Component({
   selector: 'iav-layout-fourcorners',
@@ -8,4 +8,7 @@ import { Component } from "@angular/core";
   ]
 })
 
-export class FourCornersCmp{}
+export class FourCornersCmp{
+  @Input('iav-layout-fourcorners-cnr-cntr-ngclass')
+  cornerContainerClasses = {}
+}

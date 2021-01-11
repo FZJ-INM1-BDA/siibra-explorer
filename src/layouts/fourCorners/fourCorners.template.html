@@ -2,15 +2,19 @@
   <ng-content select="[iavLayoutFourCornersContent]"></ng-content>
 </div>
 
-<div class="corner-container position-absolute top-0 left-0">
+<div [ngClass]="cornerContainerClasses"
+  class="corner-container position-absolute top-0 left-0">
   <ng-content select="[iavLayoutFourCornersTopLeft]"></ng-content>  
 </div>
-<div class="corner-container position-absolute top-0 right-0">
+<div [ngClass]="cornerContainerClasses"
+  class="corner-container position-absolute top-0 right-0">
   <ng-content select="[iavLayoutFourCornersTopRight]"></ng-content>  
 </div>
-<div class="corner-container position-absolute bottom-0 left-0">
+<div [ngClass]="cornerContainerClasses"
+  class="corner-container position-absolute bottom-0 left-0">
   <ng-content select="[iavLayoutFourCornersBottomLeft]"></ng-content>  
 </div>
-<div class="corner-container position-absolute bottom-0 right-0">
+<div [ngClass]="cornerContainerClasses"
+  class="corner-container position-absolute bottom-0 right-0">
   <ng-content select="[iavLayoutFourCornersBottomRight]"></ng-content>  
 </div>

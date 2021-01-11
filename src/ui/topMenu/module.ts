@@ -10,6 +10,7 @@ import { ConfigModule } from "../config/module";
 import { CookieModule } from "../cookieAgreement/module";
 import { HelpModule } from "../help/module";
 import { KgTosModule } from "../kgtos/module";
+import { ScreenshotModule } from "../screenshot";
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 
@@ -27,6 +28,7 @@ import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
     HelpModule,
     PluginModule,
     AuthModule,
+    ScreenshotModule,
   ],
   declarations: [
     TopMenuCmp

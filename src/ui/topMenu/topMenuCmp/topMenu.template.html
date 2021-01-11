@@ -1,6 +1,7 @@
 <ng-template [ngIf]="ismobile" [ngIfElse]="fullTmpl">
   <div iav-fab-speed-dial-container
-    #fab="iavFabSpeedDialContainer">
+    #fab="iavFabSpeedDialContainer"
+    class="d-flex flex-column align-items-center">
     <button mat-fab
       iav-fab-speed-dial-trigger
       [color]="fab.isOpen ? 'basic' : 'accent'">
