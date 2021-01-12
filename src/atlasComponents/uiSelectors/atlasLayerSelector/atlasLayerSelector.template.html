@@ -11,7 +11,8 @@
             </mat-card-subtitle>
             <mat-grid-list cols="3" rowHeight="3:4">
                 <!-- template tiles -->
-                <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId">
+                <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId"
+                    [attr.aria-checked]="selectedTemplateSpaceId === template['@id']">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: template,
                         selected: selectedTemplateSpaceId === template['@id'],
@@ -31,7 +32,8 @@
             <mat-grid-list cols="3" rowHeight="3:4">
 
                 <!-- non grouped layers -->
-                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async); trackBy: trackbyAtId">
+                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async); trackBy: trackbyAtId"
+                    [attr.aria-checked]="selectedLayersIncludes(layer['@id'])">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: layer,
                         selected: selectedLayersIncludes(layer['@id']),
@@ -43,7 +45,8 @@
                 </mat-grid-tile>
 
                 <!-- grouped layers -->
-                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async); trackBy: trackbyName">
+                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async); trackBy: trackbyName"
+                    [attr.aria-checked]="selectedOneOfTheLayers(group.parcellations)">
                     <ng-container *ngTemplateOutlet="tileTmpl; context: {
                         tileSrc: group,
                         selected: selectedOneOfTheLayers(group.parcellations),
@@ -175,7 +178,8 @@
             rowHeight="1:1"
             iav-stop="click"
             (iav-outsideClick)="collapseExpandedGroup()">
-            <mat-grid-tile *ngFor="let layer of layerGroupItems">
+            <mat-grid-tile *ngFor="let layer of layerGroupItems"
+                [attr.aria-checked]="selectedLayersIncludes(layer['@id'])">
 
                 <ng-container *ngTemplateOutlet="tileTmpl; context: {
                     tileSrc: layer,
