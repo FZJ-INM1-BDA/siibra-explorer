@@ -9,6 +9,9 @@ on:
       url:
         required: true
         default: https://interactive-viewer-next.apps-dev.hbp.eu/
+  push:
+    branches:
+      - dev
 
 jobs:
   e2e:
