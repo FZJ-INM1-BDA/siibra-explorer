@@ -3,9 +3,6 @@ name: "[e2e] prod-specs"
 on:
   workflow_dispatch:
     inputs:
-      branch: 
-        required: true
-        default: dev
       url:
         required: true
         default: https://interactive-viewer-next.apps-dev.hbp.eu/
@@ -40,7 +37,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        ref: ${{ github.event.inputs.branch }}
+        ref: ${{ github.event.ref }}
 
     - name: Install dep
       run: |
