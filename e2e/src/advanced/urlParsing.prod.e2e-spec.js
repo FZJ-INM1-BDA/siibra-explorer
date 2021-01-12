@@ -121,32 +121,38 @@ describe('> url parsing', () => {
     ))
   })
 
-  it('> if datasetPreview is set, should load with previews', async () => {
-    const url = `http://localhost:3000/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22fingerprint%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fautoradiography%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fprofile%22%7D%5D`
-    const datasetPreview = [
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "fingerprint"
-      },
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "GABAᴀ(BZ)/autoradiography"
-      },
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "GABAᴀ(BZ)/profile"
-      }
-    ]
+  /**
+   * encoding of dataset previews in url is current not enabled
+   */
+  it('> if datasetPreview is set, should load with previews', 
+  // async () => {
+  //   const url = `http://localhost:3000/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22fingerprint%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fautoradiography%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fprofile%22%7D%5D`
+  //   const datasetPreview = [
+  //     {
+  //       "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+  //       "filename": "fingerprint"
+  //     },
+  //     {
+  //       "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+  //       "filename": "GABAᴀ(BZ)/autoradiography"
+  //     },
+  //     {
+  //       "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+  //       "filename": "GABAᴀ(BZ)/profile"
+  //     }
+  //   ]
 
-    const searchParam = new URLSearchParams()
+  //   const searchParam = new URLSearchParams()
 
-    searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
-    searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
-    searchParam.set('previewingDatasetFiles', JSON.stringify(datasetPreview))
-    await iavPage.goto(`/?${searchParam.toString()}`)
+  //   searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+  //   searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+  //   searchParam.set('previewingDatasetFiles', JSON.stringify(datasetPreview))
+  //   await iavPage.goto(`/?${searchParam.toString()}`)
 
-    const visibleArr = await iavPage.areVisible(`[aria-label="${ARIA_LABELS.DATASET_FILE_PREVIEW}"]`)
-    expect(visibleArr.length).toEqual(3)
-    expect(visibleArr).toEqual([true, true, true])
-  })
+  //   const visibleArr = await iavPage.areVisible(`[aria-label="${ARIA_LABELS.DATASET_FILE_PREVIEW}"]`)
+  //   expect(visibleArr.length).toEqual(3)
+  //   expect(visibleArr).toEqual([true, true, true])
+  // }
+  
+  )
 })

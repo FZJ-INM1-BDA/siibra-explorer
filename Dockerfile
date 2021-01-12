@@ -16,7 +16,7 @@ COPY . /iv
 WORKDIR /iv
 
 ARG VERSION
-ENV VERSION=${VERSION:-devNext}
+ENV VERSION=${VERSION}
 
 RUN npm i
 RUN npm run build-aot

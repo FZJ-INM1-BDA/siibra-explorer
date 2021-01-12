@@ -1,4 +1,10 @@
+const { isatty } = require("tty")
 const { AtlasPage } = require("../util")
+
+const atlasName = 'Multilevel Human Atlas'
+const tNameIcbm152 = 'ICBM 152 2009c Nonlinear Asymmetric'
+const tNameColin = 'MNI Colin 27'
+const tNameBB = 'Big Brain (Histology)'
 
 describe('templates > ', () => {
 
@@ -12,7 +18,7 @@ describe('templates > ', () => {
     
     it('can select template by clicking main card', async () => {
       await iavPage.goto()
-      await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
+      await iavPage.setAtlasSpecifications(atlasName)
       await iavPage.wait(1000)
   
       const viewerIsPopulated = await iavPage.viewerIsPopulated()
@@ -24,10 +30,10 @@ describe('templates > ', () => {
   
       await iavPage.goto()
   
-      await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameIcbm152 ])
       await iavPage.wait(1000)
   
-      await iavPage.selectDropdownTemplate('Big Brain (Histology)')
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameBB ])
       await iavPage.wait(7000)
   
       const viewerIsPopulated = await iavPage.viewerIsPopulated()
@@ -40,10 +46,10 @@ describe('templates > ', () => {
   
       await iavPage.goto()
   
-      await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameIcbm152 ])
       await iavPage.wait(1000)
   
-      const info = await iavPage.getTemplateInfo()
+      const info = await iavPage.getAtlasTileInfo(tNameIcbm152)
   
       expect(
         info.indexOf(expectedDesc)
@@ -51,29 +57,50 @@ describe('templates > ', () => {
     })
   })
   
-  describe('switching template > ', () => {
-    it('works in history navigation', async () => {
+  describe('> switching template > ', () => {
+    beforeEach(async () => {
+
       await iavPage.goto()
-      await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameIcbm152 ])
+      await iavPage.wait(500)
+      await iavPage.waitUntilAllChunksLoaded()
+    })
+    it('> activeFlag works', async () => {
+      const isActive = await iavPage.atlasTileIsActive(tNameIcbm152)
+      expect(isActive.toString()).toEqual('true')
+      const isNotActive = await iavPage.atlasTileIsActive(tNameColin)
+      expect(isNotActive.toString()).toEqual('false')
+
+    })
+    it('> works in regular navigation', async () => {
+
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameColin ])
       await iavPage.wait(500)
       await iavPage.waitUntilAllChunksLoaded()
 
-      await iavPage.selectDropdownTemplate('MNI Colin 27')
+      const isActive = await iavPage.atlasTileIsActive(tNameColin)
+      expect(isActive.toString()).toEqual('true')
+
+      const isNotActive = await iavPage.atlasTileIsActive(tNameIcbm152)
+      expect(isNotActive.toString()).toEqual('false')
+
+    })
+
+    it('> works in history navigation', async () => {
+
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameColin ])
       await iavPage.wait(500)
       await iavPage.waitUntilAllChunksLoaded()
-
+      
       await iavPage.historyBack()
       await iavPage.wait(500)
-      await iavPage.historyBack()
-      await iavPage.wait(2000)
+      await iavPage.waitForAsync()
 
-      const visible = await iavPage.sideNavIsVisible()
-      if (!visible) await iavPage.clickSideNavTab()
-      const templateInfo = await iavPage.getTemplateInfo()
-
-      expect(
-        templateInfo.indexOf('ICBM 2009c Nonlinear Asymmetric')
-      ).toBeGreaterThanOrEqual(0)
+      const isActive = await iavPage.atlasTileIsActive(tNameIcbm152)
+      expect(isActive.toString()).toEqual('true')
+      const isNotActive = await iavPage.atlasTileIsActive(tNameColin)
+      expect(isNotActive.toString()).toEqual('false')
     })
   })
+
 })

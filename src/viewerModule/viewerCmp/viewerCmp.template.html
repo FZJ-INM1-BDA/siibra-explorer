@@ -252,7 +252,6 @@
 </ng-template>
 
 <!-- parcellation chip / region chip -->
-<!-- TODO maybe migrate to atlas cmp... later? -->
 <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
   <div [matMenuTriggerFor]="layerVersionMenu"
     [matMenuTriggerData]="{ layerVersionMenuTrigger: layerVersionMenuTrigger }"
@@ -264,6 +263,7 @@
           parcel: p,
           selected: true,
           dismissable: true,
+          ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
           onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
         }">
         </ng-container>
@@ -274,6 +274,7 @@
         parcel: parc,
         selected: false,
         dismissable: false,
+        ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
         onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
       }">
       </ng-container>
@@ -285,6 +286,7 @@
 <!-- layer version selector -->
 <mat-menu #layerVersionMenu
   class="bg-none box-shadow-none"
+  [aria-label]="ARIA_LABELS.PARC_VER_CONTAINER"
   [hasBackdrop]="false">
   <ng-template matMenuContent let-layerVersionMenuTrigger="layerVersionMenuTrigger">
     <div (iav-outsideClick)="layerVersionMenuTrigger.closeMenu()">
@@ -296,6 +298,7 @@
             selected: selectedParcellation['@id'] === parcVer['@id'],
             dismissable: false,
             class: 'w-100',
+            ariaLabel: parcVer.displayName || parcVer.name,
             onclick: bindFns([
               [ selectParcellation.bind(this), parcVer ],
               [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
@@ -315,9 +318,11 @@
   let-selected="selected"
   let-dismissable="dismissable"
   let-chipClass="class"
+  let-ariaLabel="ariaLabel"
   let-onclick="onclick">
   <mat-chip class="pe-all position-relative z-index-2 d-inline-flex justify-content-between"
     [ngClass]="chipClass"
+    [attr.aria-label]="ariaLabel"
     (click)="onclick && onclick()"
     [selected]="selected">
 

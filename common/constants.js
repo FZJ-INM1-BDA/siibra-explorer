@@ -44,6 +44,8 @@
     SHARE_CUSTOM_URL_DIALOG: 'Dialog for creating a custom URL',
 
     // parcellation region specific
+    PARC_VER_SELECT: 'Select parcellation versions',
+    PARC_VER_CONTAINER: 'List of parcellation versions',
     GO_TO_REGION_CENTROID: 'Navigate to region centroid',
     SHOW_ORIGIN_DATASET: `Show probabilistic map`,
     SHOW_CONNECTIVITY_DATA: `Show connectivity data`,

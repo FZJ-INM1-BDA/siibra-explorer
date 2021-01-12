@@ -362,23 +362,68 @@ class WdLayoutPage extends WdBase{
     }
   }
 
-  async selectTile(tileName){
+  /**
+   * 
+   * @param {WebElement} webEl 
+   * @description Look for child element fas.fa-info, click, then get modal text
+   */
+  async _getInfo(webEl) {
+    const infoBtn = await webEl.findElement(
+      By.css(`.fas.fa-info`)
+    )
+    if (!infoBtn) {
+      return null
+    } 
+    await infoBtn.click()
+    await this.wait(500)
+    await this.waitForAsync()
+    const text = await this.getModalText()
+    await this.clearAlerts()
+    await this.wait(500)
+    return text
+  }
+
+  async _getAtlasSelectorTile(tileName) {
+
     if (!tileName) throw new Error(`tileName needs to be provided`)
     await this._setAtlasSelectorExpanded(true)
     await this.wait(1000)
     const allTiles = await this._browser.findElements( By.css(`mat-grid-tile`) )
 
     const idx = await _getIndexFromArrayOfWebElements(tileName, allTiles)
-    if (idx >= 0) await allTiles[idx].click()
-    else throw new Error(`#selectTile: tileName ${tileName} cannot be found.`)
+
+    if (idx < 0) throw new Error(`#selectTile: tileName ${tileName} cannot be found.`)
+    return allTiles[idx]
+  }
+
+  async selectTile(tileName){
+    const el = await this._getAtlasSelectorTile(tileName)
+    await el.click()
+  }
+
+  async getAtlasTileInfo(tileName){
+    const el = await this._getAtlasSelectorTile(tileName)
+    return this._getInfo(el)
+  }
+
+  async atlasTileIsActive(tileName) {
+    const el = await this._getAtlasSelectorTile(tileName)
+    return await el.getAttribute('aria-checked')
   }
 
   async changeParc(parcName) {
     throw new Error(`changeParc NYI`)
   }
 
-  async changeParcVersion(parcVerion) {
-    throw new Error(`changeParcVersion NYI`)
+  async changeParcVersion(parcVersion) {
+    await this._browser.findElement(
+      By.css(`[aria-label="${ARIA_LABELS.PARC_VER_SELECT}"]`)
+    ).click()
+    await this.wait(500)
+    this._browser.findElement(
+      By.css(`[aria-label="${ARIA_LABELS.PARC_VER_CONTAINER}"] [aria-label="${parcVersion}"]`)
+    ).click()
+    await this.wait(500)
   }
 
   async setAtlasSpecifications(atlasName, atlasSpecifications = [], parcVersion = null) {
@@ -393,7 +438,7 @@ class WdLayoutPage extends WdBase{
        * if not at title screen
        * select from dropdown
        */
-      console.log(e)
+      console.log(`selecting from ui-splash screen errored, try selecting from dropdown`)
       await this.selectDropdownOption(`[aria-label="${ARIA_LABELS.SELECT_ATLAS}"]`, atlasName)
     }
 
@@ -492,10 +537,6 @@ class WdLayoutPage extends WdBase{
   clickStatusPanel() {
     // Will throw if status panel is not visible
     return this._getStatusPanel().click()
-  }
-
-  async getTemplateInfo(){
-    throw new Error(`getTemplateInfo has been deprecated. Implmenet new method of getting info`)
   }
 
   // will throw if additional layer control is not visible
