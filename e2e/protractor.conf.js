@@ -2,6 +2,12 @@
 // n.b. to start selenium, run npm run wd -- update && npm run wd -- start
 // n.b. you will need to run `npm i --no-save puppeteer`, so that normal download script does not download chrome binary
 const chromeOpts = require('./chromeOpts')
+const fs = require('fs')
+const path = require('path')
+const { promisify } = require('util')
+const asyncWrite = promisify(fs.writeFile)
+const asyncMkdir = promisify(fs.mkdir)
+
 const SELENIUM_ADDRESS = process.env.SELENIUM_ADDRESS
 
 const {
@@ -31,6 +37,29 @@ const localConfig = {
           : { binary: (() => require('puppeteer').executablePath())() }
       )
     }
+  },
+  onPrepare: function() {
+    // polyfill for node10 or lower
+    if (typeof globalThis === 'undefined') global.globalThis = {}
+    jasmine.getEnv().addReporter({
+      specDone: async ({ status, id, fullName, ...rest }) => {
+        if (status !== 'passed') {
+          const b64 = await globalThis.IAVBase.takeScreenshot()
+          const dir = './scrnsht/'
+          await asyncMkdir(dir, { recursive: true })
+          await asyncWrite(
+            path.join(dir, `${id}.png`),
+            b64,
+            'base64'
+          )
+          await asyncWrite(
+            path.join(dir, `${id}.txt`),
+            JSON.stringify({ id, status, fullName }, null, 2),
+            'utf-8'
+          )
+        }
+      }
+    })
   }
 }
 

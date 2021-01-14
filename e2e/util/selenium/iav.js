@@ -18,15 +18,7 @@ class WdIavPage extends WdLayoutPage{
 
   async waitUntilAllChunksLoaded(){
     await this.waitForCss(`iav-cmp-viewer-nehuba-glue`)
-    await this._browser.wait(async () => {
-      const els = await this._browser.findElements(
-        By.css('div.loadingIndicator')
-      )
-      const els2 = await this._browser.findElements(
-        By.css('.spinnerAnimationCircle')
-      )
-      return [...els, ...els2].length === 0
-    }, 1e3 * 60 * 10)
+    await this.waitForAsync()
   }
 
   async getFloatingCtxInfoAsText(){
