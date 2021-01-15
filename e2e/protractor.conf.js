@@ -44,6 +44,12 @@ const localConfig = {
     jasmine.getEnv().addReporter({
       specDone: async ({ status, id, fullName, ...rest }) => {
         if (status !== 'passed') {
+          if (process.stdout.isTTY) {
+            console.log(`\x1b[31m&s\x1b[0m`, 'F')
+            console.log(`spec failed, taking screenshot`)
+          } else {
+            console.log(`F`)
+          }
           const b64 = await globalThis.IAVBase.takeScreenshot()
           const dir = './scrnsht/'
           await asyncMkdir(dir, { recursive: true })

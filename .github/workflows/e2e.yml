@@ -82,9 +82,6 @@ jobs:
       with:
         name: ${{ env.ARTEFACT_NAME }}
         path: ./scrnsht/
-    
-    outputs:
-      e2e_status: ${{ job.status }}
 
   update-after-e2e-status:
     if: always()
@@ -97,7 +94,7 @@ jobs:
       - name: update badge
         run: |
           state=''
-          [[ ${{ needs.e2e.outputs.e2e_status }} = success ]] && state="success" || state="failure"
+          [[ ${{ success() }} = "true" ]] && state="success" || state="failure"
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
