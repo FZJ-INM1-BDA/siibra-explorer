@@ -83,17 +83,25 @@ jobs:
         name: ${{ env.ARTEFACT_NAME }}
         path: ./scrnsht/
 
-  update-after-e2e-status:
+  set-state-success:
     if: always()
     needs: e2e
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ success() }}
+
+  update-after-e2e-status:
+    if: always()
+    needs: set-state-success
     runs-on: ubuntu-latest
     env:
       URL_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
       SHA: ${{ github.event.inputs.sha }}
-      ENV_STATE: $([[ ${{ success() }} = "true" ]] "success" || "failure")
     steps:
       - name: update badge
         run: |
+          state=''
+          [[ ${{ needs.set-state-success.outputs.status }} = 'true' ]] && success || failure
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
@@ -102,5 +110,5 @@ jobs:
             -d '{
               "target_url":"'$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'",
               "description": "e2e completed successfully.",
-              "state": "${{ env.ENV_STATE }}"
+              "state": "'$state'"
             }'
