@@ -90,11 +90,10 @@ jobs:
     env:
       URL_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
       SHA: ${{ github.event.inputs.sha }}
+      ENV_STATE: $([[ ${{ success() }} = "true" ]] "success" || "failure")
     steps:
       - name: update badge
         run: |
-          state=''
-          [[ ${{ success() }} = "true" ]] && state="success" || state="failure"
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
@@ -103,5 +102,5 @@ jobs:
             -d '{
               "target_url":"'$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'",
               "description": "e2e completed successfully.",
-              "state": "'$state'"
+              "state": "${{ env.ENV_STATE }}"
             }'
