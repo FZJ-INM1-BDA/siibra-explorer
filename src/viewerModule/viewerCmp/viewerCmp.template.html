@@ -54,7 +54,7 @@
     </mat-drawer>
 
     <mat-drawer-content class="visible position-relative pe-none">
-      
+
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
 
         <!-- pullable tab top right corner -->
@@ -83,7 +83,7 @@
           <div class="flex-grow-0 d-inline-flex align-items-start">
 
             <!-- signin banner at top right corner -->
-            
+
 
             <top-menu-cmp class="mt-3 mr-2 d-inline-block"
               [ismobile]="ismobile"
@@ -132,7 +132,7 @@
           iav-shown-dataset
           #iavShownDataset="iavShownDataset">
         </div>
-      
+
         <div class="hidden"
           iav-shown-previews
           (emitter)="iavAdditionalLayers$.next($event)"
@@ -142,7 +142,7 @@
         <!-- sidenav datasets -->
         <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
           <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
-            
+
             <!-- single dataset side nav panel -->
             <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
               (clear)="clearPreviewingDataset(id)"
@@ -186,42 +186,42 @@
     <mat-drawer-content class="visible position-relative">
 
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
-    
+
         <!-- bottom left corner (atlas selector and currently selected) -->
         <div iavLayoutFourCornersBottomLeft class="d-inline-flex align-items-center mb-4 ml-2 w-100">
-    
+
           <!-- atlas selector -->
           <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
             #alSelector="atlasLayerSelector"
             (iav-outsideClick)="alSelector.selectorExpanded = false">
           </atlas-layer-selector>
-    
+
           <!-- chips -->
           <div class="flex-grow-1 flex-shrink-1 overflow-x-auto">
 
             <mat-chip-list class="d-inline-block">
               <!-- additional layer -->
-      
+
               <ng-container>
                 <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: (parcellationSelected$ | async) }">
                 </ng-container>
               </ng-container>
-      
+
               <!-- any selected region(s) -->
               <ng-container>
                 <ng-container *ngTemplateOutlet="selectedRegionTmpl">
                 </ng-container>
               </ng-container>
-      
+
               <!-- controls for iav volumes -->
               <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
               <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
               </ng-container>
-      
+
             </mat-chip-list>
           </div>
         </div>
-    
+
       </iav-layout-fourcorners>
 
     </mat-drawer-content>
@@ -245,7 +245,7 @@
           [selectedParcellation]="parcellationSelected$ | async"
           #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
         </iav-cmp-viewer-nehuba-glue>
-      
+
       </div>
     </div>
   </iav-layout-fourcorners>
@@ -575,7 +575,7 @@
         'lighttheme': customColorDarkmode === false
       }"
       [style.backgroundColor]="customColor"
-      
+
       [color]="(!customColor && matColor) ? matColor : null">
 
       <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
@@ -610,7 +610,7 @@
           </ng-container>
         </ng-container>
       </ng-template>
-      
+
       <!-- multi region wrapper -->
       <ng-template #multiRegionWrapperTmpl>
         <ng-container *ngTemplateOutlet="multiRegionTmpl; context: {
@@ -684,7 +684,7 @@
 
       <ng-template #exploreInOtherTmpl>
         <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
-          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer" 
+          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer"
           (click)="iavRegion.changeView(sameRegion)"
           [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
           mat-ripple>
@@ -711,7 +711,7 @@
     <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
 
       <data-browser
-        *ngIf="expansionPanel.expanded" 
+        *ngIf="expansionPanel.expanded"
         [disableVirtualScroll]="true"
         [regions]="[region]">
       </data-browser>
@@ -767,12 +767,13 @@
               [region]="region"
               [parcellationId]="selectedParcellation['@id']"
               (setOpenState)="expansionPanel.expanded = $event"
-              [accordionExpanded]="expansionPanel.expanded">
+              [accordionExpanded]="expansionPanel.expanded"
+              (connectivityNumberReceived)="connectedCounterDir.value = $event">
             </connectivity-browser>
           </ng-container>
         </mat-card-content>
       </ng-template>
-  
+
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: 'Connectivity',
         desc: connectedCounterDir.value,
@@ -786,16 +787,6 @@
       <div class="w-0 h-0"
         iav-counter
         #connectedCounterDir="iavCounter">
-        <!-- TODO figure out why conn browser does not work here -->
-        <!-- @fsdavid, can you take a look why this component is not emitting connectivityNumberReceived event? -->
-        <connectivity-browser *ngIf="region && region.name"
-          class="d-block h-0 w-0 overflow-hidden"
-          [region]="region"
-          [parcellationId]="selectedParcellation['@id']"
-          [accordionExpanded]="true"
-          (connectivityNumberReceived)="connectedCounterDir.value = $event">
-          
-        </connectivity-browser>
       </div>
     </ng-container>
 
@@ -891,7 +882,7 @@
         [regions]="regions"
         #iavDbDirective="iavDatabrowserDirective">
       </div>
-  
+
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: CONST.REGIONAL_FEATURES,
         desc: iavDbDirective?.dataentries?.length,
@@ -920,7 +911,7 @@
           </mat-chip>
         </mat-chip-list>
       </ng-template>
-      
+
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: 'Brain regions',
         desc: regions.length,
@@ -938,10 +929,10 @@
 <ng-template #collapseBtn>
 
   <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
-    
+
     <button mat-raised-button class="mat-elevation-z8"
       [attr.aria-label]="ARIA_LABELS.COLLAPSE"
-      (click)="sideNavFullLeftSwitch.close()"  
+      (click)="sideNavFullLeftSwitch.close()"
       color="basic">
       <i class="fas fa-chevron-up"></i>
       <span>
