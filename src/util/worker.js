@@ -47,7 +47,7 @@ const getIcoVertex = (pos, scale) => `-525731.0 0.0 850651.0
 850651.0 -525731.0 0.0
 -850651.0 -525731.0 0.0`
   .split('\n')
-  .map(line => 
+  .map(line =>
     line
       .split(' ')
       .map((string, idx) => (Number(string) * (scale ? scale : 1) + pos[idx]).toString() )
@@ -77,7 +77,7 @@ const getIcoPoly = (startingIdx) => `3 1 4 0
 3 5 2 9
 3 11 2 7`
   .split('\n')
-  .map((line) => 
+  .map((line) =>
     line
       .split(' ')
       .map((v,idx) => idx === 0 ? v : (Number(v) + startingIdx).toString() )
@@ -86,8 +86,8 @@ const getIcoPoly = (startingIdx) => `3 1 4 0
   .join('\n')
 
 const getMeshVertex = (vertices) =>  vertices.map(vertex => vertex.join(' ')).join('\n')
-const getMeshPoly = (polyIndices, currentIdx) => polyIndices.map(triplet => 
-  '3 '.concat(triplet.map(index => 
+const getMeshPoly = (polyIndices, currentIdx) => polyIndices.map(triplet =>
+  '3 '.concat(triplet.map(index =>
     index + currentIdx
   ).join(' '))
 ).join('\n')
@@ -114,7 +114,7 @@ const parseLmToVtk = (landmarks, scale) => {
     else{
       //curr[0] : [number,number,number][] vertices
       //curr[1] : [number,number,number][] indices for the vertices that poly forms
-      
+
       /**
        * poly primitive
        */
@@ -137,7 +137,7 @@ const parseLmToVtk = (landmarks, scale) => {
     labelString : [],
   })
 
-  // if no vertices are been rendered, do not replace old 
+  // if no vertices are been rendered, do not replace old
   if(reduce.currentVertexIndex === 0)
     return false
 
@@ -168,7 +168,7 @@ const getLandmarksVtk = (action) => {
     : 2.8
 
   const vtk = parseLmToVtk(landmarks, scale)
-  
+
   if(!vtk) return
 
   // when new set of landmarks are to be displayed, the old landmarks will be discarded
@@ -228,7 +228,7 @@ const rebuildSelectedRegion = (payload) => {
   const activeTreeBranch = []
   const isRegionActive = (region) => selectedRegions.some(r => r.name === region.name)
     || region.children && region.children.length > 0 && region.children.every(isRegionActive)
-  
+
   /**
    * some active tree branch
    * branch is active if SOME children are active
@@ -240,7 +240,7 @@ const rebuildSelectedRegion = (payload) => {
   const handleRegion = (r) => {
     isRegionActive(r) ? activeTreeBranch.push(r) : {}
     isSomeRegionActive(r) ? someActiveTreeBranch.push(r) : {}
-    if (r.children && r.children.length > 0) 
+    if (r.children && r.children.length > 0)
       r.children.forEach(handleRegion)
   }
   regions.forEach(handleRegion)
@@ -292,6 +292,147 @@ const processParcRegionAttr = (payload) => {
   })
 }
 
+const parseLineDataToVtk = (data, scale, plotyMultiple) => {
+  const lineCoordinates = []
+
+  for (let i = 1; i < data.x.length; i++) {
+
+    // ToDo use neuron colors
+    // if (i+1 === data.x.length) {
+    //   colors.push(data.marker.color[lineDataIndex-1])
+    //   break;
+    // }
+
+    if (data.x[i] !== null && data.x[i-1] !== null) {
+      lineCoordinates.push([[
+        data.x[i-1] * plotyMultiple,
+        data.y[i-1] * plotyMultiple,
+        data.z[i-1] * plotyMultiple,
+      ], [
+        data.x[i] * plotyMultiple,
+        data.y[i] * plotyMultiple,
+        data.z[i] * plotyMultiple,
+      ]])
+    }
+  }
+
+  const lineCoordinatesArrayToString = () => {
+    let returnString = ''
+    lineCoordinates.forEach(lc => {
+      returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
+    })
+    return returnString
+  }
+
+  const coordinateLength = lineCoordinates.length
+
+  const vtk = '# vtk DataFile Version 2.0\n' +
+    'Created by worker thread at https://github.com/HumanBrainProject/interactive-viewer\n' +
+    'ASCII\n' +
+    'DATASET POLYDATA\n' +
+    `POINTS ${coordinateLength*8} float\n` +
+    lineCoordinatesArrayToString() +
+    `POLYGONS ${coordinateLength*12} ${coordinateLength*48}\n` +
+    getPolygonStringByNumber(coordinateLength) +
+    `POINT_DATA ${coordinateLength*8}\n` +
+    'SCALARS label unsigned_char 1\n' +
+    'LOOKUP_TABLE none\n' +
+    getColorIds(coordinateLength*8)
+
+  return vtk
+}
+
+const getColorIds = (n) => {
+  let returnString = ''
+  for (let i=0; i<n-1; i++){
+    returnString += '0\n'
+  }
+  returnString += '0'
+  return returnString
+}
+
+const getPolygonStringByNumber = (n) => {
+  let returnString = ''
+  for (let i = 0; i < n; i++) {
+    returnString +=
+      `3 ${0 + 8*i} ${1 + 8*i} ${3 + 8*i}\n` +
+      `3 ${0 + 8*i} ${2 + 8*i} ${3 + 8*i}\n` +
+      `3 ${4 + 8*i} ${5 + 8*i} ${7 + 8*i}\n` +
+      `3 ${4 + 8*i} ${6 + 8*i} ${7 + 8*i}\n` +
+      `3 ${2 + 8*i} ${6 + 8*i} ${7 + 8*i}\n` +
+      `3 ${2 + 8*i} ${3 + 8*i} ${7 + 8*i}\n` +
+      `3 ${3 + 8*i} ${1 + 8*i} ${7 + 8*i}\n` +
+      `3 ${1 + 8*i} ${5 + 8*i} ${7 + 8*i}\n` +
+      `3 ${2 + 8*i} ${0 + 8*i} ${6 + 8*i}\n` +
+      `3 ${0 + 8*i} ${4 + 8*i} ${6 + 8*i}\n` +
+      `3 ${1 + 8*i} ${0 + 8*i} ${4 + 8*i}\n` +
+      `3 ${1 + 8*i} ${4 + 8*i} ${5 + 8*i}\n`
+  }
+  return returnString
+}
+
+const getPerpendicularPointsForLine = (A, B, scale) => {
+
+  const wi = scale * 230000
+  const he = scale * 230000
+
+  let u = A.map((item, index) => {
+    return item - B[index];
+  })
+  const uLength = Math.sqrt((u[0] * u[0]) + (u[1] * u[1]) + (u[2] * u[2]))
+  u = u.map((item, index) => {
+    return item/uLength
+  })
+
+  const n = []
+  if(Math.abs(u[0]) <= Math.abs(u[1]) && Math.abs(u[0]) <= Math.abs(u[2])) {
+    n[0] = u[1] * u[1] + u[2] * u[2]
+    n[1] = -u[1] * u[0]
+    n[2] = -u[2] * u[0]
+  }
+  else if(Math.abs(u[1])<=Math.abs(u[0])&&Math.abs(u[1])<=Math.abs(u[2]))
+  {
+    n[0] = -u[0] * u[2]
+    n[1] = u[0] * u[0] + u[2] * u[2]
+    n[2] = -u[2] * u[1]
+  }
+  else if(Math.abs(u[2])<=Math.abs(u[0])&&Math.abs(u[2])<=Math.abs(u[1]))
+  {
+    n[0] = -u[0] * u[2]
+    n[1] = -u[1] * u[2]
+    n[2] = u[0] * u[0] + u[1] * u[1]
+  }
+
+  const v = [ u[1] * n[2] - u[2] * n[1], u[2] * n[0] - u[0] * n[2], u[0] * n[1] - u[1] * n[0] ]
+
+  const RMul = (k) => {
+    const res = []
+    res[0] = v[0]*k[0] + n[0]*k[1] + u[0]*k[2]
+    res[1] = v[1]*k[0] + n[1]*k[1] + u[1]*k[2]
+    res[2] = v[2]*k[0] + n[2]*k[1] + u[2]*k[2]
+    return res
+  }
+
+  const sumArrays = (a1, a2) => {
+    return a1.map((item, index) => {
+      return item + a2[index];
+    })
+  }
+
+  const a = sumArrays(A, RMul([wi,he,0]))
+  const b = sumArrays(A, RMul([-wi,he,0]))
+  const c = sumArrays(A, RMul([wi,-he,0]))
+  const d = sumArrays(A, RMul([-wi,-he,0]))
+
+  const e = sumArrays(B, RMul([wi,he,0]))
+  const f = sumArrays(B, RMul([-wi,he,0]))
+  const g = sumArrays(B, RMul([wi,-he,0]))
+  const h = sumArrays(B, RMul([-wi,-he,0]))
+
+  return `${a.join(' ')}\n ${b.join(' ')}\n ${c.join(' ')}\n ${d.join(' ')}\n ${e.join(' ')}\n ${f.join(' ')}\n ${g.join(' ')}\n ${h.join(' ')}\n `
+}
+
+
 let plotyVtkUrl
 
 onmessage = (message) => {
@@ -312,7 +453,8 @@ onmessage = (message) => {
           }
         }
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
-        const vtkString = parseLmToVtk(lm, 3e-2)
+        const vtkString = parseLineDataToVtk(plotlyData.traces[0], 3e-2, plotyMultiple)
+
         plotyVtkUrl = URL.createObjectURL(
           new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
         )
@@ -341,7 +483,7 @@ onmessage = (message) => {
     })
     return
   }
-  
+
   if(validTypes.findIndex(type => type === message.data.type) >= 0){
     switch(message.data.type){
       case 'GET_LANDMARKS_VTK':
