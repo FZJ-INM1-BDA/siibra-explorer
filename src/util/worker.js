@@ -316,24 +316,19 @@ const parseLineDataToVtk = (data, scale, plotyMultiple) => {
     }
   }
 
-  const lineCoordinatesArrayToString = () => {
-    let returnString = ''
-    lineCoordinates.forEach(lc => {
-      returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
-    })
-    return returnString
-  }
-
   const coordinateLength = lineCoordinates.length
 
-  const vtk = '# vtk DataFile Version 2.0\n' +
-    'Created by worker thread at https://github.com/HumanBrainProject/interactive-viewer\n' +
-    'ASCII\n' +
-    'DATASET POLYDATA\n' +
+  const vtk = `${vtkHeader}\n` +
     `POINTS ${coordinateLength*8} float\n` +
-    lineCoordinatesArrayToString() +
+    (() => {
+      let returnString = ''
+      lineCoordinates.forEach(lc => {
+        returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
+      })
+      return returnString
+    })() +
     `POLYGONS ${coordinateLength*12} ${coordinateLength*48}\n` +
-    getPolygonStringByNumber(coordinateLength) +
+    getLineDataVtkPolygonStringWithNumber(coordinateLength) +
     `POINT_DATA ${coordinateLength*8}\n` +
     'SCALARS label unsigned_char 1\n' +
     'LOOKUP_TABLE none\n' +
@@ -351,30 +346,32 @@ const getColorIds = (n) => {
   return returnString
 }
 
-const getPolygonStringByNumber = (n) => {
+const getLineDataVtkPolygonStringWithNumber = (neuronCoordinateLength) => {
   let returnString = ''
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < neuronCoordinateLength; i++) {
+    const neuronNumber = 8*i
     returnString +=
-      `3 ${0 + 8*i} ${1 + 8*i} ${3 + 8*i}\n` +
-      `3 ${0 + 8*i} ${2 + 8*i} ${3 + 8*i}\n` +
-      `3 ${4 + 8*i} ${5 + 8*i} ${7 + 8*i}\n` +
-      `3 ${4 + 8*i} ${6 + 8*i} ${7 + 8*i}\n` +
-      `3 ${2 + 8*i} ${6 + 8*i} ${7 + 8*i}\n` +
-      `3 ${2 + 8*i} ${3 + 8*i} ${7 + 8*i}\n` +
-      `3 ${3 + 8*i} ${1 + 8*i} ${7 + 8*i}\n` +
-      `3 ${1 + 8*i} ${5 + 8*i} ${7 + 8*i}\n` +
-      `3 ${2 + 8*i} ${0 + 8*i} ${6 + 8*i}\n` +
-      `3 ${0 + 8*i} ${4 + 8*i} ${6 + 8*i}\n` +
-      `3 ${1 + 8*i} ${0 + 8*i} ${4 + 8*i}\n` +
-      `3 ${1 + 8*i} ${4 + 8*i} ${5 + 8*i}\n`
+      `3 ${0 + neuronNumber} ${1 + neuronNumber} ${3 + neuronNumber}\n` +
+      `3 ${0 + neuronNumber} ${2 + neuronNumber} ${3 + neuronNumber}\n` +
+      `3 ${4 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${4 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${2 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${2 + neuronNumber} ${3 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${3 + neuronNumber} ${1 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${1 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
+      `3 ${2 + neuronNumber} ${0 + neuronNumber} ${6 + neuronNumber}\n` +
+      `3 ${0 + neuronNumber} ${4 + neuronNumber} ${6 + neuronNumber}\n` +
+      `3 ${1 + neuronNumber} ${0 + neuronNumber} ${4 + neuronNumber}\n` +
+      `3 ${1 + neuronNumber} ${4 + neuronNumber} ${5 + neuronNumber}\n`
   }
   return returnString
 }
 
 const getPerpendicularPointsForLine = (A, B, scale) => {
 
-  const wi = scale * 230000
-  const he = scale * 230000
+  const lineWeight = 2e5
+  const lineWidth = scale * lineWeight
+  const lineHeight = scale * lineWeight
 
   let u = A.map((item, index) => {
     return item - B[index];
@@ -419,15 +416,15 @@ const getPerpendicularPointsForLine = (A, B, scale) => {
     })
   }
 
-  const a = sumArrays(A, RMul([wi,he,0]))
-  const b = sumArrays(A, RMul([-wi,he,0]))
-  const c = sumArrays(A, RMul([wi,-he,0]))
-  const d = sumArrays(A, RMul([-wi,-he,0]))
+  const a = sumArrays(A, RMul([lineWidth,lineHeight,0]))
+  const b = sumArrays(A, RMul([-lineWidth,lineHeight,0]))
+  const c = sumArrays(A, RMul([lineWidth,-lineHeight,0]))
+  const d = sumArrays(A, RMul([-lineWidth,-lineHeight,0]))
 
-  const e = sumArrays(B, RMul([wi,he,0]))
-  const f = sumArrays(B, RMul([-wi,he,0]))
-  const g = sumArrays(B, RMul([wi,-he,0]))
-  const h = sumArrays(B, RMul([-wi,-he,0]))
+  const e = sumArrays(B, RMul([lineWidth,lineHeight,0]))
+  const f = sumArrays(B, RMul([-lineWidth,lineHeight,0]))
+  const g = sumArrays(B, RMul([lineWidth,-lineHeight,0]))
+  const h = sumArrays(B, RMul([-lineWidth,-lineHeight,0]))
 
   return `${a.join(' ')}\n ${b.join(' ')}\n ${c.join(' ')}\n ${d.join(' ')}\n ${e.join(' ')}\n ${f.join(' ')}\n ${g.join(' ')}\n ${h.join(' ')}\n `
 }
