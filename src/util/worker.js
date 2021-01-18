@@ -292,7 +292,7 @@ const processParcRegionAttr = (payload) => {
   })
 }
 
-const parseLineDataToVtk = (data, scale, plotyMultiple) => {
+const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
   const lineCoordinates = []
 
   for (let i = 1; i < data.x.length; i++) {
@@ -371,7 +371,7 @@ const getLineDataVtkPolygonStringWithNumber = (neuronCoordinateLength) => {
 
 const getPerpendicularPointsForLine = (A, B, scale) => {
 
-  const lineWeight = 2e5
+  const lineWeight = 1e6
   const lineWidth = scale * lineWeight
   const lineHeight = scale * lineWeight
 
@@ -452,7 +452,7 @@ onmessage = (message) => {
           }
         }
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
-        const vtkString = parseLineDataToVtk(plotlyData.traces[0], 3e-2, plotyMultiple)
+        const vtkString = parseLineDataToVtk(plotlyData.traces[0], 5e-3, plotyMultiple)
 
         plotyVtkUrl = URL.createObjectURL(
           new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
