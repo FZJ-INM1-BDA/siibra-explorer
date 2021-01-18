@@ -39,7 +39,7 @@ jobs:
           './src/advanced/urlParsing.prod.e2e-spec.js',
           './src/advanced/pluginApi.prod.e2e-spec.js',
           './src/advanced/nonAtlasImages.prod.e2e-spec.js',
-          './src/advanced/browsingForDatasets.prod.e2e-spec.js',
+          # './src/advanced/browsingForDatasets.prod.e2e-spec.js',
           './src/advanced/favDatasets.prod.e2e-spec.js',
           
           './src/selecting/region.prod.e2e-spec.js',
@@ -68,6 +68,10 @@ jobs:
     - name: 'Run e2e for ${{ matrix.protractor-spec }} on ${{ github.event.inputs.url }}'
       run: npm run e2e
 
+    - name: Set output when workflow fails
+      if: failure()
+      run: echo '::set-output name=failure_state::true'
+
     - name: Define screenshot artefact
       if: failure()
       run: |
@@ -83,16 +87,9 @@ jobs:
         name: ${{ env.ARTEFACT_NAME }}
         path: ./scrnsht/
 
-  set-state-success:
-    if: always()
-    needs: e2e
-    runs-on: ubuntu-latest
-    outputs:
-      status: ${{ success() }}
-
   update-after-e2e-status:
     if: always()
-    needs: set-state-success
+    needs: e2e
     runs-on: ubuntu-latest
     env:
       URL_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
@@ -100,8 +97,7 @@ jobs:
     steps:
       - name: update badge
         run: |
-          state=''
-          [[ ${{ needs.set-state-success.outputs.status }} = 'true' ]] && success || failure
+          [[ '${{ needs.e2e.outputs.failure_state }}' = 'true' ]] && state=failure || state=success &&
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
