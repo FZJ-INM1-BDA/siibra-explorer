@@ -318,15 +318,17 @@ const parseLineDataToVtk = (data, scale, plotyMultiple) => {
 
   const coordinateLength = lineCoordinates.length
 
+  const lineCoordinatesArrayToString = (() => {
+    let returnString = ''
+    lineCoordinates.forEach(lc => {
+      returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
+    })
+    return returnString
+  })()
+
   const vtk = `${vtkHeader}\n` +
     `POINTS ${coordinateLength*8} float\n` +
-    (() => {
-      let returnString = ''
-      lineCoordinates.forEach(lc => {
-        returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
-      })
-      return returnString
-    })() +
+    lineCoordinatesArrayToString +
     `POLYGONS ${coordinateLength*12} ${coordinateLength*48}\n` +
     getLineDataVtkPolygonStringWithNumber(coordinateLength) +
     `POINT_DATA ${coordinateLength*8}\n` +
@@ -351,18 +353,18 @@ const getLineDataVtkPolygonStringWithNumber = (neuronCoordinateLength) => {
   for (let i = 0; i < neuronCoordinateLength; i++) {
     const neuronNumber = 8*i
     returnString +=
-      `3 ${0 + neuronNumber} ${1 + neuronNumber} ${3 + neuronNumber}\n` +
-      `3 ${0 + neuronNumber} ${2 + neuronNumber} ${3 + neuronNumber}\n` +
-      `3 ${4 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${4 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${3 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${3 + neuronNumber} ${1 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${0 + neuronNumber} ${6 + neuronNumber}\n` +
-      `3 ${0 + neuronNumber} ${4 + neuronNumber} ${6 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${0 + neuronNumber} ${4 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${4 + neuronNumber} ${5 + neuronNumber}\n`
+      `3 ${0 + neuronNumber} ${1 + neuronNumber} ${3 + neuronNumber}
+       3 ${0 + neuronNumber} ${2 + neuronNumber} ${3 + neuronNumber}
+       3 ${4 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}
+       3 ${4 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}
+       3 ${2 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}
+       3 ${2 + neuronNumber} ${3 + neuronNumber} ${7 + neuronNumber}
+       3 ${3 + neuronNumber} ${1 + neuronNumber} ${7 + neuronNumber}
+       3 ${1 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}
+       3 ${2 + neuronNumber} ${0 + neuronNumber} ${6 + neuronNumber}
+       3 ${0 + neuronNumber} ${4 + neuronNumber} ${6 + neuronNumber}
+       3 ${1 + neuronNumber} ${0 + neuronNumber} ${4 + neuronNumber}
+       3 ${1 + neuronNumber} ${4 + neuronNumber} ${5 + neuronNumber}\n`
   }
   return returnString
 }
