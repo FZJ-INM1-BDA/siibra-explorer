@@ -18,7 +18,11 @@ import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { calculateSliceZoomFactor, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
-import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
+import {
+  API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
+  AtlasViewerAPIServices,
+  TSetViewerHandle
+} from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 
 interface INgLayerInterface {
@@ -266,6 +270,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Subject<NehubaViewerUnit>,
+    @Optional() private apiService: AtlasViewerAPIServices,
   ){
     this.viewerEvents$.next({
       type: 'MOUSEOVER_ANNOTATION',
@@ -278,7 +283,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       const { deregister, register } = clickInterceptor
       const selOnhoverRegion = this.selectHoveredRegion.bind(this)
       register(selOnhoverRegion)
-      this.onDestroyCb.push(() => deregister(selOnhoverRegion)) 
+      this.onDestroyCb.push(() => deregister(selOnhoverRegion))
     }
 
     const nehubaViewerSub = this.newViewer$.pipe(
@@ -306,7 +311,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       /**
        * TODO smarter with event stream
        */
-      if (!viewPanels.every(v => !!v)) { 
+      if (!viewPanels.every(v => !!v)) {
         this.log.error(`on relayout, not every view panel is populated. This should not occur!`)
         return
       }
@@ -371,7 +376,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
       const newLayers = ngLayers.filter(l => this.ngLayersRegister.layers?.findIndex(ol => ol.name === l.name) < 0)
       const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayers?.findIndex(nl => nl.name === l.name) < 0)
-      
+
       if (newLayers?.length > 0) {
         const newLayersObj: any = {}
         newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
@@ -582,7 +587,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
            * TODO reenable with updated select_regions api
            */
           this.log.warn(`showSegment is temporarily disabled`)
-  
+
           // if(!this.selectedRegionIndexSet.has(labelIndex))
           //   this.store.dispatch({
           //     type : SELECT_REGIONS,
@@ -600,7 +605,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
           if (!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3)) {
             throw new Error('position needs to be a length 3 tuple of numbers ')
           }
-  
+
           this.store$.dispatch(viewerStateAddUserLandmarks({
             landmarks
           }))
@@ -615,7 +620,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
            * TODO reenable with updated select_regions api
            */
           this.log.warn(`hideSegment is temporarily disabled`)
-  
+
           // if(this.selectedRegionIndexSet.has(labelIndex)){
           //   this.store.dispatch({
           //     type :SELECT_REGIONS,
@@ -645,7 +650,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
           for (const [key, colormap] of this.nehubaContainerDirective.nehubaViewerInstance.multiNgIdColorMap.entries()) {
             const newColormap = new Map()
             newMainMap.set(key, newColormap)
-  
+
             for (const [lableIndex, entry] of colormap.entries()) {
               newColormap.set(lableIndex, JSON.parse(JSON.stringify(entry)))
             }
@@ -692,7 +697,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       })
     })
     this.onDestroyCb.push(() => setupViewerApiSub.unsubscribe())
-  
+
   }
 
   handleViewerLoadedEvent(flag: boolean) {
@@ -703,7 +708,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   private selectHoveredRegion(ev: any, next: Function){
-    if (!this.onhoverSegments || !(this.onhoverSegments.length)) return next()
+    if (!this.onhoverSegments || !(this.onhoverSegments.length) || this.apiService.getUserToSelectRegion.length) return next()
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
         selectRegions: this.onhoverSegments.slice(0, 1)
