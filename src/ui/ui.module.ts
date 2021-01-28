@@ -128,7 +128,7 @@ import { AtlasCmptConnModule } from "src/atlasComponents/connectivity";
           })
         }
         const { x, y, width, height } = param
-        const { devicePixelRatio: dpr } = window
+        const { devicePixelRatio: dpr = 1 } = window
         return new Promise(rs => {
           const subCanvas = document.createElement('canvas')
           subCanvas.width = width * dpr
@@ -153,6 +153,8 @@ import { AtlasCmptConnModule } from "src/atlasComponents/connectivity";
             width * dpr,
             height * dpr
           )
+
+          context.scale(dpr, dpr)
 
           subCanvas.toBlob(blob => {
             const url = URL.createObjectURL(blob)
