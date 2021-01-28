@@ -1,0 +1,62 @@
+name: '[ci]'
+
+on:
+  push:
+    branches-ignore:
+    - dev
+    - staging
+    - master
+
+jobs:
+  lint:
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14.x for lint
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+    - run: npm i
+    - run: npm run lint
+
+  frontend:
+    if: always()
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
+    env:
+      NODE_ENV: test
+      
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i
+    - run: npm run test
+
+  backend:
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
+    env:
+      NODE_ENV: test
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: cd deploy
+    - run: npm i
+    - run: npm run test
