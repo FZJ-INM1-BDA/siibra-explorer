@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '14.x'
-    - run: npm ci
+    - run: npm i
     - run: npm run lint
 
   frontend:
@@ -35,7 +35,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
+    - run: npm i
     - run: npm run test
 
   backend:
@@ -52,5 +52,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: cd deploy
-    - run: npm ci
+    - run: npm i
     - run: npm run test
