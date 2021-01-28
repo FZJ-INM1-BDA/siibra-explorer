@@ -1,5 +1,5 @@
 import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/testing"
-import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
+import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects, ClickInterceptorService } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
@@ -1211,65 +1211,101 @@ describe('> glue.ts', () => {
     /**
      * TODO finish writing the test for ClickInterceptorService
      */
+    let interceptorService: ClickInterceptorService
 
-    it('can obtain override fn', () => {
-
+    beforeEach(() => {
+      interceptorService = new ClickInterceptorService()
     })
 
-    describe('> if getUserToSelectRegion.length === 0', () => {
-
-      it('by default, next fn will be called', () => {
-
+    describe('> #addInterceptor', () => {
+      it('> adds interceptor fn', () => {
+        const fn = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
       })
-  
-      it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
+      it('> when config not supplied, or last not present, will add fn to the first of the queue', () => {
 
-      })
-    })
-    describe('> if getUserToSelectRegion.length > 0', () => {
-      it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
+        const dummy = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(dummy)
         
+        const fn = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(0)
+
+        const fn2 = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn2, {})
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(1)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn2)).toEqual(0)
       })
-      it('if multiple getUserToSelectRegion handler exists, it resolves in a LIFO manner', () => {
+      it('> when last is supplied as a config param, will add the fn at the end', () => {
 
-      })
+        const dummy = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(dummy)
 
-      describe('> if spec is not set (defaults to parcellation region mode)', () => {
+        const fn = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn, { last: true })
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(1)
 
-        it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
-
-        })
-      })
-
-      describe('> if spec is set', () => {
-        describe('> if spec is set to PARCELLATION_REGION', () => {
-
-          it('> mouseoversegment.length === 0, will not call next, will not rs, will not call rj', () => {
-
-          })
-          
-          it('> mouseoversegment.length > 0, will not call next, will call rs', () => {
-
-          })
-        })
-
-        describe('> if spec is set to POINT', () => {
-          it('> rs is called if mouseoversegment.length === 0', () => {
-
-          })
-          it('> rs is called with correct arg if mouseoversegment.length > 0', () => {
-
-          })
-        })
-
-        describe('> if multiple getUserToSelectRegion exist', () => {
-          it('> only the last Promise will be evaluated', () => {
-
-      
-          })
-        })
       })
     })
 
+    describe('> deregister', () => {
+      it('> if the fn exist in the register, it will be removed', () => {
+
+        const fn = (ev: any, next: Function) => {}
+        const fn2 = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
+        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
+
+        interceptorService.removeInterceptor(fn)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeLessThan(0)
+        expect(interceptorService['clickInterceptorStack'].length).toEqual(0)
+      })
+
+      it('> if fn does not exist in register, it will not be removed', () => {
+        
+        const fn = (ev: any, next: Function) => {}
+        const fn2 = (ev: any, next: Function) => {}
+        interceptorService.addInterceptor(fn)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
+        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
+
+        interceptorService.removeInterceptor(fn2)
+        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
+        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
+      })
+    })
+
+    describe('> # run', () => {
+      it('> will run fns from first idx to last idx', () => {
+        const callNext = (ev: any, next: Function) => next()
+        const fn = jasmine.createSpy().and.callFake(callNext)
+        const fn2 = jasmine.createSpy().and.callFake(callNext)
+
+        interceptorService.addInterceptor(fn)
+        interceptorService.addInterceptor(fn2)
+        interceptorService.run({})
+
+        expect(fn2).toHaveBeenCalledBefore(fn)
+      })
+      it('> will stop at when next is not called', () => {
+
+        const callNext = (ev: any, next: Function) => next()
+        const halt = (ev: any, next: Function) => {}
+        const fn = jasmine.createSpy().and.callFake(callNext)
+        const fn2 = jasmine.createSpy().and.callFake(halt)
+        const fn3 = jasmine.createSpy().and.callFake(callNext)
+
+        interceptorService.addInterceptor(fn)
+        interceptorService.addInterceptor(fn2)
+        interceptorService.addInterceptor(fn3)
+        interceptorService.run({})
+
+        expect(fn3).toHaveBeenCalled()
+        expect(fn2).toHaveBeenCalled()
+        expect(fn).not.toHaveBeenCalled()
+      })
+    })
   })
 })
