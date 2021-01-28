@@ -277,7 +277,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     if (clickInterceptor) {
       const { deregister, register } = clickInterceptor
       const selOnhoverRegion = this.selectHoveredRegion.bind(this)
-      register(selOnhoverRegion)
+      register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion)) 
     }
 

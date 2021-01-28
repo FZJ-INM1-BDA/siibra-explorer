@@ -18,6 +18,7 @@ import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
 import { generalActionError } from "./services/stateStore.helper"
+import { TClickInterceptorConfig } from "./util/injectionTokens"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -737,8 +738,8 @@ export class ClickInterceptorService{
       this.clickInterceptorStack.splice(idx, 1)
     }
   }
-  addInterceptor(fn: Function, atTheEnd?: boolean) {
-    if (atTheEnd) {
+  addInterceptor(fn: Function, config?: TClickInterceptorConfig) {
+    if (config?.last) {
       this.clickInterceptorStack.push(fn)
     } else {
       this.clickInterceptorStack.unshift(fn)
