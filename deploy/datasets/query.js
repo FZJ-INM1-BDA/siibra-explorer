@@ -59,7 +59,7 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
   const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   return await new Promise((resolve, reject) => {
-    request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+    request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : '&databaseScope=INFERRED'}`, option, (err, resp, body) => {
       if (err) return reject(err)
       if (resp.statusCode >= 400) return reject(resp.statusCode)
       try {
@@ -108,8 +108,11 @@ const getPublicDs = async () => {
   throw `cached Data not yet resolved, neither is get public ds defined`
 }
 
-
-const getDs = ({ user }) => (user
+/**
+ * force get only public ds
+ * getting individual ds is too slow
+ */
+const getDs = ({ user }) => (false && user
     ? fetchDatasetFromKg({ user }).then(({ results }) => results)
     : getPublicDs()
   ).then(async datasets => {
