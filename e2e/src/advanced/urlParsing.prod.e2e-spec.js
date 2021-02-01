@@ -74,8 +74,23 @@ describe('> url parsing', () => {
     expect(red).toEqual(blue)
   })
 
+  it('> [bkwards compat] if ill defined labelIndex for regionsSelected are defined, should handle gracefully', async () => {
+    const url = '/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&navigation=0_0_0_1__-0.2753947079181671_0.6631333827972412_-0.6360703706741333_0.2825356423854828__3000000__-17800000_-6700000_-7500000__200000&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii'
+    await iavPage.goto(url)
+    await iavPage.clearAlerts()
+    await iavPage.wait(5000)
+    await iavPage.waitForAsync()
+    const log = await iavPage.getLog()
+    const filteredLog = log.filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
+
+    // expecting some errors in the console. In catastrophic event, there will most likely be looped errors (on each render cycle)
+    expect(
+      filteredLog.length
+    ).toBeLessThan(50)
+  })
+
   it('> if niftiLayers are defined, parcellation layer should be hidden', async () => {
-    const url = `/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.eu%2Fprecomputed%2FJuBrain%2F17%2Ficbm152casym%2Fpmaps%2FVisual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+    const url = `/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&navigation=0_0_0_1__-0.2753947079181671_0.6631333827972412_-0.6360703706741333_0.2825356423854828__3000000__-17800000_-6700000_-7500000__200000&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii`
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
@@ -149,4 +164,5 @@ describe('> url parsing', () => {
     expect(visibleArr.length).toEqual(3)
     expect(visibleArr).toEqual([true, true, true])
   })
+
 })

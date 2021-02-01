@@ -145,7 +145,7 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
     const selectedRegionsParam = searchparams.get('regionsSelected')
     if (selectedRegionsParam) {
       const ids = selectedRegionsParam.split('_')
-      return ids.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
+      return ids.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId })).filter(v => !!v)
     }
 
     const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
