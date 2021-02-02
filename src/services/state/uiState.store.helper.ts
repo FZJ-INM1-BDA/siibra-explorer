@@ -11,6 +11,8 @@ export {
   uiActionHideDatasetWithId,
   uiActionShowDatasetWtihId,
   uiActionSnackbarMessage,
+  uiActionMouseoverLandmark,
+  uiActionMouseoverSegments,
 } from './uiState/actions'
 
 export {

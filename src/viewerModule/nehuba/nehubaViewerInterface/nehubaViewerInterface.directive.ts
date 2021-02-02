@@ -1,19 +1,17 @@
 import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { Subscription, Observable, fromEvent } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
-import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { getNavigationStateFromConfig, takeOnePipe } from "../util";
-import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { timedValues } from "src/util/generator";
-import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiState.store";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
-import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
+import { viewerStateChangeNavigation, viewerStateMouseOverCustomLandmarkInPerspectiveView, viewerStateNehubaLayerchanged } from "src/services/state/viewerState/actions";
 import { viewerStateStandAloneVolumes, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { LoggingService } from "src/logging";
+import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
+import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -272,7 +270,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   constructor(
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
     @Optional() private log: LoggingService,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
@@ -299,8 +297,8 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   private nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
   private navigationChanges$: Observable<any>
 
-  private viewerPerformanceConfig$: Observable<ViewerConfigStateInterface>
-  private viewerConfig: Partial<ViewerConfigStateInterface> = {}
+  private viewerPerformanceConfig$: Observable<IViewerConfigState>
+  private viewerConfig: Partial<IViewerConfigState> = {}
 
   public oldNavigation: any = {}
   private storedNav: any
@@ -403,7 +401,8 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
     if (gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
-      initialNgState.gpuLimit = gpuLimit
+      // the correct key is gpuMemoryLimit
+      initialNgState.gpuMemoryLimit = gpuLimit
     }
 
     /* TODO replace with id from KG */
@@ -419,9 +418,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       }),
 
       this.nehubaViewerInstance.layersChanged.subscribe(() => {
-        this.store$.dispatch({
-          type: NEHUBA_LAYER_CHANGED
-        })
+        this.store$.dispatch(
+          viewerStateNehubaLayerchanged()
+        )
       }),
 
       this.nehubaViewerInstance.nehubaReady.subscribe(() => {
@@ -439,26 +438,28 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         scan(accumulatorFn, new Map()),
         map((map: Map<string, any>) => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId)),
       ).subscribe(arrOfArr => {
-        this.store$.dispatch({
-          type: MOUSE_OVER_SEGMENTS,
-          segments: arrOfArr.map( ([ngId, {segment, segmentId}]) => {
-            return {
-              layer: {
-                name: ngId,
-              },
-              segment: segment || `${ngId}#${segmentId}`,
-            }
-          } ),
-        })
+        this.store$.dispatch(
+          uiActionMouseoverSegments({
+            segments: arrOfArr.map( ([ngId, {segment, segmentId}]) => {
+              return {
+                layer: {
+                  name: ngId,
+                },
+                segment: segment || `${ngId}#${segmentId}`,
+              }
+            } )
+          })
+        )
       }),
 
       this.nehubaViewerInstance.mouseoverLandmarkEmitter.pipe(
         distinctUntilChanged()
       ).subscribe(label => {
-        this.store$.dispatch({
-          type : MOUSE_OVER_LANDMARK,
-          landmark : label,
-        })
+        this.store$.dispatch(
+          uiActionMouseoverLandmark({
+            landmark: label
+          })
+        )
       }),
 
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
@@ -529,10 +530,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     /* navigation changed actively (by user interaction with the viewer)
       probagate the changes to the store */
 
-    this.store$.dispatch({
-      type : CHANGE_NAVIGATION,
-      navigation,
-    })
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation,
+      })
+    )
   }
 
 

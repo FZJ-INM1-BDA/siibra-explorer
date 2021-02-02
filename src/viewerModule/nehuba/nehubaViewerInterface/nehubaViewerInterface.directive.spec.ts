@@ -108,13 +108,29 @@ describe('> nehubaViewerInterface.directive.ts', () => {
       })
 
       describe('> on createNehubaInstance called', () => {
-        const template = {}
+        const template = {        }
         const lifecycle = {}
-        beforeEach(() => {
-          directiveInstance.createNehubaInstance(template, lifecycle)
-        })
         it('> method el.clear gets called before el.createComponent', () => {
+          directiveInstance.createNehubaInstance(template, lifecycle)
           expect(elClearSpy).toHaveBeenCalledBefore(elCreateComponentSpy)
+        })
+
+        it('> if viewerConfig has gpuLimit, gpuMemoryLimit will be in initialNgSTate', () => {
+          template['nehubaConfig'] = {
+            dataset: {
+              initialNgState: {}
+            }
+          }
+          directiveInstance['viewerConfig'] = {
+            gpuLimit: 5e8
+          }
+          directiveInstance.createNehubaInstance(template, lifecycle)
+          expect(
+            directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuMemoryLimit
+          ).toEqual(5e8)
+          expect(
+            directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuLimit
+          ).toBeFalsy()
         })
       })
     
@@ -143,6 +159,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
           expect(elClearSpy).toHaveBeenCalled()
         })
       })
+    
     })
   })
 })

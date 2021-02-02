@@ -10,7 +10,7 @@ import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-shee
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
 import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
 import { IUiState } from './uiState/common'
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId, uiActionSnackbarMessage } from './uiState/actions';
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionMouseoverLandmark, uiActionMouseoverSegments, uiActionShowDatasetWtihId, uiActionSnackbarMessage } from './uiState/actions';
 export const defaultState: IUiState = {
   shownDatasetId: [],
 
@@ -67,7 +67,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiS
       previewingDatasetFiles
     }
   }
-  case MOUSE_OVER_SEGMENTS: {
+  case uiActionMouseoverSegments.type: {
     const { segments } = action
     return {
       ...prevState,
@@ -87,7 +87,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiS
       mouseOverUserLandmark,
     }
   }
-  case MOUSE_OVER_LANDMARK:
+  case uiActionMouseoverLandmark.type:
     return {
       ...prevState,
       mouseOverLandmark : action.landmark,
@@ -259,8 +259,6 @@ export class UiStateUseEffect implements OnDestroy{
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
-export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
-export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`

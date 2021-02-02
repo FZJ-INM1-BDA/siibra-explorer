@@ -23,7 +23,6 @@ export const CONFIG_CONSTANTS = {
 export const VIEWER_CONFIG_ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
-  CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`,
   SET_MOBILE_UI: actionSetMobileUi.type,
 }
 
@@ -74,18 +73,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       ...action.config,
     }
-  case VIEWER_CONFIG_ACTION_TYPES.CHANGE_GPU_LIMIT: {
-    const newGpuLimit = Math.min(
-      CONFIG_CONSTANTS.gpuLimitMax,
-      Math.max(
-        (prevState.gpuLimit || CONFIG_CONSTANTS.defaultGpuLimit) + action.payload.delta,
-        CONFIG_CONSTANTS.gpuLimitMin,
-      ))
-    return {
-      ...prevState,
-      gpuLimit: newGpuLimit,
-    }
-  }
   default: return prevState
   }
 }

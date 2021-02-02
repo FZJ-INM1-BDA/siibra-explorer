@@ -25,6 +25,10 @@ export const viewerStateSetConnectivityRegion = createAction(
   props<{ connectivityRegion: any }>()
 )
 
+export const viewerStateNehubaLayerchanged = createAction(
+  `[viewerState] nehubaLayerChanged`,
+)
+
 export const viewerStateNavigateToRegion = createAction(
   `[viewerState] navigateToRegion`,
   props<{ payload: { region: any } }>()
