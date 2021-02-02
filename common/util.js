@@ -47,14 +47,13 @@
    *
    * https://stackoverflow.com/a/16348977/6059235
    */
-  exports.intToRgb = int => {
-    if (int >= 65500) {
-      return [255, 255, 255]
-    }
-    const str = String(int * 65535)
+  exports.strToRgb = str => {
+    if (typeof str !== 'string') throw new Error(`strToRgb input must be typeof string !`)
+
     let hash = 0
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    // run at least 2 cycles, or else, len 1 string does not get hashed well
+    for (let i = 0; i < str.length || i < 5; i++) {
+      hash = str.charCodeAt(i % str.length) + ((hash << 5) - hash);
     }
     const returnV = []
     for (let i = 0; i < 3; i++) {
