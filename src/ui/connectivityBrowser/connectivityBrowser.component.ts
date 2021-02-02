@@ -112,6 +112,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public datasetList: any[] = []
     public selectedDataset: any
     public selectedDatasetDescription: string = ''
+    public selectedDatasetKgId: string = ''
+    public selectedDatasetKgSchema: string = ''
     public connectedAreas = []
 
     private selectedParcellationFlatRegions$ = this.store$.pipe(
@@ -151,7 +153,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.datasetList = res.filter(dl => dl['parcellation id'] === this.parcellationId)
         this.selectedDataset = this.datasetList[0].name
         this.selectedDatasetDescription = this.datasetList[0].description
-
+        this.selectedDatasetKgId = this.datasetList[0].kgId
+        this.selectedDatasetKgSchema = this.datasetList[0].kgschema
         this.changeDataset()
       })
     }
@@ -166,9 +169,9 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           }
         })
       )
-        
-      /** 
-       * Listen to of clear view entries 
+
+      /**
+       * Listen to of clear view entries
        * can come from within the component (when connectivity is not available for the dataset)
        * --> do not collapse
        * or outside (user clicks x in chip)
@@ -186,7 +189,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           }
         })
       )
-        
+
 
       this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
         if (this.accordionIsExpanded && !ocm) {
@@ -278,7 +281,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.restoreDefaultColormap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
-    
+
     clearViewer() {
       this.store$.dispatch(
         ngViewerActionClearView({
@@ -298,6 +301,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       if (event) {
         this.selectedDataset = event.value
         this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
+        this.selectedDatasetKgId = this.datasetList.find(d => d.name === this.selectedDataset).kgId || null
+        this.selectedDatasetKgSchema = this.datasetList.find(d => d.name === this.selectedDataset).kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
         const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
@@ -355,7 +360,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       const existingMap: Map<string, Map<number, { red: number, green: number, blue: number }>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
       const colorMap = new Map(existingMap)
-        
+
       this.allRegions.forEach(r => {
         if (r.ngId) {
           colorMap.get(r.ngId).set(r.labelIndex, {red: 255, green: 255, blue: 255})
@@ -365,7 +370,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.connectedAreas.forEach(area => {
         const areaAsRegion = this.allRegions
           .filter(r => {
-              
+
             if (this.regionHemisphere) {
               let regionName = area.name
               let regionStatus = null
@@ -378,7 +383,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
               }
               return r.name === regionName && r.status === regionStatus
             }
-              
+
             return r.name === area.name
           })
           .map(r => r)
