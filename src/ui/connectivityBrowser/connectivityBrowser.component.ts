@@ -212,7 +212,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           this.setColorMap$.pipe(
             distinctUntilChanged()
           ),
-          fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived').pipe(
+          fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived').pipe(
             map((e: CustomEvent) => e.detail)
           )
         ).subscribe(([flag, connectedAreas]) => {
@@ -300,9 +300,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     changeDataset(event = null) {
       if (event) {
         this.selectedDataset = event.value
-        this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
-        this.selectedDatasetKgId = this.datasetList.find(d => d.name === this.selectedDataset).kgId || null
-        this.selectedDatasetKgSchema = this.datasetList.find(d => d.name === this.selectedDataset).kgschema || null
+        const foundDataset = this.datasetList.find(d => d.name === this.selectedDataset)
+        this.selectedDatasetDescription = foundDataset?.description
+        this.selectedDatasetKgId = foundDataset?.kgId || null
+        this.selectedDatasetKgSchema = foundDataset?.kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
         const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
@@ -405,7 +406,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public exportFullConnectivity() {
-      this.fullConnectivityGridElement.nativeElement['downloadCSV']()
+      this.fullConnectivityGridElement?.nativeElement['downloadCSV']()
     }
 
 }
