@@ -7,7 +7,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { intToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
+import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
 
 export class RegionBase {
 
@@ -36,7 +36,11 @@ export class RegionBase {
     this.position = val && val.position
     if (!this._region) return
 
-    const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
+    let rgb = this._region.rgb
+    rgb = rgb || this._region.labelIndex > 65500 ? [255, 255, 255] : null
+    rgb = rgb || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
+    rgb = rgb || [255, 200, 200]
+    
     this.rgbString = `rgb(${rgb.join(',')})`
     const [_h, _s, l] = rgbToHsl(...rgb)
     this.rgbDarkmode = l < 0.4

@@ -10,7 +10,7 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
 import { scanSliceViewRenderFn } from "../util";
-import { intToRgb as intToColour, deserialiseParcRegionId } from 'common/util'
+import { strToRgb, deserialiseParcRegionId } from 'common/util'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -944,7 +944,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
               return [val, {}]
             }),
           ],
-        ).map((val: [number, any]) => ([val[0], this.getRgb(val[0], val[1].rgb)])) as any),
+        ).map((val: [number, any]) => ([val[0], this.getRgb(val[0], { ngId, rgb: val[1].rgb})])) as any),
       ]
     }) as Array<[string, Map<number, {red: number, green: number, blue: number}>]>
 
@@ -987,9 +987,17 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     })
   }
 
-  private getRgb(labelIndex: number, rgb?: number[]): {red: number, green: number, blue: number} {
+  private getRgb(labelIndex: number, region: { rgb: number[], ngId: string }): {red: number, green: number, blue: number} {
+    const { rgb, ngId } = region
     if (typeof rgb === 'undefined' || rgb === null) {
-      const arr = intToColour(Number(labelIndex))
+      if (labelIndex > 65500) {
+        return {
+          red: 255,
+          green: 255,
+          blue: 255
+        }
+      }
+      const arr = strToRgb(`${ngId}${labelIndex}`)
       return {
         red : arr[0],
         green: arr[1],
