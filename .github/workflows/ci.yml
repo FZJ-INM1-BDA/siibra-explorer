@@ -3,9 +3,14 @@ name: '[ci]'
 on:
   push:
     branches-ignore:
-    - dev
-    - staging
-    - master
+    - 'dev'
+    - 'staging'
+    - 'master'
+
+    # ignore changes to docs and mkdocs.yml
+    paths-ignore:
+    - 'docs/**'
+    - 'mkdocs.yml'
 
 jobs:
   lint:
