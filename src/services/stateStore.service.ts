@@ -55,7 +55,7 @@ export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
 export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
 export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, IProperty, IPublication, IReferenceSpace, IFile, IFileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export { GENERAL_ACTION_TYPES, generalActionError } from './stateStore.helper'

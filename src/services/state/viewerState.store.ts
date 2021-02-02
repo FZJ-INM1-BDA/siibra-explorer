@@ -24,7 +24,7 @@ import {
   viewerStateNewViewer
 } from './viewerState.store.helper';
 import { cvtNehubaConfigToNavigationObj } from 'src/state';
-import { viewerStateChangeNavigation } from './viewerState/actions';
+import { viewerStateChangeNavigation, viewerStateNehubaLayerchanged } from './viewerState/actions';
 import { serialiseParcellationRegion } from "common/util"
 
 export interface StateInterface {
@@ -185,7 +185,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
      * TODO
      * duplicated with ngViewerState.layers ?
      */
-  case NEHUBA_LAYER_CHANGED: {
+  case viewerStateNehubaLayerchanged.type: {
     const viewer = getViewer()
     if (!viewer) {
       return {
@@ -261,7 +261,6 @@ export const USER_LANDMARKS = `USER_LANDMARKS`
 
 export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
 
-export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
 export const SET_OVERWRITTEN_COLOR_MAP = `SET_OVERWRITTEN_COLOR_MAP`
