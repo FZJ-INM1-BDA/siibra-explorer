@@ -15,7 +15,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {DatabrowserModule} from "src/ui/databrowserModule";
 
-fdescribe('ConnectivityComponent', () => {
+describe('ConnectivityComponent', () => {
 
     let component: ConnectivityBrowserComponent;
     let fixture: ComponentFixture<ConnectivityBrowserComponent>;
