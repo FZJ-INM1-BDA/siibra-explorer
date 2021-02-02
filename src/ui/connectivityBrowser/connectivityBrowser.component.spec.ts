@@ -1,24 +1,21 @@
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
-import {StoreModule} from "@ngrx/store";
+import {Action} from "@ngrx/store";
 import {
-    ngViewerState,
-    pluginState,
-    uiState,
-    userConfigState,
-    viewerConfigState,
-    viewerState
+    defaultRootState,
 } from "src/services/stateStore.service";
-import {viewerStateHelperReducer, viewerStateMetaReducers} from "src/services/state/viewerState.store.helper";
-import {datasetPreviewMetaReducer} from "src/glue";
 import {HttpClientModule} from "@angular/common/http";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {DatabrowserModule} from "src/ui/databrowserModule";
+import {provideMockActions} from "@ngrx/effects/testing";
+import {provideMockStore} from "@ngrx/store/testing";
+import {Observable, of} from "rxjs";
 
 describe('ConnectivityComponent', () => {
 
     let component: ConnectivityBrowserComponent;
     let fixture: ComponentFixture<ConnectivityBrowserComponent>;
+    const actions$: Observable<Action> = of({type: 'TEST'})
 
     let datasetList = [
         {
@@ -38,23 +35,13 @@ describe('ConnectivityComponent', () => {
 
     beforeEach(async (() => {
         TestBed.configureTestingModule({
-            imports: [StoreModule.forRoot({
-                pluginState,
-                viewerConfigState,
-                ngViewerState,
-                viewerState,
-                viewerStateHelper: viewerStateHelperReducer,
-                uiState,
-                userConfigState,
-            }, {
-                metaReducers: [
-                    // debug,
-                    ...viewerStateMetaReducers,
-                    datasetPreviewMetaReducer,
-                ]
-            }),
+            imports: [
                 HttpClientModule,
                 DatabrowserModule
+            ],
+            providers: [
+                provideMockActions(() => actions$),
+                provideMockStore({ initialState: defaultRootState })
             ],
             declarations: [ConnectivityBrowserComponent],
             schemas: [
