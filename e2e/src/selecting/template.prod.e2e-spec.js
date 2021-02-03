@@ -57,7 +57,7 @@ describe('templates > ', () => {
     })
   })
   
-  describe('> switching template > ', () => {
+  describe('> switching template', () => {
     beforeEach(async () => {
 
       await iavPage.goto()
@@ -77,7 +77,8 @@ describe('templates > ', () => {
       await iavPage.setAtlasSpecifications(atlasName, [ tNameColin ])
       await iavPage.wait(500)
       await iavPage.waitUntilAllChunksLoaded()
-
+      await iavPage.wait(500)
+      
       const isActive = await iavPage.atlasTileIsActive(tNameColin)
       expect(isActive.toString()).toEqual('true')
 
