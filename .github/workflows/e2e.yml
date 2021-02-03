@@ -54,6 +54,9 @@ jobs:
       PPTR_VERSION: "5.3.1"
       CHROMIUM_VERSION: "86.0.4240.0"
 
+    outputs:
+      failure-state: ${{ steps.failure-state-step.FAILURE_STATE }}
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -99,7 +102,7 @@ jobs:
     steps:
       - name: update badge
         run: |
-          [[ '${{ needs.e2e.steps.failure-state-step.outputs.FAILURE_STATE }}' = 'true' ]] && state=failure || state=success &&
+          [[ '${{ needs.e2e.outputs.failure-state }}' = 'true' ]] && state=failure || state=success &&
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
