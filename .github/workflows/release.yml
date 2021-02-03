@@ -1,0 +1,33 @@
+name: '[release]'
+
+# on push to master, create release
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+    - run: |
+        PACKAGEJSON_VER=v$(cat package.json | jq -r '.version')
+        echo 'PACKAGEJSON_VER='$PACKAGEJSON_VER >> $GITHUB_ENV
+
+  create-release:
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.PACKAGEJSON_VER }}
+        release_name: Release ${{ env.PACKAGEJSON_VER }}
+        draft: false
+        prerelease: false

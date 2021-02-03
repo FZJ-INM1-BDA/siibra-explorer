@@ -70,15 +70,17 @@ jobs:
 
     - name: Set output when workflow fails
       if: failure()
-      run: echo '::set-output name=failure_state::true'
+      run: echo '::set-output name=FAILURE_STATE::true'
+      id: failure-state-step
 
     - name: Define screenshot artefact
       if: failure()
       run: |
         strip_prefix=${PROTRACTOR_SPECS#./src/}
         strip_suffix=${strip_prefix%.e2e-spec.js}
-        replace_slash=${strip_suffix//\/-}
-        echo 'ARTEFACT_NAME='$replace_slash >> $GITHUB_ENV
+        replace_slash=${strip_suffix//\//-}
+        replace_dots=${replace_slash//\./-}
+        echo 'ARTEFACT_NAME='$replace_dots >> $GITHUB_ENV
 
     - name: 'Upload screenshots artefact'
       if: failure()
@@ -97,7 +99,7 @@ jobs:
     steps:
       - name: update badge
         run: |
-          [[ '${{ needs.e2e.outputs.failure_state }}' = 'true' ]] && state=failure || state=success &&
+          [[ '${{ needs.e2e.steps.failure-state-step.outputs.FAILURE_STATE }}' = 'true' ]] && state=failure || state=success &&
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
