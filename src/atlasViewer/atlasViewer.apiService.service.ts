@@ -38,6 +38,7 @@ export interface ILoadMesh {
   type: 'VTK'
   id: string
   url: string
+  customFragmentColor?: string
 }
 export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
 
@@ -76,7 +77,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
   public getNextUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
     if (this.getUserToSelectRegion.length > 0) {
       return this.getUserToSelectRegion[this.getUserToSelectRegion.length - 1]
-    } 
+    }
     else return null
   }
 
@@ -84,7 +85,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
     if (this.getUserToSelectRegion.length > 0) {
       this.getUserToSelectRegion.pop()
       this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
-    } 
+    }
   }
 
   private s: Subscription[] = []
@@ -92,7 +93,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
   private onMouseClick(ev: any, next){
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
-      
+
       let moSegments
       this.store.pipe(
         select(uiStateMouseOverSegmentsSelector),
@@ -175,7 +176,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
               this.dismissDialog()
               this.dismissDialog = null
             }
-            
+
             if (arr.length === 0) return of(null)
 
             const last = arr[arr.length - 1]
@@ -350,7 +351,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
     })
 
     this.s.push(
-      this.loadMesh$.subscribe(({ url, id, type }) => {
+      this.loadMesh$.subscribe(({ url, id, type, customFragmentColor = null }) => {
         if (!this.interactiveViewer.viewerHandle) {
           this.snackbar.open('No atlas loaded! Loading mesh failed!', 'Dismiss')
         }
@@ -358,7 +359,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
           [id]: {
             type: 'mesh',
             source: `vtk://${url}`,
-            shader: `void main(){${FRAGMENT_EMIT_RED};}`
+            shader: `void main(){${customFragmentColor || FRAGMENT_EMIT_RED};}`
           }
         })
       })

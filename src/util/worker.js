@@ -294,14 +294,9 @@ const processParcRegionAttr = (payload) => {
 
 const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
   const lineCoordinates = []
+  const colors = []
 
   for (let i = 1; i < data.x.length; i++) {
-
-    // ToDo use neuron colors
-    // if (i+1 === data.x.length) {
-    //   colors.push(data.marker.color[lineDataIndex-1])
-    //   break;
-    // }
 
     if (data.x[i] !== null && data.x[i-1] !== null) {
       lineCoordinates.push([[
@@ -313,6 +308,8 @@ const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
         data.y[i] * plotyMultiple,
         data.z[i] * plotyMultiple,
       ]])
+
+      colors.push(data.marker.color[i-1])
     }
   }
 
@@ -326,7 +323,9 @@ const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
     return returnString
   })()
 
-  const vtk = `${vtkHeader}\n` +
+  const customFragmentColor = getFragmentColorString(colors)
+
+  const vtkString = `${vtkHeader}\n` +
     `POINTS ${coordinateLength*8} float\n` +
     lineCoordinatesArrayToString +
     `POLYGONS ${coordinateLength*12} ${coordinateLength*48}\n` +
@@ -334,17 +333,45 @@ const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
     `POINT_DATA ${coordinateLength*8}\n` +
     'SCALARS label unsigned_char 1\n' +
     'LOOKUP_TABLE none\n' +
-    getColorIds(coordinateLength*8)
+    getColorIds(colors)
 
-  return vtk
+  return {vtkString, customFragmentColor}
 }
 
-const getColorIds = (n) => {
-  let returnString = ''
-  for (let i=0; i<n-1; i++){
-    returnString += '0\n'
+const getFragmentColorString = (colors) => {
+
+  const hexToRgb = (hex) => {
+    const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16))
+    return `emitRGB(vec3(${r/255}, ${g/255}, ${b/255}))`
   }
-  returnString += '0'
+
+  const colorsUnique = colors.filter((cf, i) => colors[i-1] !== cf)
+    .map((color, j) => {
+      return `if (label > ${j - 0.01} && label < ${j + 0.01}) { ${hexToRgb(color)}; }`
+    })
+
+  const fragmentColorString = `${colorsUnique.join(' else ')} else {emitRGB(vec3(1.0, 0.1, 0.12));}`
+  return fragmentColorString
+}
+
+const getColorIds = (colors) => {
+  let returnString = ''
+
+  let colorId = 0
+
+  for (let i=0; i < colors.length; i++){
+    if (i > 0 && colors[i] !== colors[i-1]) {
+      colorId += 1
+    }
+    for (let j=0; j < 8; j++){
+      if (i === colors.length-1 && j === 7) {
+        returnString += colorId
+      } else {
+        returnString += colorId + '\n'
+      }
+    }
+  }
+
   return returnString
 }
 
@@ -452,7 +479,7 @@ onmessage = (message) => {
           }
         }
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
-        const vtkString = parseLineDataToVtk(plotlyData.traces[0], 5e-3, plotyMultiple)
+        const { vtkString, customFragmentColor} = parseLineDataToVtk(plotlyData.traces[0], 5e-3, plotyMultiple)
 
         plotyVtkUrl = URL.createObjectURL(
           new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
@@ -460,7 +487,8 @@ onmessage = (message) => {
         postMessage({
           id,
           result: {
-            objectUrl: plotyVtkUrl
+            objectUrl: plotyVtkUrl,
+            customFragmentColor
           }
         })
       } catch (e) {
