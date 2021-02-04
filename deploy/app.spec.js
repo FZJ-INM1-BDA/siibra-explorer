@@ -1,6 +1,5 @@
-const { expect } = require('chai')
+const { expect, assert } = require('chai')
 const fs = require('fs')
-const { assert } = require('console')
 const express = require('express')
 const got = require('got')
 const sinon = require('sinon')

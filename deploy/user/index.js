@@ -58,7 +58,7 @@ router.delete('/pluginPermissions/:pluginKey', async (req, res) => {
   const newPermission = {}
   const permittedCsp = req.session.permittedCsp || {}
   for (const key in permittedCsp) {
-    if (!pluginKey !== key) {
+    if (pluginKey !== key) {
       newPermission[key] = permittedCsp[key]
     }
   }

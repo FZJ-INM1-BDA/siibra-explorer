@@ -3,10 +3,7 @@ const app = require('express')()
 const sinon = require('sinon')
 const { stub, spy } = require('sinon')
 const { default: got } = require('got/dist/source')
-const { expect } = require('chai')
-const { assert } = require('console')
-
-
+const { expect, assert } = require('chai')
 
 const sessionObj = {
   permittedCspVal: {},
@@ -140,7 +137,7 @@ describe('> user/index.js', () => {
       'foo': 'bar',
       'buzz': 'lightyear'
     }
-    before(() => {
+    beforeEach(() => {
       sessionObj.permittedCspVal = prevVal
     })
 
