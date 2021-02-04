@@ -13,7 +13,7 @@ export type TUserRoute = {
 }
 
 export type TUserRouteError = {
-  error: boolean,
+  error: boolean
   message?: string
 }
 
