@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
+import { Observable, combineLatest, fromEvent, Subscription, of } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
 import { getNgIds } from 'src/util/fn';
@@ -13,6 +13,7 @@ import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPane
 import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
+import { TUserRouteError } from 'src/auth/auth.service';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -145,6 +146,12 @@ export function stateStore(state, action) {
   return ngViewerStateReducer(state, action)
 }
 
+type TUserConfig = {
+
+}
+
+type TUserConfigResp = TUserConfig & TUserRouteError
+
 @Injectable({
   providedIn: 'root',
 })
@@ -209,11 +216,17 @@ export class NgViewerUseEffect implements OnDestroy {
       })
     )
 
-    this.applySavedUserConfig$ = this.http.get(`${BACKENDURL}user/config`).pipe(
+    this.applySavedUserConfig$ = this.http.get<TUserConfigResp>(`${BACKENDURL}user/config`).pipe(
+      map(json => {
+        if (json.error) {
+          throw new Error(json.message || 'User not loggedin.')
+        }
+        return json
+      }),
       catchError((err,caught) => of(null)),
       filter(v => !!v),
       withLatestFrom(this.store$),
-      map(([{ngViewerState: fetchedNgViewerState}, state]) => {
+      map(([{ ngViewerState: fetchedNgViewerState }, state]) => {
         const { ngViewerState } = state
         return generalApplyState({
           state: {

@@ -1,9 +1,22 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { Observable, of, Subscription } from "rxjs";
-import { catchError, shareReplay } from "rxjs/operators";
+import { catchError, map, shareReplay } from "rxjs/operators";
+import { BACKENDURL } from "src/util/constants";
 
 const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
+
+export type TUserRouteResp = TUserRoute & TUserRouteError
+
+export type TUserRoute = {
+  id: string
+}
+
+export type TUserRouteError = {
+  error: boolean,
+  message?: string
+}
+
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +39,13 @@ export class AuthService implements OnDestroy {
   }]
 
   constructor(private httpClient: HttpClient) {
-    this.user$ = this.httpClient.get('user').pipe(
+    this.user$ = this.httpClient.get<TUserRouteResp>(`${BACKENDURL}user`).pipe(
+      map(json => {
+        if (json.error) {
+          throw new Error(json.message || 'User not loggedin.')
+        }
+        return json
+      }),
       catchError(_err => {
         return of(null)
       }),

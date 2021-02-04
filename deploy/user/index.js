@@ -4,7 +4,12 @@ const bodyParser = require('body-parser')
 
 const loggedInOnlyMiddleware = (req, res, next) => {
   const { user } = req
-  if (!user) return res.status(401).end()
+  if (!user) {
+    return res.status(200).json({
+      error: true,
+      message: 'Not logged in'
+    })
+  }
   return next()
 }
 
