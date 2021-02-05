@@ -190,5 +190,7 @@
     }
   }
 })(
-  typeof exports === 'undefined' ? module.exports : exports
+  typeof exports === 'undefined'
+  ? self
+  : exports
 )

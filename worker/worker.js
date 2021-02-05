@@ -7,7 +7,7 @@ globalThis.constants = {
   vtkHeader
 }
 
-if (typeof self.importScripts === 'function')  self.importScripts('./worker-second.js')
+if (typeof self.importScripts === 'function')  self.importScripts('./worker-plotly.js')
 
 /**
  * TODO migrate processing functionalities to other scripts
