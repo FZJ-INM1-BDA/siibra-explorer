@@ -9,16 +9,6 @@ module.exports = {
         loaders : ['ts-loader','angular2-template-loader?keepUrl=true'],
         exclude : /node_modules|[Ss]pec\.ts$/
       },
-      {
-        test : /third_party|.*?worker.*?\.js$/,
-        exclude: /[Ss]pec\.js$/,
-        use : {
-          loader : 'file-loader',
-          options: {
-            name : '[name].[ext]'
-          }
-        }
-      }
     ]
   },
   plugins : [
