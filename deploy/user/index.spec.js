@@ -3,10 +3,7 @@ const app = require('express')()
 const sinon = require('sinon')
 const { stub, spy } = require('sinon')
 const { default: got } = require('got/dist/source')
-const { expect } = require('chai')
-const { assert } = require('console')
-
-
+const { expect, assert } = require('chai')
 
 const sessionObj = {
   permittedCspVal: {},
@@ -18,10 +15,13 @@ const sessionObj = {
   }
 }
 
+let userObj = null
+
 const permittedCspSpy = spy(sessionObj, 'permittedCsp', ['get', 'set'])
 
 const middleware = (req, res, next) => {
   req.session = sessionObj
+  req.user = userObj
   next()
 }
 
@@ -41,9 +41,62 @@ describe('> user/index.js', () => {
     permittedCspSpy.get.resetHistory()
     permittedCspSpy.set.resetHistory()
     sessionObj.permittedCspVal = {}
+    userObj = null
   })
 
-  after(done => server.close(done))
+  after(done => server.close(() => done()))
+
+  describe('> GET ', () => {
+    describe('> user undefined', () => {
+      it('> should return 200, but error in resp', async () => {
+        const { body, statusCode } = await got.get('http://localhost:1234')
+        try {
+          assert(
+            statusCode < 400,
+            'expect the response to be OK'
+          )
+          const { error } = JSON.parse(body)
+          assert(
+            !!error,
+            'expect error is truthy'
+          )
+        } catch (e) {
+          assert(
+            false,
+            `expect no error, but got ${e.toString()}`
+          )
+        }
+      })
+    })
+  
+    describe('> user defined', () => {
+      const user = {
+        foo: 'bar'
+      }
+      beforeEach(() => {
+        userObj = user
+      })
+      it('> should return 200, and user obj in resp', async () => {
+
+        const { body, statusCode } = await got.get('http://localhost:1234')
+        try {
+          assert(
+            statusCode < 400,
+            'expect the response to be ok'
+          )
+          const gotUser = JSON.parse(body)
+          expect(
+            gotUser
+          ).to.deep.equal(user)
+        } catch (e) {
+          assert(
+            false,
+            `expect no error, but got ${e.toString()}`
+          )
+        }
+      })
+    })
+  })
 
   describe('> GET /pluginPermissions', () => {
     it('> getter called, setter not called', async () => {
@@ -140,7 +193,7 @@ describe('> user/index.js', () => {
       'foo': 'bar',
       'buzz': 'lightyear'
     }
-    before(() => {
+    beforeEach(() => {
       sessionObj.permittedCspVal = prevVal
     })
 

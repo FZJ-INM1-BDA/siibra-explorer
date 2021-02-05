@@ -270,14 +270,17 @@
       </ng-container>
     </ng-template>
     <ng-template #defaultParcTmpl>
-      <ng-container *ngTemplateOutlet="chipTmpl; context: {
-        parcel: parc,
-        selected: false,
-        dismissable: false,
-        ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
-        onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
-      }">
-      </ng-container>
+      <ng-template [ngIf]="parc">
+
+        <ng-container *ngTemplateOutlet="chipTmpl; context: {
+          parcel: parc,
+          selected: false,
+          dismissable: false,
+          ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
+          onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
+        }">
+        </ng-container>
+      </ng-template>
     </ng-template>
   </div>
 </ng-template>
