@@ -36,3 +36,5 @@ export type TypeOpenedWidget = {
   type: EnumWidgetTypes
   data: IDatasetPreviewData
 }
+
+export const SHOW_KG_TOS = `SHOW_KG_TOS`

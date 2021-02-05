@@ -3,8 +3,6 @@ import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { filter, shareReplay } from "rxjs/operators";
-import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { BACKENDURL } from "src/util/constants";
 import { uiStateShowBottomSheet } from "src/services/state/uiState.store.helper";
 import { ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState/actions";
@@ -16,7 +14,7 @@ export class KgSingleDatasetService implements OnDestroy {
   public ngLayers: Set<string> = new Set()
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
     private http: HttpClient,
   ) {
 
@@ -69,16 +67,6 @@ export class KgSingleDatasetService implements OnDestroy {
         }
       })
     )
-  }
-
-  public previewFile(file: Partial<ViewerPreviewFile>, dataset: Partial<IDataEntry>) {
-    this.store$.dispatch({
-      type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
-      payload: {
-        file,
-        dataset
-      }
-    })
   }
 
   public removeNgLayer({ url }) {

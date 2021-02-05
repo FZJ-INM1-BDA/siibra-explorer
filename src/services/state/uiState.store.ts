@@ -267,7 +267,6 @@ export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`
-export const SHOW_KG_TOS = `SHOW_KG_TOS`
 
 export const SNACKBAR_MESSAGE = uiActionSnackbarMessage.type
 export const SHOW_BOTTOM_SHEET = `SHOW_BOTTOM_SHEET`

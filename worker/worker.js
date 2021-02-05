@@ -1,3 +1,19 @@
+const vtkHeader = `# vtk DataFile Version 2.0
+Created by worker thread at https://github.com/HumanBrainProject/interactive-viewer
+ASCII
+DATASET POLYDATA`
+
+globalThis.constants = {
+  vtkHeader
+}
+
+if (typeof self.importScripts === 'function')  self.importScripts('./worker-second.js')
+
+/**
+ * TODO migrate processing functionalities to other scripts
+ * see worker-plotly.js
+ */
+
 const validTypes = [
   'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
@@ -19,11 +35,6 @@ const validOutType = [
   'RETURN_REBUILT_REGION_SELECTION_TREE',
   'UPDATE_PARCELLATION_REGIONS'
 ]
-
-const vtkHeader = `# vtk DataFile Version 2.0
-Created by worker thread at https://github.com/HumanBrainProject/interactive-viewer
-ASCII
-DATASET POLYDATA`
 
 const getVertexHeader = (numVertex) => `POINTS ${numVertex} float`
 
@@ -292,175 +303,28 @@ const processParcRegionAttr = (payload) => {
   })
 }
 
-const parseLineDataToVtk = (data, scale= 1, plotyMultiple) => {
-  const lineCoordinates = []
-
-  for (let i = 1; i < data.x.length; i++) {
-
-    // ToDo use neuron colors
-    // if (i+1 === data.x.length) {
-    //   colors.push(data.marker.color[lineDataIndex-1])
-    //   break;
-    // }
-
-    if (data.x[i] !== null && data.x[i-1] !== null) {
-      lineCoordinates.push([[
-        data.x[i-1] * plotyMultiple,
-        data.y[i-1] * plotyMultiple,
-        data.z[i-1] * plotyMultiple,
-      ], [
-        data.x[i] * plotyMultiple,
-        data.y[i] * plotyMultiple,
-        data.z[i] * plotyMultiple,
-      ]])
-    }
-  }
-
-  const coordinateLength = lineCoordinates.length
-
-  const lineCoordinatesArrayToString = (() => {
-    let returnString = ''
-    lineCoordinates.forEach(lc => {
-      returnString += getPerpendicularPointsForLine(lc[0], lc[1], scale)
-    })
-    return returnString
-  })()
-
-  const vtk = `${vtkHeader}\n` +
-    `POINTS ${coordinateLength*8} float\n` +
-    lineCoordinatesArrayToString +
-    `POLYGONS ${coordinateLength*12} ${coordinateLength*48}\n` +
-    getLineDataVtkPolygonStringWithNumber(coordinateLength) +
-    `POINT_DATA ${coordinateLength*8}\n` +
-    'SCALARS label unsigned_char 1\n' +
-    'LOOKUP_TABLE none\n' +
-    getColorIds(coordinateLength*8)
-
-  return vtk
-}
-
-const getColorIds = (n) => {
-  let returnString = ''
-  for (let i=0; i<n-1; i++){
-    returnString += '0\n'
-  }
-  returnString += '0'
-  return returnString
-}
-
-const getLineDataVtkPolygonStringWithNumber = (neuronCoordinateLength) => {
-  let returnString = ''
-  for (let i = 0; i < neuronCoordinateLength; i++) {
-    const neuronNumber = 8*i
-    returnString +=
-      `3 ${0 + neuronNumber} ${1 + neuronNumber} ${3 + neuronNumber}\n` +
-      `3 ${0 + neuronNumber} ${2 + neuronNumber} ${3 + neuronNumber}\n` +
-      `3 ${4 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${4 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${6 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${3 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${3 + neuronNumber} ${1 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${5 + neuronNumber} ${7 + neuronNumber}\n` +
-      `3 ${2 + neuronNumber} ${0 + neuronNumber} ${6 + neuronNumber}\n` +
-      `3 ${0 + neuronNumber} ${4 + neuronNumber} ${6 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${0 + neuronNumber} ${4 + neuronNumber}\n` +
-      `3 ${1 + neuronNumber} ${4 + neuronNumber} ${5 + neuronNumber}\n`
-  }
-  return returnString
-}
-
-const getPerpendicularPointsForLine = (A, B, scale) => {
-
-  const lineWeight = 1e6
-  const lineWidth = scale * lineWeight
-  const lineHeight = scale * lineWeight
-
-  let u = A.map((item, index) => {
-    return item - B[index];
-  })
-  const uLength = Math.sqrt((u[0] * u[0]) + (u[1] * u[1]) + (u[2] * u[2]))
-  u = u.map((item, index) => {
-    return item/uLength
-  })
-
-  const n = []
-  if(Math.abs(u[0]) <= Math.abs(u[1]) && Math.abs(u[0]) <= Math.abs(u[2])) {
-    n[0] = u[1] * u[1] + u[2] * u[2]
-    n[1] = -u[1] * u[0]
-    n[2] = -u[2] * u[0]
-  }
-  else if(Math.abs(u[1])<=Math.abs(u[0])&&Math.abs(u[1])<=Math.abs(u[2]))
-  {
-    n[0] = -u[0] * u[2]
-    n[1] = u[0] * u[0] + u[2] * u[2]
-    n[2] = -u[2] * u[1]
-  }
-  else if(Math.abs(u[2])<=Math.abs(u[0])&&Math.abs(u[2])<=Math.abs(u[1]))
-  {
-    n[0] = -u[0] * u[2]
-    n[1] = -u[1] * u[2]
-    n[2] = u[0] * u[0] + u[1] * u[1]
-  }
-
-  const v = [ u[1] * n[2] - u[2] * n[1], u[2] * n[0] - u[0] * n[2], u[0] * n[1] - u[1] * n[0] ]
-
-  const RMul = (k) => {
-    const res = []
-    res[0] = v[0]*k[0] + n[0]*k[1] + u[0]*k[2]
-    res[1] = v[1]*k[0] + n[1]*k[1] + u[1]*k[2]
-    res[2] = v[2]*k[0] + n[2]*k[1] + u[2]*k[2]
-    return res
-  }
-
-  const sumArrays = (a1, a2) => {
-    return a1.map((item, index) => {
-      return item + a2[index];
-    })
-  }
-
-  const a = sumArrays(A, RMul([lineWidth,lineHeight,0]))
-  const b = sumArrays(A, RMul([-lineWidth,lineHeight,0]))
-  const c = sumArrays(A, RMul([lineWidth,-lineHeight,0]))
-  const d = sumArrays(A, RMul([-lineWidth,-lineHeight,0]))
-
-  const e = sumArrays(B, RMul([lineWidth,lineHeight,0]))
-  const f = sumArrays(B, RMul([-lineWidth,lineHeight,0]))
-  const g = sumArrays(B, RMul([lineWidth,-lineHeight,0]))
-  const h = sumArrays(B, RMul([-lineWidth,-lineHeight,0]))
-
-  return `${a.join(' ')}\n ${b.join(' ')}\n ${c.join(' ')}\n ${d.join(' ')}\n ${e.join(' ')}\n ${f.join(' ')}\n ${g.join(' ')}\n ${h.join(' ')}\n `
-}
-
-
 let plotyVtkUrl
 
 onmessage = (message) => {
+
   if (message.data.method && VALID_METHODS.indexOf(message.data.method) >= 0) {
     const { id } = message.data
     if (message.data.method === VALID_METHOD.PROCESS_PLOTLY) {
-      /**
-       * units in mm --> convert to nm
-       */
-      const plotyMultiple=1e6
       try {
-        const { data: plotlyData } = message.data.param
-        const { x, y, z } = plotlyData.traces[0]
-        const lm = []
-        for (const idx in x) {
-          if (typeof x !== 'undefined' && x !== null) {
-            lm.push([x[idx]*plotyMultiple, y[idx]*plotyMultiple, z[idx]*plotyMultiple])
-          }
-        }
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
-        const vtkString = parseLineDataToVtk(plotlyData.traces[0], 5e-3, plotyMultiple)
-
-        plotyVtkUrl = URL.createObjectURL(
+        const { data: plotlyData } = message.data.param
+        const {
+          vtkString,
+          customFragmentColor
+        } = self.plotly.convert(plotlyData)
+        const plotyVtkUrl = URL.createObjectURL(
           new Blob([ encoder.encode(vtkString) ], { type: 'application/octet-stream' })
         )
         postMessage({
           id,
           result: {
-            objectUrl: plotyVtkUrl
+            objectUrl: plotyVtkUrl,
+            customFragmentColor
           }
         })
       } catch (e) {

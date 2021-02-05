@@ -31,7 +31,7 @@
     ZOOM_OUT: 'Zoom out',
     MAXIMISE_VIEW: 'Maximise this view',
     UNMAXIMISE_VIEW: 'Undo maximise',
-    STATUS_PANEL: 'Viewre status panel',
+    STATUS_PANEL: 'Viewer status panel',
     SHOW_FULL_STATUS_PANEL: 'Show full status panel',
     HIDE_FULL_STATUS_PANEL: 'Hide full status panel',
     TOGGLE_SIDE_PANEL: 'Toggle side panel',

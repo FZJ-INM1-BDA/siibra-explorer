@@ -136,11 +136,12 @@ export class MesssagingModule{
       isLoadingSnack?.dismiss()
       const meshId = 'bobby'
       if (this.loadMesh) {
-        const { objectUrl } = resp.result || {}
+        const { objectUrl, customFragmentColor } = resp.result || {}
         this.loadMesh({
           type: 'VTK',
           id: meshId,
-          url: objectUrl
+          url: objectUrl,
+          customFragmentColor
         })
       } else {
         this.snackbar.open(`Error: loadMesh method not injected.`)
