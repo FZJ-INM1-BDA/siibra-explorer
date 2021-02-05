@@ -1,3 +1,5 @@
+self.importScripts('./worker-second.js')
+
 const validTypes = [
   'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
@@ -462,6 +464,14 @@ const getPerpendicularPointsForLine = (A, B, scale) => {
 let plotyVtkUrl
 
 onmessage = (message) => {
+
+  if (message.data.method === 'ping') {
+    return postMessage({
+      id: message.data.id,
+      result: `pong ${self.meaningOfLife}`
+    })
+  }
+
   if (message.data.method && VALID_METHODS.indexOf(message.data.method) >= 0) {
     const { id } = message.data
     if (message.data.method === VALID_METHOD.PROCESS_PLOTLY) {

@@ -11,6 +11,7 @@ module.exports = {
       },
       {
         test : /third_party|.*?worker.*?\.js$/,
+        exclude: /[Ss]pec\.js$/,
         use : {
           loader : 'file-loader',
           options: {

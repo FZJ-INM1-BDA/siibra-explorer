@@ -21,7 +21,7 @@ module.exports = merge(staticAssets, {
   module: {
     rules: [
       {
-        test : /third_party.*?\.js$|worker\.js/,
+        test : /third_party.*?\.js$|worker\.js|worker-\w+\.js/,
         use : {
           loader : 'file-loader',
           options: {
