@@ -261,7 +261,7 @@ export const regionInOtherTemplateSelector = createSelector(
   viewerStateFetchedTemplatesSelector,
   viewerStateSelectedTemplateSelector,
   (atlas, fetchedTemplates, templateSelected, prop) => {
-    const atlasTemplateSpacesIds = atlas.templateSpaces.map(({ ['@id']: id }) => id)
+    const atlasTemplateSpacesIds = atlas.templateSpaces.map(({ ['@id']: id, fullId }) => id || fullId)
     const { region: regionOfInterest } = prop
     const returnArr = []
 
@@ -276,7 +276,7 @@ export const regionInOtherTemplateSelector = createSelector(
     
     const otherTemplates = fetchedTemplates
       .filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
-      .filter(({ ['@id']: id }) => atlasTemplateSpacesIds.includes(id))
+      .filter(({ ['@id']: id, fullId }) => atlasTemplateSpacesIds.includes(id || fullId))
     for (const template of otherTemplates) {
       for (const parcellation of template.parcellations) {
         const flattenedRegions = flattenRegions(parcellation.regions)

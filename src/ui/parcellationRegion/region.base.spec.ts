@@ -328,16 +328,22 @@ const getRegionInOtherTemplateSelectorBundle = (version: EnumParcRegVersion) => 
 describe('> region.base.ts', () => {
   describe('> regionInOtherTemplateSelector', () => {
 
+    // TODO
+    it('> only selects region in the template specified by selected atlas')
+
     for (const enumKey of Object.keys(EnumParcRegVersion)) {
       describe(`> selector version for ${enumKey}`, () => {
 
         const { mockFetchedTemplates, mr0, mt2, mt0, mp0, mt1, mp1h, mr0lh, mt3, mr0rh } = getRegionInOtherTemplateSelectorBundle(enumKey as EnumParcRegVersion)
 
+        let selectedAtlas = {
+          templateSpaces: mockFetchedTemplates
+        }
         describe('> no hemisphere selected, simulates big brain cyto map', () => {
   
           let result: any[]
           beforeAll(() => {
-            result = regionInOtherTemplateSelector.projector(mockFetchedTemplates, mt0, { region: mr0 })
+            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, mt0, { region: mr0 })
           })
     
           it('> length checks out', () => {
@@ -409,7 +415,7 @@ describe('> region.base.ts', () => {
         describe('> hemisphere data selected (left hemisphere), simulates julich-brain in mni152', () => {
           let result
           beforeAll(() => {
-            result = regionInOtherTemplateSelector.projector(mockFetchedTemplates, mt2, { region: mr0lh })
+            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, mt2, { region: mr0lh })
           })
     
           it('> length checks out', () => {
