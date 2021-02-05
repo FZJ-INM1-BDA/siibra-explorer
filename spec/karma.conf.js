@@ -37,7 +37,7 @@ module.exports = function(config) {
         included: true
       },
       {
-        pattern: './src/util/worker.js',
+        pattern: './worker/worker.js',
         served: true,
         included: false
       },
