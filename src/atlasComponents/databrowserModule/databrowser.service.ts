@@ -3,23 +3,24 @@ import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, forkJoin, from, fromEvent, Observable, of, Subscription } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
 // TODO remove dependency on widget unit module
 import { WidgetUnit } from "src/widget";
 
 import { LoggingService } from "src/logging";
-import { SHOW_KG_TOS } from "src/services/state/uiState.store";
-import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
+import { SHOW_KG_TOS } from "src/services/state/uiState.store.helper";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
-import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
+import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset, datastateActionFetchedDataentries } from "src/services/state/dataState/actions";
 
 import { getStringIdsFromRegion, getRegionHemisphere, getIdFromFullId } from 'common/util'
 import { viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
+import { BACKENDURL, getFetchOption, getHttpHeader } from "src/util/constants";
+import { IKgDataEntry } from ".";
 
+const SPATIAL_WIDTH = 600 
 const noMethodDisplayName = 'No methods described'
 
 /**
@@ -52,7 +53,7 @@ function generateToken() {
 export class DatabrowserService implements OnDestroy {
 
   public kgTos$: Observable<any>
-  public favedDataentries$: Observable<Partial<IDataEntry>[]>
+  public favedDataentries$: Observable<Partial<IKgDataEntry>[]>
   public darktheme: boolean = false
 
   public instantiatedWidgetUnits: WidgetUnit[] = []
@@ -64,10 +65,10 @@ export class DatabrowserService implements OnDestroy {
     })
   }
   public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
-  public getDataByRegion: (arg: {regions: any[] }) => Observable<IDataEntry[]> = ({ regions }) => 
+  public getDataByRegion: (arg: {regions: any[] }) => Observable<IKgDataEntry[]> = ({ regions }) => 
     forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
       map(
-        (arrOfArr: IDataEntry[][]) => arrOfArr.reduce(
+        (arrOfArr: IKgDataEntry[][]) => arrOfArr.reduce(
           (acc, curr) => {
             /**
              * In the event of multi region selection
@@ -84,25 +85,25 @@ export class DatabrowserService implements OnDestroy {
     )
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
-  private dataentries: IDataEntry[] = []
+  private dataentries: IKgDataEntry[] = []
 
   private subscriptions: Subscription[] = []
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
-  public spatialDatasets$: Observable<any>
+  private spatialDatasets$: Observable<any>
   public viewportBoundingBox$: Observable<[Point, Point]>
 
   private templateSelected: any
 
   constructor(
     private workerService: AtlasWorkerService,
-    private constantService: AtlasViewerConstantsServices,
-    private store: Store<IavRootStoreInterface>,
+    
+    private store: Store<any>,
     private http: HttpClient,
     private log: LoggingService,
   ) {
 
-    this.kgTos$ = this.http.get(`${this.constantService.backendUrl}datasets/tos`, {
+    this.kgTos$ = this.http.get(`${BACKENDURL}datasets/tos`, {
       responseType: 'text',
     }).pipe(
       catchError((err, _obs) => {
@@ -120,9 +121,7 @@ export class DatabrowserService implements OnDestroy {
 
     this.subscriptions.push(
       store.pipe(
-        select('dataStore'),
-        safeFilter('fetchedDataEntries'),
-        map(v => v.fetchedDataEntries),
+        select('fetchedDataEntries'),
       ).subscribe(de => {
         this.dataentries = de
       }),
@@ -145,7 +144,7 @@ export class DatabrowserService implements OnDestroy {
 
         // in mm
         const center = position.map(n => n / 1e6)
-        const searchWidth = this.constantService.spatialWidth / 4 * zoom / 1e6
+        const searchWidth = SPATIAL_WIDTH / 4 * zoom / 1e6
         const pt1 = center.map(v => (v - searchWidth)) as [number, number, number]
         const pt2 = center.map(v => (v + searchWidth)) as [number, number, number]
 
@@ -167,18 +166,11 @@ export class DatabrowserService implements OnDestroy {
          */
         if (!templateSelected || !templateSelected.name) { return from(Promise.reject('templateSelected must not be empty')) }
         const encodedTemplateName = encodeURIComponent(templateSelected.name)
-        return this.http.get(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).pipe(
-          catchError((err) => (this.log.log(err), of([]))),
-        )
-      }),
-    )
-
-    this.subscriptions.push(
-      this.spatialDatasets$.subscribe(arr => {
-        this.store.dispatch({
-          type: FETCHED_SPATIAL_DATA,
-          fetchedDataEntries: arr,
-        })
+        // spatial dataset has halted for the time being
+        return of(null)
+        // return this.http.get(`${BACKENDURL}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).pipe(
+        //   catchError((err) => (this.log.log(err), of([]))),
+        // )
       }),
     )
 
@@ -203,7 +195,7 @@ export class DatabrowserService implements OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public toggleFav(dataentry: Partial<IDataEntry>) {
+  public toggleFav(dataentry: Partial<IKgDataEntry>) {
     this.store.dispatch(
       datastateActionToggleFav({
         payload: {
@@ -213,7 +205,7 @@ export class DatabrowserService implements OnDestroy {
     )
   }
 
-  public saveToFav(dataentry: Partial<IDataEntry>) {
+  public saveToFav(dataentry: Partial<IKgDataEntry>) {
     this.store.dispatch(
       datastateActionFavDataset({
         payload: {
@@ -223,7 +215,7 @@ export class DatabrowserService implements OnDestroy {
     )
   }
 
-  public removeFromFav(dataentry: Partial<IDataEntry>) {
+  public removeFromFav(dataentry: Partial<IKgDataEntry>) {
     this.store.dispatch(
       datastateActionUnfavDataset({
         payload: {
@@ -237,18 +229,19 @@ export class DatabrowserService implements OnDestroy {
   public fetchPreviewData(datasetName: string) {
     const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
-      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`, this.constantService.getFetchOption())
+      fetch(`${BACKENDURL}datasets/preview/${encodedDatasetName}`, getFetchOption())
         .then(res => res.json())
         .then(resolve)
         .catch(reject)
     })
   }
 
-  private dispatchData(arr: IDataEntry[]) {
-    this.store.dispatch({
-      type : FETCHED_DATAENTRIES,
-      fetchedDataEntries : arr,
-    })
+  private dispatchData(arr: IKgDataEntry[]) {
+    this.store.dispatch(
+      datastateActionFetchedDataentries({
+        fetchedDataEntries: arr
+      })
+    )
   }
 
   public fetchedFlag: boolean = false
@@ -256,7 +249,7 @@ export class DatabrowserService implements OnDestroy {
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
-  private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry[]>>()
+  private memoizedDatasetByRegion = new Map<string, Observable<IKgDataEntry[]>>()
   private getDatasetsByRegion(region: { fullId: any }){
 
     const hemisphereObj = (() => {
@@ -271,14 +264,14 @@ export class DatabrowserService implements OnDestroy {
 
     for (const fullId of fullIds) {
       if (!this.memoizedDatasetByRegion.has(fullId)) {
-        const obs$ =  this.http.get<IDataEntry[]>(
-          `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
+        const obs$ =  this.http.get<IKgDataEntry[]>(
+          `${BACKENDURL}datasets/byRegion/${encodeURIComponent(fullId)}`,
           {
             params: {
               ...hemisphereObj,
               ...refSpaceObj
             },
-            headers: this.constantService.getHttpHeader(),
+            headers: getHttpHeader(),
             responseType: 'json'
           }
         ).pipe(
@@ -299,14 +292,14 @@ export class DatabrowserService implements OnDestroy {
     )
   }
 
-  private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {
+  private lowLevelQuery(templateName: string, parcellationName: string): Promise<IKgDataEntry[]> {
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
 
     return this.http.get(
-      `${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`,
+      `${BACKENDURL}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`,
       {
-        headers: this.constantService.getHttpHeader(),
+        headers: getHttpHeader(),
         responseType: 'json'
       }
     ).pipe(
@@ -315,7 +308,7 @@ export class DatabrowserService implements OnDestroy {
           const newMap = new Map(acc)
           return newMap.set(item.name, item)
         }, new Map())
-        return Array.from(map.values() as IDataEntry[])
+        return Array.from(map.values() as IKgDataEntry[])
       })
     ).toPromise()
   }
@@ -368,7 +361,7 @@ export class DatabrowserService implements OnDestroy {
   public getModalityFromDE = getModalityFromDE
 }
 
-export function reduceDataentry(accumulator: Array<{name: string, occurance: number}>, dataentry: IDataEntry) {
+export function reduceDataentry(accumulator: Array<{name: string, occurance: number}>, dataentry: IKgDataEntry) {
   const methods = (dataentry.methods || [])
     .reduce((acc, item) => acc.concat(
       item.length > 0
@@ -395,11 +388,11 @@ export function reduceDataentry(accumulator: Array<{name: string, occurance: num
   }))
 }
 
-export function getModalityFromDE(dataentries: IDataEntry[]): CountedDataModality[] {
+export function getModalityFromDE(dataentries: IKgDataEntry[]): CountedDataModality[] {
   return dataentries.reduce((acc, de) => reduceDataentry(acc, de), [])
 }
 
-export function getIdFromDataEntry(dataentry: IDataEntry) {
+export function getIdFromDataEntry(dataentry: IKgDataEntry) {
   const { id, fullId } = dataentry
   const regex = /\/([a-zA-Z0-9-]*?)$/.exec(fullId)
   return (regex && regex[1]) || id

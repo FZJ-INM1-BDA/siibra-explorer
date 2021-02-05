@@ -71,7 +71,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public mapParcellationNameToFetchUrl: Map<string, string[]> = new Map(this._mapArray)
   public spatialSearchUrl = 'https://kg-int.humanbrainproject.org/solr/'
   public spatialResultsPerPage = 10
-  public spatialWidth = 600
 
   public chartBaseStyle = {
     fill : 'origin',
