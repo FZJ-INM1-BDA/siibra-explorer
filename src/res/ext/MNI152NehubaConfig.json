@@ -220,7 +220,7 @@
         "MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/JulichBrainV2_5_3/precomputed/JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_453c4c95827e38dcce5372b200065cba",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo-ng-bot/JulichBrainV2_5_3/precomputed/JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_453c4c95827e38dcce5372b200065cba",
           "transform": [
             [
               1,
@@ -251,7 +251,7 @@
         "MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.eu//precomputed/data-repo-ng-bot/JulichBrainV2_5_3/precomputed/JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_3f5ec6016bc2242769c41befdbc1b2e0",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.eu//precomputed/data-repo-ng-bot/JulichBrainV2_5_3/precomputed/JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_3f5ec6016bc2242769c41befdbc1b2e0",
           "transform": [
             [
               1,

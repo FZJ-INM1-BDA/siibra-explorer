@@ -12,7 +12,7 @@ const KG_IDS = {
     LONG_BUNDLE: 'juelich/iav/atlas/v1.0.0/5',
     SHORT_BUNDLE: 'juelich/iav/atlas/v1.0.0/6',
     JULICH_BRAIN: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579',
-    JULICH_BRAIN_V25: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26',
+    JULICH_BRAIN_V25: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25',
     JULICH_BRAIN_V24_BIGBRAIN: 'juelich/iav/atlas/v1.0.0/7'
   }
 }

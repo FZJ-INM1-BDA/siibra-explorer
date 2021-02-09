@@ -75,7 +75,7 @@ module.exports = [
     "parcellationAtlas": [
       {
         "name": "Jülich Cytoarchitechtonic Brain Atlas (human)",
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26",
+        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
         "id": [
           "deec923ec31a82f89a9c7c76a6fefd6b",
           "e2d45e028b6da0f6d9fdb9491a4de80a"
