@@ -115,7 +115,7 @@
       "@version": {
         "@next": null,
         "@this": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
-        "name": "v2.5",
+        "name": "v2.6",
         "@previous": "juelich/iav/atlas/v1.0.0/8"
       },
       "availableIn": [
