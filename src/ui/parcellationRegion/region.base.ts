@@ -257,9 +257,11 @@ export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
 }
 
 export const regionInOtherTemplateSelector = createSelector(
+  viewerStateGetSelectedAtlas,
   viewerStateFetchedTemplatesSelector,
   viewerStateSelectedTemplateSelector,
-  (fetchedTemplates, templateSelected, prop) => {
+  (atlas, fetchedTemplates, templateSelected, prop) => {
+    const atlasTemplateSpacesIds = atlas.templateSpaces.map(({ ['@id']: id, fullId }) => id || fullId)
     const { region: regionOfInterest } = prop
     const returnArr = []
 
@@ -268,7 +270,13 @@ export const regionInOtherTemplateSelector = createSelector(
     const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
     if (!templateSelected) return []
     const selectedTemplateId = getIdFromFullId(templateSelected.fullId)
-    const otherTemplates = fetchedTemplates.filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
+
+    // need to ensure that the templates are defined in atlas definition
+    // atlas is the single source of truth 
+    
+    const otherTemplates = fetchedTemplates
+      .filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
+      .filter(({ ['@id']: id, fullId }) => atlasTemplateSpacesIds.includes(id || fullId))
     for (const template of otherTemplates) {
       for (const parcellation of template.parcellations) {
         const flattenedRegions = flattenRegions(parcellation.regions)
