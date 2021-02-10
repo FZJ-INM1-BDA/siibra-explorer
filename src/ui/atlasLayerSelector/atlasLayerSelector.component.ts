@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, QueryList, HostBinding } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter, startWith } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -47,7 +47,9 @@ export class AtlasLayerSelector implements OnInit {
       )
 
       this.availableTemplates$ = this.store$.pipe(
-        select(viewerStateSelectedTemplateFullInfoSelector)
+        select(viewerStateSelectedTemplateFullInfoSelector),
+        map(v => v || []),
+        startWith<any[]>([])
       )
 
       this.selectedTemplate$ = this.store$.pipe(
@@ -91,16 +93,17 @@ export class AtlasLayerSelector implements OnInit {
             .filter(p => !p['groupName'])
             .filter(p => !p['baseLayer'])
         ),
+        startWith<any[]>([])
       )
 
-      this.groupedLayers$ = combineLatest(
+      this.groupedLayers$ = combineLatest([
         atlasLayersLatest$.pipe(
           map(allParcellations => 
             allParcellations.filter(p => !p['baseLayer'])
           ),
         ),
         layersGroupBy$
-      ).pipe(
+      ]).pipe(
         map(([ allParcellations, arr]) => arr
           .filter(([ key ]) => !!key )
           .map(([key, parcellations]) => ({
@@ -116,6 +119,7 @@ export class AtlasLayerSelector implements OnInit {
             })
           }))
         ),
+        startWith<any[]>([])
       )
     }
 
