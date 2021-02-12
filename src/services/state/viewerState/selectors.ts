@@ -32,6 +32,11 @@ export const viewerStateSelectedTemplateSelector = createSelector(
   viewerState => viewerState['templateSelected']
 )
 
+export const viewerStateSelectorStandaloneVolumes = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['standaloneVolumes']
+)
+
 /**
  * viewerStateSelectedTemplateSelector may have it navigation mutated to allow for initiliasation of viewer at the correct navigation
  * in some circumstances, it may be required to get the original navigation object

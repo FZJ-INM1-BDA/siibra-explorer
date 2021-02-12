@@ -36,7 +36,6 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/ut
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
-import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
@@ -60,6 +59,7 @@ import { ViewerModule } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { MouseoverModule } from './mouseoverModule/mouseover.module';
+import { AtlasViewerRouterModule } from './routerModule';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -92,6 +92,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     CookieModule,
     KgTosModule,
     MouseoverModule,
+    AtlasViewerRouterModule,
     
     EffectsModule.forRoot([
       UseEffects,
@@ -100,7 +101,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       ViewerStateUseEffect,
       NgViewerUseEffect,
       PluginServiceUseEffect,
-      AtlasViewerHistoryUseEffect,
       UiStateUseEffect,
       NewTemplateUseEffect,
       ViewerStateHelperEffect,

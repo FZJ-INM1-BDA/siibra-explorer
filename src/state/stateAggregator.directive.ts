@@ -1,10 +1,10 @@
 import { Directive } from "@angular/core";
-import { Store } from "@ngrx/store";
+import { NavigationEnd, Router } from "@angular/router";
 import { Observable } from "rxjs";
-import { map, debounceTime, shareReplay } from "rxjs/operators";
-import { cvtStateToSearchParam } from "src/atlasViewer/atlasViewer.urlUtil";
+import { filter, map } from "rxjs/operators";
 
-const jsonVersion = '0.0.1'
+const jsonVersion = '1.0.0'
+// ver 0.0.1 === query param
 
 interface IJsonifiedState {
   ver: string
@@ -20,18 +20,16 @@ export class StateAggregator{
 
   public jsonifiedSstate$: Observable<IJsonifiedState>
   constructor(
-    private store$: Store<any>
+    router: Router
   ){
-    this.jsonifiedSstate$ = this.store$.pipe(
-      debounceTime(100),
-      map(json => {
-        const queryString = cvtStateToSearchParam(json)
+    this.jsonifiedSstate$ = router.events.pipe(
+      filter(ev => ev instanceof NavigationEnd),
+      map((ev: NavigationEnd) => {
         return {
           ver: jsonVersion,
-          queryString: queryString.toString()
+          queryString: ev.urlAfterRedirects
         }
-      }),
-      shareReplay(1)
+      })
     )
   }
 }

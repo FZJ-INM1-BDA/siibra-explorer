@@ -5,6 +5,7 @@ const app = express.Router()
 const session = require('express-session')
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
+const bkwdMdl = require('./bkwdCompat')()
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
 const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
@@ -141,7 +142,7 @@ if (LOCAL_CDN_FLAG) {
     indexFile = data.replace(regex, LOCAL_CDN)
   })
   
-  app.get('/', (_req, res) => {
+  app.get('/', bkwdMdl, (_req, res) => {
     if (!indexFile) return res.status(404).end()
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     return res.status(200).send(indexFile)
@@ -163,7 +164,7 @@ app.use(require('./devBanner'))
  * populate nonce token
  */
 const { indexTemplate } = require('./constants')
-app.get('/', cookieParser(), (req, res) => {
+app.get('/', bkwdMdl, cookieParser(), (req, res) => {
   const iavError = req.cookies && req.cookies['iav-error']
   
   res.setHeader('Content-Type', 'text/html')
