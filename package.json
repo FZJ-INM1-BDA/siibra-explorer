@@ -76,6 +76,7 @@
     "webpack-merge": "^4.1.2"
   },
   "dependencies": {
+    "@angular/router": "^9.1.13",
     "@ngrx/effects": "^9.1.1",
     "@ngrx/store": "^9.1.1",
     "@types/node": "12.12.39",
