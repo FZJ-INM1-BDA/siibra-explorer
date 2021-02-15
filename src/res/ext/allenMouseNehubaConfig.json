@@ -115,7 +115,7 @@
         },
         "v3_2017": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.eu/precomputed/AMBA/parcellations/v3_2017",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/AMBA/parcellations/v3_2017",
           "transform": [
             [
               0,
