@@ -36,7 +36,7 @@ export class RegionBase {
     this.position = val && val.position
     if (!this._region) return
 
-    let rgb = this._region.rgb
+    const rgb = this._region.rgb
       || (this._region.labelIndex > 65500 && [255, 255, 255])
       || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
       || [255, 200, 200]

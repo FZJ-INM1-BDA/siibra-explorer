@@ -447,7 +447,7 @@ describe('> region.base.ts', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
-          provideMockStore({ initialState: {} })
+          provideMockStore()
         ]
       })
     })
