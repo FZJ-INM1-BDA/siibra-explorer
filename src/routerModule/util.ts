@@ -2,7 +2,7 @@ import { viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, v
 import { encodeNumber, decodeToNumber, separator } from './cipher'
 import { getGetRegionFromLabelIndexId } from 'src/util/fn'
 import { serialiseParcellationRegion } from "common/util"
-import { UrlTree } from "@angular/router"
+import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { mixNgLayers } from "src/services/state/ngViewerState.store"
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
@@ -16,7 +16,8 @@ export const PARSE_ERROR = {
   PARCELLATION_NOT_UPDATED: 'PARCELLATION_NOT_UPDATED',
 }
 
-const encodeId = (id: string) => id.replace(/\//g, '_')
+const encodeId = (id: string) => id && id.replace(/\//g, '_')
+const decodeId = (codedId: string) => codedId && codedId.replace(/_/g, '/')
 const endcodePath = (key: string, val: string) => `${key}:${encodeURIComponent(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.+)$/.exec(path)
@@ -58,7 +59,7 @@ type TConditional = Partial<
 
 type TUrlPathObj = (TUrlAtlas | TUrlStandaloneVolume) & TConditional
 
-function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: any) {
+function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: any, warnCb: Function) {
 
   /**
    * TODO if search param of either template or parcellation is incorrect, wrong things are searched
@@ -67,20 +68,21 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
   const templateSelected = (() => {
     const { fetchedTemplates } = state.viewerState
 
-    const searchedId = obj['t']
+    const searchedId = decodeId(obj['t'])
 
-    if (!searchedId) { throw new Error(PARSE_ERROR.TEMPALTE_NOT_SET) }
+    if (!searchedId) return null
     const templateToLoad = fetchedTemplates.find(template => (template['@id'] || template['fullId']) === searchedId)
     if (!templateToLoad) { throw new Error(PARSE_ERROR.TEMPLATE_NOT_FOUND) }
     return templateToLoad
   })()
 
   const parcellationSelected = (() => {
-    const searchedId = obj['p']
+    if (!templateSelected) return null
+    const searchedId = decodeId(obj['p'])
 
     const parcellationToLoad = templateSelected.parcellations.find(parcellation => parcellation['@id'] || parcellation['fullId'] === searchedId)
     if (!parcellationToLoad) { 
-      // catch error
+      warnCb(`parcellation with id ${searchedId} not found... load the first parc instead`)
     }
     return parcellationToLoad || templateSelected.parcellations[0]
   })()
@@ -88,6 +90,7 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
   /* selected regions */
 
   const regionsSelected = (() => {
+    if (!parcellationSelected) return []
 
     // TODO deprecate. Fallback (defaultNgId) (should) already exist
     // if (!viewerState.parcellationSelected.updated) throw new Error(PARCELLATION_NOT_UPDATED)
@@ -147,12 +150,13 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
   }
 }
 
-export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
+export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Function) => {
 
-  if (!fullPath.root.hasChildren()) return state
-  if (!fullPath.root.children['primary']) return state
+  let warnCb = _warnCb || ((...e: any[]) => console.warn(...e))
+  const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
+    ? fullPath.root.children['primary'].segments
+    : []
 
-  const pathFragments = fullPath.root.children['primary'].segments
   const returnState = JSON.parse(JSON.stringify(state))
 
   const returnObj: Partial<TUrlPathObj> = {}
@@ -209,11 +213,12 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
         // flag to allow for animation when enabled
         animation: {},
       }
-    } catch (_e) {
+    } catch (e) {
       /**
        * TODO Poisoned encoded char
        * send error message
        */
+      warnCb(`parse nav error`, e)
     }
   }
 
@@ -224,10 +229,11 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
     try {
       const arrPluginStates = JSON.parse(pluginStates)
       pluginState.initManifests = arrPluginStates.map(url => [PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC, url] as [string, string])
-    } catch (_e) {
+    } catch (e) {
       /**
        * parsing plugin error
        */
+      warnCb(`parse plugin states error`, e)
     }
   }
 
@@ -246,6 +252,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
     }
   } catch (e) {
     // parsing previewingDatasetFiles
+    warnCb(`parse dsp error`, e)
   }
 
   // If sv (standaloneVolume is defined)
@@ -259,14 +266,16 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
       returnState['viewerState']['standaloneVolumes'] = parsedArr
       returnState['viewerState']['navigation'] = parsedNavObj
       return returnState
-    } catch (_e) {
+    } catch (e) {
       // if any error occurs, parse rest per normal
+      warnCb(`parse standalone volume error`, e)
     }
+  } else {
+    returnState['viewerState']['standaloneVolumes'] = []
   }
 
   try {
-    const { parcellationSelected, regionsSelected, templateSelected } = parseSearchParamForTemplateParcellationRegion(returnObj as TUrlPathObj, state)
-
+    const { parcellationSelected, regionsSelected, templateSelected } = parseSearchParamForTemplateParcellationRegion(returnObj as TUrlPathObj, state, warnCb)
     returnState['viewerState']['parcellationSelected'] = parcellationSelected
     returnState['viewerState']['regionsSelected'] = regionsSelected
     returnState['viewerState']['templateSelected'] = templateSelected
@@ -274,6 +283,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state) => {
     returnState['viewerState']['navigation'] = parsedNavObj
   } catch (e) {
     // if error, show error on UI?
+    warnCb(`parse template, parc, region error`, e)
   }
 
   /**
