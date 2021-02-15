@@ -55,7 +55,7 @@ jobs:
       CHROMIUM_VERSION: "86.0.4240.0"
 
     outputs:
-      failure-state: ${{ steps.failure-state-step.FAILURE_STATE }}
+      failure-state: ${{ steps.failure-state-step.outputs.failure-state }}
 
     steps:
     - uses: actions/checkout@v2
@@ -73,7 +73,7 @@ jobs:
 
     - name: Set output when workflow fails
       if: failure()
-      run: echo '::set-output name=FAILURE_STATE::true'
+      run: echo '::set-output name=failure-state::true'
       id: failure-state-step
 
     - name: Define screenshot artefact
