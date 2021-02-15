@@ -16,6 +16,7 @@ export const PARSE_ERROR = {
   PARCELLATION_NOT_UPDATED: 'PARCELLATION_NOT_UPDATED',
 }
 
+const encodeId = (id: string) => id.replace(/\//g, '_')
 const endcodePath = (key: string, val: string) => `${key}:${encodeURIComponent(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.+)$/.exec(path)
@@ -348,11 +349,11 @@ export const cvtStateToHashedRoutes = state => {
 
   routes = {
     // for atlas
-    a: selectedAtlas && selectedAtlas['@id'],
+    a: selectedAtlas && encodeId(selectedAtlas['@id']),
     // for template
-    t: selectedTemplate && (selectedTemplate['@id'] || selectedTemplate['fullId']),
+    t: selectedTemplate && encodeId(selectedTemplate['@id'] || selectedTemplate['fullId']),
     // for parcellation
-    p: selectedParcellation && (selectedParcellation['@id'] || selectedParcellation['fullId']),
+    p: selectedParcellation && encodeId(selectedParcellation['@id'] || selectedParcellation['fullId']),
     // for regions
     r: Object.keys(cRegionObj).length > 0 && JSON.stringify(cRegionObj),
     // nav
