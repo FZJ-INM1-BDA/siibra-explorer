@@ -4,7 +4,7 @@ import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable } from "rxjs";
-import { debounceTime, filter, map, mapTo, shareReplay, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, filter, map, mapTo, shareReplay, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { generalApplyState } from "src/services/stateStore.helper";
@@ -17,8 +17,11 @@ import { cvtStateToHashedRoutes, cvtFullRouteToState } from "./util";
 
 export class RouterService {
 
-  private firstRenderFlag = true
   private allFetchingReady$: Observable<boolean>
+
+  private logError(...e: any[]) {
+    console.log(...e)
+  }
 
   constructor(
     router: Router,
@@ -68,32 +71,18 @@ export class RouterService {
       )
     ).subscribe(([ev, state]: [NavigationEnd, any]) => {
       const fullPath = ev.urlAfterRedirects
-      const newState = cvtFullRouteToState(router.parseUrl(fullPath), state)
-      let newUrl: any[]
+      const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
+      let routeFromState: string[]
       try {
-        newUrl = cvtStateToHashedRoutes(newState)
+        routeFromState = cvtStateToHashedRoutes(state)
       } catch (_e) {
-        console.error(`cvtStateToHashedRoutes error`, _e)
+        routeFromState = []
       }
 
-      // NB this is required, as parseUrl seems to decode %3A back to :
-      // resulting in false positive
-      const newRoute = newUrl && router.parseUrl(
-        `/${newUrl.join('/')}`
-      ).toString()
-      const currentRoute = router.routerState.snapshot.url
-
-      // this fn would in principle be invoked every time path changes
-      // We are only interested in when path changes as a result of:
-      // - on open
-      // - on on history
-      // on way to do this is by checking the updated route === current route
-      // above scenarios would result in newRoute !== currentRoute
-      if ( this.firstRenderFlag || newRoute !== currentRoute) {
-        this.firstRenderFlag = false
+      if ( fullPath !== `/${routeFromState.join('/')}`) {
         store$.dispatch(
           generalApplyState({
-            state: newState
+            state: stateFromRoute
           })
         )
       }
@@ -119,8 +108,11 @@ export class RouterService {
       if (routes.length === 0) {
         router.navigate([ baseHref ])
       } else {
+        const currUrl = router.routerState.snapshot.url
         const joinedRoutes = `/${routes.join('/')}`
-        router.navigateByUrl(joinedRoutes)
+        if (currUrl !== joinedRoutes) {
+          router.navigateByUrl(joinedRoutes)
+        }
       }
     })
   }

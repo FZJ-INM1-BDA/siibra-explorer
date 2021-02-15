@@ -114,7 +114,7 @@
         },
         "v1_01": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v1_01",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v1_01",
           "selectedAlpha": 0.35,
           "transform": [
             [
@@ -176,7 +176,7 @@
         },
         "v3": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v3",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v3",
           "selectedAlpha": 0.35,
           "transform": [
             [
@@ -207,7 +207,7 @@
         },
         "WHS_SD_rat_atlas_v4_beta": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v4_beta",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v4_beta",
           "selectedAlpha": 0.35,
           "transform": [
             [

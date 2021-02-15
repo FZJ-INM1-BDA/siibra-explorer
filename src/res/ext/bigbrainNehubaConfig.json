@@ -95,7 +95,7 @@
         },
         "v1": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_01_v1",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_01_v1",
           "segments": [
             "0"
           ],
@@ -130,7 +130,7 @@
         },
         "v2": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_01_v2",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_01_v2",
           "segments": [
             "0"
           ],
@@ -165,7 +165,7 @@
         },
         "v3v": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_09_29_v3v",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_09_29_v3v",
           "segments": [
             "0"
           ],
@@ -200,7 +200,7 @@
         },
         "v5": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_09_29_v5",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_09_29_v5",
           "segments": [
             "0"
           ],
@@ -235,7 +235,7 @@
         },
         "interpolated": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
           "segments": [
             "0"
           ],
@@ -270,7 +270,7 @@
         },
         "LGB-lam1": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam1/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam1/",
           "segments": [
             "0"
           ],
@@ -305,7 +305,7 @@
         },
         "LGB-lam2": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam2/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam2/",
           "segments": [
             "0"
           ],
@@ -340,7 +340,7 @@
         },
         "LGB-lam3": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam3/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam3/",
           "segments": [
             "0"
           ],
@@ -375,7 +375,7 @@
         },
         "LGB-lam4": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam4/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam4/",
           "segments": [
             "0"
           ],
@@ -410,7 +410,7 @@
         },
         "LGB-lam5": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam5/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam5/",
           "segments": [
             "0"
           ],
@@ -445,7 +445,7 @@
         },
         "LGB-lam6": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam6/",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2020_11_11_LGB-lam/LGB-lam6/",
           "segments": [
             "0"
           ],
@@ -480,7 +480,7 @@
         },
         "cortical layers": {
           "type": "segmentation",
-          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_27_cortical_layers",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_27_cortical_layers",
           "selectedAlpha": 0.5,
           "notSelectedAlpha": 0,
           "transform": [

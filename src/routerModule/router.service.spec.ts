@@ -137,23 +137,29 @@ describe('> router.service.ts', () => {
           router = TestBed.inject(Router)
           router.navigate(['foo', 'bar'])
   
-          TestBed.inject(RouterService)
+          const service = TestBed.inject(RouterService)
   
           tick()
   
           expect(cvtFullRouteToStateSpy).toHaveBeenCalledWith(
-            router.parseUrl('/foo/bar'), {}
+            router.parseUrl('/foo/bar'), {}, service['logError']
           )
   
           discardPeriodicTasks()
   
         }))
 
-        it('> calls cvtStateToHashedRoutes with returned states', fakeAsync(() => {
+        it('> calls cvtStateToHashedRoutes with current state', fakeAsync(() => {
           const fakeParsedState = {
             bizz: 'buzz'
           }
+          const fakeState = {
+            foo: 'bar'
+          }
           cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
+          const store = TestBed.inject(MockStore)
+          store.setState(fakeState)
+
           cvtStateToHashedRoutesSpy.and.callFake(() => {
             return ['bizz', 'buzz']
           })
@@ -164,7 +170,7 @@ describe('> router.service.ts', () => {
   
           tick()
   
-          expect(cvtStateToHashedRoutesSpy).toHaveBeenCalledWith(fakeParsedState)
+          expect(cvtStateToHashedRoutesSpy).toHaveBeenCalledWith(fakeState)
 
           discardPeriodicTasks()
         }))
@@ -214,29 +220,7 @@ describe('> router.service.ts', () => {
             discardPeriodicTasks()
           }))
 
-          it('> ... returns same value, but firstRenderFlag is true, dispatches', fakeAsync(() => {
-            const fakeParsedState = {
-              bizz: 'buzz'
-            }
-            cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
-            cvtStateToHashedRoutesSpy.and.callFake(() => {
-              return ['foo', 'bar']
-            })
-            router = TestBed.inject(Router)
-            router.navigate(['foo', 'bar'])
-    
-            TestBed.inject(RouterService)
-            const store = TestBed.inject(MockStore)
-            const dispatchSpy = spyOn(store, 'dispatch')
-            
-            tick()
-
-            expect(dispatchSpy).toHaveBeenCalled()
-    
-            discardPeriodicTasks()
-          }))
-
-          it('> ... returns same value, but firstRenderFlag is false, does not dispatches', fakeAsync(() => {
+          it('> ... returns same value, does not dispatches', fakeAsync(() => {
             const fakeParsedState = {
               bizz: 'buzz'
             }
