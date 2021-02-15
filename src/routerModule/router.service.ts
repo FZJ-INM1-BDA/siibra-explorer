@@ -19,6 +19,10 @@ export class RouterService {
 
   private allFetchingReady$: Observable<boolean>
 
+  private logError(...e: any[]) {
+    console.log(...e)
+  }
+
   constructor(
     router: Router,
     pureConstantService: PureContantService,
@@ -67,8 +71,13 @@ export class RouterService {
       )
     ).subscribe(([ev, state]: [NavigationEnd, any]) => {
       const fullPath = ev.urlAfterRedirects
-      const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, (...e: any[]) => console.log(...e))
-      const routeFromState = cvtStateToHashedRoutes(state)
+      const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
+      let routeFromState: string[]
+      try {
+        routeFromState = cvtStateToHashedRoutes(state)
+      } catch (_e) {
+        routeFromState = []
+      }
 
       if ( fullPath !== `/${routeFromState.join('/')}`) {
         store$.dispatch(

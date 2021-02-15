@@ -152,7 +152,7 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
 
 export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Function) => {
 
-  let warnCb = _warnCb || ((...e: any[]) => console.warn(...e))
+  const warnCb = _warnCb || ((...e: any[]) => console.warn(...e))
   const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
     ? fullPath.root.children['primary'].segments
     : []
@@ -291,11 +291,11 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
    */
   (() => {
 
-    const viewreHelperState = returnState[viewerStateHelperStoreName]
+    const viewreHelperState = returnState[viewerStateHelperStoreName] || {}
     const { templateSelected, parcellationSelected } = returnState['viewerState']
     const { fetchedAtlases, ...rest } = viewreHelperState
     
-    const selectedAtlas = fetchedAtlases.find(a => a['templateSpaces'].find(t => t['@id'] === (templateSelected && templateSelected['@id'])))
+    const selectedAtlas = (fetchedAtlases || []).find(a => a['templateSpaces'].find(t => t['@id'] === (templateSelected && templateSelected['@id'])))
     
     const overlayLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
 
