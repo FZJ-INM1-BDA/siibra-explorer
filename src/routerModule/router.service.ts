@@ -70,7 +70,7 @@ export class RouterService {
       const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, (...e: any[]) => console.log(...e))
       const routeFromState = cvtStateToHashedRoutes(state)
 
-      if ( fullPath !== routeFromState.join('/')) {
+      if ( fullPath !== `/${routeFromState.join('/')}`) {
         store$.dispatch(
           generalApplyState({
             state: stateFromRoute

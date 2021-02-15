@@ -80,7 +80,7 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
     if (!templateSelected) return null
     const searchedId = decodeId(obj['p'])
 
-    const parcellationToLoad = templateSelected.parcellations.find(parcellation => parcellation['@id'] || parcellation['fullId'] === searchedId)
+    const parcellationToLoad = templateSelected.parcellations.find(parcellation => (parcellation['@id'] || parcellation['fullId']) === searchedId)
     if (!parcellationToLoad) { 
       warnCb(`parcellation with id ${searchedId} not found... load the first parc instead`)
     }
