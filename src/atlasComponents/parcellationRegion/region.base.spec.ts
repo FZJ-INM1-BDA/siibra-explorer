@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { RegionBase, regionInOtherTemplateSelector, getRegionParentParcRefSpace } from './region.base'
+const  util = require('common/util')
 
 /**
  * regions
@@ -518,6 +519,97 @@ describe('> region.base.ts', () => {
           position: [1, 2, 3]
         }
         expect(regionBase.position).toBeTruthy()
+      })
+    })
+  
+    describe('> rgb', () => {
+      let strToRgbSpy: jasmine.Spy
+      let mockStore: MockStore
+      beforeEach(() => {
+        strToRgbSpy = spyOn(util, 'strToRgb')
+        mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(regionInOtherTemplateSelector, [])
+        mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
+      })
+
+      afterEach(() => {
+        strToRgbSpy.calls.reset()
+      })
+
+      it('> will take region.rgb if exists', () => {
+        const regionBase = new RegionBase(mockStore)
+        regionBase.region = {
+          rgb: [100, 120, 140]
+        }
+        expect(
+          regionBase.rgbString
+        ).toEqual(`rgb(100,120,140)`)
+      })
+
+      it('> if rgb not provided, and labelIndex > 65500, set to white', () => {
+
+        const regionBase = new RegionBase(mockStore)
+        regionBase.region = {
+          labelIndex: 65535
+        }
+        expect(
+          regionBase.rgbString
+        ).toEqual(`rgb(255,255,255)`)
+      })
+
+      describe('> if rgb not provided, labelIndex < 65500', () => {
+
+        describe('> arguments for strToRgb', () => {
+          it('> if ngId is defined, use ngId', () => {
+            
+            const regionBase = new RegionBase(mockStore)
+            regionBase.region = {
+              ngId: 'foo',
+              name: 'bar',
+              labelIndex: 152
+            }
+            expect(strToRgbSpy).toHaveBeenCalledWith(`foo152`)
+          })
+          it('> if ngId is not defined, use name', () => {
+
+            const regionBase = new RegionBase(mockStore)
+            regionBase.region = {
+              name: 'bar',
+              labelIndex: 152
+            }
+            expect(strToRgbSpy).toHaveBeenCalledWith(`bar152`)
+          })
+        })
+
+        it('> calls strToRgb, and use return value for rgb', () => {
+          const getRandomNum = () => Math.floor(255*Math.random())
+          const arr = [
+            getRandomNum(),
+            getRandomNum(),
+            getRandomNum()
+          ]
+          strToRgbSpy.and.returnValue(arr)
+          const regionBase = new RegionBase(mockStore)
+          regionBase.region = {
+            foo: 'bar'
+          }
+          expect(
+            regionBase.rgbString
+          ).toEqual(`rgb(${arr.join(',')})`)
+        })
+
+        it('> if strToRgb returns falsy, uses fallback', () => {
+
+          strToRgbSpy.and.returnValue(null)
+          const regionBase = new RegionBase(mockStore)
+          regionBase.region = {
+            foo: 'bar'
+          }
+          expect(
+            regionBase.rgbString
+          ).toEqual(`rgb(255,200,200)`)
+        })
+
       })
     })
   })
