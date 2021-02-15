@@ -86,20 +86,7 @@ describe('> url parsing', () => {
     expect(red).toEqual(blue)
   })
 
-  it('> if niftiLayers is defined, after parsing, it should persist', async () => {
-    const url = `/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.eu%2Fprecomputed%2FJuBrain%2F17%2Ficbm152casym%2Fpmaps%2FVisual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
-    await iavPage.goto(url)
-    await iavPage.clearAlerts()
-
-    // TODO use execScript from iavPage API
-    const niftiLayers = await iavPage._driver.executeScript(() => {
-      const search = new URLSearchParams(window.location.search)
-      return search.get('niftiLayers')
-    })
-    const expected = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
-    expect(niftiLayers).toEqual(expected)
-  })
-  
+  it('> if using niftilayers should show deprecation worning')
 
   it('> pluginStates should result in xhr to get pluginManifest', async () => {
 
