@@ -18,10 +18,12 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting()
 );
 
-const testContext = require.context('../src', true, /\.spec\.ts$/)
-testContext.keys().map(testContext)
+// const testContext = require.context('../src', true, /\.spec\.ts$/)
+// testContext.keys().map(testContext)
 
-const workerCtx = require.context('../worker', true, /\.spec\.js$/)
-workerCtx.keys().map(workerCtx)
+// const workerCtx = require.context('../worker', true, /\.spec\.js$/)
+// workerCtx.keys().map(workerCtx)
 
-require('../common/util.spec.js')
+// require('../common/util.spec.js')
+
+require('../src/atlasComponents/parcellationRegion/region.base.spec')

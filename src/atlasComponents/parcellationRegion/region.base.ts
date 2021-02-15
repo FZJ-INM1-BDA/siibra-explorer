@@ -37,9 +37,9 @@ export class RegionBase {
     if (!this._region) return
 
     let rgb = this._region.rgb
-    rgb = rgb || this._region.labelIndex > 65500 ? [255, 255, 255] : null
-    rgb = rgb || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
-    rgb = rgb || [255, 200, 200]
+      || (this._region.labelIndex > 65500 && [255, 255, 255])
+      || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
+      || [255, 200, 200]
     
     this.rgbString = `rgb(${rgb.join(',')})`
     const [_h, _s, l] = rgbToHsl(...rgb)
