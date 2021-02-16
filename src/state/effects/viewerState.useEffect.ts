@@ -120,6 +120,10 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   @Effect()
   public onSelectAtlasSelectTmplParc$ = this.actions$.pipe(
     ofType(viewerStateSelectAtlas.type),
+    switchMap(action => this.pureService.allFetchingReady$.pipe(
+      filter(v => !!v),
+      mapTo(action)
+    )),
     withLatestFrom(
       this.store$.pipe(
         select(viewerStateFetchedTemplatesSelector),

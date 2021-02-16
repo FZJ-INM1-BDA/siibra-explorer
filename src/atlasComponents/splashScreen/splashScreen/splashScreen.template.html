@@ -20,12 +20,13 @@
       <mat-card-footer>
       </mat-card-footer>
     </mat-card>
-    <ng-container *ngIf="stillLoadingAtlases$ | async as stillLoadingTemplates">
-      <div class="d-flex align-items-center p-4 loadingIndicator" *ngFor="let t of stillLoadingTemplates">
+
+    <ng-template [ngIf]="!(finishedLoading$ | async)">
+      <div class="d-flex align-items-center p-4">
         <h1 class="mat-h1">
           <spinner-cmp></spinner-cmp>
         </h1>
       </div>
-    </ng-container>
+    </ng-template>
   </div>
 </div>

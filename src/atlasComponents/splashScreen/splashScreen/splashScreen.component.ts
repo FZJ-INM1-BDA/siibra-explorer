@@ -17,11 +17,10 @@ import { PureContantService } from "src/util";
 
 export class SplashScreen implements AfterViewInit {
 
-  public stillLoadingTemplates$: Observable<any[]>
+  public finishedLoading$: Observable<boolean>
   public loadedTemplate$: Observable<any[]>
 
   public loadedAtlases$: Observable<any[]>
-  public stillLoadingAtlases$: Observable<any[]>
 
   @ViewChild('parentContainer', {read: ElementRef})
   private parentContainer: ElementRef
@@ -40,33 +39,12 @@ export class SplashScreen implements AfterViewInit {
       shareReplay(1),
     )
 
-    this.stillLoadingTemplates$ = combineLatest(
-      this.constanceService.getTemplateEndpoint$.pipe(
-        startWith(null)
-      ),
-      this.loadedTemplate$.pipe(
-        startWith([])
-      )
-    ).pipe(
-      map(([templateEndpoints, loadedTemplates]) => {
-        if (templateEndpoints && Array.isArray(templateEndpoints)) {
-          // TODO this is not exactly correct
-          return templateEndpoints.slice(loadedTemplates.length)
-        } else {
-          return null
-        }
-      })
-    )
+    this.finishedLoading$ = this.pureConstantService.allFetchingReady$
 
     this.loadedAtlases$ = this.store.pipe(
       select(state => state[viewerStateHelperStoreName]),
       select(state => state.fetchedAtlases),
       filter(v => !!v)
-    )
-
-    this.stillLoadingAtlases$ = this.loadedAtlases$.pipe(
-      map(arr => this.pureConstantService.totalAtlasesLength - arr.length),
-      map(num => Array(num >= 0 ? num : 0).fill(null))
     )
   }
 

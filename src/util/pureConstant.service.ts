@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { Store, createSelector, select } from "@ngrx/store";
-import { Observable, merge, Subscription, of, throwError, forkJoin, fromEvent } from "rxjs";
-import { VIEWER_CONFIG_FEATURE_KEY, IViewerConfigState, viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, switchMap, map, take } from "rxjs/operators";
+import { Store, select } from "@ngrx/store";
+import { Observable, merge, Subscription, of, throwError, forkJoin, fromEvent, combineLatest, timer } from "rxjs";
+import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
+import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, switchMapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
-import { BACKENDURL } from './constants'
-import { viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
+import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { LoggingService } from "src/logging";
+import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 
 const getUniqueId = () => Math.round(Math.random() * 1e16).toString(16)
 
@@ -22,6 +22,8 @@ export class PureContantService implements OnDestroy{
   public darktheme$: Observable<boolean>
 
   public totalAtlasesLength: number
+
+  public allFetchingReady$: Observable<boolean>
 
   public backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
 
@@ -112,7 +114,7 @@ export class PureContantService implements OnDestroy{
       shareReplay(1)
     )
 
-    this.fetchedAtlases$ = this.http.get(`${BACKENDURL.replace(/\/$/, '')}/atlases/`, { responseType: 'json' }).pipe(
+    this.fetchedAtlases$ = this.http.get(`${this.backendUrl.replace(/\/$/, '')}/atlases/`, { responseType: 'json' }).pipe(
       catchError((err, obs) => of(null)),
       filter(v => !!v),
       tap((arr: any[]) => this.totalAtlasesLength = arr.length),
@@ -120,7 +122,7 @@ export class PureContantService implements OnDestroy{
         ...atlases.map(({ url }) => this.http.get(
           /^http/.test(url)
             ? url
-            : `${BACKENDURL.replace(/\/$/, '')}/${url}`,
+            : `${this.backendUrl.replace(/\/$/, '')}/${url}`,
           { responseType: 'json' }))
       )),
       scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 1000) - (b.order || 1001)), []),
@@ -133,6 +135,25 @@ export class PureContantService implements OnDestroy{
           viewerStateSetFetchedAtlases({ fetchedAtlases })
         )
       )
+    )
+
+    this.allFetchingReady$ = combineLatest([
+      this.getTemplateEndpoint$.pipe(
+        map(arr => arr.length),
+      ),
+      this.store.pipe(
+        select(viewerStateFetchedTemplatesSelector),
+        map(arr => arr.length),
+      ),
+      this.store.pipe(
+        select(viewerStateFetchedAtlasesSelector),
+        map(arr => arr.length),
+      )
+    ]).pipe(
+      map(([ expNumTmpl, actNumTmpl, actNumAtlas ]) => {
+        return expNumTmpl === actNumTmpl && actNumAtlas === this.totalAtlasesLength
+      }),
+      shareReplay(1),
     )
   }
 
