@@ -106,7 +106,7 @@ const templateMap = {
   'Allen Mouse': allenObj
 }
 
-const encodeId = id => id.replace(/\//g, '_')
+const encodeId = id => id.replace(/\//g, ':')
 
 module.exports = query => {
   const {
