@@ -16,8 +16,8 @@ export const PARSE_ERROR = {
   PARCELLATION_NOT_UPDATED: 'PARCELLATION_NOT_UPDATED',
 }
 
-const encodeId = (id: string) => id && id.replace(/\//g, '_')
-const decodeId = (codedId: string) => codedId && codedId.replace(/_/g, '/')
+const encodeId = (id: string) => id && id.replace(/\//g, ':')
+const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
 const endcodePath = (key: string, val: string) => `${key}:${encodeURIComponent(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.+)$/.exec(path)

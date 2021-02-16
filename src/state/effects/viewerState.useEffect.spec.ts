@@ -14,6 +14,7 @@ import { PluginModule } from 'src/plugin'
 import { viewerStateFetchedTemplatesSelector, viewerStateNavigateToRegion, viewerStateNavigationStateSelector, viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSelectTemplateWithName } from 'src/services/state/viewerState.store.helper'
 import { viewerStateFetchedAtlasesSelector } from 'src/services/state/viewerState/selectors'
 import { CONST } from 'common/constants'
+import { PureContantService } from 'src/util'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const bigBrainNehubaConfig = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
@@ -80,6 +81,13 @@ describe('> viewerState.useEffect.ts', () => {
           {
             provide: TemplateCoordinatesTransformation,
             useValue: mock
+          },
+          {
+            provide: PureContantService,
+            useValue: {
+              allFetchingReady$: of(true),
+              initFetchTemplate$: of([]),
+            }
           }
         ]
       }).compileComponents()
