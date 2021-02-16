@@ -3,17 +3,14 @@ import { discardPeriodicTasks, fakeAsync, TestBed, tick } from "@angular/core/te
 import { Router } from "@angular/router"
 import { RouterTestingModule } from '@angular/router/testing'
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { hot } from "jasmine-marbles"
 import { of } from "rxjs"
-import { viewerStateFetchedAtlasesSelector, viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors"
 import { PureContantService } from "src/util"
 import { RouterService } from "./router.service"
 import * as util from './util'
 
 const { routes, DummyCmp } = util
 const dummyPureConstantService = {
-  getTemplateEndpoint$: of(['dummy']),
-  totalAtlasesLength: 2
+  allFetchingReady$: of(true)
 }
 
 let cvtStateToHashedRoutesSpy: jasmine.Spy 
@@ -51,28 +48,12 @@ describe('> router.service.ts', () => {
           }
         ]
       })
-
-      const mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, ['dummy'])
-      mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, ['foo', 'bar'])
     })
 
     afterEach(() => {
       cvtStateToHashedRoutesSpy.calls.reset()
       cvtFullRouteToStateSpy.calls.reset()
     })
-    it('> can be init, and configuration emits allFetchingReady$', () => {
-      const service = TestBed.inject(RouterService)
-      expect(service).toBeTruthy()
-      expect(
-        service['allFetchingReady$']
-      ).toBeObservable(
-        hot('(a|)', {
-          a: true
-        })
-      )
-    })
-
     describe('> on state set', () => {
 
       it('> should call cvtStateToHashedRoutes', fakeAsync(() => {

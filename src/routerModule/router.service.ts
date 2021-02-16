@@ -2,11 +2,8 @@ import { Injectable } from "@angular/core";
 import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
-import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable } from "rxjs";
-import { debounceTime, filter, map, mapTo, shareReplay, switchMapTo, take, withLatestFrom } from "rxjs/operators";
-import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState.store.helper";
-import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
+import { Store } from "@ngrx/store";
+import { debounceTime, filter, map, shareReplay, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { generalApplyState } from "src/services/stateStore.helper";
 import { PureContantService } from "src/util";
 import { cvtStateToHashedRoutes, cvtFullRouteToState } from "./util";
@@ -16,8 +13,6 @@ import { cvtStateToHashedRoutes, cvtFullRouteToState } from "./util";
 })
 
 export class RouterService {
-
-  private allFetchingReady$: Observable<boolean>
 
   private logError(...e: any[]) {
     console.log(...e)
@@ -39,31 +34,13 @@ export class RouterService {
 
     navEnd$.subscribe()
 
-    this.allFetchingReady$ = combineLatest([
-      pureConstantService.getTemplateEndpoint$.pipe(
-        filter(arr => !!arr && Array.isArray(arr)),
-        map(arr => arr.length)
-      ),
-      store$.pipe(
-        select(viewerStateFetchedTemplatesSelector),
-        filter(arr => !!arr && Array.isArray(arr)),
-        map(arr => arr.length)
-      ),
-      store$.pipe(
-        select(viewerStateFetchedAtlasesSelector),
-        filter(arr => !!arr && Array.isArray(arr)),
-        map(arr => arr.length)
-      )
-    ]).pipe(
-      filter(([ expNumTmpl, actNumTmpl, actNumAtlas ]) => {
-        return expNumTmpl === actNumTmpl && actNumAtlas === pureConstantService.totalAtlasesLength
-      }),
-      mapTo(true),
+    const ready$ = pureConstantService.allFetchingReady$.pipe(
+      filter(flag => !!flag),
       take(1),
       shareReplay(1),
     )
 
-    this.allFetchingReady$.pipe(
+    ready$.pipe(
       switchMapTo(
         navEnd$.pipe(
           withLatestFrom(store$)
@@ -91,7 +68,7 @@ export class RouterService {
     // TODO this may still be a bit finiky. 
     // we rely on that update of store happens within 160ms
     // which may or many not be 
-    this.allFetchingReady$.pipe(
+    ready$.pipe(
       switchMapTo(
         store$.pipe(
           debounceTime(160),
