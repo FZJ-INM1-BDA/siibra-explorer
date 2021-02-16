@@ -18,13 +18,13 @@ export const PARSE_ERROR = {
 
 const encodeId = (id: string) => id && id.replace(/\//g, ':')
 const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
-const endcodePath = (key: string, val: string) => `${key}:${encodeURIComponent(val)}`
+const endcodePath = (key: string, val: string) => `${key}:${encodeURI(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.+)$/.exec(path)
   if (!re) return null
   return {
     key: re[1],
-    val: decodeURIComponent(re[2])
+    val: decodeURI(re[2])
   }
 }
 

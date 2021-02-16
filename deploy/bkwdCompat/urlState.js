@@ -135,12 +135,12 @@ module.exports = query => {
   const plugins = pluginStates && pluginStates.split('__')
   let redirectUrl = '/#'
   if (standaloneVolumes) {
-    redirectUrl += `/sv:${encodeURIComponent(standaloneVolumes)}`
-    if (cNavigation) redirectUrl += `/@:${encodeURIComponent(cNavigation)}`
-    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURIComponent(previewingDatasetFiles)}`
-    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURIComponent(JSON.stringify(plugins))}`
+    redirectUrl += `/sv:${encodeURI(standaloneVolumes)}`
+    if (cNavigation) redirectUrl += `/@:${encodeURI(cNavigation)}`
+    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURI(previewingDatasetFiles)}`
+    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURI(JSON.stringify(plugins))}`
 
-    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURIComponent(niftiLayers)}`
+    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURI(niftiLayers)}`
     return redirectUrl
   }
 
@@ -149,12 +149,12 @@ module.exports = query => {
     redirectUrl += `/a:${encodeId(a)}/t:${encodeId(t)}`
     const { id: p } = parc[parcellationSelected] || {}
     if (p) redirectUrl += `/p:${encodeId(p)}`
-    if (cRegionsSelected) redirectUrl += `/r:${encodeURIComponent(cRegionsSelected)}`
-    if (cNavigation) redirectUrl += `/@:${encodeURIComponent(cNavigation)}`
-    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURIComponent(previewingDatasetFiles)}`
-    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURIComponent(JSON.stringify(plugins))}`
+    if (cRegionsSelected) redirectUrl += `/r:${encodeURI(cRegionsSelected)}`
+    if (cNavigation) redirectUrl += `/@:${encodeURI(cNavigation)}`
+    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURI(previewingDatasetFiles)}`
+    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURI(JSON.stringify(plugins))}`
 
-    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURIComponent(niftiLayers)}`
+    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURI(niftiLayers)}`
     return redirectUrl
   }
   return null
