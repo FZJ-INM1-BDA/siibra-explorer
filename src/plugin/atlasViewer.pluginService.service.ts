@@ -60,13 +60,6 @@ export class PluginServices {
     @Inject(REMOVE_SCRIPT_TOKEN) private removeSrc: (src: HTMLScriptElement) => void,
   ) {
 
-    // TODO implement
-    this.store.pipe(
-      select('pluginState'),
-      select('initManifests'),
-      filter(v => !!v),
-    )
-
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
 
     /**
