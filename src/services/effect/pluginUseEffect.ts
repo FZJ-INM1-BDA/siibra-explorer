@@ -6,7 +6,7 @@ import { filter, map, startWith, switchMap } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/plugin/atlasViewer.pluginService.service"
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { PLUGINSTORE_ACTION_TYPES } from 'src/services/state/pluginState.helper'
+import { PLUGINSTORE_ACTION_TYPES, pluginStateSelectorInitManifests } from 'src/services/state/pluginState.helper'
 import { IavRootStoreInterface } from "../stateStore.service"
 import { HttpClient } from "@angular/common/http"
 
@@ -26,9 +26,7 @@ export class PluginServiceUseEffect {
     http: HttpClient
   ) {
     this.initManifests$ = store$.pipe(
-      select('pluginState'),
-      select('initManifests'),
-      filter(v => !!v),
+      select(pluginStateSelectorInitManifests),
       startWith([]),
       map(arr => {
         // only launch plugins that has init manifest src label on it
@@ -36,7 +34,7 @@ export class PluginServiceUseEffect {
       }),
       filter(arr => arr.length > 0),
       switchMap(arr => forkJoin(
-        ...arr.map(([_source, url]) => 
+        arr.map(([_source, url]) => 
           http.get(url, {
             headers: constantService.getHttpHeader(),
             responseType: 'json'

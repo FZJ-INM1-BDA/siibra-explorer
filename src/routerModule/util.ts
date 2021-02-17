@@ -20,55 +20,56 @@ const encodeId = (id: string) => id && id.replace(/\//g, ':')
 const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
 const endcodePath = (key: string, val: string) => `${key}:${encodeURI(val)}`
 const decodePath = (path: string) => {
-  const re = /^(.*?):(.+)$/.exec(path)
+  const re = /^(.*?):(.*?)$/.exec(path)
   if (!re) return null
   return {
     key: re[1],
-    val: decodeURI(re[2])
+    val: re[2].split('::').map(v => decodeURI(v))
   }
 }
 
-type TUrlStandaloneVolume = {
-  sv: string // standalone volume
+type TUrlStandaloneVolume<T> = {
+  sv: T // standalone volume
 }
 
-type TUrlAtlas = {
-  a: string   // atlas
-  t: string   // template
-  p: string   // parcellation
-  r?: string  // region selected
+type TUrlAtlas<T> = {
+  a: T   // atlas
+  t: T   // template
+  p: T   // parcellation
+  r?: T  // region selected
 }
 
-type TUrlPreviewDs = {
-  dsp: string // dataset preview
+type TUrlPreviewDs<T> = {
+  dsp: T // dataset preview
 }
 
-type TUrlPlugin = {
-  pl: string  // pluginState
+type TUrlPlugin<T> = {
+  pl: T  // pluginState
 }
 
-type TUrlNav = {
-  ['@']: string // string
+type TUrlNav<T> = {
+  ['@']: T // navstring
 }
 
-type TConditional = Partial<
-  TUrlPreviewDs &
-  TUrlPlugin &
-  TUrlNav
+type TConditional<T> = Partial<
+  TUrlPreviewDs<T> &
+  TUrlPlugin<T> &
+  TUrlNav<T>
 >
 
-type TUrlPathObj = (TUrlAtlas | TUrlStandaloneVolume) & TConditional
+type TUrlPathObj<T, V> =  (V extends TUrlStandaloneVolume<T> ? TUrlStandaloneVolume<T> : TUrlAtlas<T>) & TConditional<T>
 
-function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: any, warnCb: Function) {
+function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>, fullPath: UrlTree, state: any, warnCb: Function) {
 
   /**
    * TODO if search param of either template or parcellation is incorrect, wrong things are searched
    */
+  
 
   const templateSelected = (() => {
     const { fetchedTemplates } = state.viewerState
 
-    const searchedId = decodeId(obj['t'])
+    const searchedId = obj.t && decodeId(obj.t[0])
 
     if (!searchedId) return null
     const templateToLoad = fetchedTemplates.find(template => (template['@id'] || template['fullId']) === searchedId)
@@ -78,7 +79,7 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
 
   const parcellationSelected = (() => {
     if (!templateSelected) return null
-    const searchedId = decodeId(obj['p'])
+    const searchedId = obj.p && decodeId(obj.p[0])
 
     const parcellationToLoad = templateSelected.parcellations.find(parcellation => (parcellation['@id'] || parcellation['fullId']) === searchedId)
     if (!parcellationToLoad) { 
@@ -100,45 +101,44 @@ function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj, state: 
      * either or both parcellationToLoad and .regions maybe empty
      */
 
-    const cRegionsSelectedParam = obj['r']
-    if (cRegionsSelectedParam) {
-      try {
-        const json = JSON.parse(cRegionsSelectedParam)
+    try {
+      const json = obj.r
+        ? { [obj.r[0]] : obj.r[1] }
+        : JSON.parse(fullPath.queryParams['cRegionsSelected'] || '{}')
 
-        const selectRegionIds = []
+      const selectRegionIds = []
 
-        for (const ngId in json) {
-          const val = json[ngId]
-          const labelIndicies = val.split(separator).map(n => {
-            try {
-              return decodeToNumber(n)
-            } catch (e) {
-              /**
-               * TODO poisonsed encoded char, send error message
-               */
-              return null
-            }
-          }).filter(v => !!v)
-          for (const labelIndex of labelIndicies) {
-            selectRegionIds.push( serialiseParcellationRegion({ ngId, labelIndex }) )
+      for (const ngId in json) {
+        const val = json[ngId]
+        const labelIndicies = val.split(separator).map(n => {
+          try {
+            return decodeToNumber(n)
+          } catch (e) {
+            /**
+             * TODO poisonsed encoded char, send error message
+             */
+            return null
           }
+        }).filter(v => !!v)
+        for (const labelIndex of labelIndicies) {
+          selectRegionIds.push( serialiseParcellationRegion({ ngId, labelIndex }) )
         }
-        return selectRegionIds
-          .map(labelIndexId => {
-            const region = getRegionFromlabelIndexId({ labelIndexId })
-            if (!region) {
-              // cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
-            }
-            return region
-          })
-          .filter(r => !!r)
-
-      } catch (e) {
-        /**
-         * parsing cRegionSelected error
-         */
-        // cb && cb({ type: DECODE_CIPHER_ERROR, message: `parsing cRegionSelected error ${e.toString()}` })
       }
+      return selectRegionIds
+        .map(labelIndexId => {
+          const region = getRegionFromlabelIndexId({ labelIndexId })
+          if (!region) {
+            // cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
+          }
+          return region
+        })
+        .filter(r => !!r)
+
+    } catch (e) {
+      /**
+       * parsing cRegionSelected error
+       */
+      // cb && cb({ type: DECODE_CIPHER_ERROR, message: `parsing cRegionSelected error ${e.toString()}` })
     }
     return []
   })()
@@ -159,7 +159,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
 
   const returnState = JSON.parse(JSON.stringify(state))
 
-  const returnObj: Partial<TUrlPathObj> = {}
+  const returnObj: Partial<TUrlPathObj<string[], unknown>> = {}
   for (const f of pathFragments) {
     const { key, val } = decodePath(f.path) || {}
     if (!key || !val) continue
@@ -193,7 +193,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   // -- end fix logical assignment
 
   // nav obj is almost always defined, regardless if standaloneVolume or not
-  const cViewerState = returnObj['@']
+  const cViewerState = returnObj['@'] && returnObj['@'][0]
   let parsedNavObj = {}
   if (cViewerState) {
     try {
@@ -223,7 +223,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   }
 
   // pluginState should always be defined, regardless if standalone volume or not
-  const pluginStates = returnObj['pl']
+  const pluginStates = fullPath.queryParams['pl']
   const { pluginState } = returnState
   if (pluginStates) {
     try {
@@ -233,16 +233,21 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
       /**
        * parsing plugin error
        */
-      warnCb(`parse plugin states error`, e)
+      warnCb(`parse plugin states error`, e, pluginStates)
     }
   }
 
   // preview dataset can and should be displayed regardless of standalone volume or not
-  const { uiState } = returnState
-  const stringSearchParam = returnObj['dsp']
+
   try {
-    if (stringSearchParam) {
-      const arr = JSON.parse(stringSearchParam) as Array<{datasetId: string, filename: string}>
+    const { uiState } = returnState
+    const arr = returnObj.dsp
+      ? [{
+        datasetId: returnObj.dsp[0],
+        filename: returnObj.dsp[1]
+      }]
+      : fullPath.queryParams['previewingDatasetFiles'] && JSON.parse(fullPath.queryParams['previewingDatasetFiles'])
+    if (arr) {
       uiState.previewingDatasetFiles = arr.map(({ datasetId, filename }) => {
         return {
           datasetId,
@@ -258,6 +263,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   // If sv (standaloneVolume is defined)
   // only load sv in state
   // ignore all other params
+  // /#/sv:%5B%22precomputed%3A%2F%2Fhttps%3A%2F%2Fobject.cscs.ch%2Fv1%2FAUTH_08c08f9f119744cbbf77e216988da3eb%2Fimgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64%22%5D
   if (!!returnObj['sv']) {
     try {
       const parsedArr = JSON.parse(returnObj['sv'])
@@ -275,7 +281,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   }
 
   try {
-    const { parcellationSelected, regionsSelected, templateSelected } = parseSearchParamForTemplateParcellationRegion(returnObj as TUrlPathObj, state, warnCb)
+    const { parcellationSelected, regionsSelected, templateSelected } = parseSearchParamForTemplateParcellationRegion(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>, fullPath, state, warnCb)
     returnState['viewerState']['parcellationSelected'] = parcellationSelected
     returnState['viewerState']['regionsSelected'] = regionsSelected
     returnState['viewerState']['templateSelected'] = templateSelected
@@ -308,7 +314,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   return returnState
 }
 
-export const cvtStateToHashedRoutes = state => {
+export const cvtStateToHashedRoutes = (state): string[] => {
   // TODO check if this causes memleak
   const selectedAtlas =  viewerStateGetSelectedAtlas(state)
   const selectedTemplate = viewerStateSelectedTemplateSelector(state)
@@ -326,7 +332,9 @@ export const cvtStateToHashedRoutes = state => {
       dsPrvArr.push(preview)
     }
 
-    if (dsPrvArr.length > 0) dsPrvString = JSON.stringify(dsPrvArr)
+    if (dsPrvArr.length === 1) {
+      dsPrvString = `${dsPrvArr[0].datasetId}::${dsPrvArr[0].filename}`
+    }
   }
 
   let cNavString: string
@@ -344,20 +352,15 @@ export const cvtStateToHashedRoutes = state => {
   }
 
   // encoding selected regions
-  const accumulatorMap = new Map<string, number[]>()
-  for (const region of selectedRegions) {
+  let selectedRegionsString
+  if (selectedRegions.length === 1) {
+    const region = selectedRegions[0]
     const { ngId, labelIndex } = region
-    const existingEntry = accumulatorMap.get(ngId)
-    if (existingEntry) { existingEntry.push(labelIndex) } else { accumulatorMap.set(ngId, [ labelIndex ]) }
+    selectedRegionsString = `${ngId}::${labelIndex}`
   }
-  const cRegionObj = {}
-  for (const [key, arr] of accumulatorMap) {
-    cRegionObj[key] = arr.map(n => encodeNumber(n)).join(separator)
-  }
-
-  let routes: TUrlPathObj
-
-  routes = {
+  let routes: any
+  
+  routes= {
     // for atlas
     a: selectedAtlas && encodeId(selectedAtlas['@id']),
     // for template
@@ -365,12 +368,12 @@ export const cvtStateToHashedRoutes = state => {
     // for parcellation
     p: selectedParcellation && encodeId(selectedParcellation['@id'] || selectedParcellation['fullId']),
     // for regions
-    r: Object.keys(cRegionObj).length > 0 && JSON.stringify(cRegionObj),
+    r: selectedRegionsString && encodeURI(selectedRegionsString),
     // nav
     ['@']: cNavString,
     // dataset file preview
-    dsp: dsPrvString,
-  }
+    dsp: dsPrvString && encodeURI(dsPrvString),
+  } as TUrlPathObj<string, TUrlAtlas<string>>
 
   /**
    * if any params needs to overwrite previosu routes, put them here
@@ -378,11 +381,11 @@ export const cvtStateToHashedRoutes = state => {
   if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
     routes = {
       // standalone volumes
-      sv: JSON.stringify(standaloneVolumes),
+      sv: encodeURIComponent(JSON.stringify(standaloneVolumes)),
       // nav
       ['@']: cNavString,
-      dsp: dsPrvString
-    }
+      dsp: dsPrvString && encodeURI(dsPrvString)
+    } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
   }
 
   const returnRoutes = []

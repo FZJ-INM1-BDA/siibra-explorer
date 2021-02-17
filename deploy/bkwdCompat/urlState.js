@@ -1,6 +1,6 @@
 // this module is suppose to rewrite state stored in query param
 // and convert it to path based url
-
+const separator = '.'
 const waxolmObj = {
   aId: 'minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a',
   id: 'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8',
@@ -133,14 +133,66 @@ module.exports = query => {
   // to avoid potentially issues (e.g. url containing __, which is very possible)
 
   const plugins = pluginStates && pluginStates.split('__')
+  const searchParam = new URLSearchParams()
+
+
+  // common search param & path
+  let nav, dsp, r
+  if (cNavigation) nav = `/@:${encodeURI(cNavigation)}`
+  if (previewingDatasetFiles) {
+    try {
+      const parsedDsp = JSON.parse(previewingDatasetFiles)
+      if (Array.isArray(parsedDsp)) {
+        if (parsedDsp.length === 1) {
+          const { datasetId, filename } = parsedDsp[0]
+          dsp = `/dsp:${encodeId(datasetId)}::${encodeURI(filename)}`
+        } else {
+          searchParam.set(`previewingDatasetFiles`, previewingDatasetFiles)
+        }
+      }
+    } catch (_e) {
+      // parsing preview dataset error
+      // ignore preview dataset query param
+    }
+  }
+  if (plugins && plugins.length > 0) {
+    searchParam.set(`pl`, JSON.stringify(plugins))
+  }
+  if (niftiLayers) searchParam.set(`niftiLayers`, niftiLayers)
+  if (cRegionsSelected) {
+    try {
+      (() => {
+        const parsedRS = JSON.parse(cRegionsSelected)
+        if (Object.keys(parsedRS).length > 1) {
+          searchParam.set('cRegionsSelected', cRegionsSelected)
+          return
+        }
+        for (const ngId in parsedRS) {
+          const encodedIdArr = parsedRS[ngId]
+          const encodedRArr = encodedIdArr.split(separator)
+          if (encodedRArr.length > 0) {
+            if (encodedRArr.length > 1) {
+              searchParam.set('cRegionsSelected', cRegionsSelected)
+              return
+            }
+            if (!!encodedRArr[0]) {
+              r = `/r:${encodeURI(ngId)}::${encodeURI(encodedRArr[0])}`
+            }
+          }
+        }
+      })()
+    } catch (e) {
+      // parsing cregions selected error
+      // ignore region selected and move on
+    }
+  }
+
   let redirectUrl = '/#'
   if (standaloneVolumes) {
-    redirectUrl += `/sv:${encodeURI(standaloneVolumes)}`
-    if (cNavigation) redirectUrl += `/@:${encodeURI(cNavigation)}`
-    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURI(previewingDatasetFiles)}`
-    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURI(JSON.stringify(plugins))}`
-
-    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURI(niftiLayers)}`
+    redirectUrl += `/sv:${encodeURIComponent(standaloneVolumes)}`
+    if (nav) redirectUrl += nav
+    if (dsp) redirectUrl += dsp
+    if (Array.from(searchParam.keys()).length > 0) redirectUrl += `?${searchParam.toString()}`
     return redirectUrl
   }
 
@@ -149,12 +201,12 @@ module.exports = query => {
     redirectUrl += `/a:${encodeId(a)}/t:${encodeId(t)}`
     const { id: p } = parc[parcellationSelected] || {}
     if (p) redirectUrl += `/p:${encodeId(p)}`
-    if (cRegionsSelected) redirectUrl += `/r:${encodeURI(cRegionsSelected)}`
-    if (cNavigation) redirectUrl += `/@:${encodeURI(cNavigation)}`
-    if (previewingDatasetFiles) redirectUrl += `/dsp:${encodeURI(previewingDatasetFiles)}`
-    if (plugins && plugins.length > 0) redirectUrl += `/pl:${encodeURI(JSON.stringify(plugins))}`
+    if (r) redirectUrl += r
+    if (nav) redirectUrl += nav
+    if (dsp) redirectUrl += dsp
+    
+    if (Array.from(searchParam.keys()).length > 0) redirectUrl += `?${searchParam.toString()}`
 
-    if (niftiLayers) redirectUrl += `?niftiLayers=${encodeURI(niftiLayers)}`
     return redirectUrl
   }
   return null
