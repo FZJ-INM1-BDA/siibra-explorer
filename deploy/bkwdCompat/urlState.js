@@ -108,7 +108,13 @@ const templateMap = {
 
 const encodeId = id => id.replace(/\//g, ':')
 
-module.exports = query => {
+const WARNING_STRINGS = {
+  PREVIEW_DSF_PARSE_ERROR: 'Preview dataset files cannot be processed properly.',
+  REGION_SELECT_ERROR: 'Region selected cannot be processed properly.',
+  TEMPLATE_ERROR: 'Template not found.',
+}
+
+module.exports = (query, _warningCb) => {
   const {
     standaloneVolumes,
     niftiLayers, // deprecating - check if anyone calls this url
@@ -123,6 +129,17 @@ module.exports = query => {
     navigation, // deprecating - check if any one calls this endpoint
     cNavigation,
   } = query || {}
+
+  if (Object.keys(query).length === 0) return null
+
+  /**
+   * nb: it is absolutely imperative that warningCb are not called with dynamic data.
+   * Since it is injected as param in 
+   */
+  const warningCb = arg => {
+    if (!_warningCb) return
+    if (Object.values(WARNING_STRINGS).includes(arg)) _warningCb(arg)
+  }
 
   if (navigation) console.warn(`navigation has been deprecated`)
   if (regionsSelected) console.warn(`regionSelected has been deprecated`)
@@ -151,6 +168,7 @@ module.exports = query => {
         }
       }
     } catch (_e) {
+      warningCb(WARNING_STRINGS.PREVIEW_DSF_PARSE_ERROR)
       // parsing preview dataset error
       // ignore preview dataset query param
     }
@@ -182,6 +200,7 @@ module.exports = query => {
         }
       })()
     } catch (e) {
+      warningCb(WARNING_STRINGS.REGION_SELECT_ERROR)
       // parsing cregions selected error
       // ignore region selected and move on
     }
@@ -196,18 +215,31 @@ module.exports = query => {
     return redirectUrl
   }
 
-  if (templateSelected && templateMap[templateSelected]) {
-    const { id: t, aId: a, parc } = templateMap[templateSelected]
-    redirectUrl += `/a:${encodeId(a)}/t:${encodeId(t)}`
-    const { id: p } = parc[parcellationSelected] || {}
-    if (p) redirectUrl += `/p:${encodeId(p)}`
-    if (r) redirectUrl += r
-    if (nav) redirectUrl += nav
-    if (dsp) redirectUrl += dsp
-    
-    if (Array.from(searchParam.keys()).length > 0) redirectUrl += `?${searchParam.toString()}`
+  if (templateSelected) {
+    if (templateMap[templateSelected]) {
 
+      const { id: t, aId: a, parc } = templateMap[templateSelected]
+      redirectUrl += `/a:${encodeId(a)}/t:${encodeId(t)}`
+      if (!parc[parcellationSelected]) {
+        warningCb(`Parcelation not found, using default.`)
+      }
+      const { id: p } = parc[parcellationSelected] || {}
+      if (p) redirectUrl += `/p:${encodeId(p)}`
+      if (r) redirectUrl += r
+      if (nav) redirectUrl += nav
+      if (dsp) redirectUrl += dsp
+      
+      if (Array.from(searchParam.keys()).length > 0) redirectUrl += `?${searchParam.toString()}`
+  
+      return redirectUrl
+    } else {
+      warningCb(WARNING_STRINGS.TEMPLATE_ERROR)
+    }
+  }
+
+  if (Array.from(searchParam.keys()).length > 0) {
+    redirectUrl += `/?${searchParam.toString()}`
     return redirectUrl
   }
-  return null
+  return `${redirectUrl}/`
 }

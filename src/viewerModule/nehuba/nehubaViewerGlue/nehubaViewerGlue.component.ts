@@ -282,10 +282,10 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     }
 
     const nehubaViewerSub = this.newViewer$.pipe(
-      tap(() => nehubaViewer$.next(null)),
+      tap(() => nehubaViewer$ && nehubaViewer$.next(null)),
       switchMap(this.waitForNehuba.bind(this)),
       map(() => this.nehubaContainerDirective.nehubaViewerInstance)
-    ).subscribe(viewer => nehubaViewer$.next(viewer))
+    ).subscribe(viewer => nehubaViewer$ && nehubaViewer$.next(viewer))
     this.onDestroyCb.push(() => nehubaViewerSub.unsubscribe())
 
     /**
@@ -550,11 +550,11 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
     const setupViewerApiSub = this.newViewer$.pipe(
       tap(() => {
-        setViewerHandle(null)
+        setViewerHandle && setViewerHandle(null)
       }),
       switchMap(this.waitForNehuba.bind(this))
     ).subscribe(() => {
-      setViewerHandle({
+      setViewerHandle && setViewerHandle({
         setNavigationLoc : (coord, realSpace?) => this.nehubaContainerDirective.nehubaViewerInstance.setNavigationState({
           position : coord,
           positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
@@ -703,10 +703,14 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   private selectHoveredRegion(ev: any, next: Function){
-    if (!this.onhoverSegments || !(this.onhoverSegments.length)) return next()
+    /**
+     * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
+     */
+    const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
+    if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return next()
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
-        selectRegions: this.onhoverSegments.slice(0, 1)
+        selectRegions: trueOnhoverSegments.slice(0, 1)
       })
     )
     next()

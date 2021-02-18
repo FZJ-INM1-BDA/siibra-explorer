@@ -8,20 +8,16 @@ describe('> url parsing', () => {
   beforeEach(async () => {
     iavPage = new AtlasPage()
     await iavPage.init()
-    
   })
 
-  // tracking issue: https://github.com/HumanBrainProject/interactive-viewer/issues/455
-  // reenable when fixed
-  // it('incorrectly defined templateSelected should clear searchparam', async () => {
-  //   const search = '/?templateSelected=NoName2&parcellationSelected=NoName'
-  //   const page = await browser.newPage()
-  //   await page.goto(`${ATLAS_URL}${search}`, {waitUntil: 'networkidle2'})
-  //   await page.waitFor(500)
-  //   const searchParam = await getSearchParam(page)
-  //   const searchParamObj = new URLSearchParams(searchParam)
-  //   expect(searchParamObj.get('templateSelected')).toBeNull()
-  // })
+  it('incorrectly defined templateSelected should clear searchparam', async () => {
+    const searchParam = '/?templateSelected=NoName2&parcellationSelected=NoName'
+    
+    await iavPage.goto(searchParam, { doNotAutomate: true })
+    await iavPage.waitFor(500)
+    const text = await iavPage.getSnackbarMessage()
+    expect(text).toEqual(`Template not found.`)
+  })
 
   it('> navigation state should be perserved', async () => {
 
@@ -87,6 +83,23 @@ describe('> url parsing', () => {
   })
 
   it('> if using niftilayers should show deprecation worning')
+
+  it('> pluginStates should be fetched even if no template or parc are selected', async () => {
+
+    const searchParam = new URLSearchParams()
+    searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
+    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
+    await iavPage.wait(10000)
+    const interceptedCalls = await iavPage.getInterceptedHttpCalls()
+    expect(
+      interceptedCalls
+    ).toContain(jasmine.objectContaining(
+      {
+        method: 'GET',
+        url: 'http://localhost:3001/manifest.json'
+      }
+    ))
+  })
 
   it('> pluginStates should result in xhr to get pluginManifest', async () => {
 

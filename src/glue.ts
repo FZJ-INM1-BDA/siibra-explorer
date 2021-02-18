@@ -747,12 +747,22 @@ export class ClickInterceptorService{
   }
 
   run(ev: any){
+    let intercepted = false
     for (const clickInc of this.clickInterceptorStack) {
       let runNext = false
       clickInc(ev, () => {
         runNext = true
       })
-      if (!runNext) break
+      if (!runNext) {
+        intercepted = true
+        break
+      }
     }
+
+    if (!intercepted) this.fallback(ev)
+  }
+
+  fallback(_ev: any) {
+    // called when the call has not been intercepted
   }
 }
