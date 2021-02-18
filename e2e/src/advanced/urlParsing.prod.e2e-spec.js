@@ -88,6 +88,23 @@ describe('> url parsing', () => {
 
   it('> if using niftilayers should show deprecation worning')
 
+  it('> pluginStates should be fetched even if no template or parc are selected', async () => {
+
+    const searchParam = new URLSearchParams()
+    searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
+    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
+    await iavPage.wait(10000)
+    const interceptedCalls = await iavPage.getInterceptedHttpCalls()
+    expect(
+      interceptedCalls
+    ).toContain(jasmine.objectContaining(
+      {
+        method: 'GET',
+        url: 'http://localhost:3001/manifest.json'
+      }
+    ))
+  })
+
   it('> pluginStates should result in xhr to get pluginManifest', async () => {
 
     const searchParam = new URLSearchParams()

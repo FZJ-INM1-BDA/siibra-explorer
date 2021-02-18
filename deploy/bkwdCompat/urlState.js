@@ -209,5 +209,10 @@ module.exports = query => {
 
     return redirectUrl
   }
+
+  if (Array.from(searchParam.keys()).length > 0) {
+    redirectUrl += `/?${searchParam.toString()}`
+    return redirectUrl
+  }
   return null
 }
