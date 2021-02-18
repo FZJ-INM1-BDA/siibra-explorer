@@ -1,6 +1,6 @@
 name: Release CI
 on:
-  pull_requests:
+  pull_request:
     branches:
     - master
 
