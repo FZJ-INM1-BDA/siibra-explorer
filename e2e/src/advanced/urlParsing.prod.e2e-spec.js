@@ -8,20 +8,16 @@ describe('> url parsing', () => {
   beforeEach(async () => {
     iavPage = new AtlasPage()
     await iavPage.init()
-    
   })
 
-  // tracking issue: https://github.com/HumanBrainProject/interactive-viewer/issues/455
-  // reenable when fixed
-  // it('incorrectly defined templateSelected should clear searchparam', async () => {
-  //   const search = '/?templateSelected=NoName2&parcellationSelected=NoName'
-  //   const page = await browser.newPage()
-  //   await page.goto(`${ATLAS_URL}${search}`, {waitUntil: 'networkidle2'})
-  //   await page.waitFor(500)
-  //   const searchParam = await getSearchParam(page)
-  //   const searchParamObj = new URLSearchParams(searchParam)
-  //   expect(searchParamObj.get('templateSelected')).toBeNull()
-  // })
+  it('incorrectly defined templateSelected should clear searchparam', async () => {
+    const searchParam = '/?templateSelected=NoName2&parcellationSelected=NoName'
+    
+    await iavPage.goto(searchParam, { doNotAutomate: true })
+    await iavPage.waitFor(500)
+    const text = await iavPage.getSnackbarMessage()
+    expect(text).toEqual(`Template not found.`)
+  })
 
   it('> navigation state should be perserved', async () => {
 
