@@ -26,6 +26,8 @@ Map of layer name to Map of labelIndex (used by neuroglancer and nehuba) to the 
 
 ### viewerHandle
 
+> **nb** `viewerHandle` may be undefined at any time (user be yet to select an atlas, user could have unloaded an atlas. ...etc)
+
 #### setNavigationLoc(coordinates, realspace?:boolean)
 
 Function that teleports the navigation state to coordinates : [x:number,y:number,z:number]. Optional arg determine if the set of coordinates is in realspace (default) or voxelspace.
