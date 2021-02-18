@@ -1,7 +1,7 @@
 import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, fromEvent } from "rxjs";
+import { Subscription, Observable, fromEvent, asyncScheduler } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
 import { getNavigationStateFromConfig, takeOnePipe } from "../util";
 import { timedValues } from "src/util/generator";
@@ -463,7 +463,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       }),
 
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
-        throttleTime(160),
+        throttleTime(160, asyncScheduler, {trailing: true}),
       ).subscribe(label => {
         this.store$.dispatch(
           viewerStateMouseOverCustomLandmarkInPerspectiveView({

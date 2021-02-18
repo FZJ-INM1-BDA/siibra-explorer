@@ -1,6 +1,5 @@
-import { CommonModule } from "@angular/common"
 import { Component } from "@angular/core"
-import { TestBed, async, ComponentFixture } from "@angular/core/testing"
+import { TestBed, async, ComponentFixture, fakeAsync, tick } from "@angular/core/testing"
 import { By } from "@angular/platform-browser"
 import { BrowserDynamicTestingModule } from "@angular/platform-browser-dynamic/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
@@ -10,6 +9,7 @@ import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directiv
 import { viewerStateSelectorNavigation, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 import { Subject } from "rxjs"
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions"
+import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   describe('> NehubaViewerContainerDirective', () => {
@@ -108,7 +108,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
       })
 
       describe('> on createNehubaInstance called', () => {
-        const template = {        }
+        const template = {}
         const lifecycle = {}
         it('> method el.clear gets called before el.createComponent', () => {
           directiveInstance.createNehubaInstance(template, lifecycle)
@@ -160,6 +160,136 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         })
       })
     
+    })
+  
+    describe('> subscription of nehuba instance', () => {
+      describe('> mouseoverUserlandmarkEmitter', () => {
+        let spyNehubaViewerInstance: any
+        let dispatchSpy: jasmine.Spy
+        let directiveInstance: NehubaViewerContainerDirective
+        const template = {}
+        const lifecycle = {}
+        beforeEach(() => {
+
+          spyNehubaViewerInstance = {
+            config: null,
+            lifecycle: null,
+            templateId: null,
+            errorEmitter: new Subject(),
+            debouncedViewerPositionChange: new Subject(),
+            layersChanged: new Subject(),
+            nehubaReady: new Subject(),
+            mouseoverSegmentEmitter: new Subject(),
+            mouseoverLandmarkEmitter: new Subject(),
+            mouseoverUserlandmarkEmitter: new Subject(),
+            elementRef: {
+              nativeElement: {}
+            }
+          }
+          const mockStore = TestBed.inject(MockStore)
+          dispatchSpy = spyOn(mockStore, 'dispatch')
+
+          const fixture = TestBed.createComponent(DummyCmp)
+          const directive = fixture.debugElement.query(
+            By.directive(NehubaViewerContainerDirective)
+          )
+          
+          const spyComRef = {
+            destroy: jasmine.createSpy('destroy')
+          }
+          directiveInstance = directive.injector.get(NehubaViewerContainerDirective)
+          spyOnProperty(directiveInstance, 'nehubaViewerInstance').and.returnValue(spyNehubaViewerInstance)
+          spyOn(directiveInstance['el'], 'clear').and.callFake(() => {})
+          spyOn(directiveInstance, 'clear').and.callFake(() => {})
+          // casting return value to any is not perfect, but since only 2 methods and 1 property is used, it's a quick way 
+          // rather than allow component to be created
+          spyOn(directiveInstance['el'], 'createComponent').and.returnValue(spyComRef as any)
+
+        })
+
+        afterEach(() => {
+          dispatchSpy.calls.reset()
+        })
+        it('> single null emits null', fakeAsync(() => {
+
+          directiveInstance.createNehubaInstance(template, lifecycle)
+          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
+
+          tick(200)
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            viewerStateMouseOverCustomLandmarkInPerspectiveView({
+              payload: { label: null }
+            })
+          )
+        }))
+
+        it('> single value emits value', fakeAsync(() => {
+
+          directiveInstance.createNehubaInstance(template, lifecycle)
+          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
+
+          tick(200)
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            viewerStateMouseOverCustomLandmarkInPerspectiveView({
+              payload: { label: "24" }
+            })
+          )
+        }))
+
+        describe('> double value in 140ms emits last value', () => {
+
+          it('> null - 24 emits 24', fakeAsync(() => {
+
+            directiveInstance.createNehubaInstance(template, lifecycle)
+            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
+            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
+  
+            tick(200)
+            expect(dispatchSpy).toHaveBeenCalledWith(
+              viewerStateMouseOverCustomLandmarkInPerspectiveView({
+                payload: { label: "24" }
+              })
+            )
+          }))
+          it('> 24 - null emits null', fakeAsync(() => {
+
+            directiveInstance.createNehubaInstance(template, lifecycle)
+            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
+            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
+  
+            tick(200)
+            expect(dispatchSpy).toHaveBeenCalledWith(
+              viewerStateMouseOverCustomLandmarkInPerspectiveView({
+                payload: { label: null }
+              })
+            )
+          }))
+        })
+      
+        it('> single value outside 140 ms emits separately', fakeAsync(() => {
+
+          directiveInstance.createNehubaInstance(template, lifecycle)
+          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
+          tick(200)
+          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
+
+          tick(200)
+          expect(
+            dispatchSpy.calls.allArgs()
+          ).toEqual([
+            [
+              viewerStateMouseOverCustomLandmarkInPerspectiveView({
+                payload: { label: null }
+              })
+            ],
+            [
+              viewerStateMouseOverCustomLandmarkInPerspectiveView({
+                payload: { label: "24" }
+              })
+            ]
+          ])
+        }))
+      })
     })
   })
 })
