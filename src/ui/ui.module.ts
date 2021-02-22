@@ -85,6 +85,7 @@ import { RegionAccordionTooltipTextPipe } from './util'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import { RegionalFeaturesModule } from "./regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
+import { ViewerCtrlModule } from "src/viewerCtrl";
 
 @NgModule({
   imports : [
@@ -105,6 +106,7 @@ import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
     FabSpeedDialModule,
     RegionalFeaturesModule,
     Landmark2DModule,
+    ViewerCtrlModule,
   ],
   declarations : [
     NehubaContainer,

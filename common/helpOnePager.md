@@ -10,7 +10,7 @@
 | Zoom | `[hover]` on any slice views, `[click]` magnifier |
 | Next slice | `<ctrl>` + `[mousewheel]` |
 | Next 10 slice | `<ctrl>` + `<shift>` + `[mousewheel]` |
-| Toggle delineation | |
+| Toggle delineation | `[q]` |
 
 ---
 

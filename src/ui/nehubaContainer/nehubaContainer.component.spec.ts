@@ -40,6 +40,7 @@ import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelec
 import { PANELS } from 'src/services/state/ngViewerState/constants'
 import { RegionalFeaturesModule } from '../regionalFeatures'
 import { Landmark2DModule } from './2dLandmarks/module'
+import { ViewerCtrlModule } from 'src/viewerCtrl'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -88,6 +89,7 @@ describe('> nehubaContainer.component.ts', () => {
            */
           HttpClientTestingModule,
           Landmark2DModule,
+          ViewerCtrlModule,
         ],
         declarations: [
           NehubaContainer,

@@ -700,6 +700,20 @@
 
     <!-- perspective specific control -->
     <ng-container *ngIf="panelIndex === 3">
+      <!-- viewer ctrl -->
+      <mat-menu #viewerCtrlMenu>
+        <!-- NB must not lazy load. key listener needs to work even when component is not yet rendered -->
+        <viewer-ctrl-component class="d-block m-2"
+          [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
+          (iav-key-event)="viewerCtrlCmp.toggleParcVsbl()"
+          #viewerCtrlCmp="viewerCtrlCmp">
+        </viewer-ctrl-component>
+      </mat-menu>
+      <button mat-icon-button color="primary"
+        [matMenuTriggerFor]="viewerCtrlMenu">
+        <i class="fas fa-cog"></i>
+      </button>
+
       <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: {
         state: (nehubaViewerPerspectiveOctantRemoval$ | async),
         disableOctantRemoval: disableOctantRemoval$ | async
