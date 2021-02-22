@@ -6,7 +6,7 @@ env:
   NODE_ENV: test
 
 jobs:
-  install_dep:
+  backend:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     strategy:
