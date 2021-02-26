@@ -1,0 +1,1 @@
+export { BSFeatureReceptorModule } from './module'

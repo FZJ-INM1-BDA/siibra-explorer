@@ -127,7 +127,6 @@
 
         <!-- TODO dataset preview will become deprecated in the future.
         Regional feature/data feature will replace it -->
-
         <div class="hidden"
           iav-shown-dataset
           #iavShownDataset="iavShownDataset">
@@ -710,6 +709,27 @@
       </ng-container>
     </ng-container>
 
+    <!-- tmp experimtal -->
+    <ng-template #contenttmpl>
+      <bs-features-receptor-entry
+        [region]="region">
+      </bs-features-receptor-entry>
+    </ng-template>
+
+    <div bs-features-receptor-directive
+      [region]="region"
+      #bsFeatureReceptorDirective="bsFeatureReceptorDirective">
+    </div>
+    <spinner-cmp *ngIf="bsFeatureReceptorDirective.fetching$ | async"></spinner-cmp>
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: 'ReceptorDistribution',
+      iconClass: 'fas fa-info',
+      iavNgIf: bsFeatureReceptorDirective.hasReceptor$ | async,
+      content: contenttmpl
+    }">
+
+    </ng-container>
+
     <!--  regional features-->
     <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
 
@@ -831,8 +851,10 @@
     </mat-expansion-panel-header>
 
     <!-- content -->
-    <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
-    </ng-container>
+    <ng-template matExpansionPanelContent>
+      <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
+      </ng-container>
+    </ng-template>
   </mat-expansion-panel>
 </ng-template>
 

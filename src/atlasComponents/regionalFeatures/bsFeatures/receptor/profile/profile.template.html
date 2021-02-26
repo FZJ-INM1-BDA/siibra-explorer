@@ -1,0 +1,22 @@
+<ng-template [ngIf]="error">
+  {{ error }}
+</ng-template>
+
+<a *ngFor="let url of urls"
+  [href]="url.url"
+  class="no-hover"
+  download>
+  <i class="fas fa-download"></i>
+  <span>
+    {{ url.text || (url.url | getFilenamePipe) }}
+  </span>
+</a>
+
+<figure>
+  <figcaption class="text-muted">
+    Profile: {{ RECEPTOR_PR_CAPTION }}
+  </figcaption>
+  <kg-dataset-dumb-line
+    [attr.kg-ds-prv-darkmode]="darktheme$ && (darktheme$ | async)">
+  </kg-dataset-dumb-line>
+</figure>
