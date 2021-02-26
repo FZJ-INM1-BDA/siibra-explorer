@@ -8,7 +8,7 @@ type TReceptor = string // TODO complete all possible neuroreceptor
 
 type TReceptorSymbol = {
   [key: string]: {
-    receptor: TReceptorCommon,
+    receptor: TReceptorCommon
     neurotransmitter: TReceptorCommon & { label: string }
   }
 }

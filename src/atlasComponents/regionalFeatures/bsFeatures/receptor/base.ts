@@ -12,5 +12,6 @@ export class BsFeatureReceptorBase {
 
   public error = null
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(){}
 }

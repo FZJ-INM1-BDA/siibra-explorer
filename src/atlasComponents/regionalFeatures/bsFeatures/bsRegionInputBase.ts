@@ -17,5 +17,6 @@ export class BsRegionInputBase{
     return this._region
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(){}
 }
