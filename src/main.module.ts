@@ -32,7 +32,7 @@ import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
@@ -55,7 +55,7 @@ import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
 import { ParcellationRegionModule } from './atlasComponents/parcellationRegion';
-import { ViewerModule } from './viewerModule';
+import { ViewerModule, VIEWERMODULE_DARKTHEME } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { MouseoverModule } from './mouseoverModule/mouseover.module';
@@ -243,6 +243,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       deps: [
         AtlasViewerAPIServices
       ]
+    },
+    {
+      provide: VIEWERMODULE_DARKTHEME,
+      useFactory: (pureConstantService: PureContantService) => pureConstantService.darktheme$,
+      deps: [ PureContantService ]
     }
   ],
   bootstrap : [
