@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { viewerStateNewViewer } from 'src/services/state/viewerState/actions'
 import { RegionBase, regionInOtherTemplateSelector, getRegionParentParcRefSpace } from './region.base'
 
 /**
@@ -449,19 +450,20 @@ describe('> region.base.ts', () => {
   })
   
   describe('> RegionBase', () => {
+    let regionBase: RegionBase
+    let mockStore: MockStore
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
           provideMockStore()
         ]
       })
+      mockStore = TestBed.inject(MockStore)
+      mockStore.overrideSelector(regionInOtherTemplateSelector, [])
+      mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
     })
     describe('> position', () => {
-      let regionBase: RegionBase
       beforeEach(() => {
-        const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(regionInOtherTemplateSelector, [])
-        mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
         regionBase = new RegionBase(mockStore)
       })
       it('> does not populate if position property is absent', () => {
@@ -524,6 +526,86 @@ describe('> region.base.ts', () => {
           position: [1, 2, 3]
         }
         expect(regionBase.position).toBeTruthy()
+      })
+    })
+  
+    describe('> changeView', () => {
+      const fakeTmpl = {
+        name: 'fakeTmpl'
+      }
+      const fakeParc = {
+        name: 'fakeParc'
+      }
+      beforeEach(() => {
+        regionBase = new RegionBase(mockStore)
+      })
+
+      describe('> if sameRegion has position attribute', () => {
+        let dispatchSpy: jasmine.Spy
+
+        beforeEach(() => {
+          dispatchSpy = spyOn(mockStore, 'dispatch')
+        })
+        afterEach(() => {
+          dispatchSpy.calls.reset()
+        })
+        it('> malformed position is not an array > do not pass position', () => {
+
+          regionBase.changeView({
+            template: fakeTmpl,
+            parcellation: fakeParc,
+            region: {
+              position: 'hello wolrd'
+            }
+          })
+
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            viewerStateNewViewer({
+              selectTemplate: fakeTmpl,
+              selectParcellation: fakeParc,
+              navigation: {}
+            })
+          )
+        })
+
+        it('> malformed position is an array of incorrect size > do not pass position', () => {
+
+          regionBase.changeView({
+            template: fakeTmpl,
+            parcellation: fakeParc,
+            region: {
+              position: []
+            }
+          })
+
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            viewerStateNewViewer({
+              selectTemplate: fakeTmpl,
+              selectParcellation: fakeParc,
+              navigation: {}
+            })
+          )
+        })
+
+        it('> correct position > pass position', () => {
+          regionBase.changeView({
+            template: fakeTmpl,
+            parcellation: fakeParc,
+            region: {
+              position: [1,2,3]
+            }
+          })
+
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            viewerStateNewViewer({
+              selectTemplate: fakeTmpl,
+              selectParcellation: fakeParc,
+              navigation: {
+                position: [1,2,3]
+              }
+            })
+          )
+        })
       })
     })
   })
