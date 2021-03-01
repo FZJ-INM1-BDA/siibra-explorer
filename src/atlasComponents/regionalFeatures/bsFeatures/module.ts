@@ -12,7 +12,7 @@ import { BsFeatureService } from "./service";
   providers: [
     {
       provide: BS_ENDPOINT,
-      useValue: `https://brainscapes.apps-dev.hbp.eu`
+      useValue: BS_REST_URL || `https://brainscapes.apps-dev.hbp.eu`
     },
     BsFeatureService
   ],

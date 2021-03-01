@@ -14,6 +14,7 @@ declare var VERSION : string
 declare var PRODUCTION: boolean
 declare var BACKEND_URL: string
 declare var DATASET_PREVIEW_URL: string
+declare var BS_REST_URL: string
 declare var MATOMO_URL: string
 declare var MATOMO_ID: string
 declare var STRICT_LOCAL: boolean
