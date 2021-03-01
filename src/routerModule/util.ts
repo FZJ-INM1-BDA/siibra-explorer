@@ -1,7 +1,5 @@
 import { viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation, viewerStateSelectorStandaloneVolumes } from "src/services/state/viewerState/selectors"
 import { encodeNumber, decodeToNumber, separator } from './cipher'
-import { getGetRegionFromLabelIndexId } from 'src/util/fn'
-import { serialiseParcellationRegion } from "common/util"
 import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { mixNgLayers } from "src/services/state/ngViewerState.store"
@@ -10,14 +8,17 @@ import { viewerStateHelperStoreName } from "src/services/state/viewerState.store
 import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors"
 import { Component } from "@angular/core"
 
-export const PARSE_ERROR = {
-  TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
-  TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
-  PARCELLATION_NOT_UPDATED: 'PARCELLATION_NOT_UPDATED',
-}
+import {
+  TUrlStandaloneVolume,
+  TUrlAtlas,
+  TUrlPathObj,
+} from './type'
 
-const encodeId = (id: string) => id && id.replace(/\//g, ':')
-const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
+import {
+  parseSearchParamForTemplateParcellationRegion,
+  encodeId,
+} from './parseRouteToTmplParcReg'
+
 const endcodePath = (key: string, val: string) => `${key}:${encodeURI(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.*?)$/.exec(path)
@@ -25,128 +26,6 @@ const decodePath = (path: string) => {
   return {
     key: re[1],
     val: re[2].split('::').map(v => decodeURI(v))
-  }
-}
-
-type TUrlStandaloneVolume<T> = {
-  sv: T // standalone volume
-}
-
-type TUrlAtlas<T> = {
-  a: T   // atlas
-  t: T   // template
-  p: T   // parcellation
-  r?: T  // region selected
-}
-
-type TUrlPreviewDs<T> = {
-  dsp: T // dataset preview
-}
-
-type TUrlPlugin<T> = {
-  pl: T  // pluginState
-}
-
-type TUrlNav<T> = {
-  ['@']: T // navstring
-}
-
-type TConditional<T> = Partial<
-  TUrlPreviewDs<T> &
-  TUrlPlugin<T> &
-  TUrlNav<T>
->
-
-type TUrlPathObj<T, V> =  (V extends TUrlStandaloneVolume<T> ? TUrlStandaloneVolume<T> : TUrlAtlas<T>) & TConditional<T>
-
-function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>, fullPath: UrlTree, state: any, warnCb: Function) {
-
-  /**
-   * TODO if search param of either template or parcellation is incorrect, wrong things are searched
-   */
-  
-
-  const templateSelected = (() => {
-    const { fetchedTemplates } = state.viewerState
-
-    const searchedId = obj.t && decodeId(obj.t[0])
-
-    if (!searchedId) return null
-    const templateToLoad = fetchedTemplates.find(template => (template['@id'] || template['fullId']) === searchedId)
-    if (!templateToLoad) { throw new Error(PARSE_ERROR.TEMPLATE_NOT_FOUND) }
-    return templateToLoad
-  })()
-
-  const parcellationSelected = (() => {
-    if (!templateSelected) return null
-    const searchedId = obj.p && decodeId(obj.p[0])
-
-    const parcellationToLoad = templateSelected.parcellations.find(parcellation => (parcellation['@id'] || parcellation['fullId']) === searchedId)
-    if (!parcellationToLoad) { 
-      warnCb(`parcellation with id ${searchedId} not found... load the first parc instead`)
-    }
-    return parcellationToLoad || templateSelected.parcellations[0]
-  })()
-
-  /* selected regions */
-
-  const regionsSelected = (() => {
-    if (!parcellationSelected) return []
-
-    // TODO deprecate. Fallback (defaultNgId) (should) already exist
-    // if (!viewerState.parcellationSelected.updated) throw new Error(PARCELLATION_NOT_UPDATED)
-
-    const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({ parcellation: parcellationSelected })
-    /**
-     * either or both parcellationToLoad and .regions maybe empty
-     */
-
-    try {
-      const json = obj.r
-        ? { [obj.r[0]] : obj.r[1] }
-        : JSON.parse(fullPath.queryParams['cRegionsSelected'] || '{}')
-
-      const selectRegionIds = []
-
-      for (const ngId in json) {
-        const val = json[ngId]
-        const labelIndicies = val.split(separator).map(n => {
-          try {
-            return decodeToNumber(n)
-          } catch (e) {
-            /**
-             * TODO poisonsed encoded char, send error message
-             */
-            return null
-          }
-        }).filter(v => !!v)
-        for (const labelIndex of labelIndicies) {
-          selectRegionIds.push( serialiseParcellationRegion({ ngId, labelIndex }) )
-        }
-      }
-      return selectRegionIds
-        .map(labelIndexId => {
-          const region = getRegionFromlabelIndexId({ labelIndexId })
-          if (!region) {
-            // cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
-          }
-          return region
-        })
-        .filter(r => !!r)
-
-    } catch (e) {
-      /**
-       * parsing cRegionSelected error
-       */
-      // cb && cb({ type: DECODE_CIPHER_ERROR, message: `parsing cRegionSelected error ${e.toString()}` })
-    }
-    return []
-  })()
-
-  return {
-    templateSelected,
-    parcellationSelected,
-    regionsSelected,
   }
 }
 
@@ -316,7 +195,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
 
 export const cvtStateToHashedRoutes = (state): string[] => {
   // TODO check if this causes memleak
-  const selectedAtlas =  viewerStateGetSelectedAtlas(state)
+  const selectedAtlas = viewerStateGetSelectedAtlas(state)
   const selectedTemplate = viewerStateSelectedTemplateSelector(state)
   const selectedParcellation = viewerStateSelectedParcellationSelector(state)
   const selectedRegions = viewerStateSelectedRegionsSelector(state)
@@ -356,7 +235,7 @@ export const cvtStateToHashedRoutes = (state): string[] => {
   if (selectedRegions.length === 1) {
     const region = selectedRegions[0]
     const { ngId, labelIndex } = region
-    selectedRegionsString = `${ngId}::${labelIndex}`
+    selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`
   }
   let routes: any
   
