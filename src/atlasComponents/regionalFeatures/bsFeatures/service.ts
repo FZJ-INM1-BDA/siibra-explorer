@@ -15,7 +15,11 @@ export class BsFeatureService{
   }
 
   public getFeature<T>(featureName: TFeature, region: TRegion) {
-    return this.http.get<T>(`${this.bsEndpoint}/features/${featureName}?region=${encodeURIComponent(this.processRegion(region))}`)
+    const { context } = region
+    const { atlas, parcellation } = context
+    return this.http.get<T>(
+      `${this.bsEndpoint}/atlases/${encodeURIComponent(atlas["@id"])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(this.processRegion(region))}/features/${encodeURIComponent(featureName)}`
+    )
   }
   
   constructor(
