@@ -207,3 +207,20 @@ export const viewerStateSelectedTemplateFullInfoSelector = createSelector(
     })
   } 
 )
+
+export const viewerStateContextedSelectedRegionsSelector = createSelector(
+  viewerStateSelectedRegionsSelector,
+  viewerStateGetSelectedAtlas,
+  viewerStateSelectedTemplatePureSelector,
+  viewerStateSelectedParcellationSelector,
+  (regions, atlas, template, parcellation) => regions.map(r => {
+    return {
+      ...r,
+      context: {
+        atlas,
+        template,
+        parcellation
+      }
+    }
+  })
+)

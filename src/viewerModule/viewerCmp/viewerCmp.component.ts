@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
-import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
+import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { NehubaGlueCmp } from "../nehuba";
 import { IViewer } from "../viewer.interface";
 import { CONST, ARIA_LABELS } from 'common/constants'
@@ -57,7 +57,7 @@ import { SwitchDirective } from "src/util/directives/switch.directive";
     {
       provide: REGION_OF_INTEREST,
       useFactory: (store: Store<any>) => store.pipe(
-        select(viewerStateSelectedRegionsSelector),
+        select(viewerStateContextedSelectedRegionsSelector),
         map(rs => rs[0] || null)
       ),
       deps: [
@@ -94,7 +94,7 @@ export class ViewerCmp implements OnDestroy, AfterViewInit{
   )
 
   public selectedRegions$ = this.store$.pipe(
-    select(viewerStateSelectedRegionsSelector),
+    select(viewerStateContextedSelectedRegionsSelector),
     distinctUntilChanged(),
   )
 
