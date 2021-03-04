@@ -803,7 +803,8 @@
         iconClass: 'fas fa-braille',
         iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
         iavNgIf: selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'),
-        content: connectivityContentTmpl
+        content: connectivityContentTmpl,
+        autoExpanded: true
       }">
       </ng-container>
 
@@ -824,9 +825,11 @@
   let-iconClass="iconClass"
   let-iconTooltip="iconTooltip"
   let-iavNgIf="iavNgIf"
+  let-autoExpanded="autoExpanded"
   let-content="content">
   <mat-expansion-panel
     [attr.data-opened]="expansionPanel.expanded"
+    [expanded]="autoExpanded"
     [attr.data-mat-expansion-title]="title"
     hideToggle
     *ngIf="iavNgIf"
