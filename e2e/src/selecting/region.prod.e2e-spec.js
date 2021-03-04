@@ -74,5 +74,25 @@ describe('> selecting regions', () => {
       const allChipsText = await newPage.getAllChipsText()
       expect(allChipsText).not.toContain(CONST.MULTI_REGION_SELECTION)
     })
+
+    it('> connectivity should be loaded after region select', async() => {
+      const newPage = new AtlasPage()
+      await newPage.init()
+      await newPage.goto()
+      await newPage.setAtlasSpecifications(duplicatedRegion.atlas, [ duplicatedRegion.template ], duplicatedRegion.parcVersion)
+      await newPage.wait(500)
+      await newPage.waitForAsync()
+      await newPage.execScript(`interactiveViewer.viewerHandle.setNavigationLoc(${JSON.stringify(duplicatedRegion.position.map(v => v*1e6))}, true)`)
+      await newPage.wait(500)
+
+      await newPage.cursorMoveToAndClick({
+        position: [width * 3 / 4, height / 4]
+      })
+      await newPage.wait(500)
+      await newPage.waitForAsync()
+      const elementExists = await newPage.elementExists(`connectivity-browser`)
+      expect(elementExists).toBeTrue()
+
+    })
   })
 })

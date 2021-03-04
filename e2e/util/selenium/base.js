@@ -83,18 +83,18 @@ class WdBase{
   // without image header
   // output as b64 png
   async takeScreenshot(cssSelector){
-    
+
     let cleanUp
     if(cssSelector) {
       cleanUp= await this.highlightElement(cssSelector)
     }
-    
+
     const result = await this._browser.takeScreenshot()
 
     if (cleanUp) {
       await cleanUp()
     }
-    
+
     await this.wait(1000)
     return result
   }
@@ -104,7 +104,7 @@ class WdBase{
     const { x, y } = verifyPosition(position)
     const screenshotData = await this.takeScreenshot(cssSelector)
     const [ red, green, blue ] = await this._driver.executeAsyncScript(() => {
-      
+
       const dataUri = arguments[0]
       const pos = arguments[1]
       const dim = arguments[2]
@@ -148,7 +148,7 @@ class WdBase{
   async getText(cssSelector){
     if (!cssSelector) throw new Error(`getText needs to define css selector`)
     const el = await this._browser.findElement( By.css(cssSelector) )
-    
+
     const text = await el.getText()
     return text
   }
@@ -160,6 +160,12 @@ class WdBase{
     const isDisplayed = await el.isDisplayed()
 
     return isDisplayed
+  }
+
+  async elementExists(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const el = await this._browser.findElement( By.css( cssSelector ) )
+    return !!el
   }
 
   async areVisible(cssSelector){
@@ -340,13 +346,13 @@ class WdBase{
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
       this._browser.get(actualUrl)
-      await this.initHttpInterceptor() 
+      await this.initHttpInterceptor()
     } else {
       await this._browser.get(actualUrl)
     }
 
     // if doNotAutomate is not set
-    // should wait for async operations to end 
+    // should wait for async operations to end
     if (!doNotAutomate) {
       await this.wait(200)
       await this.clearAlerts()
