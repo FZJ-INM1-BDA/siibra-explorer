@@ -95,15 +95,6 @@
   ],
   "parcellations": [
     {
-      "@id": "julich/tmp/parcellation/freesurfer-test-parc",
-      "name": "Freesurfer atlas parc test",
-      "availableIn": [
-        {
-          "@id": "julich/tmp/referencespace/freesurfer"
-        }
-      ]
-    },
-    {
       "@id": "juelich/iav/atlas/v1.0.0/8",
       "name": "Cytoarchitectonic Maps - v1.18",
       "baseLayer": true,
@@ -304,6 +295,15 @@
           "originalDatasetFormats": [{
             "name": "continuous map"
           }]
+        }
+      ]
+    },
+    {
+      "@id": "julich/tmp/parcellation/freesurfer-test-parc",
+      "name": "Freesurfer atlas parc test",
+      "availableIn": [
+        {
+          "@id": "julich/tmp/referencespace/freesurfer"
         }
       ]
     }
