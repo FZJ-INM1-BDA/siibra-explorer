@@ -118,8 +118,9 @@ module.exports = (app) => {
           'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
           'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
           'unpkg.com/react@16/umd/', // plugin load external lib -> react
-          'unpkg.com/kg-dataset-previewer@1.1.5/', // preview component
+          'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
+          'https://unpkg.com/three-surfer@0.0.1/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,

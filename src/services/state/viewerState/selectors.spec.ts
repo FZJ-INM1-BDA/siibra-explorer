@@ -14,6 +14,7 @@ const allenTemplates = require('!json-loader!src/res/ext/allenMouse.json')
 const colinTemplates = require('!json-loader!src/res/ext/colin.json')
 const mniTemplates = require('!json-loader!src/res/ext/MNI152.json')
 const bbTemplates = require('!json-loader!src/res/ext/bigbrain.json')
+const freesurfer = require('!json-loader!src/res/ext/freesurfer.json')
 
 const fetchedAtlases = [
   waxholmAtlasJson,
@@ -27,27 +28,32 @@ const fetchedTemplates = [
   colinTemplates,
   mniTemplates,
   bbTemplates,
+  freesurfer,
 ]
 
 describe('viewerState/selector.ts', () => {
   describe('> viewerStateGetOverlayingAdditionalParcellations', () => {
-    it('> if atlas has no basic layer, should return empty array', () => {
-      const waxholmParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-        fetchedAtlases,
-        selectedAtlasId: waxholmAtlasJson['@id']
-      }, {
-        parcellationSelected: waxholmAtlasJson.parcellations[0]
+    describe('> if atlas has no basic layer, should return empty array', () => {
+      it('> true for waxholm', () => {
+        const waxholmParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+          fetchedAtlases,
+          selectedAtlasId: waxholmAtlasJson['@id']
+        }, {
+          parcellationSelected: waxholmAtlasJson.parcellations[0]
+        })
+        
+        expect(waxholmParcs).toEqual([])
       })
-      
-      expect(waxholmParcs).toEqual([])
-
-      const allenParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-        fetchedAtlases,
-        selectedAtlasId: allenAtlasJson['@id']
-      }, {
-        parcellationSelected: allenAtlasJson.parcellations[0]
+      it('> true for allen', () => {
+  
+        const allenParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+          fetchedAtlases,
+          selectedAtlasId: allenAtlasJson['@id']
+        }, {
+          parcellationSelected: allenAtlasJson.parcellations[0]
+        })
+        expect(allenParcs).toEqual([])
       })
-      expect(allenParcs).toEqual([])
     })
 
 
@@ -95,10 +101,21 @@ describe('viewerState/selector.ts', () => {
         //TODO compare strict equality of firsthalf+secondhalf with parc
       }
     }
-    it('> should work', () => {
-      check(waxholmAtlasJson, [waxholmTemplates])
-      check(allenAtlasJson, [allenTemplates])
-      check(humanAtlasJson, [bbTemplates, mniTemplates, colinTemplates])
+    describe('> should work', () => {
+      it('> for waxholm', () => {
+        check(waxholmAtlasJson, [waxholmTemplates])
+      })
+      it('> for allen', () => {
+        check(allenAtlasJson, [allenTemplates])
+      })
+      it('> for human', () => {
+        check(humanAtlasJson, [
+          bbTemplates,
+          mniTemplates,
+          colinTemplates,
+          freesurfer
+        ])
+      })
     })
   })
 

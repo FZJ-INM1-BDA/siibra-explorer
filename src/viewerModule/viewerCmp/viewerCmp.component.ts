@@ -1,11 +1,9 @@
-import { AfterViewInit, Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import { Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
-import { NehubaGlueCmp } from "../nehuba";
-import { IViewer } from "../viewer.interface";
 import { CONST, ARIA_LABELS } from 'common/constants'
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
@@ -13,6 +11,7 @@ import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services
 import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
+import { TSupportedViewer } from "../constants";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -67,12 +66,11 @@ import { SwitchDirective } from "src/util/directives/switch.directive";
   ]
 })
 
-export class ViewerCmp implements OnDestroy, AfterViewInit{
+export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
-  @ViewChild(NehubaGlueCmp) viewerCmp: IViewer
   @ViewChild('sideNavTopSwitch', { static: true })
   private sidenavTopSwitch: SwitchDirective
 
@@ -96,6 +94,15 @@ export class ViewerCmp implements OnDestroy, AfterViewInit{
   public selectedRegions$ = this.store$.pipe(
     select(viewerStateContextedSelectedRegionsSelector),
     distinctUntilChanged(),
+  )
+
+  public useViewer$: Observable<TSupportedViewer> = this.templateSelected$.pipe(
+    map(t => {
+      if (!t) return null
+      if (!!t['nehubaConfigURL'] || !!t['nehubaConfig']) return 'nehuba'
+      if (!!t['three-surfer']) return 'threeSurfer'
+      return null
+    })
   )
 
   public isStandaloneVolumes$ = this.store$.pipe(
@@ -152,16 +159,6 @@ export class ViewerCmp implements OnDestroy, AfterViewInit{
         filter(flag => !flag),
       ).subscribe(() => {
         this.openSideNavs()
-      })
-    )
-  }
-
-  ngAfterViewInit(){
-    this.subscriptions.push(
-      this.viewerCmp.viewerEvents$.pipe(
-        filter(ev => ev.type === 'VIEWERLOADED'),
-      ).subscribe(ev => {
-        this.viewerLoaded = ev.data
       })
     )
   }

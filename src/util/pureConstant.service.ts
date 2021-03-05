@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, merge, Subscription, of, throwError, forkJoin, fromEvent, combineLatest, timer } from "rxjs";
+import { Observable, merge, Subscription, of, forkJoin, fromEvent, combineLatest, timer } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
 import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, switchMapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
@@ -34,17 +34,20 @@ export class PureContantService implements OnDestroy{
 
   private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
     switchMap((template: any) => {
-      if (template.nehubaConfig) { return of(template) }
-      if (template.nehubaConfigURL) { return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
-        map(nehubaConfig => {
-          return {
-            ...template,
-            nehubaConfig,
-          }
-        }),
-      )
+      if (template.nehubaConfig) {
+        return of(template)
       }
-      throwError('neither nehubaConfig nor nehubaConfigURL defined')
+      if (template.nehubaConfigURL) {
+        return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
+          map(nehubaConfig => {
+            return {
+              ...template,
+              nehubaConfig,
+            }
+          }),
+        )
+      }
+      return of(template)
     }),
   )
 

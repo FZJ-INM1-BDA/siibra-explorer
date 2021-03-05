@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { EventEmitter } from "@angular/core";
 
 type TLayersColorMap = Map<string, Map<number, { red: number, green: number, blue: number }>>
 
@@ -44,5 +44,5 @@ export type IViewer = {
   selectedTemplate: any
   selectedParcellation: any
   viewerCtrlHandler?: IViewerCtrl
-  viewerEvents$: Observable<TViewerEvent>
+  viewerEvent: EventEmitter<TViewerEvent>
 }

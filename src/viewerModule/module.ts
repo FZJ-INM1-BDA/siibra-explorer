@@ -15,6 +15,7 @@ import { TopMenuModule } from "src/ui/topMenu/module";
 import { UtilModule } from "src/util";
 import { VIEWERMODULE_DARKTHEME } from "./constants";
 import { NehubaModule } from "./nehuba";
+import { ThreeSurferModule } from "./threeSurfer";
 import { RegionAccordionTooltipTextPipe } from "./util/regionAccordionTooltipText.pipe";
 import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
 
@@ -22,6 +23,7 @@ import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
   imports: [
     CommonModule,
     NehubaModule,
+    ThreeSurferModule,
     LayoutModule,
     DatabrowserModule,
     AtlasCmpUiSelectorsModule,
