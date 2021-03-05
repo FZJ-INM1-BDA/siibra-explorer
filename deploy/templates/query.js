@@ -13,7 +13,8 @@ exports.getAllTemplates = () => new Promise((resolve, reject) => {
     'colin',
     'MNI152',
     'waxholmRatV2_0',
-    'allenMouse'
+    'allenMouse',
+    'freesurfer'
   ]
   resolve(templates)
 })

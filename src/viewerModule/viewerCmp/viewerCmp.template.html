@@ -239,11 +239,26 @@
       </ui-splashscreen>
       <div class="h-100 w-100 overflow-hidden position-relative"
         [ngClass]="{'pe-none': !viewerLoaded}">
-        <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
-          [selectedTemplate]="templateSelected$ | async"
-          [selectedParcellation]="parcellationSelected$ | async"
-          #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
-        </iav-cmp-viewer-nehuba-glue>
+
+        <ng-container [ngSwitch]="useViewer$ | async">
+
+          <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
+            *ngSwitchCase="'nehuba'"
+            (viewerEvent)="viewerLoaded = $event.data"
+            [selectedTemplate]="templateSelected$ | async"
+            [selectedParcellation]="parcellationSelected$ | async"
+            #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
+          </iav-cmp-viewer-nehuba-glue>
+
+          <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
+            *ngSwitchCase="'threeSurfer'"
+            (viewerEvent)="viewerLoaded = $event.data"
+            [selectedTemplate]="templateSelected$ | async"
+            [selectedParcellation]="parcellationSelected$ | async">
+          </three-surfer-glue-cmp>
+
+          <div *ngSwitchDefault>Template not supported by any of the viewers</div>
+        </ng-container>
 
       </div>
     </div>

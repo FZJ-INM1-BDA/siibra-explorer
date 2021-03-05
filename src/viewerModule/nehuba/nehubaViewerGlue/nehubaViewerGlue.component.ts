@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, OnChanges, OnDestroy, Optional, SimpleChanges, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, interval, merge, Observable, of, Subject, timer } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
@@ -52,11 +52,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   @ViewChild(MouseHoverDirective, { static: true })
   private mouseoverDirective: MouseHoverDirective
 
-  public viewerEvents$ = new Subject<TViewerEvent>()
-  public viewerLoaded$ = this.viewerEvents$.pipe(
-    filter(ev => ev.type === 'VIEWERLOADED'),
-    map(ev => ev.data)
-  )
+  public viewerLoaded: boolean = false
 
   private onhoverSegments = []
   private onDestroyCb: Function[] = []
@@ -259,6 +255,9 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     }))
   }
 
+  @Output()
+  public viewerEvent = new EventEmitter<TViewerEvent>()
+
   constructor(
     private store$: Store<any>,
     private el: ElementRef,
@@ -267,7 +266,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Subject<NehubaViewerUnit>,
   ){
-    this.viewerEvents$.next({
+    this.viewerEvent.emit({
       type: 'MOUSEOVER_ANNOTATION',
       data: {}
     })
@@ -696,10 +695,11 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   handleViewerLoadedEvent(flag: boolean) {
-    this.viewerEvents$.next({
+    this.viewerEvent.emit({
       type: 'VIEWERLOADED',
       data: flag
     })
+    this.viewerLoaded = flag
   }
 
   private selectHoveredRegion(ev: any, next: Function){

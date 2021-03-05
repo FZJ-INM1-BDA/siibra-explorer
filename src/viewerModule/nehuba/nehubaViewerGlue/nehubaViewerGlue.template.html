@@ -15,7 +15,7 @@
   </div>
 </div>
 
-<current-layout *ngIf="viewerLoaded$ | async" class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
+<current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
   <div class="w-100 h-100 position-relative" cell-i>
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
   </div>

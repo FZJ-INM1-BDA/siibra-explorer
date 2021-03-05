@@ -55,6 +55,8 @@ const previewImageFIleNameMap = new Map([
   ['minds/core/parcellationatlas/v1.0.0/2449a7f0-6dd0-4b5a-8f1e-aec0db03679d', 'waxholm-v2.png'],
   ['minds/core/parcellationatlas/v1.0.0/11017b35-7056-4593-baad-3934d211daba', 'waxholm-v1.png'],
   ['juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c', 'short-bundle-hcp.png'],
+  ['julich/tmp/referencespace/freesurfer', 'freesurfer.png'],
+  ['julich/tmp/parcellation/freesurfer-test-parc', 'freesurfer.png'],
 ])
 
 router.get('/preview', (req, res) => {

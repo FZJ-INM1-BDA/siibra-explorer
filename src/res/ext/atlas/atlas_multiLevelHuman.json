@@ -82,9 +82,27 @@
           "@id": "juelich/iav/atlas/v1.0.0/4"
         }
       ]
+    },
+    {
+      "@id": "julich/tmp/referencespace/freesurfer",
+      "name": "Freesurfer atlas test tmpl",
+      "availableIn": [
+        {
+          "@id": "julich/tmp/parcellation/freesurfer-test-parc"
+        }
+      ]
     }
   ],
   "parcellations": [
+    {
+      "@id": "julich/tmp/parcellation/freesurfer-test-parc",
+      "name": "Freesurfer atlas parc test",
+      "availableIn": [
+        {
+          "@id": "julich/tmp/referencespace/freesurfer"
+        }
+      ]
+    },
     {
       "@id": "juelich/iav/atlas/v1.0.0/8",
       "name": "Cytoarchitectonic Maps - v1.18",
