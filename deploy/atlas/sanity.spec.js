@@ -9,13 +9,14 @@ const templateFiles = [
   'colin.json',
   'MNI152.json',
   'waxholmRatV2_0.json',
-  'allenMouse.json'
+  'allenMouse.json',
+  'freesurfer.json',
 ]
 
 const atlasFiles = [
   'atlas_multiLevelHuman.json',
   'atlas_waxholmRat.json',
-  'atlas_allenMouse.json'
+  'atlas_allenMouse.json',
 ]
 
 const templateIdToParcsMap = new Map()
