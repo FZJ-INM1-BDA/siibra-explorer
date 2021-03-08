@@ -101,7 +101,7 @@ export class ViewerCmp implements OnDestroy {
       if (!t) return null
       if (!!t['nehubaConfigURL'] || !!t['nehubaConfig']) return 'nehuba'
       if (!!t['three-surfer']) return 'threeSurfer'
-      return null
+      return 'notsupported'
     })
   )
 

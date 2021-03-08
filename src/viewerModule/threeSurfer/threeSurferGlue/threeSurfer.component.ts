@@ -26,6 +26,7 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   private config: TThreeSurferConfig
   public modes: TThreeSurferMode[] = []
   public selectedMode: string
+  private colormap: Map<string, Map<number, [number, number, number]>> = new Map()
 
   constructor(
     private el: ElementRef
@@ -50,17 +51,24 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
     this.selectedMode = mode.name
     const { meshes } = mode
     for (const singleMesh of meshes) {
-      const { mesh, colormap } = singleMesh
+      const { mesh, colormap, hemisphere } = singleMesh
       
       const tsM = await this.tsRef.loadMesh(
         parseContext(mesh, [this.config['@context']])
       )
+
+      const applyCM = this.colormap.get(hemisphere)
+
       this.loadedMeshes.push(tsM)
       const tsC = await this.tsRef.loadColormap(
         parseContext(colormap, [this.config['@context']])
       )
       const colorIdx = tsC[0].getData()
-      this.tsRef.applyColorMap(tsM, colorIdx)
+      this.tsRef.applyColorMap(tsM, colorIdx, 
+        {
+          custom: applyCM
+        }
+      )
     }
   }
 
@@ -79,6 +87,16 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
           }
         )
       }
+
+      for (const region of this.selectedParcellation.regions) {
+        const map = new Map<number, [number, number, number]>()
+        for (const child of region.children) {
+          const color = (child.iav?.rgb as [number, number, number] ) || [200, 200, 200]
+          map.set(Number(child.grayvalue), color.map(v => v/255) as [number, number, number])
+        }
+        this.colormap.set(region.name, map)
+      }
+      
       // load mode0 by default
       this.loadMode(this.config.modes[0])
 
