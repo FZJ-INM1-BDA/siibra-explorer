@@ -257,7 +257,11 @@
             [selectedParcellation]="parcellationSelected$ | async">
           </three-surfer-glue-cmp>
 
-          <div *ngSwitchDefault>Template not supported by any of the viewers</div>
+          <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
+          
+          <div *ngSwitchCaseDefault>
+            [ngSwitchDefault]
+          </div>
         </ng-container>
 
       </div>

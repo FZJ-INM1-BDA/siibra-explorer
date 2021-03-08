@@ -23,24 +23,13 @@
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa:/lh.pial.gii",
-            "colormap": "label_fsa_lh:"
+            "colormap": "label_fsa_lh:",
+            "hemisphere": "left"
           },
           {
             "mesh": "rootUrl:fsa_fsa:/rh.pial.gii",
-            "colormap": "label_fsa_rh:"
-          }
-        ]
-      },
-      {
-        "name": "fsaverage/fsaverage/curv",
-        "meshes": [
-          {
-            "mesh": "rootUrl:fsa_fsa:/lh.curv.gii",
-            "colormap": "label_fsa_lh:"
-          },
-          {
-            "mesh": "rootUrl:fsa_fsa:/rh.curv.gii",
-            "colormap": "label_fsa_rh:"
+            "colormap": "label_fsa_rh:",
+            "hemisphere": "right"
           }
         ]
       },
@@ -49,24 +38,33 @@
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa:/lh.white.gii",
-            "colormap": "label_fsa_lh:"
+            "colormap": "label_fsa_lh:",
+            "hemisphere": "left"
           },
           {
             "mesh": "rootUrl:fsa_fsa:/rh.white.gii",
-            "colormap": "label_fsa_rh:"
+            "colormap": "label_fsa_rh:",
+            "hemisphere": "right"
           }
         ]
       },
       {
-        "name": "fsaverage/fsaverage/inflated",
+        "name": "fsaverage/fsaverage/inflated-left",
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa:/lh.inflated.gii",
-            "colormap": "label_fsa_lh:"
-          },
+            "colormap": "label_fsa_lh:",
+            "hemisphere": "left"
+          }
+        ]
+      },
+      {
+        "name": "fsaverage/fsaverage/inflated-right",
+        "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa:/rh.inflated.gii",
-            "colormap": "label_fsa_rh:"
+            "colormap": "label_fsa_rh:",
+            "hemisphere": "right"
           }
         ]
       },
@@ -75,24 +73,13 @@
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa6:/lh.pial.gii",
-            "colormap": "label_fsa6_lh:"
+            "colormap": "label_fsa6_lh:",
+            "hemisphere": "left"
           },
           {
             "mesh": "rootUrl:fsa_fsa6:/rh.pial.gii",
-            "colormap": "label_fsa6_rh:"
-          }
-        ]
-      },
-      {
-        "name": "fsaverage/fsaverage6/curv",
-        "meshes": [
-          {
-            "mesh": "rootUrl:fsa_fsa6:/lh.curv.gii",
-            "colormap": "label_fsa6_lh:"
-          },
-          {
-            "mesh": "rootUrl:fsa_fsa6:/rh.curv.gii",
-            "colormap": "label_fsa6_rh:"
+            "colormap": "label_fsa6_rh:",
+            "hemisphere": "right"
           }
         ]
       },
@@ -101,24 +88,33 @@
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa6:/lh.white.gii",
-            "colormap": "label_fsa6_lh:"
+            "colormap": "label_fsa6_lh:",
+            "hemisphere": "left"
           },
           {
             "mesh": "rootUrl:fsa_fsa6:/rh.white.gii",
-            "colormap": "label_fsa6_rh:"
+            "colormap": "label_fsa6_rh:",
+            "hemisphere": "right"
           }
         ]
       },
       {
-        "name": "fsaverage/fsaverage6/inflated",
+        "name": "fsaverage/fsaverage6/inflated-left",
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa6:/lh.inflated.gii",
-            "colormap": "label_fsa6_lh:"
-          },
+            "colormap": "label_fsa6_lh:",
+            "hemisphere": "left"
+          }
+        ]
+      },
+      {
+        "name": "fsaverage/fsaverage6/inflated-right",
+        "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa6:/rh.inflated.gii",
-            "colormap": "label_fsa6_rh:"
+            "colormap": "label_fsa6_rh:",
+            "hemisphere": "right"
           }
         ]
       },
@@ -127,11 +123,13 @@
         "meshes": [
           {
             "mesh": "rootUrl:fsa_fsa6:/lh.sphere.gii",
-            "colormap": "label_fsa6_lh:"
+            "colormap": "label_fsa6_lh:",
+            "hemisphere": "left"
           },
           {
             "mesh": "rootUrl:fsa_fsa6:/rh.sphere.gii",
-            "colormap": "label_fsa6_rh:"
+            "colormap": "label_fsa6_rh:",
+            "hemisphere": "right"
           }
         ]
       }
@@ -146,7 +144,5058 @@
         "name": "Freesurfer Test Parc",
         "descrption": "This is a test parc for free surfer"
       },
-      "regions": []
+      "regions": [
+        {
+          "name": "right",
+          "children": [
+            {
+              "name": "Area TE 1.1 (HESCHL)",
+              "num": "0",
+              "id": "33",
+              "grayvalue": "1",
+              "iav": {
+                "name": "Area TE 1.1 (HESCHL)",
+                "labelIndex": 39,
+                "rgb": [
+                  8,
+                  113,
+                  68
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.1 (HESCHL)",
+                    "gray": "1"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 3b (PostCG)",
+              "num": "1",
+              "id": "127",
+              "grayvalue": "2",
+              "iav": {
+                "name": "Area 3b (PostCG)",
+                "labelIndex": 37,
+                "rgb": [
+                  239,
+                  246,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 3b (PostCG)",
+                    "gray": "2"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PF (IPL)",
+              "num": "2",
+              "id": "206",
+              "grayvalue": "3",
+              "iav": {
+                "name": "Area PF (IPL)",
+                "labelIndex": 12,
+                "rgb": [
+                  226,
+                  211,
+                  61
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PF (IPL)",
+                    "gray": "5"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4la (LOC)",
+              "num": "3",
+              "id": "118",
+              "grayvalue": "4",
+              "iav": {
+                "name": "Area hOc4la (LOC)",
+                "labelIndex": 29,
+                "rgb": [
+                  233,
+                  168,
+                  189
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4la (LOC)",
+                    "gray": "4"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc2 (V2, 18)",
+              "num": "4",
+              "id": "7",
+              "grayvalue": "5",
+              "iav": {
+                "name": "Area hOc2 (V2, 18)",
+                "labelIndex": 21,
+                "rgb": [
+                  84,
+                  110,
+                  22
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc2 (V2, 18)",
+                    "gray": "6"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d2 (PreCG)",
+              "num": "5",
+              "id": "288",
+              "grayvalue": "6",
+              "iav": {
+                "name": "Area 6d2 (PreCG)",
+                "labelIndex": 82,
+                "rgb": [
+                  170,
+                  151,
+                  180
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d2 (PreCG)",
+                    "gray": "7"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig3 (Insula)",
+              "num": "6",
+              "id": "336",
+              "grayvalue": "7",
+              "iav": {
+                "name": "Area Ig3 (Insula)",
+                "labelIndex": 105,
+                "rgb": [
+                  105,
+                  253,
+                  197
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig3 (Insula)",
+                    "gray": "8"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4d (Cuneus)",
+              "num": "7",
+              "id": "119",
+              "grayvalue": "8",
+              "iav": {
+                "name": "Area hOc4d (Cuneus)",
+                "labelIndex": 44,
+                "rgb": [
+                  109,
+                  218,
+                  10
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4d (Cuneus)",
+                    "gray": "9"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo4 (OFC)",
+              "num": "8",
+              "id": "324",
+              "grayvalue": "9",
+              "iav": {
+                "name": "Area Fo4 (OFC)",
+                "labelIndex": 80,
+                "rgb": [
+                  163,
+                  204,
+                  53
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo4 (OFC)",
+                    "gray": "10"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP4 (POperc)",
+              "num": "9",
+              "id": "72",
+              "grayvalue": "10",
+              "iav": {
+                "name": "Area OP4 (POperc)",
+                "labelIndex": 14,
+                "rgb": [
+                  89,
+                  80,
+                  132
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP4 (POperc)",
+                    "gray": "11"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 1 (PostCG)",
+              "num": "10",
+              "id": "125",
+              "grayvalue": "11",
+              "iav": {
+                "name": "Area 1 (PostCG)",
+                "labelIndex": 116,
+                "rgb": [
+                  232,
+                  185,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 1 (PostCG)",
+                    "gray": "12"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ch 4 (Basal Forebrain)",
+              "num": "11",
+              "id": "264",
+              "grayvalue": "12",
+              "iav": {
+                "name": "Ch 4 (Basal Forebrain)",
+                "labelIndex": 97,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ch 4 (Basal Forebrain)",
+                    "gray": "13"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-I (GapMap)",
+              "num": "12",
+              "id": "500",
+              "grayvalue": "13",
+              "iav": {
+                "name": "Frontal-I (GapMap)",
+                "labelIndex": 71,
+                "rgb": [
+                  186,
+                  255,
+                  25
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-I (GapMap)",
+                    "gray": "14"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hPO1 (POS)",
+              "num": "13",
+              "id": "297",
+              "grayvalue": "14",
+              "iav": {
+                "name": "Area hPO1 (POS)",
+                "labelIndex": 69,
+                "rgb": [
+                  153,
+                  232,
+                  235
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hPO1 (POS)",
+                    "gray": "15"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP2 (POperc)",
+              "num": "14",
+              "id": "74",
+              "grayvalue": "15",
+              "iav": {
+                "name": "Area OP2 (POperc)",
+                "labelIndex": 122,
+                "rgb": [
+                  36,
+                  47,
+                  221
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP2 (POperc)",
+                    "gray": "17"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 1.0 (HESCHL)",
+              "num": "15",
+              "id": "27",
+              "grayvalue": "16",
+              "iav": {
+                "name": "Area TE 1.0 (HESCHL)",
+                "labelIndex": 34,
+                "rgb": [
+                  252,
+                  84,
+                  222
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.0 (HESCHL)",
+                    "gray": "18"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Dorsal Dentate Nucleus (Cerebellum)",
+              "num": "16",
+              "id": "240",
+              "grayvalue": "17",
+              "iav": {
+                "name": "Dorsal Dentate Nucleus (Cerebellum)",
+                "labelIndex": 111,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Dorsal Dentate Nucleus (Cerebellum)",
+                    "gray": "16"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area STS2 (STS)",
+              "num": "17",
+              "id": "272",
+              "grayvalue": "18",
+              "iav": {
+                "name": "Area STS2 (STS)",
+                "labelIndex": 98,
+                "rgb": [
+                  62,
+                  117,
+                  123
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area STS2 (STS)",
+                    "gray": "19"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id3 (Insula)",
+              "num": "18",
+              "id": "57",
+              "grayvalue": "19",
+              "iav": {
+                "name": "Area Id3 (Insula)",
+                "labelIndex": 54,
+                "rgb": [
+                  32,
+                  32,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id3 (Insula)",
+                    "gray": "20"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6mp (SMA, mesial SFG)",
+              "num": "19",
+              "id": "298",
+              "grayvalue": "20",
+              "iav": {
+                "name": "Area 6mp (SMA, mesial SFG)",
+                "labelIndex": 108,
+                "rgb": [
+                  75,
+                  95,
+                  87
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6mp (SMA, mesial SFG)",
+                    "gray": "21"
+                  }
+                }
+              }
+            },
+            {
+              "name": "DG (Hippocampus)",
+              "num": "20",
+              "id": "61",
+              "grayvalue": "21",
+              "iav": {
+                "name": "DG (Hippocampus)",
+                "labelIndex": 91,
+                "rgb": [
+                  0,
+                  149,
+                  8
+                ],
+                "_": {
+                  "xml": {
+                    "name": "DG (Hippocampus)",
+                    "gray": "22"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PGp (IPL)",
+              "num": "21",
+              "id": "108",
+              "grayvalue": "22",
+              "iav": {
+                "name": "Area PGp (IPL)",
+                "labelIndex": 65,
+                "rgb": [
+                  92,
+                  116,
+                  83
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PGp (IPL)",
+                    "gray": "23"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig1 (Insula)",
+              "num": "22",
+              "id": "115",
+              "grayvalue": "23",
+              "iav": {
+                "name": "Area Ig1 (Insula)",
+                "labelIndex": 25,
+                "rgb": [
+                  18,
+                  111,
+                  40
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig1 (Insula)",
+                    "gray": "24"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6ma (preSMA, mesial SFG)",
+              "num": "23",
+              "id": "299",
+              "grayvalue": "24",
+              "iav": {
+                "name": "Area 6ma (preSMA, mesial SFG)",
+                "labelIndex": 70,
+                "rgb": [
+                  204,
+                  108,
+                  222
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6ma (preSMA, mesial SFG)",
+                    "gray": "25"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TI (STG)",
+              "num": "24",
+              "id": "243",
+              "grayvalue": "25",
+              "iav": {
+                "name": "Area TI (STG)",
+                "labelIndex": 13,
+                "rgb": [
+                  86,
+                  101,
+                  22
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TI (STG)",
+                    "gray": "26"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p24ab (pACC)",
+              "num": "25",
+              "id": "231",
+              "grayvalue": "26",
+              "iav": {
+                "name": "Area p24ab (pACC)",
+                "labelIndex": 63,
+                "rgb": [
+                  153,
+                  195,
+                  229
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p24ab (pACC)",
+                    "gray": "28"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFt (IPL)",
+              "num": "26",
+              "id": "109",
+              "grayvalue": "27",
+              "iav": {
+                "name": "Area PFt (IPL)",
+                "labelIndex": 20,
+                "rgb": [
+                  120,
+                  135,
+                  232
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFt (IPL)",
+                    "gray": "27"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p24c (pACC)",
+              "num": "27",
+              "id": "232",
+              "grayvalue": "28",
+              "iav": {
+                "name": "Area p24c (pACC)",
+                "labelIndex": 57,
+                "rgb": [
+                  241,
+                  164,
+                  195
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p24c (pACC)",
+                    "gray": "29"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc3v (LingG)",
+              "num": "28",
+              "id": "10",
+              "grayvalue": "29",
+              "iav": {
+                "name": "Area hOc3v (LingG)",
+                "labelIndex": 77,
+                "rgb": [
+                  83,
+                  179,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc3v (LingG)",
+                    "gray": "30"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 3 (STG)",
+              "num": "29",
+              "id": "31",
+              "grayvalue": "30",
+              "iav": {
+                "name": "Area TE 3 (STG)",
+                "labelIndex": 15,
+                "rgb": [
+                  159,
+                  104,
+                  108
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 3 (STG)",
+                    "gray": "31"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFcm (IPL)",
+              "num": "30",
+              "id": "113",
+              "grayvalue": "31",
+              "iav": {
+                "name": "Area PFcm (IPL)",
+                "labelIndex": 103,
+                "rgb": [
+                  98,
+                  128,
+                  120
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFcm (IPL)",
+                    "gray": "32"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-to-Occipital (GapMap)",
+              "num": "31",
+              "id": "504",
+              "grayvalue": "32",
+              "iav": {
+                "name": "Frontal-to-Occipital (GapMap)",
+                "labelIndex": 33,
+                "rgb": [
+                  104,
+                  161,
+                  93
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-to-Occipital (GapMap)",
+                    "gray": "33"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP5 (IPS)",
+              "num": "32",
+              "id": "295",
+              "grayvalue": "33",
+              "iav": {
+                "name": "Area hIP5 (IPS)",
+                "labelIndex": 7,
+                "rgb": [
+                  217,
+                  87,
+                  210
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP5 (IPS)",
+                    "gray": "34"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 7P (SPL)",
+              "num": "33",
+              "id": "208",
+              "grayvalue": "34",
+              "iav": {
+                "name": "Area 7P (SPL)",
+                "labelIndex": 24,
+                "rgb": [
+                  52,
+                  20,
+                  106
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7P (SPL)",
+                    "gray": "35"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d1 (PreCG)",
+              "num": "34",
+              "id": "287",
+              "grayvalue": "35",
+              "iav": {
+                "name": "Area 6d1 (PreCG)",
+                "labelIndex": 90,
+                "rgb": [
+                  45,
+                  33,
+                  27
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d1 (PreCG)",
+                    "gray": "36"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG1 (FusG)",
+              "num": "35",
+              "id": "107",
+              "grayvalue": "36",
+              "iav": {
+                "name": "Area FG1 (FusG)",
+                "labelIndex": 84,
+                "rgb": [
+                  131,
+                  183,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG1 (FusG)",
+                    "gray": "37"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP4 (IPS)",
+              "num": "36",
+              "id": "294",
+              "grayvalue": "37",
+              "iav": {
+                "name": "Area hIP4 (IPS)",
+                "labelIndex": 115,
+                "rgb": [
+                  254,
+                  52,
+                  184
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP4 (IPS)",
+                    "gray": "38"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP6 (Frontal Operculum)",
+              "num": "37",
+              "id": "349",
+              "grayvalue": "38",
+              "iav": {
+                "name": "Area OP6 (Frontal Operculum)",
+                "labelIndex": 31,
+                "rgb": [
+                  138,
+                  63,
+                  100
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP6 (Frontal Operculum)",
+                    "gray": "39"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG2 (FusG)",
+              "num": "38",
+              "id": "106",
+              "grayvalue": "39",
+              "iav": {
+                "name": "Area FG2 (FusG)",
+                "labelIndex": 28,
+                "rgb": [
+                  67,
+                  94,
+                  149
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG2 (FusG)",
+                    "gray": "40"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP6 (IPS)",
+              "num": "39",
+              "id": "292",
+              "grayvalue": "40",
+              "iav": {
+                "name": "Area hIP6 (IPS)",
+                "labelIndex": 95,
+                "rgb": [
+                  237,
+                  233,
+                  37
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP6 (IPS)",
+                    "gray": "41"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP3 (IPS)",
+              "num": "40",
+              "id": "133",
+              "grayvalue": "41",
+              "iav": {
+                "name": "Area hIP3 (IPS)",
+                "labelIndex": 75,
+                "rgb": [
+                  113,
+                  172,
+                  229
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP3 (IPS)",
+                    "gray": "43"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo5 (OFC)",
+              "num": "41",
+              "id": "325",
+              "grayvalue": "42",
+              "iav": {
+                "name": "Area Fo5 (OFC)",
+                "labelIndex": 76,
+                "rgb": [
+                  219,
+                  11,
+                  91
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo5 (OFC)",
+                    "gray": "42"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CM (Amygdala)",
+              "num": "42",
+              "id": "290",
+              "grayvalue": "43",
+              "iav": {
+                "name": "CM (Amygdala)",
+                "labelIndex": 85,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CM (Amygdala)",
+                    "gray": "44"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP7 (Frontal Operculum)",
+              "num": "43",
+              "id": "350",
+              "grayvalue": "44",
+              "iav": {
+                "name": "Area OP7 (Frontal Operculum)",
+                "labelIndex": 60,
+                "rgb": [
+                  134,
+                  116,
+                  192
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP7 (Frontal Operculum)",
+                    "gray": "45"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 4p (PreCG)",
+              "num": "44",
+              "id": "123",
+              "grayvalue": "45",
+              "iav": {
+                "name": "Area 4p (PreCG)",
+                "labelIndex": 9,
+                "rgb": [
+                  116,
+                  92,
+                  124
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 4p (PreCG)",
+                    "gray": "46"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 33 (ACC)",
+              "num": "45",
+              "id": "39",
+              "grayvalue": "46",
+              "iav": {
+                "name": "Area 33 (ACC)",
+                "labelIndex": 96,
+                "rgb": [
+                  51,
+                  57,
+                  245
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 33 (ACC)",
+                    "gray": "47"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc6 (POS)",
+              "num": "46",
+              "id": "291",
+              "grayvalue": "47",
+              "iav": {
+                "name": "Area hOc6 (POS)",
+                "labelIndex": 72,
+                "rgb": [
+                  239,
+                  66,
+                  26
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc6 (POS)",
+                    "gray": "49"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig2 (Insula)",
+              "num": "47",
+              "id": "114",
+              "grayvalue": "48",
+              "iav": {
+                "name": "Area Ig2 (Insula)",
+                "labelIndex": 45,
+                "rgb": [
+                  105,
+                  61,
+                  82
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig2 (Insula)",
+                    "gray": "50"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA2 (Hippocampus)",
+              "num": "48",
+              "id": "58",
+              "grayvalue": "49",
+              "iav": {
+                "name": "CA2 (Hippocampus)",
+                "labelIndex": 23,
+                "rgb": [
+                  0,
+                  250,
+                  98
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA2 (Hippocampus)",
+                    "gray": "51"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fp2 (FPole)",
+              "num": "49",
+              "id": "211",
+              "grayvalue": "50",
+              "iav": {
+                "name": "Area Fp2 (FPole)",
+                "labelIndex": 101,
+                "rgb": [
+                  239,
+                  137,
+                  211
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fp2 (FPole)",
+                    "gray": "52"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Entorhinal Cortex",
+              "num": "50",
+              "id": "60",
+              "grayvalue": "51",
+              "iav": {
+                "name": "Entorhinal Cortex",
+                "labelIndex": 64,
+                "rgb": [
+                  234,
+                  239,
+                  14
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Entorhinal Cortex",
+                    "gray": "53"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id4 (Insula)",
+              "num": "51",
+              "id": "337",
+              "grayvalue": "52",
+              "iav": {
+                "name": "Area Id4 (Insula)",
+                "labelIndex": 53,
+                "rgb": [
+                  38,
+                  174,
+                  113
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id4 (Insula)",
+                    "gray": "54"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id2 (Insula)",
+              "num": "52",
+              "id": "56",
+              "grayvalue": "53",
+              "iav": {
+                "name": "Area Id2 (Insula)",
+                "labelIndex": 99,
+                "rgb": [
+                  225,
+                  126,
+                  73
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id2 (Insula)",
+                    "gray": "55"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA1 (Hippocampus)",
+              "num": "53",
+              "id": "66",
+              "grayvalue": "54",
+              "iav": {
+                "name": "CA1 (Hippocampus)",
+                "labelIndex": 61,
+                "rgb": [
+                  250,
+                  89,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA1 (Hippocampus)",
+                    "gray": "57"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP1 (POperc)",
+              "num": "54",
+              "id": "73",
+              "grayvalue": "55",
+              "iav": {
+                "name": "Area OP1 (POperc)",
+                "labelIndex": 1,
+                "rgb": [
+                  250,
+                  182,
+                  34
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP1 (POperc)",
+                    "gray": "56"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id6 (Insula)",
+              "num": "55",
+              "id": "340",
+              "grayvalue": "56",
+              "iav": {
+                "name": "Area Id6 (Insula)",
+                "labelIndex": 11,
+                "rgb": [
+                  138,
+                  127,
+                  119
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id6 (Insula)",
+                    "gray": "58"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP8 (IPS)",
+              "num": "56",
+              "id": "293",
+              "grayvalue": "57",
+              "iav": {
+                "name": "Area hIP8 (IPS)",
+                "labelIndex": 50,
+                "rgb": [
+                  223,
+                  109,
+                  3
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP8 (IPS)",
+                    "gray": "60"
+                  }
+                }
+              }
+            },
+            {
+              "name": "IF (Amygdala)",
+              "num": "57",
+              "id": "237",
+              "grayvalue": "58",
+              "iav": {
+                "name": "IF (Amygdala)",
+                "labelIndex": 46,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "IF (Amygdala)",
+                    "gray": "61"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP9 (Frontal Operculum)",
+              "num": "58",
+              "id": "274",
+              "grayvalue": "59",
+              "iav": {
+                "name": "Area OP9 (Frontal Operculum)",
+                "labelIndex": 117,
+                "rgb": [
+                  175,
+                  123,
+                  34
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP9 (Frontal Operculum)",
+                    "gray": "62"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Temporal-to-Parietal (GapMap)",
+              "num": "59",
+              "id": "503",
+              "grayvalue": "60",
+              "iav": {
+                "name": "Temporal-to-Parietal (GapMap)",
+                "labelIndex": 2,
+                "rgb": [
+                  76,
+                  90,
+                  161
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Temporal-to-Parietal (GapMap)",
+                    "gray": "64"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ventral Dentate Nucleus (Cerebellum)",
+              "num": "60",
+              "id": "241",
+              "grayvalue": "61",
+              "iav": {
+                "name": "Ventral Dentate Nucleus (Cerebellum)",
+                "labelIndex": 38,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ventral Dentate Nucleus (Cerebellum)",
+                    "gray": "65"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d3 (SFS)",
+              "num": "61",
+              "id": "289",
+              "grayvalue": "62",
+              "iav": {
+                "name": "Area 6d3 (SFS)",
+                "labelIndex": 68,
+                "rgb": [
+                  55,
+                  239,
+                  21
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d3 (SFS)",
+                    "gray": "66"
+                  }
+                }
+              }
+            },
+            {
+              "name": "HATA (Hippocampus)",
+              "num": "62",
+              "id": "68",
+              "grayvalue": "63",
+              "iav": {
+                "name": "HATA (Hippocampus)",
+                "labelIndex": 56,
+                "rgb": [
+                  137,
+                  12,
+                  73
+                ],
+                "_": {
+                  "xml": {
+                    "name": "HATA (Hippocampus)",
+                    "gray": "67"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP2 (IPS)",
+              "num": "63",
+              "id": "129",
+              "grayvalue": "64",
+              "iav": {
+                "name": "Area hIP2 (IPS)",
+                "labelIndex": 59,
+                "rgb": [
+                  127,
+                  245,
+                  203
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP2 (IPS)",
+                    "gray": "68"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 44 (IFG)",
+              "num": "64",
+              "id": "2",
+              "grayvalue": "65",
+              "iav": {
+                "name": "Area 44 (IFG)",
+                "labelIndex": 92,
+                "rgb": [
+                  54,
+                  74,
+                  75
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 44 (IFG)",
+                    "gray": "69"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo7 (OFC)",
+              "num": "65",
+              "id": "327",
+              "grayvalue": "66",
+              "iav": {
+                "name": "Area Fo7 (OFC)",
+                "labelIndex": 52,
+                "rgb": [
+                  64,
+                  211,
+                  186
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo7 (OFC)",
+                    "gray": "70"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area a29 (retrosplenial)",
+              "num": "66",
+              "id": "353",
+              "grayvalue": "67"
+            },
+            {
+              "name": "Area 45 (IFG)",
+              "num": "67",
+              "id": "1",
+              "grayvalue": "68",
+              "iav": {
+                "name": "Area 45 (IFG)",
+                "labelIndex": 112,
+                "rgb": [
+                  167,
+                  103,
+                  146
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 45 (IFG)",
+                    "gray": "71"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id1 (Insula)",
+              "num": "68",
+              "id": "116",
+              "grayvalue": "69",
+              "iav": {
+                "name": "Area Id1 (Insula)",
+                "labelIndex": 78,
+                "rgb": [
+                  141,
+                  112,
+                  216
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id1 (Insula)",
+                    "gray": "72"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5Ci (SPL)",
+              "num": "69",
+              "id": "136",
+              "grayvalue": "70",
+              "iav": {
+                "name": "Area 5Ci (SPL)",
+                "labelIndex": 88,
+                "rgb": [
+                  79,
+                  242,
+                  146
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5Ci (SPL)",
+                    "gray": "73"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 1.2 (HESCHL)",
+              "num": "70",
+              "id": "30",
+              "grayvalue": "71",
+              "iav": {
+                "name": "Area TE 1.2 (HESCHL)",
+                "labelIndex": 86,
+                "rgb": [
+                  202,
+                  251,
+                  192
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.2 (HESCHL)",
+                    "gray": "74"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id5 (Insula)",
+              "num": "71",
+              "id": "338",
+              "grayvalue": "72",
+              "iav": {
+                "name": "Area Id5 (Insula)",
+                "labelIndex": 104,
+                "rgb": [
+                  112,
+                  6,
+                  50
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id5 (Insula)",
+                    "gray": "75"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PGa (IPL)",
+              "num": "72",
+              "id": "110",
+              "grayvalue": "73",
+              "iav": {
+                "name": "Area PGa (IPL)",
+                "labelIndex": 81,
+                "rgb": [
+                  42,
+                  236,
+                  131
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PGa (IPL)",
+                    "gray": "76"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP1 (IPS)",
+              "num": "73",
+              "id": "128",
+              "grayvalue": "74",
+              "iav": {
+                "name": "Area hIP1 (IPS)",
+                "labelIndex": 32,
+                "rgb": [
+                  66,
+                  149,
+                  82
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP1 (IPS)",
+                    "gray": "77"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 2 (PostCS)",
+              "num": "74",
+              "id": "252",
+              "grayvalue": "75",
+              "iav": {
+                "name": "Area 2 (PostCS)",
+                "labelIndex": 49,
+                "rgb": [
+                  23,
+                  13,
+                  35
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 2 (PostCS)",
+                    "gray": "78"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ia (Insula)",
+              "num": "75",
+              "id": "339",
+              "grayvalue": "76",
+              "iav": {
+                "name": "Area Ia (Insula)",
+                "labelIndex": 118,
+                "rgb": [
+                  71,
+                  217,
+                  62
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ia (Insula)",
+                    "gray": "80"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ch 123 (Basal Forebrain)",
+              "num": "76",
+              "id": "286",
+              "grayvalue": "77",
+              "iav": {
+                "name": "Ch 123 (Basal Forebrain)",
+                "labelIndex": 62,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ch 123 (Basal Forebrain)",
+                    "gray": "79"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 2.1 (STG)",
+              "num": "77",
+              "id": "28",
+              "grayvalue": "78",
+              "iav": {
+                "name": "Area TE 2.1 (STG)",
+                "labelIndex": 19,
+                "rgb": [
+                  67,
+                  254,
+                  44
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 2.1 (STG)",
+                    "gray": "82"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc3d (Cuneus)",
+              "num": "78",
+              "id": "120",
+              "grayvalue": "79",
+              "iav": {
+                "name": "Area hOc3d (Cuneus)",
+                "labelIndex": 106,
+                "rgb": [
+                  105,
+                  191,
+                  48
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc3d (Cuneus)",
+                    "gray": "81"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP3 (POperc)",
+              "num": "79",
+              "id": "75",
+              "grayvalue": "80",
+              "iav": {
+                "name": "Area OP3 (POperc)",
+                "labelIndex": 22,
+                "rgb": [
+                  58,
+                  122,
+                  80
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP3 (POperc)",
+                    "gray": "84"
+                  }
+                }
+              }
+            },
+            {
+              "name": "VTM (Amygdala)",
+              "num": "80",
+              "id": "228",
+              "grayvalue": "81",
+              "iav": {
+                "name": "VTM (Amygdala)",
+                "labelIndex": 109,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "VTM (Amygdala)",
+                    "gray": "83"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 7A (SPL)",
+              "num": "81",
+              "id": "134",
+              "grayvalue": "82",
+              "iav": {
+                "name": "Area 7A (SPL)",
+                "labelIndex": 17,
+                "rgb": [
+                  38,
+                  204,
+                  19
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7A (SPL)",
+                    "gray": "85"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Subiculum (Hippocampus)",
+              "num": "82",
+              "id": "192",
+              "grayvalue": "83"
+            },
+            {
+              "name": "Area OP8 (Frontal Operculum)",
+              "num": "83",
+              "id": "273",
+              "grayvalue": "84",
+              "iav": {
+                "name": "Area OP8 (Frontal Operculum)",
+                "labelIndex": 40,
+                "rgb": [
+                  29,
+                  76,
+                  168
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP8 (Frontal Operculum)",
+                    "gray": "86"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p29 (retrosplenial)",
+              "num": "84",
+              "id": "268",
+              "grayvalue": "85"
+            },
+            {
+              "name": "Area 25 (sACC)",
+              "num": "85",
+              "id": "184",
+              "grayvalue": "86",
+              "iav": {
+                "name": "Area 25 (sACC)",
+                "labelIndex": 3,
+                "rgb": [
+                  170,
+                  68,
+                  220
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 25 (sACC)",
+                    "gray": "88"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP5 (Frontal Operculum)",
+              "num": "86",
+              "id": "348",
+              "grayvalue": "87",
+              "iav": {
+                "name": "Area OP5 (Frontal Operculum)",
+                "labelIndex": 43,
+                "rgb": [
+                  222,
+                  78,
+                  253
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP5 (Frontal Operculum)",
+                    "gray": "90"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFm (IPL)",
+              "num": "87",
+              "id": "112",
+              "grayvalue": "88",
+              "iav": {
+                "name": "Area PFm (IPL)",
+                "labelIndex": 102,
+                "rgb": [
+                  53,
+                  76,
+                  145
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFm (IPL)",
+                    "gray": "92"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA3 (Hippocampus)",
+              "num": "88",
+              "id": "59",
+              "grayvalue": "89",
+              "iav": {
+                "name": "CA3 (Hippocampus)",
+                "labelIndex": 119,
+                "rgb": [
+                  39,
+                  0,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA3 (Hippocampus)",
+                    "gray": "91"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-II (GapMap)",
+              "num": "89",
+              "id": "501",
+              "grayvalue": "90",
+              "iav": {
+                "name": "Frontal-II (GapMap)",
+                "labelIndex": 27,
+                "rgb": [
+                  255,
+                  135,
+                  15
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-II (GapMap)",
+                    "gray": "93"
+                  }
+                }
+              }
+            },
+            {
+              "name": "LB (Amygdala)",
+              "num": "90",
+              "id": "187",
+              "grayvalue": "91",
+              "iav": {
+                "name": "LB (Amygdala)",
+                "labelIndex": 41,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "LB (Amygdala)",
+                    "gray": "94"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area STS1 (STS)",
+              "num": "91",
+              "id": "271",
+              "grayvalue": "92",
+              "iav": {
+                "name": "Area STS1 (STS)",
+                "labelIndex": 114,
+                "rgb": [
+                  205,
+                  228,
+                  4
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area STS1 (STS)",
+                    "gray": "96"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 4a (PreCG)",
+              "num": "92",
+              "id": "124",
+              "grayvalue": "93",
+              "iav": {
+                "name": "Area 4a (PreCG)",
+                "labelIndex": 100,
+                "rgb": [
+                  118,
+                  239,
+                  183
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 4a (PreCG)",
+                    "gray": "95"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5L (SPL)",
+              "num": "93",
+              "id": "130",
+              "grayvalue": "94",
+              "iav": {
+                "name": "Area 5L (SPL)",
+                "labelIndex": 83,
+                "rgb": [
+                  184,
+                  185,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5L (SPL)",
+                    "gray": "98"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5M (SPL)",
+              "num": "94",
+              "id": "131",
+              "grayvalue": "95",
+              "iav": {
+                "name": "Area 5M (SPL)",
+                "labelIndex": 26,
+                "rgb": [
+                  225,
+                  245,
+                  76
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5M (SPL)",
+                    "gray": "97"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-to-Temporal (GapMap)",
+              "num": "95",
+              "id": "502",
+              "grayvalue": "96",
+              "iav": {
+                "name": "Frontal-to-Temporal (GapMap)",
+                "labelIndex": 110,
+                "rgb": [
+                  161,
+                  24,
+                  74
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-to-Temporal (GapMap)",
+                    "gray": "100"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG3 (FusG)",
+              "num": "96",
+              "id": "239",
+              "grayvalue": "97",
+              "iav": {
+                "name": "Area FG3 (FusG)",
+                "labelIndex": 42,
+                "rgb": [
+                  120,
+                  147,
+                  37
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG3 (FusG)",
+                    "gray": "99"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area i30 (retrosplenial)",
+              "num": "97",
+              "id": "267",
+              "grayvalue": "98"
+            },
+            {
+              "name": "Area p30 (retrosplenial)",
+              "num": "98",
+              "id": "269",
+              "grayvalue": "99"
+            },
+            {
+              "name": "Area Fp1 (FPole)",
+              "num": "99",
+              "id": "212",
+              "grayvalue": "100",
+              "iav": {
+                "name": "Area Fp1 (FPole)",
+                "labelIndex": 107,
+                "rgb": [
+                  226,
+                  14,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fp1 (FPole)",
+                    "gray": "101"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area a30 (retrosplenial)",
+              "num": "100",
+              "id": "354",
+              "grayvalue": "101"
+            },
+            {
+              "name": "Fastigial Nucleus (Cerebellum)",
+              "num": "101",
+              "id": "219",
+              "grayvalue": "102",
+              "iav": {
+                "name": "Fastigial Nucleus (Cerebellum)",
+                "labelIndex": 89,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Fastigial Nucleus (Cerebellum)",
+                    "gray": "103"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area s32 (sACC)",
+              "num": "102",
+              "id": "46",
+              "grayvalue": "103",
+              "iav": {
+                "name": "Area s32 (sACC)",
+                "labelIndex": 74,
+                "rgb": [
+                  193,
+                  94,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area s32 (sACC)",
+                    "gray": "102"
+                  }
+                }
+              }
+            },
+            {
+              "name": "MF (Amygdala)",
+              "num": "103",
+              "id": "235",
+              "grayvalue": "104",
+              "iav": {
+                "name": "MF (Amygdala)",
+                "labelIndex": 123,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "MF (Amygdala)",
+                    "gray": "104"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 3a (PostCG)",
+              "num": "104",
+              "id": "126",
+              "grayvalue": "105",
+              "iav": {
+                "name": "Area 3a (PostCG)",
+                "labelIndex": 121,
+                "rgb": [
+                  187,
+                  133,
+                  50
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 3a (PostCG)",
+                    "gray": "105"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id7 (Insula)",
+              "num": "105",
+              "id": "159",
+              "grayvalue": "106",
+              "iav": {
+                "name": "Area Id7 (Insula)",
+                "labelIndex": 18,
+                "rgb": [
+                  188,
+                  250,
+                  216
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id7 (Insula)",
+                    "gray": "107"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc5 (LOC)",
+              "num": "106",
+              "id": "6",
+              "grayvalue": "107",
+              "iav": {
+                "name": "Area hOc5 (LOC)",
+                "labelIndex": 16,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc5 (LOC)",
+                    "gray": "106"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG4 (FusG)",
+              "num": "107",
+              "id": "238",
+              "grayvalue": "108",
+              "iav": {
+                "name": "Area FG4 (FusG)",
+                "labelIndex": 55,
+                "rgb": [
+                  170,
+                  220,
+                  175
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG4 (FusG)",
+                    "gray": "108"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Interposed Nucleus (Cerebellum)",
+              "num": "108",
+              "id": "251",
+              "grayvalue": "109",
+              "iav": {
+                "name": "Interposed Nucleus (Cerebellum)",
+                "labelIndex": 30,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Interposed Nucleus (Cerebellum)",
+                    "gray": "109"
+                  }
+                }
+              }
+            },
+            {
+              "name": "SF (Amygdala)",
+              "num": "109",
+              "id": "185",
+              "grayvalue": "110",
+              "iav": {
+                "name": "SF (Amygdala)",
+                "labelIndex": 5,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "SF (Amygdala)",
+                    "gray": "110"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo1 (OFC)",
+              "num": "110",
+              "id": "3",
+              "grayvalue": "111",
+              "iav": {
+                "name": "Area Fo1 (OFC)",
+                "labelIndex": 47,
+                "rgb": [
+                  7,
+                  255,
+                  179
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo1 (OFC)",
+                    "gray": "111"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area s24 (sACC)",
+              "num": "111",
+              "id": "183",
+              "grayvalue": "112",
+              "iav": {
+                "name": "Area s24 (sACC)",
+                "labelIndex": 73,
+                "rgb": [
+                  133,
+                  34,
+                  201
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area s24 (sACC)",
+                    "gray": "112"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo6 (OFC)",
+              "num": "112",
+              "id": "326",
+              "grayvalue": "113",
+              "iav": {
+                "name": "Area Fo6 (OFC)",
+                "labelIndex": 36,
+                "rgb": [
+                  199,
+                  156,
+                  187
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo6 (OFC)",
+                    "gray": "113"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFop (IPL)",
+              "num": "113",
+              "id": "111",
+              "grayvalue": "114",
+              "iav": {
+                "name": "Area PFop (IPL)",
+                "labelIndex": 94,
+                "rgb": [
+                  146,
+                  153,
+                  177
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFop (IPL)",
+                    "gray": "114"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4v (LingG)",
+              "num": "114",
+              "id": "9",
+              "grayvalue": "115",
+              "iav": {
+                "name": "Area hOc4v (LingG)",
+                "labelIndex": 58,
+                "rgb": [
+                  222,
+                  77,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4v (LingG)",
+                    "gray": "115"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p32 (pACC)",
+              "num": "115",
+              "id": "47",
+              "grayvalue": "116",
+              "iav": {
+                "name": "Area p32 (pACC)",
+                "labelIndex": 113,
+                "rgb": [
+                  87,
+                  135,
+                  14
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p32 (pACC)",
+                    "gray": "116"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc1 (V1, 17, CalcS)",
+              "num": "116",
+              "id": "8",
+              "grayvalue": "117",
+              "iav": {
+                "name": "Area hOc1 (V1, 17, CalcS)",
+                "labelIndex": 120,
+                "rgb": [
+                  190,
+                  132,
+                  147
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc1 (V1, 17, CalcS)",
+                    "gray": "117"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo2 (OFC)",
+              "num": "117",
+              "id": "4",
+              "grayvalue": "118",
+              "iav": {
+                "name": "Area Fo2 (OFC)",
+                "labelIndex": 67,
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo2 (OFC)",
+                    "gray": "118"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area i29 (retrosplenial)",
+              "num": "118",
+              "id": "265",
+              "grayvalue": "119"
+            },
+            {
+              "name": "Area hIP7 (IPS)",
+              "num": "119",
+              "id": "296",
+              "grayvalue": "120",
+              "iav": {
+                "name": "Area hIP7 (IPS)",
+                "labelIndex": 35,
+                "rgb": [
+                  71,
+                  196,
+                  218
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP7 (IPS)",
+                    "gray": "120"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 2.2 (STG)",
+              "num": "120",
+              "id": "34",
+              "grayvalue": "121",
+              "iav": {
+                "name": "Area TE 2.2 (STG)",
+                "labelIndex": 93,
+                "rgb": [
+                  58,
+                  104,
+                  125
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 2.2 (STG)",
+                    "gray": "119"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 7PC (SPL)",
+              "num": "121",
+              "id": "132",
+              "grayvalue": "122",
+              "iav": {
+                "name": "Area 7PC (SPL)",
+                "labelIndex": 4,
+                "rgb": [
+                  252,
+                  89,
+                  28
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7PC (SPL)",
+                    "gray": "121"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4lp (LOC)",
+              "num": "122",
+              "id": "117",
+              "grayvalue": "123",
+              "iav": {
+                "name": "Area hOc4lp (LOC)",
+                "labelIndex": 51,
+                "rgb": [
+                  96,
+                  113,
+                  253
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4lp (LOC)",
+                    "gray": "122"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo3 (OFC)",
+              "num": "123",
+              "id": "5",
+              "grayvalue": "124",
+              "iav": {
+                "name": "Area Fo3 (OFC)",
+                "labelIndex": 48,
+                "rgb": [
+                  182,
+                  189,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo3 (OFC)",
+                    "gray": "123"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TeI (STG)",
+              "num": "124",
+              "id": "242",
+              "grayvalue": "125",
+              "iav": {
+                "name": "Area TeI (STG)",
+                "labelIndex": 79,
+                "rgb": [
+                  23,
+                  78,
+                  92
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TeI (STG)",
+                    "gray": "124"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "left",
+          "children": [
+            {
+              "name": "Area TE 1.1 (HESCHL)",
+              "num": "0",
+              "id": "33",
+              "grayvalue": "1",
+              "iav": {
+                "name": "Area TE 1.1 (HESCHL)",
+                "labelIndex": 39,
+                "rgb": [
+                  8,
+                  113,
+                  68
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.1 (HESCHL)",
+                    "gray": "1"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 3b (PostCG)",
+              "num": "1",
+              "id": "127",
+              "grayvalue": "2",
+              "iav": {
+                "name": "Area 3b (PostCG)",
+                "labelIndex": 37,
+                "rgb": [
+                  239,
+                  246,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 3b (PostCG)",
+                    "gray": "2"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4la (LOC)",
+              "num": "2",
+              "id": "118",
+              "grayvalue": "3",
+              "iav": {
+                "name": "Area hOc4la (LOC)",
+                "labelIndex": 29,
+                "rgb": [
+                  233,
+                  168,
+                  189
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4la (LOC)",
+                    "gray": "4"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PF (IPL)",
+              "num": "3",
+              "id": "206",
+              "grayvalue": "4",
+              "iav": {
+                "name": "Area PF (IPL)",
+                "labelIndex": 12,
+                "rgb": [
+                  226,
+                  211,
+                  61
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PF (IPL)",
+                    "gray": "5"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc2 (V2, 18)",
+              "num": "4",
+              "id": "7",
+              "grayvalue": "5",
+              "iav": {
+                "name": "Area hOc2 (V2, 18)",
+                "labelIndex": 21,
+                "rgb": [
+                  84,
+                  110,
+                  22
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc2 (V2, 18)",
+                    "gray": "6"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d2 (PreCG)",
+              "num": "5",
+              "id": "288",
+              "grayvalue": "6",
+              "iav": {
+                "name": "Area 6d2 (PreCG)",
+                "labelIndex": 82,
+                "rgb": [
+                  170,
+                  151,
+                  180
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d2 (PreCG)",
+                    "gray": "7"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig3 (Insula)",
+              "num": "6",
+              "id": "336",
+              "grayvalue": "7",
+              "iav": {
+                "name": "Area Ig3 (Insula)",
+                "labelIndex": 105,
+                "rgb": [
+                  105,
+                  253,
+                  197
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig3 (Insula)",
+                    "gray": "8"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4d (Cuneus)",
+              "num": "7",
+              "id": "119",
+              "grayvalue": "8",
+              "iav": {
+                "name": "Area hOc4d (Cuneus)",
+                "labelIndex": 44,
+                "rgb": [
+                  109,
+                  218,
+                  10
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4d (Cuneus)",
+                    "gray": "9"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo4 (OFC)",
+              "num": "8",
+              "id": "324",
+              "grayvalue": "9",
+              "iav": {
+                "name": "Area Fo4 (OFC)",
+                "labelIndex": 80,
+                "rgb": [
+                  163,
+                  204,
+                  53
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo4 (OFC)",
+                    "gray": "10"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP4 (POperc)",
+              "num": "9",
+              "id": "72",
+              "grayvalue": "10",
+              "iav": {
+                "name": "Area OP4 (POperc)",
+                "labelIndex": 14,
+                "rgb": [
+                  89,
+                  80,
+                  132
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP4 (POperc)",
+                    "gray": "11"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 1 (PostCG)",
+              "num": "10",
+              "id": "125",
+              "grayvalue": "11",
+              "iav": {
+                "name": "Area 1 (PostCG)",
+                "labelIndex": 116,
+                "rgb": [
+                  232,
+                  185,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 1 (PostCG)",
+                    "gray": "12"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ch 4 (Basal Forebrain)",
+              "num": "11",
+              "id": "264",
+              "grayvalue": "12",
+              "iav": {
+                "name": "Ch 4 (Basal Forebrain)",
+                "labelIndex": 97,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ch 4 (Basal Forebrain)",
+                    "gray": "13"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-I (GapMap)",
+              "num": "12",
+              "id": "500",
+              "grayvalue": "13",
+              "iav": {
+                "name": "Frontal-I (GapMap)",
+                "labelIndex": 71,
+                "rgb": [
+                  186,
+                  255,
+                  25
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-I (GapMap)",
+                    "gray": "14"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hPO1 (POS)",
+              "num": "13",
+              "id": "297",
+              "grayvalue": "14",
+              "iav": {
+                "name": "Area hPO1 (POS)",
+                "labelIndex": 69,
+                "rgb": [
+                  153,
+                  232,
+                  235
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hPO1 (POS)",
+                    "gray": "15"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Dorsal Dentate Nucleus (Cerebellum)",
+              "num": "14",
+              "id": "240",
+              "grayvalue": "15",
+              "iav": {
+                "name": "Dorsal Dentate Nucleus (Cerebellum)",
+                "labelIndex": 111,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Dorsal Dentate Nucleus (Cerebellum)",
+                    "gray": "16"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP2 (POperc)",
+              "num": "15",
+              "id": "74",
+              "grayvalue": "16",
+              "iav": {
+                "name": "Area OP2 (POperc)",
+                "labelIndex": 122,
+                "rgb": [
+                  36,
+                  47,
+                  221
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP2 (POperc)",
+                    "gray": "17"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 1.0 (HESCHL)",
+              "num": "16",
+              "id": "27",
+              "grayvalue": "17",
+              "iav": {
+                "name": "Area TE 1.0 (HESCHL)",
+                "labelIndex": 34,
+                "rgb": [
+                  252,
+                  84,
+                  222
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.0 (HESCHL)",
+                    "gray": "18"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area STS2 (STS)",
+              "num": "17",
+              "id": "272",
+              "grayvalue": "18",
+              "iav": {
+                "name": "Area STS2 (STS)",
+                "labelIndex": 98,
+                "rgb": [
+                  62,
+                  117,
+                  123
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area STS2 (STS)",
+                    "gray": "19"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id3 (Insula)",
+              "num": "18",
+              "id": "57",
+              "grayvalue": "19",
+              "iav": {
+                "name": "Area Id3 (Insula)",
+                "labelIndex": 54,
+                "rgb": [
+                  32,
+                  32,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id3 (Insula)",
+                    "gray": "20"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6mp (SMA, mesial SFG)",
+              "num": "19",
+              "id": "298",
+              "grayvalue": "20",
+              "iav": {
+                "name": "Area 6mp (SMA, mesial SFG)",
+                "labelIndex": 108,
+                "rgb": [
+                  75,
+                  95,
+                  87
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6mp (SMA, mesial SFG)",
+                    "gray": "21"
+                  }
+                }
+              }
+            },
+            {
+              "name": "DG (Hippocampus)",
+              "num": "20",
+              "id": "61",
+              "grayvalue": "21",
+              "iav": {
+                "name": "DG (Hippocampus)",
+                "labelIndex": 91,
+                "rgb": [
+                  0,
+                  149,
+                  8
+                ],
+                "_": {
+                  "xml": {
+                    "name": "DG (Hippocampus)",
+                    "gray": "22"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PGp (IPL)",
+              "num": "21",
+              "id": "108",
+              "grayvalue": "22",
+              "iav": {
+                "name": "Area PGp (IPL)",
+                "labelIndex": 65,
+                "rgb": [
+                  92,
+                  116,
+                  83
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PGp (IPL)",
+                    "gray": "23"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig1 (Insula)",
+              "num": "22",
+              "id": "115",
+              "grayvalue": "23",
+              "iav": {
+                "name": "Area Ig1 (Insula)",
+                "labelIndex": 25,
+                "rgb": [
+                  18,
+                  111,
+                  40
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig1 (Insula)",
+                    "gray": "24"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6ma (preSMA, mesial SFG)",
+              "num": "23",
+              "id": "299",
+              "grayvalue": "24",
+              "iav": {
+                "name": "Area 6ma (preSMA, mesial SFG)",
+                "labelIndex": 70,
+                "rgb": [
+                  204,
+                  108,
+                  222
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6ma (preSMA, mesial SFG)",
+                    "gray": "25"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TI (STG)",
+              "num": "24",
+              "id": "243",
+              "grayvalue": "25",
+              "iav": {
+                "name": "Area TI (STG)",
+                "labelIndex": 13,
+                "rgb": [
+                  86,
+                  101,
+                  22
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TI (STG)",
+                    "gray": "26"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFt (IPL)",
+              "num": "25",
+              "id": "109",
+              "grayvalue": "26",
+              "iav": {
+                "name": "Area PFt (IPL)",
+                "labelIndex": 20,
+                "rgb": [
+                  120,
+                  135,
+                  232
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFt (IPL)",
+                    "gray": "27"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p24ab (pACC)",
+              "num": "26",
+              "id": "231",
+              "grayvalue": "27",
+              "iav": {
+                "name": "Area p24ab (pACC)",
+                "labelIndex": 63,
+                "rgb": [
+                  153,
+                  195,
+                  229
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p24ab (pACC)",
+                    "gray": "28"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p24c (pACC)",
+              "num": "27",
+              "id": "232",
+              "grayvalue": "28",
+              "iav": {
+                "name": "Area p24c (pACC)",
+                "labelIndex": 57,
+                "rgb": [
+                  241,
+                  164,
+                  195
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p24c (pACC)",
+                    "gray": "29"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc3v (LingG)",
+              "num": "28",
+              "id": "10",
+              "grayvalue": "29",
+              "iav": {
+                "name": "Area hOc3v (LingG)",
+                "labelIndex": 77,
+                "rgb": [
+                  83,
+                  179,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc3v (LingG)",
+                    "gray": "30"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 3 (STG)",
+              "num": "29",
+              "id": "31",
+              "grayvalue": "30",
+              "iav": {
+                "name": "Area TE 3 (STG)",
+                "labelIndex": 15,
+                "rgb": [
+                  159,
+                  104,
+                  108
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 3 (STG)",
+                    "gray": "31"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-to-Occipital (GapMap)",
+              "num": "30",
+              "id": "504",
+              "grayvalue": "31",
+              "iav": {
+                "name": "Frontal-to-Occipital (GapMap)",
+                "labelIndex": 33,
+                "rgb": [
+                  104,
+                  161,
+                  93
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-to-Occipital (GapMap)",
+                    "gray": "33"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFcm (IPL)",
+              "num": "31",
+              "id": "113",
+              "grayvalue": "32",
+              "iav": {
+                "name": "Area PFcm (IPL)",
+                "labelIndex": 103,
+                "rgb": [
+                  98,
+                  128,
+                  120
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFcm (IPL)",
+                    "gray": "32"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 7P (SPL)",
+              "num": "32",
+              "id": "208",
+              "grayvalue": "33",
+              "iav": {
+                "name": "Area 7P (SPL)",
+                "labelIndex": 24,
+                "rgb": [
+                  52,
+                  20,
+                  106
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7P (SPL)",
+                    "gray": "35"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP5 (IPS)",
+              "num": "33",
+              "id": "295",
+              "grayvalue": "34",
+              "iav": {
+                "name": "Area hIP5 (IPS)",
+                "labelIndex": 7,
+                "rgb": [
+                  217,
+                  87,
+                  210
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP5 (IPS)",
+                    "gray": "34"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d1 (PreCG)",
+              "num": "34",
+              "id": "287",
+              "grayvalue": "35",
+              "iav": {
+                "name": "Area 6d1 (PreCG)",
+                "labelIndex": 90,
+                "rgb": [
+                  45,
+                  33,
+                  27
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d1 (PreCG)",
+                    "gray": "36"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG1 (FusG)",
+              "num": "35",
+              "id": "107",
+              "grayvalue": "36",
+              "iav": {
+                "name": "Area FG1 (FusG)",
+                "labelIndex": 84,
+                "rgb": [
+                  131,
+                  183,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG1 (FusG)",
+                    "gray": "37"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP4 (IPS)",
+              "num": "36",
+              "id": "294",
+              "grayvalue": "37",
+              "iav": {
+                "name": "Area hIP4 (IPS)",
+                "labelIndex": 115,
+                "rgb": [
+                  254,
+                  52,
+                  184
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP4 (IPS)",
+                    "gray": "38"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP6 (Frontal Operculum)",
+              "num": "37",
+              "id": "349",
+              "grayvalue": "38",
+              "iav": {
+                "name": "Area OP6 (Frontal Operculum)",
+                "labelIndex": 31,
+                "rgb": [
+                  138,
+                  63,
+                  100
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP6 (Frontal Operculum)",
+                    "gray": "39"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG2 (FusG)",
+              "num": "38",
+              "id": "106",
+              "grayvalue": "39",
+              "iav": {
+                "name": "Area FG2 (FusG)",
+                "labelIndex": 28,
+                "rgb": [
+                  67,
+                  94,
+                  149
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG2 (FusG)",
+                    "gray": "40"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP6 (IPS)",
+              "num": "39",
+              "id": "292",
+              "grayvalue": "40",
+              "iav": {
+                "name": "Area hIP6 (IPS)",
+                "labelIndex": 95,
+                "rgb": [
+                  237,
+                  233,
+                  37
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP6 (IPS)",
+                    "gray": "41"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP3 (IPS)",
+              "num": "40",
+              "id": "133",
+              "grayvalue": "41",
+              "iav": {
+                "name": "Area hIP3 (IPS)",
+                "labelIndex": 75,
+                "rgb": [
+                  113,
+                  172,
+                  229
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP3 (IPS)",
+                    "gray": "43"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo5 (OFC)",
+              "num": "41",
+              "id": "325",
+              "grayvalue": "42",
+              "iav": {
+                "name": "Area Fo5 (OFC)",
+                "labelIndex": 76,
+                "rgb": [
+                  219,
+                  11,
+                  91
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo5 (OFC)",
+                    "gray": "42"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CM (Amygdala)",
+              "num": "42",
+              "id": "290",
+              "grayvalue": "43",
+              "iav": {
+                "name": "CM (Amygdala)",
+                "labelIndex": 85,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CM (Amygdala)",
+                    "gray": "44"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP7 (Frontal Operculum)",
+              "num": "43",
+              "id": "350",
+              "grayvalue": "44",
+              "iav": {
+                "name": "Area OP7 (Frontal Operculum)",
+                "labelIndex": 60,
+                "rgb": [
+                  134,
+                  116,
+                  192
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP7 (Frontal Operculum)",
+                    "gray": "45"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 4p (PreCG)",
+              "num": "44",
+              "id": "123",
+              "grayvalue": "45",
+              "iav": {
+                "name": "Area 4p (PreCG)",
+                "labelIndex": 9,
+                "rgb": [
+                  116,
+                  92,
+                  124
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 4p (PreCG)",
+                    "gray": "46"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 33 (ACC)",
+              "num": "45",
+              "id": "39",
+              "grayvalue": "46",
+              "iav": {
+                "name": "Area 33 (ACC)",
+                "labelIndex": 96,
+                "rgb": [
+                  51,
+                  57,
+                  245
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 33 (ACC)",
+                    "gray": "47"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc6 (POS)",
+              "num": "46",
+              "id": "291",
+              "grayvalue": "47",
+              "iav": {
+                "name": "Area hOc6 (POS)",
+                "labelIndex": 72,
+                "rgb": [
+                  239,
+                  66,
+                  26
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc6 (POS)",
+                    "gray": "49"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ig2 (Insula)",
+              "num": "47",
+              "id": "114",
+              "grayvalue": "48",
+              "iav": {
+                "name": "Area Ig2 (Insula)",
+                "labelIndex": 45,
+                "rgb": [
+                  105,
+                  61,
+                  82
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ig2 (Insula)",
+                    "gray": "50"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA2 (Hippocampus)",
+              "num": "48",
+              "id": "58",
+              "grayvalue": "49",
+              "iav": {
+                "name": "CA2 (Hippocampus)",
+                "labelIndex": 23,
+                "rgb": [
+                  0,
+                  250,
+                  98
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA2 (Hippocampus)",
+                    "gray": "51"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fp2 (FPole)",
+              "num": "49",
+              "id": "211",
+              "grayvalue": "50",
+              "iav": {
+                "name": "Area Fp2 (FPole)",
+                "labelIndex": 101,
+                "rgb": [
+                  239,
+                  137,
+                  211
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fp2 (FPole)",
+                    "gray": "52"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Entorhinal Cortex",
+              "num": "50",
+              "id": "60",
+              "grayvalue": "51",
+              "iav": {
+                "name": "Entorhinal Cortex",
+                "labelIndex": 64,
+                "rgb": [
+                  234,
+                  239,
+                  14
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Entorhinal Cortex",
+                    "gray": "53"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id4 (Insula)",
+              "num": "51",
+              "id": "337",
+              "grayvalue": "52",
+              "iav": {
+                "name": "Area Id4 (Insula)",
+                "labelIndex": 53,
+                "rgb": [
+                  38,
+                  174,
+                  113
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id4 (Insula)",
+                    "gray": "54"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id2 (Insula)",
+              "num": "52",
+              "id": "56",
+              "grayvalue": "53",
+              "iav": {
+                "name": "Area Id2 (Insula)",
+                "labelIndex": 99,
+                "rgb": [
+                  225,
+                  126,
+                  73
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id2 (Insula)",
+                    "gray": "55"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA1 (Hippocampus)",
+              "num": "53",
+              "id": "66",
+              "grayvalue": "54",
+              "iav": {
+                "name": "CA1 (Hippocampus)",
+                "labelIndex": 61,
+                "rgb": [
+                  250,
+                  89,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA1 (Hippocampus)",
+                    "gray": "57"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP1 (POperc)",
+              "num": "54",
+              "id": "73",
+              "grayvalue": "55",
+              "iav": {
+                "name": "Area OP1 (POperc)",
+                "labelIndex": 1,
+                "rgb": [
+                  250,
+                  182,
+                  34
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP1 (POperc)",
+                    "gray": "56"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id6 (Insula)",
+              "num": "55",
+              "id": "340",
+              "grayvalue": "56",
+              "iav": {
+                "name": "Area Id6 (Insula)",
+                "labelIndex": 11,
+                "rgb": [
+                  138,
+                  127,
+                  119
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id6 (Insula)",
+                    "gray": "58"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP8 (IPS)",
+              "num": "56",
+              "id": "293",
+              "grayvalue": "57",
+              "iav": {
+                "name": "Area hIP8 (IPS)",
+                "labelIndex": 50,
+                "rgb": [
+                  223,
+                  109,
+                  3
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP8 (IPS)",
+                    "gray": "60"
+                  }
+                }
+              }
+            },
+            {
+              "name": "IF (Amygdala)",
+              "num": "57",
+              "id": "237",
+              "grayvalue": "58",
+              "iav": {
+                "name": "IF (Amygdala)",
+                "labelIndex": 46,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "IF (Amygdala)",
+                    "gray": "61"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP9 (Frontal Operculum)",
+              "num": "58",
+              "id": "274",
+              "grayvalue": "59",
+              "iav": {
+                "name": "Area OP9 (Frontal Operculum)",
+                "labelIndex": 117,
+                "rgb": [
+                  175,
+                  123,
+                  34
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP9 (Frontal Operculum)",
+                    "gray": "62"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Temporal-to-Parietal (GapMap)",
+              "num": "59",
+              "id": "503",
+              "grayvalue": "60",
+              "iav": {
+                "name": "Temporal-to-Parietal (GapMap)",
+                "labelIndex": 2,
+                "rgb": [
+                  76,
+                  90,
+                  161
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Temporal-to-Parietal (GapMap)",
+                    "gray": "64"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 6d3 (SFS)",
+              "num": "60",
+              "id": "289",
+              "grayvalue": "61",
+              "iav": {
+                "name": "Area 6d3 (SFS)",
+                "labelIndex": 68,
+                "rgb": [
+                  55,
+                  239,
+                  21
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 6d3 (SFS)",
+                    "gray": "66"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ventral Dentate Nucleus (Cerebellum)",
+              "num": "61",
+              "id": "241",
+              "grayvalue": "62",
+              "iav": {
+                "name": "Ventral Dentate Nucleus (Cerebellum)",
+                "labelIndex": 38,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ventral Dentate Nucleus (Cerebellum)",
+                    "gray": "65"
+                  }
+                }
+              }
+            },
+            {
+              "name": "HATA (Hippocampus)",
+              "num": "62",
+              "id": "68",
+              "grayvalue": "63",
+              "iav": {
+                "name": "HATA (Hippocampus)",
+                "labelIndex": 56,
+                "rgb": [
+                  137,
+                  12,
+                  73
+                ],
+                "_": {
+                  "xml": {
+                    "name": "HATA (Hippocampus)",
+                    "gray": "67"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP2 (IPS)",
+              "num": "63",
+              "id": "129",
+              "grayvalue": "64",
+              "iav": {
+                "name": "Area hIP2 (IPS)",
+                "labelIndex": 59,
+                "rgb": [
+                  127,
+                  245,
+                  203
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP2 (IPS)",
+                    "gray": "68"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 44 (IFG)",
+              "num": "64",
+              "id": "2",
+              "grayvalue": "65",
+              "iav": {
+                "name": "Area 44 (IFG)",
+                "labelIndex": 92,
+                "rgb": [
+                  54,
+                  74,
+                  75
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 44 (IFG)",
+                    "gray": "69"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo7 (OFC)",
+              "num": "65",
+              "id": "327",
+              "grayvalue": "66",
+              "iav": {
+                "name": "Area Fo7 (OFC)",
+                "labelIndex": 52,
+                "rgb": [
+                  64,
+                  211,
+                  186
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo7 (OFC)",
+                    "gray": "70"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area a29 (retrosplenial)",
+              "num": "66",
+              "id": "353",
+              "grayvalue": "67"
+            },
+            {
+              "name": "Area 45 (IFG)",
+              "num": "67",
+              "id": "1",
+              "grayvalue": "68",
+              "iav": {
+                "name": "Area 45 (IFG)",
+                "labelIndex": 112,
+                "rgb": [
+                  167,
+                  103,
+                  146
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 45 (IFG)",
+                    "gray": "71"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id1 (Insula)",
+              "num": "68",
+              "id": "116",
+              "grayvalue": "69",
+              "iav": {
+                "name": "Area Id1 (Insula)",
+                "labelIndex": 78,
+                "rgb": [
+                  141,
+                  112,
+                  216
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id1 (Insula)",
+                    "gray": "72"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5Ci (SPL)",
+              "num": "69",
+              "id": "136",
+              "grayvalue": "70",
+              "iav": {
+                "name": "Area 5Ci (SPL)",
+                "labelIndex": 88,
+                "rgb": [
+                  79,
+                  242,
+                  146
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5Ci (SPL)",
+                    "gray": "73"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id5 (Insula)",
+              "num": "70",
+              "id": "338",
+              "grayvalue": "71",
+              "iav": {
+                "name": "Area Id5 (Insula)",
+                "labelIndex": 104,
+                "rgb": [
+                  112,
+                  6,
+                  50
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id5 (Insula)",
+                    "gray": "75"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 1.2 (HESCHL)",
+              "num": "71",
+              "id": "30",
+              "grayvalue": "72",
+              "iav": {
+                "name": "Area TE 1.2 (HESCHL)",
+                "labelIndex": 86,
+                "rgb": [
+                  202,
+                  251,
+                  192
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 1.2 (HESCHL)",
+                    "gray": "74"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PGa (IPL)",
+              "num": "72",
+              "id": "110",
+              "grayvalue": "73",
+              "iav": {
+                "name": "Area PGa (IPL)",
+                "labelIndex": 81,
+                "rgb": [
+                  42,
+                  236,
+                  131
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PGa (IPL)",
+                    "gray": "76"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP1 (IPS)",
+              "num": "73",
+              "id": "128",
+              "grayvalue": "74",
+              "iav": {
+                "name": "Area hIP1 (IPS)",
+                "labelIndex": 32,
+                "rgb": [
+                  66,
+                  149,
+                  82
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP1 (IPS)",
+                    "gray": "77"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 2 (PostCS)",
+              "num": "74",
+              "id": "252",
+              "grayvalue": "75",
+              "iav": {
+                "name": "Area 2 (PostCS)",
+                "labelIndex": 49,
+                "rgb": [
+                  23,
+                  13,
+                  35
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 2 (PostCS)",
+                    "gray": "78"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Ch 123 (Basal Forebrain)",
+              "num": "75",
+              "id": "286",
+              "grayvalue": "76",
+              "iav": {
+                "name": "Ch 123 (Basal Forebrain)",
+                "labelIndex": 62,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Ch 123 (Basal Forebrain)",
+                    "gray": "79"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 2.1 (STG)",
+              "num": "76",
+              "id": "28",
+              "grayvalue": "77",
+              "iav": {
+                "name": "Area TE 2.1 (STG)",
+                "labelIndex": 19,
+                "rgb": [
+                  67,
+                  254,
+                  44
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 2.1 (STG)",
+                    "gray": "82"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Ia (Insula)",
+              "num": "77",
+              "id": "339",
+              "grayvalue": "78",
+              "iav": {
+                "name": "Area Ia (Insula)",
+                "labelIndex": 118,
+                "rgb": [
+                  71,
+                  217,
+                  62
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Ia (Insula)",
+                    "gray": "80"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc3d (Cuneus)",
+              "num": "78",
+              "id": "120",
+              "grayvalue": "79",
+              "iav": {
+                "name": "Area hOc3d (Cuneus)",
+                "labelIndex": 106,
+                "rgb": [
+                  105,
+                  191,
+                  48
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc3d (Cuneus)",
+                    "gray": "81"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP3 (POperc)",
+              "num": "79",
+              "id": "75",
+              "grayvalue": "80",
+              "iav": {
+                "name": "Area OP3 (POperc)",
+                "labelIndex": 22,
+                "rgb": [
+                  58,
+                  122,
+                  80
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP3 (POperc)",
+                    "gray": "84"
+                  }
+                }
+              }
+            },
+            {
+              "name": "VTM (Amygdala)",
+              "num": "80",
+              "id": "228",
+              "grayvalue": "81",
+              "iav": {
+                "name": "VTM (Amygdala)",
+                "labelIndex": 109,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "VTM (Amygdala)",
+                    "gray": "83"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 7A (SPL)",
+              "num": "81",
+              "id": "134",
+              "grayvalue": "82",
+              "iav": {
+                "name": "Area 7A (SPL)",
+                "labelIndex": 17,
+                "rgb": [
+                  38,
+                  204,
+                  19
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7A (SPL)",
+                    "gray": "85"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP8 (Frontal Operculum)",
+              "num": "82",
+              "id": "273",
+              "grayvalue": "83",
+              "iav": {
+                "name": "Area OP8 (Frontal Operculum)",
+                "labelIndex": 40,
+                "rgb": [
+                  29,
+                  76,
+                  168
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP8 (Frontal Operculum)",
+                    "gray": "86"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Subiculum (Hippocampus)",
+              "num": "83",
+              "id": "192",
+              "grayvalue": "84"
+            },
+            {
+              "name": "Area p29 (retrosplenial)",
+              "num": "84",
+              "id": "268",
+              "grayvalue": "85"
+            },
+            {
+              "name": "Area 25 (sACC)",
+              "num": "85",
+              "id": "184",
+              "grayvalue": "86",
+              "iav": {
+                "name": "Area 25 (sACC)",
+                "labelIndex": 3,
+                "rgb": [
+                  170,
+                  68,
+                  220
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 25 (sACC)",
+                    "gray": "88"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area OP5 (Frontal Operculum)",
+              "num": "86",
+              "id": "348",
+              "grayvalue": "87",
+              "iav": {
+                "name": "Area OP5 (Frontal Operculum)",
+                "labelIndex": 43,
+                "rgb": [
+                  222,
+                  78,
+                  253
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area OP5 (Frontal Operculum)",
+                    "gray": "90"
+                  }
+                }
+              }
+            },
+            {
+              "name": "CA3 (Hippocampus)",
+              "num": "87",
+              "id": "59",
+              "grayvalue": "88",
+              "iav": {
+                "name": "CA3 (Hippocampus)",
+                "labelIndex": 119,
+                "rgb": [
+                  39,
+                  0,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "CA3 (Hippocampus)",
+                    "gray": "91"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFm (IPL)",
+              "num": "88",
+              "id": "112",
+              "grayvalue": "89",
+              "iav": {
+                "name": "Area PFm (IPL)",
+                "labelIndex": 102,
+                "rgb": [
+                  53,
+                  76,
+                  145
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFm (IPL)",
+                    "gray": "92"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-II (GapMap)",
+              "num": "89",
+              "id": "501",
+              "grayvalue": "90",
+              "iav": {
+                "name": "Frontal-II (GapMap)",
+                "labelIndex": 27,
+                "rgb": [
+                  255,
+                  135,
+                  15
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-II (GapMap)",
+                    "gray": "93"
+                  }
+                }
+              }
+            },
+            {
+              "name": "LB (Amygdala)",
+              "num": "90",
+              "id": "187",
+              "grayvalue": "91",
+              "iav": {
+                "name": "LB (Amygdala)",
+                "labelIndex": 41,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "LB (Amygdala)",
+                    "gray": "94"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 4a (PreCG)",
+              "num": "91",
+              "id": "124",
+              "grayvalue": "92",
+              "iav": {
+                "name": "Area 4a (PreCG)",
+                "labelIndex": 100,
+                "rgb": [
+                  118,
+                  239,
+                  183
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 4a (PreCG)",
+                    "gray": "95"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area STS1 (STS)",
+              "num": "92",
+              "id": "271",
+              "grayvalue": "93",
+              "iav": {
+                "name": "Area STS1 (STS)",
+                "labelIndex": 114,
+                "rgb": [
+                  205,
+                  228,
+                  4
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area STS1 (STS)",
+                    "gray": "96"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5L (SPL)",
+              "num": "93",
+              "id": "130",
+              "grayvalue": "94",
+              "iav": {
+                "name": "Area 5L (SPL)",
+                "labelIndex": 83,
+                "rgb": [
+                  184,
+                  185,
+                  58
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5L (SPL)",
+                    "gray": "98"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 5M (SPL)",
+              "num": "94",
+              "id": "131",
+              "grayvalue": "95",
+              "iav": {
+                "name": "Area 5M (SPL)",
+                "labelIndex": 26,
+                "rgb": [
+                  225,
+                  245,
+                  76
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 5M (SPL)",
+                    "gray": "97"
+                  }
+                }
+              }
+            },
+            {
+              "name": "GapMap Frontal-to-Temporal (GapMap)",
+              "num": "95",
+              "id": "502",
+              "grayvalue": "96",
+              "iav": {
+                "name": "Frontal-to-Temporal (GapMap)",
+                "labelIndex": 110,
+                "rgb": [
+                  161,
+                  24,
+                  74
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Frontal-to-Temporal (GapMap)",
+                    "gray": "100"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG3 (FusG)",
+              "num": "96",
+              "id": "239",
+              "grayvalue": "97",
+              "iav": {
+                "name": "Area FG3 (FusG)",
+                "labelIndex": 42,
+                "rgb": [
+                  120,
+                  147,
+                  37
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG3 (FusG)",
+                    "gray": "99"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area i30 (retrosplenial)",
+              "num": "97",
+              "id": "267",
+              "grayvalue": "98"
+            },
+            {
+              "name": "Area p30 (retrosplenial)",
+              "num": "98",
+              "id": "269",
+              "grayvalue": "99"
+            },
+            {
+              "name": "Area Fp1 (FPole)",
+              "num": "99",
+              "id": "212",
+              "grayvalue": "100",
+              "iav": {
+                "name": "Area Fp1 (FPole)",
+                "labelIndex": 107,
+                "rgb": [
+                  226,
+                  14,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fp1 (FPole)",
+                    "gray": "101"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area a30 (retrosplenial)",
+              "num": "100",
+              "id": "354",
+              "grayvalue": "101"
+            },
+            {
+              "name": "Fastigial Nucleus (Cerebellum)",
+              "num": "101",
+              "id": "219",
+              "grayvalue": "102",
+              "iav": {
+                "name": "Fastigial Nucleus (Cerebellum)",
+                "labelIndex": 89,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Fastigial Nucleus (Cerebellum)",
+                    "gray": "103"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area s32 (sACC)",
+              "num": "102",
+              "id": "46",
+              "grayvalue": "103",
+              "iav": {
+                "name": "Area s32 (sACC)",
+                "labelIndex": 74,
+                "rgb": [
+                  193,
+                  94,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area s32 (sACC)",
+                    "gray": "102"
+                  }
+                }
+              }
+            },
+            {
+              "name": "MF (Amygdala)",
+              "num": "103",
+              "id": "235",
+              "grayvalue": "104",
+              "iav": {
+                "name": "MF (Amygdala)",
+                "labelIndex": 123,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "MF (Amygdala)",
+                    "gray": "104"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area 3a (PostCG)",
+              "num": "104",
+              "id": "126",
+              "grayvalue": "105",
+              "iav": {
+                "name": "Area 3a (PostCG)",
+                "labelIndex": 121,
+                "rgb": [
+                  187,
+                  133,
+                  50
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 3a (PostCG)",
+                    "gray": "105"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc5 (LOC)",
+              "num": "105",
+              "id": "6",
+              "grayvalue": "106",
+              "iav": {
+                "name": "Area hOc5 (LOC)",
+                "labelIndex": 16,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc5 (LOC)",
+                    "gray": "106"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Id7 (Insula)",
+              "num": "106",
+              "id": "159",
+              "grayvalue": "107",
+              "iav": {
+                "name": "Area Id7 (Insula)",
+                "labelIndex": 18,
+                "rgb": [
+                  188,
+                  250,
+                  216
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Id7 (Insula)",
+                    "gray": "107"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area FG4 (FusG)",
+              "num": "107",
+              "id": "238",
+              "grayvalue": "108",
+              "iav": {
+                "name": "Area FG4 (FusG)",
+                "labelIndex": 55,
+                "rgb": [
+                  170,
+                  220,
+                  175
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area FG4 (FusG)",
+                    "gray": "108"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Interposed Nucleus (Cerebellum)",
+              "num": "108",
+              "id": "251",
+              "grayvalue": "109",
+              "iav": {
+                "name": "Interposed Nucleus (Cerebellum)",
+                "labelIndex": 30,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Interposed Nucleus (Cerebellum)",
+                    "gray": "109"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo1 (OFC)",
+              "num": "109",
+              "id": "3",
+              "grayvalue": "110",
+              "iav": {
+                "name": "Area Fo1 (OFC)",
+                "labelIndex": 47,
+                "rgb": [
+                  7,
+                  255,
+                  179
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo1 (OFC)",
+                    "gray": "111"
+                  }
+                }
+              }
+            },
+            {
+              "name": "SF (Amygdala)",
+              "num": "110",
+              "id": "185",
+              "grayvalue": "111",
+              "iav": {
+                "name": "SF (Amygdala)",
+                "labelIndex": 5,
+                "rgb": [
+                  200,
+                  200,
+                  200
+                ],
+                "_": {
+                  "xml": {
+                    "name": "SF (Amygdala)",
+                    "gray": "110"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area s24 (sACC)",
+              "num": "111",
+              "id": "183",
+              "grayvalue": "112",
+              "iav": {
+                "name": "Area s24 (sACC)",
+                "labelIndex": 73,
+                "rgb": [
+                  133,
+                  34,
+                  201
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area s24 (sACC)",
+                    "gray": "112"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo6 (OFC)",
+              "num": "112",
+              "id": "326",
+              "grayvalue": "113",
+              "iav": {
+                "name": "Area Fo6 (OFC)",
+                "labelIndex": 36,
+                "rgb": [
+                  199,
+                  156,
+                  187
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo6 (OFC)",
+                    "gray": "113"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4v (LingG)",
+              "num": "113",
+              "id": "9",
+              "grayvalue": "114",
+              "iav": {
+                "name": "Area hOc4v (LingG)",
+                "labelIndex": 58,
+                "rgb": [
+                  222,
+                  77,
+                  155
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4v (LingG)",
+                    "gray": "115"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area PFop (IPL)",
+              "num": "114",
+              "id": "111",
+              "grayvalue": "115",
+              "iav": {
+                "name": "Area PFop (IPL)",
+                "labelIndex": 94,
+                "rgb": [
+                  146,
+                  153,
+                  177
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area PFop (IPL)",
+                    "gray": "114"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area p32 (pACC)",
+              "num": "115",
+              "id": "47",
+              "grayvalue": "116",
+              "iav": {
+                "name": "Area p32 (pACC)",
+                "labelIndex": 113,
+                "rgb": [
+                  87,
+                  135,
+                  14
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area p32 (pACC)",
+                    "gray": "116"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc1 (V1, 17, CalcS)",
+              "num": "116",
+              "id": "8",
+              "grayvalue": "117",
+              "iav": {
+                "name": "Area hOc1 (V1, 17, CalcS)",
+                "labelIndex": 120,
+                "rgb": [
+                  190,
+                  132,
+                  147
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc1 (V1, 17, CalcS)",
+                    "gray": "117"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo2 (OFC)",
+              "num": "117",
+              "id": "4",
+              "grayvalue": "118",
+              "iav": {
+                "name": "Area Fo2 (OFC)",
+                "labelIndex": 67,
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo2 (OFC)",
+                    "gray": "118"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hIP7 (IPS)",
+              "num": "118",
+              "id": "296",
+              "grayvalue": "119",
+              "iav": {
+                "name": "Area hIP7 (IPS)",
+                "labelIndex": 35,
+                "rgb": [
+                  71,
+                  196,
+                  218
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hIP7 (IPS)",
+                    "gray": "120"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TE 2.2 (STG)",
+              "num": "119",
+              "id": "34",
+              "grayvalue": "120",
+              "iav": {
+                "name": "Area TE 2.2 (STG)",
+                "labelIndex": 93,
+                "rgb": [
+                  58,
+                  104,
+                  125
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TE 2.2 (STG)",
+                    "gray": "119"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area i29 (retrosplenial)",
+              "num": "120",
+              "id": "265",
+              "grayvalue": "121"
+            },
+            {
+              "name": "Area 7PC (SPL)",
+              "num": "121",
+              "id": "132",
+              "grayvalue": "122",
+              "iav": {
+                "name": "Area 7PC (SPL)",
+                "labelIndex": 4,
+                "rgb": [
+                  252,
+                  89,
+                  28
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area 7PC (SPL)",
+                    "gray": "121"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area hOc4lp (LOC)",
+              "num": "122",
+              "id": "117",
+              "grayvalue": "123",
+              "iav": {
+                "name": "Area hOc4lp (LOC)",
+                "labelIndex": 51,
+                "rgb": [
+                  96,
+                  113,
+                  253
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area hOc4lp (LOC)",
+                    "gray": "122"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area TeI (STG)",
+              "num": "123",
+              "id": "242",
+              "grayvalue": "124",
+              "iav": {
+                "name": "Area TeI (STG)",
+                "labelIndex": 79,
+                "rgb": [
+                  23,
+                  78,
+                  92
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area TeI (STG)",
+                    "gray": "124"
+                  }
+                }
+              }
+            },
+            {
+              "name": "Area Fo3 (OFC)",
+              "num": "124",
+              "id": "5",
+              "grayvalue": "125",
+              "iav": {
+                "name": "Area Fo3 (OFC)",
+                "labelIndex": 48,
+                "rgb": [
+                  182,
+                  189,
+                  250
+                ],
+                "_": {
+                  "xml": {
+                    "name": "Area Fo3 (OFC)",
+                    "gray": "123"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

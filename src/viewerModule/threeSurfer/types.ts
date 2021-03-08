@@ -3,6 +3,7 @@ import { IContext } from './util'
 export type TThreeSurferMesh = {
   colormap: string
   mesh: string
+  hemisphere: 'left' | 'right'
 }
 
 export type TThreeSurferMode = {
