@@ -19,3 +19,11 @@ button[mat-icon-button]
   bottom: 1rem;
   right: 1rem;
 }
+
+span.mouseover
+{
+  z-index: 1;
+  position: fixed;
+  bottom: 3rem;
+  right: 1rem;
+}
