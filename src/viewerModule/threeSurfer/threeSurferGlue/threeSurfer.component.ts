@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit, ViewChild } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit } from "@angular/core";
 import { IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { TThreeSurferConfig, TThreeSurferMode } from "../types";
-import { IContext, parseContext } from "../util";
+import { parseContext } from "../util";
+import { retry } from 'common/util'
 
 @Component({
   selector: 'three-surfer-glue-cmp',
@@ -29,18 +30,24 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   private colormap: Map<string, Map<number, [number, number, number]>> = new Map()
 
   constructor(
-    private el: ElementRef
+    private el: ElementRef,
   ){
     this.domEl = this.el.nativeElement
   }
 
   tsRef: any
-  loadedMeshes: any[] = []
+  loadedMeshes: {
+    threeSurfer: any
+    mesh: string
+    colormap: string
+    hemisphere: string
+    vIdxArr: number[]
+  }[] = []
 
   private unloadAllMeshes() {
     while(this.loadedMeshes.length > 0) {
       const m = this.loadedMeshes.pop()
-      this.tsRef.unloadMesh(m)
+      this.tsRef.unloadMesh(m.threeSurfer)
     }
   }
 
@@ -56,14 +63,20 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       const tsM = await this.tsRef.loadMesh(
         parseContext(mesh, [this.config['@context']])
       )
-
       const applyCM = this.colormap.get(hemisphere)
 
-      this.loadedMeshes.push(tsM)
       const tsC = await this.tsRef.loadColormap(
         parseContext(colormap, [this.config['@context']])
       )
       const colorIdx = tsC[0].getData()
+
+      this.loadedMeshes.push({
+        threeSurfer: tsM,
+        colormap,
+        mesh,
+        hemisphere,
+        vIdxArr: colorIdx
+      })
       this.tsRef.applyColorMap(tsM, colorIdx, 
         {
           custom: applyCM
@@ -72,8 +85,19 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
     }
   }
 
-  ngOnChanges(){
+  async ngOnChanges(){
+    if (this.tsRef) this.ngOnDestroy()
     if (this.selectedTemplate) {
+
+      /**
+       * wait until threesurfer is defined in window
+       */
+      await retry(async () => {
+        if (typeof (window as any).ThreeSurfer === 'undefined') throw new Error('ThreeSurfer not yet defined')
+      }, {
+        timeout: 160,
+        retries: 10,
+      })
       
       this.config = this.selectedTemplate['three-surfer']
       // somehow curv ... cannot be parsed properly by gifti parser... something about points missing
@@ -106,14 +130,70 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       })
     }
   }
+
   ngAfterViewInit(){
     const customEvHandler = (ev: CustomEvent) => {
-      // console.log('ev listener', ev.detail.colormap?.verticesValue)
+      
+      if (!ev.detail.mesh) {
+        return this.handleMouseoverEvent([])
+      }
+
+      const evGeom = ev.detail.mesh.geometry
+      const evVertIdx = ev.detail.mesh.verticesIdicies
+      const found = this.loadedMeshes.find(({ threeSurfer }) => threeSurfer === evGeom)
+      
+      if (!found) return this.handleMouseoverEvent([])
+
+      const { hemisphere: key, vIdxArr } = found
+
+      if (!key || !evVertIdx) {
+        return this.handleMouseoverEvent([])
+      }
+
+      const labelIdxSet = new Set<number>()
+      
+      for (const vIdx of evVertIdx) {
+        labelIdxSet.add(
+          vIdxArr[vIdx]
+        )
+      }
+      if (labelIdxSet.size === 0) {
+        return this.handleMouseoverEvent([])
+      }
+
+      const foundRegion = this.selectedParcellation.regions.find(({ name }) => name === key)
+
+      if (!foundRegion) {
+        return this.handleMouseoverEvent(
+          Array.from(labelIdxSet).map(v => {
+            return `unknown#${v}`
+          })
+        )
+      }
+
+      return this.handleMouseoverEvent(
+        Array.from(labelIdxSet)
+          .map(lblIdx => {
+            const ontoR = foundRegion.children.find(ontR => Number(ontR.grayvalue) === lblIdx)
+            if (ontoR) {
+              return ontoR.name
+            } else {
+              return `unkonwn#${lblIdx}`
+            }
+          })
+      )
+
+      
     }
-    this.domEl.addEventListener((window as any).CUSTOM_EVENTNAME, customEvHandler)
+    this.domEl.addEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME, customEvHandler)
     this.onDestroyCb.push(
-      () => this.domEl.removeEventListener((window as any).CUSTOM_EVENTNAME, customEvHandler)
+      () => this.domEl.removeEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME, customEvHandler)
     )
+  }
+
+  public mouseoverText: string
+  private handleMouseoverEvent(mouseover: any[]){
+    this.mouseoverText = mouseover.length === 0 ? null : mouseover.join(' / ')
   }
 
   private onDestroyCb: (() => void) [] = []
