@@ -37,10 +37,10 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
 
   tsRef: any
   loadedMeshes: {
-    threeSurfer: any,
-    mesh: string,
-    colormap: string,
-    hemisphere: string,
+    threeSurfer: any
+    mesh: string
+    colormap: string
+    hemisphere: string
     vIdxArr: number[]
   }[] = []
 
@@ -150,7 +150,7 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
         return this.handleMouseoverEvent([])
       }
 
-      const labelIdxSet = new Set<Number>()
+      const labelIdxSet = new Set<number>()
       
       for (const vIdx of evVertIdx) {
         labelIdxSet.add(
