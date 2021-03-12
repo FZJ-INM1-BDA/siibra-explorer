@@ -17,6 +17,7 @@ import { MessagingService } from "./service";
 
 export class MesssagingModule{
   // need to inject service
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_mS: MessagingService){
   }
 }
