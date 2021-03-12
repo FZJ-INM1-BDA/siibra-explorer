@@ -63,11 +63,12 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
       unload,
       url,
       ["@type"]: type,
-      ["@id"]: swcLayerUuid
+      ["@id"]: swcLayerUuid,
+      resourceParam
     } = payload
 
     if (type === 'swc') {
-
+      const { transform } = resourceParam
       const layer = {
         name: swcLayerUuid,
         id: swcLayerUuid,
@@ -77,6 +78,7 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
         "segments": [
           "1"
         ],
+        transform,
       }
 
       this.store.dispatch(

@@ -1,6 +1,7 @@
 import { Observable, Subject } from "rxjs"
 import { getUuid } from "src/util/fn"
-import { IMessagingActions, IMessagingActionTmpl } from "../types"
+import { IMessagingActions, IMessagingActionTmpl, TVec4 } from "../types"
+import { INmvTransform } from "./type"
 
 export const TYPE = 'bas.datasource'
 
@@ -56,8 +57,9 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     if (!transformations[0]) {
       return subject.error(`transformations[0] must be defined`)
     }
-    const { toSpace } = transformations[0]
-    
+    const { toSpace, params } = transformations[0] as INmvTransform
+    const { A, b } = params
+
     const iavSpace = translateSpace(toSpace)
     if (!iavSpace) {
       return subject.error(`toSpace with id ${toSpace} cannot be found.`)
@@ -96,7 +98,15 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       unload: () => {
         URL.revokeObjectURL(tmpUrl)
       },
-      url: tmpUrl
+      url: tmpUrl,
+      resourceParam: {
+        transform: [
+          [...A[0], b[0]] as TVec4,
+          [...A[1], b[1]] as TVec4,
+          [...A[2], b[2]] as TVec4,
+          [0, 0, 0, 1],
+        ]
+      }
     }
     subject.next({
       type: 'loadResource',
