@@ -386,7 +386,7 @@ describe('> viewerState.useEffect.ts', () => {
         )
       })
     
-      describe('> if atlas found, will try to find id of first template', () => {
+      describe('> if atlas found', () => {
         const mockParc1 = {
           ['@id']: 'parc-1',
           availableIn: [{
@@ -407,70 +407,152 @@ describe('> viewerState.useEffect.ts', () => {
           ['@id']: 'test-1',
           availableIn: [ mockParc1 ]
         }
-        it('> if fails, will return general error', () => {
 
-          mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
-            mockTmplSpc1
-          ])
-          mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
-            ['@id']: 'foo-bar',
-            templateSpaces: [ mockTmplSpc ]
-          }])
-          actions$ = hot('a', {
-            a: viewerStateSelectAtlas({
-              atlas: {
+        describe('> if template key val is not provided', () => {
+          describe('> will try to find the id of the first tmpl', () => {
+
+            it('> if fails, will return general error', () => {
+
+              mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
+                mockTmplSpc1
+              ])
+              mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
                 ['@id']: 'foo-bar',
-              }
-            })
-          })
-          
-          const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-          expect(
-            viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-          ).toBeObservable(
-            hot('a', {
-              a: generalActionError({
-                message: CONST.TEMPLATE_NOT_FOUND
+                templateSpaces: [ mockTmplSpc ]
+              }])
+              actions$ = hot('a', {
+                a: viewerStateSelectAtlas({
+                  atlas: {
+                    ['@id']: 'foo-bar',
+                  }
+                })
               })
+              
+              const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
+              ).toBeObservable(
+                hot('a', {
+                  a: generalActionError({
+                    message: CONST.TEMPLATE_NOT_FOUND
+                  })
+                })
+              )
             })
-          )
-        })
+          
+            it('> if succeeds, will dispatch new viewer', () => {
+              const completeMocktmpl = {
+                ...mockTmplSpc1,
+                parcellations: [ mockParc1 ]
+              }
+              mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
+                completeMocktmpl
+              ])
+              mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
+                ['@id']: 'foo-bar',
+                templateSpaces: [ mockTmplSpc1 ]
+              }])
+              actions$ = hot('a', {
+                a: viewerStateSelectAtlas({
+                  atlas: {
+                    ['@id']: 'foo-bar',
+                  }
+                })
+              })
+              
+              const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
+              ).toBeObservable(
+                hot('a', {
+                  a: viewerStateNewViewer({
+                    selectTemplate: completeMocktmpl,
+                    selectParcellation: mockParc1
+                  })
+                })
+              )
+            })
       
-        it('> if succeeds, will dispatch new viewer', () => {
-          const completeMocktmpl = {
+          })
+        })
+
+        describe('> if template key val is provided', () => {
+
+          const completeMockTmpl = {
+            ...mockTmplSpc,
+            parcellations: [ mockParc0 ]
+          }
+          const completeMocktmpl1 = {
             ...mockTmplSpc1,
             parcellations: [ mockParc1 ]
           }
-          mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
-            completeMocktmpl
-          ])
-          mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
-            ['@id']: 'foo-bar',
-            templateSpaces: [ mockTmplSpc1 ]
-          }])
-          actions$ = hot('a', {
-            a: viewerStateSelectAtlas({
-              atlas: {
-                ['@id']: 'foo-bar',
-              }
-            })
+          beforeEach(() => {
+
+            mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
+              completeMockTmpl,
+              completeMocktmpl1,
+            ])
+            mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
+              ['@id']: 'foo-bar',
+              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ]
+            }])
           })
-          
-          const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-          expect(
-            viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-          ).toBeObservable(
-            hot('a', {
-              a: viewerStateNewViewer({
-                selectTemplate: completeMocktmpl,
-                selectParcellation: mockParc1
+          it('> will select template.@id', () => {
+
+            actions$ = hot('a', {
+              a: viewerStateSelectAtlas({
+                atlas: {
+                  ['@id']: 'foo-bar',
+                  template: {
+                    ['@id']: mockTmplSpc1['@id']
+                  }
+                }
               })
             })
-          )
+            
+            const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
+            expect(
+              viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
+            ).toBeObservable(
+              hot('a', {
+                a: viewerStateNewViewer({
+                  selectTemplate: completeMocktmpl1,
+                  selectParcellation: mockParc1
+                })
+              })
+            )
+
+          })
+          
+          it('> if template.@id is not defined, will fallback to first template', () => {
+
+            actions$ = hot('a', {
+              a: viewerStateSelectAtlas({
+                atlas: {
+                  ['@id']: 'foo-bar',
+                  template: {
+                    
+                  } as any
+                }
+              })
+            })
+
+            const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
+            expect(
+              viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
+            ).toBeObservable(
+              hot('a', {
+                a: viewerStateNewViewer({
+                  selectTemplate: completeMockTmpl,
+                  selectParcellation: mockParc0
+                })
+              })
+            )
+
+          })
         })
       })
     })
-  
   })
 
   describe('> cvtNehubaConfigToNavigationObj', () => {

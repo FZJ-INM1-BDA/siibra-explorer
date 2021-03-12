@@ -46,7 +46,14 @@ export const viewerStateSetFetchedAtlases = createAction(
 
 export const viewerStateSelectAtlas = createAction(
   `[viewerState] selectAtlas`,
-  props<{ atlas: { ['@id']: string } }>()
+  props<{
+    atlas: {
+      ['@id']: string
+      template?: {
+        ['@id']: string
+      }
+    }
+  }>()
 )
 
 export const viewerStateHelperSelectParcellationWithId = createAction(
