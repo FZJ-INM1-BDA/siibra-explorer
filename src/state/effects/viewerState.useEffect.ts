@@ -136,7 +136,8 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
     ),
     map(([action, fetchedTemplates, fetchedAtlases ])=> {
 
-      const atlas = fetchedAtlases.find(a => a['@id'] === (action as any).atlas['@id'])
+      const { atlas: atlasObj } = action as any
+      const atlas = fetchedAtlases.find(a => a['@id'] === atlasObj['@id'])
       if (!atlas) {
         return generalActionError({
           message: CONST.ATLAS_NOT_FOUND
@@ -145,7 +146,12 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       /**
        * selecting atlas means selecting the first available templateSpace
        */
-      const templateTobeSelected = atlas.templateSpaces[0]
+      const targetTmplSpcId = atlasObj['template']?.['@id']
+      const templateTobeSelected = (
+        targetTmplSpcId
+        && atlas.templateSpaces.find(t => t['@id'] === targetTmplSpcId)
+      ) || atlas.templateSpaces[0]
+      
       const templateSpaceId = templateTobeSelected['@id']
       
       const parcellationId = (

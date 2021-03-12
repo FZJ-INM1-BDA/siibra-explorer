@@ -14,8 +14,9 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory, LOAD_MESH_TOKEN, ILoadMesh } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
+import { LOAD_MESH_TOKEN, ILoadMesh, WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
@@ -60,6 +61,7 @@ import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
+import { MessagingGlue } from './messagingGlue';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -248,6 +250,10 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: VIEWERMODULE_DARKTHEME,
       useFactory: (pureConstantService: PureContantService) => pureConstantService.darktheme$,
       deps: [ PureContantService ]
+    },
+    {
+      provide: WINDOW_MESSAGING_HANDLER_TOKEN,
+      useClass: MessagingGlue
     }
   ],
   bootstrap : [

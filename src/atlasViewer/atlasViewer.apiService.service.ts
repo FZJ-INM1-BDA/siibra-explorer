@@ -16,6 +16,7 @@ import {
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
+import { ILoadMesh } from 'src/messaging/types'
 
 declare let window
 
@@ -33,14 +34,6 @@ interface IGetUserSelectRegionPr{
 }
 
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
-
-export interface ILoadMesh {
-  type: 'VTK'
-  id: string
-  url: string
-  customFragmentColor?: string
-}
-export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
 
 @Injectable({
   providedIn : 'root'
