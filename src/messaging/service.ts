@@ -60,60 +60,23 @@ export class MessagingService {
     }
 
     window.addEventListener('message', async ({ data, origin, source }) => {
-      const { method, id, param } = data
+      
       const src = source as Window
-      if (!method) return
-      if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
-      const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
-
-      /**
-       * if ping method, respond pong method
-       */
-      if (strippedMethod === 'ping') {
-        src.postMessage({
-          id,
-          result: 'pong',
-          jsonrpc: '2.0'
-        }, origin)
-        return
-      }
-
-      /**
-       * otherwise, check permission
-       */
-
+      const { id } = data
       try {
-        const allow = await this.checkOrigin({ origin })
-        if (!allow) {
-          src.postMessage({
-            jsonrpc: '2.0',
-            id,
-            error: {
-              code: 403,
-              message: 'User declined'
-            }
-          }, origin)
-          return
-        }
-        const result = await this.processMessage({ method: strippedMethod, param })
-
+        const result = await this.handleMessage({ data, origin })
         src.postMessage({
-          jsonrpc: '2.0',
           id,
+          jsonrpc: '2.0',
           result
         }, origin)
-
-      } catch (e) {
-
+      } catch (error) {
         src.postMessage({
-          jsonrpc: '2.0',
           id,
-          error: e.code
-            ? e
-            : { code: 500, message: e.toString() }
+          jsonrpc: '2.0',
+          error
         }, origin)
       }
-
     })
 
     this.typeRegister.set(
@@ -127,11 +90,42 @@ export class MessagingService {
 
   }
 
+  public async handleMessage({ data, origin }) {
+    const { method, param } = data
+    
+    if (!method) return
+    if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
+    const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
+
+    /**
+     * if ping method, respond pong method
+     */
+    if (strippedMethod === 'ping') {
+      return 'pong'
+    }
+
+    /**
+     * otherwise, check permission
+     */
+
+    const allow = await this.checkOrigin({ origin })
+    if (!allow) throw ({
+      code: 403,
+      message: 'User declined'
+    })
+
+    // TODO 
+    // in future, check if in managed_methods
+    // if yes, directly call processJsonld
+    // if not, directly throw 
+
+    return await this.processMessage({ method: strippedMethod, param })
+  }
+
   processJsonld(jsonLd: any){
     const { ['@type']: type } = jsonLd
     const fn = this.typeRegister.get(type)
-    // TODO tidy this return value up
-    let returnValue: any
+    let returnValue: any = {}
     return new Promise((rs, rj) => {
 
       const sub = fn(jsonLd)
@@ -206,17 +200,13 @@ export class MessagingService {
     }
 
     if (MANAGED_METHODS.indexOf(method) >= 0) {
-      try {
-        return await this.processJsonld(param)
-      } catch (e) {
-        throw ({ code: 401, message: e })
-      }
+      return await this.processJsonld(param)
     }
 
     throw ({ code: 404, message: 'Method not found' })
   }
 
-  async checkOrigin({ origin }){
+  async checkOrigin({ origin }): Promise<boolean> {
     if (this.whiteListedOrigins.has(origin)) return true
     if (this.pendingRequests.has(origin)) return this.pendingRequests.get(origin)
     const responsePromise = this.dialog.open(
