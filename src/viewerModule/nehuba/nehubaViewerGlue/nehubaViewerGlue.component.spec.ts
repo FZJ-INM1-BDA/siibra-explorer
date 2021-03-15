@@ -6,7 +6,7 @@ import { PANELS } from "src/services/state/ngViewerState/constants"
 import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors"
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors"
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions"
-import { viewerStateCustomLandmarkSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
+import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 
@@ -48,6 +48,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
     mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
     mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [])
     mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [])
+    mockStore.overrideSelector(viewerStateNavigationStateSelector, null)
   })
 
   it('> can be init', () => {

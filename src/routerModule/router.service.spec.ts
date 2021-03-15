@@ -21,8 +21,8 @@ let router: Router
 describe('> router.service.ts', () => {
   describe('> RouterService', () => {
     beforeEach(() => {
-      cvtStateToHashedRoutesSpy= jasmine.createSpy('cvtStateToHashedRoutesSpy')
-      cvtFullRouteToStateSpy= jasmine.createSpy('cvtFullRouteToState')
+      cvtStateToHashedRoutesSpy = jasmine.createSpy('cvtStateToHashedRoutesSpy')
+      cvtFullRouteToStateSpy = jasmine.createSpy('cvtFullRouteToState')
 
       spyOnProperty(util, 'cvtStateToHashedRoutes').and.returnValue(cvtStateToHashedRoutesSpy)
       spyOnProperty(util, 'cvtFullRouteToState').and.returnValue(cvtFullRouteToStateSpy)
@@ -57,7 +57,7 @@ describe('> router.service.ts', () => {
     describe('> on state set', () => {
 
       it('> should call cvtStateToHashedRoutes', fakeAsync(() => {
-        cvtStateToHashedRoutesSpy.and.callFake(() => [])
+        cvtStateToHashedRoutesSpy.and.callFake(() => ``)
         const service = TestBed.inject(RouterService)
         const store = TestBed.inject(MockStore)
         const fakeState = {
@@ -86,7 +86,7 @@ describe('> router.service.ts', () => {
       }))
       it('> if cvtStateToHashedRoutes returns, should navigate to expected location', fakeAsync(() => {
         cvtStateToHashedRoutesSpy.and.callFake(() => {
-          return ['foo', 'bar']
+          return `foo/bar`
         })
         const service = TestBed.inject(RouterService)
         const store = TestBed.inject(MockStore)
@@ -100,10 +100,75 @@ describe('> router.service.ts', () => {
           location.path()
         ).toBe('/foo/bar')
       }))
+    
+      describe('> does not excessively call navigateByUrl', () => {
+        let navigateSpy: jasmine.Spy
+        let navigateByUrlSpy: jasmine.Spy
+        beforeEach(() => {
+          const router = TestBed.inject(Router)
+          navigateSpy = spyOn(router, 'navigate').and.callThrough()
+          navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.callThrough()
+        })
+        afterEach(() => {
+          navigateSpy.calls.reset()
+          navigateByUrlSpy.calls.reset()
+        })
+
+        it('> navigate calls navigateByUrl', fakeAsync(() => {
+          cvtStateToHashedRoutesSpy.and.callFake(() => {
+            return `foo/bar`
+          })
+          TestBed.inject(RouterService)
+          const store = TestBed.inject(MockStore)
+          store.setState({
+            'hello': 'world'
+          })
+          tick(320)
+          expect(cvtStateToHashedRoutesSpy).toHaveBeenCalledTimes(1 + 1)
+          expect(navigateByUrlSpy).toHaveBeenCalledTimes(1)
+        }))
+
+        it('> same state should not navigate', fakeAsync(() => {
+          cvtStateToHashedRoutesSpy.and.callFake(() => {
+            return `foo/bar`
+          })
+          
+          TestBed.inject(RouterService)
+          const router = TestBed.inject(Router)
+          router.navigate(['foo', 'bar'])
+          const store = TestBed.inject(MockStore)
+          store.setState({
+            'hello': 'world'
+          })
+          tick(320)
+          expect(cvtStateToHashedRoutesSpy).toHaveBeenCalledTimes(1 + 1)
+          expect(navigateByUrlSpy).toHaveBeenCalledTimes(1)
+        }))
+
+        it('> should handle queryParam gracefully', fakeAsync(() => {
+          const searchParam = new URLSearchParams()
+          const sv = '["precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64"]'
+          searchParam.set('standaloneVolumes', sv)
+          cvtStateToHashedRoutesSpy.and.callFake(() => {
+            return `foo/bar?${searchParam.toString()}`
+          })
+          TestBed.inject(RouterService)
+          const store = TestBed.inject(MockStore)
+
+          TestBed.inject(RouterService)
+          const router = TestBed.inject(Router)
+          router.navigate(['foo', `bar`], { queryParams: { standaloneVolumes: sv }})
+          store.setState({
+            'hello': 'world'
+          })
+          tick(320)
+          expect(cvtStateToHashedRoutesSpy).toHaveBeenCalledTimes(1 + 1)
+          expect(navigateByUrlSpy).toHaveBeenCalledTimes(1)
+        }))
+      })
     })
   
     describe('> on route change', () => {
-
 
       describe('> compares new state and previous state', () => {
 
@@ -185,7 +250,7 @@ describe('> router.service.ts', () => {
             }
             cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
             cvtStateToHashedRoutesSpy.and.callFake(() => {
-              return ['fizz', 'buzz']
+              return `fizz/buzz`
             })
             router = TestBed.inject(Router)
             router.navigate(['foo', 'bar'])
@@ -194,7 +259,7 @@ describe('> router.service.ts', () => {
             const store = TestBed.inject(MockStore)
             const dispatchSpy = spyOn(store, 'dispatch')
             
-            tick()
+            tick(320)
 
             expect(dispatchSpy).toHaveBeenCalled()
     
@@ -207,17 +272,16 @@ describe('> router.service.ts', () => {
             }
             cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
             cvtStateToHashedRoutesSpy.and.callFake(() => {
-              return ['foo', 'bar']
+              return `foo/bar`
             })
             router = TestBed.inject(Router)
             router.navigate(['foo', 'bar'])
     
             const service = TestBed.inject(RouterService)
-            service['firstRenderFlag'] = false
             const store = TestBed.inject(MockStore)
             const dispatchSpy = spyOn(store, 'dispatch')
             
-            tick()
+            tick(320)
 
             expect(dispatchSpy).not.toHaveBeenCalled()
     

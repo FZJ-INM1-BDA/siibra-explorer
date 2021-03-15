@@ -12,6 +12,7 @@ import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/
 import { LoggingService } from "src/logging";
 import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
 import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
+import { arrayOfPrimitiveEqual } from 'src/util/fn'
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -319,7 +320,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.store$.pipe(
         select(viewerStateStandAloneVolumes),
         filter(v => v && Array.isArray(v) && v.length > 0),
-        distinctUntilChanged()
+        distinctUntilChanged(arrayOfPrimitiveEqual)
       ).subscribe(async volumes => {
         const copiedNehubaConfig = JSON.parse(JSON.stringify(defaultNehubaConfig))
 

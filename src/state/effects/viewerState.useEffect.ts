@@ -15,6 +15,7 @@ import { CONST } from 'common/constants'
 import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
+import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -56,44 +57,6 @@ export function cvtNehubaConfigToNavigationObj(nehubaConfig?){
     zoom: zoomFactor,
     position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
     positionReal: true
-  }
-}
-
-export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
-  const {
-    orientation = [0, 0, 0, 1],
-    perspectiveOrientation = [0, 0, 0, 1],
-    perspectiveZoom = 1e6,
-    zoom = 1e6,
-    position = [0, 0, 0],
-    positionReal = true,
-  } = navigationObj || {}
-
-  const voxelSize = (() => {
-    const {
-      navigation = {}
-    } = nehubaConfigObj || {}
-    const { pose = {}, zoomFactor = 1e6 } = navigation
-    const { position = {}, orientation = [0, 0, 0, 1] } = pose
-    const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position
-    return voxelSize
-  })()
-
-  return {
-    perspectiveOrientation,
-    perspectiveZoom,
-    navigation: {
-      pose: {
-        position: {
-          voxelCoordinates: positionReal
-            ? [0, 1, 2].map(idx => position[idx] / voxelSize[idx])
-            : position,
-          voxelSize
-        },
-        orientation,
-      },
-      zoomFactor: zoom
-    }
   }
 }
 

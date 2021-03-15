@@ -49,14 +49,15 @@ export class RouterService {
     ).subscribe(([ev, state]: [NavigationEnd, any]) => {
       const fullPath = ev.urlAfterRedirects
       const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
-      let routeFromState: string[]
+      let routeFromState: string
       try {
         routeFromState = cvtStateToHashedRoutes(state)
       } catch (_e) {
-        routeFromState = []
+        routeFromState = ``
       }
 
-      if ( fullPath !== `/${routeFromState.join('/')}`) {
+      if ( fullPath !== `/${routeFromState}`) {
+        console.log(`apply state`, stateFromRoute)
         store$.dispatch(
           generalApplyState({
             state: stateFromRoute
@@ -76,18 +77,27 @@ export class RouterService {
             try {
               return cvtStateToHashedRoutes(state)
             } catch (e) {
-              return []
+              this.logError(e)
+              return ``
             }
           })
         )
       )
-    ).subscribe(routes => {
-      if (routes.length === 0) {
+    ).subscribe(routePath => {
+      if (routePath === '') {
         router.navigate([ baseHref ])
       } else {
-        const currUrl = router.routerState.snapshot.url
-        const joinedRoutes = `/${routes.join('/')}`
-        if (currUrl !== joinedRoutes) {
+
+        // this needs to be done, because, for some silly reasons
+        // router decodes encoded ':' character
+        // this means, if url is compared with url, it will always be falsy
+        // if a non encoded ':' exists
+        const currUrlUrlTree = router.parseUrl(router.url)
+        const joinedRoutes = `/${routePath}`
+        const newUrlUrlTree = router.parseUrl(joinedRoutes)
+        
+        if (currUrlUrlTree.toString() !== newUrlUrlTree.toString()) {
+          console.log(`navigate\n${currUrlUrlTree.toString()}\n${newUrlUrlTree.toString()}`)
           router.navigateByUrl(joinedRoutes)
         }
       }

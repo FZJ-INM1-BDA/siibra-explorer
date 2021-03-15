@@ -208,10 +208,10 @@ module.exports = (query, _warningCb) => {
 
   let redirectUrl = '/#'
   if (standaloneVolumes) {
-    redirectUrl += `/sv:${encodeURIComponent(standaloneVolumes)}`
+    searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav
     if (dsp) redirectUrl += dsp
-    if (Array.from(searchParam.keys()).length > 0) redirectUrl += `?${searchParam.toString()}`
+    if (Array.from(searchParam.keys()).length > 0) redirectUrl += `/?${searchParam.toString()}`
     return redirectUrl
   }
 
