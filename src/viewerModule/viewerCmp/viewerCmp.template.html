@@ -234,14 +234,11 @@
   <iav-layout-fourcorners>
     <div iavLayoutFourCornersContent
       class="w-100 h-100 position-absolute">
-      <ui-splashscreen *ngIf="!viewerLoaded"
-        class="position-absolute left-0 top-0">
-      </ui-splashscreen>
-      <div class="h-100 w-100 overflow-hidden position-relative"
-        [ngClass]="{'pe-none': !viewerLoaded}">
+      <div class="h-100 w-100 overflow-hidden position-relative">
 
         <ng-container [ngSwitch]="useViewer$ | async">
 
+          <!-- nehuba viewer -->
           <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'nehuba'"
             (viewerEvent)="viewerLoaded = $event.data"
@@ -250,6 +247,7 @@
             #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
           </iav-cmp-viewer-nehuba-glue>
 
+          <!-- three surfer (free surfer viewer) -->
           <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'threeSurfer'"
             (viewerEvent)="viewerLoaded = $event.data"
@@ -257,10 +255,13 @@
             [selectedParcellation]="parcellationSelected$ | async">
           </three-surfer-glue-cmp>
 
+          <!-- if not supported, show not supported message -->
           <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
           
-          <div *ngSwitchCaseDefault>
-            [ngSwitchDefault]
+          <!-- by default, show splash screen -->
+          <div *ngSwitchDefault>
+            <ui-splashscreen class="position-absolute left-0 top-0">
+            </ui-splashscreen>
           </div>
         </ng-container>
 
