@@ -4,9 +4,9 @@ import { select, Store } from "@ngrx/store";
 import { merge, Observable, Subscription, combineLatest } from "rxjs";
 import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
+import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
 import { IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
-import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
+import { viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
 import { deserialiseParcRegionId, serialiseParcellationRegion } from "common/util"
 import { getGetRegionFromLabelIndexId } from 'src/util/fn'
 
@@ -221,10 +221,10 @@ export class UseEffects implements OnDestroy {
     ),
     this.parcellationSelected$,
     this.actions$.pipe(
-      ofType(NEWVIEWER)
+      ofType(viewerStateNewViewer.type)
     ),
     this.actions$.pipe(
-      ofType(viewerStateSelectAtlas)
+      ofType(viewerStateSelectAtlas.type)
     )
   ).pipe(
     mapTo({
@@ -240,7 +240,7 @@ export class UseEffects implements OnDestroy {
 
   @Effect()
   public onNewViewerResetLandmarkSelected$ = this.actions$.pipe(
-    ofType(NEWVIEWER),
+    ofType(viewerStateNewViewer.type),
     mapTo({
       type: SELECT_LANDMARKS,
       landmarks: []

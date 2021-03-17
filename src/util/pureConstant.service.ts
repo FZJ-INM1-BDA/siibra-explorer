@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, merge, Subscription, of, forkJoin, fromEvent, combineLatest, timer } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, switchMapTo } from "rxjs/operators";
+import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, distinctUntilChanged } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
@@ -156,6 +156,7 @@ export class PureContantService implements OnDestroy{
       map(([ expNumTmpl, actNumTmpl, actNumAtlas ]) => {
         return expNumTmpl === actNumTmpl && actNumAtlas === this.totalAtlasesLength
       }),
+      distinctUntilChanged(),
       shareReplay(1),
     )
   }
