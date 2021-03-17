@@ -41,6 +41,7 @@ jobs:
           './src/advanced/nonAtlasImages.prod.e2e-spec.js',
           # './src/advanced/browsingForDatasets.prod.e2e-spec.js',
           './src/advanced/favDatasets.prod.e2e-spec.js',
+          './src/advanced/history.prod.e2e-spec.js',
           
           './src/selecting/region.prod.e2e-spec.js',
           './src/selecting/template.prod.e2e-spec.js',

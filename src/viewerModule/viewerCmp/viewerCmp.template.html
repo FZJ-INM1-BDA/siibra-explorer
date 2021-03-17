@@ -74,7 +74,7 @@
               </ng-container>
             </div>
 
-            <iav-cmp-viewer-nehuba-status *ngIf="viewerLoaded"
+            <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
               class="pe-all mt-2 muted-7">
             </iav-cmp-viewer-nehuba-status>
           </div>
