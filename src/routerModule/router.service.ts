@@ -57,7 +57,6 @@ export class RouterService {
       }
 
       if ( fullPath !== `/${routeFromState}`) {
-        console.log(`apply state`, stateFromRoute)
         store$.dispatch(
           generalApplyState({
             state: stateFromRoute
@@ -97,7 +96,6 @@ export class RouterService {
         const newUrlUrlTree = router.parseUrl(joinedRoutes)
         
         if (currUrlUrlTree.toString() !== newUrlUrlTree.toString()) {
-          console.log(`navigate\n${currUrlUrlTree.toString()}\n${newUrlUrlTree.toString()}`)
           router.navigateByUrl(joinedRoutes)
         }
       }
