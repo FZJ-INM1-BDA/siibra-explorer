@@ -96,18 +96,22 @@ export class ViewerCmp implements OnDestroy {
     distinctUntilChanged(),
   )
 
-  public useViewer$: Observable<TSupportedViewer> = this.templateSelected$.pipe(
-    map(t => {
+  public isStandaloneVolumes$ = this.store$.pipe(
+    select(viewerStateStandAloneVolumes),
+    map(v => v.length > 0)
+  )
+
+  public useViewer$: Observable<TSupportedViewer> = combineLatest([
+    this.templateSelected$,
+    this.isStandaloneVolumes$,
+  ]).pipe(
+    map(([t, isSv]) => {
+      if (isSv) return 'nehuba'
       if (!t) return null
       if (!!t['nehubaConfigURL'] || !!t['nehubaConfig']) return 'nehuba'
       if (!!t['three-surfer']) return 'threeSurfer'
       return 'notsupported'
     })
-  )
-
-  public isStandaloneVolumes$ = this.store$.pipe(
-    select(viewerStateStandAloneVolumes),
-    map(v => v.length > 0)
   )
 
   public selectedLayerVersions$ = this.store$.pipe(

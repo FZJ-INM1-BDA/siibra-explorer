@@ -27,4 +27,8 @@ export type TConditional<T> = Partial<
   TUrlNav<T>
 >
 
-export type TUrlPathObj<T, V> =  (V extends TUrlStandaloneVolume<T> ? TUrlStandaloneVolume<T> : TUrlAtlas<T>) & TConditional<T>
+export type TUrlPathObj<T, V> = 
+  (V extends TUrlStandaloneVolume<T>
+      ? TUrlStandaloneVolume<T>
+      : TUrlAtlas<T>)
+  & TConditional<T>

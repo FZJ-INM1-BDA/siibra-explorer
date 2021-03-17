@@ -1,4 +1,4 @@
-import { cvtNavigationObjToNehubaConfig, cvtNehubaConfigToNavigationObj, ViewerStateControllerUseEffect, defaultNavigationObject, defaultNehubaConfigObject } from './viewerState.useEffect'
+import { cvtNehubaConfigToNavigationObj, ViewerStateControllerUseEffect, defaultNavigationObject } from './viewerState.useEffect'
 import { Observable, of } from 'rxjs'
 import { TestBed, async } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
@@ -604,75 +604,5 @@ describe('> viewerState.useEffect.ts', () => {
       })
     })
   })
-  describe('> cvtNavigationObjToNehubaConfig', () => {
-    const validNehubaConfigObj = reconstitutedBigBrain.nehubaConfig.dataset.initialNgState
-    const validNavigationObj = currentNavigation
-    describe('> if inputs are malformed', () => {
-      describe('> if navigation object is malformed, uses navigation default object', () => {
-        it('> if navigation object is null', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(null, validNehubaConfigObj)
-          const v2 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, validNehubaConfigObj)
-          expect(v1).toEqual(v2)
-        })
-        it('> if navigation object is undefined', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(undefined, validNehubaConfigObj)
-          const v2 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, validNehubaConfigObj)
-          expect(v1).toEqual(v2)
-        })
 
-        it('> if navigation object is otherwise malformed', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(reconstitutedBigBrain, validNehubaConfigObj)
-          const v2 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, validNehubaConfigObj)
-          expect(v1).toEqual(v2)
-
-          const v3 = cvtNavigationObjToNehubaConfig({}, validNehubaConfigObj)
-          const v4 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, validNehubaConfigObj)
-          expect(v3).toEqual(v4)
-        })
-      })
-
-      describe('> if nehubaConfig object is malformed, use default nehubaConfig obj', () => {
-        it('> if nehubaConfig is null', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(validNavigationObj, null)
-          const v2 = cvtNavigationObjToNehubaConfig(validNavigationObj, defaultNehubaConfigObject)
-          expect(v1).toEqual(v2)
-        })
-
-        it('> if nehubaConfig is undefined', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(validNavigationObj, undefined)
-          const v2 = cvtNavigationObjToNehubaConfig(validNavigationObj, defaultNehubaConfigObject)
-          expect(v1).toEqual(v2)
-        })
-
-        it('> if nehubaConfig is otherwise malformed', () => {
-          const v1 = cvtNavigationObjToNehubaConfig(validNavigationObj, {})
-          const v2 = cvtNavigationObjToNehubaConfig(validNavigationObj, defaultNehubaConfigObject)
-          expect(v1).toEqual(v2)
-
-          const v3 = cvtNavigationObjToNehubaConfig(validNavigationObj, reconstitutedBigBrain)
-          const v4 = cvtNavigationObjToNehubaConfig(validNavigationObj, defaultNehubaConfigObject)
-          expect(v3).toEqual(v4)
-        })
-      })
-    })
-    it('> converts navigation object and reference nehuba config object to navigation object', () => {
-      const convertedVal = cvtNavigationObjToNehubaConfig(validNavigationObj, validNehubaConfigObj)
-      const { perspectiveOrientation, orientation, zoom, perspectiveZoom, position } = validNavigationObj
-      
-      expect(convertedVal).toEqual({
-        navigation: {
-          pose: {
-            position: {
-              voxelSize: validNehubaConfigObj.navigation.pose.position.voxelSize,
-              voxelCoordinates: [0, 1, 2].map(idx => position[idx] / validNehubaConfigObj.navigation.pose.position.voxelSize[idx])
-            },
-            orientation
-          },
-          zoomFactor: zoom
-        },
-        perspectiveOrientation: perspectiveOrientation,
-        perspectiveZoom: perspectiveZoom
-      })
-    })
-  })
 })

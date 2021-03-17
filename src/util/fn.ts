@@ -62,3 +62,10 @@ export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
   return ({ labelIndexId }) =>
     recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
 }
+
+type TPrimitive = string | number
+
+const include = <T extends TPrimitive>(el: T, arr: T[]) => arr.indexOf(el) >= 0
+export const arrayOfPrimitiveEqual = <T extends TPrimitive>(o: T[], n: T[]) =>
+  o.every(el => include(el, n))
+  && n.every(el => include(el, o))

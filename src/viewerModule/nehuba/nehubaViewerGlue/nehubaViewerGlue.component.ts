@@ -7,7 +7,7 @@ import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/sel
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime, withLatestFrom } from "rxjs/operators";
 import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMouseOverCustomLandmark, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
 import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
 import { serialiseParcellationRegion } from 'common/util'
 import { ARIA_LABELS, IDS } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
@@ -17,7 +17,7 @@ import { getNgIds, getMultiNgIdsRegionsLabelIndexMap } from "../constants";
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
-import { calculateSliceZoomFactor, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
+import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 
@@ -67,6 +67,8 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
   @Input()
   public selectedTemplate: any
+
+  private navigation: any
 
   private newViewer$ = new Subject()
 
@@ -200,12 +202,19 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     const template = (() => {
 
       const deepCopiedState = JSON.parse(JSON.stringify(_template))
-      const navigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
-      if (!navigation) {
+      const initialNgState = deepCopiedState.nehubaConfig.dataset.initialNgState
+
+      if (!initialNgState || !this.navigation) {
         return deepCopiedState
       }
-      navigation.zoomFactor = calculateSliceZoomFactor(navigation.zoomFactor)
-      deepCopiedState.nehubaConfig.dataset.initialNgState.navigation = navigation
+      const overwritingInitState = this.navigation
+        ? cvtNavigationObjToNehubaConfig(this.navigation, initialNgState)
+        : {}
+      
+      deepCopiedState.nehubaConfig.dataset.initialNgState = {
+        ...initialNgState,
+        ...overwritingInitState,
+      }
       return deepCopiedState
     })()
 
@@ -264,7 +273,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     private log: LoggingService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Subject<NehubaViewerUnit>,
   ){
     this.viewerEvent.emit({
       type: 'MOUSEOVER_ANNOTATION',
@@ -279,13 +287,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion)) 
     }
-
-    const nehubaViewerSub = this.newViewer$.pipe(
-      tap(() => nehubaViewer$ && nehubaViewer$.next(null)),
-      switchMap(this.waitForNehuba.bind(this)),
-      map(() => this.nehubaContainerDirective.nehubaViewerInstance)
-    ).subscribe(viewer => nehubaViewer$ && nehubaViewer$.next(viewer))
-    this.onDestroyCb.push(() => nehubaViewerSub.unsubscribe())
 
     /**
      * on layout change
@@ -692,6 +693,11 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     })
     this.onDestroyCb.push(() => setupViewerApiSub.unsubscribe())
   
+    // listen to navigation change from store
+    const navSub = this.store$.pipe(
+      select(viewerStateNavigationStateSelector)
+    ).subscribe(nav => this.navigation = nav)
+    this.onDestroyCb.push(() => navSub.unsubscribe())
   }
 
   handleViewerLoadedEvent(flag: boolean) {

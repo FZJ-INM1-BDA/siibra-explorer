@@ -7,7 +7,6 @@ import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
-import { PureContantService } from "src/util";
 import { FormControl } from "@angular/forms";
 import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 
@@ -55,7 +54,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
     private log: LoggingService,
     private bottomSheet: MatBottomSheet,
     private dialog: MatDialog,
-    //private pureConstantService: PureContantService,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ) {
     this.useTouchInterface$ = of(true) //this.pureConstantService.useTouchUI$

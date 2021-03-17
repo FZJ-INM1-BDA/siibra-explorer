@@ -19,7 +19,12 @@ import {
   encodeId,
 } from './parseRouteToTmplParcReg'
 
-const endcodePath = (key: string, val: string) => `${key}:${encodeURI(val)}`
+const endcodePath = (key: string, val: string|string[]) =>
+  key[0] === '?'
+    ? `?${key}=${val}`
+    : `${key}:${Array.isArray(val)
+      ? val.map(v => encodeURI(v)).join('::')
+      : encodeURI(val)}`
 const decodePath = (path: string) => {
   const re = /^(.*?):(.*?)$/.exec(path)
   if (!re) return null
@@ -143,9 +148,10 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   // only load sv in state
   // ignore all other params
   // /#/sv:%5B%22precomputed%3A%2F%2Fhttps%3A%2F%2Fobject.cscs.ch%2Fv1%2FAUTH_08c08f9f119744cbbf77e216988da3eb%2Fimgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64%22%5D
-  if (!!returnObj['sv']) {
+  const standaloneVolumes = fullPath.queryParams['standaloneVolumes']
+  if (!!standaloneVolumes) {
     try {
-      const parsedArr = JSON.parse(returnObj['sv'])
+      const parsedArr = JSON.parse(standaloneVolumes)
       if (!Array.isArray(parsedArr)) throw new Error(`Parsed standalone volumes not of type array`)
 
       returnState['viewerState']['standaloneVolumes'] = parsedArr
@@ -193,7 +199,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Fun
   return returnState
 }
 
-export const cvtStateToHashedRoutes = (state): string[] => {
+export const cvtStateToHashedRoutes = (state): string => {
   // TODO check if this causes memleak
   const selectedAtlas = viewerStateGetSelectedAtlas(state)
   const selectedTemplate = viewerStateSelectedTemplateSelector(state)
@@ -204,6 +210,8 @@ export const cvtStateToHashedRoutes = (state): string[] => {
 
   const previewingDatasetFiles = uiStatePreviewingDatasetFilesSelector(state)
   let dsPrvString: string
+  const searchParam = new URLSearchParams()
+
   if (previewingDatasetFiles && Array.isArray(previewingDatasetFiles)) {
     const dsPrvArr = []
     const datasetPreviews = (previewingDatasetFiles as {datasetId: string, filename: string}[])
@@ -258,24 +266,25 @@ export const cvtStateToHashedRoutes = (state): string[] => {
    * if any params needs to overwrite previosu routes, put them here
    */
   if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
+    searchParam.set('standaloneVolumes', JSON.stringify(standaloneVolumes))
     routes = {
-      // standalone volumes
-      sv: encodeURIComponent(JSON.stringify(standaloneVolumes)),
       // nav
       ['@']: cNavString,
       dsp: dsPrvString && encodeURI(dsPrvString)
-    } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
+    } as TUrlPathObj<string|string[], TUrlStandaloneVolume<string[]>>
   }
 
-  const returnRoutes = []
+  const routesArr: string[] = []
   for (const key in routes) {
     if (!!routes[key]) {
-      returnRoutes.push(
-        endcodePath(key, routes[key])
-      )
+      const segStr = endcodePath(key, routes[key])
+      routesArr.push(segStr)
     }
   }
-  return returnRoutes
+
+  return searchParam.toString() === '' 
+    ? routesArr.join('/')
+    : `${routesArr.join('/')}?${searchParam.toString()}`
 }
 
 @Component({
