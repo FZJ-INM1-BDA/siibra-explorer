@@ -1,4 +1,4 @@
-import { ComponentRef, NgModule } from "@angular/core";
+import { NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
 import { IMPORT_NEHUBA_INJECT_TOKEN, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
@@ -20,7 +20,7 @@ import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { Subject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 
@@ -71,7 +71,7 @@ import { AuthModule } from "src/auth";
     },
     {
       provide: NEHUBA_INSTANCE_INJTKN,
-      useValue: new Subject()
+      useValue: new BehaviorSubject(null)
     }
   ]
 })

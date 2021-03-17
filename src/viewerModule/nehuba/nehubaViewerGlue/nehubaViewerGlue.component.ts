@@ -273,7 +273,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     private log: LoggingService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Subject<NehubaViewerUnit>,
   ){
     this.viewerEvent.emit({
       type: 'MOUSEOVER_ANNOTATION',
@@ -288,13 +287,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion)) 
     }
-
-    const nehubaViewerSub = this.newViewer$.pipe(
-      tap(() => nehubaViewer$ && nehubaViewer$.next(null)),
-      switchMap(this.waitForNehuba.bind(this)),
-      map(() => this.nehubaContainerDirective.nehubaViewerInstance)
-    ).subscribe(viewer => nehubaViewer$ && nehubaViewer$.next(viewer))
-    this.onDestroyCb.push(() => nehubaViewerSub.unsubscribe())
 
     /**
      * on layout change

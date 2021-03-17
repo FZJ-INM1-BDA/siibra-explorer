@@ -10,6 +10,7 @@ import { viewerStateSelectorNavigation, viewerStateStandAloneVolumes } from "src
 import { Subject } from "rxjs"
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions"
 import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions"
+import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   describe('> NehubaViewerContainerDirective', () => {
@@ -54,6 +55,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
       mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
       mockStore.overrideSelector(viewerStateStandAloneVolumes, [])
       mockStore.overrideSelector(viewerStateSelectorNavigation, null)
+      mockStore.overrideSelector(selectViewerConfigAnimationFlag, false)
     })
 
     it('> can be inited', () => {
@@ -78,7 +80,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         lifecycle: null,
         templateId: null,
         errorEmitter: new Subject(),
-        debouncedViewerPositionChange: new Subject(),
+        viewerPositionChange: new Subject(),
         layersChanged: new Subject(),
         nehubaReady: new Subject(),
         mouseoverSegmentEmitter: new Subject(),
@@ -176,7 +178,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
             lifecycle: null,
             templateId: null,
             errorEmitter: new Subject(),
-            debouncedViewerPositionChange: new Subject(),
+            viewerPositionChange: new Subject(),
             layersChanged: new Subject(),
             nehubaReady: new Subject(),
             mouseoverSegmentEmitter: new Subject(),

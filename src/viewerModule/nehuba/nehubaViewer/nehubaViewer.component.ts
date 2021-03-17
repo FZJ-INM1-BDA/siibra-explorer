@@ -1,5 +1,5 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer } from 'rxjs'
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional } from "@angular/core";
+import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer, Subject } from 'rxjs'
 import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
@@ -9,7 +9,7 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
-import { scanSliceViewRenderFn } from "../util";
+import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
 import { strToRgb, deserialiseParcRegionId } from 'common/util'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
@@ -87,7 +87,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   @Output() public nehubaReady: EventEmitter<null> = new EventEmitter()
   @Output() public layersChanged: EventEmitter<null> = new EventEmitter()
   private layersChangedHandler: any
-  @Output() public debouncedViewerPositionChange: EventEmitter<any> = new EventEmitter()
+  @Output() public viewerPositionChange: EventEmitter<any> = new EventEmitter()
   @Output() public mouseoverSegmentEmitter:
     EventEmitter<{
       segmentId: number | null
@@ -153,8 +153,13 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
     private log: LoggingService,
-    @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>
+    @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
+    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
   ) {
+
+    if (this.nehubaViewer$) {
+      this.nehubaViewer$.next(this)
+    }
 
     getImportNehubaPr()
       .then(() => {
@@ -463,6 +468,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy() {
+    if (this.nehubaViewer$) {
+      this.nehubaViewer$.next(null)
+    }
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
@@ -794,6 +802,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
     if (this.initNav) {
       this.setNavigationState(this.initNav)
+      this.initNav = null
     }
 
     if (this.initRegions && this.initRegions.length > 0) {
@@ -820,7 +829,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
     // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
     this._s3$ = this.nehubaViewer.navigationState.all
-      .debounceTime(300)
       .distinctUntilChanged((a, b) => {
         const {
           orientation: o1,
@@ -843,6 +851,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           [0, 1, 2].every(idx => p1[idx] === p2[idx]) &&
           z1 === z2
       })
+      .filter(() => !this.initNav)
       .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
         this.viewerState = {
           orientation,
@@ -853,7 +862,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           positionReal : false,
         }
 
-        this.debouncedViewerPositionChange.emit({
+        this.viewerPositionChange.emit({
           orientation : Array.from(orientation),
           perspectiveOrientation : Array.from(perspectiveOrientation),
           perspectiveZoom,

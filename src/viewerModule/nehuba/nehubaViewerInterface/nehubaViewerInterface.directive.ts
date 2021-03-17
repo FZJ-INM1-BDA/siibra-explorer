@@ -3,16 +3,16 @@ import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaVi
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, fromEvent, asyncScheduler } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
-import { getNavigationStateFromConfig, takeOnePipe } from "../util";
-import { timedValues } from "src/util/generator";
+import { takeOnePipe } from "../util";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
-import { viewerStateChangeNavigation, viewerStateMouseOverCustomLandmarkInPerspectiveView, viewerStateNehubaLayerchanged } from "src/services/state/viewerState/actions";
-import { viewerStateStandAloneVolumes, viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
+import { viewerStateMouseOverCustomLandmarkInPerspectiveView, viewerStateNehubaLayerchanged } from "src/services/state/viewerState/actions";
+import { viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { LoggingService } from "src/logging";
 import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
 import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
+import { NehubaNavigationService } from "../navigation.service";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -44,30 +44,6 @@ const defaultNehubaConfig = {
     "initialNgState": {
       "showDefaultAnnotations": false,
       "layers": {},
-      // "navigation": {
-      //   "pose": {
-      //     "position": {
-      //       "voxelSize": [
-      //         21166.666015625,
-      //         20000,
-      //         21166.666015625
-      //       ],
-      //       "voxelCoordinates": [
-      //         -21.8844051361084,
-      //         16.288618087768555,
-      //         28.418994903564453
-      //       ]
-      //     }
-      //   },
-      //   "zoomFactor": 350000
-      // },
-      // "perspectiveOrientation": [
-      //   0.3140767216682434,
-      //   -0.7418519854545593,
-      //   0.4988985061645508,
-      //   -0.3195493221282959
-      // ],
-      // "perspectiveZoom": 1922235.5293810747
     }
   },
   "layout": {
@@ -87,27 +63,12 @@ const defaultNehubaConfig = {
         1,
         1
       ],
-      // "removePerspectiveSlicesBackground": {
-      //   "color": [
-      //     1,
-      //     1,
-      //     1,
-      //     1
-      //   ],
-      //   "mode": "=="
-      // },
       "perspectiveBackground": [
         1,
         1,
         1,
         1
       ],
-      // "fixedZoomPerspectiveSlices": {
-      //   "sliceViewportWidth": 300,
-      //   "sliceViewportHeight": 300,
-      //   "sliceZoom": 563818.3562426177,
-      //   "sliceViewportSizeMultiplier": 2
-      // },
       "mesh": {
         "backFaceColor": [
           1,
@@ -118,30 +79,8 @@ const defaultNehubaConfig = {
         "removeBasedOnNavigation": true,
         "flipRemovedOctant": true
       },
-      // "centerToOrigin": true,
-      // "drawSubstrates": {
-      //   "color": [
-      //     0,
-      //     0,
-      //     0.5,
-      //     0.15
-      //   ]
-      // },
-      // "drawZoomLevels": {
-      //   "cutOff": 200000,
-      //   "color": [
-      //     0.5,
-      //     0,
-      //     0,
-      //     0.15
-      //   ]
-      // },
       "hideImages": false,
       "waitForMesh": false,
-      // "restrictZoomLevel": {
-      //   "minZoom": 1200000,
-      //   "maxZoom": 3500000
-      // }
     }
   }
 }
@@ -256,9 +195,9 @@ const accumulatorFn: (
 
 @Directive({
   selector: '[iav-nehuba-viewer-container]',
-  exportAs: 'iavNehubaViewerContainer'
+  exportAs: 'iavNehubaViewerContainer',
+  providers: [ NehubaNavigationService ]
 })
-
 export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   public viewportToDatas: [any, any, any] = [null, null, null]
@@ -272,6 +211,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
     private store$: Store<any>,
+    private navService: NehubaNavigationService,
     @Optional() private log: LoggingService,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
@@ -284,11 +224,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
        */
       distinctUntilChanged(),
     )
-    
-    this.navigationChanges$ = this.store$.pipe(
-      select(viewerStateSelectorNavigation),
-      filter(v => !!v),
-    )
 
     this.nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
       select(ngViewerSelectorOctantRemoval),
@@ -296,13 +231,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   }
 
   private nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
-  private navigationChanges$: Observable<any>
 
   private viewerPerformanceConfig$: Observable<IViewerConfigState>
   private viewerConfig: Partial<IViewerConfigState> = {}
-
-  public oldNavigation: any = {}
-  private storedNav: any
 
   private nehubaViewerSubscriptions: Subscription[] = []
   private subscriptions: Subscription[] = []
@@ -349,17 +280,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         }
       }),
 
-
-      this.navigationChanges$.subscribe(ev => {
-        if (this.nehubaViewerInstance) {
-          this.handleDispatchedNavigationChange(ev)
-        } else {
-          this.storedNav = {
-            ...ev,
-            positionReal: true
-          }
-        }
-      }),
     )
   }
 
@@ -382,9 +302,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.nehubaViewerFactory)
 
-    if (this.storedNav) {
-      this.nehubaViewerInstance.initNav = this.storedNav
-      this.storedNav = null
+    if (this.navService.storeNav) {
+      this.nehubaViewerInstance.initNav = {
+        ...this.navService.storeNav,
+        positionReal: true
+      }
     }
 
     const { nehubaConfig } = template
@@ -396,9 +318,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
     this.nehubaViewerInstance.config = nehubaConfig
     this.nehubaViewerInstance.lifecycle = lifeCycle
-
-    this.oldNavigation = getNavigationStateFromConfig(nehubaConfig)
-    this.handleEmittedNavigationChange(this.oldNavigation)
 
     if (gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
@@ -412,10 +331,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewerInstance.errorEmitter.subscribe(e => {
         console.log(e)
-      }),
-
-      this.nehubaViewerInstance.debouncedViewerPositionChange.subscribe(val => {
-        this.handleEmittedNavigationChange(val)
       }),
 
       this.nehubaViewerInstance.layersChanged.subscribe(() => {
@@ -505,103 +420,5 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   isReady() {
     return !!(this.cr?.instance?.nehubaViewer?.ngviewer)
-  }
-
-  /* because the navigation can be changed from two sources,
-    either dynamically (e.g. navigation panel in the UI or plugins etc)
-    or actively (via user interaction with the viewer)
-    or lastly, set on init
-
-  This handler function is meant to handle anytime viewer's navigation changes from either sources */
-  public handleEmittedNavigationChange(navigation) {
-
-    /* If the navigation is changed dynamically, this.oldnavigation is set prior to the propagation of the navigation state to the viewer.
-      As the viewer updates the dynamically changed navigation, it will emit the navigation state.
-      The emitted navigation state should be identical to this.oldnavigation */
-
-    const navigationChangedActively: boolean = Object.keys(this.oldNavigation).length === 0 || !Object.keys(this.oldNavigation).every(key => {
-      return this.oldNavigation[key].constructor === Number || this.oldNavigation[key].constructor === Boolean ?
-        this.oldNavigation[key] === navigation[key] :
-        this.oldNavigation[key].every((_, idx) => this.oldNavigation[key][idx] === navigation[key][idx])
-    })
-
-    /* if navigation is changed dynamically (ie not actively), the state would have been propagated to the store already. Hence return */
-    if ( !navigationChangedActively ) { return }
-
-    /* navigation changed actively (by user interaction with the viewer)
-      probagate the changes to the store */
-
-    this.store$.dispatch(
-      viewerStateChangeNavigation({
-        navigation,
-      })
-    )
-  }
-
-
-  public handleDispatchedNavigationChange(navigation) {
-
-    /* extract the animation object */
-    const { animation, ..._navigation } = navigation
-
-    /**
-     * remove keys that are falsy
-     */
-    Object.keys(_navigation).forEach(key => (!_navigation[key]) && delete _navigation[key])
-
-    const { animation: globalAnimationFlag } = this.viewerConfig
-    if ( globalAnimationFlag && animation ) {
-      /* animated */
-
-      const gen = timedValues()
-      const dest = Object.assign({}, _navigation)
-      /* this.oldNavigation is old */
-      const delta = Object.assign({}, ...Object.keys(dest).filter(key => key !== 'positionReal').map(key => {
-        const returnObj = {}
-        returnObj[key] = typeof dest[key] === 'number' ?
-          dest[key] - this.oldNavigation[key] :
-          typeof dest[key] === 'object' ?
-            dest[key].map((val, idx) => val - this.oldNavigation[key][idx]) :
-            true
-        return returnObj
-      }))
-
-      const animate = () => {
-        const next = gen.next()
-        const d =  next.value
-
-        this.nehubaViewerInstance.setNavigationState(
-          Object.assign({}, ...Object.keys(dest).filter(k => k !== 'positionReal').map(key => {
-            const returnObj = {}
-            returnObj[key] = typeof dest[key] === 'number' ?
-              dest[key] - ( delta[key] * ( 1 - d ) ) :
-              dest[key].map((val, idx) => val - ( delta[key][idx] * ( 1 - d ) ) )
-            return returnObj
-          }), {
-            positionReal : true,
-          }),
-        )
-
-        if ( !next.done ) {
-          requestAnimationFrame(() => animate())
-        } else {
-
-          /* set this.oldnavigation to represent the state of the store */
-          /* animation done, set this.oldNavigation */
-          this.oldNavigation = Object.assign({}, this.oldNavigation, dest)
-        }
-      }
-      requestAnimationFrame(() => animate())
-    } else {
-      /* not animated */
-
-      /* set this.oldnavigation to represent the state of the store */
-      /* since the emitted change of navigation state is debounced, we can safely set this.oldNavigation to the destination */
-      this.oldNavigation = Object.assign({}, this.oldNavigation, _navigation)
-
-      this.nehubaViewerInstance.setNavigationState(Object.assign({}, _navigation, {
-        positionReal : true,
-      }))
-    }
   }
 }
