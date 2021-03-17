@@ -3,8 +3,8 @@ import { select, Store } from "@ngrx/store";
 import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxjs";
 import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { NEWVIEWER, IavRootStoreInterface } from "src/services/stateStore.service";
-import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
+import { viewerStateHelperStoreName, viewerStateNewViewer, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { PureContantService } from "src/util";
 
 @Component({
@@ -75,19 +75,21 @@ export class SplashScreen implements AfterViewInit {
   }
 
   public selectTemplateParcellation(template, parcellation) {
-    this.store.dispatch({
-      type : NEWVIEWER,
-      selectTemplate : template,
-      selectParcellation : parcellation,
-    })
+    this.store.dispatch(
+      viewerStateNewViewer({
+        selectParcellation: parcellation,
+        selectTemplate: template
+      })
+    )
   }
 
   public selectTemplate(template: any) {
-    this.store.dispatch({
-      type : NEWVIEWER,
-      selectTemplate : template,
-      selectParcellation : template.parcellations[0],
-    })
+    this.store.dispatch(
+      viewerStateNewViewer({
+        selectTemplate: template,
+        selectParcellation: template.parcellations[0]
+      })
+    )
   }
 
   get totalTemplates() {

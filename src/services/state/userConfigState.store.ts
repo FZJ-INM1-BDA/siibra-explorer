@@ -246,7 +246,7 @@ export class UserConfigStateUseEffect implements OnDestroy {
         switchMap(({ savedRegionsSelection, parcellationSelected, templateSelected, regionsSelected }) => {
           if (templateSelected.name !== savedRegionsSelection.templateSelected.name ) {
             /**
-             * template different, dispatch NEWVIEWER
+             * template different, dispatch viewerStateNewViewer.type
              */
             this.store$.dispatch(
               viewerStateNewViewer({

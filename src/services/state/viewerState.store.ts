@@ -111,7 +111,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       standaloneVolumes: []
     }
-  case NEWVIEWER: {
+  case viewerStateNewViewer.type: {
 
     const {
       selectParcellation: parcellation,
@@ -244,8 +244,6 @@ export function stateStore(state, action) {
 
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
-
-export const NEWVIEWER = viewerStateNewViewer.type
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
