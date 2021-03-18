@@ -35,9 +35,11 @@ describe('> navigating IAV via history', () => {
       position: [ Math.round(width / 4), Math.round(height / 4) ],
       delta: [ Math.round(width / 8), Math.round(height / 8) ]
     })
-    await iavPage.wait(2000)
+    await iavPage.wait(5000)
+    await iavPage.waitUntilAllChunksLoaded()
     await iavPage.historyBack()
-    await iavPage.wait(2000)
+    await iavPage.wait(5000)
+    await iavPage.waitUntilAllChunksLoaded()
 
     const nav2 = await iavPage.getNavigationState()
     // expect some positions to change after dragging
@@ -48,9 +50,11 @@ describe('> navigating IAV via history', () => {
 
   it('> history back, viewer should despawn ', async () => {
 
-    await iavPage.wait(2000)
+    await iavPage.wait(5000)
+    await iavPage.waitUntilAllChunksLoaded()
     await iavPage.historyBack()
-    await iavPage.wait(2000)
+    await iavPage.wait(5000)
+    await iavPage.waitUntilAllChunksLoaded()
 
     const flag = await iavPage.viewerIsPopulated()
     expect(flag).toBeFalse()
