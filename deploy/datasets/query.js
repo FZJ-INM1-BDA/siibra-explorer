@@ -113,8 +113,11 @@ const getPublicDs = async () => {
   throw `cached Data not yet resolved, neither is get public ds defined`
 }
 
-
-const getDs = ({ user }) => (user
+/**
+ * force get only public ds
+ * getting individual ds is too slow
+ */
+const getDs = ({ user }) => (false && user
     ? fetchDatasetFromKg({ user }).then(({ results }) => results)
     : getPublicDs()
   ).then(async datasets => {

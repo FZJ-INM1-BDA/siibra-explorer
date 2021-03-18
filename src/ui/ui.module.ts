@@ -51,6 +51,7 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "./screensh
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 import { AtlasCmptConnModule } from "src/atlasComponents/connectivity";
+import { ViewerCtrlModule } from "src/viewerCtrl";
 
 @NgModule({
   imports : [
@@ -71,6 +72,7 @@ import { AtlasCmptConnModule } from "src/atlasComponents/connectivity";
     ParcellationRegionModule,
     AtlasCmpParcellationModule,
     AtlasCmptConnModule,
+    ViewerCtrlModule,
   ],
   declarations : [
     // NehubaContainer,

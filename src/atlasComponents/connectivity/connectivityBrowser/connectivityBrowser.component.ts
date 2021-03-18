@@ -44,7 +44,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      */
     private _isFirstUpdate = true
 
-    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies'
+    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps.hbp.eu/v1.1/studies'
 
     private accordionIsExpanded = false
 
@@ -115,6 +115,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public datasetList: any[] = []
     public selectedDataset: any
     public selectedDatasetDescription: string = ''
+    public selectedDatasetKgId: string = ''
+    public selectedDatasetKgSchema: string = ''
     public connectedAreas = []
 
     private selectedParcellationFlatRegions$ = this.store$.pipe(
@@ -304,7 +306,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     changeDataset(event = null) {
       if (event) {
         this.selectedDataset = event.value
-        this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
+        const foundDataset = this.datasetList.find(d => d.name === this.selectedDataset)
+        this.selectedDatasetDescription = foundDataset?.description
+        this.selectedDatasetKgId = foundDataset?.kgId || null
+        this.selectedDatasetKgSchema = foundDataset?.kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
         const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
@@ -407,7 +412,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public exportFullConnectivity() {
-      this.fullConnectivityGridElement.nativeElement['downloadCSV']()
+      this.fullConnectivityGridElement?.nativeElement['downloadCSV']()
     }
 
 }
