@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ComponentRef, Input, OnChanges, Output, SimpleChanges, ViewContainerRef, EventEmitter } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ComponentFactoryResolver, ComponentRef, Input, OnChanges, Output, SimpleChanges, ViewContainerRef, EventEmitter } from "@angular/core";
 import { Subscription } from "rxjs";
 import { IFeature, RegionalFeaturesService } from "../regionalFeature.service";
 import { ISingleFeature } from "../singleFeatures/interfaces";

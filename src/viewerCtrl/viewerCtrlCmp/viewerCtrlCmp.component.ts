@@ -7,7 +7,7 @@ import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { ARIA_LABELS, IDS } from 'common/constants'
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'viewer-ctrl-component',

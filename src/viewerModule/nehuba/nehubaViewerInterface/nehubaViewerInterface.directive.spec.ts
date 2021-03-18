@@ -88,7 +88,8 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         mouseoverUserlandmarkEmitter: new Subject(),
         elementRef: {
           nativeElement: {}
-        }
+        },
+        toggleOctantRemoval: jasmine.createSpy()
       }
       const spyComRef = {
         destroy: jasmine.createSpy('destroy')

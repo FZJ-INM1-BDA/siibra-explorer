@@ -290,6 +290,10 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   }
 
   public toggleOctantRemoval(flag: boolean){
+    if (!this.nehubaViewerInstance) {
+      this.log.error(`this.nehubaViewerInstance is not yet available`)
+      return
+    }
     this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 

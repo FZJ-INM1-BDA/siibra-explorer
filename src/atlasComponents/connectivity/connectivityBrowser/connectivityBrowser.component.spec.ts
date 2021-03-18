@@ -1,15 +1,12 @@
-import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import {ConnectivityBrowserComponent} from "./connectivityBrowser.component";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Action} from "@ngrx/store";
-import {
-    defaultRootState,
-} from "src/services/stateStore.service";
 import {HttpClientModule} from "@angular/common/http";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
-import {DatabrowserModule} from "src/ui/databrowserModule";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
+import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 
 describe('ConnectivityComponent', () => {
 
@@ -37,11 +34,11 @@ describe('ConnectivityComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                DatabrowserModule
+                DatabrowserModule,
             ],
             providers: [
                 provideMockActions(() => actions$),
-                provideMockStore({ initialState: defaultRootState })
+                provideMockStore()
             ],
             declarations: [ConnectivityBrowserComponent],
             schemas: [
