@@ -13,13 +13,14 @@ import { ARIA_LABELS, IDS } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 
-import { getNgIds, getMultiNgIdsRegionsLabelIndexMap } from "../constants";
+import { getNgIds, getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../constants";
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
+import { NehubaMeshService } from "../mesh.service";
 
 interface INgLayerInterface {
   name: string // displayName
@@ -38,7 +39,15 @@ interface INgLayerInterface {
   styleUrls: [
     './nehubaViewerGlue.style.css'
   ],
-  exportAs: 'iavCmpViewerNehubaGlue'
+  exportAs: 'iavCmpViewerNehubaGlue',
+  providers: [
+    {
+      provide: SET_MESHES_TO_LOAD,
+      useFactory: (meshService: NehubaMeshService) => meshService.loadMeshes$,
+      deps: [ NehubaMeshService ]
+    },
+    NehubaMeshService
+  ]
 })
 
 export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
