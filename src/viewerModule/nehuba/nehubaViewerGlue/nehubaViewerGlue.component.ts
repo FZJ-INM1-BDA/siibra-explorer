@@ -1,12 +1,12 @@
 import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, interval, merge, Observable, of, Subject, timer } from "rxjs";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
+import { asyncScheduler, combineLatest, fromEvent, interval, merge, Observable, of, Subject } from "rxjs";
+import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime, withLatestFrom } from "rxjs/operators";
 import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMouseOverCustomLandmark, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
-import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
+import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
 import { serialiseParcellationRegion } from 'common/util'
 import { ARIA_LABELS, IDS } from 'common/constants'
@@ -90,31 +90,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
         position: lm.position
       }
     }))),
-  )
-
-  private forceUI$ = this.customLandmarks$.pipe(
-    map(lm => {
-      if (lm.length > 0) {
-        return {
-          target: 'perspective:octantRemoval',
-          mode: false,
-          message: `octant control disabled: showing landmarks.`
-        }
-      } else {
-        return {
-          target: 'perspective:octantRemoval',
-          mode: null
-        }
-      }
-    })
-  )
-
-  public disableOctantRemovalCtrl$ = this.forceUI$.pipe(
-    filter(({ target }) => target === 'perspective:octantRemoval'),
-  )
-
-  public nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-    select(ngViewerSelectorOctantRemoval),
   )
 
   public panelOrder$ = this.store$.pipe(
@@ -464,19 +439,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     })
     this.onDestroyCb.push(() => perspectiveRenderEvSub.unsubscribe())
 
-    const perspOctCtrlSub = this.customLandmarks$.pipe(
-      withLatestFrom(
-        this.nehubaViewerPerspectiveOctantRemoval$
-      ),
-      switchMap(this.waitForNehuba.bind(this))
-    ).subscribe(([ landmarks, flag ]) => {
-      this.nehubaContainerDirective.toggleOctantRemoval(
-        landmarks.length > 0 ? false : flag
-      )
-      this.nehubaContainerDirective.nehubaViewerInstance.updateUserLandmarks(landmarks)
-    })
-    this.onDestroyCb.push(() => perspOctCtrlSub.unsubscribe())
-
     this.sliceRenderEvent$ = fromEvent<CustomEvent>(this.el.nativeElement, 'sliceRenderEvent')
     this.sliceViewLoadingMain$ = this.sliceRenderEvent$.pipe(
       scan(scanSliceViewRenderFn, [null, null, null]),
@@ -727,14 +689,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       filter(() => !!(this.nehubaContainerDirective?.isReady())),
       take(1),
       mapTo(arg),
-    )
-  }
-
-  public setOctantRemoval(octantRemovalFlag: boolean) {
-    this.store$.dispatch(
-      ngViewerActionSetPerspOctantRemoval({
-        octantRemovalFlag
-      })
     )
   }
 

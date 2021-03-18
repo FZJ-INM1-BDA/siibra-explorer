@@ -1,14 +1,26 @@
-<h3 class="iv-custom-comp text mat-title">
-  Parcellations
+<h3 class="iv-custom-comp text mat-h3">
+  Volumes
 </h3>
 
-<mat-divider></mat-divider>
+<mat-slide-toggle [(ngModel)]="flagDelin"
+  #delinToggle="matSlideToggle"
+  [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
+  (iav-key-event)="delinToggle.toggle()">
 
-<button mat-flat-button color="warn"
-  class="mt-2"
-  (click)="toggleParcVsbl()">
-  <i class="fas fa-eye-slash"></i>
-  <span>
-    Clear All
+  <markdown-dom class="d-inline-block iv-custom-comp text">
+    Show delineations `[q]`
+  </markdown-dom>
+</mat-slide-toggle>
+
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
+<h3 class="iv-custom-comp text mat-h3">
+  Perspective View
+</h3>
+
+<mat-slide-toggle [(ngModel)]="removeOctantFlag"
+  [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT">
+  <span class="iv-custom-comp text">
+    Remove frontal octant
   </span>
-</button>
+</mat-slide-toggle>

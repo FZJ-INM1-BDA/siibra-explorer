@@ -149,6 +149,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   public nehubaLoaded: boolean = false
 
+  public landmarksLoaded: boolean = false
+
   constructor(
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
@@ -249,6 +251,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         debounceTime(100),
         map(e => e.data.url),
       ).subscribe(url => {
+        this.landmarksLoaded = !!url
         this.removeuserLandmarks()
 
         /**
@@ -258,13 +261,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           /**
            * remove transparency from meshes in current layer(s)
            */
-          for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
-            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
-            if (layer) {
-              layer.layer.displayState.objectAlpha.restoreState(1.0)
-            }
-          }
-  
+          this.setMeshTransparency(false)
           return
         }
         const _ = {}
@@ -278,12 +275,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         /**
          * adding transparency to meshes in current layer(s)
          */
-        for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
-          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
-          if (layer) {
-            layer.layer.displayState.objectAlpha.restoreState(0.2)
-          }
-        }
+        this.setMeshTransparency(true)
       }),
     )
   }
@@ -769,6 +761,38 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   public obliqueRotateZ(amount: number) {
     this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 0, 1]), amount / 4.0 * Math.PI / 180.0)
+  }
+
+  public toggleOctantRemoval(flag?: boolean) {
+    const ctrl = this.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+    if (!ctrl) {
+      this.log.error(`toggleOctantRemoval failed. this.nehubaViewer.ngviewer?.showPerspectiveSliceViews returns falsy`)
+      return
+    }
+    const newVal = typeof flag === 'undefined'
+      ? !ctrl.value
+      : flag
+    ctrl.restoreState(newVal)
+
+    if (this.landmarksLoaded) {
+      /**
+       * showPerspectSliceView -> ! meshTransparency
+       */
+      this.setMeshTransparency(!newVal)
+    }
+  }
+
+  public setMeshTransparency(flag: boolean){
+
+    /**
+     * remove transparency from meshes in current layer(s)
+     */
+    for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+      if (layer) {
+        layer.layer.displayState.objectAlpha.restoreState(flag ? 0.2 : 1.0)
+      }
+    }
   }
 
   /**

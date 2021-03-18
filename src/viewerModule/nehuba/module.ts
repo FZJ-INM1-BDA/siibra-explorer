@@ -23,6 +23,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import { ViewerCtrlModule } from "src/viewerCtrl";
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { AuthModule } from "src/auth";
     ComponentsModule,
     MouseoverModule,
     ShareModule,
+    ViewerCtrlModule,
 
     /**
      * should probably break this into its own...

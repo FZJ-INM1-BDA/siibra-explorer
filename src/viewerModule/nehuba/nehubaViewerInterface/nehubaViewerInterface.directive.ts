@@ -290,11 +290,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   }
 
   public toggleOctantRemoval(flag: boolean){
-    const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
-    if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
-    else {
-      this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
-    }
+    this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
   createNehubaInstance(template: any, lifeCycle: INehubaLifecycleHook = {}){
