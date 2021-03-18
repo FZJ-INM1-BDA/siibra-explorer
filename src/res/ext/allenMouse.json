@@ -18,6 +18,9 @@
       "name": "Allen Mouse Common Coordinate Framework v3 2017",
       "ngData": null,
       "type": "parcellation",
+      "auxillaryMeshIndices": [
+        997
+      ],
       "regions": [
         {
           "ngId": "v3_2017",
@@ -19372,6 +19375,9 @@
       "name": "Allen Mouse Common Coordinate Framework v3 2015",
       "ngData": null,
       "type": "parcellation",
+      "auxillaryMeshIndices": [
+        997
+      ],
       "regions": [
         {
           "ngId": "atlas",
@@ -19387,6 +19393,7 @@
           ],
           "name": "root",
           "labelIndex": 997,
+          "unselectable": true,
           "relatedAreas": [
             {
               "name": "Whole brain",

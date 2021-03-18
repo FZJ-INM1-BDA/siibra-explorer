@@ -1,3 +1,6 @@
+import { InjectionToken } from '@angular/core'
+import { Observable } from 'rxjs'
+
 export { getNgIds } from 'src/util/fn'
 export const NEHUBA_VIEWER_FEATURE_KEY = 'ngViewerFeature'
 
@@ -57,3 +60,12 @@ export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheri
 
   return map
 }
+
+export interface IMeshesToLoad {
+  labelIndicies: number[]
+  layer: {
+    name: string
+  }
+}
+
+export const SET_MESHES_TO_LOAD = new InjectionToken<Observable<IMeshesToLoad>>('SET_MESHES_TO_LOAD')
