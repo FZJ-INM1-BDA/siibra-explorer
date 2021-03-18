@@ -1,6 +1,6 @@
 import { Observable, Subject } from "rxjs"
 import { getUuid } from "src/util/fn"
-import { IMessagingActions, IMessagingActionTmpl, TVec4 } from "../types"
+import { IMessagingActions, IMessagingActionTmpl, TVec4, TMat4 } from "../types"
 import { INmvTransform } from "./type"
 
 export const TYPE = 'bas.datasource'
@@ -15,11 +15,11 @@ const waitFor = (condition: (...arg: any[]) => boolean) => new Promise((rs, rj) 
 })
 
 const NM_IDS = {
-  AMBA_V3: 'hbp:Allen_Mouse_CCF_v3(nm)',
-  WAXHOLM_V1_01: 'hbp:WHS_SD_Rat_v1.01(nm)',
-  BIG_BRAIN: 'hbp:BigBrain_r2015(nm)',
-  COLIN: 'hbp:Colin27_r2008(nm)',
-  MNI152_2009C_ASYM: 'hbp:ICBM_Asym_r2009c(nm)',
+  AMBA_V3: 'hbp:Allen_Mouse_CCF_v3(um)',
+  WAXHOLM_V1_01: 'hbp:WHS_SD_Rat_v1.01(um)',
+  BIG_BRAIN: 'hbp:BigBrain_r2015(um)',
+  COLIN: 'hbp:Colin27_r2008(um)',
+  MNI152_2009C_ASYM: 'hbp:ICBM_Asym_r2009c(um)',
 }
 
 const IAV_IDS = {
@@ -92,6 +92,25 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       new Blob([ encoder.encode(output) ], { type: 'application/octet-stream' })
     )
     const uuid = getUuid()
+
+    // NG internal treats skeleton as mm 
+    const scaleUmToMm = 1e-3
+    // NG translation works on nm scale
+    const scaleUmToNm = 1e3
+    const { mat3, vec3 } = (window as any).export_nehuba
+    const modA = mat3.fromValues(
+      scaleUmToMm, 0, 0,
+      0, scaleUmToMm, 0,
+      0, 0, scaleUmToMm
+    )
+    mat3.mul(modA, modA, [...A[0], ...A[1], ...A[2]])
+    const modb = vec3.scale(vec3.create(), b, scaleUmToNm)
+    const transform = [
+      [...modA.slice(0, 3), modb[0]] as TVec4,
+      [...modA.slice(3, 6), modb[1]] as TVec4,
+      [...modA.slice(6), modb[2]] as TVec4,
+      [0, 0, 0, 1],
+    ] as TMat4
     const payload: IMessagingActionTmpl['loadResource'] = {
       '@id': uuid,
       "@type" : 'swc',
@@ -100,12 +119,7 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       },
       url: tmpUrl,
       resourceParam: {
-        transform: [
-          [...A[0], b[0]] as TVec4,
-          [...A[1], b[1]] as TVec4,
-          [...A[2], b[2]] as TVec4,
-          [0, 0, 0, 1],
-        ]
+        transform
       }
     }
     subject.next({
