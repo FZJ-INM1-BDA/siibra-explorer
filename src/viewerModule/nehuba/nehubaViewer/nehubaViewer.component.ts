@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer, Subject } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
+import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip, tap } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 
@@ -11,6 +11,7 @@ import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
 import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
 import { strToRgb, deserialiseParcRegionId } from 'common/util'
+import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -157,6 +158,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     private log: LoggingService,
     @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
+    @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
   ) {
 
     if (this.nehubaViewer$) {
@@ -421,7 +423,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     )
 
     this.subscriptions.push(
-      this.loadMeshes$.pipe(
+      (this.injSetMeshesToLoad$ || this.loadMeshes$).pipe(
         scan(scanFn, []),
         debounceTime(100),
         switchMap(layerLabelIdx => 
@@ -636,8 +638,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   public hideAllSeg() {
-    // console.log('hideallseg')
-    // debugger
     if (!this.nehubaViewer) { return }
     Array.from(this.multiNgIdsLabelIndexMap.keys()).forEach(ngId => {
 
@@ -963,8 +963,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
         ...this.auxilaryMeshIndices,
       ]
-
-      this.loadMeshes(indicies, { name: id })
+      if (!this.injSetMeshesToLoad$) {
+        this.loadMeshes(indicies, { name: id })
+      }
     })
 
     const obj = Array.from(this.multiNgIdsLabelIndexMap.keys()).map(ngId => {
@@ -972,10 +973,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         ngId,
         new Map(Array.from(
           [
-            ...this.multiNgIdsLabelIndexMap.get(ngId).entries(),
+            // set aux mesh first
+            // as sometimes, existing rgb can overwrite the rgb prop of aux mesh
             ...this.auxilaryMeshIndices.map(val => {
               return [val, {}]
             }),
+            ...this.multiNgIdsLabelIndexMap.get(ngId).entries(),
           ],
         ).map((val: [number, any]) => ([val[0], this.getRgb(val[0], { ngId, rgb: val[1].rgb})])) as any),
       ]
