@@ -1,0 +1,137 @@
+<div class="tour-help position-fixed pt-3 pr-3 pl-3 pb-1 d-flex"
+     [ngStyle]="{
+        top: slides[currentTip]?.tooltipTop || null,
+        bottom: slides[currentTip].tooltipBottom || null,
+        left: slides[currentTip]?.tooltipLeft || null,
+        right: slides[currentTip]?.tooltipRight || null}"
+    [ngClass]="[slides[currentTip]?.arrowPosition === 'right'? 'flex-row-reverse' : '',
+                slides[currentTip]?.arrowPosition === 'left'? 'flex-row' : '',
+                slides[currentTip]?.arrowPosition === 'top'? 'flex-column' : '',
+                slides[currentTip]?.arrowPosition === 'bottom'? 'flex-column-reverse' : '']">
+
+
+    <div *ngIf="slides[currentTip]?.arrow">
+        <ng-content *ngTemplateOutlet="arrow"></ng-content>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center h-100 tipCard pt-3 pr-3 pl-3"
+         [ngStyle]="{margin: slides[currentTip]?.textMargin? slides[currentTip].textMargin : null,
+                    maxWidth: slides[currentTip]?.textWidth? slides[currentTip].textWidth : null}">
+        <div class="iv-custom-comp d-flex flex-column">
+            <h6 class="mb-2">
+                {{slides[currentTip].description}}
+            </h6>
+
+            <div class="text-center">
+                 <button mat-button iav-stop="mousedown mouseup"
+                     (click)="goBack()"
+                     *ngIf="currentTip">
+                   <i class="fas fa-angle-left"></i>
+                   <span class="ml-1">BACK</span>
+                </button>
+
+                <button mat-button iav-stop="mousedown mouseup"
+                    (click)="goForward()"
+                    *ngIf="currentTip < slides.length - 1">
+                    <span class="mr-1">NEXT</span>
+                    <i class="fas fa-angle-right"></i>
+                </button>
+
+                <button iav-stop="mousedown mouseup"
+                    (click)="destroy.emit();"
+                    mat-button>CLOSE</button>
+            </div>
+
+            <div class="d-flex align-self-end mb-1 mt-1">
+                <div *ngFor="let stepCircle of numberOfSteps; let i = index"
+                     class="border mr-1 stepCircle"
+                     [ngStyle]="{background: slides[currentTip]?.step === i+1? 'currentColor' : ''}"
+                     (click)="moveToTipByIndex(i)">
+                    {{stepCircle}}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<ng-template #arrow>
+    <ng-content *ngTemplateOutlet="slides[currentTip]?.arrow === 'arrow1'? arrow1 :
+                slides[currentTip]?.arrow === 'arrow2'? arrow2:
+                slides[currentTip]?.arrow === 'arrow3'? arrow3:
+                slides[currentTip]?.arrow === 'arrow5'? arrow5:
+                slides[currentTip]?.arrow === 'arrow6'? arrow6:
+                slides[currentTip]?.arrow === 'arrow4'? arrow4: null"></ng-content>
+</ng-template>
+
+<ng-template #arrow1>
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+         height="80px" class="overflow-visible" viewBox="166.586 231.427 12.015 71.497" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" style="fill-opacity: 0; paint-order: stroke markers; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3px;" d="M 183.239 326.14 C 176.831 309.209 176.634 285.376 182.647 254.643" transform="matrix(1, 0, 0, 1, -9.368863, -23.215925)"/>
+        <path class="stokeColor" d="M 187.97 263.39 C 187.12 262.245 184.536 259.536 182.665 254.732" transform="matrix(1, 0, 0, 1, -9.368863, -23.215925)"/>
+        <path class="stokeColor" d="M 182.791 254.976 C 181.626 254.227 174.925 262.146 176.09 262.895" transform="matrix(1, 0, 0, 1, -9.368863, -23.215925)"/>
+    </svg>
+</ng-template>
+
+<ng-template #arrow2>
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+         width="80px" height="70px" class="overflow-visible" viewBox="150.239 144.229 67.46 40.886" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" d="M 296.081 265.092 Q 302.545 229.649 359.476 224.337" transform="matrix(1, 0, 0, 1, -141.776566, -80.108154)"/>
+        <path class="stokeColor" d="M 292.065 265.677 C 294.922 265.86 297.891 264.941 300.918 262.844 C 302.986 261.411 299.162 257.842 295.976 253.078" transform="matrix(0, 1, -1, 0, 415.938782, -116.389183)"/>
+    </svg>
+</ng-template>
+
+
+
+<ng-template #arrow3>
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+            width="40px" class="overflow-visible" viewBox="210.782 56.841 29.636 288.223" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" d="M 212.078 57.419 C 231.858 81.463 223.38 117.762 225.382 146.924 C 226.221 159.143 228.267 171.776 232.453 183.328 C 233.961 187.49 240.011 194.737 240.418 198.726 C 240.445 198.997 234.593 204.524 233.912 205.886 C 231.231 211.249 230.106 218.152 229.665 224.115 C 227.666 251.12 229.249 278.318 227.395 305.339 C 226.51 318.233 217.11 333.266 217.11 345.064" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 3px; fill: rgba(0, 0, 0, 0);"/>
+        <path class="stokeColor" d="M 210.782 65.415 C 210.782 51.809 212.181 58.472 220.897 58.472" />
+        <path class="stokeColor" d="M 214.504 338.782 C 214.906 351.198 220.239 339.913 224.34 339.913"/>
+    </svg>
+</ng-template>
+
+<ng-template #arrow4 >
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+         height="38px" viewBox="299.543 321.915 170.933 30.964" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" d="M 301.52072039541815 323.60226246501526 C 311.5831169442529 340.51562343702426 341.60560254929175 334.7982673929286 359.2985534667969 337.2043762207031 C 367.2514321396593 338.2859081635777 375.2702876816191 342.35410524702206 382.34735107421875 345.8924865722656 C 385.22763076450417 347.33256521819686 387.1320707497497 354.70600700165824 389.4359130859375 352.4560852050781 C 390.0671934950275 351.839579670018 390.40266660252774 347.9536332932388 391.1954345703125 346.7441711425781 C 396.4823015920718 338.6784245203205 410.4743617782212 338.13712391197873 418.9132385253906 336.7287292480469 C 431.7553451427824 334.5854636244975 448.4256779742033 337.9491044314972 459.5848693847656 329.5787353515625 C 461.18996850294843 328.37477069724616 468.6846923828125 325.1523246569334 468.6846923828125 323.1907043457031" style="fill: rgb(0, 0, 0, 0);"/>
+        <path class="stokeColor" d="M 302.9312615546566 333.07007358944463 C 302.65366244614114 329.72018099572654 297.8531401351693 325.79953737428235 300.1758117675781 323.3697204589844 C 300.7803565677791 322.73728789250043 311.83416748046875 323.5789384146184 311.83416748046875 323.81036376953125" style="fill: rgba(0, 0, 0, 0);"/>
+        <path class="stokeColor" d="M 463.05231850248373 323.3282565340343 C 465.30665142189343 323.3282470703125 468.0848881713475 320.89690392424393 469.7531433105469 322.41314697265625 C 470.9482381993743 323.499344326286 470.57628053827574 331.8448791503906 469.25830078125 331.8448791503906" style="fill: rgba(0, 0, 0, 0);"/>
+    </svg>
+</ng-template>
+
+
+<ng-template #arrow5>
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+         height="100px"
+         viewBox="23.011 51.12 86.091 84.486" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" d="M 42.372 135.275 C 39.099 72.198 70.666 69.778 107.477 70.17"/>
+        <path class="stokeColor" d="M 28.277 125.699 L 41.622 125.699" transform="matrix(0.939693, -0.34202, 0.34202, 0.939693, -40.883873, 19.534008)"/>
+        <path class="stokeColor" d="M 33.304 121.099 L 25.073 128.035 L 33.062 134.606" transform="matrix(0.939693, -0.34202, 0.34202, 0.939693, -41.967846, 17.693502)"/>
+        <path class="stokeColor" d="M 92.404 63.192 L 105.749 63.192" transform="matrix(-0.34202, 0.939693, -0.939693, -0.34202, 192.343719, -8.296521)"/>
+        <path class="stokeColor" d="M 105.464 50.544 L 97.233 57.48 L 105.222 64.051" transform="matrix(-0.34202, 0.939693, -0.939693, -0.34202, 189.85376, -18.342039)"/>
+        <path class="stokeColor" d="M 42.968 77.934 L 56.313 77.934" transform="matrix(0.743145, 0.669131, -0.669131, 0.743145, 64.89846, -13.198224)"/>
+        <path class="stokeColor" d="M 49.142 66.866 L 40.911 73.802 L 48.9 80.373" transform="matrix(0.743145, 0.669131, -0.669131, 0.743145, 60.826363, -11.219056)"/>
+    </svg>
+
+</ng-template>
+
+
+
+<ng-template #arrow6>
+
+    <svg [ngStyle]="{transform: slides[currentTip]?.arrowTransform? slides[currentTip]?.arrowTransform : null,
+                     margin: slides[currentTip]?.arrowMargin? slides[currentTip]?.arrowMargin : null}"
+         height="50px" class="overflow-visible" viewBox="88.429 331.463 16.292 53.247" xmlns="http://www.w3.org/2000/svg">
+        <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); stroke-width: 3px;" d="M 96.649 384.71 L 96.649 332.904"/>
+        <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); paint-order: fill; stroke-linejoin: round; stroke-linecap: round; stroke-width: 3px;" d="M 88.708 343.497 C 86.828 341.857 94.988 329.978 96.868 331.618 C 99.945 331.127 106.222 342.826 104.392 343.118"/>
+    </svg>
+</ng-template>
+
+
