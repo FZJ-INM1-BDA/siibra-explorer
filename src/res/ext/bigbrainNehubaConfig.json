@@ -93,6 +93,37 @@
             ]
           ]
         },
+        "auxMesh": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precompmesh://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/classif_mesh",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -70666600
+            ],
+            [
+              0,
+              1,
+              0,
+              -72910000
+            ],
+            [
+              0,
+              0,
+              1,
+              -58777700
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
         "v1": {
           "type": "segmentation",
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_01_v1",

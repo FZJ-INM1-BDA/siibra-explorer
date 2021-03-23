@@ -93,6 +93,37 @@
             ]
           ]
         },
+        "auxMesh": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precompmesh://https://neuroglancer.humanbrainproject.eu/precomputed/icbm152_2009c_nonlin_asym",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -132500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -78500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
         "jubrain mni152 v18 left": {
           "type": "segmentation",
           "visible": false,

@@ -309,7 +309,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       }
     }
 
-    const { nehubaConfig } = template
+    const { nehubaConfig, name } = template
 
     /**
      * apply viewer config such as gpu limit

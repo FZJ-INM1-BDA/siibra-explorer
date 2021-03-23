@@ -4,9 +4,11 @@ import {Action} from "@ngrx/store";
 import {HttpClientModule} from "@angular/common/http";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
-import {provideMockStore} from "@ngrx/store/testing";
+import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
+import { viewerStateAllRegionsFlattenedRegionSelector, viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
+import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 
 describe('ConnectivityComponent', () => {
 
@@ -45,7 +47,15 @@ describe('ConnectivityComponent', () => {
                 CUSTOM_ELEMENTS_SCHEMA,
             ],
         }).compileComponents()
+
     }));
+
+    beforeEach(() => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateAllRegionsFlattenedRegionSelector, [])
+        mockStore.overrideSelector(viewerStateOverwrittenColorMapSelector, null)
+        mockStore.overrideSelector(ngViewerSelectorClearViewEntries, [])
+    })
 
     it('> component can be created', async () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)

@@ -1,1 +1,0 @@
-export { ViewerCtrlModule } from './module'

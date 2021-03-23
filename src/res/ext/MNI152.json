@@ -7,6 +7,23 @@
   "species": "Human",
   "useTheme": "dark",
   "ngId": "mni152",
+  "auxMeshes": [{
+    "name": "ICBM152 2009c nonlinear asymmetric - Cortex",
+    "displayName": "Cortex",
+    "@id": "icbm2009c_nonlin_asym_cortex",
+    "ngId": "auxMesh",
+    "labelIndicies": [ 65500, 65510 ],
+    "rgb": [255, 255, 255],
+    "visible": true
+  },{
+    "name": "ICBM152 2009c nonlinear asymmetric - Sulci",
+    "displayName": "Sulci",
+    "@id": "icbm2009c_nonlin_asym_sulci",
+    "ngId": "auxMesh",
+    "labelIndicies": [ 65501, 65511 ],
+    "rgb": [255, 255, 255],
+    "visible": false
+  }],
   "nehubaConfigURL": "nehubaConfig/MNI152NehubaConfig",
   "parcellations": [
     {
@@ -14,9 +31,6 @@
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25",
       "name": "Cytoarchitectonic Maps - v2.5.1",
       "displayName": "Cytoarchitectonic Maps",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "hasAdditionalViewMode": [
         "connectivity"
       ],
@@ -13144,9 +13158,6 @@
     },{
       "@id": "juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c",
       "ngId": "superficial-white-bundle-HCP",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "name": "Short Fiber Bundles - HCP",
       "originDatasets": [
         {
@@ -34996,9 +35007,6 @@
       "fullId": "juelich/iav/atlas/v1.0.0/8",
       "name": "Cytoarchitectonic maps - v1.18",
       "ngId": "jubrain mni152 v18 left",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "hasAdditionalViewMode": [
         "connectivity"
       ],
@@ -43100,9 +43108,6 @@
     {
       "@id": "juelich/iav/atlas/v1.0.0/5",
       "ngId": "fibre bundle long",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
@@ -46358,9 +46363,6 @@
       ],
       "@id": "juelich/iav/atlas/v1.0.0/6",
       "ngId": "fibre bundle short",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
@@ -46379,9 +46381,6 @@
       "name": "DiFuMo Atlas (64 dimensions)",
       "ngId": "DiFuMo Atlas (64 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
@@ -47547,9 +47546,6 @@
       "name": "DiFuMo Atlas (128 dimensions)",
       "ngId": "DiFuMo Atlas (128 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
@@ -49867,9 +49863,6 @@
       "name": "DiFuMo Atlas (256 dimensions)",
       "ngId": "DiFuMo Atlas (256 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
@@ -54491,9 +54484,6 @@
       "name": "DiFuMo Atlas (512 dimensions)",
       "ngId": "DiFuMo Atlas (512 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
@@ -63723,9 +63713,6 @@
       "name": "DiFuMo Atlas (1024 dimensions)",
       "ngId": "DiFuMo Atlas (1024 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1",
-      "auxillaryMeshIndices": [
-        65535
-      ],
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",

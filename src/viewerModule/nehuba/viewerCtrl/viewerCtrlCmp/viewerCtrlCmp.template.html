@@ -1,0 +1,43 @@
+<h3 class="iv-custom-comp text mat-h3">
+  Volumes
+</h3>
+
+<mat-slide-toggle [(ngModel)]="flagDelin"
+  #delinToggle="matSlideToggle"
+  [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
+  (iav-key-event)="delinToggle.toggle()"
+  name="toggle-delineation">
+
+  <markdown-dom class="d-inline-block iv-custom-comp text">
+    Show delineations `[q]`
+  </markdown-dom>
+</mat-slide-toggle>
+
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
+<h3 class="iv-custom-comp text mat-h3">
+  Perspective View
+</h3>
+
+<mat-slide-toggle [(ngModel)]="removeOctantFlag"
+  [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
+  name="remove-frontal-octant">
+  <span class="iv-custom-comp text">
+    Remove frontal octant
+  </span>
+</mat-slide-toggle>
+
+<ng-container *ngIf="auxMeshes$ | async as auxMeshes">
+  <mat-divider class="mt-1 mb-1"></mat-divider>
+  <form [formGroup]="auxMeshFormGroup">
+    <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
+      [formControlName]="auxMesh['@id']"
+      class="d-block"
+      [name]="'toggle-aux-mesh-' + auxMesh['@id']">
+      <span class="iv-custom-comp text">
+        {{ auxMesh.displayName || auxMesh.name }}
+      </span>
+    </mat-slide-toggle>
+  </form>
+</ng-container>
+

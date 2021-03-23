@@ -23,7 +23,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
-import { ViewerCtrlModule } from "src/viewerCtrl";
+import { ViewerCtrlModule } from "./viewerCtrl";
 
 @NgModule({
   imports: [

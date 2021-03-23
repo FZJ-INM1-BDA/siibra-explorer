@@ -1467,6 +1467,23 @@
       "type": "parcellation",
       "ngData": null,
       "ngId": " tissue type: ",
+      "auxMeshes": [{
+        "name": "Big Brain - white matter",
+        "displayName": "White matter",
+        "@id": "bigbrain_whitematter",
+        "ngId": "auxMesh",
+        "labelIndicies": [ 200 ],
+        "rgb": [255, 255, 255],
+        "visible": false
+      },{
+        "name": "Big Brain - grey matter",
+        "displayName": "Grey matter",
+        "@id": "bigbrain_greymatter",
+        "ngId": "auxMesh",
+        "labelIndicies": [ 100 ],
+        "rgb": [255, 255, 255],
+        "visible": true
+      }],
       "regions": [
         {
           "name": "Isocortex",

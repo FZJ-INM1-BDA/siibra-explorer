@@ -1,10 +1,10 @@
 import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, interval, merge, Observable, of, Subject } from "rxjs";
+import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
 import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMouseOverCustomLandmark, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
 import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
@@ -13,14 +13,16 @@ import { ARIA_LABELS, IDS } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 
-import { getNgIds, getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../constants";
+import { getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../constants";
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
-import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn, takeOnePipe } from "../util";
+import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, scanSliceViewRenderFn, takeOnePipe } from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
+import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
+import { switchMapWaitFor } from "src/util/fn";
 
 interface INgLayerInterface {
   name: string // displayName
@@ -46,7 +48,18 @@ interface INgLayerInterface {
       useFactory: (meshService: NehubaMeshService) => meshService.loadMeshes$,
       deps: [ NehubaMeshService ]
     },
-    NehubaMeshService
+    NehubaMeshService,
+    {
+      provide: SET_COLORMAP_OBS,
+      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.setColorMap$,
+      deps: [ NehubaLayerControlService ]
+    },
+    {
+      provide: SET_LAYER_VISIBILITY,
+      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.visibleLayer$,
+      deps: [ NehubaLayerControlService ]
+    },
+    NehubaLayerControlService
   ]
 })
 
@@ -139,21 +152,11 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       return
     }
 
-    /**
-     * first, get all all the ngIds, including parent id from parcellation (if defined)
-     */
-    const ngIds = getNgIds(parcellation.regions).concat( parcellation.ngId ? parcellation.ngId : [])
-
     this.multiNgIdsRegionsLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
 
     this.viewerUnit.multiNgIdsLabelIndexMap = this.multiNgIdsRegionsLabelIndexMap
     this.viewerUnit.auxilaryMeshIndices = parcellation.auxillaryMeshIndices || []
 
-    /* TODO replace with proper KG id */
-    /**
-     * need to set unique array of ngIds, or else workers will be overworked
-     */
-    this.viewerUnit.ngIds = Array.from(new Set(ngIds))
   }
 
   private unloadTmpl(tmpl: any) {
@@ -257,6 +260,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     private log: LoggingService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
+    @Optional() private layerCtrlService: NehubaLayerControlService,
   ){
     this.viewerEvent.emit({
       type: 'MOUSEOVER_ANNOTATION',
@@ -610,25 +614,37 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
             selectRegionIds: []
           }))
         },
-        segmentColourMap : new Map(),
         getLayersSegmentColourMap: () => {
+          if (!this.layerCtrlService) {
+            throw new Error(`layerCtrlService not injected. Cannot call getLayersSegmentColourMap`)
+          }
           const newMainMap = new Map()
-          for (const [key, colormap] of this.nehubaContainerDirective.nehubaViewerInstance.multiNgIdColorMap.entries()) {
-            const newColormap = new Map()
-            newMainMap.set(key, newColormap)
-  
-            for (const [lableIndex, entry] of colormap.entries()) {
-              newColormap.set(lableIndex, JSON.parse(JSON.stringify(entry)))
+          for (const key in this.layerCtrlService.activeColorMap) {
+            const obj = this.layerCtrlService.activeColorMap[key]
+            const m = new Map()
+            newMainMap.set(key, m)
+            for (const labelIndex in obj) {
+              m.set(Number(labelIndex), obj[labelIndex])
             }
           }
           return newMainMap
         },
-        applyColourMap : (_map) => {
-          throw new Error(`apply color map has been deprecated. use applyLayersColourMap instead`)
-        },
         applyLayersColourMap: (map) => {
-          this.nehubaContainerDirective.nehubaViewerInstance.setColorMap(map)
+          if (!this.layerCtrlService) {
+            throw new Error(`layerCtrlService not injected. Cannot call getLayersSegmentColourMap`)
+          }
+          const obj: IColorMap = {}
+          for (const [ key, value ] of map.entries()) {
+            const cmap = obj[key] = {}
+            for (const [ labelIdx, rgb ] of value.entries()) {
+              cmap[Number(labelIdx)] = rgb
+            }
+          }
+          this.layerCtrlService.overwriteColorMap$.next(obj)
         },
+        /**
+         * TODO go via layerCtrl.service
+         */
         loadLayer : (layerObj) => this.nehubaContainerDirective.nehubaViewerInstance.loadLayer(layerObj),
         removeLayer : (condition) => this.nehubaContainerDirective.nehubaViewerInstance.removeLayer(condition),
         setLayerVisibility : (condition, visible) => this.nehubaContainerDirective.nehubaViewerInstance.setLayerVisibility(condition, visible),
@@ -642,9 +658,14 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
           /**
            * neuroglancer prevents propagation, so use capture instead
            */
-          Observable.create(observer => {
-            this.el.nativeElement.addEventListener('mousedown', event => observer.next({eventName: 'mousedown', event}), true)
-          }) as Observable<{eventName: string, event: MouseEvent}>,
+          fromEvent(this.el.nativeElement, 'mousedown', { capture: true }).pipe(
+            map((event: MouseEvent) => {
+              return {
+                eventName: 'mousedown',
+                event
+              }
+            })
+          ),
           fromEvent(this.el.nativeElement, 'mouseup').pipe(
             map((ev: MouseEvent) => ({eventName : 'mouseup', event: ev})),
           ),
@@ -679,7 +700,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     this.viewerLoaded = flag
   }
 
-  private selectHoveredRegion(ev: any, next: Function){
+  private selectHoveredRegion(_ev: any, next: Function){
     /**
      * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
      */
@@ -693,13 +714,9 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     next()
   }
 
-  private waitForNehuba(arg: unknown) {
-    return interval(16).pipe(
-      filter(() => !!(this.nehubaContainerDirective?.isReady())),
-      take(1),
-      mapTo(arg),
-    )
-  }
+  private waitForNehuba = switchMapWaitFor({
+    condition: () => !!(this.nehubaContainerDirective?.isReady())
+  }) 
 
   public toggleMaximiseMinimise(index: number) {
     this.store$.dispatch(ngViewerActionToggleMax({
