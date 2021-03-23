@@ -2,13 +2,34 @@ import {ConnectivityBrowserComponent} from "./connectivityBrowser.component";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {Action} from "@ngrx/store";
 import {HttpClientModule} from "@angular/common/http";
-import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
-import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 import { viewerStateAllRegionsFlattenedRegionSelector, viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
+
+/**
+ * injecting databrowser module is bad idea
+ * since it relies on its own selectors
+ * since the only reason why data browser is imported is to use show dataset dialogue
+ * just use a dummy directive
+ */
+
+@Directive({
+    selector: '[iav-dataset-show-dataset-dialog]'
+})
+
+class DummyDirective{
+    @Input('iav-dataset-show-dataset-dialog-name')
+    name: string
+    @Input('iav-dataset-show-dataset-dialog-description')
+    description: string
+    @Input('iav-dataset-show-dataset-dialog-kgid')
+    kgId: string
+    @Input('iav-dataset-show-dataset-dialog-kgschema')
+    kgSchema: string
+}
 
 describe('ConnectivityComponent', () => {
 
@@ -36,13 +57,15 @@ describe('ConnectivityComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
-                DatabrowserModule,
             ],
             providers: [
                 provideMockActions(() => actions$),
                 provideMockStore()
             ],
-            declarations: [ConnectivityBrowserComponent],
+            declarations: [
+                ConnectivityBrowserComponent,
+                DummyDirective,
+            ],
             schemas: [
                 CUSTOM_ELEMENTS_SCHEMA,
             ],
