@@ -3,7 +3,8 @@ const { AtlasPage } = require("../util")
 
 const atlasName = 'Multilevel Human Atlas'
 const tNameIcbm152 = 'ICBM 152 2009c Nonlinear Asymmetric'
-const tNameColin = 'MNI Colin 27'
+// colin has temporarily been disabled
+// const tNameColin = 'MNI Colin 27'
 const tNameBB = 'Big Brain (Histology)'
 
 describe('templates > ', () => {
@@ -68,28 +69,28 @@ describe('templates > ', () => {
     it('> activeFlag works', async () => {
       const isActive = await iavPage.atlasTileIsActive(tNameIcbm152)
       expect(isActive.toString()).toEqual('true')
-      const isNotActive = await iavPage.atlasTileIsActive(tNameColin)
+      const isNotActive = await iavPage.atlasTileIsActive(tNameBB)
       expect(isNotActive.toString()).toEqual('false')
 
     })
     it('> works in regular navigation', async () => {
 
-      await iavPage.setAtlasSpecifications(atlasName, [ tNameColin ])
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameIcbm152 ])
       await iavPage.wait(500)
       await iavPage.waitUntilAllChunksLoaded()
       await iavPage.wait(500)
       
-      const isActive = await iavPage.atlasTileIsActive(tNameColin)
+      const isActive = await iavPage.atlasTileIsActive(tNameIcbm152)
       expect(isActive.toString()).toEqual('true')
 
-      const isNotActive = await iavPage.atlasTileIsActive(tNameIcbm152)
+      const isNotActive = await iavPage.atlasTileIsActive(tNameBB)
       expect(isNotActive.toString()).toEqual('false')
 
     })
 
     it('> works in history navigation', async () => {
 
-      await iavPage.setAtlasSpecifications(atlasName, [ tNameColin ])
+      await iavPage.setAtlasSpecifications(atlasName, [ tNameBB ])
       await iavPage.wait(500)
       await iavPage.waitUntilAllChunksLoaded()
       
@@ -99,7 +100,7 @@ describe('templates > ', () => {
 
       const isActive = await iavPage.atlasTileIsActive(tNameIcbm152)
       expect(isActive.toString()).toEqual('true')
-      const isNotActive = await iavPage.atlasTileIsActive(tNameColin)
+      const isNotActive = await iavPage.atlasTileIsActive(tNameBB)
       expect(isNotActive.toString()).toEqual('false')
     })
   })

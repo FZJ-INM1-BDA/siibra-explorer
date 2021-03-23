@@ -1,7 +1,7 @@
 import { TMat3, TVec3 } from "../types";
 
 export interface INmvTransform {
-  ['@type']: 'bas.AffineTransformation'
+  ['@type']: 'bas:AffineTransformation'
   fromSpace: string
   toSpace: string
   params: {

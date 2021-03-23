@@ -3,9 +3,9 @@ import { getUuid } from "src/util/fn"
 import { IMessagingActions, IMessagingActionTmpl, TVec4, TMat4 } from "../types"
 import { INmvTransform } from "./type"
 
-export const TYPE = 'bas.datasource'
+export const TYPE = 'bas:datasource'
 
-const waitFor = (condition: (...arg: any[]) => boolean) => new Promise((rs, rj) => {
+const waitFor = (condition: (...arg: any[]) => boolean) => new Promise<void>((rs, rj) => {
   const intervalRef = setInterval(() => {
     if (condition()) {
       clearInterval(intervalRef)
