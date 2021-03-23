@@ -86,7 +86,7 @@ describe('> url parsing', () => {
   })
 
   it('> if niftiLayers are defined, parcellation layer should be hidden', async () => {
-    const url = `/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&navigation=0_0_0_1__-0.2753947079181671_0.6631333827972412_-0.6360703706741333_0.2825356423854828__3000000__-17800000_-6700000_-7500000__200000&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii`
+    const url = `/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&cNavigation=0.0.0.-W000.._NjRq.2-Klk_._-Hmu.2_BdKx..DMVW..1vjMG.4eIG8~.hqT5~..10vB&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii`
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
