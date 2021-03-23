@@ -3,15 +3,15 @@ import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, ra
 import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip, tap } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
-
 import { LoggingService } from "src/logging";
-import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
+import { getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
+import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
+import { deserialiseParcRegionId } from 'common/util'
+import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
+import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
-import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
-import { strToRgb, deserialiseParcRegionId } from 'common/util'
-import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -38,17 +38,18 @@ export interface INehubaLifecycleHook{
   onInit?: () => void
 }
 
-const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex[] = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
-  const { layer } = curr
-  const { name } = layer
-  const foundIndex = acc.findIndex(({ layer }) => layer.name === name)
-  if (foundIndex < 0) { return acc.concat(curr) } else { return acc.map((item, idx) => idx === foundIndex
-    ? {
-      ...item,
-      labelIndicies: [...new Set([...item.labelIndicies, ...curr.labelIndicies])],
-    }
-    : item)
+export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
+  const found = acc.find(layerLabelIndex => {
+    return layerLabelIndex.layer.name === curr.layer.name
+  })
+  if (!found) {
+    return [ ...acc, curr ]
   }
+  return acc.map(layerLabelIndex => {
+    return layerLabelIndex.layer.name === curr.layer.name
+      ? curr
+      : layerLabelIndex
+  })
 }
 
 /**
@@ -66,12 +67,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   private sliceviewLoading$: Observable<boolean>
 
   public overrideShowLayers: string[] = []
-  get showLayersName() {
-    return [
-      ...this.overrideShowLayers,
-      ...Array.from(this.multiNgIdsLabelIndexMap.keys())
-    ]
-  }
 
   public lifecycle: INehubaLifecycleHook
 
@@ -81,7 +76,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public mousePosInReal$ = new BehaviorSubject(null)
 
   private exportNehuba: any
-  private viewer: any
 
   private subscriptions: Subscription[] = []
 
@@ -119,7 +113,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       : [1.5e9, 1.5e9, 1.5e9]
   }
 
-  public _s1$: any = null
   public _s2$: any = null
   public _s3$: any = null
   public _s4$: any = null
@@ -127,10 +120,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public _s6$: any = null
   public _s7$: any = null
   public _s8$: any = null
-  public _s9$: any = null
 
   public _s$: any[] = [
-    this._s1$,
     this._s2$,
     this._s3$,
     this._s4$,
@@ -138,7 +129,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this._s6$,
     this._s7$,
     this._s8$,
-    this._s9$,
   ]
 
   public ondestroySubscriptions: Subscription[] = []
@@ -150,6 +140,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   public nehubaLoaded: boolean = false
 
+  public landmarksLoaded: boolean = false
+
   constructor(
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
@@ -157,6 +149,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
+    @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
+    @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
   ) {
 
     if (this.nehubaViewer$) {
@@ -185,6 +179,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       })
       .catch(e => this.errorEmitter.emit(e))
 
+    /**
+     * TODO move to layerCtrl.service
+     */
     this.ondestroySubscriptions.push(
       fromEvent(this.workerService.worker, 'message').pipe(
         filter((message: any) => {
@@ -222,6 +219,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       }),
     )
 
+    /**
+     * TODO move to layerCtrl.service
+     */
     this.ondestroySubscriptions.push(
       fromEvent(this.workerService.worker, 'message').pipe(
         filter((message: any) => {
@@ -251,6 +251,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         debounceTime(100),
         map(e => e.data.url),
       ).subscribe(url => {
+        this.landmarksLoaded = !!url
         this.removeuserLandmarks()
 
         /**
@@ -260,13 +261,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           /**
            * remove transparency from meshes in current layer(s)
            */
-          for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
-            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
-            if (layer) {
-              layer.layer.displayState.objectAlpha.restoreState(1.0)
-            }
-          }
-  
+          this.setMeshTransparency(false)
           return
         }
         const _ = {}
@@ -280,18 +275,55 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         /**
          * adding transparency to meshes in current layer(s)
          */
-        for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
-          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
-          if (layer) {
-            layer.layer.displayState.objectAlpha.restoreState(0.2)
-          }
-        }
+        this.setMeshTransparency(true)
       }),
     )
-  }
+  
+    if (this.setColormap$) {
+      this.ondestroySubscriptions.push(
+        this.setColormap$.pipe(
+          debounceTime(160),
+        ).subscribe(v => {
+          const map = new Map()
+          for (const key in v) {
+            const m = new Map()
+            map.set(key, m)
+            for (const lblIdx in v[key]) {
+              m.set(lblIdx, v[key][lblIdx])
+            }
+          }
+          this.setColorMap(map)
+        })
+      )
+    } else {
+      this.log.error(`SET_COLORMAP_OBS not provided`)
+    }
 
-  private _baseUrlToParcellationIdMap: Map<string, string> = new Map()
-  private _baseUrls: string[] = []
+    if (this.layerVis$) {
+      this.ondestroySubscriptions.push(
+        this.layerVis$.pipe(
+          switchMap(switchMapWaitFor({ condition: () => !!(this.nehubaViewer?.ngviewer) })),
+          tap(() => {
+            const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
+            managedLayers.forEach(layer => layer.setVisible(false))
+          }),
+          debounceTime(160),
+        ).subscribe((layerNames: string[]) => {
+
+          for (const layerName of layerNames) {
+            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+            if (layer) {
+              layer.setVisible(true)
+            } else {
+              this.log.log('layer unavailable', layerName)
+            }
+          }
+        })
+      )
+    } else {
+      this.log.error(`SET_LAYER_VISIBILITY not provided`)
+    }
+  }
 
   public numMeshesToBeLoaded: number = 0
 
@@ -313,25 +345,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this._templateId = id
   }
 
-  /** compatible with multiple parcellation id selection */
-  private _ngIds: string[] = []
-  get ngIds() {
-    return this._ngIds
-  }
-
-  set ngIds(val: string[]) {
-    this.createNehubaPromise
-      .then(() => {
-        this._ngIds.forEach(id => {
-          const oldlayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(id)
-          if (oldlayer) {oldlayer.setVisible(false) } else { this.log.warn('could not find old layer', id) }
-        })
-        this._ngIds = val
-        this.loadNewParcellation()
-        this.showAllSeg()
-      })
-  }
-
   public spatialLandmarkSelectionChanged(labels: number[]) {
     const getCondition = (label: number) => `if(label > ${label - 0.1} && label < ${label + 0.1} ){${FRAGMENT_EMIT_RED}}`
     const newShader = `void main(){ ${labels.map(getCondition).join('else ')}else {${FRAGMENT_EMIT_WHITE}} }`
@@ -350,6 +363,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       landmarkLayer.layer.displayState.fragmentMain.restoreState(newShader)
     }
   }
+
+  // TODO move region management to another service
 
   public multiNgIdsLabelIndexMap: Map<string, Map<number, any>> = new Map()
 
@@ -399,13 +414,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
      * Hide all layers except the base layer (template)
      * Then show the layers referenced in multiNgIdLabelIndexMap
      */
-    const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
-    managedLayers.slice(1).forEach(layer => layer.setVisible(false))
-
-    for (const layerName of this.showLayersName) {
-      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-      if (layer) { layer.setVisible(true) } else { this.log.log('layer unavailable', layerName) }
-    }
 
     this.redraw()
 
@@ -771,23 +779,36 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 0, 1]), amount / 4.0 * Math.PI / 180.0)
   }
 
-  /**
-   *
-   * @param arrayIdx label indices of the shown segment(s)
-   * @param ngId segmentation layer name
-   */
-  private updateColorMap(arrayIdx: number[], ngId: string) {
-    const set = new Set(arrayIdx)
-    const newColorMap = new Map(
-      Array.from(this.multiNgIdColorMap.get(ngId).entries())
-        .map(v => set.has(v[0]) || set.size === 0 ?
-          v :
-          [v[0], {red: 255, green: 255, blue: 255}]) as any,
-    )
+  public toggleOctantRemoval(flag?: boolean) {
+    const ctrl = this.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+    if (!ctrl) {
+      this.log.error(`toggleOctantRemoval failed. this.nehubaViewer.ngviewer?.showPerspectiveSliceViews returns falsy`)
+      return
+    }
+    const newVal = typeof flag === 'undefined'
+      ? !ctrl.value
+      : flag
+    ctrl.restoreState(newVal)
 
-    this.nehubaViewer.batchAddAndUpdateSegmentColors(newColorMap, {
-      name: ngId,
-    })
+    if (this.landmarksLoaded) {
+      /**
+       * showPerspectSliceView -> ! meshTransparency
+       */
+      this.setMeshTransparency(!newVal)
+    }
+  }
+
+  public setMeshTransparency(flag: boolean){
+
+    /**
+     * remove transparency from meshes in current layer(s)
+     */
+    for (const layerKey of this.multiNgIdsLabelIndexMap.keys()) {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerKey)
+      if (layer) {
+        layer.layer.displayState.objectAlpha.restoreState(flag ? 0.2 : 1.0)
+      }
+    }
   }
 
   private newViewerInit() {
@@ -913,113 +934,22 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   private loadNewParcellation() {
 
-    /* show correct segmentation layer */
-    this._baseUrls = []
-
-    this.ngIds.map(id => {
-      const newlayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(id)
-      if (newlayer) {newlayer.setVisible(true) } else { this.log.warn('could not find new layer', id) }
-
-      const regex = /^(\S.*?):\/\/(.*?)$/.exec(newlayer.sourceUrl)
-
-      if (!regex || !regex[2]) {
-        this.log.error('could not parse baseUrl')
-        return
-      }
-      if (regex[1] !== 'precomputed') {
-        this.log.error('sourceUrl is not precomputed')
-        return
-      }
-
-      const baseUrl = regex[2]
-      this._baseUrls.push(baseUrl)
-      this._baseUrlToParcellationIdMap.set(baseUrl, id)
-
-      const indicies = [
-        ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
-        ...this.auxilaryMeshIndices,
-      ]
-      if (!this.injSetMeshesToLoad$) {
-        this.loadMeshes(indicies, { name: id })
-      }
-    })
-
-    const obj = Array.from(this.multiNgIdsLabelIndexMap.keys()).map(ngId => {
-      return [
-        ngId,
-        new Map(Array.from(
-          [
-            // set aux mesh first
-            // as sometimes, existing rgb can overwrite the rgb prop of aux mesh
-            ...this.auxilaryMeshIndices.map(val => {
-              return [val, {}]
-            }),
-            ...this.multiNgIdsLabelIndexMap.get(ngId).entries(),
-          ],
-        ).map((val: [number, any]) => ([val[0], this.getRgb(val[0], { ngId, rgb: val[1].rgb})])) as any),
-      ]
-    }) as Array<[string, Map<number, {red: number, green: number, blue: number}>]>
-
-    const multiNgIdColorMap = new Map(obj)
-
-    /* load colour maps */
-
-    this.setColorMap(multiNgIdColorMap)
-
     this._s$.forEach(_s$ => {
       if (_s$) { _s$.unsubscribe() }
     })
 
-    if (this._s1$) {this._s1$.unsubscribe() }
-    if (this._s9$) {this._s9$.unsubscribe() }
-
-    const arr = Array.from(this.multiNgIdsLabelIndexMap.keys()).map(ngId => {
-      return this.nehubaViewer.getShownSegmentsObservable({
-        name: ngId,
-      }).subscribe(arrayIdx => this.updateColorMap(arrayIdx, ngId))
-    })
-
-    this._s9$ = {
-      unsubscribe: () => {
-        while (arr.length > 0) {
-          arr.pop().unsubscribe()
-        }
-      },
-    }
   }
 
-  public setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {
+  private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {
     this.multiNgIdColorMap = map
-
-    Array.from(map.entries()).forEach(([ngId, map]) => {
-
+    for (const [ ngId, cMap ] of map.entries()) {
+      const nMap = new Map()
+      for (const [ key, cm ] of cMap.entries()) {
+        nMap.set(Number(key), cm)
+      }
       this.nehubaViewer.batchAddAndUpdateSegmentColors(
-        map,
+        nMap,
         { name : ngId })
-    })
-  }
-
-  private getRgb(labelIndex: number, region: { rgb: number[], ngId: string }): {red: number, green: number, blue: number} {
-    const { rgb, ngId } = region
-    if (typeof rgb === 'undefined' || rgb === null) {
-      if (labelIndex > 65500) {
-        return {
-          red: 255,
-          green: 255,
-          blue: 255
-        }
-      }
-      const arr = strToRgb(`${ngId}${labelIndex}`)
-      return {
-        red : arr[0],
-        green: arr[1],
-        blue : arr[2],
-      }
-    }
-    return {
-      red : rgb[0],
-      green: rgb[1],
-      blue : rgb[2],
     }
   }
 }

@@ -1,7 +1,8 @@
 import { TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
-import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
+import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
+import { selectorAuxMeshes } from "../store"
 import { getLayerNameIndiciesFromParcRs, collateLayerNameIndicies, findFirstChildrenWithLabelIndex, NehubaMeshService } from "./mesh.service"
 
 
@@ -125,6 +126,9 @@ describe('> mesh.server.ts', () => {
           NehubaMeshService,
         ]
       })
+      const mockStore = TestBed.inject(MockStore)
+      mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
+      mockStore.overrideSelector(viewerStateSelectedTemplateSelector, {})
     })
 
     it('> can be init', () => {
@@ -134,20 +138,34 @@ describe('> mesh.server.ts', () => {
 
     it('> mixes in auxillaryMeshIndices', () => {
       const mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {
-        auxillaryMeshIndices: [11, 22]
-      })
       mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [ fits1 ])
+
+      mockStore.overrideSelector(selectorAuxMeshes, [{
+        ngId: fits2.ngId,
+        labelIndicies: [11, 22],
+        "@id": '',
+        name: '',
+        rgb: [100, 100, 100],
+        visible: true,
+        displayName: ''
+      }])
+
       const service = TestBed.inject(NehubaMeshService)
       expect(
         service.loadMeshes$
       ).toBeObservable(
-        hot('a', {
+        hot('(ab)', {
           a: {
             layer: {
               name: fits1.ngId
             },
-            labelIndicies: [ fits1.labelIndex, 11, 22 ]
+            labelIndicies: [ fits1.labelIndex ]
+          },
+          b: {
+            layer: {
+              name: fits2.ngId,
+            },
+            labelIndicies: [11, 22]
           }
         })
       )

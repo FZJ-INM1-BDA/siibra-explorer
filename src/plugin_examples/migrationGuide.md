@@ -34,7 +34,6 @@ Plugin APIs have changed drastically from v0.1.0 to v0.2.0. Here is a list of pl
   - *showAllSegments()* : Function that selects all segments.
   - *hideAllSegments()* : Function that deselects all segments.
   - *loadLayer(layerObject)* : Function that loads a custom neuroglancer compatible layer into the viewer (e.g. precomputed, NIFTI, etc). Does not influence UI. 
-  - ~~*reapplyNehubaMeshFix()* Function that reapplies the cosmetic change to NehubaViewer (such as custom colour map, if defined)~~ removed. use **applyColourMap(colourMap)** instead
   - *mouseEvent* RxJs Observable. Read more at [rxjs doc](http://reactivex.io/rxjs/)
     - *mouseEvent.filter(filterFn:({eventName : String, event: Event})=>boolean)* returns an Observable. Filters the event stream according to the filter function.
     - *mouseEvent.map(mapFn:({eventName : String, event: Event})=>any)* returns an Observable. Map the event stream according to the map function.

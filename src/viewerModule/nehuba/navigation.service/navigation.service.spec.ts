@@ -4,8 +4,8 @@ import { BehaviorSubject, of, Subject } from 'rxjs'
 import { selectViewerConfigAnimationFlag } from 'src/services/state/viewerConfig/selectors'
 import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors'
 import * as NavUtil from './navigation.util'
-import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
-import { NEHUBA_INSTANCE_INJTKN } from './util'
+import { NehubaViewerUnit } from '../nehubaViewer/nehubaViewer.component'
+import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { NehubaNavigationService } from './navigation.service'
 
 const nav1 = {

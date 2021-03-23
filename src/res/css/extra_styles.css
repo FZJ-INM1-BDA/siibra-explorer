@@ -176,6 +176,11 @@ markdown-dom pre code
   white-space:pre;
 }
 
+markdown-dom p
+{
+  margin: 0;
+}
+
 .highlight
 {
   background-color:rgba(150,150,0,0.5);

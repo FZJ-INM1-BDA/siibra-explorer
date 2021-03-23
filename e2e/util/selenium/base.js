@@ -99,6 +99,11 @@ class WdBase{
     return result
   }
 
+  async getLog() {
+    const browserLog = await this._browser.manage().logs().get('browser')
+    return browserLog
+  }
+
   async getRgbAt({ position } = {}, cssSelector = null){
     if (!position) throw new Error(`position is required for getRgbAt`)
     const { x, y } = verifyPosition(position)

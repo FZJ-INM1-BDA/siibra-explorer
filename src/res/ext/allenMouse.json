@@ -9,6 +9,15 @@
     "nissl"
   ],
   "useTheme": "dark",
+  "auxMeshes": [{
+    "name": "Allen CCF v3 whole brain",
+    "displayName": "Whole brain",
+    "@id": "allen_ccf_v3_wholebrain",
+    "ngId": "auxMesh",
+    "labelIndicies": [ 997 ],
+    "rgb": [255, 255, 255],
+    "visible": true
+  }],
   "nehubaConfigURL": "nehubaConfig/allenMouseNehubaConfig",
   "parcellations": [
     {
