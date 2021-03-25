@@ -1,6 +1,6 @@
 {
   "name": "interactive-viewer",
-  "version": "2.3.9",
+  "version": "2.3.10",
   "description": "HBP interactive atlas viewer. Integrating KG query, dataset previews & more. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular.io",
   "scripts": {
     "dev-server-export": "webpack-dev-server --config webpack.export.js",
