@@ -93,13 +93,13 @@ export class AtlasLayerSelector implements OnInit {
 
     @ViewChild('expandedSelectorCard', {read: ElementRef}) expandedSelectorCard: ElementRef<HTMLElement>
     public quickTourData = {
-        order: 4,
-        description: 'This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.',
-        position: 'top-right',
-        overwritePos: {
-            collapsed: {arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}},
-            expanded: {arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center', left: this.expandedSelectorCard?.nativeElement.offsetWidth, margin: '-150px 0 0 0'}
-        }
+      order: 4,
+      description: 'This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.',
+      position: 'top-right',
+      overwritePos: {
+        collapsed: {arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}},
+        expanded: {arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center', left: this.expandedSelectorCard?.nativeElement.offsetWidth, margin: '-150px 0 0 0'}
+      }
     }
     public quickTourPosition$: BehaviorSubject<any> = new BehaviorSubject(this.quickTourData.overwritePos.collapsed)
 
@@ -158,8 +158,8 @@ export class AtlasLayerSelector implements OnInit {
 
     toggleSelector() {
       this.selectorExpanded = !this.selectorExpanded
-        this.quickTourData.overwritePos.expanded.left = this.expandedSelectorCard?.nativeElement.offsetWidth
-        this.quickTourPosition$.next(this.selectorExpanded? this.quickTourData.overwritePos.expanded : this.quickTourData.overwritePos.collapsed)
+      this.quickTourData.overwritePos.expanded.left = this.expandedSelectorCard?.nativeElement.offsetWidth
+      this.quickTourPosition$.next(this.selectorExpanded? this.quickTourData.overwritePos.expanded : this.quickTourData.overwritePos.collapsed)
     }
 
     selectTemplateWithName(template) {
