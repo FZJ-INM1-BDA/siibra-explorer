@@ -2,13 +2,18 @@ import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import {ComponentRef, Directive, HostListener} from "@angular/core";
 import { take } from "rxjs/operators";
-import {QuickTourComponent} from "src/ui/quickTour/quickToutCmp/quickTour.component";
+import {QuickTourService} from "src/ui/quickTour/quickTour.service";
+import {QuickTourComponent} from "src/ui/quickTour/quickToutComponent/quickTour.component";
 
 @Directive({
-  selector: '[quick-tour]'
+  selector: '[quick-tour-opener]'
 })
 
 export class QuickTourDirective {
+
+  constructor(private overlay: Overlay,
+                private quickTourService: QuickTourService){}
+
     public touring = false
 
     private overlayRef: OverlayRef
@@ -23,15 +28,12 @@ export class QuickTourDirective {
 
     @HostListener('click')
     onClick(){
-
+      if (this.overlayRef) this.dispose()
       this.overlayRef = this.overlay.create({
-
         height: '0px',
         width: '0px',
-
         hasBackdrop: false,
         positionStrategy: this.overlay.position().global(),
-        // panelClass: ['w-100', 'h-100'],
       })
 
       this.cmpRef = this.overlayRef.attach(
@@ -46,7 +48,7 @@ export class QuickTourDirective {
         }
       )
 
-
+      this.quickTourService.startTour()
     }
 
     dispose(){
@@ -62,7 +64,4 @@ export class QuickTourDirective {
     clear(){
       this.touring = false
     }
-
-    constructor(private overlay: Overlay){}
-
 }

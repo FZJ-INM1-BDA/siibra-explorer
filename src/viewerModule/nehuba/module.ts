@@ -23,6 +23,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import {QuickTourModule} from "src/ui/quickTour/module";
 
 @NgModule({
   imports: [
@@ -46,7 +47,8 @@ import { AuthModule } from "src/auth";
     StoreModule.forFeature(
       NEHUBA_VIEWER_FEATURE_KEY,
       reducer
-    )
+    ),
+    QuickTourModule
   ],
   declarations: [
     NehubaViewerContainerDirective,

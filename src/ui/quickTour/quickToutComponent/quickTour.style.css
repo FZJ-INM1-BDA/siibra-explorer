@@ -1,5 +1,4 @@
 :host {
-    /*z-index: 9999;*/
     display: block;
     width: 100%;
     height: 100%;
@@ -30,19 +29,12 @@
     stroke: rgb(66,66,66);
 }
 
-/*::ng-deep .mat-stroked-button:not([disabled]) {*/
-/* color: #1a1a1a;*/
-/*}*/
-
 .tour-help {
-    /*background-color: #efefef;*/
     z-index: 901;
 }
 
-
 .tipCard {
     border-radius: 10px;
-    max-width: 300px;
     text-align: left;
 }
 
@@ -61,7 +53,6 @@
     width: 100vw;
     height: 100vh;
     z-index: 899;
-    /*display: block;*/
 
     top: 0;
     left: 0;
@@ -84,7 +75,3 @@
     height: 10px;
     border-radius: 5px;
 }
-
-/*.cover {*/
-/*    pointer-events: none; z-index: 900;*/
-/*}*/

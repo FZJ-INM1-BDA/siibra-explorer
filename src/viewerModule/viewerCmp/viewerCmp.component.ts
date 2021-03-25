@@ -1,6 +1,6 @@
-import { Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import {AfterViewInit, Component, Inject, Input, OnDestroy, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subject, Subscription } from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, of, Subject, Subscription} from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
@@ -76,6 +76,28 @@ export class ViewerCmp implements OnDestroy {
 
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
+
+  public sidebarQuickTourPosition$: BehaviorSubject<any> = new BehaviorSubject({arrow: 'arrow5', left: 30, top: 50, arrowPosition: 'top-right', arrowTransform: 'rotate(25deg)'})
+  quickTourRegionSearch = {
+    order: 7,
+    description: 'Use the region quick search for finding, selecting and navigating brain regions in the selected parcellation map.',
+    overwritePos: this.sidebarQuickTourPosition$
+  }
+  quickTourAtlasSelector = {
+    order: 0,
+    description: 'This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.',
+    position: 'bottom',
+    align: 'right',
+    overwritePos: of({arrowPosition: 'top', arrowAlign: 'center'})
+  }
+  quickTourChips = {
+    order: 5,
+    description: 'These „chips“ indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.',
+    position: 'top',
+    align: 'center',
+    overwritePos: of({arrowPosition: 'bottom', arrowAlign: 'center', arrowTransform: 'scaleX(-1) rotate(180deg)', recalculate: true})
+  }
+
 
   @Input() ismobile = false
 
@@ -179,7 +201,7 @@ export class ViewerCmp implements OnDestroy {
       }
     }
   }
-  
+
   public clearAdditionalLayer(layer: { ['@id']: string }){
     this.store$.dispatch(
       viewerStateRemoveAdditionalLayer({
@@ -195,7 +217,7 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
-  
+
   public selectParcellation(parc: any) {
     this.store$.dispatch(
       viewerStateHelperSelectParcellationWithId({
@@ -209,6 +231,7 @@ export class ViewerCmp implements OnDestroy {
   }
 
   private openSideNavs() {
+    this.sidebarQuickTourPosition$.next({left: 30, top: 70, arrowPosition: 'top', arrowAlign: 'center', recalculate: true})
     this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }

@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChildren, QueryList, HostBinding } from "@angular/core";
+import {Component, OnInit, ViewChildren, QueryList, HostBinding, ElementRef, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
-import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
+import {Observable, Subscription, from, zip, of, combineLatest, BehaviorSubject} from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
@@ -48,7 +48,7 @@ export class AtlasLayerSelector implements OnInit {
     )
 
     public nonGroupedLayers$: Observable<any[]> = this.atlasLayersLatest$.pipe(
-      map(allParcellations => 
+      map(allParcellations =>
         allParcellations
           .filter(p => !p['groupName'])
           .filter(p => !p['baseLayer'])
@@ -57,7 +57,7 @@ export class AtlasLayerSelector implements OnInit {
 
     public groupedLayers$: Observable<any[]> = combineLatest([
       this.atlasLayersLatest$.pipe(
-        map(allParcellations => 
+        map(allParcellations =>
           allParcellations.filter(p => !p['baseLayer'])
         ),
       ),
@@ -90,6 +90,18 @@ export class AtlasLayerSelector implements OnInit {
     @HostBinding('attr.data-opened')
     public selectorExpanded: boolean = false
     public selectedTemplatePreviewUrl: string = ''
+
+    @ViewChild('expandedSelectorCard', {read: ElementRef}) expandedSelectorCard: ElementRef<HTMLElement>
+    public quickTourData = {
+        order: 4,
+        description: 'This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.',
+        position: 'top-right',
+        overwritePos: {
+            collapsed: {arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}},
+            expanded: {arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center', left: this.expandedSelectorCard?.nativeElement.offsetWidth, margin: '-150px 0 0 0'}
+        }
+    }
+    public quickTourPosition$: BehaviorSubject<any> = new BehaviorSubject(this.quickTourData.overwritePos.collapsed)
 
     public availableTemplates$ = this.store$.pipe<any[]>(
       select(viewerStateSelectedTemplateFullInfoSelector)
@@ -142,6 +154,12 @@ export class AtlasLayerSelector implements OnInit {
           this.atlas = sa
         })
       )
+    }
+
+    toggleSelector() {
+      this.selectorExpanded = !this.selectorExpanded
+        this.quickTourData.overwritePos.expanded.left = this.expandedSelectorCard?.nativeElement.offsetWidth
+        this.quickTourPosition$.next(this.selectorExpanded? this.quickTourData.overwritePos.expanded : this.quickTourData.overwritePos.collapsed)
     }
 
     selectTemplateWithName(template) {
@@ -204,7 +222,7 @@ export class AtlasLayerSelector implements OnInit {
         if (this.templateIncludesGroup(layer)) return layer.name
         else return `${layer.name} 🔄`
       }
-      
+
       return layer.name
     }
 

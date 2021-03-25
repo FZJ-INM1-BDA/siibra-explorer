@@ -2,7 +2,7 @@
 
     <!-- selector panel when expanded -->
 
-    <mat-card class="selector-container position-absolute" [ngClass]="selectorExpanded ? 'scale-up-bl pe-all' : 'scale-down-bl pe-none'">
+    <mat-card #expandedSelectorCard class="selector-container position-absolute" [ngClass]="selectorExpanded ? 'scale-up-bl pe-all' : 'scale-down-bl pe-none'">
         <mat-card-content>
 
             <!-- templates -->
@@ -63,13 +63,18 @@
     </mat-card>
 
     <!-- place holder when not expanded -->
-    <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all">
+    <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all"
+         quick-tour
+         [quick-tour-description]="quickTourData.description"
+         [quick-tour-order]="quickTourData.order"
+         [quick-tour-position]="quickTourData.position"
+         [quick-tour-overwrite-pos]="quickTourPosition$">
         <button color="primary"
                 matTooltip="Select layer"
                 mat-mini-fab
                 *ngIf="shouldShowRenderPlaceHolder$ | async"
                 [attr.aria-label]="TOGGLE_ATLAS_LAYER_SELECTOR"
-                (click)="selectorExpanded = !selectorExpanded">
+                (click)="toggleSelector()">
             <i class="fas fa-layer-group"></i>
         </button>
     </div>

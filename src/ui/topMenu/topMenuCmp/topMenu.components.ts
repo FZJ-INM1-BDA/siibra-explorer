@@ -6,7 +6,7 @@ import {
   TemplateRef,
 } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import {Observable, of} from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
@@ -50,6 +50,14 @@ export class TopMenuCmp {
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
+
+  quickTourData = {
+    description: 'These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.',
+    order: 8,
+    position: 'bottom',
+    align: 'center',
+    overwritePos: of({arrowPosition: 'top', arrowAlign: 'center', arrowTransform: 'scaleX(-1)'})
+  }
 
   constructor(
     private store$: Store<IavRootStoreInterface>,

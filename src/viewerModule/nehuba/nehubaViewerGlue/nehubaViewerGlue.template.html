@@ -16,16 +16,32 @@
 </div>
 
 <current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
-  <div class="w-100 h-100 position-relative" cell-i>
+  <div class="w-100 h-100 position-relative" cell-i
+       quick-tour
+       [quick-tour-description]="quickTourSliceViewSlide.description"
+       [quick-tour-order]="quickTourSliceViewSlide.order"
+       [quick-tour-position]="quickTourSliceViewSlide.position"
+       [quick-tour-overwrite-pos]="quickTourSliceViewSlide.overwritePos">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
   </div>
-  <div class="w-100 h-100 position-relative" cell-ii>
+  <div class="w-100 h-100 position-relative" cell-ii
+       quick-tour
+       [quick-tour-description]="quickTourIconsSlide.description"
+       [quick-tour-order]="quickTourIconsSlide.order"
+       [quick-tour-position]="quickTourIconsSlide.position"
+       [quick-tour-align]="quickTourIconsSlide.align"
+       [quick-tour-overwrite-pos]="quickTourIconsSlide.overwritePos">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
   </div>
-  <div class="w-100 h-100 position-relative" cell-iv>
+  <div class="w-100 h-100 position-relative" cell-iv
+       quick-tour
+       [quick-tour-description]="quickTour3dViewSlide.description"
+       [quick-tour-order]="quickTour3dViewSlide.order"
+       [quick-tour-position]="quickTour3dViewSlide.position"
+       [quick-tour-overwrite-pos]="quickTour3dViewSlide.overwritePos">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
   </div>
 </current-layout>
@@ -44,7 +60,7 @@
 
         <spinner-cmp *ngIf="showPerpsectiveScreen$ | async">
         </spinner-cmp>
-        
+
         <mat-list>
           <mat-list-item>
             {{ showPerpsectiveScreen$ | async }}

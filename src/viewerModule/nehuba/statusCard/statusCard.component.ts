@@ -1,8 +1,16 @@
-import { Component, OnInit, OnChanges, TemplateRef, HostBinding, Optional, Inject } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  TemplateRef,
+  HostBinding,
+  Optional,
+  Inject, ViewChild, ElementRef
+} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subscription, of, combineLatest } from "rxjs";
+import {Observable, Subscription, of, combineLatest, BehaviorSubject} from "rxjs";
 import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
@@ -42,6 +50,15 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public mouseVal$: Observable<string>
 
   public useTouchInterface$: Observable<boolean>
+
+  public quickTourPosition$: BehaviorSubject<any> = new BehaviorSubject({arrowPosition: 'top', arrowAlign: 'center'})
+  public quickTourData = {
+    description: 'This is the coordinate navigator. Expand it to manipulate voxel and physical coordinates, to reset the view, or to create persistent links to the current view for sharing.',
+    order: 6,
+    position: 'bottom',
+    align: 'left',
+    overwritePos: this.quickTourPosition$
+  }
 
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
