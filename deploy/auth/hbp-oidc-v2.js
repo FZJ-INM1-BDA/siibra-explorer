@@ -8,7 +8,6 @@ const clientSecret = process.env.HBP_CLIENTSECRET_V2 || 'no hbp client secret'
 const discoveryUrl = 'https://iam.ebrains.eu/auth/realms/hbp'
 const redirectUri = `${HOSTNAME}${HOST_PATHNAME}/hbp-oidc-v2/cb`
 const cb = (tokenset, {sub, given_name, family_name, ...rest}, done) => {
-  console.log({ tokenset })
   return done(null, {
     id: `hbp-oidc-v2:${sub}`,
     name: `${given_name} ${family_name}`,
