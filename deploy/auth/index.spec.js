@@ -16,7 +16,9 @@ describe('auth/index.js', () => {
       exports: hbpOidcStub
     }
     require.cache[require.resolve('./hbp-oidc-v2')] = {
-      exports: hbpOidcV2Stub
+      exports: {
+        bootstrapApp: hbpOidcV2Stub
+      }
     }
   })
 

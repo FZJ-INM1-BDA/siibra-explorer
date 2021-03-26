@@ -126,7 +126,6 @@ class Store {
   }
 
   async init() {
-    this.openIdClient = await getClient()
     this.keys = {
       [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: (await this.redisUtil.asyncGet(HBP_OIDC_V2_REFRESH_TOKEN_KEY)) || HBP_V2_REFRESH_TOKEN,
       [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: (await this.redisUtil.asyncGet(HBP_OIDC_V2_ACCESS_TOKEN_KEY)) || HBP_V2_ACCESS_TOKEN,
@@ -317,7 +316,7 @@ class Store {
     rs.push(null)
     const uploadToSeafile = async () => {
       await this.seafileHandle.uploadFile({
-        pathToFile: `/saneurl/${id}`,
+        filename: id,
         readStream: rs,
       }, {
         repoId: this.seafileRepoId,
