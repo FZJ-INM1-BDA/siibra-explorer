@@ -60,6 +60,10 @@ describe('authentication', () => {
   })
 
   after(() => {
+    delete require.cache[require.resolve('./saneUrl')]
+    delete require.cache[require.resolve('./datasets')]
+    delete require.cache[require.resolve('./user')]
+    delete require.cache[require.resolve('./constants')]
     server.close()
   })
   

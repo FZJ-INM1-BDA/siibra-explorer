@@ -1,5 +1,4 @@
 const { Issuer, Strategy } = require('openid-client')
-const jwtDecode = require('jwt-decode')
 
 const defaultCb = (tokenset, {id, ...rest}, done) => {
   return done(null, {
@@ -8,7 +7,14 @@ const defaultCb = (tokenset, {id, ...rest}, done) => {
   })
 }
 
-exports.jwtDecode = jwtDecode
+exports.jwtDecode = input => {
+  if (!input) throw new Error(`jwtDecode must have an input!`)
+  const payload = input.split('.')[1]
+  if (!payload) {
+    throw new Error(`jwt token does not have enough components`)
+  }
+  return JSON.parse(Buffer.from(payload, 'base64').toString())
+}
 
 exports.configureAuth = async ({ discoveryUrl, clientId, clientSecret, redirectUri, clientConfig = {}, cb = defaultCb, scope = 'openid' }) => {
   if (!discoveryUrl)

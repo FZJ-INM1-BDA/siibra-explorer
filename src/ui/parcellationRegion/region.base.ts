@@ -169,6 +169,9 @@ export class RegionBase {
       region
     } = sameRegion
     const { position } = region
+    const navigation = Array.isArray(position) && position.length === 3
+      ? { position }
+      : {  }
     this.closeRegionMenu.emit()
 
     /**
@@ -178,9 +181,7 @@ export class RegionBase {
     this.store$.dispatch(viewerStateNewViewer ({
       selectTemplate: template,
       selectParcellation: parcellation,
-      navigation: {
-        position
-      },
+      navigation,
     }))
   }
 

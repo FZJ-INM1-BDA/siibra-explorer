@@ -1,8 +1,8 @@
-const router = require('express').Router()
+const express = require('express')
+const router = express.Router()
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
 const { Store, NotFoundError } = require('./store')
-const bodyParser = require('body-parser')
 const { readUserData, saveUserData } = require('../user/store')
 
 const store = new Store()
@@ -109,7 +109,7 @@ router.post('/:name',
       else return res.status(500).send(e)
     }
   },
-  bodyParser.json(),
+  express.json(),
   async (req, res) => {
     const { name } = req.params
     const { body, user } = req
