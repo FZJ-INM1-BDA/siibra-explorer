@@ -52,6 +52,7 @@ It is recommended to manage your environments with `.env` file.
 | `PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `USE_LOGO` | possible values are `hbp`, `ebrains`, `fzj` | `hbp` | `ebrains` |
+| `__DEBUG__` | debug flag | 
 
 ##### ebrains user authentication
 

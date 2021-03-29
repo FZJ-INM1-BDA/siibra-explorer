@@ -9,9 +9,12 @@ const { Readable } = require('stream')
 const HBP_OIDC_V2_REFRESH_TOKEN_KEY = `HBP_OIDC_V2_REFRESH_TOKEN_KEY` // only insert valid refresh token. needs to be monitored to ensure always get new refresh token(s)
 const HBP_OIDC_V2_ACCESS_TOKEN_KEY = `HBP_OIDC_V2_ACCESS_TOKEN_KEY` // only insert valid access token. if expired, get new one via refresh token, then pop & push
 const HBP_SEAFILE_TOKEN_KEY = `HBP_SEAFILE_TOKEN_KEY` // only insert valid seafile token
-const HBP_SEAFILE_UPDATE_KEY = `HBP_SEAFILE_UPDATE_KEY` // stringified JSON key val of above three, with time stamp
+const HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN = `HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN` // stringified JSON key val of above three, with time stamp
+const HBP_SEAFILE_UPDATE_KEY = `HBP_SEAFILE_UPDATE_KEY`
 
 const {
+  __DEBUG__,
+
   OBJ_STORAGE_ROOT_URL,
 
   HBP_V2_REFRESH_TOKEN,
@@ -45,6 +48,21 @@ const userPass = (() => {
 const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
 
 class NotFoundError extends Error{}
+
+// not part of class, since class is exported, and prototype of class can be easily changed
+// using stderr instead of console.error, as by default, logs are collected via fluentd
+// debug messages should not be kept as logs
+function log(message){
+  if (__DEBUG__) {
+    process.stderr.write(`__DEBUG__`)
+    if (typeof message === 'object') {
+      process.stderr.write(JSON.stringify(message, null, 2))
+    }
+    if (typeof message === 'number' || typeof message === 'string') {
+      process.stdout.write(message)
+    }
+  }
+}
 
 class Store {
   constructor(){
@@ -95,9 +113,9 @@ class Store {
 
     this.redisClient.on('message', async (chan, mess) => {
       /**
-       * only liten to HBP_SEAFILE_UPDATE_KEY update
+       * only liten to HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN update
        */
-      if (chan === HBP_SEAFILE_UPDATE_KEY) {
+      if (chan === HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN) {
         try {
           const { pending, update } = JSON.parse(mess)
           this.pending = pending
@@ -110,7 +128,7 @@ class Store {
             }
           }
         } catch (e) {
-          console.error(`[saneUrl][store.js] parse message HBP_SEAFILE_UPDATE_KEY error`)
+          console.error(`[saneUrl][store.js] parse message HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN error`)
         }
       }
     })
@@ -141,10 +159,13 @@ class Store {
   }
 
   async checkExpiry(){
+
     const {
       [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: refreshToken,
       [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken
     } = this.keys
+
+    log({ bp: 'async checkExpiry', keys: this.keys, destructuredKeys: { accessToken, refreshToken } })
 
     /**
      * if access token is absent
@@ -186,14 +207,17 @@ class Store {
     /**
      * When start refreshing the tokens, set pending attribute, and start timestamp
      */
-    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY, JSON.stringify({
+    const payload = {
       pending: {
         ...this.pending,
         [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: {
           start: Date.now()
         }
       }
-    }))
+    }
+    await this.redisClient.asyncSet(HBP_SEAFILE_UPDATE_KEY, JSON.stringify(payload))
+    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN, JSON.stringify(payload))
+
     const client = await getClient()
     const tokenset = await client.refresh(this.keys[HBP_OIDC_V2_REFRESH_TOKEN_KEY])
     const { access_token: accessToken, refresh_token: refreshToken } = tokenset
@@ -211,7 +235,7 @@ class Store {
      */
     await this.redisUtil.asyncSet(HBP_OIDC_V2_REFRESH_TOKEN_KEY, refreshToken)
     await this.redisUtil.asyncSet(HBP_OIDC_V2_ACCESS_TOKEN_KEY, accessToken)
-    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY, JSON.stringify({
+    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN, JSON.stringify({
       keys: {
         [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: refreshToken,
         [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken,
