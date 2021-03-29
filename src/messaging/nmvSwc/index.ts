@@ -22,7 +22,7 @@ const NM_IDS = {
   MNI152_2009C_ASYM: 'hbp:ICBM_Asym_r2009c(um)',
 }
 
-const IAV_IDS = {
+export const IAV_IDS = {
   AMBA_V3: 'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9',
   WAXHOLM_V1_01: 'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8',
   BIG_BRAIN: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
@@ -30,9 +30,48 @@ const IAV_IDS = {
   MNI152_2009C_ASYM: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2',
 }
 
+/**
+ * TODO, should unify navigation voxelSize
+ * the emitted voxelCoord should be calculated on the fly
+ */
+export const IAV_VOXEL_SIZES_NM = {
+  AMBA_V3: [
+    25000,
+    25000,
+    25000
+  ],
+  WAXHOLM_V1_01: [
+    39062.5,
+    39062.5,
+    39062.5
+  ],
+  BIG_BRAIN: [
+    21166.666015625,
+    20000,
+    21166.666015625
+  ],
+  COLIN: [
+    1000000,
+    1000000,
+    1000000,
+  ],
+  MNI152_2009C_ASYM: [
+    1000000,
+    1000000,
+    1000000
+  ]
+}
+
 const translateSpace = (spaceId: string) => {
   for (const key in NM_IDS){
     if (NM_IDS[key] === spaceId) return IAV_IDS[key]
+  }
+  return null
+}
+
+const getVoxelFromSpace = (spaceId: string) => {
+  for (const key in NM_IDS){
+    if (NM_IDS[key] === spaceId) return IAV_VOXEL_SIZES_NM[key]
   }
   return null
 }
@@ -93,15 +132,25 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     )
     const uuid = getUuid()
 
-    // NG internal treats skeleton as mm 
-    const scaleUmToMm = 1e-3
+    // NG internal treats skeleton as mm
+    const voxelSize = getVoxelFromSpace(toSpace)
+    /**
+     * swc seem to scale with voxelSize... strangely enough
+     * voxelSize nm / voxel -> goal is 1 voxel/um
+     * 1e3 / voxelSize
+     */
+    const scaleUmToVoxelFixed = [
+      1e3 / voxelSize[0],
+      1e3 / voxelSize[1],
+      1e3 / voxelSize[2],
+    ]
     // NG translation works on nm scale
     const scaleUmToNm = 1e3
     const { mat3, vec3 } = (window as any).export_nehuba
     const modA = mat3.fromValues(
-      scaleUmToMm, 0, 0,
-      0, scaleUmToMm, 0,
-      0, 0, scaleUmToMm
+      scaleUmToVoxelFixed[0], 0, 0,
+      0, scaleUmToVoxelFixed[1], 0,
+      0, 0, scaleUmToVoxelFixed[2]
     )
     mat3.mul(modA, modA, [...A[0], ...A[1], ...A[2]])
     const modb = vec3.scale(vec3.create(), b, scaleUmToNm)
