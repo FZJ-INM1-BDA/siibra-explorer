@@ -31,12 +31,15 @@ describe('> saneUrl/index.js', () => {
       queryString: 'test_test'
     }
 
-  let SaneUrlStoreObjStub,
+  let DepObjStub,
+    depcGetStub,
+    SaneUrlStoreObjStub,
     getStub,
     setStub
     
   before(() => {
     const SaneUrlStore = require('./store')
+    const DepcStore = require('./depcObjStore')
     NotFoundError = SaneUrlStore.NotFoundError
 
     getStub = sinon.stub()
@@ -47,13 +50,29 @@ describe('> saneUrl/index.js', () => {
         this.set = setStub
       }
     }
+    depcGetStub = sinon.stub()
+    class DepcStubbedObj {
+      constructor() {
+        this.get = depcGetStub
+      }
+    }
+    DepObjStub = sinon.stub(DepcStore, 'Store').value(DepcStubbedObj)
     SaneUrlStoreObjStub = sinon.stub(SaneUrlStore, 'Store').value(StubbedStoreObj)
   })
   after(() => {
     SaneUrlStoreObjStub.restore()
+    DepObjStub.restore()
+  })
+
+  beforeEach(() => {
+    depcGetStub.callsFake(async () => {
+      throw new NotFoundError()
+    })
   })
 
   afterEach(() => {
+    depcGetStub.resetHistory()
+    depcGetStub.resetBehavior()
     getStub.resetHistory()
     getStub.resetBehavior()
     setStub.resetHistory()

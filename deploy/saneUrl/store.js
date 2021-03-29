@@ -1,4 +1,3 @@
-const request = require('request')
 const redis = require('redis')
 const { promisify } = require('util')
 const { Seafile } = require('hbp-seafile')
@@ -14,8 +13,6 @@ const HBP_SEAFILE_UPDATE_KEY = `HBP_SEAFILE_UPDATE_KEY`
 
 const {
   __DEBUG__,
-
-  OBJ_STORAGE_ROOT_URL,
 
   HBP_V2_REFRESH_TOKEN,
   HBP_V2_ACCESS_TOKEN,
@@ -55,12 +52,14 @@ class NotFoundError extends Error{}
 function log(message){
   if (__DEBUG__) {
     process.stderr.write(`__DEBUG__`)
+    process.stdout.write(`\n`)
     if (typeof message === 'object') {
       process.stderr.write(JSON.stringify(message, null, 2))
     }
     if (typeof message === 'number' || typeof message === 'string') {
       process.stdout.write(message)
     }
+    process.stdout.write(`\n`)
   }
 }
 
@@ -165,7 +164,7 @@ class Store {
       [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken
     } = this.keys
 
-    log({ bp: 'async checkExpiry', keys: this.keys, destructuredKeys: { accessToken, refreshToken } })
+    log({ breakpoint: 'async checkExpiry', keys: this.keys, destructuredKeys: { accessToken, refreshToken } })
 
     /**
      * if access token is absent
@@ -267,22 +266,6 @@ class Store {
     return this.seafileHandle
   }
 
-  tryGetFromSwiftObj(id) {
-    if (!OBJ_STORAGE_ROOT_URL){
-      return Promise.reject(
-        new NotFoundError()
-      )
-    }
-    return new Promise((rs, rj) => {
-      request.get(`${OBJ_STORAGE_ROOT_URL}/${id}`, (err, resp, body) => {
-        if (err) return rj(err)
-        if (resp.statusCode === 404) return rj(new NotFoundError())
-        if (resp.statusCode >= 400) return rj(resp)
-        return rs(body)
-      })
-    })
-  }
-
   async tryGetFromSeafile(id) {
     const getFiles = async () => {
       return await this.seafileHandle.ls({
@@ -318,19 +301,19 @@ class Store {
   }
 
   async get(id) {
-    try {
-      return await this.tryGetFromSwiftObj(id)
-    } catch (e) {
-      if (e instanceof NotFoundError) {
-        /**
-         * try get file from seafile
-         */
-        
-         return await this.tryGetFromSeafile(id)
-      } else {
-        throw new Error(`Unknown Error: ${e}`)
-      }
-    }
+    log({
+      breakpoint: 'async get',
+      id
+    })
+    /**
+     * try get file from seafile
+     */
+    const returnVal = await this.tryGetFromSeafile(id)
+    log({
+      breakpoint: `asyncReturn`,
+      payload: returnVal
+    })
+    return returnVal
   }
 
   async _set(id, value) {

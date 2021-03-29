@@ -40,15 +40,13 @@ describe('> store.js', () => {
     })
 
     describe('> get', () => {
-      let tryGetFromSwiftObjStub,
-        tryGetFromSeafileStub,
+      let tryGetFromSeafileStub,
         doRefreshTokensStub,
         initStub,
         result
       before(async () => {
         doRefreshTokensStub = sinon.stub(Store.prototype, 'doRefreshTokens').returns(Promise.resolve())
-        tryGetFromSwiftObjStub = sinon.stub(Store.prototype, 'tryGetFromSwiftObj').returns(Promise.resolve(objContent))
-        tryGetFromSeafileStub = sinon.stub(Store.prototype, 'tryGetFromSeafile').returns(Promise.resolve(objContent + objContent))
+        tryGetFromSeafileStub = sinon.stub(Store.prototype, 'tryGetFromSeafile').returns(Promise.resolve(objContent))
         initStub = sinon.stub(Store.prototype, 'init').returns(Promise.resolve())
         jwtDecodeStub.returns({
           exp: 1337
@@ -59,18 +57,13 @@ describe('> store.js', () => {
 
       after(() => {
         doRefreshTokensStub.restore()
-        tryGetFromSwiftObjStub.restore()
         tryGetFromSeafileStub.restore()
         initStub.restore()
         store.dispose()
       })
 
-      it('> first tries to get from tryGetFromSwiftObj', () => {
-        expect(tryGetFromSwiftObjStub.called).to.be.true
-      })
-
-      it('> does not try to fetch from tryGetFromSeafile', () => {
-        expect(tryGetFromSeafileStub.called).to.be.false
+      it('> try to fetch from tryGetFromSeafile', () => {
+        expect(tryGetFromSeafileStub.called).to.be.true
       })
 
       it('> returns value is as expected', () => {
