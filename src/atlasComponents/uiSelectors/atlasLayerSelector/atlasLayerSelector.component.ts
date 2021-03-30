@@ -5,7 +5,8 @@ import {Observable, Subscription, from, zip, of, combineLatest, BehaviorSubject}
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
+import {QuickTourData, QuickTourPosition} from "src/ui/quickTour/constrants";
 
 @Component({
   selector: 'atlas-layer-selector',
@@ -92,16 +93,15 @@ export class AtlasLayerSelector implements OnInit {
     public selectedTemplatePreviewUrl: string = ''
 
     @ViewChild('expandedSelectorCard', {read: ElementRef}) expandedSelectorCard: ElementRef<HTMLElement>
-    public quickTourData = {
+    quickTourCollapsedPosition: QuickTourPosition = {position: 'top-right', arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}}
+    quickTourExpandedPosition: QuickTourPosition = {position: 'right', arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center',
+        top: document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2,
+        left: this.expandedSelectorCard?.nativeElement.offsetWidth}
+    public quickTourData: QuickTourData = {
       order: 4,
-      description: 'This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.',
-      position: 'top-right',
-      overwritePos: {
-        collapsed: {arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}},
-        expanded: {arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center', left: this.expandedSelectorCard?.nativeElement.offsetWidth, margin: '-150px 0 0 0'}
-      }
+      description: QUICKTOUR_DESC.LAYER_SELECTOR,
+      position: this.quickTourCollapsedPosition
     }
-    public quickTourPosition$: BehaviorSubject<any> = new BehaviorSubject(this.quickTourData.overwritePos.collapsed)
 
     public availableTemplates$ = this.store$.pipe<any[]>(
       select(viewerStateSelectedTemplateFullInfoSelector)
@@ -158,8 +158,13 @@ export class AtlasLayerSelector implements OnInit {
 
     toggleSelector() {
       this.selectorExpanded = !this.selectorExpanded
-      this.quickTourData.overwritePos.expanded.left = this.expandedSelectorCard?.nativeElement.offsetWidth
-      this.quickTourPosition$.next(this.selectorExpanded? this.quickTourData.overwritePos.expanded : this.quickTourData.overwritePos.collapsed)
+      if (this.selectorExpanded) {
+          this.quickTourExpandedPosition.left = this.expandedSelectorCard?.nativeElement.offsetWidth
+          this.quickTourExpandedPosition.top = document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2
+          this.quickTourData.position = this.quickTourExpandedPosition
+      } else {
+          this.quickTourData.position = this.quickTourCollapsedPosition
+      }
     }
 
     selectTemplateWithName(template) {

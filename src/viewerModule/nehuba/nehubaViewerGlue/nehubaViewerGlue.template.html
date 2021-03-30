@@ -20,17 +20,14 @@
        quick-tour
        [quick-tour-description]="quickTourSliceViewSlide.description"
        [quick-tour-order]="quickTourSliceViewSlide.order"
-       [quick-tour-position]="quickTourSliceViewSlide.position"
-       [quick-tour-overwrite-pos]="quickTourSliceViewSlide.overwritePos">
+       [quick-tour-position]="quickTourSliceViewSlide.position">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-ii
        quick-tour
        [quick-tour-description]="quickTourIconsSlide.description"
        [quick-tour-order]="quickTourIconsSlide.order"
-       [quick-tour-position]="quickTourIconsSlide.position"
-       [quick-tour-align]="quickTourIconsSlide.align"
-       [quick-tour-overwrite-pos]="quickTourIconsSlide.overwritePos">
+       [quick-tour-position]="quickTourIconsSlide.position">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
@@ -40,8 +37,7 @@
        quick-tour
        [quick-tour-description]="quickTour3dViewSlide.description"
        [quick-tour-order]="quickTour3dViewSlide.order"
-       [quick-tour-position]="quickTour3dViewSlide.position"
-       [quick-tour-overwrite-pos]="quickTour3dViewSlide.overwritePos">
+       [quick-tour-position]="quickTour3dViewSlide.position">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
   </div>
 </current-layout>

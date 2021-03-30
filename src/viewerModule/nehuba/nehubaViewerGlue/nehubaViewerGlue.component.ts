@@ -9,7 +9,7 @@ import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMo
 import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
 import { serialiseParcellationRegion } from 'common/util'
-import { ARIA_LABELS, IDS } from 'common/constants'
+import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 
@@ -21,6 +21,7 @@ import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, ge
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
+import {QuickTourData} from "src/ui/quickTour/constrants";
 
 interface INgLayerInterface {
   name: string // displayName
@@ -91,26 +92,22 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   private findPanelIndex = (panel: HTMLElement) => this.viewPanelWeakMap.get(panel)
   public nanometersToOffsetPixelsFn: Array<(...arg) => any> = []
 
-  public quickTourSliceViewSlide = {
+  public quickTourSliceViewSlide: QuickTourData = {
     order: 1,
-    description: 'The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can double-click brain regions to select them.',
-    position: 'bottom-right',
-    overwritePos: of({arrow: 'arrow3', arrowPosition: 'left', arrowMargin: {right: -50, bottom: 130}})
+    description: QUICKTOUR_DESC.SLICE_VIEW,
+    position: {position: 'bottom-right', arrow: 'arrow3', arrowPosition: 'left', arrowMargin: {right: -50, bottom: 130}},
   }
 
-  public quickTour3dViewSlide = {
+  public quickTour3dViewSlide: QuickTourData = {
     order: 2,
-    description: 'The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. Click the „eye“ icon on the bottom left to toggle pure surface view.',
-    position: 'top-left',
-    overwritePos: of({arrow: 'arrow5', arrowPosition: 'right', arrowAlign: 'bottom', arrowMargin: {bottom: -25, left: -10}, arrowTransform: 'rotate(-130deg)'})
+    description: QUICKTOUR_DESC.PERSPECTIVE_VIEW,
+    position: {position: 'top-left', arrow: 'arrow5', arrowPosition: 'right', arrowAlign: 'bottom', arrowMargin: {bottom: -25, left: -10}, arrowTransform: 'rotate(-130deg)'},
   }
 
-  public quickTourIconsSlide = {
+  public quickTourIconsSlide: QuickTourData = {
     order: 3,
-    description: 'Use these icons in any of the views to maximize it and zoom in/out.',
-    position: 'bottom',
-    align: 'right',
-    overwritePos: of({arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'right', arrowMargin: {right: 50}})
+    description: QUICKTOUR_DESC.VIEW_ICONS,
+    position: {position: 'bottom', align: 'right', arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'right', arrowMargin: {right: 50}},
   }
 
   public customLandmarks$: Observable<any> = this.store$.pipe(

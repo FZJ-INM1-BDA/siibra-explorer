@@ -12,7 +12,7 @@ import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST } from 'common/constants'
+import { CONST, QUICKTOUR_DESC } from 'common/constants'
 
 @Component({
   selector: 'top-menu-cmp',
@@ -52,11 +52,9 @@ export class TopMenuCmp {
   public screenshotTooltipText: string = 'Take screenshot'
 
   quickTourData = {
-    description: 'These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.',
+    description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
-    position: 'bottom',
-    align: 'center',
-    overwritePos: of({arrowPosition: 'top', arrowAlign: 'center', arrowTransform: 'scaleX(-1)'})
+    position: {position: 'bottom', align: 'center', arrowPosition: 'top', arrowAlign: 'center', arrowTransform: 'scaleX(-1)'}
   }
 
   constructor(

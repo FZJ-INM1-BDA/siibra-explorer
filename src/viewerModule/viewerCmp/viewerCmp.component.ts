@@ -4,7 +4,7 @@ import {BehaviorSubject, combineLatest, Observable, of, Subject, Subscription} f
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
-import { CONST, ARIA_LABELS } from 'common/constants'
+import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
@@ -12,6 +12,7 @@ import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import { TSupportedViewer } from "../constants";
+import {QuickTourData, QuickTourPosition} from "src/ui/quickTour/constrants";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -77,25 +78,22 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
-  public sidebarQuickTourPosition$: BehaviorSubject<any> = new BehaviorSubject({arrow: 'arrow5', left: 30, top: 50, arrowPosition: 'top-right', arrowTransform: 'rotate(25deg)'})
-  quickTourRegionSearch = {
+  public quickTourRegionSearchCollapsedPosition: QuickTourPosition = {arrow: 'arrow5', left: 30, top: 60, arrowPosition: 'left', arrowAlign: 'top', arrowMargin: {top: -20}, arrowTransform: 'rotate(25deg)'}
+  public quickTourRegionSearchExpandedPosition: QuickTourPosition = {left: 30, top: 70, arrowPosition: 'top', arrowAlign: 'center'}
+  public quickTourRegionSearch: QuickTourData = {
     order: 7,
-    description: 'Use the region quick search for finding, selecting and navigating brain regions in the selected parcellation map.',
-    overwritePos: this.sidebarQuickTourPosition$
+    description: QUICKTOUR_DESC.REGION_SEARCH,
+    position: this.quickTourRegionSearchCollapsedPosition
   }
-  quickTourAtlasSelector = {
+  public quickTourAtlasSelector: QuickTourData = {
     order: 0,
-    description: 'This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.',
-    position: 'bottom',
-    align: 'right',
-    overwritePos: of({arrowPosition: 'top', arrowAlign: 'center'})
+    description: QUICKTOUR_DESC.ATLAS_SELECTOR,
+    position: {position: 'bottom', align: 'right', arrowPosition: 'top', arrowAlign: 'center'}
   }
-  quickTourChips = {
+  public quickTourChips: QuickTourData = {
     order: 5,
-    description: 'These „chips“ indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.',
-    position: 'top',
-    align: 'center',
-    overwritePos: of({arrowPosition: 'bottom', arrowAlign: 'center', arrowTransform: 'scaleX(-1) rotate(180deg)', recalculate: true})
+    description: QUICKTOUR_DESC.CHIPS,
+    position: {position: 'top', align: 'center', arrowPosition: 'bottom', arrowAlign: 'center', arrowTransform: 'scaleX(-1) rotate(180deg)'}
   }
 
 
@@ -231,7 +229,7 @@ export class ViewerCmp implements OnDestroy {
   }
 
   private openSideNavs() {
-    this.sidebarQuickTourPosition$.next({left: 30, top: 70, arrowPosition: 'top', arrowAlign: 'center', recalculate: true})
+    this.quickTourRegionSearch.position = this.quickTourRegionSearchExpandedPosition
     this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }

@@ -3,42 +3,19 @@
         visibility: tipHidden? 'hidden' : 'visible',
         top: top + 'px',
         left: left + 'px'}"
-    [ngClass]="[overwritePos?.arrowPosition.includes('right')?
-                    overwritePos?.arrowAlign === 'top'? 'flex-row-reverse align-items-start' :
-                    overwritePos?.arrowAlign === 'center'? 'flex-row-reverse align-items-center' :
-                    overwritePos?.arrowAlign === 'bottom'? 'flex-row-reverse align-items-end' :
-                    overwritePos?.arrowPosition.includes('top')? 'align-items-start' : 'flex-row-reverse align-items-end'
-                :overwritePos?.arrowPosition.includes('left')?
-                    overwritePos?.arrowAlign === 'top'? 'flex-row align-items-start' :
-                    overwritePos?.arrowAlign === 'center'? 'flex-row align-items-center' :
-                    overwritePos?.arrowAlign === 'bottom'? 'flex-row align-items-end' :
-                    overwritePos?.arrowPosition.includes('top')? 'align-items-start' : 'align-items-end'
-                :overwritePos?.arrowPosition.includes('top')?
-                    overwritePos?.arrowAlign === 'left'? 'flex-column align-items-start' :
-                    overwritePos?.arrowAlign === 'center'? 'flex-column align-items-center' :
-                    overwritePos?.arrowAlign === 'right'? 'flex-column align-items-end' :
-                    overwritePos?.arrowPosition.includes('left')? 'align-items-start' : 'align-items-end'
-                :overwritePos?.arrowPosition.includes('bottom')?
-                    overwritePos?.arrowAlign === 'left'? 'flex-column-reverse align-items-end' :
-                    overwritePos?.arrowAlign === 'center'? 'flex-column-reverse align-items-center' :
-                    overwritePos?.arrowAlign === 'right'? 'flex-column-reverse align-items-end' :
-                    overwritePos?.arrowPosition.includes('left')? 'align-items-start' : 'align-items-end'
-                : '']">
+    [ngClass]="[flexClass || '']">
 
 
     <div #arrowEl [ngStyle]="{
-                    marginLeft: this.overwritePos?.arrowMargin?.left && this.overwritePos.arrowMargin.left + 'px',
-                    marginRight: this.overwritePos?.arrowMargin?.right && this.overwritePos.arrowMargin.right + 'px',
-                    marginTop: this.overwritePos?.arrowMargin?.top && this.overwritePos.arrowMargin.top + 'px',
-                    marginBottom: this.overwritePos?.arrowMargin?.bottom && this.overwritePos.arrowMargin.bottom + 'px'}">
+                    marginLeft: this.position?.arrowMargin?.left && this.position.arrowMargin.left + 'px',
+                    marginRight: this.position?.arrowMargin?.right && this.position.arrowMargin.right + 'px',
+                    marginTop: this.position?.arrowMargin?.top && this.position.arrowMargin.top + 'px',
+                    marginBottom: this.position?.arrowMargin?.bottom && this.position.arrowMargin.bottom + 'px'}">
         <ng-content *ngTemplateOutlet="arrow"></ng-content>
     </div>
 
     <div #tipCard class="d-flex align-items-center justify-content-center h-100 tipCard pt-3 pr-3 pl-3"
          [ngStyle]="{width: slideWidth + 'px'}">
-
-<!--         [ngStyle]="{margin: slides[currentTip]?.textMargin? slides[currentTip].textMargin : null,-->
-<!--                    maxWidth: slides[currentTip]?.textWidth? slides[currentTip].textWidth : null}">-->
 
         <div class="iv-custom-comp d-flex flex-column">
             <h6 class="mb-2">
@@ -47,7 +24,7 @@
 
             <div class="text-center">
                  <button mat-button iav-stop="mousedown mouseup"
-                     (click)="quickTourService.backSlide()"
+                     (click)="quickTourService.previousSlide()"
                      *ngIf="order > 0">
                    <i class="fas fa-angle-left"></i>
                    <span class="ml-1">BACK</span>
@@ -80,15 +57,15 @@
 
 
 <ng-template #arrow>
-    <ng-content *ngTemplateOutlet="overwritePos?.arrow === 'arrow2'? arrow2:
-                overwritePos?.arrow === 'arrow3'? arrow3:
-                overwritePos?.arrow === 'arrow4'? arrow4:
-                overwritePos?.arrow === 'arrow5'? arrow5:
+    <ng-content *ngTemplateOutlet="position?.arrow === 'arrow2'? arrow2:
+                position?.arrow === 'arrow3'? arrow3:
+                position?.arrow === 'arrow4'? arrow4:
+                position?.arrow === 'arrow5'? arrow5:
                 arrow1"></ng-content>
 </ng-template>
 
 <ng-template #arrow1>
-    <svg [ngStyle]="{transform: overwritePos?.arrowTransform? overwritePos?.arrowTransform : null}"
+    <svg [ngStyle]="{transform: position?.arrowTransform? position?.arrowTransform : null}"
          height="80px" class="overflow-visible" viewBox="166.586 231.427 12.015 71.497" xmlns="http://www.w3.org/2000/svg">
         <path class="stokeColor" style="fill-opacity: 0; paint-order: stroke markers; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3px;" d="M 183.239 326.14 C 176.831 309.209 176.634 285.376 182.647 254.643" transform="matrix(1, 0, 0, 1, -9.368863, -23.215925)"/>
         <path class="stokeColor" d="M 187.97 263.39 C 187.12 262.245 184.536 259.536 182.665 254.732" transform="matrix(1, 0, 0, 1, -9.368863, -23.215925)"/>
@@ -97,7 +74,7 @@
 </ng-template>
 
 <ng-template #arrow2>
-    <svg [ngStyle]="{transform: overwritePos?.arrowTransform? overwritePos?.arrowTransform : null}"
+    <svg [ngStyle]="{transform: position?.arrowTransform? position?.arrowTransform : null}"
          width="80px" height="50px" class="overflow-visible" viewBox="150.239 144.229 67.46 40.886" xmlns="http://www.w3.org/2000/svg">
         <path class="stokeColor" d="M 296.081 265.092 Q 302.545 229.649 359.476 224.337" transform="matrix(1, 0, 0, 1, -141.776566, -80.108154)"/>
         <path class="stokeColor" d="M 292.065 265.677 C 294.922 265.86 297.891 264.941 300.918 262.844 C 302.986 261.411 299.162 257.842 295.976 253.078" transform="matrix(0, 1, -1, 0, 415.938782, -116.389183)"/>
@@ -105,7 +82,7 @@
 </ng-template>
 
 <ng-template #arrow3>
-    <svg [ngStyle]="{transform: overwritePos?.arrowTransform? overwritePos?.arrowTransform : null}"
+    <svg [ngStyle]="{transform: position?.arrowTransform? position?.arrowTransform : null}"
          height="100px"
          viewBox="23.011 51.12 86.091 84.486" xmlns="http://www.w3.org/2000/svg">
         <path class="stokeColor" d="M 42.372 135.275 C 39.099 72.198 70.666 69.778 107.477 70.17"/>
@@ -120,7 +97,7 @@
 </ng-template>
 
 <ng-template #arrow4>
-    <svg [ngStyle]="{transform: overwritePos?.arrowTransform? overwritePos?.arrowTransform : null}"
+    <svg [ngStyle]="{transform: position?.arrowTransform? position?.arrowTransform : null}"
          height="50px" class="overflow-visible" viewBox="88.429 331.463 16.292 53.247" xmlns="http://www.w3.org/2000/svg">
         <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); stroke-width: 3px;" d="M 96.649 384.71 L 96.649 332.904"/>
         <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); paint-order: fill; stroke-linejoin: round; stroke-linecap: round; stroke-width: 3px;" d="M 88.708 343.497 C 86.828 341.857 94.988 329.978 96.868 331.618 C 99.945 331.127 106.222 342.826 104.392 343.118"/>
@@ -128,7 +105,7 @@
 </ng-template>
 
 <ng-template #arrow5>
-    <svg [ngStyle]="{transform: overwritePos?.arrowTransform? overwritePos?.arrowTransform : null}"
+    <svg [ngStyle]="{transform: position?.arrowTransform? position?.arrowTransform : null}"
          width="50px" viewBox="140.601 179.981 53.247 16.292" xmlns="http://www.w3.org/2000/svg">
         <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); stroke-width: 3px;" d="M 167.945 213.956 L 167.945 162.15" transform="matrix(0, -1, 1, 0, -20.107986, 355.997986)"/>
         <path class="stokeColor" style="fill-rule: evenodd; fill: rgba(0, 0, 0, 0); paint-order: fill; stroke-linejoin: round; stroke-linecap: round; stroke-width: 3px;" d="M 138.751 194.144 C 136.871 192.504 145.031 180.625 146.911 182.265 C 149.988 181.774 156.265 193.473 154.435 193.765" transform="matrix(0, -1, 1, 0, -41.509438, 334.744568)"/>

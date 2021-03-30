@@ -14,12 +14,13 @@ import {Observable, Subscription, of, combineLatest, BehaviorSubject} from "rxjs
 import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl } from "@angular/forms";
 import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
+import {QuickTourData, QuickTourPosition} from "src/ui/quickTour/constrants";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -51,13 +52,12 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
   public useTouchInterface$: Observable<boolean>
 
-  public quickTourPosition$: BehaviorSubject<any> = new BehaviorSubject({arrowPosition: 'top', arrowAlign: 'center'})
-  public quickTourData = {
-    description: 'This is the coordinate navigator. Expand it to manipulate voxel and physical coordinates, to reset the view, or to create persistent links to the current view for sharing.',
+  public quickTourExpandedPosition: QuickTourPosition = {position: 'bottom', align: 'left', top: 150, arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'center'}
+  public quickTourCollapsedPosition: QuickTourPosition = {position: 'bottom', align: 'left', top: 60, arrowPosition: 'top', arrowAlign: 'center'}
+  public quickTourData: QuickTourData = {
+    description: QUICKTOUR_DESC.STATUS_CARD,
     order: 6,
-    position: 'bottom',
-    align: 'left',
-    overwritePos: this.quickTourPosition$
+    position: this.quickTourCollapsedPosition
   }
 
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN

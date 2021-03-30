@@ -3,14 +3,13 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostListener,
-  OnDestroy,
   OnInit,
   Output, ViewChild
 } from "@angular/core";
-import {Observable, of, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {QuickTourService} from "src/ui/quickTour/quickTour.service";
-import {map, switchMap} from "rxjs/operators";
+import {map} from "rxjs/operators";
+import {QuickTourPosition} from "src/ui/quickTour/constrants";
 
 @Component({
   selector : 'quick-tour',
@@ -19,25 +18,25 @@ import {map, switchMap} from "rxjs/operators";
 })
 export class QuickTourComponent implements OnInit, AfterViewInit {
 
-  slideWidth = 300
+  public slideWidth = 300
+  private tip: any
 
-  private tip
+  public isLast = false
+  public left: number
+  public top: number
+  private topHardcoded = false
+  private leftHardcoded = false
+  public description: string
+  public order: number
 
-  public left
-  public top
-  public leftBeforeHardcodeChange
-  public topBeforeHardcodeChange
-  public description
-  public order
+  private targetElWidth: number
+  private targetElHeight: number
 
-  private targetElWidth
-  private targetElHeight
-  private currentTip
-
-  public overwritePos$: Observable<any>
-  public overwritePos: any
+  public position: QuickTourPosition
 
   public tipHidden = true
+  public flexClass: string
+  public positionChangedByArrow = false
 
   private subscriptions: Subscription[] = []
 
@@ -52,117 +51,107 @@ export class QuickTourComponent implements OnInit, AfterViewInit {
     this.subscriptions.push(
       this.quickTourService.currentTip$.pipe(
 
-        switchMap(tip => {
+        map(tip => {
           if (!tip) return
-          this.tip = null
-          this.tip = tip
-
           this.clear()
-          this.calculate()
+          this.tip = tip
+          this.description = tip.description
+          this.position = tip.position
+          this.order = tip.order
+          this.isLast = tip === [...this.quickTourService.quickTourThisDirectives].pop()
+          this.setFlexClass()
 
-          return tip.overwritePos$ || of(null)
+          this.calculate()
+          if (tip.position.left) {
+            this.leftHardcoded = true
+            this.left = tip.position.left
+          }
+          if (tip.position.top) {
+            this.topHardcoded = true
+            this.top = tip.position.top
+          }
+
+          setTimeout(() => this.calculateArrowPosition())
+
 
         }),
-        map((op: any) => {
-          if (op) {
-            this.tipHidden = true
-
-            setTimeout(() => {
-              if (op.recalculate) {
-                this.clear()
-                this.calculate()
-              }
-              this.overwritePos = null
-              this.overwritePos = op
-
-              if (op.left) {
-                this.leftBeforeHardcodeChange = this.left
-                this.left = op.left
-              } else if (this.leftBeforeHardcodeChange) {
-                this.left = this.leftBeforeHardcodeChange
-              }
-              if (op.top) {
-                this.topBeforeHardcodeChange = this.top
-                this.top = op.top
-              } else if (this.topBeforeHardcodeChange) {
-                this.top = this.topBeforeHardcodeChange
-              }
-              setTimeout(() => this.calculateArrowPosition())
-            })
-          }
-        })
-      ).subscribe(),
-
+      ).subscribe()
     )
   }
 
-
   ngAfterViewInit() {
-    this.calculatePosition(this.currentTip, this.targetElWidth, this.targetElHeight)
+    this.calculate()
   }
 
   clear() {
+    this.tip = null
     this.left = null
+    this.topHardcoded = false
+    this.leftHardcoded = false
     this.top = null
-    this.leftBeforeHardcodeChange = null
-    this.topBeforeHardcodeChange = null
     this.description = null
-    this.overwritePos$ = null
-    this.overwritePos = null
+    this.position = null
     this.order = null
     this.targetElWidth = null
     this.targetElHeight = null
     this.positionChangedByArrow = false
+    this.tipHidden = true
+    this.flexClass = null
   }
 
   calculate() {
     const tip = this.tip
     if (tip === null) return
 
-    const { x, y, width, height } = tip.calcPos()
-    this.left = x
-    this.top = y
-    this.description = tip.description
-    this.overwritePos$ = tip.overwritePos$
-    this.order = tip.order
+    const { x, y, width, height } = tip.getHostPos()
 
     this.targetElWidth = width
     this.targetElHeight = height
-    this.currentTip = tip
 
-    if (this.tipCardEl) setTimeout(() =>this.calculatePosition(tip, width, height))
+    if (this.tipCardEl) setTimeout(() => {
+      if (!this.leftHardcoded) {
+        this.left = x
+        this.calculatePosition('left', tip, width, height)
+      }
+      if (!this.topHardcoded) {
+        this.top = y
+        this.calculatePosition('top', tip, width, height)
+      }
+    })
   }
 
-  calculatePosition(tip, elementWidth, elementHeight) {
+  calculatePosition(calculate: 'top' | 'left', tip, elementWidth, elementHeight) {
     const cardWidth = this.tipCardEl.nativeElement.offsetWidth
     const cardHeight = this.tipCardEl.nativeElement.offsetHeight
+    const calculateTop = calculate === 'top'
+    const calculateLeft = calculate === 'left'
 
-    if (tip.position) {
-      if (tip.position.includes('top')) {
+    if (tip.position?.position) {
+      if (tip.position.position.includes('top') && calculateTop) {
         this.top -= cardHeight
       }
-      if (tip.position.includes('right')) {
+      if (tip.position.position.includes('right') && calculateLeft) {
         this.left += elementWidth
       }
-      if (tip.position.includes('bottom')) {
+      if (tip.position.position.includes('bottom') && calculateTop) {
         this.top += elementHeight
       }
-      if (tip.position.includes('left')) {
+      if (tip.position.position.includes('left') && calculateLeft) {
         this.left -= cardWidth
       }
     }
-    if (tip.align) {
-      if (tip.align === 'right') {
+    if (tip.position.align) {
+      if (tip.position.align === 'right' && calculateLeft) {
         this.left -= cardWidth - elementWidth
       }
-      if (tip.align === 'bottom') {
+      if (tip.position.align === 'bottom' && calculateTop) {
         this.top -= cardHeight - elementHeight
       }
-      if (tip.align === 'center') {
-        if (['right', 'left'].includes(tip.position)) {
+      if (tip.position.align === 'center') {
+        if (['right', 'left'].includes(tip.position.position) && calculateTop) {
           this.top -= (cardHeight - elementHeight)/2
         }
-        if (['bottom', 'top'].includes(tip.position)) {
+        if (['bottom', 'top'].includes(tip.position.position) && calculateLeft) {
           this.left -= (cardWidth - elementWidth)/2
         }
       }
@@ -170,26 +159,26 @@ export class QuickTourComponent implements OnInit, AfterViewInit {
   }
 
   calculateArrowPosition() {
-    if (['top-left', 'top-right'].includes(this.overwritePos.arrowPosition)) {
-      if (!this.overwritePos.arrowMargin || !this.overwritePos.arrowMargin.top) {
-        this.overwritePos.arrowMargin = {}
-        this.overwritePos.arrowMargin.top = 0
+    if (['top-left', 'top-right'].includes(this.position.arrowPosition)) {
+      if (!this.position.arrowMargin || !this.position.arrowMargin.top) {
+        this.position.arrowMargin = {}
+        this.position.arrowMargin.top = 0
       }
-      this.overwritePos.arrowMargin.top += -this.arrowEl.nativeElement.offsetHeight
+      this.position.arrowMargin.top += -this.tipCardEl.nativeElement.offsetHeight
 
-      if (!this.positionChangedByArrow) this.top += this.arrowEl.nativeElement.offsetHeight
+      if (!this.positionChangedByArrow) this.top += this.tipCardEl.nativeElement.offsetHeight
       this.positionChangedByArrow = true
     }
 
-    if (['bottom-left', 'bottom-right'].includes(this.overwritePos.arrowPosition)) {
-      if (!this.overwritePos.arrowMargin || !this.overwritePos.arrowMargin.top) {
-        this.overwritePos.arrowMargin = {}
-        this.overwritePos.arrowMargin.top = 0
+    if (['bottom-left', 'bottom-right'].includes(this.position.arrowPosition)) {
+      if (!this.position.arrowMargin || !this.position.arrowMargin.top) {
+        this.position.arrowMargin = {}
+        this.position.arrowMargin.top = 0
       }
-      this.overwritePos.arrowMargin.top += this.tipCardEl.nativeElement.offsetHeight
+      this.position.arrowMargin.top += this.tipCardEl.nativeElement.offsetHeight
     }
 
-    if (['bottom-left', 'bottom-right', 'bottom'].includes(this.overwritePos.arrowPosition)) {
+    if (['bottom-left', 'bottom-right', 'bottom'].includes(this.position.arrowPosition)) {
       if (!this.positionChangedByArrow) this.top -= this.arrowEl.nativeElement.offsetHeight
       this.positionChangedByArrow = true
     }
@@ -197,10 +186,27 @@ export class QuickTourComponent implements OnInit, AfterViewInit {
     this.tipHidden = false
   }
 
-  positionChangedByArrow = false
-
-  get isLast() {
-    return this.quickTourService.currentTip$.value === [...this.quickTourService.quickTourThisDirectives].pop()
+  setFlexClass() {
+    const position = this.tip.position
+    this.flexClass = position?.arrowPosition.includes('right')?
+        position?.arrowAlign === 'top'? 'flex-row-reverse align-items-start' :
+            position?.arrowAlign === 'center'? 'flex-row-reverse align-items-center' :
+                position?.arrowAlign === 'bottom'? 'flex-row-reverse align-items-end' :
+                    position?.arrowPosition.includes('top')? 'align-items-start' : 'flex-row-reverse align-items-end'
+      :position?.arrowPosition.includes('left')?
+        position?.arrowAlign === 'top'? 'flex-row align-items-start' :
+            position?.arrowAlign === 'center'? 'flex-row align-items-center' :
+                position?.arrowAlign === 'bottom'? 'flex-row align-items-end' :
+                    position?.arrowPosition.includes('top')? 'align-items-start' : 'align-items-end'
+        :position?.arrowPosition.includes('top')?
+            position?.arrowAlign === 'left'? 'flex-column align-items-start' :
+                position?.arrowAlign === 'center'? 'flex-column align-items-center' :
+                    position?.arrowAlign === 'right'? 'flex-column align-items-end' :
+                        position?.arrowPosition.includes('left')? 'align-items-start' : 'align-items-end'
+          :position?.arrowPosition.includes('bottom')?
+                position?.arrowAlign === 'left'? 'flex-column-reverse align-items-end' :
+                    position?.arrowAlign === 'center'? 'flex-column-reverse align-items-center' :
+                        position?.arrowAlign === 'right'? 'flex-column-reverse align-items-end' :
+                            position?.arrowPosition.includes('left')? 'align-items-start' : 'align-items-end' : ''
   }
-
 }

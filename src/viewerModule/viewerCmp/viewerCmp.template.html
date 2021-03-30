@@ -9,7 +9,9 @@
   <mat-drawer-container
     [iav-switch-initstate]="false"
     iav-switch
-    (iav-switch-event)="sidebarQuickTourPosition$.next(sideNavTopSwitch.switchState? {left: 30, top: 70, arrowPosition: 'top', arrowAlign: 'center', recalculate: true} : {arrow: 'arrow5', left: 30, top: 50, arrowPosition: 'top-right', arrowTransform: 'rotate(25deg)'})"
+    (iav-switch-event)="quickTourRegionSearch.position =
+            sideNavTopSwitch.switchState? quickTourRegionSearchExpandedPosition
+            : quickTourRegionSearchCollapsedPosition"
     #sideNavTopSwitch="iavSwitch"
     class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
     [hasBackdrop]="false">
@@ -30,7 +32,7 @@
            quick-tour
            [quick-tour-description]="quickTourRegionSearch.description"
            [quick-tour-order]="quickTourRegionSearch.order"
-           [quick-tour-overwrite-pos]="quickTourRegionSearch.overwritePos">
+           [quick-tour-position]="quickTourRegionSearch.position">
         <ng-container *ngTemplateOutlet="autocompleteTmpl">
         </ng-container>
       </div>
@@ -100,9 +102,7 @@
               quick-tour
               [quick-tour-description]="quickTourAtlasSelector.description"
               [quick-tour-order]="quickTourAtlasSelector.order"
-              [quick-tour-position]="quickTourAtlasSelector.position"
-              [quick-tour-align]="quickTourAtlasSelector.align"
-              [quick-tour-overwrite-pos]="quickTourAtlasSelector.overwritePos">
+              [quick-tour-position]="quickTourAtlasSelector.position">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -213,9 +213,7 @@
                            quick-tour
                            [quick-tour-description]="quickTourChips.description"
                            [quick-tour-order]="quickTourChips.order"
-                           [quick-tour-position]="quickTourChips.position"
-                           [quick-tour-align]="quickTourChips.align"
-                           [quick-tour-overwrite-pos]="quickTourChips.overwritePos">
+                           [quick-tour-position]="quickTourChips.position">
               <!-- additional layer -->
 
               <ng-container>

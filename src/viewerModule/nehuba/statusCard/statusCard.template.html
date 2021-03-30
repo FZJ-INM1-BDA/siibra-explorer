@@ -1,9 +1,7 @@
 <div quick-tour
      [quick-tour-description]="quickTourData.description"
      [quick-tour-order]="quickTourData.order"
-     [quick-tour-position]="quickTourData.position"
-     [quick-tour-align]="quickTourData.align"
-     [quick-tour-overwrite-pos]="quickTourData.overwritePos">
+     [quick-tour-position]="quickTourData.position">
 <mat-card class="expandedContainer p-2 pt-1" *ngIf="showFull; else showMin"
 
 >
@@ -42,7 +40,7 @@
 
       <button mat-icon-button
         [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
-        (click)="showFull = false; quickTourPosition$.next({arrowPosition: 'top', arrowAlign: 'center', recalculate: true})">
+        (click)="showFull = false; quickTourData.position = quickTourCollapsedPosition">
         <i class="fas fa-angle-up"></i>
       </button>
     </div>
@@ -132,8 +130,7 @@
 
     <button mat-icon-button
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
-      (click)="showFull = true;
-      quickTourPosition$.next({arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'center', recalculate: true})">
+      (click)="showFull = true; quickTourData.position = quickTourExpandedPosition">
       <i class="fas fa-angle-down"></i>
     </button>
   </div>
