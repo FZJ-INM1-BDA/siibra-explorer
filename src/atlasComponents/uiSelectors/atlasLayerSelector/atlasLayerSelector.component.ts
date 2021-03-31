@@ -95,8 +95,8 @@ export class AtlasLayerSelector implements OnInit {
     @ViewChild('expandedSelectorCard', {read: ElementRef}) expandedSelectorCard: ElementRef<HTMLElement>
     quickTourCollapsedPosition: QuickTourPosition = {position: 'top-right', arrow: 'arrow2', arrowPosition: 'left', arrowAlign: 'bottom', arrowMargin: {left: -20}}
     quickTourExpandedPosition: QuickTourPosition = {position: 'right', arrow: 'arrow5', arrowPosition: 'left', arrowAlign: 'center',
-        top: document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2,
-        left: this.expandedSelectorCard?.nativeElement.offsetWidth}
+      top: document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2,
+      left: this.expandedSelectorCard?.nativeElement.offsetWidth}
     public quickTourData: QuickTourData = {
       order: 4,
       description: QUICKTOUR_DESC.LAYER_SELECTOR,
@@ -159,11 +159,11 @@ export class AtlasLayerSelector implements OnInit {
     toggleSelector() {
       this.selectorExpanded = !this.selectorExpanded
       if (this.selectorExpanded) {
-          this.quickTourExpandedPosition.left = this.expandedSelectorCard?.nativeElement.offsetWidth
-          this.quickTourExpandedPosition.top = document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2
-          this.quickTourData.position = this.quickTourExpandedPosition
+        this.quickTourExpandedPosition.left = this.expandedSelectorCard?.nativeElement.offsetWidth
+        this.quickTourExpandedPosition.top = document.body.offsetHeight - this.expandedSelectorCard?.nativeElement.offsetHeight/2
+        this.quickTourData.position = this.quickTourExpandedPosition
       } else {
-          this.quickTourData.position = this.quickTourCollapsedPosition
+        this.quickTourData.position = this.quickTourCollapsedPosition
       }
     }
 
