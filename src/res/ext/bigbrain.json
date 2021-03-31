@@ -852,36 +852,6 @@
                           "ngId": "v3v",
                           "status": "fully mapped",
                           "labelIndex": 1,
-                          "position": [],
-                          "rgb": [
-                            83,
-                            179,
-                            155
-                          ],
-                          "children": [],
-                          "fullId": {
-                            "kg": {
-                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                              "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
-                            }
-                          },
-                          "relatedAreas": [],
-                          "originDatasets":[
-                            {
-                              "kgSchema": "minds/core/dataset/v1.0.0",
-                              "kgId": "f746514d-b79a-48e2-9c07-39f7c62459cf",
-                              "format": {
-                                "name": "Full 3D map"
-                              }
-                            }
-                          ]
-                        },
-                        {
-                          "name": "Area hOc3v (LingG)",
-                          "ngId": "v3v",
-                          "status": "fully mapped",
-                          "labelIndex": 1,
-                          "position": [],
                           "rgb": [
                             83,
                             179,
@@ -937,7 +907,6 @@
                               "ngId": "v5",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 255,
                                 0,
@@ -991,7 +960,6 @@
                               "ngId": "LGB-lam1",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 255,
                                 255,
@@ -1020,7 +988,6 @@
                               "ngId": "LGB-lam2",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 222,
                                 74,
@@ -1049,7 +1016,6 @@
                               "ngId": "LGB-lam3",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 132,
                                 90,
@@ -1078,7 +1044,6 @@
                               "ngId": "LGB-lam4",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 41,
                                 123,
@@ -1107,7 +1072,6 @@
                               "ngId": "LGB-lam5",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 82,
                                 214,
@@ -1136,7 +1100,6 @@
                               "ngId": "LGB-lam6",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 99,
                                 231,
@@ -1170,7 +1133,6 @@
                               "ngId": "v5",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 255,
                                 0,
@@ -1215,7 +1177,6 @@
                               "ngId": "LGB-lam1",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 255,
                                 255,
@@ -1235,7 +1196,6 @@
                               "ngId": "LGB-lam2",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 222,
                                 74,
@@ -1255,7 +1215,6 @@
                               "ngId": "LGB-lam3",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 132,
                                 90,
@@ -1275,7 +1234,6 @@
                               "ngId": "LGB-lam4",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 41,
                                 123,
@@ -1295,7 +1253,6 @@
                               "ngId": "LGB-lam5",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 82,
                                 214,
@@ -1315,7 +1272,6 @@
                               "ngId": "LGB-lam6",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "position": [],
                               "rgb": [
                                 99,
                                 231,
@@ -1511,6 +1467,23 @@
       "type": "parcellation",
       "ngData": null,
       "ngId": " tissue type: ",
+      "auxMeshes": [{
+        "name": "Big Brain - white matter",
+        "displayName": "White matter",
+        "@id": "bigbrain_whitematter",
+        "ngId": "auxMesh",
+        "labelIndicies": [ 200 ],
+        "rgb": [255, 255, 255],
+        "visible": false
+      },{
+        "name": "Big Brain - grey matter",
+        "displayName": "Grey matter",
+        "@id": "bigbrain_greymatter",
+        "ngId": "auxMesh",
+        "labelIndicies": [ 100 ],
+        "rgb": [255, 255, 255],
+        "visible": true
+      }],
       "regions": [
         {
           "name": "Isocortex",

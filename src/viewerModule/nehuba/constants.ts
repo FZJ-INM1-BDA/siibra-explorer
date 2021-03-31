@@ -15,7 +15,13 @@ export interface INgLayerInterface {
   transform?: any
 }
 
-export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
+export interface IRegion {
+  [key: string]: any
+  ngId: string
+  rgb?: [number, number, number]
+}
+
+export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, IRegion>> {
   const map: Map<string, Map<number, any>> = new Map()
   
   const inheritAttrs = Object.keys(inheritAttrsOpt)

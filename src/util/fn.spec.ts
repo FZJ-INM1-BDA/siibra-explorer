@@ -1,9 +1,13 @@
+import { fakeAsync, tick } from '@angular/core/testing'
 import {} from 'jasmine'
-import { isSame, getGetRegionFromLabelIndexId } from './fn'
+import { cold, hot } from 'jasmine-marbles'
+import { of } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
+import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor } from './fn'
 
-describe(`util/fn.ts`, () => {
+describe(`> util/fn.ts`, () => {
 
-  describe('getGetRegionFromLabelIndexId', () => {
+  describe('> #getGetRegionFromLabelIndexId', () => {
     const colinsJson = require('!json-loader!../res/ext/colin.json')
     
     const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
@@ -23,7 +27,7 @@ describe(`util/fn.ts`, () => {
       
     })
   })
-  describe(`#isSame`, () => {
+  describe(`> #isSame`, () => {
     it('should return true with null, null', () => {
       expect(isSame(null, null)).toBe(true)
     })
@@ -47,6 +51,31 @@ describe(`util/fn.ts`, () => {
       }
       expect(isSame(obj, obj2)).toBe(true)
       expect(obj).not.toEqual(obj2)
+    })
+  })
+
+  describe('> #switchMapWaitFor', () => {
+    const val = 'hello world'
+    describe('> if condition is true to begin', () => {
+      const conditionFn = jasmine.createSpy()
+      beforeEach(() => {
+        conditionFn.and.returnValue(true)
+      })
+      afterEach(() => {
+        conditionFn.calls.reset()
+      })
+      it('> should wait for 16 ms then emit', fakeAsync(() => {
+        const obs$ = of(val).pipe(
+          switchMap(switchMapWaitFor({
+            condition: conditionFn
+          }))
+        )
+        obs$.subscribe(ex => {
+          expect(conditionFn).toHaveBeenCalled()
+          expect(ex).toEqual(val)
+        })
+        tick(200)
+      }))
     })
   })
 })

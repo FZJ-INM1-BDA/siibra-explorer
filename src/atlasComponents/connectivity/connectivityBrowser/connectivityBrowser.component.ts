@@ -12,15 +12,9 @@ import {
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
 import {distinctUntilChanged, filter, map} from "rxjs/operators";
-import {
-  CLEAR_CONNECTIVITY_REGION,
-  SELECT_REGIONS,
-  SET_OVERWRITTEN_COLOR_MAP
-} from "src/services/state/viewerState.store";
-import {safeFilter} from "src/services/stateStore.service";
-import {viewerStateNavigateToRegion} from "src/services/state/viewerState.store.helper";
-import {ngViewerActionClearView} from "src/services/state/ngViewerState/actions";
-import {ngViewerSelectorClearViewEntries} from "src/services/state/ngViewerState/selectors";
+
+import { viewerStateNavigateToRegion, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
+import { ngViewerSelectorClearViewEntries, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
 import {
   viewerStateAllRegionsFlattenedRegionSelector,
   viewerStateOverwrittenColorMapSelector
@@ -44,7 +38,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      */
     private _isFirstUpdate = true
 
-    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies'
+    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps.hbp.eu/v1.1/studies'
 
     private accordionIsExpanded = false
 
@@ -66,7 +60,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         })
       )
       this.store$.dispatch({
-        type: SET_OVERWRITTEN_COLOR_MAP,
+        type: 'SET_OVERWRITTEN_COLOR_MAP',
         payload: flag? CONNECTIVITY_NAME_PLATE : false,
       })
     }
@@ -88,7 +82,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
       if (!val) {
         this.store$.dispatch({
-          type: SET_OVERWRITTEN_COLOR_MAP,
+          type: 'SET_OVERWRITTEN_COLOR_MAP',
           payload: false,
         })
         return
@@ -115,6 +109,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public datasetList: any[] = []
     public selectedDataset: any
     public selectedDatasetDescription: string = ''
+    public selectedDatasetKgId: string = ''
+    public selectedDatasetKgSchema: string = ''
     public connectedAreas = []
 
     private selectedParcellationFlatRegions$ = this.store$.pipe(
@@ -139,9 +135,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     ) {
 
       this.overwrittenColorMap$ = this.store$.pipe(
-        select('viewerState'),
-        safeFilter('overwrittenColorMap'),
-        map(state => state.overwrittenColorMap),
+        select(viewerStateOverwrittenColorMapSelector),
         distinctUntilChanged()
       )
     }
@@ -239,19 +233,14 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
             if (flag) {
               this.addNewColorMap()
               this.store$.dispatch({
-                type: SET_OVERWRITTEN_COLOR_MAP,
+                type: 'SET_OVERWRITTEN_COLOR_MAP',
                 payload: 'connectivity',
               })
             } else {
               this.restoreDefaultColormap()
 
-              this.store$.dispatch({type: SET_OVERWRITTEN_COLOR_MAP, payload: null})
+              this.store$.dispatch({type: 'SET_OVERWRITTEN_COLOR_MAP', payload: null})
 
-              /**
-                         * TODO
-                         * may no longer be necessary
-                         */
-              this.store$.dispatch({type: CLEAR_CONNECTIVITY_REGION})
             }
           }
         })
@@ -304,7 +293,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     changeDataset(event = null) {
       if (event) {
         this.selectedDataset = event.value
-        this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
+        const foundDataset = this.datasetList.find(d => d.name === this.selectedDataset)
+        this.selectedDatasetDescription = foundDataset?.description
+        this.selectedDatasetKgId = foundDataset?.kgId || null
+        this.selectedDatasetKgSchema = foundDataset?.kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
         const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
@@ -325,10 +317,11 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     selectRegion(region) {
-      this.store$.dispatch({
-        type: SELECT_REGIONS,
-        selectRegions: [region],
-      })
+      this.store$.dispatch(
+        viewerStateSetSelectedRegions({
+          selectRegions: [ region ]
+        })
+      )
     }
 
     getRegionWithName(region) {
@@ -407,7 +400,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public exportFullConnectivity() {
-      this.fullConnectivityGridElement.nativeElement['downloadCSV']()
+      this.fullConnectivityGridElement?.nativeElement['downloadCSV']()
     }
 
 }

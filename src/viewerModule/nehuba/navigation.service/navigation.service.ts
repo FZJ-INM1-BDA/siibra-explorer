@@ -5,8 +5,8 @@ import { debounceTime } from "rxjs/operators";
 import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
-import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { NEHUBA_INSTANCE_INJTKN } from "./util";
+import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
+import { NEHUBA_INSTANCE_INJTKN } from "../util";
 import { timedValues } from 'src/util/generator'
 import { INavObj, navAdd, navMul, navObjEqual } from './navigation.util'
 

@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChildren, QueryList, HostBinding, ElementRef, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
-import {Observable, Subscription, from, zip, of, combineLatest, BehaviorSubject} from "rxjs";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter, startWith } from "rxjs/operators";
+import { Observable, Subscription, from, zip, of, combineLatest, BehaviorSubject } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";

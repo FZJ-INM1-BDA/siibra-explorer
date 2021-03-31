@@ -631,6 +631,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
   
   public datasetPreviewDisplayed(file: DatasetPreview, dataset?: IKgDataEntry){
+    if (!file) return of(false)
     return this.previewingDatasetFiles$.pipe(
       map(datasetPreviews => {
         const { filename, datasetId } = file

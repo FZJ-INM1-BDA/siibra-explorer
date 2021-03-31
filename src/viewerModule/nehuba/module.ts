@@ -24,6 +24,7 @@ import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
+import { ViewerCtrlModule } from "./viewerCtrl";
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
     ComponentsModule,
     MouseoverModule,
     ShareModule,
+    ViewerCtrlModule,
 
     /**
      * should probably break this into its own...

@@ -290,11 +290,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   }
 
   public toggleOctantRemoval(flag: boolean){
-    const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
-    if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
-    else {
-      this.log && this.log.warn(`showPerspectiveSliceViews not defined`)
+    if (!this.nehubaViewerInstance) {
+      this.log.error(`this.nehubaViewerInstance is not yet available`)
+      return
     }
+    this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
   createNehubaInstance(template: any, lifeCycle: INehubaLifecycleHook = {}){
@@ -309,7 +309,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       }
     }
 
-    const { nehubaConfig } = template
+    const { nehubaConfig, name } = template
 
     /**
      * apply viewer config such as gpu limit
