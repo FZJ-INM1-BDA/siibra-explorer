@@ -1,20 +1,23 @@
-export interface QuickTourData {
+import { TemplateRef } from "@angular/core"
+
+type TPosition = 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left'
+
+type TCustomPosition = {
+    left: number
+    top: number
+}
+
+export interface IQuickTourData {
     order: number
     description: string
-    position?: QuickTourPosition
+    tourPosition?: TPosition
+    overwritePosition?: IQuickTourOverwritePosition
+    overwriteArrow?: TemplateRef<any> | string
 }
 
-export interface QuickTourPosition {
-    // Position of tip
-    position?: 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left'
-    align?: 'right' | 'left' | 'top' | 'bottom' | 'center'
-    left?: number
-    top?: number
-
-    // Position of arrow
-    arrow?: string
-    arrowPosition?: 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left'
-    arrowAlign?: 'right' | 'left' | 'top' | 'bottom' | 'center'
-    arrowMargin?: {top?: number, right?: number, bottom?: number, left?: number}
-    arrowTransform?: string
+export interface IQuickTourOverwritePosition {
+    dialog: TCustomPosition
+    arrow: TCustomPosition
 }
+
+export type TQuickTourPosition = TPosition

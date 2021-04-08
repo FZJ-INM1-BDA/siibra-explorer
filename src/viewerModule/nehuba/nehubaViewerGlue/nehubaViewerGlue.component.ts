@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, interval, merge, Observable, of, Subject, timer } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
@@ -21,7 +21,7 @@ import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, ge
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
-import {QuickTourData} from "src/ui/quickTour/constrants";
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 interface INgLayerInterface {
   name: string // displayName
@@ -92,22 +92,19 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   private findPanelIndex = (panel: HTMLElement) => this.viewPanelWeakMap.get(panel)
   public nanometersToOffsetPixelsFn: Array<(...arg) => any> = []
 
-  public quickTourSliceViewSlide: QuickTourData = {
+  public quickTourSliceViewSlide: IQuickTourData = {
     order: 1,
     description: QUICKTOUR_DESC.SLICE_VIEW,
-    position: {position: 'bottom-right', arrow: 'arrow3', arrowPosition: 'left', arrowMargin: {right: -50, bottom: 130}},
   }
 
-  public quickTour3dViewSlide: QuickTourData = {
+  public quickTour3dViewSlide: IQuickTourData = {
     order: 2,
     description: QUICKTOUR_DESC.PERSPECTIVE_VIEW,
-    position: {position: 'top-left', arrow: 'arrow5', arrowPosition: 'right', arrowAlign: 'bottom', arrowMargin: {bottom: -25, left: -10}, arrowTransform: 'rotate(-130deg)'},
   }
 
-  public quickTourIconsSlide: QuickTourData = {
+  public quickTourIconsSlide: IQuickTourData = {
     order: 3,
     description: QUICKTOUR_DESC.VIEW_ICONS,
-    position: {position: 'bottom', align: 'right', arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'right', arrowMargin: {right: 50}},
   }
 
   public customLandmarks$: Observable<any> = this.store$.pipe(
@@ -119,6 +116,10 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       }
     }))),
   )
+
+  ngAfterViewInit(){
+    this.setQuickTourPos()
+  }
 
   private forceUI$ = this.customLandmarks$.pipe(
     map(lm => {
@@ -833,4 +834,28 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     )
   }
 
+  public quickTourOverwritingPos = {
+    'dialog': {
+      left: '0px',
+      top: '0px',
+    },
+    'arrow': {
+      left: '0px',
+      top: '0px',
+    }
+  }
+
+  setQuickTourPos(){
+    const { innerWidth, innerHeight } = window
+    this.quickTourOverwritingPos = {
+    'dialog': {
+      left: `${innerWidth / 2}px`,
+      top: `${innerHeight / 2}px`,
+    },
+    'arrow': {
+      left: `${innerWidth / 2 - 48}px`,
+      top: `${innerHeight / 2 - 48}px`,
+    }
+    }
+  }
 }

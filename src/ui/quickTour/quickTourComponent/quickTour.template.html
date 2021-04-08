@@ -1,0 +1,43 @@
+<mat-card
+    iav-window-resize
+    [iav-window-resize-time]="64"
+    (iav-window-resize-event)="handleWindowResize()"
+    [style.width]="tourCardWidth"
+    [style.transform]="tourCardTransform">
+    <mat-card-content>
+        {{ description$ | async }}
+    </mat-card-content>
+    <mat-card-actions>
+        <button  mat-icon-button
+            (click)="prevSlide()"
+            [disabled]="isFirst$ | async">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button mat-icon-button
+            (click)="nextSlide()"
+            [disabled]="isLast$ | async">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <button mat-icon-button
+            (click)="endTour()">
+            <i class="fas fa-times"></i>
+        </button>
+    </mat-card-actions>
+</mat-card>
+
+<div *ngIf="arrowTmpl" [style.transform]="customArrowTransform"
+    class="custom-svg">
+    <ng-container *ngTemplateOutlet="arrowTmpl">
+    </ng-container>
+</div>
+
+<ng-template [ngIf]="arrowSrc">
+    arrow src not yet implmented
+</ng-template>
+
+<quick-tour-arrow
+    *ngIf="!arrowTmpl && !arrowSrc"
+    [quick-tour-arrow-to]="arrowTo"
+    [quick-tour-arrow-from]="arrowFrom"
+    [quick-tour-arrow-type]="arrowType">
+</quick-tour-arrow>

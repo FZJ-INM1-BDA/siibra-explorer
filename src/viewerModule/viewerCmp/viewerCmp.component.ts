@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, Inject, Input, OnDestroy, Optional, ViewChild} from "@angular/core";
+import { Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {BehaviorSubject, combineLatest, Observable, of, Subject, Subscription} from "rxjs";
+import { combineLatest, Observable, of, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
@@ -12,7 +12,7 @@ import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import { TSupportedViewer } from "../constants";
-import {QuickTourData, QuickTourPosition} from "src/ui/quickTour/constrants";
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -78,22 +78,18 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
-  public quickTourRegionSearchCollapsedPosition: QuickTourPosition = {arrow: 'arrow5', left: 30, top: 60, arrowPosition: 'left', arrowAlign: 'top', arrowMargin: {top: -20}, arrowTransform: 'rotate(25deg)'}
-  public quickTourRegionSearchExpandedPosition: QuickTourPosition = {left: 30, top: 70, arrowPosition: 'top', arrowAlign: 'center'}
-  public quickTourRegionSearch: QuickTourData = {
+  
+  public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,
-    position: this.quickTourRegionSearchCollapsedPosition
   }
-  public quickTourAtlasSelector: QuickTourData = {
+  public quickTourAtlasSelector: IQuickTourData = {
     order: 0,
     description: QUICKTOUR_DESC.ATLAS_SELECTOR,
-    position: {position: 'bottom', align: 'right', arrowPosition: 'top', arrowAlign: 'center'}
   }
-  public quickTourChips: QuickTourData = {
+  public quickTourChips: IQuickTourData = {
     order: 5,
     description: QUICKTOUR_DESC.CHIPS,
-    position: {position: 'top', align: 'center', arrowPosition: 'bottom', arrowAlign: 'center', arrowTransform: 'scaleX(-1) rotate(180deg)'}
   }
 
 
@@ -229,7 +225,6 @@ export class ViewerCmp implements OnDestroy {
   }
 
   private openSideNavs() {
-    this.quickTourRegionSearch.position = this.quickTourRegionSearchExpandedPosition
     this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }

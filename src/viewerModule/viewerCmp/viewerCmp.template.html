@@ -9,16 +9,13 @@
   <mat-drawer-container
     [iav-switch-initstate]="false"
     iav-switch
-    (iav-switch-event)="quickTourRegionSearch.position =
-            sideNavTopSwitch.switchState? quickTourRegionSearchExpandedPosition
-            : quickTourRegionSearchCollapsedPosition"
     #sideNavTopSwitch="iavSwitch"
     class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
     [hasBackdrop]="false">
 
     <!-- sidenav-content -->
 
-    <!-- (closedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.close()"
+    <!-- (closedStart)="sideNavwFullLeftSwitch.switchState && matDrawerLeft.close()"
     (openedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.open()" -->
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
@@ -29,10 +26,11 @@
       #matDrawerTop="matDrawer">
 
       <div class="h-0 w-100 region-text-search-autocomplete-position"
-           quick-tour
-           [quick-tour-description]="quickTourRegionSearch.description"
-           [quick-tour-order]="quickTourRegionSearch.order"
-           [quick-tour-position]="quickTourRegionSearch.position">
+        *ngIf="matDrawerTop.opened">
+
+        <!-- quick-tour
+        [quick-tour-description]="quickTourRegionSearch.description"
+        [quick-tour-order]="quickTourRegionSearch.order" -->
         <ng-container *ngTemplateOutlet="autocompleteTmpl">
         </ng-container>
       </div>
@@ -101,8 +99,7 @@
               class="iv-custom-comp bg card m-2 mat-elevation-z2"
               quick-tour
               [quick-tour-description]="quickTourAtlasSelector.description"
-              [quick-tour-order]="quickTourAtlasSelector.order"
-              [quick-tour-position]="quickTourAtlasSelector.position">
+              [quick-tour-order]="quickTourAtlasSelector.order">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -210,10 +207,9 @@
           <div class="flex-grow-1 flex-shrink-1 overflow-x-auto">
 
             <mat-chip-list class="d-inline-block"
-                           quick-tour
-                           [quick-tour-description]="quickTourChips.description"
-                           [quick-tour-order]="quickTourChips.order"
-                           [quick-tour-position]="quickTourChips.position">
+              quick-tour
+              [quick-tour-description]="quickTourChips.description"
+              [quick-tour-order]="quickTourChips.order">
               <!-- additional layer -->
 
               <ng-container>

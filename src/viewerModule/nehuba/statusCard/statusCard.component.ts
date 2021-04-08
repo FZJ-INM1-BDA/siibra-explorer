@@ -5,12 +5,12 @@ import {
   TemplateRef,
   HostBinding,
   Optional,
-  Inject, ViewChild, ElementRef
+  Inject,
 } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import {Observable, Subscription, of, combineLatest, BehaviorSubject} from "rxjs";
+import { Observable, Subscription, of, combineLatest } from "rxjs";
 import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
@@ -20,7 +20,7 @@ import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSele
 
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
-import {QuickTourData, QuickTourPosition} from "src/ui/quickTour/constrants";
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -52,12 +52,9 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
   public useTouchInterface$: Observable<boolean>
 
-  public quickTourExpandedPosition: QuickTourPosition = {position: 'bottom', align: 'left', top: 150, arrow: 'arrow4', arrowPosition: 'top', arrowAlign: 'center'}
-  public quickTourCollapsedPosition: QuickTourPosition = {position: 'bottom', align: 'left', top: 60, arrowPosition: 'top', arrowAlign: 'center'}
-  public quickTourData: QuickTourData = {
+  public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.STATUS_CARD,
     order: 6,
-    position: this.quickTourCollapsedPosition
   }
 
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN

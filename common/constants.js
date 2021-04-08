@@ -83,7 +83,7 @@
   exports.QUICKTOUR_DESC ={
     REGION_SEARCH: `Use the region quick search for finding, selecting and navigating brain regions in the selected parcellation map.`,
     ATLAS_SELECTOR: `This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.`,
-    CHIPS: `These „chips“ indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.`,
+    CHIPS: `These "chips" indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.`,
     SLICE_VIEW: `The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can double-click brain regions to select them.`,
     PERSPECTIVE_VIEW: `The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. Click the „eye“ icon on the bottom left to toggle pure surface view.`,
     VIEW_ICONS: `Use these icons in any of the views to maximize it and zoom in/out.`,
