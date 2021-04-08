@@ -33,20 +33,20 @@ export class ArrowComponent implements OnChanges{
   ngOnChanges(){
     let rotate: string
     switch(this.type) {
-      case 'concave-from-top': {
-        rotate = '0deg'
-        break
-      }
-      case 'concave-from-bottom': {
-        rotate = '180deg'
-        break
-      }
-      default: {
-        rotate = `${(Math.PI / 2) + Math.atan2(
-          (this.toPos[1] - this.fromPos[1]),
-          (this.toPos[0] - this.fromPos[0])
-        )}rad`
-      }
+    case 'concave-from-top': {
+      rotate = '0deg'
+      break
+    }
+    case 'concave-from-bottom': {
+      rotate = '180deg'
+      break
+    }
+    default: {
+      rotate = `${(Math.PI / 2) + Math.atan2(
+        (this.toPos[1] - this.fromPos[1]),
+        (this.toPos[0] - this.fromPos[0])
+      )}rad`
+    }
     }
 
     this.transform = `translate(${this.fromPos[0]}px, ${this.fromPos[1]}px)`

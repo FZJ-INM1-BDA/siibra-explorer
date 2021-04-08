@@ -848,14 +848,14 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   setQuickTourPos(){
     const { innerWidth, innerHeight } = window
     this.quickTourOverwritingPos = {
-    'dialog': {
-      left: `${innerWidth / 2}px`,
-      top: `${innerHeight / 2}px`,
-    },
-    'arrow': {
-      left: `${innerWidth / 2 - 48}px`,
-      top: `${innerHeight / 2 - 48}px`,
-    }
+      'dialog': {
+        left: `${innerWidth / 2}px`,
+        top: `${innerHeight / 2}px`,
+      },
+      'arrow': {
+        left: `${innerWidth / 2 - 48}px`,
+        top: `${innerHeight / 2 - 48}px`,
+      }
     }
   }
 }

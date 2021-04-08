@@ -1,4 +1,4 @@
-import { TemplateRef } from "@angular/core"
+import { InjectionToken, TemplateRef } from "@angular/core"
 
 type TPosition = 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left'
 
@@ -21,3 +21,5 @@ export interface IQuickTourOverwritePosition {
 }
 
 export type TQuickTourPosition = TPosition
+
+export const QUICK_TOUR_CMP_INJTKN = new InjectionToken('QUICK_TOUR_CMP_INJTKN')

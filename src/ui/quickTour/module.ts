@@ -9,6 +9,7 @@ import { QuickTourComponent } from "src/ui/quickTour/quickTourComponent/quickTou
 import { QuickTourDirective } from "src/ui/quickTour/quickTour.directive";
 import { ArrowComponent } from "./arrowCmp/arrow.component";
 import { WindowResizeModule } from "src/util/windowResize";
+import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
 
 @NgModule({
   imports: [
@@ -28,10 +29,15 @@ import { WindowResizeModule } from "src/util/windowResize";
     QuickTourThis,
   ],
   providers:[
-    {provide: OverlayContainer,
+    {
+      provide: OverlayContainer,
       useClass: FullscreenOverlayContainer
     },
-    QuickTourService
+    QuickTourService,
+    {
+      provide: QUICK_TOUR_CMP_INJTKN,
+      useValue: QuickTourComponent
+    }
   ]
 })
 export class QuickTourModule{}

@@ -1,10 +1,10 @@
-import { ComponentRef, Injectable } from "@angular/core";
+import { ComponentRef, Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Subject } from "rxjs";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
-import { QuickTourComponent } from "./quickTourComponent/quickTour.component";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
+import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
 
 export function findInLinkedList<T>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
   let compareObj = first,
@@ -25,7 +25,7 @@ export function findInLinkedList<T>(first: IDoublyLinkedItem<T>, predicate: (lin
 export class QuickTourService {
 
   private overlayRef: OverlayRef
-  private cmpRef: ComponentRef<QuickTourComponent>
+  private cmpRef: ComponentRef<any>
 
   public currSlideNum: number = null
   public currentTip$: BehaviorSubject<IDoublyLinkedItem<QuickTourThis>> = new BehaviorSubject(null)
@@ -36,6 +36,12 @@ export class QuickTourService {
 
   constructor(
     private overlay: Overlay,
+    /**
+     * quickTourService cannot directly reference quickTourComponent
+     * since quickTourComponent DI quickTourService
+     * makes sense, since we want to keep the dependency of svc on cmp as loosely (or non existent) as possible
+     */
+    @Inject(QUICK_TOUR_CMP_INJTKN) private quickTourCmp: any,
   ){
 
     // todo remove in production
@@ -69,7 +75,7 @@ export class QuickTourService {
     
     if (!this.cmpRef) {
       this.cmpRef = this.overlayRef.attach(
-        new ComponentPortal(QuickTourComponent)
+        new ComponentPortal(this.quickTourCmp)
       )
   
       this.currActiveSlide = this.slides.first

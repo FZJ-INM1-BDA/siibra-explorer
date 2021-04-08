@@ -15,7 +15,6 @@ export class DoublyLinkedList<T extends object>{
       console.warn(`element has already been added to the doublylinkedlist`)
       return
     }
-    let newDoublyLinkedItem: IDoublyLinkedItem<T>
 
     const insertAfter = FindInLinkedList<T>(
       this,
@@ -30,7 +29,7 @@ export class DoublyLinkedList<T extends object>{
       ? insertAfter.next
       : this.first
 
-    newDoublyLinkedItem = {
+    const newDoublyLinkedItem: IDoublyLinkedItem<T> = {
       prev: insertAfter,
       next: newDoublyLinkedItemNext,
       thisObj: element

@@ -12,11 +12,11 @@ export class QuickTourDirective {
   ){}
 
     @HostListener('window:keydown', ['$event'])
-    keyListener(ev: KeyboardEvent){
-      if (ev.key === 'Escape') {
-        this.quickTourService.endTour()
-      }
+  keyListener(ev: KeyboardEvent){
+    if (ev.key === 'Escape') {
+      this.quickTourService.endTour()
     }
+  }
 
     @HostListener('click')
     onClick(){

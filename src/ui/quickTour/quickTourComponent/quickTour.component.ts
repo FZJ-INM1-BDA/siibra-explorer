@@ -163,7 +163,7 @@ export class QuickTourComponent {
     const { innerWidth, innerHeight } = window
 
     const { position: tipPosition } = this.currTip
-    let translate: {x: number, y: number} = { x: hostX + hostWidth / 2, y: hostY + hostHeight / 2 }
+    const translate: {x: number, y: number} = { x: hostX + hostWidth / 2, y: hostY + hostHeight / 2 }
 
     const hostCogX = hostX + hostWidth / 2
     const hostCogY = hostY + hostHeight / 2
