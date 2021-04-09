@@ -124,7 +124,7 @@
     [attr.data-viewer-controller-visible]="visible"
     [attr.data-viewer-controller-index]="panelIndex">
 
-    <div class="d-inline-block"
+    <div class="position-absolute w-100 h-100 pe-none"
       *ngIf="panelIndex === 1"
       quick-tour
       [quick-tour-description]="quickTourIconsSlide.description"
