@@ -25,13 +25,8 @@
       [disableClose]="true"
       #matDrawerTop="matDrawer">
 
-      <div class="h-0 w-100 region-text-search-autocomplete-position"
-        *ngIf="matDrawerTop.opened">
-
-        <!-- quick-tour
-        [quick-tour-description]="quickTourRegionSearch.description"
-        [quick-tour-order]="quickTourRegionSearch.order" -->
-        <ng-container *ngTemplateOutlet="autocompleteTmpl">
+      <div class="h-0 w-100 region-text-search-autocomplete-position">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true, visible: matDrawerTop.opened }">
         </ng-container>
       </div>
 
@@ -522,10 +517,17 @@
 
 <!-- auto complete search box -->
 
-<ng-template #autocompleteTmpl>
+<ng-template #autocompleteTmpl let-visible="visible" let-showTour="showTour">
   <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
+
+    <div class="w-100 h-100 position-absolute"
+      *ngIf="visible && showTour"
+      quick-tour
+      [quick-tour-description]="quickTourRegionSearch.description"
+      [quick-tour-order]="quickTourRegionSearch.order">
+    </div>
   </div>
 </ng-template>
 
