@@ -1,7 +1,9 @@
-export interface IDoublyLinkedItem<T> {
+export interface IDoublyLinkedItem<T extends object> {
   next: IDoublyLinkedItem<T>
   prev: IDoublyLinkedItem<T>
   thisObj: T
+  readonly index: number
+  list: DoublyLinkedList<T>
 }
 
 export class DoublyLinkedList<T extends object>{
@@ -32,7 +34,17 @@ export class DoublyLinkedList<T extends object>{
     const newDoublyLinkedItem: IDoublyLinkedItem<T> = {
       prev: insertAfter,
       next: newDoublyLinkedItemNext,
-      thisObj: element
+      thisObj: element,
+      get index() {
+        let count = 0, prev: IDoublyLinkedItem<T>
+        prev = this.prev
+        while (prev) {
+          prev = prev.prev
+          count ++
+        }
+        return count
+      },
+      list: this
     }
 
     /**

@@ -5,7 +5,7 @@ import {
   SecurityContext,
   TemplateRef,
 } from "@angular/core";
-import { Subscription } from "rxjs";
+import { combineLatest, Subscription } from "rxjs";
 import { QuickTourService } from "../quickTour.service";
 import { debounceTime, map, shareReplay} from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -66,6 +66,23 @@ export class QuickTourComponent {
 
   public description$ = this.currTipLinkedObj$.pipe(
     map(val => val.thisObj.description)
+  )
+
+  private quickTourSize$ = this.currTipLinkedObj$.pipe(
+    map(val => val.list.size())
+  )
+
+  private quickTourIdx$ = this.currTipLinkedObj$.pipe(
+    map(val => val.index)
+  )
+
+  public quickTourProgress$ = combineLatest([
+    this.quickTourSize$,
+    this.quickTourIdx$
+  ]).pipe(
+    map(([ size, idx ]) => {
+      return Array(size).fill(false).map((_, index) => index === idx ? 'active' : _)
+    })
   )
 
   public overwrittenPosition = this.currTipLinkedObj$.pipe(

@@ -438,6 +438,11 @@ markdown-dom pre code
   opacity: 0.5!important;
 }
 
+.muted-3
+{
+  opacity: 0.3!important;
+}
+
 .card
 {
   background:none;

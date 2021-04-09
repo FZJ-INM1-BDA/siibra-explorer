@@ -6,7 +6,7 @@ import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
 import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
 
-export function findInLinkedList<T>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
+export function findInLinkedList<T extends object>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
   let compareObj = first,
     returnObj: IDoublyLinkedItem<T> = null
 
@@ -43,11 +43,6 @@ export class QuickTourService {
      */
     @Inject(QUICK_TOUR_CMP_INJTKN) private quickTourCmp: any,
   ){
-
-    // todo remove in production
-    setTimeout(() => {
-      this.startTour()
-    }, 2500)
   }
 
   public register(dir: QuickTourThis) {

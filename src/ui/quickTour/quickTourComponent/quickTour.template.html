@@ -22,6 +22,11 @@
             (click)="endTour()">
             <i class="fas fa-times"></i>
         </button>
+        <span class="muted d-inline-flex align-items-center">
+            <i *ngFor="let active of quickTourProgress$ | async"
+                [ngClass]="{ 'fa-xs muted-3': !active }"
+                class="ml-1 fas fa-circle"></i>
+        </span>
     </mat-card-actions>
 </mat-card>
 
