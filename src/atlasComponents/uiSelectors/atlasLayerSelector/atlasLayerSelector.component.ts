@@ -1,18 +1,39 @@
-import {Component, OnInit, ViewChildren, QueryList, HostBinding } from "@angular/core";
+import { Component, OnInit, ViewChildren, QueryList, HostBinding, ViewChild, TemplateRef, ElementRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
-import {Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
+import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { animate, state, style, transition, trigger } from "@angular/animations";
 
 @Component({
   selector: 'atlas-layer-selector',
   templateUrl: './atlasLayerSelector.template.html',
   styleUrls: ['./atlasLayerSelector.style.css'],
-  exportAs: 'atlasLayerSelector'
+  exportAs: 'atlasLayerSelector',
+  animations: [
+    trigger('toggleAtlasLayerSelector', [
+      state('false', style({
+        transform: 'scale(0)',
+        opacity: 0,
+        transformOrigin: '0% 100%'
+      })),
+      state('true', style({
+        transform: 'scale(1)',
+        opacity: 1,
+        transformOrigin: '0% 100%'
+      })),
+      transition('false => true', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ]),
+      transition('true => false', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ])
+    ])
+  ]
 })
 export class AtlasLayerSelector implements OnInit {
 
@@ -20,6 +41,9 @@ export class AtlasLayerSelector implements OnInit {
 
     @ViewChildren(MatMenuTrigger) matMenuTriggers: QueryList<MatMenuTrigger>
     public atlas: any
+
+    @ViewChild('selectorPanelTmpl', { read: ElementRef })
+    selectorPanelTemplateRef: ElementRef
 
     public selectedAtlas$: Observable<any> = this.store$.pipe(
       select(viewerStateGetSelectedAtlas),

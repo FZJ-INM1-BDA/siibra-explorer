@@ -2,7 +2,11 @@
 
     <!-- selector panel when expanded -->
 
-    <mat-card class="selector-container position-absolute" [ngClass]="selectorExpanded ? 'scale-up-bl pe-all' : 'scale-down-bl pe-none'">
+    <mat-card class="selector-container position-absolute"
+        [ngClass]="{'pe-all': selectorExpanded}"
+        [@toggleAtlasLayerSelector]="selectorExpanded"
+        (@toggleAtlasLayerSelector.done)="atlasSelectorTour?.attachTo(selectorExpanded ? selectorPanelTemplateRef : null)"
+        #selectorPanelTmpl>
         <mat-card-content>
 
             <!-- templates -->
@@ -66,7 +70,8 @@
     <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all"
         quick-tour
         [quick-tour-description]="quickTourData.description"
-        [quick-tour-order]="quickTourData.order">
+        [quick-tour-order]="quickTourData.order"
+        #atlasSelectorTour="quickTour">
         <button color="primary"
             matTooltip="Select layer"
             mat-mini-fab

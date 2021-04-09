@@ -14,13 +14,15 @@ export class QuickTourThis implements OnInit, OnChanges, OnDestroy {
   @Input('quick-tour-overwrite-position') overwritePosition: IQuickTourOverwritePosition
   @Input('quick-tour-overwrite-arrow') overWriteArrow: TemplateRef<any> | string
   
+  private attachedTmpl: ElementRef
+
   constructor(
     private quickTourService: QuickTourService,
     private el: ElementRef
   ) {}
 
   public getHostPos() {
-    const { x, y, width, height } = (this.el.nativeElement as HTMLElement).getBoundingClientRect()
+    const { x, y, width, height } = (this.attachedTmpl?.nativeElement || this.el.nativeElement as HTMLElement).getBoundingClientRect()
     return { x, y, width, height }
   }
 
@@ -34,5 +36,10 @@ export class QuickTourThis implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.quickTourService.unregister(this)
+  }
+
+  attachTo(tmp: ElementRef){
+    this.attachedTmpl = tmp
+    this.quickTourService.changeDetected(this)
   }
 }
