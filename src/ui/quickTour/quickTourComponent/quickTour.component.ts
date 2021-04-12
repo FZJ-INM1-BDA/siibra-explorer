@@ -1,13 +1,14 @@
 import {
   Component,
-  HostBinding,
+  ElementRef,
   HostListener,
   SecurityContext,
   TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import { combineLatest, Subscription } from "rxjs";
 import { QuickTourService } from "../quickTour.service";
-import { debounceTime, map, shareReplay } from "rxjs/operators";
+import { debounceTime, map, shareReplay, tap } from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
 import { QuickTourThis } from "../quickTourThis.directive";
 import { clamp } from "src/util/generator";
@@ -16,13 +17,17 @@ import { clamp } from "src/util/generator";
   templateUrl : './quickTour.template.html',
   styleUrls : [
     './quickTour.style.css'
-  ]
+  ],
 })
 export class QuickTourComponent {
 
   static TourCardMargin = 24
   static TourCardWidthPx = 256
   static TourCardHeightPx = 64
+  static TourCardWindowMargin = 8
+
+  @ViewChild('quickTourDialog', { read: ElementRef })
+  private quickTourDialog: ElementRef
 
   public tourCardWidth = `${QuickTourComponent.TourCardWidthPx}px`
   public arrowTmpl: TemplateRef<any>
@@ -34,15 +39,6 @@ export class QuickTourComponent {
       this.quickTourService.endTour()
     }
   }
-
-  @HostBinding('style.align-items')
-  alignItems: 'center' | 'flex-start' | 'flex-end' = 'center'
-
-  @HostBinding('style.justify-content')
-  justifyContent: 'center' | 'flex-start' | 'flex-end' = 'center'
-
-  @HostBinding('style.transform')
-  transform = this.sanitizer.bypassSecurityTrustStyle(`translate(200px, -450px)`)
 
   public tourCardTransform = `translate(0px, 0px)`
   public customArrowTransform = `translate(0px, 0px)`
@@ -157,8 +153,6 @@ export class QuickTourComponent {
     }
 
     if (tip.overwritePosition) {
-      this.alignItems = 'flex-start'
-      this.justifyContent = 'flex-start'
       const { dialog, arrow } = tip.overwritePosition
       const { top: dialogTop, left: dialogLeft } = dialog
       const {
@@ -216,38 +210,33 @@ export class QuickTourComponent {
      * default behaviour: center
      * overwrite if align keywords appear
      */
-    this.alignItems = 'center'
-    this.justifyContent = 'center'
 
     if (usePosition.includes('top')) {
       translate.y = hostY
-      this.alignItems = 'flex-end'
     }
     if (usePosition.includes('bottom')) {
       translate.y = hostY + hostHeight
-      this.alignItems = 'flex-start'
     }
     if (usePosition.includes('left')) {
       translate.x = hostCogX
-      this.justifyContent = 'flex-end'
     }
     if (usePosition.includes('right')) {
       translate.x = hostCogX
-      this.justifyContent = 'flex-start'
     }
-
-    this.transform = this.sanitizer.sanitize(
-      SecurityContext.STYLE,
-      `translate(0px, 0px)`
-    )
 
     /**
      * set tour card transform
      * set a given margin, so 
      */
+    const { width: cmpWidth, height: cmpHeight } = this.quickTourDialog
+      ? (this.quickTourDialog.nativeElement as HTMLElement).getBoundingClientRect()
+      : {} as any
+
     const tourCardMargin = QuickTourComponent.TourCardMargin
-    const tourCardWidth = QuickTourComponent.TourCardWidthPx
-    const tourCardHeight = QuickTourComponent.TourCardHeightPx
+    const tourCardWidth = cmpWidth || QuickTourComponent.TourCardWidthPx
+    const tourCardHeight = cmpHeight || QuickTourComponent.TourCardHeightPx
+    const tourCardWindowMargin = QuickTourComponent.TourCardWindowMargin
+
     /**
      * catch if element is off screen
      * clamp it inside the viewport
@@ -257,17 +246,28 @@ export class QuickTourComponent {
       clamp(translate.y, 0, innerHeight),
     ]
     if (usePosition.includes('top')) {
-      tourCardTranslate[1] += -1 * tourCardMargin
+      tourCardTranslate[1] += -1 * tourCardMargin - tourCardHeight
     }
     if (usePosition.includes('bottom')) {
       tourCardTranslate[1] += tourCardMargin
     }
     if (usePosition.includes('left')) {
-      tourCardTranslate[0] += -1 * tourCardMargin
+      tourCardTranslate[0] += -1 * tourCardMargin - tourCardWidth
     }
     if (usePosition.includes('right')) {
       tourCardTranslate[0] += tourCardMargin
     }
+    tourCardTranslate[0] = clamp(
+      tourCardTranslate[0],
+      tourCardWindowMargin,
+      innerWidth - tourCardWidth - tourCardWindowMargin
+    )
+
+    tourCardTranslate[1] = clamp(
+      tourCardTranslate[1],
+      tourCardWindowMargin,
+      innerHeight - tourCardHeight - tourCardWindowMargin
+    )
     this.tourCardTransform = `translate(${tourCardTranslate[0]}px, ${tourCardTranslate[1]}px)`
 
     /**

@@ -3,7 +3,8 @@
     [iav-window-resize-time]="64"
     (iav-window-resize-event)="handleWindowResize()"
     [style.width]="tourCardWidth"
-    [style.transform]="tourCardTransform">
+    [style.transform]="tourCardTransform"
+    #quickTourDialog>
     <mat-card-content>
         {{ description$ | async }}
     </mat-card-content>
