@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { combineLatest, Subscription } from "rxjs";
 import { QuickTourService } from "../quickTour.service";
-import { debounceTime, map, shareReplay} from "rxjs/operators";
+import { debounceTime, map, shareReplay } from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
 import { QuickTourThis } from "../quickTourThis.directive";
 import { clamp } from "src/util/generator";

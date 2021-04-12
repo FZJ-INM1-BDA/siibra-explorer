@@ -12,7 +12,7 @@ export class DoublyLinkedList<T extends object>{
   public last: IDoublyLinkedItem<T>
   private _map = new WeakMap<T, IDoublyLinkedItem<T>>()
   private _size: number = 0
-  insertAfter(element: T, predicate: (cmpObj: T) => boolean){
+  insertAfter(element: T, predicate: (cmpObj: IDoublyLinkedItem<T>) => boolean){
     if (this._map.get(element)) {
       console.warn(`element has already been added to the doublylinkedlist`)
       return
@@ -87,14 +87,14 @@ export class DoublyLinkedList<T extends object>{
   }
 }
 
-export function FindInLinkedList<T extends object>(list: DoublyLinkedList<T>, predicate: (element: T) => boolean){
+export function FindInLinkedList<T extends object>(list: DoublyLinkedList<T>, predicate: (element: IDoublyLinkedItem<T>) => boolean){
   let compareObj = list.first,
     returnObj: IDoublyLinkedItem<T> = null
 
   if (!compareObj) return null
 
   do {
-    if (predicate(compareObj.thisObj)) {
+    if (predicate(compareObj)) {
       returnObj = compareObj
       break
     }

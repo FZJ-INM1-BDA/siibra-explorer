@@ -46,10 +46,15 @@ export class QuickTourService {
   }
 
   public register(dir: QuickTourThis) {
-    
     this.slides.insertAfter(
       dir,
-      tourObj => tourObj.order < dir.order
+      linkedItem => {
+        const nextItem = linkedItem.next
+        if (nextItem && nextItem.thisObj.order < dir.order) {
+          return false
+        }
+        return linkedItem.thisObj.order < dir.order
+      }
     )
   }
 
