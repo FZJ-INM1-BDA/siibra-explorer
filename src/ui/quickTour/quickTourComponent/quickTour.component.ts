@@ -40,8 +40,8 @@ export class QuickTourComponent {
     }
   }
 
-  public tourCardTransform = `translate(0px, 0px)`
-  public customArrowTransform = `translate(0px, 0px)`
+  public tourCardTransform = `translate(-500px, -500px)`
+  public customArrowTransform = `translate(-500px, -500px)`
 
   public arrowFrom: [number, number] = [0, 0]
   public arrowTo: [number, number] = [0, 0]

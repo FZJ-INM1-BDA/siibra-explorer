@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, of, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
@@ -12,7 +12,8 @@ import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import { TSupportedViewer } from "../constants";
-import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
+import { MatDrawer } from "@angular/material/sidenav";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -244,6 +245,21 @@ export class ViewerCmp implements OnDestroy {
       id
         ? uiActionHideDatasetWithId({ id })
         : uiActionHideAllDatasets()
+    )
+  }
+
+  @ViewChild('regionSelRef', { read: ElementRef })
+  regionSelRef: ElementRef<any>
+
+  @ViewChild('regionSearchQuickTour', { read: QuickTourThis })
+  regionSearchQuickTour: QuickTourThis
+
+  @ViewChild('matDrawerLeft', { read: MatDrawer })
+  matDrawerLeft: MatDrawer
+
+  handleSideNavAnimationDone(sideNavExpanded: boolean) {
+    this.regionSearchQuickTour?.attachTo(
+      !sideNavExpanded ? null : this.regionSelRef
     )
   }
 }

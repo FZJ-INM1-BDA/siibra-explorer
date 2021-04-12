@@ -23,10 +23,11 @@
       [opened]="sideNavTopSwitch.switchState"
       [autoFocus]="false"
       [disableClose]="true"
+      (openedChange)="handleSideNavAnimationDone($event)"
       #matDrawerTop="matDrawer">
 
       <div class="h-0 w-100 region-text-search-autocomplete-position">
-        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true, visible: matDrawerTop.opened }">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
         </ng-container>
       </div>
 
@@ -65,7 +66,11 @@
 
             <div *ngIf="viewerLoaded"
               class="pe-all tab-toggle-container"
-              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle();">
+              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()"
+              quick-tour
+              [quick-tour-description]="quickTourRegionSearch.description"
+              [quick-tour-order]="quickTourRegionSearch.order"
+              #regionSearchQuickTour="quickTour">
               <ng-container *ngTemplateOutlet="tabTmpl; context: {
                 isOpen: sideNavTopSwitch.switchState,
                 regionSelected: selectedRegions$ | async,
@@ -517,16 +522,14 @@
 
 <!-- auto complete search box -->
 
-<ng-template #autocompleteTmpl let-visible="visible" let-showTour="showTour">
+<ng-template #autocompleteTmpl let-showTour="showTour">
   <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
 
-    <div class="w-100 h-100 position-absolute"
-      *ngIf="visible && showTour"
-      quick-tour
-      [quick-tour-description]="quickTourRegionSearch.description"
-      [quick-tour-order]="quickTourRegionSearch.order">
+    <div class="w-100 h-100 position-absolute pe-none"
+      *ngIf="showTour"
+      #regionSelRef>
     </div>
   </div>
 </ng-template>
