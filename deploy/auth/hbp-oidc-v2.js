@@ -17,7 +17,24 @@ const cb = (tokenset, {sub, given_name, family_name, ...rest}, done) => {
   })
 }
 
+const {
+  __DEBUG__
+} = process.env
+
 let oidcStrategy, client, pr
+
+const userScope = [
+  'openid',
+  'email',
+  'profile',
+  'collab.drive'
+]
+
+const adminScope = [
+  'offline_access',
+  'group',
+  'team'
+]
 
 const memoizedInit = () => {
   if (pr) return pr
@@ -31,7 +48,10 @@ const memoizedInit = () => {
       discoveryUrl,
       redirectUri,
       cb,
-      scope: 'openid email offline_access profile collab.drive',
+      scope: [
+        ...userScope,
+        ...(__DEBUG__ ? adminScope : []),
+      ].join(' '),
       clientConfig: {
         redirect_uris: [ redirectUri ],
         response_types: [ 'code' ]

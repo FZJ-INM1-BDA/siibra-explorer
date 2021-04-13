@@ -1,15 +1,15 @@
 const redis = require('redis')
 const { promisify } = require('util')
-const { Seafile } = require('hbp-seafile')
 const { getClient } = require('../auth/hbp-oidc-v2')
 const { jwtDecode } = require('../auth/oidc')
-const { Readable } = require('stream')
+const request = require('request')
 
 const HBP_OIDC_V2_REFRESH_TOKEN_KEY = `HBP_OIDC_V2_REFRESH_TOKEN_KEY` // only insert valid refresh token. needs to be monitored to ensure always get new refresh token(s)
 const HBP_OIDC_V2_ACCESS_TOKEN_KEY = `HBP_OIDC_V2_ACCESS_TOKEN_KEY` // only insert valid access token. if expired, get new one via refresh token, then pop & push
-const HBP_SEAFILE_TOKEN_KEY = `HBP_SEAFILE_TOKEN_KEY` // only insert valid seafile token
-const HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN = `HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN` // stringified JSON key val of above three, with time stamp
-const HBP_SEAFILE_UPDATE_KEY = `HBP_SEAFILE_UPDATE_KEY`
+const HBP_OIDC_V2_UPDATE_CHAN = `HBP_OIDC_V2_UPDATE_CHAN` // stringified JSON key val of above three, with time stamp
+const HBP_OIDC_V2_UPDATE_KEY = `HBP_OIDC_V2_UPDATE_KEY`
+const HBP_DATAPROXY_READURL = `HBP_DATAPROXY_READURL`
+const HBP_DATAPROXY_WRITEURL = `HBP_DATAPROXY_WRITEURL`
 
 const {
   __DEBUG__,
@@ -27,6 +27,9 @@ const {
 
   REDIS_USERNAME,
   REDIS_PASSWORD,
+
+  DATA_PROXY_URL,
+  DATA_PROXY_BUCKETNAME,
 
 } = process.env
 
@@ -61,6 +64,18 @@ function log(message){
     }
     process.stdout.write(`\n`)
   }
+}
+
+
+function _checkValid(urlString){
+  log({
+    breakpoint: '_checkValid',
+    payload: urlString
+  })
+  if (!urlString) return false
+  const url = new URL(urlString)
+  const expiry = url.searchParams.get('temp_url_expires')
+  return (new Date() - new Date(expiry)) < 1e3 * 10
 }
 
 class Store {
@@ -112,9 +127,9 @@ class Store {
 
     this.redisClient.on('message', async (chan, mess) => {
       /**
-       * only liten to HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN update
+       * only liten to HBP_OIDC_V2_UPDATE_CHAN update
        */
-      if (chan === HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN) {
+      if (chan === HBP_OIDC_V2_UPDATE_CHAN) {
         try {
           const { pending, update } = JSON.parse(mess)
           this.pending = pending
@@ -127,7 +142,7 @@ class Store {
             }
           }
         } catch (e) {
-          console.error(`[saneUrl][store.js] parse message HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN error`)
+          console.error(`[saneUrl][store.js] parse message HBP_OIDC_V2_UPDATE_CHAN error`)
         }
       }
     })
@@ -146,13 +161,9 @@ class Store {
     this.keys = {
       [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: (await this.redisUtil.asyncGet(HBP_OIDC_V2_REFRESH_TOKEN_KEY)) || HBP_V2_REFRESH_TOKEN,
       [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: (await this.redisUtil.asyncGet(HBP_OIDC_V2_ACCESS_TOKEN_KEY)) || HBP_V2_ACCESS_TOKEN,
-      [HBP_SEAFILE_TOKEN_KEY]: await this.redisUtil.asyncGet(HBP_SEAFILE_TOKEN_KEY),
+      [HBP_DATAPROXY_READURL]: await this.redisUtil.asyncGet(HBP_DATAPROXY_READURL),
+      [HBP_DATAPROXY_WRITEURL]: await this.redisUtil.asyncGet(HBP_DATAPROXY_WRITEURL),
     }
-    
-    await this.refreshSeafileHandle()
-    const repos = await this.seafileHandle.getRepos()
-    const repoToUse = repos.find(repo => repo.name === 'interactive-atlas-viewer')
-    this.seafileRepoId = repoToUse.id
     
     this.healthFlag = true
   }
@@ -164,7 +175,9 @@ class Store {
       [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken
     } = this.keys
 
-    log({ breakpoint: 'async checkExpiry', keys: this.keys, destructuredKeys: { accessToken, refreshToken } })
+    log({
+      breakpoint: 'async checkExpiry',
+    })
 
     /**
      * if access token is absent
@@ -177,9 +190,13 @@ class Store {
     const { exp: refreshExp } = jwtDecode(refreshToken)
     const { exp: accessExp } = jwtDecode(accessToken)
 
-    const now = new Date()
+    const now = new Date().getTime() / 1000
 
-    if (now < refreshExp && now > accessExp) {
+    if (now > refreshExp) {
+      console.warn(`[saneUrl] refresh token expired... Need a new refresh token`)
+      return false
+    }
+    if (now > accessExp) {
       console.log(`[saneUrl] access token expired. Refreshing access token...`)
       await this.doRefreshTokens()
       console.log(`[saneUrl] access token successfully refreshed...`)
@@ -190,6 +207,10 @@ class Store {
   }
 
   async doRefreshTokens(){
+
+    log({
+      breakpoint: 'doing refresh tokens'
+    })
 
     /**
      * first, check if another process/pod is currently updating
@@ -214,8 +235,8 @@ class Store {
         }
       }
     }
-    await this.redisClient.asyncSet(HBP_SEAFILE_UPDATE_KEY, JSON.stringify(payload))
-    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN, JSON.stringify(payload))
+    await this.redisClient.asyncSet(HBP_OIDC_V2_UPDATE_KEY, JSON.stringify(payload))
+    this.redisClient.publish(HBP_OIDC_V2_UPDATE_CHAN, JSON.stringify(payload))
 
     const client = await getClient()
     const tokenset = await client.refresh(this.keys[HBP_OIDC_V2_REFRESH_TOKEN_KEY])
@@ -234,7 +255,7 @@ class Store {
      */
     await this.redisUtil.asyncSet(HBP_OIDC_V2_REFRESH_TOKEN_KEY, refreshToken)
     await this.redisUtil.asyncSet(HBP_OIDC_V2_ACCESS_TOKEN_KEY, accessToken)
-    this.redisClient.publish(HBP_SEAFILE_UPDATE_KEY_PUBLISH_CHAN, JSON.stringify({
+    this.redisClient.publish(HBP_OIDC_V2_UPDATE_CHAN, JSON.stringify({
       keys: {
         [HBP_OIDC_V2_REFRESH_TOKEN_KEY]: refreshToken,
         [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken,
@@ -250,54 +271,59 @@ class Store {
     }
   }
 
-  async refreshSeafileHandle(){
-    await this.checkExpiry()
-    const {
-      [HBP_OIDC_V2_ACCESS_TOKEN_KEY]: accessToken,
-      [HBP_SEAFILE_TOKEN_KEY]: token,
-    } = this.keys
-    this.seafileHandle = Seafile.from({
-      token,
-      accessToken
+  async _getTmpUrl(permission){
+    if (permission !== 'read' && permission !== 'write') throw new Error(`permission need to be either read or write!`)
+    const method = permission === 'read'
+      ? 'GET'
+      : 'PUT'
+    log({
+      breakpoint: 'access key',
+      access: this.keys[HBP_OIDC_V2_ACCESS_TOKEN_KEY]
     })
-    if (!token) {
-      await this.seafileHandle.init()
-    }
-    return this.seafileHandle
+    const { url } = await new Promise((rs, rj) => {
+      const payload = {
+        method,
+        uri: `${DATA_PROXY_URL}/tempurl/${DATA_PROXY_BUCKETNAME}?lifetime=very_long`,
+        headers: {
+          'Authorization': `Bearer ${this.keys[HBP_OIDC_V2_ACCESS_TOKEN_KEY]}`
+        }
+      }
+      log({
+        breakpoint: '_getTmpUrl',
+        payload
+      })
+      request(payload, (err, resp, body) => {
+        if (err) return rj(err)
+        if (resp.statusCode >= 400) return rj(new Error(`${resp.statusCode}: ${resp.statusMessage}`))
+        if (resp.statusCode === 200) {
+          rs(JSON.parse(body))
+          return
+        }
+        return rj(new Error(`[saneurl] [get] unknown error`))
+      })
+    })
+
+    return url
   }
 
-  async tryGetFromSeafile(id) {
-    const getFiles = async () => {
-      return await this.seafileHandle.ls({
-        repoId: this.seafileRepoId,
-        dir: `/saneurl/`
-      })
-    }
-    let files
-    try {
-      files = await getFiles()
-    } catch (e) {
-      await this.refreshSeafileHandle()
-      files = await getFiles()
-    }
+  _getTmplTag(key, _strings, _proxyUrl, bucketName, id){
+    const defaultReturn = `${_strings[0]}${_proxyUrl}${_strings[1]}${bucketName}${_strings[2]}${id}`
+    if (!key) return defaultReturn
+    const {
+      [key]: urlOfInterest
+    } = this.keys
+    if (!urlOfInterest) return defaultReturn
+    const url = new URL(urlOfInterest)
+    url.pathname += id
+    return url
+  }
 
-    if (!files.find(f => f.name === id)) {
-      throw new NotFoundError()
-    }
+  _getWriteTmplTag(...args) {
+    return this._getTmplTag(HBP_DATAPROXY_WRITEURL, ...args)
+  }
 
-    const getFile = async () => {
-      return await this.seafileHandle.readFile({
-        dir: `/saneurl/${id}`,
-        repoId: this.seafileRepoId
-      })
-    }
-
-    try {
-      return await getFile()
-    } catch (e) {
-      this.refreshSeafileHandle()
-      return await getFile()
-    }
+  _getReadTmplTag(...args){
+    return this._getTmplTag(HBP_DATAPROXY_READURL, ...args)
   }
 
   async get(id) {
@@ -305,37 +331,85 @@ class Store {
       breakpoint: 'async get',
       id
     })
-    /**
-     * try get file from seafile
-     */
-    const returnVal = await this.tryGetFromSeafile(id)
-    log({
-      breakpoint: `asyncReturn`,
-      payload: returnVal
+    const {
+      [HBP_DATAPROXY_READURL]: readUrl
+    } = this.keys
+
+    if (!_checkValid(readUrl)) {
+      log({
+        breakpoint: 'read url not valid, getting new url'
+      })
+      const url = await this._getTmpUrl('read')
+      const payload = {
+        keys: {
+          [HBP_DATAPROXY_READURL]: url
+        }
+      }
+      this.redisClient.publish(HBP_OIDC_V2_UPDATE_CHAN, JSON.stringify(payload))
+      this.redisUtil.asyncSet(HBP_DATAPROXY_READURL, url)
+      this.keys[HBP_DATAPROXY_READURL] = url
+    }
+
+    return await new Promise((rs, rj) => {
+      request({
+        method: 'GET',
+        uri: this._getReadTmplTag`${DATA_PROXY_URL}/buckets/${DATA_PROXY_BUCKETNAME}/${encodeURIComponent(id)}`,
+      }, (err, resp, body) => {
+        if (err) return rj(err)
+        if (resp.statusCode === 404) return rj(new NotFoundError())
+        if (resp.statusCode >= 400) return rj(new Error(`${resp.statusCode}: ${resp.statusMessage}`))
+        if (resp.statusCode === 200) return rs(body)
+        return rj(new Error(`[saneurl] [get] unknown error`))
+      })
     })
-    return returnVal
   }
 
   async _set(id, value) {
-    const rs = new Readable()
-    rs.path = id
-    rs.push(value)
-    rs.push(null)
-    const uploadToSeafile = async () => {
-      await this.seafileHandle.uploadFile({
-        filename: id,
-        readStream: rs,
-      }, {
-        repoId: this.seafileRepoId,
-        dir: '/saneurl/'
+    const {
+      [HBP_DATAPROXY_WRITEURL]: writeUrl
+    } = this.keys
+
+    if (!_checkValid(writeUrl)) {
+      log({
+        breakpoint: '_set',
+        message: 'write url not valid, getting new one'
+      })
+      const url = await this._getTmpUrl('write')
+      const payload = {
+        keys: {
+          [HBP_DATAPROXY_WRITEURL]: url
+        }
+      }
+      this.redisClient.publish(HBP_OIDC_V2_UPDATE_CHAN, JSON.stringify(payload))
+      this.redisUtil.asyncSet(HBP_DATAPROXY_WRITEURL, url)
+      this.keys[HBP_DATAPROXY_WRITEURL] = url
+      log({
+        breakpoint: '_set',
+        message: 'got new write url'
       })
     }
-    try {
-      await uploadToSeafile()
-    } catch (e) {
-      await this.refreshSeafileHandle()
-      await uploadToSeafile()
-    }
+
+    await new Promise((rs, rj) => {
+      const payload = {
+        method: 'PUT',
+        uri: this._getWriteTmplTag`${DATA_PROXY_URL}/buckets/${DATA_PROXY_BUCKETNAME}/${encodeURIComponent(id)}`,
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        },
+        body: value
+      }
+      log({
+        breakpoint: 'pre set',
+        payload
+      })
+      request(payload, (err, resp, body) => {
+        if (err) return rj(err)
+        if (resp.statusCode === 404) return rj(new NotFoundError())
+        if (resp.statusCode >= 400) return rj(new Error(`${resp.statusCode}: ${resp.statusMessage}`))
+        if (resp.statusCode >= 200 && resp.statusCode < 300) return rs(body)
+        return rj(new Error(`[saneurl] [get] unknown error`))
+      })
+    })
   }
 
   async set(id, value) {

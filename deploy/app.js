@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser')
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
 const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
+const { router: saneUrlRouter, ready: saneUrlIsReady } = require('./saneUrl')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -169,10 +170,12 @@ app.get('/ready', async (req, res) => {
   const authIsReady = await authReady()
   const regionalFeatureReady = await regionalFeatureIsReady()
   const datasetReady = await datasetRouteIsReady()
+  const saneUrlReady = await saneUrlIsReady()
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
     datasetReady,
+    saneUrlReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -194,7 +197,6 @@ app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 /**
  * saneUrl end points
  */
-const saneUrlRouter = require('./saneUrl')
 app.use('/saneUrl', saneUrlRouter)
 
 const jsonMiddleware = (req, res, next) => {

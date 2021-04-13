@@ -83,7 +83,7 @@ describe('> saneUrl/index.js', () => {
 
     let server, user
     before(() => {
-      const router = require('./index')
+      const { router } = require('./index')
       const app = express()
       app.use('', (req, res, next) => {
         req.user = user
