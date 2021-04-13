@@ -166,4 +166,11 @@ router.use((_, res) => {
   res.status(405).send('Not implemneted')
 })
 
-module.exports = router
+const ready = async () => {
+  return await store.healthCheck()
+}
+
+module.exports = {
+  router,
+  ready,
+}
