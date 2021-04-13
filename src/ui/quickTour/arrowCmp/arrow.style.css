@@ -26,9 +26,10 @@ svg path
 
 #arrow_head
 {
-  width: 4rem;
+  width: 2.4rem;
   height: 4rem;
   transform-origin: 50% 0;
+  stroke-width: 3px;
 }
 
 #arrow_head #arrow_head_group

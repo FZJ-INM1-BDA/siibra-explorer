@@ -52,7 +52,7 @@ export class ArrowComponent implements OnChanges{
     this.transform = `translate(${this.fromPos[0]}px, ${this.fromPos[1]}px)`
 
     this.headTranslate = `
-      translateX(-2rem)
+      translateX(-1.2rem)
       translate(${this.toPos[0] - this.fromPos[0]}px, ${this.toPos[1] - this.fromPos[1]}px)
       rotate(${rotate})
     `
