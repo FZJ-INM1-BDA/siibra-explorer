@@ -35,7 +35,10 @@ describe('authentication', () => {
     }
   
     require.cache[require.resolve('./saneUrl')] = {
-      exports: (req, res, next) => next()
+      exports: {
+        router: (req, res, next) => next(),
+        ready: async () => true
+      } 
     }
 
     require.cache[require.resolve('./user')] = {

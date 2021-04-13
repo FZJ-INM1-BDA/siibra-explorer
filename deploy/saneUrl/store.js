@@ -315,7 +315,6 @@ class Store {
     if (!urlOfInterest) return defaultReturn
     const url = new URL(urlOfInterest)
     url.pathname += id
-    url.port = '443'
     return url
   }
 

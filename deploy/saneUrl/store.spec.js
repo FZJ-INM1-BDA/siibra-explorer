@@ -1,5 +1,10 @@
 const objStorateRootUrl = `http://fake.obj`
 process.env['OBJ_STORAGE_ROOT_URL'] = objStorateRootUrl
+const DATA_PROXY_URL = process.env['DATA_PROXY_URL'] = 'http://localhost:1234'
+const DATA_PROXY_BUCKETNAME = process.env['DATA_PROXY_BUCKETNAME'] = 'tmp_bucket'
+const tempHost = 'http://localhost:5678'
+const tempPath = '/tmpurl/'
+const tempUrl = `${tempHost}${tempPath}`
 const sinon = require('sinon')
 
 const mockClient = {
@@ -26,6 +31,25 @@ describe('> store.js', () => {
     before(() => {
       getClientStub = sinon.stub(HbpOidcv2, 'getClient').returns(Promise.resolve(mockClient))
       jwtDecodeStub = sinon.stub(OIDC, 'jwtDecode')
+      const nockedProxy = nock(DATA_PROXY_URL)
+      const queryObj = {
+        lifetime: 'very_long'
+      }
+      nockedProxy.get(`/tempurl/${DATA_PROXY_BUCKETNAME}`)
+        .query(queryObj)
+        .reply(200, {
+          url: tempUrl
+        })
+      nockedProxy.put(`/tempurl/${DATA_PROXY_BUCKETNAME}`)
+        .query(queryObj)
+        .reply(200, {
+          url: tempUrl
+        })
+
+      const nockedObjProxy = nock(tempHost)
+      nockedObjProxy
+        .get(`${tempPath}${objName}`)
+        .reply(200, objContent)
     })
 
     after(() => {
@@ -40,13 +64,11 @@ describe('> store.js', () => {
     })
 
     describe('> get', () => {
-      let tryGetFromSeafileStub,
-        doRefreshTokensStub,
+      let doRefreshTokensStub,
         initStub,
         result
       before(async () => {
         doRefreshTokensStub = sinon.stub(Store.prototype, 'doRefreshTokens').returns(Promise.resolve())
-        tryGetFromSeafileStub = sinon.stub(Store.prototype, 'tryGetFromSeafile').returns(Promise.resolve(objContent))
         initStub = sinon.stub(Store.prototype, 'init').returns(Promise.resolve())
         jwtDecodeStub.returns({
           exp: 1337
@@ -57,13 +79,8 @@ describe('> store.js', () => {
 
       after(() => {
         doRefreshTokensStub.restore()
-        tryGetFromSeafileStub.restore()
         initStub.restore()
         store.dispose()
-      })
-
-      it('> try to fetch from tryGetFromSeafile', () => {
-        expect(tryGetFromSeafileStub.called).to.be.true
       })
 
       it('> returns value is as expected', () => {
@@ -72,95 +89,29 @@ describe('> store.js', () => {
     })
 
     describe('> set', () => {
-      let initStub,
-        fakeSeafileHandle = {
-          uploadFile: sinon.stub()
-        },
-        fakeRepoId,
-        refreshSeafileHandleStub
 
       describe('> if no need to refresh', () => {
 
         before(async () => {
-          initStub = sinon.stub(Store.prototype, 'init').callsFake(async function(){
-            this.seafileHandle = fakeSeafileHandle
-            this.seafileRepoId = fakeRepoId
-            return this.seafileHandle
-          })
   
           store = new Store()
-          fakeSeafileHandle.uploadFile.returns(Promise.resolve())
-          refreshSeafileHandleStub = sinon.stub(Store.prototype, 'refreshSeafileHandle').returns(Promise.resolve())
           await store.set('key', 'value')
         })
   
         after(() => {
-          fakeSeafileHandle.uploadFile.resetHistory()
-          fakeSeafileHandle.uploadFile.resetBehavior()
-          refreshSeafileHandleStub.restore()
-          initStub.restore()
           store.dispose()
         })
   
-        it('> calls this.seafileHandle.uploadFile', () => {
-          expect(fakeSeafileHandle.uploadFile.called).to.be.true
-        })
-        it('> calls this.seafileHandle.uploadFile only once', () => {
-          expect(fakeSeafileHandle.uploadFile.calledOnce).to.be.true
-        })
-
-        it('> does not call refreshSeafileHandle', () => {
-          expect(refreshSeafileHandleStub.called).to.be.false
-        })
-
-        it('> calls this.seafileHandle.uploadFile with the correct arguments', done => {
-          const arg = fakeSeafileHandle.uploadFile.args
-          const [ arg1, arg2 ] = arg[0]
-          expect(arg2.repoId).to.equal(fakeRepoId, 'expecting repoId to match')
-          expect(arg2.dir).to.equal('/saneurl/', 'expecting path to be saneurl')
-          expect(arg1.filename).to.equal(`key`, 'not so important... expecting filename to match')
-
-          let output = ''
-          arg1.readStream.on('data', chunk => {
-            output += chunk
-          })
-          arg1.readStream.on('end', () => {
-            arg1.readStream.destroy()
-            expect(output).to.equal('value', 'expecitng value of uptload to match')
-            done()
-          })
-        })
       })
 
       describe('> if need to refresh', () => {
 
         before(async () => {
-          initStub = sinon.stub(Store.prototype, 'init').callsFake(async function(){
-            this.seafileHandle = fakeSeafileHandle
-            this.seafileRepoId = fakeRepoId
-            return this.seafileHandle
-          })
-  
-          store = new Store()
-          fakeSeafileHandle.uploadFile.onCall(0).returns(Promise.reject())
-          fakeSeafileHandle.uploadFile.onCall(1).returns(Promise.resolve())
-          refreshSeafileHandleStub = sinon.stub(Store.prototype, 'refreshSeafileHandle').returns(Promise.resolve())
           await store.set('key', 'value')
         })
   
         after(() => {
-          fakeSeafileHandle.uploadFile.resetHistory()
-          fakeSeafileHandle.uploadFile.resetBehavior()
-          refreshSeafileHandleStub.restore()
-          initStub.restore()
           store.dispose()
-        })
-        it('> calls this.seafileHandle.uploadFile twice', () => {
-          expect(fakeSeafileHandle.uploadFile.calledTwice).to.be.true
-        })
-
-        it('> calls refreshSeafileStub', () => {
-          expect(refreshSeafileHandleStub.called).to.be.true
         })
       })
     })
