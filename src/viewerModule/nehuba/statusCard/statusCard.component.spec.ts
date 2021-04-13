@@ -16,6 +16,7 @@ import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig
 import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors"
 import * as util from '../util'
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions"
+import {QuickTourModule} from "src/ui/quickTour/module";
 
 @Directive({
   selector: '[iav-auth-auth-state]',
@@ -46,6 +47,7 @@ describe('> statusCard.component.ts', () => {
           ReactiveFormsModule,
           NoopAnimationsModule,
           UtilModule,
+          QuickTourModule
         ],
         declarations: [
           StatusCardComponent,
@@ -88,13 +90,13 @@ describe('> statusCard.component.ts', () => {
       })
 
       it('> toggle can be found', () => {
-      
+
         const slider = fixture.debugElement.query( By.directive(MatSlideToggle) )
         expect(slider).toBeTruthy()
       })
-  
+
       it('> toggling voxel/real toggle also toggles statusPanelRealSpace flag', () => {
-  
+
         const prevFlag = fixture.componentInstance.statusPanelRealSpace
         const sliderEl = fixture.debugElement.query( By.directive(MatSlideToggle) )
         const slider = sliderEl.injector.get(MatSlideToggle)
@@ -102,21 +104,21 @@ describe('> statusCard.component.ts', () => {
         fixture.detectChanges()
         expect(fixture.componentInstance.statusPanelRealSpace).toEqual(!prevFlag)
       })
-  
+
       describe('> textNavigationTo', () => {
         it('> takes into account of statusPanelRealSpace panel', () => {
           const setNavigationStateSpy = jasmine.createSpy('setNavigationState')
           fixture.componentInstance.nehubaViewer = {
             setNavigationState: setNavigationStateSpy,
           } as any
-  
+
           fixture.componentInstance.statusPanelRealSpace = true
           fixture.componentInstance.textNavigateTo('1, 0, 0')
           expect(setNavigationStateSpy).toHaveBeenCalledWith({
             position: [1e6, 0, 0],
             positionReal: true
           })
-  
+
           fixture.componentInstance.statusPanelRealSpace = false
           fixture.componentInstance.textNavigateTo('1, 0, 0')
           expect(setNavigationStateSpy).toHaveBeenCalledWith({
@@ -152,9 +154,9 @@ describe('> statusCard.component.ts', () => {
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(viewerStateSelectedTemplatePureSelector, mockTemplate)
         mockStore.overrideSelector(viewerStateNavigationStateSelector, mockCurrNavigation)
-        
+
         spyOnProperty(util, 'getNavigationStateFromConfig').and.returnValue(getNavigationStateFromConfigSpy)
-        
+
         fixture = TestBed.createComponent(StatusCardComponent)
         fixture.detectChanges()
         fixture.componentInstance.showFull = true
@@ -176,7 +178,7 @@ describe('> statusCard.component.ts', () => {
             const idspatchSpy = spyOn(mockStore, 'dispatch')
             fixture.componentInstance.resetNavigation({ [method]: true,  })
             fixture.detectChanges()
-            
+
             const overrideObj = {}
             if (method === 'rotation') overrideObj['orientation'] = mockNavState['orientation']
             if (method === 'position') overrideObj['position'] = mockNavState['position']
@@ -195,7 +197,7 @@ describe('> statusCard.component.ts', () => {
         })
       }
     })
-  
-    
+
+
   })
 })

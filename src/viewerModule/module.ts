@@ -18,6 +18,7 @@ import { NehubaModule } from "./nehuba";
 import { ThreeSurferModule } from "./threeSurfer";
 import { RegionAccordionTooltipTextPipe } from "./util/regionAccordionTooltipText.pipe";
 import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
+import {QuickTourModule} from "src/ui/quickTour/module";
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
     AtlasCmptConnModule,
     ComponentsModule,
     BSFeatureModule,
+    QuickTourModule,
   ],
   declarations: [
     ViewerCmp,

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
@@ -9,7 +9,7 @@ import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMo
 import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
 import { serialiseParcellationRegion } from 'common/util'
-import { ARIA_LABELS, IDS } from 'common/constants'
+import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 
@@ -21,6 +21,7 @@ import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, ge
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { switchMapWaitFor } from "src/util/fn";
 
@@ -104,6 +105,21 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   private findPanelIndex = (panel: HTMLElement) => this.viewPanelWeakMap.get(panel)
   public nanometersToOffsetPixelsFn: Array<(...arg) => any> = []
 
+  public quickTourSliceViewSlide: IQuickTourData = {
+    order: 1,
+    description: QUICKTOUR_DESC.SLICE_VIEW,
+  }
+
+  public quickTour3dViewSlide: IQuickTourData = {
+    order: 2,
+    description: QUICKTOUR_DESC.PERSPECTIVE_VIEW,
+  }
+
+  public quickTourIconsSlide: IQuickTourData = {
+    order: 3,
+    description: QUICKTOUR_DESC.VIEW_ICONS,
+  }
+
   public customLandmarks$: Observable<any> = this.store$.pipe(
     select(viewerStateCustomLandmarkSelector),
     map(lms => lms.map(lm => ({
@@ -113,6 +129,10 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       }
     }))),
   )
+
+  ngAfterViewInit(){
+    this.setQuickTourPos()
+  }
 
   public panelOrder$ = this.store$.pipe(
     select(ngViewerSelectorPanelOrder),
@@ -197,7 +217,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       const overwritingInitState = this.navigation
         ? cvtNavigationObjToNehubaConfig(this.navigation, initialNgState)
         : {}
-      
+
       deepCopiedState.nehubaConfig.dataset.initialNgState = {
         ...initialNgState,
         ...overwritingInitState,
@@ -273,7 +293,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       const { deregister, register } = clickInterceptor
       const selOnhoverRegion = this.selectHoveredRegion.bind(this)
       register(selOnhoverRegion, { last: true })
-      this.onDestroyCb.push(() => deregister(selOnhoverRegion)) 
+      this.onDestroyCb.push(() => deregister(selOnhoverRegion))
     }
 
     /**
@@ -294,7 +314,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       /**
        * TODO smarter with event stream
        */
-      if (!viewPanels.every(v => !!v)) { 
+      if (!viewPanels.every(v => !!v)) {
         this.log.error(`on relayout, not every view panel is populated. This should not occur!`)
         return
       }
@@ -359,7 +379,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
       const newLayers = ngLayers.filter(l => this.ngLayersRegister.layers?.findIndex(ol => ol.name === l.name) < 0)
       const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayers?.findIndex(nl => nl.name === l.name) < 0)
-      
+
       if (newLayers?.length > 0) {
         const newLayersObj: any = {}
         newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
@@ -557,7 +577,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
            * TODO reenable with updated select_regions api
            */
           this.log.warn(`showSegment is temporarily disabled`)
-  
+
           // if(!this.selectedRegionIndexSet.has(labelIndex))
           //   this.store.dispatch({
           //     type : SELECT_REGIONS,
@@ -575,7 +595,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
           if (!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3)) {
             throw new Error('position needs to be a length 3 tuple of numbers ')
           }
-  
+
           this.store$.dispatch(viewerStateAddUserLandmarks({
             landmarks
           }))
@@ -590,7 +610,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
            * TODO reenable with updated select_regions api
            */
           this.log.warn(`hideSegment is temporarily disabled`)
-  
+
           // if(this.selectedRegionIndexSet.has(labelIndex)){
           //   this.store.dispatch({
           //     type :SELECT_REGIONS,
@@ -684,7 +704,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
       })
     })
     this.onDestroyCb.push(() => setupViewerApiSub.unsubscribe())
-  
+
     // listen to navigation change from store
     const navSub = this.store$.pipe(
       select(viewerStateNavigationStateSelector)
@@ -785,4 +805,28 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     )
   }
 
+  public quickTourOverwritingPos = {
+    'dialog': {
+      left: '0px',
+      top: '0px',
+    },
+    'arrow': {
+      left: '0px',
+      top: '0px',
+    }
+  }
+
+  setQuickTourPos(){
+    const { innerWidth, innerHeight } = window
+    this.quickTourOverwritingPos = {
+      'dialog': {
+        left: `${innerWidth / 2}px`,
+        top: `${innerHeight / 2}px`,
+      },
+      'arrow': {
+        left: `${innerWidth / 2 - 48}px`,
+        top: `${innerHeight / 2 - 48}px`,
+      }
+    }
+  }
 }

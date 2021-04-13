@@ -15,7 +15,7 @@
 
     <!-- sidenav-content -->
 
-    <!-- (closedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.close()"
+    <!-- (closedStart)="sideNavwFullLeftSwitch.switchState && matDrawerLeft.close()"
     (openedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.open()" -->
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
@@ -23,10 +23,11 @@
       [opened]="sideNavTopSwitch.switchState"
       [autoFocus]="false"
       [disableClose]="true"
+      (openedChange)="handleSideNavAnimationDone($event)"
       #matDrawerTop="matDrawer">
 
       <div class="h-0 w-100 region-text-search-autocomplete-position">
-        <ng-container *ngTemplateOutlet="autocompleteTmpl">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
         </ng-container>
       </div>
 
@@ -65,7 +66,11 @@
 
             <div *ngIf="viewerLoaded"
               class="pe-all tab-toggle-container"
-              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()">
+              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()"
+              quick-tour
+              [quick-tour-description]="quickTourRegionSearch.description"
+              [quick-tour-order]="quickTourRegionSearch.order"
+              #regionSearchQuickTour="quickTour">
               <ng-container *ngTemplateOutlet="tabTmpl; context: {
                 isOpen: sideNavTopSwitch.switchState,
                 regionSelected: selectedRegions$ | async,
@@ -91,7 +96,10 @@
             </top-menu-cmp>
 
             <div *ngIf="viewerLoaded"
-              class="iv-custom-comp bg card m-2 mat-elevation-z2">
+              class="iv-custom-comp bg card m-2 mat-elevation-z2"
+              quick-tour
+              [quick-tour-description]="quickTourAtlasSelector.description"
+              [quick-tour-order]="quickTourAtlasSelector.order">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -198,7 +206,10 @@
           <!-- chips -->
           <div class="flex-grow-1 flex-shrink-1 overflow-x-auto">
 
-            <mat-chip-list class="d-inline-block">
+            <mat-chip-list class="d-inline-block"
+              quick-tour
+              [quick-tour-description]="quickTourChips.description"
+              [quick-tour-order]="quickTourChips.order">
               <!-- additional layer -->
 
               <ng-container>
@@ -257,7 +268,7 @@
 
           <!-- if not supported, show not supported message -->
           <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
-          
+
           <!-- by default, show splash screen -->
           <div *ngSwitchDefault>
             <ui-splashscreen class="position-absolute left-0 top-0">
@@ -511,10 +522,15 @@
 
 <!-- auto complete search box -->
 
-<ng-template #autocompleteTmpl>
+<ng-template #autocompleteTmpl let-showTour="showTour">
   <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
+
+    <div class="w-100 h-100 position-absolute pe-none"
+      *ngIf="showTour"
+      #regionSelRef>
+    </div>
   </div>
 </ng-template>
 

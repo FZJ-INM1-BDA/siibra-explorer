@@ -42,6 +42,9 @@
 <ng-template #fullTmpl>
 
   <div class="d-flex flex-row-reverse"
+    quick-tour
+    [quick-tour-description]="quickTourData.description"
+    [quick-tour-order]="quickTourData.order"
     [iav-key-listener]="keyListenerConfig"
     (iav-key-event)="openTmplWithDialog(helperOnePager)">
 
