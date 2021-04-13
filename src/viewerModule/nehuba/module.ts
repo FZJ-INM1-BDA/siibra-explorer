@@ -25,6 +25,7 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
+import { ViewerCtrlModule } from "./viewerCtrl";
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import { WindowResizeModule } from "src/util/windowResize";
     MouseoverModule,
     ShareModule,
     WindowResizeModule,
+    ViewerCtrlModule,
 
     /**
      * should probably break this into its own...

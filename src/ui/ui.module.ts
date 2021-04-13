@@ -3,7 +3,6 @@ import { ComponentsModule } from "src/components/components.module";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
-// import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
 import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
@@ -28,7 +27,6 @@ import { DatabrowserModule } from "../atlasComponents/databrowserModule/databrow
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
-// import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
@@ -73,13 +71,10 @@ import { AtlasCmptConnModule } from "src/atlasComponents/connectivity";
     AtlasCmptConnModule,
   ],
   declarations : [
-    // NehubaContainer,
     
     CitationsContainer,
     LogoContainer,
     MobileOverlay,
-
-    // StatusCardComponent,
 
     ActionDialog,
 

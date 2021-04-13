@@ -1,0 +1,42 @@
+name: Release CI
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  check_version:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: |
+        MASTER_VERSION=$(git show origin/master:package.json | jq '.version')
+        THIS_VERSION=$(jq '.version' < package.json)
+        test "$MASTER_VERSION" == "$THIS_VERSION" && exit 1 || exit 0
+
+  check_release:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: |
+        VERSION_NUM=$(jq '.version' < package.json)
+        VERSION_NUM=${VERSION_NUM#\"}
+        VERSION_NUM=${VERSION_NUM%\"}
+        test -f docs/releases/v$VERSION_NUM.md && exit 0 || exit 1
+  
+  release_linked_mkdocs:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: |
+        VERSION_NUM=$(jq '.version' < package.json)
+        VERSION_NUM=${VERSION_NUM#\"} 
+        VERSION_NUM=${VERSION_NUM%\"} 
+        echo "VERSION_NUM: $VERSION_NUM"
+        cat mkdocs.yml
+        GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
+        echo GREP_VERSION_NUM: $GREP_VERSION_NUM
+        test -z "$GREP_VERSION_NUM" && exit 1 || exit 0

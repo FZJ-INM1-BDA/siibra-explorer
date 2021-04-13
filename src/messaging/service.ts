@@ -125,6 +125,9 @@ export class MessagingService {
   processJsonld(jsonLd: any){
     const { ['@type']: type } = jsonLd
     const fn = this.typeRegister.get(type)
+    if (!fn) {
+      return Promise.reject(`${type} does not have a handler registered.`)
+    }
     let returnValue: any = {}
     return new Promise((rs, rj) => {
 

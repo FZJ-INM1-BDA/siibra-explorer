@@ -133,12 +133,12 @@
 
     <!-- perspective specific control -->
     <ng-container *ngIf="panelIndex === 3">
-      <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: {
-        state: (nehubaViewerPerspectiveOctantRemoval$ | async),
-        disableOctantRemovalCtrl: disableOctantRemovalCtrl$ | async
-      }">
 
-      </ng-container>
+      <button mat-icon-button color="primary"
+        [matMenuTriggerFor]="viewerCtrlMenu">
+        <i class="fas fa-cog"></i>
+      </button>
+
     </ng-container>
 
     <!-- factor < 1.0 === zoom in -->
@@ -163,31 +163,15 @@
 
 </ng-template>
 
-<!-- tmpl for toggling perspective frontal octant -->
-<ng-template #perspectiveOctantRemovalTmpl
-  let-state="state"
-  let-disableOctantRemovalCtrl="disableOctantRemovalCtrl">
-  <div class="d-inline-block"
-    [matTooltip]="disableOctantRemovalCtrl?.mode !== null ? disableOctantRemovalCtrl.message : null">
-    <button
-      (click)="setOctantRemoval(!state)"
-      mat-icon-button
-      [disabled]="disableOctantRemovalCtrl?.mode !== null"
-      [attr.aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
-      color="primary">
-
-      <!-- octant removal is true -->
-      <ng-template [ngIf]="disableOctantRemovalCtrl?.mode !== null ? disableOctantRemovalCtrl.mode : state" [ngIfElse]="octantRemovalOffTmpl">
-        <i class="fas fa-eye-slash"></i>
-      </ng-template>
-
-      <!-- octant removal is false -->
-      <ng-template #octantRemovalOffTmpl>
-        <i class="fas fa-eye"></i>
-      </ng-template>
-    </button>
-  </div>
-</ng-template>
+<!-- viewer ctrl -->
+<mat-menu #viewerCtrlMenu>
+  <!-- NB must not lazy load. key listener needs to work even when component is not yet rendered -->
+  <!-- stop propagation is needed, or else click will result in dismiss of menu -->
+  <viewer-ctrl-component class="d-block m-2 ml-3 mr-3"
+    #viewerCtrlCmp="viewerCtrlCmp"
+    (click)="$event.stopPropagation()">
+  </viewer-ctrl-component>
+</mat-menu>
 
 <ng-template #sliceViewArrow>
   <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">

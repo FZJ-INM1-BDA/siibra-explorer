@@ -5,17 +5,17 @@
   "useTheme": "dark",
   "three-surfer": {
     "@context": {
-      "rootUrl": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305",
+      "rootUrl": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305",
       "fsa_fsa": "/fsaverage/fsaverage",
       "fsa_fsa6": "/fsaverage/fsaverage6",
-      "label_fsa_lh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_fsaverage.gii",
-      "label_fsa_rh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_fsaverage.gii",
-      "label_fsa6_lh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage6.gii",
-      "label_fsa6_rh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage6.gii",
-      "label_bv_hcp32k_lh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
-      "label_bv_hcp32k_rh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
-      "label_ants_hcp32k_lh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k.gii",
-      "label_ants_hcp32k_rh": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii"
+      "label_fsa_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_fsaverage.gii",
+      "label_fsa_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_fsaverage.gii",
+      "label_fsa6_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage6.gii",
+      "label_fsa6_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage6.gii",
+      "label_bv_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
+      "label_bv_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
+      "label_ants_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k.gii",
+      "label_ants_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii"
     },
     "modes": [
       {

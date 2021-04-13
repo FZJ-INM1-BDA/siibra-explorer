@@ -437,13 +437,7 @@ export interface IVIewerHandle {
   showAllSegments: () => void
   hideAllSegments: () => void
 
-  // TODO deprecate
-  segmentColourMap: Map<number, {red: number, green: number, blue: number}>
-
   getLayersSegmentColourMap: () => Map<string, Map<number, {red: number, green: number, blue: number}>>
-
-  // TODO deprecate
-  applyColourMap: (newColourMap: Map<number, {red: number, green: number, blue: number}>) => void
 
   applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red: number, green: number, blue: number}>>) => void
 

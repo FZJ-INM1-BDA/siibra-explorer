@@ -135,7 +135,8 @@
             <ng-template [ngIf]="matExpansionPanel.expanded">
               <feature-container
                 [feature]="feature"
-                [region]="region$ | async">
+                [region]="region$ | async"
+                (viewChanged)="detectChange()">
               </feature-container>
             </ng-template>
           </mat-expansion-panel>
