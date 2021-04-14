@@ -16,6 +16,7 @@ jobs:
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra-explorer/'
 
     steps:
+    - uses: actions/checkout@v2
     - name: 'Set matomo env var'
       run: |
         echo "Using github.ref: $GITHUB_REF"
@@ -45,7 +46,6 @@ jobs:
           VERSION=$(git rev-parse --short HEAD)
         fi
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-    - uses: actions/checkout@v2
     - name: 'Build docker image'
       run: |
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
