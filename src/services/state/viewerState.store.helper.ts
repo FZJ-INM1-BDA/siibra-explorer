@@ -112,7 +112,7 @@ export const viewerStateMetaReducers = [
 
 export class ViewerStateHelperEffect{
   @Effect()
-  selectParcellationWithId$: Observable<any> = this.actions$.pipe(
+  onRemoveAdditionalLayer$: Observable<any> = this.actions$.pipe(
     ofType(viewerStateRemoveAdditionalLayer.type),
     withLatestFrom(
       this.store$.pipe(
@@ -133,7 +133,8 @@ export class ViewerStateHelperEffect{
       const eligibleParcIdSet = new Set(
         tmpl.availableIn.map(p => p['@id'])
       )
-      const baseLayer = selectedAtlas['parcellations'].find(fullP => fullP['baseLayer'] && eligibleParcIdSet.has(fullP['@id']))
+      const baseLayers = selectedAtlas['parcellations'].filter(fullP => fullP['baseLayer'] && eligibleParcIdSet.has(fullP['@id']))
+      const baseLayer = baseLayers.find(layer => !!layer['@version'] && !layer['@version']['@next']) || baseLayers[0]
       return viewerStateHelperSelectParcellationWithId({ payload: baseLayer })
     })
   )
