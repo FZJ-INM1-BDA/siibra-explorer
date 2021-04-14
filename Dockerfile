@@ -59,6 +59,8 @@ COPY --from=compressor /iv ./public
 # is this even necessary any more?
 COPY --from=compressor /iv/res/json ./res
 
+RUN chown -R node:node /iav-app
+
 USER node
 RUN npm i
 
