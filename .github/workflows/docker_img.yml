@@ -20,13 +20,13 @@ jobs:
       run: |
         echo "Using github.ref: $GITHUB_REF"
 
-        echo "$BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+        echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either master or staging, using prod env..."
-          echo "MATAMO_URL=${ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+          echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
 
         else
           echo "Using dev env..."
