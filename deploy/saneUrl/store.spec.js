@@ -1,10 +1,22 @@
-const { Store } = require('./store')
+const objStorateRootUrl = `http://fake.obj`
+process.env['OBJ_STORAGE_ROOT_URL'] = objStorateRootUrl
+const DATA_PROXY_URL = process.env['DATA_PROXY_URL'] = 'http://localhost:1234'
+const DATA_PROXY_BUCKETNAME = process.env['DATA_PROXY_BUCKETNAME'] = 'tmp_bucket'
+const tempHost = 'http://localhost:5678'
+const tempPath = '/tmpurl/'
+const tempUrl = `${tempHost}${tempPath}`
 const sinon = require('sinon')
+
+const mockClient = {
+  refresh: sinon.stub()
+}
+const HbpOidcv2 = require('../auth/hbp-oidc-v2')
+const OIDC = require('../auth/oidc')
+
+const { Store } = require('./store')
 const { expect } = require("chai")
 const nock = require('nock')
 
-const fakeToken = `token-123-token`
-const objStorateRootUrl = `http://fake.obj`
 const objName = `objname`
 const objContent = `objContent`
 
@@ -12,73 +24,96 @@ describe('> store.js', () => {
   
   describe('> Store', () => {
 
-    let getTokenSpy, store
-    before(() => {
+    let store,
+      getClientStub,
+      jwtDecodeStub
 
-      getTokenSpy = sinon
-        .stub(Store.prototype, 'getToken')
-        .returns(Promise.resolve(fakeToken))
-    
-      store = new Store({ objStorateRootUrl })
+    before(() => {
+      getClientStub = sinon.stub(HbpOidcv2, 'getClient').returns(Promise.resolve(mockClient))
+      jwtDecodeStub = sinon.stub(OIDC, 'jwtDecode')
+      const nockedProxy = nock(DATA_PROXY_URL)
+      const queryObj = {
+        lifetime: 'very_long'
+      }
+      nockedProxy.get(`/tempurl/${DATA_PROXY_BUCKETNAME}`)
+        .query(queryObj)
+        .reply(200, {
+          url: tempUrl
+        })
+      nockedProxy.put(`/tempurl/${DATA_PROXY_BUCKETNAME}`)
+        .query(queryObj)
+        .reply(200, {
+          url: tempUrl
+        })
+
+      const nockedObjProxy = nock(tempHost)
+      nockedObjProxy
+        .get(`${tempPath}${objName}`)
+        .reply(200, objContent)
     })
 
     after(() => {
-      getTokenSpy.restore()
       nock.restore()
+      getClientStub.restore()
+      jwtDecodeStub.restore()
+      store.dispose()
     })
     afterEach(() => {
-      getTokenSpy.resetHistory()
+      getClientStub.resetHistory()
+      jwtDecodeStub.resetHistory()
     })
 
-    it('> spy works', async () => {
-      expect(getTokenSpy.called).to.be.true
-
-      const token = await store.getToken()
-      expect(token).to.equal(fakeToken)
-    })
-
-    it('> spy gets reset', async () => {
-      expect(getTokenSpy.notCalled).to.be.true
-    })
-
-    it('> get works', async () => {
-      const scope = nock(objStorateRootUrl)
-        .get(`/${objName}`)
-        .reply(200, objContent)
-
-      const content = await store.get(objName)
-      expect(content).to.equal(objContent)
-      expect(scope.isDone()).to.be.true
-
-    })
-
-    it('> set works', async () => {
-
-      const scope = nock(objStorateRootUrl)
-        .put(`/${objName}`)
-        .reply(200)
-
-      scope.on('request', (req, int, body) => {
-        expect(body).to.equal(objContent)
+    describe('> get', () => {
+      let doRefreshTokensStub,
+        initStub,
+        result
+      before(async () => {
+        doRefreshTokensStub = sinon.stub(Store.prototype, 'doRefreshTokens').returns(Promise.resolve())
+        initStub = sinon.stub(Store.prototype, 'init').returns(Promise.resolve())
+        jwtDecodeStub.returns({
+          exp: 1337
+        })
+        store = new Store()
+        result = await store.get(objName)
       })
 
-      await store.set(objName, objContent)
-      expect(scope.isDone()).to.be.true
+      after(() => {
+        doRefreshTokensStub.restore()
+        initStub.restore()
+        store.dispose()
+      })
+
+      it('> returns value is as expected', () => {
+        expect(result).to.equal(objContent)
+      })
     })
 
-    it('> set retries if at first fails', async () => {
-      let index = 0
-      const scope = nock(objStorateRootUrl)
-        .put(`/${objName}`)
-        .twice()
-        .reply((_uri, _reqBody, cb) => {
-          cb(null, [ index % 2 === 0 ? 401 : 200 ])
-          index ++
+    describe('> set', () => {
+
+      describe('> if no need to refresh', () => {
+
+        before(async () => {
+  
+          store = new Store()
+          await store.set('key', 'value')
         })
-      
-      await store.set(objName, objContent)
-      expect(scope.isDone()).to.be.true
-      expect(getTokenSpy.called).to.be.true
+  
+        after(() => {
+          store.dispose()
+        })
+  
+      })
+
+      describe('> if need to refresh', () => {
+
+        before(async () => {
+          await store.set('key', 'value')
+        })
+  
+        after(() => {
+          store.dispose()
+        })
+      })
     })
   })
 })

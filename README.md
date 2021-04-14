@@ -52,6 +52,7 @@ It is recommended to manage your environments with `.env` file.
 | `PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `USE_LOGO` | possible values are `hbp`, `ebrains`, `fzj` | `hbp` | `ebrains` |
+| `__DEBUG__` | debug flag | 
 
 ##### ebrains user authentication
 
@@ -115,14 +116,9 @@ It is recommended to manage your environments with `.env` file.
 
 | name | description | default | example |
 | --- | --- | --- | --- |
-| `OBJ_STORAGE_AUTH_URL` |
-| `OBJ_STORAGE_IDP_NAME` |
-| `OBJ_STORAGE_IDP_PROTO` |
-| `OBJ_STORAGE_IDP_URL` |
-| `OBJ_STORAGE_USERNAME` |
-| `OBJ_STORAGE_PASSWORD` |
-| `OBJ_STORAGE_PROJECT_ID` |
 | `OBJ_STORAGE_ROOT_URL` |
+| `HBP_V2_REFRESH_TOKEN` |
+| `HBP_V2_ACCESS_TOKEN` |
 
 ##### Test deploy denvironments
 

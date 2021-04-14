@@ -1,11 +1,13 @@
-const router = require('express').Router()
+const express = require('express')
+const router = express.Router()
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
 const { Store, NotFoundError } = require('./store')
-const bodyParser = require('body-parser')
+const { Store: DepcStore } = require('./depcObjStore')
 const { readUserData, saveUserData } = require('../user/store')
 
 const store = new Store()
+const depStore = new DepcStore()
 
 const { 
   REDIS_PROTO,
@@ -46,14 +48,27 @@ const passthrough = (_, __, next) => next()
 
 const acceptHtmlProg = /text\/html/i
 
-const getFile = async name => {
-
-  const value = await store.get(name)
-  const json = JSON.parse(value)
-  const { expiry } = json
-  if ( expiry && ((Date.now() - expiry) > 0) ) {
-    throw new NotFoundError(`File expired`)
+const getFileFromStore = async (name, store) => {
+  try {
+    const value = await store.get(name)
+    const json = JSON.parse(value)
+    const { expiry } = json
+    if ( expiry && ((Date.now() - expiry) > 0) ) {
+      return null
+    }
+  
+    return value
+  } catch (e) {
+    if (e instanceof NotFoundError) {
+      return null
+    }
+    throw e
   }
+}
+
+const getFile = async name => {
+  const value = await getFileFromStore(name, depStore)
+    || await getFileFromStore(name, store)
 
   return value
 }
@@ -66,6 +81,7 @@ router.get('/:name', async (req, res) => {
     
   try {
     const value = await getFile(name)
+    if (!value) throw new NotFoundError()
     const json = JSON.parse(value)
     const { queryString } = json
 
@@ -102,14 +118,15 @@ router.post('/:name',
   async (req, res, next) => {
     const { name } = req.params
     try {
-      await getFile(name)
+      const exist = await getFile(name)
+      if (!exist) throw new NotFoundError()
       return res.status(409).send(`filename already exists`)
     } catch (e) {
       if (e instanceof NotFoundError) return next()
       else return res.status(500).send(e)
     }
   },
-  bodyParser.json(),
+  express.json(),
   async (req, res) => {
     const { name } = req.params
     const { body, user } = req
@@ -149,4 +166,11 @@ router.use((_, res) => {
   res.status(405).send('Not implemneted')
 })
 
-module.exports = router
+const ready = async () => {
+  return await store.healthCheck()
+}
+
+module.exports = {
+  router,
+  ready,
+}

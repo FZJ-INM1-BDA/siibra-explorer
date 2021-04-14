@@ -1,6 +1,6 @@
-const router = require('express').Router()
+const express = require('express')
+const router = express.Router()
 const { readUserData, saveUserData } = require('./store')
-const bodyParser = require('body-parser')
 
 const loggedInOnlyMiddleware = (req, res, next) => {
   const { user } = req
@@ -23,15 +23,20 @@ router.get('/config', loggedInOnlyMiddleware, async (req, res) => {
   }
 })
 
-router.post('/config', loggedInOnlyMiddleware, bodyParser.json(), async (req, res) => {
-  const { user, body } = req
-  try {
-    await saveUserData(user, body)
-    res.status(200).end()
-  } catch (e) {
-    console.error(e)
-    res.status(500).send(e.toString())
+router.post(
+  '/config',
+  loggedInOnlyMiddleware,
+  express.json(),
+  async (req, res) => {
+    const { user, body } = req
+    try {
+      await saveUserData(user, body)
+      res.status(200).end()
+    } catch (e) {
+      console.error(e)
+      res.status(500).send(e.toString())
+    }
   }
-})
+)
 
 module.exports = router

@@ -1,5 +1,5 @@
 const csp = require('helmet-csp')
-const bodyParser = require('body-parser')
+const express = require('express')
 const crypto = require('crypto')
 
 let WHITE_LIST_SRC, CSP_CONNECT_SRC, SCRIPT_SRC
@@ -103,15 +103,19 @@ module.exports = (app) => {
   }))
 
   if (!CSP_REPORT_URI) {
-    app.post('/report-violation', bodyParser.json({
-      type: ['json', 'application/csp-report']
-    }), (req, res) => {
-      if (req.body) {
-        console.warn(`CSP Violation: `, req.body)
-      } else {
-        console.warn(`CSP Violation: no data received!`)
+    app.post(
+      '/report-violation',
+      express.json({
+        type: ['json', 'application/csp-report']
+      }),
+      (req, res) => {
+        if (req.body) {
+          console.warn(`CSP Violation: `, req.body)
+        } else {
+          console.warn(`CSP Violation: no data received!`)
+        }
+        res.status(204).end()
       }
-      res.status(204).end()
-    })
+    )
   }
 }
