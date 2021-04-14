@@ -20,19 +20,20 @@ jobs:
       run: |
         echo "Using github.ref: $GITHUB_REF"
 
-        echo "::set-env name=BRANCH_NAME::${GITHUB_REF#refs/heads/}"
+        echo "$BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either master or staging, using prod env..."
-          echo "::set-env name=MATAMO_URL::${{ env.MATAMO_URL_PROD }}"
-          echo "::set-env name=MATOMO_ID::${{ env.MATOMO_ID_PROD }}"
+          echo "$MATAMO_URL=${ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "$MATOMO_ID=${ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+
         else
           echo "Using dev env..."
-          echo "::set-env name=MATAMO_URL::${{ env.MATAMO_URL_DEV }}"
-          echo "::set-env name=MATOMO_ID::${{ env.MATOMO_ID_DEV }}"
+          echo "$MATAMO_URL=${{ env.MATAMO_URL_DEV }}" >> $GITHUB_ENV
+          echo "$MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
         fi
-        
+
     - name: 'Set version variable'
       run: |
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
@@ -43,7 +44,7 @@ jobs:
           echo "Using git hash"
           VERSION=$(git rev-parse --short HEAD)
         fi
-        echo "::set-env name=VERSION::${VERSION}"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
     - uses: actions/checkout@v2
     - name: 'Build docker image'
       run: |
@@ -52,11 +53,11 @@ jobs:
         docker build \
           --build-arg VERSION=$VERSION \
           --build-arg MATAMO_URL=$MATAMO_URL \
-          --build-arg MATAMO_ID=$MATAMO_URL \
+          --build-arg MATAMO_ID=$MATAMO_ID \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
-        echo "::set-env name=DOCKER_BUILT_TAG::$DOCKER_BUILT_TAG"
+        echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
     - name: 'Push to docker registry'
       run: |
