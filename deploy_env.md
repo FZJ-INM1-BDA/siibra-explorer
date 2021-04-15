@@ -30,7 +30,6 @@
 | --- | --- | --- | --- |
 | `REFRESH_TOKEN` |
 | `ACCESS_TOKEN` | **nb** as access tokens are usually short lived, this should only be set for development purposes 
-| `CACHE_DATASET_FILENAME` | | `deploy/dataset/cachedKgDataset.json` |
 | `KG_ROOT` | | `https://kg.humanbrainproject.eu/query` |
 | `KG_SEARCH_VOCAB` | | `https://schema.hbp.eu/myQuery/` |
 | `KG_DATASET_SEARCH_QUERY_NAME` | | `interactiveViewerKgQuery-v0_3` |
