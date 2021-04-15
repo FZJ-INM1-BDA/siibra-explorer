@@ -68,7 +68,11 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       const tsC = await this.tsRef.loadColormap(
         parseContext(colormap, [this.config['@context']])
       )
-      const colorIdx = tsC[0].getData()
+      
+      let colorIdx = tsC[0].getData()
+      if (tsC[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+        colorIdx = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(colorIdx)
+      }
 
       this.loadedMeshes.push({
         threeSurfer: tsM,

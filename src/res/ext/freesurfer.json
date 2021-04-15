@@ -15,9 +15,60 @@
       "label_bv_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
       "label_bv_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
       "label_ants_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k.gii",
-      "label_ants_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii"
+      "label_ants_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii",
+      "label_fsaverage6_cleaned_lh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage6_cleaned.gii",
+      "label_fsaverage_cleaned_lh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage_cleaned.gii",
+      "label_hcp32k_cleaned_lh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k_cleaned.gii",
+      "label_fsaverage6_cleaned_rh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage6_cleaned.gii",
+      "label_fsaverage_cleaned_rh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage_cleaned.gii",
+      "label_hcp32k_cleaned_rh":"https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k_cleaned.gii"
     },
     "modes": [
+      {
+        "name": "cleaned/fsaverage6/pial",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa6:/lh.pial.gii",
+            "colormap": "label_fsaverage6_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa6:/rh.pial.gii",
+            "colormap": "label_fsaverage6_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage/pial",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa:/lh.pial.gii",
+            "colormap": "label_fsaverage_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa:/rh.pial.gii",
+            "colormap": "label_fsaverage_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/hcp32k/pial",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa:/lh.pial.gii",
+            "colormap": "label_hcp32k_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa:/rh.pial.gii",
+            "colormap": "label_hcp32k_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
       {
         "name": "fsaverage/fsaverage/pial",
         "meshes": [
