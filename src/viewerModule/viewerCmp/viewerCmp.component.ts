@@ -1,6 +1,6 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
@@ -11,9 +11,10 @@ import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services
 import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
-import { TSupportedViewer } from "../constants";
+import { IViewerCmpUiState, TSupportedViewer } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
+import { ComponentStore } from "../componentStore";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -59,12 +60,16 @@ import { MatDrawer } from "@angular/material/sidenav";
       provide: REGION_OF_INTEREST,
       useFactory: (store: Store<any>) => store.pipe(
         select(viewerStateContextedSelectedRegionsSelector),
-        map(rs => rs[0] || null)
+        map(rs => {
+          if (!rs[0]) return null
+          return rs[0]
+        })
       ),
       deps: [
         Store
       ]
-    }
+    },
+    ComponentStore
   ]
 })
 
@@ -172,8 +177,24 @@ export class ViewerCmp implements OnDestroy {
 
   constructor(
     private store$: Store<any>,
+    private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: []
+      }
+    })
+
+    this.activePanelTitles$ = this.viewerCmpLocalUiStore.select(
+      state => state.sideNav.activePanelsTitle
+    ) as Observable<string[]>
+    this.subscriptions.push(
+      this.activePanelTitles$.subscribe(
+        (activePanelTitles: string[]) => this.activePanelTitles = activePanelTitles
+      )
+    )
+
     this.subscriptions.push(
       this.alwaysHideMinorPanel$.pipe(
         distinctUntilChanged(),
@@ -188,6 +209,26 @@ export class ViewerCmp implements OnDestroy {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
   }
 
+  public activePanelTitles$: Observable<string[]>
+  private activePanelTitles: string[] = []
+  handleExpansionPanelClosedEv(title: string){
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: this.activePanelTitles.filter(n => n !== title)
+      }
+    })
+  }
+  handleExpansionPanelAfterExpandEv(title: string){
+    if (this.activePanelTitles.includes(title)) return
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: [
+          ...this.activePanelTitles,
+          title
+        ]
+      }
+    })
+  }
 
   public bindFns(fns){
     return () => {

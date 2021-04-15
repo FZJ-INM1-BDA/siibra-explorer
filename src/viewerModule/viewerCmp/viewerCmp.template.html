@@ -862,8 +862,11 @@
   let-iavNgIf="iavNgIf"
   let-content="content">
   <mat-expansion-panel
+    [expanded]="activePanelTitles$ | async | arrayContains : title"
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
+    (closed)="handleExpansionPanelClosedEv(title)"
+    (afterExpand)="handleExpansionPanelAfterExpandEv(title)"
     hideToggle
     *ngIf="iavNgIf"
     #expansionPanel="matExpansionPanel">
