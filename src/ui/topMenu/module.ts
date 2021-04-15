@@ -13,6 +13,7 @@ import { KgTosModule } from "../kgtos/module";
 import { ScreenshotModule } from "../screenshot";
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
+import {UserAnnotationsModule} from "src/atlasComponents/userAnnotations";
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
     PluginModule,
     AuthModule,
     ScreenshotModule,
+    UserAnnotationsModule
   ],
   declarations: [
     TopMenuCmp

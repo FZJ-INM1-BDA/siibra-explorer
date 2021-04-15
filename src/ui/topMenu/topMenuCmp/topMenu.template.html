@@ -26,6 +26,12 @@
       </ng-container>
     </div>
 
+    <!-- user annotations -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="userAnnotationsBtnTmpl">
+      </ng-container>
+    </div>
+
     <!-- help one pager -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="helpBtnTmpl">
@@ -55,6 +61,10 @@
 
     <!-- pinned dataset -->
     <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+    </ng-container>
+
+    <!-- user annotations -->
+    <ng-container *ngTemplateOutlet="userAnnotationsBtnTmpl">
     </ng-container>
 
     <!-- help one pager -->
@@ -116,6 +126,22 @@
       iav-dynamic-mat-button-aria-label="Show pinned datasets">
 
       <i class="fas fa-thumbtack"></i>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
+<!-- User annotations btn -->
+<ng-template #userAnnotationsBtnTmpl>
+  <div class="btnWrapper"
+    (click)="bottomSheet.open(userAnnotations, {hasBackdrop: false})"
+    matTooltip="My annotations">
+    <iav-dynamic-mat-button
+      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Annotations">
+
+      <i class="fas fa-pencil-ruler"></i>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
@@ -256,4 +282,11 @@
 
     </mat-list-item>
   </mat-list>
+</ng-template>
+
+
+
+<ng-template #userAnnotations>
+  <user-annotations (close)="bottomSheet.dismiss()" style="max-width: 600px">
+  </user-annotations>
 </ng-template>

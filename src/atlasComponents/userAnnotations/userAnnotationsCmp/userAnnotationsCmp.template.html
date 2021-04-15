@@ -1,0 +1,110 @@
+<div class="w-100 d-flex justify-content-center position-relative overflow-hidden"
+     (mouseleave)="cursorOut = true" (mouseenter)="cursorOut=false"
+     [ngClass]="selecting && cursorOut? 'selecting-height' : minimized? 'minimized' : ''">
+    <div class="minimize-icon" *ngIf="!editingMode">
+        <i *ngIf="minimized" class="fas fa-plus cursor-pointer" (click)="minimized=false"></i>
+        <i *ngIf="!minimized" class="fas fa-minus cursor-pointer" (click)="minimized=true"></i>
+        <i class="ml-3 fas fa-times cursor-pointer" (click)="close.emit()"></i>
+    </div>
+    <div aria-label="user annotations viewer" class="annotation-content w-100">
+        <div class="minimize-row d-flex align-items-center" *ngIf="minimized" (click)="minimized=false">
+            {{this.annotations.length}} - Annotations
+        </div>
+
+        <div aria-label="user annotations header" class="overflow-hidden">
+            <edit-annotation [cursorOut]="cursorOut"
+                             [showOnFocus]="true"
+                             (saveAnnotation)="saveAnnotation($event)"
+                             (editingMode)="editingMode = $event"
+                             (selectingOutput)="this.selecting = $event"></edit-annotation>
+        </div>
+
+        <div *ngIf="!editingMode"
+             aria-label="user annotations list"
+             class="annotation-list d-flex flex-column overflow-auto mb-2">
+            <div *ngFor="let annotation of annotations; let i = index;"
+                      [ngClass]="expanded === i? 'selected-border' : hovering === i? 'hovering-border' : 'anno-item'"
+                      (mouseenter)="hovering = i"
+                      (mouseleave)="hovering = -1"
+                 class="p-2 pr-4 pl-4 m-2">
+                <div class="d-flex align-items-center justify-content-between"
+                     (click)="toggleAnnotationView(i)">
+                    <div class="d-flex align-items-center">
+                        <small class="mr-4"><i [ngClass]="annotation.type === 'line'? 'fas fa-slash'
+                        : annotation.type === 'bounding box'? 'far fa-square'
+                        : annotation.type === 'ellipsoid'? 'fas fa-bullseye' : 'fas fa-circle'"></i></small>
+                        <div>
+                            <div *ngIf="annotation.name">{{annotation.name}}</div>
+                            <div matCardSubtitle class="m-0" *ngIf="annotation.templateName">{{annotation.templateName}}</div>
+                            <div matCardSubtitle class="d-flex align-items-center m-0">
+                                <small class="font-italic">{{annotation.position1}}</small>
+                                <small class="font-italic" *ngIf="annotation.position2"> • {{annotation.position2}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="mr-1 ml-1" mat-icon-button
+                                aria-label="Toggle annotation view">
+                            <i class="fas" [ngClass]="expanded === i? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="expanded === i">
+                    <div *ngIf="annotation.description">{{annotation.description}}</div>
+                    <div class="d-flex align-items-center justify-content-center w-100">
+                        <button class="mr-1 ml-1" mat-icon-button
+                                aria-label="Hide annotation"
+                                [matTooltip]="annotation.annotationVisible? 'Hide' : 'Show'"
+                                (click)="toggleAnnotationVisibility(annotation.id)">
+                            <i class="far fa-circle" *ngIf="!annotation.annotationVisible"></i>
+                            <i class="fas far fa-check-circle" *ngIf="annotation.annotationVisible"></i>
+                        </button>
+                        <button class="mr-1 ml-1" mat-icon-button
+                                disabled
+                                aria-label="Export single annotation">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                        <button class="mr-1 ml-1" mat-icon-button
+                                disabled
+                                aria-label="Edit annotation">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="mr-1 ml-1" mat-icon-button
+                                aria-label="Delete annotation"
+                                (click)="removeAnnotation(annotation.id)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <mat-divider class="mt-2 mb-2"></mat-divider>
+        <div arial-label="user annotations footer" class="d-flex justify-content-between">
+            <div>
+                <button class="mr-1 ml-1" mat-icon-button
+                        disabled
+                        aria-label="Import user annotation"
+                        matTooltip="Import">
+                    <i class="fas fa-file-import"></i>
+                </button>
+                <button class="mr-1 ml-1" mat-icon-button
+                        disabled
+                        aria-label="Export user annotation"
+                        matTooltip="Export">
+                    <i class="fas fa-file-export"></i>
+                </button>
+            </div>
+            <div class="d-flex flex-column">
+                <small [ngClass]="[landmarkFilter !== 'all'? 'inactive-filter' : '']"
+                       class="cursor-pointer" (click)="landmarkFilter = 'all'">
+                    All landmarks
+                </small>
+                <small [ngClass]="[landmarkFilter !== 'current'? 'inactive-filter' : '']"
+                       class="cursor-pointer" (click)="landmarkFilter = 'current'">
+                    Current template
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
