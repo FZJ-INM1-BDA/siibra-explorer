@@ -18,6 +18,9 @@ ENV KIOSK_MODE=${KIOSK_MODE:-false}
 COPY . /iv
 WORKDIR /iv
 
+# When building in local, where node_module already exist, prebuilt binary may throw an error
+RUN rm -rf ./node_modules
+
 ARG VERSION
 ENV VERSION=${VERSION}
 
@@ -33,15 +36,6 @@ COPY --from=builder /iv/dist/aot /iv
 WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
-
-# Building doc
-FROM python:3.7 as doc-builder
-
-COPY . /iav
-WORKDIR /iav
-
-RUN pip install mkdocs mkdocs-material mdx_truly_sane_lists errandkun
-RUN mkdocs build
 
 # prod container
 FROM node:12-alpine 
@@ -61,12 +55,15 @@ COPY --from=builder /iv/deploy .
 # Copy built interactive viewer
 COPY --from=compressor /iv ./public
 
-# Copy docs
-COPY --from=doc-builder /iav/site ./docs
-
 # Copy the resources files needed to respond to queries
 # is this even necessary any more?
 COPY --from=compressor /iv/res/json ./res
+
+RUN chown -R node:node /iv-app
+
+USER node
 RUN npm i
 
+EXPOSE 3000
+ENV PORT 3000
 ENTRYPOINT [ "node", "server.js" ]
