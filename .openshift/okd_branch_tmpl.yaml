@@ -114,7 +114,7 @@ objects:
   metadata:
     labels:
       app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
-    name: siibra-explorer-branch-deploy
+    name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
   spec:
     host: siibra-explorer.apps-dev.hbp.eu
     path: /${SANITIZED_BRANCH_NAME}
