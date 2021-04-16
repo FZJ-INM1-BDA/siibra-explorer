@@ -12,7 +12,8 @@ jobs:
       MATAMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra-explorer/'
-
+      GITHUB_API_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
+      
     steps:
     - uses: actions/checkout@v2
     - name: 'Set matomo env var'
@@ -112,8 +113,14 @@ jobs:
           fi
       - name: 'Update status badge'
         if: success()
-        uses: ouzi-dev/commit-status-updater@v1.1.0
-        with:
-          statue: "success"
-          name: Deployed at OKD
-          url: https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}
+        run: |
+          curl -v \
+            -X POST \
+            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H 'accept: application/vnd.github.v3+json' \
+            ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
+            -d '{
+              "target_url":"https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}",
+              "name": "Deployed at OKD",
+              "state": "success"
+            }'
