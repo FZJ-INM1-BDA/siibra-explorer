@@ -14,22 +14,6 @@
     max-height: 400px;
 }
 
-.anno-item {
-    background: #424242;
-    box-shadow:  5px 5px 10px #383838,
-    -5px -5px 10px #4c4c4c;
-}
-.hovering-border {
-    background: linear-gradient(145deg, #3b3b3b, #474747);
-    box-shadow:  5px 5px 10px #383838,
-    -5px -5px 10px #4c4c4c;
-}
-.selected-border {
-    background: #424242;
-    box-shadow: inset 5px 5px 10px #383838,
-    inset -5px -5px 10px #4c4c4c;
-}
-
 .minimize-icon {
     position: absolute;
     top: 10px;

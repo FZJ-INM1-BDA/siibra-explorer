@@ -133,7 +133,7 @@
 <!-- User annotations btn -->
 <ng-template #userAnnotationsBtnTmpl>
   <div class="btnWrapper"
-    (click)="bottomSheet.open(userAnnotations, {hasBackdrop: false})"
+    (click)="bottomSheet.open(userAnnotations, {hasBackdrop: false, disableClose: true})"
     matTooltip="My annotations">
     <iav-dynamic-mat-button
       [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"

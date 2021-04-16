@@ -248,9 +248,11 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
     }
 
     removeLoadingAnnotation() {
-      const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations').layer
-      const annotations = annotationLayer.localAnnotations.toJSON()
-      annotationLayer.localAnnotations.restoreState(annotations.filter(a => a.id !== 'adding'))
+      const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations')?.layer
+      if (annotationLayer) {
+        const annotations = annotationLayer.localAnnotations.toJSON()
+        annotationLayer.localAnnotations.restoreState(annotations.filter(a => a.id !== 'adding'))
+      }
     }
 
     submitForm() {

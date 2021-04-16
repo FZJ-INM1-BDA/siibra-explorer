@@ -33,8 +33,11 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.viewer?.layerManager.removeManagedLayer(
-        this.viewer.layerManager.getLayerByName('user_annotations'))
+    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations')
+    if (annotationLayer) {
+      this.viewer?.layerManager.removeManagedLayer(
+          this.viewer.layerManager.getLayerByName('user_annotations'))
+    }
   }
 
   ngOnInit(): void {
@@ -142,10 +145,12 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   }
 
   removeAnnotationFromViewer(id) {
-    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations').layer
-    let annotations = annotationLayer.localAnnotations.toJSON()
-    annotations = annotations.filter(a => a.id !== id)
-    annotationLayer.localAnnotations.restoreState(annotations)
+    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations')?.layer
+    if (annotationLayer) {
+      let annotations = annotationLayer.localAnnotations.toJSON()
+      annotations = annotations.filter(a => a.id !== id)
+      annotationLayer.localAnnotations.restoreState(annotations)
+    }
   }
 
   // navigate(coord) {

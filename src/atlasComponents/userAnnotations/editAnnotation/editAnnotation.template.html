@@ -37,7 +37,8 @@
             <div class="d-flex flex-column align-items-center w-100">
                 <mat-form-field class="w-100 annotation-editing-body"
                     [ngStyle]="{border: cursorOut && selecting === 'position1'? '2px solid' : null}">
-                    <mat-label>position {{selectedType.twoCoordinates && ' 1'}} in mm (curr. voxel)</mat-label>
+                    <mat-label *ngIf="selectedType.name !== 'Ellipsoid'">position {{selectedType.twoCoordinates && ' 1'}}</mat-label>
+                    <mat-label *ngIf="selectedType.name === 'Ellipsoid'">center (vox)</mat-label>
                     <div>
                     <input type="text" name="position1"
                            placeholder="0,0,0"
@@ -45,7 +46,7 @@
                            formControlName="position1" matInput
                            (focusin)="position1Selected = false; changeSelectingPoint('position1')"
                            (focusout)="position1CursorOut()">
-                        <i *ngIf="cursorOut && selecting === 'position1'" class="fas fa-edit" style="margin-left: -20px;"></i>
+                        <i *ngIf="selecting === 'position1'" class="fas fa-crosshairs" style="margin-left: -20px;"></i>
                         <i *ngIf="position1Selected && !(cursorOut && selecting === 'position1')" class="fas fa-check-circle" style="margin-left: -20px;"></i>
                     </div>
                 </mat-form-field>
@@ -55,14 +56,15 @@
             <div class="d-flex flex-column align-items-center w-100" *ngIf="selectedType.twoCoordinates">
                 <mat-form-field class="w-100 annotation-editing-body"
                                 [ngStyle]="{border: cursorOut && selecting === 'position2'? '2px solid' : null}">
-                    <mat-label>position 2 in mm (curr. voxel)</mat-label>
+                    <mat-label *ngIf="selectedType.name !== 'Ellipsoid'">position 2 (vox)</mat-label>
+                    <mat-label *ngIf="selectedType.name === 'Ellipsoid'">radii</mat-label>
                     <input type="text" name="position2"
                            class="pr-4"
                            placeholder="0,0,0"
                            formControlName="position2" matInput
                            (focusin)="position2Selected = false; changeSelectingPoint('position2')"
                            (focusout)="position2CursorOut()">
-                    <i *ngIf="cursorOut && selecting === 'position2'" class="fas fa-edit" style="margin-left: -20px;"></i>
+                    <i *ngIf="selecting === 'position2'" class="fas fa-crosshairs" style="margin-left: -20px;"></i>
                     <i *ngIf="position2Selected && !(cursorOut && selecting === 'position2')" class="fas fa-check-circle" style="margin-left: -20px;"></i>
                 </mat-form-field>
                 <small *ngIf="cursorOut && selecting === 'position2'" style="margin-top: -20px;">selecting</small>

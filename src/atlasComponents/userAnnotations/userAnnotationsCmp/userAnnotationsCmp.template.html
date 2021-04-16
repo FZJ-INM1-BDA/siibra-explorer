@@ -23,7 +23,7 @@
              aria-label="user annotations list"
              class="annotation-list d-flex flex-column overflow-auto mb-2">
             <div *ngFor="let annotation of annotations; let i = index;"
-                      [ngClass]="expanded === i? 'selected-border' : hovering === i? 'hovering-border' : 'anno-item'"
+                      [ngClass]="expanded === i? 'mat-elevation-z6' : hovering === i? 'mat-elevation-z8' : 'mat-elevation-z2'"
                       (mouseenter)="hovering = i"
                       (mouseleave)="hovering = -1"
                  class="p-2 pr-4 pl-4 m-2">
