@@ -109,7 +109,7 @@ jobs:
           if oc get dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME; then
             # trigger redeploy if deployconfig exists already
             echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME already exist, redeploy..."
-            oc rollout latest dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
+            oc rollout latest dc/siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
           else 
             # create new app if deployconfig does not yet exist
             echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME does not yet exist, create new app..."
