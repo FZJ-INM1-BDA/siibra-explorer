@@ -1,6 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { TestBed } from "@angular/core/testing"
 import { hot } from "jasmine-marbles"
+import { PureContantService } from "src/util"
 import { AuthService } from "./auth.service"
 
 describe('>auth.service.ts', () => {
@@ -11,7 +12,13 @@ describe('>auth.service.ts', () => {
           HttpClientTestingModule
         ],
         providers: [
-          AuthService
+          AuthService,
+          {
+            provide: PureContantService,
+            useValue: {
+              backendUrl: `http://localhost:3000/`
+            }
+          }
         ]
       })
     })
