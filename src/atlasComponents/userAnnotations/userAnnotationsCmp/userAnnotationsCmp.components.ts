@@ -1,6 +1,10 @@
-import {AfterViewInit, Component, EventEmitter, Inject, OnDestroy, OnInit, Optional, Output} from "@angular/core";
-import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
-import {Store} from "@ngrx/store";
+import { Component, EventEmitter, Inject, OnDestroy, OnInit, Optional, Output} from "@angular/core";
+import { Observable, Subscription } from "rxjs";
+import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
+import { getUuid } from 'src/util/fn'
+
+const USER_ANNOTATION_LAYER_NAME = 'USER_ANNOTATION_LAYER_NAME'
+const USER_ANNOTATION_STORE_KEY = `user_landmarks_demo_1`
 
 @Component({
   selector: 'user-annotations',
@@ -9,13 +13,11 @@ import {Store} from "@ngrx/store";
 })
 export class UserAnnotationsComponent implements OnInit, OnDestroy {
 
-  public userAnnotationLayerName = 'user_annotations'
   public landmarkFilter: 'all' | 'current' = 'all'
   public cursorOut = false
   public selecting: string
   public editingMode = false
   public minimized = false
-  public nameInLocalStorage = 'user_landmarks_demo_1'
 
   public hovering = -1
   public expanded = -1
@@ -24,27 +26,32 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
 
   @Output() close: EventEmitter<any> = new EventEmitter()
 
-  constructor(@Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer,
-              private store: Store<any>) {
+  private subscription: Subscription[] = []
+  constructor(
+    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<any>
+  ) {
+    if (nehuba$) {
+      this.subscription.push(
+        nehuba$.subscribe(v => this.viewer = v)
+      )
+    }
   }
 
-  private get viewer(){
-    return this.injectedViewer || (window as any).viewer
-  }
+  private viewer: any
 
   ngOnDestroy(): void {
-    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations')
+    const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME)
     if (annotationLayer) {
       this.viewer?.layerManager.removeManagedLayer(
-          this.viewer.layerManager.getLayerByName('user_annotations'))
+          this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME))
     }
   }
 
   ngOnInit(): void {
     this.loadAnnotationLayer()
 
-    if (window.localStorage.getItem(this.nameInLocalStorage) && window.localStorage.getItem(this.nameInLocalStorage).length) {
-      const annotationsString = window.localStorage.getItem(this.nameInLocalStorage)
+    if (window.localStorage.getItem(USER_ANNOTATION_STORE_KEY) && window.localStorage.getItem(USER_ANNOTATION_STORE_KEY).length) {
+      const annotationsString = window.localStorage.getItem(USER_ANNOTATION_STORE_KEY)
       this.annotations = JSON.parse(annotationsString)
       this.annotations.filter(a => a.annotationVisible).forEach(a => this.addAnnotationOnViewer(a))
     }
@@ -64,7 +71,7 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
 
   saveAnnotation(annotation) {
     if (!annotation.id) {
-      annotation.id = this.randomId
+      annotation.id = getUuid()
     }
 
     const foundIndex = this.annotations.findIndex(x => x.id === annotation.id)
@@ -81,7 +88,7 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   }
 
   addAnnotationOnViewer(annotation) {
-    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations').layer
+    const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME).layer
     const annotations = annotationLayer.localAnnotations.toJSON()
 
     // ToDo Still some error with the logic
@@ -141,11 +148,11 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   }
 
   storeToLocalStorage() {
-    window.localStorage.setItem(this.nameInLocalStorage, JSON.stringify(this.annotations))
+    window.localStorage.setItem(USER_ANNOTATION_STORE_KEY, JSON.stringify(this.annotations))
   }
 
   removeAnnotationFromViewer(id) {
-    const annotationLayer = this.viewer.layerManager.getLayerByName('user_annotations')?.layer
+    const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME)?.layer
     if (annotationLayer) {
       let annotations = annotationLayer.localAnnotations.toJSON()
       annotations = annotations.filter(a => a.id !== id)
@@ -167,12 +174,8 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   public annotationLayerObj = {"user_annotations": {
     "type": "annotation",
     "tool": "annotateBoundingBox",
-    "name": this.userAnnotationLayerName,
+    "name": USER_ANNOTATION_LAYER_NAME,
     "annotationColor": "#ffee00",
     "annotations": [],
   }}
-
-  get randomId() {
-    return Math.random().toString(36).substr(2, 9)
-  }
 }

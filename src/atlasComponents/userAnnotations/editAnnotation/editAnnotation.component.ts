@@ -10,19 +10,20 @@ import {
   Optional,
   Output
 } from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {animate, style, transition, trigger} from "@angular/animations";
-import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
-import {Subscription} from "rxjs";
-import {filter, map} from "rxjs/operators";
-import {select, Store} from "@ngrx/store";
-import {viewerStateSelectedTemplateSelector} from "src/services/state/viewerState/selectors";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { animate, style, transition, trigger } from "@angular/animations";
+import { Observable, Subscription } from "rxjs";
+import { filter } from "rxjs/operators";
+import { select, Store } from "@ngrx/store";
+import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
+import { NEHUBA_INSTANCE_INJTKN  } from "src/viewerModule/nehuba/util";
 
 @Component({
   selector: 'edit-annotation',
   templateUrl: './editAnnotation.template.html',
   styleUrls: ['./editAnnotation.style.css'],
   animations: [
+    // doesn't do anything?
     trigger(
       'enterAnimation', [
         transition(':enter', [
@@ -75,14 +76,15 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
     get interactiveViewer() {
       return (window as any).interactiveViewer
     }
-    private get viewer(){
-      return this.injectedViewer || (window as any).viewer
-    }
 
-    constructor(private formBuilder: FormBuilder,
-                private changeDetectionRef: ChangeDetectorRef,
-                private store: Store<any>,
-                @Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer) {
+    private viewer: any
+
+    constructor(
+      private formBuilder: FormBuilder,
+      private changeDetectionRef: ChangeDetectorRef,
+      private store: Store<any>,
+      @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<any>
+    ) {
       this.annotationForm = this.formBuilder.group({
         id: [{value: null, disabled: true}],
         position1: [{value: '', disabled: this.loading}],
@@ -97,6 +99,10 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
         type: [{value: 'point'}],
         annotationVisible: [true]
       })
+
+      this.subscriptions.push(
+        nehuba$.subscribe(v => this.viewer = v)
+      )
     }
 
     ngOnInit() {
