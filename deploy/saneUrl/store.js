@@ -235,7 +235,7 @@ class Store {
         }
       }
     }
-    await this.redisClient.asyncSet(HBP_OIDC_V2_UPDATE_KEY, JSON.stringify(payload))
+    await this.redisUtil.asyncSet(HBP_OIDC_V2_UPDATE_KEY, JSON.stringify(payload))
     this.redisClient.publish(HBP_OIDC_V2_UPDATE_CHAN, JSON.stringify(payload))
 
     const client = await getClient()
