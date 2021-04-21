@@ -229,8 +229,16 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: CLICK_INTERCEPTOR_INJECTOR,
       useFactory: (clickIntService: ClickInterceptorService) => {
         return {
-          deregister: clickIntService.removeInterceptor.bind(clickIntService),
-          register: clickIntService.addInterceptor.bind(clickIntService)
+          deregister: clickIntService.deregister.bind(clickIntService),
+          register: (fn: (arg: any) => boolean, config?) => {
+            if (config?.last) {
+              clickIntService.register(fn)
+            } else {
+              clickIntService.register(fn, {
+                first: true
+              })
+            }
+          }
         } as ClickInterceptor
       },
       deps: [

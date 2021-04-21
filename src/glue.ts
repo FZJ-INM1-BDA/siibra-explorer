@@ -18,7 +18,7 @@ import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
 import { generalActionError } from "./services/stateStore.helper"
-import { TClickInterceptorConfig } from "./util/injectionTokens"
+import { RegDeregController } from "./util/regDereg.base"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -726,34 +726,13 @@ export const gluActionSetFavDataset = createAction(
   providedIn: 'root'
 })
 
-export class ClickInterceptorService{
-  private clickInterceptorStack: Function[] = []
+export class ClickInterceptorService extends RegDeregController<any, boolean>{
 
-  removeInterceptor(fn: Function) {
-    const idx = this.clickInterceptorStack.findIndex(int => int === fn)
-    if (idx < 0) {
-      console.warn(`clickInterceptorService could not remove the function. Did you pass the EXACT reference? 
-      Anonymouse functions such as () => {}  or .bind will create a new reference! 
-      You may want to assign .bind to a ref, and pass it to register and unregister functions`)
-    } else {
-      this.clickInterceptorStack.splice(idx, 1)
-    }
-  }
-  addInterceptor(fn: Function, config?: TClickInterceptorConfig) {
-    if (config?.last) {
-      this.clickInterceptorStack.push(fn)
-    } else {
-      this.clickInterceptorStack.unshift(fn)
-    }
-  }
-
-  run(ev: any){
+  callRegFns(ev: any){
     let intercepted = false
-    for (const clickInc of this.clickInterceptorStack) {
-      let runNext = false
-      clickInc(ev, () => {
-        runNext = true
-      })
+    for (const clickInc of this.callbacks) {
+      
+      const runNext = clickInc(ev)
       if (!runNext) {
         intercepted = true
         break

@@ -150,18 +150,18 @@ export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeatu
     }, [])
   )
 
-  private clickIntp(ev: any, next: Function) {
+  private clickIntp(ev: any): boolean {
     let hoveredLandmark = null
     this.regionFeatureService.onHoverLandmarks$.pipe(
       take(1)
     ).subscribe(val => {
       hoveredLandmark = val
     })
-    if (!hoveredLandmark) return next()
+    if (!hoveredLandmark) return true
     const isOne = this.landmarksLoaded.some(lm => {
       return lm['_']['electrodeId'] === hoveredLandmark['_']['electrodeId']
     })
-    if (!isOne) return next()
+    if (!isOne) return true
     this.exploreElectrode$.next(hoveredLandmark['_']['electrodeId'])
   }
 }

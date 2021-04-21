@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
@@ -11,10 +11,13 @@ import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services
 import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
-import { IViewerCmpUiState, TSupportedViewer } from "../constants";
+import { IViewerCmpUiState } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
 import { ComponentStore } from "../componentStore";
+import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
+import { getGetRegionFromLabelIndexId } from "src/util/fn";
+import { ContextMenuService } from "src/contextMenuModule";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -102,6 +105,7 @@ export class ViewerCmp implements OnDestroy {
   @Input() ismobile = false
 
   private subscriptions: Subscription[] = []
+  private onDestroyCb: (() => void)[]  = []
   public viewerLoaded: boolean = false
 
   public templateSelected$ = this.store$.pipe(
@@ -123,7 +127,7 @@ export class ViewerCmp implements OnDestroy {
     map(v => v.length > 0)
   )
 
-  public useViewer$: Observable<TSupportedViewer> = combineLatest([
+  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
     this.templateSelected$,
     this.isStandaloneVolumes$,
   ]).pipe(
@@ -175,9 +179,17 @@ export class ViewerCmp implements OnDestroy {
     map(([ regions, layers ]) => regions.length === 0 && layers.length === 0)
   )
 
+  @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
+  private viewerStatusCtxMenu: TemplateRef<any>
+
+  public context: TContextArg<TSupportedViewers>
+  private templateSelected: any
+  private getRegionFromlabelIndexId: Function
+
   constructor(
     private store$: Store<any>,
     private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
+    private viewerModuleSvc: ContextMenuService,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
     this.viewerCmpLocalUiStore.setState({
@@ -201,12 +213,70 @@ export class ViewerCmp implements OnDestroy {
         filter(flag => !flag),
       ).subscribe(() => {
         this.openSideNavs()
-      })
+      }),
+      this.viewerModuleSvc.context$.subscribe(
+        (ctx: any) => this.context = ctx
+      ),
+      this.templateSelected$.subscribe(
+        t => this.templateSelected = t
+      ),
+      this.parcellationSelected$.subscribe(
+        p => {
+          this.getRegionFromlabelIndexId = !!p
+            ? getGetRegionFromLabelIndexId({ parcellation: p })
+            : null
+        }
+      )
+    )
+  }
+
+  ngAfterViewInit(){
+    const cb = (context: TContextArg<'nehuba' | 'threeSurfer'>) => {
+      let hoveredRegions = []
+      
+      if (context.viewerType === 'nehuba') {
+        hoveredRegions = (context as TContextArg<'nehuba'>).payload.nehuba.reduce(
+          (acc, curr) => acc.concat(
+            curr.labelIndices.map(
+              lblIdx => {
+                const labelIndexId = `${curr.layerName}#${lblIdx}`
+                if (!!this.getRegionFromlabelIndexId) {
+                  return this.getRegionFromlabelIndexId({
+                    labelIndexId: `${curr.layerName}#${lblIdx}`
+                  })
+                }
+                return labelIndexId
+              }
+            )
+          ),
+          []
+        )
+      }
+
+      if (context.viewerType === 'threeSurfer') {
+        hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
+      }
+      
+      return {
+        tmpl: this.viewerStatusCtxMenu,
+        data: {
+          context,
+          metadata: {
+            template: this.templateSelected,
+            hoveredRegions
+          }
+        }
+      }
+    }
+    this.viewerModuleSvc.register(cb)
+    this.onDestroyCb.push(
+      () => this.viewerModuleSvc.deregister(cb)
     )
   }
 
   ngOnDestroy() {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
+    while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
   public activePanelTitles$: Observable<string[]>
@@ -242,6 +312,14 @@ export class ViewerCmp implements OnDestroy {
     this.store$.dispatch(
       viewerStateRemoveAdditionalLayer({
         payload: layer
+      })
+    )
+  }
+
+  public selectRoi(roi: any) {
+    this.store$.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: [ roi ]
       })
     )
   }
@@ -302,5 +380,21 @@ export class ViewerCmp implements OnDestroy {
     this.regionSearchQuickTour?.attachTo(
       !sideNavExpanded ? null : this.regionSelRef
     )
+  }
+
+  public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>){
+    switch(event.type) {
+    case EnumViewerEvt.VIEWERLOADED:
+      this.viewerLoaded = event.data
+      break
+    case EnumViewerEvt.VIEWER_CTX:
+      this.viewerModuleSvc.context$.next(event.data)
+      break
+    default:
+    }
+  }
+
+  public disposeCtxMenu(){
+    this.viewerModuleSvc.dismissCtxMenu()
   }
 }

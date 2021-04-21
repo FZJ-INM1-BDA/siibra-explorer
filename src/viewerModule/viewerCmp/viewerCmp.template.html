@@ -245,14 +245,16 @@
   <iav-layout-fourcorners>
     <div iavLayoutFourCornersContent
       class="w-100 h-100 position-absolute">
-      <div class="h-100 w-100 overflow-hidden position-relative">
+      <div class="h-100 w-100 overflow-hidden position-relative"
+        ctx-menu-host
+        [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
 
         <ng-container [ngSwitch]="useViewer$ | async">
 
           <!-- nehuba viewer -->
           <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'nehuba'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async"
             #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
@@ -261,7 +263,7 @@
           <!-- three surfer (free surfer viewer) -->
           <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'threeSurfer'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async">
           </three-surfer-glue-cmp>
@@ -1013,4 +1015,88 @@
       Select a region by clicking on the viewer or search from above
     </span>
   </div>
+</ng-template>
+
+<!-- context menu template -->
+<ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
+  <mat-card class="p-0" (iav-outsideClick)="disposeCtxMenu()">
+    <mat-card-content *ngFor="let tmplRef of tmplRefs">
+      <ng-container *ngTemplateOutlet="tmplRef.tmpl; context: { $implicit: tmplRef.data } ">
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<!-- viewer status ctx menu -->
+<ng-template #viewerStatusCtxMenu let-data>
+  <mat-list>
+
+    <!-- ref space & position -->
+    <ng-container [ngSwitch]="data.context.viewerType">
+
+      <!-- volumetric i.e. nehuba -->
+      <ng-container *ngSwitchCase="'nehuba'">
+        <mat-list-item>
+          <span mat-line>
+            {{ data.context.payload.mouse.real | nmToMm | addUnitAndJoin : '' }} (mm)
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.metadata.template.displayName || data.metadata.template.name }}
+            </span>
+          </span>
+
+          <button mat-icon-button>
+            <i class="fas fa-thumbtack"></i>
+          </button>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'threeSurfer'">
+        <mat-list-item>
+          <span mat-line>
+            face#{{ data.context.payload.faceIndex }}
+          </span>
+          <span mat-line>
+            vertices#{{ data.context.payload.vertexIndices | addUnitAndJoin : '' }}
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.context.payload.fsversion }}
+            </span>
+          </span>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        DEFAULT
+      </ng-container>
+    </ng-container>
+
+    <!-- hovered ROIs -->
+    <ng-template [ngIf]="data.metadata.hoveredRegions.length > 0">
+      <mat-divider></mat-divider>
+      
+      <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions">
+        <span mat-line>
+          {{ hoveredR.displayName || hoveredR.name }}
+        </span>
+        <span mat-line class="text-muted">
+          <i class="fas fa-brain"></i>
+          <span>
+            Brain region
+          </span>
+        </span>
+
+        <!-- lookup region -->
+        <button mat-icon-button
+          (click)="selectRoi(hoveredR)"
+          ctx-menu-dismiss>
+          <i class="fas fa-search"></i>
+        </button>
+      </mat-list-item>
+    </ng-template>
+  </mat-list>
 </ng-template>

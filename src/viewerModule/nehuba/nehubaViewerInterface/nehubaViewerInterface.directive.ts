@@ -1,7 +1,7 @@
 import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, fromEvent, asyncScheduler } from "rxjs";
+import { Subscription, Observable, fromEvent, asyncScheduler, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
 import { takeOnePipe } from "../util";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
@@ -12,7 +12,7 @@ import { LoggingService } from "src/logging";
 import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
 import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
-import { NehubaNavigationService } from "../navigation.service";
+import { INavObj, NehubaNavigationService } from "../navigation.service";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -111,6 +111,14 @@ interface IProcessedVolume{
   }
 }
 
+export type TMouseoverEvent = {
+  layer: {
+    name: string
+  },
+  segment: any | string
+  segmentId: string
+}
+
 const processStandaloneVolume: (url: string) => Promise<IProcessedVolume> = async (url: string) => {
   const protocol = determineProtocol(url)
   if (protocol === 'nifti'){
@@ -202,6 +210,15 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   public viewportToDatas: [any, any, any] = [null, null, null]
 
+  @Output('iav-nehuba-viewer-container-mouseover')
+  public mouseOverSegments = new EventEmitter<TMouseoverEvent[]>()
+
+  @Output('iav-nehuba-viewer-container-navigation')
+  public navigationEmitter = new EventEmitter<INavObj>()
+
+  @Output('iav-nehuba-viewer-container-mouse-pos')
+  public mousePosEmitter = new EventEmitter<{ voxel: number[], real: number[] }>()
+
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
@@ -279,7 +296,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
           this.nehubaViewerInstance.applyPerformanceConfig(config)
         }
       }),
-
+      this.navService.viewerNav$.subscribe(v => {
+        this.navigationEmitter.emit(v)
+      })
     )
   }
 
@@ -353,20 +372,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(
         scan(accumulatorFn, new Map()),
         map((map: Map<string, any>) => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId)),
-      ).subscribe(arrOfArr => {
-        this.store$.dispatch(
-          uiActionMouseoverSegments({
-            segments: arrOfArr.map( ([ngId, {segment, segmentId}]) => {
-              return {
-                layer: {
-                  name: ngId,
-                },
-                segment: segment || `${ngId}#${segmentId}`,
-              }
-            } )
-          })
-        )
-      }),
+      ).subscribe(val => this.handleMouseoverSegments(val)),
 
       this.nehubaViewerInstance.mouseoverLandmarkEmitter.pipe(
         distinctUntilChanged()
@@ -394,6 +400,16 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       ).subscribe((events: CustomEvent[]) => {
         [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       }),
+
+      combineLatest([
+        this.nehubaViewerInstance.mousePosInVoxel$,
+        this.nehubaViewerInstance.mousePosInReal$
+      ]).subscribe(([ voxel, real ]) => {
+        this.mousePosEmitter.emit({
+          voxel,
+          real
+        })
+      })
     )
   }
 
@@ -420,5 +436,23 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
   isReady() {
     return !!(this.cr?.instance?.nehubaViewer?.ngviewer)
+  }
+
+  handleMouseoverSegments(arrOfArr: [string, any][]) {
+    const payload = arrOfArr.map( ([ngId, {segment, segmentId}]) => {
+      return {
+        layer: {
+          name: ngId,
+        },
+        segment: segment || `${ngId}#${segmentId}`,
+        segmentId
+      }
+    })
+    this.mouseOverSegments.emit(payload)
+    this.store$.dispatch(
+      uiActionMouseoverSegments({
+        segments: payload
+      })
+    )
   }
 }

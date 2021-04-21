@@ -1,4 +1,6 @@
 import { EventEmitter } from "@angular/core";
+import { TNehubaContextInfo } from "./nehuba/types";
+import { TThreeSurferContextInfo } from "./threeSurfer/types";
 
 type TLayersColorMap = Map<string, Map<number, { red: number, green: number, blue: number }>>
 
@@ -27,22 +29,43 @@ interface IViewerCtrl {
   getLayersColourMap(): TLayersColorMap
 }
 
-type TViewerEventMOAnno = {
-  type: "MOUSEOVER_ANNOTATION"
-  data: any
+export interface IViewerCtx {
+  'nehuba': TNehubaContextInfo
+  'threeSurfer': TThreeSurferContextInfo
+}
+
+export type TContextArg<K extends keyof IViewerCtx> = ({
+  viewerType: K
+  payload: IViewerCtx[K]
+})
+
+export enum EnumViewerEvt {
+  VIEWERLOADED,
+  VIEWER_CTX,
 }
 
 type TViewerEventViewerLoaded = {
-  type: "VIEWERLOADED"
+  type: EnumViewerEvt.VIEWERLOADED
   data: boolean
 }
 
-export type TViewerEvent = TViewerEventMOAnno | TViewerEventViewerLoaded
+export type TViewerEvent<T extends keyof IViewerCtx> = TViewerEventViewerLoaded |
+  {
+    type: EnumViewerEvt.VIEWER_CTX,
+    data: TContextArg<T>
+  }
 
-export type IViewer = {
+export type TSupportedViewers = keyof IViewerCtx
+
+export interface IViewer<K extends keyof IViewerCtx> {
   
   selectedTemplate: any
   selectedParcellation: any
   viewerCtrlHandler?: IViewerCtrl
-  viewerEvent: EventEmitter<TViewerEvent>
+  viewerEvent: EventEmitter<TViewerEvent<K>>
+}
+
+export interface IGetContextInjArg {
+  register: (fn: (contextArg: TContextArg<TSupportedViewers>) => void) => void
+  deregister: (fn: (contextArg: TContextArg<TSupportedViewers>) => void) => void
 }

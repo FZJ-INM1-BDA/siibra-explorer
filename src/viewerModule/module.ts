@@ -9,6 +9,7 @@ import { BSFeatureModule, BS_DARKTHEME,  } from "src/atlasComponents/regionalFea
 import { SplashUiModule } from "src/atlasComponents/splashScreen";
 import { AtlasCmpUiSelectorsModule } from "src/atlasComponents/uiSelectors";
 import { ComponentsModule } from "src/components";
+import { ContextMenuModule } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { TopMenuModule } from "src/ui/topMenu/module";
@@ -38,6 +39,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
     ComponentsModule,
     BSFeatureModule,
     QuickTourModule,
+    ContextMenuModule,
   ],
   declarations: [
     ViewerCmp,

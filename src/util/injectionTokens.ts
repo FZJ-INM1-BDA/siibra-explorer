@@ -7,6 +7,6 @@ export type TClickInterceptorConfig = {
 }
 
 export interface ClickInterceptor{
-  register: (interceptorFunction: (ev: any, next: Function) => void, config?: TClickInterceptorConfig) => void
+  register: (interceptorFunction: (ev: any) => boolean, config?: TClickInterceptorConfig) => void
   deregister: (interceptorFunction: Function) => void
 }

@@ -15,3 +15,11 @@ export type TThreeSurferConfig = {
   ['@context']: IContext
   modes: TThreeSurferMode[]
 }
+
+export type TThreeSurferContextInfo = {
+  position: number[]
+  faceIndex: number
+  vertexIndices: number[]
+  fsversion: string
+  _mouseoverRegion?: any[]
+}

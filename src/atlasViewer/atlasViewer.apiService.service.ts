@@ -83,7 +83,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   private s: Subscription[] = []
 
-  private onMouseClick(ev: any, next){
+  private onMouseClick(ev: any): boolean{
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
 
@@ -112,10 +112,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
                 mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
               })
           }
-          return rs({
+          rs({
             type: spec.type,
             payload: mousePositionReal
           })
+          return false
         }
 
         /**
@@ -125,10 +126,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
           if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
             this.popUserRegionSelectHandler()
-            return rs({
+            rs({
               type: spec.type,
               payload: moSegments
             })
+            return false
           }
         }
       } else {
@@ -138,11 +140,12 @@ export class AtlasViewerAPIServices implements OnDestroy{
          */
         if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
           this.popUserRegionSelectHandler()
-          return rs(moSegments[0])
+          rs(moSegments[0])
+          return false
         }
       }
     }
-    next()
+    return true
   }
 
   constructor(
