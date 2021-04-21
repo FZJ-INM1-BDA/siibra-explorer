@@ -23,6 +23,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import {QuickTourModule} from "src/ui/quickTour/module";
+import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
 
 @NgModule({
@@ -37,6 +39,7 @@ import { ViewerCtrlModule } from "./viewerCtrl";
     ComponentsModule,
     MouseoverModule,
     ShareModule,
+    WindowResizeModule,
     ViewerCtrlModule,
 
     /**
@@ -48,7 +51,8 @@ import { ViewerCtrlModule } from "./viewerCtrl";
     StoreModule.forFeature(
       NEHUBA_VIEWER_FEATURE_KEY,
       reducer
-    )
+    ),
+    QuickTourModule
   ],
   declarations: [
     NehubaViewerContainerDirective,

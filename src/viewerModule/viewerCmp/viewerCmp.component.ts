@@ -1,17 +1,20 @@
-import { Component, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
-import { CONST, ARIA_LABELS } from 'common/constants'
+import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
 import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
-import { TSupportedViewer } from "../constants";
+import { IViewerCmpUiState, TSupportedViewer } from "../constants";
+import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
+import { MatDrawer } from "@angular/material/sidenav";
+import { ComponentStore } from "../componentStore";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -57,12 +60,16 @@ import { TSupportedViewer } from "../constants";
       provide: REGION_OF_INTEREST,
       useFactory: (store: Store<any>) => store.pipe(
         select(viewerStateContextedSelectedRegionsSelector),
-        map(rs => rs[0] || null)
+        map(rs => {
+          if (!rs[0]) return null
+          return rs[0]
+        })
       ),
       deps: [
         Store
       ]
-    }
+    },
+    ComponentStore
   ]
 })
 
@@ -76,6 +83,21 @@ export class ViewerCmp implements OnDestroy {
 
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
+
+  
+  public quickTourRegionSearch: IQuickTourData = {
+    order: 7,
+    description: QUICKTOUR_DESC.REGION_SEARCH,
+  }
+  public quickTourAtlasSelector: IQuickTourData = {
+    order: 0,
+    description: QUICKTOUR_DESC.ATLAS_SELECTOR,
+  }
+  public quickTourChips: IQuickTourData = {
+    order: 5,
+    description: QUICKTOUR_DESC.CHIPS,
+  }
+
 
   @Input() ismobile = false
 
@@ -155,8 +177,24 @@ export class ViewerCmp implements OnDestroy {
 
   constructor(
     private store$: Store<any>,
+    private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: []
+      }
+    })
+
+    this.activePanelTitles$ = this.viewerCmpLocalUiStore.select(
+      state => state.sideNav.activePanelsTitle
+    ) as Observable<string[]>
+    this.subscriptions.push(
+      this.activePanelTitles$.subscribe(
+        (activePanelTitles: string[]) => this.activePanelTitles = activePanelTitles
+      )
+    )
+
     this.subscriptions.push(
       this.alwaysHideMinorPanel$.pipe(
         distinctUntilChanged(),
@@ -171,6 +209,26 @@ export class ViewerCmp implements OnDestroy {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
   }
 
+  public activePanelTitles$: Observable<string[]>
+  private activePanelTitles: string[] = []
+  handleExpansionPanelClosedEv(title: string){
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: this.activePanelTitles.filter(n => n !== title)
+      }
+    })
+  }
+  handleExpansionPanelAfterExpandEv(title: string){
+    if (this.activePanelTitles.includes(title)) return
+    this.viewerCmpLocalUiStore.setState({
+      sideNav: {
+        activePanelsTitle: [
+          ...this.activePanelTitles,
+          title
+        ]
+      }
+    })
+  }
 
   public bindFns(fns){
     return () => {
@@ -179,7 +237,7 @@ export class ViewerCmp implements OnDestroy {
       }
     }
   }
-  
+
   public clearAdditionalLayer(layer: { ['@id']: string }){
     this.store$.dispatch(
       viewerStateRemoveAdditionalLayer({
@@ -195,7 +253,7 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
-  
+
   public selectParcellation(parc: any) {
     this.store$.dispatch(
       viewerStateHelperSelectParcellationWithId({
@@ -228,6 +286,21 @@ export class ViewerCmp implements OnDestroy {
       id
         ? uiActionHideDatasetWithId({ id })
         : uiActionHideAllDatasets()
+    )
+  }
+
+  @ViewChild('regionSelRef', { read: ElementRef })
+  regionSelRef: ElementRef<any>
+
+  @ViewChild('regionSearchQuickTour', { read: QuickTourThis })
+  regionSearchQuickTour: QuickTourThis
+
+  @ViewChild('matDrawerLeft', { read: MatDrawer })
+  matDrawerLeft: MatDrawer
+
+  handleSideNavAnimationDone(sideNavExpanded: boolean) {
+    this.regionSearchQuickTour?.attachTo(
+      !sideNavExpanded ? null : this.regionSelRef
     )
   }
 }

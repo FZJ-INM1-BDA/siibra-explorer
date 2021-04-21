@@ -1,4 +1,12 @@
-import { Component, OnInit, OnChanges, TemplateRef, HostBinding, Optional, Inject } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  TemplateRef,
+  HostBinding,
+  Optional,
+  Inject,
+} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
@@ -6,12 +14,13 @@ import { Observable, Subscription, of, combineLatest } from "rxjs";
 import { map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl } from "@angular/forms";
 import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -42,6 +51,11 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public mouseVal$: Observable<string>
 
   public useTouchInterface$: Observable<boolean>
+
+  public quickTourData: IQuickTourData = {
+    description: QUICKTOUR_DESC.STATUS_CARD,
+    order: 6,
+  }
 
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD

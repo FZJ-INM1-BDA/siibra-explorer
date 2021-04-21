@@ -6,6 +6,7 @@
   "three-surfer": {
     "@context": {
       "rootUrl": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305",
+      "rootUrl2": "https://neuroglancer-dev.humanbrainproject.eu/precomputed/data-repo/20210415-new-freesurfer",
       "fsa_fsa": "/fsaverage/fsaverage",
       "fsa_fsa6": "/fsaverage/fsaverage6",
       "label_fsa_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_fsaverage.gii",
@@ -15,9 +16,105 @@
       "label_bv_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
       "label_bv_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.allSub_RF_ANTs_MNI152_orig_to_hcp32k.gii",
       "label_ants_hcp32k_lh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k.gii",
-      "label_ants_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii"
+      "label_ants_hcp32k_rh": "https://neuroglancer.humanbrainproject.eu/precomputed/freesurfer/20210305/julichbrain_labels/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k.gii",
+      "label_fsaverage6_cleaned_lh":"/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage6_cleaned.gii",
+      "label_fsaverage_cleaned_lh":"/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_fsaverage_cleaned.gii",
+      "label_hcp32k_cleaned_lh":"/lh.JulichBrain_MPMAtlas_l_N10_nlin2Stdicbm152asym2009c_publicDOI_83fb39b2811305777db0eb80a0fc8b53.BV_MNI152_orig_to_hcp32k_cleaned.gii",
+      "label_fsaverage6_cleaned_rh":"/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage6_cleaned.gii",
+      "label_fsaverage_cleaned_rh":"/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_fsaverage_cleaned.gii",
+      "label_hcp32k_cleaned_rh":"/rh.JulichBrain_MPMAtlas_r_N10_nlin2Stdicbm152asym2009c_publicDOI_172e93a5bec140c111ac862268f0d046.BV_MNI152_orig_to_hcp32k_cleaned.gii"
     },
     "modes": [
+      {
+        "name": "cleaned/fsaverage6/white",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa6:/lh.white.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa6:/rh.white.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage/white",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa:/lh.white.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa:/rh.white.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage6/pial",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa6:/lh.pial.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa6:/rh.pial.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage/pial",
+        "meshes": [
+          {
+            "mesh": "rootUrl:fsa_fsa:/lh.pial.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl:fsa_fsa:/rh.pial.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage6/inflated",
+        "meshes": [
+          {
+            "mesh": "rootUrl2:/fsa6-translated-inflated/lh.inflated.surf.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl2:/fsa6-translated-inflated/rh.inflated.surf.gii",
+            "colormap": "rootUrl2:label_fsaverage6_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
+      {
+        "name": "cleaned/fsaverage/inflated",
+        "meshes": [
+          {
+            "mesh": "rootUrl2:/fsa7-translated-inflated/lh.inflated.surf.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_lh:",
+            "hemisphere": "left"
+          },
+          {
+            "mesh": "rootUrl2:/fsa7-translated-inflated/rh.inflated.surf.gii",
+            "colormap": "rootUrl2:label_fsaverage_cleaned_rh:",
+            "hemisphere": "right"
+          }
+        ]
+      },
       {
         "name": "fsaverage/fsaverage/pial",
         "meshes": [
@@ -49,20 +146,15 @@
         ]
       },
       {
-        "name": "fsaverage/fsaverage/inflated-left",
+        "name": "fsaverage/fsaverage/inflated",
         "meshes": [
           {
-            "mesh": "rootUrl:fsa_fsa:/lh.inflated.gii",
+            "mesh": "rootUrl2:/fsa7-translated-inflated/lh.inflated.surf.gii",
             "colormap": "label_fsa_lh:",
             "hemisphere": "left"
-          }
-        ]
-      },
-      {
-        "name": "fsaverage/fsaverage/inflated-right",
-        "meshes": [
+          },
           {
-            "mesh": "rootUrl:fsa_fsa:/rh.inflated.gii",
+            "mesh": "rootUrl2:/fsa7-translated-inflated/rh.inflated.surf.gii",
             "colormap": "label_fsa_rh:",
             "hemisphere": "right"
           }
@@ -99,20 +191,15 @@
         ]
       },
       {
-        "name": "fsaverage/fsaverage6/inflated-left",
+        "name": "fsaverage/fsaverage6/inflated",
         "meshes": [
           {
-            "mesh": "rootUrl:fsa_fsa6:/lh.inflated.gii",
+            "mesh": "rootUrl2:/fsa6-translated-inflated/lh.inflated.surf.gii",
             "colormap": "label_fsa6_lh:",
             "hemisphere": "left"
-          }
-        ]
-      },
-      {
-        "name": "fsaverage/fsaverage6/inflated-right",
-        "meshes": [
+          },
           {
-            "mesh": "rootUrl:fsa_fsa6:/rh.inflated.gii",
+            "mesh": "rootUrl2:/fsa6-translated-inflated/rh.inflated.surf.gii",
             "colormap": "label_fsa6_rh:",
             "hemisphere": "right"
           }

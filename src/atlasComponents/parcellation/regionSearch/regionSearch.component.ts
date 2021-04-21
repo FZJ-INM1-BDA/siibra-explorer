@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, merge } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap, withLatestFrom } from "rxjs/operators";
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
+import { CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
@@ -13,6 +13,7 @@ import { PureContantService } from "src/util";
 import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { serialiseParcellationRegion } from "common/util"
+import { actionAddToRegionsSelectionWithIds } from "src/services/state/viewerState/actions";
 
 const filterRegionBasedOnText = searchTerm => region => `${region.name.toLowerCase()}${region.status? ' (' + region.status + ')' : null}`.includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -140,10 +141,11 @@ export class RegionTextSearchAutocomplete {
         deselecRegionIds: [id],
       })
     } else {
-      this.store$.dispatch({
-        type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
-        selectRegionIds : [id],
-      })
+      this.store$.dispatch(
+        actionAddToRegionsSelectionWithIds({
+          selectRegionIds : [id],
+        })
+      )
     }
   }
 

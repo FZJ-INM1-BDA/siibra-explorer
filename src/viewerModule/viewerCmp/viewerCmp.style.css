@@ -45,3 +45,8 @@
 {
   flex-wrap: nowrap;
 }
+
+mat-drawer
+{
+  overflow-x: hidden;
+}

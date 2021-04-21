@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   Input,
   TemplateRef,
@@ -12,7 +11,8 @@ import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST } from 'common/constants'
+import { CONST, QUICKTOUR_DESC } from 'common/constants'
+import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -51,12 +51,16 @@ export class TopMenuCmp {
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
 
+  public quickTourData: IQuickTourData = {
+    description: QUICKTOUR_DESC.TOP_MENU,
+    order: 8,
+  }
+
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
-    private changeDetectionRef: ChangeDetectorRef,
   ) {
     this.user$ = this.authService.user$
 

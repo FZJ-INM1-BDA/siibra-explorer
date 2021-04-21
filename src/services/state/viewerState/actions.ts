@@ -88,7 +88,7 @@ export const viewerStateRemoveAdditionalLayer = createAction(
 
 export const viewerStateSelectRegionWithIdDeprecated = createAction(
   `[viewerState] [deprecated] selectRegionsWithId`,
-  props<{ selectRegionIds: number[] }>()
+  props<{ selectRegionIds: string[] }>()
 )
 
 export const viewerStateDblClickOnViewer = createAction(
@@ -124,4 +124,18 @@ export const viewerStateChangeNavigation = createAction(
 export const actionSetMobileUi = createAction(
   `[viewerState] setMobileUi`,
   props<{ payload: { useMobileUI: boolean } }>()
+)
+
+export const actionAddToRegionsSelectionWithIds = createAction(
+  `[viewerState] addToRegionSelectionWithIds`,
+  props<{
+    selectRegionIds: string[]
+  }>()
+)
+
+export const actionSelectLandmarks = createAction(
+  `[viewerState] selectLandmarks`,
+  props<{
+    landmarks: any[]
+  }>()
 )
