@@ -7,6 +7,7 @@ import { ComponentsModule } from "src/components"
 import { DialogService } from "src/services/dialogService.service"
 import { selectorPluginCspPermission } from "src/services/state/userConfigState.helper"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
+import { PureContantService } from "src/util"
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN } from "src/util/constants"
 import { WidgetModule, WidgetServices } from "src/widget"
 import { PluginServices } from "./atlasViewer.pluginService.service"
@@ -70,6 +71,12 @@ describe('> atlasViewer.pluginService.service.ts', () => {
             provide: DialogService,
             useValue: {
               getUserConfirm: () => Promise.resolve()
+            }
+          },
+          {
+            provide: PureContantService,
+            useValue: {
+              backendUrl: `http://localhost:3000/`
             }
           }
         ]

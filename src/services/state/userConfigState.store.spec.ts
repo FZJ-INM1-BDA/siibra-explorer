@@ -5,6 +5,7 @@ import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { from, Observable } from "rxjs"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
+import { PureContantService } from "src/util"
 import { DialogService } from "../dialogService.service"
 import { actionUpdatePluginCsp, UserConfigStateUseEffect } from "./userConfigState.store"
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "./viewerState/selectors"
@@ -28,7 +29,13 @@ describe('> userConfigState.store.spec.ts', () => {
               }
             }
           }),
-          DialogService
+          DialogService,
+          {
+            provide: PureContantService,
+            useValue: {
+              backendUrl: 'http://localhost:3000/'
+            }
+          }
         ]
       })
 
