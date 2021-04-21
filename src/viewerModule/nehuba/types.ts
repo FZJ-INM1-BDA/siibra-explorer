@@ -7,7 +7,7 @@ export type TNehubaContextInfo = {
     voxel: number[]
   }
   nehuba: {
-    layerName: string,
+    layerName: string
     labelIndices: number[]
   }[]
 }

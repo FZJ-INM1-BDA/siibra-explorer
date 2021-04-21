@@ -37,7 +37,7 @@ export class RegDeregController<T, Y = void> extends RegDereg<T, Y>{
   /**
    * Can be overwritten by inherited class
    */
-   callRegFns(arg: T) {
+  callRegFns(arg: T) {
     for (const fn of this.callbacks) {
       fn(arg)
     }

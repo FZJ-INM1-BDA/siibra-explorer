@@ -5,8 +5,8 @@ import { ReplaySubject, Subject, Subscription } from "rxjs"
 import { RegDeregController } from "src/util/regDereg.base"
 
 type TTmplRef = {
-  tmpl: TemplateRef<any>,
-  data: any,
+  tmpl: TemplateRef<any>
+  data: any
 }
 
 @Injectable({

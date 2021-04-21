@@ -114,7 +114,7 @@ interface IProcessedVolume{
 export type TMouseoverEvent = {
   layer: {
     name: string
-  },
+  }
   segment: any | string
   segmentId: string
 }

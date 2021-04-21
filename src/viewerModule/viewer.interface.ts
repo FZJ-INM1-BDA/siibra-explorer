@@ -51,7 +51,7 @@ type TViewerEventViewerLoaded = {
 
 export type TViewerEvent<T extends keyof IViewerCtx> = TViewerEventViewerLoaded |
   {
-    type: EnumViewerEvt.VIEWER_CTX,
+    type: EnumViewerEvt.VIEWER_CTX
     data: TContextArg<T>
   }
 

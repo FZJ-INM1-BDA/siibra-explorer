@@ -164,7 +164,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       mouseOverSegments,
       navigationEmitter,
       mousePosEmitter,
-     } = this.nehubaContainerDirective
+    } = this.nehubaContainerDirective
     const sub = combineLatest([
       mouseOverSegments,
       navigationEmitter,
