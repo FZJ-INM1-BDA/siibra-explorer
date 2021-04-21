@@ -12,6 +12,7 @@ import { serialiseParcellationRegion } from 'common/util'
 import { HttpClient } from "@angular/common/http";
 import { actionSetMobileUi, viewerStateNewViewer, viewerStateSelectParcellation, viewerStateSetSelectedRegions } from "./viewerState/actions";
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "./viewerState/selectors";
+import { PureContantService } from "src/util";
 
 interface ICsp{
   'connect-src'?: string[]
@@ -119,6 +120,7 @@ export class UserConfigStateUseEffect implements OnDestroy {
     private store$: Store<any>,
     private dialogService: DialogService,
     private http: HttpClient,
+    private constantSvc: PureContantService,
   ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -409,7 +411,7 @@ export class UserConfigStateUseEffect implements OnDestroy {
   public restoreSRSsFromStorage$: Observable<any>
 
   @Effect()
-  public setInitPluginPermission$ = this.http.get(`${BACKENDURL.replace(/\/+$/g, '/')}user/pluginPermissions`, {
+  public setInitPluginPermission$ = this.http.get(`${this.constantSvc.backendUrl}user/pluginPermissions`, {
     responseType: 'json'
   }).pipe(
     /**

@@ -4,7 +4,7 @@ import { Effect, Actions, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
 import { getNgIds } from 'src/util/fn';
 import { Action, select, Store, createReducer, on } from '@ngrx/store'
-import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
+import { CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
@@ -208,7 +208,7 @@ export class NgViewerUseEffect implements OnDestroy {
         distinctUntilChanged(),
         throttleTime(1000)
       ).subscribe(ngViewerState => {
-        this.http.post(`${BACKENDURL}user/config`, JSON.stringify({ ngViewerState }),  {
+        this.http.post(`${this.pureConstantService.backendUrl}user/config`, JSON.stringify({ ngViewerState }),  {
           headers: {
             'Content-type': 'application/json'
           }
@@ -216,7 +216,7 @@ export class NgViewerUseEffect implements OnDestroy {
       })
     )
 
-    this.applySavedUserConfig$ = this.http.get<TUserConfigResp>(`${BACKENDURL}user/config`).pipe(
+    this.applySavedUserConfig$ = this.http.get<TUserConfigResp>(`${this.pureConstantService.backendUrl}user/config`).pipe(
       map(json => {
         if (json.error) {
           throw new Error(json.message || 'User not loggedin.')

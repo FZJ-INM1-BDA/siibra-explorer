@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: siibra-explorer-branch-deploy
+  annotations:
+    description: "Deploy branch of siibra-explorer"
+    tags: "nodejs,siibra-explorer"
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+    labels:
+      app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+    template:
+      metadata:
+        labels:
+          app: siibra-explorer-branch-deploy
+          deploymentconfig: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+      spec:
+          containers:
+          - env:
+            - name: SESSION_SECRET
+              value: ${SESSION_SECRET}
+            - name: HOSTNAME
+              value: https://siibra-explorer.apps-dev.hbp.eu
+            - name: HOST_PATHNAME
+              value: /${SANITIZED_BRANCH_NAME}
+            - name: IAV_STAGE
+              value: ${SANITIZED_BRANCH_NAME}
+            - name: BUILD_TEXT
+              value: ${SANITIZED_BRANCH_NAME}
+            - name: SCRIPT_SRC
+              value: '["stats-dev.humanbrainproject.eu"]'
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: redis-rate-limiting-db-ephemeral
+            - name: REGIONAL_FEATURE_ENDPOINT_ARRAY
+              value: '["https://jugit.fz-juelich.de/x.gui/20201104_ieegcoord_output/-/raw/master/output/brainscape-json-left-v2.json","https://jugit.fz-juelich.de/x.gui/20201104_ieegcoord_output/-/raw/master/output/brainscape-json-right-v2.json","https://jugit.fz-juelich.de/x.gui/20201113_receptornewui/-/raw/master/output/receptor.json"]'
+            envFrom:
+            - configMapRef:
+                name: hbp-oauth-config-map
+            - configMapRef:
+                name: fluent-logging
+            - configMapRef:
+                name: plugins
+            - configMapRef:
+                name: other-deploy-config
+            - configMapRef:
+                name: obj-storage-env-var
+              prefix: OBJ_STORAGE_
+            - configMapRef:
+                name: obj-stoage-credentials
+              prefix: OBJ_STORAGE_
+
+            image: "docker-registry.ebrains.eu/siibra-explorer/siibra-explorer:${BRANCH_NAME}"
+            imagePullPolicy: Always
+            livenessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /${SANITIZED_BRANCH_NAME}/ready
+                port: 8080
+                scheme: HTTP
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /${SANITIZED_BRANCH_NAME}/ready
+                port: 8080
+                scheme: HTTP
+              initialDelaySeconds: 3
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 6
+            name: siibra-explorer-${SANITIZED_BRANCH_NAME}
+            ports:
+            - containerPort: 8080
+              protocol: TCP
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+    name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+    name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+  spec:
+    host: siibra-explorer.apps-dev.hbp.eu
+    path: /${SANITIZED_BRANCH_NAME}
+    port:
+      targetPort: 8080-tcp
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
+      weight: 100
+    wildcardPolicy: None
+
+parameters:
+- description: Session secret
+  from: '[A-Z0-9]{16}'
+  generate: expression
+  name: SESSION_SECRET
+- name: BRANCH_NAME
+  required: true
+- name: SANITIZED_BRANCH_NAME
+  required: true
+  description: |
+    A lot of routing/naming follow special rules:
+    - does not allow special characters, except for - or . .
+    - only allows lower case.
+    Strip all special characters from BRANCH_NAME, change to all lower case and pass it as SANITIZED_BRANCH_NAME
+
+labels:
+  template: siibra-explorer-branch-deploy-template
