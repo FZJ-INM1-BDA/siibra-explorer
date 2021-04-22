@@ -7,9 +7,9 @@ type TRegDeregConfig = {
  * a pattern which is observed very frequently
  */
 export class RegDereg<T, Y = void> {
-  constructor(){
 
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  constructor(){}
   public allowDuplicate = false
   protected callbacks: ((allArg: T) => Y)[] = []
   register(fn: (allArg: T) => Y, config?: TRegDeregConfig) {
