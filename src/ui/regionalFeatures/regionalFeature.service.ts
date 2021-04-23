@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
-import { forkJoin, from, Observable, of, Subject, Subscription } from "rxjs";
+import { forkJoin, from, Observable, of, Subject, Subscription, throwError } from "rxjs";
 import { catchError, map, mapTo, shareReplay, switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";
@@ -66,7 +66,7 @@ export class RegionalFeaturesService implements OnDestroy{
   )
 
   public getAllFeaturesByRegion(region: {['fullId']: string}){
-    if (!region.fullId) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
+    if (!region.fullId) return throwError(`getAllFeaturesByRegion - region does not have fullId defined`)
     const regionFullIds = getStringIdsFromRegion(region)
     const hemisphereObj = (() => {
       const hemisphere = getRegionHemisphere(region)

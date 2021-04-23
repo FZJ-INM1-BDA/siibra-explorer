@@ -1,4 +1,8 @@
 (function(exports) {
+
+  const flattenReducer = (acc, curr) => acc.concat(curr)
+  exports.flattenReducer = flattenReducer
+
   const getIdObj = fullId => {
     if (!fullId) return null
     if (typeof fullId === 'string') {
@@ -94,11 +98,17 @@
   }
 
   exports.getStringIdsFromRegion = region => {
-    const { fullId } = region
+    const { fullId, relatedAreas = [] } = region
     /**
      * other ways of getting id?
      */
-    return getIdsObj(fullId)
+    const relatedAreasId = relatedAreas
+      .map(({ fullId }) => getIdsObj(fullId))
+      .reduce(flattenReducer, [])
+    return [
+      ...getIdsObj(fullId),
+      ...relatedAreasId
+    ]
   }
 
   const defaultConfig = {
@@ -128,8 +138,6 @@
   )
 
   exports.flattenRegions = flattenRegions
-
-  exports.flattenReducer = (acc, curr) => acc.concat(curr)
 
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 

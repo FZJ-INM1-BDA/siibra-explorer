@@ -1,6 +1,6 @@
 import { EventEmitter, Input, Output, SimpleChanges } from "@angular/core"
 import { BehaviorSubject, forkJoin, Observable, of } from "rxjs"
-import { shareReplay, switchMap, tap } from "rxjs/operators"
+import { catchError, shareReplay, switchMap, tap } from "rxjs/operators"
 import { IHasId } from "src/util/interfaces"
 import { IFeature, RegionalFeaturesService } from "../../regionalFeature.service"
 
@@ -64,7 +64,11 @@ export class RegionFeatureBase{
         ? this._regionalFeatureService.getAllFeaturesByRegion(changes.region.currentValue)
         : of([])
       ).pipe(
-
+        /**
+         * region may have no fullId defined
+         * in this case, just emit []
+         */
+        catchError(() => of([]))
       ).subscribe({
         next: features => this.features = features,
         complete: () => this.isLoading = false
