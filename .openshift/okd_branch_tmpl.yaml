@@ -60,7 +60,7 @@ objects:
                 name: obj-stoage-credentials
               prefix: OBJ_STORAGE_
 
-            image: "docker-registry.ebrains.eu/siibra-explorer/siibra-explorer:${BRANCH_NAME}"
+            image: "docker-registry.ebrains.eu/siibra/siibra-explorer:${BRANCH_NAME}"
             imagePullPolicy: Always
             livenessProbe:
               failureThreshold: 3
