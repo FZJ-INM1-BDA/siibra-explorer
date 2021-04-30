@@ -11,7 +11,7 @@ jobs:
       MATOMO_ID_PROD: '12'
       MATAMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
-      DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra-explorer/'
+      DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
 
     steps:
     - uses: actions/checkout@v2
