@@ -36,10 +36,7 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription[] = []
   private onDestroyCb: (() => void )[] = []
-  constructor(
-  ) {
-  }
-
+  
   private get viewer(){
     return (window as any).viewer
   }
