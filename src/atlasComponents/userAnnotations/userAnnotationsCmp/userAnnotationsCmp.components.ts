@@ -1,9 +1,16 @@
-import { Component, EventEmitter, Inject, OnDestroy, OnInit, Optional, Output} from "@angular/core";
+import { Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
 import { Observable, Subscription } from "rxjs";
-import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
+import { distinctUntilChanged } from "rxjs/operators";
 import { getUuid } from 'src/util/fn'
 
 const USER_ANNOTATION_LAYER_NAME = 'USER_ANNOTATION_LAYER_NAME'
+const USER_ANNOTATION_LAYER_SPEC = {
+  "type": "annotation",
+  "tool": "annotateBoundingBox",
+  "name": USER_ANNOTATION_LAYER_NAME,
+  "annotationColor": "#ffee00",
+  "annotations": [],
+}
 const USER_ANNOTATION_STORE_KEY = `user_landmarks_demo_1`
 
 @Component({
@@ -23,27 +30,29 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   public expanded = -1
 
   public annotations = []
+  private hoverAnnotation$: Observable<{id: string, partIndex: number}>
 
   @Output() close: EventEmitter<any> = new EventEmitter()
 
   private subscription: Subscription[] = []
+  private onDestroyCb: (() => void )[] = []
   constructor(
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<any>
   ) {
-    if (nehuba$) {
-      this.subscription.push(
-        nehuba$.subscribe(v => this.viewer = v)
-      )
-    }
   }
 
-  private viewer: any
+  private get viewer(){
+    return (window as any).viewer
+  }
 
   ngOnDestroy(): void {
+    while(this.onDestroyCb.length) this.onDestroyCb.pop()()
+
+    if (!this.viewer) {
+      throw new Error(`this.viewer is undefined`)
+    }
     const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME)
     if (annotationLayer) {
-      this.viewer?.layerManager.removeManagedLayer(
-          this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME))
+      this.viewer.layerManager.removeManagedLayer(annotationLayer)
     }
   }
 
@@ -58,15 +67,39 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   }
 
   public loadAnnotationLayer() {
-    return Object.keys(this.annotationLayerObj)
-      .filter(key =>
-      /* if the layer exists, it will not be loaded */
-        !this.viewer?.layerManager.getLayerByName(key))
-      .map(key => {
-        this.viewer?.layerManager.addManagedLayer(
-          this.viewer.layerSpecification.getLayer(key, this.annotationLayerObj[key]))
-        return this.annotationLayerObj[key]
+    if (!this.viewer) {
+      throw new Error(`viewer is not initialised`)
+    }
+
+    const layer = this.viewer.layerSpecification.getLayer(
+      USER_ANNOTATION_LAYER_NAME,
+      USER_ANNOTATION_LAYER_SPEC
+    )
+
+    const addedLayer = this.viewer.layerManager.addManagedLayer(layer)
+    
+    this.hoverAnnotation$ = new Observable<{id: string, partIndex: number}>(obs => {
+      const mouseState = this.viewer.mouseState
+      const cb: () => void = mouseState.changed.add(() => {
+        if (mouseState.active && mouseState.pickedAnnotationLayer === addedLayer.layer.annotationLayerState.value) {
+          obs.next({
+            id: mouseState.pickedAnnotationId,
+            partIndex: mouseState.pickedOffset
+          })
+        } else {
+          obs.next(null)
+        }
       })
+      this.onDestroyCb.push(() => {
+        cb()
+        obs.complete()
+      })
+    }).pipe(
+      distinctUntilChanged((o, n) => {
+        if (o === n) return true
+        return `${o?.id || ''}${o?.partIndex || ''}` === `${n?.id || ''}${n?.partIndex || ''}`
+      })
+    )
   }
 
   saveAnnotation(annotation) {
@@ -170,12 +203,4 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
   //     })
   //   )
   // }
-
-  public annotationLayerObj = {"user_annotations": {
-    "type": "annotation",
-    "tool": "annotateBoundingBox",
-    "name": USER_ANNOTATION_LAYER_NAME,
-    "annotationColor": "#ffee00",
-    "annotations": [],
-  }}
 }
