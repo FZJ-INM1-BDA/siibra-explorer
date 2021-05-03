@@ -24,7 +24,7 @@ import {
   viewerStateNewViewer
 } from './viewerState.store.helper';
 import { cvtNehubaConfigToNavigationObj } from 'src/state';
-import { viewerStateChangeNavigation, viewerStateNehubaLayerchanged } from './viewerState/actions';
+import { actionSelectLandmarks, viewerStateChangeNavigation, viewerStateNehubaLayerchanged } from './viewerState/actions';
 import { serialiseParcellationRegion } from "common/util"
 
 export interface StateInterface {
@@ -169,7 +169,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0),
     }
   }
-  case SELECT_LANDMARKS : {
+  case actionSelectLandmarks.type: {
     return {
       ...prevState,
       landmarksSelected : action.landmarks,
@@ -250,14 +250,9 @@ export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
 
 export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 
-export const DESELECT_REGIONS = `DESELECT_REGIONS`
-export const SELECT_REGIONS = `SELECT_REGIONS`
-export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
-export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
+export const SELECT_REGIONS = viewerStateSetSelectedRegions.type
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
-
-export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
 
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
@@ -375,7 +370,7 @@ export class ViewerStateUseEffect {
         startWith([]),
       )),
       map(([{ segments }, regionsSelected]) => {
-        const selectedSet = new Set(regionsSelected.map(serialiseParcellationRegion))
+        const selectedSet = new Set<string>(regionsSelected.map(serialiseParcellationRegion))
         const toggleArr = segments.map(({ segment, layer }) => serialiseParcellationRegion({ ngId: layer.name, ...segment }))
 
         const deleteFlag = toggleArr.some(id => selectedSet.has(id))
@@ -384,10 +379,9 @@ export class ViewerStateUseEffect {
           if (deleteFlag) { selectedSet.delete(id) } else { selectedSet.add(id) }
         }
 
-        return {
-          type: SELECT_REGIONS_WITH_ID,
+        return viewerStateSelectRegionWithIdDeprecated({
           selectRegionIds: [...selectedSet],
-        }
+        })
       }),
     )
 
@@ -405,10 +399,9 @@ export class ViewerStateUseEffect {
           ? selectedSpatialDatas.filter((_, idx) => idx !== selectedIdx)
           : selectedSpatialDatas.concat(landmark)
 
-        return {
-          type: SELECT_LANDMARKS,
+        return actionSelectLandmarks({
           landmarks: newSelectedSpatialDatas,
-        }
+        })
       }),
     )
 

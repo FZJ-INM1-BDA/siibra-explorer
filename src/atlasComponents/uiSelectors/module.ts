@@ -5,6 +5,7 @@ import { UtilModule } from "src/util";
 import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 import { AtlasDropdownSelector } from "./atlasDropdown/atlasDropdown.component";
 import { AtlasLayerSelector } from "./atlasLayerSelector/atlasLayerSelector.component";
+import {QuickTourModule} from "src/ui/quickTour/module";
 
 @NgModule({
   imports: [
@@ -12,6 +13,7 @@ import { AtlasLayerSelector } from "./atlasLayerSelector/atlasLayerSelector.comp
     AngularMaterialModule,
     UtilModule,
     DatabrowserModule,
+    QuickTourModule
   ],
   declarations: [
     AtlasDropdownSelector,

@@ -77,13 +77,14 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
       return (window as any).interactiveViewer
     }
 
-    private viewer: any
+    private get viewer(){
+      return (window as any).viewer
+    }
 
     constructor(
       private formBuilder: FormBuilder,
       private changeDetectionRef: ChangeDetectorRef,
       private store: Store<any>,
-      @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<any>
     ) {
       this.annotationForm = this.formBuilder.group({
         id: [{value: null, disabled: true}],
@@ -99,10 +100,6 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
         type: [{value: 'point'}],
         annotationVisible: [true]
       })
-
-      this.subscriptions.push(
-        nehuba$.subscribe(v => this.viewer = v)
-      )
     }
 
     ngOnInit() {

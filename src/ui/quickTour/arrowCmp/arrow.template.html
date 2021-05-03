@@ -1,0 +1,56 @@
+<!-- arrow head point to top -->
+
+<svg id="arrow_head"
+  [style.transform]="headTranslate"
+  fill="none"
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg">
+  <g id="arrow_head_group">
+    <path id="arrrow_head_path" d="M.5 75.5c10-43 31-75 50-75s37 27 50 74"/></g>
+</svg>
+
+<!-- stem -->
+<ng-container [ngSwitch]="type">
+  <!-- arrow stem, bottom left top right, concave from top left -->
+  <ng-template [ngSwitchCase]="'concave-from-top'">
+    <svg id="arrow_stem"
+      [style]="stemStyle"
+      viewBox="0 0 100 100"
+      fill="none"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <path id="arrow_stem_concave_2" d="M0 0.499998C0 0.499998 26.0937 -0.22897 42 4C56.0254 7.72889 65.0753 9.44672 76 19C89.5421 30.8421 92.3854 42.6124 97 60C100.968 74.9525 100 99.5 100 99.5" />
+      </g>
+    </svg>
+
+  </ng-template>
+  <ng-template [ngSwitchCase]="'concave-from-bottom'">
+    <svg id="arrow_stem"
+      [style]="stemStyle"
+      viewBox="0 0 100 100"
+      fill="none"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <g>
+        <path id="arrow_stem_concave_2" d="M0 0.499998C0 0.499998 26.0937 -0.22897 42 4C56.0254 7.72889 65.0753 9.44672 76 19C89.5421 30.8421 92.3854 42.6124 97 60C100.968 74.9525 100 99.5 100 99.5" />
+      </g>
+    </svg>
+
+  </ng-template>
+
+  <!-- arrow stem, straight -->
+  <ng-template ngSwitchDefault>
+    <svg id="arrow_stem"
+      [style]="stemStyle"
+      viewBox="0 0 100 100"
+      fill="none"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <g id="arrow_stem_straight">
+        <path id="arrow_stem_straight_path" d="M0 0 100 100" />
+      </g>
+    </svg>
+  </ng-template>
+</ng-container>

@@ -1,6 +1,4 @@
 const { AtlasPage } = require("../util")
-const proxy = require('selenium-webdriver/proxy')
-const { ARIA_LABELS } = require('../../../common/constants')
 
 describe('> url parsing', () => {
   let iavPage
@@ -77,12 +75,19 @@ describe('> url parsing', () => {
     await iavPage.wait(5000)
     await iavPage.waitForAsync()
     const log = await iavPage.getLog()
-    const filteredLog = log.filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
+    const filteredLog = log
+      // in headless & non gpu mode, a lot of webgl warnings are thrown
+      .filter(({ level }) => level.toString() === 'SEVERE')
+      .filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
 
     // expecting some errors in the console. In catastrophic event, there will most likely be looped errors (on each render cycle)
+    // capture logs and write to spec https://stackoverflow.com/a/24980483/6059235
     expect(
       filteredLog.length
-    ).toBeLessThan(50)
+    ).toBeLessThan(
+      50,
+      JSON.stringify(filteredLog)
+    )
   })
 
   it('> if niftiLayers are defined, parcellation layer should be hidden', async () => {

@@ -42,7 +42,7 @@ const localConfig = {
     // polyfill for node10 or lower
     if (typeof globalThis === 'undefined') global.globalThis = {}
     jasmine.getEnv().addReporter({
-      specDone: async ({ status, id, fullName, ...rest }) => {
+      specDone: async ({ status, id, message, fullName, ...rest }) => {
         if (status === 'failed') {
           console.log(`spec failed, taking screenshot`)
           const b64 = await globalThis.IAVBase.takeScreenshot()
@@ -55,7 +55,7 @@ const localConfig = {
           )
           await asyncWrite(
             path.join(dir, `${id}.txt`),
-            JSON.stringify({ id, status, fullName }, null, 2),
+            JSON.stringify({ id, status, message, fullName }, null, 2),
             'utf-8'
           )
         }

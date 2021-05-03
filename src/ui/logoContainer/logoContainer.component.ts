@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { BACKENDURL } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { Subscription } from "rxjs";
 
@@ -13,20 +12,20 @@ import { Subscription } from "rxjs";
 
 export class LogoContainer {
   // only used to define size
-  public imgSrc = `${BACKENDURL}logo`
+  public imgSrc = `${this.pureConstantService.backendUrl}logo`
   
   public containerStyle = {
-    backgroundImage: `url('${BACKENDURL}logo')`
+    backgroundImage: `url('${this.pureConstantService.backendUrl}logo')`
   }
 
   private subscriptions: Subscription[] = []
   constructor(
-    pureConstantService: PureContantService
+    private pureConstantService: PureContantService
   ){
     this.subscriptions.push(
       pureConstantService.darktheme$.subscribe(flag => {
         this.containerStyle = {
-          backgroundImage: `url('${BACKENDURL}logo${!!flag ? '?darktheme=true' : ''}')`
+          backgroundImage: `url('${this.pureConstantService.backendUrl}logo${!!flag ? '?darktheme=true' : ''}')`
         }
       })
     )

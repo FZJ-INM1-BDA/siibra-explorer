@@ -72,7 +72,7 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.2",
     "webpack-closure-compiler": "^2.1.6",
-    "webpack-dev-server": "^3.10.3",
+    "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^4.1.2"
   },
   "dependencies": {
@@ -80,7 +80,7 @@
     "@ngrx/effects": "^9.1.1",
     "@ngrx/store": "^9.1.1",
     "@types/node": "12.12.39",
-    "export-nehuba": "0.0.9",
+    "export-nehuba": "0.0.12",
     "hbp-connectivity-component": "^0.3.18",
     "zone.js": "^0.10.2"
   }

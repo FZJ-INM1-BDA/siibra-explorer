@@ -24,8 +24,9 @@ describe('> ngViewerState.store.ts', () => {
           provideMockStore({ initialState: initState }),
           {
             provide: PureContantService,
-            useValue: class {
-              useTouchUI$ = of(false)
+            useValue: {
+              useTouchUI$: of(false),
+              backendUrl: `http://localhost:3000/`
             }
           }
         ]

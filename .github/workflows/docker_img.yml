@@ -1,0 +1,132 @@
+name: '[docker image]'
+
+on: [ 'push' ]
+
+jobs:
+  build-docker-img:
+    runs-on: ubuntu-latest
+    env:
+      MATOMO_ID_DEV: '7'
+      MATAMO_URL_DEV: 'https://stats-dev.humanbrainproject.eu/'
+      MATOMO_ID_PROD: '12'
+      MATAMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
+      PRODUCTION: 'true'
+      DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 'Set matomo env var'
+      run: |
+        echo "Using github.ref: $GITHUB_REF"
+
+        echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+        
+        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        then
+          echo "Either master or staging, using prod env..."
+          echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+
+        else
+          echo "Using dev env..."
+          echo "MATAMO_URL=${{ env.MATAMO_URL_DEV }}" >> $GITHUB_ENV
+          echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
+        fi
+
+    - name: 'Set version variable'
+      run: |
+        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        then
+          echo "Either master or staging, using package.json"
+          VERSION=$(jq -r '.version' package.json)
+        else
+          echo "Using git hash"
+          VERSION=$(git rev-parse --short HEAD)
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+    - name: 'Build docker image'
+      run: |
+        DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
+        echo "Building $DOCKER_BUILT_TAG"
+        docker build \
+          --build-arg VERSION=$VERSION \
+          --build-arg MATAMO_URL=$MATAMO_URL \
+          --build-arg MATAMO_ID=$MATAMO_ID \
+          -t $DOCKER_BUILT_TAG \
+          .
+        echo "Successfully built $DOCKER_BUILT_TAG"
+        echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
+
+    - name: 'Push to docker registry'
+      run: |
+        echo "Login to docker registry"
+        docker login \
+          -u "${{ secrets.EBRAINS_DOCKER_REG_USER }}" \
+          -p "${{ secrets.EBRAINS_DOCKER_REG_TOKEN }}" \
+          docker-registry.ebrains.eu
+        echo "Pushing $DOCKER_BUILT_TAG"
+        docker push $DOCKER_BUILT_TAG
+
+  trigger-deploy:
+    if: success()
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_API_ROOT: https://api.github.com/repos/fzj-inm1-bda/siibra-explorer
+      
+    needs: build-docker-img
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env var
+        run: |
+          echo "Using github.ref: $GITHUB_REF"
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+        
+          echo "Branch is $BRANCH_NAME ."
+          if [[ "$BRANCH_NAME" == 'master' ]] || [[ "$BRANCH_NAME" == 'staging' ]]
+          then
+            echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
+            echo "OKD_SECRET=${{ secrets.OKD_PROD_SECRET }}" >> $GITHUB_ENV
+            echo "OKD_PROJECT=interactive-viewer" >> $GITHUB_ENV
+            echo "Deploy on prod cluster..."
+          else
+            echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
+            echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
+            echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
+            echo "Deploy on dev cluster..."
+          fi
+      - name: 'Login via oc cli & deploy'
+        run: |
+          oc login $OKD_URL --token=$OKD_SECRET
+          oc project $OKD_PROJECT
+
+          # sanitized branchname == remove _ / and lowercase everything
+          SANITIZED_BRANCH_NAME=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
+          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
+          echo "Working branch name: $BRANCH_NAME, sanitized branch name: $SANITIZED_BRANCH_NAME"
+
+          # check if the deploy already exist
+          if oc get dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME; then
+            # trigger redeploy if deployconfig exists already
+            echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME already exist, redeploy..."
+            oc rollout latest dc/siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
+          else 
+            # create new app if deployconfig does not yet exist
+            echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME does not yet exist, create new app..."
+            oc new-app --template siibra-explorer-branch-deploy \
+              -p BRANCH_NAME=$BRANCH_NAME \
+              -p SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME
+          fi
+      - name: 'Update status badge'
+        if: success()
+        run: |
+          curl -v \
+            -X POST \
+            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H 'accept: application/vnd.github.v3+json' \
+            ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
+            -d '{
+              "target_url":"https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}",
+              "name": "Deployed at OKD",
+              "state": "success"
+            }'

@@ -1,8 +1,17 @@
 import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit } from "@angular/core";
-import { IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
+import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { TThreeSurferConfig, TThreeSurferMode } from "../types";
 import { parseContext } from "../util";
 import { retry } from 'common/util'
+
+type THandlingCustomEv = {
+  regions: ({ name?: string, error?: string })[]
+  event: CustomEvent
+  evMesh?: {
+    faceIndex: number
+    verticesIndicies: number[]
+  }
+}
 
 @Component({
   selector: 'three-surfer-glue-cmp',
@@ -12,7 +21,7 @@ import { retry } from 'common/util'
   ]
 })
 
-export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, OnDestroy {
+export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, AfterViewInit, OnDestroy {
 
   @Input()
   selectedTemplate: any
@@ -21,7 +30,7 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   selectedParcellation: any
   
   @Output()
-  viewerEvent = new EventEmitter<TViewerEvent>()
+  viewerEvent = new EventEmitter<TViewerEvent<'threeSurfer'>>()
 
   private domEl: HTMLElement
   private config: TThreeSurferConfig
@@ -68,7 +77,11 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       const tsC = await this.tsRef.loadColormap(
         parseContext(colormap, [this.config['@context']])
       )
-      const colorIdx = tsC[0].getData()
+      
+      let colorIdx = tsC[0].getData()
+      if (tsC[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+        colorIdx = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(colorIdx)
+      }
 
       this.loadedMeshes.push({
         threeSurfer: tsM,
@@ -125,7 +138,7 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       this.loadMode(this.config.modes[0])
 
       this.viewerEvent.emit({
-        type: 'VIEWERLOADED',
+        type: EnumViewerEvt.VIEWERLOADED,
         data: true
       })
     }
@@ -133,21 +146,31 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
 
   ngAfterViewInit(){
     const customEvHandler = (ev: CustomEvent) => {
+      const evMesh = ev.detail?.mesh && {
+        faceIndex: ev.detail.mesh.faceIndex,
+        // typo in three-surfer
+        verticesIndicies: ev.detail.mesh.verticesIdicies
+      }
+      const custEv: THandlingCustomEv = {
+        event: ev,
+        regions: [],
+        evMesh
+      }
       
       if (!ev.detail.mesh) {
-        return this.handleMouseoverEvent([])
+        return this.handleMouseoverEvent(custEv)
       }
 
       const evGeom = ev.detail.mesh.geometry
       const evVertIdx = ev.detail.mesh.verticesIdicies
       const found = this.loadedMeshes.find(({ threeSurfer }) => threeSurfer === evGeom)
       
-      if (!found) return this.handleMouseoverEvent([])
+      if (!found) return this.handleMouseoverEvent(custEv)
 
       const { hemisphere: key, vIdxArr } = found
 
       if (!key || !evVertIdx) {
-        return this.handleMouseoverEvent([])
+        return this.handleMouseoverEvent(custEv)
       }
 
       const labelIdxSet = new Set<number>()
@@ -158,30 +181,32 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
         )
       }
       if (labelIdxSet.size === 0) {
-        return this.handleMouseoverEvent([])
+        return this.handleMouseoverEvent(custEv)
       }
 
       const foundRegion = this.selectedParcellation.regions.find(({ name }) => name === key)
 
       if (!foundRegion) {
-        return this.handleMouseoverEvent(
-          Array.from(labelIdxSet).map(v => {
-            return `unknown#${v}`
-          })
-        )
+        custEv.regions = Array.from(labelIdxSet).map(v => {
+          return {
+            error: `unknown#${v}`
+          }
+        })
+        return this.handleMouseoverEvent(custEv)
       }
 
-      return this.handleMouseoverEvent(
-        Array.from(labelIdxSet)
-          .map(lblIdx => {
-            const ontoR = foundRegion.children.find(ontR => Number(ontR.grayvalue) === lblIdx)
-            if (ontoR) {
-              return ontoR.name
-            } else {
-              return `unkonwn#${lblIdx}`
+      custEv.regions =  Array.from(labelIdxSet)
+        .map(lblIdx => {
+          const ontoR = foundRegion.children.find(ontR => Number(ontR.grayvalue) === lblIdx)
+          if (ontoR) {
+            return ontoR
+          } else {
+            return {
+              error: `unkonwn#${lblIdx}`
             }
-          })
-      )
+          }
+        })
+      return this.handleMouseoverEvent(custEv)
 
       
     }
@@ -192,8 +217,26 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   }
 
   public mouseoverText: string
-  private handleMouseoverEvent(mouseover: any[]){
-    this.mouseoverText = mouseover.length === 0 ? null : mouseover.join(' / ')
+  private handleMouseoverEvent(ev: THandlingCustomEv){
+    const { regions: mouseover, evMesh } = ev
+    this.viewerEvent.emit({
+      type: EnumViewerEvt.VIEWER_CTX,
+      data: {
+        viewerType: 'threeSurfer',
+        payload: {
+          fsversion: this.selectedMode,
+          faceIndex: evMesh?.faceIndex,
+          vertexIndices: evMesh?.verticesIndicies,
+          position: [],
+          _mouseoverRegion: mouseover.filter(el => !el.error)
+        }
+      }
+    })
+    this.mouseoverText = mouseover.length === 0 ?
+      null :
+      mouseover.map(
+        el => el.name || el.error
+      ).join(' / ')
   }
 
   private onDestroyCb: (() => void) [] = []

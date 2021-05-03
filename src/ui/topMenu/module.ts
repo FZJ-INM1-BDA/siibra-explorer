@@ -13,7 +13,8 @@ import { KgTosModule } from "../kgtos/module";
 import { ScreenshotModule } from "../screenshot";
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
-import {UserAnnotationsModule} from "src/atlasComponents/userAnnotations";
+import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
+import { QuickTourModule } from "src/ui/quickTour/module";
 
 @NgModule({
   imports: [
@@ -30,7 +31,8 @@ import {UserAnnotationsModule} from "src/atlasComponents/userAnnotations";
     PluginModule,
     AuthModule,
     ScreenshotModule,
-    UserAnnotationsModule
+    UserAnnotationsModule,
+    QuickTourModule,
   ],
   declarations: [
     TopMenuCmp

@@ -120,7 +120,7 @@ module.exports = (app) => {
           'unpkg.com/react@16/umd/', // plugin load external lib -> react
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
-          'https://unpkg.com/three-surfer@0.0.5/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
+          'https://unpkg.com/three-surfer@0.0.8/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,

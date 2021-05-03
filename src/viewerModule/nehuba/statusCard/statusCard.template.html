@@ -1,108 +1,115 @@
-<mat-card class="expandedContainer p-2 pt-1" *ngIf="showFull; else showMin">
-  <mat-card-content>
+<div quick-tour
+  [quick-tour-description]="quickTourData.description"
+  [quick-tour-order]="quickTourData.order"
+  #statusCardQT="quickTour">
+  <mat-card *ngIf="showFull; else showMin"
+    class="expandedContainer p-2 pt-1">
+    
+    <mat-card-content>
 
-    <!-- reset -->
-    <div class="d-flex">
-      <span class="flex-grow-0 d-flex align-items-center">
-        Reset
-      </span>
+      <!-- reset -->
+      <div class="d-flex">
+        <span class="flex-grow-0 d-flex align-items-center">
+          Reset
+        </span>
 
-      <div class="flex-grow-1"></div>
+        <div class="flex-grow-1"></div>
 
-      <button
-        mat-icon-button
-        (click)="resetNavigation({position:true})"
-        matTooltip="Reset position">
-        <i class="iavic iavic-translation"></i>
-      </button>
+        <button
+          mat-icon-button
+          (click)="resetNavigation({position:true})"
+          matTooltip="Reset position">
+          <i class="iavic iavic-translation"></i>
+        </button>
 
-      <button
-        mat-icon-button
-        (click)="resetNavigation({rotation:true})"
-        matTooltip="Reset rotation">
-        <i class="iavic iavic-rotation"></i>
-      </button>
+        <button
+          mat-icon-button
+          (click)="resetNavigation({rotation:true})"
+          matTooltip="Reset rotation">
+          <i class="iavic iavic-rotation"></i>
+        </button>
 
-      <button
-        mat-icon-button
-        (click)="resetNavigation({zoom:true})"
-        matTooltip="Reset zoom">
-        <i class="iavic iavic-scaling"></i>
-      </button>
+        <button
+          mat-icon-button
+          (click)="resetNavigation({zoom:true})"
+          matTooltip="Reset zoom">
+          <i class="iavic iavic-scaling"></i>
+        </button>
 
-      <mat-divider [vertical]="true"></mat-divider>
+        <mat-divider [vertical]="true"></mat-divider>
 
-      <button mat-icon-button
-        [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
-        (click)="showFull = false">
-        <i class="fas fa-angle-up"></i>
-      </button>
-    </div>
+        <button mat-icon-button
+          [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
+          (click)="statusCardQT.ngOnChanges(); showFull = false">
+          <i class="fas fa-angle-up"></i>
+        </button>
+      </div>
 
-    <!-- space -->
-    <div class="d-flex">
-      <span class="d-flex align-items-center">
-        Voxel space
-      </span>
+      <!-- space -->
+      <div class="d-flex">
+        <span class="d-flex align-items-center">
+          Voxel space
+        </span>
 
-      <mat-slide-toggle
-        [formControl]="statusPanelFormCtrl"
-        class="pl-2 pr-2">
-      </mat-slide-toggle>
-      
-      <span class="d-flex align-items center">
-        Physical space
-      </span>
-    </div>
+        <mat-slide-toggle
+          [formControl]="statusPanelFormCtrl"
+          class="pl-2 pr-2">
+        </mat-slide-toggle>
 
-    <!-- coord -->
-    <div class="d-flex">
+        <span class="d-flex align-items center">
+          Physical space
+        </span>
+      </div>
 
-      <mat-form-field class="flex-grow-1">
+      <!-- coord -->
+      <div class="d-flex">
+
+        <mat-form-field class="flex-grow-1">
+          <mat-label>
+            {{ (statusPanelRealSpace$ | async) ? 'Physical Coord' : 'Voxel Coord' }}
+          </mat-label>
+          <input type="text"
+            matInput
+            (keydown.enter)="textNavigateTo(navInput.value)"
+            (keydown.tab)="textNavigateTo(navInput.value)"
+            [value]="navVal$ | async"
+            #navInput="matInput">
+
+        </mat-form-field>
+
+        <div class="w-0 position-relative">
+          <button
+            (click)="showBottomSheet(shareTmpl)"
+            [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
+            mat-icon-button
+            class="position-absolute share-btn">
+            <i class="fas fa-share-square"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- cursor pos -->
+      <mat-form-field *ngIf="!(useTouchInterface$ | async)"
+        class="w-100">
         <mat-label>
-          {{ (statusPanelRealSpace$ | async) ? 'Physical Coord' : 'Voxel Coord' }}
+          Cursor Position
         </mat-label>
         <input type="text"
           matInput
-          (keydown.enter)="textNavigateTo(navInput.value)"
-          (keydown.tab)="textNavigateTo(navInput.value)"
-          [value]="navVal$ | async"
-          #navInput="matInput">
-  
+          [readonly]="true"
+          [value]="mouseVal$ | async">
       </mat-form-field>
 
-      <div class="w-0 position-relative">
-        <button
-          (click)="showBottomSheet(shareTmpl)"
-          [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
-          mat-icon-button
-          class="position-absolute share-btn">
-          <i class="fas fa-share-square"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- cursor pos -->
-    <mat-form-field *ngIf="!(useTouchInterface$ | async)"
-      class="w-100">
-      <mat-label>
-        Cursor Position
-      </mat-label>
-      <input type="text"
-        matInput
-        [readonly]="true"
-        [value]="mouseVal$ | async">
-    </mat-form-field>
-
-  </mat-card-content>
-</mat-card>
+    </mat-card-content>
+  </mat-card>
+</div>
 
 <!-- minimised status bar -->
 <ng-template #showMin>
   <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center m-1 mt-3"
     iav-media-query
     #media="iavMediaQuery">
-    
+
     <i aria-label="viewer navigation" class="fas fa-compass"></i>
     <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="pl-2">
       {{ navVal$ | async }}
@@ -123,7 +130,7 @@
 
     <button mat-icon-button
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
-      (click)="showFull = true">
+      (click)="statusCardQT.ngOnChanges(); showFull = true">
       <i class="fas fa-angle-down"></i>
     </button>
   </div>
@@ -150,12 +157,12 @@
     <mat-list-item (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL })"
       [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
       [attr.tab-index]="10">
-      <mat-icon 
+      <mat-icon
         class="mr-4"
         fontSet="fas"
         fontIcon="fa-link">
       </mat-icon>
-      
+
       <span>
         Create custom URL
       </span>

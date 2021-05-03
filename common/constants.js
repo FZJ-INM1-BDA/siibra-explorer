@@ -79,4 +79,16 @@
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
   }
+
+  exports.QUICKTOUR_DESC ={
+    REGION_SEARCH: `Use the region quick search for finding, selecting and navigating brain regions in the selected parcellation map.`,
+    ATLAS_SELECTOR: `This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.`,
+    CHIPS: `These "chips" indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.`,
+    SLICE_VIEW: `The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can double-click brain regions to select them.`,
+    PERSPECTIVE_VIEW: `The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. Click the „eye“ icon on the bottom left to toggle pure surface view.`,
+    VIEW_ICONS: `Use these icons in any of the views to maximize it and zoom in/out.`,
+    TOP_MENU: `These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.`,
+    LAYER_SELECTOR: `This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.`,
+    STATUS_CARD: `This is the coordinate navigator. Expand it to manipulate voxel and physical coordinates, to reset the view, or to create persistent links to the current view for sharing.`,
+  }
 })(typeof exports === 'undefined' ? module.exports : exports)

@@ -15,7 +15,7 @@
 
     <!-- sidenav-content -->
 
-    <!-- (closedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.close()"
+    <!-- (closedStart)="sideNavwFullLeftSwitch.switchState && matDrawerLeft.close()"
     (openedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.open()" -->
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
@@ -23,10 +23,11 @@
       [opened]="sideNavTopSwitch.switchState"
       [autoFocus]="false"
       [disableClose]="true"
+      (openedChange)="handleSideNavAnimationDone($event)"
       #matDrawerTop="matDrawer">
 
       <div class="h-0 w-100 region-text-search-autocomplete-position">
-        <ng-container *ngTemplateOutlet="autocompleteTmpl">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
         </ng-container>
       </div>
 
@@ -65,7 +66,11 @@
 
             <div *ngIf="viewerLoaded"
               class="pe-all tab-toggle-container"
-              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()">
+              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()"
+              quick-tour
+              [quick-tour-description]="quickTourRegionSearch.description"
+              [quick-tour-order]="quickTourRegionSearch.order"
+              #regionSearchQuickTour="quickTour">
               <ng-container *ngTemplateOutlet="tabTmpl; context: {
                 isOpen: sideNavTopSwitch.switchState,
                 regionSelected: selectedRegions$ | async,
@@ -91,7 +96,10 @@
             </top-menu-cmp>
 
             <div *ngIf="viewerLoaded"
-              class="iv-custom-comp bg card m-2 mat-elevation-z2">
+              class="iv-custom-comp bg card m-2 mat-elevation-z2"
+              quick-tour
+              [quick-tour-description]="quickTourAtlasSelector.description"
+              [quick-tour-order]="quickTourAtlasSelector.order">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -196,9 +204,12 @@
           </atlas-layer-selector>
 
           <!-- chips -->
-          <div class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+          <div class="flex-grow-1 flex-shrink-1 overflow-x-auto pe-all">
 
-            <mat-chip-list class="d-inline-block">
+            <mat-chip-list class="d-inline-block"
+              quick-tour
+              [quick-tour-description]="quickTourChips.description"
+              [quick-tour-order]="quickTourChips.order">
               <!-- additional layer -->
 
               <ng-container>
@@ -234,14 +245,16 @@
   <iav-layout-fourcorners>
     <div iavLayoutFourCornersContent
       class="w-100 h-100 position-absolute">
-      <div class="h-100 w-100 overflow-hidden position-relative">
+      <div class="h-100 w-100 overflow-hidden position-relative"
+        ctx-menu-host
+        [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
 
         <ng-container [ngSwitch]="useViewer$ | async">
 
           <!-- nehuba viewer -->
           <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'nehuba'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async"
             #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
@@ -250,14 +263,14 @@
           <!-- three surfer (free surfer viewer) -->
           <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'threeSurfer'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async">
           </three-surfer-glue-cmp>
 
           <!-- if not supported, show not supported message -->
           <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
-          
+
           <!-- by default, show splash screen -->
           <div *ngSwitchDefault>
             <ui-splashscreen class="position-absolute left-0 top-0">
@@ -511,10 +524,15 @@
 
 <!-- auto complete search box -->
 
-<ng-template #autocompleteTmpl>
+<ng-template #autocompleteTmpl let-showTour="showTour">
   <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
+
+    <div class="w-100 h-100 position-absolute pe-none"
+      *ngIf="showTour"
+      #regionSelRef>
+    </div>
   </div>
 </ng-template>
 
@@ -846,8 +864,11 @@
   let-iavNgIf="iavNgIf"
   let-content="content">
   <mat-expansion-panel
+    [expanded]="activePanelTitles$ | async | arrayContains : title"
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
+    (closed)="handleExpansionPanelClosedEv(title)"
+    (afterExpand)="handleExpansionPanelAfterExpandEv(title)"
     hideToggle
     *ngIf="iavNgIf"
     #expansionPanel="matExpansionPanel">
@@ -994,4 +1015,88 @@
       Select a region by clicking on the viewer or search from above
     </span>
   </div>
+</ng-template>
+
+<!-- context menu template -->
+<ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
+  <mat-card class="p-0" (iav-outsideClick)="disposeCtxMenu()">
+    <mat-card-content *ngFor="let tmplRef of tmplRefs">
+      <ng-container *ngTemplateOutlet="tmplRef.tmpl; context: { $implicit: tmplRef.data } ">
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<!-- viewer status ctx menu -->
+<ng-template #viewerStatusCtxMenu let-data>
+  <mat-list>
+
+    <!-- ref space & position -->
+    <ng-container [ngSwitch]="data.context.viewerType">
+
+      <!-- volumetric i.e. nehuba -->
+      <ng-container *ngSwitchCase="'nehuba'">
+        <mat-list-item>
+          <span mat-line>
+            {{ data.context.payload.mouse.real | nmToMm | addUnitAndJoin : '' }} (mm)
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.metadata.template.displayName || data.metadata.template.name }}
+            </span>
+          </span>
+
+          <button mat-icon-button>
+            <i class="fas fa-thumbtack"></i>
+          </button>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'threeSurfer'">
+        <mat-list-item>
+          <span mat-line>
+            face#{{ data.context.payload.faceIndex }}
+          </span>
+          <span mat-line>
+            vertices#{{ data.context.payload.vertexIndices | addUnitAndJoin : '' }}
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.context.payload.fsversion }}
+            </span>
+          </span>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        DEFAULT
+      </ng-container>
+    </ng-container>
+
+    <!-- hovered ROIs -->
+    <ng-template [ngIf]="data.metadata.hoveredRegions.length > 0">
+      <mat-divider></mat-divider>
+      
+      <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions">
+        <span mat-line>
+          {{ hoveredR.displayName || hoveredR.name }}
+        </span>
+        <span mat-line class="text-muted">
+          <i class="fas fa-brain"></i>
+          <span>
+            Brain region
+          </span>
+        </span>
+
+        <!-- lookup region -->
+        <button mat-icon-button
+          (click)="selectRoi(hoveredR)"
+          ctx-menu-dismiss>
+          <i class="fas fa-search"></i>
+        </button>
+      </mat-list-item>
+    </ng-template>
+  </mat-list>
 </ng-template>
