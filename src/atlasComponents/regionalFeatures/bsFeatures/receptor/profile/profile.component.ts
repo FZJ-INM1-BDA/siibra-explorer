@@ -42,13 +42,13 @@ export class BsFeatureReceptorProfile extends BsFeatureReceptorBase implements O
       return
     }
 
-    this.urls = this.bsFeature.data.urls
+    this.urls = this.bsFeature.__files
       .filter(url => url.indexOf(`_pr_${this.bsLabel}`) >= 0)
       .map(url => {
         return { url }
       })
 
-    const profileBs = this.bsFeature.data._ReceptorDistribution__profiles[this.bsLabel]
+    const profileBs = this.bsFeature.__data.__profiles[this.bsLabel]
     const lineEl = (this.elRef.nativeElement as HTMLElement).querySelector<any>('kg-dataset-dumb-line')
     lineEl.profileBs = profileBs
   }

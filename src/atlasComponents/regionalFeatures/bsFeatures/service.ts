@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { shareReplay } from "rxjs/operators";
-import { BS_ENDPOINT, TFeature, TRegion } from "./constants";
+import { BS_ENDPOINT, IBSSummaryResponse, IBSDetailResponse, TRegion } from "./constants";
 
 @Injectable()
 export class BsFeatureService{
@@ -14,11 +14,19 @@ export class BsFeatureService{
     return `${region.name} ${region.status ? region.status : '' }`
   }
 
-  public getFeature<T>(featureName: TFeature, region: TRegion) {
+  public getFeatures<T extends keyof IBSSummaryResponse>(featureName: T, region: TRegion){
     const { context } = region
     const { atlas, parcellation } = context
-    return this.http.get<T>(
+    return this.http.get<IBSSummaryResponse[T][]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlas["@id"])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(this.processRegion(region))}/features/${encodeURIComponent(featureName)}`
+    )
+  }
+
+  public getFeature<T extends keyof IBSDetailResponse>(featureName: T, region: TRegion, featureId: string) {
+    const { context } = region
+    const { atlas, parcellation } = context
+    return this.http.get<IBSDetailResponse[T]>(
+      `${this.bsEndpoint}/atlases/${encodeURIComponent(atlas["@id"])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(this.processRegion(region))}/features/${encodeURIComponent(featureName)}/${encodeURIComponent(featureId)}`
     )
   }
   

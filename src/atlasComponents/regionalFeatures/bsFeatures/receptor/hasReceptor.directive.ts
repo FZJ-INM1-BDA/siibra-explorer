@@ -20,7 +20,7 @@ export class BsFeatureReceptorDirective extends BsRegionInputBase implements OnD
   public hasReceptor$ = this.region$.pipe(
     switchMap(val => merge(
       of(null),
-      this.featureReceptorService.getFeatureFromRegion(val).pipe(
+      this.featureReceptorService.getReceptorRegionalFeature(val).pipe(
         mapTo(true),
         catchError(() => of(false))
       )
