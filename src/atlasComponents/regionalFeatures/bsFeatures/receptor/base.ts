@@ -1,9 +1,9 @@
 import { Input } from "@angular/core";
-import { TBSResp } from "./type";
+import { TBSDetail } from "./type";
 
 export class BsFeatureReceptorBase {
   @Input()
-  bsFeature: TBSResp
+  bsFeature: TBSDetail
 
   public urls: {
     url: string

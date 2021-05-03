@@ -37,7 +37,7 @@ export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChan
       return
     }
 
-    const url = this.bsFeature.data._ReceptorDistribution__autoradiographs[this.bsLabel]
+    const url = this.bsFeature.__data.__autoradiographs[this.bsLabel]
     if (!url) {
       this.error = `ar cannot be found`
       return

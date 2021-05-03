@@ -1,31 +1,41 @@
-<bs-features-receptor-fingerprint
-  (onSelectReceptor)="onSelectReceptor($event)"
-  [bsFeature]="receptorResp$ | async">
-</bs-features-receptor-fingerprint>
+<mat-select [(value)]="selectedREntryId">
+  <mat-option *ngFor="let rec of receptorsSummary$ | async"
+    [value]="rec['@id']">
+    {{ rec.name }}
+  </mat-option>
+</mat-select>
 
-<mat-divider></mat-divider>
+<ng-container *ngIf="selectedReceptor$ | async as selectedRec">
 
-<mat-form-field class="mt-2 w-100">
-  <mat-label>
-    Select a receptor
-  </mat-label>
-  <mat-select [(value)]="selectedReceptor">
-    <mat-option
-      *ngFor="let receptorName of (allReceptors$ | async)"
-      [value]="receptorName">
-      {{ receptorName }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+  <bs-features-receptor-fingerprint
+    (onSelectReceptor)="onSelectReceptor($event)"
+    [bsFeature]="selectedRec">
+  </bs-features-receptor-fingerprint>
 
-<bs-features-receptor-profile
-  *ngIf="selectedReceptor"
-  [bsFeature]="receptorResp$ | async"
-  [bsLabel]="selectedReceptor">
-</bs-features-receptor-profile>
+  <mat-divider></mat-divider>
 
-<bs-features-receptor-autoradiograph
-  *ngIf="selectedReceptor"
-  [bsFeature]="receptorResp$ | async"
-  [bsLabel]="selectedReceptor">
-</bs-features-receptor-autoradiograph>
+  <mat-form-field class="mt-2 w-100">
+    <mat-label>
+      Select a receptor
+    </mat-label>
+    <mat-select [(value)]="selectedReceptor">
+      <mat-option
+        *ngFor="let receptorName of (allReceptors$ | async)"
+        [value]="receptorName">
+        {{ receptorName }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <bs-features-receptor-profile
+    *ngIf="selectedReceptor"
+    [bsFeature]="selectedRec"
+    [bsLabel]="selectedReceptor">
+  </bs-features-receptor-profile>
+
+  <bs-features-receptor-autoradiograph
+    *ngIf="selectedReceptor"
+    [bsFeature]="selectedRec"
+    [bsLabel]="selectedReceptor">
+  </bs-features-receptor-autoradiograph>
+</ng-container>
