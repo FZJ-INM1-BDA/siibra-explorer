@@ -13,8 +13,9 @@ jobs:
     steps:
     - name: 'Set env var'
       run: |
-        echo "Using github.ref: $GITHUB_REF"
-        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        DEL_REF=${{ github.event.ref }}
+        echo "Using github.event.ref: $DEL_REF"
+        BRANCH_NAME=${DEL_REF#refs/heads/}
         echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
         echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
         echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
