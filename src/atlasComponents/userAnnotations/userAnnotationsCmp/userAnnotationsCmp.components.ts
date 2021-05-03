@@ -36,13 +36,14 @@ export class UserAnnotationsComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription[] = []
   private onDestroyCb: (() => void )[] = []
-  
+
   private get viewer(){
     return (window as any).viewer
   }
 
   ngOnDestroy(): void {
     while(this.onDestroyCb.length) this.onDestroyCb.pop()()
+    while(this.subscription.length) this.subscription.pop().unsubscribe()
 
     if (!this.viewer) {
       throw new Error(`this.viewer is undefined`)
