@@ -10,7 +10,7 @@ import { IAuxMesh } from '../store'
 export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
   const returnVal: IColorMap = {}
   for (const auxMesh of auxMeshes as IAuxMesh[]) {
-    const { ngId, labelIndicies, rgb } = auxMesh
+    const { ngId, labelIndicies, rgb = [255, 255, 255] } = auxMesh
     const auxMeshColorMap = returnVal[ngId] || {}
     for (const lblIdx of labelIndicies) {
       auxMeshColorMap[lblIdx as number] = {

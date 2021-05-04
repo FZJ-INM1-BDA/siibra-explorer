@@ -2,8 +2,7 @@ import { InjectionToken } from "@angular/core";
 import { Observable } from "rxjs";
 import { IHasId } from "src/util/interfaces";
 import { TBSDetail, TBSSummary } from "./receptor/type";
-
-export const BS_ENDPOINT = new InjectionToken<string>('BS_ENDPOINT')
+export { BS_ENDPOINT } from 'src/util/constants'
 
 export type TRegion = {
   name: string

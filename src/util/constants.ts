@@ -115,3 +115,4 @@ export const compareLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]
 }
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
+export const BS_ENDPOINT = new InjectionToken<string>('BS_ENDPOINT')

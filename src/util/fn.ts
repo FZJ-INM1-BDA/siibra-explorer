@@ -83,3 +83,40 @@ export function switchMapWaitFor(opts: ISwitchMapWaitFor){
     mapTo(arg)
   )
 }
+
+export class MultiDimMap{
+  
+  private map = new Map()
+
+  static GetKey(...arg: any[]){
+    let mapKey = ``
+    for (let i = 0; i < arg.length; i++) {
+      mapKey += arg[i]
+    }
+    return mapKey
+  }
+
+  set(...arg: any[]) {
+    const mapKey = MultiDimMap.GetKey(...(arg.slice(0, -1)))
+    this.map.set(mapKey, arg[arg.length - 1])
+  }
+  get(...arg: any[]) {
+    const mapKey = MultiDimMap.GetKey(...arg)
+    return this.map.get(mapKey)
+  }
+  delete(...arg: any[]) {
+    const mapKey = MultiDimMap.GetKey(...arg)
+    return this.map.delete(mapKey)
+  }
+}
+
+export function recursiveMutate<T>(arr: T[], getChildren: (obj: T) => T[], mutateFn: (obj: T) => void){
+  for (const obj of arr) {
+    mutateFn(obj)
+    recursiveMutate(
+      getChildren(obj),
+      getChildren,
+      mutateFn
+    )
+  }
+}

@@ -62,6 +62,7 @@ import { KgTosModule } from './ui/kgtos/module';
 import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
+import { BS_ENDPOINT } from './util/constants';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -254,7 +255,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     {
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,
       useClass: MessagingGlue
-    }
+    },
+    {
+      provide: BS_ENDPOINT,
+      useValue: (BS_REST_URL || `https://brainscapes.apps-dev.hbp.eu`).replace(/\/$/, '')
+    },
   ],
   bootstrap : [
     AtlasViewer,

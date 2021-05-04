@@ -30,7 +30,6 @@ export class SplashScreen implements AfterViewInit {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private constanceService: AtlasViewerConstantsServices,
     private pureConstantService: PureContantService
   ) {
     this.loadedTemplate$ = this.store.pipe(
@@ -90,10 +89,6 @@ export class SplashScreen implements AfterViewInit {
         selectParcellation: template.parcellations[0]
       })
     )
-  }
-
-  get totalTemplates() {
-    return this.constanceService.templateUrls.length
   }
 }
 

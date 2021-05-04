@@ -26,12 +26,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   // instead of using window.location.href, which includes query param etc
   public backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
 
-  public totalTemplates = null
-
-  public getTemplateEndpoint$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
-    shareReplay(1)
-  )
-
   public templateUrls = Array(100)
 
   /* to be provided by KG in future */
@@ -217,10 +211,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
           this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
         }
       }),
-    ),
-    this.pureConstantService.getTemplateEndpoint$.subscribe(arr => {
-      this.totalTemplates = arr.length
-    })
+    )
   }
 
   private subscriptions: Subscription[] = []
