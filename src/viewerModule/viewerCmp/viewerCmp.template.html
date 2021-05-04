@@ -824,7 +824,6 @@
           <ng-container *ngFor="let region of selectedRegions$ | async">
             <connectivity-browser class="pe-all flex-shrink-1"
               [region]="region"
-              [parcellationId]="selectedParcellation['@id']"
               (setOpenState)="expansionPanel.expanded = $event"
               [accordionExpanded]="expansionPanel.expanded"
               (connectivityNumberReceived)="connectedCounterDir.value = $event">

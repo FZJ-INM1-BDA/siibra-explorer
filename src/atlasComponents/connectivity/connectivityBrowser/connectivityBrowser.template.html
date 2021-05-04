@@ -30,8 +30,8 @@
                                 (selectionChange)="changeDataset($event)">
                             <mat-option
                                     *ngFor="let dataset of datasetList"
-                                    [value]="dataset.name">
-                                {{ dataset.name }}
+                                    [value]="dataset['@id']">
+                                {{ dataset['src_name'] }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
