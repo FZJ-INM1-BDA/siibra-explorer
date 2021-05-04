@@ -92,13 +92,13 @@ describe('ConnectivityComponent', () => {
 
         component.datasetList = datasetList
 
-        component.changeDataset({value: 'n1'})
+        component.changeDataset({value: 'id1'})
 
         expect(component.selectedDatasetDescription).toEqual('d1')
         expect(component.selectedDatasetKgId).toEqual('kgId1')
         expect(component.selectedDatasetKgSchema).toEqual('kgschema1')
 
-        component.changeDataset({value: 'n2'})
+        component.changeDataset({value: 'id2'})
 
         expect(component.selectedDatasetDescription).toEqual('d2')
         expect(component.selectedDatasetKgId).toEqual('kgId2')
