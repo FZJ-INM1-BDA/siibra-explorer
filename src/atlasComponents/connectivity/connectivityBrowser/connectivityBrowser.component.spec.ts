@@ -39,15 +39,15 @@ describe('ConnectivityComponent', () => {
 
     let datasetList = [
         {
-            id: 'id1',
-            name: 'n1',
-            description: 'd1',
+            ['@id']: 'id1',
+            src_name: 'id1',
+            src_info: 'd1',
             kgId: 'kgId1',
             kgschema: 'kgschema1'
         }, {
-            id: 'id2',
-            name: 'n2',
-            description: 'd2',
+            ['@id']: 'id2',
+            src_name: 'id2',
+            src_info: 'd2',
             kgId: 'kgId2',
             kgschema: 'kgschema2'
         }
