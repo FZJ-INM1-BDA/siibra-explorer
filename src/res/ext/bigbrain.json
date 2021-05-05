@@ -1198,30 +1198,6 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "name": "lateral occipital cortex",
-                          "children": [
-                            {
-                              "name": "Area hOc5 (LOC)",
-                              "ngId": "v5",
-                              "status": "fully mapped",
-                              "labelIndex": 1,
-                              "rgb": [
-                                255,
-                                0,
-                                0
-                              ],
-                              "children": [],
-                              "fullId": {
-                                "kg": {
-                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
-                                }
-                              },
-                              "relatedAreas": []
-                            }
-                          ]
                         }
                       ]
                     }
