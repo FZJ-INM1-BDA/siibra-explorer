@@ -70,30 +70,12 @@ function getNehubaConfig(darkTheme: boolean) {
     "rotateAtViewCentre": true,
     "enableMeshLoadingControl": true,
     "zoomAtViewCentre": true,
-    "restrictUserNavigation": true,
-    "disableSegmentSelection": false,
+    // "restrictUserNavigation": true,
     "dataset": {
       "imageBackground": backgrd,
       "initialNgState": {
         "showDefaultAnnotations": false,
         "layers": {},
-        // "navigation": {
-        //   "pose": {
-        //     "position": {
-        //       "voxelSize": [
-        //         21166.666015625,
-        //         20000,
-        //         21166.666015625
-        //       ],
-        //       "voxelCoordinates": [
-        //         -21.8844051361084,
-        //         16.288618087768555,
-        //         28.418994903564453
-        //       ]
-        //     }
-        //   },
-        //   "zoomFactor": 350000
-        // },
         "perspectiveOrientation": [
           0.3140767216682434,
           -0.7418519854545593,
@@ -104,11 +86,7 @@ function getNehubaConfig(darkTheme: boolean) {
       }
     },
     "layout": {
-      "views": "hbp-neuro",
-      "planarSlicesBackground": backgrd,
       "useNehubaPerspective": {
-        "enableShiftDrag": false,
-        "doNotRestrictUserNavigation": false,
         "perspectiveSlicesBackground": backgrd,
         "removePerspectiveSlicesBackground": rmPsp,
         "perspectiveBackground": backgrd,
@@ -126,8 +104,6 @@ function getNehubaConfig(darkTheme: boolean) {
         "centerToOrigin": true,
         "drawSubstrates": drawSubstrates,
         "drawZoomLevels": drawZoomLevels,
-        "hideImages": false,
-        "waitForMesh": true,
         "restrictZoomLevel": {
           "minZoom": 1200000,
           "maxZoom": 3500000
@@ -322,6 +298,7 @@ export class PureContantService implements OnDestroy{
                       'name': parc.version?.name,
                       '@this': parseId(parc.id)
                     },
+                    groupName: parc.modality || null,
                     availableIn: parc.availableSpaces.map(space => {
                       return {
                         '@id': space.id,
@@ -337,6 +314,10 @@ export class PureContantService implements OnDestroy{
                   }
                 })
               }
+            }),
+            catchError((err, obs) => {
+              console.error(err)
+              return of(null)
             })
           )
         )
@@ -371,12 +352,12 @@ export class PureContantService implements OnDestroy{
                              * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
                              */
                             if (
-                              tmpl.id in region.volumeSrc
+                              tmpl.id in (region.volumeSrc || {})
                               && 'collect' in region.volumeSrc[tmpl.id]
                             ) {
                               const dedicatedMap = region.volumeSrc[tmpl.id]['collect'].filter(v => v.volume_type === 'neuroglancer/precomputed')
                               if (dedicatedMap.length === 1) {
-                                const ngId = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0].id)
+                                const ngId = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                                 region['ngId'] = ngId
                                 region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
                                 ngLayerObj[tmpl.id][ngId] = {
@@ -426,7 +407,7 @@ export class PureContantService implements OnDestroy{
                         for (const parc of parcellations) {
                           if (tmpl.id in (parc.volumeSrc || {})) {
                             // key: 'left hemisphere' | 'right hemisphere' | 'whole brain'
-                            for (const key in parc.volumeSrc[tmpl.id]) {
+                            for (const key in (parc.volumeSrc[tmpl.id] || {})) {
                               for (const vol of parc.volumeSrc[tmpl.id][key]) {
                                 if (vol.volume_type === 'neuroglancer/precomputed') {
                                   const ngIdKey = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parseId(parc.id), key)
@@ -440,6 +421,9 @@ export class PureContantService implements OnDestroy{
                             }
                           }
                         }
+                      }),
+                      catchError((err, obs) => {
+                        return of(null)
                       })
                     )
                   )

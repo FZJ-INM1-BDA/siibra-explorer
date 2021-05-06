@@ -7,7 +7,7 @@ type TSpaceType = 'mri' | 'histology'
 type TNgTransform = number[][]
 
 type TVolumeType = 'nii' | 'neuroglancer/precomputed' | 'neuroglancer/precompmesh' | 'detailed maps'
-type TParcModality = 'cytoarchitecture'
+type TParcModality = 'cytoarchitecture' | 'functional modes' | 'fibre architecture'
 
 type TAuxMesh = {
   name: string
@@ -31,7 +31,8 @@ interface IVolumeTypeDetail {
 }
 
 type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
-  id: string
+  '@id': string
+  '@type': 'fzj/tmp/volume_type/v0.0.1'
   name: string
   url: string
   volume_type: TVolumeType

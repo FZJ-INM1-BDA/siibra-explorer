@@ -84,16 +84,137 @@ export function switchMapWaitFor(opts: ISwitchMapWaitFor){
   )
 }
 
+export const CachedFunction = () => {
+  const cache = {}
+  const cachedValKeySym = Symbol('cachedValKeySym')
+  return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value
+    descriptor.value = function(...args: any[]) {
+      let found = cache
+      for (const arg of args) {
+        if (!cache[arg]) cache[arg] = {}
+        found = cache[arg]
+      }
+      if (found[cachedValKeySym]) return found[cachedValKeySym]
+      const returnVal = originalMethod.apply(this, args)
+      found[cachedValKeySym] = returnVal
+      return returnVal
+    }
+  }
+}
+
+// A quick, non security hash function
+// TODO implement cache decorator
+export class QuickHash {
+  private length = 6
+  constructor(opts?: any){
+    if (opts?.length) this.length = opts.length
+  }
+
+  @CachedFunction()
+  getHash(str: string){
+    let hash = 0
+    for (const char of str) {
+      const charCode = char.charCodeAt(0)
+      hash = ((hash << 5) - hash) + charCode
+      hash = hash & hash
+    }
+    return hash.toString(16).slice(1, this.length+1)
+  }
+}
+
+/**
+ * in order to maintain backwards compat with url encoding of selected regions
+ * TODO setup a sentry to catch if these are ever used. if not, retire the hard coding 
+ */
+const BACKCOMAP_KEY_DICT = {
+
+  // human multi level
+  'juelich/iav/atlas/v1.0.0/1': {
+    // icbm152
+    'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': {
+      // julich brain v2.6
+      'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25': {
+        'left hemisphere': 'MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE',
+        'right hemisphere': 'MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE'
+      },
+      // bundle hcp
+      "juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c": {
+        "whole brain": "superficial-white-bundle-HCP"
+      },
+      // julich brain v1.18
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579": {
+        "left hemisphere": "jubrain mni152 v18 left",
+        "right hemisphere": "jubrain mni152 v18 right",
+      },
+      // long bundle
+      "juelich/iav/atlas/v1.0.0/5": {
+        "whole brain": "fibre bundle long"
+      },
+      // bundle short
+      "juelich/iav/atlas/v1.0.0/6": {
+        "whole brain": "fibre bundle short"
+      },
+      // difumo 64
+      "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721": {
+        "whole brain": "DiFuMo Atlas (64 dimensions)"
+      },
+      "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8": {
+        "whole brain": "DiFuMo Atlas (128 dimensions)"
+      },
+      "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235": {
+        "whole brain": "DiFuMo Atlas (256 dimensions)"
+      },
+      "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16": {
+        "whole brain": "DiFuMo Atlas (512 dimensions)"
+      },
+      "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1": {
+        "whole brain": "DiFuMo Atlas (1024 dimensions)"
+      },
+    },
+    // colin 27
+    "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": {
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25": {
+        "left hemisphere": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
+        "right hemisphere": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
+      },
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579": {
+        "left hemisphere": "jubrain colin v18 left",
+        "right hemisphere": "jubrain colin v18 right",
+      }
+    },
+    // big brain
+    "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": {
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25": {
+
+      },
+      // isocortex
+      "juelich/iav/atlas/v1.0.0/4": {
+        "whole brain": " tissue type: "
+      },
+      // cortical layers
+      "juelich/iav/atlas/v1.0.0/3": {
+        "whole brain": "cortical layers"
+      },
+    }
+  }
+}
+
 export class MultiDimMap{
   
   private map = new Map()
 
+  static KeyHash = new QuickHash()
+
   static GetKey(...arg: any[]){
     let mapKey = ``
+    let proxyKeyMatch = BACKCOMAP_KEY_DICT
     for (let i = 0; i < arg.length; i++) {
+      if (proxyKeyMatch) proxyKeyMatch = proxyKeyMatch[arg[i]]
       mapKey += arg[i]
     }
-    return mapKey
+    if (proxyKeyMatch) return proxyKeyMatch
+    return MultiDimMap.KeyHash.getHash(mapKey)
   }
 
   set(...arg: any[]) {
