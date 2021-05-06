@@ -72,24 +72,6 @@ export class SplashScreen implements AfterViewInit {
       )),
     )
   }
-
-  public selectTemplateParcellation(template, parcellation) {
-    this.store.dispatch(
-      viewerStateNewViewer({
-        selectParcellation: parcellation,
-        selectTemplate: template
-      })
-    )
-  }
-
-  public selectTemplate(template: any) {
-    this.store.dispatch(
-      viewerStateNewViewer({
-        selectTemplate: template,
-        selectParcellation: template.parcellations[0]
-      })
-    )
-  }
 }
 
 @Pipe({
