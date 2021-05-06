@@ -418,7 +418,8 @@ describe('> viewerState.useEffect.ts', () => {
               ])
               mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
                 ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc ]
+                templateSpaces: [ mockTmplSpc ],
+                parcellations: [ mockParc0 ]
               }])
               actions$ = hot('a', {
                 a: viewerStateSelectAtlas({
@@ -450,7 +451,8 @@ describe('> viewerState.useEffect.ts', () => {
               ])
               mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
                 ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc1 ]
+                templateSpaces: [ mockTmplSpc1 ],
+                parcellations: [ mockParc1 ]
               }])
               actions$ = hot('a', {
                 a: viewerStateSelectAtlas({
@@ -494,7 +496,8 @@ describe('> viewerState.useEffect.ts', () => {
             ])
             mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
               ['@id']: 'foo-bar',
-              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ]
+              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ],
+              parcellations: [ mockParc0, mockParc1 ]
             }])
           })
           it('> will select template.@id', () => {

@@ -116,8 +116,15 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       ) || atlas.templateSpaces[0]
       
       const templateSpaceId = templateTobeSelected['@id']
-      
       const atlasTmpl = atlas.templateSpaces.find(t => t['@id'] === templateSpaceId)
+
+      const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
+      if (!templateSelected) {
+        return generalActionError({
+          message: CONST.TEMPLATE_NOT_FOUND
+        })
+      }
+
       const atlasParcs = atlasTmpl.availableIn
         .map(availP => atlas.parcellations.find(p => availP['@id'] === p['@id']))
         .filter(fullP => !!fullP)
@@ -127,15 +134,8 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           return !p['@version']['@next']
         }
         return true
-      })
+      }) || templateSelected.parcellations[0]
       const parcellationId = atlasParc && atlasParc['@id']
-        
-      const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
-      if (!templateSelected) {
-        return generalActionError({
-          message: CONST.TEMPLATE_NOT_FOUND
-        })
-      }
       const parcellationSelected = parcellationId && templateSelected.parcellations.find(p => p['@id'] === parcellationId)
       return viewerStateNewViewer({
         selectTemplate: templateSelected,

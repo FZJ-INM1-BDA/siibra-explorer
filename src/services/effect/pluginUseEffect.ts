@@ -5,9 +5,7 @@ import { Observable, forkJoin } from "rxjs"
 import { filter, map, startWith, switchMap } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/plugin/atlasViewer.pluginService.service"
-import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { PLUGINSTORE_ACTION_TYPES, pluginStateSelectorInitManifests } from 'src/services/state/pluginState.helper'
-import { IavRootStoreInterface } from "../stateStore.service"
+import { PLUGINSTORE_CONSTANTS, PLUGINSTORE_ACTION_TYPES, pluginStateSelectorInitManifests } from 'src/services/state/pluginState.helper'
 import { HttpClient } from "@angular/common/http"
 
 @Injectable({
@@ -20,7 +18,7 @@ export class PluginServiceUseEffect {
   public initManifests$: Observable<any>
 
   constructor(
-    store$: Store<IavRootStoreInterface>,
+    store$: Store<any>,
     constantService: AtlasViewerConstantsServices,
     pluginService: PluginServices,
     http: HttpClient

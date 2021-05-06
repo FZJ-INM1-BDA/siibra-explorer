@@ -164,6 +164,8 @@ export class PureContantService implements OnDestroy{
     )
   }
 
+  private httpCallCache = new Map<string, Observable<any>>()
+
   private getParcDetail(atlasId: string, parcId: string) {
     return this.http.get<TParc>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}`,
@@ -186,10 +188,15 @@ export class PureContantService implements OnDestroy{
   }
 
   private getSpacesAndParc(atlasId: string) {
+    const cacheKey = `getSpacesAndParc::${atlasId}`
+    if (this.httpCallCache.has(cacheKey)) return this.httpCallCache.get(cacheKey)
+    
     const spaces$ = this.getSpaces(atlasId).pipe(
-      switchMap(spaces => forkJoin(
-        spaces.map(space => this.getSpaceDetail(atlasId, parseId(space.id)))
-      ))
+      switchMap(spaces => spaces.length > 0
+          ? forkJoin(
+              spaces.map(space => this.getSpaceDetail(atlasId, parseId(space.id)))
+            )
+          : of([]))
     )
     const parcs$ = this.getParcs(atlasId).pipe(
       // need not to get full parc data. first level gets all data
@@ -197,14 +204,17 @@ export class PureContantService implements OnDestroy{
       //   parcs.map(parc => this.getParcDetail(atlasId, parseId(parc.id)))
       // ))
     )
-    return forkJoin([
+    const returnObs = forkJoin([
       spaces$,
       parcs$,
     ]).pipe(
       map(([ templateSpaces, parcellations ]) => {
         return { templateSpaces, parcellations }
-      })
+      }),
+      shareReplay(1)
     )
+    this.httpCallCache.set(cacheKey, returnObs)
+    return returnObs
   }
 
   constructor(

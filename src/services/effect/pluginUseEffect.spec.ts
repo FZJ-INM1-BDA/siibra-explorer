@@ -6,13 +6,13 @@ import { Action } from "@ngrx/store";
 import { provideMockActions } from "@ngrx/effects/testing";
 import { provideMockStore } from "@ngrx/store/testing";
 import { defaultRootState } from "../stateStore.service";
-import { PLUGINSTORE_CONSTANTS } from '../state/pluginState.store'
-import { PLUGINSTORE_ACTION_TYPES } from '../state/pluginState.helper'
+import { PLUGINSTORE_CONSTANTS, PLUGINSTORE_ACTION_TYPES } from '../state/pluginState.helper'
 import { Injectable } from "@angular/core";
 import { getRandomHex } from 'common/util'
 import { PluginServices } from "src/plugin";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { hot } from "jasmine-marbles";
+import { BS_ENDPOINT } from "src/util/constants";
 
 const actions$: Observable<Action> = of({type: 'TEST'})
 
@@ -103,6 +103,10 @@ describe('pluginUseEffect.ts', () => {
         {
           provide: PluginServices,
           useClass: MockPluginService
+        },
+        {
+          provide: BS_ENDPOINT,
+          useValue: `http://localhost:1234`
         }
       ]
     }).compileComponents()
