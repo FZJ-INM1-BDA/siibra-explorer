@@ -193,10 +193,10 @@ export class PureContantService implements OnDestroy{
     
     const spaces$ = this.getSpaces(atlasId).pipe(
       switchMap(spaces => spaces.length > 0
-          ? forkJoin(
-              spaces.map(space => this.getSpaceDetail(atlasId, parseId(space.id)))
-            )
-          : of([]))
+        ? forkJoin(
+          spaces.map(space => this.getSpaceDetail(atlasId, parseId(space.id)))
+        )
+        : of([]))
     )
     const parcs$ = this.getParcs(atlasId).pipe(
       // need not to get full parc data. first level gets all data
