@@ -87,7 +87,7 @@ export function switchMapWaitFor(opts: ISwitchMapWaitFor){
 export const CachedFunction = () => {
   const cache = {}
   const cachedValKeySym = Symbol('cachedValKeySym')
-  return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (_target: Record<string, any>, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
     descriptor.value = function(...args: any[]) {
       let found = cache

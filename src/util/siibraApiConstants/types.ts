@@ -64,7 +64,7 @@ export type TAtlas = {
 export type TSpaceSummary = {
   id: {
     kg: TKgIdentifier
-  },
+  }
   name: string
   links: {
     self: THref

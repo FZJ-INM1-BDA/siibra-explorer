@@ -150,7 +150,7 @@ export class PureContantService implements OnDestroy{
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions`,
       {
         params: {
-          space_id: spaceId
+          'space_id': spaceId
         },
         responseType: 'json'
       }
@@ -205,10 +205,6 @@ export class PureContantService implements OnDestroy{
         return { templateSpaces, parcellations }
       })
     )
-  }
-
-  private getFullRegions(atlasId: string, parcId: string, spaceId: string) {
-
   }
 
   constructor(
