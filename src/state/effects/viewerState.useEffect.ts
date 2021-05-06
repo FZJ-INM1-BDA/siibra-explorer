@@ -117,10 +117,18 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       
       const templateSpaceId = templateTobeSelected['@id']
       
-      const parcellationId = (
-        templateTobeSelected.availableIn.find(p => !!p.baseLayer) ||
-        templateTobeSelected.availableIn[0]
-      )['@id']
+      const atlasTmpl = atlas.templateSpaces.find(t => t['@id'] === templateSpaceId)
+      const atlasParcs = atlasTmpl.availableIn
+        .map(availP => atlas.parcellations.find(p => availP['@id'] === p['@id']))
+        .filter(fullP => !!fullP)
+      const atlasParc = atlasParcs.find(p => {
+        if (!p.baseLayer) return false
+        if (p['@version']) {
+          return !p['@version']['@next']
+        }
+        return true
+      })
+      const parcellationId = atlasParc && atlasParc['@id']
         
       const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
       if (!templateSelected) {
@@ -128,7 +136,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           message: CONST.TEMPLATE_NOT_FOUND
         })
       }
-      const parcellationSelected = templateSelected.parcellations.find(p => p['@id'] === parcellationId)
+      const parcellationSelected = parcellationId && templateSelected.parcellations.find(p => p['@id'] === parcellationId)
       return viewerStateNewViewer({
         selectTemplate: templateSelected,
         selectParcellation: parcellationSelected
