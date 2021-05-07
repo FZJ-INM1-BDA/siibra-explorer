@@ -8,6 +8,7 @@ import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import { viewerStateAllRegionsFlattenedRegionSelector, viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
+import {BS_ENDPOINT} from "src/util/constants";
 
 /**
  * injecting databrowser module is bad idea
@@ -15,6 +16,7 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
  * since the only reason why data browser is imported is to use show dataset dialogue
  * just use a dummy directive
  */
+const MOCK_BS_ENDPOINT = `http://localhost:1234`
 
 @Directive({
     selector: '[iav-dataset-show-dataset-dialog]'
@@ -60,7 +62,11 @@ describe('ConnectivityComponent', () => {
             ],
             providers: [
                 provideMockActions(() => actions$),
-                provideMockStore()
+                provideMockStore(),
+                {
+                    provide: BS_ENDPOINT,
+                    useValue: MOCK_BS_ENDPOINT
+                }
             ],
             declarations: [
                 ConnectivityBrowserComponent,
