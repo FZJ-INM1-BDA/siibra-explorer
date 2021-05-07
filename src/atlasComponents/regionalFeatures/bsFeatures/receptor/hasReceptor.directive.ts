@@ -21,7 +21,7 @@ export class BsFeatureReceptorDirective extends BsRegionInputBase implements OnD
     switchMap(val => merge(
       of(null),
       this.featureReceptorService.getReceptorRegionalFeature(val).pipe(
-        mapTo(true),
+        map(arr => arr.length > 0),
         catchError(() => of(false))
       )
     )),
