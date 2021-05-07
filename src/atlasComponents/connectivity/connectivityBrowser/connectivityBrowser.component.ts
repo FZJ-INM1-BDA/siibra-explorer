@@ -1,13 +1,13 @@
 import {
-    AfterViewInit, ChangeDetectorRef,
-    Component,
-    ElementRef,
-    EventEmitter,
-    OnDestroy,
-    Output,
-    ViewChild,
-    Input,
-    OnInit, Inject,
+  AfterViewInit, ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  Output,
+  ViewChild,
+  Input,
+  OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
@@ -100,7 +100,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
 
       this.regionName = newRegionName
-      this.regionId = `${val.fullId.kg.kgSchema}/${val.fullId.kg.kgId}`
+      this.regionId = `${val.id.kg.kgSchema}/${val.id.kg.kgId}`
       this.atlasId = val.context.atlas['@id']
       this.parcellationId = val.context.parcellation['@id']
 
@@ -151,7 +151,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public fullConnectivityLoadUrl: string
 
     ngOnInit(): void {
-      this.connectivityUrl = `${this.siibraApiUrl}atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId)}/features/ConnectivityProfile`
+      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId)}/features/ConnectivityProfile`
 
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res
@@ -312,7 +312,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.connectivityLoadUrl.emit(url)
         this.loadUrl = url
 
-        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDataset)}`
+        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDataset)}`
       }
     }
 

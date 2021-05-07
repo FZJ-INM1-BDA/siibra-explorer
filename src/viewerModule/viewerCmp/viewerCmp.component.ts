@@ -1,7 +1,7 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import {Component, ElementRef, Inject, Input, OnDestroy, OnInit, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
+import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
+import {distinctUntilChanged, filter, map, startWith, switchMap} from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -15,6 +15,8 @@ import { IViewerCmpUiState, TSupportedViewer } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
 import { ComponentStore } from "../componentStore";
+import {BS_ENDPOINT} from "src/util/constants";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -73,7 +75,7 @@ import { ComponentStore } from "../componentStore";
   ]
 })
 
-export class ViewerCmp implements OnDestroy {
+export class ViewerCmp implements OnInit, OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
@@ -84,7 +86,7 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
-  
+
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,
@@ -103,6 +105,9 @@ export class ViewerCmp implements OnDestroy {
 
   private subscriptions: Subscription[] = []
   public viewerLoaded: boolean = false
+
+  public hasConnectivity = false
+  public connectivityNumber = 0
 
   public templateSelected$ = this.store$.pipe(
     select(viewerStateSelectedTemplateSelector),
@@ -178,7 +183,9 @@ export class ViewerCmp implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
-    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
+    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>,
+    @Inject(BS_ENDPOINT) private siibraApiUrl: string,
+    private httpClient: HttpClient,
   ){
     this.viewerCmpLocalUiStore.setState({
       sideNav: {
@@ -205,8 +212,48 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
+  ngOnInit() {
+    this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
+      if (sr && sr.length) {
+        this.checkConnectivity(sr[0])
+      } else {
+        this.hasConnectivity = false
+        this.connectivityNumber = 0
+      }
+    }))
+  }
+
   ngOnDestroy() {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
+  }
+
+  checkConnectivity(region) {
+    const {atlas, parcellation, template} = region.context
+    if (region.id && region.id.kg) {
+      const regionId = `${region.id.kg.kgSchema}/${region.id.kg.kgId}`
+
+      const connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(atlas['@id'])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(regionId)}/features/ConnectivityProfile`
+
+      this.subscriptions.push(
+        this.httpClient.get<[]>(connectivityUrl).pipe(switchMap((res: any[]) => {
+          if (res && res.length) {
+            this.hasConnectivity = true
+            const url = `${connectivityUrl}/${encodeURIComponent(res[0]['@id'])}`
+            return this.httpClient.get(url)
+          } else {
+            this.hasConnectivity = false
+            this.connectivityNumber = 0
+          }
+          return of(null)
+        })).subscribe(res => {
+
+          if (res && res['__profile']) {
+            this.connectivityNumber = res['__profile'].filter(p => p > 0).length
+            console.log(this.connectivityNumber)
+          }
+        })
+      )
+    }
   }
 
   public activePanelTitles$: Observable<string[]>
