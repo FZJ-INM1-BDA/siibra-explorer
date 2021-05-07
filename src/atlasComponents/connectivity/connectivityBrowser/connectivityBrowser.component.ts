@@ -1,13 +1,13 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnDestroy,
-  Output,
-  ViewChild,
-  Input,
-  OnInit,
+    AfterViewInit, ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    OnDestroy,
+    Output,
+    ViewChild,
+    Input,
+    OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
@@ -20,6 +20,7 @@ import {
   viewerStateOverwrittenColorMapSelector
 } from "src/services/state/viewerState/selectors";
 import {HttpClient} from "@angular/common/http";
+import {BS_ENDPOINT} from "src/util/constants";
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
@@ -38,9 +39,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      */
     private _isFirstUpdate = true
 
-    // public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps.hbp.eu/v1.1/studies'
     public connectivityUrl: string
-    private siibraApiUrl = 'https://siibra-api-tmpfullvolmetadata.apps-dev.hbp.eu/v1_0/'
 
     private accordionIsExpanded = false
 
@@ -139,6 +138,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         private store$: Store<any>,
         private changeDetectionRef: ChangeDetectorRef,
         private httpClient: HttpClient,
+        @Inject(BS_ENDPOINT) private siibraApiUrl: string,
     ) {
 
       this.overwrittenColorMap$ = this.store$.pipe(
