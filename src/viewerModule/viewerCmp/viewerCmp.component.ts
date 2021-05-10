@@ -75,7 +75,7 @@ import {HttpClient} from "@angular/common/http";
   ]
 })
 
-export class ViewerCmp implements OnInit, OnDestroy {
+export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
@@ -105,9 +105,6 @@ export class ViewerCmp implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = []
   public viewerLoaded: boolean = false
-
-  public hasConnectivity = false
-  public connectivityNumber = 0
 
   public templateSelected$ = this.store$.pipe(
     select(viewerStateSelectedTemplateSelector),
@@ -212,48 +209,8 @@ export class ViewerCmp implements OnInit, OnDestroy {
     )
   }
 
-  ngOnInit() {
-    this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
-      if (sr && sr.length) {
-        this.checkConnectivity(sr[0])
-      } else {
-        this.hasConnectivity = false
-        this.connectivityNumber = 0
-      }
-    }))
-  }
-
   ngOnDestroy() {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
-  }
-
-  checkConnectivity(region) {
-    const {atlas, parcellation, template} = region.context
-    if (region.id && region.id.kg) {
-      const regionId = `${region.id.kg.kgSchema}/${region.id.kg.kgId}`
-
-      const connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(atlas['@id'])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(regionId)}/features/ConnectivityProfile`
-
-      this.subscriptions.push(
-        this.httpClient.get<[]>(connectivityUrl).pipe(switchMap((res: any[]) => {
-          if (res && res.length) {
-            this.hasConnectivity = true
-            const url = `${connectivityUrl}/${encodeURIComponent(res[0]['@id'])}`
-            return this.httpClient.get(url)
-          } else {
-            this.hasConnectivity = false
-            this.connectivityNumber = 0
-          }
-          return of(null)
-        })).subscribe(res => {
-
-          if (res && res['__profile']) {
-            this.connectivityNumber = res['__profile'].filter(p => p > 0).length
-            console.log(this.connectivityNumber)
-          }
-        })
-      )
-    }
   }
 
   public activePanelTitles$: Observable<string[]>

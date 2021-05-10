@@ -826,7 +826,7 @@
               [region]="region"
               (setOpenState)="expansionPanel.expanded = $event"
               [accordionExpanded]="expansionPanel.expanded"
-              (connectivityNumberReceived)="connectivityNumber = $event">
+              (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">
             </connectivity-browser>
           </ng-container>
         </mat-card-content>
@@ -834,13 +834,19 @@
 
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: 'Connectivity',
-        desc: connectivityNumber,
+        desc: hasConnectivityDirective.connectivityNumber,
         iconClass: 'fas fa-braille',
-        iconTooltip: connectivityNumber | regionAccordionTooltipTextPipe : 'connectivity',
-        iavNgIf: hasConnectivity,
+        iconTooltip: hasConnectivityDirective.connectivityNumber | regionAccordionTooltipTextPipe : 'connectivity',
+        iavNgIf: hasConnectivityDirective.hasConnectivity,
         content: connectivityContentTmpl
       }">
       </ng-container>
+
+      <div has-connectivity
+           [region]="selectedRegions$ | async"
+           #hasConnectivityDirective="hasConnectivityDirective">
+      </div>
+
     </ng-container>
 
   </mat-accordion>
