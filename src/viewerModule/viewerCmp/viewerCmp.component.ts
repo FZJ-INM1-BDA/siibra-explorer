@@ -1,7 +1,7 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
+import {Component, ElementRef, Inject, Input, OnDestroy, OnInit, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
+import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
+import {distinctUntilChanged, filter, map, startWith, switchMap} from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -15,6 +15,8 @@ import { IViewerCmpUiState, TSupportedViewer } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
 import { ComponentStore } from "../componentStore";
+import {BS_ENDPOINT} from "src/util/constants";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -84,7 +86,7 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
-  
+
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,
@@ -178,7 +180,9 @@ export class ViewerCmp implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
-    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
+    @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>,
+    @Inject(BS_ENDPOINT) private siibraApiUrl: string,
+    private httpClient: HttpClient,
   ){
     this.viewerCmpLocalUiStore.setState({
       sideNav: {

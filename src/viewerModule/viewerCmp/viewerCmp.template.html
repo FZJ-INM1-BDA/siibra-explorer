@@ -824,10 +824,9 @@
           <ng-container *ngFor="let region of selectedRegions$ | async">
             <connectivity-browser class="pe-all flex-shrink-1"
               [region]="region"
-              [parcellationId]="selectedParcellation['@id']"
               (setOpenState)="expansionPanel.expanded = $event"
               [accordionExpanded]="expansionPanel.expanded"
-              (connectivityNumberReceived)="connectedCounterDir.value = $event">
+              (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">
             </connectivity-browser>
           </ng-container>
         </mat-card-content>
@@ -835,18 +834,19 @@
 
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: 'Connectivity',
-        desc: connectedCounterDir.value,
+        desc: hasConnectivityDirective.connectivityNumber,
         iconClass: 'fas fa-braille',
-        iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
-        iavNgIf: selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'),
+        iconTooltip: hasConnectivityDirective.connectivityNumber | regionAccordionTooltipTextPipe : 'connectivity',
+        iavNgIf: hasConnectivityDirective.hasConnectivity,
         content: connectivityContentTmpl
       }">
       </ng-container>
 
-      <div class="w-0 h-0"
-        iav-counter
-        #connectedCounterDir="iavCounter">
+      <div has-connectivity
+           [region]="selectedRegions$ | async"
+           #hasConnectivityDirective="hasConnectivityDirective">
       </div>
+
     </ng-container>
 
   </mat-accordion>
