@@ -4,7 +4,6 @@ import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { UtilModule } from "src/util";
-import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
 import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
@@ -37,7 +36,7 @@ import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
 import { FilterPreviewByType } from "./preview/filterPreview.pipe";
 import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
 import { LayerBrowserModule } from "../../ui/layerbrowser";
-import { DatabrowserDirective } from "./databrowser/databrowser.directive";
+
 import { ContributorModule } from "./contributor";
 import { DatabrowserService } from "./databrowser.service";
 import { ShownDatasetDirective } from "./shownDataset.directive";
@@ -66,7 +65,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     KgDatasetModule,
   ],
   declarations: [
-    DataBrowser,
     SingleDatasetView,
     SingleDatasetDirective,
     SingleDatasetListView,
@@ -81,7 +79,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
      */
     PreviewDatasetFile,
     ShownPreviewsDirective,
-    DatabrowserDirective,
     ShownDatasetDirective,
 
     /**
@@ -105,7 +102,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   ],
   exports: [
     KgDatasetModule,
-    DataBrowser,
     SingleDatasetView,
     SingleDatasetDirective,
     SingleDatasetListView,
@@ -118,12 +114,10 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     ShownPreviewsDirective,
     FilterPreviewByType,
     PreviewCardComponent,
-    DatabrowserDirective,
     ShownDatasetDirective,
     SingleDatasetSideNavView,
   ],
   entryComponents: [
-    DataBrowser,
     SingleDatasetView,
     PreviewComponentWrapper
   ],

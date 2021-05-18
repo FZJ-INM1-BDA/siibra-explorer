@@ -10,7 +10,7 @@ import { WidgetUnit } from "src/widget";
 
 import { LoggingService } from "src/logging";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store.helper";
-import { DataBrowser } from "./databrowser/databrowser.component";
+
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset, datastateActionFetchedDataentries } from "src/services/state/dataState/actions";
@@ -57,14 +57,7 @@ export class DatabrowserService implements OnDestroy {
   public darktheme: boolean = false
 
   public instantiatedWidgetUnits: WidgetUnit[] = []
-  public queryData: (arg: {regions: any[], template: any, parcellation: any}) => void = (arg) => {
-    const { widgetUnit } = this.createDatabrowser(arg)
-    this.instantiatedWidgetUnits.push(widgetUnit.instance)
-    widgetUnit.onDestroy(() => {
-      this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
-    })
-  }
-  public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
+
   public getDataByRegion: (arg: {regions: any[] }) => Observable<IKgDataEntry[]> = ({ regions }) => 
     forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
       map(
@@ -349,12 +342,6 @@ export class DatabrowserService implements OnDestroy {
       type: 'BUILD_REGION_SELECTION_TREE',
       selectedRegions,
       regions,
-    })
-  }
-
-  public dbComponentInit(_db: DataBrowser) {
-    this.store.dispatch({
-      type: SHOW_KG_TOS,
     })
   }
 

@@ -110,6 +110,7 @@ class WdIavPage extends WdLayoutPage{
   }
 
   _getSingleDatasetListView(){
+    throw new Error(`data-browser has been deprecated. rewrite selector`)
     return this._browser
       .findElement( By.css('data-browser') )
       .findElements( By.css('single-dataset-list-view') )
