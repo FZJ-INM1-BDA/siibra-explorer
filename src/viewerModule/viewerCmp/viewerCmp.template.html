@@ -904,30 +904,6 @@
     <!-- other regions detail accordion -->
     <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
 
-      <!--  regional features-->
-      <ng-template #regionalFeaturesTmpl>
-        <data-browser
-          [disableVirtualScroll]="true"
-          [regions]="regions">
-        </data-browser>
-      </ng-template>
-
-      <div class="hidden"
-        iav-databrowser-directive
-        [regions]="regions"
-        #iavDbDirective="iavDatabrowserDirective">
-      </div>
-
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: CONST.REGIONAL_FEATURES,
-        desc: iavDbDirective?.dataentries?.length,
-        iconClass: 'fas fa-database',
-        iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
-        iavNgIf: iavDbDirective?.dataentries?.length,
-        content: regionalFeaturesTmpl
-      }">
-      </ng-container>
-
       <!-- Multi regions include -->
       <ng-template #multiRegionInclTmpl>
         <mat-chip-list>

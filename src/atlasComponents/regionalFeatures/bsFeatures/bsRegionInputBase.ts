@@ -30,12 +30,12 @@ export class BsRegionInputBase{
   )
 
   protected getFeatureInstancesList<T extends keyof IBSSummaryResponse>(feature: T){
-    if (!this._region) return throwError('region needs to be defined')
+    if (!this._region) return throwError('#getFeatureInstancesList region needs to be defined')
     return this.svc.getFeatures<T>(feature, this._region)
   }
 
   protected getFeatureInstance<T extends keyof IBSDetailResponse>(feature: T, id: string) {
-    if (!this._region) return throwError('region needs to be defined')
+    if (!this._region) return throwError('#getFeatureInstance region needs to be defined')
     return this.svc.getFeature<T>(feature, this._region, id)
   }
 }

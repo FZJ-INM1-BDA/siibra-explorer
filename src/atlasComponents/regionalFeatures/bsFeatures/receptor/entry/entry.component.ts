@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from "@angular/core";
 import { Observable, of, Subject, Subscription } from "rxjs";
-import { filter, map, shareReplay, startWith, switchMap, switchMapTo, tap } from "rxjs/operators";
+import { filter, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { BsFeatureService } from "../../service";
 import { TBSDetail } from "../type";
@@ -41,7 +41,7 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
 
   public receptorsSummary$ = this.region$.pipe(
     filter(v => !!v),
-    switchMapTo(this.getFeatureInstancesList('ReceptorDistribution')),
+    switchMap(() => this.getFeatureInstancesList('ReceptorDistribution')),
     tap(arr => {
       if (arr && arr.length > 0) {
         this.selectedREntryId = arr[0]['@id']
@@ -69,5 +69,8 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
     svc: BsFeatureService
   ){
     super(svc)
+    this.sub.push(
+      this.selectedReceptor$.subscribe()
+    )
   }
 }
