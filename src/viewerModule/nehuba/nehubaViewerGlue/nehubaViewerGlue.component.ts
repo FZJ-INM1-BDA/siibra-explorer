@@ -797,7 +797,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     )
   }
 
-  public handleMouseLeaveCustomLandmark() {
+  public handleMouseLeaveCustomLandmark(_lm) {
     this.store$.dispatch(
       viewerStateMouseOverCustomLandmark({
         payload: { userLandmark: null }
