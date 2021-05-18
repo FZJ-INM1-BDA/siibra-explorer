@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
@@ -486,7 +486,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
         /**
          * TODO dig into event detail to see if the exact mesh loaded
          */
-        const { meshesLoaded, meshFragmentsLoaded, lastLoadedMeshId } = (event as any).detail
+        const { meshesLoaded, meshFragmentsLoaded: _meshFragmentsLoaded, lastLoadedMeshId: _lastLoadedMeshId } = (event as any).detail
         return meshesLoaded >= this.nehubaContainerDirective.nehubaViewerInstance.numMeshesToBeLoaded
           ? null
           : 'Loading meshes ...'
@@ -555,7 +555,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
           positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
         }),
         /* TODO introduce animation */
-        moveToNavigationLoc : (coord, realSpace?) => {
+        moveToNavigationLoc : (coord, _realSpace?) => {
           this.store$.dispatch(
             viewerStateChangeNavigation({
               navigation: {
@@ -797,7 +797,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     )
   }
 
-  public handleMouseLeaveCustomLandmark(lm) {
+  public handleMouseLeaveCustomLandmark() {
     this.store$.dispatch(
       viewerStateMouseOverCustomLandmark({
         payload: { userLandmark: null }

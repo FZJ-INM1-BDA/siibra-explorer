@@ -52,7 +52,7 @@ export class KgRegionalFeaturesList extends BsRegionInputBase implements OnDestr
   }
 
   public detailDict: {
-    [key:string]: TBSDetail
+    [key: string]: TBSDetail
   } = {}
 
   public handlePopulatedDetailEv(detail: TBSDetail){

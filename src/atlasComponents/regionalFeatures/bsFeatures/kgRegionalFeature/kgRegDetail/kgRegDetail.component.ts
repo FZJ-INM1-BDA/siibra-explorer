@@ -10,7 +10,7 @@ import { TBSDetail } from "../type";
   ]
 })
 
-export class kgRegDetailCmp extends BsRegionInputBase {
+export class KgRegDetailCmp extends BsRegionInputBase {
 
   @Input()
   public detail: TBSDetail

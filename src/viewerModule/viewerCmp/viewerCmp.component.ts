@@ -1,7 +1,7 @@
-import {Component, ElementRef, Inject, Input, OnDestroy, OnInit, Optional, ViewChild} from "@angular/core";
+import {Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, startWith, switchMap} from "rxjs/operators";
+import {combineLatest, Observable, Subject, Subscription} from "rxjs";
+import {distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
