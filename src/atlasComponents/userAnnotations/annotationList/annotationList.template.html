@@ -1,0 +1,100 @@
+<div aria-label="user annotations viewer" class="annotation-content w-100">
+
+    <div aria-label="user annotations header" class="overflow-hidden mt-3 mr-2 ml-2">
+        <div arial-label="user annotations footer" class="d-flex justify-content-between">
+            <div>
+                <button class="mr-1 ml-1" mat-icon-button
+                        disabled
+                        aria-label="Import user annotation"
+                        matTooltip="Import">
+                    <i class="fas fa-file-import"></i>
+                </button>
+                <button class="mr-1 ml-1" mat-icon-button
+                        disabled
+                        aria-label="Export user annotation"
+                        matTooltip="Export">
+                    <i class="fas fa-file-export"></i>
+                </button>
+            </div>
+            <div class="d-flex flex-column">
+                <small [ngClass]="[annotationFilter !== 'all'? 'inactive-filter' : '']"
+                       class="cursor-pointer" (click)="annotationFilter = 'all'">
+                    All landmarks
+                </small>
+                <small [ngClass]="[annotationFilter !== 'current'? 'inactive-filter' : '']"
+                       class="cursor-pointer" (click)="annotationFilter = 'current'">
+                    Current template
+                </small>
+            </div>
+        </div>
+    </div>
+    <mat-divider class="mt-2 mb-2"></mat-divider>
+
+
+    <mat-accordion aria-label="user annotations list"
+                 class="h-100 d-flex flex-column overflow-auto">
+<!--        <mat-expansion-panel hideToggle *ngFor="let annotation of ans.annotations | groupAnnotationPolygons; let i = index;">-->
+        <mat-expansion-panel hideToggle *ngFor="let annotation of annotationsToShow; let i = index;">
+            <mat-expansion-panel-header>
+
+                <mat-panel-title>
+                    <div class="d-flex flex-column align-items-center m-0">
+                        <small class="font-italic">{{annotation.position1}}</small>
+                        <small class="font-italic" *ngIf="annotation.position2"> {{annotation.position2}}</small>
+                    </div>
+                </mat-panel-title>
+
+                <mat-panel-description class="w-100 d-flex align-items-center justify-content-end"
+                                       [matTooltip]="annotation.type">
+                    <span class="mr-2">{{annotation.name}}</span>
+                    <small><i [ngClass]="annotation.type === 'line'? 'fas fa-slash'
+                        : annotation.type === 'bounding box'? 'far fa-square'
+                        : annotation.type === 'ellipsoid'? 'fas fa-bullseye'
+                        : annotation.type === 'polygonParent' || annotation.type === 'polygon'? 'fas fa-draw-polygon'
+                         : 'fas fa-circle'"></i></small>
+                </mat-panel-description>
+
+
+
+            </mat-expansion-panel-header>
+
+
+            <div>
+                <div *ngIf="annotation.description">{{annotation.description}}</div>
+
+                <small>{{annotation.templateName}}</small>
+
+                <div class="d-flex align-items-center justify-content-center w-100">
+                    <button class="mr-1 ml-1" mat-icon-button
+                            aria-label="Hide annotation"
+                            [matTooltip]="annotation.annotationVisible? 'Hide' : 'Show'"
+                            (click)="toggleAnnotationVisibility(annotation)">
+                        <i class="fas far fa-check-circle" *ngIf="annotation.annotationVisible; else notVisible"></i>
+                        <ng-template #notVisible><i class="far fa-circle"></i></ng-template>
+                    </button>
+                    <button class="mr-1 ml-1" mat-icon-button
+                            disabled
+                            aria-label="Export single annotation">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <button class="mr-1 ml-1" mat-icon-button
+                            (click)="editing = i"
+                            aria-label="Edit annotation">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="mr-1 ml-1" mat-icon-button
+                            aria-label="Delete annotation"
+                            (click)="removeAnnotation(annotation)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+                <edit-annotation [annotation]="annotation" *ngIf="editing === i" (finished)="editing = -1">
+                </edit-annotation>
+            </div>
+
+        </mat-expansion-panel>
+
+    </mat-accordion>
+
+</div>

@@ -1,0 +1,12 @@
+.annotation-content {
+    max-width: 500px;
+    min-width: 300px;
+}
+
+.inactive-filter {
+    color: #bababa;
+}
+
+.selecting-height {
+    max-height: 100px;
+}

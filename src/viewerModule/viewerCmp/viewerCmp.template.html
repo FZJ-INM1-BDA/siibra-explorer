@@ -5,8 +5,39 @@
 
 <layout-floating-container [zIndex]="10">
 
+
+  <!-- Annotation mode -->
+  <div *ngIf="(viewerMode$ | async) === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+
+    <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+                          [hasBackdrop]="false">
+      <mat-drawer #drawer [mode]="'push'" class="pe-all">
+        <annotation-list></annotation-list>
+      </mat-drawer>
+      <mat-drawer-content class="visible position-relative pe-none">
+        <!-- pullable tab top right corner -->
+        <div iavLayoutFourCornersTopLeft class="d-flex flex-column flex-nowrap w-100">
+
+          <!-- top left -->
+          <div class="flex-grow-1 d-flex flex-nowrap mb-2">
+            <div (click)="drawer.toggle()" class="tab-toggle-container">
+              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+              matColor: 'primary',
+              fontIcon: 'fa-list',
+              tooltip: 'Annotation list'}">
+              </ng-container>
+            </div>
+          </div>
+          <annotating-mode #annotationMode>
+          </annotating-mode>
+        </div>
+
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </div>
   <!-- top drawer -->
   <mat-drawer-container
+    [hidden]="viewerMode$ | async"
     [iav-switch-initstate]="false"
     iav-switch
     #sideNavTopSwitch="iavSwitch"
@@ -190,7 +221,7 @@
     </mat-drawer>
 
     <!-- main-content -->
-    <mat-drawer-content class="visible position-relative">
+    <mat-drawer-content class="visible position-relative" [hidden]="viewerMode$ | async">
 
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
 
@@ -599,32 +630,32 @@
     </ng-template>
   </ng-template>
 
-  <ng-template #tabTmpl_defaultTmpl
-    let-matColor="matColor"
-    let-fontIcon="fontIcon"
-    let-customColor="customColor"
-    let-customColorDarkmode="customColorDarkmode"
-    let-tooltip="tooltip">
-    <!-- (click)="sideNavMasterSwitch.toggle()" -->
-    <button mat-raised-button
-      [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
-      [matTooltip]="tooltip"
-      class="pe-all tab-toggle"
-      [ngClass]="{
+
+</ng-template>
+<ng-template #tabTmpl_defaultTmpl
+             let-matColor="matColor"
+             let-fontIcon="fontIcon"
+             let-customColor="customColor"
+             let-customColorDarkmode="customColorDarkmode"
+             let-tooltip="tooltip">
+  <!-- (click)="sideNavMasterSwitch.toggle()" -->
+  <button mat-raised-button
+          [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
+          [matTooltip]="tooltip"
+          class="pe-all tab-toggle"
+          [ngClass]="{
         'darktheme': customColorDarkmode === true,
         'lighttheme': customColorDarkmode === false
       }"
-      [style.backgroundColor]="customColor"
+          [style.backgroundColor]="customColor"
 
-      [color]="(!customColor && matColor) ? matColor : null">
+          [color]="(!customColor && matColor) ? matColor : null">
 
       <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
         <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
       </span>
-    </button>
-  </ng-template>
+  </button>
 </ng-template>
-
 
 <!-- region sidenav tmpl -->
 <ng-template #sidenavRegionTmpl>
@@ -1078,7 +1109,7 @@
     <!-- hovered ROIs -->
     <ng-template [ngIf]="data.metadata.hoveredRegions.length > 0">
       <mat-divider></mat-divider>
-      
+
       <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions">
         <span mat-line>
           {{ hoveredR.displayName || hoveredR.name }}

@@ -3,7 +3,7 @@ import { IRegion } from './constants'
 
 export const viewerStateNewViewer = createAction(
   `[viewerState] newViewer`,
-  props<{ 
+  props<{
     selectTemplate: any
     selectParcellation: any
     navigation?: any
@@ -67,7 +67,7 @@ export const viewerStateSelectParcellation = createAction(
 )
 
 export const viewerStateSelectTemplateWithName = createAction(
-  `[viewerState] selectTemplateWithName`, 
+  `[viewerState] selectTemplateWithName`,
   props<{ payload: { name: string } }>()
 )
 
@@ -89,6 +89,11 @@ export const viewerStateRemoveAdditionalLayer = createAction(
 export const viewerStateSelectRegionWithIdDeprecated = createAction(
   `[viewerState] [deprecated] selectRegionsWithId`,
   props<{ selectRegionIds: string[] }>()
+)
+
+export const viewerStateSetViewerMode = createAction(
+  `[viewerState] setViewerMode`,
+  props<{payload: string}>()
 )
 
 export const viewerStateDblClickOnViewer = createAction(

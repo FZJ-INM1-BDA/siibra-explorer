@@ -4,70 +4,39 @@
       (keydown.enter)="!annotationForm.invalid? submitForm() : null"
       (ngSubmit)="submitForm()">
 
-    <mat-form-field *ngIf="!(showFull && cursorOut && selecting)"
-            [ngClass]="!showOnFocus || showFull? 'w-100' : 'short-input'">
-        <mat-label>{{!showOnFocus || showFull ? 'name' : '+ Annotate'}}</mat-label>
-        <input (focusin)="focusInName()"
-               name="name"
-               formControlName="name"
-               matInput>
-    </mat-form-field>
 
-    <div *ngIf="!showOnFocus || showFull"
-         class="w-100"
+    <div class="w-100"
          [@enterAnimation]>
-
-        <div class="w-100 d-flex justify-content-center">
-            <div class="d-flex flex-column align-items-center">
-                <small *ngIf="!(showFull && cursorOut && selecting)">Annotation type</small>
-                <div>
-                    <button *ngFor="let type of annotationTypes"
-                            mat-icon-button
-                            type="button"
-                            [matTooltip]="type.name"
-                            [color]="type.name === selectedType.name? 'primary' : null"
-                            (click)="selectType(type)">
-                        <i [ngClass]="type.class"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
+        <mat-form-field class="w-100">
+            <mat-label>Name</mat-label>
+            <input name="name"
+                   formControlName="name"
+                   matInput>
+        </mat-form-field>
         <div class="d-flex w-100">
             <div class="d-flex flex-column align-items-center w-100">
-                <mat-form-field class="w-100 annotation-editing-body"
-                    [ngStyle]="{border: cursorOut && selecting === 'position1'? '2px solid' : null}">
-                    <mat-label *ngIf="selectedType.name !== 'Ellipsoid'">position {{selectedType.twoCoordinates && ' 1'}}</mat-label>
-                    <mat-label *ngIf="selectedType.name === 'Ellipsoid'">center (vox)</mat-label>
+                <mat-form-field class="w-100 annotation-editing-body">
+                    <mat-label *ngIf="annotation.type !== 'ellipsoid'">Position {{annotation.position2 && ' 1'}}</mat-label>
+                    <mat-label *ngIf="annotation.type === 'ellipsoid'">Center (vox)</mat-label>
                     <div>
-                    <input type="text" name="position1"
-                           placeholder="0,0,0"
-                           class="pr-4"
-                           formControlName="position1" matInput
-                           (focusin)="position1Selected = false; changeSelectingPoint('position1')"
-                           (focusout)="position1CursorOut()">
-                        <i *ngIf="selecting === 'position1'" class="fas fa-crosshairs" style="margin-left: -20px;"></i>
-                        <i *ngIf="position1Selected && !(cursorOut && selecting === 'position1')" class="fas fa-check-circle" style="margin-left: -20px;"></i>
+                        <input type="text" name="position1"
+                               placeholder="0,0,0"
+                               class="pr-4"
+                               formControlName="position1"
+                               matInput>
                     </div>
                 </mat-form-field>
-                <small *ngIf="cursorOut && selecting === 'position1'" style="margin-top: -20px;">selecting</small>
             </div>
 
-            <div class="d-flex flex-column align-items-center w-100" *ngIf="selectedType.twoCoordinates">
-                <mat-form-field class="w-100 annotation-editing-body"
-                                [ngStyle]="{border: cursorOut && selecting === 'position2'? '2px solid' : null}">
-                    <mat-label *ngIf="selectedType.name !== 'Ellipsoid'">position 2 (vox)</mat-label>
-                    <mat-label *ngIf="selectedType.name === 'Ellipsoid'">radii</mat-label>
+            <div class="d-flex flex-column align-items-center w-100" *ngIf="annotation.position2">
+                <mat-form-field class="w-100 annotation-editing-body">
+                    <mat-label *ngIf="annotation.type !== 'ellipsoid'">Position 2 (vox)</mat-label>
+                    <mat-label *ngIf="annotation.type === 'ellipsoid'">Radii</mat-label>
                     <input type="text" name="position2"
                            class="pr-4"
                            placeholder="0,0,0"
-                           formControlName="position2" matInput
-                           (focusin)="position2Selected = false; changeSelectingPoint('position2')"
-                           (focusout)="position2CursorOut()">
-                    <i *ngIf="selecting === 'position2'" class="fas fa-crosshairs" style="margin-left: -20px;"></i>
-                    <i *ngIf="position2Selected && !(cursorOut && selecting === 'position2')" class="fas fa-check-circle" style="margin-left: -20px;"></i>
+                           formControlName="position2" matInput>
                 </mat-form-field>
-                <small *ngIf="cursorOut && selecting === 'position2'" style="margin-top: -20px;">selecting</small>
             </div>
         </div>
 

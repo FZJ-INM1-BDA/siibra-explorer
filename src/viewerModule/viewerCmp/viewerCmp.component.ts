@@ -3,7 +3,15 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
-import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
+import {
+  viewerStateContextedSelectedRegionsSelector,
+  viewerStateGetOverlayingAdditionalParcellations,
+  viewerStateParcVersionSelector,
+  viewerStateSelectedParcellationSelector,
+  viewerStateSelectedTemplateSelector,
+  viewerStateStandAloneVolumes,
+  viewerStateViewerModeSelector
+} from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
@@ -87,7 +95,7 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
-  
+
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,
@@ -125,6 +133,12 @@ export class ViewerCmp implements OnDestroy {
   public isStandaloneVolumes$ = this.store$.pipe(
     select(viewerStateStandAloneVolumes),
     map(v => v.length > 0)
+  )
+
+  public viewerMode: string
+  public viewerMode$ = this.store$.pipe(
+    select(viewerStateViewerModeSelector),
+    distinctUntilChanged(),
   )
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
@@ -233,7 +247,7 @@ export class ViewerCmp implements OnDestroy {
   ngAfterViewInit(){
     const cb = (context: TContextArg<'nehuba' | 'threeSurfer'>) => {
       let hoveredRegions = []
-      
+
       if (context.viewerType === 'nehuba') {
         hoveredRegions = (context as TContextArg<'nehuba'>).payload.nehuba.reduce(
           (acc, curr) => acc.concat(
@@ -256,7 +270,7 @@ export class ViewerCmp implements OnDestroy {
       if (context.viewerType === 'threeSurfer') {
         hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
       }
-      
+
       return {
         tmpl: this.viewerStatusCtxMenu,
         data: {

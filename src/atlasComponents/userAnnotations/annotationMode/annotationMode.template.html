@@ -1,0 +1,26 @@
+<div class="pe-all d-flex flex-column justify-content-content annotation-toolbar">
+
+    <div class="d-flex flex-column flex-grow-0 panel-default"
+         [ngStyle]="{backgroundColor: dark? '#424242' : 'white',
+         color: dark? 'antiquewhite' : '#424242'}"
+         style="margin-bottom: 20px;">
+        <button *ngFor="let type of ans.annotationTypes; let i = index"
+                mat-icon-button
+                type="button"
+                (click)="selectAnnotationType(i)"
+                class="mb-2 mt-2"
+                [matTooltip]="type.name"
+                [color]="selectedType === i? 'primary' : 'secondary'">
+            <i [ngClass]="type.class"></i>
+        </button>
+        <button
+                mat-icon-button
+                (click)="ans.disable()"
+                type="button"
+                class="mb-2 mt-2"
+                matTooltip="Disable annotating"
+                color="warn">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>

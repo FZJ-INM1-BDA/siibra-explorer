@@ -11,7 +11,8 @@ import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST, QUICKTOUR_DESC } from 'common/constants'
+import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
+import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
@@ -50,6 +51,7 @@ export class TopMenuCmp {
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
+  public annotateTooltipText: string = 'Start annotating'
 
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
@@ -88,6 +90,10 @@ export class TopMenuCmp {
         ...overwriteConfig
       })
     }
+  }
+
+  setAnnotatingMode() {
+    this.store$.dispatch(viewerStateSetViewerMode({payload: ARIA_LABELS.VIEWER_MODE_ANNOTATING,}))
   }
 
   private keyListenerConfigBase = {

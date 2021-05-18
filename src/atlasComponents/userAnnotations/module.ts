@@ -2,10 +2,13 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {DatabrowserModule} from "src/atlasComponents/databrowserModule";
 import {AngularMaterialModule} from "src/ui/sharedModules/angularMaterial.module";
-import {UserAnnotationsComponent} from "src/atlasComponents/userAnnotations/userAnnotationsCmp/userAnnotationsCmp.components";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {EditAnnotationComponent} from "src/atlasComponents/userAnnotations/editAnnotation/editAnnotation.component";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode/annotationMode.component";
+import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
+import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
+import {GroupAnnotationPolygons} from "src/atlasComponents/userAnnotations/groupAnnotationPolygons.pipe";
 
 @NgModule({
   imports: [
@@ -17,11 +20,17 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     AngularMaterialModule,
   ],
   declarations: [
-    UserAnnotationsComponent,
     EditAnnotationComponent,
+    AnnotationMode,
+    AnnotationList,
+    GroupAnnotationPolygons
+  ],
+  providers: [
+    AnnotationService
   ],
   exports: [
-    UserAnnotationsComponent,
+    AnnotationMode,
+    AnnotationList
   ]
 })
 

@@ -54,7 +54,10 @@
 
     // additional volumes
     TOGGLE_SHOW_LAYER_CONTROL: `Show layer control`,
-    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control'
+    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control',
+
+    //Viewer mode
+    VIEWER_MODE_ANNOTATING: 'annotating'
   }
 
   exports.IDS = {
@@ -78,6 +81,12 @@
     RECEPTOR_FP_CAPTION: `The receptor densities are visualized as fingerprints (fp), which provide the mean density and standard deviation for each of the analyzed receptor types, averaged across samples.`,
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
+
+    // Annotatins
+
+    // Annotations
+    USER_ANNOTATION_LAYER_NAME: 'user_annotations',
+    USER_ANNOTATION_STORE_KEY: `user_landmarks_demo_1`
   }
 
   exports.QUICKTOUR_DESC ={

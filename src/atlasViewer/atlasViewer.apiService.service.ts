@@ -6,7 +6,10 @@ import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
-import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors";
+import {
+  viewerStateFetchedTemplatesSelector,
+  viewerStateViewerModeSelector
+} from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
@@ -17,6 +20,7 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
 import { ILoadMesh } from 'src/messaging/types'
+import {ARIA_LABELS} from "common/constants";
 
 declare let window
 
@@ -84,6 +88,15 @@ export class AtlasViewerAPIServices implements OnDestroy{
   private s: Subscription[] = []
 
   private onMouseClick(ev: any): boolean{
+
+    // If annotation mode is on, avoid region selection
+    let viewerMode
+    this.store.pipe(
+      select(viewerStateViewerModeSelector),
+      take(1)
+    ).subscribe(vm => viewerMode = vm)
+    if (viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) return false
+
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
 

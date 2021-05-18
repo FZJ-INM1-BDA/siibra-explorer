@@ -19,6 +19,7 @@ import { NehubaModule } from "./nehuba";
 import { ThreeSurferModule } from "./threeSurfer";
 import { RegionAccordionTooltipTextPipe } from "./util/regionAccordionTooltipText.pipe";
 import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
+import {UserAnnotationsModule} from "src/atlasComponents/userAnnotations";
 import {QuickTourModule} from "src/ui/quickTour/module";
 
 @NgModule({
@@ -38,6 +39,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
     AtlasCmptConnModule,
     ComponentsModule,
     BSFeatureModule,
+    UserAnnotationsModule,
     QuickTourModule,
     ContextMenuModule,
   ],

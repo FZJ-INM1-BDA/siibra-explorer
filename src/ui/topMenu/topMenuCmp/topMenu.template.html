@@ -26,12 +26,6 @@
       </ng-container>
     </div>
 
-    <!-- user annotations -->
-    <div iav-fab-speed-dial-child>
-      <ng-container *ngTemplateOutlet="userAnnotationsBtnTmpl">
-      </ng-container>
-    </div>
-
     <!-- help one pager -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="helpBtnTmpl">
@@ -64,10 +58,6 @@
 
     <!-- pinned dataset -->
     <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
-    </ng-container>
-
-    <!-- user annotations -->
-    <ng-container *ngTemplateOutlet="userAnnotationsBtnTmpl">
     </ng-container>
 
     <!-- help one pager -->
@@ -133,22 +123,6 @@
   </div>
 </ng-template>
 
-<!-- User annotations btn -->
-<ng-template #userAnnotationsBtnTmpl>
-  <div class="btnWrapper"
-    (click)="bottomSheet.open(userAnnotations, {hasBackdrop: false, disableClose: true})"
-    matTooltip="My annotations">
-    <iav-dynamic-mat-button
-      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
-      [iav-dynamic-mat-button-style]="matBtnStyle"
-      [iav-dynamic-mat-button-color]="matBtnColor"
-      iav-dynamic-mat-button-aria-label="Annotations">
-
-      <i class="fas fa-pencil-ruler"></i>
-    </iav-dynamic-mat-button>
-  </div>
-</ng-template>
-
 <ng-template #helpBtnTmpl>
 
   <div class="btnWrapper"
@@ -175,6 +149,16 @@
     </mat-icon>
     <span>
       Screenshot
+    </span>
+  </button>
+  <button mat-menu-item
+    [disabled]="!viewerLoaded"
+    (click)="setAnnotatingMode()"
+    [matTooltip]="annotateTooltipText">
+    <mat-icon fontSet="fas" fontIcon="fa-pencil-ruler">
+    </mat-icon>
+    <span>
+      Annotate
     </span>
   </button>
   <plugin-banner></plugin-banner>
@@ -285,11 +269,4 @@
 
     </mat-list-item>
   </mat-list>
-</ng-template>
-
-
-
-<ng-template #userAnnotations>
-  <user-annotations (close)="bottomSheet.dismiss()" style="max-width: 600px">
-  </user-annotations>
 </ng-template>
