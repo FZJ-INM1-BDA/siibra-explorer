@@ -65,8 +65,17 @@ export class RegionalFeaturesService implements OnDestroy{
     select(uiStateMouseoverUserLandmark)
   )
 
-  public getAllFeaturesByRegion(region: {['fullId']: string}){
-    if (!region.fullId) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
+  public getAllFeaturesByRegion(_region: {['fullId']: string} | { id: { kg: {kgSchema: string, kgId: string} } }){
+    
+    const region = {
+      ..._region,
+    }
+    if (!region['fullId']) {
+      const { kgSchema, kgId } = region['id']?.kg || {}
+      if (kgSchema && kgId) region['fullId'] = `${kgSchema}/${kgId}`
+    }
+
+    if (!region['fullId']) throw new Error(`getAllFeaturesByRegion - region does not have fullId defined`)
     const regionFullIds = getStringIdsFromRegion(region)
     const hemisphereObj = (() => {
       const hemisphere = getRegionHemisphere(region)

@@ -1,6 +1,9 @@
+import { BehaviorSubject, throwError } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
+import { TRegion, IBSSummaryResponse, IBSDetailResponse } from "./type";
+import { BsFeatureService } from "./service";
+import { flattenReducer } from 'common/util'
 import { Input } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
-import { TRegion } from "./constants";
 
 export class BsRegionInputBase{
 
@@ -17,6 +20,22 @@ export class BsRegionInputBase{
     return this._region
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor(){}
+  constructor(
+    private svc: BsFeatureService
+  ){}
+
+  protected featuresList$ = this.region$.pipe(
+    switchMap(region => this.svc.listFeatures(region)),
+    map(result => result.features.map(obj => Object.keys(obj).reduce(flattenReducer, [])))
+  )
+
+  protected getFeatureInstancesList<T extends keyof IBSSummaryResponse>(feature: T){
+    if (!this._region) return throwError('region needs to be defined')
+    return this.svc.getFeatures<T>(feature, this._region)
+  }
+
+  protected getFeatureInstance<T extends keyof IBSDetailResponse>(feature: T, id: string) {
+    if (!this._region) return throwError('region needs to be defined')
+    return this.svc.getFeature<T>(feature, this._region, id)
+  }
 }

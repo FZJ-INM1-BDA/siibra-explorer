@@ -1,4 +1,4 @@
-import { Directive, Input, HostListener, Inject, InjectionToken, Optional } from "@angular/core";
+import { Directive, HostListener, Inject, Input, Optional } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
@@ -10,7 +10,6 @@ export const IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG = `IAV_DATASET_SHOW_DATASET_
   selector: '[iav-dataset-show-dataset-dialog]',
   exportAs: 'iavDatasetShowDatasetDialog'
 })
-
 export class ShowDatasetDialogDirective{
 
   static defaultDialogConfig = {
@@ -35,7 +34,7 @@ export class ShowDatasetDialogDirective{
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
-    @Inject(IAV_DATASET_SHOW_DATASET_DIALOG_CMP) private dialogCmp: any,
+    @Optional() @Inject(IAV_DATASET_SHOW_DATASET_DIALOG_CMP) private dialogCmp: any,
     @Optional() @Inject(OVERWRITE_SHOW_DATASET_DIALOG_TOKEN) private overwriteFn: TOverwriteShowDatasetDialog
   ){ }
 
@@ -61,6 +60,7 @@ export class ShowDatasetDialogDirective{
       return this.overwriteFn(data)
     }
 
+    if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)
     this.matDialog.open(this.dialogCmp, {
       ...ShowDatasetDialogDirective.defaultDialogConfig,
       data

@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { KgRegionalFeatureModule } from "./kgRegionalFeature";
 import { BSFeatureReceptorModule } from "./receptor";
 import { BsFeatureService } from "./service";
 
@@ -7,12 +8,14 @@ import { BsFeatureService } from "./service";
   imports: [
     CommonModule,
     BSFeatureReceptorModule,
+    KgRegionalFeatureModule,
   ],
   providers: [
     BsFeatureService
   ],
   exports: [
-    BSFeatureReceptorModule
+    BSFeatureReceptorModule,
+    KgRegionalFeatureModule,
   ]
 })
 

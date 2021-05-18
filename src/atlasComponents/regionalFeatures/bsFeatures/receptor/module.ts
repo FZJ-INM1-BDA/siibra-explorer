@@ -8,7 +8,6 @@ import { BsFeatureReceptorEntry } from "./entry/entry.component";
 import { BsFeatureReceptorFingerprint } from "./fp/fp.component";
 import { BsFeatureReceptorDirective } from "./hasReceptor.directive";
 import { BsFeatureReceptorProfile } from "./profile/profile.component";
-import { BsFeatureReceptorService } from "./service";
 
 @NgModule({
   imports: [
@@ -27,9 +26,6 @@ import { BsFeatureReceptorService } from "./service";
   exports: [
     BsFeatureReceptorEntry,
     BsFeatureReceptorDirective,
-  ],
-  providers: [
-    BsFeatureReceptorService,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

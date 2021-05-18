@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, Pipe, PipeTransform } from "@angular/core";
-import { CountedDataModality } from "../databrowser.service";
+import { TCountedDataModality } from "../type";
 import { ARIA_LABELS } from 'common/constants'
 
 
@@ -19,12 +19,12 @@ export class ModalityPicker implements OnChanges {
   public modalityVisibility: Set<string> = new Set()
 
   @Input()
-  public countedDataM: CountedDataModality[] = []
+  public countedDataM: TCountedDataModality[] = []
 
-  public checkedModality: CountedDataModality[] = []
+  public checkedModality: TCountedDataModality[] = []
 
   @Output()
-  public modalityFilterEmitter: EventEmitter<CountedDataModality[]> = new EventEmitter()
+  public modalityFilterEmitter: EventEmitter<TCountedDataModality[]> = new EventEmitter()
 
   // filter(dataentries:DataEntry[]) {
   //   return this.modalityVisibility.size === 0
@@ -40,7 +40,7 @@ export class ModalityPicker implements OnChanges {
    * TODO
    * togglemodailty should emit event, and let parent handle state
    */
-  public toggleModality(modality: Partial<CountedDataModality>) {
+  public toggleModality(modality: Partial<TCountedDataModality>) {
     this.modalityFilterEmitter.emit(
       this.countedDataM.map(d => d.name === modality.name
         ? {
@@ -67,7 +67,7 @@ export class ModalityPicker implements OnChanges {
   }
 }
 
-const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').toLowerCase().charCodeAt(0) - (b.name || '0').toLowerCase().charCodeAt(0) 
+const sortByFn = (a: TCountedDataModality, b: TCountedDataModality) => (a.name || '0').toLowerCase().charCodeAt(0) - (b.name || '0').toLowerCase().charCodeAt(0) 
 
 @Pipe({
   name: 'sortModalityAlphabetically',
@@ -75,7 +75,7 @@ const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || 
 })
 
 export class SortModalityAlphabeticallyPipe implements PipeTransform{
-  public transform(arr: CountedDataModality[]): CountedDataModality[]{
+  public transform(arr: TCountedDataModality[]): TCountedDataModality[]{
     return [...arr].sort(sortByFn)
   }
 }
