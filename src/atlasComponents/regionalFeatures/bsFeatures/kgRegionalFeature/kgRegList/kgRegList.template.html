@@ -1,0 +1,77 @@
+<mat-expansion-panel hideToggle>
+  <mat-expansion-panel-header class="align-items-center"
+    [attr.aria-label]="ARIA_LABELS.MODALITY_FILTER">
+    <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
+      <span>
+          Filter features
+      </span>
+      <small *ngIf="kgRegionalFeatures.length > 0" class="text-muted">
+        <ng-template [ngIf]="kgRegionalFeatures.length !== visibleRegionalFeatures.length"
+          [ngIfElse]="noFilterTmpl">
+          {{ visibleRegionalFeatures.length }} / {{ kgRegionalFeatures.length }}
+        </ng-template>
+        
+        <ng-template #noFilterTmpl>
+          {{ kgRegionalFeatures.length }} features
+        </ng-template>
+      </small>
+    </div>
+
+    <!-- filter icon -->
+    <ng-template [ngIf]="kgRegionalFeatures.length !== visibleRegionalFeatures.length"
+      [ngIfElse]="defaultFilterIconTmpl">
+
+      <button mat-icon-button
+        matTooltip="Reset filters"
+        color="primary"
+        iav-stop="click"
+        iav-delay-event="click"
+        (iav-delay-event-emit)="clearFilters()">
+        <i class="fas fa-filter"></i>
+      </button>
+    </ng-template>
+
+    <ng-template #defaultFilterIconTmpl>
+      <button mat-icon-button color="basic">
+        <i class="fas fa-filter"></i>
+      </button>
+    </ng-template>
+  </mat-expansion-panel-header>
+
+  <modality-picker class="max-h-10em overflow-y-auto overflow-x-hidden"
+    [countedDataM]="dataModalities"
+    (modalityFilterEmitter)="handleModalityVisbilityChange($event)">
+  </modality-picker>
+</mat-expansion-panel>
+
+
+<ng-container *ngTemplateOutlet="virtualScrollTmpl">
+</ng-container>
+
+<ng-template #virtualScrollTmpl>
+  <cdk-virtual-scroll-viewport
+    [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL"
+    class="h-100"
+    minBufferPx="200"
+    maxBufferPx="400"
+    itemSize="50">
+    <div *cdkVirtualFor="let dataset of visibleRegionalFeatures; trackBy: trackByFn; templateCacheSize: 20; let index = index"
+      class="virtual-scroll-element overflow-hidden">
+
+      <!-- divider, show if not first -->
+      <mat-divider *ngIf="index !== 0"></mat-divider>
+
+      <kg-regional-feature-summary
+        mat-ripple
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-kgid]="dataset['@id'] | getTrailingHex"
+        class="d-block pb-1 pt-1"
+        [region]="region"
+        [loadFull]="true"
+        [summary]="dataset"
+        (loadedDetail)="handlePopulatedDetailEv($event)">
+      </kg-regional-feature-summary>
+
+    </div>
+  </cdk-virtual-scroll-viewport>
+</ng-template>

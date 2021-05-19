@@ -179,8 +179,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
     const {
       orientation,
-      perspectiveOrientation,
-      perspectiveZoom,
       position,
       zoom
     } = getNavigationStateFromConfig(this.selectedTemplatePure.nehubaConfig)

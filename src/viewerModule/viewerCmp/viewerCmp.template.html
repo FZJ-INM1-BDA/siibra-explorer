@@ -746,7 +746,7 @@
     </ng-container>
 
     <!-- tmp experimtal -->
-    <ng-template #contenttmpl>
+    <ng-template #regionalReceptorTmpl>
       <bs-features-receptor-entry
         [region]="region">
       </bs-features-receptor-entry>
@@ -761,58 +761,29 @@
       title: 'ReceptorDistribution',
       iconClass: 'fas fa-info',
       iavNgIf: bsFeatureReceptorDirective.hasReceptor$ | async,
-      content: contenttmpl
+      content: regionalReceptorTmpl
     }">
 
     </ng-container>
 
-    <!--  regional features-->
-    <ng-template #regionalFeaturesTmpl let-expansionPanel="expansionPanel">
-
-      <data-browser
-        *ngIf="expansionPanel.expanded"
-        [disableVirtualScroll]="true"
-        [regions]="[region]">
-      </data-browser>
+    <!-- kg regional features list -->
+    <ng-template #kgRegionalFeatureList>
+      <kg-regional-features-list [region]="region">
+      </kg-regional-features-list>
     </ng-template>
 
-    <div class="hidden" iav-databrowser-directive
-      [regions]="[region]"
-      #iavDbDirective="iavDatabrowserDirective">
+    <div kg-regional-features-list-directive
+      [region]="region"
+      #kgRegFeatlist="kgRegionalFeaturesListDirective">
     </div>
-
-    <!-- if dataset is loading -->
-    <ng-template
-      [ngIf]="iavDbDirective?.fetchingFlag"
-      [ngIfElse]="featureLoadedTmpl">
-      <div class="d-flex justify-content-center">
-        <spinner-cmp></spinner-cmp>
-      </div>
-    </ng-template>
-
-    <ng-template #featureLoadedTmpl>
-
-      <!-- place holder content, if no regional features or connectivity or change ref space options are available -->
-      <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0">
-        <ng-container *ngIf="parcellationSelected$ | async as selectedParcellation">
-          <ng-template [ngIf]="selectedParcellation?.hasAdditionalViewMode?.includes('connectivity')">
-            <div class="p-4">
-              {{ CONST.NO_ADDIONTAL_INFO_AVAIL }}
-            </div>
-          </ng-template>
-        </ng-container>
-      </ng-template>
-
-    </ng-template>
-
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: CONST.REGIONAL_FEATURES,
-      desc: iavDbDirective?.dataentries?.length,
       iconClass: 'fas fa-database',
-      iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
-      iavNgIf: iavDbDirective?.dataentries?.length,
-      content: regionalFeaturesTmpl
+      content: kgRegionalFeatureList,
+      desc: kgRegFeatlist.kgRegionalFeatures.length,
+      iconTooltip: kgRegFeatlist.kgRegionalFeatures.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
+      iavNgIf: (kgRegFeatlist.kgRegionalFeatures$ | async ).length
     }">
     </ng-container>
 
@@ -932,30 +903,6 @@
 
     <!-- other regions detail accordion -->
     <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
-
-      <!--  regional features-->
-      <ng-template #regionalFeaturesTmpl>
-        <data-browser
-          [disableVirtualScroll]="true"
-          [regions]="regions">
-        </data-browser>
-      </ng-template>
-
-      <div class="hidden"
-        iav-databrowser-directive
-        [regions]="regions"
-        #iavDbDirective="iavDatabrowserDirective">
-      </div>
-
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: CONST.REGIONAL_FEATURES,
-        desc: iavDbDirective?.dataentries?.length,
-        iconClass: 'fas fa-database',
-        iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
-        iavNgIf: iavDbDirective?.dataentries?.length,
-        content: regionalFeaturesTmpl
-      }">
-      </ng-container>
 
       <!-- Multi regions include -->
       <ng-template #multiRegionInclTmpl>

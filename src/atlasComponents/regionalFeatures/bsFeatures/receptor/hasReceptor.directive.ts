@@ -2,7 +2,7 @@ import { Directive, OnDestroy } from "@angular/core";
 import { merge, of, Subscription } from "rxjs";
 import { catchError, map, mapTo, switchMap } from "rxjs/operators";
 import { BsRegionInputBase } from "../bsRegionInputBase";
-import { BsFeatureReceptorService } from "./service";
+import { BsFeatureService } from "../service";
 
 @Directive({
   selector: '[bs-features-receptor-directive]',
@@ -20,7 +20,7 @@ export class BsFeatureReceptorDirective extends BsRegionInputBase implements OnD
   public hasReceptor$ = this.region$.pipe(
     switchMap(val => merge(
       of(null),
-      this.featureReceptorService.getReceptorRegionalFeature(val).pipe(
+      this.getFeatureInstancesList('ReceptorDistribution').pipe(
         mapTo(true),
         catchError(() => of(false))
       )
@@ -32,8 +32,8 @@ export class BsFeatureReceptorDirective extends BsRegionInputBase implements OnD
   )
   
   constructor(
-    private featureReceptorService: BsFeatureReceptorService
+    svc: BsFeatureService
   ){
-    super()
+    super(svc)
   }
 }

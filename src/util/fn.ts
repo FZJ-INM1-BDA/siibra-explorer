@@ -84,16 +84,33 @@ export function switchMapWaitFor(opts: ISwitchMapWaitFor){
   )
 }
 
-export const CachedFunction = () => {
+
+type TCacheFunctionArg = {
+  serialization?: (...arg: any[]) => string
+}
+
+/**
+ * Member function decorator
+ * Multiple function calls with strictly equal arguments will return cached result
+ * @returns cached result if exists, else call original function
+ */
+export const CachedFunction = (config?: TCacheFunctionArg) => {
+  const { serialization } = config || {}
   const cache = {}
   const cachedValKeySym = Symbol('cachedValKeySym')
   return (_target: Record<string, any>, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
     descriptor.value = function(...args: any[]) {
       let found = cache
-      for (const arg of args) {
-        if (!cache[arg]) cache[arg] = {}
-        found = cache[arg]
+      if (serialization) {
+        const key = serialization(...args)
+        if (!cache[key]) cache[key] = {}
+        found = cache[key]
+      } else {
+        for (const arg of args) {
+          if (!cache[arg]) cache[arg] = {}
+          found = cache[arg]
+        }
       }
       if (found[cachedValKeySym]) return found[cachedValKeySym]
       const returnVal = originalMethod.apply(this, args)
@@ -104,7 +121,6 @@ export const CachedFunction = () => {
 }
 
 // A quick, non security hash function
-// TODO implement cache decorator
 export class QuickHash {
   private length = 6
   constructor(opts?: any){

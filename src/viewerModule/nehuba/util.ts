@@ -304,9 +304,9 @@ export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
     const {
       navigation = {}
     } = nehubaConfigObj || {}
-    const { pose = {}, zoomFactor = 1e6 } = navigation
-    const { position = {}, orientation = [0, 0, 0, 1] } = pose
-    const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position
+    const { pose = {} } = navigation
+    const { position = {} } = pose
+    const { voxelSize = [1, 1, 1] } = position
     return voxelSize
   })()
 

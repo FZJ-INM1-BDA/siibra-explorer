@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { async, TestBed } from "@angular/core/testing";
-import { AngularMaterialModule } from "../../ui/sharedModules/angularMaterial.module";
-import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
+import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDataset.directive";
 import { By } from "@angular/platform-browser";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";

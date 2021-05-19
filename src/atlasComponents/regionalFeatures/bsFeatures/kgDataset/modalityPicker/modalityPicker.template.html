@@ -4,7 +4,7 @@
   </legend>
 
   <mat-checkbox
-    [ariaLabel]="datamodality.name"
+    
     [checked]="datamodality.visible"
     (change)="toggleModality(datamodality)"
     [ngClass]="{'muted': datamodality.occurance === 0}"

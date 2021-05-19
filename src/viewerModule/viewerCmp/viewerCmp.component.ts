@@ -1,14 +1,14 @@
-import {Component, ElementRef, Inject, Input, OnDestroy, OnInit, Optional, ViewChild} from "@angular/core";
+import {Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, startWith, switchMap} from "rxjs/operators";
+import {combineLatest, Observable, Subject, Subscription} from "rxjs";
+import {distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
-import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import { IViewerCmpUiState, TSupportedViewer } from "../constants";
@@ -67,9 +67,22 @@ import {HttpClient} from "@angular/common/http";
           return rs[0]
         })
       ),
-      deps: [
-        Store
-      ]
+      deps: [ Store ]
+    },
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useFactory: (store: Store) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
+          if (arg.fullId) {
+            store.dispatch(
+              uiActionShowDatasetWtihId({
+                id: arg.fullId
+              })
+            )
+          }
+        }
+      },
+      deps: [ Store ]
     },
     ComponentStore
   ]
