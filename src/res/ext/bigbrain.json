@@ -909,14 +909,14 @@
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
                               "relatedAreas": [],
                               "originDatasets":[
                                 {
                                   "kgSchema": "minds/core/dataset/v1.0.0",
-                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
                                   "format": {
                                     "name": "Full 3D map"
                                   }
@@ -932,14 +932,14 @@
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
                               "relatedAreas": [],
                               "originDatasets":[
                                 {
                                   "kgSchema": "minds/core/dataset/v1.0.0",
-                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
                                   "format": {
                                     "name": "Full 3D map"
                                   }
@@ -955,14 +955,14 @@
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
                               "relatedAreas": [],
                               "originDatasets":[
                                 {
                                   "kgSchema": "minds/core/dataset/v1.0.0",
-                                  "kgId": "d0c36f4a-91a8-4885-880d-f2896f5c54cf",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
                                   "format": {
                                     "name": "Full 3D map"
                                   }
