@@ -122,18 +122,20 @@ export class AnnotationService implements OnDestroy {
       }
     }
 
+    giveNameByType(type) {
+      const pointAnnotationNumber = this.annotations
+        .filter(a => a.name && a.name.startsWith(type) && (+a.name.split(type)[1]))
+        .map(a => +a.name.split(type)[1])
+
+      return pointAnnotationNumber && pointAnnotationNumber.length?
+        `${type}${Math.max(...pointAnnotationNumber) + 1}` : `${type}1`
+
+    }
+
     storeAnnotation(annotation) {
       // give names by type + number
       if (!annotation.name) {
-        const pointAnnotationNumber = this.annotations
-          .filter(a => a.name && a.name.startsWith(annotation.type) && (+a.name.split(annotation.type)[1]))
-          .map(a => +a.name.split(annotation.type)[1])
-
-        if (pointAnnotationNumber && pointAnnotationNumber.length) {
-          annotation.name = `${annotation.type}${Math.max(...pointAnnotationNumber) + 1}`
-        } else {
-          annotation.name  = `${annotation.type}1`
-        }
+        annotation.name = this.giveNameByType(annotation.type)
       }
 
       const foundIndex = this.annotations.findIndex(x => x.id === annotation.id)
@@ -198,6 +200,7 @@ export class AnnotationService implements OnDestroy {
     removeAnnotation(id) {
       this.removeAnnotationFromViewer(id)
       this.annotations = this.annotations.filter(a => a.id !== id)
+      this.displayAnnotations = this.annotations.filter(a => a.id !== id)
       this.storeToLocalStorage()
     }
 
@@ -227,28 +230,32 @@ export class AnnotationService implements OnDestroy {
           const polygonAnnotations = annotations.filter(a => a.id.split('_')[0] === annotationId[0]
                 && a.id.split('_')[1])
 
-          const polygonPositions = polygonAnnotations.map((a, i) => {
-            return i+1 !== polygonAnnotations.length? {
+          const polygonPositions = polygonAnnotations.map((a, index) => {
+            return (index+1) !== polygonAnnotations.length? {
               position: a.position2,
               lines: [
                 {id: a.id, point: 2},
-                {id: polygonAnnotations[i+1], point: 1}
+                {id: polygonAnnotations[index+1].id, point: 1}
               ]
-            } : polygonAnnotations[i].position2 !== polygonAnnotations[0].position1? {
+            } : a.position2 !== polygonAnnotations[0].position1? {
               position: a.position2,
               lines: [
                 {id: a.id, point: 2}
               ]
-            } : {
-              position: a.position2,
-              lines: [
-                {id: a.id, point: 2},
-                {id: polygonAnnotations[0].id, point: 1}
-              ]
-            }
+            } : null
+          }).filter(a => !!a)
+          polygonPositions.unshift({
+            position: polygonAnnotations[0].position1,
+            lines: polygonAnnotations[0].position1 === [...polygonAnnotations].pop().position2?
+              [{id: polygonAnnotations[0].id, point: 1}, {id: [...polygonAnnotations].pop().id, point: 2}]
+              : [{id: polygonAnnotations[0].id, point: 1}]
           })
 
           transformed = transformed.filter(a => a.id.split('_')[0] !== annotationId[0])
+
+          if (!annotations[i].name) {
+            annotations[i].name = this.giveNameByType(annotations[i].type)
+          }
 
           transformed.push({
             id: annotationId[0],
@@ -263,10 +270,15 @@ export class AnnotationService implements OnDestroy {
 
       }
 
-      this.displayAnnotations = [
-        ...this.displayAnnotations,
-        ...transformed
-      ]
+      transformed.forEach(tr=> {
+        const foundIndex = this.displayAnnotations.findIndex(x => x.id === tr.id)
+
+        if (foundIndex >= 0) {
+          this.displayAnnotations[foundIndex] = tr
+        } else {
+          this.displayAnnotations.push(tr)
+        }
+      })
     }
 
     changeAnnotationFilter(filter) {

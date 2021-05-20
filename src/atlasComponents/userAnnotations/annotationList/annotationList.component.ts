@@ -14,8 +14,8 @@ export class AnnotationList {
 
   get annotationsToShow() {
     return this.ans.annotations
-      // .filter(a => this.annotationFilter === 'all' || a.templateName === this.ans.selectedTemplate)
-      // .filter(a => (a.type !== 'polygon' || +a.id.split('_')[1] === 0)
+    // .filter(a => this.annotationFilter === 'all' || a.templateName === this.ans.selectedTemplate)
+    // .filter(a => (a.type !== 'polygon' || +a.id.split('_')[1] === 0)
 
     // let transformed = [...this.ans.annotations]
     //
@@ -113,6 +113,20 @@ export class AnnotationList {
       return
     }
     this.ans.saveAnnotation(annotation)
+  }
+
+  savePolygonPosition(position, inputVal) {
+    position.lines.forEach(l => {
+      if (l.point === 2) {
+        const annotation = this.ans.annotations.find(a => a.id === l.id)
+        annotation.position2 = inputVal
+        this.saveAnnotation(annotation)
+      } else {
+        const annotation = this.ans.annotations.find(a => a.id === l.id)
+        annotation.position1 = inputVal
+        this.saveAnnotation(annotation)
+      }
+    })
   }
 
 }
