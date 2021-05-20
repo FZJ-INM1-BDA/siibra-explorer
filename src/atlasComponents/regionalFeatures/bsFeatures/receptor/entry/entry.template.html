@@ -1,4 +1,5 @@
-<mat-select [(value)]="selectedREntryId">
+<!-- potential selector for receptor data -->
+<mat-select class="invisible" [(value)]="selectedREntryId">
   <mat-option *ngFor="let rec of receptorsSummary$ | async"
     [value]="rec['@id']">
     {{ rec.name }}
