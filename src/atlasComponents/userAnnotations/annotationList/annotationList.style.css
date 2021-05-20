@@ -1,5 +1,5 @@
 .annotation-content {
-    max-width: 500px;
+    max-width: 300px;
     min-width: 300px;
 }
 
@@ -10,3 +10,13 @@
 .selecting-height {
     max-height: 100px;
 }
+
+input, textarea {
+  background: none;
+  border: none;
+}
+
+input:focus, textarea:focus {
+  border-bottom: 2px solid;
+}
+

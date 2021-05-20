@@ -10,6 +10,8 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { animate, style, transition, trigger } from "@angular/animations";
 import { Subscription } from "rxjs";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
+import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
+import {Store} from "@ngrx/store";
 
 @Component({
   selector: 'edit-annotation',
@@ -37,7 +39,8 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
 
     constructor(
       private formBuilder: FormBuilder,
-      public ans: AnnotationService
+      public ans: AnnotationService,
+      private store$: Store<any>,
     ) {
       this.annotationForm = this.formBuilder.group({
         id: [{value: 'null'}],
@@ -69,6 +72,11 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
 
     submitForm() {
       if (this.annotationForm.valid) {
+        if (this.annotationForm.controls.position1.value.split(',').length !== 3 ||
+            (this.annotationForm.controls.position2.value
+                && this.annotationForm.controls.position2.value.split(',').length !== 3)) {
+          return
+        }
         this.ans.saveAnnotation(this.annotationForm.value)
         this.cancelEditing()
       }
@@ -92,6 +100,19 @@ export class EditAnnotationComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
       this.subscriptions.forEach(s => s.unsubscribe())
+    }
+
+    navigate(position) {
+      //ToDo change for real position for all templates
+      position = position.split(',').map(p => +p * 1e6)
+      this.store$.dispatch(
+        viewerStateChangeNavigation({
+          navigation: {
+            position,
+            positionReal: true
+          },
+        })
+      )
     }
 
 }

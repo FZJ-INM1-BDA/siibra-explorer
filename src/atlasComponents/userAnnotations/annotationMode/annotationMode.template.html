@@ -1,9 +1,8 @@
 <div class="pe-all d-flex flex-column justify-content-content annotation-toolbar">
 
-    <div class="d-flex flex-column flex-grow-0 panel-default"
-         [ngStyle]="{backgroundColor: dark? '#424242' : 'white',
-         color: dark? 'antiquewhite' : '#424242'}"
-         style="margin-bottom: 20px;">
+    <div class="d-flex flex-column flex-grow-0 panel-default annotation-toolbar-content"
+         [ngStyle]="{backgroundColor: ans.darkTheme? '#424242' : 'white',
+         color: ans.darkTheme? 'antiquewhite' : '#424242'}">
         <button *ngFor="let type of ans.annotationTypes; let i = index"
                 mat-icon-button
                 type="button"
@@ -18,9 +17,20 @@
                 (click)="ans.disable()"
                 type="button"
                 class="mb-2 mt-2"
-                matTooltip="Disable annotating"
+                matTooltip="Exit annotation mode"
                 color="warn">
             <i class="fas fa-times"></i>
         </button>
     </div>
+</div>
+
+<div class="pe-all position-absolute d-flex align-items-center p-3 annotation-mode-message-panel">
+    <span>Annotation mode</span>
+    <button mat-icon-button
+            (click)="ans.disable()"
+            type="button"
+            class="mb-2 mt-2"
+            matTooltip="Exit annotation mode">
+        <i class="fas fa-times"></i>
+    </button>
 </div>

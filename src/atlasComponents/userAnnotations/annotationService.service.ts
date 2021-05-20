@@ -19,10 +19,13 @@ const USER_ANNOTATION_LAYER_SPEC = {
 export class AnnotationService implements OnDestroy {
 
     public annotations = []
+    public displayAnnotations = []
     public addedLayer: any
     public ellipsoidMinRadius = 0.5
+    public annotationFilter: 'all' | 'current' = 'current'
 
     public selectedTemplate: string
+    public darkTheme = false
     public subscriptions: Subscription[] = []
 
     public annotationTypes = [
@@ -30,8 +33,8 @@ export class AnnotationService implements OnDestroy {
       {name: 'Point', class: 'fas fa-circle', type: 'singleCoordinate'},
       {name: 'Line', class: 'fas fa-slash', type: 'doubleCoordinate'},
       {name: 'Polygon', class: 'fas fa-draw-polygon', type: 'polygon'},
-      {name: 'Bounding box', class: 'far fa-square', type: 'doubleCoordinate'},
-      {name: 'Ellipsoid', class: 'fas fa-bullseye', type: 'doubleCoordinate'},
+      // {name: 'Bounding box', class: 'far fa-square', type: 'doubleCoordinate'},
+      // {name: 'Ellipsoid', class: 'fas fa-bullseye', type: 'doubleCoordinate'},
       {name: 'Remove', class: 'fas fa-trash', type: 'remove'},
     ]
 
@@ -74,7 +77,7 @@ export class AnnotationService implements OnDestroy {
       description = null,
       name = null,
       templateName = null,
-    } = {}) {
+    } = {}, store = true, backup = false) {
       let annotation = {
         id: id || getUuid(),
         annotationVisible: true,
@@ -93,11 +96,68 @@ export class AnnotationService implements OnDestroy {
           ...this.annotations[foundIndex],
           ...annotation
         }
+      }
+
+      this.addAnnotationOnViewer(annotation)
+
+      if (backup) {
+        const i = this.saveEditList.findIndex((e) => e.id === annotation.id)
+        if (i < 0) {this.saveEditList.push(annotation)
+        } else {this.saveEditList[i] = annotation}
+      }
+
+      if (store) {
+        this.storeAnnotation(annotation)
+      }
+    }
+    public saveEditList = []
+
+    public storeBackup() {
+      if (this.saveEditList.length) {
+        if (this.saveEditList[0].type === 'polygon') {
+          this.addPolygonsToDisplayAnnotations(this.saveEditList)
+        }
+        this.saveEditList.forEach(a => this.storeAnnotation(a))
+        this.saveEditList = []
+      }
+    }
+
+    storeAnnotation(annotation) {
+      // give names by type + number
+      if (!annotation.name) {
+        const pointAnnotationNumber = this.annotations
+          .filter(a => a.name && a.name.startsWith(annotation.type) && (+a.name.split(annotation.type)[1]))
+          .map(a => +a.name.split(annotation.type)[1])
+
+        if (pointAnnotationNumber && pointAnnotationNumber.length) {
+          annotation.name = `${annotation.type}${Math.max(...pointAnnotationNumber) + 1}`
+        } else {
+          annotation.name  = `${annotation.type}1`
+        }
+      }
+
+      const foundIndex = this.annotations.findIndex(x => x.id === annotation.id)
+
+      if (foundIndex >= 0) {
+        annotation = {
+          ...this.annotations[foundIndex],
+          ...annotation
+        }
         this.annotations[foundIndex] = annotation
       } else {
         this.annotations.push(annotation)
       }
-      this.addAnnotationOnViewer(annotation)
+
+      if(annotation.type !== 'polygon') {
+        const foundIndex = this.displayAnnotations.findIndex(x => x.id === annotation.id)
+
+        if (foundIndex >= 0) {
+          this.displayAnnotations[foundIndex] = annotation
+        } else {
+          this.displayAnnotations.push(annotation)
+        }
+      }
+
       this.storeToLocalStorage()
     }
 
@@ -155,6 +215,64 @@ export class AnnotationService implements OnDestroy {
         annotations = annotations.filter(a => a.id !== id)
         annotationLayer.localAnnotations.restoreState(annotations)
       }
+    }
+
+    addPolygonsToDisplayAnnotations(annotations) {
+      let transformed = [...annotations]
+
+      for (let i = 0; i<annotations.length; i++) {
+
+        const annotationId = annotations[i].id.split('_')
+        if (!transformed.find(t => t.id === annotationId[0])) {
+          const polygonAnnotations = annotations.filter(a => a.id.split('_')[0] === annotationId[0]
+                && a.id.split('_')[1])
+
+          const polygonPositions = polygonAnnotations.map((a, i) => {
+            return i+1 !== polygonAnnotations.length? {
+              position: a.position2,
+              lines: [
+                {id: a.id, point: 2},
+                {id: polygonAnnotations[i+1], point: 1}
+              ]
+            } : polygonAnnotations[i].position2 !== polygonAnnotations[0].position1? {
+              position: a.position2,
+              lines: [
+                {id: a.id, point: 2}
+              ]
+            } : {
+              position: a.position2,
+              lines: [
+                {id: a.id, point: 2},
+                {id: polygonAnnotations[0].id, point: 1}
+              ]
+            }
+          })
+
+          transformed = transformed.filter(a => a.id.split('_')[0] !== annotationId[0])
+
+          transformed.push({
+            id: annotationId[0],
+            name: annotations[i].name,
+            type: 'polygon',
+            annotations: polygonAnnotations,
+            positions: polygonPositions,
+            annotationVisible: annotations[i].annotationVisible,
+            templateName: annotations[i].templateName
+          })
+        }
+
+      }
+
+      this.displayAnnotations = [
+        ...this.displayAnnotations,
+        ...transformed
+      ]
+    }
+
+    changeAnnotationFilter(filter) {
+      this.annotationFilter = filter
+      this.displayAnnotations = this.displayAnnotations
+        .filter(a => this.annotationFilter === 'all' || a.templateName === this.selectedTemplate)
     }
 
     ngOnDestroy(){

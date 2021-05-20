@@ -1,5 +1,7 @@
 import {Component} from "@angular/core";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
+import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
+import {Store} from "@ngrx/store";
 
 @Component({
   selector: 'annotation-list',
@@ -8,16 +10,57 @@ import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationS
 })
 export class AnnotationList {
 
-  public annotationFilter: 'all' | 'current' = 'all'
   public editing = -1
 
   get annotationsToShow() {
     return this.ans.annotations
-      .filter(a => (a.type !== 'polygon' || +a.id.split('_')[1] === 0)
-        && (this.annotationFilter === 'all' || a.templateName === this.ans.selectedTemplate))
+      // .filter(a => this.annotationFilter === 'all' || a.templateName === this.ans.selectedTemplate)
+      // .filter(a => (a.type !== 'polygon' || +a.id.split('_')[1] === 0)
+
+    // let transformed = [...this.ans.annotations]
+    //
+    // for (let i = 0; i<this.ans.annotations.length; i++) {
+    //   if (this.ans.annotations[i].type === 'polygon') {
+    //     const annotationId = this.ans.annotations[i].id.split('_')
+    //     if (!transformed.find(t => t.id === annotationId[0])) {
+    //       const polygonAnnotations = this.ans.annotations.filter(a => a.id.split('_')[0] === annotationId[0]
+    //         && a.id.split('_')[1])
+    //
+    //       const polygonPositions = polygonAnnotations.map((a, i) => {
+    //         return i-1 !== polygonAnnotations.length? {
+    //           position: a.position1,
+    //           lines: [
+    //             {id: a.id, point: 2},
+    //             {id: polygonAnnotations[i+1], point: 1}
+    //           ]
+    //         } : polygonAnnotations[i].position2 !== polygonAnnotations[0].position1? {
+    //           position: a.position2,
+    //           lines: [
+    //             {id: a.id, point: 2}
+    //           ]
+    //         } : null
+    //       })
+    //
+    //       transformed = transformed.filter(a => a.id.split('_')[0] !== annotationId[0])
+    //
+    //       transformed.push({
+    //         id: annotationId[0],
+    //         name: this.ans.annotations[i].name,
+    //         type: 'polygon',
+    //         annotations: polygonAnnotations,
+    //         positions: polygonPositions,
+    //         annotationVisible: this.ans.annotations[i].annotationVisible,
+    //         templateName: this.ans.annotations[i].templateName
+    //       })
+    //     }
+    //   }
+    // }
+    // return transformed
   }
 
-  constructor(public ans: AnnotationService) {}
+  public identifyer = (index: number, item: any) => item.id
+
+  constructor(private store$: Store<any>, public ans: AnnotationService) {}
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {
@@ -48,6 +91,28 @@ export class AnnotationList {
     } else {
       this.ans.removeAnnotation(annotation.id)
     }
+  }
+
+  navigate(position) {
+    //ToDo change for real position for all templates
+    position = position.split(',').map(p => +p * 1e6)
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          position,
+          positionReal: true
+        },
+      })
+    )
+  }
+
+  saveAnnotation(annotation) {
+    if (annotation.position1.split(',').length !== 3 || !annotation.position1.split(',').every(e => !!e)
+        || ((annotation.position2
+            && annotation.position2.split(',').length !== 3) || !annotation.position1.split(',').every(e => !!e))) {
+      return
+    }
+    this.ans.saveAnnotation(annotation)
   }
 
 }
