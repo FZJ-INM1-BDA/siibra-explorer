@@ -161,7 +161,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   ngOnDestroy() {
-    debugger
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
