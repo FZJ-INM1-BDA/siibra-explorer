@@ -1,7 +1,7 @@
 import {Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, Observable, Subject, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
+import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
+import {distinctUntilChanged, filter, map, startWith, switchMap } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector,  viewerStateSelectedTemplateSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -17,6 +17,7 @@ import { MatDrawer } from "@angular/material/sidenav";
 import { ComponentStore } from "../componentStore";
 import {BS_ENDPOINT} from "src/util/constants";
 import {HttpClient} from "@angular/common/http";
+import { PureContantService } from "src/util";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -60,14 +61,16 @@ import {HttpClient} from "@angular/common/http";
   providers: [
     {
       provide: REGION_OF_INTEREST,
-      useFactory: (store: Store<any>) => store.pipe(
+      useFactory: (store: Store<any>, svc: PureContantService) => store.pipe(
         select(viewerStateContextedSelectedRegionsSelector),
-        map(rs => {
-          if (!rs[0]) return null
-          return rs[0]
+        switchMap(r => {
+          if (!r[0]) return of(null)
+          const { context } = r[0]  
+          const { atlas, template, parcellation } = context || {}
+          return svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0])
         })
       ),
-      deps: [ Store ]
+      deps: [ Store, PureContantService ]
     },
     {
       provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,

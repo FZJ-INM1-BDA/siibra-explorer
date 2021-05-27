@@ -8,11 +8,12 @@ import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/sel
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions"
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util"
+import { NehubaLayerControlService } from "../layerCtrl.service"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 
 describe('> nehubaViewerGlue.component.ts', () => {
   let mockStore: MockStore
-  beforeEach( () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         CommonModule,
@@ -33,7 +34,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
           deps: [
             ClickInterceptorService
           ]
-        },
+        }
       ]
     }).overrideComponent(NehubaGlueCmp, {
       set: {
@@ -41,6 +42,9 @@ describe('> nehubaViewerGlue.component.ts', () => {
         templateUrl: null
       }
     }).compileComponents()
+  })
+
+  beforeEach(() => {
     mockStore = TestBed.inject(MockStore)
     mockStore.overrideSelector(ngViewerSelectorPanelMode, PANELS.FOUR_PANEL)
     mockStore.overrideSelector(ngViewerSelectorPanelOrder, '0123')
@@ -50,6 +54,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
     mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [])
     mockStore.overrideSelector(viewerStateNavigationStateSelector, null)
   })
+
 
   it('> can be init', () => {
     const fixture = TestBed.createComponent(NehubaGlueCmp)

@@ -5,7 +5,6 @@ import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { UtilModule } from "src/util";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
-import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
@@ -33,8 +32,6 @@ import {
   OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
 } from './constants'
 import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
-import { FilterPreviewByType } from "./preview/filterPreview.pipe";
-import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
 import { LayerBrowserModule } from "../../ui/layerbrowser";
 
 import { ContributorModule } from "./contributor";
@@ -51,6 +48,9 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   return () => console.error(`previewEmitFactory not overriden`)
 }
 
+/**
+ * TODO deprecate
+ */
 @NgModule({
   imports: [
     CommonModule,
@@ -65,13 +65,11 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     KgDatasetModule,
   ],
   declarations: [
-    SingleDatasetView,
     SingleDatasetDirective,
     SingleDatasetListView,
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
-    PreviewCardComponent,
     SingleDatasetSideNavView,
 
     /**
@@ -98,11 +96,9 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     UnavailableTooltip,
     TransformDatasetToIdPipe,
     PreviewFileTypePipe,
-    FilterPreviewByType,
   ],
   exports: [
     KgDatasetModule,
-    SingleDatasetView,
     SingleDatasetDirective,
     SingleDatasetListView,
     FilterDataEntriesbyMethods,
@@ -112,13 +108,10 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewDatasetFile,
     PreviewFileTypePipe,
     ShownPreviewsDirective,
-    FilterPreviewByType,
-    PreviewCardComponent,
     ShownDatasetDirective,
     SingleDatasetSideNavView,
   ],
   entryComponents: [
-    SingleDatasetView,
     PreviewComponentWrapper
   ],
   providers: [

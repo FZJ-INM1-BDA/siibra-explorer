@@ -1,11 +1,16 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, merge, Observable, Subject } from "rxjs";
-import { filter, map, shareReplay, tap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, from, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { getRgb, IColorMap } from "./layerCtrl.util";
 import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
 import { IAuxMesh } from '../store'
+import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { TRegionDetail } from "src/util/siibraApiConstants/types";
+import { EnumColorMapName } from "src/util/colorMaps";
+import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
+import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
 
 export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
   const returnVal: IColorMap = {}
@@ -25,7 +30,9 @@ export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
 }
 
 @Injectable()
-export class NehubaLayerControlService {
+export class NehubaLayerControlService implements OnDestroy{
+
+  static PMAP_LAYER_NAME = 'regional-pmap'
 
   private selectedParcellation$ = this.store$.pipe(
     select(viewerStateSelectedParcellationSelector)
@@ -100,10 +107,81 @@ export class NehubaLayerControlService {
     })
   )
 
+  private sub: Subscription[] = []
+
+  ngOnDestroy(){
+    while (this.sub.length > 0) this.sub.pop().unsubscribe()
+  }
+
   constructor(
     private store$: Store<any>,
+    @Optional() @Inject(REGION_OF_INTEREST) roi$: Observable<TRegionDetail>
   ){
+    if (roi$) {
 
+      this.sub.push(
+        roi$.pipe(
+          switchMap(roi => {
+            if (!roi || !roi.hasRegionalMap) {
+              // clear pmap
+              return of(null)
+            }
+            
+            const { links } = roi
+            const { regional_map: regionalMapUrl, regional_map_info: regionalMapInfoUrl } = links
+            return from(fetch(regionalMapInfoUrl).then(res => res.json())).pipe(
+              map(regionalMapInfo => {
+                return {
+                  roi,
+                  regionalMapUrl,
+                  regionalMapInfo
+                }
+              })
+            )
+          })
+        ).subscribe(processedRoi => {
+          if (!processedRoi) {
+            this.store$.dispatch(
+              ngViewerActionRemoveNgLayer({
+                layer: {
+                  name: NehubaLayerControlService.PMAP_LAYER_NAME
+                }
+              })
+            )
+            return
+          }
+          const { 
+            roi,
+            regionalMapUrl,
+            regionalMapInfo
+          } = processedRoi
+          const { min, max, colormap = EnumColorMapName.VIRIDIS } = regionalMapInfo || {} as any
+
+          const shaderObj = {
+            ...PMAP_DEFAULT_CONFIG,
+            ...{ colormap },
+            ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
+            ...( max ? { highThreshold: max } : { highThreshold: 1 } )
+          }
+
+          const layer = {
+            name: NehubaLayerControlService.PMAP_LAYER_NAME,
+            source : `nifti://${regionalMapUrl}`,
+            mixability : 'nonmixable',
+            shader : getShader(shaderObj),
+          }
+
+          this.store$.dispatch(
+            ngViewerActionAddNgLayer({ layer })
+          )
+
+          // this.layersService.highThresholdMap.set(layerName, highThreshold)
+          // this.layersService.lowThresholdMap.set(layerName, lowThreshold)
+          // this.layersService.colorMapMap.set(layerName, cmap)
+          // this.layersService.removeBgMap.set(layerName, removeBg)
+        })
+      )
+    }
   }
 
   public activeColorMap: IColorMap

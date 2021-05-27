@@ -175,7 +175,7 @@
 
         <!-- preview volumes -->
         <ng-template #sideNavVolumePreview>
-          <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
+          <ng-container *ngIf="previews.iavAdditionalLayers$ | async as volumePreviews">
             <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
               <ng-container *ngFor="let vPreview of volumePreviews">
                 <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
@@ -223,10 +223,6 @@
                 </ng-container>
               </ng-container>
 
-              <!-- controls for iav volumes -->
-              <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
-              <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
-              </ng-container>
 
             </mat-chip-list>
           </div>
@@ -458,24 +454,7 @@
 
         <!-- chips for previewing origin datasets/continous map -->
         <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
-          <div class="hidden"
-            iav-dataset-preview-dataset-file
-            [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-            [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-            #previewDirective="iavDatasetPreviewDatasetFile">
-          </div>
-          <mat-chip *ngIf="previewDirective.active"
-            (click)="handleChipClick()"
-            class="pe-all position-relative ml-8-n">
-            <span class="pl-4">
-              {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-            </span>
-            <mat-icon (click)="previewDirective.onClick()"
-              fontSet="fas"
-              iav-stop="click"
-              fontIcon="fa-times">
-            </mat-icon>
-          </mat-chip>
+
 
           <mat-chip *ngFor="let key of clearViewKeys$ | async"
             (click)="handleChipClick()"
@@ -496,28 +475,6 @@
     </ng-template>
   </ng-template>
 
-</ng-template>
-
-
-<ng-template #selectedDatasetPreview let-layers="layers">
-
-  <ng-container *ngFor="let layer of layers">
-    <div class="hidden"
-      iav-dataset-preview-dataset-file
-      [iav-dataset-preview-dataset-file-kgid]="layer.datasetId"
-      [iav-dataset-preview-dataset-file-filename]="layer.filename"
-      #preview="iavDatasetPreviewDatasetFile">
-
-    </div>
-    <mat-chip class="pe-all"
-      (click)="handleChipClick()">
-      {{ layer.file?.name || layer.filename || 'Unknown data preview' }}
-      <mat-icon fontSet="fas" fontIcon="fa-times"
-        (click)="preview.onClick()"
-        iav-stop="click">
-      </mat-icon>
-    </mat-chip>
-  </ng-container>
 </ng-template>
 
 <!-- auto complete search box -->
@@ -694,28 +651,7 @@
     #iavRegion="iavRegion">
 
     <!-- desc -->
-    <ng-container *ngFor="let ods of (region.originDatasets || [])">
-      <ng-template #regionDescTmpl>
-        <single-dataset-view
-          [hideTitle]="true"
-          [hideExplore]="true"
-          [hidePreview]="true"
-          [hidePinBtn]="true"
-          [hideDownloadBtn]="true"
-          [kgSchema]="ods.kgSchema"
-          [kgId]="ods.kgId">
-
-        </single-dataset-view>
-      </ng-template>
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: 'Description',
-        iconClass: 'fas fa-info',
-        iavNgIf: true,
-        content: regionDescTmpl
-      }">
-
-      </ng-container>
-    </ng-container>
+    <!-- obsolete -->
 
     <!-- Explore in other template -->
     <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
@@ -868,15 +804,10 @@
   </mat-expansion-panel>
 </ng-template>
 
-<!-- TODO deprecate in favour of dedicated dataset preview side nav -->
 <ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
   <div class="w-100 flex-grow-1 d-flex flex-column">
 
-    <preview-card class="d-block bs-border-box ml-15px-n mr-15px-n flex-grow-1"
-      [attr.aria-label]="ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL"
-      [datasetId]="datasetId"
-      [filename]="filename">
-    </preview-card>
+    Previewing misc dataset
 
     <!-- collapse btn -->
     <ng-container *ngTemplateOutlet="collapseBtn">

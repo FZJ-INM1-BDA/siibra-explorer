@@ -114,6 +114,33 @@ export type TParc = {
   }
 }
 
+export type TRegionDetail = {
+  name: string
+  children: TRegionDetail[]
+  rgb: number[]
+  id: string
+  labelIndex: number
+  volumeSrc: {
+    [key: string]: {
+      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
+    }
+  }
+  availableIn: {
+    id: string
+    name: string
+  }[]
+  hasRegionalMap: boolean
+  props: {
+    centroid_mm: number[]
+    volume_mm: number
+    surface_mm: number
+    is_cortical: number
+  }
+  links: {
+    [key: string]: string
+  }
+}
+
 export type TRegion = {
   name: string
   children: TRegion[]

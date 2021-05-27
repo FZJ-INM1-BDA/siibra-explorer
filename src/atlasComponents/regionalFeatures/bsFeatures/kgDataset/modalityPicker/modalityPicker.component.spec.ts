@@ -1,5 +1,5 @@
+import { TCountedDataModality } from "../type"
 import { SortModalityAlphabeticallyPipe } from "./modalityPicker.component"
-import { CountedDataModality } from "../databrowser.service"
 
 describe('> modalityPicker.component.ts', () => {
   describe('> ModalityPicker', () => {
@@ -8,7 +8,7 @@ describe('> modalityPicker.component.ts', () => {
 
   describe('> SortModalityAlphabeticallyPipe', () => {
 
-    const mods: CountedDataModality[] = [{
+    const mods: TCountedDataModality[] = [{
       name: 'bbb',
       occurance: 0,
       visible: false

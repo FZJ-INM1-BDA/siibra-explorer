@@ -161,6 +161,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   ngOnDestroy() {
+    debugger
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
@@ -418,6 +419,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
     /**
      * define when shown segments should be updated
+     * TODO move to layerCtrl.service.ts
      */
     const regSelectSub = combineLatest([
       /**

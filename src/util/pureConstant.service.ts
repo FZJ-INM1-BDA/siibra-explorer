@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, merge, Subscription, of, forkJoin, fromEvent, combineLatest, timer } from "rxjs";
+import { Observable, Subscription, of, forkJoin, fromEvent, combineLatest } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
 import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
@@ -10,7 +10,7 @@ import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT } from "src/util/constants";
 import { flattenReducer } from 'common/util'
-import { TAtlas, TId, TParc, TRegion, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
+import { TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate } from "./fn";
 
 function parseId(id: TId){
@@ -144,6 +144,18 @@ export class PureContantService implements OnDestroy{
     filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
     map(({ data }) => data)
   )
+
+  public getRegionDetail(atlasId: string, parcId: string, spaceId: string, region: any) {
+    return this.http.get<TRegionDetail>(
+      `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions/${encodeURIComponent(region.name)}`,
+      {
+        params: {
+          'space_id': spaceId
+        },
+        responseType: 'json'
+      }
+    )
+  }
 
   private getRegions(atlasId: string, parcId: string, spaceId: string){
     return this.http.get<TRegion[]>(
