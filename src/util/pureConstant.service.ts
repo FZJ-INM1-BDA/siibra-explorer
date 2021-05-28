@@ -375,7 +375,7 @@ export class PureContantService implements OnDestroy{
                             ) {
                               const dedicatedMap = region.volumeSrc[tmpl.id]['collect'].filter(v => v.volume_type === 'neuroglancer/precomputed')
                               if (dedicatedMap.length === 1) {
-                                const ngId = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
+                                const ngId = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                                 region['ngId'] = ngId
                                 region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
                                 ngLayerObj[tmpl.id][ngId] = {
@@ -390,11 +390,11 @@ export class PureContantService implements OnDestroy{
                              * if label index is defined
                              */
                             if (!!region.labelIndex) {
-                              const hemisphereKey = /left hemisphere/.test(region.name)
+                              const hemisphereKey = /left hemisphere|left/.test(region.name)
                                 // these two keys are, unfortunately, more or less hardcoded
                                 // which is less than ideal
                                 ? 'left hemisphere'
-                                : /right hemisphere/.test(region.name)
+                                : /right hemisphere|right/.test(region.name)
                                   ? 'right hemisphere'
                                   : 'whole brain'
 
@@ -410,7 +410,7 @@ export class PureContantService implements OnDestroy{
                                 return
                               }
 
-                              const hemispheredNgId = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
+                              const hemispheredNgId = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
                               region['ngId'] = hemispheredNgId
                             }
                           }  
@@ -428,7 +428,7 @@ export class PureContantService implements OnDestroy{
                             for (const key in (parc.volumeSrc[tmpl.id] || {})) {
                               for (const vol of parc.volumeSrc[tmpl.id][key]) {
                                 if (vol.volume_type === 'neuroglancer/precomputed') {
-                                  const ngIdKey = MultiDimMap.GetKey(atlas['@id'], tmpl.id, parseId(parc.id), key)
+                                  const ngIdKey = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parseId(parc.id), key)
                                   ngLayerObj[tmpl.id][ngIdKey] = {
                                     source: `precomputed://${vol.url}`,
                                     type: "segmentation",
@@ -469,7 +469,12 @@ export class PureContantService implements OnDestroy{
                 }
               }
 
-              const precompmesh = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precompmesh')
+              // TODO
+              // siibra-python accidentally left out volume type of precompmesh
+              // https://github.com/FZJ-INM1-BDA/siibra-python/pull/55
+              // use url to determine for now
+              // const precompmesh = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precompmesh')
+              const precompmesh = tmpl.volume_src.find(src => !!src.detail?.['neuroglancer/precompmesh'])
               const auxMeshes = []
               if (precompmesh){
                 initialLayers[tmplAuxMesh] = {
