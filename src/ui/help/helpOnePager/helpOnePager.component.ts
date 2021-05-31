@@ -1,6 +1,7 @@
 import { Component, Optional } from "@angular/core";
 import QUICK_STARTER from '!!raw-loader!common/helpOnePager.md'
 import { PureContantService } from "src/util";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'help-one-pager',
@@ -11,13 +12,16 @@ import { PureContantService } from "src/util";
 })
 
 export class HelpOnePager{
+  public ARIA_LABELS = ARIA_LABELS
   public QUICK_STARTER_MD = QUICK_STARTER
   public extQuickStarter: string
+  public userDoc: string
   constructor(
     @Optional() pConstService: PureContantService
   ){
-    if (pConstService?.backendUrl) {
-      this.extQuickStarter = `${pConstService.backendUrl}quickstart`
+    this.extQuickStarter = `quickstart.html`
+    if (pConstService) {
+      this.userDoc = pConstService.docUrl
     }
   }
 }

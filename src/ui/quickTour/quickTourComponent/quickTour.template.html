@@ -6,7 +6,12 @@
     [style.transform]="tourCardTransform"
     #quickTourDialog>
     <mat-card-content>
-        {{ description$ | async }}
+        <markdown-dom *ngIf="descriptionMd$ | async as md; else plainTxtTmpl"
+            [markdown]="md">
+        </markdown-dom>
+        <ng-template #plainTxtTmpl>
+            {{ description$ | async }}
+        </ng-template>
     </mat-card-content>
     <mat-card-actions>
         <button  mat-icon-button
@@ -19,10 +24,25 @@
             [disabled]="isLast$ | async">
             <i class="fas fa-chevron-right"></i>
         </button>
-        <button mat-icon-button
-            (click)="endTour()">
-            <i class="fas fa-times"></i>
-        </button>
+
+        <!-- dismiss (last) -->
+        <ng-template [ngIf]="isLast$ | async" [ngIfElse]="notLastTmpl">
+            <button mat-stroked-button
+                color="primary"
+                (click)="endTour()">
+                <i class="m-1 fas fa-check"></i>
+                <span>complete</span>
+            </button>
+        </ng-template>
+
+        <!-- dismiss (not last) -->
+        <ng-template #notLastTmpl>
+            <button mat-icon-button (click)="endTour()">
+                <i class="fas fa-times"></i>
+            </button>
+        </ng-template>
+
+        <!-- progress dots -->
         <span class="muted d-inline-flex align-items-center">
             <i *ngFor="let active of quickTourProgress$ | async"
                 [ngClass]="{ 'fa-xs muted-3': !active }"

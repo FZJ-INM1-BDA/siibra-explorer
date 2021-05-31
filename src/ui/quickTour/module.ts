@@ -10,6 +10,7 @@ import { QuickTourDirective } from "src/ui/quickTour/quickTour.directive";
 import { ArrowComponent } from "./arrowCmp/arrow.component";
 import { WindowResizeModule } from "src/util/windowResize";
 import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
+import { ComponentsModule } from "src/components";
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
     AngularMaterialModule,
     UtilModule,
     WindowResizeModule,
+    ComponentsModule,
   ],
   declarations:[
     QuickTourThis,
