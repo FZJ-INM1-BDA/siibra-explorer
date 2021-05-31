@@ -6,7 +6,12 @@
     [style.transform]="tourCardTransform"
     #quickTourDialog>
     <mat-card-content>
-        {{ description$ | async }}
+        <markdown-dom *ngIf="descriptionMd$ | async as md; else plainTxtTmpl"
+            [markdown]="md">
+        </markdown-dom>
+        <ng-template #plainTxtTmpl>
+            {{ description$ | async }}
+        </ng-template>
     </mat-card-content>
     <mat-card-actions>
         <button  mat-icon-button
