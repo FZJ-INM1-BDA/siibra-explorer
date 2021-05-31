@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { async, TestBed } from '@angular/core/testing'
 import { ComponentsModule } from 'src/components'
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { PureContantService, UtilModule } from 'src/util'
 import { HelpOnePager } from './helpOnePager.component'
 
@@ -15,6 +16,7 @@ describe('> helpOnePager.component.ts', () => {
            * for media query directive
            */
           UtilModule,
+          AngularMaterialModule,
         ],
         declarations: [
           HelpOnePager,
