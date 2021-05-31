@@ -17,7 +17,7 @@ export class HelpOnePager{
     @Optional() pConstService: PureContantService
   ){
     if (pConstService?.backendUrl) {
-      this.extQuickStarter = `${pConstService.backendUrl}quickstart`
+      this.extQuickStarter = `quickstart.html`
     }
   }
 }
