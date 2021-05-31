@@ -77,6 +77,9 @@ export class TopMenuCmp {
   }
 
   private dialogRef: MatDialogRef<any>
+  public helperOnePagerConfig = {
+    panelClass: ['col-lg-10']
+  }
 
   public openTmplWithDialog(tmpl: TemplateRef<any>, overwriteConfig?: Partial<MatDialogConfig>) {
     this.dialogRef && this.dialogRef.close()

@@ -46,7 +46,7 @@
     [quick-tour-description]="quickTourData.description"
     [quick-tour-order]="quickTourData.order"
     [iav-key-listener]="keyListenerConfig"
-    (iav-key-event)="openTmplWithDialog(helperOnePager)">
+    (iav-key-event)="openTmplWithDialog(helperOnePager, helperOnePagerConfig)">
 
     <!-- signin -->
     <ng-container *ngTemplateOutlet="signinBtnTmpl">
@@ -126,7 +126,7 @@
 <ng-template #helpBtnTmpl>
 
   <div class="btnWrapper"
-    (click)="openTmplWithDialog(helperOnePager)"
+    (click)="openTmplWithDialog(helperOnePager, helperOnePagerConfig)"
     matTooltip="Quickstart">
     <iav-dynamic-mat-button
       [iav-dynamic-mat-button-style]="matBtnStyle"
