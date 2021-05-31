@@ -50,9 +50,11 @@ const outputPath = path.resolve(__dirname,'../dist/aot')
 compileQuickOnePager()
   .then(html => {
     const fs = require('fs')
-    fs.writeFile(path.join(outputPath, 'quickstart.html'), html, 'utf-8', (err) => {
-      if (err) throw new Error(`quickOnePager cannot be written to disk`)
-    })
+    const { execSync } = require('child_process')
+    const { promisify } = require('util')
+    const asyncWrite = promisify(fs.writeFile)
+    execSync(`mkdir -p ${outputPath}`)
+    return asyncWrite(path.join(outputPath, 'quickstart.html'), html, 'utf-8')
   })
   .catch(e => {
     console.warn(e)
