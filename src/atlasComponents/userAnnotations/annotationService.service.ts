@@ -1,13 +1,9 @@
-import {Inject, Injectable, OnDestroy, Optional} from "@angular/core";
-import {CONST, ARIA_LABELS} from "common/constants";
+import {Inject, Injectable, Optional} from "@angular/core";
+import {CONST} from "common/constants";
 import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
-import {Subscription} from "rxjs";
 import {getUuid} from "src/util/fn";
-import {select, Store} from "@ngrx/store";
+import {Store} from "@ngrx/store";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
-import {CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor} from "src/util";
-import {viewerStateViewerModeSelector} from "src/services/state/viewerState/selectors";
-import {take} from "rxjs/operators";
 import * as JSZip from 'jszip';
 
 const USER_ANNOTATION_LAYER_SPEC = {
