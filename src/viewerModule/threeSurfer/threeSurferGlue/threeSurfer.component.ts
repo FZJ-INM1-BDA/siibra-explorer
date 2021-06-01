@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestro
 import { IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { TThreeSurferConfig, TThreeSurferMode } from "../types";
 import { parseContext } from "../util";
-import { retry } from 'common/util'
+import { retry, flattenRegions } from 'common/util'
 
 @Component({
   selector: 'three-surfer-glue-cmp',
@@ -27,8 +27,8 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   private config: TThreeSurferConfig
   public modes: TThreeSurferMode[] = []
   public selectedMode: string
-  private colormap: Map<string, Map<number, [number, number, number]>> = new Map()
 
+  private regionMap: Map<string, Map<number, any>> = new Map()
   constructor(
     private el: ElementRef,
   ){
@@ -63,7 +63,12 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       const tsM = await this.tsRef.loadMesh(
         parseContext(mesh, [this.config['@context']])
       )
-      const applyCM = this.colormap.get(hemisphere)
+
+      const rMap = this.regionMap.get(hemisphere)
+      const applyCM = new Map()
+      for (const [ lblIdx, region ] of rMap.entries()) {
+        applyCM.set(lblIdx, (region.rgb || [200, 200, 200]).map(v => v/255))
+      }
 
       const tsC = await this.tsRef.loadColormap(
         parseContext(colormap, [this.config['@context']])
@@ -90,7 +95,10 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
   }
 
   async ngOnChanges(){
-    if (this.tsRef) this.ngOnDestroy()
+    if (this.tsRef) {
+      this.ngOnDestroy()
+      this.ngAfterViewInit()
+    }
     if (this.selectedTemplate) {
 
       /**
@@ -116,13 +124,21 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
         )
       }
 
-      for (const region of this.selectedParcellation.regions) {
-        const map = new Map<number, [number, number, number]>()
-        for (const child of region.children) {
-          const color = (child.iav?.rgb as [number, number, number] ) || [200, 200, 200]
-          map.set(Number(child.grayvalue), color.map(v => v/255) as [number, number, number])
+      const flattenedRegions = flattenRegions(this.selectedParcellation.regions)
+      for (const region of flattenedRegions) {
+        if (region.labelIndex) {
+          const hemisphere = /left/.test(region.name)
+            ? 'left'
+            : /right/.test(region.name)
+              ? 'right'
+              : null
+          if (!hemisphere) throw new Error(`region ${region.name} does not have hemisphere defined`)
+          if (!this.regionMap.has(hemisphere)) {
+            this.regionMap.set(hemisphere, new Map())
+          }
+          const rMap = this.regionMap.get(hemisphere)
+          rMap.set(region.labelIndex, region)
         }
-        this.colormap.set(region.name, map)
       }
       
       // load mode0 by default
@@ -165,9 +181,9 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
         return this.handleMouseoverEvent([])
       }
 
-      const foundRegion = this.selectedParcellation.regions.find(({ name }) => name === key)
+      const hemisphereMap = this.regionMap.get(key)
 
-      if (!foundRegion) {
+      if (!hemisphereMap) {
         return this.handleMouseoverEvent(
           Array.from(labelIdxSet).map(v => {
             return `unknown#${v}`
@@ -178,7 +194,7 @@ export class ThreeSurferGlueCmp implements IViewer, OnChanges, AfterViewInit, On
       return this.handleMouseoverEvent(
         Array.from(labelIdxSet)
           .map(lblIdx => {
-            const ontoR = foundRegion.children.find(ontR => Number(ontR.grayvalue) === lblIdx)
+            const ontoR = hemisphereMap.get(Number(lblIdx))
             if (ontoR) {
               return ontoR.name
             } else {

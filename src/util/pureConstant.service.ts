@@ -199,7 +199,7 @@ export class PureContantService implements OnDestroy{
     )
   }
 
-  private getSpacesAndParc(atlasId: string) {
+  private getSpacesAndParc(atlasId: string): Observable<{ templateSpaces: TSpaceFull[], parcellations: TParc[] }> {
     const cacheKey = `getSpacesAndParc::${atlasId}`
     if (this.httpCallCache.has(cacheKey)) return this.httpCallCache.get(cacheKey)
     
@@ -451,8 +451,54 @@ export class PureContantService implements OnDestroy{
               mapTo({ templateSpaces, parcellations, ngLayerObj })
             )
           }),
-          map(({ templateSpaces, ngLayerObj }) => {
+          map(({ templateSpaces, parcellations, ngLayerObj }) => {
             return templateSpaces.map(tmpl => {
+
+              // configuring three-surfer
+              let threeSurferConfig = {}
+              const threeSurferVolSrc = tmpl.volume_src.find(v => v.volume_type === 'threesurfer/gii')
+              if (threeSurferVolSrc) {
+                const foundP = parcellations.find(p => {
+                  return !!p.volumeSrc[tmpl.id]
+                })
+                const url = threeSurferVolSrc.url
+                const { surfaces } = threeSurferVolSrc.detail['threesurfer/gii'] as { surfaces: {mode: string, hemisphere: 'left' | 'right', url: string}[] }
+                const modObj = {}
+                for (const surface of surfaces) {
+                  const modeToConcat = {
+                    mesh: surface.url,
+                    hemisphere: surface.hemisphere,
+                    colormap: (() => {
+                      const hemisphereKey = surface.hemisphere === 'left'
+                        ? 'left hemisphere'
+                        : 'right hemisphere'
+                      const lbl = foundP.volumeSrc[tmpl.id][hemisphereKey].find(v => v.volume_type === 'threesurfer/gii-label')
+                      return lbl?.url
+                    })()
+                  }
+                  if (!modObj[surface.mode]) {
+                    modObj[surface.mode] = []
+                  }
+                  modObj[surface.mode].push(modeToConcat)
+                }
+                foundP[tmpl.id]
+                threeSurferConfig = {
+                  "three-surfer": {
+                    '@context': {
+                      root: url
+                    },
+                    modes: Object.keys(modObj).map(name => {
+                      return {
+                        name,
+                        meshes: modObj[name]
+                      }
+                    })
+                  },
+                  nehubaConfig: null,
+                  nehubaConfigURL: null,
+                  useTheme: 'dark'
+                }
+              }
               const darkTheme = tmpl.src_volume_type === 'mri'
               const nehubaConfig = getNehubaConfig(darkTheme)
               const initialLayers = nehubaConfig.dataset.initialNgState.layers
@@ -513,7 +559,8 @@ export class PureContantService implements OnDestroy{
                     name: parc.name,
                     regions
                   }
-                })
+                }),
+                ...threeSurferConfig
               }
             })
           })

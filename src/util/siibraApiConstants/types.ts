@@ -6,7 +6,7 @@ type TSpaceType = 'mri' | 'histology'
 
 type TNgTransform = number[][]
 
-type TVolumeType = 'nii' | 'neuroglancer/precomputed' | 'neuroglancer/precompmesh' | 'detailed maps'
+type TVolumeType = 'nii' | 'neuroglancer/precomputed' | 'neuroglancer/precompmesh' | 'detailed maps' | 'threesurfer/gii' | 'threesurfer/gii-label'
 type TParcModality = 'cytoarchitecture' | 'functional modes' | 'fibre architecture'
 
 type TAuxMesh = {
