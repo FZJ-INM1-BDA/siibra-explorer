@@ -136,7 +136,7 @@ export class ViewerCmp implements OnDestroy {
   )
 
   public viewerMode: string
-  public viewerMode$ = this.store$.pipe(
+  public hideUi$ = this.store$.pipe(
     select(viewerStateViewerModeSelector),
     distinctUntilChanged(),
   )

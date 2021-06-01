@@ -171,7 +171,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       regionsSelected: selectRegions,
     }
   }
-  case SET_VIEWER_MODE: {
+  case viewerStateSetViewerMode.type: {
     return {
       ...prevState,
       viewerMode: action.payload
@@ -266,7 +266,7 @@ export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
-export const SET_VIEWER_MODE = viewerStateSetViewerMode.type
+// export const SET_VIEWER_MODE = viewerStateSetViewerMode.type
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const SELECT_REGIONS = viewerStateSetSelectedRegions.type
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`

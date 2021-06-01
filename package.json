@@ -82,6 +82,7 @@
     "@types/node": "12.12.39",
     "export-nehuba": "0.0.12",
     "hbp-connectivity-component": "^0.3.18",
+    "jszip": "^3.6.0",
     "zone.js": "^0.10.2"
   }
 }

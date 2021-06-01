@@ -87,16 +87,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   private s: Subscription[] = []
 
-  private onMouseClick(ev: any): boolean{
-
-    // If annotation mode is on, avoid region selection
-    let viewerMode
-    this.store.pipe(
-      select(viewerStateViewerModeSelector),
-      take(1)
-    ).subscribe(vm => viewerMode = vm)
-    if (viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) return false
-
+  private onMouseClick(ev: any) {
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
 
@@ -125,11 +116,10 @@ export class AtlasViewerAPIServices implements OnDestroy{
                 mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
               })
           }
-          rs({
+          return rs({
             type: spec.type,
             payload: mousePositionReal
           })
-          return false
         }
 
         /**
@@ -139,11 +129,10 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
           if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
             this.popUserRegionSelectHandler()
-            rs({
+            return rs({
               type: spec.type,
               payload: moSegments
             })
-            return false
           }
         }
       } else {
@@ -153,8 +142,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
          */
         if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
           this.popUserRegionSelectHandler()
-          rs(moSegments[0])
-          return false
+          return rs(moSegments[0])
         }
       }
     }

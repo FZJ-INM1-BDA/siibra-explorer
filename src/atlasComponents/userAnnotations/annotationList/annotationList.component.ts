@@ -10,61 +10,13 @@ import {Store} from "@ngrx/store";
 })
 export class AnnotationList {
 
-  public editing = -1
-
-  get annotationsToShow() {
-    return this.ans.annotations
-    // .filter(a => this.annotationFilter === 'all' || a.templateName === this.ans.selectedTemplate)
-    // .filter(a => (a.type !== 'polygon' || +a.id.split('_')[1] === 0)
-
-    // let transformed = [...this.ans.annotations]
-    //
-    // for (let i = 0; i<this.ans.annotations.length; i++) {
-    //   if (this.ans.annotations[i].type === 'polygon') {
-    //     const annotationId = this.ans.annotations[i].id.split('_')
-    //     if (!transformed.find(t => t.id === annotationId[0])) {
-    //       const polygonAnnotations = this.ans.annotations.filter(a => a.id.split('_')[0] === annotationId[0]
-    //         && a.id.split('_')[1])
-    //
-    //       const polygonPositions = polygonAnnotations.map((a, i) => {
-    //         return i-1 !== polygonAnnotations.length? {
-    //           position: a.position1,
-    //           lines: [
-    //             {id: a.id, point: 2},
-    //             {id: polygonAnnotations[i+1], point: 1}
-    //           ]
-    //         } : polygonAnnotations[i].position2 !== polygonAnnotations[0].position1? {
-    //           position: a.position2,
-    //           lines: [
-    //             {id: a.id, point: 2}
-    //           ]
-    //         } : null
-    //       })
-    //
-    //       transformed = transformed.filter(a => a.id.split('_')[0] !== annotationId[0])
-    //
-    //       transformed.push({
-    //         id: annotationId[0],
-    //         name: this.ans.annotations[i].name,
-    //         type: 'polygon',
-    //         annotations: polygonAnnotations,
-    //         positions: polygonPositions,
-    //         annotationVisible: this.ans.annotations[i].annotationVisible,
-    //         templateName: this.ans.annotations[i].templateName
-    //       })
-    //     }
-    //   }
-    // }
-    // return transformed
-  }
-
-  public identifyer = (index: number, item: any) => item.id
+  public identifier = (index: number, item: any) => item.id
 
   constructor(private store$: Store<any>, public ans: AnnotationService) {}
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {
-      this.ans.annotations.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
+      this.ans.pureAnnotationsForViewer.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
         .forEach(a => this.toggleVisibility(a))
     } else {
       this.toggleVisibility(annotation)
@@ -72,21 +24,21 @@ export class AnnotationList {
   }
 
   toggleVisibility(annotation) {
-    const annotationIndex = this.ans.annotations.findIndex(a => a.id === annotation.id)
+    const annotationIndex = this.ans.pureAnnotationsForViewer.findIndex(a => a.id === annotation.id)
 
-    if (this.ans.annotations[annotationIndex].annotationVisible) {
+    if (this.ans.pureAnnotationsForViewer[annotationIndex].annotationVisible) {
       this.ans.removeAnnotationFromViewer(annotation.id)
-      this.ans.annotations[annotationIndex].annotationVisible = false
+      this.ans.pureAnnotationsForViewer[annotationIndex].annotationVisible = false
     } else {
-      this.ans.addAnnotationOnViewer(this.ans.annotations[annotationIndex])
-      this.ans.annotations[annotationIndex].annotationVisible = true
+      this.ans.addAnnotationOnViewer(this.ans.pureAnnotationsForViewer[annotationIndex])
+      this.ans.pureAnnotationsForViewer[annotationIndex].annotationVisible = true
     }
     this.ans.storeToLocalStorage()
   }
 
   removeAnnotation(annotation) {
     if (annotation.type === 'polygon') {
-      this.ans.annotations.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
+      this.ans.pureAnnotationsForViewer.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
         .forEach(a => this.ans.removeAnnotation(a.id))
     } else {
       this.ans.removeAnnotation(annotation.id)
@@ -94,7 +46,6 @@ export class AnnotationList {
   }
 
   navigate(position) {
-    //ToDo change for real position for all templates
     position = position.split(',').map(p => +p * 1e6)
     this.store$.dispatch(
       viewerStateChangeNavigation({
@@ -106,27 +57,61 @@ export class AnnotationList {
     )
   }
 
-  saveAnnotation(annotation) {
-    if (annotation.position1.split(',').length !== 3 || !annotation.position1.split(',').every(e => !!e)
-        || ((annotation.position2
-            && annotation.position2.split(',').length !== 3) || !annotation.position1.split(',').every(e => !!e))) {
-      return
+  saveAnnotation(annotation, singlePolygon = false) {
+    if (annotation.type !== 'polygon' || singlePolygon) {
+      annotation.position1 = annotation.position1.replace(/\s/g, '')
+      annotation.position2 = annotation.position2 && annotation.position2.replace(/\s/g, '')
+      if (annotation.position1.split(',').length !== 3 || !annotation.position1.split(',').every(e => !!e)
+          || ((annotation.position2
+              && annotation.position2.split(',').length !== 3) || !annotation.position1.split(',').every(e => !!e))) {
+        return
+      } else {
+        annotation.position1 = this.ans.mmToVoxel(annotation.position1.split(',')).join()
+        annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2.split(',')).join()
+      }
+      this.ans.saveAnnotation(annotation)
+    } else {
+      if (!annotation.name) {
+        annotation.name = this.ans.giveNameByType('polygon')
+      }
+
+      const toUpdateFirstAnnotation = this.ans.pureAnnotationsForViewer.find(a => a.id === `${annotation.id}_0`)
+      toUpdateFirstAnnotation.name = annotation.name
+      toUpdateFirstAnnotation.description = annotation.description
+      this.ans.saveAnnotation(toUpdateFirstAnnotation)
+
+      const toUpdate = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
+      this.ans.groupedAnnotations[toUpdate].name = annotation.name
+      this.ans.groupedAnnotations[toUpdate].description = annotation.description
+      this.ans.refreshAnnotationFilter()
+
     }
-    this.ans.saveAnnotation(annotation)
   }
 
-  savePolygonPosition(position, inputVal) {
+  savePolygonPosition(id, position, inputVal) {
+    inputVal = inputVal.replace(/\s/g, '')
+    if (inputVal.split(',').length !== 3 || !inputVal.split(',').every(e => !!e)) {
+      return
+    } else {
+      inputVal = this.ans.mmToVoxel(inputVal.split(',')).join()
+    }
     position.lines.forEach(l => {
       if (l.point === 2) {
-        const annotation = this.ans.annotations.find(a => a.id === l.id)
+        const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position2 = inputVal
-        this.saveAnnotation(annotation)
+        this.saveAnnotation(annotation, true)
       } else {
-        const annotation = this.ans.annotations.find(a => a.id === l.id)
+        const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position1 = inputVal
-        this.saveAnnotation(annotation)
+        this.saveAnnotation(annotation, true)
       }
     })
+  }
+
+  submitInput(e, area) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      area.blur()
+    }
   }
 
 }

@@ -5,9 +5,3 @@
 .annotation-toolbar-content {
     margin-bottom: 20px;
 }
-.annotation-mode-message-panel {
-    height: 30px;
-    top: 20px;
-    right: 0;
-    background-color: rgba(66,65,65, 0.3);
-}
