@@ -24,12 +24,12 @@ export class AnnotationMode implements OnInit, OnDestroy {
 
     public selectedType = 0
 
-    public position1: string
-    public position2: string
+    public position1: number[]
+    public position2: number[]
     public editingAnnotationId: string
 
     public selecting = 'position1'
-    public mousePos: any[]
+    public mousePos: number[]
     public navState: any = {}
 
     private hoverAnnotation$: Observable<{id: string, partIndex: number}>
@@ -152,8 +152,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
       let hovering: any
       let hoveringType: string
       let hoveringName: string
-      let hoveringPosition1: []
-      let hoveringPosition2: []
+      let hoveringPosition1: number[]
+      let hoveringPosition2: number[]
       let draggingStartPosition: any[]
       let hoveringPolygonAnnotations: any[]
       let dragging = false
@@ -165,8 +165,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
               draggingStartPosition = this.mousePos
               const hoveringAnnotation = this.ans.pureAnnotationsForViewer.find(a => a.id === this.ans.hoverAnnotation.id)
               if (hoveringAnnotation) {
-                hoveringPosition1 = hoveringAnnotation.position1.split(',')
-                hoveringPosition2 = hoveringAnnotation.position2 ? hoveringAnnotation.position2.split(',') : null
+                hoveringPosition1 = hoveringAnnotation.position1
+                hoveringPosition2 = hoveringAnnotation.position2 ? hoveringAnnotation.position2 : null
                 hoveringType = this.ans.pureAnnotationsForViewer.find(a => a.id === hovering.id)?.type
                 if (hoveringAnnotation.type === 'polygon') {
                   hoveringPolygonAnnotations = this.ans.pureAnnotationsForViewer.filter(a => a.id.split('_')[0] === hovering.id.split('_')[0])
@@ -203,37 +203,37 @@ export class AnnotationMode implements OnInit, OnDestroy {
               const dragRange = this.mousePos.map((mp, i) => mp - +draggingStartPosition[i])
 
               if (hoveringType === 'point') {
-                this.ans.saveAnnotation({id: hovering.id, position1: this.mousePos.join(), name: hoveringName, type: hoveringType}, false, true)
+                this.ans.saveAnnotation({id: hovering.id, position1: this.mousePos, name: hoveringName, type: hoveringType}, false, true)
               } else if (hoveringType === 'line') {
                 if (hovering.partIndex === 0) {
                   this.ans.saveAnnotation({id: hovering.id,
-                    position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]).join(),
-                    position2: hoveringPosition2.map((hp, i) => +hp + dragRange[i]).join(),
+                    position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]),
+                    position2: hoveringPosition2.map((hp, i) => +hp + dragRange[i]),
                     name: hoveringName,
                     type: hoveringType}, false, true)
                 } else if (hovering.partIndex === 1) {
                   this.ans.saveAnnotation({id: hovering.id,
-                    position1: this.mousePos.join(),
-                    position2: hoveringPosition2.join(),
+                    position1: this.mousePos,
+                    position2: hoveringPosition2,
                     name: hoveringName,
                     type: hoveringType}, false, true)
                 } else if (hovering.partIndex === 2) {
                   this.ans.saveAnnotation({id: hovering.id,
-                    position1: hoveringPosition1.join(),
-                    position2: this.mousePos.join(),
+                    position1: hoveringPosition1,
+                    position2: this.mousePos,
                     name: hoveringName,
                     type: hoveringType}, false, true)
                 }
               } else if (hoveringType === 'bounding box') {
                 this.ans.saveAnnotation({id: hovering.id,
-                  position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]).join(),
-                  position2: hoveringPosition2.map((hp, i) => +hp + dragRange[i]).join(),
+                  position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]),
+                  position2: hoveringPosition2.map((hp, i) => +hp + dragRange[i]),
                   name: hoveringName,
                   type: hoveringType}, false, true)
               } else if (hoveringType === 'ellipsoid') {
                 this.ans.saveAnnotation({id: hovering.id,
-                  position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]).join(),
-                  position2: hoveringPosition2.join(),
+                  position1: hoveringPosition1.map((hp, i) => +hp + dragRange[i]),
+                  position2: hoveringPosition2,
                   name: hoveringName,
                   type: hoveringType}, false, true)
               } else if (hoveringType === 'polygon') {
@@ -241,8 +241,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
                   hoveringPolygonAnnotations.forEach(pa => {
                     this.ans.saveAnnotation({
                       id: pa.id,
-                      position1: pa.position1.split(',').map((hp, i) => +hp + dragRange[i]).join(),
-                      position2: pa.position2.split(',').map((hp, i) => +hp + dragRange[i]).join(),
+                      position1: pa.position1.map((hp, i) => +hp + dragRange[i]),
+                      position2: pa.position2.map((hp, i) => +hp + dragRange[i]),
                       name: pa.name,
                       description: pa.description,
                       type: pa.type
@@ -254,20 +254,20 @@ export class AnnotationMode implements OnInit, OnDestroy {
                   const name = hoveringPolygonAnnotations[0].name
                   const description = hoveringPolygonAnnotations[0].description
                   if (hovering.partIndex === 2) {
-                    samePos1 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position1 === hoveringPosition2.join())
-                    samePos2 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position2 === hoveringPosition2.join())
+                    samePos1 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position1.join() === hoveringPosition2.join())
+                    samePos2 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position2.join() === hoveringPosition2.join())
                     this.ans.saveAnnotation({id: hovering.id,
-                      position1: hoveringPosition1.join(),
-                      position2: this.mousePos.join(),
+                      position1: hoveringPosition1,
+                      position2: this.mousePos,
                       name,
                       description,
                       type: hoveringType}, true, false)
                   } else if (hovering.partIndex === 1) {
-                    samePos1 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position1 === hoveringPosition1.join())
-                    samePos2 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position2 === hoveringPosition1.join())
+                    samePos1 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position1.join() === hoveringPosition1.join())
+                    samePos2 = hoveringPolygonAnnotations.filter(hp => hp.id !== hovering.id && hp.position2.join() === hoveringPosition1.join())
                     this.ans.saveAnnotation({id: hovering.id,
-                      position1: this.mousePos.join(),
-                      position2: hoveringPosition2.join(),
+                      position1: this.mousePos,
+                      position2: hoveringPosition2,
                       name,
                       description,
                       type: hoveringType}, true, false)
@@ -275,7 +275,7 @@ export class AnnotationMode implements OnInit, OnDestroy {
                   }
                   samePos1.forEach(a => {
                     this.ans.saveAnnotation({id: a.id,
-                      position1: this.mousePos.join(),
+                      position1: this.mousePos,
                       position2: a.position2,
                       name,
                       description,
@@ -285,7 +285,7 @@ export class AnnotationMode implements OnInit, OnDestroy {
                   samePos2.forEach(a => {
                     this.ans.saveAnnotation({id: a.id,
                       position1: a.position1,
-                      position2: this.mousePos.join(),
+                      position2: this.mousePos,
                       name,
                       description,
                       type: a.type}, true, false)
@@ -307,14 +307,12 @@ export class AnnotationMode implements OnInit, OnDestroy {
           .subscribe(floatArr => {
             this.mousePos = floatArr && floatArr
             if (this.selecting === 'position1' && this.mousePos) {
-              this.position1 = this.mousePos.join()
+              this.position1 = this.mousePos
             } else if (this.selecting === 'position2' && this.mousePos) {
               if (this.ans.annotationTypes[this.selectedType].name === 'Ellipsoid') {
-                this.position2 = [
-                  this.ans.getRadii(this.position1.split(','), this.mousePos),
-                ].join()
+                this.position2 = this.ans.getRadii(this.position1, this.mousePos)
               } else {
-                this.position2 = this.mousePos.join()
+                this.position2 = this.mousePos
               }
 
               if (this.position1
@@ -382,18 +380,9 @@ export class AnnotationMode implements OnInit, OnDestroy {
           }
           this.ans.voxelSize = this.ans.getVoxelFromSpace(tmpl.fullId)
 
+          this.ans.loadAnnotationsOnInit()
           // Set get annotations from the local storage and add them to the viewer
-          if (window.localStorage.getItem(CONST.USER_ANNOTATION_STORE_KEY) && window.localStorage.getItem(CONST.USER_ANNOTATION_STORE_KEY).length) {
-            const annotationsString = window.localStorage.getItem(CONST.USER_ANNOTATION_STORE_KEY)
-            this.ans.pureAnnotationsForViewer = JSON.parse(annotationsString).filter(a => a.atlas.id === this.ans.selectedAtlas.id)
-            this.ans.groupedAnnotations = this.ans.pureAnnotationsForViewer.filter(a => a.type !== 'polygon')
-            this.ans.addPolygonsToGroupedAnnotations(this.ans.pureAnnotationsForViewer.filter(a => a.type === 'polygon'))
-            this.ans.refreshAnnotationFilter()
-            this.ans.pureAnnotationsForViewer.filter(a => a.annotationVisible && a.template.id === this.ans.selectedTemplate.id)
-              .forEach(a => {
-                this.ans.addAnnotationOnViewer(a)
-              })
-          }
+
         })
       )
 
@@ -446,7 +435,6 @@ export class AnnotationMode implements OnInit, OnDestroy {
                         || this.ans.annotationTypes[this.selectedType].type === 'polygon') {
           this.selecting = 'position2'
         }
-
       } else if (this.selecting === 'position2' && this.position2 && this.mousePos) {
         if (this.ans.annotationTypes[this.selectedType].type === 'polygon') {
           this.ans.saveAnnotation({id: this.editingAnnotationId,

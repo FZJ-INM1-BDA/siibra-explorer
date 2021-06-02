@@ -17,7 +17,7 @@ const USER_ANNOTATION_LAYER_SPEC = {
 export class AnnotationService {
 
     // Annotations to display on viewer
-    public pureAnnotationsForViewer = []
+    public pureAnnotationsForViewer: ViewerAnnotation[] = []
 
     // Grouped annotations for user
     public groupedAnnotations = []
@@ -67,12 +67,33 @@ export class AnnotationService {
       )
 
       this.addedLayer = this.viewer.layerManager.addManagedLayer(layer)
-
-
     }
 
-    getRadii(a, b) {
-      const returnArray = [Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1]), Math.abs(b[2] - a[2])]
+    loadAnnotationsOnInit() {
+      const annotationsString = window.localStorage.getItem(CONST.USER_ANNOTATION_STORE_KEY)
+      const annotationList = JSON.parse(annotationsString)
+
+      if (annotationList && annotationList.length) {
+        // annotationList.forEach((a, i) => {
+        //   annotationList[i].annotations = annotationList[i].annotations? annotationList[i].annotations.map(a => {return {...a, position: +a.position.split(',').map(Number)}}) : null
+        //   annotationList[i].position1 = annotationList[i].position1 ? annotationList[i].position1.split(',').map(Number) : null
+        //   annotationList[i].position2 = annotationList[i].position2 ? annotationList[i].position2.split(',').map(Number) : null
+        // })
+
+        this.pureAnnotationsForViewer = annotationList.filter(a => a.atlas.id === this.selectedAtlas.id)
+
+        this.groupedAnnotations = this.pureAnnotationsForViewer.filter(a => a.type !== 'polygon')
+        this.addPolygonsToGroupedAnnotations(this.pureAnnotationsForViewer.filter(a => a.type === 'polygon'))
+        this.refreshFinalAnnotationList()
+        this.pureAnnotationsForViewer.filter(a => a.annotationVisible && a.template.id === this.selectedTemplate.id)
+          .forEach(a => {
+            this.addAnnotationOnViewer(a)
+          })
+      }
+    }
+
+    getRadii(a, b): number[] {
+      const returnArray: number[] = [Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1]), Math.abs(b[2] - a[2])]
         .map(n => n === 0? this.ellipsoidMinRadius : n)
       return returnArray
     }
@@ -169,7 +190,7 @@ export class AnnotationService {
         } else {
           this.groupedAnnotations.push(annotation)
         }
-        this.refreshAnnotationFilter()
+        this.refreshFinalAnnotationList()
       }
 
       this.storeToLocalStorage()
@@ -179,21 +200,18 @@ export class AnnotationService {
       const annotationLayer = this.viewer.layerManager.getLayerByName(CONST.USER_ANNOTATION_LAYER_NAME).layer
       const annotations = annotationLayer.localAnnotations.toJSON()
 
-      const position1Voxel = annotation.position1.split(',')
-      const position2Voxel = annotation.position2? annotation.position2.split(',') : ''
-
       annotations.push({
         description: annotation.description? annotation.description : '',
         id: annotation.id,
-        point: annotation.type === 'point'? annotation.position1.split(',') : null,
+        point: annotation.type === 'point'? annotation.position1 : null,
         pointA: annotation.type === 'line' || annotation.type === 'bounding box' || annotation.type === 'polygon'?
-          position1Voxel : null,
+          annotation.position1 : null,
         pointB: annotation.type === 'line' || annotation.type === 'bounding box' || annotation.type === 'polygon'?
-          position2Voxel : null,
+          annotation.position2 : null,
         center: annotation.type === 'ellipsoid'?
-          position1Voxel : null,
+          annotation.position1 : null,
         radii: annotation.type === 'ellipsoid'?
-          position2Voxel : null,
+          annotation.position2 : null,
         type: annotation.type === 'bounding box'?  'axis_aligned_bounding_box'
           : annotation.type === 'polygon'? 'line'
             : annotation.type.toUpperCase()
@@ -207,7 +225,7 @@ export class AnnotationService {
       this.removeAnnotationFromViewer(id)
       this.pureAnnotationsForViewer = this.pureAnnotationsForViewer.filter(a => a.id !== id)
       this.groupedAnnotations = this.groupedAnnotations.filter(a => a.id !== id.split('_')[0])
-      this.refreshAnnotationFilter()
+      this.refreshFinalAnnotationList()
       this.storeToLocalStorage()
     }
 
@@ -241,7 +259,7 @@ export class AnnotationService {
                 {id: a.id, point: 2},
                 {id: polygonAnnotations[index+1].id, point: 1}
               ]
-            } : a.position2 !== polygonAnnotations[0].position1? {
+            } : a.position2.join() !== polygonAnnotations[0].position1.join()? {
               position: a.position2,
               lines: [
                 {id: a.id, point: 2}
@@ -250,7 +268,7 @@ export class AnnotationService {
           }).filter(a => !!a)
           polygonPositions.unshift({
             position: polygonAnnotations[0].position1,
-            lines: polygonAnnotations[0].position1 === [...polygonAnnotations].pop().position2?
+            lines: polygonAnnotations[0].position1.join() === [...polygonAnnotations].pop().position2.join()?
               [{id: polygonAnnotations[0].id, point: 1}, {id: [...polygonAnnotations].pop().id, point: 2}]
               : [{id: polygonAnnotations[0].id, point: 1}]
           })
@@ -268,7 +286,7 @@ export class AnnotationService {
             type: 'polygon',
             annotations: polygonAnnotations,
             positions: polygonPositions,
-            circular: polygonAnnotations[0].position1 === [...polygonAnnotations].pop().position2,
+            circular: polygonAnnotations[0].position1.join() === [...polygonAnnotations].pop().position2.join(),
             annotationVisible: annotations[i].annotationVisible,
             template: annotations[i].template,
             atlas: this.selectedAtlas
@@ -285,11 +303,11 @@ export class AnnotationService {
         } else {
           this.groupedAnnotations.push(tr)
         }
-        this.refreshAnnotationFilter()
+        this.refreshFinalAnnotationList()
       })
     }
 
-    refreshAnnotationFilter(filter = null) {
+    refreshFinalAnnotationList(filter = null) {
       if (filter) {this.annotationFilter = filter}
       this.finalAnnotationList = this.groupedAnnotations
         // Filter all/current template
@@ -300,12 +318,12 @@ export class AnnotationService {
             a.positions = a.positions.map(p => {
               return {
                 ...p,
-                position: this.voxelToMM(p.position.split(',')).join()
+                position: this.voxelToMM(p.position)
               }
             })
           } else {
-            a.position1 = this.voxelToMM(a.position1.split(',')).join()
-            a.position2 = a.position2 && this.voxelToMM(a.position2.split(',')).join()
+            a.position1 = this.voxelToMM(a.position1)
+            a.position2 = a.position2 && this.voxelToMM(a.position2)
           }
 
           a.dimension = 'mm'
@@ -327,11 +345,11 @@ export class AnnotationService {
         })
     }
 
-    voxelToMM(r): any[] {
+    voxelToMM(r: number[]): number[] {
       return r.map((r, i) => parseFloat((+r*this.voxelSize[i]/1e6).toFixed(3)))
     }
 
-    mmToVoxel(mm): any[] {
+    mmToVoxel(mm: number[]): any[] {
       return mm.map((m, i) => +m*1e6/this.voxelSize[i])
     }
 
@@ -341,6 +359,18 @@ export class AnnotationService {
 
 }
 
+export interface ViewerAnnotation {
+    id: string
+    position1: number[]
+    position2: number[]
+    name: string
+    description: string
+    type: string
+    circular: boolean
+    atlas: any
+    template: any
+    annotationVisible: boolean
+}
 
 
 export const IAV_VOXEL_SIZES_NM = {

@@ -30,7 +30,7 @@ export class ImportAnnotation {
                     || !fileData.coordinateSpace || !fileData.coordinateSpace.fullName || !fileData.coordinateSpace.versionIdentifier) {
           return
         }
-        const position1 = this.ans.mmToVoxel(fileData.coordinates.value).join()
+        const position1 = this.ans.mmToVoxel(fileData.coordinates.value)
         this.ans.saveAnnotation({position1,
           template: {
             name: fileData.coordinateSpace.fullName,
@@ -46,8 +46,8 @@ export class ImportAnnotation {
         }
 
         if (fileData.type !== 'polygon') {
-          const position1 = this.ans.mmToVoxel(fileData.position1.split(',')).join()
-          const position2 = fileData.position2 && this.ans.mmToVoxel(fileData.position2.split(',')).join()
+          const position1 = this.ans.mmToVoxel(fileData.position1.split(',').map(Number))
+          const position2 = fileData.position2 && this.ans.mmToVoxel(fileData.position2.split(',').map(Number))
 
           this.ans.saveAnnotation({position1, position2,
             name, description, type, atlas, template
@@ -62,7 +62,7 @@ export class ImportAnnotation {
               type: 'polygon'})
           })
           this.ans.groupedAnnotations.push(fileData)
-          this.ans.refreshAnnotationFilter()
+          this.ans.refreshFinalAnnotationList()
         }
 
       }

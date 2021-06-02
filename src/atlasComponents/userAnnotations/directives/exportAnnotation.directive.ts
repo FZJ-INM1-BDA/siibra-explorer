@@ -10,14 +10,13 @@ export class ExportAnnotation {
 
   @HostListener('click')
   onClick() {
-    console.log(this.input)
-    this.exportAnnotations({...this.input})
+    this.exportAnnotations(this.input.annotations, this.input.sands)
   }
 
   getSandsObj(position, template) {
     return {
       coordinates: {
-        value: position.split(',').map(p => +p),
+        value: position.map(p => +p),
         unit: 'mm'
       },
       coordinateSpace: {

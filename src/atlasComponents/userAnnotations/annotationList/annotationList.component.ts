@@ -48,6 +48,7 @@ export class AnnotationList {
   }
 
   navigate(positionString: string) {
+    console.log(positionString)
     const position = positionString.split(',').map(p => +p * 1e6)
 
     if (position && position.length === 3) {
@@ -64,15 +65,15 @@ export class AnnotationList {
 
   saveAnnotation(annotation, singlePolygon = false) {
     if (annotation.type !== 'polygon' || singlePolygon) {
-      annotation.position1 = annotation.position1.replace(/\s/g, '')
-      annotation.position2 = annotation.position2 && annotation.position2.replace(/\s/g, '')
-      if (annotation.position1.split(',').length !== 3 || !annotation.position1.split(',').every(e => !!e)
+      // annotation.position1 = annotation.position1
+      // annotation.position2 = annotation.position2 && annotation.position2
+      if (annotation.position1.length !== 3 || !annotation.position1.every(e => !!e)
           || ((annotation.position2
-              && annotation.position2.split(',').length !== 3) || !annotation.position1.split(',').every(e => !!e))) {
+              && annotation.position2.length !== 3) || !annotation.position1.every(e => !!e))) {
         return
       } else {
-        annotation.position1 = this.ans.mmToVoxel(annotation.position1.split(',')).join()
-        annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2.split(',')).join()
+        annotation.position1 = this.ans.mmToVoxel(annotation.position1)
+        annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2)
       }
       this.ans.saveAnnotation(annotation)
     } else {
@@ -88,17 +89,24 @@ export class AnnotationList {
       const toUpdate = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
       this.ans.groupedAnnotations[toUpdate].name = annotation.name
       this.ans.groupedAnnotations[toUpdate].description = annotation.description
-      this.ans.refreshAnnotationFilter()
-
+      this.ans.refreshFinalAnnotationList()
     }
   }
 
+  annotationPositionsToNumbers(annotation) {
+    annotation.annotations = annotation.annotations? annotation.annotations.map(a => {return {...a, position: +a.position.split(',').map(Number)}}) : null
+    annotation.position1 = annotation.position1 ? annotation.position1.split(',').map(Number) : null
+    annotation.position2 = annotation.position2 ? annotation.position2.split(',').map(Number) : null
+
+    return annotation
+  }
+
   savePolygonPosition(id, position, inputVal) {
-    inputVal = inputVal.replace(/\s/g, '')
-    if (inputVal.split(',').length !== 3 || !inputVal.split(',').every(e => !!e)) {
+    // inputVal = inputVal
+    if (inputVal.length !== 3 || !inputVal.every(e => !!e)) {
       return
     } else {
-      inputVal = this.ans.mmToVoxel(inputVal.split(',')).join()
+      inputVal = this.ans.mmToVoxel(inputVal)
     }
     position.lines.forEach(l => {
       if (l.point === 2) {

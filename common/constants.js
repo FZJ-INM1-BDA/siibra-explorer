@@ -98,7 +98,7 @@
 
     // Annotations
     USER_ANNOTATION_LAYER_NAME: 'user_annotations',
-    USER_ANNOTATION_STORE_KEY: `user_landmarks_demo_1`
+    USER_ANNOTATION_STORE_KEY: `user_landmarks_demo_2`
   }
 
   exports.QUICKTOUR_DESC ={

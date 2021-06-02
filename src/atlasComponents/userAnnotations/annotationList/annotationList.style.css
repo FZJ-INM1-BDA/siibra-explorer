@@ -2,15 +2,6 @@
     color: #bababa;
 }
 
-input, textarea {
-  background: none;
-  border: none;
-}
-
-input:focus, textarea:focus {
-  border-bottom: 2px solid;
-}
-
 :host-context([darktheme="true"]) .hovering-header {
     background-color: #737373;
 }
