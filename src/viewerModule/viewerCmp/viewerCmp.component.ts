@@ -136,8 +136,9 @@ export class ViewerCmp implements OnDestroy {
   )
 
   public viewerMode: string
-  public hideUi$ = this.store$.pipe(
+  public hideUi$: Observable<boolean> = this.store$.pipe(
     select(viewerStateViewerModeSelector),
+    map(h => h === ARIA_LABELS.VIEWER_MODE_ANNOTATING),
     distinctUntilChanged(),
   )
 

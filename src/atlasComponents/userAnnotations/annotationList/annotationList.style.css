@@ -1,14 +1,5 @@
-.annotation-content {
-    max-width: 300px;
-    min-width: 300px;
-}
-
 .inactive-filter {
     color: #bababa;
-}
-
-.selecting-height {
-    max-height: 100px;
 }
 
 input, textarea {
@@ -18,10 +9,6 @@ input, textarea {
 
 input:focus, textarea:focus {
   border-bottom: 2px solid;
-}
-
-.annotation-name-input {
-  width: 180px;
 }
 
 :host-context([darktheme="true"]) .hovering-header {

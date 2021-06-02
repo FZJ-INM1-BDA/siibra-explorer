@@ -8,6 +8,10 @@ import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode
 import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationMessage/annotationMessage.component";
+import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
+import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
+import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
+import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
 
 @NgModule({
   imports: [
@@ -21,7 +25,11 @@ import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationM
   declarations: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage
+    AnnotationMessage,
+    AnnotationSwitch,
+    ImportAnnotation,
+    ExportAnnotation,
+    KeyListener
   ],
   providers: [
     AnnotationService
@@ -29,7 +37,8 @@ import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationM
   exports: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage
+    AnnotationMessage,
+    AnnotationSwitch
   ]
 })
 

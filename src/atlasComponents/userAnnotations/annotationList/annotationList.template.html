@@ -1,16 +1,16 @@
-<div aria-label="user annotations viewer" class="annotation-content w-100">
+<div [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_VIEWER" class="w-100">
 
-    <div aria-label="user annotations header" class="overflow-hidden mt-3 mr-2 ml-2">
-        <div arial-label="user annotations footer" class="d-flex justify-content-between">
+    <div class="overflow-hidden mt-3 mr-2 ml-2">
+        <div [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_HEADER" class="d-flex justify-content-between">
             <div>
                 <button class="mr-1 ml-1" mat-icon-button
-                        aria-label="Import annotation"
+                        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
                         matTooltip="Import JSON"
                         [matMenuTriggerFor]="importMenu">
                     <i class="fas fa-file-import"></i>
                 </button>
-                <input type="file" #importInput (change)="$event.target.files.length && ans.importFile( $event.target.files[0])" hidden/>
-                <input type="file" #importInputSands (change)="$event.target.files.length && ans.importFile($event.target.files[0], true)" hidden/>
+                <input type="file" #importInput [import-annotations]="{sands: false}" hidden/>
+                <input type="file" #importInputSands [import-annotations]="{sands: true}" hidden/>
                 <mat-menu #importMenu="matMenu">
                     <button mat-menu-item (click)="importInputSands.click()">
                         SANDS format
@@ -21,27 +21,27 @@
                 </mat-menu>
 
                 <button class="mr-1 ml-1" mat-icon-button
-                        aria-label="Export annotation"
+                        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
                         matTooltip="Export"
                         [matMenuTriggerFor]="exportAllMenu">
                     <i class="fas fa-file-export"></i>
                 </button>
                 <mat-menu #exportAllMenu="matMenu">
-                    <button mat-menu-item (click)="ans.exportAnnotations(ans.finalAnnotationList, true)">
+                    <button mat-menu-item [export-annotations]="{annotations: [ans.finalAnnotationList], sands: true}">
                         SANDS format
                     </button>
-                    <button mat-menu-item (click)="ans.exportAnnotations(ans.finalAnnotationList)">
+                    <button mat-menu-item [export-annotations]="{annotations: [ans.finalAnnotationList], sands: false}">
                         Siibra explorer format
                     </button>
                 </mat-menu>
 
             </div>
             <div class="d-flex flex-column">
-                <small [ngClass]="[ans.annotationFilter !== 'all'? 'inactive-filter' : '']"
+                <small [ngClass]="[ans.annotationFilter !== 'all'? 'text-muted' : '']"
                        class="cursor-pointer" (click)="ans.refreshAnnotationFilter('all')">
                     All landmarks
                 </small>
-                <small [ngClass]="[ans.annotationFilter !== 'current'? 'inactive-filter' : '']"
+                <small [ngClass]="[ans.annotationFilter !== 'current'? 'text-muted' : '']"
                        class="cursor-pointer" (click)="ans.refreshAnnotationFilter('current')">
                     Current template
                 </small>
@@ -50,26 +50,24 @@
     </div>
     <mat-divider class="mt-2 mb-2"></mat-divider>
 
-    <mat-accordion aria-label="user annotations list"
+    <mat-accordion [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
                  class="h-100 d-flex flex-column overflow-auto">
-        <mat-expansion-panel #expansion hideToggle *ngFor="let annotation of ans.finalAnnotationList; let i = index; trackBy: identifier">
+        <mat-expansion-panel #expansion hideToggle *ngFor="let annotation of ans.finalAnnotationList; trackBy: identifier">
             <mat-expansion-panel-header [ngClass]="ans.hoverAnnotation?.id.includes(annotation.id) && 'hovering-header'">
 
                 <mat-panel-title>
                     <small class="cursor-pointer mr-3 ml-1 d-flex align-items-center"
-                            aria-label="Hide annotation"
+                            [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_HIDE"
                             [matTooltip]="annotation.annotationVisible? 'Hide' : 'Show'"
                             (click)="$event.stopPropagation(); toggleAnnotationVisibility(annotation)">
                         <i class="fas far fa-check-circle" *ngIf="annotation.annotationVisible; else notVisible"></i>
                         <ng-template #notVisible><i class="far fa-circle"></i></ng-template>
                     </small>
-                    <input #annotationNameRef class="font-italic outline-none color-inherit annotation-name-input"
+                    <input class="font-italic outline-none color-inherit"
                            (click)="expansion.expanded? $event.stopPropagation() : null"
                            [(ngModel)]="annotation.name"
-                           (keydown.escape)="$event.stopPropagation(); annotationNameRef.blur();"
                            (keydown.space)="$event.stopPropagation();"
-                           (keydown.enter)="$event.stopPropagation(); annotationNameRef.blur();"
-                           (keydown)="submitInput($event, annotationNameRef)"
+                           annotation-list-key-listener
                            (keyup)="this.saveAnnotation(annotation)"/>
                 </mat-panel-title>
 
@@ -92,11 +90,8 @@
 
                 <div *ngIf="annotation.type !== 'polygon'" class="w-100 d-flex align-items-center justify-content-between mt-2">
                     <input class="w-100 font-italic outline-none color-inherit"
-                           #position1Ref
                            [(ngModel)]="annotation.position1"
-                           (keyup.escape)="position1Ref.blur(); $event.stopPropagation();"
-                           (keyup.enter)="position1Ref.blur(); $event.stopPropagation();"
-                           (keydown)="submitInput($event, position1Ref)"
+                           annotation-list-key-listener
                            (keyup)="this.saveAnnotation(annotation)"/>
                     <small class="d-flex align-items-center">mm <i class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer" (click)="navigate(annotation.position1)"></i></small>
                 </div>
@@ -104,10 +99,7 @@
                 <div *ngIf="annotation.type !== 'polygon' && annotation.position2" class="w-100 d-flex align-items-center justify-content-between mb-2">
                     <input class="w-100 font-italic d-flex align-items-center outline-none color-inherit"
                            [(ngModel)]="annotation.position2"
-                           #position2Ref
-                           (keyup.escape)="position2Ref.blur(); $event.stopPropagation();"
-                           (keyup.enter)="position2Ref.blur(); $event.stopPropagation();"
-                           (keydown)="submitInput($event, position2Ref)"
+                           annotation-list-key-listener
                            (keyup)="this.saveAnnotation(annotation)"/>
                     <small class="d-flex align-items-center">mm <i class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer" (click)="navigate(annotation.position2)"></i></small>
                 </div>
@@ -117,9 +109,7 @@
                         <input class="w-100 font-italic d-flex align-items-center outline-none color-inherit"
                                [value]="position?.position"
                                #polygonPositionInput
-                               (keyup.escape)="polygonPositionInput.blur(); $event.stopPropagation();"
-                               (keyup.enter)="polygonPositionInput.blur(); $event.stopPropagation();"
-                               (keydown)="submitInput($event, polygonPositionInput)"
+                               annotation-list-key-listener
                                (keyup)="this.savePolygonPosition(annotation.id, position, polygonPositionInput.value)"/>
                         <small class="d-flex align-items-center">mm <i class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer" (click)="navigate(position?.position)"></i></small>
                     </div>
@@ -130,13 +120,11 @@
                     <textarea class="w-100 outline-none color-inherit"
                               placeholder="Add description"
                               cdkTextareaAutosize
-                              #descriptionTextAreaRef
                               #autosize="cdkTextareaAutosize"
                               cdkAutosizeMinRows="1"
                               cdkAutosizeMaxRows="5"
                               [(ngModel)]="annotation.description"
-                              (keyup.escape)="descriptionTextAreaRef.blur(); $event.stopPropagation();"
-                              (keydown)="submitInput($event, descriptionTextAreaRef)"
+                              annotation-list-key-listener
                               (keyup)="this.saveAnnotation(annotation)"></textarea>
                 </div>
 
@@ -144,21 +132,21 @@
 
                 <div class="d-flex align-items-center justify-content-end w-100">
                     <button class="mr-1 ml-1" mat-icon-button
-                            aria-label="Export single annotation"
+                            [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
                             matTooltip="Export"
                             [matMenuTriggerFor]="exportSingleMenu">
                         <i class="fas fa-file-export"></i>
                     </button>
                     <mat-menu #exportSingleMenu="matMenu">
-                        <button mat-menu-item (click)="ans.exportAnnotations([annotation], true)">
+                        <button mat-menu-item [export-annotations]="{annotations: [annotation], sands: true}">
                             SANDS format
                         </button>
-                        <button mat-menu-item (click)="ans.exportAnnotations([annotation])">
+                        <button mat-menu-item [export-annotations]="{annotations: [annotation], sands: false}">
                             Siibra explorer format
                         </button>
                     </mat-menu>
                     <button class="mr-1 ml-1" mat-icon-button
-                            aria-label="Delete annotation"
+                            [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_DELETE"
                             (click)="removeAnnotation(annotation)">
                         <i class="fas fa-trash"></i>
                     </button>

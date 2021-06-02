@@ -4,7 +4,6 @@ import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import {getUuid} from "src/util/fn";
 import {Store} from "@ngrx/store";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
-import * as JSZip from 'jszip';
 
 const USER_ANNOTATION_LAYER_SPEC = {
   "type": "annotation",
@@ -338,113 +337,6 @@ export class AnnotationService {
 
     getVoxelFromSpace = (spaceId: string) => {
       return IAV_VOXEL_SIZES_NM[spaceId]
-    }
-
-    getSandsObj(position, template) {
-      return {
-        coordinates: {
-          value: position.split(',').map(p => +p),
-          unit: 'mm'
-        },
-        coordinateSpace: {
-          fullName: template.name,
-          versionIdentifier: template.id
-        }
-      }
-    }
-
-    exportAnnotations(annotations: any[], sands = false) {
-      const zip = new JSZip()
-      const zipFileName = `annotation - ${annotations[0].atlas.name}.zip`
-
-
-      if (sands) {
-        annotations.forEach(a => {
-          zip.folder(a.name)
-          if (a.positions) {
-            a.positions.forEach(p => {
-              zip.folder(a.name).file(`${p.position}.json`, JSON.stringify(this.getSandsObj(p.position, a.template)))
-            })
-          } else {
-            zip.folder(a.name).file(`${a.position1}.json`, JSON.stringify(this.getSandsObj(a.position1, a.template)))
-            if (a.position2) zip.folder(a.name).file(`${a.position1}.json`, JSON.stringify(this.getSandsObj(a.position2, a.template)))
-          }
-        })
-      } else {
-        annotations.forEach(a => {
-          const fileName = a.name.replace(/[\\/:*?"<>|]/g, "").trim()
-          zip.file(`${fileName}.json`, JSON.stringify(a))
-        })
-      }
-
-
-      zip.file("README.txt",
-        `The annotation has been extracted from the atlas: "${annotations.map(a => a.atlas.name).filter((v, i, a) => a.indexOf(v) === i).join()}" 
-        and template(s): "${annotations.map(a => a.template.name).filter((v, i, a) => a.indexOf(v) === i).join()}"`)
-      zip.generateAsync({
-        type: "base64"
-      }).then(content => {
-        const link = document.createElement('a')
-        link.href = 'data:application/zip;base64,' + content
-        link.download = zipFileName
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      })
-    }
-
-
-    importFile(file, sands = false) {
-      const fileReader = new FileReader()
-      fileReader.readAsText(file, "UTF-8")
-      fileReader.onload = () => {
-        const fileData = JSON.parse(fileReader.result.toString())
-
-        if (sands) {
-          if (!fileData.coordinates || !fileData.coordinates.value || fileData.coordinates.value.length !== 3
-              || !fileData.coordinateSpace || !fileData.coordinateSpace.fullName || !fileData.coordinateSpace.versionIdentifier) {
-            return
-          }
-          const position1 = this.mmToVoxel(fileData.coordinates.value).join()
-          this.saveAnnotation({position1,
-            template: {
-              name: fileData.coordinateSpace.fullName,
-              id: fileData.coordinateSpace.versionIdentifier
-            },
-            type: 'point'})
-        } else {
-          const {id, name, description, type,
-            atlas, template, positions, annotations} = fileData
-
-          if (!id || !(fileData.position1 || positions) || !type) {
-            return
-          }
-
-          if (fileData.type !== 'polygon') {
-            const position1 = this.mmToVoxel(fileData.position1.split(',')).join()
-            const position2 = fileData.position2 && this.mmToVoxel(fileData.position2.split(',')).join()
-
-            this.saveAnnotation({position1, position2,
-              name, description, type, atlas, template
-            })
-          } else if (annotations) {
-            annotations.forEach(a => {
-              this.saveAnnotation({
-                id: a.id,
-                name, description,
-                position1: a.position1,
-                position2: a.position2,
-                type: 'polygon'})
-            })
-            this.groupedAnnotations.push(fileData)
-            this.refreshAnnotationFilter()
-          }
-
-        }
-      }
-      fileReader.onerror = (error) => {
-        console.warn(error)
-      }
     }
 
 }

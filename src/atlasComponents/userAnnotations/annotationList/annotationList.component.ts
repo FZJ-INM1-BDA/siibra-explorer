@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 import {Store} from "@ngrx/store";
+import {ARIA_LABELS} from "common/constants";
 
 @Component({
   selector: 'annotation-list',
@@ -10,6 +11,7 @@ import {Store} from "@ngrx/store";
 })
 export class AnnotationList {
 
+  public ARIA_LABELS = ARIA_LABELS
   public identifier = (index: number, item: any) => item.id
 
   constructor(private store$: Store<any>, public ans: AnnotationService) {}
@@ -23,7 +25,7 @@ export class AnnotationList {
     }
   }
 
-  toggleVisibility(annotation) {
+  private toggleVisibility = (annotation) => {
     const annotationIndex = this.ans.pureAnnotationsForViewer.findIndex(a => a.id === annotation.id)
 
     if (this.ans.pureAnnotationsForViewer[annotationIndex].annotationVisible) {
@@ -45,16 +47,19 @@ export class AnnotationList {
     }
   }
 
-  navigate(position) {
-    position = position.split(',').map(p => +p * 1e6)
-    this.store$.dispatch(
-      viewerStateChangeNavigation({
-        navigation: {
-          position,
-          positionReal: true
-        },
-      })
-    )
+  navigate(positionString: string) {
+    const position = positionString.split(',').map(p => +p * 1e6)
+
+    if (position && position.length === 3) {
+      this.store$.dispatch(
+        viewerStateChangeNavigation({
+          navigation: {
+            position,
+            positionReal: true
+          },
+        })
+      )
+    }
   }
 
   saveAnnotation(annotation, singlePolygon = false) {
@@ -106,12 +111,6 @@ export class AnnotationList {
         this.saveAnnotation(annotation, true)
       }
     })
-  }
-
-  submitInput(e, area) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      area.blur()
-    }
   }
 
 }
