@@ -2,7 +2,6 @@ import {Directive, HostListener} from "@angular/core";
 import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import {ARIA_LABELS} from "common/constants";
 import {Store} from "@ngrx/store";
-import {IavRootStoreInterface} from "src/services/stateStore.service";
 
 @Directive({
   selector: '[annotation-switch]'
@@ -10,7 +9,7 @@ import {IavRootStoreInterface} from "src/services/stateStore.service";
 export class AnnotationSwitch {
 
 
-  constructor(private store$: Store<IavRootStoreInterface>) {
+  constructor(private store$: Store<any>) {
 
   }
 
@@ -19,7 +18,7 @@ export class AnnotationSwitch {
     this.setAnnotatingMode()
   }
 
-  setAnnotatingMode() {
+  private setAnnotatingMode() {
     this.store$.dispatch(viewerStateSetViewerMode({payload: ARIA_LABELS.VIEWER_MODE_ANNOTATING}))
   }
 }

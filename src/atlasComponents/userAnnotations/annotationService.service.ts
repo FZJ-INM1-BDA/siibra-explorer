@@ -4,11 +4,15 @@ import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import {getUuid} from "src/util/fn";
 import {Store} from "@ngrx/store";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
+import {AnnotationType, GroupedAnnotation, ViewerAnnotation} from "src/atlasComponents/userAnnotations/annotationInterfaces";
+
+const USER_ANNOTATION_LAYER_NAME = 'user_annotations'
+const USER_ANNOTATION_STORE_KEY = `user_landmarks_demo_2`
 
 const USER_ANNOTATION_LAYER_SPEC = {
   "type": "annotation",
   "tool": "annotateBoundingBox",
-  "name": CONST.USER_ANNOTATION_LAYER_NAME,
+  "name": USER_ANNOTATION_LAYER_NAME,
   "annotationColor": "#ffee00",
   "annotations": [],
 }
@@ -20,10 +24,10 @@ export class AnnotationService {
     public pureAnnotationsForViewer: ViewerAnnotation[] = []
 
     // Grouped annotations for user
-    public groupedAnnotations = []
+    public groupedAnnotations: GroupedAnnotation[] = []
 
     // Filtered annotations with converted voxed to mm
-    public finalAnnotationList = []
+    public finalAnnotationList: GroupedAnnotation[] = []
 
     public addedLayer: any
     public ellipsoidMinRadius = 0.5
@@ -34,7 +38,7 @@ export class AnnotationService {
     public selectedAtlas: {name, id}
     public hoverAnnotation: {id: string, partIndex: number}
 
-    public annotationTypes = [
+    public annotationTypes: AnnotationType[] = [
       {name: 'Cursor', class: 'fas fa-mouse-pointer', type: 'move', action: 'none'},
       {name: 'Point', class: 'fas fa-circle', type: 'singleCoordinate', action: 'paint'},
       {name: 'Line', class: 'fas fa-slash', type: 'doubleCoordinate', action: 'paint'},
@@ -62,7 +66,7 @@ export class AnnotationService {
       }
 
       const layer = this.viewer.layerSpecification.getLayer(
-        CONST.USER_ANNOTATION_LAYER_NAME,
+        USER_ANNOTATION_LAYER_NAME,
         USER_ANNOTATION_LAYER_SPEC
       )
 
@@ -70,16 +74,10 @@ export class AnnotationService {
     }
 
     loadAnnotationsOnInit() {
-      const annotationsString = window.localStorage.getItem(CONST.USER_ANNOTATION_STORE_KEY)
+      const annotationsString = window.localStorage.getItem(USER_ANNOTATION_STORE_KEY)
       const annotationList = JSON.parse(annotationsString)
 
       if (annotationList && annotationList.length) {
-        // annotationList.forEach((a, i) => {
-        //   annotationList[i].annotations = annotationList[i].annotations? annotationList[i].annotations.map(a => {return {...a, position: +a.position.split(',').map(Number)}}) : null
-        //   annotationList[i].position1 = annotationList[i].position1 ? annotationList[i].position1.split(',').map(Number) : null
-        //   annotationList[i].position2 = annotationList[i].position2 ? annotationList[i].position2.split(',').map(Number) : null
-        // })
-
         this.pureAnnotationsForViewer = annotationList.filter(a => a.atlas.id === this.selectedAtlas.id)
 
         this.groupedAnnotations = this.pureAnnotationsForViewer.filter(a => a.type !== 'polygon')
@@ -154,7 +152,7 @@ export class AnnotationService {
       }
     }
 
-    giveNameByType(type) {
+    generateNameByType(type) {
       const pointAnnotationNumber = this.pureAnnotationsForViewer
         .filter(a => a.name && a.name.startsWith(type) && (+a.name.split(type)[1]))
         .map(a => +a.name.split(type)[1])
@@ -166,9 +164,9 @@ export class AnnotationService {
 
     storeAnnotation(annotation) {
       // give names by type + number
-      if (!annotation.name && annotation.type !== 'polygon') {
-        annotation.name = this.giveNameByType(annotation.type)
-      }
+      // if (!annotation.name && annotation.type !== 'polygon') {
+      //   annotation.name = this.generateNameByType(annotation.type)
+      // }
 
       const foundIndex = this.pureAnnotationsForViewer.findIndex(x => x.id === annotation.id)
 
@@ -197,7 +195,7 @@ export class AnnotationService {
     }
 
     addAnnotationOnViewer(annotation) {
-      const annotationLayer = this.viewer.layerManager.getLayerByName(CONST.USER_ANNOTATION_LAYER_NAME).layer
+      const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME).layer
       const annotations = annotationLayer.localAnnotations.toJSON()
 
       annotations.push({
@@ -230,11 +228,11 @@ export class AnnotationService {
     }
 
     storeToLocalStorage() {
-      window.localStorage.setItem(CONST.USER_ANNOTATION_STORE_KEY, JSON.stringify(this.pureAnnotationsForViewer))
+      window.localStorage.setItem(USER_ANNOTATION_STORE_KEY, JSON.stringify(this.pureAnnotationsForViewer))
     }
 
     removeAnnotationFromViewer(id) {
-      const annotationLayer = this.viewer.layerManager.getLayerByName(CONST.USER_ANNOTATION_LAYER_NAME)?.layer
+      const annotationLayer = this.viewer.layerManager.getLayerByName(USER_ANNOTATION_LAYER_NAME)?.layer
       if (annotationLayer) {
         let annotations = annotationLayer.localAnnotations.toJSON()
         annotations = annotations.filter(a => a.id !== id)
@@ -251,6 +249,19 @@ export class AnnotationService {
         if (!transformed.find(t => t.id === annotationId[0])) {
           const polygonAnnotations = annotations.filter(a => a.id.split('_')[0] === annotationId[0]
                 && a.id.split('_')[1])
+            // clear polygonAnnotations
+            .map(a => {
+              if (a.annotations) {
+                a.annotations = a.annotations.map(an => {
+                  return {
+                    id: an.id,
+                    position1: an.position1,
+                    position2: an.position2
+                  }
+                })
+              }
+              return a
+            })
 
           const polygonPositions = polygonAnnotations.map((a, index) => {
             return (index+1) !== polygonAnnotations.length? {
@@ -275,8 +286,8 @@ export class AnnotationService {
 
           transformed = transformed.filter(a => a.id.split('_')[0] !== annotationId[0])
 
-          if (!annotations[i].name) {
-            annotations[i].name = this.giveNameByType(annotations[i].type)
+          if (annotations[i].name === null) {
+            annotations[i].name = this.generateNameByType(annotations[i].type)
           }
 
           transformed.push({
@@ -329,20 +340,6 @@ export class AnnotationService {
           a.dimension = 'mm'
           return a
         })
-        // clear polygonAnnotations
-        .map(a => {
-          if (a.annotations) {
-            a.annotations = a.annotations.map(an => {
-              return {
-                id: an.id,
-                position1: an.position1,
-                position2: an.position2
-              }
-            })
-          }
-
-          return a
-        })
     }
 
     voxelToMM(r: number[]): number[] {
@@ -358,20 +355,6 @@ export class AnnotationService {
     }
 
 }
-
-export interface ViewerAnnotation {
-    id: string
-    position1: number[]
-    position2: number[]
-    name: string
-    description: string
-    type: string
-    circular: boolean
-    atlas: any
-    template: any
-    annotationVisible: boolean
-}
-
 
 export const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],

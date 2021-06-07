@@ -12,6 +12,7 @@ import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/a
 import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
 import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
 import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
+import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyLis
     AnnotationSwitch,
     ImportAnnotation,
     ExportAnnotation,
-    KeyListener
+    KeyListener,
+    CoordinateInputTextPipe
   ],
   providers: [
     AnnotationService

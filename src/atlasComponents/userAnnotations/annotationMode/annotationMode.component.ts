@@ -352,6 +352,7 @@ export class AnnotationMode implements OnInit, OnDestroy {
             }
 
             this.ans.storeBackup()
+            this.changeToDefaultTool()
 
             this.editingAnnotationId = null
             this.selecting = 'position1'
@@ -425,12 +426,15 @@ export class AnnotationMode implements OnInit, OnDestroy {
         } else {
           this.ans.removeAnnotation(this.ans.hoverAnnotation.id)
         }
+        this.changeToDefaultTool()
       }
       // save annotation by selected annotation type
       if (this.selecting === 'position1' && this.position1) {
         if (this.ans.annotationTypes[this.selectedType].type === 'singleCoordinate') {
-          this.ans.saveAnnotation({position1: this.position1,
+          this.ans.saveAnnotation({name: this.ans.generateNameByType(this.ans.annotationTypes[this.selectedType].name),
+            position1: this.position1,
             type: this.ans.annotationTypes[this.selectedType].name})
+          this.changeToDefaultTool()
         } else if (this.ans.annotationTypes[this.selectedType].type === 'doubleCoordinate'
                         || this.ans.annotationTypes[this.selectedType].type === 'polygon') {
           this.selecting = 'position2'
@@ -446,14 +450,20 @@ export class AnnotationMode implements OnInit, OnDestroy {
           this.editingAnnotationId = splitEditingAnnotationId[0] + '_' + (+splitEditingAnnotationId[1]+1)
         } else {
           this.ans.saveAnnotation({id: this.editingAnnotationId,
+            name: this.ans.generateNameByType(this.ans.annotationTypes[this.selectedType].name),
             position1: this.position1,
             position2: this.position2,
             type: this.ans.annotationTypes[this.selectedType].name})
+          this.changeToDefaultTool()
           this.editingAnnotationId = null
           this.selecting = 'position1'
         }
 
       }
+    }
+
+    changeToDefaultTool() {
+      this.selectedType = 0
     }
 
     public selectAnnotationType = (typeIndex) => {

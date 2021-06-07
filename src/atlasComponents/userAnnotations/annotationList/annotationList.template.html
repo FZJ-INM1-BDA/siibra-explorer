@@ -52,10 +52,10 @@
 
     <mat-accordion [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
                    class="h-100 d-flex flex-column overflow-auto">
-        <mat-expansion-panel #expansion hideToggle
-                             *ngFor="let annotation of ans.finalAnnotationList; trackBy: identifier">
+        <mat-expansion-panel hideToggle
+                             *ngFor="let annotation of ans.finalAnnotationList; let i = index; trackBy: identifier">
             <mat-expansion-panel-header
-                    [ngClass]="ans.hoverAnnotation?.id.includes(annotation.id) && 'mat-elevation-z4'">
+                    [ngClass]="ans.hoverAnnotation?.id.includes(annotation.id) && 'highlight'">
 
                 <mat-panel-title>
                     <small class="cursor-pointer mr-3 ml-1 d-flex align-items-center"
@@ -82,48 +82,61 @@
 
 
             <div class="d-flex flex-column">
-                <mat-form-field class="w-100"><input matInput class="font-italic color-inherit"
-                                       [(ngModel)]="annotation.name"
-                                       (keydown.space)="$event.stopPropagation();"
-                                       annotation-list-key-listener
-                                       (keyup)="this.saveAnnotation(annotation)"/></mat-form-field>
+                <mat-form-field class="w-100">
+                    <input matInput class="font-italic color-inherit"
+                           placeholder="Name"
+                           [(ngModel)]="annotation.name"
+                           (keydown.space)="$event.stopPropagation();"
+                           annotation-list-key-listener
+                           (keyup)="this.saveAnnotation(annotation)"/>
+                </mat-form-field>
 
-                <p class="mt-2 mb-2">{{annotation.template.name}}</p>
+                <p class="mt-2 mb-4">{{annotation.template.name}}</p>
 
                 <div *ngIf="annotation.type !== 'polygon'"
                      class="w-100 d-flex align-items-center justify-content-between mt-2">
-                    <mat-form-field class="w-100"><input matInput class="w-100 font-italic color-inherit flex-grow-1"
-                                           [(ngModel)]="annotation.position1"
-                                           annotation-list-key-listener
-                                           (keyup)="this.saveAnnotation(annotation)"/></mat-form-field>
-                    <small class="d-flex align-items-center flex-grow-0">mm <i
+                    <mat-form-field class="w-100">
+                        <input matInput class="w-100 font-italic color-inherit flex-grow-1"
+                               placeholder="Position 1"
+                               [ngModel]="(annotation.position1 | coordinateInputText)"
+                               (ngModelChange)="annotation.position1 = positionToNumberArray($event)"
+                               annotation-list-key-listener
+                               (keyup)="this.saveAnnotation(annotation)"/>
+                    </mat-form-field>
+                    <small class="d-flex align-items-center flex-grow-0"> <i
                             class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
                             (click)="navigate(annotation.position1)"></i></small>
                 </div>
 
                 <div *ngIf="annotation.type !== 'polygon' && annotation.position2"
                      class="w-100 d-flex align-items-center justify-content-between mb-2">
-                    <mat-form-field class="w-100"><input matInput
-                                           class="w-100 font-italic d-flex align-items-center color-inherit"
-                                           [(ngModel)]="annotation.position2"
-                                           annotation-list-key-listener
-                                           (keyup)="this.saveAnnotation(annotation)"/></mat-form-field>
-                    <small class="d-flex align-items-center">mm <i
+                    <mat-form-field class="w-100">
+                        <input matInput
+                               placeholder="Position 2"
+                               class="w-100 font-italic d-flex align-items-center color-inherit"
+                               [ngModel]="(annotation.position2 | coordinateInputText)"
+                               (ngModelChange)="annotation.position2 = positionToNumberArray($event)"
+                               annotation-list-key-listener
+                               (keyup)="this.saveAnnotation(annotation)"/>
+                    </mat-form-field>
+                    <small class="d-flex align-items-center"> <i
                             class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
                             (click)="navigate(annotation.position2)"></i></small>
                 </div>
 
                 <div *ngIf="annotation.type === 'polygon'">
-                    <div *ngFor="let position of annotation.positions"
+                    <div *ngFor="let position of annotation.positions; let positionIndex = index"
                          class="w-100 d-flex align-items-center justify-content-between mb-2">
-                        <mat-form-field class="w-100"><input matInput
-                                               class="w-100 font-italic d-flex align-items-center color-inherit"
-                                               [value]="position?.position"
-                                               #polygonPositionInput
-                                               annotation-list-key-listener
-                                               (keyup)="this.savePolygonPosition(annotation.id, position, polygonPositionInput.value)"/>
+                        <mat-form-field class="w-100">
+                            <input matInput
+                                   [placeholder]="'Position' + (+positionIndex + 1)"
+                                   class="w-100 font-italic d-flex align-items-center color-inherit"
+                                   [value]="(position?.position | coordinateInputText)"
+                                   #polygonPositionInput
+                                   annotation-list-key-listener
+                                   (keyup)="this.savePolygonPosition(annotation.id, position, polygonPositionInput.value)"/>
                         </mat-form-field>
-                        <small class="d-flex align-items-center">mm <i
+                        <small class="d-flex align-items-center"> <i
                                 class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
                                 (click)="navigate(position?.position)"></i></small>
                     </div>
@@ -131,15 +144,16 @@
 
 
                 <div class="w-100">
-                    <mat-form-field class="w-100"><textarea matInput class="w-100 color-inherit"
-                                              placeholder="Add description"
-                                              cdkTextareaAutosize
-                                              #autosize="cdkTextareaAutosize"
-                                              cdkAutosizeMinRows="1"
-                                              cdkAutosizeMaxRows="5"
-                                              [(ngModel)]="annotation.description"
-                                              annotation-list-key-listener
-                                              (keyup)="this.saveAnnotation(annotation)"></textarea></mat-form-field>
+                    <mat-form-field class="w-100">
+                        <textarea matInput class="w-100 color-inherit"
+                                  placeholder="Description"
+                                  cdkTextareaAutosize
+                                  #autosize="cdkTextareaAutosize"
+                                  cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"
+                                  [(ngModel)]="annotation.description"
+                                  annotation-list-key-listener
+                                  (keyup)="this.saveAnnotation(annotation)">
+                        </textarea></mat-form-field>
                 </div>
 
 

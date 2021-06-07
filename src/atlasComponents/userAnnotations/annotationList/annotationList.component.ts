@@ -18,6 +18,11 @@ export class AnnotationList {
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {
+      // ToDo Change when mainList will be groupedAnnotations
+      const annotationIndex = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
+      this.ans.groupedAnnotations[annotationIndex].annotationVisible = !this.ans.groupedAnnotations[annotationIndex].annotationVisible
+      this.ans.refreshFinalAnnotationList()
+
       this.ans.pureAnnotationsForViewer.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
         .forEach(a => this.toggleVisibility(a))
     } else {
@@ -47,9 +52,9 @@ export class AnnotationList {
     }
   }
 
-  navigate(positionString: string) {
-    console.log(positionString)
-    const position = positionString.split(',').map(p => +p * 1e6)
+  navigate(position: number[]) {
+    // Convert to nm before navigate
+    position = position.map(p => +p * 1e6)
 
     if (position && position.length === 3) {
       this.store$.dispatch(
@@ -63,29 +68,40 @@ export class AnnotationList {
     }
   }
 
-  saveAnnotation(annotation, singlePolygon = false) {
-    if (annotation.type !== 'polygon' || singlePolygon) {
-      // annotation.position1 = annotation.position1
-      // annotation.position2 = annotation.position2 && annotation.position2
-      if (annotation.position1.length !== 3 || !annotation.position1.every(e => !!e)
-          || ((annotation.position2
-              && annotation.position2.length !== 3) || !annotation.position1.every(e => !!e))) {
+  saveAnnotation(annotation) {
+    if (annotation.type !== 'polygon') {
+
+      // Convert to Number Array
+      if (annotation.position1 && (typeof annotation.position1 === 'string')) {
+        annotation.position1 = this.positionToNumberArray(annotation.position1)
+      }
+      if (annotation.position2 && (typeof annotation.position2 === 'string')) {
+        annotation.position2 = this.positionToNumberArray(annotation.position2)
+      }
+
+      // Return if positions are valid
+      if (annotation.position1.length !== 3 || !annotation.position1.every(e => !isNaN(e))
+          || (annotation.position2 && (annotation.position2.length !== 3 || !annotation.position2.every(e => !isNaN(e))))) {
         return
       } else {
+        // Convert to Voxel
         annotation.position1 = this.ans.mmToVoxel(annotation.position1)
         annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2)
       }
+      // Save annotation
       this.ans.saveAnnotation(annotation)
     } else {
-      if (!annotation.name) {
-        annotation.name = this.ans.giveNameByType('polygon')
-      }
+
+      // if (!annotation.name) {
+      //   annotation.name = this.ans.generateNameByType('polygon')
+      // }
 
       const toUpdateFirstAnnotation = this.ans.pureAnnotationsForViewer.find(a => a.id === `${annotation.id}_0`)
       toUpdateFirstAnnotation.name = annotation.name
       toUpdateFirstAnnotation.description = annotation.description
       this.ans.saveAnnotation(toUpdateFirstAnnotation)
 
+      //ToDo Change when main list will be groupedAnnotations
       const toUpdate = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
       this.ans.groupedAnnotations[toUpdate].name = annotation.name
       this.ans.groupedAnnotations[toUpdate].description = annotation.description
@@ -93,17 +109,14 @@ export class AnnotationList {
     }
   }
 
-  annotationPositionsToNumbers(annotation) {
-    annotation.annotations = annotation.annotations? annotation.annotations.map(a => {return {...a, position: +a.position.split(',').map(Number)}}) : null
-    annotation.position1 = annotation.position1 ? annotation.position1.split(',').map(Number) : null
-    annotation.position2 = annotation.position2 ? annotation.position2.split(',').map(Number) : null
-
-    return annotation
+  positionToNumberArray(position) {
+    return position.split(',').map(n => parseFloat(n))
   }
 
   savePolygonPosition(id, position, inputVal) {
-    // inputVal = inputVal
-    if (inputVal.length !== 3 || !inputVal.every(e => !!e)) {
+    inputVal = this.positionToNumberArray(inputVal)
+
+    if (inputVal.length !== 3 || !inputVal.every(e => !isNaN(e))) {
       return
     } else {
       inputVal = this.ans.mmToVoxel(inputVal)
@@ -112,11 +125,11 @@ export class AnnotationList {
       if (l.point === 2) {
         const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position2 = inputVal
-        this.saveAnnotation(annotation, true)
+        this.ans.saveAnnotation(annotation, true)
       } else {
         const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position1 = inputVal
-        this.saveAnnotation(annotation, true)
+        this.ans.saveAnnotation(annotation, true)
       }
     })
   }
