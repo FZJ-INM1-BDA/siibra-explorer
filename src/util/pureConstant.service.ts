@@ -121,6 +121,16 @@ function getNehubaConfig(darkTheme: boolean) {
 export class PureContantService implements OnDestroy{
   
   private subscriptions: Subscription[] = []
+  public repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
+  public supportEmailAddress = `support@ebrains.eu`
+  public docUrl = `https://interactive-viewer.readthedocs.io/en/latest/`
+
+  public showHelpSupportText: string = `Did you encounter an issue?
+Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>
+
+Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>
+`
+
   public useTouchUI$: Observable<boolean>
   public darktheme$: Observable<boolean>
 

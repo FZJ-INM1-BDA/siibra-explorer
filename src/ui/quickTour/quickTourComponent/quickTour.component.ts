@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { combineLatest, Subscription } from "rxjs";
 import { QuickTourService } from "../quickTour.service";
-import { debounceTime, map, shareReplay, tap } from "rxjs/operators";
+import { debounceTime, map, shareReplay } from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
 import { QuickTourThis } from "../quickTourThis.directive";
 import { clamp } from "src/util/generator";
@@ -62,6 +62,10 @@ export class QuickTourComponent {
 
   public description$ = this.currTipLinkedObj$.pipe(
     map(val => val.thisObj.description)
+  )
+
+  public descriptionMd$ = this.currTipLinkedObj$.pipe(
+    map(val => val.thisObj.descriptionMd)
   )
 
   private quickTourSize$ = this.currTipLinkedObj$.pipe(
@@ -257,6 +261,11 @@ export class QuickTourComponent {
     if (usePosition.includes('right')) {
       tourCardTranslate[0] += tourCardMargin
     }
+
+    if (usePosition === 'center') {
+      tourCardTranslate[0] -= tourCardWidth /2
+      tourCardTranslate[1] -= tourCardHeight /2
+    }
     tourCardTranslate[0] = clamp(
       tourCardTranslate[0],
       tourCardWindowMargin,
@@ -296,6 +305,9 @@ export class QuickTourComponent {
         return {
           arrowTo: [ hostX + hostWidth, hostCogY ]
         }
+      }
+      return {
+        arrowTo: [0, 0]
       }
     })()
 

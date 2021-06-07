@@ -42,6 +42,12 @@
 <ng-template #viewerBody>
   <div class="atlas-container w-100 h-100"
     iav-media-query
+    quick-tour
+    [quick-tour-position]="quickTourFinale.position"
+    [quick-tour-description]="quickTourFinale.description"
+    [quick-tour-description-md]="quickTourFinale.descriptionMd"
+    [quick-tour-order]="quickTourFinale.order"
+    [quick-tour-overwrite-arrow]="emptyArrowTmpl"
     #media="iavMediaQuery">
     <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
     <iav-cmp-viewer-container
@@ -157,4 +163,7 @@
 
 <ng-template #idleOverlay>
   <tryme-component></tryme-component>
+</ng-template>
+
+<ng-template #emptyArrowTmpl>
 </ng-template>

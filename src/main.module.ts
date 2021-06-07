@@ -63,6 +63,7 @@ import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
+import { QuickTourModule } from './ui/quickTour';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -96,6 +97,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     KgTosModule,
     MouseoverModule,
     AtlasViewerRouterModule,
+    QuickTourModule,
     
     EffectsModule.forRoot([
       UseEffects,

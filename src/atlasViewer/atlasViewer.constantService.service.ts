@@ -127,48 +127,6 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    */
   public showConfigTitle: string = 'Settings'
 
-  private showHelpGeneralMobile = [
-    ['hold 🌏 + ↕', 'change oblique slice mode'],
-    ['hold 🌏 + ↔', 'oblique slice'],
-  ]
-  private showHelpGeneralDesktop = [
-    ['num keys [0-9]', 'toggle layer visibility [0-9]'],
-    ['h', 'show help'],
-    ['?', 'show help'],
-    ['o', 'toggle perspective/orthographic'],
-  ]
-
-  public showHelpGeneralMap = this.showHelpGeneralDesktop
-
-  private showHelpSliceViewMobile = [
-    ['drag', 'pan'],
-  ]
-  private showHelpSliceViewDesktop = [
-    ['drag', 'pan'],
-    ['shift + drag', 'oblique slice'],
-  ]
-
-  public showHelpSliceViewMap = this.showHelpSliceViewDesktop
-
-  private showHelpPerspectiveMobile = [
-    ['drag', 'change perspective view'],
-  ]
-
-  private showHelpPerspectiveDesktop = [
-    ['drag', 'change perspective view'],
-  ]
-  public showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
-
-  public repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
-  public supportEmailAddress = `support@ebrains.eu`
-  public docUrl = `https://interactive-viewer.readthedocs.io/en/latest/`
-
-  public showHelpSupportText: string = `Did you encounter an issue?
-Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>
-
-Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>
-`
-
   public incorrectParcellationNameSearchParam(title) {
     return `The selected parcellation - ${title} - is not available. The the first parcellation of the template is selected instead.`
   }
@@ -196,22 +154,9 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     this.subscriptions.push(
       this.darktheme$.subscribe(flag => this.darktheme = flag),
     )
-
-    this.subscriptions.push(
-      this.pureConstantService.useTouchUI$.subscribe(bool => {
-        if (bool) {
-          this.showHelpSliceViewMap = this.showHelpSliceViewMobile
-          this.showHelpGeneralMap = this.showHelpGeneralMobile
-          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveMobile
-          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageMobile
-        } else {
-          this.showHelpSliceViewMap = this.showHelpSliceViewDesktop
-          this.showHelpGeneralMap = this.showHelpGeneralDesktop
-          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
-          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
-        }
-      }),
-    )
+    this.pureConstantService.getTemplateEndpoint$.subscribe(arr => {
+      this.totalTemplates = arr.length
+    })
   }
 
   private subscriptions: Subscription[] = []
@@ -229,9 +174,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     })
   }
 
-  private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]`
-  private dissmissUserLayerSnackbarMessageMobile = `You can dismiss extra layers in the 🌏 menu`
-  public dissmissUserLayerSnackbarMessage: string = this.dissmissUserLayerSnackbarMessageDesktop
 }
 
 export const UNSUPPORTED_PREVIEW = [{

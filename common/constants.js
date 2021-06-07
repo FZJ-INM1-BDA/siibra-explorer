@@ -6,6 +6,7 @@
     OPEN: 'Open',
     EXPAND: 'Expand',
     COLLAPSE: 'Collapse',
+    OPEN_IN_NEW_WINDOW: 'Open in a new window',
 
     // dataset specific
     EXPLORE_DATASET_IN_KG: `Explore dataset in Knowledge Graph`,

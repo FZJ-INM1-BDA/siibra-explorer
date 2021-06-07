@@ -1,6 +1,6 @@
 import { InjectionToken, TemplateRef } from "@angular/core"
 
-type TPosition = 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left'
+type TPosition = 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left' | 'center'
 
 type TCustomPosition = {
     left: number
