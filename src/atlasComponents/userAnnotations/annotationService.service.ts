@@ -5,6 +5,7 @@ import {getUuid} from "src/util/fn";
 import {Store} from "@ngrx/store";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 import * as JSZip from 'jszip';
+import { Observable, Subject } from "rxjs";
 
 const USER_ANNOTATION_LAYER_SPEC = {
   "type": "annotation",
@@ -16,6 +17,9 @@ const USER_ANNOTATION_LAYER_SPEC = {
 
 @Injectable()
 export class AnnotationService {
+
+    public tmpAnnotationMouseEvent = new Subject<{ eventype: 'mousedown' | 'mouseup' | 'mousemove', event: MouseEvent }>()
+    public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
 
     // Annotations to display on viewer
     public pureAnnotationsForViewer = []

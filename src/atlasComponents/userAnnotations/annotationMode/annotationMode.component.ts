@@ -1,7 +1,7 @@
 import {Component, HostListener, Inject, OnDestroy, OnInit, Optional} from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {ARIA_LABELS, CONST} from "common/constants";
-import { Observable, Subscription} from "rxjs";
+import { merge, Observable, Subscription} from "rxjs";
 import {getUuid} from "src/util/fn";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 import {buffer, debounceTime, distinctUntilChanged, filter, map, switchMapTo, take, takeUntil, tap} from "rxjs/operators";
@@ -22,6 +22,7 @@ import {CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor} from "src/util";
 })
 export class AnnotationMode implements OnInit, OnDestroy {
 
+    public moduleAnnotationTypes: {instance: { name: string, iconClass: string }, onClick: Function} [] = []
     public selectedType = 0
 
     public position1: string
@@ -61,6 +62,7 @@ export class AnnotationMode implements OnInit, OnDestroy {
         @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
         @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
     ) {
+      this.moduleAnnotationTypes = this.ans.moduleAnnotationTypes
       if (clickInterceptor) {
         const { register, deregister } = clickInterceptor
         const onMouseClick = this.onMouseClick.bind(this)
@@ -127,8 +129,20 @@ export class AnnotationMode implements OnInit, OnDestroy {
         filter((e: any) => e.eventName === 'mousemove')
       )
 
-      // Trigger mouse click on viewer (avoid dragging)
       this.subscriptions.push(
+        /**
+         * trigger annotation mouse events for modular tools
+         */
+        merge<{
+          eventName: 'mousedown' | 'mouseup' | 'mousemove'
+          event: MouseEvent
+        }>(...[mouseDown$, mouseUp$, mouseMove$]).subscribe(ev => {
+          this.ans.tmpAnnotationMouseEvent.next({
+            event: ev.event,
+            eventype: ev.eventName
+          })
+        }),
+        // Trigger mouse click on viewer (avoid dragging)
         mouseDown$.pipe(
           switchMapTo(
             mouseUp$.pipe(

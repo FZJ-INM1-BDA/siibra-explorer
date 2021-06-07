@@ -8,6 +8,7 @@ import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode
 import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationMessage/annotationMessage.component";
+import { UserAnnotationToolModule } from "./tools/module";
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationM
     FormsModule,
     ReactiveFormsModule,
     AngularMaterialModule,
+    UserAnnotationToolModule,
   ],
   declarations: [
     AnnotationMode,

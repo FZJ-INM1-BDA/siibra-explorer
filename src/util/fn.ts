@@ -74,11 +74,11 @@ export const arrayOfPrimitiveEqual = <T extends TPrimitive>(o: T[], n: T[]) =>
 
 interface ISwitchMapWaitFor {
   interval?: number
-  condition: () => boolean
+  condition: (arg?: any) => boolean
 }
-export function switchMapWaitFor(opts: ISwitchMapWaitFor){
-  return (arg: unknown) => interval(opts.interval || 16).pipe(
-    filter(() => opts.condition()),
+export function switchMapWaitFor<T>(opts: ISwitchMapWaitFor){
+  return (arg: T) => interval(opts.interval || 16).pipe(
+    filter(() => opts.condition(arg)),
     take(1),
     mapTo(arg)
   )
