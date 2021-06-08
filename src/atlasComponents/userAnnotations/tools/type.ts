@@ -1,6 +1,6 @@
 import { InjectionToken } from "@angular/core"
-import { Observable } from "rxjs"
-import { filter, map, mapTo, switchMap, takeUntil, tap } from 'rxjs/operators'
+import { Observable, of } from "rxjs"
+import { filter, map, mapTo, switchMap, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { getUuid } from "src/util/fn"
 
 export type TToolType = 'translation' | 'drawing' | 'deletion'
@@ -52,6 +52,7 @@ export abstract class AbsToolClass {
   public abstract ngAnnotationIsRelevant(hoverEv: TNgAnnotationEv): boolean
 
   public abstract allNgAnnotations$: Observable<INgAnnotationTypes[keyof INgAnnotationTypes][]>
+  public abstract onMouseMoveRenderPreview(mousepos: [number, number, number]): INgAnnotationTypes[keyof INgAnnotationTypes][]
 
   constructor(
     protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
@@ -87,17 +88,47 @@ export abstract class AbsToolClass {
     filter(ev => ev.type === 'hoverAnnotation')
   ) as Observable<TAnnotationEvent<'hoverAnnotation'>>
 
-  protected hoverAnnotationMouseDown$ = this.hoverAnnotation$.pipe(
-    tap(console.log),
-    filter(ev => !!this.ngAnnotationIsRelevant(ev.detail)),
-    switchMap(hoverAnnotationEv => this.mouseDown$.pipe(
-      map(mouseDownEv => {
-        return {
-          ngAnnotationEv: hoverAnnotationEv.detail,
-          mouseEvent: mouseDownEv.detail.event
-        }
-      })
-    ))
+  /**
+   * on mouseover, then drag annotation
+   * use mousedown as obs src, since hoverAnnotation$ is a bit trigger happy
+   * check if there is a hit on mousedown trigger
+   * 
+   * if true - stop mousedown propagation, switchmap to mousemove
+   * if false - 
+   * 
+   */
+  protected dragHoveredAnnotation$: Observable<{
+    startNgX: number
+    startNgY: number
+    startNgZ: number
+    currNgX: number
+    currNgY: number
+    currNgZ: number
+    ann: TAnnotationEvent<"hoverAnnotation">
+  }> = this.mouseDown$.pipe(
+    withLatestFrom(this.hoverAnnotation$),
+    switchMap(([ mousedown, ann ]) => {
+      if (!(ann.detail)) return of(null)
+      const { ngMouseEvent, event } = mousedown.detail
+      event.stopPropagation()
+      const { x: startNgX, y: startNgY, z: startNgZ } = ngMouseEvent
+      return this.mouseMove$.pipe(
+        takeUntil(this.mouseUp$),
+        map(ev => {
+          const { x: currNgX, y: currNgY, z: currNgZ } = ev.detail.ngMouseEvent
+          return {
+            startNgX,
+            startNgY,
+            startNgZ,
+            currNgX,
+            currNgY,
+            currNgZ,
+            ann,
+          }
+        })
+      )
+    }),
+    filter(v => !!v)
   )
 }
 
@@ -140,3 +171,5 @@ export interface INgAnnotationTypes {
   line: TNgAnnotationLine
   point: TNgAnnotationPoint
 }
+
+export const INJ_ANNOT_TARGET = new InjectionToken<Observable<HTMLElement>>('INJ_ANNOT_TARGET')

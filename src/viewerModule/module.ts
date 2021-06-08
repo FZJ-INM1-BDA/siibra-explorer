@@ -15,12 +15,15 @@ import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.modu
 import { TopMenuModule } from "src/ui/topMenu/module";
 import { UtilModule } from "src/util";
 import { VIEWERMODULE_DARKTHEME } from "./constants";
-import { NehubaModule } from "./nehuba";
+import { NehubaModule, NehubaViewerUnit } from "./nehuba";
 import { ThreeSurferModule } from "./threeSurfer";
 import { RegionAccordionTooltipTextPipe } from "./util/regionAccordionTooltipText.pipe";
 import { ViewerCmp } from "./viewerCmp/viewerCmp.component";
 import {UserAnnotationsModule} from "src/atlasComponents/userAnnotations";
 import {QuickTourModule} from "src/ui/quickTour/module";
+import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type";
+import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
+import { map } from "rxjs/operators";
 
 @NgModule({
   imports: [
@@ -53,6 +56,17 @@ import {QuickTourModule} from "src/ui/quickTour/module";
       useFactory: (obs$: Observable<boolean>) => obs$,
       deps: [
         VIEWERMODULE_DARKTHEME
+      ]
+    },
+    {
+      provide: INJ_ANNOT_TARGET,
+      useFactory: (obs$: Observable<NehubaViewerUnit>) => {
+        return obs$.pipe(
+          map(unit => unit?.elementRef?.nativeElement)
+        )
+      },
+      deps: [
+        NEHUBA_INSTANCE_INJTKN
       ]
     }
   ],

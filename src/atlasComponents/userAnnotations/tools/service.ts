@@ -1,15 +1,15 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable, of, Subject } from "rxjs";
-import { map, scan, switchMap } from "rxjs/operators";
+import { fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { map, scan, switchMap, filter } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AnnotationService } from "../annotationService.service";
 import { ToolPolygon } from "./poly";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, INgAnnotationTypes, TAnnotationEvent } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
 
 const IAV_VOXEL_SIZES_NM = {
@@ -24,8 +24,11 @@ const IAV_VOXEL_SIZES_NM = {
   providedIn: 'root'
 })
 
-export class ModularUserAnnotationToolService {
+export class ModularUserAnnotationToolService implements OnDestroy{
 
+  private subscription: Subscription[] = []
+
+  static TMP_PREVIEW_ANN_ID = 'tmp_preview_ann_id'
   static VIEWER_MODE = ARIA_LABELS.VIEWER_MODE_ANNOTATING
 
   static ANNOTATION_LAYER_NAME = 'modular_tool_layer_name'
@@ -37,6 +40,8 @@ export class ModularUserAnnotationToolService {
     "annotations": [],
   }
 
+  private previewNgAnnIds: string[] = []
+
   private selectedTmpl: { fullId: string, name: string }
   private ngAnnotationLayer: any
   private activeToolName: string
@@ -47,6 +52,7 @@ export class ModularUserAnnotationToolService {
   private registeredTool: {
     name: string
     iconClass: string
+    onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
     ngOnDestroy?: Function
   }[] = []
   private mousePosReal: [number, number, number]
@@ -60,7 +66,7 @@ export class ModularUserAnnotationToolService {
   ) => AbsToolClass){
 
     const newTool = new Cls(this.annotnEvSubj) as AbsToolClass & { ngOnDestroy?: Function }
-    const { name, iconClass, ngOnDestroy } = newTool
+    const { name, iconClass, onMouseMoveRenderPreview, ngOnDestroy } = newTool
     
     this.annotnSvc.moduleAnnotationTypes.push({
       instance: newTool,
@@ -83,7 +89,12 @@ export class ModularUserAnnotationToolService {
       })
     })
 
-    this.registeredTool.push({ name, iconClass, ngOnDestroy })
+    this.registeredTool.push({
+      name,
+      iconClass,
+      onMouseMoveRenderPreview: onMouseMoveRenderPreview.bind(newTool),
+      ngOnDestroy: ngOnDestroy.bind(newTool)
+    })
   }
 
   /**
@@ -102,141 +113,285 @@ export class ModularUserAnnotationToolService {
     }
   }
 
-
   constructor(
     private annotnSvc: AnnotationService,
     store: Store<any>,
+    @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ){
     this.registerTool(ToolPolygon)
 
+
+    /**
+     * listen to mouse event on nehubaViewer, and emit as TAnnotationEvent
+     */
+    this.subscription.push(
+      annotTarget$.pipe(
+        switchMap(el => {
+          if (!el) return of(null)
+          return merge(...(
+            ['mousedown', 'mouseup', 'mousemove'].map(type => 
+              fromEvent(el, type, { capture: true }).pipe(
+                map((ev: MouseEvent) => {
+                  return {
+                    type: type,
+                    event: ev,
+                  }
+                }),
+                // filter(ev => ev.event.target)
+              )
+            )
+          ))
+        }),
+        filter(v => !!v)
+      ).subscribe(ev => {
+        /**
+         * do not emit if any mousePosReal is NaN
+         */
+        if (!this.mousePosReal || this.mousePosReal.some(p => isNaN(p))) return
+        const payload = {
+          type: ev.type,
+          detail: {
+            event: ev.event,
+            ngMouseEvent: {
+              x: this.mousePosReal[0],
+              y: this.mousePosReal[1],
+              z: this.mousePosReal[2]
+            }
+          }
+        } as TAnnotationEvent<'mousedown' | 'mouseup' | 'mousemove'>
+        this.annotnEvSubj.next(payload)
+      })
+    )
+
     /**
      * on new nehubaViewer, unset annotationLayer
      */
-    nehubaViewer$.subscribe(() => {
-      this.ngAnnotationLayer = null
-    })
+    this.subscription.push(
+      nehubaViewer$.subscribe(() => {
+        this.ngAnnotationLayer = null
+      })
+    )
 
     /**
      * on new nehubaViewer, listen to mouseState
      */
     let cb: () => void
-    nehubaViewer$.pipe(
-      switchMap(switchMapWaitFor({
-        condition: nv => !!(nv?.nehubaViewer),
-      }))
-    ).subscribe(nehubaViewer => {
-      if (cb) cb()
-      if (nehubaViewer) {
-        const mouseState = nehubaViewer.nehubaViewer.ngviewer.mouseState
-        cb = mouseState.changed.add(() => {
-          const payload: IAnnotationEvents['hoverAnnotation'] = mouseState.active && !!mouseState.pickedAnnotationId
-            ? {
-              pickedAnnotationId: mouseState.pickedAnnotationId,
-              pickedOffset: mouseState.pickedOffset
-            }
-            : null
-          this.annotnEvSubj.next({
-            type: 'hoverAnnotation',
-            detail: payload
+    this.subscription.push(
+      nehubaViewer$.pipe(
+        switchMap(switchMapWaitFor({
+          condition: nv => !!(nv?.nehubaViewer),
+        }))
+      ).subscribe(nehubaViewer => {
+        if (cb) cb()
+        if (nehubaViewer) {
+          const mouseState = nehubaViewer.nehubaViewer.ngviewer.mouseState
+          cb = mouseState.changed.add(() => {
+            const payload: IAnnotationEvents['hoverAnnotation'] = mouseState.active && !!mouseState.pickedAnnotationId
+              ? {
+                pickedAnnotationId: mouseState.pickedAnnotationId,
+                pickedOffset: mouseState.pickedOffset
+              }
+              : null
+            this.annotnEvSubj.next({
+              type: 'hoverAnnotation',
+              detail: payload
+            })
           })
-        })
-      }
-    })
+        }
+      })
+    )
 
     /**
      * get mouse real position
      */
-    nehubaViewer$.pipe(
-      switchMap(v => v?.mousePosInReal$ || of(null))
-    ).subscribe(v => this.mousePosReal = v)
+    this.subscription.push(
+      nehubaViewer$.pipe(
+        switchMap(v => v?.mousePosInReal$ || of(null))
+      ).subscribe(v => this.mousePosReal = v)
+    )
     
     /**
-     * listen to mouse event on nehubaViewer, and emit as TAnnotationEvent
+     * on mouse move, render preview annotation
      */
-    this.annotnSvc.tmpAnnotationMouseEvent.subscribe(ev => {
-      const payload = {
-        type: ev.eventype,
-        detail: {
-          event: ev.event,
-          ngMouseEvent: {
-            x: this.mousePosReal[0],
-            y: this.mousePosReal[1],
-            z: this.mousePosReal[2]
+    this.subscription.push(
+      this.annotnEvSubj.pipe(
+        filter(ev => ev.type === 'toolSelect')
+      ).pipe(
+        switchMap((toolSelEv: TAnnotationEvent<'toolSelect'>) => {
+          /**
+           * on new tool set (or unset) remove existing preview annotations, if exist
+           */
+          while (this.previewNgAnnIds.length > 0) {
+            this.clearAllPreviewAnnotations()
           }
+          if (!toolSelEv.detail.name) return of(null)
+          return this.annotnEvSubj.pipe(
+            filter(v => v.type === 'mousemove'),
+            map((ev: TAnnotationEvent<'mousemove'>) => {
+              return {
+                selectedToolName: toolSelEv.detail.name,
+                ngMouseEvent: ev.detail.ngMouseEvent
+              }
+            })
+          )
+        })
+      ).subscribe((ev: { 
+        selectedToolName: string
+        ngMouseEvent: {x: number, y: number, z: number}
+      }) => {
+        if (!ev) {
+          this.clearAllPreviewAnnotations()
+          return
         }
-      } as TAnnotationEvent<'mousedown' | 'mouseup' | 'mousemove'>
-      this.annotnEvSubj.next(payload)
-    })
-
+        const { selectedToolName, ngMouseEvent } = ev
+        const selectedTool = this.registeredTool.find(tool => tool.name === selectedToolName)
+        if (!selectedTool) {
+          console.warn(`cannot find tool ${selectedToolName}`)
+          return
+        }
+        const { onMouseMoveRenderPreview } = selectedTool
+        const previewNgAnnotation = onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
+  
+        if (this.previewNgAnnIds.length !== previewNgAnnotation.length) {
+          this.clearAllPreviewAnnotations()
+        }
+        for (let idx = 0; idx < previewNgAnnotation.length; idx ++) {
+          const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
+          const annSpec = {
+            ...parseNgAnnotation(previewNgAnnotation[idx]),
+            id: `${ModularUserAnnotationToolService.TMP_PREVIEW_ANN_ID}_${idx}`
+          }
+          const annRef = localAnnotations.references.get(annSpec.id)
+          if (annRef) {
+            localAnnotations.update(
+              annRef,
+              annSpec
+            )
+          } else {
+            localAnnotations.add(
+              annSpec
+            )
+          }
+          this.previewNgAnnIds[idx] = annSpec.id
+        }
+      })
+    )
 
     /**
      * on annotation update, update annotations
      */
-    this.ngAnnotations$.pipe(
-      switchMap(switchMapWaitFor({
-        condition: () => !!this.ngAnnotationLayer
-      })),
-      scan((acc, curr) => {
-        console.log(curr)
-        return {
-          ...acc,
-          [curr.tool]: curr.annotations
+    this.subscription.push(
+      this.ngAnnotations$.pipe(
+        switchMap(switchMapWaitFor({
+          condition: () => !!this.ngAnnotationLayer,
+          leading: true
+        })),
+        scan((acc, curr) => {
+          return {
+            ...acc,
+            [curr.tool]: curr.annotations
+          }
+        }, {} as {
+          [key: string]: INgAnnotationTypes[keyof INgAnnotationTypes][] 
+        }),
+        map(acc => {
+          const out: INgAnnotationTypes[keyof INgAnnotationTypes][] = []
+          for (const key in acc) {
+            out.push(...acc[key])
+          }
+          return out
+        })
+      ).subscribe(arr => {
+        for (const annotation of arr) {
+          const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
+          const annRef = localAnnotations.references.get(annotation.id)
+          const annSpec = parseNgAnnotation(annotation)
+          if (annRef) {
+            localAnnotations.update(
+              annRef,
+              annSpec
+            )
+          } else {
+            localAnnotations.add(
+              annSpec
+            )
+          }
         }
-      }, {} as {
-        [key: string]: INgAnnotationTypes[keyof INgAnnotationTypes][] 
-      }),
-      map(acc => {
-        const out: INgAnnotationTypes[keyof INgAnnotationTypes][] = []
-        for (const key in acc) {
-          out.push(...acc[key])
-        }
-        return out
       })
-    ).subscribe(val => {
-      this.ngAnnotationLayer.layer.localAnnotations.restoreState(val)
-    })
+    )
 
     /**
      * on viewer mode update, either create layer, or show/hide layer
      */
-    store.pipe(
-      select(viewerStateViewerModeSelector)
-    ).subscribe(viewerMode => {
-      if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
-        if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(true)
-        else {
-          const viewer = (window as any).viewer
-          const voxelSize = IAV_VOXEL_SIZES_NM[this.selectedTmpl.fullId]
-          if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.fullId} cannot be found!`)
-          const layer = viewer.layerSpecification.getLayer(
-            ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
-            {
-              ...ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC,
-              transform: [
-                [1/voxelSize[0], 0, 0, 0],
-                [0, 1/voxelSize[1], 0, 0],
-                [0, 0, 1/voxelSize[2], 0],
-                [0, 0, 0, 1],
-              ]
-            }
-          )
-          this.ngAnnotationLayer = viewer.layerManager.addManagedLayer(layer)
+    this.subscription.push(
+      store.pipe(
+        select(viewerStateViewerModeSelector)
+      ).subscribe(viewerMode => {
+        if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
+          if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(true)
+          else {
+            const viewer = (window as any).viewer
+            const voxelSize = IAV_VOXEL_SIZES_NM[this.selectedTmpl.fullId]
+            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.fullId} cannot be found!`)
+            const layer = viewer.layerSpecification.getLayer(
+              ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
+              {
+                ...ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC,
+                transform: [
+                  [1/voxelSize[0], 0, 0, 0],
+                  [0, 1/voxelSize[1], 0, 0],
+                  [0, 0, 1/voxelSize[2], 0],
+                  [0, 0, 0, 1],
+                ]
+              }
+            )
+            this.ngAnnotationLayer = viewer.layerManager.addManagedLayer(layer)
+          }
+        } else {
+          if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(false)
         }
-      } else {
-        if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(false)
-      }
-    })
+      })  
+    )
 
     /**
      * on template select, update selectedtmpl
      * required for metadata in annotation geometry and voxel size
      */
-    store.pipe(
-      select(viewerStateSelectedTemplatePureSelector)
-    ).subscribe(tmpl => {
-      this.selectedTmpl = tmpl
-    })
+    this.subscription.push(
+      store.pipe(
+        select(viewerStateSelectedTemplatePureSelector)
+      ).subscribe(tmpl => {
+        this.selectedTmpl = tmpl
+      })
+    )
+  }
+
+  private clearAllPreviewAnnotations(){
+    while (this.previewNgAnnIds.length > 0) this.deleteAnnotationById(this.previewNgAnnIds.pop())
+  }
+
+  private deleteAnnotationById(annId: string) {
+    const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
+    const annRef = localAnnotations.references.get(annId)
+    if (annRef) {
+      localAnnotations.delete(annRef)
+    }
+  }
+
+  ngOnDestroy(){
+    while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
+  }
+}
+
+export function parseNgAnnotation(ann: INgAnnotationTypes[keyof INgAnnotationTypes]){
+  let overwritingType = null
+  if (ann.type === 'point') overwritingType = 0
+  if (ann.type === 'line') overwritingType = 1
+  if (overwritingType === null) throw new Error(`overwrite type lookup failed for ${ann.type}`)
+  return {
+    ...ann,
+    type: overwritingType
   }
 }

@@ -35,9 +35,16 @@ export class Point extends IAnnotationGeometry {
     const { x, y, z, id } = json
     return new Point([x, y, z], id)
   }
+
+  public translate(x: number, y: number, z: number) {
+    this.x += x
+    this.y += y
+    this.z += z
+  }
 }
 
 export class ToolPoint extends AbsToolClass implements IAnnotationTools {
+  static PREVIEW_ID='tool_point_preview'
   public name = 'Point'
   public toolType: TToolType = 'drawing'
   public iconClass = 'fas fa-circle'
@@ -48,6 +55,16 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools {
   ){
     super(annotationEv$)
   }
+
+  onMouseMoveRenderPreview(pos: [number, number, number]) {
+    return [{
+      id: `${ToolPoint.PREVIEW_ID}_0`,
+      point: pos,
+      type: 'point',
+      description: ''
+    }] as INgAnnotationTypes['point'][]
+  }
+
   ngAnnotationIsRelevant(annotation: TNgAnnotationEv){
     return this.managedAnnotations.some(p => p.id === annotation.pickedAnnotationId)
   }

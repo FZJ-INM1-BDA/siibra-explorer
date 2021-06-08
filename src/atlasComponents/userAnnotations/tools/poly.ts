@@ -1,8 +1,8 @@
 import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType } from "./type";
 import { Point } from './point'
 import { OnDestroy } from "@angular/core";
-import { merge, Observable, Subject, Subscription } from "rxjs";
-import { debounceTime, filter, map, switchMapTo, takeUntil } from "rxjs/operators";
+import { merge, Observable, of, Subject, Subscription } from "rxjs";
+import { filter, map, pairwise, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 
 class Polygon extends IAnnotationGeometry{
   public id: string
@@ -93,9 +93,17 @@ class Polygon extends IAnnotationGeometry{
   constructor(){
     super()
   }
+
+  public translate(x: number, y: number, z: number) {
+    for (const p of this.points){
+      p.translate(x, y, z)
+    }
+  }
 }
 
 export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDestroy {
+  static PREVIEW_ID='tool_poly_preview'
+
   public name = 'polygon'
   public iconClass = 'fas fa-draw-polygon'
   public toolType: TToolType = 'drawing'
@@ -105,26 +113,27 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
 
   private managedAnnotations: Polygon[] = []
   private subs: Subscription[] = []
+  private forceRefreshAnnotations$ = new Subject()
   public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
 
-  private hoveredAnnotation$: Observable<{
-    annotation: Polygon
-    detail: { point: Point }
-  }> = this.hoverAnnotation$.pipe(
-    map(ann => {
-      const { pickedAnnotationId, pickedOffset } = ann.detail
-      const annotation = this.managedAnnotations.find(poly => poly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset))
-      if (!annotation) {
-        return null
-      }
-      return {
-        annotation,
-        detail: {
-          point: annotation.parseNgAnnotationObj(pickedAnnotationId, pickedOffset).point
-        }
-      }
-    })
-  )
+  onMouseMoveRenderPreview(pos: [number, number, number]) {
+    if (this.lastAddedPoint) {
+      const { x, y, z } = this.lastAddedPoint
+      return [{
+        id: `${ToolPolygon.PREVIEW_ID}_0`,
+        pointA: [ x, y, z ],
+        pointB: pos,
+        type: 'line',
+        description: ''
+      }] as INgAnnotationTypes['line'][]
+    }
+    return [{
+      id: `${ToolPolygon.PREVIEW_ID}_0`,
+      point: pos,
+      type: 'point',
+      description: ''
+    }] as INgAnnotationTypes['point'][]
+  }
 
   constructor(
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
@@ -155,14 +164,22 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
        * until tool deselected
        */
       toolSelThenClick$.pipe(
-      ).subscribe(mouseev => {
+        withLatestFrom(this.hoverAnnotation$)
+      ).subscribe(([mouseev, ann]) => {
         if (!this.selectedPoly) {
           this.selectedPoly = new Polygon()
           this.managedAnnotations.push(this.selectedPoly)
         }
 
+        let existingPoint: Point
+        if (ann.detail) {
+          const { pickedAnnotationId, pickedOffset } = ann.detail
+          const out = this.selectedPoly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset)
+          existingPoint = out?.point
+        }
+
         const addedPoint = this.selectedPoly.addPoint(
-          mouseev.detail.ngMouseEvent,
+          existingPoint || mouseev.detail.ngMouseEvent,
           this.lastAddedPoint
         )
         this.lastAddedPoint = addedPoint
@@ -173,9 +190,10 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
        */
       merge(
         toolDeselect$,
-        toolSelThenClick$
+        toolSelThenClick$,
+        this.forceRefreshAnnotations$,
       ).pipe(
-        debounceTime(16),
+        
       ).subscribe(() => {
         let out: INgAnnotationTypes['line'][] = []
         for (const managedAnn of this.managedAnnotations) {
@@ -183,11 +201,55 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
         }
         this.allNgAnnotations$.next(out)
       }),
-      this.hoverAnnotation$.subscribe(val => {
-        if (val.detail) {
-          console.log(val.detail)
+
+      /**
+       * emit on init, and reset on mouseup$
+       * otherwise, pairwise confuses last drag event and first drag event
+       */
+      merge(
+        of(null),
+        this.mouseUp$
+      ).pipe(
+        switchMapTo(this.dragHoveredAnnotation$.pipe(
+          pairwise(),
+          map(([ prev, curr ]) => {
+            const { currNgX, currNgY, currNgZ } = curr
+            const {
+              currNgX: prevNgX,
+              currNgY: prevNgY,
+              currNgZ: prevNgZ
+            } = prev
+            return {
+              ann: curr.ann,
+              deltaX: currNgX - prevNgX,
+              deltaY: currNgY - prevNgY,
+              deltaZ: currNgZ - prevNgZ,
+            }
+          }),
+        ))
+      ).subscribe(val => {
+        const { ann, deltaX, deltaY, deltaZ } = val
+        const { pickedAnnotationId, pickedOffset } = ann.detail
+        const annotation = this.managedAnnotations.find(poly => poly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset))
+        if (!annotation) {
+          return null
         }
-      })
+        const parsedAnnotation = annotation.parseNgAnnotationObj(pickedAnnotationId, pickedOffset)
+        
+        if (!parsedAnnotation.point) {
+          /**
+           * if point is undefined, then, must be hovering an edge. translate all points
+           */
+          annotation.translate(deltaX, deltaY, deltaZ)
+        } else {
+          /**
+           * else, only translate the point
+           */
+          parsedAnnotation.point.translate(deltaX, deltaY, deltaZ)
+        }
+
+        this.forceRefreshAnnotations$.next(null)
+      }),
     )
   }
 

@@ -130,18 +130,6 @@ export class AnnotationMode implements OnInit, OnDestroy {
       )
 
       this.subscriptions.push(
-        /**
-         * trigger annotation mouse events for modular tools
-         */
-        merge<{
-          eventName: 'mousedown' | 'mouseup' | 'mousemove'
-          event: MouseEvent
-        }>(...[mouseDown$, mouseUp$, mouseMove$]).subscribe(ev => {
-          this.ans.tmpAnnotationMouseEvent.next({
-            event: ev.event,
-            eventype: ev.eventName
-          })
-        }),
         // Trigger mouse click on viewer (avoid dragging)
         mouseDown$.pipe(
           switchMapTo(

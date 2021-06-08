@@ -1,5 +1,5 @@
 import { deserialiseParcRegionId } from 'common/util'
-import { interval } from 'rxjs'
+import { interval, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 
 export function isSame(o, n) {
@@ -74,12 +74,16 @@ export const arrayOfPrimitiveEqual = <T extends TPrimitive>(o: T[], n: T[]) =>
 
 interface ISwitchMapWaitFor {
   interval?: number
+  leading?: boolean
   condition: (arg?: any) => boolean
 }
 export function switchMapWaitFor<T>(opts: ISwitchMapWaitFor){
-  return (arg: T) => interval(opts.interval || 16).pipe(
-    filter(() => opts.condition(arg)),
-    take(1),
-    mapTo(arg)
-  )
+  return (arg: T) => {
+    if (opts.leading && opts.condition(arg)) return of(arg)
+    return interval(opts.interval || 16).pipe(
+      filter(() => opts.condition(arg)),
+      take(1),
+      mapTo(arg)
+    )
+  }
 }
