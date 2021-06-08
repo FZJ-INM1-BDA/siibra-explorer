@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxjs";
-import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { fromEvent, Observable, Subject, Subscription } from "rxjs";
+import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay } from 'rxjs/operators'
 import { IavRootStoreInterface } from "src/services/stateStore.service";
-import { viewerStateHelperStoreName, viewerStateNewViewer, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
+import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { PureContantService } from "src/util";
 
 @Component({

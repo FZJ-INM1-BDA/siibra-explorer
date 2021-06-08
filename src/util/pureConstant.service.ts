@@ -7,7 +7,7 @@ import { HttpClient } from "@angular/common/http";
 import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { LoggingService } from "src/logging";
-import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT } from "src/util/constants";
 import { flattenReducer } from 'common/util'
 import { TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
@@ -247,7 +247,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
     this.darktheme$ = this.store.pipe(
-      select(state => state?.viewerState?.templateSelected?.useTheme === 'dark')
+      select(viewerStateSelectedTemplateSelector),
+      map(tmpl => tmpl?.useTheme === 'dark')
     )
 
     this.useTouchUI$ = this.store.pipe(

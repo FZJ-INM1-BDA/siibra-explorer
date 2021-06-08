@@ -53,7 +53,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<any>,
-    private constantsService: PureContantService,
+    private pureConstantSvc: PureContantService,
     private log: LoggingService,
   ) {
     this.ngLayers$ = store.pipe(
@@ -109,7 +109,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
       startWith(false)
     )
 
-    this.darktheme$ = this.constantsService.darktheme$.pipe(
+    this.darktheme$ = this.pureConstantSvc.darktheme$.pipe(
       shareReplay(1),
     )
 

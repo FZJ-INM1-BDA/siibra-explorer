@@ -18,7 +18,7 @@ import {
   isDefined,
   safeFilter,
 } from "../services/stateStore.service";
-import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
+import { UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "src/util/constants";
 import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
@@ -96,7 +96,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
-    private constantsService: AtlasViewerConstantsServices,
     private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
@@ -220,7 +219,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.constantsService.darktheme$.subscribe(flag => {
+      this.pureConstantService.darktheme$.subscribe(flag => {
         this.rd.setAttribute(document.body, 'darktheme', flag.toString())
       }),
     )
