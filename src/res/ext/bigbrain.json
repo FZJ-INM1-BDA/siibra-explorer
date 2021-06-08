@@ -1126,165 +1126,76 @@
                           ]
                         },
                         {
-                          "name": "lateral occipital cortex",
+                          "name": "medial geniculate body",
                           "children": [
                             {
-                              "name": "Area hOc5 (LOC)",
-                              "ngId": "v5",
+                              "name": "MGB-MGBd (CGM, Metathalamus)",
+                              "ngId": "MGBd",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "rgb": [
-                                255,
-                                0,
-                                0
-                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
-                              "relatedAreas": []
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "diencephalon",
-          "children": [
-            {
-              "name": "cerebral nuclei",
-              "children": [
-                {
-                  "name": "thalamus",
-                  "children": [
-                    {
-                      "name": "metathalamus",
-                      "children": [
-                        {
-                          "name": "lateral geniculate body",
-                          "children": [
-                            {
-                              "name": "LGB-lam1 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam1",
-                              "status": "fully mapped",
-                              "labelIndex": 1,
-                              "rgb": [
-                                255,
-                                255,
-                                74
-                              ],
-                              "children": [],
-                              "fullId": {
-                                "kg": {
-                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
                                 }
-                              },
-                              "relatedAreas": []
+                              ]
                             },
                             {
-                              "name": "LGB-lam2 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam2",
+                              "name": "MGB-MGBm (CGM, Metathalamus)",
+                              "ngId": "MGBm",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "rgb": [
-                                222,
-                                74,
-                                173
-                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
-                              "relatedAreas": []
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
                             },
                             {
-                              "name": "LGB-lam3 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam3",
+                              "name": "MGB-MGBv (CGM, Metathalamus)",
+                              "ngId": "MGBv",
                               "status": "fully mapped",
                               "labelIndex": 1,
-                              "rgb": [
-                                132,
-                                90,
-                                173
-                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {
                                   "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
                                 }
                               },
-                              "relatedAreas": []
-                            },
-                            {
-                              "name": "LGB-lam4 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam4",
-                              "status": "fully mapped",
-                              "labelIndex": 1,
-                              "rgb": [
-                                41,
-                                123,
-                                198
-                              ],
-                              "children": [],
-                              "fullId": {
-                                "kg": {
-                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
                                 }
-                              },
-                              "relatedAreas": []
-                            },
-                            {
-                              "name": "LGB-lam5 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam5",
-                              "status": "fully mapped",
-                              "labelIndex": 1,
-                              "rgb": [
-                                82,
-                                214,
-                                222
-                              ],
-                              "children": [],
-                              "fullId": {
-                                "kg": {
-                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
-                                }
-                              },
-                              "relatedAreas": []
-                            },
-                            {
-                              "name": "LGB-lam6 (CGL, Metathalamus)",
-                              "ngId": "LGB-lam6",
-                              "status": "fully mapped",
-                              "labelIndex": 1,
-                              "rgb": [
-                                99,
-                                231,
-                                66
-                              ],
-                              "children": [],
-                              "fullId": {
-                                "kg": {
-                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                                  "kgId": "29335a69-4241-422a-a91c-117bc3bc8fa8"
-                                }
-                              },
-                              "relatedAreas": []
+                              ]
                             }
                           ]
                         }
