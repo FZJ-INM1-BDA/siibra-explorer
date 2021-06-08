@@ -1124,6 +1124,80 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "name": "medial geniculate body",
+                          "children": [
+                            {
+                              "name": "MGB-MGBd (CGM, Metathalamus)",
+                              "ngId": "MGBd",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "MGB-MGBm (CGM, Metathalamus)",
+                              "ngId": "MGBm",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "name": "MGB-MGBv (CGM, Metathalamus)",
+                              "ngId": "MGBv",
+                              "status": "fully mapped",
+                              "labelIndex": 1,
+                              "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b90d1d0c-6032-4d7e-b659-049a8dac4215"
+                                }
+                              },
+                              "relatedAreas": [],
+                              "originDatasets":[
+                                {
+                                  "kgSchema": "minds/core/dataset/v1.0.0",
+                                  "kgId": "6e3ca542-af3b-4869-b3ec-38986c4b1395",
+                                  "format": {
+                                    "name": "Full 3D map"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ]
                     }
