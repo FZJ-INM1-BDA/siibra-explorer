@@ -231,7 +231,24 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       parcs$,
     ]).pipe(
       map(([ templateSpaces, parcellations ]) => {
-        return { templateSpaces, parcellations }
+        /**
+         * select only parcellations that contain renderable volume(s)
+         */
+        const filteredParcellations = parcellations.filter(p => {
+          for (const spaceKey in p.volumeSrc) {
+            for (const hemisphereKey in p.volumeSrc[spaceKey]) {
+              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'neuroglancer/precomputed')) return true
+              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'neuroglancer/precompmesh')) return true
+              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'threesurfer/gii')) return true
+              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'threesurfer/gii-label')) return true
+            }
+          }
+          return false
+        })
+        return {
+          templateSpaces,
+          parcellations: filteredParcellations
+        }
       }),
       shareReplay(1)
     )
