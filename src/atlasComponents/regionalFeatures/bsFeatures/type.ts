@@ -1,6 +1,6 @@
 import { IHasId } from "src/util/interfaces";
 import { TBSDetail as TReceptorDetail, TBSSummary as TReceptorSummary } from "./receptor/type";
-import { TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFeature/type'
+import { KG_REGIONAL_FEATURE_KEY, TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFeature/type'
 
 /**
  * change KgRegionalFeature -> EbrainsRegionalDataset in prod
@@ -8,12 +8,12 @@ import { TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFe
 
 export interface IBSSummaryResponse {
   'ReceptorDistribution': TReceptorSummary
-  'KgRegionalFeature': TKGSummary
+  [KG_REGIONAL_FEATURE_KEY]: TKGSummary
 }
 
 export interface IBSDetailResponse {
   'ReceptorDistribution': TReceptorDetail
-  'KgRegionalFeature': TKGDetail
+  [KG_REGIONAL_FEATURE_KEY]: TKGDetail
 }
 
 export type TRegion = {

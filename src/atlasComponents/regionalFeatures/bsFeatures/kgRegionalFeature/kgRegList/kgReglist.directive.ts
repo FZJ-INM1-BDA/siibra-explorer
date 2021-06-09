@@ -1,5 +1,5 @@
 import { Directive, OnDestroy } from "@angular/core";
-import { TBSSummary } from "../type";
+import { KG_REGIONAL_FEATURE_KEY, TBSSummary } from "../type";
 import { BsFeatureService } from "../../service";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { Subscription } from "rxjs";
@@ -15,7 +15,7 @@ export class KgRegionalFeaturesListDirective extends BsRegionInputBase implement
   public kgRegionalFeatures$ = this.region$.pipe(
     filter(v => !!v),
     // must not use switchmapto here
-    switchMap(() => this.getFeatureInstancesList('KgRegionalFeature')),
+    switchMap(() => this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY)),
     startWith([])
   )
   constructor(svc: BsFeatureService){

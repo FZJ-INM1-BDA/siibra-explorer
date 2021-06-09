@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { BsFeatureService } from "../../service";
-import { TBSDetail, TBSSummary } from '../type'
+import { KG_REGIONAL_FEATURE_KEY, TBSDetail, TBSSummary } from '../type'
 
 @Component({
   selector: 'kg-regional-feature-summary',
@@ -40,7 +40,7 @@ export class KgRegSummaryCmp extends BsRegionInputBase implements OnChanges{
         return
       }
       this.loadingDetail = true
-      this.getFeatureInstance('KgRegionalFeature', this.summary["@id"]).subscribe(
+      this.getFeatureInstance(KG_REGIONAL_FEATURE_KEY, this.summary["@id"]).subscribe(
         detail => {
           this.detail = detail
           this.loadedDetail.emit(detail)

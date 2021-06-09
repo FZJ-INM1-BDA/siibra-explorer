@@ -4,7 +4,7 @@ import { filter, switchMap, tap } from "rxjs/operators";
 import { TCountedDataModality } from '../../kgDataset'
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { BsFeatureService } from "../../service";
-import { TBSDetail, TBSSummary } from "../type";
+import { KG_REGIONAL_FEATURE_KEY, TBSDetail, TBSSummary } from "../type";
 import { ARIA_LABELS } from 'common/constants'
 import { filterKgFeatureByModailty } from "../../kgDataset/util";
 
@@ -31,7 +31,7 @@ export class KgRegionalFeaturesList extends BsRegionInputBase implements OnDestr
   public kgRegionalFeatures$ = this.region$.pipe(
     filter(v => !!v),
     // must not use switchmapto here
-    switchMap(() => this.getFeatureInstancesList('KgRegionalFeature'))
+    switchMap(() => this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY))
   )
   constructor(private cdr: ChangeDetectorRef, svc: BsFeatureService){
     super(svc)
