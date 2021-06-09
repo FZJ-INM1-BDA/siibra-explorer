@@ -1,11 +1,8 @@
 import {Inject, Injectable, Optional} from "@angular/core";
-import {CONST} from "common/constants";
 import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import {getUuid} from "src/util/fn";
 import {Store} from "@ngrx/store";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
-import * as JSZip from 'jszip';
-import { Observable } from "rxjs";
 import {AnnotationType, GroupedAnnotation, ViewerAnnotation} from "src/atlasComponents/userAnnotations/annotationInterfaces";
 
 const USER_ANNOTATION_LAYER_NAME = 'user_annotations'
@@ -21,8 +18,6 @@ const USER_ANNOTATION_LAYER_SPEC = {
 
 @Injectable()
 export class AnnotationService {
-
-    public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
 
     // Annotations to display on viewer
     public pureAnnotationsForViewer: ViewerAnnotation[] = []

@@ -14,6 +14,7 @@ import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/e
 import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
 import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
 import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
+import { UtilModule } from "src/util";
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annot
     ReactiveFormsModule,
     AngularMaterialModule,
     UserAnnotationToolModule,
+    UtilModule,
   ],
   declarations: [
     AnnotationMode,

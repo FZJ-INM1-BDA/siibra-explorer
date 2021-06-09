@@ -7,7 +7,6 @@ import { map, scan, switchMap, filter } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AnnotationService } from "../annotationService.service";
 import { ToolPolygon } from "./poly";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
@@ -49,7 +48,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     tool: string
     annotations: INgAnnotationTypes[keyof INgAnnotationTypes][]
   }>()
-  private registeredTool: {
+
+  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
+
+  private registeredTools: {
     name: string
     iconClass: string
     onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
@@ -68,7 +70,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const newTool = new Cls(this.annotnEvSubj) as AbsToolClass & { ngOnDestroy?: Function }
     const { name, iconClass, onMouseMoveRenderPreview, ngOnDestroy } = newTool
     
-    this.annotnSvc.moduleAnnotationTypes.push({
+    this.moduleAnnotationTypes.push({
       instance: newTool,
       onClick: () => {
         const tool = this.activeToolName === name
@@ -89,7 +91,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       })
     })
 
-    this.registeredTool.push({
+    this.registeredTools.push({
       name,
       iconClass,
       onMouseMoveRenderPreview: onMouseMoveRenderPreview.bind(newTool),
@@ -104,17 +106,16 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    * @returns void
    */
   private deregisterTool(name: string) {
-    this.annotnSvc.moduleAnnotationTypes = this.annotnSvc.moduleAnnotationTypes.filter(tool => tool.instance.name !== name)
-    const foundIdx = this.registeredTool.findIndex(spec => spec.name === name)
+    this.moduleAnnotationTypes = this.moduleAnnotationTypes.filter(tool => tool.instance.name !== name)
+    const foundIdx = this.registeredTools.findIndex(spec => spec.name === name)
     if (foundIdx >= 0) {
-      const tool = this.registeredTool.splice(foundIdx, 1)[0]
+      const tool = this.registeredTools.splice(foundIdx, 1)[0]
       const { ngOnDestroy } = tool
       if (ngOnDestroy) ngOnDestroy.call(tool)
     }
   }
 
   constructor(
-    private annotnSvc: AnnotationService,
     store: Store<any>,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
@@ -246,7 +247,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           return
         }
         const { selectedToolName, ngMouseEvent } = ev
-        const selectedTool = this.registeredTool.find(tool => tool.name === selectedToolName)
+        const selectedTool = this.registeredTools.find(tool => tool.name === selectedToolName)
         if (!selectedTool) {
           console.warn(`cannot find tool ${selectedToolName}`)
           return
@@ -379,6 +380,18 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       localAnnotations.delete(annRef)
       localAnnotations.references.delete(annId)
     }
+  }
+
+  public deselectTools(){
+
+    // TODO refactor
+    this.activeToolName = null
+    this.annotnEvSubj.next({
+      type: 'toolSelect',
+      detail: {
+        name: null
+      }
+    })
   }
 
   ngOnDestroy(){

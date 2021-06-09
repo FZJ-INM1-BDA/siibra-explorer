@@ -14,6 +14,7 @@ import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationS
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 import {CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor} from "src/util";
+import { ModularUserAnnotationToolService } from "../tools/service";
 
 @Component({
   selector: 'annotating-mode',
@@ -58,11 +59,12 @@ export class AnnotationMode implements OnInit, OnDestroy {
     constructor(
         private store$: Store<any>,
         public ans: AnnotationService,
+        private modularToolSvc: ModularUserAnnotationToolService,
         @Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer,
         @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
         @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
     ) {
-      this.moduleAnnotationTypes = this.ans.moduleAnnotationTypes
+      this.moduleAnnotationTypes = this.modularToolSvc.moduleAnnotationTypes
       if (clickInterceptor) {
         const { register, deregister } = clickInterceptor
         const onMouseClick = this.onMouseClick.bind(this)
@@ -399,7 +401,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
       }
     }
 
-    @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    onKeydownHandler() {
+      this.modularToolSvc.deselectTools()
       if (this.selecting === 'position2' && this.mousePos) {
         this.ans.removeAnnotation(this.editingAnnotationId)
         this.ans.storeBackup()

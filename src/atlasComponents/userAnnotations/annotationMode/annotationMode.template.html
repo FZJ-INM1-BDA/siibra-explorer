@@ -1,4 +1,6 @@
-<div class="pe-all d-flex flex-column justify-content-content z-index-10 w-3em">
+<div class="pe-all d-flex flex-column justify-content-content z-index-10 w-3em"
+    [iav-key-listener]="[{ type: 'keydown', key: 'Escape', target: 'document' }]"
+    (iav-key-event)="onKeydownHandler()">
 
     <mat-card class="d-flex flex-column flex-grow-0 panel-default p-0">
 
