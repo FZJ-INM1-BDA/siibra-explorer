@@ -377,6 +377,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const annRef = localAnnotations.references.get(annId)
     if (annRef) {
       localAnnotations.delete(annRef)
+      localAnnotations.references.delete(annId)
     }
   }
 
