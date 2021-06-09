@@ -150,7 +150,7 @@ const BACKCOMAP_KEY_DICT = {
     // icbm152
     'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': {
       // julich brain v2.6
-      'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25': {
+      'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26': {
         'left hemisphere': 'MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE',
         'right hemisphere': 'MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE'
       },
@@ -190,7 +190,7 @@ const BACKCOMAP_KEY_DICT = {
     },
     // colin 27
     "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": {
-      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25": {
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26": {
         "left hemisphere": "COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE",
         "right hemisphere": "COLIN_V25_RIGHT_NG_SPLIT_HEMISPHERE",
       },
@@ -201,7 +201,7 @@ const BACKCOMAP_KEY_DICT = {
     },
     // big brain
     "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": {
-      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25": {
+      "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26": {
 
       },
       // isocortex

@@ -431,7 +431,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                */
                               if (
                                 tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25'
+                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26'
                                 && hemisphereKey === 'whole brain'
                               ) {
                                 region.labelIndex = null

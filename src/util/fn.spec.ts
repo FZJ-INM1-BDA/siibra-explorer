@@ -11,7 +11,7 @@ describe(`> util/fn.ts`, () => {
     const colinsJson = require('!json-loader!../res/ext/colin.json')
     
     const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
-    const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25'
+    const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26'
     
     it('translateds hoc1 from labelIndex to region', () => {
 
