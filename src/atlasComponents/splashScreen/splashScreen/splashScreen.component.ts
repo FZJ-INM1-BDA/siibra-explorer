@@ -64,17 +64,3 @@ export class GetTemplateImageSrcPipe implements PipeTransform {
     return `./res/image/${name.replace(/[|&;$%@()+,\s./]/g, '')}.png`
   }
 }
-
-@Pipe({
-  name: 'imgSrcSetPipe',
-})
-
-export class ImgSrcSetPipe implements PipeTransform {
-  public transform(src: string): string {
-    const regex = /^(.*?)(\.\w*?)$/.exec(src)
-    if (!regex) { throw new Error(`cannot find filename, ext ${src}`) }
-    const filename = regex[1]
-    const ext = regex[2]
-    return [100, 200, 300, 400].map(val => `${filename}-${val}${ext} ${val}w`).join(',')
-  }
-}

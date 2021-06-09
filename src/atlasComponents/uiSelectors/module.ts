@@ -4,7 +4,7 @@ import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.modu
 import { UtilModule } from "src/util";
 import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 import { AtlasDropdownSelector } from "./atlasDropdown/atlasDropdown.component";
-import { AtlasLayerSelector } from "./atlasLayerSelector/atlasLayerSelector.component";
+import { AtlasLayerSelector, GetPreviewUrlPipe } from "./atlasLayerSelector/atlasLayerSelector.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
 
 @NgModule({
@@ -18,6 +18,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
   declarations: [
     AtlasDropdownSelector,
     AtlasLayerSelector,
+    GetPreviewUrlPipe,
   ],
   exports: [
     AtlasDropdownSelector,

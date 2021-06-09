@@ -119,25 +119,25 @@
 
             <div class="position-relative d-flex flex-column align-items-center">
                 <div class="position-relative">
-                <!-- info icon btn -->
-                <div class="position-absolute top-0 right-0 info-container"
-                    [ngClass]="{ 'darktheme': tileSrc.darktheme, 'lighttheme': !tileSrc.darktheme }">
-                    <ng-container *ngTemplateOutlet="infoBtn; context: { tileSrc: tileSrc}">
+                    <!-- info icon btn -->
+                    <div class="position-absolute top-0 right-0 info-container"
+                        [ngClass]="{ 'darktheme': tileSrc.darktheme, 'lighttheme': !tileSrc.darktheme }">
+                        <ng-container *ngTemplateOutlet="infoBtn; context: { tileSrc: tileSrc}">
 
-                    </ng-container>
-                </div>
+                        </ng-container>
+                    </div>
 
-                <!-- preview image -->
-                <img [src]="tileSrc.previewUrl"
-                    alt="Preview of this tile"
-                    class="layer-image align-self-center"
-                    [ngClass]="{ 'selectedLayerBorder': selected }"
-                    draggable="false">
+                    <!-- preview image -->
+                    <img [src]="tileSrc | getPreviewUrlPipe"
+                        alt="Preview of this tile"
+                        class="layer-image align-self-center"
+                        [ngClass]="{ 'selectedLayerBorder': selected }"
+                        draggable="false">
 
-                <!-- if is directory, show directory icon -->
-                <div *ngIf="isDirectory" class="position-absolute bottom-0 right-0">
-                    <i class="fas fa-folder folder-container fa-2x"></i>
-                </div>
+                    <!-- if is directory, show directory icon -->
+                    <div *ngIf="isDirectory" class="position-absolute bottom-0 right-0">
+                        <i class="fas fa-folder folder-container fa-2x"></i>
+                    </div>
                 </div>
             </div>
 
