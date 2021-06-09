@@ -1,10 +1,11 @@
-import { AfterViewInit, Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
+import { Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { select, Store } from "@ngrx/store";
-import { fromEvent, Observable, Subject, Subscription } from "rxjs";
-import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay } from 'rxjs/operators'
-import { IavRootStoreInterface } from "src/services/stateStore.service";
+import { Observable, Subject, Subscription } from "rxjs";
+import { filter } from 'rxjs/operators'
 import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { PureContantService } from "src/util";
+import { CONST } from 'common/constants'
 
 @Component({
   selector : 'ui-splashscreen',
@@ -14,30 +15,25 @@ import { PureContantService } from "src/util";
   ],
 })
 
-export class SplashScreen implements AfterViewInit {
+export class SplashScreen {
 
-  public finishedLoading$: Observable<boolean>
-  public loadedTemplate$: Observable<any[]>
+  public finishedLoading: boolean = false
 
   public loadedAtlases$: Observable<any[]>
 
   @ViewChild('parentContainer', {read: ElementRef})
-  private parentContainer: ElementRef
   public activatedTemplate$: Subject<any> = new Subject()
 
   private subscriptions: Subscription[] = []
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
+    private store: Store<any>,
+    private snack: MatSnackBar,
     private pureConstantService: PureContantService
   ) {
-    this.loadedTemplate$ = this.store.pipe(
-      select('viewerState'),
-      select('fetchedTemplates'),
-      shareReplay(1),
+    this.subscriptions.push(
+      this.pureConstantService.allFetchingReady$.subscribe(flag => this.finishedLoading = flag)
     )
-
-    this.finishedLoading$ = this.pureConstantService.allFetchingReady$
 
     this.loadedAtlases$ = this.store.pipe(
       select(state => state[viewerStateHelperStoreName]),
@@ -46,29 +42,15 @@ export class SplashScreen implements AfterViewInit {
     )
   }
 
-  public ngAfterViewInit() {
-
-    /**
-     * instead of blindly listening to click event, this event stream waits to see if user mouseup within 200ms
-     * if yes, it is interpreted as a click
-     * if no, user may want to select a text
-     */
-    /**
-     * TODO change to onclick listener
-     */
-    this.subscriptions.push(
-      fromEvent(this.parentContainer.nativeElement, 'mousedown').pipe(
-        filter((ev: MouseEvent) => ev.button === 0),
-        switchMap(() => fromEvent(this.parentContainer.nativeElement, 'mouseup').pipe(
-          bufferTime(200),
-          take(1),
-        )),
-        filter(arr => arr.length > 0),
-        withLatestFrom(this.activatedTemplate$),
-        map(([_, atlas]) => atlas),
-      ).subscribe(atlas => this.store.dispatch(
-        viewerStateSelectAtlas({ atlas })
-      )),
+  public selectAtlas(atlas: any){
+    if (!this.finishedLoading) {
+      this.snack.open(CONST.DATA_NOT_READY, null, {
+        duration: 3000
+      })
+      return
+    }
+    this.store.dispatch(
+      viewerStateSelectAtlas({ atlas })
     )
   }
 }
