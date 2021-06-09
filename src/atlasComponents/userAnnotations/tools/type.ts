@@ -39,19 +39,31 @@ export type TNgMouseEvent = {
   }
 }
 
+/**
+ * base class to be extended by all annotation tools
+ */
 export abstract class AbsToolClass {
 
   public abstract name: string
   public abstract iconClass: string
 
   /**
-   * @description check if any specific annotation is relevant to the tool. Used for filtering annotations
+   * @description to be overwritten by subclass. Check if a given annotation is relevant to the tool. Used for filtering annotations.
    * @param {TNgAnnotationEv} annotation
    * @returns {boolean} if annotation is relevant to this tool
    */
   public abstract ngAnnotationIsRelevant(hoverEv: TNgAnnotationEv): boolean
 
+  /**
+   * @description to be overwritten by subclass. Emit the latest representation of NgAnnotations from the tool.
+   */
   public abstract allNgAnnotations$: Observable<INgAnnotationTypes[keyof INgAnnotationTypes][]>
+
+  /**
+   * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active. 
+   * @param {[number, number, number]} mousepos 
+   * @returns {INgAnnotationTypes[keyof INgAnnotationTypes][]} Array of NgAnnotation to be rendered.
+   */
   public abstract onMouseMoveRenderPreview(mousepos: [number, number, number]): INgAnnotationTypes[keyof INgAnnotationTypes][]
 
   constructor(
