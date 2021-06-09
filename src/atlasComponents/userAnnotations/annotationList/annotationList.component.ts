@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 import {Store} from "@ngrx/store";
+import {ARIA_LABELS} from "common/constants";
 
 @Component({
   selector: 'annotation-list',
@@ -10,12 +11,18 @@ import {Store} from "@ngrx/store";
 })
 export class AnnotationList {
 
+  public ARIA_LABELS = ARIA_LABELS
   public identifier = (index: number, item: any) => item.id
 
   constructor(private store$: Store<any>, public ans: AnnotationService) {}
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {
+      // ToDo Change when mainList will be groupedAnnotations
+      const annotationIndex = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
+      this.ans.groupedAnnotations[annotationIndex].annotationVisible = !this.ans.groupedAnnotations[annotationIndex].annotationVisible
+      this.ans.refreshFinalAnnotationList()
+
       this.ans.pureAnnotationsForViewer.filter(an => an.id.split('_')[0] === annotation.id.split('_')[0])
         .forEach(a => this.toggleVisibility(a))
     } else {
@@ -23,7 +30,7 @@ export class AnnotationList {
     }
   }
 
-  toggleVisibility(annotation) {
+  private toggleVisibility = (annotation) => {
     const annotationIndex = this.ans.pureAnnotationsForViewer.findIndex(a => a.id === annotation.id)
 
     if (this.ans.pureAnnotationsForViewer[annotationIndex].annotationVisible) {
@@ -45,73 +52,86 @@ export class AnnotationList {
     }
   }
 
-  navigate(position) {
-    position = position.split(',').map(p => +p * 1e6)
-    this.store$.dispatch(
-      viewerStateChangeNavigation({
-        navigation: {
-          position,
-          positionReal: true
-        },
-      })
-    )
+  navigate(position: number[]) {
+    // Convert to nm before navigate
+    position = position.map(p => +p * 1e6)
+
+    if (position && position.length === 3) {
+      this.store$.dispatch(
+        viewerStateChangeNavigation({
+          navigation: {
+            position,
+            positionReal: true
+          },
+        })
+      )
+    }
   }
 
-  saveAnnotation(annotation, singlePolygon = false) {
-    if (annotation.type !== 'polygon' || singlePolygon) {
-      annotation.position1 = annotation.position1.replace(/\s/g, '')
-      annotation.position2 = annotation.position2 && annotation.position2.replace(/\s/g, '')
-      if (annotation.position1.split(',').length !== 3 || !annotation.position1.split(',').every(e => !!e)
-          || ((annotation.position2
-              && annotation.position2.split(',').length !== 3) || !annotation.position1.split(',').every(e => !!e))) {
+  saveAnnotation(annotation) {
+    if (annotation.type !== 'polygon') {
+
+      // Convert to Number Array
+      if (annotation.position1 && (typeof annotation.position1 === 'string')) {
+        annotation.position1 = this.positionToNumberArray(annotation.position1)
+      }
+      if (annotation.position2 && (typeof annotation.position2 === 'string')) {
+        annotation.position2 = this.positionToNumberArray(annotation.position2)
+      }
+
+      // Return if positions are valid
+      if (annotation.position1.length !== 3 || !annotation.position1.every(e => !isNaN(e))
+          || (annotation.position2 && (annotation.position2.length !== 3 || !annotation.position2.every(e => !isNaN(e))))) {
         return
       } else {
-        annotation.position1 = this.ans.mmToVoxel(annotation.position1.split(',')).join()
-        annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2.split(',')).join()
+        // Convert to Voxel
+        annotation.position1 = this.ans.mmToVoxel(annotation.position1)
+        annotation.position2 = annotation.position2 && this.ans.mmToVoxel(annotation.position2)
       }
+      // Save annotation
       this.ans.saveAnnotation(annotation)
     } else {
-      if (!annotation.name) {
-        annotation.name = this.ans.giveNameByType('polygon')
-      }
+
+      // if (!annotation.name) {
+      //   annotation.name = this.ans.generateNameByType('polygon')
+      // }
 
       const toUpdateFirstAnnotation = this.ans.pureAnnotationsForViewer.find(a => a.id === `${annotation.id}_0`)
       toUpdateFirstAnnotation.name = annotation.name
       toUpdateFirstAnnotation.description = annotation.description
       this.ans.saveAnnotation(toUpdateFirstAnnotation)
 
+      //ToDo Change when main list will be groupedAnnotations
       const toUpdate = this.ans.groupedAnnotations.findIndex(a => a.id === annotation.id)
       this.ans.groupedAnnotations[toUpdate].name = annotation.name
       this.ans.groupedAnnotations[toUpdate].description = annotation.description
-      this.ans.refreshAnnotationFilter()
-
+      this.ans.refreshFinalAnnotationList()
     }
   }
 
+  positionToNumberArray(position) {
+    return position.split(',').map(n => parseFloat(n))
+  }
+
   savePolygonPosition(id, position, inputVal) {
-    inputVal = inputVal.replace(/\s/g, '')
-    if (inputVal.split(',').length !== 3 || !inputVal.split(',').every(e => !!e)) {
+    inputVal = this.positionToNumberArray(inputVal)
+
+    if (inputVal.length !== 3 || !inputVal.every(e => !isNaN(e))) {
       return
     } else {
-      inputVal = this.ans.mmToVoxel(inputVal.split(',')).join()
+      inputVal = this.ans.mmToVoxel(inputVal)
     }
     position.lines.forEach(l => {
       if (l.point === 2) {
         const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position2 = inputVal
-        this.saveAnnotation(annotation, true)
+        this.ans.saveAnnotation(annotation, true)
       } else {
         const annotation = this.ans.pureAnnotationsForViewer.find(a => a.id === l.id)
         annotation.position1 = inputVal
-        this.saveAnnotation(annotation, true)
+        this.ans.saveAnnotation(annotation, true)
       }
     })
-  }
-
-  submitInput(e, area) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      area.blur()
-    }
   }
 
 }

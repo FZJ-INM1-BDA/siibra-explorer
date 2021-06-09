@@ -57,7 +57,19 @@
     ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control',
 
     //Viewer mode
-    VIEWER_MODE_ANNOTATING: 'annotating'
+    VIEWER_MODE_ANNOTATING: 'annotating',
+
+    // Annotations
+    USER_ANNOTATION_VIEWER: 'user annotations viewer',
+    USER_ANNOTATION_HEADER: 'user annotations header',
+    USER_ANNOTATION_LIST: 'user annotations footer',
+    USER_ANNOTATION_IMPORT: 'user annotations import',
+    USER_ANNOTATION_EXPORT: 'user annotations export',
+    USER_ANNOTATION_EXPORT_SINGLE: 'user annotations export single',
+    USER_ANNOTATION_HIDE: 'user annotations hide',
+    USER_ANNOTATION_DELETE: 'user annotations delete',
+
+
   }
 
   exports.IDS = {
@@ -82,11 +94,6 @@
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
 
-    // Annotatins
-
-    // Annotations
-    USER_ANNOTATION_LAYER_NAME: 'user_annotations',
-    USER_ANNOTATION_STORE_KEY: `user_landmarks_demo_1`
   }
 
   exports.QUICKTOUR_DESC ={

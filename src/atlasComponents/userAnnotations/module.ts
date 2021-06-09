@@ -9,6 +9,11 @@ import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationMessage/annotationMessage.component";
 import { UserAnnotationToolModule } from "./tools/module";
+import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
+import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
+import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
+import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
+import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
 
 @NgModule({
   imports: [
@@ -23,7 +28,12 @@ import { UserAnnotationToolModule } from "./tools/module";
   declarations: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage
+    AnnotationMessage,
+    AnnotationSwitch,
+    ImportAnnotation,
+    ExportAnnotation,
+    KeyListener,
+    CoordinateInputTextPipe
   ],
   providers: [
     AnnotationService
@@ -31,7 +41,8 @@ import { UserAnnotationToolModule } from "./tools/module";
   exports: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage
+    AnnotationMessage,
+    AnnotationSwitch
   ]
 })
 

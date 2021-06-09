@@ -92,10 +92,6 @@ export class TopMenuCmp {
     }
   }
 
-  setAnnotatingMode() {
-    this.store$.dispatch(viewerStateSetViewerMode({payload: ARIA_LABELS.VIEWER_MODE_ANNOTATING,}))
-  }
-
   private keyListenerConfigBase = {
     type: 'keydown',
     stop: true,
