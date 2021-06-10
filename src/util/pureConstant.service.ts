@@ -579,7 +579,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 ngId: tmplNgId,
                 nehubaConfig,
                 auxMeshes,
-                parcellations: tmpl.availableParcellations.map(parc => {
+                /**
+                 * only populate the parcelltions made available
+                 */
+                parcellations: tmpl.availableParcellations.filter(
+                  p => parcellations.some(p2 => parseId(p2.id) === p.id)
+                ).map(parc => {
                   const regions = this.atlasParcSpcRegionMap.get(atlas['@id'], tmpl.id, parc.id) || []
                   return {
                     fullId: parc.id,
