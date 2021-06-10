@@ -303,13 +303,15 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.ondestroySubscriptions.push(
         this.layerVis$.pipe(
           switchMap(switchMapWaitFor({ condition: () => !!(this.nehubaViewer?.ngviewer) })),
-          tap(() => {
-            const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
-            managedLayers.forEach(layer => layer.setVisible(false))
-          }),
           debounceTime(160),
         ).subscribe((layerNames: string[]) => {
-
+          /**
+           * debounce 160ms to set layer invisible etc
+           * on switch from freesurfer -> volumetric viewer, race con results in managed layer not necessarily setting layer visible correctly
+           */
+          const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
+          managedLayers.forEach(layer => layer.setVisible(false))
+          
           for (const layerName of layerNames) {
             const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
             if (layer) {
