@@ -1,5 +1,4 @@
 import {Inject, Injectable, Optional} from "@angular/core";
-import {CONST} from "common/constants";
 import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
 import {getUuid} from "src/util/fn";
 import {Store} from "@ngrx/store";
@@ -353,7 +352,6 @@ export class AnnotationService {
     getVoxelFromSpace = (spaceId: string) => {
       return IAV_VOXEL_SIZES_NM[spaceId]
     }
-
 }
 
 export const IAV_VOXEL_SIZES_NM = {

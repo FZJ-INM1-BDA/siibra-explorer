@@ -1,7 +1,7 @@
 import {Component, HostListener, Inject, OnDestroy, OnInit, Optional} from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {ARIA_LABELS, CONST} from "common/constants";
-import { Observable, Subscription} from "rxjs";
+import { merge, Observable, Subscription} from "rxjs";
 import {getUuid} from "src/util/fn";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 import {buffer, debounceTime, distinctUntilChanged, filter, map, switchMapTo, take, takeUntil, tap} from "rxjs/operators";
@@ -14,6 +14,7 @@ import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationS
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 import {CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor} from "src/util";
+import { ModularUserAnnotationToolService } from "../tools/service";
 
 @Component({
   selector: 'annotating-mode',
@@ -22,6 +23,7 @@ import {CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor} from "src/util";
 })
 export class AnnotationMode implements OnInit, OnDestroy {
 
+    public moduleAnnotationTypes: {instance: { name: string, iconClass: string }, onClick: Function} [] = []
     public selectedType = 0
 
     public position1: number[]
@@ -57,10 +59,12 @@ export class AnnotationMode implements OnInit, OnDestroy {
     constructor(
         private store$: Store<any>,
         public ans: AnnotationService,
+        private modularToolSvc: ModularUserAnnotationToolService,
         @Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer,
         @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
         @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
     ) {
+      this.moduleAnnotationTypes = this.modularToolSvc.moduleAnnotationTypes
       if (clickInterceptor) {
         const { register, deregister } = clickInterceptor
         const onMouseClick = this.onMouseClick.bind(this)
@@ -127,8 +131,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
         filter((e: any) => e.eventName === 'mousemove')
       )
 
-      // Trigger mouse click on viewer (avoid dragging)
       this.subscriptions.push(
+        // Trigger mouse click on viewer (avoid dragging)
         mouseDown$.pipe(
           switchMapTo(
             mouseUp$.pipe(
@@ -397,7 +401,8 @@ export class AnnotationMode implements OnInit, OnDestroy {
       }
     }
 
-    @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    onKeydownHandler() {
+      this.modularToolSvc.deselectTools()
       if (this.selecting === 'position2' && this.mousePos) {
         this.ans.removeAnnotation(this.editingAnnotationId)
         this.ans.storeBackup()

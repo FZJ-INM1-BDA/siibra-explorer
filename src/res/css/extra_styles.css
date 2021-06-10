@@ -303,6 +303,10 @@ markdown-dom p
   width: 0!important;
 }
 
+.w-3em
+{
+  width: 3em!important;
+}
 .w-5em
 {
   width: 5em!important;

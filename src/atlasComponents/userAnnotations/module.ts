@@ -8,11 +8,13 @@ import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode
 import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationMessage/annotationMessage.component";
+import { UserAnnotationToolModule } from "./tools/module";
 import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
 import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
 import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
 import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
 import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
+import { UtilModule } from "src/util";
 
 @NgModule({
   imports: [
@@ -22,6 +24,8 @@ import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annot
     FormsModule,
     ReactiveFormsModule,
     AngularMaterialModule,
+    UserAnnotationToolModule,
+    UtilModule,
   ],
   declarations: [
     AnnotationMode,
