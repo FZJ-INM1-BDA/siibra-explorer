@@ -10,7 +10,7 @@ type THasId = {
 }
 export abstract class IAnnotationGeometry {
   public id: string
-  
+
   abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
   abstract toJSON(): object
 
@@ -60,8 +60,8 @@ export abstract class AbsToolClass {
   public abstract allNgAnnotations$: Observable<INgAnnotationTypes[keyof INgAnnotationTypes][]>
 
   /**
-   * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active. 
-   * @param {[number, number, number]} mousepos 
+   * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active.
+   * @param {[number, number, number]} mousepos
    * @returns {INgAnnotationTypes[keyof INgAnnotationTypes][]} Array of NgAnnotation to be rendered.
    */
   public abstract onMouseMoveRenderPreview(mousepos: [number, number, number]): INgAnnotationTypes[keyof INgAnnotationTypes][]
@@ -104,10 +104,10 @@ export abstract class AbsToolClass {
    * on mouseover, then drag annotation
    * use mousedown as obs src, since hoverAnnotation$ is a bit trigger happy
    * check if there is a hit on mousedown trigger
-   * 
+   *
    * if true - stop mousedown propagation, switchmap to mousemove
-   * if false - 
-   * 
+   * if false -
+   *
    */
   protected dragHoveredAnnotation$: Observable<{
     startNgX: number
