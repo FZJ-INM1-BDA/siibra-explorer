@@ -2,14 +2,17 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { map, scan, switchMap, filter } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { map, switchMap, filter } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { ToolPolygon } from "./poly";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent } from "./type";
+import { Polygon, ToolPolygon } from "./poly";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
+import { PolyUpdateCmp } from './poly/poly.component'
+import { Point, ToolPoint } from "./point";
+import { PointUpdateCmp } from "./point/point.component";
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -17,6 +20,30 @@ const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': [21166.666015625, 20000, 21166.666015625],
   'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992': [1000000, 1000000, 1000000,],
   'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': [1000000, 1000000, 1000000]
+}
+
+function scanCollapse<T>(){
+  return (src: Observable<{
+    tool: string
+    annotations: T[]
+  }>) => new Observable<T[]>(obs => {
+    const cache: {
+      [key: string]: T[]
+    } = {}
+    src.subscribe({
+      next: val => {
+        const { annotations, tool } = val
+        cache[tool] = annotations
+        const out: T[] = []
+        for (const key in cache) {
+          out.push(...cache[key])
+        }
+        obs.next(out)
+      },
+      complete: obs.complete,
+      error: obs.error
+    })
+  })
 }
 
 @Injectable({
@@ -41,34 +68,55 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private previewNgAnnIds: string[] = []
 
-  private selectedTmpl: { fullId: string, name: string }
   private ngAnnotationLayer: any
   private activeToolName: string
+  private forcedAnnotationRefresh$ = new BehaviorSubject(null)
   private ngAnnotations$ = new Subject<{
     tool: string
     annotations: INgAnnotationTypes[keyof INgAnnotationTypes][]
   }>()
 
+
+  private selectedTmpl: any
   public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
+  private managedAnnotationsStream$ = new Subject<{
+    tool: string
+    annotations: IAnnotationGeometry[]
+  }>()
+
+  private managedAnnotations: IAnnotationGeometry[] = []
+  public managedAnnotations$ = this.managedAnnotationsStream$.pipe(
+    scanCollapse(),
+  )
 
   private registeredTools: {
     name: string
-    iconClass: string
+    iconClass: string,
+    target?: ClassInterface<IAnnotationGeometry>,
+    editCmp?: ClassInterface<any>,
     onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
-    ngOnDestroy?: Function
+    onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
 
   /**
    * @description register new annotation tool
-   * @param {AbsToolClass} Cls 
+   * Some tools (deletion / dragging) may not have target and editCmp 
+   * 
+   * @param {{
+   *   toolCls: ClassInterface<AbsToolClass>
+   *   target?: ClassInterface<IAnnotationGeometry>
+   *   editCmp?: ClassInterface<any>
+   * }} arg 
    */
-  private registerTool(Cls: new (
-    svc: Subject<TAnnotationEvent<keyof IAnnotationEvents>>
-  ) => AbsToolClass){
-
+  private registerTool<T extends AbsToolClass>(arg: {
+    toolCls: ClassInterface<T>,
+    target?: ClassInterface<IAnnotationGeometry>,
+    editCmp?: ClassInterface<any>
+  }){
+    const { toolCls: Cls, target, editCmp } = arg
     const newTool = new Cls(this.annotnEvSubj) as AbsToolClass & { ngOnDestroy?: Function }
-    const { name, iconClass, onMouseMoveRenderPreview, ngOnDestroy } = newTool
+    const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({
       instance: newTool,
@@ -84,18 +132,37 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       }
     })
 
-    newTool.allNgAnnotations$.subscribe(ann => {
-      this.ngAnnotations$.next({
-        tool: name,
-        annotations: ann
+    const toolSubscriptions: Subscription[] = []
+
+    toolSubscriptions.push(
+      newTool.allNgAnnotations$.subscribe(ann => {
+        this.ngAnnotations$.next({
+          tool: name,
+          annotations: ann
+        })
+      }),
+      newTool.managedAnnotations$.subscribe(ann => {
+        this.managedAnnotationsStream$.next({
+          annotations: ann,
+          tool: name
+        })
       })
-    })
+    )
 
     this.registeredTools.push({
       name,
       iconClass,
+      target,
+      editCmp,
       onMouseMoveRenderPreview: onMouseMoveRenderPreview.bind(newTool),
-      ngOnDestroy: ngOnDestroy.bind(newTool)
+      onDestoryCallBack: () => {
+        newTool.ngOnDestroy && newTool.ngOnDestroy()
+        this.managedAnnotationsStream$.next({
+          annotations: [],
+          tool: name
+        })
+        while(toolSubscriptions.length > 0) toolSubscriptions.pop().unsubscribe()
+      }
     })
   }
 
@@ -110,10 +177,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const foundIdx = this.registeredTools.findIndex(spec => spec.name === name)
     if (foundIdx >= 0) {
       const tool = this.registeredTools.splice(foundIdx, 1)[0]
-      const { ngOnDestroy } = tool
-      if (ngOnDestroy) ngOnDestroy.call(tool)
+      tool.onDestoryCallBack()
     }
   }
+
+  public exportFormat$ = new BehaviorSubject<TExportFormats>('string')
 
   constructor(
     store: Store<any>,
@@ -121,8 +189,18 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ){
-    this.registerTool(ToolPolygon)
 
+    this.registerTool({
+      toolCls: ToolPoint,
+      target: Point,
+      editCmp: PointUpdateCmp,
+    })
+
+    this.registerTool({
+      toolCls: ToolPolygon,
+      target: Polygon,
+      editCmp: PolyUpdateCmp,
+    })
 
     /**
      * listen to mouse event on nehubaViewer, and emit as TAnnotationEvent
@@ -281,31 +359,33 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     )
 
     /**
-     * on annotation update, update annotations
+     * on tool managed annotations update, update annotations
      */
     this.subscription.push(
-      this.ngAnnotations$.pipe(
-        switchMap(switchMapWaitFor({
-          condition: () => !!this.ngAnnotationLayer,
-          leading: true
-        })),
-        scan((acc, curr) => {
-          return {
-            ...acc,
-            [curr.tool]: curr.annotations
-          }
-        }, {} as {
-          [key: string]: INgAnnotationTypes[keyof INgAnnotationTypes][] 
-        }),
-        map(acc => {
-          const out: INgAnnotationTypes[keyof INgAnnotationTypes][] = []
-          for (const key in acc) {
-            out.push(...acc[key])
-          }
-          return out
-        })
+      combineLatest([
+        this.forcedAnnotationRefresh$,
+        this.ngAnnotations$.pipe(
+          switchMap(switchMapWaitFor({
+            condition: () => !!this.ngAnnotationLayer,
+            leading: true
+          })),
+          scanCollapse(),
+        )
+      ]).pipe(
+        map(([_, ngAnnos]) => ngAnnos),
       ).subscribe(arr => {
+        const ignoreNgAnnIdsSet = new Set<string>()
+        for (const hiddenAnnot of this.hiddenAnnotations) {
+          const ids = hiddenAnnot.getNgAnnotationIds()
+          for (const id of ids) {
+            ignoreNgAnnIdsSet.add(id)
+          }
+        }
         for (const annotation of arr) {
+          if (ignoreNgAnnIdsSet.has(annotation.id)) {
+            this.deleteNgAnnotationById(annotation.id)
+            continue
+          }
           const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
           const annRef = localAnnotations.references.get(annotation.id)
           const annSpec = parseNgAnnotation(annotation)
@@ -365,15 +445,46 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         select(viewerStateSelectedTemplatePureSelector)
       ).subscribe(tmpl => {
         this.selectedTmpl = tmpl
-      })
+        this.annotnEvSubj.next({
+          type: 'metadataEv',
+          detail: {
+            space: tmpl && { ['@id']: tmpl['@id'] }
+          }
+        })
+      }),
+      this.managedAnnotations$.subscribe(ann => this.managedAnnotations = ann),
     )
   }
 
-  private clearAllPreviewAnnotations(){
-    while (this.previewNgAnnIds.length > 0) this.deleteAnnotationById(this.previewNgAnnIds.pop())
+  private hiddenAnnotationIds = new Set<string>()
+
+  public hiddenAnnotations$ = new BehaviorSubject<IAnnotationGeometry[]>([])
+  private hiddenAnnotations: IAnnotationGeometry[] = []
+  public toggleAnnotationVisibilityById(id: string){
+    if (this.hiddenAnnotationIds.has(id)) this.hiddenAnnotationIds.delete(id)
+    else this.hiddenAnnotationIds.add(id)
+
+    this.hiddenAnnotations = []
+    for (const id of Array.from(this.hiddenAnnotationIds)) {
+      const found = this.managedAnnotations.find(managedAnn => managedAnn.id === id)
+      if (found) {
+        this.hiddenAnnotations.push(found)
+      }
+    }
+    this.hiddenAnnotations$.next(this.hiddenAnnotations)
+    this.forcedAnnotationRefresh$.next(null)
   }
 
-  private deleteAnnotationById(annId: string) {
+  public getEditAnnotationCmp(annotation: IAnnotationGeometry): ClassInterface<any>{
+    const foundTool = this.registeredTools.find(t => annotation instanceof t.target)
+    return foundTool && foundTool.editCmp
+  }
+
+  private clearAllPreviewAnnotations(){
+    while (this.previewNgAnnIds.length > 0) this.deleteNgAnnotationById(this.previewNgAnnIds.pop())
+  }
+
+  private deleteNgAnnotationById(annId: string) {
     const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
     const annRef = localAnnotations.references.get(annId)
     if (annRef) {

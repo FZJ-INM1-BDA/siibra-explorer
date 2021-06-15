@@ -75,8 +75,12 @@ export class NehubaNavigationService implements OnDestroy{
     if (animation && this.globalAnimationFlag) {
 
       const gen = timedValues()
-      const dest = navigation
       const src = this.viewerNav
+
+      const dest = {
+        ...src,
+        ...navigation
+      }
 
       const delta = navAdd(dest, navMul(src, -1))
 

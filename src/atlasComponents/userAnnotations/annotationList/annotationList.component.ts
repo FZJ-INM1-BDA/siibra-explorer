@@ -3,18 +3,35 @@ import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationS
 import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 import {Store} from "@ngrx/store";
 import {ARIA_LABELS} from "common/constants";
+import { ModularUserAnnotationToolService } from "../tools/service";
+import { EXPORT_FORMAT_INJ_TOKEN, TExportFormats } from "../tools/type";
+
 
 @Component({
   selector: 'annotation-list',
   templateUrl: './annotationList.template.html',
-  styleUrls: ['./annotationList.style.css']
+  styleUrls: ['./annotationList.style.css'],
+  providers: [{
+    provide: EXPORT_FORMAT_INJ_TOKEN,
+    useFactory: (svc: ModularUserAnnotationToolService) => svc.exportFormat$,
+    deps: [
+      ModularUserAnnotationToolService
+    ]
+  }]
 })
 export class AnnotationList {
 
   public ARIA_LABELS = ARIA_LABELS
   public identifier = (index: number, item: any) => item.id
 
-  constructor(private store$: Store<any>, public ans: AnnotationService) {}
+  public availableFormat: TExportFormats[] = ['json', 'sands', 'string']
+  public exportFromat$ = this.annotSvc.exportFormat$
+  public selectExportFormat(format: TExportFormats) {
+    this.exportFromat$.next(format)
+  }
+
+  public managedAnnotations$ = this.annotSvc.managedAnnotations$
+  constructor(private store$: Store<any>, public ans: AnnotationService, private annotSvc: ModularUserAnnotationToolService) {}
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {
@@ -134,4 +151,8 @@ export class AnnotationList {
     })
   }
 
+  public hiddenAnnotations$ = this.annotSvc.hiddenAnnotations$
+  toggleManagedAnnotationVisibility(id: string) {
+    this.annotSvc.toggleAnnotationVisibilityById(id)
+  }
 }

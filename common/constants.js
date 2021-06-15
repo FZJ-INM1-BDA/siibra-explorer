@@ -61,14 +61,13 @@
 
     // Annotations
     USER_ANNOTATION_VIEWER: 'user annotations viewer',
-    USER_ANNOTATION_HEADER: 'user annotations header',
     USER_ANNOTATION_LIST: 'user annotations footer',
     USER_ANNOTATION_IMPORT: 'user annotations import',
     USER_ANNOTATION_EXPORT: 'user annotations export',
     USER_ANNOTATION_EXPORT_SINGLE: 'user annotations export single',
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'user annotations delete',
-
+    GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest.'
 
   }
 
