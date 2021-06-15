@@ -1,0 +1,37 @@
+<div class="d-flex align-items-center">
+  <button mat-icon-button
+    class="flex-grow-0 flex-shrink-0"
+    [attr.aria-label]="ARIA_LABELS.GOTO_ANNOTATION_ROI"
+    (click)="gotoRoi()">
+    <i [class]="POLY_ICON_CLASS"></i>
+  </button>
+
+  <form class="flex-grow-1 flex-shrink-1">
+    <mat-form-field class="w-100">
+      <mat-label>
+        {{ annotationLabel }}
+      </mat-label>
+  
+      <textarea matInput
+        disabled="true"
+        #copyTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
+
+      <button mat-icon-button
+        matSuffix
+        iav-stop="click"
+        aria-label="Copy to clipboard"
+        matTooltip="Copy to clipboard."
+        (click)="copyToClipboard(copyValue)"
+        color="basic">
+        <i class="fas fa-copy"></i>
+      </button>
+    </mat-form-field>
+  </form>
+</div>
+
+<point-update-cmp
+  *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
+  class="pl-4"
+  [annotation-label]="'Point ' + ( i + 1 )"
+  [update-annotation]="point">
+</point-update-cmp>

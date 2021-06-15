@@ -15,6 +15,8 @@ import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/i
 import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
 import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
 import { UtilModule } from "src/util";
+import { SingleAnnotationClsIconPipe, SingleAnnotationNamePipe, SingleAnnotationUnit } from "./singleAnnotationUnit/singleAnnotationUnit.component";
+import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
 
 @NgModule({
   imports: [
@@ -35,7 +37,11 @@ import { UtilModule } from "src/util";
     ImportAnnotation,
     ExportAnnotation,
     KeyListener,
-    CoordinateInputTextPipe
+    CoordinateInputTextPipe,
+    SingleAnnotationUnit,
+    SingleAnnotationNamePipe,
+    SingleAnnotationClsIconPipe,
+    AnnotationVisiblePipe,
   ],
   providers: [
     AnnotationService

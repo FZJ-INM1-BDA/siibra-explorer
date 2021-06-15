@@ -1,55 +1,73 @@
 <div [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_VIEWER" class="w-100">
 
-    <div class="overflow-hidden mt-3 mr-2 ml-2">
-        <div [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_HEADER" class="d-flex justify-content-between">
-            <div>
-                <button class="mr-1 ml-1" mat-icon-button
-                        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
-                        matTooltip="Import JSON"
-                        [matMenuTriggerFor]="importMenu">
-                    <i class="fas fa-file-import"></i>
+    <!-- header section -->
+    <div class="overflow-hidden mt-3 mr-2 ml-2 d-flex justify-content-between">
+        <div>
+            <button class="mr-1 ml-1" mat-icon-button
+                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
+                    matTooltip="Import JSON"
+                    [matMenuTriggerFor]="importMenu">
+                <i class="fas fa-file-import"></i>
+            </button>
+            <input type="file" #importInput [import-annotations]="{sands: false}" hidden/>
+            <input type="file" #importInputSands [import-annotations]="{sands: true}" hidden/>
+            <mat-menu #importMenu="matMenu">
+                <button mat-menu-item (click)="importInputSands.click()">
+                    SANDS format
                 </button>
-                <input type="file" #importInput [import-annotations]="{sands: false}" hidden/>
-                <input type="file" #importInputSands [import-annotations]="{sands: true}" hidden/>
-                <mat-menu #importMenu="matMenu">
-                    <button mat-menu-item (click)="importInputSands.click()">
-                        SANDS format
-                    </button>
-                    <button mat-menu-item (click)="importInput.click()">
-                        Siibra explorer format
-                    </button>
-                </mat-menu>
-
-                <button class="mr-1 ml-1" mat-icon-button
-                        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
-                        matTooltip="Export"
-                        [matMenuTriggerFor]="exportAllMenu">
-                    <i class="fas fa-file-export"></i>
+                <button mat-menu-item (click)="importInput.click()">
+                    Siibra explorer format
                 </button>
-                <mat-menu #exportAllMenu="matMenu">
-                    <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: true}">
-                        SANDS format
-                    </button>
-                    <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: false}">
-                        Siibra explorer format
-                    </button>
-                </mat-menu>
+            </mat-menu>
 
-            </div>
-            <div class="d-flex flex-column">
-                <small [ngClass]="[ans.annotationFilter !== 'all'? 'text-muted' : '']"
-                       class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('all')">
-                    All landmarks
-                </small>
-                <small [ngClass]="[ans.annotationFilter !== 'current'? 'text-muted' : '']"
-                       class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('current')">
-                    Current template
-                </small>
-            </div>
+            <button class="mr-1 ml-1" mat-icon-button
+                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
+                    matTooltip="Export"
+                    [matMenuTriggerFor]="exportAllMenu">
+                <i class="fas fa-file-export"></i>
+            </button>
+            <mat-menu #exportAllMenu="matMenu">
+                <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: true}">
+                    SANDS format
+                </button>
+                <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: false}">
+                    Siibra explorer format
+                </button>
+            </mat-menu>
+
+        </div>
+
+        <!-- select export format -->
+        <button mat-icon-button [matMenuTriggerFor]="exportFormatMenu">
+            <i class="fas fa-code"></i>
+        </button>
+
+        <mat-menu #exportFormatMenu="matMenu">
+            <button *ngFor="let format of availableFormat"
+                mat-menu-item
+                (click)="selectExportFormat(format)">
+                <span class="iv-custom-comp text"
+                    [ngClass]="{'primary': (exportFromat$ | async) === format}">
+                    {{ format }}
+                </span>
+            </button>
+        </mat-menu>
+
+        <div class="d-flex flex-column">
+            <small [ngClass]="[ans.annotationFilter !== 'all'? 'text-muted' : '']"
+                   class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('all')">
+                All landmarks
+            </small>
+            <small [ngClass]="[ans.annotationFilter !== 'current'? 'text-muted' : '']"
+                   class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('current')">
+                Current template
+            </small>
         </div>
     </div>
-    <mat-divider class="mt-2 mb-2"></mat-divider>
 
+    <mat-divider class="m-2"></mat-divider>
+
+    <!-- list of annotations -->
     <mat-accordion [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
                    class="h-100 d-flex flex-column overflow-auto">
         <mat-expansion-panel hideToggle
@@ -183,6 +201,34 @@
 
         </mat-expansion-panel>
 
+        <!-- expansion panel -->
+        <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations$ | async"
+            hideToggle>
+
+            <mat-expansion-panel-header>
+                <mat-panel-title class="d-flex align-items-center">
+
+                    <!-- toggle visibility -->
+                    <button
+                        mat-icon-button
+                        iav-stop="click"
+                        (click)="toggleManagedAnnotationVisibility(managedAnnotation.id)">
+                        <i [ngClass]="(hiddenAnnotations$ | async | annotationVisiblePipe : managedAnnotation) ?  'fa-eye' : 'fa-eye-slash'" class="fas"></i>
+                    </button>
+                    <span class="flex-shrink-1 flex-grow-1" [ngClass]="{ 'text-muted': !managedAnnotation.name }">
+                        {{ managedAnnotation | singleAnnotationNamePipe : managedAnnotation.name }}
+                    </span>    
+                    <i class="flex-shrink-0 flex-grow-0" [ngClass]="managedAnnotation | singleannotationClsIconPipe"></i>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <!-- single annotation edit body -->
+            <ng-template matExpansionPanelContent>
+                <single-annotation-unit
+                    [single-annotation-unit-annotation]="managedAnnotation">
+                </single-annotation-unit>
+            </ng-template>
+        </mat-expansion-panel>
     </mat-accordion>
 
 </div>

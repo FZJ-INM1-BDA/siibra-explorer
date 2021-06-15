@@ -1,31 +1,69 @@
-import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType } from "./type";
-import { Point } from './point'
+import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord } from "./type";
+import { Point, TPointJsonSpec } from './point'
 import { OnDestroy } from "@angular/core";
-import { merge, Observable, of, Subject, Subscription } from "rxjs";
-import { filter, map, pairwise, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
+import { merge, Observable, Subject, Subscription } from "rxjs";
+import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
+import { getUuid } from "src/util/fn";
 
-class Polygon extends IAnnotationGeometry{
+type TPolyJsonSpec = {
+  points: TPointJsonSpec[]
+  edges: [number, number][]
+  '@type': 'siibra-ex/annotation/polyline'
+} & TBaseAnnotationGeomtrySpec
+
+export class Polygon extends IAnnotationGeometry{
   public id: string
 
-  private points: Point[] = []
-  private idCounter = 0
-  private edges: [number, number][] = []
+  public points: Point[] = []
+  public edges: [number, number][] = []
 
-  public hasPoint(p: Point) {
+  public hasPoint(p: Point): boolean {
     return this.points.indexOf(p) >= 0
+  }
+
+  private ptWkMp = new WeakMap<Point, {
+    onremove: Function
+  }>()
+
+  public removePoint(p: Point) {
+    if (!this.hasPoint(p)) throw new Error(`polygon does not have this point`)
+    const returnObj = this.ptWkMp.get(p)
+    if (returnObj && returnObj.onremove) returnObj.onremove()
+
+    /**
+     * remove all edges associated with this point
+     */
+    const ptIdx = this.points.indexOf(p)
+    this.edges = this.edges.filter(([ idx1, idx2 ]) => idx1 !== ptIdx && idx2 !== ptIdx)
+    this.points.splice(ptIdx, 1)
+
+    this.sendUpdateSignal()
   }
 
   public addPoint(p: Point | {x: number, y: number, z: number}, linkTo?: Point): Point {
     if (linkTo && !this.hasPoint(linkTo)) {
       throw new Error(`linkTo point does not exist for polygon!`)
     }
-    
     const pointToBeAdded = p instanceof Point
       ? p
-      : new Point([p.x, p.y, p.z], `${this.id}_${this.idCounter}`)
-    this.idCounter += 1
+      : new Point({
+          id: `${this.id}_${getUuid()}`,
+          space: this.space,
+          '@type': 'siibra-ex/annotatoin/point',
+          ...p
+        })
     
-    if (!this.hasPoint(pointToBeAdded)) this.points.push(pointToBeAdded)
+    if (!this.hasPoint(pointToBeAdded)) {
+      this.points.push(pointToBeAdded)
+      const sub = pointToBeAdded.updateSignal$.subscribe(
+        () => this.sendUpdateSignal()
+      )
+      this.ptWkMp.set(pointToBeAdded, {
+        onremove: () => {
+          sub.unsubscribe()
+        }
+      })
+    }
     if (linkTo) {
       const newEdge = [
         this.points.indexOf(linkTo),
@@ -33,19 +71,57 @@ class Polygon extends IAnnotationGeometry{
       ] as [number, number]
       this.edges.push(newEdge)
     }
+    this.sendUpdateSignal()
     return pointToBeAdded
   }
 
-  toJSON(){
-    const { id, points, edges } = this
-    return { id, points, edges }
+  toJSON(): TPolyJsonSpec{
+    const { id, points, edges, space, name, desc } = this
+    return {
+      id,
+      points: points.map(p => p.toJSON()),
+      edges,
+      space,
+      name,
+      desc,
+      '@type': 'siibra-ex/annotation/polyline'
+    }
+  }
+
+  toString() {
+    return `Points: ${JSON.stringify(this.points.map(p => p.toString()))}, edges: ${JSON.stringify(this.edges)}.`
+  }
+
+  toSands(): TSandsPolyLine{
+    return {
+      "@id": this.id,
+      "@type": 'tmp/poly',
+      coordinateSpace: {
+        '@id': this.space["@id"],
+      },
+      coordinatesPairs: this.edges.map(([ idx1, idx2 ]) => {
+        const { x: x1, y: y1, z: z1 } = this.points[idx1]
+        const { x: x2, y: y2, z: z2 } = this.points[idx2]
+        return [
+          [getCoord(x1), getCoord(y1), getCoord(z1)],
+          [getCoord(x2), getCoord(y2), getCoord(z2)]
+        ]
+      })
+    }
+  }
+
+  private getNgAnnotationId(edgeIdx: number){
+    return `${this.id}_${edgeIdx}_0`
+  }
+  getNgAnnotationIds(){
+    return this.edges.map((_, edgeIdx) => this.getNgAnnotationId(edgeIdx))
   }
   toNgAnnotation(): INgAnnotationTypes['line'][]{
     return this.edges.map((indices, edgeIdx) => {
       const pt1 = this.points[indices[0]]
       const pt2 = this.points[indices[1]]
       return {
-        id: `${this.id}_${edgeIdx}_0`,
+        id: this.getNgAnnotationId(edgeIdx),
         pointA: [pt1.x, pt1.y, pt1.z],
         pointB: [pt2.x, pt2.y, pt2.z],
         type: 'line',
@@ -81,37 +157,46 @@ class Polygon extends IAnnotationGeometry{
     }
   }
 
-  static fromJSON(json: any){
-    const { id, points, edges } = json
-    const p = new Polygon()
-    p.points = points.map(Point.fromJSON)
-    p.edges = edges
-    p.id = id
-    return p
+  static fromJSON(json: TPolyJsonSpec){
+    return new Polygon(json)
   }
 
-  constructor(){
-    super()
+  constructor(spec?: TPolyJsonSpec){
+    super(spec)
+    const { points = [], edges = [] } = spec || {}
+    this.points = points.map(Point.fromJSON)
+    this.edges = edges
+  }
+
+  private sendUpdateSignal(){
+    this.updateSignal$.next(this.toString())
   }
 
   public translate(x: number, y: number, z: number) {
     for (const p of this.points){
       p.translate(x, y, z)
     }
+    this.sendUpdateSignal()
   }
 }
+
+export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
 
 export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_poly_preview'
 
   public name = 'polygon'
-  public iconClass = 'fas fa-draw-polygon'
+  public iconClass = POLY_ICON_CLASS
   public toolType: TToolType = 'drawing'
+
+  private space: TBaseAnnotationGeomtrySpec['space']
 
   private selectedPoly: Polygon
   private lastAddedPoint: Point
 
   private managedAnnotations: Polygon[] = []
+  public managedAnnotations$ = new Subject<Polygon[]>()
+
   private subs: Subscription[] = []
   private forceRefreshAnnotations$ = new Subject()
   public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
@@ -151,6 +236,10 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
     )
 
     this.subs.push(
+      this.metadataEv$.subscribe(ev => {
+        this.space = ev.detail.space
+      }),
+
       /**
        * on end tool select
        */
@@ -167,8 +256,14 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
         withLatestFrom(this.hoverAnnotation$)
       ).subscribe(([mouseev, ann]) => {
         if (!this.selectedPoly) {
-          this.selectedPoly = new Polygon()
+          this.selectedPoly = new Polygon({
+            edges: [],
+            points: [],
+            space: this.space,
+            '@type': 'siibra-ex/annotation/polyline'
+          })
           this.managedAnnotations.push(this.selectedPoly)
+          this.managedAnnotations$.next(this.managedAnnotations)
         }
 
         let existingPoint: Point
@@ -197,37 +292,21 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
       ).subscribe(() => {
         let out: INgAnnotationTypes['line'][] = []
         for (const managedAnn of this.managedAnnotations) {
-          out = out.concat(...managedAnn.toNgAnnotation())
+          /**
+           * only emit annotations in matching space
+           */
+          if (managedAnn.space["@id"] === this.space["@id"]) {
+            out = out.concat(...managedAnn.toNgAnnotation())
+          }
         }
         this.allNgAnnotations$.next(out)
       }),
 
       /**
-       * emit on init, and reset on mouseup$
-       * otherwise, pairwise confuses last drag event and first drag event
+       * translate point when on hover a point
+       * translate entire annotation when hover edge
        */
-      merge(
-        of(null),
-        this.mouseUp$
-      ).pipe(
-        switchMapTo(this.dragHoveredAnnotation$.pipe(
-          pairwise(),
-          map(([ prev, curr ]) => {
-            const { currNgX, currNgY, currNgZ } = curr
-            const {
-              currNgX: prevNgX,
-              currNgY: prevNgY,
-              currNgZ: prevNgZ
-            } = prev
-            return {
-              ann: curr.ann,
-              deltaX: currNgX - prevNgX,
-              deltaY: currNgY - prevNgY,
-              deltaZ: currNgZ - prevNgZ,
-            }
-          }),
-        ))
-      ).subscribe(val => {
+      this.dragHoveredAnnotationsDelta$.subscribe(val => {
         const { ann, deltaX, deltaY, deltaZ } = val
         const { pickedAnnotationId, pickedOffset } = ann.detail
         const annotation = this.managedAnnotations.find(poly => poly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset))
@@ -251,6 +330,16 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
         this.forceRefreshAnnotations$.next(null)
       }),
     )
+  }
+
+  removeAnnotation(id: string) {
+    const idx = this.managedAnnotations.findIndex(ann => ann.id === id)
+    if (idx < 0) {
+      return
+    }
+    this.managedAnnotations.splice(idx, 1)
+    this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefreshAnnotations$.next(null)
   }
 
   ngAnnotationIsRelevant(annotation: TNgAnnotationEv): boolean {

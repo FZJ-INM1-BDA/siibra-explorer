@@ -13,7 +13,7 @@ import {OnDestroy} from "@angular/core";
 import { merge, Observable, of, Subject, Subscription } from "rxjs";
 import { filter, map, pairwise, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 
-class Line extends IAnnotationGeometry{
+export class Line extends IAnnotationGeometry{
   public id: string
 
   public points: [Point, Point] = [null, null]

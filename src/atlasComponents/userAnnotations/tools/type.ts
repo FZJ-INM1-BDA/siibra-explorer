@@ -1,43 +1,7 @@
 import { InjectionToken } from "@angular/core"
-import { Observable, of } from "rxjs"
-import { filter, map, mapTo, switchMap, takeUntil, withLatestFrom } from 'rxjs/operators'
+import { merge, Observable, of, Subject } from "rxjs"
+import { filter, map, mapTo, pairwise, switchMap, switchMapTo, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { getUuid } from "src/util/fn"
-
-export type TToolType = 'translation' | 'drawing' | 'deletion'
-
-type THasId = {
-  id?: string
-}
-export abstract class IAnnotationGeometry {
-  public id: string
-
-  abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
-  abstract toJSON(): object
-
-  constructor(spec?: THasId){
-    this.id = spec && spec.id || getUuid()
-  }
-}
-
-export interface IAnnotationTools {
-  name: string
-  iconClass: string
-  toolType: TToolType
-}
-
-export type TNgAnnotationEv = {
-  pickedAnnotationId: string
-  pickedOffset: number
-}
-
-export type TNgMouseEvent = {
-  event: MouseEvent
-  ngMouseEvent: {
-    x: number
-    y: number
-    z: number
-  }
-}
 
 /**
  * base class to be extended by all annotation tools
@@ -46,6 +10,9 @@ export abstract class AbsToolClass {
 
   public abstract name: string
   public abstract iconClass: string
+
+  public abstract removeAnnotation(id: string): void
+  public abstract managedAnnotations$: Observable<IAnnotationGeometry[]>
 
   /**
    * @description to be overwritten by subclass. Check if a given annotation is relevant to the tool. Used for filtering annotations.
@@ -76,6 +43,10 @@ export abstract class AbsToolClass {
     filter(ev => ev.type === 'toolSelect'),
     map(ev => (ev as TAnnotationEvent<'toolSelect'>).detail.name === this.name)
   )
+
+  protected metadataEv$ = this.annotationEv$.pipe(
+    filter(ev => ev.type === 'metadataEv'),
+  ) as Observable<TAnnotationEvent<'metadataEv'>>
 
   protected mouseDown$ = this.annotationEv$.pipe(
     filter(ev => ev.type === 'mousedown')
@@ -142,6 +113,163 @@ export abstract class AbsToolClass {
     }),
     filter(v => !!v)
   )
+
+
+  /**
+   * emit on init, and reset on mouseup$
+   * otherwise, pairwise confuses last drag event and first drag event
+   */
+  protected dragHoveredAnnotationsDelta$: Observable<{
+    ann: TAnnotationEvent<"hoverAnnotation">,
+    deltaX: number,
+    deltaY: number,
+    deltaZ: number
+  }> = merge(
+    of(null),
+    this.mouseUp$
+  ).pipe(
+    switchMapTo(this.dragHoveredAnnotation$.pipe(
+      pairwise(),
+      map(([ prev, curr ]) => {
+        const { currNgX, currNgY, currNgZ } = curr
+        const {
+          currNgX: prevNgX,
+          currNgY: prevNgY,
+          currNgZ: prevNgZ
+        } = prev
+        return {
+          ann: curr.ann,
+          deltaX: currNgX - prevNgX,
+          deltaY: currNgY - prevNgY,
+          deltaZ: currNgZ - prevNgZ,
+        }
+      }),
+    ))
+  )
+}
+
+export type TToolType = 'translation' | 'drawing' | 'deletion'
+
+export type TBaseAnnotationGeomtrySpec = {
+  id?: string
+  space?: {
+    ['@id']: string
+  }
+  name?: string
+  desc?: string
+}
+
+export function getCoord(value: number): TSandsQValue {
+  return {
+    '@id': getUuid(),
+    '@type': "https://openminds.ebrains.eu/core/QuantitativeValue",
+    value,
+    unit: {
+      "@id": 'id.link/mm'
+    }
+  }
+}
+
+type TSandsQValue = {
+  '@id': string
+  '@type': 'https://openminds.ebrains.eu/core/QuantitativeValue'
+  uncertainty?: [number, number]
+  value: number
+  unit: {
+    '@id': 'id.link/mm'
+  }
+}
+type TSandsCoord = [TSandsQValue, TSandsQValue] | [TSandsQValue, TSandsQValue, TSandsQValue]
+
+export type TSandsPolyLine = {
+  coordinatesPairs: [TSandsCoord, TSandsCoord][]
+  coordinateSpace: {
+    '@id': string
+  }
+  '@type': 'tmp/poly'
+  '@id': string
+}
+
+export type TSandsLine = {
+  coordinatesFrom: TSandsCoord
+  coordinatesTo: TSandsCoord
+  coordinateSpace: {
+    '@id': string
+  }
+  '@type': 'tmp/line'
+  '@id': string
+}
+
+export type TSandsPoint = {
+  coordinates: TSandsCoord
+  coordinateSpace: {
+    '@id': string
+  }
+  '@type': 'https://openminds.ebrains.eu/sands/CoordinatePoint'
+  '@id': string
+}
+
+export interface ISandsAnnotation {
+  point: TSandsPoint
+  line: TSandsLine
+  polyline: TSandsPolyLine
+}
+
+export abstract class IAnnotationGeometry {
+  public id: string
+  
+  public name: string
+  public desc: string
+
+  public space: TBaseAnnotationGeomtrySpec['space']
+
+  abstract getNgAnnotationIds(): string[]
+  abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
+  abstract toJSON(): object
+  abstract toString(): string
+  abstract toSands(): ISandsAnnotation[keyof ISandsAnnotation]
+
+  public updateSignal$ = new Subject()
+
+  constructor(spec?: TBaseAnnotationGeomtrySpec){
+    this.id = spec && spec.id || getUuid()
+    this.space = spec?.space
+    this.name = spec?.name
+    this.desc = spec?.desc
+  }
+
+  setName(name: string) {
+    this.name = name
+    this.updateSignal$.next(this.toString())
+  }
+  setDesc(desc: string) {
+    this.desc = desc
+    this.updateSignal$.next(this.toString())
+  }
+}
+
+export interface IAnnotationTools {
+  name: string
+  iconClass: string
+  toolType: TToolType
+}
+
+export type TNgAnnotationEv = {
+  pickedAnnotationId: string
+  pickedOffset: number
+}
+
+export type TNgMouseEvent = {
+  event: MouseEvent
+  ngMouseEvent: {
+    x: number
+    y: number
+    z: number
+  }
+}
+
+export type TMetaEvent = {
+  space: { ['@id']: string }
 }
 
 export interface IAnnotationEvents {
@@ -152,6 +280,8 @@ export interface IAnnotationEvents {
   mousedown: TNgMouseEvent
   mouseup: TNgMouseEvent
   hoverAnnotation: TNgAnnotationEv
+
+  metadataEv: TMetaEvent
 }
 
 export type TAnnotationEvent<T extends keyof IAnnotationEvents> = {
@@ -185,3 +315,14 @@ export interface INgAnnotationTypes {
 }
 
 export const INJ_ANNOT_TARGET = new InjectionToken<Observable<HTMLElement>>('INJ_ANNOT_TARGET')
+export const UDPATE_ANNOTATION_TOKEN = new InjectionToken<IAnnotationGeometry>('UDPATE_ANNOTATION_TOKEN')
+
+export interface ClassInterface<T> {
+  new (...arg: any[]): T
+}
+
+export type TExportFormats = 'sands' | 'json' | 'string'
+
+export const EXPORT_FORMAT_INJ_TOKEN = new InjectionToken<
+  Observable<TExportFormats>
+>('EXPORT_FORMAT_INJ_TOKEN')
