@@ -5,41 +5,93 @@ import {
   IAnnotationEvents,
   AbsToolClass,
   INgAnnotationTypes,
-  TNgAnnotationEv,
   TToolType,
+  TSandsLine,
+  getCoord,
+  TBaseAnnotationGeomtrySpec,
 } from "./type";
-import { Point } from './point'
-import {OnDestroy} from "@angular/core";
-import { merge, Observable, of, Subject, Subscription } from "rxjs";
-import { filter, map, pairwise, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
+import { Point, TPointJsonSpec } from './point'
+import { OnDestroy } from "@angular/core";
+import { merge, Observable, Subject, Subscription } from "rxjs";
+import { filter, switchMapTo, takeUntil } from "rxjs/operators";
+import { getUuid } from "src/util/fn";
+
+type TLineJsonSpec = {
+  '@type': 'siibra-ex/annotation/line'
+  points: TPointJsonSpec[]
+} & TBaseAnnotationGeomtrySpec
 
 export class Line extends IAnnotationGeometry{
   public id: string
 
-  public points: [Point, Point] = [null, null]
+  public points: Point[] = []
 
   public hasPoint(p: Point) {
     return this.points.indexOf(p) >= 0
   }
 
   public addLinePoints(p: Point | {x: number, y: number, z: number}): Point {
-    const point = p instanceof Point ? p : new Point([p.x, p.y, p.z], this.id)
-    this.points[0] = point
-    if (!this.points[1]) this.points[1] = point
+    if (this.checkComplete()) {
+      throw new Error(`This line is already complete!`)
+    }
+    const point = p instanceof Point
+      ? p
+      : new Point({
+          id: `${this.id}_${getUuid()}`,
+          "@type": 'siibra-ex/annotatoin/point',
+          ...p
+        })
+    if (!this.points[0]) this.points[0] = point
+    else this.points[1] = point
+    this.sendUpdateSignal()
     return point
   }
 
+  getNgAnnotationIds() {
+    return [this.id]
+  }
 
-  toJSON(){
-    const { id, points } = this
-    return { id, points }
+  private checkComplete(){
+    return this.points.length >= 2
+  }
+
+  toString(): string {
+    if (!this.checkComplete()) {
+      return `Line incomplete.`
+    } 
+    
+    return `Line from ${this.points[0].toString()} to ${this.points[1].toString()}`
+  }
+
+  toSands(): TSandsLine {
+    if (!this.checkComplete()) {
+      return null
+    }
+    const {
+      x: x0, y: y0, z: z0
+    } = this.points[0]
+
+    const {
+      x: x1, y: y1, z: z1
+    } = this.points[1]
+
+    return {
+      '@id': this.id,
+      '@type': "tmp/line",
+      coordinateSpace: {
+        '@id': this.space["@id"]
+      },
+      coordinatesFrom: [getCoord(x0/1e6), getCoord(y0/1e6), getCoord(z0/1e6)],
+      coordinatesTo: [getCoord(x1/1e6), getCoord(y1/1e6), getCoord(z1/1e6)],
+    }
   }
 
   toNgAnnotation(): INgAnnotationTypes['line'][] {
+    if (!this.checkComplete()) return []
     const pt1 = this.points[0]
     const pt2 = this.points[1]
     return [{
-      id: `${this.id}`,
+      id: this.id,
       pointA: [pt1.x, pt1.y, pt1.z],
       pointB: [pt2.x, pt2.y, pt2.z],
       type: 'line',
@@ -48,22 +100,30 @@ export class Line extends IAnnotationGeometry{
 
   }
 
-  static fromJSON(json: any){
-    const { id, points } = json
-    const p = new Line()
-    p.points = points.map(Point.fromJSON)
-    p.id = id
-    return p
+  toJSON(){
+    const { id, points } = this
+    return { id, points }
   }
 
-  constructor(){
-    super()
+  static fromJSON(json: TLineJsonSpec){
+    return new Line(json)
+  }
+
+  constructor(spec?: TLineJsonSpec){
+    super(spec)
+    const { points = [] } = spec || {}
+    this.points = points.map(Point.fromJSON)
   }
 
   public translate(x: number, y: number, z: number) {
     for (const p of this.points){
       p.translate(x, y, z)
     }
+    this.sendUpdateSignal()
+  }
+
+  private sendUpdateSignal(){
+    this.updateSignal$.next(this.toString())
   }
 }
 
@@ -74,18 +134,18 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
   public iconClass = 'fas fa-slash'
 
   private selectedLine: Line
-  private firstPoint: Point
-  private secondPoint: Point
+  
+  subs: Subscription[] = []
 
-  private subs: Subscription[] = []
   private forceRefreshAnnotations$ = new Subject()
   private managedAnnotations: Line[] = []
+  public managedAnnotations$ = new Subject<Line[]>()
   public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
 
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
-    if (this.firstPoint) {
-      const { x, y, z } = this.firstPoint
+    if (this.selectedLine && !!this.selectedLine.points[0]) {
+      const { x, y, z } = this.selectedLine.points[0]
       return [{
         id: `${ToolLine.PREVIEW_ID}_0`,
         pointA: [ x, y, z ],
@@ -108,6 +168,8 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
   ){
     super(annotationEv$)
 
+    this.init()
+    
     const toolDeselect$ = this.toolSelected$.pipe(
       filter(flag => !flag)
     )
@@ -124,7 +186,6 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
        */
       toolDeselect$.subscribe(() => {
         this.selectedLine = null
-        this.firstPoint = null
       }),
       /**
        * on tool selected
@@ -132,22 +193,22 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
        * until tool deselected
        */
       toolSelThenClick$.pipe(
-        withLatestFrom(this.hoverAnnotation$)
-      ).subscribe(([mouseev, ann]) => {
-        if (!this.selectedLine) {
-          this.selectedLine = new Line()
-          this.managedAnnotations.push(this.selectedLine)
-        }
-
-
+      ).subscribe(mouseev => {
         const crd = mouseev.detail.ngMouseEvent
-
-        if (!this.firstPoint) {
+        if (!this.selectedLine) {
+          this.selectedLine = new Line({
+            space: this.space,
+            "@type": 'siibra-ex/annotation/line',
+            points: []
+          })
           this.selectedLine.addLinePoints(crd)
-          this.firstPoint = new Point([crd.x, crd.y, crd.z], this.selectedLine.id)
+          this.managedAnnotations.push(this.selectedLine)
+          this.managedAnnotations$.next(this.managedAnnotations)
         } else {
-          // ToDo Tool Should Be Deselected.
 
+          // ToDo Tool Should Be Deselected.
+          this.selectedLine.addLinePoints(crd)
+          this.selectedLine = null
         }
       }),
 
@@ -165,6 +226,7 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
         for (const managedAnn of this.managedAnnotations) {
           out = out.concat(...managedAnn.toNgAnnotation())
         }
+
         this.allNgAnnotations$.next(out)
       }),
 
@@ -172,34 +234,16 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
        * emit on init, and reset on mouseup$
        * otherwise, pairwise confuses last drag event and first drag event
        */
-      merge(
-        of(null),
-        this.mouseUp$
-      ).pipe(
-        switchMapTo(this.dragHoveredAnnotation$.pipe(
-          pairwise(),
-          map(([ prev, curr ]) => {
-            const { currNgX, currNgY, currNgZ } = curr
-            const {currNgX: prevNgX, currNgY: prevNgY, currNgZ: prevNgZ} = prev
-            return {
-              ann: curr.ann,
-              deltaX: currNgX - prevNgX,
-              deltaY: currNgY - prevNgY,
-              deltaZ: currNgZ - prevNgZ,
-            }
-          }),
-        ))
-      ).subscribe(val => {
+      this.dragHoveredAnnotationsDelta$.subscribe(val => {
+        
         const { ann, deltaX, deltaY, deltaZ } = val
         const { pickedAnnotationId, pickedOffset } = ann.detail
-
 
         const annotation = this.managedAnnotations.find(an => an.id === pickedAnnotationId)
         if (!annotation) {
           return null
         }
-
-        // ToDo does not work
+        
         if (pickedOffset === 2) {
           annotation.points[1].translate(deltaX, deltaY, deltaZ)
         } else if (pickedOffset === 1) {
@@ -207,17 +251,23 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
         } else {
           annotation.translate(deltaX, deltaY, deltaZ)
         }
-
+        this.forceRefreshAnnotations$.next(null)
       })
     )
   }
 
-  ngAnnotationIsRelevant(annotation: TNgAnnotationEv){
-    return this.managedAnnotations.some(p => p.id === annotation.pickedAnnotationId)
-  }
-
   ngOnDestroy(){
     this.subs.forEach(s => s.unsubscribe())
+  }
+
+  removeAnnotation(id: string){
+    const idx = this.managedAnnotations.findIndex(ann => ann.id === id)
+    if (idx < 0) {
+      return
+    }
+    this.managedAnnotations.splice(idx, 1)
+    this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefreshAnnotations$.next(null)
   }
 
 }

@@ -1,5 +1,5 @@
 import { InjectionToken } from "@angular/core"
-import { merge, Observable, of, Subject } from "rxjs"
+import { merge, Observable, of, Subject, Subscription } from "rxjs"
 import { filter, map, mapTo, pairwise, switchMap, switchMapTo, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { getUuid } from "src/util/fn"
 
@@ -14,12 +14,8 @@ export abstract class AbsToolClass {
   public abstract removeAnnotation(id: string): void
   public abstract managedAnnotations$: Observable<IAnnotationGeometry[]>
 
-  /**
-   * @description to be overwritten by subclass. Check if a given annotation is relevant to the tool. Used for filtering annotations.
-   * @param {TNgAnnotationEv} annotation
-   * @returns {boolean} if annotation is relevant to this tool
-   */
-  public abstract ngAnnotationIsRelevant(hoverEv: TNgAnnotationEv): boolean
+  abstract subs: Subscription[]
+  protected space: TBaseAnnotationGeomtrySpec['space']
 
   /**
    * @description to be overwritten by subclass. Emit the latest representation of NgAnnotations from the tool.
@@ -37,6 +33,14 @@ export abstract class AbsToolClass {
     protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
   ){
 
+  }
+
+  init(){
+    this.subs.push(
+      this.metadataEv$.subscribe(ev => {
+        this.space = ev.detail.space
+      })
+    )
   }
 
   public toolSelected$ = this.annotationEv$.pipe(

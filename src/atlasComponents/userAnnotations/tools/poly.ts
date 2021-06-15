@@ -189,15 +189,13 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
   public iconClass = POLY_ICON_CLASS
   public toolType: TToolType = 'drawing'
 
-  private space: TBaseAnnotationGeomtrySpec['space']
-
   private selectedPoly: Polygon
   private lastAddedPoint: Point
 
   private managedAnnotations: Polygon[] = []
   public managedAnnotations$ = new Subject<Polygon[]>()
 
-  private subs: Subscription[] = []
+  public subs: Subscription[] = []
   private forceRefreshAnnotations$ = new Subject()
   public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
 
@@ -224,7 +222,7 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
   ){
     super(annotationEv$)
-
+    this.init()
     const toolDeselect$ = this.toolSelected$.pipe(
       filter(flag => !flag)
     )
@@ -340,11 +338,6 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
     this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
     this.forceRefreshAnnotations$.next(null)
-  }
-
-  ngAnnotationIsRelevant(annotation: TNgAnnotationEv): boolean {
-    // perhaps use more advanced way to track if annotation is a part of polygon?
-    return this.managedAnnotations.some(poly => poly.id.indexOf(annotation.pickedAnnotationId) >= 0)
   }
 
   ngOnDestroy(){

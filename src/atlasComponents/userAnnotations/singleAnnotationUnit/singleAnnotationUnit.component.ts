@@ -8,6 +8,7 @@ import { select, Store } from "@ngrx/store";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Line } from "../tools/line";
 
 @Component({
   selector: 'single-annotation-unit',
@@ -114,6 +115,7 @@ export class SingleAnnotationNamePipe implements PipeTransform{
     if (name) return name
     if (ann instanceof Polygon) return `Unnamed Polygon`
     if (ann instanceof Point) return `Unname Point`
+    if (ann instanceof Line) return `Unnamed Line`
     return `Unnamed geometry`
   }
 }
@@ -127,6 +129,7 @@ export class SingleAnnotationClsIconPipe implements PipeTransform{
   public transform(ann: IAnnotationGeometry): string{
     if (ann instanceof Polygon) return `fas fa-draw-polygon`
     if (ann instanceof Point) return `fas fa-circle`
+    if (ann instanceof Line) return `fas fa-slash`
     return `fas fa-mouse-pointer`
   }
 }
