@@ -30,7 +30,8 @@ export abstract class AbsToolClass {
   public abstract onMouseMoveRenderPreview(mousepos: [number, number, number]): INgAnnotationTypes[keyof INgAnnotationTypes][]
 
   constructor(
-    protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
+    protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
+    protected callback?: TCallbackFunction
   ){
 
   }
@@ -124,9 +125,9 @@ export abstract class AbsToolClass {
    * otherwise, pairwise confuses last drag event and first drag event
    */
   protected dragHoveredAnnotationsDelta$: Observable<{
-    ann: TAnnotationEvent<"hoverAnnotation">,
-    deltaX: number,
-    deltaY: number,
+    ann: TAnnotationEvent<"hoverAnnotation">
+    deltaX: number
+    deltaY: number
     deltaZ: number
   }> = merge(
     of(null),
@@ -153,6 +154,15 @@ export abstract class AbsToolClass {
 }
 
 export type TToolType = 'translation' | 'drawing' | 'deletion'
+
+export type TCallback = {
+  paintingEnd: {
+    callArg: {}
+    returns: void
+  }
+}
+
+export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['callArg'] & { type: T }) => TCallback[T] | void
 
 export type TBaseAnnotationGeomtrySpec = {
   id?: string

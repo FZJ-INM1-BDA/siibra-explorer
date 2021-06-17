@@ -1,23 +1,19 @@
 <!-- actions -->
+
+<span class="m-2 text-muted">
+  Endpoints
+</span>
+
+<mat-chip-list>
+  <mat-chip *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
+    (click)="gotoPoint(point)">
+    {{ i }}
+  </mat-chip>
+</mat-chip-list>
+
+<mat-divider class="m-2"></mat-divider>
+
 <div class="d-flex">
-
-  <!-- show more -->
-  <button mat-icon-button (click)="showMoreFlag = !showMoreFlag">
-    <i [ngClass]="showMoreFlag ? 'r-90' :  ''"
-      class="t-a-ease-200 transform-origin-center fas fa-chevron-right">
-    </i>
-  </button>
-
-  <!-- spacer -->
-  <div class="flex-grow-1"></div>
-
-  <!-- go to -->
-  <button mat-icon-button
-    [attr.aria-label]="ARIA_LABELS.GOTO_ANNOTATION_ROI"
-    [matTooltip]="ARIA_LABELS.GOTO_ANNOTATION_ROI"
-    (click)="gotoRoi()">
-    <i class="fas fa-map-marked-alt"></i>
-  </button>
 
   <!-- export -->
   <button mat-icon-button
@@ -64,40 +60,3 @@
     </div>
   </div>
 </mat-menu>
-
-<!-- detail pane -->
-<ng-template [ngIf]="showMoreFlag">
-  
-  <h2 class="mat-h4">
-    Points connecting the line
-  </h2>
-  
-  <!-- points detail -->
-  <mat-tab-group animationDuration="0ms">
-  
-    <!-- summary -->
-    <mat-tab label="Summary">
-      <div class="m-2">
-        <mat-chip-list>
-          <mat-chip *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
-            (click)="gotoPoint(point)">
-            {{ i }}
-          </mat-chip>
-        </mat-chip-list>
-      </div>
-    </mat-tab>
-  
-    <!-- detail -->
-    <mat-tab label="Detail">
-      <ng-template matTabContent>
-        <point-update-cmp
-          *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
-          class="pl-4"
-          [annotation-label]="'Point ' + ( i + 1 )"
-          [update-annotation]="point">
-        </point-update-cmp>
-      </ng-template>
-    </mat-tab>
-  </mat-tab-group>
-  
-</ng-template>

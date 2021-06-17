@@ -8,7 +8,7 @@ import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector 
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { Polygon, ToolPolygon } from "./poly";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats, TCallbackFunction } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
 import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
 import { PolyUpdateCmp } from './poly/poly.component'
@@ -93,13 +93,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private registeredTools: {
     name: string
-    iconClass: string,
-    target?: ClassInterface<IAnnotationGeometry>,
-    editCmp?: ClassInterface<any>,
+    iconClass: string
+    target?: ClassInterface<IAnnotationGeometry>
+    editCmp?: ClassInterface<any>
     onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
     onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
+
+  private handleToolCallback: TCallbackFunction = arg => {
+    switch (arg.type) {
+    case 'paintingEnd': {
+      this.deselectTools()
+      return
+    }
+    }
+  }
 
   /**
    * @description register new annotation tool
@@ -112,12 +121,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    * }} arg 
    */
   private registerTool<T extends AbsToolClass>(arg: {
-    toolCls: ClassInterface<T>,
-    target?: ClassInterface<IAnnotationGeometry>,
+    toolCls: ClassInterface<T>
+    target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
   }){
     const { toolCls: Cls, target, editCmp } = arg
-    const newTool = new Cls(this.annotnEvSubj) as AbsToolClass & { ngOnDestroy?: Function }
+    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as AbsToolClass & { ngOnDestroy?: Function }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({

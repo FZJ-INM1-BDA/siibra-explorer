@@ -9,6 +9,7 @@ import {
   TSandsLine,
   getCoord,
   TBaseAnnotationGeomtrySpec,
+  TCallbackFunction,
 } from "./type";
 import { Point, TPointJsonSpec } from './point'
 import { OnDestroy } from "@angular/core";
@@ -37,11 +38,11 @@ export class Line extends IAnnotationGeometry{
     const point = p instanceof Point
       ? p
       : new Point({
-          id: `${this.id}_${getUuid()}`,
-          "@type": 'siibra-ex/annotatoin/point',
-          space: this.space,
-          ...p
-        })
+        id: `${this.id}_${getUuid()}`,
+        "@type": 'siibra-ex/annotatoin/point',
+        space: this.space,
+        ...p
+      })
     if (!this.points[0]) this.points[0] = point
     else this.points[1] = point
     this.sendUpdateSignal()
@@ -167,9 +168,10 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
 
 
   constructor(
-    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
+    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
+    callback?: TCallbackFunction
   ){
-    super(annotationEv$)
+    super(annotationEv$, callback)
 
     this.init()
     
@@ -212,6 +214,10 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
           // ToDo Tool Should Be Deselected.
           this.selectedLine.addLinePoints(crd)
           this.selectedLine = null
+
+          if (this.callback) {
+            this.callback({ type: 'paintingEnd' })
+          }
         }
       }),
 

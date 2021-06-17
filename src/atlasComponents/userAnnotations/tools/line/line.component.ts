@@ -23,8 +23,6 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
   @Input('update-annotation')
   public updateAnnotation: Line
 
-  public showMoreFlag = false
-
   public ARIA_LABELS = ARIA_LABELS
 
   public annotationLabel = 'Line'
@@ -77,7 +75,7 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
     return this.copyTarget && this.copyTarget.nativeElement.value
   }
 
-  gotoRoi(roi?:IAnnotationGeometry){
+  gotoRoi(roi?: IAnnotationGeometry){
     if (!this.updateAnnotation && !roi) {
       throw new Error(`updateAnnotation undefined`)
     }
@@ -100,7 +98,7 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
     )
   }
 
-  gotoPoint(point:Point){
+  gotoPoint(point: Point){
     if (!point) throw new Error(`Point is not defined.`)
     const { x, y, z } = point
 

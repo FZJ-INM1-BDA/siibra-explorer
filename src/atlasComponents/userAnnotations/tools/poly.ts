@@ -47,11 +47,11 @@ export class Polygon extends IAnnotationGeometry{
     const pointToBeAdded = p instanceof Point
       ? p
       : new Point({
-          id: `${this.id}_${getUuid()}`,
-          space: this.space,
-          '@type': 'siibra-ex/annotatoin/point',
-          ...p
-        })
+        id: `${this.id}_${getUuid()}`,
+        space: this.space,
+        '@type': 'siibra-ex/annotatoin/point',
+        ...p
+      })
     
     if (!this.hasPoint(pointToBeAdded)) {
       this.points.push(pointToBeAdded)
