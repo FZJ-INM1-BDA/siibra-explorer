@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { Subject } from "rxjs";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { UtilModule } from "src/util";
+import { LineUpdateCmp } from "./line/line.component";
 import { PointUpdateCmp } from "./point/point.component";
 import { PolyUpdateCmp } from "./poly/poly.component";
 import { ModularUserAnnotationToolService } from "./service";
@@ -16,11 +17,13 @@ import { ANNOTATION_EVENT_INJ_TOKEN } from "./type";
     UtilModule,
   ],
   declarations: [
+    LineUpdateCmp,
     PolyUpdateCmp,
     PointUpdateCmp,
     ToFormattedStringPipe,
   ],
   exports: [
+    LineUpdateCmp,
     PolyUpdateCmp,
     PointUpdateCmp,
   ],

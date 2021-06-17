@@ -370,6 +370,11 @@ markdown-dom p
   pointer-events: all;
 }
 
+.t-a-ease-200
+{
+  transition: all ease 200ms;
+}
+
 .t-a-ease-500
 {
   transition: all ease 500ms;

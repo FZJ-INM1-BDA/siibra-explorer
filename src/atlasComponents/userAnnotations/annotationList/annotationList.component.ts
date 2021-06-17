@@ -4,34 +4,34 @@ import {viewerStateChangeNavigation} from "src/services/state/viewerState/action
 import {Store} from "@ngrx/store";
 import {ARIA_LABELS} from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
-import { EXPORT_FORMAT_INJ_TOKEN, TExportFormats } from "../tools/type";
+import { TExportFormats } from "../tools/type";
+import { ComponentStore } from "src/viewerModule/componentStore";
 
 
 @Component({
   selector: 'annotation-list',
   templateUrl: './annotationList.template.html',
   styleUrls: ['./annotationList.style.css'],
-  providers: [{
-    provide: EXPORT_FORMAT_INJ_TOKEN,
-    useFactory: (svc: ModularUserAnnotationToolService) => svc.exportFormat$,
-    deps: [
-      ModularUserAnnotationToolService
-    ]
-  }]
+  providers: [
+    ComponentStore,
+  ]
 })
 export class AnnotationList {
 
   public ARIA_LABELS = ARIA_LABELS
   public identifier = (index: number, item: any) => item.id
 
-  public availableFormat: TExportFormats[] = ['json', 'sands', 'string']
-  public exportFromat$ = this.annotSvc.exportFormat$
-  public selectExportFormat(format: TExportFormats) {
-    this.exportFromat$.next(format)
-  }
-
   public managedAnnotations$ = this.annotSvc.managedAnnotations$
-  constructor(private store$: Store<any>, public ans: AnnotationService, private annotSvc: ModularUserAnnotationToolService) {}
+  constructor(
+    private store$: Store<any>,
+    public ans: AnnotationService,
+    private annotSvc: ModularUserAnnotationToolService,
+    cStore: ComponentStore<{ useFormat: TExportFormats }>,
+  ) {
+    cStore.setState({
+      useFormat: 'json'
+    })
+  }
 
   toggleAnnotationVisibility(annotation) {
     if (annotation.type === 'polygon') {

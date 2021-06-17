@@ -37,22 +37,6 @@
 
         </div>
 
-        <!-- select export format -->
-        <button mat-icon-button [matMenuTriggerFor]="exportFormatMenu">
-            <i class="fas fa-code"></i>
-        </button>
-
-        <mat-menu #exportFormatMenu="matMenu">
-            <button *ngFor="let format of availableFormat"
-                mat-menu-item
-                (click)="selectExportFormat(format)">
-                <span class="iv-custom-comp text"
-                    [ngClass]="{'primary': (exportFromat$ | async) === format}">
-                    {{ format }}
-                </span>
-            </button>
-        </mat-menu>
-
         <div class="d-flex flex-column">
             <small [ngClass]="[ans.annotationFilter !== 'all'? 'text-muted' : '']"
                    class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('all')">

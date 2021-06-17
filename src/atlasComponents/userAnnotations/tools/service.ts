@@ -14,6 +14,7 @@ import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
 import { PolyUpdateCmp } from './poly/poly.component'
 import { Point, ToolPoint } from "./point";
 import { PointUpdateCmp } from "./point/point.component";
+import { LineUpdateCmp } from "./line/line.component";
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -182,8 +183,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
-  public exportFormat$ = new BehaviorSubject<TExportFormats>('string')
-
   constructor(
     store: Store<any>,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
@@ -199,7 +198,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
     this.registerTool({
       toolCls: ToolLine,
-      target: Line
+      target: Line,
+      editCmp: LineUpdateCmp,
     })
 
     this.registerTool({

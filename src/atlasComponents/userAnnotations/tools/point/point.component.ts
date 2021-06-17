@@ -1,12 +1,12 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Point, POINT_ICON_CLASS } from "../point";
-import { EXPORT_FORMAT_INJ_TOKEN, IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
+import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { ToolCmpBase } from "../toolCmp.base";
 import { Store } from "@ngrx/store";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
-import { Observable, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'point-update-cmp',
@@ -39,18 +39,10 @@ export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
     private store: Store<any>,
     snackbar: MatSnackBar,
     clipboard: Clipboard,
-    @Optional() @Inject(EXPORT_FORMAT_INJ_TOKEN) useFormat$: Observable<TExportFormats>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
     super(clipboard, snackbar)
     
-    if (useFormat$) {
-      this.sub.push(
-        useFormat$.subscribe(val => {
-          this.useFormat = val
-        })
-      )
-    }
     if (updateAnnotation) {
       if (updateAnnotation instanceof Point) {
         this.updateAnnotation = updateAnnotation

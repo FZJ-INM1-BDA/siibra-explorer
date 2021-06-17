@@ -326,7 +326,3 @@ export interface ClassInterface<T> {
 }
 
 export type TExportFormats = 'sands' | 'json' | 'string'
-
-export const EXPORT_FORMAT_INJ_TOKEN = new InjectionToken<
-  Observable<TExportFormats>
->('EXPORT_FORMAT_INJ_TOKEN')

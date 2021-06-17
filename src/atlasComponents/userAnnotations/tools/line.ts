@@ -39,6 +39,7 @@ export class Line extends IAnnotationGeometry{
       : new Point({
           id: `${this.id}_${getUuid()}`,
           "@type": 'siibra-ex/annotatoin/point',
+          space: this.space,
           ...p
         })
     if (!this.points[0]) this.points[0] = point
@@ -127,11 +128,13 @@ export class Line extends IAnnotationGeometry{
   }
 }
 
+export const LINE_ICON_CLASS = 'fas fa-slash'
+
 export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_line_preview'
   public name = 'Line'
   public toolType: TToolType = 'drawing'
-  public iconClass = 'fas fa-slash'
+  public iconClass = LINE_ICON_CLASS
 
   private selectedLine: Line
   
