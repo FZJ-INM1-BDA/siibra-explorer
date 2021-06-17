@@ -154,7 +154,10 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
    * @param id id of annotation
    */
   removeAnnotation(id: string) {
+    const idx = this.managedAnnotations.findIndex(ann => id === ann.id)
 
+    this.managedAnnotations.splice(idx, 1)
+    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
