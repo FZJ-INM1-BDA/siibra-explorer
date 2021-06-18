@@ -1,195 +1,26 @@
-<div [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_VIEWER" class="w-100">
+<!-- header -->
 
-    <!-- header section -->
-    <div class="overflow-hidden mt-3 mr-2 ml-2 d-flex justify-content-between">
-        <div>
-            <button class="mr-1 ml-1" mat-icon-button
-                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
-                    matTooltip="Import JSON"
-                    [matMenuTriggerFor]="importMenu">
-                <i class="fas fa-file-import"></i>
-            </button>
-            <input type="file" #importInput [import-annotations]="{sands: false}" hidden/>
-            <input type="file" #importInputSands [import-annotations]="{sands: true}" hidden/>
-            <mat-menu #importMenu="matMenu">
-                <button mat-menu-item (click)="importInputSands.click()">
-                    SANDS format
-                </button>
-                <button mat-menu-item (click)="importInput.click()">
-                    Siibra explorer format
-                </button>
-            </mat-menu>
+<div class="d-flex">
+    <h2 class="mat-h2 mt-4 text-muted">
+        Annotations
+    </h2>
+</div>
 
-            <button class="mr-1 ml-1" mat-icon-button
-                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
-                    matTooltip="Export"
-                    [matMenuTriggerFor]="exportAllMenu">
-                <i class="fas fa-file-export"></i>
-            </button>
-            <mat-menu #exportAllMenu="matMenu">
-                <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: true}">
-                    SANDS format
-                </button>
-                <button mat-menu-item [export-annotations]="{annotations: ans.finalAnnotationList, sands: false}">
-                    Siibra explorer format
-                </button>
-            </mat-menu>
-
-        </div>
-
-        <div class="d-flex flex-column">
-            <small [ngClass]="[ans.annotationFilter !== 'all'? 'text-muted' : '']"
-                   class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('all')">
-                All landmarks
-            </small>
-            <small [ngClass]="[ans.annotationFilter !== 'current'? 'text-muted' : '']"
-                   class="cursor-pointer" (click)="ans.refreshFinalAnnotationList('current')">
-                Current template
-            </small>
-        </div>
-    </div>
-
-    <mat-divider class="m-2"></mat-divider>
-
-    <!-- list of annotations -->
-    <mat-accordion [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
-                   class="h-100 d-flex flex-column overflow-auto">
-        <mat-expansion-panel hideToggle
-                             *ngFor="let annotation of ans.finalAnnotationList; let i = index; trackBy: identifier">
-            <mat-expansion-panel-header
-                    [ngClass]="ans.hoverAnnotation?.id.includes(annotation.id) && 'highlight'">
-
-                <mat-panel-title>
-                    <small class="cursor-pointer mr-3 ml-1 d-flex align-items-center"
-                           [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_HIDE"
-                           [matTooltip]="annotation.annotationVisible? 'Hide' : 'Show'"
-                           (click)="$event.stopPropagation(); toggleAnnotationVisibility(annotation)">
-                        <i class="fas far fa-check-circle" *ngIf="annotation.annotationVisible; else notVisible"></i>
-                        <ng-template #notVisible><i class="far fa-circle"></i></ng-template>
-                    </small>
-                    <div class="color-inherit">{{annotation.name}}</div>
-                </mat-panel-title>
-
-                <mat-panel-description class="w-100 d-flex align-items-center justify-content-end"
-                                       [matTooltip]="annotation.type">
-                    <small><i [ngClass]="annotation.type === 'line'? 'fas fa-slash'
-                        : annotation.type === 'bounding box'? 'far fa-square'
-                        : annotation.type === 'ellipsoid'? 'fas fa-bullseye'
-                        : annotation.type === 'polygonParent' || annotation.type === 'polygon'? 'fas fa-draw-polygon'
-                         : 'fas fa-circle'"></i></small>
-                </mat-panel-description>
+<mat-divider></mat-divider>
 
 
-            </mat-expansion-panel-header>
+<!-- list of annotations -->
+<ng-template [ngIf]="managedAnnotations$ | async" [ngIfElse]="placeholderTmpl" let-managedAnnotations>
 
-
-            <div class="d-flex flex-column">
-                <mat-form-field class="w-100">
-                    <input matInput class="font-italic color-inherit"
-                           placeholder="Name"
-                           [(ngModel)]="annotation.name"
-                           (keydown.space)="$event.stopPropagation();"
-                           annotation-list-key-listener
-                           (keyup)="this.saveAnnotation(annotation)"/>
-                </mat-form-field>
-
-                <p class="mt-2 mb-4">{{annotation.template.name}}</p>
-
-                <div *ngIf="annotation.type !== 'polygon'"
-                     class="w-100 d-flex align-items-center justify-content-between mt-2">
-                    <mat-form-field class="w-100">
-                        <input matInput class="w-100 font-italic color-inherit flex-grow-1"
-                               placeholder="Position 1"
-                               [ngModel]="(annotation.position1 | coordinateInputText)"
-                               (ngModelChange)="annotation.position1 = positionToNumberArray($event)"
-                               annotation-list-key-listener
-                               (keyup)="this.saveAnnotation(annotation)"/>
-                    </mat-form-field>
-                    <small class="d-flex align-items-center flex-grow-0"> <i
-                            class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
-                            (click)="navigate(annotation.position1)"></i></small>
-                </div>
-
-                <div *ngIf="annotation.type !== 'polygon' && annotation.position2"
-                     class="w-100 d-flex align-items-center justify-content-between mb-2">
-                    <mat-form-field class="w-100">
-                        <input matInput
-                               placeholder="Position 2"
-                               class="w-100 font-italic d-flex align-items-center color-inherit"
-                               [ngModel]="(annotation.position2 | coordinateInputText)"
-                               (ngModelChange)="annotation.position2 = positionToNumberArray($event)"
-                               annotation-list-key-listener
-                               (keyup)="this.saveAnnotation(annotation)"/>
-                    </mat-form-field>
-                    <small class="d-flex align-items-center"> <i
-                            class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
-                            (click)="navigate(annotation.position2)"></i></small>
-                </div>
-
-                <div *ngIf="annotation.type === 'polygon'">
-                    <div *ngFor="let position of annotation.positions; let positionIndex = index"
-                         class="w-100 d-flex align-items-center justify-content-between mb-2">
-                        <mat-form-field class="w-100">
-                            <input matInput
-                                   [placeholder]="'Position' + (+positionIndex + 1)"
-                                   class="w-100 font-italic d-flex align-items-center color-inherit"
-                                   [value]="(position?.position | coordinateInputText)"
-                                   #polygonPositionInput
-                                   annotation-list-key-listener
-                                   (keyup)="this.savePolygonPosition(annotation.id, position, polygonPositionInput.value)"/>
-                        </mat-form-field>
-                        <small class="d-flex align-items-center"> <i
-                                class="fas fa-map-marked-alt mr-2 ml-2 cursor-pointer"
-                                (click)="navigate(position?.position)"></i></small>
-                    </div>
-                </div>
-
-
-                <div class="w-100">
-                    <mat-form-field class="w-100">
-                        <textarea matInput class="w-100 color-inherit"
-                                  placeholder="Description"
-                                  cdkTextareaAutosize
-                                  #autosize="cdkTextareaAutosize"
-                                  cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"
-                                  [(ngModel)]="annotation.description"
-                                  annotation-list-key-listener
-                                  (keyup)="this.saveAnnotation(annotation)">
-                        </textarea></mat-form-field>
-                </div>
-
-
-                <div class="d-flex align-items-center justify-content-end w-100">
-                    <button class="mr-1 ml-1" mat-icon-button
-                            [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
-                            matTooltip="Export"
-                            [matMenuTriggerFor]="exportSingleMenu">
-                        <i class="fas fa-file-export"></i>
-                    </button>
-                    <mat-menu #exportSingleMenu="matMenu">
-                        <button mat-menu-item [export-annotations]="{annotations: [annotation], sands: true}">
-                            SANDS format
-                        </button>
-                        <button mat-menu-item [export-annotations]="{annotations: [annotation], sands: false}">
-                            Siibra explorer format
-                        </button>
-                    </mat-menu>
-                    <button class="mr-1 ml-1" mat-icon-button
-                            [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_DELETE"
-                            (click)="removeAnnotation(annotation)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-
-            </div>
-
-        </mat-expansion-panel>
+    <mat-accordion *ngIf="managedAnnotations.length > 0; else placeholderTmpl"
+        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
+        class="h-100 d-flex flex-column overflow-auto">
 
         <!-- expansion panel -->
-        <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations$ | async"
+        <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations"
             hideToggle>
 
-            <mat-expansion-panel-header>
+            <mat-expansion-panel-header [ngClass]="{'highlight': managedAnnotation.highlighted }">
                 <mat-panel-title class="d-flex align-items-center">
 
                     <!-- toggle visibility -->
@@ -214,5 +45,16 @@
             </ng-template>
         </mat-expansion-panel>
     </mat-accordion>
+</ng-template>
 
-</div>
+<!-- place holder when no annotations exist -->
+<ng-template #placeholderTmpl>
+    <mat-card>
+        <span>
+            No annotations visible yet. 
+        </span>
+        <span>
+            Start by adding an annotion, or import an existing annotation.
+        </span>
+    </mat-card>
+</ng-template>

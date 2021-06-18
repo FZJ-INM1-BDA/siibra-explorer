@@ -119,7 +119,11 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
         pt.remove = () => this.removeAnnotation(id)
         this.managedAnnotations.push(pt)
         this.managedAnnotations$.next(this.managedAnnotations)
-
+        
+        /**
+         * force refresh of ng annotation
+         */
+        this.forceRefresh$.next(null)
         /**
          * deselect on selecting a point
          */
@@ -142,9 +146,9 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
        * evts which forces redraw of ng annotations
        */
       merge(
-        toolSelThenClick$,
         this.forceRefresh$,
       ).subscribe(() => {
+        console.log('emit... here?')
         let out: INgAnnotationTypes['point'][] = []
         for (const managedAnn of this.managedAnnotations) {
           if (managedAnn.space['@id'] === this.space['@id']) {

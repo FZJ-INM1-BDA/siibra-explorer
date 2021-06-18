@@ -7,7 +7,6 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode/annotationMode.component";
 import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
 import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
-import {AnnotationMessage} from "src/atlasComponents/userAnnotations/annotationMessage/annotationMessage.component";
 import { UserAnnotationToolModule } from "./tools/module";
 import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
 import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
@@ -32,7 +31,6 @@ import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
   declarations: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage,
     AnnotationSwitch,
     ImportAnnotation,
     ExportAnnotation,
@@ -49,7 +47,6 @@ import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
   exports: [
     AnnotationMode,
     AnnotationList,
-    AnnotationMessage,
     AnnotationSwitch
   ]
 })

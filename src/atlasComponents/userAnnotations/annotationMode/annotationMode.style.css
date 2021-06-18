@@ -1,7 +1,13 @@
-.annotation-toolbar {
-    z-index: 100;
-    width: 40px;
+.tab-toggle-container
+{
+  margin-left: -3rem;
+  padding-top: 0;
+  padding-bottom: 0;
 }
-.annotation-toolbar-content {
-    margin-bottom: 20px;
+
+.tab-toggle
+{
+  margin: 0.25rem -1rem 0.25rem 0rem;
+  padding-right: 1rem;
+  text-align: right;
 }

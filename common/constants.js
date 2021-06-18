@@ -60,15 +60,14 @@
     VIEWER_MODE_ANNOTATING: 'annotating',
 
     // Annotations
-    USER_ANNOTATION_VIEWER: 'user annotations viewer',
     USER_ANNOTATION_LIST: 'user annotations footer',
     USER_ANNOTATION_IMPORT: 'user annotations import',
     USER_ANNOTATION_EXPORT: 'user annotations export',
     USER_ANNOTATION_EXPORT_SINGLE: 'Export annotation',
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'Delete annotation',
-    GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest'
-
+    GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
+    EXIT_ANNOTATION_MODE: 'Exit annotation mode'
   }
 
   exports.IDS = {

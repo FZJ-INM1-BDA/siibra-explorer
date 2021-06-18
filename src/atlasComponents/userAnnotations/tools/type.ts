@@ -5,7 +5,9 @@ import { getUuid } from "src/util/fn"
 
 /**
  * base class to be extended by all annotation tools
+ * TODO perhaps split into drawing subclass/utility subclass
  */
+
 export abstract class AbsToolClass {
 
   public abstract name: string
@@ -153,16 +155,20 @@ export abstract class AbsToolClass {
   )
 }
 
-export type TToolType = 'translation' | 'drawing' | 'deletion'
+export type TToolType = 'selecting' | 'drawing' | 'deletion'
 
 export type TCallback = {
   paintingEnd: {
     callArg: {}
     returns: void
   }
+  requestManAnnStreeam: {
+    callArg: {}
+    returns: Observable<IAnnotationGeometry[]>
+  }
 }
 
-export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['callArg'] & { type: T }) => TCallback[T] | void
+export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['callArg'] & { type: T }) => TCallback[T]['returns'] | void
 
 export type TBaseAnnotationGeomtrySpec = {
   id?: string
@@ -229,7 +235,20 @@ export interface ISandsAnnotation {
   polyline: TSandsPolyLine
 }
 
-export abstract class IAnnotationGeometry {
+export abstract class Highlightable {
+
+  public highlighted = false
+  constructor(defaultFlag?: boolean){
+    if (typeof defaultFlag !== 'undefined') {
+      this.highlighted = defaultFlag
+    }
+  }
+  setHighlighted(flag: boolean){
+    this.highlighted = flag
+  }
+}
+
+export abstract class IAnnotationGeometry extends Highlightable {
   public id: string
   
   public name: string
@@ -249,6 +268,7 @@ export abstract class IAnnotationGeometry {
   public updateSignal$ = new Subject()
 
   constructor(spec?: TBaseAnnotationGeomtrySpec){
+    super()
     this.id = spec && spec.id || getUuid()
     this.space = spec?.space
     this.name = spec?.name

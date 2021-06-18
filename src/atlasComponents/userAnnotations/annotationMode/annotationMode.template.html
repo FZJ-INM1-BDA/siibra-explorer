@@ -1,41 +1,25 @@
-<div class="pe-all d-flex flex-column justify-content-content z-index-10 w-3em"
-    [iav-key-listener]="[{ type: 'keydown', key: 'Escape', target: 'document' }]"
-    (iav-key-event)="onKeydownHandler()">
+<mat-card class="d-inline-flex flex-column pe-all tab-toggle-container"
+    [iav-key-listener]="[{ type: 'keydown', key: 'Escape', target: 'document', capture: true }]"
+    (iav-key-event)="deselectTools()">
 
-    <mat-card class="d-flex flex-column flex-grow-0 panel-default p-0">
+    <button
+        *ngFor="let moduleAnnotType of moduleAnnotationTypes"
+        mat-button
+        class="tab-toggle"
+        (click)="moduleAnnotType.onClick()"
+        [color]="(moduleAnnotType.instance.toolSelected$ | async) ? 'primary' : 'basic'"
+        type="button">
+        <i [class]="moduleAnnotType.instance.iconClass"></i>
+    </button>
 
-        <div *ngFor="let type of ans.annotationTypes; let i = index; let last = last">
-            <button
-                    mat-icon-button
-                    type="button"
-                    (click)="selectAnnotationType(i)"
-                    class="mb-2 mt-2"
-                    [matTooltip]="type.name"
-                    [color]="selectedType === i? 'primary' : 'secondary'">
-                <i [ngClass]="type.class"></i>
-            </button>
-            <mat-divider *ngIf="last || type.action !== ans.annotationTypes[i+1].action"></mat-divider>
-        </div>
-        <button
-                mat-icon-button
-                (click)="ans.disable()"
-                type="button"
-                class="mb-2 mt-2"
-                matTooltip="Exit annotation mode"
-                color="warn">
-            <i class="fas fa-times"></i>
-        </button>
-        <div>
-            <mat-divider></mat-divider>
-            <button 
-                *ngFor="let moduleAnnotType of moduleAnnotationTypes"
-                mat-icon-button
-                (click)="moduleAnnotType.onClick()"
-                class="mt-2 mb-2"
-                [color]="(moduleAnnotType.instance.toolSelected$ | async) ? 'primary' : 'basic'"
-                type="button">
-                <i [class]="moduleAnnotType.instance.iconClass"></i>
-            </button>
-        </div>
-    </mat-card>
-</div>
+    <mat-divider class="d-block"></mat-divider>
+
+    <button
+        mat-button
+        (click)="exitAnnotationMode()"
+        class="tab-toggle"
+        [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
+        color="warn">
+        <i class="fas fa-times"></i>
+    </button>
+</mat-card>

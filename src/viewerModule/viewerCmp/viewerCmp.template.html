@@ -5,35 +5,45 @@
 
 <layout-floating-container [zIndex]="10">
 
-
   <!-- Annotation mode -->
   <div *ngIf="hideUi$ | async">
-
     <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
-                          [hasBackdrop]="false">
-      <mat-drawer #drawer [mode]="'push'" [disableClose]="true" class="box-shadow-none border-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
+      [hasBackdrop]="false">
+      <mat-drawer #annotationDrawer
+        [mode]="'push'"
+        [disableClose]="true"
+        class="box-shadow-none border-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
         <annotation-list></annotation-list>
       </mat-drawer>
-      <mat-drawer-content class="visible position-relative pe-none">
-        <!-- pullable tab top right corner -->
-        <div class="d-flex flex-column flex-nowrap w-100">
 
-          <!-- top left -->
-          <div class="flex-grow-1 d-flex flex-nowrap mb-2">
-            <div (click)="drawer.toggle()" class="mt-3">
-              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl;
-              context: {matColor: 'primary',fontIcon: 'fa-list',tooltip: 'Annotation list'}">
+
+      <mat-drawer-content class="visible position-relative pe-none">
+
+        <iav-layout-fourcorners>
+
+          <!-- pullable tab top right corner -->
+          <div iavLayoutFourCornersTopLeft class="mt-5">
+            <div>
+              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+                matColor: 'primary',
+                fontIcon: 'fa-list',
+                tooltip: 'Annotation list',
+                click: annotationDrawer.toggle.bind(annotationDrawer)
+              }">
               </ng-container>
             </div>
+  
+            <annotating-tools-panel class="z-index-10">
+            </annotating-tools-panel>
           </div>
-          <annotating-mode #annotationMode>
-          </annotating-mode>
-        </div>
+        </iav-layout-fourcorners>
+  
 
       </mat-drawer-content>
     </mat-drawer-container>
-    <annotation-message></annotation-message>
+    <!-- <annotation-message></annotation-message> -->
   </div>
+
   <!-- top drawer -->
   <mat-drawer-container
     [hidden]="hideUi$ | async"
@@ -632,27 +642,28 @@
 
 </ng-template>
 <ng-template #tabTmpl_defaultTmpl
-             let-matColor="matColor"
-             let-fontIcon="fontIcon"
-             let-customColor="customColor"
-             let-customColorDarkmode="customColorDarkmode"
-             let-tooltip="tooltip">
+  let-matColor="matColor"
+  let-fontIcon="fontIcon"
+  let-customColor="customColor"
+  let-customColorDarkmode="customColorDarkmode"
+  let-tooltip="tooltip"
+  let-click="click">
   <!-- (click)="sideNavMasterSwitch.toggle()" -->
   <button mat-raised-button
-          [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
-          [matTooltip]="tooltip"
-          class="pe-all tab-toggle"
-          [ngClass]="{
-        'darktheme': customColorDarkmode === true,
-        'lighttheme': customColorDarkmode === false
-      }"
-          [style.backgroundColor]="customColor"
+    [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
+    [matTooltip]="tooltip"
+    class="pe-all tab-toggle"
+    [ngClass]="{
+      'darktheme': customColorDarkmode === true,
+      'lighttheme': customColorDarkmode === false
+    }"
+    (click)="click && click()"
+    [style.backgroundColor]="customColor"
+    [color]="(!customColor && matColor) ? matColor : null">
 
-          [color]="(!customColor && matColor) ? matColor : null">
-
-      <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
-        <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
-      </span>
+    <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+      <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
+    </span>
   </button>
 </ng-template>
 

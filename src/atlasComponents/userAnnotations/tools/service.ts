@@ -15,6 +15,8 @@ import { PolyUpdateCmp } from './poly/poly.component'
 import { Point, ToolPoint } from "./point";
 import { PointUpdateCmp } from "./point/point.component";
 import { LineUpdateCmp } from "./line/line.component";
+import { ToolSelect } from "./select";
+import { ToolDelete } from "./delete";
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -94,9 +96,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private registeredTools: {
     name: string
     iconClass: string
+    toolInsance: AbsToolClass
     target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
-    onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
     onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
@@ -106,6 +108,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     case 'paintingEnd': {
       this.deselectTools()
       return
+    }
+    case 'requestManAnnStreeam': {
+      return this.managedAnnotations$
     }
     }
   }
@@ -124,7 +129,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     toolCls: ClassInterface<T>
     target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
-  }){
+  }): AbsToolClass{
     const { toolCls: Cls, target, editCmp } = arg
     const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as AbsToolClass & { ngOnDestroy?: Function }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
@@ -145,27 +150,35 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
     const toolSubscriptions: Subscription[] = []
 
-    toolSubscriptions.push(
-      newTool.allNgAnnotations$.subscribe(ann => {
-        this.ngAnnotations$.next({
-          tool: name,
-          annotations: ann
+    const { allNgAnnotations$, managedAnnotations$ } = newTool
+
+    if ( allNgAnnotations$ ) {
+      toolSubscriptions.push(
+        newTool.allNgAnnotations$.subscribe(ann => {
+          this.ngAnnotations$.next({
+            tool: name,
+            annotations: ann
+          })
+        }),
+      )
+    }
+    if ( managedAnnotations$ ){
+      toolSubscriptions.push(
+        managedAnnotations$.subscribe(ann => {
+          this.managedAnnotationsStream$.next({
+            annotations: ann,
+            tool: name
+          })
         })
-      }),
-      newTool.managedAnnotations$.subscribe(ann => {
-        this.managedAnnotationsStream$.next({
-          annotations: ann,
-          tool: name
-        })
-      })
-    )
+      )
+    }
 
     this.registeredTools.push({
       name,
       iconClass,
       target,
       editCmp,
-      onMouseMoveRenderPreview: onMouseMoveRenderPreview.bind(newTool),
+      toolInsance: newTool,
       onDestoryCallBack: () => {
         newTool.ngOnDestroy && newTool.ngOnDestroy()
         this.managedAnnotationsStream$.next({
@@ -175,6 +188,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         while(toolSubscriptions.length > 0) toolSubscriptions.pop().unsubscribe()
       }
     })
+
+    return newTool
   }
 
   /**
@@ -199,6 +214,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ){
 
+    const selTool = this.registerTool({
+      toolCls: ToolSelect
+    })
+    this.defaultTool = selTool
+
     this.registerTool({
       toolCls: ToolPoint,
       target: Point,
@@ -215,6 +235,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       toolCls: ToolPolygon,
       target: Polygon,
       editCmp: PolyUpdateCmp,
+    })
+
+    this.registerTool({
+      toolCls: ToolDelete
     })
 
     /**
@@ -345,8 +369,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           console.warn(`cannot find tool ${selectedToolName}`)
           return
         }
-        const { onMouseMoveRenderPreview } = selectedTool
-        const previewNgAnnotation = onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
+        const { toolInsance } = selectedTool
+        const previewNgAnnotation = toolInsance.onMouseMoveRenderPreview
+          ? toolInsance.onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
+          : []
 
         if (this.previewNgAnnIds.length !== previewNgAnnotation.length) {
           this.clearAllPreviewAnnotations()
@@ -505,7 +531,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }
 
   public getEditAnnotationCmp(annotation: IAnnotationGeometry): ClassInterface<any>{
-    const foundTool = this.registeredTools.find(t => annotation instanceof t.target)
+    const foundTool = this.registeredTools.find(t => t.target && annotation instanceof t.target)
     return foundTool && foundTool.editCmp
   }
 
@@ -522,14 +548,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
+  private defaultTool: AbsToolClass
   public deselectTools(){
 
-    // TODO refactor
     this.activeToolName = null
     this.annotnEvSubj.next({
       type: 'toolSelect',
       detail: {
-        name: null
+        name: this.defaultTool.name || null
       }
     })
   }
