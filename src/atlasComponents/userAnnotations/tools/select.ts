@@ -14,9 +14,9 @@ export class ToolSelect extends AbsToolClass implements IAnnotationTools, OnDest
   onMouseMoveRenderPreview(){
     return []
   }
-  removeAnnotation(){
 
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  removeAnnotation(){}
 
   managedAnnotations$ = new Subject<Point[]>()
   allNgAnnotations$ = new Subject<TNgAnnotationPoint[]>()
