@@ -1,4 +1,4 @@
-<!-- actions -->
+<!-- summary of geometry -->
 
 <span class="m-2 text-muted">
   Endpoints
@@ -6,12 +6,15 @@
 
 <mat-chip-list>
   <mat-chip *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
-    (click)="gotoPoint(point)">
+    (click)="gotoRoi(point)"
+    [matTooltip]="point">
     {{ i }}
   </mat-chip>
 </mat-chip-list>
 
 <mat-divider class="m-2"></mat-divider>
+
+<!-- actions -->
 
 <div class="d-flex">
 
@@ -21,6 +24,14 @@
     [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
     [matMenuTriggerFor]="exportMenu">
     <i class="fas fa-file-export"></i>
+  </button>
+
+  <!-- delete -->
+  <button mat-icon-button
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    (click)="remove()">
+    <i class="fas fa-trash"></i>
   </button>
 </div>
 

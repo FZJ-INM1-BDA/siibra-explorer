@@ -1,4 +1,4 @@
-import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord } from "./type";
+import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
 import { Point, TPointJsonSpec } from './point'
 import { OnDestroy } from "@angular/core";
 import { merge, Observable, Subject, Subscription } from "rxjs";
@@ -219,9 +219,10 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
   }
 
   constructor(
-    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
+    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
+    callback: TCallbackFunction
   ){
-    super(annotationEv$)
+    super(annotationEv$, callback)
     this.init()
     const toolDeselect$ = this.toolSelected$.pipe(
       filter(flag => !flag)
@@ -242,6 +243,34 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
        * on end tool select
        */
       toolDeselect$.subscribe(() => {
+
+        /**
+         * cleanup poly on tool deselect
+         */
+        if (this.selectedPoly) {
+
+          const { edges, points } = this.selectedPoly
+          /**
+           * check if closed. if not close, close it
+           */
+          if (edges.length > 0) {
+
+            if (edges[edges.length - 1].every(v => v !== 0)) {
+              this.selectedPoly.addPoint(
+                points[0],
+                points[points.length - 1]
+              )
+            }
+          }
+
+          /**
+           * if edges < 3, discard poly
+           */
+          if (edges.length < 3) {
+            this.removeAnnotation(this.selectedPoly.id)
+          }
+        }
+
         this.selectedPoly = null
         this.lastAddedPoint = null
       }),
@@ -260,19 +289,32 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
             space: this.space,
             '@type': 'siibra-ex/annotation/polyline'
           })
+          const { id } = this.selectedPoly
+          this.selectedPoly.remove = () => this.removeAnnotation(id)
           this.managedAnnotations.push(this.selectedPoly)
           this.managedAnnotations$.next(this.managedAnnotations)
-        }
+        } else {
 
-        let existingPoint: Point
-        if (ann.detail) {
-          const { pickedAnnotationId, pickedOffset } = ann.detail
-          const out = this.selectedPoly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset)
-          existingPoint = out?.point
+          if (ann.detail) {
+            const { pickedAnnotationId, pickedOffset } = ann.detail
+            const out = this.selectedPoly.parseNgAnnotationObj(pickedAnnotationId, pickedOffset)
+            const isFirstPoint = out?.point === this.selectedPoly.points[0]
+            if (isFirstPoint) {
+              this.selectedPoly.addPoint(
+                this.selectedPoly.points[0],
+                this.lastAddedPoint
+              )
+              this.callback({
+                type: 'paintingEnd',
+              })
+              return
+            }
+          }
+  
         }
 
         const addedPoint = this.selectedPoly.addPoint(
-          existingPoint || mouseev.detail.ngMouseEvent,
+          mouseev.detail.ngMouseEvent,
           this.lastAddedPoint
         )
         this.lastAddedPoint = addedPoint

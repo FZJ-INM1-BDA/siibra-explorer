@@ -1,32 +1,72 @@
-<div class="d-flex align-items center">
-  <button mat-icon-button
-    class="flex-grow-0 flex-shrink-0"
-    [attr.aria-label]="ARIA_LABELS.GOTO_ANNOTATION_ROI"
+<!-- summary of geometry -->
+
+<span class="m-2 text-muted">
+  Point
+</span>
+
+<mat-chip-list>
+  <mat-chip [matTooltip]="updateAnnotation"
     (click)="gotoRoi()">
-    <i [class]="POINT_ICON_CLASS"></i>
+    0
+  </mat-chip>
+</mat-chip-list>
+
+<mat-divider class="m-2"></mat-divider>
+
+<!-- actions -->
+
+<div class="d-flex">
+
+  <!-- export -->
+  <button mat-icon-button
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [matMenuTriggerFor]="exportMenu">
+    <i class="fas fa-file-export"></i>
   </button>
 
-  <div class="flex-grow-1 flex-shrink-1">
-    <mat-form-field class="w-100">
-      <mat-label>
-        {{ annotationLabel }}
-      </mat-label>
-
-      <textarea matInput
-        disabled="true"
-        #copyTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
-
-      <!-- copy to clipboard button -->
-      <button mat-icon-button
-        matSuffix
-        iav-stop="click"
-        aria-label="Copy to clipboard"
-        matTooltip="Copy to clipboard."
-        (click)="copyToClipboard(copyValue)"
-        *ngIf="showCopyBtn && !!copyTarget"
-        color="basic">
-        <i class="fas fa-copy"></i>
-      </button>
-    </mat-form-field>
-  </div>
+  <!-- delete -->
+  <button mat-icon-button
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    (click)="remove()">
+    <i class="fas fa-trash"></i>
+  </button>
 </div>
+
+<mat-menu #exportMenu="matMenu" xPosition="before">
+  <div class="iv-custom-comp card text"
+    iav-stop="click">
+
+    <div class="d-flex">
+      <button *ngFor="let format of viableFormats"
+        (click)="setFormat(format)"
+        mat-flat-button
+        [color]="useFormat === format ? 'primary' : ''">
+        {{ format }}
+      </button>
+    </div>
+
+    <div class="iv-custom-comp text">
+      <mat-form-field>
+        <mat-label>
+          {{ useFormat }}
+        </mat-label>
+        <textarea
+          disabled="true"
+          matInput
+          #exportTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
+
+        <button mat-icon-button
+          matSuffix
+          iav-stop="click"
+          aria-label="Copy to clipboard"
+          matTooltip="Copy to clipboard."
+          (click)="copyToClipboard(exportTarget.value)"
+          color="basic">
+          <i class="fas fa-copy"></i>
+        </button>
+      </mat-form-field>
+    </div>
+  </div>
+</mat-menu>

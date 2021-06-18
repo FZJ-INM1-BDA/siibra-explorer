@@ -3,7 +3,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { map, switchMap, filter } from "rxjs/operators";
+import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
@@ -374,21 +374,35 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     )
 
     /**
-     * on tool managed annotations update, update annotations
+     * on tool managed annotations update
      */
+    const managedAnnotationUpdate$ = combineLatest([
+      this.forcedAnnotationRefresh$,
+      this.ngAnnotations$.pipe(
+        switchMap(switchMapWaitFor({
+          condition: () => !!this.ngAnnotationLayer,
+          leading: true
+        })),
+        scanCollapse(),
+      )
+    ]).pipe(
+      map(([_, ngAnnos]) => ngAnnos),
+      shareReplay(1),
+    )
     this.subscription.push(
-      combineLatest([
-        this.forcedAnnotationRefresh$,
-        this.ngAnnotations$.pipe(
-          switchMap(switchMapWaitFor({
-            condition: () => !!this.ngAnnotationLayer,
-            leading: true
-          })),
-          scanCollapse(),
-        )
-      ]).pipe(
-        map(([_, ngAnnos]) => ngAnnos),
-      ).subscribe(arr => {
+      // delete removed annotations
+      managedAnnotationUpdate$.pipe(
+        pairwise(),
+        filter(([ oldAnn, newAnn ]) => newAnn.length < oldAnn.length),
+      ).subscribe(([ oldAnn, newAnn ]) => {
+        const newAnnIdSet = new Set(newAnn.map(ann => ann.id))
+        const outs = oldAnn.filter(ann => !newAnnIdSet.has(ann.id))
+        for (const out of outs){
+          this.deleteNgAnnotationById(out.id)
+        }
+      }), 
+      //update annotations
+      managedAnnotationUpdate$.subscribe(arr => {
         const ignoreNgAnnIdsSet = new Set<string>()
         for (const hiddenAnnot of this.hiddenAnnotations) {
           const ids = hiddenAnnot.getNgAnnotationIds()

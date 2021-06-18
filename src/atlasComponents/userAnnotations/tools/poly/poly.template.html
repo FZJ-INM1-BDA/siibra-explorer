@@ -1,37 +1,73 @@
-<div class="d-flex align-items-center">
+<!-- summary of geometry -->
+
+<span class="m-2 text-muted">
+  Vertices
+</span>
+
+<mat-chip-list>
+  <mat-chip *ngFor="let point of (updateAnnotation?.points || []); let i = index"
+    (click)="gotoRoi(point)"
+    [matTooltip]="point">
+    {{ i }}
+  </mat-chip>
+</mat-chip-list>
+
+<mat-divider class="m-2"></mat-divider>
+
+<!-- actions -->
+
+<div class="d-flex">
+
+  <!-- export -->
   <button mat-icon-button
-    class="flex-grow-0 flex-shrink-0"
-    [attr.aria-label]="ARIA_LABELS.GOTO_ANNOTATION_ROI"
-    (click)="gotoRoi()">
-    <i [class]="POLY_ICON_CLASS"></i>
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [matMenuTriggerFor]="exportMenu">
+    <i class="fas fa-file-export"></i>
   </button>
-
-  <div class="flex-grow-1 flex-shrink-1">
-    <mat-form-field class="w-100">
-      <mat-label>
-        {{ annotationLabel }}
-      </mat-label>
   
-      <textarea matInput
-        disabled="true"
-        #copyTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
-
-      <button mat-icon-button
-        matSuffix
-        iav-stop="click"
-        aria-label="Copy to clipboard"
-        matTooltip="Copy to clipboard."
-        (click)="copyToClipboard(copyValue)"
-        color="basic">
-        <i class="fas fa-copy"></i>
-      </button>
-    </mat-form-field>
-  </div>
+  <!-- delete -->
+  <button mat-icon-button
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_DELETE"
+    (click)="remove()">
+    <i class="fas fa-trash"></i>
+  </button>
 </div>
 
-<point-update-cmp
-  *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
-  class="pl-4"
-  [annotation-label]="'Point ' + ( i + 1 )"
-  [update-annotation]="point">
-</point-update-cmp>
+<mat-menu #exportMenu="matMenu" xPosition="before">
+  <div class="iv-custom-comp card text"
+    iav-stop="click">
+
+    <div class="d-flex">
+      <button *ngFor="let format of viableFormats"
+        (click)="setFormat(format)"
+        mat-flat-button
+        [color]="useFormat === format ? 'primary' : ''">
+        {{ format }}
+      </button>
+    </div>
+
+    <div class="iv-custom-comp text">
+      <mat-form-field>
+        <mat-label>
+          {{ useFormat }}
+        </mat-label>
+        <textarea
+          disabled="true"
+          matInput
+          #exportTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
+
+        <button mat-icon-button
+          matSuffix
+          iav-stop="click"
+          aria-label="Copy to clipboard"
+          matTooltip="Copy to clipboard."
+          (click)="copyToClipboard(exportTarget.value)"
+          color="basic">
+          <i class="fas fa-copy"></i>
+        </button>
+      </mat-form-field>
+    </div>
+  </div>
+</mat-menu>

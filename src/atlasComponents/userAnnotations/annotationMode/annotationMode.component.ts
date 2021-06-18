@@ -1,7 +1,7 @@
 import {Component, HostListener, Inject, OnDestroy, OnInit, Optional} from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {ARIA_LABELS, CONST} from "common/constants";
-import { merge, Observable, Subscription} from "rxjs";
+import { ARIA_LABELS } from "common/constants";
+import { Observable, Subscription} from "rxjs";
 import {getUuid} from "src/util/fn";
 import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 import {buffer, debounceTime, distinctUntilChanged, filter, map, switchMapTo, take, takeUntil, tap} from "rxjs/operators";

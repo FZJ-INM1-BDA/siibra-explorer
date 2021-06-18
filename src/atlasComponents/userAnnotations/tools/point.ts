@@ -109,14 +109,20 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
       toolSelThenClick$.subscribe(ev => {
         const {x, y, z} = ev.detail.ngMouseEvent
         const { space } = this
-        this.managedAnnotations.push(
-          new Point({
-            x, y, z,
-            space,
-            '@type': 'siibra-ex/annotatoin/point'
-          })
-        )
+        const pt = new Point({
+          x, y, z,
+          space,
+          '@type': 'siibra-ex/annotatoin/point'
+        })
+        const { id } = pt
+        pt.remove = () => this.removeAnnotation(id)
+        this.managedAnnotations.push(pt)
         this.managedAnnotations$.next(this.managedAnnotations)
+
+        /**
+         * deselect on selecting a point
+         */
+        this.callback({ type: 'paintingEnd' })
       }),
 
       /**

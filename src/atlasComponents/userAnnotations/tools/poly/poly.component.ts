@@ -6,7 +6,9 @@ import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "..
 import { Clipboard } from "@angular/cdk/clipboard";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
+import { Point } from "../point";
+import { ARIA_LABELS } from 'common/constants'
+import { ComponentStore } from "src/viewerModule/componentStore";
 
 @Component({
   selector: 'poly-update-cmp',
@@ -20,22 +22,29 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
   @Input('update-annotation')
   public updateAnnotation: Polygon
 
-  public annotationLabel = 'Polygon'
+  public ARIA_LABELS = ARIA_LABELS
   public POLY_ICON_CLASS = POLY_ICON_CLASS
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef
 
   public useFormat: TExportFormats = 'string'
-  private sub: Subscription[] = []
 
   constructor(
     private store: Store<any>,
     snackbar: MatSnackBar,
     clipboard: Clipboard,
+    cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
-    super(clipboard, snackbar)
+    super(clipboard, snackbar, cStore)
+    if (this.cStore) {
+      this.sub.push(
+        this.cStore.select(store => store.useFormat).subscribe((val: TExportFormats) => {
+          this.useFormat = val
+        })
+      )
+    }
 
     if (updateAnnotation) {
       if (updateAnnotation instanceof Polygon) {
@@ -52,10 +61,26 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
     return this.copyTarget && this.copyTarget.nativeElement.value
   }
 
-  gotoRoi(){
+  gotoRoi(roi?: IAnnotationGeometry){
     if (!this.updateAnnotation) {
       throw new Error(`updateAnnotation undefined`)
     }
+
+    if (roi && roi instanceof Point) {
+      const { x, y, z } = roi
+
+      this.store.dispatch(
+        viewerStateChangeNavigation({
+          navigation: {
+            position: [x, y, z],
+            positionReal: true,
+            animation: {}
+          }
+        })
+      )
+      return
+    }
+
     if (this.updateAnnotation.points.length < 1) {
       this.snackbar.open('No points added to polygon yet.', 'Dismiss', {
         duration: 3000
@@ -73,5 +98,9 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
         }
       })
     )
+  }
+
+  remove(){
+    this.updateAnnotation?.remove()
   }
 }

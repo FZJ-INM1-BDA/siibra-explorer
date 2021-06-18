@@ -6,7 +6,8 @@ import { Clipboard } from "@angular/cdk/clipboard";
 import { ToolCmpBase } from "../toolCmp.base";
 import { Store } from "@ngrx/store";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
-import { Subscription } from "rxjs";
+import { ComponentStore } from "src/viewerModule/componentStore";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'point-update-cmp',
@@ -18,19 +19,11 @@ import { Subscription } from "rxjs";
 
 export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
 
+  public ARIA_LABELS = ARIA_LABELS
   public POINT_ICON_CLASS = POINT_ICON_CLASS
 
   @Input('update-annotation')
   updateAnnotation: Point
-
-  @Input('annotation-label')
-  annotationLabel = 'Point'
-
-  @Input('show-copy-button')
-  showCopyBtn = true
-
-  private sub: Subscription[] = []
-  public useFormat: TExportFormats = 'string'
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef
@@ -39,9 +32,10 @@ export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
     private store: Store<any>,
     snackbar: MatSnackBar,
     clipboard: Clipboard,
+    cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
-    super(clipboard, snackbar)
+    super(clipboard, snackbar, cStore)
     
     if (updateAnnotation) {
       if (updateAnnotation instanceof Point) {
@@ -75,4 +69,7 @@ export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
     )
   }
 
+  remove(){
+    this.updateAnnotation?.remove()
+  }
 }

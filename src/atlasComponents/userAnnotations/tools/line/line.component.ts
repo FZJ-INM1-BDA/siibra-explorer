@@ -1,7 +1,6 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
 import { Line, LINE_ICON_CLASS } from "../line";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
@@ -24,46 +23,24 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
   public updateAnnotation: Line
 
   public ARIA_LABELS = ARIA_LABELS
-
-  public annotationLabel = 'Line'
   public LINE_ICON_CLASS = LINE_ICON_CLASS
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef
 
-  public useFormat: TExportFormats = 'json'
-  private sub: Subscription[] = []
-
   constructor(
     private store: Store<any>,
     snackbar: MatSnackBar,
     clipboard: Clipboard,
-    private cStore: ComponentStore<{ useFormat: TExportFormats }>,
+    cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
-    super(clipboard, snackbar)
-    if (this.cStore) {
-      this.sub.push(
-        this.cStore.select(store => store.useFormat).subscribe((val: TExportFormats) => {
-          this.useFormat = val
-        })
-      )
-    }
+    super(clipboard, snackbar, cStore)
 
     if (updateAnnotation) {
       if (updateAnnotation instanceof Line) {
         this.updateAnnotation = updateAnnotation
       }
-    }
-  }
-
-  public viableFormats: TExportFormats[] = ['json', 'sands']
-
-  setFormat(format: TExportFormats){
-    if (this.cStore) {
-      this.cStore.setState({
-        useFormat: format
-      })
     }
   }
 
@@ -79,6 +56,22 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
     if (!this.updateAnnotation && !roi) {
       throw new Error(`updateAnnotation undefined`)
     }
+
+    if (roi && roi instanceof Point) {
+      const { x, y, z } = roi
+
+      this.store.dispatch(
+        viewerStateChangeNavigation({
+          navigation: {
+            position: [x, y, z],
+            positionReal: true,
+            animation: {}
+          }
+        })
+      )
+      return
+    }
+
     if (this.updateAnnotation.points.length < 1) {
       this.snackbar.open('No points added to polygon yet.', 'Dismiss', {
         duration: 3000
@@ -98,18 +91,7 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
     )
   }
 
-  gotoPoint(point: Point){
-    if (!point) throw new Error(`Point is not defined.`)
-    const { x, y, z } = point
-
-    this.store.dispatch(
-      viewerStateChangeNavigation({
-        navigation: {
-          position: [x, y, z],
-          positionReal: true,
-          animation: {}
-        }
-      })
-    )
+  remove(){
+    this.updateAnnotation?.remove()
   }
 }

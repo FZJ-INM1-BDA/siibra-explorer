@@ -190,6 +190,13 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
        * on end tool select
        */
       toolDeselect$.subscribe(() => {
+        /**
+         * if line is not completed by tool deselect
+         * it only has a single point, and should be removed
+         */
+        if (this.selectedLine) {
+          this.removeAnnotation(this.selectedLine.id)
+        }
         this.selectedLine = null
       }),
       /**
@@ -206,12 +213,13 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
             "@type": 'siibra-ex/annotation/line',
             points: []
           })
+          const { id } = this.selectedLine
+          this.selectedLine.remove = () => this.removeAnnotation(id)
           this.selectedLine.addLinePoints(crd)
           this.managedAnnotations.push(this.selectedLine)
           this.managedAnnotations$.next(this.managedAnnotations)
         } else {
 
-          // ToDo Tool Should Be Deselected.
           this.selectedLine.addLinePoints(crd)
           this.selectedLine = null
 

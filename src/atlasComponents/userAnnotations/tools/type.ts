@@ -243,6 +243,9 @@ export abstract class IAnnotationGeometry {
   abstract toString(): string
   abstract toSands(): ISandsAnnotation[keyof ISandsAnnotation]
 
+  public remove() {
+    throw new Error(`The remove method needs to be overwritten by the tool manager`)
+  }
   public updateSignal$ = new Subject()
 
   constructor(spec?: TBaseAnnotationGeomtrySpec){
