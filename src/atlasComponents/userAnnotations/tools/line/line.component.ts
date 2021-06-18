@@ -1,46 +1,69 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Polygon, POLY_ICON_CLASS } from "../poly";
+import { Store } from "@ngrx/store";
+import { Subscription } from "rxjs";
+import { Line, LINE_ICON_CLASS } from "../line";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
-import { Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
+import { Point } from "../point";
+import { ARIA_LABELS } from 'common/constants'
+import { ComponentStore } from "src/viewerModule/componentStore";
 
 @Component({
-  selector: 'poly-update-cmp',
-  templateUrl: './poly.template.html',
+  selector: 'line-update-cmp',
+  templateUrl: './line.template.html',
   styleUrls: [
-    './poly.style.css',
+    './line.style.css'
   ]
 })
 
-export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
+export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
   @Input('update-annotation')
-  public updateAnnotation: Polygon
+  public updateAnnotation: Line
 
-  public annotationLabel = 'Polygon'
-  public POLY_ICON_CLASS = POLY_ICON_CLASS
+  public ARIA_LABELS = ARIA_LABELS
+
+  public annotationLabel = 'Line'
+  public LINE_ICON_CLASS = LINE_ICON_CLASS
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef
 
-  public useFormat: TExportFormats = 'string'
+  public useFormat: TExportFormats = 'json'
   private sub: Subscription[] = []
 
   constructor(
     private store: Store<any>,
     snackbar: MatSnackBar,
     clipboard: Clipboard,
+    private cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
     super(clipboard, snackbar)
+    if (this.cStore) {
+      this.sub.push(
+        this.cStore.select(store => store.useFormat).subscribe((val: TExportFormats) => {
+          this.useFormat = val
+        })
+      )
+    }
 
     if (updateAnnotation) {
-      if (updateAnnotation instanceof Polygon) {
+      if (updateAnnotation instanceof Line) {
         this.updateAnnotation = updateAnnotation
       }
+    }
+  }
+
+  public viableFormats: TExportFormats[] = ['json', 'sands']
+
+  setFormat(format: TExportFormats){
+    if (this.cStore) {
+      this.cStore.setState({
+        useFormat: format
+      })
     }
   }
 
@@ -52,8 +75,8 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
     return this.copyTarget && this.copyTarget.nativeElement.value
   }
 
-  gotoRoi(){
-    if (!this.updateAnnotation) {
+  gotoRoi(roi?: IAnnotationGeometry){
+    if (!this.updateAnnotation && !roi) {
       throw new Error(`updateAnnotation undefined`)
     }
     if (this.updateAnnotation.points.length < 1) {
@@ -64,6 +87,21 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
     }
     const { x, y, z } = this.updateAnnotation.points[0]
     
+    this.store.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          position: [x, y, z],
+          positionReal: true,
+          animation: {}
+        }
+      })
+    )
+  }
+
+  gotoPoint(point: Point){
+    if (!point) throw new Error(`Point is not defined.`)
+    const { x, y, z } = point
+
     this.store.dispatch(
       viewerStateChangeNavigation({
         navigation: {

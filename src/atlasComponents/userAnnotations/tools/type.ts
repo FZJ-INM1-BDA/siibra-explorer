@@ -1,5 +1,5 @@
 import { InjectionToken } from "@angular/core"
-import { merge, Observable, of, Subject } from "rxjs"
+import { merge, Observable, of, Subject, Subscription } from "rxjs"
 import { filter, map, mapTo, pairwise, switchMap, switchMapTo, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { getUuid } from "src/util/fn"
 
@@ -14,12 +14,8 @@ export abstract class AbsToolClass {
   public abstract removeAnnotation(id: string): void
   public abstract managedAnnotations$: Observable<IAnnotationGeometry[]>
 
-  /**
-   * @description to be overwritten by subclass. Check if a given annotation is relevant to the tool. Used for filtering annotations.
-   * @param {TNgAnnotationEv} annotation
-   * @returns {boolean} if annotation is relevant to this tool
-   */
-  public abstract ngAnnotationIsRelevant(hoverEv: TNgAnnotationEv): boolean
+  abstract subs: Subscription[]
+  protected space: TBaseAnnotationGeomtrySpec['space']
 
   /**
    * @description to be overwritten by subclass. Emit the latest representation of NgAnnotations from the tool.
@@ -27,16 +23,25 @@ export abstract class AbsToolClass {
   public abstract allNgAnnotations$: Observable<INgAnnotationTypes[keyof INgAnnotationTypes][]>
 
   /**
-   * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active. 
-   * @param {[number, number, number]} mousepos 
+   * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active.
+   * @param {[number, number, number]} mousepos
    * @returns {INgAnnotationTypes[keyof INgAnnotationTypes][]} Array of NgAnnotation to be rendered.
    */
   public abstract onMouseMoveRenderPreview(mousepos: [number, number, number]): INgAnnotationTypes[keyof INgAnnotationTypes][]
 
   constructor(
-    protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
+    protected annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
+    protected callback?: TCallbackFunction
   ){
 
+  }
+
+  init(){
+    this.subs.push(
+      this.metadataEv$.subscribe(ev => {
+        this.space = ev.detail.space
+      })
+    )
   }
 
   public toolSelected$ = this.annotationEv$.pipe(
@@ -75,10 +80,10 @@ export abstract class AbsToolClass {
    * on mouseover, then drag annotation
    * use mousedown as obs src, since hoverAnnotation$ is a bit trigger happy
    * check if there is a hit on mousedown trigger
-   * 
+   *
    * if true - stop mousedown propagation, switchmap to mousemove
-   * if false - 
-   * 
+   * if false -
+   *
    */
   protected dragHoveredAnnotation$: Observable<{
     startNgX: number
@@ -120,9 +125,9 @@ export abstract class AbsToolClass {
    * otherwise, pairwise confuses last drag event and first drag event
    */
   protected dragHoveredAnnotationsDelta$: Observable<{
-    ann: TAnnotationEvent<"hoverAnnotation">,
-    deltaX: number,
-    deltaY: number,
+    ann: TAnnotationEvent<"hoverAnnotation">
+    deltaX: number
+    deltaY: number
     deltaZ: number
   }> = merge(
     of(null),
@@ -149,6 +154,15 @@ export abstract class AbsToolClass {
 }
 
 export type TToolType = 'translation' | 'drawing' | 'deletion'
+
+export type TCallback = {
+  paintingEnd: {
+    callArg: {}
+    returns: void
+  }
+}
+
+export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['callArg'] & { type: T }) => TCallback[T] | void
 
 export type TBaseAnnotationGeomtrySpec = {
   id?: string
@@ -322,7 +336,3 @@ export interface ClassInterface<T> {
 }
 
 export type TExportFormats = 'sands' | 'json' | 'string'
-
-export const EXPORT_FORMAT_INJ_TOKEN = new InjectionToken<
-  Observable<TExportFormats>
->('EXPORT_FORMAT_INJ_TOKEN')

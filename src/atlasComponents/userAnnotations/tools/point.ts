@@ -79,10 +79,8 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
   public name = 'Point'
   public toolType: TToolType = 'drawing'
   public iconClass = POINT_ICON_CLASS
-
-  private space: TBaseAnnotationGeomtrySpec['space']
   
-  private subs: Subscription[] = []
+  public subs: Subscription[] = []
   private managedAnnotations: Point[] = []
   public managedAnnotations$ = new Subject<Point[]>()
   public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
@@ -92,7 +90,7 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
   ){
     super(annotationEv$)
-
+    this.init()
     const toolDeselect$ = this.toolSelected$.pipe(
       filter(flag => !flag)
     )
@@ -105,12 +103,6 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
     )
 
     this.subs.push(
-      /**
-       * subscribe to space event space info
-       */
-      this.metadataEv$.subscribe(ev => {
-        this.space = ev.detail.space
-      }),
       /**
        * listen to click ev, add point when it occurrs
        */
@@ -157,8 +149,15 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
     )
   }
 
+  /**
+   * @description remove managed annotation via id
+   * @param id id of annotation
+   */
   removeAnnotation(id: string) {
+    const idx = this.managedAnnotations.findIndex(ann => id === ann.id)
 
+    this.managedAnnotations.splice(idx, 1)
+    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
@@ -168,10 +167,6 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
       type: 'point',
       description: ''
     }] as INgAnnotationTypes['point'][]
-  }
-
-  ngAnnotationIsRelevant(annotation: TNgAnnotationEv){
-    return this.managedAnnotations.some(p => p.id === annotation.pickedAnnotationId)
   }
 
   ngOnDestroy(){

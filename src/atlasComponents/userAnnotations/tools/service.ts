@@ -8,11 +8,13 @@ import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector 
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { Polygon, ToolPolygon } from "./poly";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats, TCallbackFunction } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
+import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
 import { PolyUpdateCmp } from './poly/poly.component'
 import { Point, ToolPoint } from "./point";
 import { PointUpdateCmp } from "./point/point.component";
+import { LineUpdateCmp } from "./line/line.component";
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -91,13 +93,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private registeredTools: {
     name: string
-    iconClass: string,
-    target?: ClassInterface<IAnnotationGeometry>,
-    editCmp?: ClassInterface<any>,
+    iconClass: string
+    target?: ClassInterface<IAnnotationGeometry>
+    editCmp?: ClassInterface<any>
     onMouseMoveRenderPreview: (pos: [number, number, number]) => INgAnnotationTypes[keyof INgAnnotationTypes][]
     onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
+
+  private handleToolCallback: TCallbackFunction = arg => {
+    switch (arg.type) {
+    case 'paintingEnd': {
+      this.deselectTools()
+      return
+    }
+    }
+  }
 
   /**
    * @description register new annotation tool
@@ -110,12 +121,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    * }} arg 
    */
   private registerTool<T extends AbsToolClass>(arg: {
-    toolCls: ClassInterface<T>,
-    target?: ClassInterface<IAnnotationGeometry>,
+    toolCls: ClassInterface<T>
+    target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
   }){
     const { toolCls: Cls, target, editCmp } = arg
-    const newTool = new Cls(this.annotnEvSubj) as AbsToolClass & { ngOnDestroy?: Function }
+    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as AbsToolClass & { ngOnDestroy?: Function }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({
@@ -167,7 +178,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }
 
   /**
-   * 
+   *
    * @description deregister tool. Calls any necessary clean up function
    * @param name name of the tool to be deregistered
    * @returns void
@@ -181,8 +192,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
-  public exportFormat$ = new BehaviorSubject<TExportFormats>('string')
-
   constructor(
     store: Store<any>,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
@@ -194,6 +203,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       toolCls: ToolPoint,
       target: Point,
       editCmp: PointUpdateCmp,
+    })
+
+    this.registerTool({
+      toolCls: ToolLine,
+      target: Line,
+      editCmp: LineUpdateCmp,
     })
 
     this.registerTool({
@@ -210,7 +225,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         switchMap(el => {
           if (!el) return of(null)
           return merge(...(
-            ['mousedown', 'mouseup', 'mousemove'].map(type => 
+            ['mousedown', 'mouseup', 'mousemove'].map(type =>
               fromEvent(el, type, { capture: true }).pipe(
                 map((ev: MouseEvent) => {
                   return {
@@ -290,7 +305,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         switchMap(v => v?.mousePosInReal$ || of(null))
       ).subscribe(v => this.mousePosReal = v)
     )
-    
+
     /**
      * on mouse move, render preview annotation
      */
@@ -316,7 +331,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             })
           )
         })
-      ).subscribe((ev: { 
+      ).subscribe((ev: {
         selectedToolName: string
         ngMouseEvent: {x: number, y: number, z: number}
       }) => {
@@ -332,7 +347,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         }
         const { onMouseMoveRenderPreview } = selectedTool
         const previewNgAnnotation = onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
-  
+
         if (this.previewNgAnnIds.length !== previewNgAnnotation.length) {
           this.clearAllPreviewAnnotations()
         }
@@ -433,7 +448,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         } else {
           if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(false)
         }
-      })  
+      })
     )
 
     /**

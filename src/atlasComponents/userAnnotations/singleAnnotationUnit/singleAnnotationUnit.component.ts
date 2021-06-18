@@ -1,13 +1,14 @@
 import { AfterViewInit, Component, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, Pipe, PipeTransform, ViewChild, ViewContainerRef } from "@angular/core";
-import { EXPORT_FORMAT_INJ_TOKEN, IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../tools/type";
+import { IAnnotationGeometry, UDPATE_ANNOTATION_TOKEN } from "../tools/type";
 import { Point } from '../tools/point'
 import { Polygon } from '../tools/poly'
 import { FormControl, FormGroup } from "@angular/forms";
-import { Observable, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 import { select, Store } from "@ngrx/store";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Line } from "../tools/line";
 
 @Component({
   selector: 'single-annotation-unit',
@@ -59,7 +60,7 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
     private snackbar: MatSnackBar,
     private svc: ModularUserAnnotationToolService,
     private cfr: ComponentFactoryResolver,
-    @Optional() @Inject(EXPORT_FORMAT_INJ_TOKEN) private useFormat$: Observable<TExportFormats>,
+    private injector: Injector,
   ){
     this.subs.push(
       store.pipe(
@@ -81,18 +82,19 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
     if (this.managedAnnotation && this.editAnnotationVCR) {
       const editCmp = this.svc.getEditAnnotationCmp(this.managedAnnotation)
       if (!editCmp) {
-        this.snackbar.open(`Update component not found!`)
+        this.snackbar.open(`Update component not found!`, 'Dismiss', {
+          duration: 3000
+        })
         throw new Error(`Edit component not found!`)
       }
       const cf = this.cfr.resolveComponentFactory(editCmp)
+      
       const injector = Injector.create({
         providers: [{
           provide: UDPATE_ANNOTATION_TOKEN,
           useValue: this.managedAnnotation
-        }, {
-          provide: EXPORT_FORMAT_INJ_TOKEN,
-          useValue: this.useFormat$
-        }]
+        }],
+        parent: this.injector
       })
       this.editAnnotationVCR.createComponent(cf, null, injector)
     }
@@ -114,6 +116,7 @@ export class SingleAnnotationNamePipe implements PipeTransform{
     if (name) return name
     if (ann instanceof Polygon) return `Unnamed Polygon`
     if (ann instanceof Point) return `Unname Point`
+    if (ann instanceof Line) return `Unnamed Line`
     return `Unnamed geometry`
   }
 }
@@ -127,6 +130,7 @@ export class SingleAnnotationClsIconPipe implements PipeTransform{
   public transform(ann: IAnnotationGeometry): string{
     if (ann instanceof Polygon) return `fas fa-draw-polygon`
     if (ann instanceof Point) return `fas fa-circle`
+    if (ann instanceof Line) return `fas fa-slash`
     return `fas fa-mouse-pointer`
   }
 }
