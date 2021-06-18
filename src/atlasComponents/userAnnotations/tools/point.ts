@@ -1,4 +1,4 @@
-import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TNgAnnotationEv, TSandsPoint, TToolType } from "./type";
+import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TCallbackFunction, TNgAnnotationEv, TSandsPoint, TToolType } from "./type";
 import { merge, Observable, Subject, Subscription } from "rxjs";
 import { OnDestroy } from "@angular/core";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
@@ -87,9 +87,10 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
   private forceRefresh$ = new Subject()
 
   constructor(
-    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>
+    annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
+    callback: TCallbackFunction
   ){
-    super(annotationEv$)
+    super(annotationEv$, callback)
     this.init()
     const toolDeselect$ = this.toolSelected$.pipe(
       filter(flag => !flag)
