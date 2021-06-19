@@ -9,6 +9,12 @@ import { PolyUpdateCmp } from "./poly/poly.component";
 import { ModularUserAnnotationToolService } from "./service";
 import { ToFormattedStringPipe } from "./toFormattedString.pipe";
 import { ANNOTATION_EVENT_INJ_TOKEN } from "./type";
+import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
+
+import { Point, ToolPoint } from "./point";
+import { ToolSelect } from "./select";
+import { ToolDelete } from "./delete";
+import { Polygon, ToolPolygon } from "./poly";
 
 @NgModule({
   imports: [
@@ -38,6 +44,32 @@ import { ANNOTATION_EVENT_INJ_TOKEN } from "./type";
 
 export class UserAnnotationToolModule {
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor(_svc: ModularUserAnnotationToolService){}
+  constructor(svc: ModularUserAnnotationToolService){
+    const selTool = svc.registerTool({
+      toolCls: ToolSelect
+    })
+    svc.defaultTool = selTool
+
+    svc.registerTool({
+      toolCls: ToolPoint,
+      target: Point,
+      editCmp: PointUpdateCmp,
+    })
+
+    svc.registerTool({
+      toolCls: ToolLine,
+      target: Line,
+      editCmp: LineUpdateCmp,
+    })
+
+    svc.registerTool({
+      toolCls: ToolPolygon,
+      target: Polygon,
+      editCmp: PolyUpdateCmp,
+    })
+
+    svc.registerTool({
+      toolCls: ToolDelete
+    })
+  }
 }

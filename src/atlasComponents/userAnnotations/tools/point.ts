@@ -7,7 +7,7 @@ export type TPointJsonSpec = {
   x: number
   y: number
   z: number
-  '@type': 'siibra-ex/annotatoin/point'
+  '@type': 'siibra-ex/annotation/point'
 } & TBaseAnnotationGeomtrySpec
 
 export class Point extends IAnnotationGeometry {
@@ -31,7 +31,7 @@ export class Point extends IAnnotationGeometry {
   }
   toJSON(): TPointJsonSpec{
     const { id, x, y, z, space, name, desc } = this
-    return { id, x, y, z, space, name, desc, '@type': 'siibra-ex/annotatoin/point' }
+    return { id, x, y, z, space, name, desc, '@type': 'siibra-ex/annotation/point' }
   }
 
   getNgAnnotationIds(){
@@ -46,6 +46,33 @@ export class Point extends IAnnotationGeometry {
   }
   static fromJSON(json: TPointJsonSpec) {
     return new Point(json)
+  }
+
+  static fromSANDS(sands: TSandsPoint): Point {
+    const {
+      "@id": id,
+      "@type": type,
+      coordinateSpace,
+      coordinates
+    } = sands
+    if (type === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
+      const parsedCoordinate = coordinates.map(coord => {
+        const { value, unit } = coord
+        if (unit["@id"] !== 'id.link/mm') throw new Error(`Unit does not parse`)
+        return value * 1e6
+      })
+      const point = new Point({
+        id,
+        space: coordinateSpace,
+        "@type": 'siibra-ex/annotation/point',
+        x: parsedCoordinate[0],
+        y: parsedCoordinate[1],
+        z: parsedCoordinate[2],
+      })
+      return point
+    }
+
+    throw new Error(`cannot parse sands for points, @type mismatch`)
   }
 
   toString(){
@@ -74,7 +101,7 @@ export class Point extends IAnnotationGeometry {
 
 export const POINT_ICON_CLASS='fas fa-circle'
 
-export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestroy {
+export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_point_preview'
   public name = 'Point'
   public toolType: TToolType = 'drawing'
@@ -113,7 +140,7 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
         const pt = new Point({
           x, y, z,
           space,
-          '@type': 'siibra-ex/annotatoin/point'
+          '@type': 'siibra-ex/annotation/point'
         })
         const { id } = pt
         pt.remove = () => this.removeAnnotation(id)
@@ -135,7 +162,7 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
        */
       this.dragHoveredAnnotationsDelta$.subscribe(ev => {
         const { ann, deltaX, deltaY, deltaZ } = ev
-        const { pickedAnnotationId, pickedOffset } = ann.detail
+        const { pickedAnnotationId } = ann.detail
         const foundAnn = this.managedAnnotations.find(ann => ann.id === pickedAnnotationId)
         if (foundAnn) {
           foundAnn.translate(deltaX, deltaY, deltaZ)
@@ -148,7 +175,6 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
       merge(
         this.forceRefresh$,
       ).subscribe(() => {
-        console.log('emit... here?')
         let out: INgAnnotationTypes['point'][] = []
         for (const managedAnn of this.managedAnnotations) {
           if (managedAnn.space['@id'] === this.space['@id']) {
@@ -160,15 +186,27 @@ export class ToolPoint extends AbsToolClass implements IAnnotationTools, OnDestr
     )
   }
 
+  addAnnotation(point: Point){
+    const found = this.managedAnnotations.find(p => p.id === point.id)
+    if (found) throw new Error(`Point annotation already added`)
+    this.managedAnnotations.push(point)
+    this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefresh$.next(null)
+  }
+
   /**
    * @description remove managed annotation via id
    * @param id id of annotation
    */
   removeAnnotation(id: string) {
     const idx = this.managedAnnotations.findIndex(ann => id === ann.id)
-
+    if (idx < 0){
+      throw new Error(`cannot find point idx ${idx}`)
+      return
+    }
     this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefresh$.next(null)
   }
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {

@@ -7,16 +7,12 @@ import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { Polygon, ToolPolygon } from "./poly";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats, TCallbackFunction } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats, TCallbackFunction, TSandsPolyLine, TSandsPoint, TSandsLine } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
-import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
-import { PolyUpdateCmp } from './poly/poly.component'
-import { Point, ToolPoint } from "./point";
-import { PointUpdateCmp } from "./point/point.component";
-import { LineUpdateCmp } from "./line/line.component";
-import { ToolSelect } from "./select";
-import { ToolDelete } from "./delete";
+import { Polygon } from "./poly";
+import { Line } from "./line";
+import { Point } from "./point";
+
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -96,7 +92,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private registeredTools: {
     name: string
     iconClass: string
-    toolInsance: AbsToolClass
+    toolInstance: AbsToolClass<any>
     target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
     onDestoryCallBack: () => void
@@ -125,13 +121,13 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    *   editCmp?: ClassInterface<any>
    * }} arg 
    */
-  private registerTool<T extends AbsToolClass>(arg: {
+  public registerTool<T extends AbsToolClass<any>>(arg: {
     toolCls: ClassInterface<T>
     target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<any>
-  }): AbsToolClass{
+  }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
-    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as AbsToolClass & { ngOnDestroy?: Function }
+    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: Function }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({
@@ -178,7 +174,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       iconClass,
       target,
       editCmp,
-      toolInsance: newTool,
+      toolInstance: newTool,
       onDestoryCallBack: () => {
         newTool.ngOnDestroy && newTool.ngOnDestroy()
         this.managedAnnotationsStream$.next({
@@ -213,33 +209,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ){
-
-    const selTool = this.registerTool({
-      toolCls: ToolSelect
-    })
-    this.defaultTool = selTool
-
-    this.registerTool({
-      toolCls: ToolPoint,
-      target: Point,
-      editCmp: PointUpdateCmp,
-    })
-
-    this.registerTool({
-      toolCls: ToolLine,
-      target: Line,
-      editCmp: LineUpdateCmp,
-    })
-
-    this.registerTool({
-      toolCls: ToolPolygon,
-      target: Polygon,
-      editCmp: PolyUpdateCmp,
-    })
-
-    this.registerTool({
-      toolCls: ToolDelete
-    })
 
     /**
      * listen to mouse event on nehubaViewer, and emit as TAnnotationEvent
@@ -369,9 +338,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           console.warn(`cannot find tool ${selectedToolName}`)
           return
         }
-        const { toolInsance } = selectedTool
-        const previewNgAnnotation = toolInsance.onMouseMoveRenderPreview
-          ? toolInsance.onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
+        const { toolInstance } = selectedTool
+        const previewNgAnnotation = toolInstance.onMouseMoveRenderPreview
+          ? toolInstance.onMouseMoveRenderPreview([ngMouseEvent.x, ngMouseEvent.y, ngMouseEvent.z])
           : []
 
         if (this.previewNgAnnIds.length !== previewNgAnnotation.length) {
@@ -548,7 +517,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
-  private defaultTool: AbsToolClass
+  public defaultTool: AbsToolClass<any>
   public deselectTools(){
 
     this.activeToolName = null
@@ -558,6 +527,29 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         name: this.defaultTool.name || null
       }
     })
+  }
+
+  parseAnnotationObject(json: TSandsPolyLine | TSandsPoint | TSandsLine): IAnnotationGeometry{
+    if (json['@type'] === 'tmp/poly') {
+      return Polygon.fromSANDS(json)
+    }
+    if (json['@type'] === 'tmp/line') {
+      return Line.fromSANDS(json)
+    }
+    if (json['@type'] === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
+      return Point.fromSANDS(json)
+    }
+    throw new Error(`cannot parse annotation object`)
+  }
+
+  importAnnotation(annotationObj: IAnnotationGeometry){
+    for (const tool of this.registeredTools) {
+      const { toolInstance, target } = tool
+      if (!!target && annotationObj instanceof target) {
+        toolInstance.addAnnotation(annotationObj)
+        return
+      }
+    }
   }
 
   ngOnDestroy(){

@@ -6,7 +6,7 @@ import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
 
 type TPolyJsonSpec = {
-  points: TPointJsonSpec[]
+  points: (TPointJsonSpec|Point)[]
   edges: [number, number][]
   '@type': 'siibra-ex/annotation/polyline'
 } & TBaseAnnotationGeomtrySpec
@@ -49,7 +49,7 @@ export class Polygon extends IAnnotationGeometry{
       : new Point({
         id: `${this.id}_${getUuid()}`,
         space: this.space,
-        '@type': 'siibra-ex/annotatoin/point',
+        '@type': 'siibra-ex/annotation/point',
         ...p
       })
     
@@ -99,14 +99,11 @@ export class Polygon extends IAnnotationGeometry{
       coordinateSpace: {
         '@id': this.space["@id"],
       },
-      coordinatesPairs: this.edges.map(([ idx1, idx2 ]) => {
-        const { x: x1, y: y1, z: z1 } = this.points[idx1]
-        const { x: x2, y: y2, z: z2 } = this.points[idx2]
-        return [
-          [getCoord(x1), getCoord(y1), getCoord(z1)],
-          [getCoord(x2), getCoord(y2), getCoord(z2)]
-        ]
-      })
+      coordinates: this.points.map(p => {
+        const { x, y, z } = p
+        return [getCoord(x/1e6), getCoord(y/1e6), getCoord(z/1e6)]
+      }),
+      closed: true
     }
   }
 
@@ -161,10 +158,54 @@ export class Polygon extends IAnnotationGeometry{
     return new Polygon(json)
   }
 
+  static fromSANDS(sands: TSandsPolyLine): Polygon {
+    const {
+      "@id": id,
+      "@type": type,
+      coordinateSpace,
+      coordinates
+    } = sands
+    if (type === 'tmp/poly') {
+      const points: Point[] = []
+      const edges: [number, number][] = []
+      for (const coordinate of coordinates) {
+        const parsedValue = coordinate.map(c => {
+          if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Unit does not parse`)
+          return c.value * 1e6
+        })
+        const p = new Point({
+          space: coordinateSpace,
+          x: parsedValue[0],
+          y: parsedValue[1],
+          z:  parsedValue[2],
+          "@type": "siibra-ex/annotation/point"
+        })
+        const newIdx = points.push(p)
+        if (newIdx > 1) {
+          edges.push([ newIdx - 2, newIdx - 1 ])
+        }
+      }
+
+      const poly = new Polygon({
+        id,
+        "@type": 'siibra-ex/annotation/polyline',
+        space: coordinateSpace,
+        points,
+        edges
+      })
+      return poly
+    }
+
+    throw new Error(`cannot import sands`)
+  }
+
   constructor(spec?: TPolyJsonSpec){
     super(spec)
     const { points = [], edges = [] } = spec || {}
-    this.points = points.map(Point.fromJSON)
+    this.points = points.map(p => {
+      if (p instanceof Point) return p
+      return Point.fromJSON(p)
+    })
     this.edges = edges
   }
 
@@ -182,7 +223,7 @@ export class Polygon extends IAnnotationGeometry{
 
 export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
 
-export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDestroy {
+export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_poly_preview'
 
   public name = 'polygon'
@@ -292,7 +333,6 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
           const { id } = this.selectedPoly
           this.selectedPoly.remove = () => this.removeAnnotation(id)
           this.managedAnnotations.push(this.selectedPoly)
-          this.managedAnnotations$.next(this.managedAnnotations)
         } else {
 
           if (ann.detail) {
@@ -318,6 +358,11 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
           this.lastAddedPoint
         )
         this.lastAddedPoint = addedPoint
+
+        /**
+         * always emit new annotation onclick
+         */
+        this.managedAnnotations$.next(this.managedAnnotations)
       }),
 
       /**
@@ -370,6 +415,14 @@ export class ToolPolygon extends AbsToolClass implements IAnnotationTools, OnDes
         this.forceRefreshAnnotations$.next(null)
       }),
     )
+  }
+
+  addAnnotation(poly: Polygon){
+    const idx = this.managedAnnotations.findIndex(ann => ann.id === poly.id)
+    if (idx >= 0) throw new Error(`Polygon already added.`)
+    this.managedAnnotations.push(poly)
+    this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefreshAnnotations$.next(null)
   }
 
   removeAnnotation(id: string) {

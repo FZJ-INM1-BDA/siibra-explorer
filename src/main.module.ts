@@ -29,7 +29,6 @@ import { UIService } from "./services/uiService.service";
 import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/atlasComponents/databrowserModule";
 import { ViewerStateControllerUseEffect } from "src/state";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
-import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
@@ -134,7 +133,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     DockedContainerDirective,
     FloatingContainerDirective,
     FloatingMouseContextualContainerDirective,
-    DragDropDirective,
 
     /* pipes */
     GetNamesPipe,

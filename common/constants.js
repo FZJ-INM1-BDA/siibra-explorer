@@ -61,8 +61,8 @@
 
     // Annotations
     USER_ANNOTATION_LIST: 'user annotations footer',
-    USER_ANNOTATION_IMPORT: 'user annotations import',
-    USER_ANNOTATION_EXPORT: 'user annotations export',
+    USER_ANNOTATION_IMPORT: 'Import annotations',
+    USER_ANNOTATION_EXPORT: 'Export all of my annotations',
     USER_ANNOTATION_EXPORT_SINGLE: 'Export annotation',
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'Delete annotation',

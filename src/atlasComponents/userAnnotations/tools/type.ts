@@ -8,13 +8,14 @@ import { getUuid } from "src/util/fn"
  * TODO perhaps split into drawing subclass/utility subclass
  */
 
-export abstract class AbsToolClass {
+export abstract class AbsToolClass<T extends IAnnotationGeometry> {
 
   public abstract name: string
   public abstract iconClass: string
 
+  public abstract addAnnotation(annotation: T): void
   public abstract removeAnnotation(id: string): void
-  public abstract managedAnnotations$: Observable<IAnnotationGeometry[]>
+  public abstract managedAnnotations$: Observable<T[]>
 
   abstract subs: Subscription[]
   protected space: TBaseAnnotationGeomtrySpec['space']
@@ -202,7 +203,8 @@ type TSandsQValue = {
 type TSandsCoord = [TSandsQValue, TSandsQValue] | [TSandsQValue, TSandsQValue, TSandsQValue]
 
 export type TSandsPolyLine = {
-  coordinatesPairs: [TSandsCoord, TSandsCoord][]
+  coordinates: TSandsCoord[]
+  closed: boolean
   coordinateSpace: {
     '@id': string
   }

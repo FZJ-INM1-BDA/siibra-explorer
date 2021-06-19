@@ -11,7 +11,7 @@
   </mat-chip>
 </mat-chip-list>
 
-<mat-divider class="m-2"></mat-divider>
+<mat-divider class="m-2 d-block position-relative"></mat-divider>
 
 <!-- actions -->
 
@@ -37,15 +37,6 @@
 <mat-menu #exportMenu="matMenu" xPosition="before">
   <div class="iv-custom-comp card text"
     iav-stop="click">
-
-    <div class="d-flex">
-      <button *ngFor="let format of viableFormats"
-        (click)="setFormat(format)"
-        mat-flat-button
-        [color]="useFormat === format ? 'primary' : ''">
-        {{ format }}
-      </button>
-    </div>
 
     <div class="iv-custom-comp text">
       <mat-form-field>

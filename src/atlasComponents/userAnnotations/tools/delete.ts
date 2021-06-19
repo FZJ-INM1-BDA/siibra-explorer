@@ -4,7 +4,7 @@ import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { Point } from "./point";
 import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TNgAnnotationPoint, TToolType } from "./type";
 
-export class ToolDelete extends AbsToolClass implements IAnnotationTools, OnDestroy {
+export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
 
   public subs: Subscription[] = []
   toolType: TToolType = 'deletion'
@@ -15,6 +15,9 @@ export class ToolDelete extends AbsToolClass implements IAnnotationTools, OnDest
     return []
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addAnnotation(){}
+  
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   removeAnnotation(){}
 

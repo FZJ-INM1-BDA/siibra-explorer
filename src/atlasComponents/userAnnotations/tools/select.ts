@@ -4,7 +4,7 @@ import { filter } from 'rxjs/operators'
 import { Point } from "./point";
 import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TNgAnnotationPoint, TToolType } from "./type";
 
-export class ToolSelect extends AbsToolClass implements IAnnotationTools, OnDestroy {
+export class ToolSelect extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
 
   public subs: Subscription[] = []
   toolType: TToolType = 'selecting'
@@ -14,6 +14,9 @@ export class ToolSelect extends AbsToolClass implements IAnnotationTools, OnDest
   onMouseMoveRenderPreview(){
     return []
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addAnnotation(){}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   removeAnnotation(){}

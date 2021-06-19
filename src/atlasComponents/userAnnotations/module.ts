@@ -6,16 +6,14 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {AnnotationMode} from "src/atlasComponents/userAnnotations/annotationMode/annotationMode.component";
 import {AnnotationList} from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
-import {AnnotationService} from "src/atlasComponents/userAnnotations/annotationService.service";
 import { UserAnnotationToolModule } from "./tools/module";
 import {AnnotationSwitch} from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
-import {ExportAnnotation} from "src/atlasComponents/userAnnotations/directives/exportAnnotation.directive";
-import {ImportAnnotation} from "src/atlasComponents/userAnnotations/directives/importAnnotation.directive";
-import {KeyListener} from "src/atlasComponents/userAnnotations/directives/keyListener.directive";
 import {CoordinateInputTextPipe} from "src/atlasComponents/userAnnotations/annotationList/coordinateInputText.pipe";
 import { UtilModule } from "src/util";
 import { SingleAnnotationClsIconPipe, SingleAnnotationNamePipe, SingleAnnotationUnit } from "./singleAnnotationUnit/singleAnnotationUnit.component";
 import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
+import { FileInputModule } from "src/getFileInput/module";
+import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 
 @NgModule({
   imports: [
@@ -27,22 +25,18 @@ import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
     AngularMaterialModule,
     UserAnnotationToolModule,
     UtilModule,
+    FileInputModule,
+    ZipFilesOutputModule,
   ],
   declarations: [
     AnnotationMode,
     AnnotationList,
     AnnotationSwitch,
-    ImportAnnotation,
-    ExportAnnotation,
-    KeyListener,
     CoordinateInputTextPipe,
     SingleAnnotationUnit,
     SingleAnnotationNamePipe,
     SingleAnnotationClsIconPipe,
     AnnotationVisiblePipe,
-  ],
-  providers: [
-    AnnotationService
   ],
   exports: [
     AnnotationMode,

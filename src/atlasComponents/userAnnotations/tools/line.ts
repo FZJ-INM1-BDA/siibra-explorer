@@ -19,7 +19,7 @@ import { getUuid } from "src/util/fn";
 
 type TLineJsonSpec = {
   '@type': 'siibra-ex/annotation/line'
-  points: TPointJsonSpec[]
+  points: (TPointJsonSpec|Point)[]
 } & TBaseAnnotationGeomtrySpec
 
 export class Line extends IAnnotationGeometry{
@@ -39,7 +39,7 @@ export class Line extends IAnnotationGeometry{
       ? p
       : new Point({
         id: `${this.id}_${getUuid()}`,
-        "@type": 'siibra-ex/annotatoin/point',
+        "@type": 'siibra-ex/annotation/point',
         space: this.space,
         ...p
       })
@@ -111,10 +111,54 @@ export class Line extends IAnnotationGeometry{
     return new Line(json)
   }
 
+  static fromSANDS(json: TSandsLine): Line{
+    const {
+      "@id": id,
+      "@type": type,
+      coordinateSpace,
+      coordinatesFrom,
+      coordinatesTo
+    } = json
+    if (type !== 'tmp/line') throw new Error(`cannot parse line from sands`)
+    const fromPt = coordinatesFrom.map(c => {
+      if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Cannot parse unit`)
+      return c.value * 1e6
+    })
+    const toPoint = coordinatesTo.map(c => {
+      if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Cannot parse unit`)
+      return c.value * 1e6
+    })
+    const line = new Line({
+      id,
+      "@type": "siibra-ex/annotation/line",
+      points: [
+        new Point({
+          "@type": 'siibra-ex/annotation/point',
+          x: fromPt[0],
+          y: fromPt[1],
+          z: fromPt[2],
+          space: coordinateSpace
+        }),
+        new Point({
+          '@type': "siibra-ex/annotation/point",
+          x: toPoint[0],
+          y: toPoint[1],
+          z: toPoint[2],
+          space: coordinateSpace
+        })
+      ],
+      space: coordinateSpace
+    })
+    return line
+  }
+
   constructor(spec?: TLineJsonSpec){
     super(spec)
     const { points = [] } = spec || {}
-    this.points = points.map(Point.fromJSON)
+    this.points = points.map(p => {
+      if (p instanceof Point) return p
+      return Point.fromJSON(p)
+    })
   }
 
   public translate(x: number, y: number, z: number) {
@@ -131,7 +175,7 @@ export class Line extends IAnnotationGeometry{
 
 export const LINE_ICON_CLASS = 'fas fa-slash'
 
-export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestroy {
+export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_line_preview'
   public name = 'Line'
   public toolType: TToolType = 'drawing'
@@ -275,6 +319,14 @@ export class ToolLine extends AbsToolClass implements IAnnotationTools, OnDestro
 
   ngOnDestroy(){
     this.subs.forEach(s => s.unsubscribe())
+  }
+
+  addAnnotation(line: Line) {
+    const idx = this.managedAnnotations.findIndex(ann => ann.id === line.id)
+    if (idx >= 0) throw new Error(`Line annotation has already been added`)
+    this.managedAnnotations.push(line)
+    this.managedAnnotations$.next(this.managedAnnotations)
+    this.forceRefreshAnnotations$.next(null)
   }
 
   removeAnnotation(id: string){

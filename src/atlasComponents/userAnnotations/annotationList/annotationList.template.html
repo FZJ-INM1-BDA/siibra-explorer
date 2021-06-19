@@ -1,60 +1,92 @@
-<!-- header -->
+<mat-card class="mat-elevantion-z4 h-100">
+    <div class="sidenav-cover-header-container bg-50-grey-20">
 
-<div class="d-flex">
-    <h2 class="mat-h2 mt-4 text-muted">
-        Annotations
-    </h2>
-</div>
+        <!-- title -->
+        <mat-card-title>
+            My Annotations
+        </mat-card-title>
 
-<mat-divider></mat-divider>
-
-
-<!-- list of annotations -->
-<ng-template [ngIf]="managedAnnotations$ | async" [ngIfElse]="placeholderTmpl" let-managedAnnotations>
-
-    <mat-accordion *ngIf="managedAnnotations.length > 0; else placeholderTmpl"
-        [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
-        class="h-100 d-flex flex-column overflow-auto">
-
-        <!-- expansion panel -->
-        <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations"
-            hideToggle>
-
-            <mat-expansion-panel-header [ngClass]="{'highlight': managedAnnotation.highlighted }">
-                <mat-panel-title class="d-flex align-items-center">
-
-                    <!-- toggle visibility -->
-                    <button
-                        mat-icon-button
-                        iav-stop="click"
-                        (click)="toggleManagedAnnotationVisibility(managedAnnotation.id)">
-                        <i [ngClass]="(hiddenAnnotations$ | async | annotationVisiblePipe : managedAnnotation) ?  'fa-eye' : 'fa-eye-slash'" class="fas"></i>
-                    </button>
-                    <span class="flex-shrink-1 flex-grow-1" [ngClass]="{ 'text-muted': !managedAnnotation.name }">
-                        {{ managedAnnotation | singleAnnotationNamePipe : managedAnnotation.name }}
-                    </span>    
-                    <i class="flex-shrink-0 flex-grow-0" [ngClass]="managedAnnotation | singleannotationClsIconPipe"></i>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-
-            <!-- single annotation edit body -->
-            <ng-template matExpansionPanelContent>
-                <single-annotation-unit
-                    [single-annotation-unit-annotation]="managedAnnotation">
-                </single-annotation-unit>
+        <!-- actions -->
+        <mat-card-subtitle>
+            <!-- import -->
+            <ng-template #importMessageTmpl>
+                Please select a annotation file to import.
             </ng-template>
-        </mat-expansion-panel>
-    </mat-accordion>
-</ng-template>
 
-<!-- place holder when no annotations exist -->
-<ng-template #placeholderTmpl>
-    <mat-card>
-        <span>
-            No annotations visible yet. 
-        </span>
-        <span>
-            Start by adding an annotion, or import an existing annotation.
-        </span>
-    </mat-card>
-</ng-template>
+            <button mat-icon-button
+                (file-input-directive)="handleImportEvent($event)"
+                [file-input-directive-title]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
+                [file-input-directive-text]="true"
+                [file-input-directive-file]="true"
+                [file-input-directive-message]="importMessageTmpl"
+                [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
+                [matTooltip]="ARIA_LABELS.USER_ANNOTATION_IMPORT">
+                <i class="fas fa-folder-open"></i>
+            </button>
+
+            <!-- export -->
+            <button mat-icon-button
+                [zip-files-output]="filesExport$ | async"
+                zip-files-output-zip-filename="exported_annotations.zip"
+                [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
+                [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
+                [disabled]="!(manAnnExists$ | async)">
+                <i class="fas fa-file-export"></i>
+            </button>
+        </mat-card-subtitle>
+    </div>
+
+    <!-- content -->
+    <mat-card-content class="mt-4 ml-15px-n mr-15px-n pb-4">
+        <!-- list of annotations -->
+        <ng-template [ngIf]="managedAnnotations$ | async" [ngIfElse]="placeholderTmpl" let-managedAnnotations>
+
+            <mat-accordion *ngIf="managedAnnotations.length > 0; else placeholderTmpl"
+                [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_LIST"
+                class="h-100 d-flex flex-column overflow-auto">
+
+                <!-- expansion panel -->
+                <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations"
+                    hideToggle>
+
+                    <mat-expansion-panel-header [ngClass]="{'highlight': managedAnnotation.highlighted }">
+                        <mat-panel-title class="d-flex align-items-center">
+
+                            <!-- toggle visibility -->
+                            <button
+                                mat-icon-button
+                                iav-stop="click"
+                                (click)="toggleManagedAnnotationVisibility(managedAnnotation.id)">
+                                <i [ngClass]="(hiddenAnnotations$ | async | annotationVisiblePipe : managedAnnotation) ?  'fa-eye' : 'fa-eye-slash'" class="fas"></i>
+                            </button>
+                            <span class="flex-shrink-1 flex-grow-1" [ngClass]="{ 'text-muted': !managedAnnotation.name }">
+                                {{ managedAnnotation | singleAnnotationNamePipe : managedAnnotation.name }}
+                            </span>    
+                            <i class="flex-shrink-0 flex-grow-0" [ngClass]="managedAnnotation | singleannotationClsIconPipe"></i>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <!-- single annotation edit body -->
+                    <ng-template matExpansionPanelContent>
+                        <div class="d-flex">
+
+                            <!-- spacer for inset single-annotation-unit -->
+                            <div class="w-3em flex-grow-0 flex-shrink-0"></div>
+
+                            <single-annotation-unit [single-annotation-unit-annotation]="managedAnnotation"
+                                class="flex-grow-1 flex-shrink-1">
+                            </single-annotation-unit>
+                        </div>
+                    </ng-template>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </ng-template>
+
+        <!-- place holder when no annotations exist -->
+        <ng-template #placeholderTmpl>
+            <div class="p-4 text-muted">
+                <p>Start by adding an annotation, or import existing annotations.</p>
+            </div>
+        </ng-template>
+    </mat-card-content>
+</mat-card>
