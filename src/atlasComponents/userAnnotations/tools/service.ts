@@ -502,7 +502,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     /**
      * before unload, save annotations
      */
-     window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', () => {
       this.storeAnnotation(this.managedAnnotations)
     })
   }
