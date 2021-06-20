@@ -7,7 +7,7 @@ ARG DATASET_PREVIEW_URL
 ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
 
 ARG BS_REST_URL
-ENV BS_REST_URL=${BS_REST_URL:-https://brainscapes.apps-dev.hbp.eu/v1_0}
+ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-tmpfullvolmetadata.apps-dev.hbp.eu/v1_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}

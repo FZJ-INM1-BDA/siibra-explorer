@@ -67,14 +67,14 @@ export class BsFeatureReceptorFingerprint extends BsFeatureReceptorBase implemen
     }
 
     this.urls.push(
-      ...this.bsFeature.data.urls
+      ...this.bsFeature.__files
         .filter(u => /_fp_/.test(u))
         .map(url => {
           return {
             url,
           }
         }),
-      ...this.bsFeature.data.urls
+      ...this.bsFeature.__files
         .filter(u => !/_pr_|_ar_/.test(u) && /receptors\.tsv$/.test(u))
         .map(url => {
           return {
@@ -84,7 +84,7 @@ export class BsFeatureReceptorFingerprint extends BsFeatureReceptorBase implemen
     )
 
     const radarEl = (this.elRef.nativeElement as HTMLElement).querySelector<any>('kg-dataset-dumb-radar')
-    radarEl.radarBs = this.bsFeature.data._ReceptorDistribution__fingerprint
-    radarEl.metaBs = this.bsFeature.receptor_symbols
+    radarEl.radarBs = this.bsFeature.__data.__fingerprint
+    radarEl.metaBs = this.bsFeature.__receptor_symbols
   }
 }

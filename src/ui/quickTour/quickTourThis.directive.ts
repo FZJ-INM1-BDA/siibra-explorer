@@ -10,6 +10,7 @@ export class QuickTourThis implements OnInit, OnChanges, OnDestroy {
 
   @Input('quick-tour-order') order: number = 0
   @Input('quick-tour-description') description: string = 'No description'
+  @Input('quick-tour-description-md') descriptionMd: string
   @Input('quick-tour-position') position: TQuickTourPosition
   @Input('quick-tour-overwrite-position') overwritePosition: IQuickTourOverwritePosition
   @Input('quick-tour-overwrite-arrow') overWriteArrow: TemplateRef<any> | string

@@ -13,7 +13,6 @@ import { Store, select, ActionsSubject } from "@ngrx/store";
 import { Observable, Subscription, interval, merge, of, timer, fromEvent } from "rxjs";
 import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
 
-import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
   IavRootStoreInterface,
   isDefined,
@@ -26,7 +25,6 @@ import { LocalFileService } from "src/services/localFile.service";
 import { AGREE_COOKIE, AGREE_KG_TOS } from "src/services/state/uiState.store";
 import { SHOW_KG_TOS } from 'src/services/state/uiState.store.helper'
 import { isSame } from "src/util/fn";
-// import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
@@ -36,7 +34,6 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { ClickInterceptorService } from "src/glue";
 
 /**
@@ -66,9 +63,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
-  @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
-
-  // @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
@@ -83,10 +77,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
-
-  public dedicatedView$: Observable<string | null>
-  public onhoverSegments: any[]
-  public onhoverSegments$: Observable<any[]>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
@@ -133,35 +123,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('viewerState'),
       select('templateSelected'),
       distinctUntilChanged(isSame),
-    )
-
-    // TODO deprecate
-    this.dedicatedView$ = this.store.pipe(
-      select('viewerState'),
-      select('dedicatedView'),
-      distinctUntilChanged(),
-      map(v => v[v.length -1])
-    )
-
-    // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegments$ = this.store.pipe(
-      select(uiStateMouseOverSegmentsSelector),
-      filter(v => !!v),
-      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
-      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-
-    ).pipe(
-      withLatestFrom(
-        this.onhoverLandmark$ || of(null)
-      ),
-      map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
-      map(segments => {
-        if (!segments) { return null }
-        const filteredSeg = segments.filter(filterFn)
-        return filteredSeg.length > 0
-          ? segments.map(s => s.segment)
-          : null
-      }),
     )
 
     this.selectedParcellation$ = this.store.pipe(
@@ -230,10 +191,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.onhoverSegments$.subscribe(seg => this.onhoverSegments = seg)
-    )
-
-    this.subscriptions.push(
       this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
     )
 
@@ -260,12 +217,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.newViewer$.subscribe(() => {
         this.widgetServices.clearAllWidgets()
       }),
-    )
-
-    this.subscriptions.push(
-      this.sidePanelView$.pipe(
-        filter(() => typeof this.layoutMainSide !== 'undefined'),
-      ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v)),
     )
 
     this.subscriptions.push(
@@ -366,6 +317,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: AGREE_COOKIE,
     })
+  }
+
+  public quickTourFinale = {
+    order: 1e6,
+    descriptionMd: `That's it! We hope you enjoy your stay.
+
+---
+
+If you have any comments or need further support, please send contact us at [${this.pureConstantService.supportEmailAddress}](${this.pureConstantService.supportEmailAddress})`,
+    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please send contact us at ${this.pureConstantService.supportEmailAddress}`,
+    position: 'center'
   }
 
   @HostBinding('attr.version')

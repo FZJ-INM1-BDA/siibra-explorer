@@ -61,8 +61,8 @@ jobs:
       run: |
         echo "Login to docker registry"
         docker login \
-          -u "${{ secrets.EBRAINS_DOCKER_REG_USER }}" \
-          -p "${{ secrets.EBRAINS_DOCKER_REG_TOKEN }}" \
+          -u '${{ secrets.EBRAINS_DOCKER_REG_USER }}' \
+          -p '${{ secrets.EBRAINS_DOCKER_REG_TOKEN }}' \
           docker-registry.ebrains.eu
         echo "Pushing $DOCKER_BUILT_TAG"
         docker push $DOCKER_BUILT_TAG
