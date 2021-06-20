@@ -9,18 +9,24 @@ type TTmplRef = {
   data: any
 }
 
+type CtxMenuInterArg<T> = {
+  context: T
+  append: (arg: TTmplRef) => void
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class ContextMenuService extends RegDeregController<unknown, { tmpl: TemplateRef<any>, data: any}>{
+
+export class ContextMenuService<T> extends RegDeregController<CtxMenuInterArg<T>, boolean>{
   
   public vcr: ViewContainerRef
   private overlayRef: OverlayRef
 
   private subs: Subscription[] = []
   
-  public context$ = new Subject()
-  public context: any
+  public context$ = new Subject<T>()
+  public context: T
 
   public tmplRefs$ = new ReplaySubject<TTmplRef[]>(1)
   public tmplRefs: TTmplRef[] = []
@@ -35,16 +41,20 @@ export class ContextMenuService extends RegDeregController<unknown, { tmpl: Temp
   }
 
   callRegFns(){
-    const tmplRefs: TTmplRef[] = []
+    let tmplRefs: TTmplRef[] = []
     for (const fn of this.callbacks){
-      const resp = fn(this.context)
-      if (resp) {
-        const { tmpl, data } = resp
-        tmplRefs.push({ tmpl, data })
+      const resp = fn({
+        context: this.context,
+        append: arg => tmplRefs.push(arg),
+      })
+      if (!resp) {
+        tmplRefs = []
+        return false
       }
     }
     this.tmplRefs = tmplRefs
     this.tmplRefs$.next(tmplRefs)
+    return true
   }
 
   dismissCtxMenu(){
@@ -60,7 +70,8 @@ export class ContextMenuService extends RegDeregController<unknown, { tmpl: Temp
       return
     }
     this.dismissCtxMenu()
-    this.callRegFns()
+    const flag = this.callRegFns()
+    if (!flag) return 
 
     const { x, y } = ev
     const positionStrategy = this.overlay.position()
@@ -89,3 +100,5 @@ export class ContextMenuService extends RegDeregController<unknown, { tmpl: Temp
     )
   }
 }
+
+export type TContextMenuReg<T> = (arg: CtxMenuInterArg<T>) => boolean

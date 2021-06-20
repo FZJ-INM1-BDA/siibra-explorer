@@ -25,7 +25,7 @@ import { MatDrawer } from "@angular/material/sidenav";
 import { ComponentStore } from "../componentStore";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { getGetRegionFromLabelIndexId } from "src/util/fn";
-import { ContextMenuService } from "src/contextMenuModule";
+import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -204,7 +204,7 @@ export class ViewerCmp implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
-    private viewerModuleSvc: ContextMenuService,
+    private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
     this.viewerCmpLocalUiStore.setState({
@@ -246,7 +246,7 @@ export class ViewerCmp implements OnDestroy {
   }
 
   ngAfterViewInit(){
-    const cb = (context: TContextArg<'nehuba' | 'threeSurfer'>) => {
+    const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
       let hoveredRegions = []
 
       if (context.viewerType === 'nehuba') {
@@ -272,7 +272,7 @@ export class ViewerCmp implements OnDestroy {
         hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
       }
 
-      return {
+      append({
         tmpl: this.viewerStatusCtxMenu,
         data: {
           context,
@@ -281,7 +281,8 @@ export class ViewerCmp implements OnDestroy {
             hoveredRegions
           }
         }
-      }
+      })
+      return true
     }
     this.viewerModuleSvc.register(cb)
     this.onDestroyCb.push(

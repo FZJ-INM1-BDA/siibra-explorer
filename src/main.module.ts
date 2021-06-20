@@ -32,7 +32,7 @@ import { DockedContainerDirective } from "./util/directives/dockedContainer.dire
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";

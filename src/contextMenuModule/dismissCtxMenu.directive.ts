@@ -1,4 +1,5 @@
 import { Directive, HostListener } from "@angular/core";
+import { TContextArg } from "src/viewerModule/viewer.interface";
 import { ContextMenuService } from "./service";
 
 @Directive({
@@ -6,13 +7,13 @@ import { ContextMenuService } from "./service";
 })
 
 export class DismissCtxMenuDirective{
-  @HostListener('click', ['$event'])
-  onClickListener(ev: MouseEvent) {
+  @HostListener('click')
+  onClickListener() {
     this.svc.dismissCtxMenu()
   }
 
   constructor(
-    private svc: ContextMenuService
+    private svc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>
   ){
 
   }

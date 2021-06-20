@@ -2,7 +2,7 @@ import { RegDereg } from "./regDereg.base"
 
 describe('> regDereg.base.ts', () => {
   describe('> RegDereg', () => {
-    let regDereg: RegDereg<string, boolean>
+    let regDereg: RegDereg<(arg: string) => boolean>
     beforeEach(() => {
       regDereg = new RegDereg()
     })

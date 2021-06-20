@@ -1,3 +1,3 @@
 export { ContextMenuModule } from './module'
-export { ContextMenuService } from './service'
+export { TContextMenuReg, ContextMenuService } from './service'
 export { DismissCtxMenuDirective } from './dismissCtxMenu.directive'

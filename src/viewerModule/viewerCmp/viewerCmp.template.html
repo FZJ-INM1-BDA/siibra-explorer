@@ -1060,10 +1060,23 @@
 
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
-  <mat-card class="p-0" (iav-outsideClick)="disposeCtxMenu()">
+  <mat-card class="p-0"
+    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
+    (iav-key-event)="disposeCtxMenu()"
+    (iav-outsideClick)="disposeCtxMenu()">
     <mat-card-content *ngFor="let tmplRef of tmplRefs">
-      <ng-container *ngTemplateOutlet="tmplRef.tmpl; context: { $implicit: tmplRef.data } ">
-      </ng-container>
+
+      <!-- template provided -->
+      <ng-template [ngIf]="tmplRef.tmpl"
+        [ngIfElse]="fallbackTmpl"
+        [ngTemplateOutlet]="tmplRef.tmpl"
+        [ngTemplateOutletContext]="{$implicit: tmplRef.data}">
+      </ng-template>
+      
+      <!-- template not provided -->
+      <ng-template #fallbackTmpl>
+        {{ tmplRef.data.message || 'test' }}
+      </ng-template>
     </mat-card-content>
   </mat-card>
 </ng-template>
@@ -1087,10 +1100,6 @@
               {{ data.metadata.template.displayName || data.metadata.template.name }}
             </span>
           </span>
-
-          <button mat-icon-button>
-            <i class="fas fa-thumbtack"></i>
-          </button>
         </mat-list-item>
       </ng-container>
 

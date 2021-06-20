@@ -9,11 +9,11 @@ import { BSFeatureModule, BS_DARKTHEME,  } from "src/atlasComponents/regionalFea
 import { SplashUiModule } from "src/atlasComponents/splashScreen";
 import { AtlasCmpUiSelectorsModule } from "src/atlasComponents/uiSelectors";
 import { ComponentsModule } from "src/components";
-import { ContextMenuModule } from "src/contextMenuModule";
+import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { TopMenuModule } from "src/ui/topMenu/module";
-import { UtilModule } from "src/util";
+import { CONTEXT_MENU_ITEM_INJECTOR, TContextMenu, UtilModule } from "src/util";
 import { VIEWERMODULE_DARKTHEME } from "./constants";
 import { NehubaModule, NehubaViewerUnit } from "./nehuba";
 import { ThreeSurferModule } from "./threeSurfer";
@@ -24,6 +24,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
 import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type";
 import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
 import { map } from "rxjs/operators";
+import { TContextArg } from "./viewer.interface";
 
 @NgModule({
   imports: [
@@ -68,7 +69,17 @@ import { map } from "rxjs/operators";
       deps: [
         NEHUBA_INSTANCE_INJTKN
       ]
-    }
+    },
+    {
+      provide: CONTEXT_MENU_ITEM_INJECTOR,
+      useFactory: (svc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>) => {
+        return {
+          register: svc.register.bind(svc),
+          deregister: svc.deregister.bind(svc)
+        } as TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
+      },
+      deps: [ ContextMenuService ]
+    },
   ],
   exports: [
     ViewerCmp,
