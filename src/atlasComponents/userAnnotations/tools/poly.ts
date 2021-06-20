@@ -5,7 +5,7 @@ import { merge, Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
 
-type TPolyJsonSpec = {
+export type TPolyJsonSpec = {
   points: (TPointJsonSpec|Point)[]
   edges: [number, number][]
   '@type': 'siibra-ex/annotation/polyline'

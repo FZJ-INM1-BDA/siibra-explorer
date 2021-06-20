@@ -197,6 +197,9 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
   private viewerStatusCtxMenu: TemplateRef<any>
 
+  @ViewChild('viewerStatusRegionCtxMenu', { read: TemplateRef })
+  private viewerStatusRegionCtxMenu: TemplateRef<any>
+
   public context: TContextArg<TSupportedViewers>
   private templateSelected: any
   private getRegionFromlabelIndexId: Function
@@ -247,8 +250,25 @@ export class ViewerCmp implements OnDestroy {
 
   ngAfterViewInit(){
     const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
-      let hoveredRegions = []
 
+      /**
+       * first append general viewer info
+       */
+      append({
+        tmpl: this.viewerStatusCtxMenu,
+        data: {
+          context,
+          metadata: {
+            template: this.templateSelected,
+          }
+        },
+        order: 0
+      })
+
+      /**
+       * check hovered region
+       */
+      let hoveredRegions = []
       if (context.viewerType === 'nehuba') {
         hoveredRegions = (context as TContextArg<'nehuba'>).payload.nehuba.reduce(
           (acc, curr) => acc.concat(
@@ -272,16 +292,17 @@ export class ViewerCmp implements OnDestroy {
         hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
       }
 
-      append({
-        tmpl: this.viewerStatusCtxMenu,
-        data: {
-          context,
-          metadata: {
-            template: this.templateSelected,
-            hoveredRegions
-          }
-        }
-      })
+      if (hoveredRegions.length > 0) {
+        append({
+          tmpl: this.viewerStatusRegionCtxMenu,
+          data: {
+            context,
+            metadata: { hoveredRegions }
+          },
+          order: 5
+        })
+      }
+
       return true
     }
     this.viewerModuleSvc.register(cb)

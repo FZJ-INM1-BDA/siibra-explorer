@@ -17,7 +17,7 @@ import { merge, Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
 
-type TLineJsonSpec = {
+export type TLineJsonSpec = {
   '@type': 'siibra-ex/annotation/line'
   points: (TPointJsonSpec|Point)[]
 } & TBaseAnnotationGeomtrySpec
@@ -102,9 +102,16 @@ export class Line extends IAnnotationGeometry{
 
   }
 
-  toJSON(){
-    const { id, points } = this
-    return { id, points }
+  toJSON(): TLineJsonSpec{
+    const { id, name, desc, points, space } = this
+    return {
+      id,
+      name,
+      desc,
+      points: points.map(p => p.toJSON()),
+      space,
+      '@type': 'siibra-ex/annotation/line'
+    }
   }
 
   static fromJSON(json: TLineJsonSpec){
@@ -266,7 +273,7 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
 
           this.selectedLine.addLinePoints(crd)
           this.selectedLine = null
-
+          this.managedAnnotations$.next(this.managedAnnotations)
           if (this.callback) {
             this.callback({ type: 'paintingEnd' })
           }

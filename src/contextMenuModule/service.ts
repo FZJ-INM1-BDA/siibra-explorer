@@ -4,9 +4,21 @@ import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core"
 import { ReplaySubject, Subject, Subscription } from "rxjs"
 import { RegDeregController } from "src/util/regDereg.base"
 
-type TTmplRef = {
+type TTmpl = {
   tmpl: TemplateRef<any>
   data: any
+}
+
+type TSimple = {
+  data: {
+    message: string
+    iconClass?: string
+  }
+}
+
+type TTmplRef = (TTmpl | TSimple) & {
+  order?: number
+  onClick?: Function
 }
 
 type CtxMenuInterArg<T> = {

@@ -8,8 +8,8 @@ import { PointUpdateCmp } from "./point/point.component";
 import { PolyUpdateCmp } from "./poly/poly.component";
 import { ModularUserAnnotationToolService } from "./service";
 import { ToFormattedStringPipe } from "./toFormattedString.pipe";
-import { ANNOTATION_EVENT_INJ_TOKEN } from "./type";
-import {Line, ToolLine} from "src/atlasComponents/userAnnotations/tools/line";
+import { ANNOTATION_EVENT_INJ_TOKEN, } from "./type";
+import { Line, ToolLine } from "src/atlasComponents/userAnnotations/tools/line";
 
 import { Point, ToolPoint } from "./point";
 import { ToolSelect } from "./select";

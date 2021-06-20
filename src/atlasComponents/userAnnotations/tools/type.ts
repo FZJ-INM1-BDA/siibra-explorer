@@ -2,6 +2,9 @@ import { InjectionToken } from "@angular/core"
 import { merge, Observable, of, Subject, Subscription } from "rxjs"
 import { filter, map, mapTo, pairwise, switchMap, switchMapTo, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { getUuid } from "src/util/fn"
+import { TLineJsonSpec } from "./line"
+import { TPointJsonSpec } from "./point"
+import { TPolyJsonSpec } from "./poly"
 
 /**
  * base class to be extended by all annotation tools
@@ -201,6 +204,9 @@ type TSandsQValue = {
   }
 }
 type TSandsCoord = [TSandsQValue, TSandsQValue] | [TSandsQValue, TSandsQValue, TSandsQValue]
+
+export type TGeometryJson = TPointJsonSpec | TLineJsonSpec | TPolyJsonSpec
+export type TSands = TSandsPolyLine | TSandsLine | TSandsPoint
 
 export type TSandsPolyLine = {
   coordinates: TSandsCoord[]

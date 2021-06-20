@@ -7,7 +7,7 @@ import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TExportFormats, TCallbackFunction, TSandsPolyLine, TSandsPoint, TSandsLine } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
@@ -87,6 +87,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private managedAnnotations: IAnnotationGeometry[] = []
   public managedAnnotations$ = this.managedAnnotationsStream$.pipe(
     scanCollapse(),
+    shareReplay(1),
   )
 
   private registeredTools: {
@@ -374,11 +375,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const managedAnnotationUpdate$ = combineLatest([
       this.forcedAnnotationRefresh$,
       this.ngAnnotations$.pipe(
+        scanCollapse(),
         switchMap(switchMapWaitFor({
           condition: () => !!this.ngAnnotationLayer,
           leading: true
         })),
-        scanCollapse(),
       )
     ]).pipe(
       map(([_, ngAnnos]) => ngAnnos),
@@ -529,7 +530,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     })
   }
 
-  parseAnnotationObject(json: TSandsPolyLine | TSandsPoint | TSandsLine): IAnnotationGeometry{
+  parseAnnotationObject(json: TSands | TGeometryJson): IAnnotationGeometry{
     if (json['@type'] === 'tmp/poly') {
       return Polygon.fromSANDS(json)
     }
@@ -538,6 +539,15 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
     if (json['@type'] === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
       return Point.fromSANDS(json)
+    }
+    if (json['@type'] === 'siibra-ex/annotation/point') {
+      return Point.fromJSON(json)
+    }
+    if (json['@type'] === 'siibra-ex/annotation/line') {
+      return Line.fromJSON(json)
+    }
+    if (json['@type'] === 'siibra-ex/annotation/polyline') {
+      return Polygon.fromJSON(json)
     }
     throw new Error(`cannot parse annotation object`)
   }

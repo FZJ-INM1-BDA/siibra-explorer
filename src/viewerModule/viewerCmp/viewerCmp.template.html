@@ -1060,11 +1060,14 @@
 
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
-  <mat-card class="p-0"
+  <mat-card class="p-0 d-flex flex-column"
     [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">
-    <mat-card-content *ngFor="let tmplRef of tmplRefs">
+    <mat-card-content *ngFor="let tmplRef of tmplRefs"
+      class="m-0"
+      [ngStyle]="{order: tmplRef.order || 0}">
+      <mat-divider></mat-divider>
 
       <!-- template provided -->
       <ng-template [ngIf]="tmplRef.tmpl"
@@ -1077,6 +1080,8 @@
       <ng-template #fallbackTmpl>
         {{ tmplRef.data.message || 'test' }}
       </ng-template>
+      
+      <mat-divider></mat-divider>
     </mat-card-content>
   </mat-card>
 </ng-template>
@@ -1124,29 +1129,30 @@
         DEFAULT
       </ng-container>
     </ng-container>
+  </mat-list>
+</ng-template>
 
-    <!-- hovered ROIs -->
-    <ng-template [ngIf]="data.metadata.hoveredRegions.length > 0">
-      <mat-divider></mat-divider>
-
-      <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions">
-        <span mat-line>
-          {{ hoveredR.displayName || hoveredR.name }}
+<ng-template #viewerStatusRegionCtxMenu let-data>
+  <!-- hovered ROIs -->
+  <mat-list>
+    <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions; let first = first">
+      <mat-divider class="top-0" *ngIf="!first"></mat-divider>
+      <span mat-line>
+        {{ hoveredR.displayName || hoveredR.name }}
+      </span>
+      <span mat-line class="text-muted">
+        <i class="fas fa-brain"></i>
+        <span>
+          Brain region
         </span>
-        <span mat-line class="text-muted">
-          <i class="fas fa-brain"></i>
-          <span>
-            Brain region
-          </span>
-        </span>
+      </span>
 
-        <!-- lookup region -->
-        <button mat-icon-button
-          (click)="selectRoi(hoveredR)"
-          ctx-menu-dismiss>
-          <i class="fas fa-search"></i>
-        </button>
-      </mat-list-item>
-    </ng-template>
+      <!-- lookup region -->
+      <button mat-icon-button
+        (click)="selectRoi(hoveredR)"
+        ctx-menu-dismiss>
+        <i class="fas fa-search"></i>
+      </button>
+    </mat-list-item>
   </mat-list>
 </ng-template>
