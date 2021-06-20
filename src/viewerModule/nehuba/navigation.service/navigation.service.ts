@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subscription } from "rxjs";
+import { Observable, ReplaySubject, Subscription } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
@@ -19,6 +19,7 @@ export class NehubaNavigationService implements OnDestroy{
   private nehubaViewerInstance: NehubaViewerUnit
   public storeNav: INavObj
   public viewerNav: INavObj
+  public viewerNav$ = new ReplaySubject<INavObj>(1)
 
   // if set, ignores store attempt to update nav
   private viewerNavLock: boolean = false
@@ -74,8 +75,12 @@ export class NehubaNavigationService implements OnDestroy{
     if (animation && this.globalAnimationFlag) {
 
       const gen = timedValues()
-      const dest = navigation
       const src = this.viewerNav
+
+      const dest = {
+        ...src,
+        ...navigation
+      }
 
       const delta = navAdd(dest, navMul(src, -1))
 
@@ -105,6 +110,7 @@ export class NehubaNavigationService implements OnDestroy{
       this.nehubaViewerInstance.viewerPositionChange.subscribe(
         (val: INavObj) => {
           this.viewerNav = val
+          this.viewerNav$.next(val)
           this.viewerNavLock = true
         }
       ),

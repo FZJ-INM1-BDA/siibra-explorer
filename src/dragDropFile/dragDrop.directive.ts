@@ -4,15 +4,16 @@ import { debounceTime, map, scan, switchMap } from "rxjs/operators";
 import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
 
 @Directive({
-  selector: '[drag-drop]',
+  selector: '[drag-drop-file]',
+  exportAs: 'dragDropFile'
 })
 
-export class DragDropDirective implements OnInit, OnDestroy {
+export class DragDropFileDirective implements OnInit, OnDestroy {
 
   @Input()
   public snackText: string
 
-  @Output('drag-drop')
+  @Output('drag-drop-file')
   public dragDropOnDrop: EventEmitter<File[]> = new EventEmitter()
 
   @HostBinding('style.transition')

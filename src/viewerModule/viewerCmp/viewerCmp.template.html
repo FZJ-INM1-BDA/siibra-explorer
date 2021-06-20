@@ -5,8 +5,63 @@
 
 <layout-floating-container [zIndex]="10">
 
+  <!-- Annotation mode -->
+  <div *ngIf="hideUi$ | async">
+    <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+      [hasBackdrop]="false">
+      <mat-drawer #annotationDrawer
+        mode="side"
+        [autoFocus]="false"
+        [disableClose]="true"
+        class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
+        <annotation-list></annotation-list>
+      </mat-drawer>
+
+      <mat-drawer-content class="visible position-relative pe-none">
+
+        <iav-layout-fourcorners>
+
+          <!-- pullable tab top right corner -->
+          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
+            <div>
+              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+                matColor: 'primary',
+                fontIcon: 'fa-list',
+                tooltip: 'Annotation list',
+                click: annotationDrawer.toggle.bind(annotationDrawer)
+              }">
+              </ng-container>
+            </div>
+  
+            <annotating-tools-panel class="z-index-10">
+            </annotating-tools-panel>
+          </div>
+
+          <div iavLayoutFourCornersTopRight>
+            <mat-card class="mat-card-sm pe-all m-4">
+              <span>
+                Annotating
+              </span>
+              <button mat-icon-button
+                [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
+                color="warn"
+                annotation-switch
+                annotation-switch-mode="off">
+                <i class="fas fa-times"></i>
+              </button>
+            </mat-card>
+          </div>
+        </iav-layout-fourcorners>
+  
+
+      </mat-drawer-content>
+    </mat-drawer-container>
+    <!-- <annotation-message></annotation-message> -->
+  </div>
+
   <!-- top drawer -->
   <mat-drawer-container
+    [hidden]="hideUi$ | async"
     [iav-switch-initstate]="false"
     iav-switch
     #sideNavTopSwitch="iavSwitch"
@@ -190,7 +245,7 @@
     </mat-drawer>
 
     <!-- main-content -->
-    <mat-drawer-content class="visible position-relative">
+    <mat-drawer-content class="visible position-relative" [hidden]="hideUi$ | async">
 
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
 
@@ -245,14 +300,16 @@
   <iav-layout-fourcorners>
     <div iavLayoutFourCornersContent
       class="w-100 h-100 position-absolute">
-      <div class="h-100 w-100 overflow-hidden position-relative">
+      <div class="h-100 w-100 overflow-hidden position-relative"
+        ctx-menu-host
+        [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
 
         <ng-container [ngSwitch]="useViewer$ | async">
 
           <!-- nehuba viewer -->
           <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'nehuba'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async"
             #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
@@ -261,7 +318,7 @@
           <!-- three surfer (free surfer viewer) -->
           <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
             *ngSwitchCase="'threeSurfer'"
-            (viewerEvent)="viewerLoaded = $event.data"
+            (viewerEvent)="handleViewerEvent($event)"
             [selectedTemplate]="templateSelected$ | async"
             [selectedParcellation]="parcellationSelected$ | async">
           </three-surfer-glue-cmp>
@@ -597,32 +654,33 @@
     </ng-template>
   </ng-template>
 
-  <ng-template #tabTmpl_defaultTmpl
-    let-matColor="matColor"
-    let-fontIcon="fontIcon"
-    let-customColor="customColor"
-    let-customColorDarkmode="customColorDarkmode"
-    let-tooltip="tooltip">
-    <!-- (click)="sideNavMasterSwitch.toggle()" -->
-    <button mat-raised-button
-      [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
-      [matTooltip]="tooltip"
-      class="pe-all tab-toggle"
-      [ngClass]="{
-        'darktheme': customColorDarkmode === true,
-        'lighttheme': customColorDarkmode === false
-      }"
-      [style.backgroundColor]="customColor"
 
-      [color]="(!customColor && matColor) ? matColor : null">
-
-      <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
-        <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
-      </span>
-    </button>
-  </ng-template>
 </ng-template>
+<ng-template #tabTmpl_defaultTmpl
+  let-matColor="matColor"
+  let-fontIcon="fontIcon"
+  let-customColor="customColor"
+  let-customColorDarkmode="customColorDarkmode"
+  let-tooltip="tooltip"
+  let-click="click">
+  <!-- (click)="sideNavMasterSwitch.toggle()" -->
+  <button mat-raised-button
+    [attr.aria-label]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
+    [matTooltip]="tooltip"
+    class="pe-all tab-toggle"
+    [ngClass]="{
+      'darktheme': customColorDarkmode === true,
+      'lighttheme': customColorDarkmode === false
+    }"
+    (click)="click && click()"
+    [style.backgroundColor]="customColor"
+    [color]="(!customColor && matColor) ? matColor : null">
 
+    <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+      <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
+    </span>
+  </button>
+</ng-template>
 
 <!-- region sidenav tmpl -->
 <ng-template #sidenavRegionTmpl>
@@ -1013,4 +1071,103 @@
       Select a region by clicking on the viewer or search from above
     </span>
   </div>
+</ng-template>
+
+<!-- context menu template -->
+<ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
+  <mat-card class="p-0 d-flex flex-column"
+    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
+    (iav-key-event)="disposeCtxMenu()"
+    (iav-outsideClick)="disposeCtxMenu()">
+    <mat-card-content *ngFor="let tmplRef of tmplRefs"
+      class="m-0"
+      [ngStyle]="{order: tmplRef.order || 0}">
+      <mat-divider></mat-divider>
+
+      <!-- template provided -->
+      <ng-template [ngIf]="tmplRef.tmpl"
+        [ngIfElse]="fallbackTmpl"
+        [ngTemplateOutlet]="tmplRef.tmpl"
+        [ngTemplateOutletContext]="{$implicit: tmplRef.data}">
+      </ng-template>
+      
+      <!-- template not provided -->
+      <ng-template #fallbackTmpl>
+        {{ tmplRef.data.message || 'test' }}
+      </ng-template>
+      
+      <mat-divider></mat-divider>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<!-- viewer status ctx menu -->
+<ng-template #viewerStatusCtxMenu let-data>
+  <mat-list>
+
+    <!-- ref space & position -->
+    <ng-container [ngSwitch]="data.context.viewerType">
+
+      <!-- volumetric i.e. nehuba -->
+      <ng-container *ngSwitchCase="'nehuba'">
+        <mat-list-item>
+          <span mat-line>
+            {{ data.context.payload.mouse.real | nmToMm | addUnitAndJoin : '' }} (mm)
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.metadata.template.displayName || data.metadata.template.name }}
+            </span>
+          </span>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'threeSurfer'">
+        <mat-list-item>
+          <span mat-line>
+            face#{{ data.context.payload.faceIndex }}
+          </span>
+          <span mat-line>
+            vertices#{{ data.context.payload.vertexIndices | addUnitAndJoin : '' }}
+          </span>
+          <span mat-line class="text-muted">
+            <i class="fas fa-map"></i>
+            <span>
+              {{ data.context.payload.fsversion }}
+            </span>
+          </span>
+        </mat-list-item>
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        DEFAULT
+      </ng-container>
+    </ng-container>
+  </mat-list>
+</ng-template>
+
+<ng-template #viewerStatusRegionCtxMenu let-data>
+  <!-- hovered ROIs -->
+  <mat-list>
+    <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions; let first = first">
+      <mat-divider class="top-0" *ngIf="!first"></mat-divider>
+      <span mat-line>
+        {{ hoveredR.displayName || hoveredR.name }}
+      </span>
+      <span mat-line class="text-muted">
+        <i class="fas fa-brain"></i>
+        <span>
+          Brain region
+        </span>
+      </span>
+
+      <!-- lookup region -->
+      <button mat-icon-button
+        (click)="selectRoi(hoveredR)"
+        ctx-menu-dismiss>
+        <i class="fas fa-search"></i>
+      </button>
+    </mat-list-item>
+  </mat-list>
 </ng-template>

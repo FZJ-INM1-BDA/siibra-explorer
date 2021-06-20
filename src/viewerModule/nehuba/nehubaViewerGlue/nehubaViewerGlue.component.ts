@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
+import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
@@ -14,9 +14,9 @@ import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 
 import { getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../constants";
-import { IViewer, TViewerEvent } from "../../viewer.interface";
+import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { NehubaViewerContainerDirective } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
+import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, scanSliceViewRenderFn, takeOnePipe } from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
@@ -24,6 +24,7 @@ import { NehubaMeshService } from "../mesh.service";
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { switchMapWaitFor } from "src/util/fn";
+import { INavObj } from "../navigation.service";
 
 interface INgLayerInterface {
   name: string // displayName
@@ -64,7 +65,7 @@ interface INgLayerInterface {
   ]
 })
 
-export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
+export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, AfterViewInit {
 
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
@@ -130,10 +131,6 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     }))),
   )
 
-  ngAfterViewInit(){
-    this.setQuickTourPos()
-  }
-
   public panelOrder$ = this.store$.pipe(
     select(ngViewerSelectorPanelOrder),
     distinctUntilChanged(),
@@ -158,6 +155,43 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     }else if (selectedParcellation && selectedParcellation.currentValue !== selectedParcellation.previousValue) {
       this.loadParc(selectedParcellation.currentValue)
     }
+  }
+
+  ngAfterViewInit(){
+    this.setQuickTourPos()
+
+    const { 
+      mouseOverSegments,
+      navigationEmitter,
+      mousePosEmitter,
+    } = this.nehubaContainerDirective
+    const sub = combineLatest([
+      mouseOverSegments,
+      navigationEmitter,
+      mousePosEmitter,
+    ]).pipe(
+      throttleTime(16, asyncScheduler, { trailing: true })
+    ).subscribe(([ seg, nav, mouse ]: [ TMouseoverEvent [], INavObj, { real: number[], voxel: number[] } ]) => {
+      this.viewerEvent.emit({
+        type: EnumViewerEvt.VIEWER_CTX,
+        data: {
+          viewerType: 'nehuba',
+          payload: {
+            nav,
+            mouse,
+            nehuba: seg.map(v => {
+              return {
+                layerName: v.layer.name,
+                labelIndices: [ Number(v.segmentId) ]
+              }
+            })
+          }
+        }
+      })
+    })
+    this.onDestroyCb.push(
+      () => sub.unsubscribe()
+    )
   }
 
   ngOnDestroy() {
@@ -272,7 +306,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
   }
 
   @Output()
-  public viewerEvent = new EventEmitter<TViewerEvent>()
+  public viewerEvent = new EventEmitter<TViewerEvent<'nehuba'>>()
 
   constructor(
     private store$: Store<any>,
@@ -282,10 +316,7 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
   ){
-    this.viewerEvent.emit({
-      type: 'MOUSEOVER_ANNOTATION',
-      data: {}
-    })
+
     /**
      * define onclick behaviour
      */
@@ -714,24 +745,24 @@ export class NehubaGlueCmp implements IViewer, OnChanges, OnDestroy{
 
   handleViewerLoadedEvent(flag: boolean) {
     this.viewerEvent.emit({
-      type: 'VIEWERLOADED',
+      type: EnumViewerEvt.VIEWERLOADED,
       data: flag
     })
     this.viewerLoaded = flag
   }
 
-  private selectHoveredRegion(_ev: any, next: Function){
+  private selectHoveredRegion(_ev: any): boolean{
     /**
      * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
      */
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
-    if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return next()
+    if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
         selectRegions: trueOnhoverSegments.slice(0, 1)
       })
     )
-    next()
+    return true
   }
 
   private waitForNehuba = switchMapWaitFor({

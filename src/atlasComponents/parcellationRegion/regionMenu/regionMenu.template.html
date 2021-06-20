@@ -2,7 +2,7 @@
   <!-- rgbDarkmode must be checked for strict equality to true/false 
   as if rgb is undefined, rgbDarkmode will be null/undefined
   which is falsy -->
-  <div class="header-container"
+  <div class="sidenav-cover-header-container"
     [ngClass]="{'darktheme': rgbDarkmode === true, 'lighttheme': rgbDarkmode === false}"
     [style.backgroundColor]="rgbString">
     <mat-card-title>

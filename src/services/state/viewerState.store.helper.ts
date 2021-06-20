@@ -22,6 +22,7 @@ import {
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
   viewerStateSelectRegionWithIdDeprecated,
+  viewerStateSetViewerMode,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks,
@@ -46,6 +47,7 @@ export {
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
   viewerStateSelectRegionWithIdDeprecated,
+  viewerStateSetViewerMode,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks,
@@ -143,7 +145,7 @@ export class ViewerStateHelperEffect{
     private store$: Store<any>,
     private actions$: Actions
   ){
-    
+
   }
 }
 
@@ -180,7 +182,7 @@ export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId)
     while (currPreviousId) {
       it += 1
       if (it>100) throw new Error(`iteration excced 100, did you include a loop?`)
-      
+
       const curr = arr.find(v => v['@version']['@this'] === currPreviousId)
       if (!curr) throw new Error(`GenNewerVersions error, version id ${currPreviousId} not found`)
       currPreviousId = curr['@version'][ flag ? '@next' : '@previous' ]
@@ -196,8 +198,8 @@ export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId)
   for (const obj of GenNewerVersions(false)) {
     if (obj['@version']['@this'] === compObj['@id']) {
       return true
-    } 
+    }
   }
-  
+
   throw new Error(`isNewerThan error, neither srcObj nor compObj exist in array`)
 }

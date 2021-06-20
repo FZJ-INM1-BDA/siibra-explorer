@@ -29,11 +29,10 @@ import { UIService } from "./services/uiService.service";
 import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/atlasComponents/databrowserModule";
 import { ViewerStateControllerUseEffect } from "src/state";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
-import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
@@ -136,7 +135,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     DockedContainerDirective,
     FloatingContainerDirective,
     FloatingMouseContextualContainerDirective,
-    DragDropDirective,
 
     /* pipes */
     GetNamesPipe,
@@ -231,8 +229,16 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: CLICK_INTERCEPTOR_INJECTOR,
       useFactory: (clickIntService: ClickInterceptorService) => {
         return {
-          deregister: clickIntService.removeInterceptor.bind(clickIntService),
-          register: clickIntService.addInterceptor.bind(clickIntService)
+          deregister: clickIntService.deregister.bind(clickIntService),
+          register: (fn: (arg: any) => boolean, config?) => {
+            if (config?.last) {
+              clickIntService.register(fn)
+            } else {
+              clickIntService.register(fn, {
+                first: true
+              })
+            }
+          }
         } as ClickInterceptor
       },
       deps: [

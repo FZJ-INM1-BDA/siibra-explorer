@@ -1,0 +1,10 @@
+.inactive-filter {
+    color: #bababa;
+}
+
+:host-context([darktheme="true"]) .hovering-header {
+    background-color: #737373;
+}
+:host-context([darktheme="false"]) .hovering-header {
+    background-color: rgb(245, 245, 245);
+}
