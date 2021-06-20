@@ -10,7 +10,7 @@ import { LoggingService } from 'src/logging';
 import { IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { CLOSE_SIDE_PANEL } from './uiState.store';
-import { 
+import {
   viewerStateSetSelectedRegions,
   viewerStateSetConnectivityRegion,
   viewerStateSelectParcellation,
@@ -24,7 +24,12 @@ import {
   viewerStateNewViewer
 } from './viewerState.store.helper';
 import { cvtNehubaConfigToNavigationObj } from 'src/state';
-import { actionSelectLandmarks, viewerStateChangeNavigation, viewerStateNehubaLayerchanged } from './viewerState/actions';
+import {
+  viewerStateChangeNavigation,
+  viewerStateNehubaLayerchanged,
+  viewerStateSetViewerMode,
+  actionSelectLandmarks
+} from './viewerState/actions';
 import { serialiseParcellationRegion } from "common/util"
 
 export interface StateInterface {
@@ -33,6 +38,8 @@ export interface StateInterface {
   templateSelected: any | null
   parcellationSelected: any | null
   regionsSelected: any[]
+
+  viewerMode: string
 
   landmarksSelected: any[]
   userLandmarks: IUserLandmark[]
@@ -75,6 +82,7 @@ export const defaultState: StateInterface = {
   fetchedTemplates : [],
   loadedNgLayers: [],
   regionsSelected: [],
+  viewerMode: null,
   userLandmarks: [],
   dedicatedView: null,
   navigation: null,
@@ -163,6 +171,12 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       regionsSelected: selectRegions,
     }
   }
+  case viewerStateSetViewerMode.type: {
+    return {
+      ...prevState,
+      viewerMode: action.payload
+    }
+  }
   case DESELECT_LANDMARKS : {
     return {
       ...prevState,
@@ -223,7 +237,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     return {
       ...prevState,
       overwrittenColorMap: action.payload || '',
-    }  
+    }
   default :
     return prevState
   }
@@ -250,6 +264,10 @@ export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
 
 export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 
+export const DESELECT_REGIONS = `DESELECT_REGIONS`
+export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
+// export const SET_VIEWER_MODE = viewerStateSetViewerMode.type
+export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const SELECT_REGIONS = viewerStateSetSelectedRegions.type
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`

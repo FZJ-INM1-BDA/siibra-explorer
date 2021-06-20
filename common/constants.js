@@ -6,6 +6,7 @@
     OPEN: 'Open',
     EXPAND: 'Expand',
     COLLAPSE: 'Collapse',
+    COPY_TO_CLIPBOARD: 'Copy to clipboard',
     OPEN_IN_NEW_WINDOW: 'Open in a new window',
 
     // dataset specific
@@ -55,7 +56,20 @@
 
     // additional volumes
     TOGGLE_SHOW_LAYER_CONTROL: `Show layer control`,
-    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control'
+    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control',
+
+    //Viewer mode
+    VIEWER_MODE_ANNOTATING: 'annotating',
+
+    // Annotations
+    USER_ANNOTATION_LIST: 'user annotations footer',
+    USER_ANNOTATION_IMPORT: 'Import annotations',
+    USER_ANNOTATION_EXPORT: 'Export all of my annotations',
+    USER_ANNOTATION_EXPORT_SINGLE: 'Export annotation',
+    USER_ANNOTATION_HIDE: 'user annotations hide',
+    USER_ANNOTATION_DELETE: 'Delete annotation',
+    GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
+    EXIT_ANNOTATION_MODE: 'Exit annotation mode'
   }
 
   exports.IDS = {

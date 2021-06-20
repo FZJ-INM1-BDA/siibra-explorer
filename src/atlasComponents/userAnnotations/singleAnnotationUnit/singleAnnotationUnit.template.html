@@ -1,0 +1,38 @@
+<form [formGroup]="formGrp" class="d-flex flex-column" autocomplete="off">
+  <mat-form-field>
+    <mat-label>
+      Space
+    </mat-label>
+    <mat-select formControlName="spaceId">
+      <mat-option *ngFor="let tmpl of templateSpaces" [value]="tmpl['@id']">
+        {{ tmpl.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>
+      Name
+    </mat-label>
+    <input
+      type="text"
+      matInput
+      formControlName="name"
+      [placeholder]="managedAnnotation | singleAnnotationNamePipe">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>
+      Description
+    </mat-label>
+    <textarea
+      matInput
+      formControlName="desc">
+    </textarea>
+  </mat-form-field>
+</form>
+
+<mat-divider class="m-2 d-block position-relative"></mat-divider>
+
+<ng-template #editAnnotationVCRef>
+</ng-template>

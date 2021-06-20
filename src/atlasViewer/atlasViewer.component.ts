@@ -279,8 +279,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public mouseClickDocument(_event: MouseEvent) {
-    this.clickIntService.run(_event)
+  public mouseClickDocument(event: MouseEvent) {
+    this.clickIntService.callRegFns(event)
   }
 
   /**

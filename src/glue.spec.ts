@@ -856,94 +856,44 @@ describe('> glue.ts', () => {
       interceptorService = new ClickInterceptorService()
     })
 
-    describe('> #addInterceptor', () => {
-      it('> adds interceptor fn', () => {
-        const fn = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
+    describe('> # callRegFns', () => {
+      let spy1: jasmine.Spy,
+        spy2: jasmine.Spy,
+        spy3: jasmine.Spy
+      beforeEach(() => {
+        spy1 = jasmine.createSpy('spy1')
+        spy2 = jasmine.createSpy('spy2')
+        spy3 = jasmine.createSpy('spy3')
+        interceptorService['callbacks'] = [
+          spy1,
+          spy2,
+          spy3,
+        ]
+        spy1.and.returnValue(true)
+        spy2.and.returnValue(true)
+        spy3.and.returnValue(true)
       })
-      it('> when config not supplied, or last not present, will add fn to the first of the queue', () => {
+      it('> fns are all called', () => {
 
-        const dummy = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(dummy)
-        
-        const fn = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(0)
-
-        const fn2 = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn2, {})
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(1)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn2)).toEqual(0)
+        interceptorService.callRegFns('stuff')
+        expect(spy1).toHaveBeenCalled()
+        expect(spy2).toHaveBeenCalled()
+        expect(spy3).toHaveBeenCalled()
       })
-      it('> when last is supplied as a config param, will add the fn at the end', () => {
-
-        const dummy = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(dummy)
-
-        const fn = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn, { last: true })
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toEqual(1)
-
-      })
-    })
-
-    describe('> deregister', () => {
-      it('> if the fn exist in the register, it will be removed', () => {
-
-        const fn = (ev: any, next: Function) => {}
-        const fn2 = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
-        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
-
-        interceptorService.removeInterceptor(fn)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeLessThan(0)
-        expect(interceptorService['clickInterceptorStack'].length).toEqual(0)
-      })
-
-      it('> if fn does not exist in register, it will not be removed', () => {
-        
-        const fn = (ev: any, next: Function) => {}
-        const fn2 = (ev: any, next: Function) => {}
-        interceptorService.addInterceptor(fn)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
-        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
-
-        interceptorService.removeInterceptor(fn2)
-        expect(interceptorService['clickInterceptorStack'].indexOf(fn)).toBeGreaterThanOrEqual(0)
-        expect(interceptorService['clickInterceptorStack'].length).toEqual(1)
-      })
-    })
-
-    describe('> # run', () => {
       it('> will run fns from first idx to last idx', () => {
-        const callNext = (ev: any, next: Function) => next()
-        const fn = jasmine.createSpy().and.callFake(callNext)
-        const fn2 = jasmine.createSpy().and.callFake(callNext)
 
-        interceptorService.addInterceptor(fn)
-        interceptorService.addInterceptor(fn2)
-        interceptorService.run({})
-
-        expect(fn2).toHaveBeenCalledBefore(fn)
+        interceptorService.callRegFns('stuff')
+        expect(spy1).toHaveBeenCalledBefore(spy2)
+        expect(spy2).toHaveBeenCalledBefore(spy3)
       })
       it('> will stop at when next is not called', () => {
 
-        const callNext = (ev: any, next: Function) => next()
-        const halt = (ev: any, next: Function) => {}
-        const fn = jasmine.createSpy().and.callFake(callNext)
-        const fn2 = jasmine.createSpy().and.callFake(halt)
-        const fn3 = jasmine.createSpy().and.callFake(callNext)
+        spy2.and.returnValue(false)
+        interceptorService.callRegFns('stuff')
 
-        interceptorService.addInterceptor(fn)
-        interceptorService.addInterceptor(fn2)
-        interceptorService.addInterceptor(fn3)
-        interceptorService.run({})
-
-        expect(fn3).toHaveBeenCalled()
-        expect(fn2).toHaveBeenCalled()
-        expect(fn).not.toHaveBeenCalled()
+        expect(spy1).toHaveBeenCalled()
+        expect(spy2).toHaveBeenCalled()
+        expect(spy3).not.toHaveBeenCalled()
       })
     })
   })

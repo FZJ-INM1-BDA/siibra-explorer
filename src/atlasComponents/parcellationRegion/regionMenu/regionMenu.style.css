@@ -20,10 +20,3 @@ mat-icon
   font-size: 95%;
   line-height: normal;
 }
-
-.header-container
-{
-  padding: 16px;
-  margin: -16px!important;
-  padding-top: 6rem;
-}

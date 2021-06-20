@@ -7,6 +7,13 @@ export type TClickInterceptorConfig = {
 }
 
 export interface ClickInterceptor{
-  register: (interceptorFunction: (ev: any, next: Function) => void, config?: TClickInterceptorConfig) => void
+  register: (interceptorFunction: (ev: any) => boolean, config?: TClickInterceptorConfig) => void
   deregister: (interceptorFunction: Function) => void
+}
+
+export const CONTEXT_MENU_ITEM_INJECTOR = new InjectionToken('CONTEXT_MENU_ITEM_INJECTOR')
+
+export type TContextMenu<T> = {
+  register: (fn: T) => void
+  deregister: (fn: (fn: T) => void) => void
 }

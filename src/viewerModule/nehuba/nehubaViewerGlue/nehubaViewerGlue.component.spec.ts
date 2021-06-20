@@ -27,8 +27,8 @@ describe('> nehubaViewerGlue.component.ts', () => {
           provide: CLICK_INTERCEPTOR_INJECTOR,
           useFactory: (clickIntService: ClickInterceptorService) => {
             return {
-              deregister: clickIntService.removeInterceptor.bind(clickIntService),
-              register: clickIntService.addInterceptor.bind(clickIntService)
+              deregister: clickIntService.deregister.bind(clickIntService),
+              register: arg => clickIntService.register(arg)
             } as ClickInterceptor
           },
           deps: [
@@ -77,7 +77,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       beforeEach(() => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
         TestBed.createComponent(NehubaGlueCmp)
-        clickIntServ.run(null)
+        clickIntServ.callRegFns(null)
       })
       it('> dispatch not called', () => {
         expect(dispatchSpy).not.toHaveBeenCalled()
@@ -97,7 +97,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
         mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, ['hello world', testObj0])
         TestBed.createComponent(NehubaGlueCmp)
-        clickIntServ.run(null)
+        clickIntServ.callRegFns(null)
       })
       it('> dispatch not called', () => {
         expect(dispatchSpy).not.toHaveBeenCalled()
@@ -132,7 +132,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       })
       it('> dispatch called with obj1', () => {
         TestBed.createComponent(NehubaGlueCmp)
-        clickIntServ.run(null)
+        clickIntServ.callRegFns(null)
         const { segment } = testObj1
         expect(dispatchSpy).toHaveBeenCalledWith(
           viewerStateSetSelectedRegions({
@@ -142,7 +142,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       })
       it('> fallback called (does not intercept)', () => {
         TestBed.createComponent(NehubaGlueCmp)
-        clickIntServ.run(null)
+        clickIntServ.callRegFns(null)
         expect(fallbackSpy).toHaveBeenCalled()
       })
     })

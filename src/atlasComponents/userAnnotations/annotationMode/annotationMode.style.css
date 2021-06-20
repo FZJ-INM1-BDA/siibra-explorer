@@ -1,0 +1,13 @@
+.tab-toggle-container
+{
+  margin-left: -3rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.tab-toggle
+{
+  margin: 0.25rem -1rem 0.25rem 0rem;
+  padding-right: 1rem;
+  text-align: right;
+}

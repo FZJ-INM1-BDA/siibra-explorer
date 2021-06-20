@@ -6,7 +6,10 @@ import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
-import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors";
+import {
+  viewerStateFetchedTemplatesSelector,
+  viewerStateViewerModeSelector
+} from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
@@ -17,6 +20,7 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
 import { ILoadMesh } from 'src/messaging/types'
+import {ARIA_LABELS} from "common/constants";
 
 declare let window
 
@@ -83,7 +87,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   private s: Subscription[] = []
 
-  private onMouseClick(ev: any, next){
+  private onMouseClick(ev: any): boolean {
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
 
@@ -112,10 +116,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
                 mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
               })
           }
-          return rs({
+          rs({
             type: spec.type,
             payload: mousePositionReal
           })
+          return false
         }
 
         /**
@@ -125,10 +130,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
           if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
             this.popUserRegionSelectHandler()
-            return rs({
+            rs({
               type: spec.type,
               payload: moSegments
             })
+            return false
           }
         }
       } else {
@@ -138,11 +144,12 @@ export class AtlasViewerAPIServices implements OnDestroy{
          */
         if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
           this.popUserRegionSelectHandler()
-          return rs(moSegments[0])
+          rs(moSegments[0])
+          return false
         }
       }
     }
-    next()
+    return true
   }
 
   constructor(

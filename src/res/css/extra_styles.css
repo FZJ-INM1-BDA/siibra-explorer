@@ -303,6 +303,10 @@ markdown-dom p
   width: 0!important;
 }
 
+.w-3em
+{
+  width: 3em!important;
+}
 .w-5em
 {
   width: 5em!important;
@@ -364,6 +368,11 @@ markdown-dom p
 .pe-all
 {
   pointer-events: all;
+}
+
+.t-a-ease-200
+{
+  transition: all ease 200ms;
 }
 
 .t-a-ease-500
@@ -833,4 +842,11 @@ mat-list.sm mat-list-item
 .color-inherit
 {
   color: inherit!important;
+}
+
+.sidenav-cover-header-container
+{
+  padding: 16px;
+  margin: -16px!important;
+  padding-top: 6rem;
 }
