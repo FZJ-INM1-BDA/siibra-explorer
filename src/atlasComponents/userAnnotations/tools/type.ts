@@ -24,11 +24,6 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
   protected space: TBaseAnnotationGeomtrySpec['space']
 
   /**
-   * @description to be overwritten by subclass. Emit the latest representation of NgAnnotations from the tool.
-   */
-  public abstract allNgAnnotations$: Observable<INgAnnotationTypes[keyof INgAnnotationTypes][]>
-
-  /**
    * @description to be overwritten by subclass. Called once every mousemove event, if the tool is active.
    * @param {[number, number, number]} mousepos
    * @returns {INgAnnotationTypes[keyof INgAnnotationTypes][]} Array of NgAnnotation to be rendered.

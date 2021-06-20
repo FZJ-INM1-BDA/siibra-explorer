@@ -6,6 +6,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, TContextMenu } from "src/util";
 import { TContextArg } from "src/viewerModule/viewer.interface";
 import { TContextMenuReg } from "src/contextMenuModule";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'annotating-tools-panel',
@@ -29,6 +30,7 @@ export class AnnotationMode implements OnDestroy{
   constructor(
     private store$: Store<any>,
     private modularToolSvc: ModularUserAnnotationToolService,
+    snackbar: MatSnackBar,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(CONTEXT_MENU_ITEM_INJECTOR) ctxMenuInterceptor: TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
   ) {
@@ -45,6 +47,13 @@ export class AnnotationMode implements OnDestroy{
       register(stopClickProp)
       this.onDestroyCb.push(() => deregister(stopClickProp))
     }
+
+    this.modularToolSvc.loadStoredAnnotations()
+      .catch(e => {
+        snackbar.open(`Loading annotations from storage failed: ${e.toString()}`, 'Dismiss', {
+          duration: 3000
+        })
+      })
   }
 
   exitAnnotationMode(){

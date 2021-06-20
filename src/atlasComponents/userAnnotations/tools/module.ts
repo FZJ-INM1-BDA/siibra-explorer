@@ -8,25 +8,28 @@ import { PointUpdateCmp } from "./point/point.component";
 import { PolyUpdateCmp } from "./poly/poly.component";
 import { ModularUserAnnotationToolService } from "./service";
 import { ToFormattedStringPipe } from "./toFormattedString.pipe";
-import { ANNOTATION_EVENT_INJ_TOKEN, } from "./type";
+import { ANNOTATION_EVENT_INJ_TOKEN } from "./type";
 import { Line, ToolLine } from "src/atlasComponents/userAnnotations/tools/line";
-
 import { Point, ToolPoint } from "./point";
 import { ToolSelect } from "./select";
 import { ToolDelete } from "./delete";
 import { Polygon, ToolPolygon } from "./poly";
+import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
+import { TextareaCopyExportCmp } from "./textareaCopyExport/textareaCopyExport.component";
 
 @NgModule({
   imports: [
     CommonModule,
     AngularMaterialModule,
     UtilModule,
+    ZipFilesOutputModule,
   ],
   declarations: [
     LineUpdateCmp,
     PolyUpdateCmp,
     PointUpdateCmp,
     ToFormattedStringPipe,
+    TextareaCopyExportCmp,
   ],
   exports: [
     LineUpdateCmp,
@@ -44,7 +47,9 @@ import { Polygon, ToolPolygon } from "./poly";
 
 export class UserAnnotationToolModule {
 
-  constructor(svc: ModularUserAnnotationToolService){
+  constructor(
+    svc: ModularUserAnnotationToolService,
+  ){
     const selTool = svc.registerTool({
       toolCls: ToolSelect
     })

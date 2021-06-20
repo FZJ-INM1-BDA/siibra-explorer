@@ -23,7 +23,7 @@ export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools,
 
   managedAnnotations$ = new Subject<Point[]>()
   private allManAnnotations: IAnnotationGeometry[] = []
-  allNgAnnotations$ = new Subject<TNgAnnotationPoint[]>()
+  
   constructor(
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
     callback: TCallbackFunction

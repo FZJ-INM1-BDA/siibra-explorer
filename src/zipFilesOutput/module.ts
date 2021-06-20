@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { SingleFileOutput } from "./downloadSingleFile.directive";
 import { ZipFilesOutput } from "./zipFilesOutput.directive";
 
 @NgModule({
@@ -7,10 +8,12 @@ import { ZipFilesOutput } from "./zipFilesOutput.directive";
     CommonModule,
   ],
   declarations: [
-    ZipFilesOutput
+    ZipFilesOutput,
+    SingleFileOutput,
   ],
   exports: [
-    ZipFilesOutput
+    ZipFilesOutput,
+    SingleFileOutput,
   ]
 })
 

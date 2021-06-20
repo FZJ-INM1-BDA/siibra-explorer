@@ -237,8 +237,6 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
   public managedAnnotations$ = new Subject<Polygon[]>()
 
   public subs: Subscription[] = []
-  private forceRefreshAnnotations$ = new Subject()
-  public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
     if (this.lastAddedPoint) {
@@ -312,6 +310,8 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
           }
         }
 
+        this.managedAnnotations$.next(this.managedAnnotations)
+
         this.selectedPoly = null
         this.lastAddedPoint = null
       }),
@@ -324,15 +324,14 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
         withLatestFrom(this.hoverAnnotation$)
       ).subscribe(([mouseev, ann]) => {
         if (!this.selectedPoly) {
-          this.selectedPoly = new Polygon({
+          const newPoly =  new Polygon({
             edges: [],
             points: [],
             space: this.space,
             '@type': 'siibra-ex/annotation/polyline'
           })
-          const { id } = this.selectedPoly
-          this.selectedPoly.remove = () => this.removeAnnotation(id)
-          this.managedAnnotations.push(this.selectedPoly)
+          this.addAnnotation(newPoly)
+          this.selectedPoly = newPoly
         } else {
 
           if (ann.detail) {
@@ -366,28 +365,6 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
       }),
 
       /**
-       * conditions by which ng annotations are refreshed
-       */
-      merge(
-        toolDeselect$,
-        toolSelThenClick$,
-        this.forceRefreshAnnotations$,
-      ).pipe(
-        
-      ).subscribe(() => {
-        let out: INgAnnotationTypes['line'][] = []
-        for (const managedAnn of this.managedAnnotations) {
-          /**
-           * only emit annotations in matching space
-           */
-          if (managedAnn.space["@id"] === this.space["@id"]) {
-            out = out.concat(...managedAnn.toNgAnnotation())
-          }
-        }
-        this.allNgAnnotations$.next(out)
-      }),
-
-      /**
        * translate point when on hover a point
        * translate entire annotation when hover edge
        */
@@ -412,7 +389,7 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
           parsedAnnotation.point.translate(deltaX, deltaY, deltaZ)
         }
 
-        this.forceRefreshAnnotations$.next(null)
+        this.managedAnnotations$.next(this.managedAnnotations)
       }),
     )
   }
@@ -420,9 +397,9 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
   addAnnotation(poly: Polygon){
     const idx = this.managedAnnotations.findIndex(ann => ann.id === poly.id)
     if (idx >= 0) throw new Error(`Polygon already added.`)
+    poly.remove = () => this.removeAnnotation(poly.id)
     this.managedAnnotations.push(poly)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefreshAnnotations$.next(null)
   }
 
   removeAnnotation(id: string) {
@@ -432,7 +409,6 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
     }
     this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefreshAnnotations$.next(null)
   }
 
   ngOnDestroy(){

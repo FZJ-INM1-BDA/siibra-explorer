@@ -110,8 +110,6 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
   public subs: Subscription[] = []
   private managedAnnotations: Point[] = []
   public managedAnnotations$ = new Subject<Point[]>()
-  public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
-  private forceRefresh$ = new Subject()
 
   constructor(
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
@@ -142,15 +140,8 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
           space,
           '@type': 'siibra-ex/annotation/point'
         })
-        const { id } = pt
-        pt.remove = () => this.removeAnnotation(id)
-        this.managedAnnotations.push(pt)
-        this.managedAnnotations$.next(this.managedAnnotations)
+        this.addAnnotation(pt)
         
-        /**
-         * force refresh of ng annotation
-         */
-        this.forceRefresh$.next(null)
         /**
          * deselect on selecting a point
          */
@@ -166,32 +157,18 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
         const foundAnn = this.managedAnnotations.find(ann => ann.id === pickedAnnotationId)
         if (foundAnn) {
           foundAnn.translate(deltaX, deltaY, deltaZ)
-          this.forceRefresh$.next(null)
+          this.managedAnnotations$.next(this.managedAnnotations)
         }
       }),
-      /**
-       * evts which forces redraw of ng annotations
-       */
-      merge(
-        this.forceRefresh$,
-      ).subscribe(() => {
-        let out: INgAnnotationTypes['point'][] = []
-        for (const managedAnn of this.managedAnnotations) {
-          if (managedAnn.space['@id'] === this.space['@id']) {
-            out = out.concat(...managedAnn.toNgAnnotation())
-          }
-        }
-        this.allNgAnnotations$.next(out)
-      })
     )
   }
 
   addAnnotation(point: Point){
     const found = this.managedAnnotations.find(p => p.id === point.id)
     if (found) throw new Error(`Point annotation already added`)
+    point.remove = () => this.removeAnnotation(point.id)
     this.managedAnnotations.push(point)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefresh$.next(null)
   }
 
   /**
@@ -206,7 +183,6 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
     }
     this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefresh$.next(null)
   }
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {

@@ -3,7 +3,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Polygon, POLY_ICON_CLASS } from "../poly";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
-import { Clipboard } from "@angular/cdk/clipboard";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { Store } from "@ngrx/store";
 import { Point } from "../point";
@@ -32,12 +31,11 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
 
   constructor(
     private store: Store<any>,
-    snackbar: MatSnackBar,
-    clipboard: Clipboard,
+    private snackbar: MatSnackBar,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
-    super(clipboard, snackbar, cStore)
+    super(cStore)
     if (this.cStore) {
       this.sub.push(
         this.cStore.select(store => store.useFormat).subscribe((val: TExportFormats) => {

@@ -10,7 +10,7 @@
     <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
       [hasBackdrop]="false">
       <mat-drawer #annotationDrawer
-        [mode]="'push'"
+        mode="side"
         [autoFocus]="false"
         [disableClose]="true"
         class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
@@ -22,7 +22,7 @@
         <iav-layout-fourcorners>
 
           <!-- pullable tab top right corner -->
-          <div iavLayoutFourCornersTopLeft class="mt-5">
+          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
             <div>
               <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
                 matColor: 'primary',
@@ -35,6 +35,21 @@
   
             <annotating-tools-panel class="z-index-10">
             </annotating-tools-panel>
+          </div>
+
+          <div iavLayoutFourCornersTopRight>
+            <mat-card class="mat-card-sm pe-all m-4">
+              <span>
+                Annotating
+              </span>
+              <button mat-icon-button
+                [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
+                color="warn"
+                annotation-switch
+                annotation-switch-mode="off">
+                <i class="fas fa-times"></i>
+              </button>
+            </mat-card>
           </div>
         </iav-layout-fourcorners>
   

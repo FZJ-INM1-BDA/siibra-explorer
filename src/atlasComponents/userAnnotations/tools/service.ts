@@ -7,12 +7,15 @@ import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
+import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
+import { retry } from 'common/util'
 
+const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 
 const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
@@ -71,13 +74,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private ngAnnotationLayer: any
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
-  private ngAnnotations$ = new Subject<{
-    tool: string
-    annotations: INgAnnotationTypes[keyof INgAnnotationTypes][]
-  }>()
-
 
   private selectedTmpl: any
+  private selectedTmpl$ = this.store.pipe(
+    select(viewerStateSelectedTemplatePureSelector),
+  )
   public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
   private managedAnnotationsStream$ = new Subject<{
     tool: string
@@ -85,9 +86,21 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }>()
 
   private managedAnnotations: IAnnotationGeometry[] = []
+  private filterAnnotationBySpacePipe = new FilterAnnotationsBySpace()
   public managedAnnotations$ = this.managedAnnotationsStream$.pipe(
     scanCollapse(),
     shareReplay(1),
+  )
+  public spaceFilteredManagedAnnotations$ = combineLatest([
+    this.selectedTmpl$,
+    this.managedAnnotations$
+  ]).pipe(
+    map(([tmpl, annts]) => {
+      return this.filterAnnotationBySpacePipe.transform(
+        annts,
+        tmpl
+      )
+    })
   )
 
   private registeredTools: {
@@ -147,18 +160,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
     const toolSubscriptions: Subscription[] = []
 
-    const { allNgAnnotations$, managedAnnotations$ } = newTool
+    const { managedAnnotations$ } = newTool
 
-    if ( allNgAnnotations$ ) {
-      toolSubscriptions.push(
-        newTool.allNgAnnotations$.subscribe(ann => {
-          this.ngAnnotations$.next({
-            tool: name,
-            annotations: ann
-          })
-        }),
-      )
-    }
     if ( managedAnnotations$ ){
       toolSubscriptions.push(
         managedAnnotations$.subscribe(ann => {
@@ -205,7 +208,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }
 
   constructor(
-    store: Store<any>,
+    private store: Store<any>,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
@@ -372,22 +375,27 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     /**
      * on tool managed annotations update
      */
-    const managedAnnotationUpdate$ = combineLatest([
+    const spaceFilteredManagedAnnotationUpdate$ = combineLatest([
       this.forcedAnnotationRefresh$,
-      this.ngAnnotations$.pipe(
-        scanCollapse(),
+      this.spaceFilteredManagedAnnotations$.pipe(
         switchMap(switchMapWaitFor({
           condition: () => !!this.ngAnnotationLayer,
           leading: true
         })),
       )
     ]).pipe(
-      map(([_, ngAnnos]) => ngAnnos),
+      map(([_, annts]) => {
+        const out = []
+        for (const ann of annts) {
+          out.push(...ann.toNgAnnotation())
+        }
+        return out
+      }),
       shareReplay(1),
     )
     this.subscription.push(
       // delete removed annotations
-      managedAnnotationUpdate$.pipe(
+      spaceFilteredManagedAnnotationUpdate$.pipe(
         pairwise(),
         filter(([ oldAnn, newAnn ]) => newAnn.length < oldAnn.length),
       ).subscribe(([ oldAnn, newAnn ]) => {
@@ -398,7 +406,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         }
       }), 
       //update annotations
-      managedAnnotationUpdate$.subscribe(arr => {
+      spaceFilteredManagedAnnotationUpdate$.subscribe(arr => {
         const ignoreNgAnnIdsSet = new Set<string>()
         for (const hiddenAnnot of this.hiddenAnnotations) {
           const ids = hiddenAnnot.getNgAnnotationIds()
@@ -454,6 +462,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
               }
             )
             this.ngAnnotationLayer = viewer.layerManager.addManagedLayer(layer)
+
+            /**
+             * on template changes, the layer gets lost
+             * force redraw annotations if layer needs to be recreated
+             */
+            this.forcedAnnotationRefresh$.next(null)
           }
         } else {
           if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(false)
@@ -466,9 +480,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      * required for metadata in annotation geometry and voxel size
      */
     this.subscription.push(
-      store.pipe(
-        select(viewerStateSelectedTemplatePureSelector)
-      ).subscribe(tmpl => {
+      this.selectedTmpl$.subscribe(tmpl => {
         this.selectedTmpl = tmpl
         this.annotnEvSubj.next({
           type: 'metadataEv',
@@ -476,9 +488,74 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             space: tmpl && { ['@id']: tmpl['@id'] }
           }
         })
+        this.forcedAnnotationRefresh$.next(null)
       }),
-      this.managedAnnotations$.subscribe(ann => this.managedAnnotations = ann),
+      this.managedAnnotations$.subscribe(ann => {
+        this.managedAnnotations = ann
+      }),
     )
+
+    /**
+     * on window unload, save annotation
+     */
+
+    /**
+     * before unload, save annotations
+     */
+     window.addEventListener('beforeunload', () => {
+      this.storeAnnotation(this.managedAnnotations)
+    })
+  }
+
+  /**
+   * ensure that loadStoredAnnotation only gets called once
+   */
+  private loadFlag = false
+  public async loadStoredAnnotations(){
+    if (this.loadFlag) return
+    this.loadFlag = true
+    
+    const encoded = window.localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (!encoded) return []
+    const bin = atob(encoded)
+    
+    await retry(() => {
+      if (!!(window as any).export_nehuba) return true
+      else throw new Error(`export nehuba not yet ready`)
+    }, {
+      timeout: 1000,
+      retries: 10
+    })
+    
+    const { pako } = (window as any).export_nehuba
+    const decoded = pako.inflate(bin, { to: 'string' })
+    const arr = JSON.parse(decoded)
+    const anns: IAnnotationGeometry[] = []
+    for (const obj of arr) {
+      const geometry = this.parseAnnotationObject(obj)
+      anns.push(geometry)
+    }
+    
+    for (const ann of anns) {
+      this.importAnnotation(ann)
+    }
+  }
+
+  private storeAnnotation(anns: IAnnotationGeometry[]){
+    const arr = []
+    for (const ann of anns) {
+      const json = ann.toJSON()
+      arr.push(json)
+    }
+    const stringifiedJSON = JSON.stringify(arr)
+    const { pako } = (window as any).export_nehuba
+    const compressed = pako.deflate(stringifiedJSON)
+    let out = ''
+    for (const num of compressed) {
+      out += String.fromCharCode(num)
+    }
+    const encoded = btoa(out)
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, encoded)
   }
 
   private hiddenAnnotationIds = new Set<string>()

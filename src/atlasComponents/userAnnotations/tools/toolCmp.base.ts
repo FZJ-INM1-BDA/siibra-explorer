@@ -1,5 +1,3 @@
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { Clipboard } from "@angular/cdk/clipboard";
 import { ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { TExportFormats } from "./type";
@@ -13,8 +11,6 @@ export abstract class ToolCmpBase {
 
   protected sub: Subscription[] = []
   constructor(
-    protected clipboard: Clipboard,
-    protected snackbar: MatSnackBar,
     protected cStore: ComponentStore<{ useFormat: TExportFormats }>,
   ){
 
@@ -33,15 +29,6 @@ export abstract class ToolCmpBase {
         useFormat: format
       })
     }
-  }
-
-  copyToClipboard(value: string){
-    const success = this.clipboard.copy(`${value}`)
-    this.snackbar.open(
-      success ? `Copied to clipboard!` : `Failed to copy URL to clipboard!`,
-      null,
-      { duration: 1000 }
-    )
   }
 
   /**

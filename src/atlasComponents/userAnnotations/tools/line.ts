@@ -13,7 +13,7 @@ import {
 } from "./type";
 import { Point, TPointJsonSpec } from './point'
 import { OnDestroy } from "@angular/core";
-import { merge, Observable, Subject, Subscription } from "rxjs";
+import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
 
@@ -192,11 +192,8 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
   
   subs: Subscription[] = []
 
-  private forceRefreshAnnotations$ = new Subject()
   private managedAnnotations: Line[] = []
   public managedAnnotations$ = new Subject<Line[]>()
-  public allNgAnnotations$ = new Subject<INgAnnotationTypes[keyof INgAnnotationTypes][]>()
-
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
     if (this.selectedLine && !!this.selectedLine.points[0]) {
@@ -259,16 +256,14 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
       ).subscribe(mouseev => {
         const crd = mouseev.detail.ngMouseEvent
         if (!this.selectedLine) {
-          this.selectedLine = new Line({
+          const newLine = new Line({
             space: this.space,
             "@type": 'siibra-ex/annotation/line',
             points: []
           })
-          const { id } = this.selectedLine
-          this.selectedLine.remove = () => this.removeAnnotation(id)
-          this.selectedLine.addLinePoints(crd)
-          this.managedAnnotations.push(this.selectedLine)
-          this.managedAnnotations$.next(this.managedAnnotations)
+          newLine.addLinePoints(crd)
+          this.addAnnotation(newLine)
+          this.selectedLine = newLine
         } else {
 
           this.selectedLine.addLinePoints(crd)
@@ -278,24 +273,6 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
             this.callback({ type: 'paintingEnd' })
           }
         }
-      }),
-
-      /**
-       * conditions by which ng annotations are refreshed
-       */
-      merge(
-        toolDeselect$,
-        toolSelThenClick$,
-        this.forceRefreshAnnotations$,
-      ).pipe(
-
-      ).subscribe(() => {
-        let out: INgAnnotationTypes['line'][] = []
-        for (const managedAnn of this.managedAnnotations) {
-          out = out.concat(...managedAnn.toNgAnnotation())
-        }
-
-        this.allNgAnnotations$.next(out)
       }),
 
       /**
@@ -319,7 +296,7 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
         } else {
           annotation.translate(deltaX, deltaY, deltaZ)
         }
-        this.forceRefreshAnnotations$.next(null)
+        this.managedAnnotations$.next(this.managedAnnotations)
       })
     )
   }
@@ -331,9 +308,9 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
   addAnnotation(line: Line) {
     const idx = this.managedAnnotations.findIndex(ann => ann.id === line.id)
     if (idx >= 0) throw new Error(`Line annotation has already been added`)
+    line.remove = () => this.removeAnnotation(line.id)
     this.managedAnnotations.push(line)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefreshAnnotations$.next(null)
   }
 
   removeAnnotation(id: string){
@@ -343,7 +320,6 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
     }
     this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
-    this.forceRefreshAnnotations$.next(null)
   }
 
 }

@@ -29,7 +29,7 @@ export class AnnotationList {
   @ViewChild(FileInputDirective)
   fileInput: FileInputDirective
 
-  public managedAnnotations$ = this.annotSvc.managedAnnotations$
+  public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
 
   public manAnnExists$ = this.managedAnnotations$.pipe(
     map(arr => !!arr && arr.length > 0),

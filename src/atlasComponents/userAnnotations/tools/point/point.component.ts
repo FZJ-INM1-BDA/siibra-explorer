@@ -1,8 +1,6 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { Point, POINT_ICON_CLASS } from "../point";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
-import { Clipboard } from "@angular/cdk/clipboard";
 import { ToolCmpBase } from "../toolCmp.base";
 import { Store } from "@ngrx/store";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
@@ -30,12 +28,10 @@ export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
 
   constructor(
     private store: Store<any>,
-    snackbar: MatSnackBar,
-    clipboard: Clipboard,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() @Inject(UDPATE_ANNOTATION_TOKEN) updateAnnotation: IAnnotationGeometry,
   ){
-    super(clipboard, snackbar, cStore)
+    super(cStore)
     
     if (updateAnnotation) {
       if (updateAnnotation instanceof Point) {

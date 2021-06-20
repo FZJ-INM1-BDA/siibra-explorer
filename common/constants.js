@@ -6,6 +6,7 @@
     OPEN: 'Open',
     EXPAND: 'Expand',
     COLLAPSE: 'Collapse',
+    COPY_TO_CLIPBOARD: 'Copy to clipboard',
 
     // dataset specific
     EXPLORE_DATASET_IN_KG: `Explore dataset in Knowledge Graph`,

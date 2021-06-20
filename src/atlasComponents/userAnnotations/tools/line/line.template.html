@@ -40,25 +40,12 @@
     iav-stop="click">
 
     <div class="iv-custom-comp text">
-      <mat-form-field>
-        <mat-label>
-          {{ useFormat }}
-        </mat-label>
-        <textarea
-          disabled="true"
-          matInput
-          #exportTarget>{{ updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat }}</textarea>
-
-        <button mat-icon-button
-          matSuffix
-          iav-stop="click"
-          aria-label="Copy to clipboard"
-          matTooltip="Copy to clipboard."
-          (click)="copyToClipboard(exportTarget.value)"
-          color="basic">
-          <i class="fas fa-copy"></i>
-        </button>
-      </mat-form-field>
+      <textarea-copy-export
+        [textarea-copy-export-label]="useFormat"
+        [textarea-copy-export-text]="updateAnnotation.updateSignal$ | async | toFormattedStringPipe : updateAnnotation : useFormat"
+        [textarea-copy-export-download-filename]="updateAnnotation.id + '.sands.json'"
+        [textarea-copy-export-disable]="true">
+      </textarea-copy-export>
     </div>
   </div>
 </mat-menu>

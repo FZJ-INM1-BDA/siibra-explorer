@@ -22,7 +22,6 @@ export class ToolSelect extends AbsToolClass<Point> implements IAnnotationTools,
   removeAnnotation(){}
 
   managedAnnotations$ = new Subject<Point[]>()
-  allNgAnnotations$ = new Subject<TNgAnnotationPoint[]>()
   constructor(
     annotationEv$: Observable<TAnnotationEvent<keyof IAnnotationEvents>>,
     callback: TCallbackFunction
