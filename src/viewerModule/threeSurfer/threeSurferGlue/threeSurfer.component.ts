@@ -37,6 +37,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   public modes: TThreeSurferMode[] = []
   public selectedMode: string
 
+  public allKeys: {name: string, checked: boolean}[] = []
+
   private regionMap: Map<string, Map<number, any>> = new Map()
   constructor(
     private el: ElementRef,
@@ -54,6 +56,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   }[] = []
 
   private unloadAllMeshes() {
+    this.allKeys = []
     while(this.loadedMeshes.length > 0) {
       const m = this.loadedMeshes.pop()
       this.tsRef.unloadMesh(m.threeSurfer)
@@ -68,7 +71,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     const { meshes } = mode
     for (const singleMesh of meshes) {
       const { mesh, colormap, hemisphere } = singleMesh
-      
+      this.allKeys.push({name: hemisphere, checked: true})
+
       const tsM = await this.tsRef.loadMesh(
         parseContext(mesh, [this.config['@context']])
       )
@@ -182,6 +186,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       const found = this.loadedMeshes.find(({ threeSurfer }) => threeSurfer === evGeom)
       
       if (!found) return this.handleMouseoverEvent(custEv)
+      
+      /**
+       * check if the mesh is toggled off
+       * if so, do not proceed
+       */
+      const checkKey = this.allKeys.find(key => key.name === found.hemisphere)
+      if (checkKey && !checkKey.checked) return 
 
       const { hemisphere: key, vIdxArr } = found
 
@@ -252,6 +263,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       mouseover.map(
         el => el.name || el.error
       ).join(' / ')
+  }
+
+  public handleCheckBox(key: { name: string, checked: boolean }, flag: boolean){
+    const foundMesh = this.loadedMeshes.find(m => m.hemisphere === key.name)
+    if (!foundMesh) {
+      throw new Error(`Cannot find mesh with name: ${key.name}`)
+    }
+    const meshObj = this.tsRef.customColormap.get(foundMesh.threeSurfer)
+    if (!meshObj) {
+      throw new Error(`mesh obj not found!`)
+    }
+    meshObj.mesh.visible = flag
   }
 
   private onDestroyCb: (() => void) [] = []
