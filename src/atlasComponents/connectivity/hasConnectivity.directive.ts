@@ -3,6 +3,7 @@ import {of, Subscription} from "rxjs";
 import {switchMap} from "rxjs/operators";
 import {BS_ENDPOINT} from "src/util/constants";
 import {HttpClient} from "@angular/common/http";
+import {getIdFromKgIdObj} from "common/util";
 
 @Directive({
   selector: '[has-connectivity]',
@@ -27,10 +28,11 @@ export class HasConnectivity implements OnInit, OnDestroy {
 
     checkConnectivity(region) {
       const {atlas, parcellation, template} = region.context
-      if (region.id && region.id.kg) {
-        const regionId = `${region.id.kg.kgSchema}/${region.id.kg.kgId}`
+      if (region.id || region.name) {
+        const regionId = region.id? region.id.kg? getIdFromKgIdObj(region.id.kg)
+          : region.id : null
 
-        const connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(atlas['@id'])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(regionId)}/features/ConnectivityProfile`
+        const connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(atlas['@id'])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(regionId || region.name)}/features/ConnectivityProfile`
 
         this.subscriptions.push(
           this.httpClient.get<[]>(connectivityUrl).pipe(switchMap((res: any[]) => {

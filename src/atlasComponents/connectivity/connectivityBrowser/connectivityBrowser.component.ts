@@ -21,6 +21,8 @@ import {
 } from "src/services/state/viewerState/selectors";
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
+import {getIdFromKgIdObj} from "common/util";
+
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
@@ -100,7 +102,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
 
       this.regionName = newRegionName
-      this.regionId = `${val.id.kg.kgSchema}/${val.id.kg.kgId}`
+      this.regionId = val.id? val.id.kg? getIdFromKgIdObj(val.id.kg) : val.id : null
       this.atlasId = val.context.atlas['@id']
       this.parcellationId = val.context.parcellation['@id']
 
@@ -151,7 +153,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public fullConnectivityLoadUrl: string
 
     ngOnInit(): void {
-      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId)}/features/ConnectivityProfile`
+      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId || this.regionName)}/features/ConnectivityProfile`
 
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res

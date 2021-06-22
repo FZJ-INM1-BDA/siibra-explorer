@@ -72,6 +72,13 @@
 
   exports.getIdObj = getIdObj
 
+  exports.getIdFromKgIdObj = kg => {
+    if(kg.kgId && kg.kgSchema) {
+      return `${kg.kgSchema}/${kg.kgId}`
+    }
+    return null
+  }
+
   exports.getIdFromFullId = fullId => {
     const idObj = getIdObj(fullId)
     if (!idObj) return null
@@ -117,7 +124,7 @@
         await (() => new Promise(rs => setTimeout(rs, timeout)))()
       }
     }
-  
+
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
   const flattenRegions = regions => regions.concat(
