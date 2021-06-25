@@ -69,6 +69,15 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
 
     this.selectedMode = mode.name
     const { meshes } = mode
+    await retry(async () => {
+      for (const singleMesh of meshes) {
+        const { hemisphere } = singleMesh
+      if (!this.regionMap.has(hemisphere)) throw new Error(`regionmap does not have hemisphere defined!`)
+      }
+    }, {
+      timeout: 32,
+      retries: 10
+    })
     for (const singleMesh of meshes) {
       const { mesh, colormap, hemisphere } = singleMesh
       this.allKeys.push({name: hemisphere, checked: true})
@@ -77,6 +86,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         parseContext(mesh, [this.config['@context']])
       )
 
+      if (!this.regionMap.has(hemisphere)) continue
       const rMap = this.regionMap.get(hemisphere)
       const applyCM = new Map()
       for (const [ lblIdx, region ] of rMap.entries()) {

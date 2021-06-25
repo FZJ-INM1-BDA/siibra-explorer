@@ -1,9 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core"
 
-/**
- * TODO find this pipe a home
- * not too sure where this should stay
- */
 @Pipe({
   name: 'regionAccordionTooltipTextPipe',
   pure: true

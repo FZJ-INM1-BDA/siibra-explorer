@@ -8,6 +8,7 @@ import { KgRegDetailCmp } from "./kgRegDetail/kgRegDetail.component";
 import { KgDatasetModule } from "../kgDataset";
 import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "../kgDataset/showDataset/showDataset.directive";
 import { UtilModule } from "src/util";
+import { ComponentsModule } from "src/components";
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { UtilModule } from "src/util";
     AngularMaterialModule,
     KgDatasetModule,
     UtilModule,
+    ComponentsModule,
   ],
   declarations:[
     KgRegSummaryCmp,

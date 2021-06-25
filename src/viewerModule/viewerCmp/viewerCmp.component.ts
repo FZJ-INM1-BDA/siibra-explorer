@@ -19,12 +19,8 @@ import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDataset
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
-import { IViewerCmpUiState } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
-import { ComponentStore } from "../componentStore";
-import {BS_ENDPOINT} from "src/util/constants";
-import {HttpClient} from "@angular/common/http";
 import { PureContantService } from "src/util";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { getGetRegionFromLabelIndexId } from "src/util/fn";
@@ -98,7 +94,6 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
       },
       deps: [ Store ]
     },
-    ComponentStore
   ]
 })
 
@@ -224,24 +219,9 @@ export class ViewerCmp implements OnDestroy {
 
   constructor(
     private store$: Store<any>,
-    private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: []
-      }
-    })
-
-    this.activePanelTitles$ = this.viewerCmpLocalUiStore.select(
-      state => state.sideNav.activePanelsTitle
-    ) as Observable<string[]>
-    this.subscriptions.push(
-      this.activePanelTitles$.subscribe(
-        (activePanelTitles: string[]) => this.activePanelTitles = activePanelTitles
-      )
-    )
 
     this.subscriptions.push(
       this.alwaysHideMinorPanel$.pipe(
@@ -334,27 +314,6 @@ export class ViewerCmp implements OnDestroy {
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  public activePanelTitles$: Observable<string[]>
-  private activePanelTitles: string[] = []
-  handleExpansionPanelClosedEv(title: string){
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: this.activePanelTitles.filter(n => n !== title)
-      }
-    })
-  }
-  handleExpansionPanelAfterExpandEv(title: string){
-    if (this.activePanelTitles.includes(title)) return
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: [
-          ...this.activePanelTitles,
-          title
-        ]
-      }
-    })
-  }
-
   public bindFns(fns){
     return () => {
       for (const [ fn, ...arg] of fns) {
@@ -411,7 +370,7 @@ export class ViewerCmp implements OnDestroy {
       }})
     )
   }
-  public clearPreviewingDataset(id: string){
+  public clearPreviewingDataset(id?: string){
     /**
      * clear all preview
      */

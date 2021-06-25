@@ -113,7 +113,7 @@
 
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
 
-        <!-- pullable tab top right corner -->
+        <!-- pullable tab top left corner -->
         <div iavLayoutFourCornersTopLeft class="d-flex flex-nowrap w-100">
 
           <!-- top left -->
@@ -205,26 +205,26 @@
         <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
           <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
 
-            <!-- single dataset side nav panel -->
-            <single-dataset-sidenav-view *ngFor="let id of shownDatasetId"
-              (clear)="clearPreviewingDataset(id)"
-              [fullId]="id"
-              class="bs-border-box ml-15px-n mr-15px-n">
-              <mat-chip *ngIf="regionOfInterest$ && regionOfInterest$ | async as region"
-                region-of-interest
-                iav-region
-                [region]="region"
-                [ngClass]="{
-                  'darktheme':regionDirective.rgbDarkmode === true,
-                  'lighttheme': regionDirective.rgbDarkmode === false
-                }"
-                [style.backgroundColor]="regionDirective.rgbString"
-                #regionDirective="iavRegion">
-                <span class="iv-custom-comp text text-truncate d-inline">
-                  {{ region.name }}
+            <div class="position-relative ml-15px-n mr-15px-n">
+
+              <!-- back btn -->
+              <button mat-button
+                (click)="clearPreviewingDataset()"
+                [attr.aria-label]="ARIA_LABELS.CLOSE"
+                class="position-absolute z-index-10 m-2">
+                <i class="fas fa-chevron-left"></i>
+                <span class="ml-1">
+                  Back
                 </span>
-              </mat-chip>
-            </single-dataset-sidenav-view>
+              </button>
+
+              <!-- ebrains region -->
+              <kg-regional-feature-detail
+                *ngFor="let datasetId of shownDatasetId"
+                [summary]="{'@id': datasetId}"
+                [region]="selectedRegions$ | async | getNthElement : 0">
+              </kg-regional-feature-detail>
+            </div>
           </ng-template>
         </ng-container>
 
@@ -695,126 +695,10 @@
   <!-- region detail -->
   <ng-container *ngIf="region; else regionPlaceholderTmpl">
     <region-menu
-      [showRegionInOtherTmpl]="false"
       [region]="region"
-      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
+      class="flex-grow-1 bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
     </region-menu>
   </ng-container>
-
-  <!-- other region detail accordion -->
-  <mat-accordion *ngIf="region"
-    class="bs-border-box ml-15px-n mr-15px-n mt-2"
-    iav-region
-    [region]="region"
-    #iavRegion="iavRegion">
-
-    <!-- desc -->
-    <!-- obsolete -->
-
-    <!-- Explore in other template -->
-    <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
-
-      <ng-template #exploreInOtherTmpl>
-        <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
-          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer"
-          (click)="iavRegion.changeView(sameRegion)"
-          [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
-          mat-ripple>
-          <small>
-            {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
-          </small>
-        </mat-card>
-      </ng-template>
-
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: 'Explore in other templates',
-        desc: regionInOtherTemplates.length,
-        iconClass: 'fas fa-brain',
-        iconTooltip: regionInOtherTemplates.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
-        iavNgIf: regionInOtherTemplates.length,
-        content: exploreInOtherTmpl
-      }">
-
-
-      </ng-container>
-    </ng-container>
-
-    <!-- tmp experimtal -->
-    <ng-template #regionalReceptorTmpl>
-      <bs-features-receptor-entry
-        [region]="region">
-      </bs-features-receptor-entry>
-    </ng-template>
-
-    <div bs-features-receptor-directive
-      [region]="region"
-      #bsFeatureReceptorDirective="bsFeatureReceptorDirective">
-    </div>
-    <spinner-cmp *ngIf="bsFeatureReceptorDirective.fetching$ | async"></spinner-cmp>
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: 'ReceptorDistribution',
-      iconClass: 'fas fa-info',
-      iavNgIf: bsFeatureReceptorDirective.hasReceptor$ | async,
-      content: regionalReceptorTmpl
-    }">
-
-    </ng-container>
-
-    <!-- kg regional features list -->
-    <ng-template #kgRegionalFeatureList>
-      <kg-regional-features-list [region]="region">
-      </kg-regional-features-list>
-    </ng-template>
-
-    <div kg-regional-features-list-directive
-      [region]="region"
-      #kgRegFeatlist="kgRegionalFeaturesListDirective">
-    </div>
-
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: CONST.REGIONAL_FEATURES,
-      iconClass: 'fas fa-database',
-      content: kgRegionalFeatureList,
-      desc: kgRegFeatlist.kgRegionalFeatures.length,
-      iconTooltip: kgRegFeatlist.kgRegionalFeatures.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
-      iavNgIf: (kgRegFeatlist.kgRegionalFeatures$ | async ).length
-    }">
-    </ng-container>
-
-    <!-- Connectivity -->
-    <ng-container  *ngIf="parcellationSelected$ | async as selectedParcellation">
-
-      <ng-template #connectivityContentTmpl let-expansionPanel="expansionPanel">
-        <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
-          <ng-container *ngFor="let region of selectedRegions$ | async">
-            <connectivity-browser class="pe-all flex-shrink-1"
-              [region]="region"
-              (setOpenState)="expansionPanel.expanded = $event"
-              [accordionExpanded]="expansionPanel.expanded"
-              (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">
-            </connectivity-browser>
-          </ng-container>
-        </mat-card-content>
-      </ng-template>
-
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: 'Connectivity',
-        desc: hasConnectivityDirective.connectivityNumber,
-        iconClass: 'fas fa-braille',
-        iconTooltip: hasConnectivityDirective.connectivityNumber | regionAccordionTooltipTextPipe : 'connectivity',
-        iavNgIf: hasConnectivityDirective.hasConnectivity,
-        content: connectivityContentTmpl
-      }">
-      </ng-container>
-
-      <div has-connectivity
-           [region]="selectedRegions$ | async"
-           #hasConnectivityDirective="hasConnectivityDirective">
-      </div>
-
-    </ng-container>
-
-  </mat-accordion>
 </ng-template>
 
 
@@ -827,11 +711,8 @@
   let-iavNgIf="iavNgIf"
   let-content="content">
   <mat-expansion-panel
-    [expanded]="activePanelTitles$ | async | arrayContains : title"
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
-    (closed)="handleExpansionPanelClosedEv(title)"
-    (afterExpand)="handleExpansionPanelAfterExpandEv(title)"
     hideToggle
     *ngIf="iavNgIf"
     #expansionPanel="matExpansionPanel">
@@ -883,10 +764,7 @@
 <ng-template #multiRegionTmpl let-regions="regions">
   <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
     <region-menu
-      [showRegionInOtherTmpl]="false"
-      [region]="{
-        name: CONST.MULTI_REGION_SELECTION
-      }"
+      [region]="{ name: CONST.MULTI_REGION_SELECTION }"
       class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
     </region-menu>
 

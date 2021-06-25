@@ -548,6 +548,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       arr.push(json)
     }
     const stringifiedJSON = JSON.stringify(arr)
+    if (!(window as any).export_nehuba) return
     const { pako } = (window as any).export_nehuba
     const compressed = pako.deflate(stringifiedJSON)
     let out = ''
