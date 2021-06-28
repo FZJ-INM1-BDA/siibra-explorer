@@ -32,7 +32,7 @@
               }">
               </ng-container>
             </div>
-  
+
             <annotating-tools-panel class="z-index-10">
             </annotating-tools-panel>
           </div>
@@ -52,7 +52,7 @@
             </mat-card>
           </div>
         </iav-layout-fourcorners>
-  
+
 
       </mat-drawer-content>
     </mat-drawer-container>
@@ -154,7 +154,8 @@
               class="iv-custom-comp bg card m-2 mat-elevation-z2"
               quick-tour
               [quick-tour-description]="quickTourAtlasSelector.description"
-              [quick-tour-order]="quickTourAtlasSelector.order">
+              [quick-tour-order]="quickTourAtlasSelector.order"
+              [quick-tour-check-auto-start]="true">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -1090,12 +1091,12 @@
         [ngTemplateOutlet]="tmplRef.tmpl"
         [ngTemplateOutletContext]="{$implicit: tmplRef.data}">
       </ng-template>
-      
+
       <!-- template not provided -->
       <ng-template #fallbackTmpl>
         {{ tmplRef.data.message || 'test' }}
       </ng-template>
-      
+
       <mat-divider></mat-divider>
     </mat-card-content>
   </mat-card>
