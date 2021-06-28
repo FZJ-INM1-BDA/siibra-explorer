@@ -1,7 +1,6 @@
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef } from "@angular/core";
 import { QuickTourService } from "src/ui/quickTour/quickTour.service";
 import { IQuickTourOverwritePosition, TQuickTourPosition } from "src/ui/quickTour/constrants";
-import {LOCAL_STORAGE_CONST} from "src/util/constants";
 
 @Directive({
   selector: '[quick-tour]',
