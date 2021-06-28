@@ -5,6 +5,7 @@ import { ComponentPortal } from "@angular/cdk/portal";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
 import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
+import {LOCAL_STORAGE_CONST} from "src/util/constants";
 
 export function findInLinkedList<T extends object>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
   let compareObj = first,
@@ -62,6 +63,13 @@ export class QuickTourService {
     this.slides.remove(dir)
   }
 
+  public autoStart() {
+    if (!localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)) {
+      this.startTour()
+      localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+    }
+  }
+
   public startTour() {
     if (!this.overlayRef) {
       this.overlayRef = this.overlay.create({
@@ -70,14 +78,14 @@ export class QuickTourService {
         hasBackdrop: true,
         backdropClass: ['pe-none', 'cdk-overlay-dark-backdrop'],
         positionStrategy: this.overlay.position().global(),
-      })  
+      })
     }
-    
+
     if (!this.cmpRef) {
       this.cmpRef = this.overlayRef.attach(
         new ComponentPortal(this.quickTourCmp)
       )
-  
+
       this.currActiveSlide = this.slides.first
       this.currentTip$.next(this.currActiveSlide)
     }

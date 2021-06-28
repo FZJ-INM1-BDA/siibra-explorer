@@ -33,10 +33,7 @@ export class QuickTourThis implements OnInit, OnChanges, OnDestroy {
     this.quickTourService.register(this)
 
     if (this.quickTourCheckAutoStart) {
-      if (!localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)) {
-        this.quickTourService.startTour()
-        localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
-      }
+      this.quickTourService.autoStart()
     }
 
   }
