@@ -282,6 +282,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     if (this.setColormap$) {
       this.ondestroySubscriptions.push(
         this.setColormap$.pipe(
+          switchMap(switchMapWaitFor({
+            condition: () => !!(this.nehubaViewer?.ngviewer)
+          })),
           debounceTime(160),
         ).subscribe(v => {
           const map = new Map()
