@@ -325,8 +325,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
 ---
 
-If you have any comments or need further support, please send contact us at [${this.pureConstantService.supportEmailAddress}](${this.pureConstantService.supportEmailAddress})`,
-    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please send contact us at ${this.pureConstantService.supportEmailAddress}`,
+If you have any comments or need further support, please contact us at [${this.pureConstantService.supportEmailAddress}](mailto:${this.pureConstantService.supportEmailAddress})`,
+    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.pureConstantService.supportEmailAddress}`,
     position: 'center'
   }
 
