@@ -1,12 +1,11 @@
 <!-- header -->
-
 <mat-card class="mat-elevation-z4">
 
   <div class="sidenav-cover-header-container bg-50-grey-20">
     <mat-card-title>
       <ng-content select="[region-of-interest]"></ng-content>
       <div *ngIf="!loadingFlag; else isLoadingTmpl">
-        {{ (detail && detail.src_name) || nameFallback }}
+        {{ name || nameFallback }}
       </div>
     </mat-card-title>
 
@@ -25,8 +24,8 @@
       <mat-divider [vertical]="true" class="ml-2 h-2rem"></mat-divider>
 
       <!-- explore btn -->
-      <a *ngFor="let kgRef of (detail?.__detail?.kgReference || [])"
-        [href]="kgRef | doiParserPipe"
+      <a *ngFor="let kgRef of (urls || [])"
+        [href]="kgRef.doi | doiParserPipe"
         class="color-inherit"
         mat-icon-button
         [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
@@ -42,7 +41,7 @@
 <!-- description -->
 
 <markdown-dom class="text-muted d-block mat-body m-4" *ngIf="!loadingFlag"
-  [markdown]="detail?.__detail?.description || descriptionFallback">
+  [markdown]="description || descriptionFallback">
 </markdown-dom>
 
 <ng-template #isLoadingTmpl>

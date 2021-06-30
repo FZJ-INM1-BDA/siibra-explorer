@@ -1,5 +1,5 @@
-import { Directive, HostListener, Inject, Input, Optional } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { Component, Directive, HostListener, Inject, Input, Optional } from "@angular/core";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
 
@@ -12,7 +12,7 @@ export const IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG = `IAV_DATASET_SHOW_DATASET_
 })
 export class ShowDatasetDialogDirective{
 
-  static defaultDialogConfig = {
+  static defaultDialogConfig: MatDialogConfig = {
     autoFocus: false
   }
 
@@ -31,6 +31,12 @@ export class ShowDatasetDialogDirective{
   @Input('iav-dataset-show-dataset-dialog-fullid')
   fullId: string
 
+  @Input('iav-dataset-show-dataset-dialog-urls')
+  urls: {
+    cite: string
+    doi: string
+  }[] = []
+
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
@@ -47,8 +53,8 @@ export class ShowDatasetDialogDirective{
         }
       }
       if (this.name || this.description) {
-        const { name, description } = this
-        return { name, description }
+        const { name, description, urls } = this
+        return { name, description, urls }
       }
     })()
 
@@ -63,6 +69,7 @@ export class ShowDatasetDialogDirective{
     if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)
     this.matDialog.open(this.dialogCmp, {
       ...ShowDatasetDialogDirective.defaultDialogConfig,
+      panelClass: ['no-padding-dialog'],
       data
     })
   }

@@ -1,4 +1,4 @@
-import { Directive, OnDestroy } from "@angular/core";
+import { Directive, EventEmitter, OnDestroy, Output } from "@angular/core";
 import { merge, of, Subscription } from "rxjs";
 import { catchError, map, mapTo, switchMap } from "rxjs/operators";
 import { BsRegionInputBase } from "../bsRegionInputBase";
@@ -35,5 +35,11 @@ export class BsFeatureReceptorDirective extends BsRegionInputBase implements OnD
     svc: BsFeatureService
   ){
     super(svc)
+    this.sub.push(
+      this.fetching$.subscribe(flag => this.fetchingFlagEmitter.emit(flag))
+    )
   }
+
+  @Output('bs-features-receptor-directive-fetching-flag')
+  public fetchingFlagEmitter = new EventEmitter<boolean>()
 }

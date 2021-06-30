@@ -8,6 +8,7 @@ import { RenderViewOriginDatasetLabelPipe } from '../region.base'
 import { Directive, Input } from "@angular/core"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { ComponentsModule } from "src/components"
+import { BSFeatureReceptorModule } from "src/atlasComponents/regionalFeatures/bsFeatures/receptor"
 
 const mt0 = {
   name: 'mt0'
@@ -104,6 +105,7 @@ describe('> regionMenu.component.ts', () => {
           CommonModule,
           NoopAnimationsModule,
           ComponentsModule,
+          BSFeatureReceptorModule,
         ],
         declarations: [
           RegionMenuComponent,

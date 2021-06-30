@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { Component, NgModule } from "@angular/core";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { KgRegSummaryCmp } from "./kgRegSummary/kgRegSummary.component";
 import { KgRegionalFeaturesList } from "./kgRegList/kgRegList.component";
@@ -9,6 +9,23 @@ import { KgDatasetModule } from "../kgDataset";
 import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "../kgDataset/showDataset/showDataset.directive";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
+
+@Component({
+  selector: 'blabla',
+  template: `
+<mat-dialog-content class="m-0 p-0">
+  <kg-regional-feature-detail></kg-regional-feature-detail>
+</mat-dialog-content>
+
+<mat-dialog-actions align="center">
+  <button mat-button mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions>
+`
+})
+
+export class ShowDsDialogCmp{}
 
 @NgModule({
   imports: [
@@ -23,6 +40,7 @@ import { ComponentsModule } from "src/components";
     KgRegionalFeaturesList,
     KgRegionalFeaturesListDirective,
     KgRegDetailCmp,
+    ShowDsDialogCmp,
   ],
   exports:[
     KgRegSummaryCmp,
@@ -33,7 +51,7 @@ import { ComponentsModule } from "src/components";
   providers: [
     {
       provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
-      useValue: KgRegDetailCmp
+      useValue: ShowDsDialogCmp
     }
   ]
 })

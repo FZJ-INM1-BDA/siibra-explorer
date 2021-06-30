@@ -37,7 +37,6 @@ import { LayerBrowserModule } from "../../ui/layerbrowser";
 import { ContributorModule } from "./contributor";
 import { DatabrowserService } from "./databrowser.service";
 import { ShownDatasetDirective } from "./shownDataset.directive";
-import { SingleDatasetSideNavView } from "./singleDataset/sideNavView/sDsSideNavView.component";
 import { RegionalFeaturesModule } from "../regionalFeatures";
 import { SingleDatasetDirective } from "./singleDataset/singleDataset.directive";
 import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
@@ -70,7 +69,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
-    SingleDatasetSideNavView,
 
     /**
      * Directives
@@ -109,7 +107,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewFileTypePipe,
     ShownPreviewsDirective,
     ShownDatasetDirective,
-    SingleDatasetSideNavView,
   ],
   entryComponents: [
     PreviewComponentWrapper

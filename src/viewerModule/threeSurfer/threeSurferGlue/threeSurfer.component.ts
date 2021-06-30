@@ -72,7 +72,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     await retry(async () => {
       for (const singleMesh of meshes) {
         const { hemisphere } = singleMesh
-      if (!this.regionMap.has(hemisphere)) throw new Error(`regionmap does not have hemisphere defined!`)
+        if (!this.regionMap.has(hemisphere)) throw new Error(`regionmap does not have hemisphere defined!`)
       }
     }, {
       timeout: 32,

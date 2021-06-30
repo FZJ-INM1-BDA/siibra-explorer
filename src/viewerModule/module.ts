@@ -23,6 +23,7 @@ import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type
 import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
 import { map } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
+import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { TContextArg } from "./viewer.interface";
     UserAnnotationsModule,
     QuickTourModule,
     ContextMenuModule,
+    ViewerStateBreadCrumbModule,
   ],
   declarations: [
     ViewerCmp,

@@ -51,8 +51,29 @@
 
 <mat-accordion class="d-block mt-2">
 
+  <!-- description -->
+  <ng-template [ngIf]="(region.originDatainfos || []).length > 0">
+    <ng-container *ngFor="let originData of region.originDatainfos">
+      <ng-template #descTmpl>
+        <markdown-dom [markdown]="originData.description"
+          class="text-muted text-sm">
+        </markdown-dom>
+      </ng-template>
+
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Description',
+        iconClass: 'fas fa-info',
+        iavNgIf: true,
+        content: descTmpl
+      }">
+
+      </ng-container>
+    </ng-container>
+  </ng-template>
+
   <!-- receptor -->
   <div bs-features-receptor-directive
+    (bs-features-receptor-directive-fetching-flag$)="handleBusySignal('receptor', $event)"
     [region]="region"
     #bsFeatureReceptorDirective="bsFeatureReceptorDirective">
   </div>

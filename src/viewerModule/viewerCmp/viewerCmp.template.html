@@ -261,25 +261,9 @@
           <!-- chips -->
           <div class="flex-grow-0 p-1 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
 
-            <mat-chip-list class="d-inline-block"
-              quick-tour
-              [quick-tour-description]="quickTourChips.description"
-              [quick-tour-order]="quickTourChips.order">
-              <!-- additional layer -->
-
-              <ng-container>
-                <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: (parcellationSelected$ | async) }">
-                </ng-container>
-              </ng-container>
-
-              <!-- any selected region(s) -->
-              <ng-container>
-                <ng-container *ngTemplateOutlet="selectedRegionTmpl">
-                </ng-container>
-              </ng-container>
-
-
-            </mat-chip-list>
+            <viewer-state-breadcrumb
+              (on-item-click)="handleChipClick()">
+            </viewer-state-breadcrumb>
           </div>
         </div>
 
@@ -334,206 +318,6 @@
   </iav-layout-fourcorners>
 </ng-template>
 
-<!-- parcellation chip / region chip -->
-<ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
-  <div [matMenuTriggerFor]="layerVersionMenu"
-    [matMenuTriggerData]="{ layerVersionMenuTrigger: layerVersionMenuTrigger }"
-    #layerVersionMenuTrigger="matMenuTrigger">
-
-    <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
-      <ng-container *ngFor="let p of addParc">
-        <ng-container *ngTemplateOutlet="chipTmpl; context: {
-          parcel: p,
-          selected: true,
-          dismissable: true,
-          ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
-          onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
-        }">
-        </ng-container>
-      </ng-container>
-    </ng-template>
-    <ng-template #defaultParcTmpl>
-      <ng-template [ngIf]="parc">
-
-        <ng-container *ngTemplateOutlet="chipTmpl; context: {
-          parcel: parc,
-          selected: false,
-          dismissable: false,
-          ariaLabel: ARIA_LABELS.PARC_VER_SELECT,
-          onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
-        }">
-        </ng-container>
-      </ng-template>
-    </ng-template>
-  </div>
-</ng-template>
-
-
-<!-- layer version selector -->
-<mat-menu #layerVersionMenu
-  class="bg-none box-shadow-none"
-  [aria-label]="ARIA_LABELS.PARC_VER_CONTAINER"
-  [hasBackdrop]="false">
-  <ng-template matMenuContent let-layerVersionMenuTrigger="layerVersionMenuTrigger">
-    <div (iav-outsideClick)="layerVersionMenuTrigger.closeMenu()">
-      <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
-        <ng-container *ngIf="parcellationSelected$ | async as selectedParcellation">
-
-          <ng-container *ngTemplateOutlet="chipTmpl; context: {
-            parcel: parcVer,
-            selected: selectedParcellation['@id'] === parcVer['@id'],
-            dismissable: false,
-            class: 'w-100',
-            ariaLabel: parcVer.displayName || parcVer.name,
-            onclick: bindFns([
-              [ selectParcellation.bind(this), parcVer ],
-              [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
-            ])
-          }">
-          </ng-container>
-        </ng-container>
-        <div class="mt-1"></div>
-      </ng-container>
-    </div>
-  </ng-template>
-</mat-menu>
-
-<!-- chip tmpl -->
-<ng-template #chipTmpl
-  let-parcel="parcel"
-  let-selected="selected"
-  let-dismissable="dismissable"
-  let-chipClass="class"
-  let-ariaLabel="ariaLabel"
-  let-onclick="onclick">
-  <mat-chip class="pe-all position-relative z-index-2 d-inline-flex justify-content-between"
-    [ngClass]="chipClass"
-    [attr.aria-label]="ariaLabel"
-    (click)="onclick && onclick()"
-    [selected]="selected">
-
-    <span class="ws-no-wrap">
-      {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel && (parcel.displayName || parcel.name) }}
-    </span>
-
-    <!-- info icon -->
-    <ng-template [ngIf]="parcel?.originDatasets?.length > 0" [ngIfElse]="infoIconBasic">
-
-      <mat-icon
-        *ngFor="let ds of parcel.originDatasets"
-        fontSet="fas"
-        fontIcon="fa-info-circle"
-        iav-stop="click"
-        iav-dataset-show-dataset-dialog
-        [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
-        [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
-        [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
-        [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
-      </mat-icon>
-
-    </ng-template>
-
-    <ng-template #infoIconBasic>
-      <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
-        fontSet="fas"
-        fontIcon="fa-info-circle"
-        iav-stop="click"
-        iav-dataset-show-dataset-dialog
-        [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
-        [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
-
-      </mat-icon>
-    </ng-template>
-
-    <!-- dismiss icon -->
-    <mat-icon
-      *ngIf="dismissable"
-      (click)="clearAdditionalLayer(parcel); $event.stopPropagation()"
-      fontSet="fas"
-      fontIcon="fa-times">
-    </mat-icon>
-  </mat-chip>
-</ng-template>
-
-
-<ng-template #selectedRegionTmpl>
-
-  <!-- regions chip -->
-  <ng-template [ngIf]="selectedRegions$ | async" let-selectedRegions="ngIf">
-    <!-- if regions.length > 1 -->
-    <!-- use group chip -->
-    <ng-template [ngIf]="selectedRegions.length > 1" [ngIfElse]="singleRegionChipTmpl">
-      <mat-chip
-        color="primary"
-        selected
-        (click)="handleChipClick()"
-        class="pe-all position-relative z-index-1 ml-8-n">
-        <span class="iv-custom-comp text text-truncate d-inline pl-4">
-          {{ CONST.MULTI_REGION_SELECTION }}
-        </span>
-        <mat-icon
-          (click)="clearSelectedRegions()"
-          fontSet="fas"
-          iav-stop="click"
-          fontIcon="fa-times">
-        </mat-icon>
-      </mat-chip>
-    </ng-template>
-
-    <!-- if reginos.lengt === 1 -->
-    <!-- use single region chip -->
-    <ng-template #singleRegionChipTmpl>
-      <ng-container *ngFor="let r of selectedRegions">
-
-        <!-- region chip for discrete map -->
-        <mat-chip
-          iav-region
-          (click)="handleChipClick()"
-          [region]="r"
-          class="pe-all position-relative z-index-1 ml-8-n"
-          [ngClass]="{
-            'darktheme':regionDirective.rgbDarkmode === true,
-            'lighttheme': regionDirective.rgbDarkmode === false
-          }"
-          [style.backgroundColor]="regionDirective.rgbString"
-          #regionDirective="iavRegion">
-          <span class="iv-custom-comp text text-truncate d-inline pl-4">
-            {{ r.name }}
-          </span>
-          <mat-icon
-            class="iv-custom-comp text"
-            (click)="clearSelectedRegions()"
-            fontSet="fas"
-            iav-stop="click"
-            fontIcon="fa-times">
-          </mat-icon>
-        </mat-chip>
-
-        <!-- chips for previewing origin datasets/continous map -->
-        <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
-
-
-          <mat-chip *ngFor="let key of clearViewKeys$ | async"
-            (click)="handleChipClick()"
-            class="pe-all position-relative ml-8-n">
-            <span class="pl-4">
-              {{ key }}
-            </span>
-            <mat-icon (click)="unsetClearViewByKey(key)"
-              fontSet="fas"
-              iav-stop="click"
-              fontIcon="fa-times">
-
-            </mat-icon>
-          </mat-chip>
-        </ng-container>
-
-      </ng-container>
-    </ng-template>
-  </ng-template>
-
-</ng-template>
-
 <!-- auto complete search box -->
 
 <ng-template #autocompleteTmpl let-showTour="showTour">
@@ -547,7 +331,6 @@
     </div>
   </div>
 </ng-template>
-
 
 <!-- template for rendering tab -->
 <ng-template #tabTmpl
@@ -658,9 +441,7 @@
       <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
         <!-- a series of bugs result in requiring this hacky -->
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
-        <ng-container *ngFor="let region of selectedRegions">
-          <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: region }">
-          </ng-container>
+        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: (regionOfInterest$ | async) }">
         </ng-container>
       </ng-template>
 

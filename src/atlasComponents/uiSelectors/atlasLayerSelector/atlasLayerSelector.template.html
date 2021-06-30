@@ -150,29 +150,20 @@
 </ng-template>
 
 <ng-template #infoBtn let-tileSrc="tileSrc">
-    <div *ngIf="tileSrc.originDatasets?.length > 0; else plainBtn"
-        mat-icon-button
-        iav-stop="click"
-        class="iv-custom-comp d-flex justify-content-center infoButton"
-        [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
-        iav-dataset-show-dataset-dialog
-        [iav-dataset-show-dataset-dialog-kgid]="tileSrc.originDatasets[0].kgId"
-        [iav-dataset-show-dataset-dialog-kgschema]="tileSrc.originDatasets[0].kgSchema">
-        <small><i class="fas fa-info"></i></small>
-    </div>
+    <ng-container *ngFor="let originDatainfo of tileSrc.originDatainfos">
 
-    <ng-template #plainBtn>
-        <div *ngIf="tileSrc.properties?.name || tileSrc.properties?.description"
-            mat-icon-button
+        <div mat-icon-button
             iav-stop="click"
             class="iv-custom-comp d-flex justify-content-center align-items-center infoButton"
             [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
             iav-dataset-show-dataset-dialog
-            [iav-dataset-show-dataset-dialog-name]="tileSrc.properties.name"
-            [iav-dataset-show-dataset-dialog-description]="tileSrc.properties.description">
+            [iav-dataset-show-dataset-dialog-name]="originDatainfo.name"
+            [iav-dataset-show-dataset-dialog-description]="originDatainfo.description"
+            [iav-dataset-show-dataset-dialog-urls]="originDatainfo.urls">
             <small><i class="fas fa-info"></i></small>
         </div>
-    </ng-template>
+    </ng-container>
+
 </ng-template>
 
 <!-- mat menu for grouped layer -->

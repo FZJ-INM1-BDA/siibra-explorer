@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, QueryList, HostBinding, ViewChild, TemplateRef, ElementRef, Pipe, PipeTransform } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter, startWith } from "rxjs/operators";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter, tap } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -33,6 +33,12 @@ import { animate, state, style, transition, trigger } from "@angular/animations"
         animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
       ])
     ])
+  ],
+  providers:[
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useValue: null
+    }
   ]
 })
 export class AtlasLayerSelector implements OnInit {
@@ -122,7 +128,7 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     public availableTemplates$ = this.store$.pipe<any[]>(
-      select(viewerStateSelectedTemplateFullInfoSelector)
+      select(viewerStateSelectedTemplateFullInfoSelector),
     )
 
     public containerMaxWidth: number
@@ -273,6 +279,7 @@ import 'src/res/images/atlas-selection/waxholm-v2.png'
 import 'src/res/images/atlas-selection/waxholm-v1.png'
 import 'src/res/images/atlas-selection/short-bundle-hcp.png'
 import 'src/res/images/atlas-selection/freesurfer.png'
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 
 const previewImgMap = new Map([
   ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', 'bigbrain.png'],

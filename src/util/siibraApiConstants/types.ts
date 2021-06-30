@@ -76,6 +76,15 @@ export type TParcSummary = {
   name: string
 }
 
+export type TDatainfos = {
+  name: string
+  description: string
+  urls: {
+    cite: string
+    doi: string
+  }[]
+}
+
 export type TSpaceFull = {
   id: string
   name: string
@@ -90,6 +99,7 @@ export type TSpaceFull = {
     templates: THref
     parcellation_maps: THref
   }
+  originDatainfos: TDatainfos[]
 }
 
 export type TParc = {
@@ -112,6 +122,7 @@ export type TParc = {
       [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
     }
   }
+  originDatainfos: TDatainfos[]
 }
 
 export type TRegionDetail = {
@@ -139,6 +150,7 @@ export type TRegionDetail = {
   links: {
     [key: string]: string
   }
+  originDatainfos: TDatainfos[]
 }
 
 export type TRegion = {

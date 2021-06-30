@@ -115,6 +115,7 @@ describe('ShowDatasetDialogDirective', () => {
     expect(args[0]).toEqual(DummyDialogCmp)
     expect(args[1]).toEqual({
       ...ShowDatasetDialogDirective.defaultDialogConfig,
+      panelClass: ['no-padding-dialog'],
       data: {
         fullId: `minds/core/dataset/v1.0.0/aaa-bbb`
       }
@@ -151,6 +152,7 @@ describe('ShowDatasetDialogDirective', () => {
     expect(args[0]).toEqual(DummyDialogCmp)
     expect(args[1]).toEqual({
       ...ShowDatasetDialogDirective.defaultDialogConfig,
+      panelClass: ['no-padding-dialog'],
       data: {
         fullId: `abc/ccc-ddd`
       }

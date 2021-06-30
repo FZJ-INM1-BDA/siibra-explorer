@@ -330,7 +330,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         '@id': parc.id,
                         name: parc.name
                       }
-                    })
+                    }),
+                    originDatainfos: tmpl.originDatainfos || []
                   }
                 }),
                 parcellations: parcellations.map(parc => {
@@ -356,7 +357,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         //   name: "probability map"
                         // }]
                       }
-                    })
+                    }),
+                    originDatainfos: parc.originDatainfos || []
                   }
                 })
               }
@@ -611,12 +613,14 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 parcellations: tmpl.availableParcellations.filter(
                   p => parcellations.some(p2 => parseId(p2.id) === p.id)
                 ).map(parc => {
+                  const fullParcInfo = parcellations.find(p => parseId(p.id) === parc.id)
                   const regions = this.atlasParcSpcRegionMap.get(atlas['@id'], tmpl.id, parc.id) || []
                   return {
                     fullId: parc.id,
                     '@id': parc.id,
                     name: parc.name,
-                    regions
+                    regions,
+                    originDatainfos: fullParcInfo?.originDatainfos || []
                   }
                 }),
                 ...threeSurferConfig

@@ -1,20 +1,16 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, startWith, switchMap } from "rxjs/operators";
-import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
+import {distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
-  viewerStateGetOverlayingAdditionalParcellations,
-  viewerStateParcVersionSelector,
   viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplateSelector,
   viewerStateStandAloneVolumes,
   viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
-import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
@@ -74,7 +70,15 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
           if (!r[0]) return of(null)
           const { context } = r[0]  
           const { atlas, template, parcellation } = context || {}
-          return svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0])
+          return svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
+            map(det => {
+              return {
+                ...det,
+                context
+              }
+            }),
+            shareReplay(1),
+          )
         })
       ),
       deps: [ Store, PureContantService ]
@@ -117,11 +121,6 @@ export class ViewerCmp implements OnDestroy {
     order: 0,
     description: QUICKTOUR_DESC.ATLAS_SELECTOR,
   }
-  public quickTourChips: IQuickTourData = {
-    order: 5,
-    description: QUICKTOUR_DESC.CHIPS,
-  }
-
 
   @Input() ismobile = false
 
@@ -166,24 +165,6 @@ export class ViewerCmp implements OnDestroy {
       if (!!t['three-surfer']) return 'threeSurfer'
       return 'notsupported'
     })
-  )
-
-  public selectedLayerVersions$ = this.store$.pipe(
-    select(viewerStateParcVersionSelector),
-    map(arr => arr.map(item => {
-      const overwrittenName = item['@version'] && item['@version']['name']
-      return overwrittenName
-        ? { ...item, displayName: overwrittenName }
-        : item
-    }))
-  )
-
-  public selectedAdditionalLayers$ = this.store$.pipe(
-    select(viewerStateGetOverlayingAdditionalParcellations),
-  )
-
-  public clearViewKeys$ = this.store$.pipe(
-    select(ngViewerSelectorClearViewEntries)
   )
 
   /**
@@ -314,42 +295,10 @@ export class ViewerCmp implements OnDestroy {
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  public bindFns(fns){
-    return () => {
-      for (const [ fn, ...arg] of fns) {
-        fn(...arg)
-      }
-    }
-  }
-
-  public clearAdditionalLayer(layer: { ['@id']: string }){
-    this.store$.dispatch(
-      viewerStateRemoveAdditionalLayer({
-        payload: layer
-      })
-    )
-  }
-
   public selectRoi(roi: any) {
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
         selectRegions: [ roi ]
-      })
-    )
-  }
-
-  public clearSelectedRegions(){
-    this.store$.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: []
-      })
-    )
-  }
-
-  public selectParcellation(parc: any) {
-    this.store$.dispatch(
-      viewerStateHelperSelectParcellationWithId({
-        payload: parc
       })
     )
   }
@@ -363,13 +312,6 @@ export class ViewerCmp implements OnDestroy {
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }
 
-  public unsetClearViewByKey(key: string){
-    this.store$.dispatch(
-      ngViewerActionClearView({ payload: {
-        [key]: false
-      }})
-    )
-  }
   public clearPreviewingDataset(id?: string){
     /**
      * clear all preview
