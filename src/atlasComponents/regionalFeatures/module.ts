@@ -1,4 +1,5 @@
 import { CommonModule } from "@angular/common";
+import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
 import { AngularMaterialModule } from "../../ui/sharedModules/angularMaterial.module";
@@ -18,6 +19,7 @@ import { ReceptorDensityModule } from "./singleFeatures/receptorDensity/module";
     AngularMaterialModule,
     FeatureIEEGRecordings,
     ReceptorDensityModule,
+    HttpClientModule,
   ],
   declarations: [
     /**
