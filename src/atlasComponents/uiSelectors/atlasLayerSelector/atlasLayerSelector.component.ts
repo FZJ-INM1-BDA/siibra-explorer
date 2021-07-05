@@ -305,7 +305,7 @@ const previewImgMap = new Map([
   ['juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c', 'short-bundle-hcp.png'],
   ['minds/core/referencespace/v1.0.0/tmp-fsaverage', 'freesurfer.png'],
   ['minds/core/referencespace/v1.0.0/tmp-fsaverage6', 'freesurfer.png'],
-  ['julich/tmp/parcellation/freesurfer-test-parc', 'freesurfer.png'],
+  ['minds/core/referencespace/v1.0.0/tmp-hcp32k', 'freesurfer.png'],
 ])
 
 /**
