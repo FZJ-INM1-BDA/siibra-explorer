@@ -504,37 +504,37 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                   /**
                    * concating all available gii maps
                    */
-                  const allFreesurferLabels = foundP.volumeSrc[tmpl.id][hemisphereKey].filter(v => v.volume_type === 'threesurfer/gii-label')
-                  for (const lbl of allFreesurferLabels) {
-                    const modeToConcat = {
-                      mesh: surface.url,
-                      hemisphere: surface.hemisphere,
-                      colormap: lbl.url
-                    }
+                  // const allFreesurferLabels = foundP.volumeSrc[tmpl.id][hemisphereKey].filter(v => v.volume_type === 'threesurfer/gii-label')
+                  // for (const lbl of allFreesurferLabels) {
+                  //   const modeToConcat = {
+                  //     mesh: surface.url,
+                  //     hemisphere: surface.hemisphere,
+                  //     colormap: lbl.url
+                  //   }
 
-                    const key = `${surface.mode} - ${lbl.name}`
-                    if (!modObj[key]) {
-                      modObj[key] = []
-                    }
-                    modObj[key].push(modeToConcat)
-                  }
+                  //   const key = `${surface.mode} - ${lbl.name}`
+                  //   if (!modObj[key]) {
+                  //     modObj[key] = []
+                  //   }
+                  //   modObj[key].push(modeToConcat)
+                  // }
 
                   /**
                    * only concat first matching gii map
                    */
-                  // const key = surface.mode
-                  // const modeToConcat = {
-                  //   mesh: surface.url,
-                  //   hemisphere: surface.hemisphere,
-                  //   colormap: (() => {
-                  //     const lbl = foundP.volumeSrc[tmpl.id][hemisphereKey].find(v => v.volume_type === 'threesurfer/gii-label')
-                  //     return lbl?.url
-                  //   })()
-                  // }
-                  // if (!modObj[key]) {
-                  //   modObj[key] = []
-                  // }
-                  // modObj[key].push(modeToConcat)
+                  const key = surface.mode
+                  const modeToConcat = {
+                    mesh: surface.url,
+                    hemisphere: surface.hemisphere,
+                    colormap: (() => {
+                      const lbl = foundP.volumeSrc[tmpl.id][hemisphereKey].find(v => v.volume_type === 'threesurfer/gii-label')
+                      return lbl?.url
+                    })()
+                  }
+                  if (!modObj[key]) {
+                    modObj[key] = []
+                  }
+                  modObj[key].push(modeToConcat)
 
                 }
                 foundP[tmpl.id]

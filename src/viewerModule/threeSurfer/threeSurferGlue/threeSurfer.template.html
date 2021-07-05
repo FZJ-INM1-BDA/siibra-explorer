@@ -5,15 +5,7 @@
 
 <div class="button-container">
 
-  <!-- configurator -->
-  <button mat-icon-button
-    color="primary"
-    [matMenuTriggerFor]="configMenu"
-    class="pe-all">
-    <i class="fas fa-cog"></i>
-  </button>
-
-  <!-- selector -->
+  <!-- selector & configurator -->
   <button mat-icon-button
     color="primary"
     class="pe-all"
@@ -22,9 +14,11 @@
   </button>
 </div>
 
-<!-- config menu -->
-<mat-menu #configMenu="matMenu">
-  <div class="iv-custom-comp text p-2">
+
+<!-- selector/configurator menu -->
+<mat-menu #fsModeSelMenu="matMenu">
+
+  <div class="iv-custom-comp text pl-2 m-2">
     <mat-checkbox *ngFor="let key of allKeys"
       class="d-block"
       iav-stop="click"
@@ -33,10 +27,7 @@
       {{ key.name }}
     </mat-checkbox>
   </div>
-</mat-menu>
-
-<!-- selector menu -->
-<mat-menu #fsModeSelMenu="matMenu">
+  <mat-divider></mat-divider>
   <button *ngFor="let mode of modes"
     mat-menu-item
     (click)="loadMode(mode)"
