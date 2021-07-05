@@ -29,7 +29,7 @@ export const viewerStateFetchedTemplatesSelector = createSelector(
 
 export const viewerStateSelectedTemplateSelector = createSelector(
   state => state['viewerState'],
-  viewerState => viewerState['templateSelected']
+  viewerState => viewerState?.['templateSelected']
 )
 
 export const viewerStateSelectorStandaloneVolumes = createSelector(
