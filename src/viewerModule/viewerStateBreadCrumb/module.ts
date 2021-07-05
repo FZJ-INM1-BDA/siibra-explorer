@@ -5,7 +5,6 @@ import { KgDatasetModule } from "src/atlasComponents/regionalFeatures/bsFeatures
 import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { UtilModule } from "src/util";
-import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
 
 @NgModule({

@@ -3,8 +3,8 @@ import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.in
 import { TThreeSurferConfig, TThreeSurferMode } from "../types";
 import { parseContext } from "../util";
 import { retry, flattenRegions } from 'common/util'
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { debounceTime, filter, map, switchMap } from "rxjs/operators";
+import { Observable, Subject } from "rxjs";
+import { debounceTime, filter, switchMap } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { viewerStateChangeNavigation, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
@@ -234,9 +234,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     const cameraSub = this.cameraEv$.pipe(
       filter(v => !!v),
       debounceTime(160)
-    ).subscribe(ev => {
-      const { position } = ev
-      const { x, y, z } = position
+    ).subscribe(() => {
       
       const THREE = (window as any).ThreeSurfer.THREE
       
@@ -251,7 +249,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
           perspectiveOrientation: q.toArray(),
           perspectiveZoom: t.length()
         })
-      } catch (e) {
+      } catch (_e) {
         // LockError, ignore
       }
     })

@@ -78,7 +78,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
               }
             }),
             // in case detailed requests 
-            catchError((err, obs) => of(r[0])),
+            catchError((_err, _obs) => of(r[0])),
             shareReplay(1),
           )
         })
