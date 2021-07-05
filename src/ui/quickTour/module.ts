@@ -11,6 +11,7 @@ import { ArrowComponent } from "./arrowCmp/arrow.component";
 import { WindowResizeModule } from "src/util/windowResize";
 import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
 import { ComponentsModule } from "src/components";
+import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourDialog.component";
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { ComponentsModule } from "src/components";
     QuickTourComponent,
     QuickTourDirective,
     ArrowComponent,
+    StartTourDialogDialog
   ],
   exports: [
     QuickTourDirective,

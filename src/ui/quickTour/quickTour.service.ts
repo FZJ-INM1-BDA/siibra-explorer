@@ -1,11 +1,14 @@
-import { ComponentRef, Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Subject } from "rxjs";
+import {ComponentRef, Inject, Injectable, OnDestroy} from "@angular/core";
+import {BehaviorSubject, Subject, Subscription} from "rxjs";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
 import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
 import {LOCAL_STORAGE_CONST} from "src/util/constants";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourDialog.component";
+import {take} from "rxjs/operators";
 
 export function findInLinkedList<T extends object>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
   let compareObj = first,
@@ -35,6 +38,8 @@ export class QuickTourService {
   public currActiveSlide: IDoublyLinkedItem<QuickTourThis>
   public slides = new DoublyLinkedList<QuickTourThis>()
 
+  private startTourDialogRef: MatDialogRef<any>
+
   constructor(
     private overlay: Overlay,
     /**
@@ -43,6 +48,7 @@ export class QuickTourService {
      * makes sense, since we want to keep the dependency of svc on cmp as loosely (or non existent) as possible
      */
     @Inject(QUICK_TOUR_CMP_INJTKN) private quickTourCmp: any,
+    private matDialog: MatDialog
   ){
   }
 
@@ -63,10 +69,22 @@ export class QuickTourService {
     this.slides.remove(dir)
   }
 
-  public autoStart() {
+  autoStart() {
     if (!localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)) {
-      this.startTour()
-      localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+      this.startTourDialogRef = this.matDialog.open(StartTourDialogDialog)
+      this.startTourDialogRef.afterClosed().pipe(take(1)).subscribe(res => {
+        switch (res) {
+        case 'start':
+          this.startTour()
+          localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+          break;
+        case 'close':
+          localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+          break;
+        default:
+          break;
+        }
+      })
     }
   }
 
