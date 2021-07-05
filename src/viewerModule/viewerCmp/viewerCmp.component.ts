@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
@@ -77,6 +77,8 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
                 context
               }
             }),
+            // in case detailed requests 
+            catchError((err, obs) => of(r[0])),
             shareReplay(1),
           )
         })

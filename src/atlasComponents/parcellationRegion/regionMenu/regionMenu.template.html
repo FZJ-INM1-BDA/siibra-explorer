@@ -1,3 +1,5 @@
+<ng-template [ngIf]="region">
+
 <mat-card class="mat-elevation-z4">
   <!-- rgbDarkmode must be checked for strict equality to true/false 
   as if rgb is undefined, rgbDarkmode will be null/undefined
@@ -217,4 +219,17 @@
       </ng-container>
     </ng-template>
   </mat-expansion-panel>
+</ng-template>
+</ng-template>
+
+
+<ng-template [ngIf]="!region">
+  <mat-card class="mat-elevation-z4">
+    <h1 class="mat-h1 sidenav-cover-header-container">
+      <spinner-cmp class="d-inline-block"></spinner-cmp>
+      <span class="text-muted">
+        Loading region
+      </span>
+    </h1>
+  </mat-card>
 </ng-template>
