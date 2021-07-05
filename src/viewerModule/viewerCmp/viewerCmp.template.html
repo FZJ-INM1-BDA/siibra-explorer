@@ -659,7 +659,7 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="'threeSurfer'">
-        <mat-list-item>
+        <mat-list-item *ngIf="data?.context?.payload?.faceIndex && data?.context?.payload?.vertexIndices">
           <span mat-line>
             face#{{ data.context.payload.faceIndex }}
           </span>

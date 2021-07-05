@@ -468,7 +468,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
             this.tsRef = null
           }
         );
-        (window as any).tsRef = this.tsRef
+        this.tsRef.control.enablePan = false
         while (this.tsRefInitCb.length > 0) this.tsRefInitCb.pop()(this.tsRef)
       }
 
