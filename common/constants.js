@@ -78,6 +78,8 @@
   }
 
   exports.CONST = {
+    CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
+    DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
     REGIONAL_FEATURES: 'Regional features',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,

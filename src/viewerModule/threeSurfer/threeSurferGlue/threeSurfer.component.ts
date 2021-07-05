@@ -1,14 +1,22 @@
-import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit, Inject, Optional } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { TThreeSurferConfig, TThreeSurferMode } from "../types";
 import { parseContext } from "../util";
 import { retry, flattenRegions } from 'common/util'
-import { Subject } from "rxjs";
-import { debounceTime, filter } from "rxjs/operators";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { debounceTime, filter, map, switchMap } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
+import { viewerStateChangeNavigation, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
+import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { CONST } from 'common/constants'
+import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
+import { switchMapWaitFor } from "src/util/fn";
+
+const pZoomFactor = 5e3
 
 type THandlingCustomEv = {
   regions: ({ name?: string, error?: string })[]
@@ -24,6 +32,14 @@ type TCameraOrientation = {
 }
 
 const threshold = 1e-3
+
+function getHemisphereKey(region: { name: string }){
+  return /left/.test(region.name)
+    ? 'left'
+    : /right/.test(region.name)
+      ? 'right'
+      : null
+}
 
 function cameraNavsAreSimilar(c1: TCameraOrientation, c2: TCameraOrientation){
   if (c1 === c2) return true
@@ -72,11 +88,140 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   public allKeys: {name: string, checked: boolean}[] = []
 
   private regionMap: Map<string, Map<number, any>> = new Map()
+  private mouseoverRegions = []
   constructor(
     private el: ElementRef,
     private store$: Store<any>,
     private navStateStoreRelay: ComponentStore<{ perspectiveOrientation: [number, number, number, number], perspectiveZoom: number }>,
+    private snackbar: MatSnackBar,
+    @Optional() @Inject(REGION_OF_INTEREST) private roi$: Observable<any>,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
+    @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
   ){
+
+    // set viewer handle
+    // the API won't be 100% compatible with ngviewer
+    if (setViewerHandle) {
+      const nyi = () => {
+        throw new Error(`Not yet implemented`)
+      }
+      setViewerHandle({
+        add3DLandmarks: nyi,
+        loadLayer: nyi,
+        applyLayersColourMap: (map: Map<string, Map<number, { red: number, green: number, blue: number }>>) => {
+          const applyCm = new Map()
+          for (const [hem, m] of map.entries()) {
+            const nMap = new Map()
+            applyCm.set(hem, nMap)
+            for (const [lbl, vals] of m.entries()) {
+              const { red, green, blue } = vals
+              nMap.set(lbl, [red/255, green/255, blue/255])
+            }
+          }
+          this.externalHemisphLblColorMap = applyCm
+        },
+        getLayersSegmentColourMap: () => {
+          const map = this.getColormapCopy()
+          const outmap = new Map<string, Map<number, { red: number, green: number, blue: number }>>()
+          for (const [ hem, m ] of map.entries()) {
+            const nMap = new Map<number, {red: number, green: number, blue: number}>()
+            outmap.set(hem, nMap)
+            for (const [ lbl, vals ] of m.entries()) {
+              nMap.set(lbl, {
+                red: vals[0] * 255,
+                green: vals[1] * 255,
+                blue: vals[2] * 255,
+              })
+            }
+          }
+          return outmap
+        },
+        getNgHash: nyi,
+        hideAllSegments: nyi,
+        hideSegment: nyi,
+        mouseEvent: null, 
+        mouseOverNehuba: null,
+        mouseOverNehubaLayers: null,
+        mouseOverNehubaUI: null,
+        moveToNavigationLoc: null,
+        moveToNavigationOri: null,
+        remove3DLandmarks: null,
+        removeLayer: null,
+        setLayerVisibility: null,
+        setNavigationLoc: null,
+        setNavigationOri: null,
+        showAllSegments: nyi,
+        showSegment: nyi,
+      })
+    }
+
+    if (this.roi$) {
+      const sub = this.roi$.pipe(
+        switchMap(switchMapWaitFor({
+          condition: () => this.colormapLoaded
+        }))
+      ).subscribe(r => {
+        try {
+          if (!r) throw new Error(`No region selected.`)
+          const cmap = this.getColormapCopy()
+          const hemisphere = getHemisphereKey(r)
+          if (!hemisphere) {
+            this.snackbar.open(CONST.CANNOT_DECIPHER_HEMISPHERE, 'Dismiss', {
+              duration: 3000
+            })
+            throw new Error(CONST.CANNOT_DECIPHER_HEMISPHERE)
+          }
+          for (const [ hem, m ] of cmap.entries()) {
+            for (const lbl of m.keys()) {
+              if (hem !== hemisphere || lbl !== r.labelIndex) {
+                m.set(lbl, [1, 1, 1])
+              }
+            }
+          }
+          this.internalHemisphLblColorMap = cmap
+        } catch (e) {
+          this.internalHemisphLblColorMap = null
+        }
+
+        this.applyColorMap()
+      })
+      this.onDestroyCb.push(
+        () => sub.unsubscribe()
+      )
+    }
+
+    /**
+     * intercept click and act
+     */
+    if (clickInterceptor) {
+      const handleClick = (ev: MouseEvent) => {
+
+        // if does not click inside container, ignore
+        if (!(this.el.nativeElement as HTMLElement).contains(ev.target as HTMLElement)) {
+          return true
+        }
+        
+        if (this.mouseoverRegions.length === 0) return true
+        if (this.mouseoverRegions.length > 1) {
+          this.snackbar.open(CONST.DOES_NOT_SUPPORT_MULTI_REGION_SELECTION, 'Dismiss', {
+            duration: 3000
+          })
+          return true
+        }
+        this.store$.dispatch(
+          viewerStateSetSelectedRegions({
+            selectRegions: this.mouseoverRegions
+          })
+        )
+        return true
+      }
+      const { register, deregister } = clickInterceptor
+      register(handleClick)
+      this.onDestroyCb.push(
+        () => deregister(register)
+      )
+    }
+    
     this.domEl = this.el.nativeElement
 
     /**
@@ -122,7 +267,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
             orientation: [0, 0, 0, 1],
             zoom: 1,
             perspectiveOrientation: v.perspectiveOrientation,
-            perspectiveZoom: v.perspectiveZoom
+            perspectiveZoom: v.perspectiveZoom * pZoomFactor
           }
         })
       )
@@ -149,7 +294,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         const THREE = (window as any).ThreeSurfer.THREE
         
         const cameraQuat = new THREE.Quaternion(...this.mainStoreCameraNav.perspectiveOrientation)
-        const cameraPos = new THREE.Vector3(0, 0, this.mainStoreCameraNav.perspectiveZoom)
+        const cameraPos = new THREE.Vector3(0, 0, this.mainStoreCameraNav.perspectiveZoom / pZoomFactor)
         cameraPos.applyQuaternion(cameraQuat)
         this.toTsRef(tsRef => {
           tsRef.camera.position.copy(cameraPos)
@@ -171,7 +316,15 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     hemisphere: string
     vIdxArr: number[]
   }[] = []
-
+  private hemisphLblColorMap: Map<string, Map<number, [number, number, number]>> = new Map()
+  private internalHemisphLblColorMap: Map<string, Map<number, [number, number, number]>>
+  private externalHemisphLblColorMap: Map<string, Map<number, [number, number, number]>>
+  
+  get activeColorMap() {
+    if (this.externalHemisphLblColorMap) return this.externalHemisphLblColorMap
+    if (this.internalHemisphLblColorMap) return this.internalHemisphLblColorMap
+    return this.hemisphLblColorMap
+  }
   private relayStoreLock: () => void = null
   private tsRefInitCb: ((tsRef: any) => void)[] = []
   private toTsRef(callback: (tsRef: any) => void) {
@@ -188,6 +341,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       const m = this.loadedMeshes.pop()
       this.tsRef.unloadMesh(m.threeSurfer)
     }
+    this.hemisphLblColorMap.clear()
+    this.colormapLoaded = false
   }
 
   public async loadMode(mode: TThreeSurferMode) {
@@ -236,7 +391,32 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         hemisphere,
         vIdxArr: colorIdx
       })
-      this.tsRef.applyColorMap(tsM, colorIdx, 
+
+      this.hemisphLblColorMap.set(hemisphere, applyCM)
+    }
+    this.colormapLoaded = true
+    this.applyColorMap()
+  }
+
+  private colormapLoaded = false
+
+  private getColormapCopy(): Map<string, Map<number, [number, number, number]>> {
+    const outmap = new Map()
+    for (const [key, value] of this.hemisphLblColorMap.entries()) {
+      outmap.set(key, new Map(value))
+    }
+    return outmap
+  }
+
+  /**
+   * TODO perhaps debounce calls to applycolormap
+   * so that the colormap doesn't "flick"
+   */
+  private applyColorMap(){
+    for (const mesh of this.loadedMeshes) {
+      const { hemisphere, threeSurfer, vIdxArr } = mesh
+      const applyCM = this.activeColorMap.get(hemisphere)
+      this.tsRef.applyColorMap(threeSurfer, vIdxArr, 
         {
           custom: applyCM
         }
@@ -279,11 +459,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       const flattenedRegions = flattenRegions(this.selectedParcellation.regions)
       for (const region of flattenedRegions) {
         if (region.labelIndex) {
-          const hemisphere = /left/.test(region.name)
-            ? 'left'
-            : /right/.test(region.name)
-              ? 'right'
-              : null
+          const hemisphere = getHemisphereKey(region)
           if (!hemisphere) throw new Error(`region ${region.name} does not have hemisphere defined`)
           if (!this.regionMap.has(hemisphere)) {
             this.regionMap.set(hemisphere, new Map())
@@ -397,6 +573,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   public mouseoverText: string
   private handleMouseoverEvent(ev: THandlingCustomEv){
     const { regions: mouseover, evMesh } = ev
+    this.mouseoverRegions = mouseover
     this.viewerEvent.emit({
       type: EnumViewerEvt.VIEWER_CTX,
       data: {
