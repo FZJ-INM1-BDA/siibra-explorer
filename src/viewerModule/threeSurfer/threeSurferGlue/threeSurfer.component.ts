@@ -155,6 +155,10 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       })
     }
 
+    this.onDestroyCb.push(
+      () => setViewerHandle(null)
+    )
+
     if (this.roi$) {
       const sub = this.roi$.pipe(
         switchMap(switchMapWaitFor({
