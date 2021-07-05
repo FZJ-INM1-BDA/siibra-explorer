@@ -563,14 +563,7 @@ describe('> viewerState.useEffect.ts', () => {
       it('> if no arg is provided', () => {
 
         const obj = cvtNehubaConfigToNavigationObj()
-        expect(obj).toEqual({
-          orientation: [0, 0, 0, 1],
-          perspectiveOrientation: [0 , 0, 0, 1],
-          perspectiveZoom: 1e6,
-          zoom: 1e6,
-          position: [0, 0, 0],
-          positionReal: true
-        })
+        expect(obj).toEqual(defaultNavigationObject)
       })
       it('> if null or undefined is provided', () => {
 

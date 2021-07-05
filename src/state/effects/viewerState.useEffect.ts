@@ -22,7 +22,7 @@ const defaultZoom = 1e6
 
 export const defaultNavigationObject = {
   orientation: [0, 0, 0, 1],
-  perspectiveOrientation: [0 , 0, 0, 1],
+  perspectiveOrientation: [0.5, -0.5, -0.5, 0.5],
   perspectiveZoom: defaultPerspectiveZoom,
   zoom: defaultZoom,
   position: [0, 0, 0],
@@ -45,7 +45,11 @@ export const defaultNehubaConfigObject = {
 }
 
 export function cvtNehubaConfigToNavigationObj(nehubaConfig?){
-  const { navigation, perspectiveOrientation = [0.5, -0.5, -0.5, 0.5], perspectiveZoom = 1e6 } = nehubaConfig || {}
+  const {
+    navigation,
+    perspectiveOrientation = defaultNavigationObject.perspectiveOrientation,
+    perspectiveZoom = defaultNavigationObject.perspectiveZoom
+  } = nehubaConfig || {}
   const { pose, zoomFactor = 1e6 } = navigation || {}
   const { position, orientation = [0, 0, 0, 1] } = pose || {}
   const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position || {}
