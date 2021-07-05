@@ -413,6 +413,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
    * so that the colormap doesn't "flick"
    */
   private applyColorMap(){
+    /**
+     * on apply color map, reset mesh visibility
+     * this issue is more difficult to solve than first anticiplated.
+     * test scenarios:
+     * 
+     * 1/ hide hemisphere, select region
+     * 2/ hide hemisphere, select region, unhide hemisphere
+     * 3/ select region, hide hemisphere, deselect region
+     */
+    for (const key of this.allKeys) {
+      key.checked = true
+    }
     for (const mesh of this.loadedMeshes) {
       const { hemisphere, threeSurfer, vIdxArr } = mesh
       const applyCM = this.activeColorMap.get(hemisphere)
