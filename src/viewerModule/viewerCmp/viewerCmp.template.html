@@ -154,8 +154,7 @@
               class="iv-custom-comp bg card m-2 mat-elevation-z2"
               quick-tour
               [quick-tour-description]="quickTourAtlasSelector.description"
-              [quick-tour-order]="quickTourAtlasSelector.order"
-              [quick-tour-check-auto-start]="true">
+              [quick-tour-order]="quickTourAtlasSelector.order">
               <atlas-dropdown-selector class="pe-all mt-2">
               </atlas-dropdown-selector>
             </div>
@@ -260,7 +259,7 @@
           </atlas-layer-selector>
 
           <!-- chips -->
-          <div class="flex-grow-0 p-1 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
+          <div *ngIf="parcellationSelected$ | async" class="flex-grow-0 p-1 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
 
             <mat-chip-list class="d-inline-block"
               quick-tour

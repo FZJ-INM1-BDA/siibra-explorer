@@ -40,6 +40,8 @@ export class QuickTourService {
 
   private startTourDialogRef: MatDialogRef<any>
 
+  public autoStartTriggered = false
+
   constructor(
     private overlay: Overlay,
     /**
@@ -70,22 +72,22 @@ export class QuickTourService {
   }
 
   autoStart() {
-    if (!localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)) {
-      this.startTourDialogRef = this.matDialog.open(StartTourDialogDialog)
-      this.startTourDialogRef.afterClosed().pipe(take(1)).subscribe(res => {
-        switch (res) {
-        case 'start':
-          this.startTour()
-          localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
-          break;
-        case 'close':
-          localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
-          break;
-        default:
-          break;
-        }
-      })
-    }
+    this.autoStartTriggered = true
+    this.startTourDialogRef = this.matDialog.open(StartTourDialogDialog)
+    this.startTourDialogRef.afterClosed().pipe(take(1)).subscribe(res => {
+      switch (res) {
+      case 'start':
+        this.startTour()
+        localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+        break;
+      case 'close':
+        localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
+        break;
+      default:
+        break;
+      }
+    })
+
   }
 
   public startTour() {
