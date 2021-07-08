@@ -1,14 +1,13 @@
-import {ComponentRef, Inject, Injectable, OnDestroy} from "@angular/core";
-import {BehaviorSubject, Subject, Subscription} from "rxjs";
+import { ComponentRef, Inject, Injectable } from "@angular/core";
+import { BehaviorSubject, Subject } from "rxjs";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
-import { QUICK_TOUR_CMP_INJTKN } from "./constrants";
-import {LOCAL_STORAGE_CONST} from "src/util/constants";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourDialog.component";
-import {take} from "rxjs/operators";
+import { EnumQuickTourSeverity, PERMISSION_DIALOG_ACTIONS, QUICK_TOUR_CMP_INJTKN } from "./constrants";
+import { LOCAL_STORAGE_CONST } from "src/util/constants";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { StartTourDialogDialog } from "src/ui/quickTour/startTourDialog/startTourDialog.component";
 
 export function findInLinkedList<T extends object>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
   let compareObj = first,
@@ -65,6 +64,11 @@ export class QuickTourService {
         return linkedItem.thisObj.order < dir.order
       }
     )
+
+    
+    if (dir.quickTourSeverity === EnumQuickTourSeverity.MEDIUM || dir.quickTourSeverity === EnumQuickTourSeverity.HIGH) {
+      this.autoStart()
+    }
   }
 
   public unregister(dir: QuickTourThis){
@@ -72,19 +76,24 @@ export class QuickTourService {
   }
 
   autoStart() {
+
+    // if already viewed quick tour, return
+    if (localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)){
+      return
+    }
+    // if auto start already triggered, return
+    if (this.autoStartTriggered) return
     this.autoStartTriggered = true
     this.startTourDialogRef = this.matDialog.open(StartTourDialogDialog)
-    this.startTourDialogRef.afterClosed().pipe(take(1)).subscribe(res => {
+    this.startTourDialogRef.afterClosed().subscribe(res => {
       switch (res) {
-      case 'start':
+      case PERMISSION_DIALOG_ACTIONS.START:
         this.startTour()
         localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
-        break;
-      case 'close':
+        break
+      case PERMISSION_DIALOG_ACTIONS.CANCEL:
         localStorage.setItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED, 'true')
-        break;
-      default:
-        break;
+        break
       }
     })
 

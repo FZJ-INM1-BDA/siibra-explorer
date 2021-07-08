@@ -1,9 +1,34 @@
-<div class="d-flex flex-column">
-    <h3>Welcome to Ebrains Siibra explorer.</h3>
-    <div> Click start to go through quick steps to get familiar with the viewer.</div>
-    <div class="d-flex flex-row-reverse justify-content-starts mt-3">
-        <button mat-button color="primary" [mat-dialog-close]="'start'">Start</button>
-        <button mat-button [mat-dialog-close]="'next time'">Next time</button>
-        <button mat-button [mat-dialog-close]="'close'">Close</button>
-    </div>
+<h3 mat-dialog-title>
+    {{ CONST.QUICKTOUR_HEADER }}
+</h3>
+
+<div mat-dialog-content>
+    <span>
+        {{ CONST.PERMISSION_TO_QUICKTOUR }}
+    </span>
+</div>
+
+<div mat-dialog-actions class="d-flex">
+    <button
+        mat-raised-button
+        color="primary"
+        [mat-dialog-close]="PERMISSION_DIALOG_ACTIONS.START">
+        <i class="fas fa-play"></i>
+        <span>
+            {{ CONST.QUICKTOUR_OK }}
+        </span>
+    </button>
+    <button
+        mat-stroked-button
+        [mat-dialog-close]="PERMISSION_DIALOG_ACTIONS.NOTNOW">
+        {{ CONST.QUICKTOUR_NEXTTIME }}
+    </button>
+    
+    <div class="flex-grow-1 flex-shrink-1"></div>
+
+    <button
+        mat-button
+        [mat-dialog-close]="PERMISSION_DIALOG_ACTIONS.CANCEL">
+        {{ CONST.QUICKTOUR_CANCEL }}
+    </button>
 </div>

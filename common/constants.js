@@ -94,6 +94,11 @@
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
 
+    QUICKTOUR_HEADER: `Welcome to ebrains siibra explorer`,
+    PERMISSION_TO_QUICKTOUR: `Would you like a quick tour?`,
+    QUICKTOUR_OK: `Start`,
+    QUICKTOUR_NEXTTIME: `Not now`,
+    QUICKTOUR_CANCEL: `Dismiss`,
   }
 
   exports.QUICKTOUR_DESC ={
