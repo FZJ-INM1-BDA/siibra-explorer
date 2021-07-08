@@ -309,6 +309,12 @@ describe('> nehubaViewer.component.ts', () => {
       const setup = () => {
 
         const fixture = TestBed.createComponent(NehubaViewerUnit)
+        /**
+         * set nehubaViewer, since some methods check viewer is loaded
+         */
+         fixture.componentInstance.nehubaViewer = {
+           ngviewer: {}
+         }
         fixture.detectChanges()
         prvSetCMSpy = spyOn<any>(fixture.componentInstance, 'setColorMap').and.callFake(() => {})
       }
