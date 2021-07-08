@@ -31,7 +31,7 @@ export enum EnumQuickTourSeverity {
 }
 
 export const PERMISSION_DIALOG_ACTIONS = {
-    START: `start`,
-    CANCEL: `cancel`,
-    NOTNOW: `notnow`
+  START: `start`,
+  CANCEL: `cancel`,
+  NOTNOW: `notnow`,
 }
