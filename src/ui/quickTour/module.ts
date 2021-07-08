@@ -42,6 +42,7 @@ import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourD
       provide: QUICK_TOUR_CMP_INJTKN,
       useValue: QuickTourComponent
     }
-  ]
+  ],
+  entryComponents: [ StartTourDialogDialog ]
 })
 export class QuickTourModule{}
