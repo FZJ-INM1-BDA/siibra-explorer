@@ -37,7 +37,33 @@ type TIAVAtlas = {
   } & THasId)[]
 } & THasId
 
-function getNehubaConfig(darkTheme: boolean) {
+const spaceMiscInfoMap = new Map([
+  ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', {
+    name: 'bigbrain',
+    scale: 1,
+  }],
+  ['minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2', {
+    name: 'icbm2009c',
+    scale: 1,
+  }],
+  ['minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992', {
+    name: 'colin27',
+    scale: 1,
+  }],
+  ['minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9', {
+    name: 'allen-mouse',
+    scale: 0.1,
+  }],
+  ['minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8', {
+    name: 'waxholm',
+    scale: 0.1,
+  }],
+])
+
+function getNehubaConfig(space: TSpaceFull) {
+
+  const darkTheme = space.src_volume_type === 'mri'
+  const { scale } = spaceMiscInfoMap.get(space.id) || { scale: 1 }
   const backgrd = darkTheme
     ? [0,0,0,1]
     : [1,1,1,1]
@@ -49,8 +75,8 @@ function getNehubaConfig(darkTheme: boolean) {
     ? {"color":[0.5,0.5,1,0.2]}
     : {"color":[0,0,0.5,0.15]}
   const drawZoomLevels = darkTheme
-    ? {"cutOff":150000}
-    : {"cutOff":200000,"color":[0.5,0,0,0.15] }
+    ? {"cutOff":150000 * scale }
+    : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
 
   return {
     "configName": "",
@@ -76,13 +102,16 @@ function getNehubaConfig(darkTheme: boolean) {
       "initialNgState": {
         "showDefaultAnnotations": false,
         "layers": {},
+        "navigation": {
+          "zoomFactor": 350000 * scale,
+        },
         "perspectiveOrientation": [
           0.3140767216682434,
           -0.7418519854545593,
           0.4988985061645508,
           -0.3195493221282959
         ],
-        "perspectiveZoom": 1922235.5293810747
+        "perspectiveZoom": 1922235.5293810747 * scale
       }
     },
     "layout": {
@@ -93,7 +122,7 @@ function getNehubaConfig(darkTheme: boolean) {
         "fixedZoomPerspectiveSlices": {
           "sliceViewportWidth": 300,
           "sliceViewportHeight": 300,
-          "sliceZoom": 563818.3562426177,
+          "sliceZoom": 563818.3562426177 * scale,
           "sliceViewportSizeMultiplier": 2
         },
         "mesh": {
@@ -105,8 +134,8 @@ function getNehubaConfig(darkTheme: boolean) {
         "drawSubstrates": drawSubstrates,
         "drawZoomLevels": drawZoomLevels,
         "restrictZoomLevel": {
-          "minZoom": 1200000,
-          "maxZoom": 3500000
+          "minZoom": 1200000 * scale,
+          "maxZoom": 3500000 * scale
         }
       }
     }
@@ -556,7 +585,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 }
               }
               const darkTheme = tmpl.src_volume_type === 'mri'
-              const nehubaConfig = getNehubaConfig(darkTheme)
+              const nehubaConfig = getNehubaConfig(tmpl)
               const initialLayers = nehubaConfig.dataset.initialNgState.layers
               
               const tmplNgId = tmpl.name
