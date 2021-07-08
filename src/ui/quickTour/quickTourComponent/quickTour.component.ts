@@ -1,12 +1,12 @@
 import {
   Component,
   ElementRef,
-  HostListener,
+  OnDestroy,
   SecurityContext,
   TemplateRef,
   ViewChild,
 } from "@angular/core";
-import { combineLatest, Subscription } from "rxjs";
+import { combineLatest, fromEvent, Subscription } from "rxjs";
 import { QuickTourService } from "../quickTour.service";
 import { debounceTime, map, shareReplay } from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -19,7 +19,7 @@ import { clamp } from "src/util/generator";
     './quickTour.style.css'
   ],
 })
-export class QuickTourComponent {
+export class QuickTourComponent implements OnDestroy{
 
   static TourCardMargin = 24
   static TourCardWidthPx = 256
@@ -32,13 +32,6 @@ export class QuickTourComponent {
   public tourCardWidth = `${QuickTourComponent.TourCardWidthPx}px`
   public arrowTmpl: TemplateRef<any>
   public arrowSrc: string
-
-  @HostListener('window:keydown', ['$event'])
-  keydownListener(ev: KeyboardEvent){
-    if (ev.key === 'Escape') {
-      this.quickTourService.endTour()
-    }
-  }
 
   public tourCardTransform = `translate(-500px, -500px)`
   public customArrowTransform = `translate(-500px, -500px)`
@@ -126,8 +119,26 @@ export class QuickTourComponent {
         }
         this.currTip = linkedObj.thisObj
         this.calculateTransforms()
+      }),
+
+      fromEvent(window, 'keydown', { capture: true }).subscribe((ev: KeyboardEvent) => {
+        if (ev.key === 'Escape') {
+          this.quickTourService.endTour()
+        }
+        if (ev.key === 'ArrowRight') {
+          this.quickTourService.nextSlide()
+          ev.stopPropagation()
+        }
+        if (ev.key === 'ArrowLeft') {
+          this.quickTourService.previousSlide()
+          ev.stopPropagation()
+        }
       })
     )
+  }
+
+  ngOnDestroy(){
+    while (this.subscriptions.length > 0) this.subscriptions.pop().unsubscribe()
   }
 
   nextSlide(){
@@ -136,6 +147,10 @@ export class QuickTourComponent {
 
   prevSlide(){
     this.quickTourService.previousSlide()
+  }
+
+  ff(index: number){
+    this.quickTourService.ff(index)
   }
 
   endTour(){

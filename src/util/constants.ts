@@ -7,6 +7,7 @@ export const LOCAL_STORAGE_CONST = {
   MOBILE_UI: 'fzj.xg.iv.MOBILE_UI',
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
+  QUICK_TOUR_VIEWED: 'fzj.dg.iv.QUICK_TOUR_VIEWED',
 
   FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
@@ -41,7 +42,7 @@ export const appendScriptFactory = (document: Document) => {
   })
 }
 
-export const REMOVE_SCRIPT_TOKEN: InjectionToken<(el: HTMLScriptElement) => void> = new InjectionToken(`REMOVE_SCRIPT_TOKEN`) 
+export const REMOVE_SCRIPT_TOKEN: InjectionToken<(el: HTMLScriptElement) => void> = new InjectionToken(`REMOVE_SCRIPT_TOKEN`)
 
 export const removeScriptFactory = (document: Document) => {
   return (srcEl: HTMLScriptElement) => {
@@ -73,10 +74,10 @@ import { EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { InjectionToken } from "@angular/core"
 
 export const getShader = ({
-  colormap = EnumColorMapName.GREYSCALE, 
+  colormap = EnumColorMapName.GREYSCALE,
   lowThreshold = 0,
   highThreshold = 1,
-  brightness = 0, 
+  brightness = 0,
   contrast = 0,
   removeBg = false
 } = {}): string => {

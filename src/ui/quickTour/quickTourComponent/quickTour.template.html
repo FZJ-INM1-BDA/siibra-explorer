@@ -16,12 +16,14 @@
     <mat-card-actions>
         <button  mat-icon-button
             (click)="prevSlide()"
-            [disabled]="isFirst$ | async">
+            [disabled]="isFirst$ | async"
+            matTooltip="Previous [LEFT ARROW]">
             <i class="fas fa-chevron-left"></i>
         </button>
         <button mat-icon-button
             (click)="nextSlide()"
-            [disabled]="isLast$ | async">
+            [disabled]="isLast$ | async"
+            matTooltip="Next [RIGHT ARROW]">
             <i class="fas fa-chevron-right"></i>
         </button>
 
@@ -29,7 +31,8 @@
         <ng-template [ngIf]="isLast$ | async" [ngIfElse]="notLastTmpl">
             <button mat-stroked-button
                 color="primary"
-                (click)="endTour()">
+                (click)="endTour()"
+                matTooltip="Dismiss [ESC]">
                 <i class="m-1 fas fa-check"></i>
                 <span>complete</span>
             </button>
@@ -37,16 +40,19 @@
 
         <!-- dismiss (not last) -->
         <ng-template #notLastTmpl>
-            <button mat-icon-button (click)="endTour()">
+            <button mat-icon-button
+                (click)="endTour()"
+                matTooltip="Dismiss [ESC]">
                 <i class="fas fa-times"></i>
             </button>
         </ng-template>
 
         <!-- progress dots -->
         <span class="muted d-inline-flex align-items-center">
-            <i *ngFor="let active of quickTourProgress$ | async"
+            <i *ngFor="let active of quickTourProgress$ | async; let index = index"
+                (click)="ff(index)"
                 [ngClass]="{ 'fa-xs muted-3': !active }"
-                class="ml-1 fas fa-circle"></i>
+                class="ml-1 fas fa-circle cursor-pointer progress-dot"></i>
         </span>
     </mat-card-actions>
 </mat-card>

@@ -96,7 +96,12 @@
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
 
-    DATA_NOT_READY: `Still fetching data. Please try again in a few moments.`
+    DATA_NOT_READY: `Still fetching data. Please try again in a few moments.`,
+    QUICKTOUR_HEADER: `Welcome to ebrains siibra explorer`,
+    PERMISSION_TO_QUICKTOUR: `Would you like a quick tour?`,
+    QUICKTOUR_OK: `Start`,
+    QUICKTOUR_NEXTTIME: `Not now`,
+    QUICKTOUR_CANCEL: `Dismiss`,
   }
 
   exports.QUICKTOUR_DESC ={
@@ -104,7 +109,7 @@
     ATLAS_SELECTOR: `This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.`,
     CHIPS: `These "chips" indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.`,
     SLICE_VIEW: `The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can double-click brain regions to select them.`,
-    PERSPECTIVE_VIEW: `The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. Click the „eye“ icon on the bottom left to toggle pure surface view.`,
+    PERSPECTIVE_VIEW: `The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. On the 3d view you can find additional settings.`,
     VIEW_ICONS: `Use these icons in any of the views to maximize it and zoom in/out.`,
     TOP_MENU: `These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.`,
     LAYER_SELECTOR: `This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.`,
