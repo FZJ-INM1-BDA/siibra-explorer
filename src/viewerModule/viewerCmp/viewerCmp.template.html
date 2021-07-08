@@ -32,7 +32,7 @@
               }">
               </ng-container>
             </div>
-  
+
             <annotating-tools-panel class="z-index-10">
             </annotating-tools-panel>
           </div>
@@ -52,7 +52,7 @@
             </mat-card>
           </div>
         </iav-layout-fourcorners>
-  
+
 
       </mat-drawer-content>
     </mat-drawer-container>
@@ -259,7 +259,7 @@
           </atlas-layer-selector>
 
           <!-- chips -->
-          <div class="flex-grow-0 p-1 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
+          <div *ngIf="parcellationSelected$ | async" class="flex-grow-0 p-1 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
 
             <mat-chip-list class="d-inline-block"
               quick-tour
@@ -1090,12 +1090,12 @@
         [ngTemplateOutlet]="tmplRef.tmpl"
         [ngTemplateOutletContext]="{$implicit: tmplRef.data}">
       </ng-template>
-      
+
       <!-- template not provided -->
       <ng-template #fallbackTmpl>
         {{ tmplRef.data.message || 'test' }}
       </ng-template>
-      
+
       <mat-divider></mat-divider>
     </mat-card-content>
   </mat-card>

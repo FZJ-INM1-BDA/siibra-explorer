@@ -1,6 +1,7 @@
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, TemplateRef } from "@angular/core";
 import { QuickTourService } from "src/ui/quickTour/quickTour.service";
-import { IQuickTourOverwritePosition, TQuickTourPosition } from "src/ui/quickTour/constrants";
+import { EnumQuickTourSeverity, IQuickTourOverwritePosition, TQuickTourPosition } from "src/ui/quickTour/constrants";
+import {LOCAL_STORAGE_CONST} from "src/util/constants";
 
 @Directive({
   selector: '[quick-tour]',
@@ -14,7 +15,8 @@ export class QuickTourThis implements OnInit, OnChanges, OnDestroy {
   @Input('quick-tour-position') position: TQuickTourPosition
   @Input('quick-tour-overwrite-position') overwritePosition: IQuickTourOverwritePosition
   @Input('quick-tour-overwrite-arrow') overWriteArrow: TemplateRef<any> | string
-  
+  @Input('quick-tour-severity') quickTourSeverity: EnumQuickTourSeverity = EnumQuickTourSeverity.MEDIUM
+
   private attachedTmpl: ElementRef
 
   constructor(
