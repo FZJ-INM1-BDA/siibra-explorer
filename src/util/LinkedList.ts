@@ -85,6 +85,18 @@ export class DoublyLinkedList<T extends object>{
   size(){
     return this._size
   }
+
+  get(idx: number) {
+    if (idx >= this.size()) throw new Error(`Index out of bound!`)
+    let i = 0
+    let curr = this.first
+    while (i < idx) {
+      curr = curr.next
+      if (!curr) throw new Error(`Index out of bound!`)
+      i ++
+    }
+    return curr
+  }
 }
 
 export function FindInLinkedList<T extends object>(list: DoublyLinkedList<T>, predicate: (element: IDoublyLinkedItem<T>) => boolean){

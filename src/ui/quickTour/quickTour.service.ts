@@ -9,21 +9,6 @@ import { LOCAL_STORAGE_CONST } from "src/util/constants";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { StartTourDialogDialog } from "src/ui/quickTour/startTourDialog/startTourDialog.component";
 
-export function findInLinkedList<T extends object>(first: IDoublyLinkedItem<T>, predicate: (linkedObj: IDoublyLinkedItem<T>) => boolean): IDoublyLinkedItem<T>{
-  let compareObj = first,
-    returnObj: IDoublyLinkedItem<T> = null
-
-  do {
-    if (predicate(compareObj)) {
-      returnObj = compareObj
-      break
-    }
-    compareObj = compareObj.next
-  } while(!!compareObj)
-
-  return returnObj
-}
-
 @Injectable()
 export class QuickTourService {
 
@@ -129,13 +114,25 @@ export class QuickTourService {
   }
 
   public nextSlide() {
+    if (!this.currActiveSlide.next) return
     this.currActiveSlide = this.currActiveSlide.next
     this.currentTip$.next(this.currActiveSlide)
   }
 
   public previousSlide() {
+    if (!this.currActiveSlide.prev) return
     this.currActiveSlide = this.currActiveSlide.prev
     this.currentTip$.next(this.currActiveSlide)
+  }
+
+  public ff(index: number) {
+    try {
+      const slide = this.slides.get(index)
+      this.currActiveSlide = slide
+      this.currentTip$.next(slide)
+    } catch (_e) {
+      console.warn(`cannot find slide with index ${index}`)
+    }
   }
 
   changeDetected(dir: QuickTourThis) {
