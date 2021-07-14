@@ -75,7 +75,7 @@
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
       [attr.data-mat-drawer-top-open]="matDrawerTop.opened"
-      [opened]="sideNavTopSwitch.switchState"
+      [opened]="sideNavTopSwitch.switchState && !(hideUi$ | async)"
       [autoFocus]="false"
       [disableClose]="true"
       (openedChange)="handleSideNavAnimationDone($event)"
@@ -177,7 +177,7 @@
     <!-- sidenav-content -->
     <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
-      [opened]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState"
+      [opened]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState && !(hideUi$ | async)"
       [attr.data-mat-drawer-fullleft-open]="matDrawerLeft.opened"
       [autoFocus]="false"
       #matDrawerLeft="matDrawer"
