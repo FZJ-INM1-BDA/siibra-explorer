@@ -2,12 +2,13 @@
 {
   margin-left: -3rem;
   padding-top: 0;
-  padding-bottom: 0;
+  padding-bottom: 0.5rem;
 }
 
 .tab-toggle
 {
   margin: 0.25rem -1rem 0.25rem 0rem;
-  padding-right: 1rem;
-  text-align: right;
+  padding-right: .5rem;
+  text-align: center;
+  padding-left: 2.5rem;
 }
