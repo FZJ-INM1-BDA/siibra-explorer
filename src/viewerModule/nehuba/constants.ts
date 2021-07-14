@@ -29,9 +29,9 @@ export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheri
 
   const processRegion = (region: any) => {
     const { ngId: rNgId } = region
-    const existingMap = map.get(rNgId)
     const labelIndex = Number(region.labelIndex)
-    if (labelIndex) {
+    if (labelIndex && rNgId) {
+      const existingMap = map.get(rNgId)
       if (!existingMap) {
         const newMap = new Map()
         newMap.set(labelIndex, region)

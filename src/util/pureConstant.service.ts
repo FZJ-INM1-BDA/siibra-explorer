@@ -13,6 +13,12 @@ import { flattenReducer } from 'common/util'
 import { TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate } from "./fn";
 
+function getNgId(atlasId: string, tmplId: string, parcId: string, regionKey: string){
+  const proxyId = MultiDimMap.GetProxyKeyMatch(atlasId, tmplId, parcId, regionKey)
+  if (proxyId) return proxyId
+  return '_' + MultiDimMap.GetKey(atlasId, tmplId, parcId, regionKey)
+}
+
 function parseId(id: TId){
   if (typeof id === 'string') return id
   return `${id.kg.kgSchema}/${id.kg.kgId}`
@@ -434,7 +440,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             ) {
                               const dedicatedMap = region.volumeSrc[tmpl.id]['collect'].filter(v => v.volume_type === 'neuroglancer/precomputed')
                               if (dedicatedMap.length === 1) {
-                                const ngId = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
+                                const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                                 region['ngId'] = ngId
                                 region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
                                 ngLayerObj[tmpl.id][ngId] = {
@@ -469,7 +475,16 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                 return
                               }
 
-                              const hemispheredNgId = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
+                              if (
+                                tmpl.id === 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
+                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
+                                && hemisphereKey === 'whole brain'
+                              ) {
+                                region.children = []
+                                return
+                              }
+
+                              const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
                               region['ngId'] = hemispheredNgId
                             }
                           }  
@@ -487,7 +502,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             for (const key in (parc.volumeSrc[tmpl.id] || {})) {
                               for (const vol of parc.volumeSrc[tmpl.id][key]) {
                                 if (vol.volume_type === 'neuroglancer/precomputed') {
-                                  const ngIdKey = '_' + MultiDimMap.GetKey(atlas['@id'], tmpl.id, parseId(parc.id), key)
+                                  const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
                                   ngLayerObj[tmpl.id][ngIdKey] = {
                                     source: `precomputed://${vol.url}`,
                                     type: "segmentation",

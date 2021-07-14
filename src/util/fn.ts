@@ -139,7 +139,7 @@ export class QuickHash {
       hash = ((hash << 5) - hash) + charCode
       hash = hash & hash
     }
-    return hash.toString(16).slice(1, this.length+1)
+    return hash.toString(16).slice(1)
   }
 }
 
@@ -226,14 +226,21 @@ export class MultiDimMap{
 
   static KeyHash = new QuickHash()
 
-  static GetKey(...arg: any[]){
-    let mapKey = ``
+  static GetProxyKeyMatch(...arg:any[]):string {
+
     let proxyKeyMatch = BACKCOMAP_KEY_DICT
     for (let i = 0; i < arg.length; i++) {
       if (proxyKeyMatch) proxyKeyMatch = proxyKeyMatch[arg[i]]
+    }
+    if (proxyKeyMatch) return proxyKeyMatch as any
+    return null
+  }
+
+  static GetKey(...arg: any[]){
+    let mapKey = ``
+    for (let i = 0; i < arg.length; i++) {
       mapKey += arg[i]
     }
-    if (proxyKeyMatch) return proxyKeyMatch
     return MultiDimMap.KeyHash.getHash(mapKey)
   }
 
