@@ -4,7 +4,7 @@ import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConn
 import { distinctUntilChanged, switchMap, filter, map, withLatestFrom } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
-import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
+import { flattenRegions, getIdFromFullId, getIdFromKgIdObj, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
@@ -40,7 +40,7 @@ export class RegionBase {
       || (this._region.labelIndex > 65500 && [255, 255, 255])
       || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
       || [255, 200, 200]
-    
+
     this.rgbString = `rgb(${rgb.join(',')})`
     const [_h, _s, l] = rgbToHsl(...rgb)
     this.rgbDarkmode = l < 0.4
@@ -49,7 +49,7 @@ export class RegionBase {
   get region(){
     return this._region
   }
-  
+
   private region$: BehaviorSubject<any> = new BehaviorSubject(null)
 
   @Input()
@@ -215,12 +215,12 @@ export const getRegionParentParcRefSpace = createSelector(
      */
     const checkRegions = regions => {
       for (const region of regions) {
-        
+
         /**
          * check ROI to iterating regions
          */
         if (region.name === regionOfInterest.name) return true
-        
+
         if (region && region.children && Array.isArray(region.children)) {
           const flag = checkRegions(region.children)
           if (flag) return true
@@ -239,8 +239,8 @@ export const getRegionParentParcRefSpace = createSelector(
           parcellation: p
         }
       }
-    } 
-    
+    }
+
     return {
       template: null,
       parcellation: null
@@ -264,55 +264,49 @@ export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
 export const regionInOtherTemplateSelector = createSelector(
   viewerStateGetSelectedAtlas,
   viewerStateFetchedTemplatesSelector,
-  viewerStateSelectedTemplateSelector,
-  (atlas, fetchedTemplates, templateSelected, prop) => {
-    const atlasTemplateSpacesIds = atlas.templateSpaces.map(({ ['@id']: id, fullId }) => id || fullId)
+  (atlas, fetchedTemplates, prop) => {
+    const atlasTemplateSpacesIds = atlas.templateSpaces.map(a => a['@id'])
     const { region: regionOfInterest } = prop
     const returnArr = []
 
     const regionOfInterestHemisphere = getRegionHemisphere(regionOfInterest)
 
-    const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
-    if (!templateSelected) return []
-    const selectedTemplateId = getIdFromFullId(templateSelected.fullId)
-
-    // need to ensure that the templates are defined in atlas definition
-    // atlas is the single source of truth 
-    
     const otherTemplates = fetchedTemplates
-      .filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
-      .filter(({ ['@id']: id, fullId }) => atlasTemplateSpacesIds.includes(id || fullId))
-    for (const template of otherTemplates) {
-      for (const parcellation of template.parcellations) {
-        const flattenedRegions = flattenRegions(parcellation.regions)
-        const selectableRegions = flattenedRegions.filter(({ labelIndex }) => !!labelIndex)
+      .filter(({ ['@id']: id }) => id !== regionOfInterest.context.template['@id'])
+      .filter(({ ['@id']: id }) => atlasTemplateSpacesIds.includes(id))
+      .filter(({ ['@id']: id }) => regionOfInterest.availableIn.map(({id}) => id).includes(id))
 
-        for (const region of selectableRegions) {
-          const id = getIdFromFullId(region.fullId)
-          if (!!id && id === regionOfInterestId) {
-            const regionHemisphere = getRegionHemisphere(region)
-            /**
+    for (const template of otherTemplates) {
+      const parcellation = template.parcellations.find(p => p['@id'] === regionOfInterest.context.parcellation['@id'])
+
+      const flattenedRegions = flattenRegions(parcellation.regions)
+      const selectableRegions = flattenedRegions.filter(({ labelIndex }) => !!labelIndex)
+
+      for (const region of selectableRegions) {
+        if (regionsEqual(regionOfInterest, region)) {
+
+          const regionHemisphere = getRegionHemisphere(region)
+          /**
              * if both hemisphere metadatas are defined
              */
-            if (
-              !!regionOfInterestHemisphere &&
+          if (
+            !!regionOfInterestHemisphere &&
               !!regionHemisphere
-            ) {
-              if (regionHemisphere === regionOfInterestHemisphere) {
-                returnArr.push({
-                  template,
-                  parcellation,
-                  region,
-                })
-              }
-            } else {
+          ) {
+            if (regionHemisphere === regionOfInterestHemisphere) {
               returnArr.push({
                 template,
                 parcellation,
                 region,
-                hemisphere: regionHemisphere
               })
             }
+          } else {
+            returnArr.push({
+              template,
+              parcellation,
+              region,
+              hemisphere: regionHemisphere
+            })
           }
         }
       }
@@ -320,3 +314,22 @@ export const regionInOtherTemplateSelector = createSelector(
     return returnArr
   }
 )
+
+const regionsEqual = (region1, region2) => {
+  const region1Hemisphere = getRegionHemisphere(region1)
+  const region2Hemisphere = getRegionHemisphere(region2)
+
+  if (region1.id && region1.id.kg && region2.id && region2.id.kg) {
+    return getIdFromKgIdObj(region1.id.kg) === getIdFromKgIdObj(region2.id.kg)
+        // If both has hemispheres, they should be equal
+        && (!(region1Hemisphere && region2Hemisphere) || region1Hemisphere === region2Hemisphere)
+  }
+
+  if (region1Hemisphere && region2Hemisphere) {
+    return region1.name === region2.name
+  } else {
+    const region1NameBasis = region1Hemisphere? region1.name.substring(0, region1.name.lastIndexOf(' ')) : region1.name
+    const region2NameBasis = region2Hemisphere? region2.name.substring(0, region2.name.lastIndexOf(' ')) : region2.name
+    return region1NameBasis === region2NameBasis
+  }
+}
