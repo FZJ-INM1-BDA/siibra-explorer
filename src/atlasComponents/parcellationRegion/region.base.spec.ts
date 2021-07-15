@@ -342,16 +342,16 @@ describe('> region.base.ts', () => {
           templateSpaces: mockFetchedTemplates
         }
         describe('> no hemisphere selected, simulates big brain cyto map', () => {
-  
+
           let result: any[]
           beforeAll(() => {
-            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, mt0, { region: mr0 })
+            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, { region: {...mr0, context: {template: mt0, parcellation: mp0}} })
           })
-    
+
           it('> length checks out', () => {
             expect(result.length).toEqual(5)
           })
-    
+
           it('> does not contain itself', () => {
             expect(result).not.toContain(
               jasmine.objectContaining({
@@ -361,7 +361,7 @@ describe('> region.base.ts', () => {
               })
             )
           })
-    
+
           it('> no hemisphere result has no hemisphere meta data', () => {
             expect(result).toContain(
               jasmine.objectContaining({
@@ -371,7 +371,7 @@ describe('> region.base.ts', () => {
               })
             )
           })
-    
+
           it('> hemisphere result has hemisphere metadata # 1', () => {
             expect(result).toContain(
               jasmine.objectContaining({
@@ -413,17 +413,17 @@ describe('> region.base.ts', () => {
             )
           })
         })
-    
+
         describe('> hemisphere data selected (left hemisphere), simulates julich-brain in mni152', () => {
           let result
           beforeAll(() => {
-            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, mt2, { region: mr0lh })
+            result = regionInOtherTemplateSelector.projector(selectedAtlas, mockFetchedTemplates, { region: {...mr0lh, context: {template: mt2, parcellation: mp1h}} })
           })
-    
+
           it('> length checks out', () => {
             expect(result.length).toEqual(3)
           })
-    
+
           it('> does not select wrong hemisphere (right hemisphere)', () => {
             expect(result).not.toContain(
               jasmine.objectContaining({
@@ -433,7 +433,7 @@ describe('> region.base.ts', () => {
               })
             )
           })
-    
+
           it('> select the corresponding hemisphere (left hemisphere), but without hemisphere metadata', () => {
             expect(result).toContain(
               jasmine.objectContaining({
@@ -444,12 +444,12 @@ describe('> region.base.ts', () => {
             )
           })
         })
-      
+
       })
     }
 
   })
-  
+
   describe('> RegionBase', () => {
     let regionBase: RegionBase
     let mockStore: MockStore
@@ -520,7 +520,7 @@ describe('> region.base.ts', () => {
           expect(regionBase.position).toBeFalsy()
         })
       })
-    
+
       it('> populates if position property is array with length 3 and non NaN element', () => {
         regionBase.region = {
           ...mr0,
@@ -529,7 +529,7 @@ describe('> region.base.ts', () => {
         expect(regionBase.position).toBeTruthy()
       })
     })
-  
+
     describe('> rgb', () => {
       let strToRgbSpy: jasmine.Spy
       let mockStore: MockStore
@@ -569,7 +569,7 @@ describe('> region.base.ts', () => {
 
         describe('> arguments for strToRgb', () => {
           it('> if ngId is defined, use ngId', () => {
-            
+
             const regionBase = new RegionBase(mockStore)
             regionBase.region = {
               ngId: 'foo',
