@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, Observable, of, Subject, Subscription} from "rxjs";
+import {combineLatest, merge, Observable, of, Subject, Subscription} from "rxjs";
 import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
@@ -70,18 +70,21 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
           if (!r[0]) return of(null)
           const { context } = r[0]  
           const { atlas, template, parcellation } = context || {}
-          return svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
-            map(det => {
-              return {
-                ...det,
-                context
-              }
-            }),
-            // in case detailed requests 
-            catchError((_err, _obs) => of(r[0])),
-            shareReplay(1),
+          return merge(
+            of(null),
+            svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
+              map(det => {
+                return {
+                  ...det,
+                  context
+                }
+              }),
+              // in case detailed requests 
+              catchError((_err, _obs) => of(r[0])),
+            )
           )
-        })
+        }),
+        shareReplay(1)
       ),
       deps: [ Store, PureContantService ]
     },
