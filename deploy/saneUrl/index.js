@@ -2,40 +2,12 @@ const router = require('express').Router()
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
 const { Store, NotFoundError } = require('./store')
+const { redisURL } = require('../lruStore')
 const bodyParser = require('body-parser')
 const { readUserData, saveUserData } = require('../user/store')
 
 const store = new Store()
-
-const { 
-  REDIS_PROTO,
-  REDIS_ADDR,
-  REDIS_PORT,
-
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT,
-
-  REDIS_USERNAME,
-  REDIS_PASSWORD,
-
-  HOSTNAME,
-  HOST_PATHNAME,
-  DISABLE_LIMITER,
-} = process.env
-
-const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO || 'redis'
-const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
-const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
-
-/**
- * nb this way to set username and pswd can be risky, but given that site adnimistrator sets the username and pswd via env var
- * it should not be a security concern
- */
-const userPass = (REDIS_USERNAME || REDIS_PASSWORD) && `${REDIS_USERNAME || ''}:${REDIS_PASSWORD || ''}@`
-
-const redisURL = redisAddr && `${redisProto}://${userPass || ''}${redisAddr}:${redisPort}`
-
+const { DISABLE_LIMITER, HOSTNAME, HOST_PATHNAME } = process.env
 const limiter = new RateLimit({
   windowMs: 1e3 * 5,
   max: 5,

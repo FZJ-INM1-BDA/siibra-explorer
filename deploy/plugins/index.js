@@ -4,7 +4,7 @@
  */
 
 const express = require('express')
-const { store } = require('../lruStore')
+const lruStore = require('../lruStore')
 const got = require('got')
 const router = express.Router()
 const PLUGIN_URLS = (process.env.PLUGIN_URLS && process.env.PLUGIN_URLS.split(';')) || []
@@ -26,6 +26,10 @@ router.get('/manifests', async (_req, res) => {
     ...STAGING_PLUGIN_URLS
   ].map(async url => {
     const key = getKey(url)
+    
+    await lruStore._initPr
+    const { store } = lruStore
+    
     try {
       const storedManifest = await store.get(key)
       if (storedManifest) return JSON.parse(storedManifest)
