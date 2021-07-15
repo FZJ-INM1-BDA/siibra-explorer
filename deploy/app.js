@@ -45,14 +45,16 @@ app.use((req, _, next) => {
  * async function, but can start server without
  */
 
+let authReady
+
 const _ = (async () => {
 
 /**
  * load env first, then load other modules
  */
 
-  const { configureAuth, ready: authReady } = require('./auth')
-
+  const { configureAuth, ready } = require('./auth')
+  authReady = ready
   const store = await (async () => {
 
     const { USE_DEFAULT_MEMORY_STORE } = process.env
@@ -199,7 +201,7 @@ app.get('/', (req, res, next) => {
 app.use('/logo', require('./logo'))
 
 app.get('/ready', async (req, res) => {
-  const authIsReady = await authReady()
+  const authIsReady = authReady ? await authReady() : false
   const regionalFeatureReady = await regionalFeatureIsReady()
   const datasetReady = await datasetRouteIsReady()
   const allReady = [ 
