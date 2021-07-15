@@ -191,8 +191,10 @@ export class NehubaLayerControlService implements OnDestroy{
   public setColorMap$: Observable<IColorMap> = merge(
     this.activeColorMap$,
     this.overwriteColorMap$.pipe(
-      filter(v => !!v)
+      filter(v => !!v),
     )
+  ).pipe(
+    shareReplay(1)
   )
 
   public visibleLayer$: Observable<string[]> = combineLatest([

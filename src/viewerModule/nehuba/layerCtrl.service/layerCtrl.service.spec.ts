@@ -1,9 +1,11 @@
-import { TestBed } from "@angular/core/testing"
+import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
 import { hot } from "jasmine-marbles"
+import { IColorMap } from "./layerCtrl.util"
+import { debounceTime } from "rxjs/operators"
 
 
 describe('> layerctrl.service.ts', () => {
@@ -169,6 +171,18 @@ describe('> layerctrl.service.ts', () => {
           })
         })
       })
+
+      const foobar1 = {
+        'foo-bar': {
+          1: { red: 100, green: 200, blue: 255 },
+          2: { red: 15, green: 15, blue: 15 },
+        }
+      }
+      const foobar2 = {
+        'foo-bar': {
+          2: { red: 255, green: 255, blue: 255 },
+        }
+      }
     
       describe('> overwriteColorMap$ firing', () => {
         beforeEach(() => {
@@ -191,32 +205,47 @@ describe('> layerctrl.service.ts', () => {
 
         it('> should overwrite existing colormap', () => {
           const service = TestBed.inject(NehubaLayerControlService)
-          service.overwriteColorMap$.next({
-            'foo-bar': {
-              2: {
-                red: 255,
-                green: 255,
-                blue: 255,
-              }
-            }
-          })
+          service.overwriteColorMap$.next(foobar2)
 
           expect(service.setColorMap$).toBeObservable(
-            hot('(ab)', {
-              a: {
-                'foo-bar': {
-                  1: { red: 100, green: 200, blue: 255 },
-                  2: { red: 15, green: 15, blue: 15 },
-                }
-              },
-              b: {
-                'foo-bar': {
-                  2: { red: 255, green: 255, blue: 255 },
-                }
-              }
+            hot('(b)', {
+              a: foobar1,
+              b: foobar2
             })
           )
         })
+
+        it('> unsub/resub should not result in overwritecolormap last emitted value', fakeAsync(() => {
+          const service = TestBed.inject(NehubaLayerControlService)
+
+          let subscrbiedVal: IColorMap
+          const sub = service.setColorMap$.pipe(
+            debounceTime(16),
+          ).subscribe(val => {
+            subscrbiedVal = val
+          })
+          
+          service.overwriteColorMap$.next(foobar2)
+          tick(32)
+          expect(subscrbiedVal).toEqual(foobar2)
+          tick(16)
+          sub.unsubscribe()
+          subscrbiedVal = null
+
+          // mock emit selectParc etc...
+          mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
+          mockStore.setState({})
+          const sub2 = service.setColorMap$.pipe(
+            debounceTime(16),
+          ).subscribe(val => {
+            subscrbiedVal = val
+          })
+
+          tick(32)
+          expect(subscrbiedVal).toEqual(foobar1)
+          sub2.unsubscribe()
+
+        }))
       })
     })
 
