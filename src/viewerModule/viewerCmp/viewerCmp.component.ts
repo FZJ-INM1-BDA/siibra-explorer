@@ -152,11 +152,8 @@ export class ViewerCmp implements OnDestroy {
     map(v => v.length > 0)
   )
 
-  public viewerMode: string
-  public hideUi$: Observable<boolean> = this.store$.pipe(
+  public viewerMode$: Observable<string> = this.store$.pipe(
     select(viewerStateViewerModeSelector),
-    map(h => h === ARIA_LABELS.VIEWER_MODE_ANNOTATING),
-    distinctUntilChanged(),
   )
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([

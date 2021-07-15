@@ -6,7 +6,7 @@
 <layout-floating-container [zIndex]="10">
 
   <!-- Annotation mode -->
-  <div *ngIf="hideUi$ | async">
+  <div *ngIf="(viewerMode$ | async) === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
     <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
       [hasBackdrop]="false">
       <mat-drawer #annotationDrawer
@@ -61,7 +61,7 @@
 
   <!-- top drawer -->
   <mat-drawer-container
-    [hidden]="hideUi$ | async"
+    [hidden]="viewerMode$ | async"
     [iav-switch-initstate]="false"
     iav-switch
     #sideNavTopSwitch="iavSwitch"
@@ -168,6 +168,7 @@
 
   <!-- full left drawer -->
   <mat-drawer-container
+    [hidden]="viewerMode$ | async"
     [iav-switch-initstate]="!(alwaysHideMinorPanel$ | async)"
     iav-switch
     #sideNavFullLeftSwitch="iavSwitch"
@@ -245,7 +246,7 @@
     </mat-drawer>
 
     <!-- main-content -->
-    <mat-drawer-content class="visible position-relative" [hidden]="hideUi$ | async">
+    <mat-drawer-content class="visible position-relative" [hidden]="viewerMode$ | async">
 
       <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
 
