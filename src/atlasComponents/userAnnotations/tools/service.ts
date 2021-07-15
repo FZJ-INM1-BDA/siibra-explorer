@@ -453,10 +453,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
               ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
               {
                 ...ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC,
+                // since voxel coordinates are no longer defined, so voxel size will always be 1/1/1
                 transform: [
-                  [1/voxelSize[0], 0, 0, 0],
-                  [0, 1/voxelSize[1], 0, 0],
-                  [0, 0, 1/voxelSize[2], 0],
+                  [1, 0, 0, 0],
+                  [0, 1, 0, 0],
+                  [0, 0, 1, 0],
                   [0, 0, 0, 1],
                 ]
               }
