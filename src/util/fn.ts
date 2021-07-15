@@ -226,7 +226,7 @@ export class MultiDimMap{
 
   static KeyHash = new QuickHash()
 
-  static GetProxyKeyMatch(...arg:any[]):string {
+  static GetProxyKeyMatch(...arg: any[]): string {
 
     let proxyKeyMatch = BACKCOMAP_KEY_DICT
     for (let i = 0; i < arg.length; i++) {
