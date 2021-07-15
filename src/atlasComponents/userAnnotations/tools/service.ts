@@ -119,7 +119,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       this.deselectTools()
       return
     }
-    case 'requestManAnnStreeam': {
+    case 'requestManAnnStream': {
       return this.managedAnnotations$
     }
     }
