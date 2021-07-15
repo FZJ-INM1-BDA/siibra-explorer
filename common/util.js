@@ -21,15 +21,15 @@
   }
 
   const HEMISPHERE = {
-    LEFT_HEMISPHERE: `left hemisphere`,
-    RIGHT_HEMISPHERE: `right hemisphere`
+    LEFT_HEMISPHERE: `left`,
+    RIGHT_HEMISPHERE: `right`
   }
 
   exports.getRegionHemisphere = region => {
     if (!region) return null
-    return (region.name && region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+    return (region.name && region.name.includes(' right') || (!!region.status && region.status.includes('right')))
       ? HEMISPHERE.RIGHT_HEMISPHERE
-      : (region.name && region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+      : (region.name && region.name.includes(' left') || (!!region.status && region.status.includes('left')))
         ? HEMISPHERE.LEFT_HEMISPHERE
         : null
   }
