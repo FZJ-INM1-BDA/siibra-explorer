@@ -7,13 +7,14 @@ import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine, TCallback } from "./type";
 import { switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { retry } from 'common/util'
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 
@@ -113,7 +114,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }[] = []
   private mousePosReal: [number, number, number]
 
+  public toolEvents = new Subject()
   private handleToolCallback: TCallbackFunction = arg => {
+    this.toolEvents.next(arg)
     switch (arg.type) {
     case 'paintingEnd': {
       this.deselectTools()
@@ -121,6 +124,19 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
     case 'requestManAnnStream': {
       return this.managedAnnotations$
+    }
+    case 'message': {
+      const d = (arg as TCallback['message']['callArg'] & { type: any })
+      const { message, actionCallback, action = null } = d
+      this.snackbar.open(message, action, {
+        duration: 3000
+      }).afterDismissed().subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction && actionCallback) actionCallback()
+      })
+      return
+    }
+    case 'showList': {
+      return
     }
     }
   }
@@ -209,6 +225,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   constructor(
     private store: Store<any>,
+    private snackbar: MatSnackBar,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,

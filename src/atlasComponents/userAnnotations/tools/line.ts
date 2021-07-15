@@ -270,6 +270,12 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
           this.selectedLine = null
           this.managedAnnotations$.next(this.managedAnnotations)
           if (this.callback) {
+            this.callback({
+              type: 'message',
+              message: 'Line added.',
+              action: 'Open',
+              actionCallback: () => this.callback({ type: 'showList' })
+            })
             this.callback({ type: 'paintingEnd' })
           }
         }

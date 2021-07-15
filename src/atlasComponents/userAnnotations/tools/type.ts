@@ -165,6 +165,18 @@ export type TCallback = {
     callArg: {}
     returns: Observable<IAnnotationGeometry[]>
   }
+  message: {
+    callArg: {
+      message: string
+      action?: string
+      actionCallback?: () => void
+    }
+    returns: void
+  }
+  showList: {
+    callArg: {}
+    returns: void
+  }
 }
 
 export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['callArg'] & { type: T }) => TCallback[T]['returns'] | void

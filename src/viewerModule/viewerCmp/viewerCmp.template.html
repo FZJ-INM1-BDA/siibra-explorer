@@ -9,8 +9,10 @@
   <div *ngIf="(viewerMode$ | async) === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
     <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
       [hasBackdrop]="false">
-      <mat-drawer #annotationDrawer
+      <mat-drawer #annotationDrawer="matDrawer"
         mode="side"
+        (annotation-event-directive)="annotationDrawer.open()"
+        [annotation-event-directive-filter]="['showList']"
         [autoFocus]="false"
         [disableClose]="true"
         class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
