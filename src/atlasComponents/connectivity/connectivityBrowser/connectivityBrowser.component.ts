@@ -106,6 +106,9 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.atlasId = val.context.atlas['@id']
       this.parcellationId = val.context.parcellation['@id']
 
+      this.setConnectivityUrl()
+      this.setProfileLoadUrl()
+
       // TODO may not be necessary
       this.changeDetectionRef.detectChanges()
     }
@@ -153,7 +156,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public fullConnectivityLoadUrl: string
 
     ngOnInit(): void {
-      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId || this.regionName)}/features/ConnectivityProfile`
+      this.setConnectivityUrl()
 
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res
@@ -286,6 +289,16 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
+    private setConnectivityUrl() {
+      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId || this.regionName)}/features/ConnectivityProfile`
+    }
+
+    private setProfileLoadUrl() {
+      const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
+      this.connectivityLoadUrl.emit(url)
+      this.loadUrl = url
+    }
+
     clearViewer() {
       this.store$.dispatch(
         ngViewerActionClearView({
@@ -310,9 +323,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.selectedDatasetKgSchema = foundDataset?.kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
-        const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
-        this.connectivityLoadUrl.emit(url)
-        this.loadUrl = url
+        this.setProfileLoadUrl()
 
         this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDataset)}`
       }
