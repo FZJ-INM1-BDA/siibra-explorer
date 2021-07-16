@@ -4,7 +4,7 @@ import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, ski
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { LoggingService } from "src/logging";
-import { getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
+import { bufferUntil, getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
 import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
 import { deserialiseParcRegionId } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
@@ -12,6 +12,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
+import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -151,6 +152,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
+    @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
+    @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
   ) {
 
     if (this.nehubaViewer$) {
@@ -328,6 +331,56 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     } else {
       this.log.error(`SET_LAYER_VISIBILITY not provided`)
     }
+
+    if (this.segVis$) {
+      this.ondestroySubscriptions.push(
+        this.segVis$.pipe().subscribe(val => {
+          // null === hide all seg
+          if (val === null) {
+            this.hideAllSeg()
+            return
+          }
+          // empty array === show all seg
+          if (val.length === 0) {
+            this.showAllSeg()
+            return
+          }
+          // show limited seg
+          this.showSegs(val)
+        })
+      )
+    } else {
+      this.log.error(`SET_SEGMENT_VISIBILITY not provided`)
+    }
+
+    if (this.layerCtrl$) {
+      this.ondestroySubscriptions.push(
+        this.layerCtrl$.pipe(
+          bufferUntil(({
+            condition: () => !!this.nehubaViewer?.ngviewer
+          }))
+        ).subscribe(messages => {
+          for (const message of messages) {
+            if (message.type === 'add') {
+              const p = message as TNgLayerCtrl<'add'>
+              this.loadLayer(p.payload)
+            }
+            if (message.type === 'remove') {
+              const p = message as TNgLayerCtrl<'remove'>
+              for (const name of p.payload.names){
+                this.removeLayer({ name })
+              }
+            }
+            if (message.type === 'update') {
+              const p = message as TNgLayerCtrl<'update'>
+              this.updateLayer(p.payload)
+            }
+          }
+        })
+      )
+    } else {
+      this.log.error(`NG_LAYER_CONTROL not provided`)
+    }
   }
 
   public numMeshesToBeLoaded: number = 0
@@ -391,12 +444,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   private loadMeshes$: ReplaySubject<{labelIndicies: number[], layer: { name: string }}> = new ReplaySubject()
-  private loadMeshes(labelIndicies: number[], { name }) {
-    this.loadMeshes$.next({
-      labelIndicies,
-      layer: { name },
-    })
-  }
 
   public mouseOverSegment: number | null
   public mouseOverLayer: {name: string, url: string}| null
@@ -656,6 +703,18 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
         return layerObj[key]
       })
+  }
+
+  public updateLayer(layerObj: INgLayerCtrl['update']) {
+
+    const viewer = this.nehubaViewer.ngviewer
+
+    for (const layerName in layerObj) {
+      const layer = viewer.layerManager.getLayerByName(layerName)
+      if (!layer) continue
+      const { visible } = layerObj[layerName]
+      layer.setVisible(!!visible)
+    }
   }
 
   public hideAllSeg() {

@@ -1,5 +1,5 @@
 export {
-  NehubaLayerControlService
+  NehubaLayerControlService,
 } from './layerCtrl.service'
 
 export {
@@ -7,4 +7,5 @@ export {
   SET_COLORMAP_OBS,
   SET_LAYER_VISIBILITY,
   getRgb,
+  INgLayerInterface,
 } from './layerCtrl.util'

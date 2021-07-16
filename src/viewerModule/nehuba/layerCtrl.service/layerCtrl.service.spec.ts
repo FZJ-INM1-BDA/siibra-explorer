@@ -1,12 +1,13 @@
 import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
+import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
 import { hot } from "jasmine-marbles"
 import { IColorMap } from "./layerCtrl.util"
 import { debounceTime } from "rxjs/operators"
-
+import { ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper"
+const  util = require('common/util')
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -295,6 +296,125 @@ describe('> layerctrl.service.ts', () => {
           ]
         }))
       })
+    })
+
+    describe('> segmentVis$', () => {
+      const region1= {
+        ngId: 'ngid',
+        labelIndex: 1
+      }
+      const region2= {
+        ngId: 'ngid',
+        labelIndex: 2
+      }
+      beforeEach(() => {
+        mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [])
+        mockStore.overrideSelector(ngViewerSelectorLayers, [])
+        mockStore.overrideSelector(ngViewerSelectorClearView, false)
+        mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
+      })
+
+      it('> by default, should return []', () => {
+        const service = TestBed.inject(NehubaLayerControlService)
+        expect(service.segmentVis$).toBeObservable(
+          hot('a', {
+            a: []
+          })
+        )
+      })
+
+      describe('> if sel regions exist', () => {
+        beforeEach(() => {
+          mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [
+            region1, region2
+          ])
+        })
+
+        it('> default, should return encoded strings', () => {
+          mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [
+            region1, region2
+          ])
+          const service = TestBed.inject(NehubaLayerControlService)
+          expect(service.segmentVis$).toBeObservable(
+            hot('a', {
+              a: [`ngid#1`, `ngid#2`]
+            })
+          )
+        })
+
+        it('> if clearflag is true, then return []', () => {
+
+          mockStore.overrideSelector(ngViewerSelectorClearView, true)
+          const service = TestBed.inject(NehubaLayerControlService)
+          expect(service.segmentVis$).toBeObservable(
+            hot('a', {
+              a: []
+            })
+          )
+        })        
+      })
+
+      describe('> if non mixable layer exist', () => {
+        beforeEach(() => {
+          mockStore.overrideSelector(ngViewerSelectorLayers, [{
+            mixability: 'nonmixable'
+          }])
+        })
+
+        it('> default, should return null', () => {
+          const service = TestBed.inject(NehubaLayerControlService)
+          expect(service.segmentVis$).toBeObservable(
+            hot('a', {
+              a: null
+            })
+          )
+        })
+
+        it('> if regions selected, should still return null', () => {
+
+          mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [
+            region1, region2
+          ])
+          const service = TestBed.inject(NehubaLayerControlService)
+          expect(service.segmentVis$).toBeObservable(
+            hot('a', {
+              a: null
+            })
+          )
+        })
+
+        describe('> if clear flag is set', () => {
+          beforeEach(() => {
+            mockStore.overrideSelector(ngViewerSelectorClearView, true)
+          })
+
+          it('> default, should return []', () => {
+            const service = TestBed.inject(NehubaLayerControlService)
+            expect(service.segmentVis$).toBeObservable(
+              hot('a', {
+                a: []
+              })
+            )
+          })
+
+          it('> if reg selected, should return []', () => {
+
+            mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [
+              region1, region2
+            ])
+            const service = TestBed.inject(NehubaLayerControlService)
+            expect(service.segmentVis$).toBeObservable(
+              hot('a', {
+                a: []
+              })
+            )
+          })
+        })
+      })
+    })
+
+    describe('> ngLayersController$', () => {
+      
     })
   })
 })

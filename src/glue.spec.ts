@@ -2,15 +2,13 @@ import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/te
 import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects, ClickInterceptorService } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
-import { getRandomHex } from 'common/util'
+import { getRandomHex, getIdObj } from 'common/util'
 import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
-import { getIdObj } from 'common/util'
 import { DS_PREVIEW_URL } from 'src/util/constants'
 import { NgLayersService } from "./ui/layerbrowser/ngLayerService.service"
-import { EnumColorMapName } from "./util/colorMaps"
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
 import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
 import { generalActionError } from "./services/stateStore.helper"

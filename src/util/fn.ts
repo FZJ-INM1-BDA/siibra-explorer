@@ -1,5 +1,5 @@
 import { deserialiseParcRegionId } from 'common/util'
-import { interval, of } from 'rxjs'
+import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 
 export function isSame(o, n) {
@@ -267,4 +267,34 @@ export function recursiveMutate<T>(arr: T[], getChildren: (obj: T) => T[], mutat
       mutateFn
     )
   }
+}
+
+export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
+  const { condition, leading, interval: int = 160 } = opts
+  let buffer: T[] = []
+  return (src: Observable<T>) => new Observable<T[]>(obs => {
+    const sub = interval(int).pipe(
+      filter(() => buffer.length > 0)
+    ).subscribe(() => {
+      if (condition()) {
+        obs.next(buffer)
+        buffer = []
+      }
+    })
+    src.subscribe(
+      val => {
+        if (leading && condition()) {
+          obs.next([...buffer, val])
+          buffer = []
+        } else {
+          buffer.push(val)
+        }
+      },
+      err => obs.error(err),
+      () => {
+        obs.complete()
+        sub.unsubscribe()
+      }
+    )
+  })
 }

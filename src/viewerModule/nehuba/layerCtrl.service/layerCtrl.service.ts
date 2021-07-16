@@ -1,16 +1,17 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, from, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
-import { viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { getRgb, IColorMap } from "./layerCtrl.util";
+import { distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
+import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
+import { getRgb, IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
 import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
 import { IAuxMesh } from '../store'
 import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { TRegionDetail } from "src/util/siibraApiConstants/types";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
+import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
+import { serialiseParcellationRegion } from 'common/util'
 
 export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
   const returnVal: IColorMap = {}
@@ -182,6 +183,31 @@ export class NehubaLayerControlService implements OnDestroy{
         })
       )
     }
+
+    this.sub.push(
+      this.ngLayers$.subscribe(({ ngLayers }) => {
+        this.ngLayersRegister.layers = ngLayers
+      })
+    )
+
+    this.sub.push(
+      this.store$.pipe(
+        select(ngViewerSelectorClearView),
+        distinctUntilChanged()
+      ).subscribe(flag => {
+        const pmapLayer = this.ngLayersRegister.layers.find(l => l.name === NehubaLayerControlService.PMAP_LAYER_NAME)
+        if (!pmapLayer) return
+        const payload = {
+          type: 'update',
+          payload: {
+            [NehubaLayerControlService.PMAP_LAYER_NAME]: {
+              visible: !flag
+            }
+          }
+        } as TNgLayerCtrl<'update'>
+        this.manualNgLayersControl$.next(payload)
+      })
+    )
   }
 
   public activeColorMap: IColorMap
@@ -215,5 +241,123 @@ export class NehubaLayerControlService implements OnDestroy{
       }
       return Array.from(ngIdSet)
     })
+  )
+
+  /**
+   * define when shown segments should be updated
+   */
+  public segmentVis$: Observable<string[]> = combineLatest([
+    /**
+     * selectedRegions
+     */
+    this.store$.pipe(
+      select(viewerStateSelectedRegionsSelector)
+    ),
+    /**
+     * if layer contains non mixable layer
+     */
+    this.store$.pipe(
+      select(ngViewerSelectorLayers),
+      map(layers => layers.findIndex(l => l.mixability === 'nonmixable') >= 0),
+    ),
+    /**
+     * clearviewqueue, indicating something is controlling colour map
+     * show all seg
+     */
+    this.store$.pipe(
+      select(ngViewerSelectorClearView),
+      distinctUntilChanged()
+    )
+  ]).pipe(
+    withLatestFrom(this.selectedParcellation$),
+    map(([[ regions, nonmixableLayerExists, clearViewFlag ], selParc]) => {
+      if (nonmixableLayerExists && !clearViewFlag) {
+        return null
+      }
+      const { ngId: defaultNgId } = selParc || {}
+  
+      /* selectedregionindexset needs to be updated regardless of forceshowsegment */
+      const selectedRegionIndexSet = new Set<string>(regions.map(({ngId = defaultNgId, labelIndex}) => serialiseParcellationRegion({ ngId, labelIndex })))
+      if (selectedRegionIndexSet.size > 0 && !clearViewFlag) {
+        return [...selectedRegionIndexSet]
+      } else {
+        return []
+      }
+    })
+  )
+
+  /**
+   * ngLayers controller
+   */
+
+  private ngLayersRegister: {layers: INgLayerInterface[]} = {
+    layers: []
+  }
+  public removeNgLayers(layerNames: string[]) {
+    this.ngLayersRegister.layers
+      .filter(layer => layerNames?.findIndex(l => l === layer.name) >= 0)
+      .map(l => l.name)
+      .forEach(layerName => {
+        this.store$.dispatch(ngViewerActionRemoveNgLayer({
+          layer: {
+            name: layerName
+          }
+        }))
+      })
+  }
+  public addNgLayer(layers: INgLayerInterface[]){
+    this.store$.dispatch(ngViewerActionAddNgLayer({
+      layer: layers
+    }))
+  }
+  private ngLayers$ = this.store$.pipe(
+    select(ngViewerSelectorLayers),
+    map((ngLayers: INgLayerInterface[]) => {
+      const newLayers = ngLayers.filter(l => {
+        const registeredLayerNames = this.ngLayersRegister.layers.map(l => l.name)
+        return !registeredLayerNames.includes(l.name)
+      })
+      const removeLayers = this.ngLayersRegister.layers.filter(l => {
+        const stateLayerNames = ngLayers.map(l => l.name)
+        return !stateLayerNames.includes(l.name)
+      })
+      return { newLayers, removeLayers, ngLayers }
+    }),
+    shareReplay(1)
+  )
+  private manualNgLayersControl$ = new Subject<TNgLayerCtrl<keyof INgLayerCtrl>>()
+  ngLayersController$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>> = merge(
+    this.ngLayers$.pipe(
+      map(({ newLayers }) => newLayers),
+      filter(layers => layers.length > 0),
+      map(newLayers => {
+
+        const newLayersObj: any = {}
+        newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
+          ...rest,
+          source,
+          // source: getProxyUrl(source),
+          // ...getProxyOther({source})
+        })
+  
+        return {
+          type: 'add',
+          payload: newLayersObj
+        } as TNgLayerCtrl<'add'>
+      })
+    ),
+    this.ngLayers$.pipe(
+      map(({ removeLayers }) => removeLayers),
+      filter(layers => layers.length > 0),
+      map(removeLayers => {
+        const removeLayerNames = removeLayers.map(v => v.name)
+        return {
+          type: 'remove',
+          payload: { names: removeLayerNames }
+        } as TNgLayerCtrl<'remove'>
+      })
+    ),
+    this.manualNgLayersControl$,
+  ).pipe(
   )
 }

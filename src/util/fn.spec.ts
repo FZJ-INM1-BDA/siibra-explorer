@@ -1,9 +1,9 @@
 import { fakeAsync, tick } from '@angular/core/testing'
 import {} from 'jasmine'
-import { cold, hot } from 'jasmine-marbles'
-import { of } from 'rxjs'
+import { hot } from 'jasmine-marbles'
+import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor } from './fn'
+import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor, bufferUntil } from './fn'
 
 describe(`> util/fn.ts`, () => {
 
@@ -76,6 +76,55 @@ describe(`> util/fn.ts`, () => {
         })
         tick(200)
       }))
+    })
+  })
+
+  describe('> #bufferUntil', () => {
+    let src: Observable<number>
+    beforeEach(() => {
+      src = hot('a-b-c|', {
+        a: 1,
+        b: 2,
+        c: 3,
+      })
+    })
+    it('> outputs array of original emitted value', () => {
+
+      expect(
+        src.pipe(
+          bufferUntil({
+            condition: () => true,
+            leading: true,
+          })
+        )
+      ).toBeObservable(
+        hot('a-b-c|', {
+          a: [1],
+          b: [2],
+          c: [3],
+        })
+      )
+    })
+
+    it('> on condition success, emit all in array', () => {
+
+      let counter = 0
+      expect(
+        src.pipe(
+          bufferUntil({
+            condition: () => {
+              counter ++
+              return counter > 2
+            },
+            leading: true,
+            interval: 60000,
+          })
+        )
+      ).toBeObservable(
+        hot('----c|', {
+          c: [1,2,3],
+        })
+      )
     })
   })
 })
