@@ -106,9 +106,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.atlasId = val.context.atlas['@id']
       this.parcellationId = val.context.parcellation['@id']
 
-      this.setConnectivityUrl()
-      this.setProfileLoadUrl()
-
+      if(this.selectedDataset) {
+        this.setConnectivityUrl()
+        this.setProfileLoadUrl()
+      }
       // TODO may not be necessary
       this.changeDetectionRef.detectChanges()
     }
