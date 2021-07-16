@@ -275,9 +275,9 @@ export const regionInOtherTemplateSelector = createSelector(
     // atlas is the single source of truth
 
     const otherTemplates = fetchedTemplates
-      .filter(({ ['@id']: id }) => id !== regionOfInterest.context.template['@id'])
-      .filter(({ ['@id']: id }) => atlasTemplateSpacesIds.includes(id))
-      .filter(({ ['@id']: id }) => regionOfInterest.availableIn.map(ai => ai.id).includes(id))
+      .filter(({ ['@id']: id }) => id !== regionOfInterest.context.template['@id']
+          && atlasTemplateSpacesIds.includes(id)
+          && regionOfInterest.availableIn.map(ai => ai.id).includes(id))
 
     for (const template of otherTemplates) {
       const parcellation = template.parcellations.find(p => p['@id'] === regionOfInterest.context.parcellation['@id'])
