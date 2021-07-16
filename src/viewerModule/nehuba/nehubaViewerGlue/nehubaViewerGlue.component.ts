@@ -24,7 +24,7 @@ import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
-import { switchMapWaitFor } from "src/util/fn";
+import {getViewer, switchMapWaitFor} from "src/util/fn";
 import { INavObj } from "../navigation.service";
 
 interface INgLayerInterface {
@@ -161,7 +161,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
   ngAfterViewInit(){
     this.setQuickTourPos()
 
-    const { 
+    const {
       mouseOverSegments,
       navigationEmitter,
       mousePosEmitter,
@@ -448,6 +448,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     })
     this.onDestroyCb.push(() => addRemoveAdditionalLayerSub.unsubscribe())
 
+
+    const hiddenLayersByCleanView = []
     /**
      * define when shown segments should be updated
      * TODO move to layerCtrl.service.ts
@@ -464,7 +466,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
        */
       this.store$.pipe(
         select(ngViewerSelectorLayers),
-        map(layers => layers.findIndex(l => l.mixability === 'nonmixable') >= 0),
+        map(layers => layers.filter(l => l.mixability === 'nonmixable')),
       ),
       /**
        * clearviewqueue, indicating something is controlling colour map
@@ -476,10 +478,25 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       )
     ]).pipe(
       switchMap(this.waitForNehuba.bind(this)),
-    ).subscribe(([ regions, nonmixableLayerExists, clearViewFlag ]) => {
-      if (nonmixableLayerExists) {
-        this.nehubaContainerDirective.nehubaViewerInstance.hideAllSeg()
-        return
+    ).subscribe(([ regions, nonmixableLayers, clearViewFlag ]) => {
+      if (nonmixableLayers.length) {
+        if (clearViewFlag) {
+          nonmixableLayers.forEach(l => {
+            const layer = getViewer().layerManager.getLayerByName(l.name)
+            if (layer.visible) {
+              hiddenLayersByCleanView.push(layer)
+              layer.setVisible(false)
+            }
+          })
+        } else {
+          if (hiddenLayersByCleanView) {
+            hiddenLayersByCleanView.forEach(layer => layer.setVisible(true))
+            hiddenLayersByCleanView.length = 0
+          }
+
+          this.nehubaContainerDirective.nehubaViewerInstance.hideAllSeg()
+          return
+        }
       }
       const { ngId: defaultNgId } = this.selectedParcellation || {}
 
@@ -769,7 +786,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
 
   private waitForNehuba = switchMapWaitFor({
     condition: () => !!(this.nehubaContainerDirective?.isReady())
-  }) 
+  })
 
   public toggleMaximiseMinimise(index: number) {
     this.store$.dispatch(ngViewerActionToggleMax({
