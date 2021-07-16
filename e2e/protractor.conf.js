@@ -22,7 +22,7 @@ const PROTRACTOR_SPECS = process.env.PROTRACTOR_SPECS
 const localConfig = {
   ...(SELENIUM_ADDRESS
     ? { seleniumAddress: SELENIUM_ADDRESS }
-    : { directConnect: true } 
+    : { directConnect: true }
   ),
   capabilities: {
     // Use headless chrome
@@ -71,13 +71,13 @@ let bsLocal
 /**
  * config adapted from
  * https://github.com/browserstack/protractor-browserstack
- * 
+ *
  * MIT licensed
  */
 const bsConfig = {
   'browserstackUser': BROWSERSTACK_USERNAME,
   'browserstackKey': BROWSERSTACK_ACCESS_KEY,
-  
+
   'capabilities': {
     'build': 'protractor-browserstack',
     'name': BROWSERSTACK_TEST_NAME || 'iav_e2e',
@@ -121,7 +121,7 @@ exports.config = {
   jasmineNodeOpts: {
     defaultTimeoutInterval: 1000 * 60 * 10
   },
-  
+
   ...(
     BROWSERSTACK_ACCESS_KEY && BROWSERSTACK_USERNAME
     ? bsConfig
