@@ -161,9 +161,21 @@ export type TCallback = {
     callArg: {}
     returns: void
   }
-  requestManAnnStreeam: {
+  requestManAnnStream: {
     callArg: {}
     returns: Observable<IAnnotationGeometry[]>
+  }
+  message: {
+    callArg: {
+      message: string
+      action?: string
+      actionCallback?: () => void
+    }
+    returns: void
+  }
+  showList: {
+    callArg: {}
+    returns: void
   }
 }
 

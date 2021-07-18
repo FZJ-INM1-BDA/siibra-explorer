@@ -19,7 +19,8 @@ const README = 'EXAMPLE OF READ ME TEXT'
   styleUrls: ['./annotationList.style.css'],
   providers: [
     ComponentStore,
-  ]
+  ],
+  exportAs: 'annotationListCmp'
 })
 export class AnnotationList {
 

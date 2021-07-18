@@ -5,7 +5,7 @@
     #parentContainer
     class="p-5 w-100 d-flex flex-column flex-wrap justify-content-center align-items-stretch pe-all">
     <mat-card
-      (mousedown)="activatedTemplate$.next(atlas)"
+      (click)="selectAtlas(atlas)"
       matRipple
       *ngFor="let atlas of loadedAtlases$ | async | filterNull"
       class="m-3 col-md-12 col-lg-12 pe-all">
@@ -21,7 +21,7 @@
       </mat-card-footer>
     </mat-card>
 
-    <ng-template [ngIf]="!(finishedLoading$ | async)">
+    <ng-template [ngIf]="!finishedLoading">
       <div class="d-flex align-items-center p-4">
         <h1 class="mat-h1">
           <spinner-cmp></spinner-cmp>

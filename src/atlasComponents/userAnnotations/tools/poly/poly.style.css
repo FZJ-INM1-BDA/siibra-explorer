@@ -3,3 +3,8 @@ point-update-cmp
   width: 100%;
   display: block;
 }
+
+:host >>> .mat-chip-list-wrapper
+{
+  flex-wrap: wrap;
+}

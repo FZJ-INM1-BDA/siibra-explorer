@@ -1,6 +1,6 @@
-import { Directive, ElementRef, Input, HostListener, Output, OnDestroy } from "@angular/core";
+import { Directive, ElementRef, Input, OnDestroy } from "@angular/core";
 import { Observable, fromEvent, merge, Subscription } from "rxjs";
-import { map, filter, shareReplay, switchMap, pairwise, takeUntil, tap, switchMapTo } from "rxjs/operators";
+import { map, filter, shareReplay, switchMap, pairwise, takeUntil, switchMapTo } from "rxjs/operators";
 import { getExportNehuba } from 'src/util/fn'
 import { computeDistance } from "../nehubaViewer/nehubaViewer.component";
 

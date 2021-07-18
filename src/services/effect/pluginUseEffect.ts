@@ -3,12 +3,10 @@ import { Effect } from "@ngrx/effects"
 import { select, Store } from "@ngrx/store"
 import { Observable, forkJoin } from "rxjs"
 import { filter, map, startWith, switchMap } from "rxjs/operators"
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/plugin/atlasViewer.pluginService.service"
-import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { PLUGINSTORE_ACTION_TYPES, pluginStateSelectorInitManifests } from 'src/services/state/pluginState.helper'
-import { IavRootStoreInterface } from "../stateStore.service"
+import { PLUGINSTORE_CONSTANTS, PLUGINSTORE_ACTION_TYPES, pluginStateSelectorInitManifests } from 'src/services/state/pluginState.helper'
 import { HttpClient } from "@angular/common/http"
+import { getHttpHeader } from "src/util/constants"
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +18,7 @@ export class PluginServiceUseEffect {
   public initManifests$: Observable<any>
 
   constructor(
-    store$: Store<IavRootStoreInterface>,
-    constantService: AtlasViewerConstantsServices,
+    store$: Store<any>,
     pluginService: PluginServices,
     http: HttpClient
   ) {
@@ -36,7 +33,7 @@ export class PluginServiceUseEffect {
       switchMap(arr => forkJoin(
         arr.map(([_source, url]) => 
           http.get(url, {
-            headers: constantService.getHttpHeader(),
+            headers: getHttpHeader(),
             responseType: 'json'
           })
         )

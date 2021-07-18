@@ -7,7 +7,7 @@ ARG DATASET_PREVIEW_URL
 ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
 
 ARG BS_REST_URL
-ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-tmpfullvolmetadata.apps-dev.hbp.eu/v1_0}
+ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-latest.apps-dev.hbp.eu/v1_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}
@@ -38,7 +38,7 @@ WORKDIR /iv
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:12-alpine 
+FROM node:12-alpine
 
 ENV NODE_ENV=production
 

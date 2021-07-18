@@ -2,14 +2,32 @@
   class="mouseover iv-custom-comp text">
   {{ mouseoverText }}
 </span>
-<button mat-icon-button
-  color="primary"
-  class="pe-all"
-  [matMenuTriggerFor]="fsModeSelMenu">
-  <i class="fas fa-bars"></i>
-</button>
 
+<div class="button-container">
+
+  <!-- selector & configurator -->
+  <button mat-icon-button
+    color="primary"
+    class="pe-all"
+    [matMenuTriggerFor]="fsModeSelMenu">
+    <i class="fas fa-bars"></i>
+  </button>
+</div>
+
+
+<!-- selector/configurator menu -->
 <mat-menu #fsModeSelMenu="matMenu">
+
+  <div class="iv-custom-comp text pl-2 m-2">
+    <mat-checkbox *ngFor="let key of allKeys"
+      class="d-block"
+      iav-stop="click"
+      (ngModelChange)="handleCheckBox(key, $event)"
+      [(ngModel)]="key.checked">
+      {{ key.name }}
+    </mat-checkbox>
+  </div>
+  <mat-divider></mat-divider>
   <button *ngFor="let mode of modes"
     mat-menu-item
     (click)="loadMode(mode)"

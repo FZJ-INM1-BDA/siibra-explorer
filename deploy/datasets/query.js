@@ -7,7 +7,7 @@ const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets, filterDatasetsByRegion } = require('./util')
 const ibc = require('./importIBS')
 const { returnAdditionalDatasets } = require('../regionalFeatures')
-const { store } = require('../lruStore')
+const lruStore = require('../lruStore')
 
 const IAV_DS_CACHE_KEY = 'IAV_DS_CACHE_KEY'
 const IAV_DS_TIMESTAMP_KEY = 'IAV_DS_TIMESTAMP_KEY'
@@ -55,6 +55,8 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 }
 
 const refreshCache = async () => {
+  await lruStore._initPr
+  const { store } = lruStore
   store.set(IAV_DS_REFRESH_TIMESTAMP_KEY, new Date().toString())
   const text = await fetchDatasetFromKg()
   await store.set(IAV_DS_CACHE_KEY, text)
@@ -64,6 +66,9 @@ const refreshCache = async () => {
 
 const getPublicDs = async () => {
   console.log(`fetching public ds ...`)
+  
+  await lruStore._initPr
+  const { store } = lruStore
 
   let cachedData = await store.get(IAV_DS_CACHE_KEY)
   if (!cachedData) {

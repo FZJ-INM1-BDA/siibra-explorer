@@ -1,4 +1,6 @@
-<mat-card>
+<ng-template [ngIf]="region">
+
+<mat-card class="mat-elevation-z4">
   <!-- rgbDarkmode must be checked for strict equality to true/false 
   as if rgb is undefined, rgbDarkmode will be null/undefined
   which is falsy -->
@@ -32,55 +34,6 @@
             {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
           </span>
         </ng-template>
-
-        <span
-          aria-hidden="true"
-          [kgSchema]="originDataset.kgSchema"
-          [kgId]="originDataset.kgId"
-          single-dataset-directive
-          #sdDirective="singleDatasetDirective">
-        </span>
-
-        <ng-template [ngIf]="sdDirective.fetchFlag" [ngIfElse]="contentTmpl">
-          <spinner-cmp></spinner-cmp>
-        </ng-template>
-
-        <ng-template #contentTmpl>
-
-          <!-- fall back if no kg ref is available -->
-          <a *ngIf="sdDirective.kgReference.length === 0"
-            [href]="sdDirective.directLinkToKg"
-            target="_blank">
-            <button mat-icon-button
-              color="primary">
-              <i class="fas fa-external-link-alt"></i>
-            </button>
-          </a>
-
-          <!-- kg ref, normally doi -->
-          <a *ngFor="let kgRef of sdDirective.kgReference"
-            [href]="kgRef | doiParserPipe"
-            target="_blank">
-            <button mat-icon-button
-              color="primary">
-              <i class="fas fa-external-link-alt"></i>
-            </button>
-          </a>
-
-          <!-- pin/unpin -->
-          <ng-container *ngTemplateOutlet="pinTmpl; context: { $implicit: sdDirective.isFav$ | async }">
-          </ng-container>
-
-          <ng-template #pinTmpl let-isFav>
-
-            <button mat-icon-button
-              (click)="isFav ? sdDirective.undoableRemoveFav() : sdDirective.undoableAddFav()"
-              [color]="isFav ? 'primary' : 'default'">
-              <i class="fas fa-thumbtack"></i>
-            </button>
-          </ng-template>
-
-        </ng-template>
       </div>
 
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
@@ -88,54 +41,207 @@
       <!-- position -->
       <button mat-icon-button *ngIf="position"
         (click)="navigateToRegion()"
-        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | nmToMm | addUnitAndJoin : 'mm')">
+        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | addUnitAndJoin : 'mm')">
         <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
         </mat-icon>
       </button>
 
-      <!-- region in other templates -->
-      <button mat-icon-button
-        *ngIf="showRegionInOtherTmpl"
-        [attr.data-available-in-tmpl-count]="(regionInOtherTemplates$ | async).length"
-        [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE"
-        [matMenuTriggerFor]="regionInOtherTemplatesMenu"
-        [matMenuTriggerData]="{ regionInOtherTemplates: regionInOtherTemplates$ | async }">
-        <i class="fas fa-globe"></i>
-      </button>
+      <!-- explore doi -->
+      <ng-template let-infos [ngIf]="region?.originDatainfos">
+        <ng-container *ngFor="let info of infos">
+          <a *ngFor="let url of info.urls"
+            [href]="url.doi | doiParserPipe"
+            target="_blank"
+            mat-icon-button>
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+        </ng-container>
+      </ng-template>
 
     </mat-card-subtitle>
 
   </div>
 </mat-card>
 
-<!-- template for switching template -->
-<mat-menu #regionInOtherTemplatesMenu="matMenu"
-  [aria-label]="SHOW_IN_OTHER_REF_SPACE">
-  <ng-template matMenuContent let-regionInOtherTemplates="regionInOtherTemplates">
+<mat-accordion class="d-block mt-2">
 
-    <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
-      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
-      (click)="changeView(sameRegion)"
-      mat-ripple
-      [attr.role]="'button'">
-      <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-      <div mat-line>
-        <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
-        </ng-container>
-      </div>
-    </mat-list-item>
+  <!-- description -->
+  <ng-template [ngIf]="(region.originDatainfos || []).length > 0">
+    <ng-container *ngFor="let originData of region.originDatainfos">
+      <ng-template #descTmpl>
+        <markdown-dom [markdown]="originData.description"
+          class="text-muted text-sm">
+        </markdown-dom>
+      </ng-template>
+
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Description',
+        iconClass: 'fas fa-info',
+        iavNgIf: true,
+        content: descTmpl
+      }">
+
+      </ng-container>
+    </ng-container>
   </ng-template>
-</mat-menu>
 
-<!-- template for rendering template name and template hemisphere -->
-<ng-template #regionInOtherTemplate let-template="template" let-hemisphere="hemisphere">
-  <span class="overflow-x-hidden text-truncate"
-  [matTooltip]="template.name  + (hemisphere ? (' ' + hemisphere) : '')">
-    <span>
-      {{ template.name }}
-    </span>
-    <span *ngIf="hemisphere" class="text-muted">
-      ({{ hemisphere }})
-    </span>
-  </span>
+  <!-- receptor -->
+  <div bs-features-receptor-directive
+    (bs-features-receptor-directive-fetching-flag$)="handleBusySignal('receptor', $event)"
+    [region]="region"
+    #bsFeatureReceptorDirective="bsFeatureReceptorDirective">
+  </div>
+  <ng-template #regionalReceptorTmpl>
+    <bs-features-receptor-entry [region]="region">
+    </bs-features-receptor-entry>
+  </ng-template>
+  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: 'ReceptorDistribution',
+      iconClass: 'fas fa-info',
+      iavNgIf: bsFeatureReceptorDirective.hasReceptor$ | async,
+      content: regionalReceptorTmpl
+    }">
+  </ng-container>
+
+
+  <!-- Explore in other template -->
+  <ng-container *ngIf="regionInOtherTemplates$ | async as regionInOtherTemplates">
+
+    <ng-template #exploreInOtherTmpl>
+      <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
+        class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer"
+        (click)="changeView(sameRegion)"
+        [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
+        mat-ripple>
+        <small>
+          {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
+        </small>
+      </mat-card>
+    </ng-template>
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: 'Explore in other templates',
+      desc: regionInOtherTemplates.length,
+      iconClass: 'fas fa-brain',
+      iconTooltip: regionInOtherTemplates.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
+      iavNgIf: regionInOtherTemplates.length,
+      content: exploreInOtherTmpl
+    }">
+
+
+    </ng-container>
+  </ng-container>
+
+  <!-- kg regional features list -->
+  <ng-template #kgRegionalFeatureList>
+    <kg-regional-features-list [region]="region">
+    </kg-regional-features-list>
+  </ng-template>
+
+  <div kg-regional-features-list-directive
+    [region]="region"
+    (kg-regional-features-list-directive-busy)="handleBusySignal('regionFeatureList', $event)"
+    #kgRegFeatlist="kgRegionalFeaturesListDirective">
+  </div>
+
+  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+    title: CONST.REGIONAL_FEATURES,
+    iconClass: 'fas fa-database',
+    content: kgRegionalFeatureList,
+    desc: kgRegFeatlist.kgRegionalFeatures.length,
+    iconTooltip: kgRegFeatlist.kgRegionalFeatures.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
+    iavNgIf: (kgRegFeatlist.kgRegionalFeatures$ | async ).length
+  }">
+  </ng-container>
+
+  <!-- Connectivity -->
+  
+  <ng-template #connectivityContentTmpl let-expansionPanel="expansionPanel">
+    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
+      <connectivity-browser class="pe-all flex-shrink-1"
+        [region]="region"
+        (setOpenState)="expansionPanel.expanded = $event"
+        [accordionExpanded]="expansionPanel.expanded"
+        (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">
+      </connectivity-browser>
+    </mat-card-content>
+  </ng-template>
+
+  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+    title: 'Connectivity',
+    desc: hasConnectivityDirective.connectivityNumber,
+    iconClass: 'fas fa-braille',
+    iconTooltip: hasConnectivityDirective.connectivityNumber | regionAccordionTooltipTextPipe : 'connectivity',
+    iavNgIf: hasConnectivityDirective.hasConnectivity,
+    content: connectivityContentTmpl
+  }">
+  </ng-container>
+
+  <div has-connectivity
+    [region]="[region]"
+    #hasConnectivityDirective="hasConnectivityDirective">
+  </div>
+</mat-accordion>
+
+<div *ngIf="busyFlag" class="mt-2 d-flex justify-content-center">
+  <spinner-cmp></spinner-cmp>
+</div>
+
+<!-- expansion tmpl -->
+<ng-template #ngMatAccordionTmpl
+  let-title="title"
+  let-desc="desc"
+  let-iconClass="iconClass"
+  let-iconTooltip="iconTooltip"
+  let-iavNgIf="iavNgIf"
+  let-content="content">
+  <mat-expansion-panel
+    [expanded]="activePanelTitles$ | async | arrayContains : title"
+    [attr.data-opened]="expansionPanel.expanded"
+    [attr.data-mat-expansion-title]="title"
+    (closed)="handleExpansionPanelClosedEv(title)"
+    (afterExpand)="handleExpansionPanelAfterExpandEv(title)"
+    hideToggle
+    *ngIf="iavNgIf"
+    #expansionPanel="matExpansionPanel">
+
+    <mat-expansion-panel-header>
+
+      <!-- title -->
+      <mat-panel-title>
+        {{ title }}
+      </mat-panel-title>
+
+      <!-- desc + icon -->
+      <mat-panel-description class="d-flex align-items-center justify-content-end"
+        [matTooltip]="iconTooltip">
+        <span class="mr-3">{{ desc }}</span>
+        <span class="accordion-icon d-inline-flex justify-content-center">
+          <i [class]="iconClass"></i>
+        </span>
+      </mat-panel-description>
+
+    </mat-expansion-panel-header>
+
+    <!-- content -->
+    <ng-template matExpansionPanelContent>
+      <ng-container *ngTemplateOutlet="content; context: {
+        expansionPanel: expansionPanel
+      }">
+      </ng-container>
+    </ng-template>
+  </mat-expansion-panel>
+</ng-template>
+</ng-template>
+
+
+<ng-template [ngIf]="!region">
+  <mat-card class="mat-elevation-z4">
+    <h1 class="mat-h1 sidenav-cover-header-container">
+      <spinner-cmp class="d-inline-block"></spinner-cmp>
+      <span class="text-muted">
+        Loading region
+      </span>
+    </h1>
+  </mat-card>
 </ng-template>

@@ -1,21 +1,19 @@
-import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStateShowBottomSheet, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
+import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
 import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
 import { Subscription, Observable, forkJoin, of, merge, combineLatest } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
-import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError, bufferTime } from "rxjs/operators"
+import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError } from "rxjs/operators"
 import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
 import { getIdObj } from 'common/util'
 import { MatDialogRef } from "@angular/material/dialog"
 import { HttpClient } from "@angular/common/http"
-import { DS_PREVIEW_URL, getShader, PMAP_DEFAULT_CONFIG } from 'src/util/constants'
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, INgLayerInterface } from "./services/state/ngViewerState.store.helper"
+import { DS_PREVIEW_URL } from 'src/util/constants'
+import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState.store.helper"
 import { ARIA_LABELS } from 'common/constants'
 import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
-import { EnumColorMapName } from "./util/colorMaps"
 import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
-import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
 import { generalActionError } from "./services/stateStore.helper"
 import { RegDeregController } from "./util/regDereg.base"
@@ -24,8 +22,6 @@ const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
   EnumPreviewFileTypes.VOLUMES
 ]
-
-const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
 
 const prvFilterNull = ({ prvToDismiss, prvToShow }) => ({
   prvToDismiss: prvToDismiss.filter(v => !!v),
@@ -296,57 +292,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     )
   }
 
-  public selectedRegionPreview$ = this.store$.pipe(
-    select(state => state?.viewerState?.regionsSelected),
-    filter(regions => !!regions),
-    map(regions => /** effectively flatMap */ regions.reduce((acc, curr) => acc.concat(
-      curr.originDatasets && Array.isArray(curr.originDatasets) && curr.originDatasets.length > 0
-        ? curr.originDatasets
-        : []
-    ), [])),
-  )
-
-  public onRegionSelectChangeShowPreview$ = this.selectedRegionPreview$.pipe(
-    switchMap(arr => arr.length > 0
-      ? forkJoin(arr.map(({ kgId, kgSchema, filename }) => this.getDatasetPreviewFromId({ datasetId: kgId, datasetSchema: kgSchema, filename })))
-      : of([])
-    ),
-    map(arr => arr.filter(item => !!item)),
-    shareReplay(1),
-  )
-
-  public onRegionDeselectRemovePreview$ = this.onRegionSelectChangeShowPreview$.pipe(
-    pairwise(),
-    map(([oArr, nArr]) => oArr.filter((item: any) => {
-      return !nArr
-        .map(DatasetPreviewGlue.GetDatasetPreviewId)
-        .includes(
-          DatasetPreviewGlue.GetDatasetPreviewId(item)
-        )
-    })),
-  )
-
-  public onClearviewRemovePreview$ = this.onRegionSelectChangeShowPreview$.pipe(
-    filter(arr => arr.length > 0),
-    switchMap(arr => this.store$.pipe(
-      select(ngViewerSelectorClearView),
-      distinctUntilChanged(),
-      filter(val => val),
-      mapTo(arr)
-    )),
-  )
-
-  public onClearviewAddPreview$ = this.onRegionSelectChangeShowPreview$.pipe(
-    filter(arr => arr.length > 0),
-    switchMap(arr => this.store$.pipe(
-      select(ngViewerSelectorClearView),
-      distinctUntilChanged(),
-      filter(val => !val),
-      skip(1),
-      mapTo(arr)
-    ))
-  )
-
   private fetchedDatasetPreviewCache: Map<string, Observable<any>> = new Map()
   public getDatasetPreviewFromId({ datasetSchema = 'minds/core/dataset/v1.0.0', datasetId, filename }: IDatasetPreviewData){
     const dsPrvId = DatasetPreviewGlue.GetDatasetPreviewId({ datasetSchema, datasetId, filename })
@@ -420,154 +365,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           this.store$.dispatch(ngViewerActionRemoveNgLayer({
             layer: volumes
           }))
-        }
-      })
-    )
-
-    // managing niftiVolumes
-    // monitors previewDatasetFile obs to add/remove ng layer
-
-    this.subscriptions.push(
-      merge(
-        this.getDiffDatasetFilesPreviews(
-          dsPrv => determinePreviewFileType(dsPrv) === EnumPreviewFileTypes.NIFTI
-        ),
-        this.onRegionSelectChangeShowPreview$.pipe(
-          map(prvToShow => ({ prvToShow, prvToDismiss: [] }))
-        ),
-        this.onRegionDeselectRemovePreview$.pipe(
-          map(prvToDismiss => ({ prvToShow: [], prvToDismiss }))
-        ),
-        this.onClearviewRemovePreview$.pipe(
-          map(prvToDismiss => ({ prvToDismiss, prvToShow: [] }))
-        ),
-        this.onClearviewAddPreview$.pipe(
-          map(prvToShow => ({ prvToDismiss: [], prvToShow }))
-        )
-      ).pipe(
-        map(prvFilterNull),
-        bufferTime(15),
-        map(arr => {
-          const prvToDismiss = []
-          const prvToShow = []
-
-          const showPrvIds = new Set()
-          const dismissPrvIds = new Set()
-
-          for (const { prvToDismiss: dismisses, prvToShow: shows } of arr) {
-            for (const dismiss of dismisses) {
-
-              const id = DatasetPreviewGlue.GetDatasetPreviewId(dismiss)
-              if (!dismissPrvIds.has(id)) {
-                dismissPrvIds.add(id)
-                prvToDismiss.push(dismiss)
-              }
-            }
-
-            for (const show of shows) {
-              const id = DatasetPreviewGlue.GetDatasetPreviewId(show)
-              if (!dismissPrvIds.has(id) && !showPrvIds.has(id)) {
-                showPrvIds.add(id)
-                prvToShow.push(show)
-              }
-            }
-          }
-
-          return {
-            prvToDismiss,
-            prvToShow
-          }
-        }),
-        withLatestFrom(this.store$.pipe(
-          select(state => state?.viewerState?.templateSelected || null),
-          distinctUntilChanged(),
-        ))
-      ).subscribe(([ { prvToShow, prvToDismiss }, templateSelected ]) => {
-        // TODO consider where to check validity of previewed nifti file
-        for (const prv of prvToShow) {
-
-          const { url, filename, name, volumeMetadata = {} } = prv
-          const { min, max, colormap = EnumColorMapName.VIRIDIS } = volumeMetadata || {}
-          
-          const previewFileId = DatasetPreviewGlue.GetDatasetPreviewId(prv)
-
-          const shaderObj = {
-            ...PMAP_DEFAULT_CONFIG,
-            ...{ colormap },
-            ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
-            ...( max ? { highThreshold: max } : { highThreshold: 1 } )
-          }
-
-          const layer = {
-            // name: filename,
-            name: name || filename,
-            id: previewFileId,
-            source : `nifti://${url}`,
-            mixability : 'nonmixable',
-            shader : getShader(shaderObj),
-            annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
-          }
-
-          const { name: layerName } = layer
-          const { colormap: cmap, lowThreshold, highThreshold, removeBg } = shaderObj
-
-          this.layersService.highThresholdMap.set(layerName, highThreshold)
-          this.layersService.lowThresholdMap.set(layerName, lowThreshold)
-          this.layersService.colorMapMap.set(layerName, cmap)
-          this.layersService.removeBgMap.set(layerName, removeBg)
-
-          this.store$.dispatch(
-            ngViewerActionAddNgLayer({ layer })
-          )
-        }
-
-        for (const prv of prvToDismiss) {
-          const { url, filename, name } = prv
-          const previewFileId = DatasetPreviewGlue.GetDatasetPreviewId(prv)
-          const layer = {
-            name: name || filename,
-            id: previewFileId,
-            source : `nifti://${url}`,
-            mixability : 'nonmixable',
-            shader : getShader(PMAP_DEFAULT_CONFIG),
-            annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
-          }
-          this.store$.dispatch(
-            ngViewerActionRemoveNgLayer({ layer })
-          )
-        }
-
-        if (prvToShow.length > 0) this.store$.dispatch(uiStateShowBottomSheet({ bottomSheetTemplate: null }))
-      })
-    )
-
-    // monitors ngViewerStateLayers, and if user removes, also remove dataset preview, if exists
-    this.subscriptions.push(
-      this.store$.pipe(
-        select(state => state?.ngViewerState?.layers || []),
-        distinctUntilChanged(),
-        pairwise(),
-        map(([o, n]: [INgLayerInterface[], INgLayerInterface[]]) => {
-          const nNameSet = new Set(n.map(({ name }) => name))
-          const oNameSet = new Set(o.map(({ name }) => name))
-          return {
-            add: n.filter(({ name: nName }) => !oNameSet.has(nName)),
-            remove: o.filter(({ name: oName }) => !nNameSet.has(oName)),
-          }
-        }),
-        map(({ remove }) => remove),
-      ).subscribe(layers => {
-        for (const layer of layers) {
-          const { id } = layer
-          if (!id) return console.warn(`monitoring ngViewerStateLayers id is undefined`)
-          try {
-            const { datasetId, filename } = DatasetPreviewGlue.GetDatasetPreviewFromId(layer.id)
-            this.store$.dispatch(
-              glueActionRemoveDatasetPreview({ datasetPreviewFile: { filename, datasetId } })
-            )
-          } catch (e) {
-            console.warn(`monitoring ngViewerStateLayers parsing id or dispatching action failed`, e)
-          }
         }
       })
     )

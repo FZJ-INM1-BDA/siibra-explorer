@@ -22,7 +22,7 @@ const defaultZoom = 1e6
 
 export const defaultNavigationObject = {
   orientation: [0, 0, 0, 1],
-  perspectiveOrientation: [0 , 0, 0, 1],
+  perspectiveOrientation: [0.5, -0.5, -0.5, 0.5],
   perspectiveZoom: defaultPerspectiveZoom,
   zoom: defaultZoom,
   position: [0, 0, 0],
@@ -45,7 +45,11 @@ export const defaultNehubaConfigObject = {
 }
 
 export function cvtNehubaConfigToNavigationObj(nehubaConfig?){
-  const { navigation, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e6 } = nehubaConfig || {}
+  const {
+    navigation,
+    perspectiveOrientation = defaultNavigationObject.perspectiveOrientation,
+    perspectiveZoom = defaultNavigationObject.perspectiveZoom
+  } = nehubaConfig || {}
   const { pose, zoomFactor = 1e6 } = navigation || {}
   const { position, orientation = [0, 0, 0, 1] } = pose || {}
   const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position || {}
@@ -116,19 +120,27 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       ) || atlas.templateSpaces[0]
       
       const templateSpaceId = templateTobeSelected['@id']
-      
-      const parcellationId = (
-        templateTobeSelected.availableIn.find(p => !!p.baseLayer) ||
-        templateTobeSelected.availableIn[0]
-      )['@id']
-        
+      const atlasTmpl = atlas.templateSpaces.find(t => t['@id'] === templateSpaceId)
+
       const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
       if (!templateSelected) {
         return generalActionError({
           message: CONST.TEMPLATE_NOT_FOUND
         })
       }
-      const parcellationSelected = templateSelected.parcellations.find(p => p['@id'] === parcellationId)
+
+      const atlasParcs = atlasTmpl.availableIn
+        .map(availP => atlas.parcellations.find(p => availP['@id'] === p['@id']))
+        .filter(fullP => !!fullP)
+      const atlasParc = atlasParcs.find(p => {
+        if (!p.baseLayer) return false
+        if (p['@version']) {
+          return !p['@version']['@next']
+        }
+        return true
+      }) || templateSelected.parcellations[0]
+      const parcellationId = atlasParc && atlasParc['@id']
+      const parcellationSelected = parcellationId && templateSelected.parcellations.find(p => p['@id'] === parcellationId)
       return viewerStateNewViewer({
         selectTemplate: templateSelected,
         selectParcellation: parcellationSelected
@@ -388,7 +400,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           })
         }
 
-        const { position } = region
+        const position = region.position || (region?.props?.centroid_mm || []).map((v: number) => v*1e6)
         if (!position) {
           return generalActionError({
             message: `${region.name} - does not have a position defined`

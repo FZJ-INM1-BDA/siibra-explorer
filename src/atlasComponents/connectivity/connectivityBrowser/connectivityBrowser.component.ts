@@ -7,7 +7,7 @@ import {
   Output,
   ViewChild,
   Input,
-  OnInit,
+  OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
@@ -20,6 +20,9 @@ import {
   viewerStateOverwrittenColorMapSelector
 } from "src/services/state/viewerState/selectors";
 import {HttpClient} from "@angular/common/http";
+import {BS_ENDPOINT} from "src/util/constants";
+import {getIdFromKgIdObj} from "common/util";
+
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
@@ -38,7 +41,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      */
     private _isFirstUpdate = true
 
-    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps.hbp.eu/v1.1/studies'
+    public connectivityUrl: string
 
     private accordionIsExpanded = false
 
@@ -99,11 +102,20 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
 
       this.regionName = newRegionName
+      this.regionId = val.id? val.id.kg? getIdFromKgIdObj(val.id.kg) : val.id : null
+      this.atlasId = val.context.atlas['@id']
+      this.parcellationId = val.context.parcellation['@id']
 
+      if(this.selectedDataset) {
+        this.setConnectivityUrl()
+        this.setProfileLoadUrl()
+      }
       // TODO may not be necessary
       this.changeDetectionRef.detectChanges()
     }
-    @Input() parcellationId: any
+    public atlasId: any
+    public parcellationId: any
+    public regionId: string
     public regionName: string
     public regionHemisphere: string = null
     public datasetList: any[] = []
@@ -132,6 +144,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         private store$: Store<any>,
         private changeDetectionRef: ChangeDetectorRef,
         private httpClient: HttpClient,
+        @Inject(BS_ENDPOINT) private siibraApiUrl: string,
     ) {
 
       this.overwrittenColorMap$ = this.store$.pipe(
@@ -144,10 +157,12 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public fullConnectivityLoadUrl: string
 
     ngOnInit(): void {
+      this.setConnectivityUrl()
+
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
-        this.datasetList = res.filter(dl => dl['parcellation id'] === this.parcellationId)
-        this.selectedDataset = this.datasetList[0]?.name
-        this.selectedDatasetDescription = this.datasetList[0]?.description
+        this.datasetList = res
+        this.selectedDataset = this.datasetList[0]?.['@id']
+        this.selectedDatasetDescription = this.datasetList[0]?.['src_info']
 
         this.changeDataset()
       })
@@ -275,6 +290,16 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
+    private setConnectivityUrl() {
+      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId || this.regionName)}/features/ConnectivityProfile`
+    }
+
+    private setProfileLoadUrl() {
+      const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
+      this.connectivityLoadUrl.emit(url)
+      this.loadUrl = url
+    }
+
     clearViewer() {
       this.store$.dispatch(
         ngViewerActionClearView({
@@ -293,18 +318,15 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     changeDataset(event = null) {
       if (event) {
         this.selectedDataset = event.value
-        const foundDataset = this.datasetList.find(d => d.name === this.selectedDataset)
-        this.selectedDatasetDescription = foundDataset?.description
+        const foundDataset = this.datasetList.find(d => d['@id'] === this.selectedDataset)
+        this.selectedDatasetDescription = foundDataset?.['src_info']
         this.selectedDatasetKgId = foundDataset?.kgId || null
         this.selectedDatasetKgSchema = foundDataset?.kgschema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
-        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
-        const url = selectedDatasetId ? `${this.connectivityUrl}/${selectedDatasetId}` : null
-        this.connectivityLoadUrl.emit(url)
-        this.loadUrl = url
+        this.setProfileLoadUrl()
 
-        this.fullConnectivityLoadUrl = selectedDatasetId ? `${this.connectivityUrl}/${selectedDatasetId}/full_matrix` : null
+        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDataset)}`
       }
     }
 

@@ -36,5 +36,36 @@ export function getRgb(labelIndex: number, region: { rgb?: [number, number, numb
   }
 }
 
+
+export interface INgLayerCtrl {
+  remove: {
+    names: string[]
+  }
+  add: {
+    [key: string]: INgLayerInterface
+  }
+  update: {
+    [key: string]: INgLayerInterface
+  }
+}
+
+export type TNgLayerCtrl<T extends keyof INgLayerCtrl> = {
+  type: T
+  payload: INgLayerCtrl[T]
+}
+
 export const SET_COLORMAP_OBS = new InjectionToken<Observable<IColorMap>>('SET_COLORMAP_OBS')
 export const SET_LAYER_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_LAYER_VISIBILITY')
+export const SET_SEGMENT_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_SEGMENT_VISIBILITY')
+export const NG_LAYER_CONTROL = new InjectionToken<TNgLayerCtrl<keyof INgLayerCtrl>>('NG_LAYER_CONTROL')
+
+export interface INgLayerInterface {
+  name: string // displayName
+  source: string
+  mixability: string // base | mixable | nonmixable
+  annotation?: string //
+  id?: string // unique identifier
+  visible?: boolean
+  shader?: string
+  transform?: any
+}

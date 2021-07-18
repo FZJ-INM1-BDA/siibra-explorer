@@ -59,15 +59,15 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
 
-      VERSION: process.env.VERSION 
-        ? JSON.stringify(process.env.VERSION) 
+      VERSION: process.env.VERSION
+        ? JSON.stringify(process.env.VERSION)
         : process.env.GIT_HASH
           ? JSON.stringify(process.env.GIT_HASH)
           : JSON.stringify('unspecificied hash'),
       PRODUCTION: !!process.env.PRODUCTION,
       BACKEND_URL: (process.env.BACKEND_URL && JSON.stringify(process.env.BACKEND_URL)) || 'null',
       DATASET_PREVIEW_URL: JSON.stringify(process.env.DATASET_PREVIEW_URL || 'https://hbp-kg-dataset-previewer.apps.hbp.eu/v2'),
-      BS_REST_URL: JSON.stringify(process.env.BS_REST_URL || 'https://siibra-api-tmpfullvolmetadata.apps-dev.hbp.eu/v1_0'),
+      BS_REST_URL: JSON.stringify(process.env.BS_REST_URL || 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0'),
       SPATIAL_TRANSFORM_BACKEND: JSON.stringify(process.env.SPATIAL_TRANSFORM_BACKEND || 'https://hbp-spatial-backend.apps.hbp.eu'),
       MATOMO_URL: JSON.stringify(process.env.MATOMO_URL || null),
       MATOMO_ID: JSON.stringify(process.env.MATOMO_ID || null),

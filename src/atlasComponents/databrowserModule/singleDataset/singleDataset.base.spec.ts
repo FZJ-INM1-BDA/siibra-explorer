@@ -1,4 +1,3 @@
-import { SingleDatasetView } from './detailedView/singleDataset.component'
 import { TestBed, async } from '@angular/core/testing';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { ComponentsModule } from 'src/components/components.module';

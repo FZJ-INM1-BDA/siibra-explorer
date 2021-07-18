@@ -8,6 +8,7 @@ import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import { viewerStateAllRegionsFlattenedRegionSelector, viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
+import {BS_ENDPOINT} from "src/util/constants";
 
 /**
  * injecting databrowser module is bad idea
@@ -15,6 +16,7 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
  * since the only reason why data browser is imported is to use show dataset dialogue
  * just use a dummy directive
  */
+const MOCK_BS_ENDPOINT = `http://localhost:1234`
 
 @Directive({
     selector: '[iav-dataset-show-dataset-dialog]'
@@ -39,15 +41,15 @@ describe('ConnectivityComponent', () => {
 
     let datasetList = [
         {
-            id: 'id1',
-            name: 'n1',
-            description: 'd1',
+            ['@id']: 'id1',
+            src_name: 'id1',
+            src_info: 'd1',
             kgId: 'kgId1',
             kgschema: 'kgschema1'
         }, {
-            id: 'id2',
-            name: 'n2',
-            description: 'd2',
+            ['@id']: 'id2',
+            src_name: 'id2',
+            src_info: 'd2',
             kgId: 'kgId2',
             kgschema: 'kgschema2'
         }
@@ -60,7 +62,11 @@ describe('ConnectivityComponent', () => {
             ],
             providers: [
                 provideMockActions(() => actions$),
-                provideMockStore()
+                provideMockStore(),
+                {
+                    provide: BS_ENDPOINT,
+                    useValue: MOCK_BS_ENDPOINT
+                }
             ],
             declarations: [
                 ConnectivityBrowserComponent,
@@ -92,13 +98,13 @@ describe('ConnectivityComponent', () => {
 
         component.datasetList = datasetList
 
-        component.changeDataset({value: 'n1'})
+        component.changeDataset({value: 'id1'})
 
         expect(component.selectedDatasetDescription).toEqual('d1')
         expect(component.selectedDatasetKgId).toEqual('kgId1')
         expect(component.selectedDatasetKgSchema).toEqual('kgschema1')
 
-        component.changeDataset({value: 'n2'})
+        component.changeDataset({value: 'id2'})
 
         expect(component.selectedDatasetDescription).toEqual('d2')
         expect(component.selectedDatasetKgId).toEqual('kgId2')

@@ -266,7 +266,7 @@ describe('> viewerState.useEffect.ts', () => {
             expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
               hot('a', {
                 a: generalActionError({
-                  message: `${region.name} - does not have a position defined`
+                  message: `${region.name} has malformed position property: []`
                 })
               })
             )
@@ -418,7 +418,8 @@ describe('> viewerState.useEffect.ts', () => {
               ])
               mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
                 ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc ]
+                templateSpaces: [ mockTmplSpc ],
+                parcellations: [ mockParc0 ]
               }])
               actions$ = hot('a', {
                 a: viewerStateSelectAtlas({
@@ -450,7 +451,8 @@ describe('> viewerState.useEffect.ts', () => {
               ])
               mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
                 ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc1 ]
+                templateSpaces: [ mockTmplSpc1 ],
+                parcellations: [ mockParc1 ]
               }])
               actions$ = hot('a', {
                 a: viewerStateSelectAtlas({
@@ -494,7 +496,8 @@ describe('> viewerState.useEffect.ts', () => {
             ])
             mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
               ['@id']: 'foo-bar',
-              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ]
+              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ],
+              parcellations: [ mockParc0, mockParc1 ]
             }])
           })
           it('> will select template.@id', () => {
@@ -560,14 +563,7 @@ describe('> viewerState.useEffect.ts', () => {
       it('> if no arg is provided', () => {
 
         const obj = cvtNehubaConfigToNavigationObj()
-        expect(obj).toEqual({
-          orientation: [0, 0, 0, 1],
-          perspectiveOrientation: [0 , 0, 0, 1],
-          perspectiveZoom: 1e6,
-          zoom: 1e6,
-          position: [0, 0, 0],
-          positionReal: true
-        })
+        expect(obj).toEqual(defaultNavigationObject)
       })
       it('> if null or undefined is provided', () => {
 

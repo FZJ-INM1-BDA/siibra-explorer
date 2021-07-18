@@ -4,10 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { UtilModule } from "src/util";
-import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
-import { ModalityPicker, SortModalityAlphabeticallyPipe } from "./modalityPicker/modalityPicker.component";
-import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
@@ -20,14 +17,11 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
-import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
 import { GetKgSchemaIdFromFullIdPipe, getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
-import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
 import { DatasetPreviewList, UnavailableTooltip } from "./preview/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
-import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
 import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./preview/previewDatasetFile.directive";
 
 import {
@@ -38,16 +32,14 @@ import {
   OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
 } from './constants'
 import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
-import { FilterPreviewByType } from "./preview/filterPreview.pipe";
-import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
 import { LayerBrowserModule } from "../../ui/layerbrowser";
-import { DatabrowserDirective } from "./databrowser/databrowser.directive";
+
 import { ContributorModule } from "./contributor";
 import { DatabrowserService } from "./databrowser.service";
 import { ShownDatasetDirective } from "./shownDataset.directive";
-import { SingleDatasetSideNavView } from "./singleDataset/sideNavView/sDsSideNavView.component";
 import { RegionalFeaturesModule } from "../regionalFeatures";
 import { SingleDatasetDirective } from "./singleDataset/singleDataset.directive";
+import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -55,6 +47,9 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   return () => console.error(`previewEmitFactory not overriden`)
 }
 
+/**
+ * TODO deprecate
+ */
 @NgModule({
   imports: [
     CommonModule,
@@ -66,26 +61,20 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     LayerBrowserModule,
     ContributorModule,
     RegionalFeaturesModule,
+    KgDatasetModule,
   ],
   declarations: [
-    DataBrowser,
-    ModalityPicker,
-    SingleDatasetView,
     SingleDatasetDirective,
     SingleDatasetListView,
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
-    PreviewCardComponent,
-    SingleDatasetSideNavView,
 
     /**
      * Directives
      */
-    ShowDatasetDialogDirective,
     PreviewDatasetFile,
     ShownPreviewsDirective,
-    DatabrowserDirective,
     ShownDatasetDirective,
 
     /**
@@ -101,47 +90,31 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     GetKgSchemaIdFromFullIdPipe,
     PreviewFileIconPipe,
     PreviewFileTypePipe,
-    AppendFilerModalityPipe,
-    ResetCounterModalityPipe,
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
     TransformDatasetToIdPipe,
-    SortModalityAlphabeticallyPipe,
     PreviewFileTypePipe,
-    FilterPreviewByType,
   ],
   exports: [
-    DataBrowser,
-    SingleDatasetView,
+    KgDatasetModule,
     SingleDatasetDirective,
     SingleDatasetListView,
-    ModalityPicker,
     FilterDataEntriesbyMethods,
     GetKgSchemaIdFromFullIdPipe,
     BulkDownloadBtn,
     TransformDatasetToIdPipe,
-    ShowDatasetDialogDirective,
     PreviewDatasetFile,
     PreviewFileTypePipe,
     ShownPreviewsDirective,
-    FilterPreviewByType,
-    PreviewCardComponent,
-    DatabrowserDirective,
     ShownDatasetDirective,
-    SingleDatasetSideNavView,
   ],
   entryComponents: [
-    DataBrowser,
-    SingleDatasetView,
     PreviewComponentWrapper
   ],
   providers: [
     KgSingleDatasetService,
     DatabrowserService,
     {
-      provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
-      useValue: SingleDatasetView
-    },{
       provide: IAV_DATASET_PREVIEW_DATASET_FN,
       useFactory: previewEmitFactory,
       deps: [ [new Optional(), OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN] ]

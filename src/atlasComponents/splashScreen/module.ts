@@ -4,7 +4,7 @@ import { ComponentsModule } from "src/components";
 import { KgTosModule } from "src/ui/kgtos/module";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { UtilModule } from "src/util";
-import { GetTemplateImageSrcPipe, SplashScreen, ImgSrcSetPipe } from "./splashScreen/splashScreen.component";
+import { GetTemplateImageSrcPipe, SplashScreen } from "./splashScreen/splashScreen.component";
 
 @NgModule({
   imports: [
@@ -17,7 +17,6 @@ import { GetTemplateImageSrcPipe, SplashScreen, ImgSrcSetPipe } from "./splashSc
   declarations: [
     SplashScreen,
     GetTemplateImageSrcPipe,
-    ImgSrcSetPipe,
   ],
   exports: [
     SplashScreen,

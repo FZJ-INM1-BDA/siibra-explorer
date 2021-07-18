@@ -78,6 +78,8 @@
   }
 
   exports.CONST = {
+    CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
+    DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
     REGIONAL_FEATURES: 'Regional features',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
@@ -94,6 +96,7 @@
     RECEPTOR_PR_CAPTION: `For a single tissue sample, an exemplary density distribution for a single receptor from the pial surface to the border between layer VI and the white matter.`,
     RECEPTOR_AR_CAPTION: `An exemplary density distribution of a single receptor for one laminar cross-section in a single tissue sample.`,
 
+    DATA_NOT_READY: `Still fetching data. Please try again in a few moments.`,
     QUICKTOUR_HEADER: `Welcome to ebrains siibra explorer`,
     PERMISSION_TO_QUICKTOUR: `Would you like a quick tour?`,
     QUICKTOUR_OK: `Start`,

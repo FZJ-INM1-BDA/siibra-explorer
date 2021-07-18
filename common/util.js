@@ -21,15 +21,15 @@
   }
 
   const HEMISPHERE = {
-    LEFT_HEMISPHERE: `left hemisphere`,
-    RIGHT_HEMISPHERE: `right hemisphere`
+    LEFT_HEMISPHERE: `left`,
+    RIGHT_HEMISPHERE: `right`
   }
 
   exports.getRegionHemisphere = region => {
     if (!region) return null
-    return (region.name && region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+    return (region.name && region.name.includes(' right') || (!!region.status && region.status.includes('right')))
       ? HEMISPHERE.RIGHT_HEMISPHERE
-      : (region.name && region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+      : (region.name && region.name.includes(' left') || (!!region.status && region.status.includes('left')))
         ? HEMISPHERE.LEFT_HEMISPHERE
         : null
   }
@@ -71,6 +71,13 @@
   }
 
   exports.getIdObj = getIdObj
+
+  exports.getIdFromKgIdObj = kg => {
+    if(kg.kgId && kg.kgSchema) {
+      return `${kg.kgSchema}/${kg.kgId}`
+    }
+    return null
+  }
 
   exports.getIdFromFullId = fullId => {
     const idObj = getIdObj(fullId)
@@ -117,7 +124,7 @@
         await (() => new Promise(rs => setTimeout(rs, timeout)))()
       }
     }
-  
+
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
   const flattenRegions = regions => regions.concat(

@@ -1,8 +1,18 @@
 const sinon = require('sinon')
 const cookie = require('cookie')
-const { Store, NotFoundError } = require('./store')
 
 const userStore = require('../user/store')
+
+class StubStore {
+  async set(key, val) {
+
+  }
+  async get(key) {
+
+  }
+}
+
+class StubNotFoundError extends Error{}
 
 const savedUserDataPayload = {
   otherData: 'not relevant data',
@@ -21,69 +31,75 @@ const saveUserDataStub = sinon
   .returns(Promise.resolve())
 
 const express = require('express')
-const router = require('./index')
 const got = require('got')
 const { expect } = require('chai')
 
-const app = express()
-let user
-app.use('', (req, res, next) => {
-  req.user = user
-  next()
-}, router)
-
-const name = `nameme`
-
-const payload = {
-  ver: '0.0.1',
-  queryString: 'test_test'
-}
-
 describe('> saneUrl/index.js', () => {
 
-  let getTokenStub
+  let getTokenStub, app, user, server, setStub, getStub
+  const payload = {
+    ver: '0.0.1',
+    queryString: 'test_test'
+  }
+
+  const name = `nameme`
+
+  after(() => {
+
+    server.close()
+    setStub && setStub.restore()
+
+    delete require.cache[require.resolve('../lruStore')]
+    delete require.cache[require.resolve('./store')]
+  })
+
   before(() => {
-    getTokenStub = sinon
-      .stub(Store.prototype, 'getToken')
-      .returns(Promise.resolve(`--fake-token--`))
+    getStub = sinon.stub(StubStore.prototype, 'get')
+    setStub = sinon.stub(StubStore.prototype, 'set')
+    require.cache[require.resolve('../lruStore')] = {
+      exports: {
+        redisURL: null
+      }
+    }
+
+    require.cache[require.resolve('./store')] = {
+      exports: {
+        Store: StubStore,
+        NotFoundError: StubNotFoundError
+      }
+    }
+
+    app = express()
+
+    const router = require('./index')
+    app.use('', (req, res, next) => {
+      req.user = user
+      next()
+    }, router)
+
+    server = app.listen(50000)
   })
 
   after(() => {
-    getTokenStub.restore()
+    getTokenStub && getTokenStub.restore()
+  })
+
+  afterEach(() => {
+    setStub.resetHistory()
+    getStub.resetHistory()
   })
 
   describe('> router', () => {
-
-    let server, setStub
-    before(() => {
-
-      setStub = sinon
-        .stub(Store.prototype, 'set')
-        .returns(Promise.resolve())
-      server = app.listen(50000)
-    })
-
-    afterEach(() => {
-      setStub.resetHistory()
-    })
-
-    after(() => {
-      server.close()
-      setStub.restore()
-    })
     
     it('> works', async () => {
       const body = {
         ...payload
       }
-      const getStub = sinon
-        .stub(Store.prototype, 'get')
-        .returns(Promise.resolve(JSON.stringify(body)))
+      getStub.returns(Promise.resolve(JSON.stringify(body)))
       const { body: respBody } = await got(`http://localhost:50000/${name}`)
 
       expect(getStub.calledWith(name)).to.be.true
       expect(respBody).to.equal(JSON.stringify(body))
-      getStub.restore()
     })
 
     it('> get on expired returns 404', async () => {
@@ -91,16 +107,13 @@ describe('> saneUrl/index.js', () => {
         ...payload,
         expiry: Date.now() - 1e3 * 60
       }
-      const getStub = sinon
-        .stub(Store.prototype, 'get')
-        .returns(Promise.resolve(JSON.stringify(body)))
+      getStub.returns(Promise.resolve(JSON.stringify(body)))
         
       const { statusCode } = await got(`http://localhost:50000/${name}`, {
         throwHttpErrors: false
       })
       expect(statusCode).to.equal(404)
       expect(getStub.calledWith(name)).to.be.true
-      getStub.restore()
     })
 
     it('> get on expired with txt html header sets cookie and redirect', async () => {
@@ -109,9 +122,7 @@ describe('> saneUrl/index.js', () => {
         ...payload,
         expiry: Date.now() - 1e3 * 60
       }
-      const getStub = sinon
-        .stub(Store.prototype, 'get')
-        .returns(Promise.resolve(JSON.stringify(body)))
+      getStub.returns(Promise.resolve(JSON.stringify(body)))
         
       const { statusCode, headers } = await got(`http://localhost:50000/${name}`, {
         headers: {
@@ -123,7 +134,6 @@ describe('> saneUrl/index.js', () => {
       expect(statusCode).to.be.lessThan(303)
 
       expect(getStub.calledWith(name)).to.be.true
-      getStub.restore()
 
       const c = cookie.parse(...headers['set-cookie'])
       expect(!!c['iav-error']).to.be.true
@@ -133,9 +143,7 @@ describe('> saneUrl/index.js', () => {
 
       it('> checks if the name is available', async () => {
 
-        const getStub = sinon
-          .stub(Store.prototype, 'get')
-          .returns(Promise.reject(new NotFoundError()))
+        getStub.returns(Promise.reject(new StubNotFoundError()))
 
         await got(`http://localhost:50000/${name}`, {
           method: 'POST',
@@ -150,16 +158,12 @@ describe('> saneUrl/index.js', () => {
         expect(storedName).to.equal(name)
         expect(getStub.called).to.be.true
         expect(setStub.called).to.be.true
-
-        getStub.restore()
       })
 
 
       it('> if file exist, will return 409 conflict', async () => {
 
-        const getStub = sinon
-          .stub(Store.prototype, 'get')
-          .returns(Promise.resolve('{}'))
+        getStub.returns(Promise.resolve('{}'))
 
         const { statusCode } = await got(`http://localhost:50000/${name}`, {
           method: 'POST',
@@ -174,14 +178,11 @@ describe('> saneUrl/index.js', () => {
         expect(getStub.called).to.be.true
         expect(setStub.called).to.be.false
 
-        getStub.restore()
       })
 
       it('> if other error, will return 500', async () => {
         
-        const getStub = sinon
-          .stub(Store.prototype, 'get')
-          .returns(Promise.reject(new Error(`other errors`)))
+        getStub.returns(Promise.reject(new Error(`other errors`)))
 
         const { statusCode } = await got(`http://localhost:50000/${name}`, {
           method: 'POST',
@@ -195,21 +196,12 @@ describe('> saneUrl/index.js', () => {
         expect(statusCode).to.equal(500)
         expect(getStub.called).to.be.true
         expect(setStub.called).to.be.false
-
-        getStub.restore()
       })
 
       describe('> set with unauthenticated user', () => {
-        let getStub
         
         before(() => {
-          getStub = sinon
-            .stub(Store.prototype, 'get')
-            .returns(Promise.reject(new NotFoundError()))
-        })
-
-        after(() => {
-          getStub.restore()
+          getStub.returns(Promise.reject(new StubNotFoundError()))
         })
         
         it('> set with anonymous user has user undefined and expiry as defined', async () => {
@@ -236,13 +228,7 @@ describe('> saneUrl/index.js', () => {
       describe('> set with authenticated user', () => {
         
         before(() => {
-          getStub = sinon
-            .stub(Store.prototype, 'get')
-            .returns(Promise.reject(new NotFoundError()))
-        })
-
-        after(() => {
-          getStub.restore()
+          getStub.returns(Promise.reject(new StubNotFoundError()))
         })
         
         before(() => {

@@ -8,6 +8,6 @@
 .tab-toggle
 {
   margin: 0.25rem -1rem 0.25rem 0rem;
-  padding-right: 1rem;
-  text-align: right;
+  padding-right: 0;
+  padding-left: 1.5rem;
 }

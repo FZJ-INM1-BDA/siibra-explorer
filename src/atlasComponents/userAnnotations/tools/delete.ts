@@ -33,8 +33,8 @@ export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools,
   }
   init(){
     if (this.callback) {
-      const obs$ = this.callback({ type: 'requestManAnnStreeam' })
-      if (!obs$) throw new Error(`Error requestManAnnStreeam`)
+      const obs$ = this.callback({ type: 'requestManAnnStream' })
+      if (!obs$) throw new Error(`Error requestManAnnStream`)
 
       const toolDeselect$ = this.toolSelected$.pipe(
         filter(flag => !flag)

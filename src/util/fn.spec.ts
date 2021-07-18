@@ -1,9 +1,9 @@
 import { fakeAsync, tick } from '@angular/core/testing'
 import {} from 'jasmine'
-import { cold, hot } from 'jasmine-marbles'
-import { of } from 'rxjs'
+import { hot } from 'jasmine-marbles'
+import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor } from './fn'
+import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor, bufferUntil } from './fn'
 
 describe(`> util/fn.ts`, () => {
 
@@ -11,7 +11,7 @@ describe(`> util/fn.ts`, () => {
     const colinsJson = require('!json-loader!../res/ext/colin.json')
     
     const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
-    const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-25'
+    const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26'
     
     it('translateds hoc1 from labelIndex to region', () => {
 
@@ -76,6 +76,55 @@ describe(`> util/fn.ts`, () => {
         })
         tick(200)
       }))
+    })
+  })
+
+  describe('> #bufferUntil', () => {
+    let src: Observable<number>
+    beforeEach(() => {
+      src = hot('a-b-c|', {
+        a: 1,
+        b: 2,
+        c: 3,
+      })
+    })
+    it('> outputs array of original emitted value', () => {
+
+      expect(
+        src.pipe(
+          bufferUntil({
+            condition: () => true,
+            leading: true,
+          })
+        )
+      ).toBeObservable(
+        hot('a-b-c|', {
+          a: [1],
+          b: [2],
+          c: [3],
+        })
+      )
+    })
+
+    it('> on condition success, emit all in array', () => {
+
+      let counter = 0
+      expect(
+        src.pipe(
+          bufferUntil({
+            condition: () => {
+              counter ++
+              return counter > 2
+            },
+            leading: true,
+            interval: 60000,
+          })
+        )
+      ).toBeObservable(
+        hot('----c|', {
+          c: [1,2,3],
+        })
+      )
     })
   })
 })

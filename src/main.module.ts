@@ -32,7 +32,7 @@ import { DockedContainerDirective } from "./util/directives/dockedContainer.dire
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, PureContantService, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
@@ -61,6 +61,7 @@ import { KgTosModule } from './ui/kgtos/module';
 import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
+import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -262,7 +263,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     {
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,
       useClass: MessagingGlue
-    }
+    },
+    {
+      provide: BS_ENDPOINT,
+      useValue: (BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v1_0`).replace(/\/$/, '')
+    },
   ],
   bootstrap : [
     AtlasViewer,

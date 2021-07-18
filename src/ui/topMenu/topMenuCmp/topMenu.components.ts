@@ -11,8 +11,7 @@ import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import {viewerStateSetViewerMode} from "src/services/state/viewerState/actions";
+import { CONST, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({

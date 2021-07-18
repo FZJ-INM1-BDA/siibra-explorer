@@ -141,11 +141,24 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
           '@type': 'siibra-ex/annotation/point'
         })
         this.addAnnotation(pt)
-        
-        /**
-         * deselect on selecting a point
-         */
-        this.callback({ type: 'paintingEnd' })
+
+        if (this.callback) {
+
+          /**
+           * message
+           */
+          this.callback({
+            type: 'message',
+            message: `Point added`,
+            action: 'Open',
+            actionCallback: () => this.callback({ type: 'showList' })
+          })
+          
+          /**
+            * deselect on selecting a point
+            */
+          this.callback({ type: 'paintingEnd' })
+        }
       }),
 
       /**

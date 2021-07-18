@@ -1,13 +1,14 @@
+// import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
+import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
+import { ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
 import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMouseOverCustomLandmark, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
-import { ngViewerSelectorLayers, ngViewerSelectorClearView, ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors";
+import { ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
+import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector } from "src/services/state/viewerState/selectors";
 import { serialiseParcellationRegion } from 'common/util'
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
@@ -25,17 +26,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { switchMapWaitFor } from "src/util/fn";
 import { INavObj } from "../navigation.service";
-
-interface INgLayerInterface {
-  name: string // displayName
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  id?: string // unique identifier
-  visible?: boolean
-  shader?: string
-  transform?: any
-}
+import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
 
 @Component({
   selector: 'iav-cmp-viewer-nehuba-glue',
@@ -61,6 +52,16 @@ interface INgLayerInterface {
       useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.visibleLayer$,
       deps: [ NehubaLayerControlService ]
     },
+    {
+      provide: SET_SEGMENT_VISIBILITY,
+      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.segmentVis$,
+      deps: [ NehubaLayerControlService ]
+    },
+    {
+      provide: NG_LAYER_CONTROL,
+      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.ngLayersController$,
+      deps: [ NehubaLayerControlService ]
+    },
     NehubaLayerControlService
   ]
 })
@@ -81,9 +82,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
   private onhoverSegments = []
   private onDestroyCb: Function[] = []
   private viewerUnit: NehubaViewerUnit
-  private ngLayersRegister: {layers: INgLayerInterface[]} = {
-    layers: []
-  }
   private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>>
 
   @Input()
@@ -222,16 +220,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
 
     /* on selecting of new template, remove additional nglayers */
     const baseLayerNames = Object.keys(tmpl.nehubaConfig.dataset.initialNgState.layers)
-    this.ngLayersRegister.layers
-      .filter(layer => baseLayerNames?.findIndex(l => l === layer.name) >= 0)
-      .map(l => l.name)
-      .forEach(layerName => {
-        this.store$.dispatch(ngViewerActionRemoveNgLayer({
-          layer: {
-            name: layerName
-          }
-        }))
-      })
+    this.layerCtrlService.removeNgLayers(baseLayerNames)
   }
 
   private async loadTmpl(_template: any, parcellation: any) {
@@ -295,14 +284,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           ? null
           : layers[key].transform,
       }
-      this.ngLayersRegister.layers.push(layer)
       return layer
     })
 
+    this.layerCtrlService.addNgLayer(dispatchLayers)
     this.newViewer$.next(true)
-    this.store$.dispatch(ngViewerActionAddNgLayer({
-      layer: dispatchLayers
-    }))
   }
 
   @Output()
@@ -400,98 +386,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     })
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
 
-    /**
-     * subscribe to when ngLayer gets updated, and add/remove layer as necessary
-     */
-    const addRemoveAdditionalLayerSub = this.store$.pipe(
-      select(ngViewerSelectorLayers),
-      switchMap(this.waitForNehuba.bind(this)),
-    ).subscribe((ngLayers: INgLayerInterface[]) => {
-
-      const newLayers = ngLayers.filter(l => this.ngLayersRegister.layers?.findIndex(ol => ol.name === l.name) < 0)
-      const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayers?.findIndex(nl => nl.name === l.name) < 0)
-
-      if (newLayers?.length > 0) {
-        const newLayersObj: any = {}
-        newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
-          ...rest,
-          source,
-          // source: getProxyUrl(source),
-          // ...getProxyOther({source})
-        })
-
-        this.nehubaContainerDirective.nehubaViewerInstance.loadLayer(newLayersObj)
-
-        /**
-         * previous miplementation... if nehubaViewer has not yet be instantiated, add it to the queue
-         * may no longer be necessary
-         * or implement proper queue'ing rather than ... this... half assed queue'ing
-         */
-        // if (!this.nehubaViewer.nehubaViewer || !this.nehubaViewer.nehubaViewer.ngviewer) {
-        //   this.nehubaViewer.initNiftiLayers.push(newLayersObj)
-        // } else {
-        //   this.nehubaViewer.loadLayer(newLayersObj)
-        // }
-        this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
-      }
-
-      if (removeLayers?.length > 0) {
-        removeLayers.forEach(l => {
-          if (this.nehubaContainerDirective.nehubaViewerInstance.removeLayer({
-            name : l.name,
-          })) {
-            this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
-          }
-        })
-      }
-    })
-    this.onDestroyCb.push(() => addRemoveAdditionalLayerSub.unsubscribe())
-
-    /**
-     * define when shown segments should be updated
-     */
-    const regSelectSub = combineLatest([
-      /**
-       * selectedRegions
-       */
-      this.store$.pipe(
-        select(viewerStateSelectedRegionsSelector)
-      ),
-      /**
-       * if layer contains non mixable layer
-       */
-      this.store$.pipe(
-        select(ngViewerSelectorLayers),
-        map(layers => layers.findIndex(l => l.mixability === 'nonmixable') >= 0),
-      ),
-      /**
-       * clearviewqueue, indicating something is controlling colour map
-       * show all seg
-       */
-      this.store$.pipe(
-        select(ngViewerSelectorClearView),
-        distinctUntilChanged()
-      )
-    ]).pipe(
-      switchMap(this.waitForNehuba.bind(this)),
-    ).subscribe(([ regions, nonmixableLayerExists, clearViewFlag ]) => {
-      if (nonmixableLayerExists) {
-        this.nehubaContainerDirective.nehubaViewerInstance.hideAllSeg()
-        return
-      }
-      const { ngId: defaultNgId } = this.selectedParcellation || {}
-
-      /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-      const selectedRegionIndexSet = new Set<string>(regions.map(({ngId = defaultNgId, labelIndex}) => serialiseParcellationRegion({ ngId, labelIndex })))
-
-      if (selectedRegionIndexSet.size > 0 && !clearViewFlag) {
-        this.nehubaContainerDirective.nehubaViewerInstance.showSegs([...selectedRegionIndexSet])
-      } else {
-        this.nehubaContainerDirective.nehubaViewerInstance.showAllSeg()
-      }
-    })
-    this.onDestroyCb.push(() => regSelectSub.unsubscribe())
-
     const perspectiveRenderEvSub = this.newViewer$.pipe(
       switchMapTo(fromEvent<CustomEvent>(this.el.nativeElement, 'perpspectiveRenderEvent').pipe(
         take(1)
@@ -517,7 +411,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
         /**
          * TODO dig into event detail to see if the exact mesh loaded
          */
-        const { meshesLoaded, meshFragmentsLoaded, lastLoadedMeshId } = (event as any).detail
+        const { meshesLoaded, meshFragmentsLoaded: _meshFragmentsLoaded, lastLoadedMeshId: _lastLoadedMeshId } = (event as any).detail
         return meshesLoaded >= this.nehubaContainerDirective.nehubaViewerInstance.numMeshesToBeLoaded
           ? null
           : 'Loading meshes ...'
@@ -586,7 +480,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
         }),
         /* TODO introduce animation */
-        moveToNavigationLoc : (coord, realSpace?) => {
+        moveToNavigationLoc : (coord, _realSpace?) => {
           this.store$.dispatch(
             viewerStateChangeNavigation({
               navigation: {
@@ -828,7 +722,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     )
   }
 
-  public handleMouseLeaveCustomLandmark(lm) {
+  public handleMouseLeaveCustomLandmark(_lm) {
     this.store$.dispatch(
       viewerStateMouseOverCustomLandmark({
         payload: { userLandmark: null }

@@ -13,6 +13,7 @@ import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
 import { FileInputModule } from "src/getFileInput/module";
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 import { FilterAnnotationsBySpace } from "./filterAnnotationBySpace.pipe";
+import { AnnotationEventDirective } from "./directives/annotationEv.directive";
 
 @NgModule({
   imports: [
@@ -35,11 +36,13 @@ import { FilterAnnotationsBySpace } from "./filterAnnotationBySpace.pipe";
     SingleAnnotationClsIconPipe,
     AnnotationVisiblePipe,
     FilterAnnotationsBySpace,
+    AnnotationEventDirective,
   ],
   exports: [
     AnnotationMode,
     AnnotationList,
-    AnnotationSwitch
+    AnnotationSwitch,
+    AnnotationEventDirective
   ]
 })
 

@@ -1,28 +1,23 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, map, startWith } from "rxjs/operators";
-import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
+import {combineLatest, merge, Observable, of, Subject, Subscription} from "rxjs";
+import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
-  viewerStateGetOverlayingAdditionalParcellations,
-  viewerStateParcVersionSelector,
   viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplateSelector,
   viewerStateStandAloneVolumes,
   viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
-import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId } from "src/services/state/uiState/actions";
-import { REGION_OF_INTEREST } from "src/util/interfaces";
+import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
+import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
-import { IViewerCmpUiState } from "../constants";
 import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
-import { ComponentStore } from "../componentStore";
+import { PureContantService } from "src/util";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { getGetRegionFromLabelIndexId } from "src/util/fn";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
@@ -69,18 +64,49 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
   providers: [
     {
       provide: REGION_OF_INTEREST,
-      useFactory: (store: Store<any>) => store.pipe(
+      useFactory: (store: Store<any>, svc: PureContantService) => store.pipe(
         select(viewerStateContextedSelectedRegionsSelector),
-        map(rs => {
-          if (!rs[0]) return null
-          return rs[0]
-        })
+        switchMap(r => {
+          if (!r[0]) return of(null)
+          const { context } = r[0]  
+          const { atlas, template, parcellation } = context || {}
+          return merge(
+            of(null),
+            svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
+              map(det => {
+                console.log('region detail', {
+                  id: r[0],
+                  det
+                })
+                return {
+                  ...det,
+                  context
+                }
+              }),
+              // in case detailed requests 
+              catchError((_err, _obs) => of(r[0])),
+            )
+          )
+        }),
+        shareReplay(1)
       ),
-      deps: [
-        Store
-      ]
+      deps: [ Store, PureContantService ]
     },
-    ComponentStore
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useFactory: (store: Store) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
+          if (arg.fullId) {
+            store.dispatch(
+              uiActionShowDatasetWtihId({
+                id: arg.fullId
+              })
+            )
+          }
+        }
+      },
+      deps: [ Store ]
+    },
   ]
 })
 
@@ -104,11 +130,6 @@ export class ViewerCmp implements OnDestroy {
     order: 0,
     description: QUICKTOUR_DESC.ATLAS_SELECTOR,
   }
-  public quickTourChips: IQuickTourData = {
-    order: 5,
-    description: QUICKTOUR_DESC.CHIPS,
-  }
-
 
   @Input() ismobile = false
 
@@ -135,11 +156,8 @@ export class ViewerCmp implements OnDestroy {
     map(v => v.length > 0)
   )
 
-  public viewerMode: string
-  public hideUi$: Observable<boolean> = this.store$.pipe(
+  public viewerMode$: Observable<string> = this.store$.pipe(
     select(viewerStateViewerModeSelector),
-    map(h => h === ARIA_LABELS.VIEWER_MODE_ANNOTATING),
-    distinctUntilChanged(),
   )
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
@@ -153,24 +171,6 @@ export class ViewerCmp implements OnDestroy {
       if (!!t['three-surfer']) return 'threeSurfer'
       return 'notsupported'
     })
-  )
-
-  public selectedLayerVersions$ = this.store$.pipe(
-    select(viewerStateParcVersionSelector),
-    map(arr => arr.map(item => {
-      const overwrittenName = item['@version'] && item['@version']['name']
-      return overwrittenName
-        ? { ...item, displayName: overwrittenName }
-        : item
-    }))
-  )
-
-  public selectedAdditionalLayers$ = this.store$.pipe(
-    select(viewerStateGetOverlayingAdditionalParcellations),
-  )
-
-  public clearViewKeys$ = this.store$.pipe(
-    select(ngViewerSelectorClearViewEntries)
   )
 
   /**
@@ -206,24 +206,9 @@ export class ViewerCmp implements OnDestroy {
 
   constructor(
     private store$: Store<any>,
-    private viewerCmpLocalUiStore: ComponentStore<IViewerCmpUiState>,
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: []
-      }
-    })
-
-    this.activePanelTitles$ = this.viewerCmpLocalUiStore.select(
-      state => state.sideNav.activePanelsTitle
-    ) as Observable<string[]>
-    this.subscriptions.push(
-      this.activePanelTitles$.subscribe(
-        (activePanelTitles: string[]) => this.activePanelTitles = activePanelTitles
-      )
-    )
 
     this.subscriptions.push(
       this.alwaysHideMinorPanel$.pipe(
@@ -316,63 +301,10 @@ export class ViewerCmp implements OnDestroy {
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  public activePanelTitles$: Observable<string[]>
-  private activePanelTitles: string[] = []
-  handleExpansionPanelClosedEv(title: string){
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: this.activePanelTitles.filter(n => n !== title)
-      }
-    })
-  }
-  handleExpansionPanelAfterExpandEv(title: string){
-    if (this.activePanelTitles.includes(title)) return
-    this.viewerCmpLocalUiStore.setState({
-      sideNav: {
-        activePanelsTitle: [
-          ...this.activePanelTitles,
-          title
-        ]
-      }
-    })
-  }
-
-  public bindFns(fns){
-    return () => {
-      for (const [ fn, ...arg] of fns) {
-        fn(...arg)
-      }
-    }
-  }
-
-  public clearAdditionalLayer(layer: { ['@id']: string }){
-    this.store$.dispatch(
-      viewerStateRemoveAdditionalLayer({
-        payload: layer
-      })
-    )
-  }
-
   public selectRoi(roi: any) {
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
         selectRegions: [ roi ]
-      })
-    )
-  }
-
-  public clearSelectedRegions(){
-    this.store$.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: []
-      })
-    )
-  }
-
-  public selectParcellation(parc: any) {
-    this.store$.dispatch(
-      viewerStateHelperSelectParcellationWithId({
-        payload: parc
       })
     )
   }
@@ -386,14 +318,7 @@ export class ViewerCmp implements OnDestroy {
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }
 
-  public unsetClearViewByKey(key: string){
-    this.store$.dispatch(
-      ngViewerActionClearView({ payload: {
-        [key]: false
-      }})
-    )
-  }
-  public clearPreviewingDataset(id: string){
+  public clearPreviewingDataset(id?: string){
     /**
      * clear all preview
      */

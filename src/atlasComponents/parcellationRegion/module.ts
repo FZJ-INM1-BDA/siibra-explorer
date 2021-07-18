@@ -9,6 +9,9 @@ import { RegionDirective } from "./region.directive";
 import { RegionListSimpleViewComponent } from "./regionListSimpleView/regionListSimpleView.component";
 import { RegionMenuComponent } from "./regionMenu/regionMenu.component";
 import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
+import { BSFeatureModule } from "../regionalFeatures/bsFeatures";
+import { RegionAccordionTooltipTextPipe } from "./regionAccordionTooltipText.pipe";
+import { AtlasCmptConnModule } from "../connectivity";
 
 @NgModule({
   imports: [
@@ -17,6 +20,8 @@ import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
     DatabrowserModule,
     AngularMaterialModule,
     ComponentsModule,
+    BSFeatureModule,
+    AtlasCmptConnModule,
   ],
   declarations: [
     RegionMenuComponent,
@@ -25,6 +30,7 @@ import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
 
     RegionDirective,
     RenderViewOriginDatasetLabelPipe,
+    RegionAccordionTooltipTextPipe,
   ],
   exports: [
     RegionMenuComponent,

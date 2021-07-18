@@ -4,10 +4,11 @@ import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.modu
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
 import { provideMockStore } from "@ngrx/store/testing"
-import { RenderViewOriginDatasetLabelPipe } from '../region.base'
-import { Directive, Input } from "@angular/core"
+import { Component, Directive, Input } from "@angular/core"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { ComponentsModule } from "src/components"
+import { ParcellationRegionModule } from "../module"
+import { BS_ENDPOINT } from "src/util/constants"
 
 const mt0 = {
   name: 'mt0'
@@ -55,42 +56,22 @@ const hemisphereMrms = [ {
 
 const nohemisphereHrms = [mrm0, mrm1]
 
-@Directive({
-  selector: '[iav-dataset-preview-dataset-file]',
-  exportAs: 'iavDatasetPreviewDatasetFile'
+@Component({
+  selector: 'kg-regional-features-list',
+  template: ''
 })
-class MockPrvDsFileDirective {
-  @Input('iav-dataset-preview-dataset-file') 
-  file
 
-  @Input('iav-dataset-preview-dataset-file-filename') 
-  filefilename
-
-  @Input('iav-dataset-preview-dataset-file-dataset') 
-  filedataset
-
-  @Input('iav-dataset-preview-dataset-file-kgid') 
-  filekgid
-
-  @Input('iav-dataset-preview-dataset-file-kgschema') 
-  filekgschema
-
-  @Input('iav-dataset-preview-dataset-file-fullid') 
-  filefullid
-
-}
+class DummyKgRegionalFeatureList{}
 
 @Directive({
-  selector: '[single-dataset-directive]',
-  exportAs: 'singleDatasetDirective'
+  selector: '[kg-regional-features-list-directive]',
+  exportAs: 'kgRegionalFeaturesListDirective'
 })
 
 class DummySingleDatasetDirective{
   @Input()
-  kgId: string
+  region: string
 
-  @Input()
-  kgSchema: string
 }
 
 describe('> regionMenu.component.ts', () => {
@@ -104,18 +85,21 @@ describe('> regionMenu.component.ts', () => {
           CommonModule,
           NoopAnimationsModule,
           ComponentsModule,
+          ParcellationRegionModule,
         ],
         declarations: [
-          RegionMenuComponent,
-          RenderViewOriginDatasetLabelPipe,
           /**
            * Used by regionMenu.template.html to show region preview
            */
-          MockPrvDsFileDirective,
           DummySingleDatasetDirective,
+          DummyKgRegionalFeatureList,
         ],
         providers: [
-          provideMockStore({ initialState: {} })
+          provideMockStore({ initialState: {} }),
+          {
+            provide: BS_ENDPOINT,
+            useValue: 'http://example.dev/1_0'
+          }
         ]
       }).compileComponents()
       

@@ -9,3 +9,7 @@ export const pluginStateSelectorInitManifests = createSelector(
   state => state['pluginState'],
   pluginState => pluginState.initManifests
 )
+
+export const PLUGINSTORE_CONSTANTS = {
+  INIT_MANIFEST_SRC: 'INIT_MANIFEST_SRC',
+}

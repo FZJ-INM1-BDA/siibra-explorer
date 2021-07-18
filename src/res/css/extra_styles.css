@@ -850,3 +850,10 @@ mat-list.sm mat-list-item
   margin: -16px!important;
   padding-top: 6rem;
 }
+
+.no-padding-dialog > mat-dialog-container
+{
+  padding-top:0 !important;
+  padding-right:0 !important;
+  padding-left:0 !important;
+}

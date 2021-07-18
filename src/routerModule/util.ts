@@ -3,7 +3,7 @@ import { encodeNumber, decodeToNumber, separator } from './cipher'
 import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { mixNgLayers } from "src/services/state/ngViewerState.store"
-import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
+import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.helper'
 import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper"
 import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors"
 import { Component } from "@angular/core"

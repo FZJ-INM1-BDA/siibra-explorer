@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const csp = require('./index')
+const { middelware: cspMiddleware } = require('./index')
 const got = require('got')
 const { expect, assert } = require('chai')
 
@@ -45,7 +45,7 @@ describe('> csp/index.js', () => {
   }
   before(done => {
     app.use(middleware)
-    csp(app)
+    app.use(cspMiddleware)
     app.get('/', (req, res) => {
       res.status(200).send('OK')
     })

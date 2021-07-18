@@ -343,9 +343,18 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
                 this.selectedPoly.points[0],
                 this.lastAddedPoint
               )
-              this.callback({
-                type: 'paintingEnd',
-              })
+
+              if (this.callback) {
+                this.callback({
+                  type: 'message',
+                  message: 'Polyline added.',
+                  action: 'Open',
+                  actionCallback: () => this.callback({ type: 'showList' })
+                })
+                this.callback({
+                  type: 'paintingEnd',
+                })
+              }
               return
             }
           }
