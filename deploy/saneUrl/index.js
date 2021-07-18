@@ -2,9 +2,8 @@ const express = require('express')
 const router = express.Router()
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
-const { Store, NotFoundError } = require('./store')
-const { redisURL } = require('../lruStore')
-const { readUserData, saveUserData } = require('../user/store')
+const { FallbackStore: Store, NotFoundError } = require('./store')
+const lruStore = require('../lruStore')
 const { Store: DepcStore } = require('./depcObjStore')
 const { readUserData, saveUserData } = require('../user/store')
 
@@ -12,11 +11,29 @@ const store = new Store()
 const depStore = new DepcStore()
 
 const { DISABLE_LIMITER, HOSTNAME, HOST_PATHNAME } = process.env
-const limiter = new RateLimit({
-  windowMs: 1e3 * 5,
-  max: 5,
-  ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
-})
+
+
+let limiter
+const getLimiter = async () => {
+  if (DISABLE_LIMITER) return passthrough
+  
+  if (!!limiter) return limiter
+
+  await lruStore._initPr
+  if (lruStore.redisURL) {
+    limiter = new RateLimit({
+      windowMs: 1e3 * 5,
+      max: 5,
+      store: new RedisStore({ redisURL })
+    })
+  } else {
+    limiter = new RateLimit({
+      windowMs: 1e3 * 5,
+      max: 5,
+    })
+  }
+  return limiter
+}
 
 const passthrough = (_, __, next) => next()
 
@@ -88,7 +105,7 @@ router.get('/:name', async (req, res) => {
 })
 
 router.post('/:name',
-  DISABLE_LIMITER ? passthrough : limiter,
+  getLimiter,
   async (req, res, next) => {
     const { name } = req.params
     try {

@@ -8,8 +8,7 @@ const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
-const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
-const { ready: saneUrlIsReady } = require('./saneUrl')
+const { router: datasetRouter } = require('./datasets')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -109,7 +108,8 @@ const _ = (async () => {
   /**
    * saneUrl end points
    */
-  app.use('/saneUrl', require('./saneUrl'))
+  const { router: saneUrlRouter } = require('./saneUrl')
+  app.use('/saneUrl', saneUrlRouter)
 })()
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
@@ -204,13 +204,10 @@ app.use('/logo', require('./logo'))
 app.get('/ready', async (req, res) => {
   const authIsReady = authReady ? await authReady() : false
   const regionalFeatureReady = await regionalFeatureIsReady()
-  const datasetReady = await datasetRouteIsReady()
-  const saneUrlReady = await saneUrlIsReady()
+
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
-    datasetReady,
-    saneUrlReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
