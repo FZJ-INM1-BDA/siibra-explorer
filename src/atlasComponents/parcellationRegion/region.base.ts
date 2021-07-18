@@ -4,7 +4,7 @@ import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConn
 import { distinctUntilChanged, switchMap, filter, map, withLatestFrom } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
-import { flattenRegions, getIdFromFullId, getIdFromKgIdObj, rgbToHsl } from 'common/util'
+import { flattenRegions, getIdFromKgIdObj, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
@@ -18,6 +18,7 @@ export class RegionBase {
 
   private _position: [number, number, number]
   set position(val){
+    console.log('position', val)
     if (verifyPositionArg(val)) {
       this._position = val
     } else {
@@ -33,7 +34,9 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this._region)
-    this.position = val && val.position
+
+    // bug the centroid returned is currently nonsense
+    // this.position = val?.props?.centroid_mm
     if (!this._region) return
 
     const rgb = this._region.rgb

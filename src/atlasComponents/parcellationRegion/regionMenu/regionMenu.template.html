@@ -41,10 +41,22 @@
       <!-- position -->
       <button mat-icon-button *ngIf="position"
         (click)="navigateToRegion()"
-        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | nmToMm | addUnitAndJoin : 'mm')">
+        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | addUnitAndJoin : 'mm')">
         <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
         </mat-icon>
       </button>
+
+      <!-- explore doi -->
+      <ng-template let-infos [ngIf]="region?.originDatainfos">
+        <ng-container *ngFor="let info of infos">
+          <a *ngFor="let url of info.urls"
+            [href]="url.doi | doiParserPipe"
+            target="_blank"
+            mat-icon-button>
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+        </ng-container>
+      </ng-template>
 
     </mat-card-subtitle>
 

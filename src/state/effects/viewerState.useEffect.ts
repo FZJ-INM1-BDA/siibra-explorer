@@ -400,7 +400,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           })
         }
 
-        const { position } = region
+        const position = region.position || (region?.props?.centroid_mm || []).map((v: number) => v*1e6)
         if (!position) {
           return generalActionError({
             message: `${region.name} - does not have a position defined`
