@@ -7,6 +7,17 @@ const express = require('express')
 let NotFoundError
 const userStore = require('../user/store')
 
+class StubStore {
+  async set(key, val) {
+
+  }
+  async get(key) {
+
+  }
+}
+
+class StubNotFoundError extends Error{}
+
 const savedUserDataPayload = {
   otherData: 'not relevant data',
   savedCustomLinks: [
@@ -79,7 +90,14 @@ describe('> saneUrl/index.js', () => {
     setStub.resetBehavior()
   })
 
-  describe('> router', () => {
+  before(() => {
+    getStub = sinon.stub(StubStore.prototype, 'get')
+    setStub = sinon.stub(StubStore.prototype, 'set')
+    require.cache[require.resolve('../lruStore')] = {
+      exports: {
+        redisURL: null
+      }
+    }
 
     let server, user
     before(() => {

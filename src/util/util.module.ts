@@ -25,6 +25,8 @@ import { FilterByPropertyPipe } from "./pipes/filterByProperty.pipe";
 import { ArrayContainsPipe } from "./pipes/arrayContains.pipe";
 import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { TmpParcNamePipe } from "./pipes/_tmpParcName.pipe";
+import { ObjectToArrayPipe } from "./pipes/objToArray.pipe";
+import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 
 @NgModule({
   imports:[
@@ -55,6 +57,8 @@ import { TmpParcNamePipe } from "./pipes/_tmpParcName.pipe";
     ArrayContainsPipe,
     DoiParserPipe,
     TmpParcNamePipe,
+    ObjectToArrayPipe,
+    GetFilenamePipe,
   ],
   exports: [
     FilterNullPipe,
@@ -81,6 +85,8 @@ import { TmpParcNamePipe } from "./pipes/_tmpParcName.pipe";
     ArrayContainsPipe,
     DoiParserPipe,
     TmpParcNamePipe,
+    ObjectToArrayPipe,
+    GetFilenamePipe,
   ]
 })
 

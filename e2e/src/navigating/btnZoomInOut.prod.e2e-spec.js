@@ -15,16 +15,13 @@ describe('> zoom in btns on panels', () => {
     })
     it('> panel btns do not show', async () => {
       
-      await iavPage.cursorMoveTo({
-        position: [width / 4, height/4]
-      })
+      await iavPage.cursorMoveToElement(`[aria-label="${ARIA_LABELS.SELECT_ATLAS}"]`)
 
       await iavPage.wait(500)
 
       const visibleFlags = await iavPage.areVisible(`[aria-label="${ARIA_LABELS.ZOOM_IN}"]`)
       expect(visibleFlags.length).toBe(4)
       expect(visibleFlags).toEqual([false, false, false, false])
-      await iavPage.clickSideNavTab()
     })
   })
 

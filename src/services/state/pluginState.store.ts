@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store'
-import { GENERAL_ACTION_TYPES } from '../stateStore.service'
-
+import { generalApplyState } from '../stateStore.helper'
+import { PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from './pluginState.helper'
 export const defaultState: StateInterface = {
   initManifests: []
 }
@@ -16,14 +16,6 @@ export interface ActionInterface extends Action {
   }
 }
 
-export const PLUGINSTORE_ACTION_TYPES = {
-  SET_INIT_PLUGIN: `SET_INIT_PLUGIN`,
-  CLEAR_INIT_PLUGIN: 'CLEAR_INIT_PLUGIN',
-}
-
-export const PLUGINSTORE_CONSTANTS = {
-  INIT_MANIFEST_SRC: 'INIT_MANIFEST_SRC',
-}
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
@@ -45,7 +37,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       initManifests: newManifests,
     }
   }
-  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+  case generalApplyState.type: {
     const { pluginState } = (action as any).state
     return pluginState
   }

@@ -1,0 +1,22 @@
+mat-icon
+{
+  transform: scale(0.75);
+}
+
+.action-list
+{
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.action-list mat-icon
+{
+  padding-left: 0px;
+}
+
+.region-name
+{
+  display: inherit;
+  font-size: 95%;
+  line-height: normal;
+}

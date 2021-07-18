@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { IUser, AuthService } from './auth.service'
 
 @Directive({
-  selector: '[iav-auth-authState]',
+  selector: '[iav-auth-auth-state]',
   exportAs: 'iavAuthAuthState'
 })
 

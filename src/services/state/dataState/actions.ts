@@ -1,4 +1,5 @@
 import { createAction, props } from "@ngrx/store";
+import { IKgDataEntry } from "src/atlasComponents/databrowserModule";
 
 export const datastateActionToggleFav = createAction(
   `[datastate] toggleFav`,
@@ -18,4 +19,9 @@ export const datastateActionUnfavDataset = createAction(
 export const datastateActionFavDataset = createAction(
   `[datastate] fav`,
   props<{ payload: { fullId: string } }>()
+)
+
+export const datastateActionFetchedDataentries = createAction(
+  `[datastate] fetchedDatastate`,
+  props<{ fetchedDataEntries: IKgDataEntry[] }>()
 )

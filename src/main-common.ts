@@ -18,6 +18,11 @@ import '!!file-loader?context=src/res&name=icons/iav-icons.ttf!src/res/icons/iav
 import '!!file-loader?context=src/res&name=icons/iav-icons.woff!src/res/icons/iav-icons.woff'
 import '!!file-loader?context=src/res&name=icons/iav-icons.svg!src/res/icons/iav-icons.svg'
 
+/**
+ * favicons
+ */
+import '!!file-loader?context=src/res/favicons&name=favicon-128-light.png!src/res/favicons/favicon-128-light.png'
+
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
 

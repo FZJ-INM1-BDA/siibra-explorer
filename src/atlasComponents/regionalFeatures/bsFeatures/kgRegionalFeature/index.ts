@@ -1,0 +1,3 @@
+export {
+  KgRegionalFeatureModule
+} from './module'

@@ -27,9 +27,9 @@ export class CaptureClickListenerDirective implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    const mouseDownObs$ = fromEvent(this.element, 'mousedown', { capture: this.captureDocument })
-    const mouseMoveObs$ = fromEvent(this.element, 'mousemove', { capture: this.captureDocument })
-    const mouseUpObs$ = fromEvent(this.element, 'mouseup', { capture: this.captureDocument })
+    const mouseDownObs$ = fromEvent(this.element, 'pointerdown', { capture: this.captureDocument })
+    const mouseMoveObs$ = fromEvent(this.element, 'pointermove', { capture: this.captureDocument })
+    const mouseUpObs$ = fromEvent(this.element, 'pointerup', { capture: this.captureDocument })
 
     this.subscriptions.push(
       mouseDownObs$.subscribe(event => {

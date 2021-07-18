@@ -20,9 +20,20 @@ const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP
 const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
 const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
 
-const userPass = `${REDIS_USERNAME || ''}${( REDIS_PASSWORD && (':' + REDIS_PASSWORD)) || ''}${ (REDIS_USERNAME || REDIS_PASSWORD) && '@'}`
+const userPass = (() => {
+  let returnString = ''
+  if (REDIS_USERNAME) {
+    returnString += REDIS_USERNAME
+  }
+  if (REDIS_PASSWORD) {
+    returnString += `:${REDIS_PASSWORD}`
+  }
+  return returnString === ''
+    ? ''
+    : `${returnString}@`
+})()
 
-const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
+const _redisURL = redisAddr && `${redisProto || ''}://${userPass}${redisAddr}:${redisPort}`
 
 const crypto = require('crypto')
 
@@ -45,69 +56,109 @@ const ensureString = val => {
   if (typeof val !== 'string') throw new Error(`both key and val must be string`)
 }
 
-if (redisURL) {
-  const redis = require('redis')
-  const { promisify } = require('util')
-  const client = redis.createClient({
-    url: redisURL
-  })
-  
-  const asyncGet = promisify(client.get).bind(client)
-  const asyncSet = promisify(client.set).bind(client)
-  const asyncDel = promisify(client.del).bind(client)
+class ExportObj {
+  constructor(){
+    this.StoreType = null
+    this.redisURL = null
+    this.store = null
+    this._rs = null
+    this._rj = null
 
-  const keys = []
-
-  exports.store = {
-    set: async (key, val) => {
-      ensureString(key)
-      ensureString(val)
-      asyncSet(key, val)
-      keys.push(key)
-    },
-    get: async (key) => {
-      ensureString(key)
-      return asyncGet(key)
-    },
-    clear: async auth => {
-      if (auth !== authKey) {
-        getAuthKey()
-        throw new Error(`unauthorized`)
-      }
-      await asyncDel(keys.splice(0))
-    }
+    this._initPr = new Promise((rs, rj) => {
+      this._rs = rs
+      this._rj = rj
+    })
   }
+}
 
-  exports.StoreType = `redis`
-  console.log(`redis`)
+const exportObj = new ExportObj()
 
-} else {
+const setupLru = () => {
+
   const LRU = require('lru-cache')
-  const store = new LRU({
+  const lruStore = new LRU({
     max: 1024 * 1024 * 1024, // 1gb
     length: (n, key) => n.length,
     maxAge: Infinity, // never expires
   })
 
-  exports.store = {
-    set: async (key, val) => {
+  exportObj.store = {
+    /**
+     * maxage in milli seconds
+     */
+    set: async (key, val, { maxAge } = {}) => {
       ensureString(key)
       ensureString(val)
-      store.set(key, val)
+      lruStore.set(key, val, ...( maxAge ? [ maxAge ] : [] ))
     },
     get: async (key) => {
       ensureString(key)
-      return store.get(key)
+      return lruStore.get(key)
     },
     clear: async auth => {
       if (auth !== authKey) {
         getAuthKey()
         throw new Error(`unauthorized`)
       }
-      store.reset()
+      lruStore.reset()
     }
   }
 
-  exports.StoreType = `lru-cache`
-  console.log(`lru-cache`)
+  exportObj.StoreType = `lru-cache`
+  console.log(`using lru-cache`)
+  exportObj._rs()
 }
+
+if (_redisURL) {
+  const redis = require('redis')
+  const { promisify } = require('util')
+  const client = redis.createClient({
+    url: _redisURL
+  })
+
+  client.on('ready', () => {
+
+    const asyncGet = promisify(client.get).bind(client)
+    const asyncSet = promisify(client.set).bind(client)
+    const asyncDel = promisify(client.del).bind(client)
+  
+    const keys = []
+  
+    /**
+     * maxage in milli seconds
+     */
+     exportObj.store = {
+      set: async (key, val, { maxAge } = {}) => {
+        ensureString(key)
+        ensureString(val)
+        asyncSet(key, val, ...( maxAge ? [ 'PX', maxAge ] : [] ))
+        keys.push(key)
+      },
+      get: async (key) => {
+        ensureString(key)
+        return asyncGet(key)
+      },
+      clear: async auth => {
+        if (auth !== authKey) {
+          getAuthKey()
+          throw new Error(`unauthorized`)
+        }
+        await asyncDel(keys.splice(0))
+      }
+    }
+  
+    exportObj.StoreType = `redis`
+    exportObj.redisURL = _redisURL
+    console.log(`using redis`)
+    exportObj._rs()
+  }).on('error', () => {
+    console.warn(`setting up Redis error, fallback to setupLru`)
+    setupLru()
+    client.quit()
+  })
+
+} else {
+  setupLru()
+}
+
+module.exports = exportObj

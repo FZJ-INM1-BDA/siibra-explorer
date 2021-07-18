@@ -1,5 +1,9 @@
 import { filter } from 'rxjs/operators';
 
+export {
+  recursiveFindRegionWithLabelIndexId
+} from 'src/util/fn'
+
 export { getNgIds } from 'src/util/fn'
 
 import {
@@ -23,7 +27,7 @@ import {
   ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
   defaultState as userConfigDefaultState,
   StateInterface as UserConfigStateInterface,
-  stateStore as userConfigState,
+  userConfigReducer as userConfigState,
 } from './state/userConfigState.store'
 import {
   defaultState as viewerConfigDefaultState,
@@ -49,9 +53,9 @@ export { ViewerStateInterface, ViewerActionInterface, viewerState }
 export { IUiState, UIActionInterface, uiState }
 export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
-export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
+export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
 export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, IProperty, IPublication, IReferenceSpace, IFile, IFileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export { GENERAL_ACTION_TYPES, generalActionError } from './stateStore.helper'
@@ -61,12 +65,6 @@ export function safeFilter(key: string) {
   return filter((state: any) =>
     (typeof state !== 'undefined' && state !== null) &&
     typeof state[key] !== 'undefined' && state[key] !== null)
-}
-
-export function getNgIdLabelIndexFromRegion({ region }) {
-  const { ngId, labelIndex } = region
-  if (ngId && labelIndex) { return { ngId, labelIndex } }
-  throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
 }
 
 export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
@@ -149,41 +147,6 @@ export function isDefined(obj) {
   return typeof obj !== 'undefined' && obj !== null
 }
 
-export function generateLabelIndexId({ ngId, labelIndex }) {
-  return `${ngId}#${labelIndex}`
-}
-
-export function getNgIdLabelIndexFromId({ labelIndexId } = {labelIndexId: ''}) {
-  const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
-  const ngId = _.length > 1
-    ? _[0]
-    : null
-  const labelIndex = _.length > 1
-    ? Number(_[1])
-    : _.length === 0
-      ? null
-      : Number(_[0])
-  return { ngId, labelIndex }
-}
-
-const recursiveFlatten = (region, {ngId}) => {
-  return [{
-    ngId,
-    ...region,
-  }].concat(
-    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
-  )
-}
-
-export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId: string}) {
-  const { ngId, labelIndex } = getNgIdLabelIndexFromId({ labelIndexId })
-  const fr1 = regions.map(r => recursiveFlatten(r, { ngId: inheritedNgId }))
-  const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
-  const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
-  if (found) { return found }
-  return null
-}
-
 export interface IavRootStoreInterface {
   pluginState: PluginStateInterface
   viewerConfigState: ViewerConfigStateInterface
@@ -194,7 +157,7 @@ export interface IavRootStoreInterface {
   userConfigState: UserConfigStateInterface
 }
 
-import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
+import { DATASTORE_DEFAULT_STATE } from 'src/atlasComponents/databrowserModule'
 
 export const defaultRootState: any = {
   pluginState: pluginDefaultState,

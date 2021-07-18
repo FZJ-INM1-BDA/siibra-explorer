@@ -1,91 +1,116 @@
-name: e2e
+name: "[e2e] prod-specs"
 
 on:
-  pull_request:
-    branches:
-      - dev
-
-env:
-  DOCKER_IMAGE_NAME: gha-iav-image
-  DOCKER_IMAGE_TAG: ${{ github.sha }}
-  DOCKER_CONTAINER_NAME: gha-iav-built-${{ github.sha }}
-  DOCKER_E2E_PPTR: gha-iav-e2e-pptr-${{ github.sha }}
-  DOCKER_E2E_NETWORK: gha-dkr-network
-  ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000/
-  CHROMIUM_VERSION: "80.0.3987.106"
-  PPTR_VERSION: "2.1.0"
+  workflow_dispatch:
+    inputs:
+      url:
+        required: true
+        default: https://interactive-viewer-next.apps-dev.hbp.eu/
+      sha:
+        required: true
+        default: ''
 
 jobs:
-  buildimage:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: self-hosted
+  update-e2e-status:
+    runs-on: ubuntu-latest
+    env:
+      URL_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
+      SHA: ${{ github.event.inputs.sha }}
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: build docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-      run: |
-        docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
-      env:
-        BACKEND_URL: ${{ env.ATLAS_URL }}
-  test:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: self-hosted
-    needs: buildimage
+      - name: update commit status
+        run: |
+          curl -v \
+            -X POST \
+            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H 'accept: application/vnd.github.v3+json' \
+            ${URL_ROOT}/statuses/${SHA} \
+            -d '{
+              "target_url":"'$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'",
+              "description": "Running e2e",
+              "state": "pending"
+            }'
+  e2e:
+    needs: update-e2e-status
+    runs-on: [self-hosted, headless]
+    strategy:
+      fail-fast: false
+      matrix:
+        protractor-spec: [
+          './src/advanced/urlParsing.prod.e2e-spec.js',
+          './src/advanced/pluginApi.prod.e2e-spec.js',
+          './src/advanced/nonAtlasImages.prod.e2e-spec.js',
+          # './src/advanced/browsingForDatasets.prod.e2e-spec.js',
+          './src/advanced/favDatasets.prod.e2e-spec.js',
+          './src/advanced/history.prod.e2e-spec.js',
+          
+          './src/selecting/region.prod.e2e-spec.js',
+          './src/selecting/template.prod.e2e-spec.js',
+          './src/selecting/atlas.prod.e2e-spec.js',
+
+          './src/layout/home.prod.e2e-spec.js'
+        ]
+    env:
+      PROTRACTOR_SPECS: ${{ matrix.protractor-spec }}
+      ATLAS_URL: ${{ github.event.inputs.url }}
+      PPTR_VERSION: "5.3.1"
+      CHROMIUM_VERSION: "86.0.4240.0"
+
+    outputs:
+      failure-state: ${{ steps.failure-state-step.outputs.failure-state }}
+
     steps:
-    - name: clean up previous 
-      run: |
-        GHA_CONTAINERS=$( docker ps | grep gha | awk '{print $1}' )
-        if [ -z "$GHA_CONTAINERS" ]; then for f in $GHA_CONTAINERS; do docker stop $f; done; fi
-    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} as container ${{ env.DOCKER_CONTAINER_NAME }}
-      run: |
-        docker run \
-          --rm \
-          --name ${DOCKER_CONTAINER_NAME} \
-          --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
-          --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
-          --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
-          --env PLUGIN_URLS=${{ env.ATLAS_URL }}/res/plugin_examples/plugin1/manifest.json \
-          -dit \
-          ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-    - uses: actions/checkout@v1
-    - name: Start pptr docker container with name ${{ env.DOCKER_E2E_PPTR }}
-      run: |
-        docker run --rm \
-          -v /dev/shm:/dev/shm \
-          --name ${DOCKER_E2E_PPTR} \
-          -dt \
-          puppeteer
-        docker cp . ${DOCKER_E2E_PPTR}:/iav
-        docker exec -u root ${DOCKER_E2E_PPTR} chown -R pptruser:pptruser /iav
-        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm i
-        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome=${{ env.CHROMIUM_VERSION }}
-        docker exec -t ${DOCKER_E2E_PPTR} npm i --no-save puppeteer@${{ env.PPTR_VERSION }}
-    - name: Setup docker network
-      run: |
-        docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_E2E_PPTR }}
-        docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_CONTAINER_NAME }}
-    - name: run pptr tests - ${{ env.ATLAS_URL }}
-      run: |
-        docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
-    - name : make screenshot, if success
-      if: success()
-      run: |
-        docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e -- --specs ./e2e/screenshots/gen.js
-        docker cp ${DOCKER_E2E_PPTR}:/iav/docs/autogen_images ./autogen_images
-    - uses: actions/upload-artifact@v1
-      if: success()
+    - uses: actions/checkout@v2
       with:
-        name: screenshots-${{ github.sha }}
-        path: ./autogen_images
-    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
-      if: success()
+        ref: ${{ github.event.ref }}
+
+    - name: Install dep
       run: |
-        docker stop ${DOCKER_CONTAINER_NAME}
-        docker stop ${DOCKER_E2E_PPTR}
-    - name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-      if: success()
+        npm i
+        npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
+        npm i --no-save puppeteer@${PPTR_VERSION}
+  
+    - name: 'Run e2e for ${{ matrix.protractor-spec }} on ${{ github.event.inputs.url }}'
+      run: npm run e2e
+
+    - name: Set output when workflow fails
+      if: failure()
+      run: echo '::set-output name=failure-state::true'
+      id: failure-state-step
+
+    - name: Define screenshot artefact
+      if: failure()
       run: |
-        docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+        strip_prefix=${PROTRACTOR_SPECS#./src/}
+        strip_suffix=${strip_prefix%.e2e-spec.js}
+        replace_slash=${strip_suffix//\//-}
+        replace_dots=${replace_slash//\./-}
+        echo 'ARTEFACT_NAME='$replace_dots >> $GITHUB_ENV
+
+    - name: 'Upload screenshots artefact'
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTEFACT_NAME }}
+        path: ./scrnsht/
+
+  update-after-e2e-status:
+    if: always()
+    needs: e2e
+    runs-on: ubuntu-latest
+    env:
+      URL_ROOT: https://api.github.com/repos/HumanBrainProject/interactive-viewer
+      SHA: ${{ github.event.inputs.sha }}
+    steps:
+      - name: update badge
+        run: |
+          [[ '${{ needs.e2e.outputs.failure-state }}' = 'true' ]] && state=failure || state=success &&
+          curl -v \
+            -X POST \
+            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H 'accept: application/vnd.github.v3+json' \
+            ${URL_ROOT}/statuses/${SHA} \
+            -d '{
+              "target_url":"'$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'",
+              "description": "e2e completed successfully.",
+              "state": "'$state'"
+            }'

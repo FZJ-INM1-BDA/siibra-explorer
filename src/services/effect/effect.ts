@@ -4,9 +4,11 @@ import { select, Store } from "@ngrx/store";
 import { merge, Observable, Subscription, combineLatest } from "rxjs";
 import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
-import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
-import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
+import { IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
+import { deserialiseParcRegionId, serialiseParcellationRegion } from "common/util"
+import { getGetRegionFromLabelIndexId } from 'src/util/fn'
+import { actionAddToRegionsSelectionWithIds, actionSelectLandmarks, viewerStateSelectParcellation, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions } from "../state/viewerState/actions";
 
 @Injectable({
   providedIn: 'root',
@@ -51,26 +53,10 @@ export class UseEffects implements OnDestroy {
           /**
            * only allow 1 selection at a time
            */
-        return {
-          type: SELECT_REGIONS,
+        return viewerStateSetSelectedRegions({
           selectRegions: selectRegions.slice(0,1)
-        }
-      })
-    )
-    
-    this.onDeselectRegions = this.actions$.pipe(
-      ofType(DESELECT_REGIONS),
-      withLatestFrom(this.regionsSelected$),
-      map(([action, regionsSelected]) => {
-        const { deselectRegions } = action
-        const selectRegions = regionsSelected.filter(r => {
-          return !(deselectRegions as any[]).find(dr => compareRegions(dr, r))
         })
-        return {
-          type: SELECT_REGIONS,
-          selectRegions,
-        }
-      }),
+      })
     )
 
     this.onDeselectRegionsWithId$ = this.actions$.pipe(
@@ -82,16 +68,15 @@ export class UseEffects implements OnDestroy {
       withLatestFrom(this.regionsSelected$),
       map(([ deselecRegionIds, alreadySelectedRegions ]) => {
         const deselectSet = new Set(deselecRegionIds)
-        return {
-          type: SELECT_REGIONS,
+        return viewerStateSetSelectedRegions({
           selectRegions: alreadySelectedRegions
-            .filter(({ ngId, labelIndex }) => !deselectSet.has(generateLabelIndexId({ ngId, labelIndex }))),
-        }
+            .filter(({ ngId, labelIndex }) => !deselectSet.has(serialiseParcellationRegion({ ngId, labelIndex }))),
+        })
       }),
     )
 
     this.addToSelectedRegions$ = this.actions$.pipe(
-      ofType(ADD_TO_REGIONS_SELECTION_WITH_IDS),
+      ofType(actionAddToRegionsSelectionWithIds.type),
       map(action => {
         const { selectRegionIds } = action
         return selectRegionIds
@@ -104,10 +89,9 @@ export class UseEffects implements OnDestroy {
       map(this.convertRegionIdsToRegion),
       withLatestFrom(this.regionsSelected$),
       map(([ selectedRegions, alreadySelectedRegions ]) => {
-        return {
-          type: SELECT_REGIONS,
+        return viewerStateSetSelectedRegions({
           selectRegions: this.removeDuplicatedRegions(selectedRegions, alreadySelectedRegions),
-        }
+        })
       }),
     )
   }
@@ -123,7 +107,7 @@ export class UseEffects implements OnDestroy {
   private subscriptions: Subscription[] = []
 
   private parcellationSelected$ = this.actions$.pipe(
-    ofType(SELECT_PARCELLATION),
+    ofType(viewerStateSelectParcellation.type),
   )
 
 
@@ -135,18 +119,15 @@ export class UseEffects implements OnDestroy {
   )
 
   @Effect()
-  public onDeselectRegions: Observable<any>
-
-  @Effect()
   public onDeselectRegionsWithId$: Observable<any>
 
   private convertRegionIdsToRegion = ([selectRegionIds, parcellation]) => {
     const { ngId: defaultNgId } = parcellation
     return (selectRegionIds as any[])
-      .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
+      .map(labelIndexId => deserialiseParcRegionId(labelIndexId))
       .map(({ ngId, labelIndex }) => {
         return {
-          labelIndexId: generateLabelIndexId({
+          labelIndexId: serialiseParcellationRegion({
             ngId: ngId || defaultNgId,
             labelIndex,
           }),
@@ -190,7 +171,7 @@ export class UseEffects implements OnDestroy {
    */
   @Effect()
   public onSelectRegionWithId = this.actions$.pipe(
-    ofType(SELECT_REGIONS_WITH_ID),
+    ofType(viewerStateSelectRegionWithIdDeprecated.type),
     map(action => {
       const { selectRegionIds } = action
       return selectRegionIds
@@ -202,10 +183,9 @@ export class UseEffects implements OnDestroy {
     )),
     map(this.convertRegionIdsToRegion),
     map(selectRegions => {
-      return {
-        type: SELECT_REGIONS,
-        selectRegions,
-      }
+      return viewerStateSetSelectedRegions({
+        selectRegions
+      })
     }),
   )
 
@@ -219,16 +199,17 @@ export class UseEffects implements OnDestroy {
     ),
     this.parcellationSelected$,
     this.actions$.pipe(
-      ofType(NEWVIEWER)
+      ofType(viewerStateNewViewer.type)
     ),
     this.actions$.pipe(
-      ofType(viewerStateSelectAtlas)
+      ofType(viewerStateSelectAtlas.type)
     )
   ).pipe(
-    mapTo({
-      type: SELECT_REGIONS,
-      selectRegions: [],
-    })
+    mapTo(
+      viewerStateSetSelectedRegions({
+        selectRegions: []
+      })
+    )
   )
 
   /**
@@ -238,19 +219,13 @@ export class UseEffects implements OnDestroy {
 
   @Effect()
   public onNewViewerResetLandmarkSelected$ = this.actions$.pipe(
-    ofType(NEWVIEWER),
-    mapTo({
-      type: SELECT_LANDMARKS,
-      landmarks: []
-    })
+    ofType(viewerStateNewViewer.type),
+    mapTo(
+      actionSelectLandmarks({
+        landmarks: []
+      })
+    )
   )
-}
-
-export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
-  const { ngId: defaultNgId, regions } = parcellation
-  // if (!updated) throw new Error(`parcellation not yet updated`)
-  return ({ labelIndexId }) =>
-    recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
 }
 
 export const compareRegions: (r1: any, r2: any) => boolean = (r1, r2) => {

@@ -7,29 +7,11 @@ const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets, filterDatasetsByRegion } = require('./util')
 const ibc = require('./importIBS')
 const { returnAdditionalDatasets } = require('../regionalFeatures')
+const lruStore = require('../lruStore')
 
-let cachedData = null
-
-const CACHE_DATASET_FILENAME = process.env.CACHE_DATASET_FILENAME || path.join(__dirname, 'cachedKgDataset.json')
-
-fs.readFile(CACHE_DATASET_FILENAME, 'utf-8', (err, data) => {
-  /**
-   * the file may or may not be present on init
-   */
-  if (err) {
-    console.warn(`read cache failed`, err)
-    return
-  }
-
-  try {
-    cachedData = JSON.parse(data)
-  }catch (e) {
-    /**
-     * parsing saved cached json error
-     */
-    console.error(e)
-  }
-})
+const IAV_DS_CACHE_KEY = 'IAV_DS_CACHE_KEY'
+const IAV_DS_TIMESTAMP_KEY = 'IAV_DS_TIMESTAMP_KEY'
+const IAV_DS_REFRESH_TIMESTAMP_KEY = 'IAV_DS_REFRESH_TIMESTAMP_KEY'
 
 const { KG_ROOT, KG_SEARCH_VOCAB } = constants
 
@@ -57,55 +39,61 @@ const getKgQuerySingleDatasetUrl = ({ kgId }) => {
 const fetchDatasetFromKg = async ({ user } = {}) => {
 
   const { releasedOnly, option } = await getUserKGRequestParam({ user })
-
   return await new Promise((resolve, reject) => {
-    request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : '&databaseScope=INFERRED'}`, option, (err, resp, body) => {
-      if (err) return reject(err)
-      if (resp.statusCode >= 400) return reject(resp.statusCode)
-      try {
-        const json = JSON.parse(body)
-        return resolve(json)
-      }catch (e) {
-        console.warn(`parsing json obj error`, body)
-        reject(e)
-      }
-    })
+    request(
+      `${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`,
+      {
+        timeout: 60 * 1000,
+        ...option
+      },
+      (err, resp, body) => {
+        if (err) return reject(err)
+        if (resp.statusCode >= 400) return reject(resp.statusCode)
+        resolve(body)
+      })
   })
 }
 
-const cacheData = ({ results, ...rest }) => {
-  cachedData = results
-  otherQueryResult = rest
-  fs.writeFile(CACHE_DATASET_FILENAME, JSON.stringify(results), (err) => {
-    if (err) console.error('writing cached data fail')
-  })
-  return cachedData
+const refreshCache = async () => {
+  await lruStore._initPr
+  const { store } = lruStore
+  store.set(IAV_DS_REFRESH_TIMESTAMP_KEY, new Date().toString())
+  const text = await fetchDatasetFromKg()
+  await store.set(IAV_DS_CACHE_KEY, text)
+  await store.set(IAV_DS_REFRESH_TIMESTAMP_KEY, null)
+  await store.set(IAV_DS_TIMESTAMP_KEY, new Date().toString())
 }
-
-let fetchingPublicDataInProgress = false
-let getPublicDsPr
 
 const getPublicDs = async () => {
   console.log(`fetching public ds ...`)
+  
+  await lruStore._initPr
+  const { store } = lruStore
 
-  /**
-   * every request to public ds will trigger a refresh pull from master KG (throttled pending on resolved request)
-   */
-  if (!fetchingPublicDataInProgress) {
-    fetchingPublicDataInProgress = true
-    getPublicDsPr = fetchDatasetFromKg()
-      .then(_ => {
-        console.log(`public ds fetched!`)
-        fetchingPublicDataInProgress = false
-        getPublicDsPr = null
-        return _
-      })
-      .then(cacheData)
+  let cachedData = await store.get(IAV_DS_CACHE_KEY)
+  if (!cachedData) {
+    await refreshCache()
+    cachedData = await store.get(IAV_DS_CACHE_KEY)
   }
 
-  if (cachedData) return Promise.resolve(cachedData)
-  if (getPublicDsPr) return getPublicDsPr
-  throw `cached Data not yet resolved, neither is get public ds defined`
+  const timestamp = await store.get(IAV_DS_TIMESTAMP_KEY)
+  const refreshTimestamp = await store.get(IAV_DS_REFRESH_TIMESTAMP_KEY)
+  
+  if (
+    new Date() - new Date(timestamp) > 1e3 * 60 * 30
+  ) {
+    if (
+      !refreshTimestamp ||
+      new Date() - new Date(refreshTimestamp) > 1e3 * 60 * 5
+    ) {
+      refreshCache()
+    }
+  }
+  if (cachedData) {
+    const { results } = JSON.parse(cachedData)
+    return Promise.resolve(results)
+  }
+  throw new Error(`cacheData not defined!`)
 }
 
 /**
@@ -113,7 +101,9 @@ const getPublicDs = async () => {
  * getting individual ds is too slow
  */
 const getDs = ({ user }) => (false && user
-    ? fetchDatasetFromKg({ user }).then(({ results }) => results)
+    ? fetchDatasetFromKg({ user })
+        .then(text => JSON.parse(text))
+        .then(({ results }) => results)
     : getPublicDs()
   ).then(async datasets => {
     

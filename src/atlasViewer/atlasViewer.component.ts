@@ -8,29 +8,25 @@ import {
   TemplateRef,
   ViewChild,
   ElementRef,
-  Inject,
-  Optional,
-  InjectionToken,
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { Observable, Subscription, combineLatest, interval, merge, of, timer, fromEvent } from "rxjs";
+import { Observable, Subscription, interval, merge, of, timer, fromEvent } from "rxjs";
 import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
 
-import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
   IavRootStoreInterface,
   isDefined,
   safeFilter,
 } from "../services/stateStore.service";
-import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
+import { UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "src/util/constants";
 import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { AGREE_COOKIE, AGREE_KG_TOS } from "src/services/state/uiState.store";
+import { SHOW_KG_TOS } from 'src/services/state/uiState.store.helper'
 import { isSame } from "src/util/fn";
-import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
-import { MouseHoverDirective } from "src/atlasViewer/mouseOver.directive";
+import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS, CONST } from 'common/constants'
@@ -38,13 +34,7 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
-import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateHelperSelectParcellationWithId } from "src/services/state/viewerState.store.helper";
-import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
-import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
-import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { ClickInterceptorService } from "src/glue";
-import {SET_OVERWRITTEN_COLOR_MAP} from "src/services/state/viewerState.store";
 
 /**
  * TODO
@@ -73,9 +63,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
-  @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
-
-  @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
@@ -88,19 +75,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
 
-  public selectedRegions$: Observable<any[]>
-  public selectedPOI$: Observable<any[]>
-
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
 
-  public dedicatedView$: Observable<string | null>
-  public onhoverSegments: any[]
-  public onhoverSegments$: Observable<any[]>
-
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
-
-  public overwrittenColorMap$: Observable<any>
 
   private subscriptions: Subscription[] = []
 
@@ -109,39 +87,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
 
-  public isStandaloneVolumes$ = this.store.pipe(
-    select(viewerStateStandAloneVolumes),
-    map(v => v.length > 0)
-  )
-
-  public selectedAdditionalLayers$ = this.store.pipe(
-    select(viewerStateGetOverlayingAdditionalParcellations),
-  )
-
-  public selectedLayerVersions$ = this.store.pipe(
-    select(viewerStateParcVersionSelector),
-    map(arr => arr.map(item => {
-      const overwrittenName = item['@version'] && item['@version']['name']
-      return overwrittenName
-        ? { ...item, displayName: overwrittenName }
-        : item
-    }))
-  )
-
   private selectedParcellation$: Observable<any>
   public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
   private kgTosDialogRef: MatDialogRef<any>
 
-  public clearViewKeys$ = this.store.pipe(
-    select(ngViewerSelectorClearViewEntries)
-  )
-
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
-    private constantsService: AtlasViewerConstantsServices,
     private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
@@ -164,58 +118,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(state => state.focusedSidePanel),
     )
 
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.regionsSelected)),
-      map(state => state.regionsSelected),
-      distinctUntilChanged(),
-    )
-
-    this.selectedPOI$ = combineLatest(
-      this.selectedRegions$,
-      this.store.pipe(
-        select('viewerState'),
-        filter(state => isDefined(state) && isDefined(state.landmarksSelected)),
-        map(state => state.landmarksSelected),
-        distinctUntilChanged(),
-      ),
-    ).pipe(
-      map(results => [...results[0], ...results[1]]),
-    )
-
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
       select('templateSelected'),
       distinctUntilChanged(isSame),
-    )
-
-    // TODO deprecate
-    this.dedicatedView$ = this.store.pipe(
-      select('viewerState'),
-      select('dedicatedView'),
-      distinctUntilChanged(),
-      map(v => v[v.length -1])
-    )
-
-    // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegments$ = this.store.pipe(
-      select(uiStateMouseOverSegmentsSelector),
-      filter(v => !!v),
-      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
-      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-
-    ).pipe(
-      withLatestFrom(
-        this.onhoverLandmark$ || of(null)
-      ),
-      map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
-      map(segments => {
-        if (!segments) { return null }
-        const filteredSeg = segments.filter(filterFn)
-        return filteredSeg.length > 0
-          ? segments.map(s => s.segment)
-          : null
-      }),
     )
 
     this.selectedParcellation$ = this.store.pipe(
@@ -232,13 +138,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     )
 
-    this.overwrittenColorMap$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('overwrittenColorMap'),
-      map(state => state.overwrittenColorMap),
-      distinctUntilChanged()
-    )
-
     const error = this.el.nativeElement.getAttribute('data-error')
 
     if (error) {
@@ -249,7 +148,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
-    this.clickIntService.addInterceptor(this.selectHoveredRegion.bind(this), true)
 
     if (KIOSK_MODE) {
 
@@ -292,10 +190,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.onhoverSegments$.subscribe(seg => this.onhoverSegments = seg)
-    )
-
-    this.subscriptions.push(
       this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
     )
 
@@ -325,13 +219,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.sidePanelView$.pipe(
-        filter(() => typeof this.layoutMainSide !== 'undefined'),
-      ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v)),
-    )
-
-    this.subscriptions.push(
-      this.constantsService.darktheme$.subscribe(flag => {
+      this.pureConstantService.darktheme$.subscribe(flag => {
         this.rd.setAttribute(document.body, 'darktheme', flag.toString())
       }),
     )
@@ -351,9 +239,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.rd.appendChild(document.head, prefecthMainBundle)
     }
 
-    this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
-      select('landmark')
-    )
+    // this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
+    //   select('landmark')
+    // )
 
     /**
      * Show Cookie disclaimer if not yet agreed
@@ -389,62 +277,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
-    this.clickIntService.removeInterceptor(this.selectHoveredRegion.bind(this))
   }
 
-  private selectHoveredRegion(ev: any, next: Function){
-    if (!this.onhoverSegments) return
-      
-    this.store.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: this.onhoverSegments.slice(0, 1)
-      })
-    )
-    next()
-  }
-
-  public unsetClearViewByKey(key: string){
-    this.store.dispatch(
-      ngViewerActionClearView({ payload: {
-        [key]: false
-      }})
-    )
-  }
-
-  public selectParcellation(parc: any) {
-    this.store.dispatch(
-      viewerStateHelperSelectParcellationWithId({
-        payload: parc
-      })
-    )
-  }
-
-  public bindFns(fns){
-    return () => {
-      for (const [ fn, ...arg] of fns) {
-        fn(...arg)
-      }
-    }
-  }
-
-  public clearAdditionalLayer(layer: { ['@id']: string }){
-    this.store.dispatch(
-      viewerStateRemoveAdditionalLayer({
-        payload: layer
-      })
-    )
-  }
-
-  public clearSelectedRegions(){
-    this.store.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: []
-      })
-    )
-  }
-
-  public mouseClickDocument(_event: MouseEvent) {
-    this.clickIntService.run(_event)
+  public mouseClickDocument(event: MouseEvent) {
+    this.clickIntService.callRegFns(event)
   }
 
   /**
@@ -480,6 +316,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: AGREE_COOKIE,
     })
+  }
+
+  public quickTourFinale = {
+    order: 1e6,
+    descriptionMd: `That's it! We hope you enjoy your stay.
+
+---
+
+If you have any comments or need further support, please contact us at [${this.pureConstantService.supportEmailAddress}](mailto:${this.pureConstantService.supportEmailAddress})`,
+    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.pureConstantService.supportEmailAddress}`,
+    position: 'center'
   }
 
   @HostBinding('attr.version')

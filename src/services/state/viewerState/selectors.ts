@@ -18,7 +18,7 @@ const flattenFetchedTemplatesIntoParcellationsReducer = (acc, curr) => {
       useTheme: curr['useTheme']
     }
   })
-  
+
   return acc.concat( parcelations )
 }
 
@@ -29,7 +29,12 @@ export const viewerStateFetchedTemplatesSelector = createSelector(
 
 export const viewerStateSelectedTemplateSelector = createSelector(
   state => state['viewerState'],
-  viewerState => viewerState['templateSelected']
+  viewerState => viewerState?.['templateSelected']
+)
+
+export const viewerStateSelectorStandaloneVolumes = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['standaloneVolumes']
 )
 
 /**
@@ -84,6 +89,11 @@ export const viewerStateStandAloneVolumes = createSelector(
 export const viewerStateSelectorNavigation = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['navigation']
+)
+
+export const viewerStateViewerModeSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['viewerMode']
 )
 
 export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
@@ -200,5 +210,22 @@ export const viewerStateSelectedTemplateFullInfoSelector = createSelector(
         darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
       }
     })
-  } 
+  }
+)
+
+export const viewerStateContextedSelectedRegionsSelector = createSelector(
+  viewerStateSelectedRegionsSelector,
+  viewerStateGetSelectedAtlas,
+  viewerStateSelectedTemplatePureSelector,
+  viewerStateSelectedParcellationSelector,
+  (regions, atlas, template, parcellation) => regions.map(r => {
+    return {
+      ...r,
+      context: {
+        atlas,
+        template,
+        parcellation
+      }
+    }
+  })
 )

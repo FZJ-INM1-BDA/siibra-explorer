@@ -1,0 +1,1 @@
+export { AtlasViewerRouterModule } from './module'

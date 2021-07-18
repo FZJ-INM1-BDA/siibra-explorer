@@ -25,15 +25,15 @@
   }
 
   const HEMISPHERE = {
-    LEFT_HEMISPHERE: `left hemisphere`,
-    RIGHT_HEMISPHERE: `right hemisphere`
+    LEFT_HEMISPHERE: `left`,
+    RIGHT_HEMISPHERE: `right`
   }
 
   exports.getRegionHemisphere = region => {
     if (!region) return null
-    return (region.name && region.name.includes('- right hemisphere') || (!!region.status && region.status.includes('right hemisphere')))
+    return (region.name && region.name.includes(' right') || (!!region.status && region.status.includes('right')))
       ? HEMISPHERE.RIGHT_HEMISPHERE
-      : (region.name && region.name.includes('- left hemisphere') || (!!region.status && region.status.includes('left hemisphere')))
+      : (region.name && region.name.includes(' left') || (!!region.status && region.status.includes('left')))
         ? HEMISPHERE.LEFT_HEMISPHERE
         : null
   }
@@ -51,14 +51,13 @@
    *
    * https://stackoverflow.com/a/16348977/6059235
    */
-  exports.intToRgb = int => {
-    if (int >= 65500) {
-      return [255, 255, 255]
-    }
-    const str = String(int * 65535)
+  exports.strToRgb = str => {
+    if (typeof str !== 'string') throw new Error(`strToRgb input must be typeof string !`)
+
     let hash = 0
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    // run at least 2 cycles, or else, len 1 string does not get hashed well
+    for (let i = 0; i < str.length || i < 5; i++) {
+      hash = str.charCodeAt(i % str.length) + ((hash << 5) - hash);
     }
     const returnV = []
     for (let i = 0; i < 3; i++) {
@@ -76,6 +75,13 @@
   }
 
   exports.getIdObj = getIdObj
+
+  exports.getIdFromKgIdObj = kg => {
+    if(kg.kgId && kg.kgSchema) {
+      return `${kg.kgSchema}/${kg.kgId}`
+    }
+    return null
+  }
 
   exports.getIdFromFullId = fullId => {
     const idObj = getIdObj(fullId)
@@ -128,7 +134,7 @@
         await (() => new Promise(rs => setTimeout(rs, timeout)))()
       }
     }
-  
+
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
   const flattenRegions = regions => regions.concat(
@@ -180,4 +186,58 @@
       )
     )
   }
+
+  exports.serialiseParcellationRegion = ({ ngId, labelIndex }) => {
+    if (!ngId) {
+      throw new Error(`#serialiseParcellationRegion error: ngId must be defined`)
+    }
+
+    if (!labelIndex) {
+      throw new Error(`#serialiseParcellationRegion error labelIndex must be defined`)
+    }
+
+    return `${ngId}#${labelIndex}`
+  }
+
+  const deserialiseParcRegionId = labelIndexId => {
+    const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
+    const ngId = _.length > 1
+      ? _[0]
+      : null
+    const labelIndex = _.length > 1
+      ? Number(_[1])
+      : _.length === 0
+        ? null
+        : Number(_[0])
+    return { labelIndex, ngId }
+  }
+
+  exports.deserialiseParcRegionId = deserialiseParcRegionId
+
+  exports.deserialiseParcellationRegion = ({ region, labelIndexId, inheritedNgId = 'root' }) => {
+    const { labelIndex, ngId } = deserialiseParcRegionId(labelIndexId)
+  }
+
+  const getPad = ({ length, pad }) => {
+    if (pad.length !== 1) throw new Error(`pad needs to be precisely 1 character`)
+    return input => {
+      const padNum = Math.max(input.toString().length - length, 0)
+      const padString = Array(padNum).fill(pad).join('')
+      return `${padString}${input}`
+    }
+  }
+
+  exports.getDateString = () => {
+    const d = new Date()
+    const pad2 = getPad({ pad: '0', length: 2 })
+
+    const year = d.getFullYear()
+    const month = d.getMonth() + 1
+    const date = d.getDate()
+
+    const hr = d.getHours()
+    const min = d.getMinutes()
+    return `${year}${pad2(month)}${pad2(date)}_${pad2(hr)}${pad2(min)}`
+  }
+
 })(typeof exports === 'undefined' ? module.exports : exports)

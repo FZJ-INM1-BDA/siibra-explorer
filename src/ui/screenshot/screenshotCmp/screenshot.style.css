@@ -1,0 +1,30 @@
+:host
+{
+  display: block;
+  width:100%;
+}
+
+.cover
+{
+  background-color: rgba(0,0,0, 0.5);
+}
+
+.box
+{
+  /* background: none; */
+  box-sizing: content-box;
+  width: 0;
+  height: 0;
+  transform-origin: top left;
+}
+
+.inner-box
+{
+  border: 1px white solid;
+}
+
+img
+{
+  max-width: 50vw;
+  min-width: 20vw;
+}

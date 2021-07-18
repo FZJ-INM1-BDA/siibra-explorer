@@ -3,7 +3,7 @@ import { IRegion } from './constants'
 
 export const viewerStateNewViewer = createAction(
   `[viewerState] newViewer`,
-  props<{ 
+  props<{
     selectTemplate: any
     selectParcellation: any
     navigation?: any
@@ -25,6 +25,10 @@ export const viewerStateSetConnectivityRegion = createAction(
   props<{ connectivityRegion: any }>()
 )
 
+export const viewerStateNehubaLayerchanged = createAction(
+  `[viewerState] nehubaLayerChanged`,
+)
+
 export const viewerStateNavigateToRegion = createAction(
   `[viewerState] navigateToRegion`,
   props<{ payload: { region: any } }>()
@@ -42,7 +46,14 @@ export const viewerStateSetFetchedAtlases = createAction(
 
 export const viewerStateSelectAtlas = createAction(
   `[viewerState] selectAtlas`,
-  props<{ atlas: { ['@id']: string } }>()
+  props<{
+    atlas: {
+      ['@id']: string
+      template?: {
+        ['@id']: string
+      }
+    }
+  }>()
 )
 
 export const viewerStateHelperSelectParcellationWithId = createAction(
@@ -56,7 +67,7 @@ export const viewerStateSelectParcellation = createAction(
 )
 
 export const viewerStateSelectTemplateWithName = createAction(
-  `[viewerState] selectTemplateWithName`, 
+  `[viewerState] selectTemplateWithName`,
   props<{ payload: { name: string } }>()
 )
 
@@ -77,7 +88,12 @@ export const viewerStateRemoveAdditionalLayer = createAction(
 
 export const viewerStateSelectRegionWithIdDeprecated = createAction(
   `[viewerState] [deprecated] selectRegionsWithId`,
-  props<{ selectRegionIds: number[] }>()
+  props<{ selectRegionIds: string[] }>()
+)
+
+export const viewerStateSetViewerMode = createAction(
+  `[viewerState] setViewerMode`,
+  props<{payload: string}>()
 )
 
 export const viewerStateDblClickOnViewer = createAction(
@@ -108,4 +124,23 @@ export const viewerStateMouseOverCustomLandmarkInPerspectiveView = createAction(
 export const viewerStateChangeNavigation = createAction(
   `[viewerState] changeNavigation`,
   props<{ navigation: any }>()
+)
+
+export const actionSetMobileUi = createAction(
+  `[viewerState] setMobileUi`,
+  props<{ payload: { useMobileUI: boolean } }>()
+)
+
+export const actionAddToRegionsSelectionWithIds = createAction(
+  `[viewerState] addToRegionSelectionWithIds`,
+  props<{
+    selectRegionIds: string[]
+  }>()
+)
+
+export const actionSelectLandmarks = createAction(
+  `[viewerState] selectLandmarks`,
+  props<{
+    landmarks: any[]
+  }>()
 )

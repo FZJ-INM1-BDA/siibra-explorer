@@ -3,10 +3,10 @@
  */
 
 import { Action } from '@ngrx/store'
-import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { LOCAL_STORAGE_CONST } from 'src/util/constants'
-import { datastateActionUpdateFavDataset } from './dataState/actions'
+import { datastateActionFetchedDataentries, datastateActionUpdateFavDataset } from './dataState/actions'
 import { IHasId } from 'src/util/interfaces'
+import { generalApplyState } from '../stateStore.helper'
 
 /**
  * TODO merge with databrowser.usereffect.ts
@@ -44,6 +44,7 @@ export const defaultState = {
 export const getStateStore = ({ state: state = defaultState } = {}) => (prevState: IStateInterface = state, action: Partial<IActionInterface>) => {
 
   switch (action.type) {
+  case datastateActionFetchedDataentries.type:
   case FETCHED_DATAENTRIES: {
     return {
       ...prevState,
@@ -63,7 +64,7 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
       favDataEntries,
     }
   }
-  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+  case generalApplyState.type: {
     const { dataStore } = (action as any).state
     return dataStore
   }

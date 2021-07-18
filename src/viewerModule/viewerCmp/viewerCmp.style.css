@@ -1,0 +1,52 @@
+:host
+{
+  position: relative;
+}
+
+.explore-btn
+{
+  margin-top: 4.5rem;
+}
+
+.region-text-search-autocomplete-position
+{
+  z-index: 10;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.tab-toggle-container
+{
+  margin-top: 1.5rem;
+}
+
+
+.tab-toggle
+{
+  margin-left: -2rem;
+  padding-right: 0.75rem;
+  margin-right: 1rem;
+  text-align: right;
+}
+
+.accordion-icon
+{
+  width:1.5rem;
+}
+
+.collapse-position
+{
+  z-index: 10;
+  position: sticky;
+  bottom: 0.5rem;
+}
+
+:host >>> .mat-chip-list-wrapper
+{
+  flex-wrap: nowrap;
+}
+
+mat-drawer
+{
+  overflow-x: hidden;
+}

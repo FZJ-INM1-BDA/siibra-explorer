@@ -7,13 +7,12 @@ import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { getViewer } from 'src/util/fn';
 import { LoggingService } from 'src/logging';
-import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
+import { IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { CLOSE_SIDE_PANEL } from './uiState.store';
-import { 
+import {
   viewerStateSetSelectedRegions,
   viewerStateSetConnectivityRegion,
-  viewerStateSelectAtlas,
   viewerStateSelectParcellation,
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateCustomLandmarkSelector,
@@ -24,8 +23,14 @@ import {
   viewerStateMouseOverCustomLandmarkInPerspectiveView,
   viewerStateNewViewer
 } from './viewerState.store.helper';
-import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
-import { viewerStateChangeNavigation } from './viewerState/actions';
+import { cvtNehubaConfigToNavigationObj } from 'src/state';
+import {
+  viewerStateChangeNavigation,
+  viewerStateNehubaLayerchanged,
+  viewerStateSetViewerMode,
+  actionSelectLandmarks
+} from './viewerState/actions';
+import { serialiseParcellationRegion } from "common/util"
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -33,6 +38,8 @@ export interface StateInterface {
   templateSelected: any | null
   parcellationSelected: any | null
   regionsSelected: any[]
+
+  viewerMode: string
 
   landmarksSelected: any[]
   userLandmarks: IUserLandmark[]
@@ -75,6 +82,7 @@ export const defaultState: StateInterface = {
   fetchedTemplates : [],
   loadedNgLayers: [],
   regionsSelected: [],
+  viewerMode: null,
   userLandmarks: [],
   dedicatedView: null,
   navigation: null,
@@ -111,7 +119,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       standaloneVolumes: []
     }
-  case NEWVIEWER: {
+  case viewerStateNewViewer.type: {
 
     const {
       selectParcellation: parcellation,
@@ -163,13 +171,19 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       regionsSelected: selectRegions,
     }
   }
+  case viewerStateSetViewerMode.type: {
+    return {
+      ...prevState,
+      viewerMode: action.payload
+    }
+  }
   case DESELECT_LANDMARKS : {
     return {
       ...prevState,
       landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0),
     }
   }
-  case SELECT_LANDMARKS : {
+  case actionSelectLandmarks.type: {
     return {
       ...prevState,
       landmarksSelected : action.landmarks,
@@ -185,7 +199,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
      * TODO
      * duplicated with ngViewerState.layers ?
      */
-  case NEHUBA_LAYER_CHANGED: {
+  case viewerStateNehubaLayerchanged.type: {
     const viewer = getViewer()
     if (!viewer) {
       return {
@@ -223,7 +237,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     return {
       ...prevState,
       overwrittenColorMap: action.payload || '',
-    }  
+    }
   default :
     return prevState
   }
@@ -245,23 +259,19 @@ export function stateStore(state, action) {
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
-export const NEWVIEWER = viewerStateNewViewer.type
-
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
 
 export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
-export const SELECT_REGIONS = `SELECT_REGIONS`
 export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
+// export const SET_VIEWER_MODE = viewerStateSetViewerMode.type
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
+export const SELECT_REGIONS = viewerStateSetSelectedRegions.type
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
 
-export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
-
-export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
 export const SET_OVERWRITTEN_COLOR_MAP = `SET_OVERWRITTEN_COLOR_MAP`
@@ -378,8 +388,8 @@ export class ViewerStateUseEffect {
         startWith([]),
       )),
       map(([{ segments }, regionsSelected]) => {
-        const selectedSet = new Set(regionsSelected.map(generateLabelIndexId))
-        const toggleArr = segments.map(({ segment, layer }) => generateLabelIndexId({ ngId: layer.name, ...segment }))
+        const selectedSet = new Set<string>(regionsSelected.map(serialiseParcellationRegion))
+        const toggleArr = segments.map(({ segment, layer }) => serialiseParcellationRegion({ ngId: layer.name, ...segment }))
 
         const deleteFlag = toggleArr.some(id => selectedSet.has(id))
 
@@ -387,10 +397,9 @@ export class ViewerStateUseEffect {
           if (deleteFlag) { selectedSet.delete(id) } else { selectedSet.add(id) }
         }
 
-        return {
-          type: SELECT_REGIONS_WITH_ID,
+        return viewerStateSelectRegionWithIdDeprecated({
           selectRegionIds: [...selectedSet],
-        }
+        })
       }),
     )
 
@@ -408,10 +417,9 @@ export class ViewerStateUseEffect {
           ? selectedSpatialDatas.filter((_, idx) => idx !== selectedIdx)
           : selectedSpatialDatas.concat(landmark)
 
-        return {
-          type: SELECT_LANDMARKS,
+        return actionSelectLandmarks({
           landmarks: newSelectedSpatialDatas,
-        }
+        })
       }),
     )
 

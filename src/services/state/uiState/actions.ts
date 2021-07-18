@@ -24,6 +24,16 @@ export const uiStateShowBottomSheet = createAction(
   props<{ bottomSheetTemplate: TemplateRef<unknown>, config?: MatBottomSheetConfig }>()
 )
 
+export const uiActionMouseoverLandmark = createAction(
+  `[uiState] mouseoverLandmark`,
+  props<{ landmark: any }>()
+)
+
+export const uiActionMouseoverSegments = createAction(
+  `[uiState] mouseoverSegments`,
+  props<{ segments: any[] }>()
+)
+
 export const uiActionSetPreviewingDatasetFiles = createAction(
   `[uiState] setDatasetPreviews`,
   props<{previewingDatasetFiles: {datasetId: string, filename: string}[]}>()
@@ -45,4 +55,9 @@ export const uiActionHideDatasetWithId = createAction(
 
 export const uiActionHideAllDatasets = createAction(
   `[uiState] hideAllDatasets`
+)
+
+export const uiActionSnackbarMessage = createAction(
+  `[uiState] snackbarMessage`,
+  props<{snackbarMessage: string}>()
 )

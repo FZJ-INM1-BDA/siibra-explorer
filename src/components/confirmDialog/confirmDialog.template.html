@@ -3,9 +3,16 @@
 </h1>
 
 <mat-dialog-content>
-  <p>
-    {{ message }}
-  </p>
+  <ng-template [ngIf]="markdown" [ngIfElse]="stringMessageTmpl">
+    <markdown-dom [markdown]="markdown">
+    </markdown-dom>
+  </ng-template>
+
+  <ng-template #stringMessageTmpl>
+    <p>
+      {{ message }}
+    </p>
+  </ng-template>
 </mat-dialog-content>
 
 <mat-divider></mat-divider>

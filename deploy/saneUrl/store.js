@@ -17,35 +17,10 @@ const {
   HBP_V2_REFRESH_TOKEN,
   HBP_V2_ACCESS_TOKEN,
 
-  REDIS_PROTO,
-  REDIS_ADDR,
-  REDIS_PORT,
-
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT,
-
-  REDIS_USERNAME,
-  REDIS_PASSWORD,
-
   DATA_PROXY_URL,
   DATA_PROXY_BUCKETNAME,
 
 } = process.env
-
-const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO || 'redis'
-const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
-const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
-
-const userPass = (() => {
-  let returnString = ''
-  if (REDIS_USERNAME) returnString += REDIS_USERNAME
-  if (REDIS_PASSWORD) returnString += `:${REDIS_PASSWORD}`
-  if (returnString.length > 0) returnString += `@`
-  return returnString
-})()
-
-const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
 
 class NotFoundError extends Error{}
 
@@ -78,8 +53,21 @@ function _checkValid(urlString){
   return (new Date() - new Date(expiry)) < 1e3 * 10
 }
 
+class FallbackStore {
+  async get(){
+    throw new Error(`saneurl is currently offline for maintainence.`)
+  }
+  async set(){
+    throw new Error(`saneurl is currently offline for maintainence.`)
+  }
+  async healthCheck() {
+    return false
+  }
+}
+
 class Store {
   constructor(){
+    throw new Error(`Not implemented`)
 
     this.healthFlag = false
     this.seafileHandle = null
@@ -427,6 +415,6 @@ class Store {
   }
 }
 
-
+exports.FallbackStore = FallbackStore
 exports.Store = Store
 exports.NotFoundError = NotFoundError

@@ -35,3 +35,8 @@ export const ngViewerSelectorNehubaReady = createSelector(
   state => state['ngViewerState'],
   ngViewerState => ngViewerState.nehubaReady
 )
+
+export const ngViewerSelectorLayers = createSelector(
+  state => state['ngViewerState'],
+  ngViewerState => ngViewerState?.layers || []
+)

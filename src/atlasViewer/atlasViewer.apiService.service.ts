@@ -6,18 +6,21 @@ import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
-import { viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors";
+import {
+  viewerStateFetchedTemplatesSelector,
+  viewerStateViewerModeSelector
+} from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
   IavRootStoreInterface,
   safeFilter
 } from "src/services/stateStore.service";
-import { FRAGMENT_EMIT_RED } from "src/ui/nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
-import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
-import { IPluginManifest, PluginServices } from "./pluginUnit";
+import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
+import { IPluginManifest, PluginServices } from "src/plugin";
+import { ILoadMesh } from 'src/messaging/types'
+import {ARIA_LABELS} from "common/constants";
 
 declare let window
 
@@ -35,14 +38,6 @@ interface IGetUserSelectRegionPr{
 }
 
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
-export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
-
-export interface ILoadMesh {
-  type: 'VTK'
-  id: string
-  url: string
-}
-export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
 
 @Injectable({
   providedIn : 'root'
@@ -79,7 +74,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
   public getNextUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
     if (this.getUserToSelectRegion.length > 0) {
       return this.getUserToSelectRegion[this.getUserToSelectRegion.length - 1]
-    } 
+    }
     else return null
   }
 
@@ -87,15 +82,15 @@ export class AtlasViewerAPIServices implements OnDestroy{
     if (this.getUserToSelectRegion.length > 0) {
       this.getUserToSelectRegion.pop()
       this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
-    } 
+    }
   }
 
   private s: Subscription[] = []
 
-  private onMouseClick(ev: any, next){
+  private onMouseClick(ev: any): boolean {
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
-      
+
       let moSegments
       this.store.pipe(
         select(uiStateMouseOverSegmentsSelector),
@@ -121,10 +116,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
                 mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
               })
           }
-          return rs({
+          rs({
             type: spec.type,
             payload: mousePositionReal
           })
+          return false
         }
 
         /**
@@ -134,10 +130,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
           if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
             this.popUserRegionSelectHandler()
-            return rs({
+            rs({
               type: spec.type,
               payload: moSegments
             })
+            return false
           }
         }
       } else {
@@ -147,11 +144,12 @@ export class AtlasViewerAPIServices implements OnDestroy{
          */
         if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
           this.popUserRegionSelectHandler()
-          return rs(moSegments[0])
+          rs(moSegments[0])
+          return false
         }
       }
     }
-    next()
+    return true
   }
 
   constructor(
@@ -161,7 +159,6 @@ export class AtlasViewerAPIServices implements OnDestroy{
     private zone: NgZone,
     private pluginService: PluginServices,
     @Optional() @Inject(CANCELLABLE_DIALOG) openCancellableDialog: (message: string, options: any) => () => void,
-    @Optional() @Inject(GET_TOAST_HANDLER_TOKEN) private getToastHandler: Function,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor
   ) {
     if (clickInterceptor) {
@@ -179,7 +176,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
               this.dismissDialog()
               this.dismissDialog = null
             }
-            
+
             if (arr.length === 0) return of(null)
 
             const last = arr[arr.length - 1]
@@ -255,39 +252,12 @@ export class AtlasViewerAPIServices implements OnDestroy{
       },
       uiHandle : {
         getModalHandler : () => {
-          const handler = new ModalHandler()
-          let modalRef
-          handler.show = () => {
-            /**
-             * TODO enable
-             * temporarily disabled
-             */
-            // modalRef = this.modalService.show(ModalUnit, {
-            //   initialState : {
-            //     title : handler.title,
-            //     body : handler.body
-            //       ? handler.body
-            //       : 'handler.body has yet been defined ...',
-            //     footer : handler.footer
-            //   },
-            //   class : this.darktheme ? 'darktheme' : 'not-darktheme',
-            //   backdrop : handler.dismissable ? true : 'static',
-            //   keyboard : handler.dismissable
-            // })
-          }
-          handler.hide = () => {
-            if (modalRef) {
-              modalRef.hide()
-              modalRef = null
-            }
-          }
-          return handler
+          throw new Error(`uihandle.getModalHandler has been deprecated`)
         },
 
         /* to be overwritten by atlasViewer.component.ts */
         getToastHandler : () => {
-          if (this.getToastHandler) return this.getToastHandler()
-          else throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
+          throw new Error('uiHandle.getToastHandler has been deprecated')
         },
 
         /**
@@ -381,7 +351,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
     })
 
     this.s.push(
-      this.loadMesh$.subscribe(({ url, id, type }) => {
+      this.loadMesh$.subscribe(({ url, id, type, customFragmentColor = null }) => {
         if (!this.interactiveViewer.viewerHandle) {
           this.snackbar.open('No atlas loaded! Loading mesh failed!', 'Dismiss')
         }
@@ -389,7 +359,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
           [id]: {
             type: 'mesh',
             source: `vtk://${url}`,
-            shader: `void main(){${FRAGMENT_EMIT_RED};}`
+            shader: `void main(){${customFragmentColor || FRAGMENT_EMIT_RED};}`
           }
         })
       })
@@ -416,43 +386,11 @@ export interface IInteractiveViewerInterface {
     datasetsBSubject: Observable<any[]>
   }
 
-  viewerHandle?: {
-    setNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
-    moveToNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
-    setNavigationOri: (quat: [number, number, number, number]) => void
-    moveToNavigationOri: (quat: [number, number, number, number]) => void
-    showSegment: (labelIndex: number) => void
-    hideSegment: (labelIndex: number) => void
-    showAllSegments: () => void
-    hideAllSegments: () => void
-
-    // TODO deprecate
-    segmentColourMap: Map<number, {red: number, green: number, blue: number}>
-
-    getLayersSegmentColourMap: () => Map<string, Map<number, {red: number, green: number, blue: number}>>
-
-    // TODO deprecate
-    applyColourMap: (newColourMap: Map<number, {red: number, green: number, blue: number}>) => void
-
-    applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red: number, green: number, blue: number}>>) => void
-
-    loadLayer: (layerobj: any) => any
-    removeLayer: (condition: {name: string | RegExp}) => string[]
-    setLayerVisibility: (condition: {name: string|RegExp}, visible: boolean) => void
-
-    add3DLandmarks: (landmarks: IUserLandmark[]) => void
-    remove3DLandmarks: (ids: string[]) => void
-
-    mouseEvent: Observable<{eventName: string, event: MouseEvent}>
-    mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
-    mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-    mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
-    getNgHash: () => string
-  }
+  viewerHandle?: IVIewerHandle
 
   uiHandle: {
-    getModalHandler: () => ModalHandler
-    getToastHandler: () => ToastHandler
+    getModalHandler: () => void
+    getToastHandler: () => void
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
@@ -495,8 +433,39 @@ export interface ICustomRegionSpec{
   type: string // type of EnumCustomRegion
 }
 
-export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle) => void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
+export interface IVIewerHandle {
+
+  setNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
+  moveToNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
+  setNavigationOri: (quat: [number, number, number, number]) => void
+  moveToNavigationOri: (quat: [number, number, number, number]) => void
+  showSegment: (labelIndex: number) => void
+  hideSegment: (labelIndex: number) => void
+  showAllSegments: () => void
+  hideAllSegments: () => void
+
+  getLayersSegmentColourMap: () => Map<string, Map<number, {red: number, green: number, blue: number}>>
+
+  applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red: number, green: number, blue: number}>>) => void
+
+  loadLayer: (layerobj: any) => any
+  removeLayer: (condition: {name: string | RegExp}) => string[]
+  setLayerVisibility: (condition: {name: string|RegExp}, visible: boolean) => void
+
+  add3DLandmarks: (landmarks: IUserLandmark[]) => void
+  remove3DLandmarks: (ids: string[]) => void
+
+  mouseEvent: Observable<{eventName: string, event: MouseEvent}>
+  mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
+  mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
+  mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
+  getNgHash: () => string
+}
+
+export type TSetViewerHandle = (viewerHandle: IVIewerHandle) => void
+
+export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<TSetViewerHandle>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
 
 export const setViewerHandleFactory = (apiService: AtlasViewerAPIServices) => {
-  return viewerHandle => apiService.interactiveViewer.viewerHandle = viewerHandle
+  return (viewerHandle: IVIewerHandle) => apiService.interactiveViewer.viewerHandle = viewerHandle
 }

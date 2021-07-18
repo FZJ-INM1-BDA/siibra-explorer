@@ -1,0 +1,14 @@
+<fieldset>
+  <legend class="sr-only">
+    Dataset modalities
+  </legend>
+
+  <mat-checkbox
+    
+    [checked]="datamodality.visible"
+    (change)="toggleModality(datamodality)"
+    [ngClass]="{'muted': datamodality.occurance === 0}"
+    *ngFor="let datamodality of countedDataM | sortModalityAlphabetically">
+    {{ datamodality.name }} <span class="text-muted">({{ datamodality.occurance }})</span>
+  </mat-checkbox>
+</fieldset>

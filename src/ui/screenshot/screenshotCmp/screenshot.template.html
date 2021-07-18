@@ -1,0 +1,74 @@
+
+<ng-template #placeholderTmpl>
+
+  <div class="d-flex align-items-center justify-content-center w-100 h-100 cover">
+    <span class="iv-custom-comp text">
+      <h2 class="mat-h2 text-center">
+        <span>
+          Drag a box to take a screenshot or
+        </span>
+
+        <button mat-stroked-button iav-stop="mousedown mouseup"
+          (click)="captureScreenshot()">
+          <i class="fas fa-camera"></i>
+          <span class="ml-1">
+            capture whole screen
+          </span>
+        </button>
+      </h2>
+
+      <h3 class="mat-h3 text-center">
+        <span>
+          cancel with Esc or
+        </span>
+        <button iav-stop="mousedown mouseup"
+          (click)="destroy.emit()"
+          mat-button>
+          click here
+        </button>
+      </h3>
+    </span>
+  </div>
+
+</ng-template>
+
+<ng-template [ngIf]="isDragging$ | async" [ngIfElse]="placeholderTmpl">
+  <div [style.border]="borderStyle"
+    [style.transform]="(transformString$ | async)"
+    [style.width]="widthString$ | async"
+    [style.height]="heightString$ | async"
+    class="box">
+    <div class="inner-box h-100 w-100">
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #previewTmpl let-data>
+  
+  <mat-dialog-content class="d-flex justify-content-center">
+    <img [src]="data.url | safeResource">
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <a [href]="data.url | safeResource"
+      [download]="data.download"
+      mat-raised-button color="primary">
+      <i class="fas fa-save"></i>
+      <span class="ml-1">Save</span>
+    </a>
+
+    <button mat-stroked-button
+      color="default"
+      mat-dialog-close="try again">
+      <i class="fas fa-camera"></i>
+      <span class="ml-1">Try again</span>
+    </button>
+
+    <button mat-button
+      color="default"
+      mat-dialog-close="cancel">
+      Cancel
+    </button>
+  </mat-dialog-actions>
+</ng-template>

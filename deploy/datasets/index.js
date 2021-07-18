@@ -191,6 +191,7 @@ datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
 })
 
 datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
+  return res.status(400).send('Deprecated')
   const { kgId } = req.query
   const { kgSchema } = req.query
   const { user } = req

@@ -7,6 +7,7 @@ describe('> selecting regions', () => {
   const duplicatedRegion = {
     atlas: 'Multilevel Human Atlas',
     template: `ICBM 152 2009c Nonlinear Asymmetric`,
+    parcVersion: 'v1.18',
     position: [-0.256, 26.028, -11.678]
   }
   describe(`> when selecting duplicated regions at ${duplicatedRegion.atlas} / ${duplicatedRegion.template} / ${JSON.stringify(duplicatedRegion.position)}`, () => {
@@ -14,7 +15,7 @@ describe('> selecting regions', () => {
       const newPage = new AtlasPage()
       await newPage.init()
       await newPage.goto()
-      await newPage.setAtlasSpecifications(duplicatedRegion.atlas, [ duplicatedRegion.template ])
+      await newPage.setAtlasSpecifications(duplicatedRegion.atlas, [ duplicatedRegion.template ], duplicatedRegion.parcVersion)
       await newPage.wait(500)
       await newPage.waitForAsync()
       await newPage.execScript(`interactiveViewer.viewerHandle.setNavigationLoc(${JSON.stringify(duplicatedRegion.position.map(v => v*1e6))}, true)`)
