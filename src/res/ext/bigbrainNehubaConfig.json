@@ -614,6 +614,111 @@
             ]
           ]
         },
+        "MGBd": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2021_04_27_mgb/2021_04_27_MGBd/",
+          "segments": [
+            "0"
+          ],
+          "selectedAlpha": 0.45,
+          "notSelectedAlpha": 0,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -70677184.0
+            ],
+            [
+              0,
+              1,
+              0,
+              -7290000.0
+            ],
+            [
+              0,
+              0,
+              1,
+              -58788284.0
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "MGBm": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2021_04_27_mgb/2021_04_27_MGBm/",
+          "segments": [
+            "0"
+          ],
+          "selectedAlpha": 0.45,
+          "notSelectedAlpha": 0,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -70677184.0
+            ],
+            [
+              0,
+              1,
+              0,
+              -7290000.0
+            ],
+            [
+              0,
+              0,
+              1,
+              -58788284.0
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "MGBv": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2021_04_27_mgb/2021_04_27_MGBv/",
+          "segments": [
+            "0"
+          ],
+          "selectedAlpha": 0.45,
+          "notSelectedAlpha": 0,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -70677184.0
+            ],
+            [
+              0,
+              1,
+              0,
+              -7290000.0
+            ],
+            [
+              0,
+              0,
+              1,
+              -58788284.0
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
         "cortical layers": {
           "type": "segmentation",
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_27_cortical_layers",

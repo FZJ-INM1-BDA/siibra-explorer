@@ -9,6 +9,7 @@ const bkwdMdl = require('./bkwdCompat')()
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
 const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
+const { ready: saneUrlIsReady } = require('./saneUrl')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -204,10 +205,12 @@ app.get('/ready', async (req, res) => {
   const authIsReady = authReady ? await authReady() : false
   const regionalFeatureReady = await regionalFeatureIsReady()
   const datasetReady = await datasetRouteIsReady()
+  const saneUrlReady = await saneUrlIsReady()
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
     datasetReady,
+    saneUrlReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean

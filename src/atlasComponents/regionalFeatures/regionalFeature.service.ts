@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { getIdFromFullId, getRegionHemisphere, getStringIdsFromRegion, flattenReducer } from 'common/util'
-import { forkJoin, from, Observable, of, Subject, Subscription } from "rxjs";
+import { forkJoin, from, Observable, of, Subject, Subscription, throwError } from "rxjs";
 import { catchError, map, mapTo, shareReplay, switchMap } from "rxjs/operators";
 import { IHasId } from "src/util/interfaces";
 import { select, Store } from "@ngrx/store";

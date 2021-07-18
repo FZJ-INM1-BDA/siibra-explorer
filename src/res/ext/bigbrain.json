@@ -1133,6 +1133,11 @@
                               "ngId": "MGBd",
                               "status": "fully mapped",
                               "labelIndex": 1,
+                              "rgb": [
+                                19,
+                                254,
+                                218
+                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {
@@ -1156,6 +1161,11 @@
                               "ngId": "MGBm",
                               "status": "fully mapped",
                               "labelIndex": 1,
+                              "rgb": [
+                                246,
+                                168,
+                                78
+                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {
@@ -1179,6 +1189,11 @@
                               "ngId": "MGBv",
                               "status": "fully mapped",
                               "labelIndex": 1,
+                              "rgb": [
+                                42,
+                                81,
+                                183
+                              ],
                               "children": [],
                               "fullId": {
                                 "kg": {

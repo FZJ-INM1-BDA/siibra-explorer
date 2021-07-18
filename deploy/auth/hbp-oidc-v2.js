@@ -17,28 +17,69 @@ const cb = (tokenset, {sub, given_name, family_name, ...rest}, done) => {
   })
 }
 
-module.exports = async (app) => {
-  try {
-    const { oidcStrategy } = await configureAuth({
+const {
+  __DEBUG__
+} = process.env
+
+let oidcStrategy, client, pr
+
+const userScope = [
+  'openid',
+  'email',
+  'profile',
+  'collab.drive'
+]
+
+const adminScope = [
+  'offline_access',
+  'group',
+  'team'
+]
+
+const memoizedInit = () => {
+  if (pr) return pr
+  pr = (async () => {
+    if (client) {
+      return
+    }
+    const re = await configureAuth({
       clientId,
       clientSecret,
       discoveryUrl,
       redirectUri,
       cb,
-      scope: 'openid email offline_access profile collab.drive',
+      scope: [
+        ...userScope,
+        ...(__DEBUG__ ? adminScope : []),
+      ].join(' '),
       clientConfig: {
         redirect_uris: [ redirectUri ],
         response_types: [ 'code' ]
       }
     })
-    
-    passport.use('hbp-oidc-v2', oidcStrategy)
-    app.get('/hbp-oidc-v2/auth', passport.authenticate('hbp-oidc-v2'))
-    app.get('/hbp-oidc-v2/cb', passport.authenticate('hbp-oidc-v2', {
-      successRedirect: `${HOST_PATHNAME}/`,
-      failureRedirect: `${HOST_PATHNAME}/`
-    }))
-  } catch (e) {
-    console.error('oidcv2 auth error', e)
+    oidcStrategy = re.oidcStrategy
+    client = re.client
+  })()
+  return pr
+}
+
+module.exports = {
+  bootstrapApp: async (app) => {
+    try {
+      await memoizedInit()
+      passport.use('hbp-oidc-v2', oidcStrategy)
+      app.get('/hbp-oidc-v2/auth', passport.authenticate('hbp-oidc-v2'))
+      app.get('/hbp-oidc-v2/cb', passport.authenticate('hbp-oidc-v2', {
+        successRedirect: `${HOST_PATHNAME}/`,
+        failureRedirect: `${HOST_PATHNAME}/`
+      }))
+      return { client }
+    } catch (e) {
+      console.error('oidcv2 auth error', e)
+    }
+  },
+  getClient: async () => {
+    await memoizedInit()
+    return client
   }
 }

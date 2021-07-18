@@ -124,7 +124,6 @@ module.exports = {
       } else {
         console.warn(`CSP Violation: no data received!`)
       }
-      res.status(204).end()
     })
   }
 }

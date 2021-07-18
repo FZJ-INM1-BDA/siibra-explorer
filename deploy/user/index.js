@@ -1,6 +1,7 @@
-const router = require('express').Router()
-const { readUserData, saveUserData } = require('./store')
+const express = require('express')
 const bodyParser = require('body-parser')
+const router = express.Router()
+const { readUserData, saveUserData } = require('./store')
 
 const loggedInOnlyMiddleware = (req, res, next) => {
   const { user } = req

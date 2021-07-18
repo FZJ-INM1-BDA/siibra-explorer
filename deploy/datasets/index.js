@@ -10,11 +10,10 @@ const archiver = require('archiver')
 const { getHandleErrorFn } = require('../util/streamHandleError')
 const { IBC_SCHEMA } = require('./importIBS')
 
-const bodyParser = require('body-parser')
 const { getIdFromFullId } = require('../../common/util')
 
-datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
-datasetsRouter.use(bodyParser.json())
+datasetsRouter.use(express.urlencoded({ extended: false }))
+datasetsRouter.use(express.json())
 
 let readyFlag = false
 
@@ -230,7 +229,7 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
   }
 })
 
-datasetsRouter.post('/bulkDownloadKgFiles', bodyParser.urlencoded({ extended: false }), async (req, res) => {
+datasetsRouter.post('/bulkDownloadKgFiles', express.urlencoded({ extended: false }), async (req, res) => {
   try{
     const { body = {}, user } = req
     const { kgIds } = body

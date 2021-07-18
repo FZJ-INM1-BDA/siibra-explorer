@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "DISABLE_LIMITER=1 node ./node_modules/.bin/mocha './**/*.spec.js' --exclude 'node_modules/*' --timeout 60000",
+    "test": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha './**/*.spec.js' --exclude 'node_modules/*' --timeout 60000 --exit",
     "mocha": "mocha"
   },
   "keywords": [],
@@ -20,9 +20,8 @@
     "express-rate-limit": "^5.1.1",
     "express-session": "^1.15.6",
     "got": "^10.5.5",
-    "hbp-seafile": "0.0.6",
+    "hbp-seafile": "^0.1.0",
     "helmet-csp": "^2.8.0",
-    "jwt-decode": "^2.2.0",
     "lru-cache": "^5.1.1",
     "memorystore": "^1.6.1",
     "nomiseco": "0.0.2",
