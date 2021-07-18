@@ -74,10 +74,6 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
             of(null),
             svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
               map(det => {
-                console.log('region detail', {
-                  id: r[0],
-                  det
-                })
                 return {
                   ...det,
                   context
