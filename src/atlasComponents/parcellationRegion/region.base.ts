@@ -18,7 +18,6 @@ export class RegionBase {
 
   private _position: [number, number, number]
   set position(val){
-    console.log('position', val)
     if (verifyPositionArg(val)) {
       this._position = val
     } else {
@@ -35,6 +34,7 @@ export class RegionBase {
     this._region = val
     this.region$.next(this._region)
 
+    this.position = val?.position
     // bug the centroid returned is currently nonsense
     // this.position = val?.props?.centroid_mm
     if (!this._region) return
