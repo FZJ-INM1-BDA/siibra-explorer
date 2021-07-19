@@ -35,12 +35,12 @@ jobs:
           echo "Either staging, using staging env..."
           echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
-          echo "BS_REST_URL=${{ SIIBRA_API_RC }}" >> $GITHUB_ENV
+          echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
           echo "Using dev env..."
           echo "MATAMO_URL=${{ env.MATAMO_URL_DEV }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
-          echo "BS_REST_URL=${{ SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
         fi
 
     - name: 'Set version variable'
