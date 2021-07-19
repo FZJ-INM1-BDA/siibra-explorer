@@ -13,7 +13,7 @@ objects:
     labels:
       app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
   spec:
-    replicas: 1
+    replicas: 3
     revisionHistoryLimit: 10
     selector:
       deploymentconfig: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
@@ -116,7 +116,7 @@ objects:
       app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
     name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
   spec:
-    host: siibra-explorer.apps-dev.hbp.eu
+    host: siibra-explorer.apps${PATH_POSTFIX}.hbp.eu
     path: /${SANITIZED_BRANCH_NAME}
     port:
       targetPort: 8080-tcp
@@ -143,6 +143,8 @@ parameters:
     - does not allow special characters, except for - or . .
     - only allows lower case.
     Strip all special characters from BRANCH_NAME, change to all lower case and pass it as SANITIZED_BRANCH_NAME
-
+- name: PATH_POSTFIX
+  description: url path postfix. either '-dev' or '' (empty string)
+  value: ''
 labels:
   template: siibra-explorer-branch-deploy-template

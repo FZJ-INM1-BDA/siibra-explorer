@@ -12,6 +12,9 @@ jobs:
       MATAMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v1_0"'
+      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v1_0"'
+      SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0"'
 
     steps:
     - uses: actions/checkout@v2
@@ -21,16 +24,23 @@ jobs:
 
         echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         
-        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
         then
-          echo "Either master or staging, using prod env..."
+          echo "Either master, using prod env..."
           echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
-
+          echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
+        elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        then
+          echo "Either staging, using staging env..."
+          echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+          echo "BS_REST_URL=${{ SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
           echo "Using dev env..."
           echo "MATAMO_URL=${{ env.MATAMO_URL_DEV }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
+          echo "BS_REST_URL=${{ SIIBRA_API_LATEST }}" >> $GITHUB_ENV
         fi
 
     - name: 'Set version variable'
@@ -52,6 +62,7 @@ jobs:
           --build-arg VERSION=$VERSION \
           --build-arg MATAMO_URL=$MATAMO_URL \
           --build-arg MATAMO_ID=$MATAMO_ID \
+          --build-arg BS_REST_URL=$BS_REST_URL \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
@@ -88,11 +99,13 @@ jobs:
             echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_PROD_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-viewer" >> $GITHUB_ENV
+            echo "PATH_POSTFIX=" >> $GITHUB_ENV
             echo "Deploy on prod cluster..."
           else
             echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
+            echo "PATH_POSTFIX=-dev" >> $GITHUB_ENV
             echo "Deploy on dev cluster..."
           fi
       - name: 'Login via oc cli & deploy'
@@ -115,18 +128,30 @@ jobs:
             echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME does not yet exist, create new app..."
             oc new-app --template siibra-explorer-branch-deploy \
               -p BRANCH_NAME=$BRANCH_NAME \
-              -p SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME
+              -p SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME \
+              -p PATH_POSTFIX=$PATH_POSTFIX
           fi
       - name: 'Update status badge'
         if: success()
         run: |
+
+          if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
+          then
+            DEPLOY_URL="https://siibra-explorer.apps.hbp.eu/master"
+          elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+          then
+            DEPLOY_URL="https://siibra-explorer.apps.hbp.eu/staging"
+          else
+            DEPLOY_URL="https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}"
+          fi
+
           curl -v \
             -X POST \
             -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
             -d '{
-              "target_url":"https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}",
+              "target_url":"$DEPLOY_URL",
               "name": "Deployed at OKD",
               "state": "success"
             }'
