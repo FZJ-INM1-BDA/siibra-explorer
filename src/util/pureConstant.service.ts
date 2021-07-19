@@ -280,9 +280,40 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
           }
           return false
         })
+
+        /**
+         * remove parcellation versions that are marked as deprecated
+         * and assign prev/next id accordingly
+         */
+        for (const p of filteredParcellations) {
+          if (!p.version) continue
+          if (p.version.deprecated) {
+            const prevId = p.version.prev
+            const nextId = p.version.next
+
+            const prev = prevId && filteredParcellations.find(p => parseId(p.id) === prevId)
+            const next = nextId && filteredParcellations.find(p => parseId(p.id) === nextId)
+
+            const newPrevId = prev && parseId(prev.id)
+            const newNextId = next && parseId(next.id)
+
+            if (!!prev.version) {
+              prev.version.next = newNextId
+            }
+
+            if (!!next.version) {
+              next.version.prev = newPrevId
+            }
+          }
+        }
+        const removeDeprecatedParc = filteredParcellations.filter(p => {
+          if (!p.version) return true
+          return !(p.version.deprecated)
+        })
+
         return {
           templateSpaces,
-          parcellations: filteredParcellations
+          parcellations: removeDeprecatedParc
         }
       }),
       shareReplay(1)
@@ -353,6 +384,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
         atlases.map(
           atlas => this.getSpacesAndParc(atlas.id).pipe(
             map(({ templateSpaces, parcellations }) => {
+              console.log({parcellations})
               return {
                 '@id': atlas.id,
                 name: atlas.name,
@@ -369,7 +401,10 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                     originDatainfos: tmpl.originDatainfos || []
                   }
                 }),
-                parcellations: parcellations.map(parc => {
+                parcellations: parcellations.filter(p => {
+                  if (p.version?.deprecated) return false
+                  return true
+                }).map(parc => {
                   return {
                     '@id': parseId(parc.id),
                     name: parc.name,

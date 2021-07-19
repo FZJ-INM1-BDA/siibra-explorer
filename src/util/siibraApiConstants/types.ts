@@ -48,6 +48,7 @@ type TVersion = {
   name: string
   prev: string | null
   next: string | null
+  deprecated?: boolean
 }
 
 export type TId = string | { kg: TKgIdentifier }
