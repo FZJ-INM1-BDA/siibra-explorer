@@ -53,12 +53,6 @@ objects:
                 name: plugins
             - configMapRef:
                 name: other-deploy-config
-            - configMapRef:
-                name: obj-storage-env-var
-              prefix: OBJ_STORAGE_
-            - configMapRef:
-                name: obj-stoage-credentials
-              prefix: OBJ_STORAGE_
 
             image: "docker-registry.ebrains.eu/siibra/siibra-explorer:${BRANCH_NAME}"
             imagePullPolicy: Always

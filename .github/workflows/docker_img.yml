@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MATOMO_ID_DEV: '7'
-      MATAMO_URL_DEV: 'https://stats-dev.humanbrainproject.eu/'
+      MATOMO_URL_DEV: 'https://stats-dev.humanbrainproject.eu/'
       MATOMO_ID_PROD: '12'
-      MATAMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
+      MATOMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
       SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v1_0'
@@ -27,18 +27,18 @@ jobs:
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
         then
           echo "Either master, using prod env..."
-          echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
         elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either staging, using staging env..."
-          echo "MATAMO_URL=${{ env.MATAMO_URL_PROD }}" >> $GITHUB_ENV
+          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
           echo "Using dev env..."
-          echo "MATAMO_URL=${{ env.MATAMO_URL_DEV }}" >> $GITHUB_ENV
+          echo "MATOMO_URL=${{ env.MATOMO_URL_DEV }}" >> $GITHUB_ENV
           echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
         fi
@@ -60,8 +60,8 @@ jobs:
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
           --build-arg VERSION=$VERSION \
-          --build-arg MATAMO_URL=$MATAMO_URL \
-          --build-arg MATAMO_ID=$MATAMO_ID \
+          --build-arg MATOMO_URL=$MATOMO_URL \
+          --build-arg MATOMO_ID=$MATOMO_ID \
           --build-arg BS_REST_URL=$BS_REST_URL \
           -t $DOCKER_BUILT_TAG \
           .
