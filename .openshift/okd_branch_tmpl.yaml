@@ -34,7 +34,7 @@ objects:
             - name: IAV_STAGE
               value: ${SANITIZED_BRANCH_NAME}
             - name: BUILD_TEXT
-              value: ${SANITIZED_BRANCH_NAME}
+              value: ${BUILD_TEXT}
             - name: SCRIPT_SRC
               value: '["stats-dev.humanbrainproject.eu"]'
             - name: REDIS_PASSWORD
@@ -140,5 +140,8 @@ parameters:
 - name: PATH_POSTFIX
   description: url path postfix. either '-dev' or '' (empty string)
   value: ''
+- name: BUILD_TEXT
+  description: 'UI displaying which build'
+  value: 'dev build'
 labels:
   template: siibra-explorer-branch-deploy-template

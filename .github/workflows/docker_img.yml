@@ -94,6 +94,14 @@ jobs:
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
         
           echo "Branch is $BRANCH_NAME ."
+
+          if [[ "$BRANCH_NAME" == 'master' ]]
+          then
+            echo "BUILD_TEXT=" >> $GITHUB_ENV
+          else
+            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
+          fi
+
           if [[ "$BRANCH_NAME" == 'master' ]] || [[ "$BRANCH_NAME" == 'staging' ]]
           then
             echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
@@ -106,6 +114,7 @@ jobs:
             echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
             echo "PATH_POSTFIX=-dev" >> $GITHUB_ENV
+            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
             echo "Deploy on dev cluster..."
           fi
       - name: 'Login via oc cli & deploy'
@@ -129,7 +138,8 @@ jobs:
             oc new-app --template siibra-explorer-branch-deploy \
               -p BRANCH_NAME=$BRANCH_NAME \
               -p SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME \
-              -p PATH_POSTFIX=$PATH_POSTFIX
+              -p PATH_POSTFIX=$PATH_POSTFIX \
+              -p BUILD_TEXT=$BUILD_TEXT
           fi
       - name: 'Update status badge'
         if: success()
