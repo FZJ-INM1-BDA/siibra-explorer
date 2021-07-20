@@ -14,6 +14,18 @@ export interface ITemplateCoordXformResp{
 })
 export class TemplateCoordinatesTransformation {
 
+  static VALID_TEMPLATE_SPACE_NAMES = {
+    MNI152: 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
+    COLIN27: 'MNI Colin 27',
+    BIG_BRAIN: 'Big Brain (Histology)',
+    INFANT: 'Infant Atlas',
+  }
+
+  static NameMap = new Map([
+    ['MNI152 2009c nonl asym', TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152],
+    ["Big Brain", TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN]
+  ])
+
   constructor(private httpClient: HttpClient) {}
 
   public url = `${SPATIAL_TRANSFORM_BACKEND.replace(/\/$/, '')}/v1/transform-points`
@@ -27,12 +39,20 @@ export class TemplateCoordinatesTransformation {
         'Content-Type':  'application/json'
       })
     }
+    const srcTmplName = Object.values(TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES).includes(sourceTemplateName)
+      ? sourceTemplateName
+      : TemplateCoordinatesTransformation.NameMap.get(sourceTemplateName)
+
+    const targetTmplName = Object.values(TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES).includes(targetTemplateName)
+      ? targetTemplateName
+      : TemplateCoordinatesTransformation.NameMap.get(targetTemplateName)
+    
     return this.httpClient.post(
       this.url,
       JSON.stringify({
         'source_points': [[...coordinatesInNm.map(c => c/1e6)]],
-        'source_space': sourceTemplateName,
-        'target_space': targetTemplateName
+        'source_space': srcTmplName,
+        'target_space': targetTmplName
       }),
       httpOptions
     ).pipe(

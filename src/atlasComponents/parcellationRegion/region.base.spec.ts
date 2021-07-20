@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
-import { viewerStateNewViewer } from 'src/services/state/viewerState/actions'
+import { viewerStateSelectTemplateWithId } from 'src/services/state/viewerState/actions'
 import { RegionBase, regionInOtherTemplateSelector, getRegionParentParcRefSpace } from './region.base'
 const  util = require('common/util')
 
@@ -620,16 +620,18 @@ describe('> region.base.ts', () => {
     })
     describe('> changeView', () => {
       const fakeTmpl = {
+        '@id': 'faketmplid',
         name: 'fakeTmpl'
       }
       const fakeParc = {
+        '@id': 'fakeparcid',
         name: 'fakeParc'
       }
       beforeEach(() => {
         regionBase = new RegionBase(mockStore)
       })
 
-      describe('> if sameRegion has position attribute', () => {
+      describe('> [tmp] sameRegion to use transform backend', () => {
         let dispatchSpy: jasmine.Spy
 
         beforeEach(() => {
@@ -638,64 +640,106 @@ describe('> region.base.ts', () => {
         afterEach(() => {
           dispatchSpy.calls.reset()
         })
-        it('> malformed position is not an array > do not pass position', () => {
+
+        it('> calls viewerStateSelectTemplateWithId', () => {
 
           regionBase.changeView({
             template: fakeTmpl,
             parcellation: fakeParc,
-            region: {
-              position: 'hello wolrd'
-            }
           })
 
           expect(dispatchSpy).toHaveBeenCalledWith(
-            viewerStateNewViewer({
-              selectTemplate: fakeTmpl,
-              selectParcellation: fakeParc,
-              navigation: {}
-            })
-          )
-        })
-
-        it('> malformed position is an array of incorrect size > do not pass position', () => {
-
-          regionBase.changeView({
-            template: fakeTmpl,
-            parcellation: fakeParc,
-            region: {
-              position: []
-            }
-          })
-
-          expect(dispatchSpy).toHaveBeenCalledWith(
-            viewerStateNewViewer({
-              selectTemplate: fakeTmpl,
-              selectParcellation: fakeParc,
-              navigation: {}
-            })
-          )
-        })
-
-        it('> correct position > pass position', () => {
-          regionBase.changeView({
-            template: fakeTmpl,
-            parcellation: fakeParc,
-            region: {
-              position: [1,2,3]
-            }
-          })
-
-          expect(dispatchSpy).toHaveBeenCalledWith(
-            viewerStateNewViewer({
-              selectTemplate: fakeTmpl,
-              selectParcellation: fakeParc,
-              navigation: {
-                position: [1,2,3]
+            viewerStateSelectTemplateWithId({
+              payload: {
+                '@id': fakeTmpl['@id']
+              },
+              config: {
+                selectParcellation: {
+                  "@id": fakeParc['@id']
+                }
               }
             })
           )
         })
       })
+
+      /**
+       * currently, without position metadata, the navigation is broken
+       * fix changeView to fetch position metadata. If cannot, fallback to spatial backend
+       */
+
+      // describe('> if sameRegion has position attribute', () => {
+      //   let dispatchSpy: jasmine.Spy
+
+      //   beforeEach(() => {
+      //     dispatchSpy = spyOn(mockStore, 'dispatch')
+      //   })
+      //   afterEach(() => {
+      //     dispatchSpy.calls.reset()
+      //   })
+      //   it('> malformed position is not an array > do not pass position', () => {
+
+      //     regionBase.changeView({
+      //       template: fakeTmpl,
+      //       parcellation: fakeParc,
+      //       region: {
+      //         position: 'hello wolrd'
+      //       }
+      //     })
+
+      //     expect(dispatchSpy).toHaveBeenCalledWith(
+      //       viewerStateNewViewer({
+      //         selectTemplate: fakeTmpl,
+      //         selectParcellation: fakeParc,
+      //         navigation: {}
+      //       })
+      //     )
+      //   })
+
+      //   it('> malformed position is an array of incorrect size > do not pass position', () => {
+
+      //     regionBase.changeView({
+      //       template: fakeTmpl,
+      //       parcellation: fakeParc,
+      //       region: {
+      //         position: []
+      //       }
+      //     })
+
+      //     expect(dispatchSpy).toHaveBeenCalledWith(
+      //       viewerStateSelectTemplateWithId({
+      //         payload: {
+      //           '@id': fakeTmpl['@id']
+      //         },
+      //         config: {
+      //           selectParcellation: {
+      //             "@id": fakeParc['@id']
+      //           }
+      //         }
+      //       })
+      //     )
+      //   })
+
+      //   it('> correct position > pass position', () => {
+      //     regionBase.changeView({
+      //       template: fakeTmpl,
+      //       parcellation: fakeParc,
+      //       region: {
+      //         position: [1,2,3]
+      //       }
+      //     })
+
+      //     expect(dispatchSpy).toHaveBeenCalledWith(
+      //       viewerStateNewViewer({
+      //         selectTemplate: fakeTmpl,
+      //         selectParcellation: fakeParc,
+      //         navigation: {
+      //           position: [1,2,3]
+      //         }
+      //       })
+      //     )
+      //   })
+      // })
     })
   })
 })

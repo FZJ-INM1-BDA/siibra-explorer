@@ -33,8 +33,8 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
 
         // subscriptions are necessary for http fetch to occur
         service.getPointCoordinatesForTemplate(
-          'from',
-          'target',
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152,
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
           [1,2,3]
         ).subscribe((_ev) => {
           
@@ -44,8 +44,8 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
         expect(
           JSON.parse(req.request.body)
         ).toEqual({
-          'source_space': 'from',
-          'target_space': 'target',
+          'source_space': TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152,
+          'target_space': TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
           'source_points': [
             [1e-6, 2e-6, 3e-6]
           ]
@@ -53,14 +53,41 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
         req.flush({})
       })
 
+      it('transforms mapped space name(s)', () => {
+        const service = TestBed.inject(TemplateCoordinatesTransformation)
+        const httpTestingController = TestBed.inject(HttpTestingController)
+
+        const key = Array.from(TemplateCoordinatesTransformation.NameMap.keys())[0]
+        service.getPointCoordinatesForTemplate(
+          key,
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
+          [1,2,3]
+        ).subscribe((_ev) => {
+          
+        })
+        const req = httpTestingController.expectOne(service.url)
+        expect(req.request.method).toEqual('POST')
+        expect(
+          JSON.parse(req.request.body)
+        ).toEqual({
+          'source_space': TemplateCoordinatesTransformation.NameMap.get(key),
+          'target_space': TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
+          'source_points': [
+            [1e-6, 2e-6, 3e-6]
+          ]
+        })
+        req.flush({})
+      })
+
+
       it('should transform response properly', () => {
 
         const service = TestBed.inject(TemplateCoordinatesTransformation)
         const httpTestingController = TestBed.inject(HttpTestingController)
 
         service.getPointCoordinatesForTemplate(
-          'from',
-          'target',
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152,
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
           [1,2,3]
         ).subscribe(({ status, result }) => {
           expect(status).toEqual('completed')
@@ -79,8 +106,8 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
         const httpTestingController = TestBed.inject(HttpTestingController)
 
         service.getPointCoordinatesForTemplate(
-          'from',
-          'target',
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152,
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
           [1,2,3]
         ).subscribe(({ status }) => {
           expect(status).toEqual('error')
@@ -96,8 +123,8 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
         const httpTestingController = TestBed.inject(HttpTestingController)
 
         service.getPointCoordinatesForTemplate(
-          'from',
-          'target',
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.MNI152,
+          TemplateCoordinatesTransformation.VALID_TEMPLATE_SPACE_NAMES.BIG_BRAIN,
           [1,2,3]
         ).subscribe(({ status, statusText }) => {
           expect(status).toEqual('error')

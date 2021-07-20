@@ -1,10 +1,10 @@
 import { EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { distinctUntilChanged, switchMap, filter, map, withLatestFrom } from "rxjs/operators";
+import { distinctUntilChanged, switchMap, filter, map, withLatestFrom, tap } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { flattenRegions, getIdFromKgIdObj, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
 import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
@@ -181,23 +181,25 @@ export class RegionBase {
     const {
       template,
       parcellation,
-      region
     } = sameRegion
-    const { position } = region
-    const navigation = Array.isArray(position) && position.length === 3
-      ? { position }
-      : {  }
     this.closeRegionMenu.emit()
 
     /**
      * TODO use createAction in future
      * for now, not importing const because it breaks tests
      */
-    this.store$.dispatch(viewerStateNewViewer ({
-      selectTemplate: template,
-      selectParcellation: parcellation,
-      navigation,
-    }))
+    this.store$.dispatch(
+      viewerStateSelectTemplateWithId({
+        payload: {
+          '@id': template['@id'] || template['fullId']
+        },
+        config: {
+          selectParcellation: {
+            '@id': parcellation['@id'] || parcellation['fullId']
+          }
+        }
+      })
+    )
   }
 }
 
