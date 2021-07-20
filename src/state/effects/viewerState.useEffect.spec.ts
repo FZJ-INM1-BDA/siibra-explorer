@@ -266,7 +266,7 @@ describe('> viewerState.useEffect.ts', () => {
             expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
               hot('a', {
                 a: generalActionError({
-                  message: `${region.name} has malformed position property: []`
+                  message: `${region.name} - does not have a position defined`
                 })
               })
             )
