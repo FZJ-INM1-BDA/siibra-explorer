@@ -92,7 +92,8 @@ describe('ConnectivityComponent', () => {
         expect(component).toBeTruthy()
     })
 
-    it('> change dataset changes description, kgId and kgschema', () => {
+    // ToDo create test for kgId and kgSchema after it will work while viewing dataset
+    it('> change dataset changes name and description', () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)
         component = fixture.componentInstance
 
@@ -100,15 +101,13 @@ describe('ConnectivityComponent', () => {
 
         component.changeDataset({value: 'id1'})
 
+        expect(component.selectedDataset).toEqual('id1')
         expect(component.selectedDatasetDescription).toEqual('d1')
-        expect(component.selectedDatasetKgId).toEqual('kgId1')
-        expect(component.selectedDatasetKgSchema).toEqual('kgschema1')
 
         component.changeDataset({value: 'id2'})
 
+        expect(component.selectedDataset).toEqual('id2')
         expect(component.selectedDatasetDescription).toEqual('d2')
-        expect(component.selectedDatasetKgId).toEqual('kgId2')
-        expect(component.selectedDatasetKgSchema).toEqual('kgschema2')
     })
 
 });

@@ -35,8 +35,9 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                <ng-container *ngIf="selectedDataset && selectedDatasetDescription" >
-                    <button class="flex-grow-0 flex-shrink-0" mat-icon-button
+                <ng-container *ngIf="selectedDataset && (selectedDatasetDescription || selectedDatasetKgId)" >
+                    <button class="flex-grow-0 flex-shrink-0"
+                            mat-icon-button
                             iav-dataset-show-dataset-dialog
                             [iav-dataset-show-dataset-dialog-name]="selectedDataset"
                             [iav-dataset-show-dataset-dialog-description]="selectedDatasetDescription"
