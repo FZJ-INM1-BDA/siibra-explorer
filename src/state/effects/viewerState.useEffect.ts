@@ -16,6 +16,7 @@ import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
 import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
+import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -400,7 +401,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           })
         }
 
-        const position = region.position || (region?.props?.centroid_mm || []).map((v: number) => v*1e6)
+        const position = region.position || getPosFromRegion(region)
         if (!position) {
           return generalActionError({
             message: `${region.name} - does not have a position defined`

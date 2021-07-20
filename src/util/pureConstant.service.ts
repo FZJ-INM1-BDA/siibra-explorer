@@ -384,7 +384,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
         atlases.map(
           atlas => this.getSpacesAndParc(atlas.id).pipe(
             map(({ templateSpaces, parcellations }) => {
-              console.log({parcellations})
               return {
                 '@id': atlas.id,
                 name: atlas.name,

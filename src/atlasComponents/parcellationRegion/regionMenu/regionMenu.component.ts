@@ -2,7 +2,7 @@ import { Component, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { RegionBase } from '../region.base'
-import { CONST } from 'common/constants'
+import { CONST, ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
 
 @Component({
@@ -14,6 +14,7 @@ import { ComponentStore } from "src/viewerModule/componentStore";
 export class RegionMenuComponent extends RegionBase implements OnDestroy {
 
   public CONST = CONST
+  public ARIA_LABELS = ARIA_LABELS
   private subscriptions: Subscription[] = []
 
   public activePanelTitles$: Observable<string[]>

@@ -143,11 +143,11 @@ export type TRegionDetail = {
   }[]
   hasRegionalMap: boolean
   props: {
-    centroid_mm: number[]
+    centroid_mm: [number, number, number]
     volume_mm: number
     surface_mm: number
     is_cortical: number
-  }
+  }[]
   links: {
     [key: string]: string
   }

@@ -3,11 +3,11 @@ import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
 import { distinctUntilChanged, switchMap, filter, map, withLatestFrom } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
-import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromKgIdObj, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan } from "src/services/state/viewerState.store.helper";
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
+import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
 export class RegionBase {
 
@@ -34,10 +34,18 @@ export class RegionBase {
     this._region = val
     this.region$.next(this._region)
 
-    this.position = val?.position
+    this.position = null
     // bug the centroid returned is currently nonsense
     // this.position = val?.props?.centroid_mm
     if (!this._region) return
+
+    if (val?.position) {
+      this.position = val?.position 
+    }
+    const pos = getPosFromRegion(val)
+    if (pos) {
+      this.position = pos
+    }
 
     const rgb = this._region.rgb
       || (this._region.labelIndex > 65500 && [255, 255, 255])
@@ -191,12 +199,6 @@ export class RegionBase {
       navigation,
     }))
   }
-
-  public GO_TO_REGION_CENTROID = ARIA_LABELS.GO_TO_REGION_CENTROID
-  public SHOW_CONNECTIVITY_DATA = ARIA_LABELS.SHOW_CONNECTIVITY_DATA
-  public SHOW_IN_OTHER_REF_SPACE = ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE
-  public SHOW_ORIGIN_DATASET = ARIA_LABELS.SHOW_ORIGIN_DATASET
-  public AVAILABILITY_IN_OTHER_REF_SPACE = ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE
 }
 
 export const getRegionParentParcRefSpace = createSelector(
