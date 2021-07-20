@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
-import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, startWith } from "rxjs/operators";
+import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, startWith, catchError } from "rxjs/operators";
 import { FETCHED_TEMPLATE, IavRootStoreInterface, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
@@ -10,13 +10,11 @@ import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithI
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
-import { verifyPositionArg } from 'common/util'
 import { CONST } from 'common/constants'
 import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
-import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
-import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -392,34 +390,48 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
 
     this.navigateToRegion$ = this.actions$.pipe(
       ofType(viewerStateNavigateToRegion),
-      map(action => {
-        const { payload = {} } = action as ViewerStateAction
-        const { region } = payload
-        if (!region) {
-          return generalActionError({
-            message: `Go to region: region not defined`
-          })
+      map(action => action.payload?.region),
+      withLatestFrom(
+        this.store$.pipe(
+          select(viewerStateGetSelectedAtlas)
+        ),
+        this.store$.pipe(
+          select(viewerStateSelectedTemplateSelector)
+        ),
+        this.store$.pipe(
+          select(viewerStateSelectedParcellationSelector)
+        )
+      ),
+      switchMap(([ region,  selectedAtlas, selectedTemplate, selectedParcellation ]) => {
+        if (!region || !selectedAtlas || !selectedTemplate || !selectedParcellation) {
+          return of(
+            generalActionError({
+              message: `Go to region: region / atlas / template / parcellation not defined.`
+            })
+          )
         }
-
-        const position = region.position || getPosFromRegion(region)
-        if (!position) {
-          return generalActionError({
-            message: `${region.name} - does not have a position defined`
-          })
-        }
-
-        if (!verifyPositionArg(position)){
-          return generalActionError({
-            message: `${region.name} has malformed position property: ${JSON.stringify(position)}`
-          })
-        }
-
-        return viewerStateChangeNavigation({
-          navigation: {
-            position,
-            animation: {},
-          }
-        })
+        return this.pureService.getRegionDetail(selectedAtlas['@id'], selectedParcellation['@id'], selectedTemplate['@id'], region).pipe(
+          map(regDetail => {
+            const pos = (() => {
+              if (!regDetail) throw new Error(`region detail not found!`)
+              if (!regDetail.props) throw new Error(`region does not have props defined!`)
+              if (!regDetail.props.length) throw new Error(`region props not found!`)
+              return regDetail.props[0].centroid_mm
+            })()
+            
+            return viewerStateChangeNavigation({
+              navigation: {
+                position: pos.map(v => v * 1e6),
+                animation: {},
+              }
+            })
+          }),
+          catchError((err) => of(
+            generalActionError({
+              message: `Fetching region detail error: ${err}`
+            })
+          ))
+        )
       }),
     )
 

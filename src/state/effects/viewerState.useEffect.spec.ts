@@ -1,5 +1,5 @@
 import { cvtNehubaConfigToNavigationObj, ViewerStateControllerUseEffect, defaultNavigationObject } from './viewerState.useEffect'
-import { Observable, of } from 'rxjs'
+import { Observable, of, throwError } from 'rxjs'
 import { TestBed, async } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
@@ -12,9 +12,10 @@ import { HttpClientModule } from '@angular/common/http'
 import { WidgetModule } from 'src/widget'
 import { PluginModule } from 'src/plugin'
 import { viewerStateFetchedTemplatesSelector, viewerStateNavigateToRegion, viewerStateNavigationStateSelector, viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSelectTemplateWithName } from 'src/services/state/viewerState.store.helper'
-import { viewerStateFetchedAtlasesSelector } from 'src/services/state/viewerState/selectors'
+import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from 'src/services/state/viewerState/selectors'
 import { CONST } from 'common/constants'
 import { PureContantService } from 'src/util'
+import { viewerStateChangeNavigation } from 'src/services/state/viewerState/actions'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const bigBrainNehubaConfig = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
@@ -57,6 +58,16 @@ const currentNavigation = {
 }
 initialState.viewerState.navigation = currentNavigation
 
+class MockPureConstantService{
+  allFetchingReady$ = of(true)
+  initFetchTemplate$ = of([])
+
+  getRegionDetail(){
+    return of(null)
+  }
+}
+
+const mockPureConstantService = new MockPureConstantService()
 describe('> viewerState.useEffect.ts', () => {
   describe('> ViewerStateControllerUseEffect', () => {
     let actions$: Observable<any>
@@ -84,10 +95,7 @@ describe('> viewerState.useEffect.ts', () => {
           },
           {
             provide: PureContantService,
-            useValue: {
-              allFetchingReady$: of(true),
-              initFetchTemplate$: of([]),
-            }
+            useValue: mockPureConstantService
           }
         ]
       }).compileComponents()
@@ -252,107 +260,223 @@ describe('> viewerState.useEffect.ts', () => {
           }
         )
       }
-      describe('> if the region has malformed position property', () => {
-        describe('> if the region has no position property', () => {
-          const region = {
-            name: 'foobar'
-          }
-          beforeEach(() => {
-            setAction(region)
-          })
+      let mockStore: MockStore
+      beforeEach(() => {
 
-          it('> should result in general action error', () => {
-            const ctrlUseEffect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
+        mockStore = TestBed.inject(MockStore)
+          
+        mockStore.overrideSelector(viewerStateGetSelectedAtlas, { '@id': 'foo-bar-atlas'})
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, { '@id': 'foo-bar-template'})
+        mockStore.overrideSelector(viewerStateSelectedParcellationSelector, { '@id': 'foo-bar-parcellation'})
+      })
+      describe('> if atlas, template, parc is not set', () => {
+        beforeEach(() => {
+          const region = {
+            name: 'foo bar'
+          }
+          setAction(region)
+        })
+        describe('> if atlas is unset', () => {
+          beforeEach(() => {
+            mockStore.overrideSelector(viewerStateGetSelectedAtlas, null)
+          })
+          it('> returns general error', () => {
+            const effect = TestBed.inject(ViewerStateControllerUseEffect)
+            expect(effect.navigateToRegion$).toBeObservable(
               hot('a', {
                 a: generalActionError({
-                  message: `${region.name} - does not have a position defined`
+                  message: 'Go to region: region / atlas / template / parcellation not defined.'
                 })
               })
             )
           })
-        
-          describe('> if the region has non array position property', () => {
-            const region = {
-              name: 'foo bar2',
-              position: {'hello': 'world'}
-            }
-            beforeEach(() => {
-              setAction(region)
+        })
+        describe('> if template is unset', () => {
+          beforeEach(() => {
+            mockStore.overrideSelector(viewerStateSelectedTemplateSelector, null)
+          })
+          it('> returns general error', () => {
+            const effect = TestBed.inject(ViewerStateControllerUseEffect)
+            expect(effect.navigateToRegion$).toBeObservable(
+              hot('a', {
+                a: generalActionError({
+                  message: 'Go to region: region / atlas / template / parcellation not defined.'
+                })
+              })
+            )
+          })
+        })
+        describe('> if parc is unset', () => {
+          beforeEach(() => {
+            mockStore.overrideSelector(viewerStateSelectedParcellationSelector, null)
+          })
+          it('> returns general error', () => {
+            const effect = TestBed.inject(ViewerStateControllerUseEffect)
+            expect(effect.navigateToRegion$).toBeObservable(
+              hot('a', {
+                a: generalActionError({
+                  message: 'Go to region: region / atlas / template / parcellation not defined.'
+                })
+              })
+            )
+          })
+        })
+      })
+      describe('> if atlas, template, parc is set, but region unset', () => {
+        beforeEach(() => {
+          setAction(null)
+        })
+        it('> returns general error', () => {
+          const effect = TestBed.inject(ViewerStateControllerUseEffect)
+          expect(effect.navigateToRegion$).toBeObservable(
+            hot('a', {
+              a: generalActionError({
+                message: 'Go to region: region / atlas / template / parcellation not defined.'
+              })
             })
-            it('> should result in general action error', () => {
-              const ctrlUseEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
+          )
+        })
+      })
+
+      describe('> if inputs are fine', () => {
+        let getRegionDetailSpy: jasmine.Spy
+        const region = {
+          name: 'foo bar'
+        }
+        beforeEach(() => {
+          getRegionDetailSpy = spyOn(mockPureConstantService, 'getRegionDetail').and.callThrough()
+          setAction(region)
+        })
+        afterEach(() => {
+          getRegionDetailSpy.calls.reset()
+        })
+
+        it('> getRegionDetailSpy is called', () => {
+          const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+
+          // necessary to trigger the emit
+          expect(
+            ctrl.navigateToRegion$
+          ).toBeObservable(
+            hot('a', {
+              a: generalActionError({
+                message: 'Fetching region detail error: Error: region detail not found!'
+              })
+            })
+          )
+
+          expect(getRegionDetailSpy).toHaveBeenCalled()
+        })
+
+        describe('> mal formed return', () => {
+          describe('> returns null', () => {
+            it('> generalactionerror', () => {
+              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                ctrl.navigateToRegion$
+              ).toBeObservable(
                 hot('a', {
                   a: generalActionError({
-                    message: `${region.name} has malformed position property: ${JSON.stringify(region.position)}`
+                    message: 'Fetching region detail error: Error: region detail not found!'
                   })
                 })
               )
             })
           })
-        
-          describe('> if the region has array position, but not all elements are number', () => {
-            const region = {
-              name: 'foo bar2',
-              position: [0, 1, 'hello world']
-            }
+          describe('> general throw', () => {
+            const msg = 'oh no!'
             beforeEach(() => {
-              setAction(region)
+              getRegionDetailSpy.and.callFake(() => throwError(msg))
             })
-            it('> should result in general action error', () => {
-              const ctrlUseEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
+
+            it('> generalactionerror', () => {
+              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                ctrl.navigateToRegion$
+              ).toBeObservable(
                 hot('a', {
                   a: generalActionError({
-                    message: `${region.name} has malformed position property: ${JSON.stringify(region.position)}`
+                    message: `Fetching region detail error: ${msg}`
+                  })
+                })
+              )
+            })
+
+          })
+          describe('> does not contain props attr', () => {
+
+            beforeEach(() => {
+              getRegionDetailSpy.and.callFake(() => of({
+                name: 'foo-bar'
+              }))
+            })
+
+            it('> generalactionerror', () => {
+              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                ctrl.navigateToRegion$
+              ).toBeObservable(
+                hot('a', {
+                  a: generalActionError({
+                    message: `Fetching region detail error: Error: region does not have props defined!`
                   })
                 })
               )
             })
           })
-        
-          describe('> if the region has array position, but some elements are NaN', () => {
-            const region = {
-              name: 'foo bar2',
-              position: [0, 1, NaN]
-            }
+
+          describe('> does not contain props.length === 0', () => {
+
             beforeEach(() => {
-              setAction(region)
+              getRegionDetailSpy.and.callFake(() => of({
+                name: 'foo-bar',
+                props: []
+              }))
             })
-            it('> should result in general action error', () => {
-              const ctrlUseEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
+
+            it('> generalactionerror', () => {
+              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                ctrl.navigateToRegion$
+              ).toBeObservable(
                 hot('a', {
                   a: generalActionError({
-                    message: `${region.name} has malformed position property: ${JSON.stringify(region.position)}`
+                    message: `Fetching region detail error: Error: region props not found!`
                   })
                 })
               )
             })
           })
-        
-        
-          describe('> if the region has array position, with incorrect length', () => {
-            const region = {
-              name: 'foo bar2',
-              position: []
-            }
+        })
+
+        describe('> wellformed response', () => {
+          beforeEach(() => {
+
             beforeEach(() => {
-              setAction(region)
+              getRegionDetailSpy.and.callFake(() => of({
+                name: 'foo-bar',
+                props: [{
+                  centroid_mm: [1,2,3]
+                }]
+              }))
             })
-            it('> should result in general action error', () => {
-              const ctrlUseEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(ctrlUseEffect.navigateToRegion$).toBeObservable(
+
+            it('> emits viewerStateChangeNavigation', () => {
+              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
+              expect(
+                ctrl.navigateToRegion$
+              ).toBeObservable(
                 hot('a', {
-                  a: generalActionError({
-                    message: `${region.name} has malformed position property: ${JSON.stringify(region.position)}`
+                  a: viewerStateChangeNavigation({
+                    navigation: {
+                      position: [1e6,2e6,3e6],
+                      animation: {}
+                    }
                   })
                 })
               )
             })
           })
-        
         })
       })
     })
