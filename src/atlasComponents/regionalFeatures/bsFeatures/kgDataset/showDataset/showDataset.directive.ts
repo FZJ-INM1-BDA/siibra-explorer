@@ -37,9 +37,6 @@ export class ShowDatasetDialogDirective{
     doi: string
   }[] = []
 
-  @Input('iav-dataset-show-dataset-dialog-show-dialog')
-  showDialog: boolean = false
-
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
@@ -65,7 +62,7 @@ export class ShowDatasetDialogDirective{
       return this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
     }
 
-    if (this.overwriteFn && !this.showDialog) {
+    if (this.overwriteFn) {
       return this.overwriteFn(data)
     }
 

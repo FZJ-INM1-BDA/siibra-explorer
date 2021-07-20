@@ -22,6 +22,7 @@ import {
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
 import {getIdFromKgIdObj} from "common/util";
+import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
 
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
@@ -29,6 +30,12 @@ const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 @Component({
   selector: 'connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
+  providers: [
+    {
+      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
+      useValue: null
+    }
+  ]
 })
 export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDestroy {
 
