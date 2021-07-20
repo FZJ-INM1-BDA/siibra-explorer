@@ -5,7 +5,7 @@ import { KgDatasetModule } from "src/atlasComponents/regionalFeatures/bsFeatures
 import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { UtilModule } from "src/util";
-import { ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
+import { OriginalDatainfoPipe, ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
 
 @NgModule({
   imports: [
@@ -18,6 +18,7 @@ import { ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
   ],
   declarations: [
     ViewerStateBreadCrumb,
+    OriginalDatainfoPipe,
   ],
   exports: [
     ViewerStateBreadCrumb,

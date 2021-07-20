@@ -1,6 +1,6 @@
 const { AtlasPage } = require("../util")
 const { ARIA_LABELS } = require('../../../common/constants')
-const { SHOW_CONNECTIVITY_DATA, SHOW_IN_OTHER_REF_SPACE, SHOW_ORIGIN_DATASET } = ARIA_LABELS
+const { SHOW_ORIGIN_DATASET } = ARIA_LABELS
 
 const cssSelector = `[aria-label="${SHOW_ORIGIN_DATASET}"]`
 

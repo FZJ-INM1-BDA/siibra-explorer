@@ -13,7 +13,7 @@ objects:
     labels:
       app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
   spec:
-    replicas: 1
+    replicas: 3
     revisionHistoryLimit: 10
     selector:
       deploymentconfig: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
@@ -34,7 +34,7 @@ objects:
             - name: IAV_STAGE
               value: ${SANITIZED_BRANCH_NAME}
             - name: BUILD_TEXT
-              value: ${SANITIZED_BRANCH_NAME}
+              value: ${BUILD_TEXT}
             - name: SCRIPT_SRC
               value: '["stats-dev.humanbrainproject.eu"]'
             - name: REDIS_PASSWORD
@@ -53,12 +53,6 @@ objects:
                 name: plugins
             - configMapRef:
                 name: other-deploy-config
-            - configMapRef:
-                name: obj-storage-env-var
-              prefix: OBJ_STORAGE_
-            - configMapRef:
-                name: obj-stoage-credentials
-              prefix: OBJ_STORAGE_
 
             image: "docker-registry.ebrains.eu/siibra/siibra-explorer:${BRANCH_NAME}"
             imagePullPolicy: Always
@@ -116,7 +110,7 @@ objects:
       app: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
     name: siibra-explorer-branch-deploy-${SANITIZED_BRANCH_NAME}
   spec:
-    host: siibra-explorer.apps-dev.hbp.eu
+    host: siibra-explorer.apps${PATH_POSTFIX}.hbp.eu
     path: /${SANITIZED_BRANCH_NAME}
     port:
       targetPort: 8080-tcp
@@ -143,6 +137,11 @@ parameters:
     - does not allow special characters, except for - or . .
     - only allows lower case.
     Strip all special characters from BRANCH_NAME, change to all lower case and pass it as SANITIZED_BRANCH_NAME
-
+- name: PATH_POSTFIX
+  description: url path postfix. either '-dev' or '' (empty string)
+  value: ''
+- name: BUILD_TEXT
+  description: 'UI displaying which build'
+  value: 'dev build'
 labels:
   template: siibra-explorer-branch-deploy-template
