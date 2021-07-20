@@ -163,6 +163,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.datasetList = res
         this.selectedDataset = this.datasetList[0]?.['@id']
         this.selectedDatasetDescription = this.datasetList[0]?.['src_info']
+        // this.selectedDatasetKgId = this.datasetList[0]?.kgId || null
+        // this.selectedDatasetKgSchema = this.datasetList[0]?.kgSchema || null
 
         this.changeDataset()
       })
@@ -320,8 +322,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         this.selectedDataset = event.value
         const foundDataset = this.datasetList.find(d => d['@id'] === this.selectedDataset)
         this.selectedDatasetDescription = foundDataset?.['src_info']
-        this.selectedDatasetKgId = foundDataset?.kgId || null
-        this.selectedDatasetKgSchema = foundDataset?.kgschema || null
+        // this.selectedDatasetKgId = foundDataset?.kgId || null
+        // this.selectedDatasetKgSchema = foundDataset?.kgSchema || null
       }
       if (this.datasetList.length && this.selectedDataset) {
         this.setProfileLoadUrl()
