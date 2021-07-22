@@ -5,6 +5,7 @@ import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { TBSDetail } from "../type";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'bs-features-receptor-entry',
@@ -17,6 +18,7 @@ import { TBSDetail } from "../type";
 export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestroy{
 
   private sub: Subscription[] = []
+  public ARIA_LABELS = ARIA_LABELS
 
   private selectedREntryId$ = new Subject<string>()
   private _selectedREntryId: string

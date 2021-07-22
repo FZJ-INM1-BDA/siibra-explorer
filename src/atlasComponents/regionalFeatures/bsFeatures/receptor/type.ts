@@ -32,7 +32,6 @@ export type TBSSummary = {
   origin_datainfos?: ({
     name: string
     description: string
-  } | {
     urls: {
       doi: string
       cite?: string
