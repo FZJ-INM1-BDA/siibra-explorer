@@ -29,6 +29,15 @@ export type TBSSummary = {
   ['@id']: string
   name: string
   info: string
+  origin_datainfos?: ({
+    name: string
+    description: string
+  } | {
+    urls: {
+      doi: string
+      cite?: string
+    }[]
+  })[]
 }
 
 export type TBSDetail = TBSSummary & {

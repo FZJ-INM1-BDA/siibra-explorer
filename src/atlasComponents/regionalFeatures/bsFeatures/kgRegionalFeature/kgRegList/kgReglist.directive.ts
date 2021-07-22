@@ -2,15 +2,16 @@ import { Directive, EventEmitter, OnDestroy, Output } from "@angular/core";
 import { KG_REGIONAL_FEATURE_KEY, TBSSummary } from "../type";
 import { BsFeatureService } from "../../service";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
-import { Subscription } from "rxjs";
-import { filter, startWith, switchMap, tap } from "rxjs/operators";
+import { merge, of, Subscription } from "rxjs";
+import { filter, mapTo, startWith, switchMap, tap } from "rxjs/operators";
+import { IRegionalFeatureReadyDirective } from "../../type";
 
 @Directive({
   selector: '[kg-regional-features-list-directive]',
   exportAs: 'kgRegionalFeaturesListDirective'
 })
 
-export class KgRegionalFeaturesListDirective extends BsRegionInputBase implements OnDestroy {
+export class KgRegionalFeaturesListDirective extends BsRegionInputBase implements IRegionalFeatureReadyDirective, OnDestroy {
   public kgRegionalFeatures: TBSSummary[] = []
   public kgRegionalFeatures$ = this.region$.pipe(
     filter(v => !!v),
@@ -18,7 +19,9 @@ export class KgRegionalFeaturesListDirective extends BsRegionInputBase implement
     switchMap(() => {
       this.busyEmitter.emit(true)
       return this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
-        tap(() => this.busyEmitter.emit(false))
+        tap(() => {
+          this.busyEmitter.emit(false)
+        })
       )
     }),
     startWith([])
@@ -36,6 +39,16 @@ export class KgRegionalFeaturesListDirective extends BsRegionInputBase implement
   ngOnDestroy(){
     while (this.sub.length) this.sub.pop().unsubscribe()
   }
+
+  results$ = this.kgRegionalFeatures$
+  busy$ = this.region$.pipe(
+    switchMap(() => merge(
+      of(true),
+      this.results$.pipe(
+        mapTo(false)
+      )
+    ))
+  )
 
   @Output('kg-regional-features-list-directive-busy')
   busyEmitter = new EventEmitter<boolean>()

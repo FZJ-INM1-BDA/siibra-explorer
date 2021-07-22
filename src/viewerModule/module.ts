@@ -24,6 +24,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
 import { map } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
 import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
+import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bsFeatures/kgRegionalFeature";
 
 @NgModule({
   imports: [
@@ -45,6 +46,7 @@ import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
     QuickTourModule,
     ContextMenuModule,
     ViewerStateBreadCrumbModule,
+    KgRegionalFeatureModule,
   ],
   declarations: [
     ViewerCmp,

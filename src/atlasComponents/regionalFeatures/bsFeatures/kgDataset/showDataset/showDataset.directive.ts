@@ -1,7 +1,9 @@
-import { Component, Directive, HostListener, Inject, Input, Optional } from "@angular/core";
+import { Directive, HostListener, Inject, Input, Optional } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
+import { TRegion as TSiibraRegion } from "src/util/siibraApiConstants/types";
+import { TRegion as TContextRegion } from 'src/atlasComponents/regionalFeatures/bsFeatures/type'
 
 export const IAV_DATASET_SHOW_DATASET_DIALOG_CMP = 'IAV_DATASET_SHOW_DATASET_DIALOG_CMP'
 export const IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG = `IAV_DATASET_SHOW_DATASET_DIALOG_CONFIG`
@@ -37,6 +39,9 @@ export class ShowDatasetDialogDirective{
     doi: string
   }[] = []
 
+  @Input('iav-dataset-show-dataset-dialog-contexted-region')
+  region: TSiibraRegion & TContextRegion
+
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
@@ -63,7 +68,7 @@ export class ShowDatasetDialogDirective{
     }
 
     if (this.overwriteFn) {
-      return this.overwriteFn(data)
+      return this.overwriteFn(data, this)
     }
 
     if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)

@@ -189,60 +189,43 @@
       (@openClose.done)="$event.toState === 'closed' && matDrawerLeft.close()"
       [disableClose]="true">
 
-      <div class="position-relative d-flex flex-column h-100">
+      <!-- check if preview volume -->
+      <div *ngIf="overlaySidenav$ | async as overlaySideNav" class="position-relative d-flex flex-column h-100">
+        <div class="position-relative ml-15px-n mr-15px-n">
+
+          <!-- back btn -->
+          <button mat-button
+            (click)="clearPreviewingDataset()"
+            [attr.aria-label]="ARIA_LABELS.CLOSE"
+            class="position-absolute z-index-10 m-2">
+            <i class="fas fa-chevron-left"></i>
+            <span class="ml-1">
+              Back
+            </span>
+          </button>
+
+          <!-- ebrains region -->
+          <kg-regional-feature-detail
+            [summary]="{'@id': overlaySideNav['context']['datasetId']}"
+            [region]="overlaySideNav['context']['region']">
+          </kg-regional-feature-detail>
+        </div>
+      </div>
+
+      <div [ngClass]="{
+        'invisible overflow-hidden h-0': overlaySidenav$ | async,
+        'h-100': !(overlaySidenav$ | async)
+      }" class="position-relative d-flex flex-column">
+
+        <ng-container *ngTemplateOutlet="sidenavRegionTmpl">
+        </ng-container>
 
         <!-- TODO dataset preview will become deprecated in the future.
         Regional feature/data feature will replace it -->
-        <div class="hidden"
+        <!-- <div class="hidden"
           iav-shown-dataset
           #iavShownDataset="iavShownDataset">
-        </div>
-
-        <div class="hidden"
-          iav-shown-previews
-          (emitter)="iavAdditionalLayers$.next($event)"
-          #previews="iavShownPreviews">
-        </div>
-
-        <!-- sidenav datasets -->
-        <ng-container *ngIf="iavShownDataset.shownDatasetId$ | async as shownDatasetId">
-          <ng-template [ngIf]="shownDatasetId.length > 0" [ngIfElse]="sideNavVolumePreview">
-
-            <div class="position-relative ml-15px-n mr-15px-n">
-
-              <!-- back btn -->
-              <button mat-button
-                (click)="clearPreviewingDataset()"
-                [attr.aria-label]="ARIA_LABELS.CLOSE"
-                class="position-absolute z-index-10 m-2">
-                <i class="fas fa-chevron-left"></i>
-                <span class="ml-1">
-                  Back
-                </span>
-              </button>
-
-              <!-- ebrains region -->
-              <kg-regional-feature-detail
-                *ngFor="let datasetId of shownDatasetId"
-                [summary]="{'@id': datasetId}"
-                [region]="selectedRegions$ | async | getNthElement : 0">
-              </kg-regional-feature-detail>
-            </div>
-          </ng-template>
-        </ng-container>
-
-        <!-- preview volumes -->
-        <ng-template #sideNavVolumePreview>
-          <ng-container *ngIf="previews.iavAdditionalLayers$ | async as volumePreviews">
-            <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
-              <ng-container *ngFor="let vPreview of volumePreviews">
-                <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
-
-                </ng-container>
-              </ng-container>
-            </ng-template>
-          </ng-container>
-        </ng-template>
+        </div> -->
 
       </div>
     </mat-drawer>
@@ -525,16 +508,16 @@
   </mat-expansion-panel>
 </ng-template>
 
-<ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
+<!-- misc dataset (e.g. PLI) -->
+<!-- <ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
   <div class="w-100 flex-grow-1 d-flex flex-column">
 
     Previewing misc dataset
 
-    <!-- collapse btn -->
     <ng-container *ngTemplateOutlet="collapseBtn">
     </ng-container>
   </div>
-</ng-template>
+</ng-template> -->
 
 <!-- select region error... for whatever reason -->
 <ng-template #selectRegionErrorTmpl>

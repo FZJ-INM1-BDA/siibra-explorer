@@ -10,9 +10,8 @@ import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-shee
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
 import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
 import { IUiState } from './uiState/common'
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionMouseoverLandmark, uiActionMouseoverSegments, uiActionShowDatasetWtihId, uiActionSnackbarMessage } from './uiState/actions';
+import { uiActionMouseoverLandmark, uiActionMouseoverSegments, uiActionSnackbarMessage } from './uiState/actions';
 export const defaultState: IUiState = {
-  shownDatasetId: [],
 
   previewingDatasetFiles: [],
 
@@ -39,27 +38,7 @@ export { IUiState }
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiState = state, action: ActionInterface) => {
   switch (action.type) {
-  case uiActionHideDatasetWithId.type:{
-    return {
-      ...prevState,
-      shownDatasetId: prevState.shownDatasetId.filter(id => id !== (action as any).id)
-    }
-  }
-  case uiActionHideAllDatasets.type:{
-    return {
-      ...prevState,
-      shownDatasetId: []
-    }
-  }
-  case uiActionShowDatasetWtihId.type: {
-    return {
-      ...prevState,
-      shownDatasetId: prevState.shownDatasetId.concat(
-        (action as any).id
-      )
-    }
-  }
-  
+
   case uiActionSetPreviewingDatasetFiles.type: {
     const { previewingDatasetFiles } = action as any
     return {

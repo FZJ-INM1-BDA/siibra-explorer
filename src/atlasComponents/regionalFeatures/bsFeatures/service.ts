@@ -1,17 +1,33 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 import { shareReplay } from "rxjs/operators";
 import { CachedFunction } from "src/util/fn";
 import { BS_ENDPOINT } from "./constants";
-import { IBSSummaryResponse, IBSDetailResponse, TRegion, IFeatureList } from './type'
+import { IBSSummaryResponse, IBSDetailResponse, TRegion, IFeatureList, IRegionalFeatureReadyDirective } from './type'
 
 function processRegion(region: TRegion) {
   return `${region.name} ${region.status ? region.status : '' }`
 }
 
-@Injectable()
+export type TFeatureCmpInput = {
+  region: TRegion
+}
+
+export type TRegisteredFeature<V = any> = {
+  name: string
+  icon: string // fontawesome font class, e.g. `fas fa-link-alt`
+  View: new (...arg: any[]) => V
+  Ctrl: new (svc: BsFeatureService, data: TFeatureCmpInput) => IRegionalFeatureReadyDirective
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class BsFeatureService{
 
+  public registeredFeatures: TRegisteredFeature[] = []
+  public registeredFeatures$ = new BehaviorSubject<TRegisteredFeature[]>(this.registeredFeatures)
   public getAllFeatures$ = this.http.get(`${this.bsEndpoint}/features`).pipe(
     shareReplay(1)
   )
@@ -50,6 +66,19 @@ export class BsFeatureService{
     ).pipe(
       shareReplay(1)
     )
+  }
+
+  public registerFeature(feature: TRegisteredFeature){
+    if (this.registeredFeatures.find(v => v.name === feature.name)) {
+      throw new Error(`feature ${feature.name} already registered`)
+    }
+    this.registeredFeatures.push(feature)
+    this.registeredFeatures$.next(this.registeredFeatures)
+  }
+
+  public deregisterFeature(name: string){
+    this.registeredFeatures = this.registeredFeatures.filter(v => v.name !== name)
+    this.registeredFeatures$.next(this.registeredFeatures)
   }
   
   constructor(

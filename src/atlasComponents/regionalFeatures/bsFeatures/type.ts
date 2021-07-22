@@ -1,6 +1,7 @@
 import { IHasId } from "src/util/interfaces";
 import { TBSDetail as TReceptorDetail, TBSSummary as TReceptorSummary } from "./receptor/type";
 import { KG_REGIONAL_FEATURE_KEY, TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFeature/type'
+import { Observable } from "rxjs";
 
 /**
  * change KgRegionalFeature -> EbrainsRegionalDataset in prod
@@ -30,4 +31,10 @@ export interface IFeatureList {
   features: {
     [key: string]: string
   }[]
+}
+
+export interface IRegionalFeatureReadyDirective {
+  ngOnDestroy(): void
+  busy$: Observable<boolean>
+  results$: Observable<IBSSummaryResponse[keyof IBSSummaryResponse][]>
 }

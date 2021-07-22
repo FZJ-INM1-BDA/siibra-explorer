@@ -1,0 +1,44 @@
+<!-- icons container -->
+<div class="d-flex flex-row align-items-stretch">
+
+  <!-- icon container -->
+  <div *ngFor="let feature of registeredFeatures$ | async; let last = last"
+    class="d-flex flex-row">
+
+    <!-- hoverable/clickable -->
+    <div class="p-2 flex-grow-1 flex-shrink-1 w-5em d-inline-flex flex-column align-items-center iv-custom-comp hoverable"
+      (click)="activateFeature(feature)"
+      [ngClass]="{
+        'text primary': activatedFeatureName === feature.name
+      }"
+      mat-ripple>
+
+      <!-- icon container -->
+      <div class="h-4rem d-flex align-items-center justify-content-center">
+        <i class="d-inline-block" [ngClass]="feature.icon"></i>
+      </div>
+
+      <!-- text -->
+      <span class="d-inline-block button-text">
+        {{ feature.name }}
+      </span>
+    </div>
+
+    <!-- divider -->
+    <mat-divider *ngIf="!last" vertical="true"
+      class="flex-grow-0 flex-shrink-0">
+    </mat-divider>
+    
+  </div>
+</div>
+
+<spinner-cmp *ngIf="busy$ | async"></spinner-cmp>
+
+
+<span *ngIf="!activatedFeatureName"
+  class="text-muted pt-4">
+  select type of regional feature
+</span>
+
+<ng-template #regionalFeatureContainerTmpl>
+</ng-template>

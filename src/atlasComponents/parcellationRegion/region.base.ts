@@ -61,7 +61,7 @@ export class RegionBase {
     return this._region
   }
 
-  private region$: BehaviorSubject<any> = new BehaviorSubject(null)
+  public region$: BehaviorSubject<any> = new BehaviorSubject(null)
 
   @Input()
   public isSelected: boolean = false

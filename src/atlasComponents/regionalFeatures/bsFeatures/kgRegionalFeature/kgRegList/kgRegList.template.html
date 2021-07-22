@@ -1,7 +1,6 @@
-<ng-container *ngTemplateOutlet="virtualScrollTmpl">
-</ng-container>
+<spinner-cmp *ngIf="busy$ | async; else contentTmpl"></spinner-cmp>
 
-<ng-template #virtualScrollTmpl>
+<ng-template #contentTmpl>
   <cdk-virtual-scroll-viewport
     [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL"
     class="h-100"
@@ -18,6 +17,7 @@
         mat-ripple
         iav-dataset-show-dataset-dialog
         [iav-dataset-show-dataset-dialog-fullid]="dataset['@id']"
+        [iav-dataset-show-dataset-dialog-contexted-region]="region"
         class="d-block pb-1 pt-1"
         [region]="region"
         [loadFull]="false"

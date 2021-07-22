@@ -43,20 +43,6 @@ export const uiActionShowSidePanelConnectivity = createAction(
   `[uiState] showSidePanelConnectivity`
 )
 
-export const uiActionShowDatasetWtihId = createAction(
-  `[uiState] showDatasetWithId`,
-  props<{ id: string }>()
-)
-
-export const uiActionHideDatasetWithId = createAction(
-  `[uiState] hideDatasetWithId`,
-  props<{ id: string }>()
-)
-
-export const uiActionHideAllDatasets = createAction(
-  `[uiState] hideAllDatasets`
-)
-
 export const uiActionSnackbarMessage = createAction(
   `[uiState] snackbarMessage`,
   props<{snackbarMessage: string}>()

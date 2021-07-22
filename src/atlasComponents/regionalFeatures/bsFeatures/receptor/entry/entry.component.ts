@@ -1,8 +1,9 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, Inject, OnDestroy, Optional } from "@angular/core";
 import { Observable, of, Subject, Subscription } from "rxjs";
 import { filter, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
-import { BsFeatureService } from "../../service";
+import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
+import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { TBSDetail } from "../type";
 
 @Component({
@@ -66,9 +67,10 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   )
 
   constructor(
-    svc: BsFeatureService
+    svc: BsFeatureService,
+    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput
   ){
-    super(svc)
+    super(svc, data)
     this.sub.push(
       this.selectedReceptor$.subscribe()
     )

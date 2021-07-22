@@ -9,6 +9,7 @@ import { KgDatasetModule } from "../kgDataset";
 import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "../kgDataset/showDataset/showDataset.directive";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
+import { BsFeatureService } from "../service";
 
 @Component({
   selector: 'blabla',
@@ -56,4 +57,13 @@ export class ShowDsDialogCmp{}
   ]
 })
 
-export class KgRegionalFeatureModule{}
+export class KgRegionalFeatureModule{
+  constructor(svc: BsFeatureService){
+    svc.registerFeature({
+      name: 'ebrains datasets',
+      icon: 'fas fa-ellipsis-h',
+      View: KgRegionalFeaturesList,
+      Ctrl: KgRegionalFeaturesListDirective,
+    })
+  }
+}

@@ -3,6 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { UtilModule } from "src/util";
+import { BsFeatureService } from "../service";
 import { BsFeatureReceptorAR } from "./ar/autoradiograph.component";
 import { BsFeatureReceptorEntry } from "./entry/entry.component";
 import { BsFeatureReceptorFingerprint } from "./fp/fp.component";
@@ -32,4 +33,13 @@ import { BsFeatureReceptorProfile } from "./profile/profile.component";
   ]
 })
 
-export class BSFeatureReceptorModule{}
+export class BSFeatureReceptorModule{
+  constructor(svc: BsFeatureService){
+    svc.registerFeature({
+      name: 'receptor',
+      icon: 'fas fa-info',
+      View: BsFeatureReceptorEntry,
+      Ctrl: BsFeatureReceptorDirective,
+    })
+  }
+}

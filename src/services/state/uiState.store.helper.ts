@@ -8,8 +8,6 @@ export {
   uiStateExpandSidePanel,
   uiStateOpenSidePanel,
   uiStateShowBottomSheet,
-  uiActionHideDatasetWithId,
-  uiActionShowDatasetWtihId,
   uiActionSnackbarMessage,
   uiActionMouseoverLandmark,
   uiActionMouseoverSegments,
@@ -19,7 +17,6 @@ export {
   uiStatePreviewingDatasetFilesSelector,
   uiStateMouseOverSegmentsSelector,
   uiStateMouseoverUserLandmark,
-  uiStateShownDatasetIdSelector,
 } from './uiState/selectors'
 
 export enum EnumWidgetTypes{

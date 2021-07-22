@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, ViewChild } from "@angular/core";
-import { Subscription } from "rxjs";
+import { ChangeDetectionStrategy, Component, Inject, Input, OnDestroy, Optional } from "@angular/core";
+import { BehaviorSubject, Subscription } from "rxjs";
 import { filter, switchMap, tap } from "rxjs/operators";
 import { TCountedDataModality } from '../../kgDataset'
 import { BsRegionInputBase } from "../../bsRegionInputBase";
-import { BsFeatureService } from "../../service";
+import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { KG_REGIONAL_FEATURE_KEY, TBSDetail, TBSSummary } from "../type";
 import { ARIA_LABELS } from 'common/constants'
-import { filterKgFeatureByModailty } from "../../kgDataset/util";
+import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 
 @Component({
   selector: 'kg-regional-features-list',
@@ -29,12 +29,25 @@ export class KgRegionalFeaturesList extends BsRegionInputBase implements OnDestr
   public visibleRegionalFeatures: TBSSummary[] = []
   public kgRegionalFeatures: TBSSummary[] = []
   public kgRegionalFeatures$ = this.region$.pipe(
-    filter(v => !!v),
+    filter(v => {
+      this.busy$.next(false)
+      return !!v
+    }),
     // must not use switchmapto here
-    switchMap(() => this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY))
+    switchMap(() => {
+      this.busy$.next(true)
+      return this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
+        tap(() => {
+          this.busy$.next(false)
+        })
+      )
+    })
   )
-  constructor(private cdr: ChangeDetectorRef, svc: BsFeatureService){
-    super(svc)
+  constructor(
+    svc: BsFeatureService,
+    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput
+  ){
+    super(svc, data)
     this.sub.push(
       this.kgRegionalFeatures$.subscribe(val => {
         this.kgRegionalFeatures = val
@@ -72,26 +85,5 @@ export class KgRegionalFeaturesList extends BsRegionInputBase implements OnDestr
     this.dataModalities = [...this.dataModalities]
   }
 
-  public handleModalityVisbilityChange(modalityFilter: TCountedDataModality[]){
-    this.dataModalities = modalityFilter
-    const visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
-
-    const filterFunc = filterKgFeatureByModailty(visibleCountedDataM)
-    this.visibleRegionalFeatures = this.kgRegionalFeatures.filter(sum => {
-      const detail = this.detailDict[sum['@id']]
-      if (!detail) return false
-      return filterFunc(detail)
-    })
-    this.cdr.markForCheck()
-  }
-
-  public clearFilters(){
-    const dataModalities = this.dataModalities.map(v => {
-      return {
-        ...v,
-        visible: false
-      }
-    })
-    this.handleModalityVisbilityChange(dataModalities)
-  }
+  public busy$ = new BehaviorSubject(false)
 }

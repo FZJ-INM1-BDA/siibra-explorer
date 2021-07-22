@@ -11,7 +11,6 @@ import {
   viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors"
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { uiActionHideAllDatasets, uiActionHideDatasetWithId, uiActionShowDatasetWtihId } from "src/services/state/uiState/actions";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { SwitchDirective } from "src/util/directives/switch.directive";
@@ -21,6 +20,26 @@ import { PureContantService } from "src/util";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { getGetRegionFromLabelIndexId } from "src/util/fn";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
+import { ComponentStore } from "../componentStore";
+
+interface IOverlayTypes {
+  ebrainsRegionalDataset: {
+    datasetId: string
+    atlasId: string
+    parcId: string
+    region: any
+    spaceId?: string
+  }
+}
+
+type TOverlaySideNav<T extends keyof IOverlayTypes> = {
+  '@type': T
+  context: IOverlayTypes[T]
+}
+
+type TCStoreViewerCmp = {
+  overlaySideNav: TOverlaySideNav<keyof IOverlayTypes>
+}
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -90,19 +109,31 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
     },
     {
       provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
-      useFactory: (store: Store) => {
-        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string } ){
-          if (arg.fullId) {
-            store.dispatch(
-              uiActionShowDatasetWtihId({
-                id: arg.fullId
-              })
-            )
-          }
+      useFactory: (cStore: ComponentStore<TCStoreViewerCmp>) => {
+        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string }, data: any ){
+          
+          const { region } = data
+          const datasetId = arg.fullId
+          const atlasId = data?.region?.context?.atlas?.['@id']
+          const parcId = data?.region?.context?.parcellation?.['@id']
+          const spaceId = data?.region?.context?.template?.['@id']
+          cStore.setState({
+            overlaySideNav: {
+              '@type': 'ebrainsRegionalDataset',
+              context: {
+                datasetId,
+                atlasId,
+                parcId,
+                region,
+                spaceId,
+              }
+            }
+          })
         }
       },
-      deps: [ Store ]
+      deps: [ ComponentStore ]
     },
+    ComponentStore
   ]
 })
 
@@ -156,6 +187,8 @@ export class ViewerCmp implements OnDestroy {
     select(viewerStateViewerModeSelector),
   )
 
+  public overlaySidenav$ = this.cStore.select(s => s.overlaySideNav)
+
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
     this.templateSelected$,
     this.isStandaloneVolumes$,
@@ -203,10 +236,14 @@ export class ViewerCmp implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
+    private cStore: ComponentStore<TCStoreViewerCmp>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
 
     this.subscriptions.push(
+      this.selectedRegions$.subscribe(() => {
+        this.clearPreviewingDataset()
+      }),
       this.alwaysHideMinorPanel$.pipe(
         distinctUntilChanged(),
         filter(flag => !flag),
@@ -314,15 +351,13 @@ export class ViewerCmp implements OnDestroy {
     this.sidenavTopSwitch && this.sidenavTopSwitch.open()
   }
 
-  public clearPreviewingDataset(id?: string){
+  public clearPreviewingDataset(){
     /**
      * clear all preview
      */
-    this.store$.dispatch(
-      id
-        ? uiActionHideDatasetWithId({ id })
-        : uiActionHideAllDatasets()
-    )
+    this.cStore.setState({
+      overlaySideNav: null
+    })
   }
 
   @ViewChild('regionSelRef', { read: ElementRef })

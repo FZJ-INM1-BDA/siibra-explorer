@@ -20,7 +20,6 @@ const isSubRegion = (high, low) => regionsEqual(high, low)
     
 
 const filterSubSelect = (dataEntry, selectedRegions) => {
-  if (dataEntry.name === 'Density measurements of different receptors for Area 7A (SPL) [human, v1.0]') console.log(dataEntry)
   return dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr, sr)))
 }
 
