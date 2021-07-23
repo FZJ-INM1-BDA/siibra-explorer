@@ -1,10 +1,11 @@
-import { Directive, EventEmitter, OnDestroy, Output } from "@angular/core";
+import { Directive, EventEmitter, Inject, OnDestroy, Optional, Output } from "@angular/core";
 import { KG_REGIONAL_FEATURE_KEY, TBSSummary } from "../type";
-import { BsFeatureService } from "../../service";
+import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { merge, of, Subscription } from "rxjs";
-import { filter, mapTo, startWith, switchMap, tap } from "rxjs/operators";
+import { catchError, mapTo, startWith, switchMap, tap } from "rxjs/operators";
 import { IRegionalFeatureReadyDirective } from "../../type";
+import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 
 @Directive({
   selector: '[kg-regional-features-list-directive]',
@@ -14,21 +15,27 @@ import { IRegionalFeatureReadyDirective } from "../../type";
 export class KgRegionalFeaturesListDirective extends BsRegionInputBase implements IRegionalFeatureReadyDirective, OnDestroy {
   public kgRegionalFeatures: TBSSummary[] = []
   public kgRegionalFeatures$ = this.region$.pipe(
-    filter(v => !!v),
     // must not use switchmapto here
     switchMap(() => {
       this.busyEmitter.emit(true)
-      return this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
-        tap(() => {
-          this.busyEmitter.emit(false)
-        })
+      return merge(
+        of([]),
+        this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
+          catchError(() => of([])),
+          tap(() => {
+            this.busyEmitter.emit(false)
+          }),
+        )
       )
     }),
     startWith([])
   )
   
-  constructor(svc: BsFeatureService){
-    super(svc)
+  constructor(
+    svc: BsFeatureService,
+    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput,  
+  ){
+    super(svc, data)
     this.sub.push(
       this.kgRegionalFeatures$.subscribe(val => {
         this.kgRegionalFeatures = val

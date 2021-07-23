@@ -1,8 +1,8 @@
 import { Component, ComponentFactory, ComponentFactoryResolver, Injector, Input, OnChanges, ViewChild, ViewContainerRef } from "@angular/core";
 import { TRegion } from "../type";
-import { BsFeatureService, TFeatureCmpInput, TRegisteredFeature } from "../service";
-import { BehaviorSubject, Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { BsFeatureService, TFeatureCmpInput } from "../service";
+import { BehaviorSubject, combineLatest, Observable } from "rxjs";
+import { map, scan } from "rxjs/operators";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../constants";
 
 @Component({
@@ -23,13 +23,37 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
 
   private weakmap = new WeakMap<(new () => any),  ComponentFactory<any>>()
 
-  public registeredFeatures$ = this.svc.registeredFeatures$
+  public registeredFeatures$: Observable<{
+    name: string
+    icon: string
+    
+  }[]>
   constructor(
     private svc: BsFeatureService,
     private cfr: ComponentFactoryResolver,
     private injector: Injector,
   ){
-    
+    this.registeredFeatures$ = this.registeredFeatureMasterStream$.pipe(
+      scan((acc, curr) => {
+        return {
+          ...acc,
+          ...curr
+        }
+      }),
+      map(obj => {
+        const returnArr = []
+        for (const name in obj) {
+          if (obj[name].busy || obj[name].results.length === 0) {
+            continue
+          }
+          returnArr.push({
+            name,
+            icon: obj[name].icon
+          })
+        }
+        return returnArr
+      })
+    )
   }
 
   private regionOnDestroyCb: (() => void)[] = []
@@ -37,11 +61,15 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
     if (!this.region) return
     const { region } = this
     for (const feat of this.svc.registeredFeatures){
+      const { name, icon } = feat
       const ctrl = new feat.Ctrl(this.svc, { region })
-      const sub = ctrl.busy$.subscribe(
-        flag => {
-          this.busyMasterStream$.next({
-            [feat.name]: flag
+      const sub = combineLatest([
+        ctrl.busy$,
+        ctrl.results$
+      ]).subscribe(
+        ([busy, results]) => {
+          this.registeredFeatureMasterStream$.next({
+            [name]: { busy, results, icon }
           })
         }
       )
@@ -50,16 +78,20 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
   }
   private cleanUpRegionalFeature(){
     while (this.regionOnDestroyCb.length) this.regionOnDestroyCb.pop()()
-    this.busyMasterStream$.next({})
+    this.registeredFeatureMasterStream$.next({})
   }
 
-  private busyMasterStream$ = new BehaviorSubject<{
-    [key: string]: boolean
+  private registeredFeatureMasterStream$ = new BehaviorSubject<{
+    [key: string]: {
+      icon: string
+      busy: boolean
+      results: any[]
+    }
   }>({})
-  public busy$: Observable<boolean> = this.busyMasterStream$.pipe(
+  public busy$: Observable<boolean> = this.registeredFeatureMasterStream$.pipe(
     map(obj => {
       for (const key in obj) {
-        if(obj[key]) return true
+        if(obj[key].busy) return true
       }
       return false
     }),
@@ -71,8 +103,15 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
   }
 
   public activatedFeatureName: string = null
-  activateFeature(feat: TRegisteredFeature){
-    this.activatedFeatureName = feat.name
+  activateFeature(featNameObj: {
+    name: string
+  }){
+    const feat = this.svc.registeredFeatures.find(f => f.name === featNameObj.name)
+    if (!feat) {
+      console.log(`cannot find feature with name ${featNameObj.name}`)
+      return
+    }
+    this.activatedFeatureName = featNameObj.name
     if (!this.regionalFeatureContainerRef) {
       console.warn(`regionalFeatureContainerRef not defined.`)
       return
