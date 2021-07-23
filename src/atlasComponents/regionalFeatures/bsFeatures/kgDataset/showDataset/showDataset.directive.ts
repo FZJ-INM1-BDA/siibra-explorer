@@ -59,7 +59,7 @@ export class ShowDatasetDialogDirective{
       }
       if (this.name || this.description) {
         const { name, description, urls } = this
-        return { name, description, urls }
+        return { name, description, urls, useClassicUi: true }
       }
     })()
 
@@ -72,10 +72,11 @@ export class ShowDatasetDialogDirective{
     }
 
     if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)
+    const { useClassicUi } = data
     this.matDialog.open(this.dialogCmp, {
       ...ShowDatasetDialogDirective.defaultDialogConfig,
-      panelClass: ['no-padding-dialog'],
-      data
+      data,
+      ...(useClassicUi ? {} : { panelClass: ['no-padding-dialog'] })
     })
   }
 }

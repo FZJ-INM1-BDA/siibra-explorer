@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, NgModule } from "@angular/core";
+import { Component, Inject, NgModule, Optional } from "@angular/core";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { KgRegSummaryCmp } from "./kgRegSummary/kgRegSummary.component";
 import { KgRegionalFeaturesList } from "./kgRegList/kgRegList.component";
@@ -10,23 +10,39 @@ import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "../kgDataset/showDataset/sh
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { BsFeatureService } from "../service";
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 @Component({
-  selector: 'blabla',
+  selector: 'show-ds-dialog-cmp',
   template: `
-<mat-dialog-content class="m-0 p-0">
+<ng-template [ngIf]="useClassicUi" [ngIfElse]="modernUiTmpl">
   <kg-regional-feature-detail></kg-regional-feature-detail>
-</mat-dialog-content>
+</ng-template>
 
-<mat-dialog-actions align="center">
-  <button mat-button mat-dialog-close>
-    Close
-  </button>
-</mat-dialog-actions>
+<ng-template #modernUiTmpl>
+
+  <mat-dialog-content class="m-0 p-0">
+    <kg-regional-feature-detail></kg-regional-feature-detail>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="center">
+    <button mat-button mat-dialog-close>
+      Close
+    </button>
+  </mat-dialog-actions>
+
+</ng-template>
 `
 })
 
-export class ShowDsDialogCmp{}
+export class ShowDsDialogCmp{
+  public useClassicUi = false
+  constructor(
+    @Optional() @Inject(MAT_DIALOG_DATA) data: any
+  ){
+    this.useClassicUi = data.useClassicUi
+  }
+}
 
 @NgModule({
   imports: [

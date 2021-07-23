@@ -37,6 +37,7 @@ export class KgRegDetailCmp extends BsRegionInputBase implements OnChanges {
   public isGdprProtected = false
 
   public descriptionFallback = `[This dataset cannot be fetched right now]`
+  public useClassicUi = false
 
   public description: string
   public name: string
@@ -51,10 +52,11 @@ export class KgRegDetailCmp extends BsRegionInputBase implements OnChanges {
   ){
     super(svc)
     if (data) {
-      const { description, name, urls } = data
+      const { description, name, urls, useClassicUi } = data
       this.description = description
       this.name = name
       this.urls = urls
+      this.useClassicUi = useClassicUi
     }
   }
 
