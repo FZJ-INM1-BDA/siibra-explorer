@@ -97,3 +97,11 @@ export const decodeToNumber:
       return castedFloat[0]
     }
   }
+
+/**
+ * see https://stackoverflow.com/questions/53051415/can-you-disable-auxiliary-secondary-routes-in-angular
+ * need to encode brackets
+ */
+export const encodeURIFull = (str: string) => {
+  return encodeURI(str).replace(/[()]/g, s => `%${s.charCodeAt(0).toString(16)}`)
+}

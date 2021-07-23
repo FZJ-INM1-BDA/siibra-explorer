@@ -83,15 +83,30 @@ describe('> util.ts', () => {
 
       mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [])
     })
-    it('> should be able encode region properly', () => {
-      const ngId = 'foobar'
-      const labelIndex = 124
-      mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [{
-        labelIndex,
-        ngId
-      }])
-      const s = cvtStateToHashedRoutes({})
-      expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
+    describe('> should be able encode region properly', () => {
+
+      it('> regular ngId', () => {
+        const ngId = 'foobar'
+        const labelIndex = 124
+        mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [{
+          labelIndex,
+          ngId
+        }])
+        const s = cvtStateToHashedRoutes({})
+        expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
+      })
+
+      it('> ngId containing ()', () => {
+
+        const ngId = 'foobar(1)'
+        const labelIndex = 124
+        mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [{
+          labelIndex,
+          ngId
+        }])
+        const s = cvtStateToHashedRoutes({})
+        expect(s).toContain(`r:foobar%281%29::${encodeNumber(labelIndex, { float: false })}`)
+      })
     })
   })
 })
