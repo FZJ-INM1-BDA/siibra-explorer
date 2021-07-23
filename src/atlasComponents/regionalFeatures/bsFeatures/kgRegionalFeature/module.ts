@@ -60,7 +60,7 @@ export class ShowDsDialogCmp{}
 export class KgRegionalFeatureModule{
   constructor(svc: BsFeatureService){
     svc.registerFeature({
-      name: 'ebrains datasets',
+      name: 'EBRAINS datasets',
       icon: 'fas fa-ellipsis-h',
       View: KgRegionalFeaturesList,
       Ctrl: KgRegionalFeaturesListDirective,

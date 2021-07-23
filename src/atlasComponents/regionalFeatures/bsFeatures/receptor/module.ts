@@ -36,7 +36,7 @@ import { BsFeatureReceptorProfile } from "./profile/profile.component";
 export class BSFeatureReceptorModule{
   constructor(svc: BsFeatureService){
     svc.registerFeature({
-      name: 'receptor',
+      name: 'receptor density',
       icon: 'fas fa-info',
       View: BsFeatureReceptorEntry,
       Ctrl: BsFeatureReceptorDirective,
