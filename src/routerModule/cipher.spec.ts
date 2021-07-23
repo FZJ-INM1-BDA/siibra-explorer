@@ -131,7 +131,7 @@ describe('common.ts', () => {
     it('> should endcode brackets', () => {
       expect(
         encodeURIFull('(')
-      ).toEqual('%2B')
+      ).toEqual('%28')
     })
   })
 })

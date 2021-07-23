@@ -105,7 +105,7 @@ describe('> util.ts', () => {
           ngId
         }])
         const s = cvtStateToHashedRoutes({})
-        expect(s).toContain(`r:foobar%281%29::${encodeNumber(labelIndex, { float: false })}`)
+        expect(s).toContain(`r:foobar%25281%2529::${encodeNumber(labelIndex, { float: false })}`)
       })
     })
   })
