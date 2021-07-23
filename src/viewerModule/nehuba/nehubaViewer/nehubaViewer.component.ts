@@ -375,6 +375,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
               const p = message as TNgLayerCtrl<'update'>
               this.updateLayer(p.payload)
             }
+            if (message.type === 'setLayerTransparency') {
+              const p = message as TNgLayerCtrl<'setLayerTransparency'>
+              for (const key in p.payload) {
+                this.setLayerTransparency(key, p.payload[key])
+              }
+            }
           }
         })
       )
@@ -860,6 +866,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
        */
       this.setMeshTransparency(!newVal)
     }
+  }
+
+  private setLayerTransparency(layerName: string, alpha: number) {
+    const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+    if (!layer) return
+    layer.layer.displayState.objectAlpha.restoreState(alpha)
   }
 
   public setMeshTransparency(flag: boolean){

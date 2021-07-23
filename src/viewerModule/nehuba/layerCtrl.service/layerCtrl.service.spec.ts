@@ -1,13 +1,12 @@
 import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
+import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
 import { hot } from "jasmine-marbles"
 import { IColorMap } from "./layerCtrl.util"
 import { debounceTime } from "rxjs/operators"
 import { ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper"
-const  util = require('common/util')
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -28,6 +27,10 @@ describe('> layerctrl.service.ts', () => {
         layerCtrlUtil,
         'getMultiNgIdsRegionsLabelIndexMap'
       ).and.returnValue(() => getMultiNgIdsRegionsLabelIndexMapReturnVal)
+      mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
+
+      mockStore.overrideSelector(viewerStateSelectedTemplateSelector, {})
+      mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
     })
 
     it('> can be init', () => {
@@ -38,10 +41,6 @@ describe('> layerctrl.service.ts', () => {
     describe('> setColorMap$', () => {
       describe('> overwriteColorMap$ not firing', () => {
         describe('> template/parc has no aux meshes', () => {
-          beforeEach(() => {
-            mockStore.overrideSelector(viewerStateSelectedTemplateSelector, {})
-            mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
-          })
 
           it('> calls getMultiNgIdsRegionsLabelIndexMapReturn', () => {
             const service = TestBed.inject(NehubaLayerControlService)

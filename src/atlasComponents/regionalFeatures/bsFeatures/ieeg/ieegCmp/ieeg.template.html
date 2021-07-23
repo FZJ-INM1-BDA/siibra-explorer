@@ -1,0 +1,71 @@
+<ng-template [ngIf]="busy$ | async" [ngIfElse]="contenttmpl">
+  <spinner-cmp></spinner-cmp>
+</ng-template>
+
+<ng-template #contenttmpl>
+  <mat-expansion-panel *ngFor="let datum of (results$ | async)"
+    [expanded]="openElectrodeId$ | async | arrayContains : datum['@id']"
+    (opened)="handleDatumExpansion(datum['@id'], true)"
+    (closed)="handleDatumExpansion(datum['@id'], false)"
+    togglePosition="before">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Electrode
+      </mat-panel-title>
+      <mat-panel-description class="text-nowrap">
+        {{ datum['@id'] }}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+
+    <!-- <label for="task-list" class="d-block mat-h4 mt-4 text-muted">
+      Tasks
+    </label>
+    <section class="d-flex align-items-center mt-1">
+      <section id="task-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+        <div role="list">
+          <mat-chip *ngFor="let task of datum['tasks']" class="ml-1">
+            {{ task }}
+          </mat-chip>
+        </div>
+      </section>
+    </section> -->
+
+    <h4 class="mat-h4">
+      {{ datum['name'] }}
+    </h4>
+
+    <button
+      [matTooltip]="CONST.GDPR_TEXT"
+      mat-icon-button color="warn">
+      <i class="fas fa-exclamation-triangle"></i>
+    </button>
+
+    <a [href]="'https://search.kg.ebrains.eu/instances/' + datum.__kg_id"
+      mat-icon-button
+      color="primary"
+      target="_blank"
+      [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
+      [attr.aria-labels]="ARIA_LABELS.EXPLORE_DATASET_IN_KG">
+      <i class="fas fa-external-link-alt"></i>
+    </a>
+    <mat-divider></mat-divider>
+
+    <label for="contact-points-list" class="d-block mat-h4 mt-4 text-muted">
+      Contact Points
+    </label>
+    <section class="d-flex align-items-center mt-1">
+      <section id="contact-points-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+        <div role="list">
+          <mat-chip *ngFor="let item of datum['__contact_points'] | keyvalue"
+            [matTooltip]="item['value']['coord']"
+            (click)="handleContactPtClk(item['value'])"
+            class="ml-1">
+            {{ item['key'] }}
+          </mat-chip>
+        </div>
+      </section>
+    </section>
+
+  </mat-expansion-panel>
+</ng-template>

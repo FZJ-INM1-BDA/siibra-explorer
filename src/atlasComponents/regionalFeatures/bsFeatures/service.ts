@@ -5,6 +5,7 @@ import { shareReplay } from "rxjs/operators";
 import { CachedFunction } from "src/util/fn";
 import { BS_ENDPOINT } from "./constants";
 import { IBSSummaryResponse, IBSDetailResponse, TRegion, IFeatureList, IRegionalFeatureReadyDirective } from './type'
+import { SIIBRA_FEATURE_KEY as IEEG_FEATURE_KEY } from '../bsFeatures/ieeg/type'
 
 function processRegion(region: TRegion) {
   return `${region.name} ${region.status ? region.status : '' }`
@@ -26,6 +27,10 @@ export type TRegisteredFeature<V = any> = {
 })
 export class BsFeatureService{
 
+  static SpaceFeatureSet = new Set([
+    IEEG_FEATURE_KEY
+  ])
+
   public registeredFeatures: TRegisteredFeature[] = []
   public registeredFeatures$ = new BehaviorSubject<TRegisteredFeature[]>(this.registeredFeatures)
   public getAllFeatures$ = this.http.get(`${this.bsEndpoint}/features`).pipe(
@@ -40,13 +45,51 @@ export class BsFeatureService{
     )
   }
 
+  private getUrl(arg: {
+    atlasId: string
+    parcId: string
+    spaceId: string
+    region: TRegion
+    featureName: string
+    featureId?: string
+  }){
+    const { 
+      atlasId,
+      parcId,
+      spaceId,
+      region,
+      featureName,
+      featureId,
+    } = arg
+
+    if (BsFeatureService.SpaceFeatureSet.has(featureName)) {
+      
+      const url = new URL(`${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/spaces/${encodeURIComponent(spaceId)}/features/${encodeURIComponent(featureName)}${ featureId ? ('/' + encodeURIComponent(featureId)) : '' }`)
+      url.searchParams.set('parcellation_id', parcId)
+      url.searchParams.set('region', processRegion(region))
+
+      return url.toString()
+    }
+    
+    if (!featureId) {
+      return `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions/${encodeURIComponent(processRegion(region))}/features/${encodeURIComponent(featureName)}`
+    }
+    return `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions/${encodeURIComponent(processRegion(region))}/features/${encodeURIComponent(featureName)}/${encodeURIComponent(featureId)}`
+  }
+
   @CachedFunction({
     serialization: (featureName, region) => `${featureName}::${processRegion(region)}`
   })
   public getFeatures<T extends keyof IBSSummaryResponse>(featureName: T, region: TRegion){
     const { context } = region
-    const { atlas, parcellation } = context
-    const url = `${this.bsEndpoint}/atlases/${encodeURIComponent(atlas["@id"])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(processRegion(region))}/features/${encodeURIComponent(featureName)}`
+    const { atlas, parcellation, template } = context
+    const url = this.getUrl({
+      atlasId: atlas['@id'],
+      parcId: parcellation['@id'],
+      region,
+      featureName,
+      spaceId: template['@id']
+    })
     
     return this.http.get<IBSSummaryResponse[T][]>(
       url
@@ -60,10 +103,16 @@ export class BsFeatureService{
   })
   public getFeature<T extends keyof IBSDetailResponse>(featureName: T, region: TRegion, featureId: string) {
     const { context } = region
-    const { atlas, parcellation } = context
-    return this.http.get<IBSDetailResponse[T]>(
-      `${this.bsEndpoint}/atlases/${encodeURIComponent(atlas["@id"])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(processRegion(region))}/features/${encodeURIComponent(featureName)}/${encodeURIComponent(featureId)}`
-    ).pipe(
+    const { atlas, parcellation, template } = context
+    const url = this.getUrl({
+      atlasId: atlas['@id'],
+      parcId: parcellation['@id'],
+      spaceId: template['@id'],
+      region,
+      featureName,
+      featureId
+    })
+    return this.http.get<IBSSummaryResponse[T]&IBSDetailResponse[T]>(url).pipe(
       shareReplay(1)
     )
   }
