@@ -10,7 +10,7 @@
     minBufferPx="200"
     maxBufferPx="400"
     itemSize="50">
-    <div *cdkVirtualFor="let feature of registeredFeatures$ | async; templateCacheSize: 20; let index = index"
+    <div *cdkVirtualFor="let feature of registeredFeatures; templateCacheSize: 20; let index = index"
       class="h-50px overflow-hidden">
 
       <!-- divider, show if not first -->
@@ -27,7 +27,7 @@
     <div class="feature-container"
       [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL">
 
-      <div *ngFor="let feature of registeredFeatures$ | async; let index = index"
+      <div *ngFor="let feature of registeredFeatures; let index = index"
         class="overflow-hidden">
 
         <!-- divider, show if not first -->

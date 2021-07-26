@@ -1,8 +1,8 @@
-import { Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnChanges, Optional, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnChanges, OnDestroy, Optional, ViewChild, ViewContainerRef } from "@angular/core";
 import { IBSSummaryResponse, TContextedFeature, TRegion } from "../type";
 import { BsFeatureService, TFeatureCmpInput } from "../service";
 import { combineLatest, Observable, Subject } from "rxjs";
-import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
+import { debounceTime, map, shareReplay, startWith, tap } from "rxjs/operators";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../constants";
 import { ARIA_LABELS } from 'common/constants'
 import {
@@ -24,7 +24,7 @@ import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from
   ]
 })
 
-export class RegionalFeatureWrapperCmp implements OnChanges{
+export class RegionalFeatureWrapperCmp implements OnChanges, OnDestroy{
 
   public useVirtualScroll = false
 
@@ -38,39 +38,14 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
 
   private weakmap = new WeakMap<(new () => any),  ComponentFactory<any>>()
 
-  public registeredFeatures$: Observable<TContextedFeature<keyof IBSSummaryResponse>[]>
+  private ondestroyCb: (() => void)[] = []
   constructor(
     private svc: BsFeatureService,
     private cfr: ComponentFactoryResolver,
     @Optional() @Inject(OVERWRITE_SHOW_DATASET_DIALOG_TOKEN) private overwriteFn: TOverwriteShowDatasetDialog
   ){
-    this.registeredFeatures$ = this.registeredFeatureMasterStream$.pipe(
-      map(obj => {
-        const returnArr = []
-        for (const name in obj) {
-          if (obj[name].busy || obj[name].results.length === 0) {
-            continue
-          }
-          for (const result of obj[name].results) {
-            const objToBeInserted = {
-              featureName: name,
-              icon: obj[name].icon,
-              result
-            }
-            /**
-             * place ebrains regional features at the end
-             */
-            if (name === EbrainsRegionalFeatureName) {
-              returnArr.push(objToBeInserted)
-            } else {
-              returnArr.unshift(objToBeInserted)
-            }
-          }
-        }
-
-        return returnArr
-      })
-    )
+    const sub = this.registeredFeatures$.subscribe(arr => this.registeredFeatures = arr)
+    this.ondestroyCb.push(() => sub.unsubscribe())
   }
 
   private regionOnDestroyCb: (() => void)[] = []
@@ -129,9 +104,43 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
     }),
   )
 
+  public registeredFeatures: TContextedFeature<keyof IBSSummaryResponse>[] = []
+  private registeredFeatures$: Observable<TContextedFeature<keyof IBSSummaryResponse>[]> = this.registeredFeatureMasterStream$.pipe(
+    map(obj => {
+      const returnArr = []
+      for (const name in obj) {
+        if (obj[name].busy || obj[name].results.length === 0) {
+          continue
+        }
+        for (const result of obj[name].results) {
+          const objToBeInserted = {
+            featureName: name,
+            icon: obj[name].icon,
+            result
+          }
+          /**
+           * place ebrains regional features at the end
+           */
+          if (name === EbrainsRegionalFeatureName) {
+            returnArr.push(objToBeInserted)
+          } else {
+            returnArr.unshift(objToBeInserted)
+          }
+        }
+      }
+
+      return returnArr
+    }),
+  )
+
   ngOnChanges(){
     this.cleanUpRegionalFeature()
     this.setupRegionalFeatureCtrl()
+  }
+
+  ngOnDestroy(){
+    this.cleanUpRegionalFeature()
+    while(this.ondestroyCb.length) this.ondestroyCb.pop()()
   }
 
   public handleFeatureClick(contextedFeature: TContextedFeature<any>){
