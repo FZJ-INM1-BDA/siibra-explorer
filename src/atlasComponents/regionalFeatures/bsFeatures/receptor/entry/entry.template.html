@@ -1,3 +1,5 @@
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
 <!-- potential selector for receptor data -->
 <mat-select class="invisible" [(value)]="selectedREntryId">
   <mat-option *ngFor="let rec of receptorsSummary$ | async"
@@ -7,26 +9,6 @@
 </mat-select>
 
 <ng-container *ngIf="selectedReceptor$ | async as selectedRec">
-
-  <h3 class="mat-h3">
-    <span>
-      {{ selectedRec.name }}
-    </span>
-  </h3>
-
-  <ng-container *ngFor="let info of (selectedRec.origin_datainfos || [])">
-    <a *ngFor="let url of (info.urls || [])"
-      mat-icon-button
-      color="primary"
-      [href]="url.doi | doiParserPipe"
-      target="_blank"
-      [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-      [attr.aria-label]="ARIA_LABELS.EXPLORE_DATASET_IN_KG">
-      <i class="fas fa-external-link-alt"></i>
-    </a>
-  </ng-container>
-
-  <mat-divider class="m-2"></mat-divider>
 
   <bs-features-receptor-fingerprint
     (onSelectReceptor)="onSelectReceptor($event)"

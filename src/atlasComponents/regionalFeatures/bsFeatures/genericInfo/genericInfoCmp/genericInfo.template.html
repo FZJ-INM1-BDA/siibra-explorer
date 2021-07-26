@@ -12,6 +12,8 @@
     <ng-container *ngTemplateOutlet="descTmpl"></ng-container>
   </small>
 
+  <ng-container *ngTemplateOutlet="insertedView">
+  </ng-container>
 
   <!-- footer -->
   <mat-card-actions iav-media-query #iavMediaQuery="iavMediaQuery">
@@ -60,7 +62,7 @@
       <mat-card-subtitle class="d-inline-flex align-items-center">
         <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
         <span>
-          ebrains regional dataset
+          {{ dataType }}
         </span>
 
         <button *ngIf="isGdprProtected"
@@ -92,6 +94,11 @@
     <ng-container *ngTemplateOutlet="descTmpl">
     </ng-container>
   </div>
+
+  <div>
+    <ng-container *ngTemplateOutlet="insertedView">
+    </ng-container>
+  </div>
 </ng-template>
 
 <ng-template #nameTmpl>
@@ -105,6 +112,13 @@
   <markdown-dom 
     [markdown]="description || descriptionFallback">
   </markdown-dom>
+</ng-template>
+
+<!-- inserted view -->
+<ng-template #insertedView>
+  <ng-template #insertViewTarget>
+
+  </ng-template>
 </ng-template>
 
 <!-- is loading tmpl -->

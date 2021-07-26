@@ -3,6 +3,7 @@ import { TBSDetail as TReceptorDetail, TBSSummary as TReceptorSummary } from "./
 import { KG_REGIONAL_FEATURE_KEY, TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFeature/type'
 import { SIIBRA_FEATURE_KEY, TBSSummary as TIEEGSummary, TBSDEtail as TIEEGDetail } from './ieeg/type'
 import { Observable } from "rxjs";
+import { InjectionToken } from "@angular/core";
 
 /**
  * change KgRegionalFeature -> EbrainsRegionalDataset in prod
@@ -41,3 +42,11 @@ export interface IRegionalFeatureReadyDirective {
   busy$: Observable<boolean>
   results$: Observable<IBSSummaryResponse[keyof IBSSummaryResponse][]>
 }
+
+export type TContextedFeature<T extends keyof IBSSummaryResponse> = {
+  featureName: string
+  icon: string
+  result: IBSSummaryResponse[T]
+}
+
+export const GENERIC_INFO_INJ_TOKEN = new InjectionToken('GENERIC_INFO_INJ_TOKEN')

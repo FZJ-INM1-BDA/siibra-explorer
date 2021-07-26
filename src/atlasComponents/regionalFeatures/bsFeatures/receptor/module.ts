@@ -9,6 +9,7 @@ import { BsFeatureReceptorEntry } from "./entry/entry.component";
 import { BsFeatureReceptorFingerprint } from "./fp/fp.component";
 import { BsFeatureReceptorDirective } from "./hasReceptor.directive";
 import { BsFeatureReceptorProfile } from "./profile/profile.component";
+import { RECEPTOR_FEATURE_NAME } from "./type";
 
 @NgModule({
   imports: [
@@ -36,7 +37,7 @@ import { BsFeatureReceptorProfile } from "./profile/profile.component";
 export class BSFeatureReceptorModule{
   constructor(svc: BsFeatureService){
     svc.registerFeature({
-      name: 'receptor density',
+      name: RECEPTOR_FEATURE_NAME,
       icon: 'fas fa-info',
       View: BsFeatureReceptorEntry,
       Ctrl: BsFeatureReceptorDirective,

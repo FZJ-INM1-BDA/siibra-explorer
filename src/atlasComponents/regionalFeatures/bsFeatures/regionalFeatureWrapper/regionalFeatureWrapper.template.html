@@ -1,44 +1,68 @@
-<!-- icons container -->
-<div class="d-flex flex-row align-items-stretch">
+<spinner-cmp *ngIf="busy$ | async; else resultTmpl"></spinner-cmp>
 
-  <!-- icon container -->
-  <div *ngFor="let feature of registeredFeatures$ | async; let last = last"
-    class="d-flex flex-row">
+<ng-template #resultTmpl>
+  
+  <!-- virtual scroll. do not activate until autosize is supported -->
+  <cdk-virtual-scroll-viewport
+    *ngIf="useVirtualScroll; else regularScrollTmpl"
+    [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL"
+    class="h-100"
+    minBufferPx="200"
+    maxBufferPx="400"
+    itemSize="50">
+    <div *cdkVirtualFor="let feature of registeredFeatures$ | async; templateCacheSize: 20; let index = index"
+      class="h-50px overflow-hidden">
 
-    <!-- hoverable/clickable -->
-    <div class="p-2 flex-grow-1 flex-shrink-1 w-5em d-inline-flex flex-column align-items-center iv-custom-comp hoverable"
-      (click)="activateFeature(feature)"
-      [ngClass]="{
-        'text primary': activatedFeatureName === feature.name
-      }"
-      mat-ripple>
+      <!-- divider, show if not first -->
+      <mat-divider *ngIf="index !== 0"></mat-divider>
+      <ng-container *ngTemplateOutlet="itemContainer; context: { $implicit: feature }">
+      </ng-container>
 
-      <!-- icon container -->
-      <div class="h-4rem d-flex align-items-center justify-content-center">
-        <i class="d-inline-block" [ngClass]="feature.icon"></i>
+    </div>
+  </cdk-virtual-scroll-viewport>
+
+  <!-- fallback, regular scroll -->
+  <!-- less efficient on large list, but for now should do -->
+  <ng-template #regularScrollTmpl>
+    <div class="feature-container"
+      [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL">
+
+      <div *ngFor="let feature of registeredFeatures$ | async; let index = index"
+        class="overflow-hidden">
+
+        <!-- divider, show if not first -->
+        <mat-divider *ngIf="index !== 0"></mat-divider>
+        <ng-container *ngTemplateOutlet="itemContainer; context: { $implicit: feature }">
+        </ng-container>
+
       </div>
+    </div>
+  </ng-template>
+  
+</ng-template>
 
-      <!-- text -->
-      <span class="d-inline-block button-text">
-        {{ feature.name }}
-      </span>
+<!-- feature template -->
+<ng-template #itemContainer let-feature>
+  <div class="d-inline-block pt-4 cursor-default"
+    (click)="handleFeatureClick(feature)"
+    mat-ripple>
+
+    <!-- mat-chip container -->
+    <!-- do not use mat-chip-list to avoid adding incorrect a11y info -->
+    <div class="transform-origin-left-center scale-80">
+      <mat-chip *ngFor="let badge of feature | getBadgeFromFeaturePipe"
+        [color]="badge.color"
+        selected>
+        {{ badge.text }}
+      </mat-chip>
     </div>
 
-    <!-- divider -->
-    <mat-divider *ngIf="!last" vertical="true"
-      class="flex-grow-0 flex-shrink-0">
-    </mat-divider>
-    
+    <small>
+      {{ feature | renderRegionalFeatureSummaryPipe }}
+    </small>
   </div>
-</div>
+</ng-template>
 
-<spinner-cmp *ngIf="busy$ | async"></spinner-cmp>
-
-
-<span *ngIf="!activatedFeatureName"
-  class="text-muted pt-4">
-  select type of regional feature
-</span>
-
+<!-- dummy container -->
 <ng-template #regionalFeatureContainerTmpl>
 </ng-template>

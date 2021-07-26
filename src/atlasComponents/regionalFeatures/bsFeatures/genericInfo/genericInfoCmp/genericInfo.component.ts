@@ -1,25 +1,34 @@
-import { Component, Inject, Input, OnChanges, Optional } from "@angular/core";
+import { AfterViewInit, Component, Inject, Input, OnChanges, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef, ViewRef } from "@angular/core";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
-import { KG_REGIONAL_FEATURE_KEY, TBSDetail, UNDER_REVIEW } from "../type";
+import { KG_REGIONAL_FEATURE_KEY, TBSDetail, UNDER_REVIEW } from "../../kgRegionalFeature/type";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { TBSSummary } from "../../kgDataset";
 import { BsFeatureService } from "../../service";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { TDatainfos } from "src/util/siibraApiConstants/types";
+import { TRegion } from "../../type";
 
 /**
  * this component is specifically used to render side panel ebrains dataset view
  */
 
+export type TInjectableData = TDatainfos & {
+  dataType?: string
+  view?: ViewRef | TemplateRef<any>
+  region?: TRegion
+  summary?: TBSSummary
+  isGdprProtected?: boolean
+}
+
 @Component({
-  selector: 'kg-regional-feature-detail',
-  templateUrl: './kgRegDetail.template.html',
+  selector: 'generic-info-cmp',
+  templateUrl: './genericInfo.template.html',
   styleUrls: [
-    './kgRegDetail.style.css'
+    './genericInfo.style.css'
   ]
 })
 
-export class KgRegDetailCmp extends BsRegionInputBase implements OnChanges {
+export class GenericInfoCmp extends BsRegionInputBase implements OnChanges, AfterViewInit, OnDestroy {
 
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
@@ -38,6 +47,7 @@ export class KgRegDetailCmp extends BsRegionInputBase implements OnChanges {
 
   public descriptionFallback = `[This dataset cannot be fetched right now]`
   public useClassicUi = false
+  public dataType = 'ebrains regional dataset'
 
   public description: string
   public name: string
@@ -46,17 +56,49 @@ export class KgRegDetailCmp extends BsRegionInputBase implements OnChanges {
     doi: string
   }[]
 
+  template: TemplateRef<any>
+  viewref: ViewRef
+
+  @ViewChild('insertViewTarget', { read: ViewContainerRef })
+  insertedViewVCR: ViewContainerRef
+
   constructor(
     svc: BsFeatureService,
-    @Optional() @Inject(MAT_DIALOG_DATA) data: TDatainfos
+    @Optional() @Inject(MAT_DIALOG_DATA) data: TInjectableData
   ){
     super(svc)
     if (data) {
-      const { description, name, urls, useClassicUi } = data
+      const { dataType, description, name, urls, useClassicUi, view, region, summary, isGdprProtected } = data
       this.description = description
       this.name = name
       this.urls = urls
       this.useClassicUi = useClassicUi
+      if (dataType) this.dataType = dataType
+      if (typeof isGdprProtected !== 'undefined') this.isGdprProtected = isGdprProtected
+
+      if (!!view) {
+        if (view instanceof TemplateRef){
+          this.template = view
+        } else {
+          this.viewref = view
+        }
+      }
+
+      if (region && summary) {
+        this.region = region
+        this.summary = summary
+        this.ngOnChanges()
+      }
+    }
+  }
+
+  ngOnDestroy(){
+    this.insertedViewVCR.clear()
+  }
+
+  ngAfterViewInit(){
+    if (this.insertedViewVCR && this.viewref) {
+      this.insertedViewVCR.insert(this.viewref)
     }
   }
 

@@ -8,7 +8,7 @@
     maxBufferPx="400"
     itemSize="50">
     <div *cdkVirtualFor="let dataset of visibleRegionalFeatures; trackBy: trackByFn; templateCacheSize: 20; let index = index"
-      class="virtual-scroll-element overflow-hidden">
+      class="h-50px overflow-hidden">
 
       <!-- divider, show if not first -->
       <mat-divider class="mt-1" *ngIf="index !== 0"></mat-divider>

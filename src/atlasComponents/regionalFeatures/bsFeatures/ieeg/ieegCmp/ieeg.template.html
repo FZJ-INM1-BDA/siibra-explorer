@@ -31,24 +31,6 @@
       </section>
     </section> -->
 
-    <h4 class="mat-h4">
-      {{ datum['name'] }}
-    </h4>
-
-    <button
-      [matTooltip]="CONST.GDPR_TEXT"
-      mat-icon-button color="warn">
-      <i class="fas fa-exclamation-triangle"></i>
-    </button>
-
-    <a [href]="'https://search.kg.ebrains.eu/instances/' + datum.__kg_id"
-      mat-icon-button
-      color="primary"
-      target="_blank"
-      [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-      [attr.aria-labels]="ARIA_LABELS.EXPLORE_DATASET_IN_KG">
-      <i class="fas fa-external-link-alt"></i>
-    </a>
     <mat-divider></mat-divider>
 
     <label for="contact-points-list" class="d-block mat-h4 mt-4 text-muted">

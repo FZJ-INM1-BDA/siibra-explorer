@@ -17,3 +17,4 @@ export type TBSDEtail = {
 }
 
 export const SIIBRA_FEATURE_KEY = 'IEEG_Electrode'
+export const IEEG_FEATURE_NAME = 'iEEG recordings'

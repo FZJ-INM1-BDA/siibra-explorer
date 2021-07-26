@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, Optional, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ComponentFactory, ComponentFactoryResolver, ElementRef, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import {combineLatest, merge, Observable, of, Subject, Subscription} from "rxjs";
 import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
@@ -18,27 +18,14 @@ import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
 import { MatDrawer } from "@angular/material/sidenav";
 import { PureContantService } from "src/util";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
-import { getGetRegionFromLabelIndexId } from "src/util/fn";
+import { getGetRegionFromLabelIndexId, switchMapWaitFor } from "src/util/fn";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { ComponentStore } from "../componentStore";
-
-interface IOverlayTypes {
-  ebrainsRegionalDataset: {
-    datasetId: string
-    atlasId: string
-    parcId: string
-    region: any
-    spaceId?: string
-  }
-}
-
-type TOverlaySideNav<T extends keyof IOverlayTypes> = {
-  '@type': T
-  context: IOverlayTypes[T]
-}
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { GenericInfoCmp } from "src/atlasComponents/regionalFeatures/bsFeatures/genericInfo";
 
 type TCStoreViewerCmp = {
-  overlaySideNav: TOverlaySideNav<keyof IOverlayTypes>
+  overlaySideNav: any
 }
 
 @Component({
@@ -110,24 +97,10 @@ type TCStoreViewerCmp = {
     {
       provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
       useFactory: (cStore: ComponentStore<TCStoreViewerCmp>) => {
-        return function overwriteShowDatasetDialog( arg: { fullId?: string, name: string, description: string }, data: any ){
+        return function overwriteShowDatasetDialog( arg: any ){
           
-          const { region } = data
-          const datasetId = arg.fullId
-          const atlasId = data?.region?.context?.atlas?.['@id']
-          const parcId = data?.region?.context?.parcellation?.['@id']
-          const spaceId = data?.region?.context?.template?.['@id']
           cStore.setState({
-            overlaySideNav: {
-              '@type': 'ebrainsRegionalDataset',
-              context: {
-                datasetId,
-                atlasId,
-                parcId,
-                region,
-                spaceId,
-              }
-            }
+            overlaySideNav: arg
           })
         }
       },
@@ -148,6 +121,8 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('sideNavFullLeftSwitch', { static: true })
   private sidenavLeftSwitch: SwitchDirective
 
+  @ViewChild('genericInfoVCR', { read: ViewContainerRef })
+  genericInfoVCR: ViewContainerRef
 
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
@@ -187,7 +162,9 @@ export class ViewerCmp implements OnDestroy {
     select(viewerStateViewerModeSelector),
   )
 
-  public overlaySidenav$ = this.cStore.select(s => s.overlaySideNav)
+  public overlaySidenav$ = this.cStore.select(s => s.overlaySideNav).pipe(
+    shareReplay(1),
+  )
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
     this.templateSelected$,
@@ -233,12 +210,16 @@ export class ViewerCmp implements OnDestroy {
   private templateSelected: any
   private getRegionFromlabelIndexId: Function
 
+  private genericInfoCF: ComponentFactory<GenericInfoCmp>
   constructor(
     private store$: Store<any>,
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     private cStore: ComponentStore<TCStoreViewerCmp>,
+    cfr: ComponentFactoryResolver,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
+
+    this.genericInfoCF = cfr.resolveComponentFactory(GenericInfoCmp)
 
     this.subscriptions.push(
       this.selectedRegions$.subscribe(() => {
@@ -326,6 +307,28 @@ export class ViewerCmp implements OnDestroy {
     this.viewerModuleSvc.register(cb)
     this.onDestroyCb.push(
       () => this.viewerModuleSvc.deregister(cb)
+    )
+    this.subscriptions.push(
+      this.overlaySidenav$.pipe(
+        switchMap(switchMapWaitFor({
+          condition: () => !!this.genericInfoVCR
+        }))
+      ).subscribe(data => {
+        if (!this.genericInfoVCR) {
+          console.warn(`genericInfoVCR not defined!`)
+          return
+        }
+        const injector = Injector.create({
+          providers: [{
+            provide: MAT_DIALOG_DATA,
+            useValue: data
+          }]
+        })
+
+        this.genericInfoVCR.clear()
+        this.genericInfoVCR.createComponent(this.genericInfoCF, null, injector)
+
+      })
     )
   }
 

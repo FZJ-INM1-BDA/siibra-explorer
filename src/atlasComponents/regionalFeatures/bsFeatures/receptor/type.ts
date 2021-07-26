@@ -53,3 +53,5 @@ export type TBSDetail = TBSSummary & {
     __profile_unit: string
   }
 }
+
+export const RECEPTOR_FEATURE_NAME = 'receptor density'

@@ -68,7 +68,7 @@ export class ShowDatasetDialogDirective{
     }
 
     if (this.overwriteFn) {
-      return this.overwriteFn(data, this)
+      return this.overwriteFn(data)
     }
 
     if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)

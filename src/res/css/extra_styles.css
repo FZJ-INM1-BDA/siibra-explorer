@@ -862,3 +862,11 @@ mat-list.sm mat-list-item
   padding-right:0 !important;
   padding-left:0 !important;
 }
+.h-50px
+{
+  height:50px;
+}
+.scale-80
+{
+  transform: scale(0.8);
+}

@@ -4,3 +4,16 @@
   line-height: 1.5rem;
   text-align: center;
 }
+
+.feature-container,
+cdk-virtual-scroll-viewport
+{
+  min-height: 24rem;
+}
+
+
+.feature-container
+{
+  height: 24rem;
+  overflow-y: scroll;
+}
