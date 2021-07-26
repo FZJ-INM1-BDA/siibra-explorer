@@ -13,6 +13,7 @@ function processRegion(region: TRegion) {
 
 export type TFeatureCmpInput = {
   region: TRegion
+  featureId?: string
 }
 
 export type TRegisteredFeature<V = any> = {

@@ -140,6 +140,7 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
       return
     }
     
+    const featureId = contextedFeature.result['@id']
     const arg = {}
     if (contextedFeature.featureName === RECEPTOR_FEATURE_NAME) {
       arg['name'] = contextedFeature.result['name']
@@ -194,7 +195,7 @@ export class RegionalFeatureWrapperCmp implements OnChanges{
         const injector = Injector.create({
           providers: [{
             provide: REGISTERED_FEATURE_INJECT_DATA,
-            useValue: { region } as TFeatureCmpInput
+            useValue: { region, featureId } as TFeatureCmpInput
           }],
         })
         const cmp = cf.create(injector)

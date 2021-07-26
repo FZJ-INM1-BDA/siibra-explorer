@@ -22,6 +22,8 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
 
+  private featureId: string
+
   private results: (TBSSummary & TBSDEtail)[] = []
   constructor(
     private store: Store<any>,
@@ -29,7 +31,7 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput,
   ){
     super(svc, data)
-
+    if (data.featureId) this.featureId = data.featureId
     this.subs.push(
       this.results$.subscribe(results => {
         this.results = results
@@ -40,7 +42,10 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
 
   public results$: Observable<(TBSSummary & TBSDEtail)[]>  = this.region$.pipe(
     switchMap(() => this.getFeatureInstancesList(SIIBRA_FEATURE_KEY).pipe(
-      switchMap(arr => forkJoin(arr.map(it => this.getFeatureInstance(SIIBRA_FEATURE_KEY, it["@id"])))),
+      switchMap(arr => forkJoin(arr.filter(it => {
+        if (!this.featureId) return true
+        return it['@id'] === this.featureId
+      }).map(it => this.getFeatureInstance(SIIBRA_FEATURE_KEY, it["@id"])))),
       catchError(() => of([]))
     )),
   )
