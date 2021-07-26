@@ -86,7 +86,7 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     /**
      * unload all the landmarks first
      */
-     this.store.dispatch(
+    this.store.dispatch(
       viewreStateRemoveUserLandmarks({
         payload: {
           landmarkIds: this.loadedLms.map(l => l['@id'])
