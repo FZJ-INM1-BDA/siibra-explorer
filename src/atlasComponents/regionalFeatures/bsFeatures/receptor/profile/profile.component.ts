@@ -4,6 +4,10 @@ import { BS_DARKTHEME } from "../../constants";
 import { BsFeatureReceptorBase } from "../base";
 import { CONST } from 'common/constants'
 
+export function isPr(filename: string, label: string = ''){
+  return filename.indexOf(`_pr_${label}`) >= 0
+}
+
 const { RECEPTOR_PR_CAPTION } = CONST
 
 @Component({
@@ -43,7 +47,7 @@ export class BsFeatureReceptorProfile extends BsFeatureReceptorBase implements O
     }
 
     this.urls = this.bsFeature.__files
-      .filter(url => url.indexOf(`_pr_${this.bsLabel}`) >= 0)
+      .filter(url => isPr(url, this.bsLabel))
       .map(url => {
         return { url }
       })

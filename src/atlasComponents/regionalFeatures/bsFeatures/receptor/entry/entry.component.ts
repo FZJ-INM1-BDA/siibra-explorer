@@ -6,6 +6,7 @@ import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { TBSDetail } from "../type";
 import { ARIA_LABELS } from 'common/constants'
+import { isPr } from "../profile/profile.component";
 
 @Component({
   selector: 'bs-features-receptor-entry',
@@ -36,6 +37,10 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
       : of(null)
     ),
     shareReplay(1),
+  )
+
+  public hasPrAr$: Observable<boolean> = this.selectedReceptor$.pipe(
+    map(detail => detail.__files.some(f => isPr(f))),
   )
 
   ngOnDestroy(){

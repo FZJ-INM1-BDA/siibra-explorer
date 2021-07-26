@@ -1,8 +1,14 @@
 import { Component, Input, OnChanges } from "@angular/core";
 import { BsFeatureReceptorBase } from "../base";
 import { CONST } from 'common/constants'
+import { TBSDetail } from "../type";
 
 const { RECEPTOR_AR_CAPTION } = CONST
+
+export function isAr(detail: TBSDetail, label: string){
+  if (label) return !!detail.__data.__autoradiographs[label]
+  return !!detail.__data.__autoradiographs
+}
 
 @Component({
   selector: 'bs-features-receptor-autoradiograph',
