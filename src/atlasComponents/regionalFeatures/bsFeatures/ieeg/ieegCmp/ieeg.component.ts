@@ -33,7 +33,6 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     this.subs.push(
       this.results$.subscribe(results => {
         this.results = results
-        console.log(this.results[0])
         this.loadLandmarks()
       })
     )
@@ -57,6 +56,7 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
   
   private subs: Subscription[] = []
   ngOnDestroy(){
+    this.unloadLandmarks()
     while(this.subs.length) this.subs.pop().unsubscribe()
   }
   private openElectrodeIdSet = new Set<string>() 
@@ -76,18 +76,22 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     color: [number, number, number]
     showInSliceView: boolean
   }[] = []
-  loadLandmarks(){
-    
+
+  private unloadLandmarks(){
     /**
      * unload all the landmarks first
      */
-    this.store.dispatch(
+     this.store.dispatch(
       viewreStateRemoveUserLandmarks({
         payload: {
           landmarkIds: this.loadedLms.map(l => l['@id'])
         }
       })
     )
+  }
+
+  private loadLandmarks(){
+    this.unloadLandmarks()
     this.loadedLms = []
 
     const lms = [] as {
