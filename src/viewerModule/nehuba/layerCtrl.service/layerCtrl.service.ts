@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, from, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { getRgb, IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
 import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
@@ -12,6 +12,12 @@ import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
 import { serialiseParcellationRegion } from 'common/util'
+
+export const BACKUP_COLOR = {
+  red: 255,
+  green: 255,
+  blue: 255
+}
 
 export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
   const returnVal: IColorMap = {}
@@ -34,6 +40,11 @@ export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
 export class NehubaLayerControlService implements OnDestroy{
 
   static PMAP_LAYER_NAME = 'regional-pmap'
+
+  private selectedRegion$ = this.store$.pipe(
+    select(viewerStateSelectedRegionsSelector),
+    shareReplay(1),
+  )
 
   private selectedParcellation$ = this.store$.pipe(
     select(viewerStateSelectedParcellationSelector)
@@ -62,6 +73,7 @@ export class NehubaLayerControlService implements OnDestroy{
         return returnVal
       })
     ),
+    this.selectedRegion$,
     this.selectedTemplateSelector$.pipe(
       map(template => {
         const { auxMeshes = [] } = template || {}
@@ -75,12 +87,30 @@ export class NehubaLayerControlService implements OnDestroy{
       })
     ),
   ]).pipe(
-    map(([ regions, ...auxMeshesArr ]) => {
+    map(([ regions, selReg, ...auxMeshesArr ]) => {
       
       const returnVal: IColorMap = {}
-
-      for (const key in regions) {
-        returnVal[key] = regions[key]
+      if (selReg.length === 0) {
+        for (const key in regions) {
+          returnVal[key] = regions[key]
+        }
+      } else {
+        /**
+         * if selected regions are non empty
+         * set the selected regions to show color,
+         * but the rest to show white 
+         */
+        for (const key in regions) {
+          const colorMap = {}
+          returnVal[key] = colorMap
+          for (const lblIdx in regions[key]) {
+            if (selReg.some(r => r.ngId === key && r.labelIndex === Number(lblIdx))) {
+              colorMap[lblIdx] = regions[key][lblIdx]
+            } else {
+              colorMap[lblIdx] = BACKUP_COLOR
+            }
+          }
+        }
       }
 
       for (const auxMeshes of auxMeshesArr) {
@@ -241,7 +271,13 @@ export class NehubaLayerControlService implements OnDestroy{
   public overwriteColorMap$ = new BehaviorSubject<IColorMap>(null)
 
   public setColorMap$: Observable<IColorMap> = merge(
-    this.activeColorMap$,
+    this.activeColorMap$.pipe(
+      // TODO this is a dirty fix
+      // it seems, sometimes, overwritecolormap and activecolormap can emit at the same time
+      // (e.g. when reg selection changes)
+      // this ensures that the activecolormap emits later, and thus take effect over overwrite colormap
+      debounceTime(16),
+    ),
     this.overwriteColorMap$.pipe(
       filter(v => !!v),
     )
@@ -276,9 +312,7 @@ export class NehubaLayerControlService implements OnDestroy{
     /**
      * selectedRegions
      */
-    this.store$.pipe(
-      select(viewerStateSelectedRegionsSelector)
-    ),
+    this.selectedRegion$,
     /**
      * if layer contains non mixable layer
      */
