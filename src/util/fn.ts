@@ -159,8 +159,12 @@ const BACKCOMAP_KEY_DICT = {
         'right hemisphere': 'MNI152_V25_RIGHT_NG_SPLIT_HEMISPHERE'
       },
       // bundle hcp
+      // even though hcp, long/short bundle, and difumo has no hemisphere distinctions, the way siibra-python parses the region,
+      // and thus attributes left/right hemisphere, still results in some regions being parsed as left/right hemisphere
       "juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c": {
-        "whole brain": "superficial-white-bundle-HCP"
+        "whole brain": "superficial-white-bundle-HCP",
+        "left hemisphere": "superficial-white-bundle-HCP",
+        "right hemisphere": "superficial-white-bundle-HCP"
       },
       // julich brain v1.18
       "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579": {
@@ -169,27 +173,41 @@ const BACKCOMAP_KEY_DICT = {
       },
       // long bundle
       "juelich/iav/atlas/v1.0.0/5": {
-        "whole brain": "fibre bundle long"
+        "whole brain": "fibre bundle long",
+        "left hemisphere": "fibre bundle long",
+        "right hemisphere": "fibre bundle long",
       },
       // bundle short
       "juelich/iav/atlas/v1.0.0/6": {
-        "whole brain": "fibre bundle short"
+        "whole brain": "fibre bundle short",
+        "left hemisphere": "fibre bundle short",
+        "right hemisphere": "fibre bundle short",
       },
       // difumo 64
       "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721": {
-        "whole brain": "DiFuMo Atlas (64 dimensions)"
+        "whole brain": "DiFuMo Atlas (64 dimensions)",
+        "left hemisphere": "DiFuMo Atlas (64 dimensions)",
+        "right hemisphere": "DiFuMo Atlas (64 dimensions)",
       },
       "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8": {
-        "whole brain": "DiFuMo Atlas (128 dimensions)"
+        "whole brain": "DiFuMo Atlas (128 dimensions)",
+        "left hemisphere": "DiFuMo Atlas (128 dimensions)",
+        "right hemisphere": "DiFuMo Atlas (128 dimensions)",
       },
       "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235": {
-        "whole brain": "DiFuMo Atlas (256 dimensions)"
+        "whole brain": "DiFuMo Atlas (256 dimensions)",
+        "left hemisphere": "DiFuMo Atlas (256 dimensions)",
+        "right hemisphere": "DiFuMo Atlas (256 dimensions)",
       },
       "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16": {
-        "whole brain": "DiFuMo Atlas (512 dimensions)"
+        "whole brain": "DiFuMo Atlas (512 dimensions)",
+        "left hemisphere": "DiFuMo Atlas (512 dimensions)",
+        "right hemisphere": "DiFuMo Atlas (512 dimensions)",
       },
       "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1": {
-        "whole brain": "DiFuMo Atlas (1024 dimensions)"
+        "whole brain": "DiFuMo Atlas (1024 dimensions)",
+        "left hemisphere": "DiFuMo Atlas (1024 dimensions)",
+        "right hemisphere": "DiFuMo Atlas (1024 dimensions)",
       },
     },
     // colin 27
