@@ -5,6 +5,7 @@ import { BsRegionInputBase } from "../bsRegionInputBase";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../service";
 import { IBSSummaryResponse, IRegionalFeatureReadyDirective } from "../type";
+import { SIIBRA_FEATURE_KEY } from './type'
 
 @Directive({
   selector: '[bs-features-ieeg-directive]',
@@ -13,12 +14,9 @@ import { IBSSummaryResponse, IRegionalFeatureReadyDirective } from "../type";
 
 export class BsFeatureIEEGDirective extends BsRegionInputBase implements IRegionalFeatureReadyDirective, OnDestroy{
 
-  public results$: Observable<IBSSummaryResponse['IEEG_Electrode'][]>  = this.region$.pipe(
-    switchMap(() => merge(
-      of([]),
-      this.getFeatureInstancesList('IEEG_Electrode').pipe(
-        catchError(() => of([]))
-      )
+  public results$: Observable<IBSSummaryResponse['IEEG_Dataset'][]>  = this.region$.pipe(
+    switchMap(() => this.getFeatureInstancesList(SIIBRA_FEATURE_KEY).pipe(
+      catchError(() => of([]))
     )),
   )
   public busy$ = this.region$.pipe(
