@@ -73,6 +73,12 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         type: 'SET_OVERWRITTEN_COLOR_MAP',
         payload: flag? CONNECTIVITY_NAME_PLATE : false,
       })
+
+      if (flag) {
+        this.addNewColorMap()
+      } else {
+        this.restoreDefaultColormap()
+      }
     }
 
     @Output()
@@ -381,7 +387,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     public addNewColorMap() {
       if (!this.defaultColorMap) {
-        this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
+        this.defaultColorMap = getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap()
       }
 
       const existingMap: Map<string, Map<number, { red: number, green: number, blue: number }>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())

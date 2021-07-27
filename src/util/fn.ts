@@ -143,6 +143,14 @@ export class QuickHash {
   }
 }
 
+// fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
+const fsAverageKeyVal = {
+  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290": {
+    "left hemisphere": "left",
+    "right hemisphere": "right"
+  }
+}
+
 /**
  * in order to maintain backwards compat with url encoding of selected regions
  * TODO setup a sentry to catch if these are ever used. if not, retire the hard coding 
@@ -234,7 +242,10 @@ const BACKCOMAP_KEY_DICT = {
       "juelich/iav/atlas/v1.0.0/3": {
         "whole brain": "cortical layers"
       },
-    }
+    },
+
+    // fsaverage
+    "minds/core/referencespace/v1.0.0/tmp-fsaverage": fsAverageKeyVal,
   }
 }
 
