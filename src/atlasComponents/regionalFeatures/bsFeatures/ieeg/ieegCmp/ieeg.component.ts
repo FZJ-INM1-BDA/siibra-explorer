@@ -112,12 +112,12 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
       for (const key in detail.__electrodes){
         const electorde = detail.__electrodes[key]
         if (!electorde.inRoi) continue
-        for (const cp_key in electorde.__contact_points) {
-          const cp = electorde.__contact_points[cp_key]
+        for (const cpKey in electorde.__contact_points) {
+          const cp = electorde.__contact_points[cpKey]
           lms.push({
-            "@id": `${detail.name}:${key}#${cp_key}`,
-            id: `${detail.name}:${key}#${cp_key}`,
-            name: `${detail.name}:${key}#${cp_key}`,
+            "@id": `${detail.name}:${key}#${cpKey}`,
+            id: `${detail.name}:${key}#${cpKey}`,
+            name: `${detail.name}:${key}#${cpKey}`,
             position: cp.coord,
             color: cp.inRoi ? [255, 100, 100]: [255,255,255],
             showInSliceView: this.openElectrodeIdSet.has(electorde.id)

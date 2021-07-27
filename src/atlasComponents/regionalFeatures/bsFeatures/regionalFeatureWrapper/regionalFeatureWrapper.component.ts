@@ -164,10 +164,10 @@ export class RegionalFeatureWrapperCmp implements OnChanges, OnDestroy{
       arg['name'] = contextedFeature.result['name']
       arg['description'] = ' '
       arg['isGdprProtected'] = true
-       arg['urls'] = []
-       for (const info of contextedFeature.result['origin_datainfos']) {
-         arg['urls'].push(...(info.urls || []))
-       }
+      arg['urls'] = []
+      for (const info of contextedFeature.result['origin_datainfos']) {
+        arg['urls'].push(...(info.urls || []))
+      }
     }
 
     if (contextedFeature.featureName === EbrainsRegionalFeatureName) {
