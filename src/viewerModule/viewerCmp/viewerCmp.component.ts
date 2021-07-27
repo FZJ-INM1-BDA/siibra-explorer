@@ -28,6 +28,31 @@ type TCStoreViewerCmp = {
   overlaySideNav: any
 }
 
+export function ROIFactory(store: Store<any>, svc: PureContantService){
+  return store.pipe(
+    select(viewerStateContextedSelectedRegionsSelector),
+    switchMap(r => {
+      if (!r[0]) return of(null)
+      const { context } = r[0]
+      const { atlas, template, parcellation } = context || {}
+      return merge(
+        of(null),
+        svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
+          map(det => {
+            return {
+              ...r[0],
+              ...det,
+            }
+          }),
+          // in case detailed requests fails
+          catchError((_err, _obs) => of(r[0])),
+        )
+      )
+    }),
+    shareReplay(1)
+  )
+}
+
 @Component({
   selector: 'iav-cmp-viewer-container',
   templateUrl: './viewerCmp.template.html',
@@ -70,28 +95,7 @@ type TCStoreViewerCmp = {
   providers: [
     {
       provide: REGION_OF_INTEREST,
-      useFactory: (store: Store<any>, svc: PureContantService) => store.pipe(
-        select(viewerStateContextedSelectedRegionsSelector),
-        switchMap(r => {
-          if (!r[0]) return of(null)
-          const { context } = r[0]  
-          const { atlas, template, parcellation } = context || {}
-          return merge(
-            of(null),
-            svc.getRegionDetail(atlas['@id'], parcellation['@id'], template['@id'], r[0]).pipe(
-              map(det => {
-                return {
-                  ...det,
-                  context
-                }
-              }),
-              // in case detailed requests 
-              catchError((_err, _obs) => of(r[0])),
-            )
-          )
-        }),
-        shareReplay(1)
-      ),
+      useFactory: ROIFactory,
       deps: [ Store, PureContantService ]
     },
     {
