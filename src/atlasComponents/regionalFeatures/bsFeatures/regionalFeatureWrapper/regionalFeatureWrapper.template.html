@@ -1,4 +1,9 @@
-<spinner-cmp *ngIf="busy$ | async; else resultTmpl"></spinner-cmp>
+<ng-template [ngTemplateOutlet]="resultTmpl">
+</ng-template>
+
+<ng-template #busyTmpl>
+  <spinner-cmp></spinner-cmp>
+</ng-template>
 
 <ng-template #resultTmpl>
   
@@ -27,6 +32,10 @@
     <div class="feature-container"
       [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL">
 
+      <!-- if busy, show spinner -->
+      <ng-template [ngIf]="busy$ | async">
+        <ng-template [ngTemplateOutlet]="busyTmpl"></ng-template>
+      </ng-template>
       <div *ngFor="let feature of registeredFeatures; let index = index"
         class="overflow-hidden">
 

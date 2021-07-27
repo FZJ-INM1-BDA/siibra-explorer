@@ -18,14 +18,11 @@ export class KgRegionalFeaturesListDirective extends BsRegionInputBase implement
     // must not use switchmapto here
     switchMap(() => {
       this.busyEmitter.emit(true)
-      return merge(
-        of([]),
-        this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
-          catchError(() => of([])),
-          tap(() => {
-            this.busyEmitter.emit(false)
-          }),
-        )
+      return this.getFeatureInstancesList(KG_REGIONAL_FEATURE_KEY).pipe(
+        catchError(() => of([])),
+        tap(() => {
+          this.busyEmitter.emit(false)
+        }),
       )
     }),
     startWith([])

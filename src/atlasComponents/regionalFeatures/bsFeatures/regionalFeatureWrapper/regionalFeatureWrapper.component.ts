@@ -164,15 +164,10 @@ export class RegionalFeatureWrapperCmp implements OnChanges, OnDestroy{
       arg['name'] = contextedFeature.result['name']
       arg['description'] = ' '
       arg['isGdprProtected'] = true
-      /**
-       * todo use actual fetched data
-       */
-      const re = /\(dataset:([a-f0-9-]+)\)/.exec(arg['name'])
-      if (re) {
-        arg['urls'] = [{
-          doi: `https://search.kg.ebrains.eu/instances/${re[1]}`
-        }]
-      }
+       arg['urls'] = []
+       for (const info of contextedFeature.result['origin_datainfos']) {
+         arg['urls'].push(...(info.urls || []))
+       }
     }
 
     if (contextedFeature.featureName === EbrainsRegionalFeatureName) {
