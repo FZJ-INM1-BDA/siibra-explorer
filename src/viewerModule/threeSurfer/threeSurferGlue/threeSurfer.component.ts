@@ -198,20 +198,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
      * intercept click and act
      */
     if (clickInterceptor) {
-
-      let singleClickFlag = false
-      let singleClickTimeoutRef = null
       const handleClick = (ev: MouseEvent) => {
-        
-        if (!singleClickFlag) {
-          singleClickFlag = true
-          singleClickTimeoutRef = setTimeout(() => {
-            singleClickFlag = false
-          }, 320)
-          return
-        }
-        singleClickFlag = false
-        clearTimeout(singleClickTimeoutRef)
 
         // if does not click inside container, ignore
         if (!(this.el.nativeElement as HTMLElement).contains(ev.target as HTMLElement)) {
