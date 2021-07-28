@@ -6,7 +6,7 @@ import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewreStateRe
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../../service";
-import { TBSDEtail, TBSSummary, SIIBRA_FEATURE_KEY, TContactPoint } from '../type'
+import { TBSDEtail, TBSSummary, SIIBRA_FEATURE_KEY, TContactPoint, TElectrode } from '../type'
 import { ARIA_LABELS, CONST } from 'common/constants'
 
 @Component({
@@ -64,12 +64,12 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     this.unloadLandmarks()
     while(this.subs.length) this.subs.pop().unsubscribe()
   }
-  private openElectrodeIdSet = new Set<string>() 
-  public openElectrodeId$ = new BehaviorSubject<string[]>([])
-  handleDatumExpansion(id: string, state: boolean) {
-    if (state) this.openElectrodeIdSet.add(id)
-    else this.openElectrodeIdSet.delete(id)
-    this.openElectrodeId$.next(Array.from(this.openElectrodeIdSet))
+  private openElectrodeSet = new Set<TElectrode>() 
+  public openElectrode$ = new BehaviorSubject<TElectrode[]>([])
+  handleDatumExpansion(electrode: TElectrode, state: boolean) {
+    if (state) this.openElectrodeSet.add(electrode)
+    else this.openElectrodeSet.delete(electrode)
+    this.openElectrode$.next(Array.from(this.openElectrodeSet))
     this.loadLandmarks()
   }
 
@@ -109,19 +109,23 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     }[]
 
     for (const detail of this.results) {
-      for (const key in detail.__electrodes){
-        const electorde = detail.__electrodes[key]
-        if (!electorde.inRoi) continue
-        for (const cpKey in electorde.__contact_points) {
-          const cp = electorde.__contact_points[cpKey]
-          lms.push({
-            "@id": `${detail.name}:${key}#${cpKey}`,
-            id: `${detail.name}:${key}#${cpKey}`,
-            name: `${detail.name}:${key}#${cpKey}`,
-            position: cp.coord,
-            color: cp.inRoi ? [255, 100, 100]: [255,255,255],
-            showInSliceView: this.openElectrodeIdSet.has(electorde.id)
-          })
+      for (const subjectKey in detail.electrodes){
+        const electrodes = detail.electrodes[subjectKey]
+        for (const electrodId in electrodes) {
+          const electrode = electrodes[electrodId]
+          if (!electrode.inRoi) continue
+          
+          for (const cpKey in electrode.contact_points) {
+            const cp = electrode.contact_points[cpKey]
+            lms.push({
+              "@id": `${detail.name}:${subjectKey}#${cpKey}`,
+              id: `${detail.name}:${subjectKey}#${cpKey}`,
+              name: `${detail.name}:${subjectKey}#${cpKey}`,
+              position: cp.location,
+              color: cp.inRoi ? [255, 100, 100]: [255, 255, 255],
+              showInSliceView: this.openElectrodeSet.has(electrode)
+            })
+          }
         }
       }
     }
@@ -135,11 +139,11 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
   }
 
   handleContactPtClk(cp: TContactPoint) {
-    const { coord } = cp
+    const { location } = cp
     this.store.dispatch(
       viewerStateChangeNavigation({
         navigation: {
-          position: coord.map(v => v * 1e6),
+          position: location.map(v => v * 1e6),
           positionReal: true,
           animation: {}
         },

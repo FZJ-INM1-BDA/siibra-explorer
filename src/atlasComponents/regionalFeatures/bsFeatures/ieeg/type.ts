@@ -4,24 +4,26 @@ export type TBSSummary = {
 }
 
 export type TContactPoint = {
-  'id': string
-  'coord': [number, number, number]
-  'inRoi'?: boolean
+  id: string
+  location: [number, number, number]
+  inRoi?: boolean
 }
 
 export type TElectrode = {
-  id: string
+  electrode_id: string
   subject_id: string
-  __contact_points: {
+  contact_points: {
     [key: string]: TContactPoint
   }
-  inRoi: boolean
+  inRoi?: boolean
 }
 
 export type TBSDEtail = {
-  '__kg_id': string
-  '__electrodes': {
-    [key: string]: TElectrode
+  'kg_id': string
+  'electrodes': {
+    [key: string]: {
+      [key: string]: TElectrode
+    }
   }
 }
 export type _TBSDEtail = {
