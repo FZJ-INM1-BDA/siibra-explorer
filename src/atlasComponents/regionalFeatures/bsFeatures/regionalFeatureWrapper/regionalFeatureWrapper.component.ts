@@ -162,7 +162,7 @@ export class RegionalFeatureWrapperCmp implements OnChanges, OnDestroy{
 
     if (contextedFeature.featureName === IEEG_FEATURE_NAME) {
       arg['name'] = contextedFeature.result['name']
-      arg['description'] = ' '
+      arg['description'] = contextedFeature.result['description'] || ' '
       arg['isGdprProtected'] = true
       arg['urls'] = []
       for (const info of contextedFeature.result['origin_datainfos']) {

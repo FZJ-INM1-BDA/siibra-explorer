@@ -1,6 +1,7 @@
 export type TBSSummary = {
   '@id': string
-  'name': string
+  name: string
+  description: string
 }
 
 export type TContactPoint = {
