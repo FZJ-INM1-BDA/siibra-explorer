@@ -11,7 +11,6 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
 import { CONST } from 'common/constants'
-import { uiActionHideAllDatasets } from "src/services/state/uiState/actions";
 import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
@@ -147,16 +146,6 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
     })
   )
 
-  /**
-   * on region selected change (clear, select, or change selection), clear selected dataset ids
-   */
-  @Effect()
-  public clearShownDatasetIdOnRegionClear: Observable<any> = this.store$.pipe(
-    select(viewerStateSelectedRegionsSelector),
-    mapTo(
-      uiActionHideAllDatasets()
-    )
-  )
 
   @Effect()
   public selectParcellation$: Observable<any>

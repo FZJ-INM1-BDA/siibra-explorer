@@ -68,6 +68,8 @@ function cameraNavsAreSimilar(c1: TCameraOrientation, c2: TCameraOrientation){
 
 export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, AfterViewInit, OnDestroy {
 
+  private loanedColorMap = new WeakSet()
+
   @Input()
   selectedTemplate: any
 
@@ -109,16 +111,22 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         add3DLandmarks: nyi,
         loadLayer: nyi,
         applyLayersColourMap: (map: Map<string, Map<number, { red: number, green: number, blue: number }>>) => {
-          const applyCm = new Map()
-          for (const [hem, m] of map.entries()) {
-            const nMap = new Map()
-            applyCm.set(hem, nMap)
-            for (const [lbl, vals] of m.entries()) {
-              const { red, green, blue } = vals
-              nMap.set(lbl, [red/255, green/255, blue/255])
+          if (this.loanedColorMap.has(map)) {
+            this.externalHemisphLblColorMap = null
+          } else {
+
+            const applyCm = new Map()
+            for (const [hem, m] of map.entries()) {
+              const nMap = new Map()
+              applyCm.set(hem, nMap)
+              for (const [lbl, vals] of m.entries()) {
+                const { red, green, blue } = vals
+                nMap.set(lbl, [red/255, green/255, blue/255])
+              }
             }
+            this.externalHemisphLblColorMap = applyCm
           }
-          this.externalHemisphLblColorMap = applyCm
+          this.applyColorMap()
         },
         getLayersSegmentColourMap: () => {
           const map = this.getColormapCopy()
@@ -134,6 +142,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
               })
             }
           }
+          this.loanedColorMap.add(outmap)
           return outmap
         },
         getNgHash: nyi,

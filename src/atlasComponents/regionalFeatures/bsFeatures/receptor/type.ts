@@ -29,6 +29,14 @@ export type TBSSummary = {
   ['@id']: string
   name: string
   info: string
+  origin_datainfos?: ({
+    name: string
+    description: string
+    urls: {
+      doi: string
+      cite?: string
+    }[]
+  })[]
 }
 
 export type TBSDetail = TBSSummary & {
@@ -45,3 +53,5 @@ export type TBSDetail = TBSSummary & {
     __profile_unit: string
   }
 }
+
+export const RECEPTOR_FEATURE_NAME = 'receptor density'

@@ -47,6 +47,9 @@ export interface INgLayerCtrl {
   update: {
     [key: string]: INgLayerInterface
   }
+  setLayerTransparency: {
+    [key: string]: number
+  }
 }
 
 export type TNgLayerCtrl<T extends keyof INgLayerCtrl> = {

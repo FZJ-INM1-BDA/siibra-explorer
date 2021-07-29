@@ -230,7 +230,6 @@ describe('> saneUrl/index.js', () => {
           })
         })
         it('> checks if the name is available', async () => {
-          debugger
           await got(`http://localhost:50000/${name}`, {
             method: 'POST',
             headers: {

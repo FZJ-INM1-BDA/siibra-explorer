@@ -395,6 +395,11 @@ markdown-dom p
   height: 2rem!important;
 }
 
+.h-4rem
+{
+  height: 4rem!important;
+}
+
 .h-50vh
 {
   height: 50vh!important;
@@ -525,11 +530,11 @@ markdown-dom p
 }
 
 .outline-none {
-    outline: none;
+  outline: none;
 }
 
 .cursor-pointer {
-    cursor: pointer!important;
+  cursor: pointer!important;
 }
 
 .z-index-1
@@ -856,4 +861,12 @@ mat-list.sm mat-list-item
   padding-top:0 !important;
   padding-right:0 !important;
   padding-left:0 !important;
+}
+.h-50px
+{
+  height:50px;
+}
+.scale-80
+{
+  transform: scale(0.8);
 }

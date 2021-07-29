@@ -1,7 +1,7 @@
 import { BehaviorSubject, throwError } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { TRegion, IBSSummaryResponse, IBSDetailResponse } from "./type";
-import { BsFeatureService } from "./service";
+import { BsFeatureService, TFeatureCmpInput } from "./service";
 import { flattenReducer } from 'common/util'
 import { Input } from "@angular/core";
 
@@ -21,8 +21,13 @@ export class BsRegionInputBase{
   }
 
   constructor(
-    private svc: BsFeatureService
-  ){}
+    private svc: BsFeatureService,
+    data?: TFeatureCmpInput
+  ){
+    if (data) {
+      this.region = data.region
+    }
+  }
 
   protected featuresList$ = this.region$.pipe(
     switchMap(region => this.svc.listFeatures(region)),

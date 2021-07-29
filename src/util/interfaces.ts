@@ -14,7 +14,7 @@ export interface IHasFullId{
 }
 
 
-export type TOverwriteShowDatasetDialog = (dataset: { fullId: string } | { name: string, description: string }) => void
+export type TOverwriteShowDatasetDialog = (arg: any) => void
 
 export const OVERWRITE_SHOW_DATASET_DIALOG_TOKEN = new InjectionToken<TOverwriteShowDatasetDialog>('OVERWRITE_SHOW_DATASET_DIALOG_TOKEN')
 

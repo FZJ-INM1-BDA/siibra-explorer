@@ -86,24 +86,6 @@
     </ng-container>
   </ng-template>
 
-  <!-- receptor -->
-  <div bs-features-receptor-directive
-    (bs-features-receptor-directive-fetching-flag$)="handleBusySignal('receptor', $event)"
-    [region]="region"
-    #bsFeatureReceptorDirective="bsFeatureReceptorDirective">
-  </div>
-  <ng-template #regionalReceptorTmpl>
-    <bs-features-receptor-entry [region]="region">
-    </bs-features-receptor-entry>
-  </ng-template>
-  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: 'ReceptorDistribution',
-      iconClass: 'fas fa-info',
-      iavNgIf: bsFeatureReceptorDirective.hasReceptor$ | async,
-      content: regionalReceptorTmpl
-    }">
-  </ng-container>
-
 
   <!-- Explore in other template -->
   <ng-container *ngIf="regionInOtherTemplates$ | async as regionInOtherTemplates">
@@ -135,23 +117,17 @@
 
   <!-- kg regional features list -->
   <ng-template #kgRegionalFeatureList>
-    <kg-regional-features-list [region]="region">
-    </kg-regional-features-list>
+    <regional-feature-wrapper [region]="region$ | async">
+    </regional-feature-wrapper>
   </ng-template>
-
-  <div kg-regional-features-list-directive
-    [region]="region"
-    (kg-regional-features-list-directive-busy)="handleBusySignal('regionFeatureList', $event)"
-    #kgRegFeatlist="kgRegionalFeaturesListDirective">
-  </div>
 
   <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
     title: CONST.REGIONAL_FEATURES,
     iconClass: 'fas fa-database',
     content: kgRegionalFeatureList,
-    desc: kgRegFeatlist.kgRegionalFeatures.length,
-    iconTooltip: kgRegFeatlist.kgRegionalFeatures.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
-    iavNgIf: (kgRegFeatlist.kgRegionalFeatures$ | async ).length
+    desc: '',
+    iconTooltip: 'Regional Features',
+    iavNgIf: true
   }">
   </ng-container>
 

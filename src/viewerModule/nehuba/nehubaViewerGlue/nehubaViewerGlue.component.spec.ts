@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common"
 import { TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
+import { Subject } from "rxjs"
 import { ClickInterceptorService } from "src/glue"
 import { PANELS } from "src/services/state/ngViewerState/constants"
 import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors"
@@ -9,6 +10,7 @@ import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/ac
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util"
 import { NehubaLayerControlService } from "../layerCtrl.service"
+import { NehubaMeshService } from "../mesh.service"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 
 describe('> nehubaViewerGlue.component.ts', () => {
@@ -22,7 +24,15 @@ describe('> nehubaViewerGlue.component.ts', () => {
         NehubaGlueCmp
       ],
       providers: [
-        provideMockStore(),
+        /**
+         * TODO, figureout which dependency is selecting viewerState.parcellationSelected
+         * then remove the inital state
+         */
+        provideMockStore({
+          initialState: {
+            viewerState: {}
+          }
+        }),
         {
           provide: CLICK_INTERCEPTOR_INJECTOR,
           useFactory: (clickIntService: ClickInterceptorService) => {
@@ -34,6 +44,19 @@ describe('> nehubaViewerGlue.component.ts', () => {
           deps: [
             ClickInterceptorService
           ]
+        },{
+          provide: NehubaLayerControlService,
+          useValue: {
+            setColorMap$: new Subject(),
+            visibleLayer$: new Subject(),
+            segmentVis$: new Subject(),
+            ngLayersController$: new Subject(),
+          }
+        }, {
+          provide: NehubaMeshService,
+          useValue: {
+            loadMeshes$: new Subject()
+          }
         }
       ]
     }).overrideComponent(NehubaGlueCmp, {

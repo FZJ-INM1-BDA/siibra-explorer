@@ -1,9 +1,9 @@
-import { decodeToNumber, encodeNumber } from "./cipher"
+import { decodeToNumber, encodeNumber, encodeURIFull } from "./cipher"
 
 describe('common.ts', () => {
   
   const FLOAT_PRECISION = 6
-  describe('encodeNumber/decodeToNumber', () => {
+  describe('> encodeNumber/decodeToNumber', () => {
   
     const getCompareOriginal = (original: number[]) => (element: string, index: number) =>
       original[index].toString().length >= element.length
@@ -127,4 +127,11 @@ describe('common.ts', () => {
     })
   })
   
+  describe('> encodeURIFull', () => {
+    it('> should endcode brackets', () => {
+      expect(
+        encodeURIFull('(')
+      ).toEqual('%28')
+    })
+  })
 })

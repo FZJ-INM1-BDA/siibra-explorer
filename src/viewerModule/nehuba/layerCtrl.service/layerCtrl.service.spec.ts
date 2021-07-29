@@ -1,13 +1,12 @@
 import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
+import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
 import { hot } from "jasmine-marbles"
 import { IColorMap } from "./layerCtrl.util"
 import { debounceTime } from "rxjs/operators"
 import { ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper"
-const  util = require('common/util')
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -28,6 +27,10 @@ describe('> layerctrl.service.ts', () => {
         layerCtrlUtil,
         'getMultiNgIdsRegionsLabelIndexMap'
       ).and.returnValue(() => getMultiNgIdsRegionsLabelIndexMapReturnVal)
+      mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
+      mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [])
+      mockStore.overrideSelector(viewerStateSelectedTemplateSelector, {})
+      mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
     })
 
     it('> can be init', () => {
@@ -38,10 +41,6 @@ describe('> layerctrl.service.ts', () => {
     describe('> setColorMap$', () => {
       describe('> overwriteColorMap$ not firing', () => {
         describe('> template/parc has no aux meshes', () => {
-          beforeEach(() => {
-            mockStore.overrideSelector(viewerStateSelectedTemplateSelector, {})
-            mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
-          })
 
           it('> calls getMultiNgIdsRegionsLabelIndexMapReturn', () => {
             const service = TestBed.inject(NehubaLayerControlService)
@@ -49,7 +48,7 @@ describe('> layerctrl.service.ts', () => {
             expect(getMultiNgIdsRegionsLabelIndexMapSpy).toHaveBeenCalled()
           })
 
-          it('> emitted value is as expected', () => {
+          it('> emitted value is as expected', fakeAsync(() => {
             const map = new Map<number, layerCtrlUtil.IRegion>()
             getMultiNgIdsRegionsLabelIndexMapReturnVal.set(
               'foo-bar',
@@ -65,19 +64,19 @@ describe('> layerctrl.service.ts', () => {
             })
 
             const service = TestBed.inject(NehubaLayerControlService)
-            expect(
-              service.setColorMap$
-            ).toBeObservable(
-              hot('a', {
-                a: {
-                  'foo-bar': {
-                    1: { red: 100, green: 200, blue: 255 },
-                    2: { red: 15, green: 15, blue: 15}
-                  }
-                }
-              })
-            )
-          })
+            let v: any
+            service.setColorMap$.subscribe(val => {
+              v = val
+            })
+            tick(32)
+            const expectedVal = {
+              'foo-bar': {
+                1: { red: 100, green: 200, blue: 255 },
+                2: { red: 15, green: 15, blue: 15}
+              }
+            }
+            expect(v).toEqual(expectedVal)
+          }))
 
         })
 
@@ -108,33 +107,34 @@ describe('> layerctrl.service.ts', () => {
             })
           })
 
-          it('> should inherit values from tmpl and parc', () => {
+          it('> should inherit values from tmpl and parc',  fakeAsync(() => {
 
             const service = TestBed.inject(NehubaLayerControlService)
-            expect(
-              service.setColorMap$
-            ).toBeObservable(
-              hot('a', {
-                a: {
-                  'bazz': {
-                    1: { red: 100, green: 100, blue: 100 },
-                    2: { red: 100, green: 100, blue: 100 },
-                    3: { red: 100, green: 100, blue: 100 },
-                  },
-                  'hello-world': {
-                    4: { red: 200, green: 200, blue: 200 },
-                    5: { red: 200, green: 200, blue: 200 },
-                    6: { red: 200, green: 200, blue: 200 },
-                    10: { red: 255, green: 255, blue: 255 },
-                    11: { red: 255, green: 255, blue: 255 },
-                    12: { red: 255, green: 255, blue: 255 },
-                  }
-                }
-              })
-            )
-          })
+            let val
+            service.setColorMap$.subscribe(v => {
+              val = v
+            })
 
-          it('> should overwrite any value if at all, from region', () => {
+            tick(32)
+
+            expect(val).toEqual({
+              'bazz': {
+                1: { red: 100, green: 100, blue: 100 },
+                2: { red: 100, green: 100, blue: 100 },
+                3: { red: 100, green: 100, blue: 100 },
+              },
+              'hello-world': {
+                4: { red: 200, green: 200, blue: 200 },
+                5: { red: 200, green: 200, blue: 200 },
+                6: { red: 200, green: 200, blue: 200 },
+                10: { red: 255, green: 255, blue: 255 },
+                11: { red: 255, green: 255, blue: 255 },
+                12: { red: 255, green: 255, blue: 255 },
+              }
+            })
+          }))
+
+          it('> should overwrite any value if at all, from region', fakeAsync(() => {
             const map = new Map<number, layerCtrlUtil.IRegion>()
             map.set(10, {
               ngId: 'hello-world',
@@ -147,29 +147,29 @@ describe('> layerctrl.service.ts', () => {
             getMultiNgIdsRegionsLabelIndexMapReturnVal.set('hello-world', map)
 
             const service = TestBed.inject(NehubaLayerControlService)
-            expect(
-              service.setColorMap$
-            ).toBeObservable(
-              hot('a', {
-                a: {
-                  'bazz': {
-                    1: { red: 100, green: 100, blue: 100 },
-                    2: { red: 100, green: 100, blue: 100 },
-                    3: { red: 100, green: 100, blue: 100 },
-                  },
-                  'hello-world': {
-                    4: { red: 200, green: 200, blue: 200 },
-                    5: { red: 200, green: 200, blue: 200 },
-                    6: { red: 200, green: 200, blue: 200 },
-                    10: { red: 255, green: 255, blue: 255 },
-                    11: { red: 255, green: 255, blue: 255 },
-                    12: { red: 255, green: 255, blue: 255 },
-                    15: { red: 0, green: 0, blue: 0 },
-                  }
-                }
-              })
-            )
-          })
+            let val
+            service.setColorMap$.subscribe(v => {
+              val = v
+            })
+
+            tick(32)
+            expect(val).toEqual({
+              'bazz': {
+                1: { red: 100, green: 100, blue: 100 },
+                2: { red: 100, green: 100, blue: 100 },
+                3: { red: 100, green: 100, blue: 100 },
+              },
+              'hello-world': {
+                4: { red: 200, green: 200, blue: 200 },
+                5: { red: 200, green: 200, blue: 200 },
+                6: { red: 200, green: 200, blue: 200 },
+                10: { red: 255, green: 255, blue: 255 },
+                11: { red: 255, green: 255, blue: 255 },
+                12: { red: 255, green: 255, blue: 255 },
+                15: { red: 0, green: 0, blue: 0 },
+              }
+            })
+          }))
         })
       })
 
@@ -225,7 +225,9 @@ describe('> layerctrl.service.ts', () => {
           ).subscribe(val => {
             subscrbiedVal = val
           })
-          
+
+          // see TODO this is a dirty fix
+          tick(32)
           service.overwriteColorMap$.next(foobar2)
           tick(32)
           expect(subscrbiedVal).toEqual(foobar2)

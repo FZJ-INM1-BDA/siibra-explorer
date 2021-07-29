@@ -84,6 +84,7 @@ export type TDatainfos = {
     cite: string
     doi: string
   }[]
+  useClassicUi: boolean
 }
 
 export type TSpaceFull = {

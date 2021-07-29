@@ -1,9 +1,12 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, Inject, OnDestroy, Optional } from "@angular/core";
 import { Observable, of, Subject, Subscription } from "rxjs";
 import { filter, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
-import { BsFeatureService } from "../../service";
+import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
+import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { TBSDetail } from "../type";
+import { ARIA_LABELS } from 'common/constants'
+import { isPr } from "../profile/profile.component";
 
 @Component({
   selector: 'bs-features-receptor-entry',
@@ -16,6 +19,7 @@ import { TBSDetail } from "../type";
 export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestroy{
 
   private sub: Subscription[] = []
+  public ARIA_LABELS = ARIA_LABELS
 
   private selectedREntryId$ = new Subject<string>()
   private _selectedREntryId: string
@@ -33,6 +37,10 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
       : of(null)
     ),
     shareReplay(1),
+  )
+
+  public hasPrAr$: Observable<boolean> = this.selectedReceptor$.pipe(
+    map(detail => detail.__files.some(f => isPr(f))),
   )
 
   ngOnDestroy(){
@@ -66,9 +74,10 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   )
 
   constructor(
-    svc: BsFeatureService
+    svc: BsFeatureService,
+    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput
   ){
-    super(svc)
+    super(svc, data)
     this.sub.push(
       this.selectedReceptor$.subscribe()
     )

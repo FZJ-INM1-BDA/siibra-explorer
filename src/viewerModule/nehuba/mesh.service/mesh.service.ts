@@ -101,11 +101,24 @@ export class NehubaMeshService implements OnDestroy {
 
   public loadMeshes$: Observable<IMeshesToLoad> = combineLatest([
     this.auxMeshes$,
+    this.selectedTemplate$,
     this.selectedParc$,
     this.selectedRegions$,
   ]).pipe(
-    switchMap(([auxMeshes, parc, selRegions]) => {
-      const obj = getLayerNameIndiciesFromParcRs(parc, selRegions)
+    switchMap(([auxMeshes, template, parc, selRegions]) => {
+      
+      /**
+       * if colin 27 and julich brain 2.9.0, select all regions
+       */
+      let overrideSelRegion = null
+      if (
+        template['@id'] === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992' &&
+        parc['@id'] === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
+      ) {
+        overrideSelRegion = []
+      }
+
+      const obj = getLayerNameIndiciesFromParcRs(parc, overrideSelRegion || selRegions)
       const { auxillaryMeshIndices = [] } = parc
       const arr: IMeshesToLoad[] = []
       for (const key in obj) {

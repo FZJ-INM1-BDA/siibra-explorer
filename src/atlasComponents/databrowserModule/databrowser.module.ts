@@ -36,7 +36,6 @@ import { LayerBrowserModule } from "../../ui/layerbrowser";
 
 import { ContributorModule } from "./contributor";
 import { DatabrowserService } from "./databrowser.service";
-import { ShownDatasetDirective } from "./shownDataset.directive";
 import { RegionalFeaturesModule } from "../regionalFeatures";
 import { SingleDatasetDirective } from "./singleDataset/singleDataset.directive";
 import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
@@ -75,7 +74,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
      */
     PreviewDatasetFile,
     ShownPreviewsDirective,
-    ShownDatasetDirective,
 
     /**
      * pipes
@@ -106,7 +104,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewDatasetFile,
     PreviewFileTypePipe,
     ShownPreviewsDirective,
-    ShownDatasetDirective,
   ],
   entryComponents: [
     PreviewComponentWrapper

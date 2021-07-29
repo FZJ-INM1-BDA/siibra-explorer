@@ -1,5 +1,5 @@
 import { viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation, viewerStateSelectorStandaloneVolumes } from "src/services/state/viewerState/selectors"
-import { encodeNumber, decodeToNumber, separator } from './cipher'
+import { encodeNumber, decodeToNumber, separator, encodeURIFull } from './cipher'
 import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { mixNgLayers } from "src/services/state/ngViewerState.store"
@@ -255,7 +255,7 @@ export const cvtStateToHashedRoutes = (state): string => {
     // for parcellation
     p: selectedParcellation && encodeId(selectedParcellation['@id'] || selectedParcellation['fullId']),
     // for regions
-    r: selectedRegionsString && encodeURI(selectedRegionsString),
+    r: selectedRegionsString && encodeURIFull(selectedRegionsString),
     // nav
     ['@']: cNavString,
     // dataset file preview
