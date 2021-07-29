@@ -1,0 +1,16 @@
+:host > *
+{
+  flex: 0 0 0;
+  margin-right: 0.4em;
+  display:inline-block;
+}
+
+:host > *
+{
+  pointer-events: all;
+}
+
+.btnWrapper
+{
+  margin: 0.5rem 0;
+}

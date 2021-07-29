@@ -1,0 +1,28 @@
+:host
+{
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.button-container
+{
+  z-index: 1;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 0px;
+  height:0px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+span.mouseover
+{
+  z-index: 1;
+  position: fixed;
+  bottom: 3rem;
+  right: 1rem;
+}

@@ -1,0 +1,30 @@
+<spinner-cmp *ngIf="busy$ | async; else contentTmpl"></spinner-cmp>
+
+<ng-template #contentTmpl>
+  <cdk-virtual-scroll-viewport
+    [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL"
+    class="h-100"
+    minBufferPx="200"
+    maxBufferPx="400"
+    itemSize="50">
+    <div *cdkVirtualFor="let dataset of visibleRegionalFeatures; trackBy: trackByFn; templateCacheSize: 20; let index = index"
+      class="h-50px overflow-hidden">
+
+      <!-- divider, show if not first -->
+      <mat-divider class="mt-1" *ngIf="index !== 0"></mat-divider>
+
+      <kg-regional-feature-summary
+        mat-ripple
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-fullid]="dataset['@id']"
+        [iav-dataset-show-dataset-dialog-contexted-region]="region"
+        class="d-block pb-1 pt-1"
+        [region]="region"
+        [loadFull]="false"
+        [summary]="dataset"
+        (loadedDetail)="handlePopulatedDetailEv($event)">
+      </kg-regional-feature-summary>
+
+    </div>
+  </cdk-virtual-scroll-viewport>
+</ng-template>

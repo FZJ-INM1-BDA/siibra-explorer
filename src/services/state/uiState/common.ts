@@ -1,5 +1,4 @@
 export interface IUiState{
-  shownDatasetId: string[]
 
   previewingDatasetFiles: {datasetId: string, filename: string}[]
 

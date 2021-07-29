@@ -1,6 +1,6 @@
 // TODO merge with uiState.store.ts after refactor completes
 
-import {
+export {
   uiActionSetPreviewingDatasetFiles,
   uiActionShowSidePanelConnectivity,
   uiStateCloseSidePanel,
@@ -8,35 +8,16 @@ import {
   uiStateExpandSidePanel,
   uiStateOpenSidePanel,
   uiStateShowBottomSheet,
-  uiActionHideDatasetWithId,
-  uiActionShowDatasetWtihId,
+  uiActionSnackbarMessage,
+  uiActionMouseoverLandmark,
+  uiActionMouseoverSegments,
 } from './uiState/actions'
 
 export {
-  uiActionSetPreviewingDatasetFiles,
-  uiActionShowSidePanelConnectivity,
-  uiStateCloseSidePanel,
-  uiStateCollapseSidePanel,
-  uiStateExpandSidePanel,
-  uiStateOpenSidePanel,
-  uiStateShowBottomSheet,
-  uiActionHideDatasetWithId,
-  uiActionShowDatasetWtihId,
-}
-
-import {
   uiStatePreviewingDatasetFilesSelector,
   uiStateMouseOverSegmentsSelector,
   uiStateMouseoverUserLandmark,
-  uiStateShownDatasetIdSelector,
 } from './uiState/selectors'
-
-export {
-  uiStatePreviewingDatasetFilesSelector,
-  uiStateMouseOverSegmentsSelector,
-  uiStateMouseoverUserLandmark,
-  uiStateShownDatasetIdSelector,
-}
 
 export enum EnumWidgetTypes{
   DATASET_PREVIEW,
@@ -52,3 +33,5 @@ export type TypeOpenedWidget = {
   type: EnumWidgetTypes
   data: IDatasetPreviewData
 }
+
+export const SHOW_KG_TOS = `SHOW_KG_TOS`

@@ -8,6 +8,7 @@
 :host[darktheme="true"]
 {
   background-color:black;
+  display: block;
 }
 
 ui-nehuba-container
@@ -68,7 +69,6 @@ mat-sidenav {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-landmark-ui,
 region-menu
 {
   display:inline-block;

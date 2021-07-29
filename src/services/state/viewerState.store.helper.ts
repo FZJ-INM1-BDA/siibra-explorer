@@ -15,12 +15,14 @@ import {
   viewerStateSelectParcellation,
   viewerStateSelectTemplateWithId,
   viewerStateSetConnectivityRegion,
+  viewerStateNehubaLayerchanged,
   viewerStateSetFetchedAtlases,
   viewerStateSetSelectedRegions,
   viewerStateSetSelectedRegionsWithIds,
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
   viewerStateSelectRegionWithIdDeprecated,
+  viewerStateSetViewerMode,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks,
@@ -38,12 +40,14 @@ export {
   viewerStateSelectParcellation,
   viewerStateSelectTemplateWithId,
   viewerStateSetConnectivityRegion,
+  viewerStateNehubaLayerchanged,
   viewerStateSetFetchedAtlases,
   viewerStateSetSelectedRegions,
   viewerStateSetSelectedRegionsWithIds,
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
   viewerStateSelectRegionWithIdDeprecated,
+  viewerStateSetViewerMode,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks,
@@ -110,7 +114,7 @@ export const viewerStateMetaReducers = [
 
 export class ViewerStateHelperEffect{
   @Effect()
-  selectParcellationWithId$: Observable<any> = this.actions$.pipe(
+  onRemoveAdditionalLayer$: Observable<any> = this.actions$.pipe(
     ofType(viewerStateRemoveAdditionalLayer.type),
     withLatestFrom(
       this.store$.pipe(
@@ -131,7 +135,8 @@ export class ViewerStateHelperEffect{
       const eligibleParcIdSet = new Set(
         tmpl.availableIn.map(p => p['@id'])
       )
-      const baseLayer = selectedAtlas['parcellations'].find(fullP => fullP['baseLayer'] && eligibleParcIdSet.has(fullP['@id']))
+      const baseLayers = selectedAtlas['parcellations'].filter(fullP => fullP['baseLayer'] && eligibleParcIdSet.has(fullP['@id']))
+      const baseLayer = baseLayers.find(layer => !!layer['@version'] && !layer['@version']['@next']) || baseLayers[0]
       return viewerStateHelperSelectParcellationWithId({ payload: baseLayer })
     })
   )
@@ -140,7 +145,7 @@ export class ViewerStateHelperEffect{
     private store$: Store<any>,
     private actions$: Actions
   ){
-    
+
   }
 }
 
@@ -177,7 +182,7 @@ export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId)
     while (currPreviousId) {
       it += 1
       if (it>100) throw new Error(`iteration excced 100, did you include a loop?`)
-      
+
       const curr = arr.find(v => v['@version']['@this'] === currPreviousId)
       if (!curr) throw new Error(`GenNewerVersions error, version id ${currPreviousId} not found`)
       currPreviousId = curr['@version'][ flag ? '@next' : '@previous' ]
@@ -193,8 +198,8 @@ export function isNewerThan(arr: IHasVersion[], srcObj: IHasId, compObj: IHasId)
   for (const obj of GenNewerVersions(false)) {
     if (obj['@version']['@this'] === compObj['@id']) {
       return true
-    } 
+    }
   }
-  
+
   throw new Error(`isNewerThan error, neither srcObj nor compObj exist in array`)
 }

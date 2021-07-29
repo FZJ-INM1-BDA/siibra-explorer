@@ -6,15 +6,16 @@ import {
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AngularMaterialModule } from '../sharedModules/angularMaterial.module';
-import { GetFilenamePipe } from './getFilename.pipe';
 import { LayerDetailComponent } from './layerDetail/layerDetail.component';
 import { FormsModule } from '@angular/forms';
+import { UtilModule } from 'src/util';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    UtilModule,
   ],
   declarations: [
     LayerBrowser,
@@ -22,7 +23,6 @@ import { FormsModule } from '@angular/forms';
 
     GetInitialLayerOpacityPipe,
     LockedLayerBtnClsPipe,
-    GetFilenamePipe
   ],
   exports: [
     GetInitialLayerOpacityPipe,

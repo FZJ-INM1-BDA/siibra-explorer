@@ -1,0 +1,49 @@
+:host
+{
+  width: 0px;
+  height: 0px;
+}
+
+:host-context([darktheme="true"]) svg
+{
+  stroke: rgb(200, 200, 200);
+}
+
+svg
+{
+  pointer-events: none;
+  stroke-width: 5px;
+  stroke: rgb(255, 255, 255);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/vector-effect */
+svg path
+{
+  vector-effect: non-scaling-stroke;
+}
+
+#arrow_head
+{
+  width: 2.4rem;
+  height: 2.4rem;
+  transform-origin: 50% 0;
+  stroke-width: 3px;
+}
+
+#arrow_head #arrow_head_group
+{
+  transform-origin: 50% 10%;
+  transform: scale(0.95, 0.80);
+}
+
+#arrow_stem
+{
+  transform-origin: 0 0;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}

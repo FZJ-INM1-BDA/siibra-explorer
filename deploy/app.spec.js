@@ -1,6 +1,4 @@
-const { expect } = require('chai')
-const fs = require('fs')
-const { assert } = require('console')
+const { expect, assert } = require('chai')
 const express = require('express')
 const got = require('got')
 const sinon = require('sinon')
@@ -17,9 +15,9 @@ describe('authentication', () => {
   process.env['USE_DEFAULT_MEMORY_STORE'] = true
 
   const fakeFunctionObj = {
-    fakeAuthConfigureAuth: (req, res, next) => next(),
+    fakeAuthConfigureAuth: sinon.stub().callsFake((req, res, next) => next()),
     fakeAuthReady: async () => true,
-    fakeUserRouterFn: (req, res, next) => res.status(200).send()
+    fakeUserRouterFn: sinon.stub().callsFake((req, res, next) => res.status(200).send())
   }
 
   before(async () => {
@@ -63,19 +61,32 @@ describe('authentication', () => {
   })
 
   after(() => {
-    delete require.cache[require.resolve('./saneUrl')]
     delete require.cache[require.resolve('./datasets')]
+    delete require.cache[require.resolve('./saneUrl')]
     delete require.cache[require.resolve('./user')]
     delete require.cache[require.resolve('./constants')]
     server.close()
   })
-  
-  it('fakeAuthConfigureAuth is called before user router', async () => {
-    const spyFakeAuthConfigureAuth = sinon.spy(fakeFunctionObj, 'fakeAuthConfigureAuth')
-    const spyFakeUserRouterFn = sinon.spy(fakeFunctionObj, 'fakeUserRouterFn')
+  it('> auth middleware is called', async () => {
     await got(`http://localhost:${PORT}/user`)
     assert(
-      spyFakeAuthConfigureAuth.calledBefore(spyFakeUserRouterFn),
+      fakeFunctionObj.fakeAuthConfigureAuth.called,
+      'auth middleware should be called'
+    )
+  })
+
+  it('> user middleware called', async () => {
+    await got(`http://localhost:${PORT}/user`)
+    assert(
+      fakeFunctionObj.fakeUserRouterFn.called,
+      'user middleware is called'
+    )
+  })
+  
+  it('fakeAuthConfigureAuth is called before user router', async () => {
+    await got(`http://localhost:${PORT}/user`)
+    assert(
+      fakeFunctionObj.fakeAuthConfigureAuth.calledBefore(fakeFunctionObj.fakeUserRouterFn),
       'fakeAuthConfigureAuth is called before user router'
     )
   })

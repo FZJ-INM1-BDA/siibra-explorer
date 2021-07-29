@@ -1,0 +1,76 @@
+<ng-template [ngIf]="busy$ | async" [ngIfElse]="contenttmpl">
+  <spinner-cmp></spinner-cmp>
+</ng-template>
+
+<ng-template #contenttmpl>
+  <ng-container *ngFor="let result of results$ | async">
+    <ng-container *ngFor="let subjectKeyVal of result | getProperty : 'electrodes' | keyvalue">
+
+      <ng-container *ngFor="let electrodeKeyVal of subjectKeyVal.value | keyvalue; let first = first">
+
+        <!-- subject id -->
+        <!-- <h4 *ngIf="first" class="mat-h4">
+          {{ subjectKeyVal.key }}
+        </h4> -->
+
+        <!-- electrodes -->
+        <ng-template [ngIf]="electrodeKeyVal.value.inRoi">
+          <ng-container *ngTemplateOutlet="electrodeTmpl; context: { $implicit: electrodeKeyVal.value }">
+          </ng-container>
+        </ng-template>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<!-- template for electrode -->
+<ng-template #electrodeTmpl let-electrode>
+
+  <mat-expansion-panel
+    [expanded]="openElectrode$ | async | arrayContains : electrode"
+    (opened)="handleDatumExpansion(electrode, true)"
+    (closed)="handleDatumExpansion(electrode, false)"
+    togglePosition="before">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Electrode
+      </mat-panel-title>
+      <mat-panel-description class="text-nowrap">
+        {{ electrode.electrode_id }}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+
+    <!-- <label for="task-list" class="d-block mat-h4 mt-4 text-muted">
+      Tasks
+    </label>
+    <section class="d-flex align-items-center mt-1">
+      <section id="task-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+        <div role="list">
+          <mat-chip *ngFor="let task of datum['tasks']" class="ml-1">
+            {{ task }}
+          </mat-chip>
+        </div>
+      </section>
+    </section> -->
+
+    <mat-divider></mat-divider>
+
+    <label for="contact-points-list" class="d-block mat-h4 mt-4 text-muted">
+      Contact Points
+    </label>
+    <section class="d-flex align-items-center mt-1">
+      <section id="contact-points-list" class="flex-grow-1 flex-shrink-1 overflow-x-auto">
+        <div role="list">
+          <mat-chip *ngFor="let cp_kv of electrode.contact_points | keyvalue"
+            [matTooltip]="cp_kv['value']['location']"
+            (click)="handleContactPtClk(cp_kv['value'])"
+            class="ml-1">
+            {{ cp_kv['key'] }}
+          </mat-chip>
+        </div>
+      </section>
+    </section>
+
+  </mat-expansion-panel>
+</ng-template>

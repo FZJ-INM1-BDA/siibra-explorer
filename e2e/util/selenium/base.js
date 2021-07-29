@@ -39,6 +39,7 @@ const verifyPosition = position => {
 class WdBase{
   constructor() {
     browser.waitForAngularEnabled(false)
+    globalThis.IAVBase = this
   }
   get _browser(){
     return browser
@@ -225,24 +226,15 @@ class WdBase{
 
   async waitForAsync(){
 
-    const checkReady = async () => {
+    await this._browser.wait(async () => {
       const els = await this._browser.findElements(
+        By.css('div.loadingIndicator')
+      )
+      const els2 = await this._browser.findElements(
         By.css('.spinnerAnimationCircle')
       )
-      const visibleEls = []
-      for (const el of els) {
-        if (await el.isDisplayed()) {
-          visibleEls.push(el)
-        }
-      }
-      return !visibleEls.length
-    }
-
-    do {
-      await this.wait(500)
-    } while (
-      !(await retry(checkReady.bind(this), { timeout: 1000, retries: 10 }))
-    )
+      return [...els, ...els2].length === 0
+    }, 1e3 * 60 * 10)
   }
 
   async cursorMoveTo({ position }) {

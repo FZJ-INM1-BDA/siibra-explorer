@@ -176,6 +176,11 @@ markdown-dom pre code
   white-space:pre;
 }
 
+markdown-dom p
+{
+  margin: 0;
+}
+
 .highlight
 {
   background-color:rgba(150,150,0,0.5);
@@ -298,6 +303,10 @@ markdown-dom pre code
   width: 0!important;
 }
 
+.w-3em
+{
+  width: 3em!important;
+}
 .w-5em
 {
   width: 5em!important;
@@ -361,6 +370,11 @@ markdown-dom pre code
   pointer-events: all;
 }
 
+.t-a-ease-200
+{
+  transition: all ease 200ms;
+}
+
 .t-a-ease-500
 {
   transition: all ease 500ms;
@@ -379,6 +393,16 @@ markdown-dom pre code
 .h-2rem
 {
   height: 2rem!important;
+}
+
+.h-4rem
+{
+  height: 4rem!important;
+}
+
+.h-50vh
+{
+  height: 50vh!important;
 }
 
 .h-5em
@@ -431,6 +455,11 @@ markdown-dom pre code
 .muted
 {
   opacity: 0.5!important;
+}
+
+.muted-3
+{
+  opacity: 0.3!important;
 }
 
 .card
@@ -501,11 +530,11 @@ markdown-dom pre code
 }
 
 .outline-none {
-    outline: none;
+  outline: none;
 }
 
 .cursor-pointer {
-    cursor: pointer!important;
+  cursor: pointer!important;
 }
 
 .z-index-1
@@ -818,4 +847,26 @@ mat-list.sm mat-list-item
 .color-inherit
 {
   color: inherit!important;
+}
+
+.sidenav-cover-header-container
+{
+  padding: 16px;
+  margin: -16px!important;
+  padding-top: 6rem;
+}
+
+.no-padding-dialog > mat-dialog-container
+{
+  padding-top:0 !important;
+  padding-right:0 !important;
+  padding-left:0 !important;
+}
+.h-50px
+{
+  height:50px;
+}
+.scale-80
+{
+  transform: scale(0.8);
 }

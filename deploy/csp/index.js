@@ -1,6 +1,5 @@
 const csp = require('helmet-csp')
-const express = require('express')
-const crypto = require('crypto')
+const bodyParser = require('body-parser')
 
 let WHITE_LIST_SRC, CSP_CONNECT_SRC, SCRIPT_SRC
 
@@ -49,73 +48,82 @@ const connectSrc = [
   ...CSP_CONNECT_SRC
 ]
 
-module.exports = (app) => {
-  app.use((req, res, next) => {
-    if (req.path === '/') res.locals.nonce = crypto.randomBytes(16).toString('hex')
-    next()
-  })
+module.exports = {
+  middelware: (req, res, next) => {
 
-  app.use(csp({
-    directives: {
-      defaultSrc: [
-        ...defaultAllowedSites,
-        ...WHITE_LIST_SRC
-      ],
-      styleSrc: [
-        ...defaultAllowedSites,
-        'stackpath.bootstrapcdn.com/bootstrap/4.3.1/',
-        'use.fontawesome.com/releases/v5.8.1/',
-        "'unsafe-inline'", // required for angular [style.xxx] bindings
-        ...WHITE_LIST_SRC
-      ],
-      fontSrc: [
-        "'self'",
-        'use.fontawesome.com/releases/v5.8.1/',
-        ...WHITE_LIST_SRC
-      ],
-      connectSrc: [
-        ...defaultAllowedSites,
-        ...connectSrc,
-        ...WHITE_LIST_SRC
-      ],
-      imgSrc: [
-        "'self'",
-        "hbp-kg-dataset-previewer.apps.hbp.eu/v2/"
-      ],
-      scriptSrc:[
-        "'self'",
-        'code.jquery.com', // plugin load external library -> jquery v2 and v3
-        'cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/', // plugin load external library -> web components
-        'cdnjs.cloudflare.com/ajax/libs/d3/', // plugin load external lib -> d3
-        'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
-        'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
-        'unpkg.com/react@16/umd/', // plugin load external lib -> react
-        'unpkg.com/kg-dataset-previewer@1.1.5/', // preview component
-        'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
-        (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
-        ...SCRIPT_SRC,
-        ...WHITE_LIST_SRC,
-        ...defaultAllowedSites
-      ],
-      reportUri: CSP_REPORT_URI || '/report-violation'
-    },
-    reportOnly
-  }))
+    const permittedCsp = (req.session && req.session.permittedCsp) || {}
+    const userConnectSrc = []
+    const userScriptSrc = []
+    for (const key in permittedCsp) {
+      userConnectSrc.push(
+        ...(permittedCsp[key]['connect-src'] || []),
+        ...(permittedCsp[key]['connectSrc'] || [])
+      )
+      userScriptSrc.push(
+        ...(permittedCsp[key]['script-src'] || []),
+        ...(permittedCsp[key]['scriptSrc'] || [])
+      )
+    }
+    csp({
+      directives: {
+        defaultSrc: [
+          ...defaultAllowedSites,
+          ...WHITE_LIST_SRC
+        ],
+        styleSrc: [
+          ...defaultAllowedSites,
+          'stackpath.bootstrapcdn.com/bootstrap/4.3.1/',
+          'use.fontawesome.com/releases/v5.8.1/',
+          "'unsafe-inline'", // required for angular [style.xxx] bindings
+          ...WHITE_LIST_SRC
+        ],
+        fontSrc: [
+          "'self'",
+          'use.fontawesome.com/releases/v5.8.1/',
+          ...WHITE_LIST_SRC
+        ],
+        connectSrc: [
+          ...userConnectSrc,
+          ...defaultAllowedSites,
+          ...connectSrc,
+          ...WHITE_LIST_SRC
+        ],
+        imgSrc: [
+          "'self'",
+          "hbp-kg-dataset-previewer.apps.hbp.eu/v2/"
+        ],
+        scriptSrc:[
+          "'self'",
+          ...userScriptSrc,
+          'code.jquery.com', // plugin load external library -> jquery v2 and v3
+          'cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/', // plugin load external library -> web components
+          'cdnjs.cloudflare.com/ajax/libs/d3/', // plugin load external lib -> d3
+          'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
+          'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
+          'unpkg.com/react@16/umd/', // plugin load external lib -> react
+          'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
+          'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
+          'https://unpkg.com/three-surfer@0.0.10/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
+          (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
+          ...SCRIPT_SRC,
+          ...WHITE_LIST_SRC,
+          ...defaultAllowedSites
+        ],
+        reportUri: CSP_REPORT_URI || '/report-violation'
+      },
+      reportOnly
+    })(req, res, next)
 
-  if (!CSP_REPORT_URI) {
-    app.post(
-      '/report-violation',
-      express.json({
-        type: ['json', 'application/csp-report']
-      }),
-      (req, res) => {
-        if (req.body) {
-          console.warn(`CSP Violation: `, req.body)
-        } else {
-          console.warn(`CSP Violation: no data received!`)
-        }
-        res.status(204).end()
+  },
+  bootstrapReportViolation: app => {
+    app.post('/report-violation', bodyParser.json({
+      type: ['json', 'application/csp-report']
+    }), (req, res) => {
+      if (req.body) {
+        console.warn(`CSP Violation: `, req.body)
+      } else {
+        console.warn(`CSP Violation: no data received!`)
       }
-    )
+    })
   }
 }

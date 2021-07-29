@@ -3,13 +3,12 @@ const path = require('path')
 const express = require('express')
 const app = express.Router()
 const session = require('express-session')
-const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
+const bkwdMdl = require('./bkwdCompat')()
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
-const { router: datasetRouter, ready: datasetRouteIsReady } = require('./datasets')
-const { router: saneUrlRouter, ready: saneUrlIsReady } = require('./saneUrl')
+const { router: datasetRouter } = require('./datasets')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -42,53 +41,75 @@ app.use((req, _, next) => {
 })
 
 /**
- * load env first, then load other modules
- */
-
-const { configureAuth, ready: authReady } = require('./auth')
-
-/**
- * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
- * this causes problems during tests
- * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
- * see app.spec.js
- */
-const { USE_DEFAULT_MEMORY_STORE } = process.env
-const store = USE_DEFAULT_MEMORY_STORE
-  ? (console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`), null)
-  : new MemoryStore({
-      checkPeriod: 86400000
-    })
-
-const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
-
-/**
- * passport application of oidc requires session
- */
-app.use(session({
-  secret: SESSIONSECRET,
-  resave: true,
-  saveUninitialized: false,
-  store
-}))
-
-/**
- * configure CSP
- */
-if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
-  console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
-} else {
-  require('./csp')(app)
-}
-
-/**
  * configure Auth
  * async function, but can start server without
  */
 
-(async () => {
+let authReady
+
+const _ = (async () => {
+
+/**
+ * load env first, then load other modules
+ */
+
+  const { configureAuth, ready } = require('./auth')
+  authReady = ready
+  const store = await (async () => {
+
+    const { USE_DEFAULT_MEMORY_STORE } = process.env
+    if (!!USE_DEFAULT_MEMORY_STORE) {
+      console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`)
+      return null
+    } 
+
+    const { _initPr, redisURL, StoreType } = require('./lruStore')
+    await _initPr
+    console.log('StoreType', redisURL, StoreType)
+    if (!!redisURL) {
+      const redis = require('redis')
+      const RedisStore = require('connect-redis')(session)
+      const client = redis.createClient({
+        url: redisURL
+      })
+      return new RedisStore({
+        client
+      })
+    }
+    
+    /**
+     * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
+     * this causes problems during tests
+     * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
+     * see app.spec.js
+     */
+    const MemoryStore = require('memorystore')(session)
+    return new MemoryStore({
+      checkPeriod: 86400000
+    })
+    
+  })() 
+
+  const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
+
+  /**
+   * passport application of oidc requires session
+   */
+  app.use(session({
+    secret: SESSIONSECRET,
+    resave: true,
+    saveUninitialized: false,
+    store
+  }))
+
   await configureAuth(app)
   app.use('/user', require('./user'))
+
+  /**
+   * saneUrl end points
+   */
+  const { router: saneUrlRouter } = require('./saneUrl')
+  app.use('/saneUrl', saneUrlRouter)
 })()
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
@@ -122,7 +143,7 @@ if (LOCAL_CDN_FLAG) {
     indexFile = data.replace(regex, LOCAL_CDN)
   })
   
-  app.get('/', (_req, res) => {
+  app.get('/', bkwdMdl, (_req, res) => {
     if (!indexFile) return res.status(404).end()
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     return res.status(200).send(indexFile)
@@ -144,7 +165,21 @@ app.use(require('./devBanner'))
  * populate nonce token
  */
 const { indexTemplate } = require('./constants')
-app.get('/', cookieParser(), (req, res) => {
+app.get('/', (req, res, next) => {
+  
+  /**
+   * configure CSP
+   */
+  if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
+    console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
+    next()
+  } else {
+    const { bootstrapReportViolation, middelware } = require('./csp')
+    bootstrapReportViolation(app)
+    middelware(req, res, next)
+  }
+
+}, bkwdMdl, cookieParser(), (req, res) => {
   const iavError = req.cookies && req.cookies['iav-error']
   
   res.setHeader('Content-Type', 'text/html')
@@ -167,15 +202,12 @@ app.get('/', cookieParser(), (req, res) => {
 app.use('/logo', require('./logo'))
 
 app.get('/ready', async (req, res) => {
-  const authIsReady = await authReady()
+  const authIsReady = authReady ? await authReady() : false
   const regionalFeatureReady = await regionalFeatureIsReady()
-  const datasetReady = await datasetRouteIsReady()
-  const saneUrlReady = await saneUrlIsReady()
+
   const allReady = [ 
     authIsReady,
     regionalFeatureReady,
-    datasetReady,
-    saneUrlReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -193,11 +225,6 @@ const { compressionMiddleware, setAlwaysOff } = require('nomiseco')
 if (LOCAL_CDN_FLAG) setAlwaysOff(true)
 
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
-
-/**
- * saneUrl end points
- */
-app.use('/saneUrl', saneUrlRouter)
 
 const jsonMiddleware = (req, res, next) => {
   if (!res.get('Content-Type')) res.set('Content-Type', 'application/json')

@@ -2,47 +2,38 @@ const express = require('express')
 const router = express.Router()
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
-const { Store, NotFoundError } = require('./store')
+const { FallbackStore: Store, NotFoundError } = require('./store')
+const lruStore = require('../lruStore')
 const { Store: DepcStore } = require('./depcObjStore')
 const { readUserData, saveUserData } = require('../user/store')
 
 const store = new Store()
 const depStore = new DepcStore()
 
-const { 
-  REDIS_PROTO,
-  REDIS_ADDR,
-  REDIS_PORT,
+const { DISABLE_LIMITER, HOSTNAME, HOST_PATHNAME } = process.env
 
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR,
-  REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT,
 
-  REDIS_USERNAME,
-  REDIS_PASSWORD,
+let limiter
+const getLimiter = async () => {
+  if (DISABLE_LIMITER) return passthrough
+  
+  if (!!limiter) return limiter
 
-  HOSTNAME,
-  HOST_PATHNAME,
-  DISABLE_LIMITER,
-} = process.env
-
-const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PROTO || 'redis'
-const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
-const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
-
-/**
- * nb this way to set username and pswd can be risky, but given that site adnimistrator sets the username and pswd via env var
- * it should not be a security concern
- */
-const userPass = (REDIS_USERNAME || REDIS_PASSWORD) && `${REDIS_USERNAME || ''}:${REDIS_PASSWORD || ''}@`
-
-const redisURL = redisAddr && `${redisProto}://${userPass || ''}${redisAddr}:${redisPort}`
-
-const limiter = new RateLimit({
-  windowMs: 1e3 * 5,
-  max: 5,
-  ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
-})
+  await lruStore._initPr
+  if (lruStore.redisURL) {
+    limiter = new RateLimit({
+      windowMs: 1e3 * 5,
+      max: 5,
+      store: new RedisStore({ redisURL })
+    })
+  } else {
+    limiter = new RateLimit({
+      windowMs: 1e3 * 5,
+      max: 5,
+    })
+  }
+  return limiter
+}
 
 const passthrough = (_, __, next) => next()
 
@@ -114,7 +105,7 @@ router.get('/:name', async (req, res) => {
 })
 
 router.post('/:name',
-  DISABLE_LIMITER ? passthrough : limiter,
+  getLimiter,
   async (req, res, next) => {
     const { name } = req.params
     try {

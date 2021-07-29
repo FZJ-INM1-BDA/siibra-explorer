@@ -1,1 +1,0 @@
-export { PluginServices, IPluginManifest } from './atlasViewer.pluginService.service'

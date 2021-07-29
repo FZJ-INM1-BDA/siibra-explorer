@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+@import '~@angular/cdk/overlay-prebuilt.css';
 
 @include  mat-core();
 
@@ -39,7 +40,7 @@
     &[bg],
     &.bg
     {
-      background-color: mat-color($background, background)
+      background-color: mat-color($background, background);
     }
 
     &[darker-bg],
@@ -69,6 +70,15 @@
     &.warn
     {
       color: mat-color($warn);
+    }
+
+    &.hoverable
+    {
+      &:hover
+      {
+        background-color: mat-color($background, hover);
+        cursor: pointer;
+      }
     }
   }
 }

@@ -1,0 +1,39 @@
+<div class="position-relative">
+  <markdown-dom mat-dialog-content [markdown]="QUICK_STARTER_MD">
+  </markdown-dom>
+
+  <a *ngIf="extQuickStarter"
+    [href]="extQuickStarter"
+    target="_blank"
+    class="position-absolute top-0 right-0"
+    [matTooltip]="ARIA_LABELS.OPEN_IN_NEW_WINDOW">
+    <button mat-icon-button
+      color="primary">
+      <i class = "m-1 fas fa-external-link-alt"></i>
+    </button>
+  </a>
+</div>
+
+<div mat-dialog-actions align="center">
+  <button mat-button color="primary" mat-dialog-close quick-tour-opener>
+    <i class = "far fa-play-circle m-1"></i>
+    <span>
+      Take a tour
+    </span>
+  </button>
+
+  <a *ngIf="userDoc"
+    [href]="userDoc"
+    target="_blank">
+    <button mat-button
+      color="primary">
+      <i class="m1 fas fa-book-open"></i>
+      <span>
+        User documentation
+      </span>
+      <i class="m-1 fas fa-external-link-alt"></i>
+    </button>
+  </a>
+
+  <button mat-button mat-dialog-close cdkFocusInitial>close</button>
+</div>

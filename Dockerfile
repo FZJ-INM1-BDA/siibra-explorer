@@ -6,17 +6,29 @@ ENV BACKEND_URL=${BACKEND_URL}
 ARG DATASET_PREVIEW_URL
 ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
 
+ARG BS_REST_URL
+ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-latest.apps-dev.hbp.eu/v1_0}
+
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}
 
 ARG KIOSK_MODE
 ENV KIOSK_MODE=${KIOSK_MODE:-false}
 
+ARG MATOMO_URL
+ENV MATOMO_URL=${MATOMO_URL}
+
+ARG MATOMO_ID
+ENV MATOMO_ID=${MATOMO_ID}
+
 COPY . /iv
 WORKDIR /iv
 
+# When building in local, where node_module already exist, prebuilt binary may throw an error
+RUN rm -rf ./node_modules
+
 ARG VERSION
-ENV VERSION=${VERSION:-devNext}
+ENV VERSION=${VERSION}
 
 RUN npm i
 RUN npm run build-aot
@@ -31,17 +43,8 @@ WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
-# Building doc
-FROM python:3.7 as doc-builder
-
-COPY . /iav
-WORKDIR /iav
-
-RUN pip install mkdocs mkdocs-material mdx_truly_sane_lists errandkun
-RUN mkdocs build
-
 # prod container
-FROM node:12-alpine 
+FROM node:12-alpine
 
 ENV NODE_ENV=production
 
@@ -58,12 +61,15 @@ COPY --from=builder /iv/deploy .
 # Copy built interactive viewer
 COPY --from=compressor /iv ./public
 
-# Copy docs
-COPY --from=doc-builder /iav/site ./docs
-
 # Copy the resources files needed to respond to queries
 # is this even necessary any more?
 COPY --from=compressor /iv/res/json ./res
+
+RUN chown -R node:node /iv-app
+
+USER node
 RUN npm i
 
+EXPOSE 8080
+ENV PORT 8080
 ENTRYPOINT [ "node", "server.js" ]

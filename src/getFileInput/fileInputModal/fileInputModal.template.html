@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>
+  {{ title }}
+</h2>
+<mat-dialog-content>
+  <ng-template [ngIf]="messageTmpl" [ngIfElse]="defaultMessageTmpl" [ngTemplateOutlet]="messageTmpl">
+  </ng-template>
+
+  <ng-template #defaultMessageTmpl>
+    Please select a file to import.
+  </ng-template>
+
+  <div class="w-100 d-flex">
+
+    <!-- text input -->
+    <mat-form-field *ngIf="allowText"
+      class="flex-grow-1 flex-shrink-1 w-0">
+      <mat-label>
+        Text Input
+      </mat-label>
+      <textarea matInput
+        [(ngModel)]="textInput"
+        rows="5"
+        placeholder="Text Input"></textarea>
+    </mat-form-field>
+
+    <!-- file-input -->
+    <div class="file-input-label-container flex-grow-1 flex-shrink-1 w-0 position-relative"
+      (drag-drop-file)="handleFileDrop($event)">
+      <label for="file-input" class="file-input-label w-100 h-100">
+        <i [ngClass]="hasFileInput ? 'fa-file' : 'fa-folder-open'" class="fas"></i>
+        <span class="ml-2">
+          {{ fileInputLabel }}
+        </span>
+      </label>
+      <input (change)="handleFileInputChange($event)"
+        type="file"
+        class="position-absolute left-0 top-0 w-0 h-0 invisible"
+        name="file-input"
+        id="file-input"
+        #fileInput>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button
+    (click)="runImport()"
+    [disabled]="!importable"
+    color="primary">
+    Import
+  </button>
+  <button mat-button mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions>

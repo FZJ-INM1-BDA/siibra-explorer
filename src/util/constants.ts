@@ -7,6 +7,7 @@ export const LOCAL_STORAGE_CONST = {
   MOBILE_UI: 'fzj.xg.iv.MOBILE_UI',
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
+  QUICK_TOUR_VIEWED: 'fzj.dg.iv.QUICK_TOUR_VIEWED',
 
   FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
@@ -41,7 +42,7 @@ export const appendScriptFactory = (document: Document) => {
   })
 }
 
-export const REMOVE_SCRIPT_TOKEN: InjectionToken<(el: HTMLScriptElement) => void> = new InjectionToken(`REMOVE_SCRIPT_TOKEN`) 
+export const REMOVE_SCRIPT_TOKEN: InjectionToken<(el: HTMLScriptElement) => void> = new InjectionToken(`REMOVE_SCRIPT_TOKEN`)
 
 export const removeScriptFactory = (document: Document) => {
   return (srcEl: HTMLScriptElement) => {
@@ -73,10 +74,10 @@ import { EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { InjectionToken } from "@angular/core"
 
 export const getShader = ({
-  colormap = EnumColorMapName.GREYSCALE, 
+  colormap = EnumColorMapName.GREYSCALE,
   lowThreshold = 0,
   highThreshold = 1,
-  brightness = 0, 
+  brightness = 0,
   contrast = 0,
   removeBg = false
 } = {}): string => {
@@ -115,3 +116,17 @@ export const compareLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]
 }
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
+export const BS_ENDPOINT = new InjectionToken<string>('BS_ENDPOINT')
+
+export const UNSUPPORTED_PREVIEW = [{
+  text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',
+  previewSrc: './res/image/1.png',
+}, {
+  text: 'Preview of Big Brain 2015 Release',
+  previewSrc: './res/image/2.png',
+}, {
+  text: 'Preview of Waxholm Rat V2.0',
+  previewSrc: './res/image/3.png',
+}]
+
+export const UNSUPPORTED_INTERVAL = 7000

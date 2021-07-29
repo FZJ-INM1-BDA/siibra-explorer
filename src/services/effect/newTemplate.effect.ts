@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Observable } from "rxjs";
-import { NEWVIEWER } from "../state/viewerState.store";
-import { mapTo, tap } from "rxjs/operators";
+import { mapTo } from "rxjs/operators";
 import { DATASETS_ACTIONS_TYPES } from "../state/dataStore.store";
+import { viewerStateNewViewer } from "../state/viewerState/actions";
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class NewTemplateUseEffect{
     private actions$: Actions
   ){
     this.onNewTemplateShouldClearPreviewDataset$ = this.actions$.pipe(
-      ofType(NEWVIEWER),
+      ofType(viewerStateNewViewer.type),
       mapTo({
         type: DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASETS
       })

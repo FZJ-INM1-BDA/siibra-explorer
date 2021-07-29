@@ -63,5 +63,6 @@ export interface DialogConfig {
   placeholder: string
   defaultValue: string
   message: string
+  markdown?: string
   iconClass: string
 }

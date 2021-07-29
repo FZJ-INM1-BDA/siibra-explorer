@@ -1,5 +1,6 @@
 const { AtlasPage } = require('../util')
-const template = 'ICBM 2009c Nonlinear Asymmetric'
+const atlasName = 'Multilevel Human Atlas'
+const template = 'ICBM 152 2009c Nonlinear Asymmetric'
 
 const pluginName = `fzj.xg.testWidget`
 const pluginDisplayName = `Test Widget Title`
@@ -24,7 +25,7 @@ describe('> plugin api', () => {
     iavPage = new AtlasPage()
     await iavPage.init()
     await iavPage.goto()
-    await iavPage.selectTitleCard(template)
+    await iavPage.setAtlasSpecifications(atlasName)
     await iavPage.wait(500)
     await iavPage.waitUntilAllChunksLoaded()
   })
@@ -76,6 +77,8 @@ describe('> plugin api', () => {
 
       describe('> getUserToSelectARegion', () => {
         let originalTitle
+        const cursorPos = [250, 660]
+        const cursorRegion = 'Area hOc1 (V1, 17, CalcS)'
         beforeEach(async () => {
           originalTitle = await iavPage.execScript(() => window.document.title)
 
@@ -114,10 +117,10 @@ describe('> plugin api', () => {
         })
 
         it('> on clicking region, resolves pr', async () => {
-          await iavPage.cursorMoveToAndClick({ position: [600, 490] })
+          await iavPage.cursorMoveToAndClick({ position: cursorPos })
           await iavPage.wait(500)
           const newTitle = await iavPage.execScript(() => window.document.title)
-          expect(newTitle).toEqual(`success Area 6ma (preSMA, mesial SFG) - left hemisphere`)
+          expect(newTitle).toEqual(`success ${cursorRegion}`)
         })
 
         it('> on failusre, clears modal', async () => {
@@ -134,7 +137,7 @@ describe('> plugin api', () => {
 
         it('> on success, clears modal', async () => {
 
-          await iavPage.cursorMoveToAndClick({ position: [600, 490] })
+          await iavPage.cursorMoveToAndClick({ position: cursorPos })
           await iavPage.wait(500)
           
           try {

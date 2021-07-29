@@ -6,6 +6,7 @@ module.exports = [
   ...(process.env.ENABLE_GPU ? []: ['--disable-gpu']),
   '--disable-setuid-sandbox',
   "--disable-extensions",
+  '--disable-dev-shm-usage',
   `--window-size=${width},${height}`,
   '--disable-application-cache'
 ]

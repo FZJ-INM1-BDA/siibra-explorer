@@ -1,0 +1,25 @@
+<mat-card class="d-inline-flex flex-column pe-all tab-toggle-container"
+    [iav-key-listener]="[{ type: 'keydown', key: 'Escape', target: 'document', capture: true }]"
+    (iav-key-event)="deselectTools()">
+
+    <button
+        *ngFor="let moduleAnnotType of moduleAnnotationTypes"
+        mat-button
+        class="tab-toggle"
+        (click)="moduleAnnotType.onClick()"
+        [color]="(moduleAnnotType.instance.toolSelected$ | async) ? 'primary' : 'basic'"
+        type="button">
+        <i [class]="moduleAnnotType.instance.iconClass"></i>
+    </button>
+
+    <mat-divider class="d-block"></mat-divider>
+
+    <button
+        mat-button
+        (click)="exitAnnotationMode()"
+        class="tab-toggle"
+        [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
+        color="warn">
+        <i class="fas fa-times"></i>
+    </button>
+</mat-card>

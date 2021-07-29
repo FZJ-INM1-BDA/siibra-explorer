@@ -1,6 +1,4 @@
 const { AtlasPage } = require("../util")
-const proxy = require('selenium-webdriver/proxy')
-const { ARIA_LABELS } = require('../../../common/constants')
 
 describe('> url parsing', () => {
   let iavPage
@@ -8,20 +6,16 @@ describe('> url parsing', () => {
   beforeEach(async () => {
     iavPage = new AtlasPage()
     await iavPage.init()
-    
   })
 
-  // tracking issue: https://github.com/HumanBrainProject/interactive-viewer/issues/455
-  // reenable when fixed
-  // it('incorrectly defined templateSelected should clear searchparam', async () => {
-  //   const search = '/?templateSelected=NoName2&parcellationSelected=NoName'
-  //   const page = await browser.newPage()
-  //   await page.goto(`${ATLAS_URL}${search}`, {waitUntil: 'networkidle2'})
-  //   await page.waitFor(500)
-  //   const searchParam = await getSearchParam(page)
-  //   const searchParamObj = new URLSearchParams(searchParam)
-  //   expect(searchParamObj.get('templateSelected')).toBeNull()
-  // })
+  it('incorrectly defined templateSelected should clear searchparam', async () => {
+    const searchParam = '/?templateSelected=NoName2&parcellationSelected=NoName'
+    
+    await iavPage.goto(searchParam, { doNotAutomate: true })
+    await iavPage.waitFor(500)
+    const text = await iavPage.getSnackbarMessage()
+    expect(text).toEqual(`Template not found.`)
+  })
 
   it('> navigation state should be perserved', async () => {
 
@@ -81,16 +75,23 @@ describe('> url parsing', () => {
     await iavPage.wait(5000)
     await iavPage.waitForAsync()
     const log = await iavPage.getLog()
-    const filteredLog = log.filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
+    const filteredLog = log
+      // in headless & non gpu mode, a lot of webgl warnings are thrown
+      .filter(({ level }) => level.toString() === 'SEVERE')
+      .filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
 
     // expecting some errors in the console. In catastrophic event, there will most likely be looped errors (on each render cycle)
+    // capture logs and write to spec https://stackoverflow.com/a/24980483/6059235
     expect(
       filteredLog.length
-    ).toBeLessThan(50)
+    ).toBeLessThan(
+      50,
+      JSON.stringify(filteredLog)
+    )
   })
 
   it('> if niftiLayers are defined, parcellation layer should be hidden', async () => {
-    const url = `/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&navigation=0_0_0_1__-0.2753947079181671_0.6631333827972412_-0.6360703706741333_0.2825356423854828__3000000__-17800000_-6700000_-7500000__200000&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii`
+    const url = `/?parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&templateSelected=MNI+Colin+27&cNavigation=0.0.0.-W000.._NjRq.2-Klk_._-Hmu.2_BdKx..DMVW..1vjMG.4eIG8~.hqT5~..10vB&regionsSelected=142&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.org%2Fprecomputed%2FJuBrain%2Fv2.2c%2FPMaps%2FBforebrain_4.nii`
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
@@ -101,20 +102,24 @@ describe('> url parsing', () => {
     expect(red).toEqual(blue)
   })
 
-  it('> if niftiLayers is defined, after parsing, it should persist', async () => {
-    const url = `/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.eu%2Fprecomputed%2FJuBrain%2F17%2Ficbm152casym%2Fpmaps%2FVisual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
-    await iavPage.goto(url)
-    await iavPage.clearAlerts()
+  it('> if using niftilayers should show deprecation worning')
 
-    // TODO use execScript from iavPage API
-    const niftiLayers = await iavPage._driver.executeScript(() => {
-      const search = new URLSearchParams(window.location.search)
-      return search.get('niftiLayers')
-    })
-    const expected = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
-    expect(niftiLayers).toEqual(expected)
+  it('> pluginStates should be fetched even if no template or parc are selected', async () => {
+
+    const searchParam = new URLSearchParams()
+    searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
+    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
+    await iavPage.wait(10000)
+    const interceptedCalls = await iavPage.getInterceptedHttpCalls()
+    expect(
+      interceptedCalls
+    ).toContain(jasmine.objectContaining(
+      {
+        method: 'GET',
+        url: 'http://localhost:3001/manifest.json'
+      }
+    ))
   })
-  
 
   it('> pluginStates should result in xhr to get pluginManifest', async () => {
 
@@ -134,35 +139,6 @@ describe('> url parsing', () => {
         url: 'http://localhost:3001/manifest.json'
       }
     ))
-  })
-
-  it('> if datasetPreview is set, should load with previews', async () => {
-    const url = `http://localhost:3000/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22fingerprint%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fautoradiography%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fprofile%22%7D%5D`
-    const datasetPreview = [
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "fingerprint"
-      },
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "GABAᴀ(BZ)/autoradiography"
-      },
-      {
-        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
-        "filename": "GABAᴀ(BZ)/profile"
-      }
-    ]
-
-    const searchParam = new URLSearchParams()
-
-    searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
-    searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
-    searchParam.set('previewingDatasetFiles', JSON.stringify(datasetPreview))
-    await iavPage.goto(`/?${searchParam.toString()}`)
-
-    const visibleArr = await iavPage.areVisible(`[aria-label="${ARIA_LABELS.DATASET_FILE_PREVIEW}"]`)
-    expect(visibleArr.length).toEqual(3)
-    expect(visibleArr).toEqual([true, true, true])
   })
 
 })

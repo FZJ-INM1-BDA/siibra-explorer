@@ -1,20 +1,15 @@
 import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/testing"
-import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
+import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects, ClickInterceptorService } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
-import { getRandomHex } from 'common/util'
+import { getRandomHex, getIdObj } from 'common/util'
 import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
-import { getIdObj } from 'common/util'
 import { DS_PREVIEW_URL } from 'src/util/constants'
 import { NgLayersService } from "./ui/layerbrowser/ngLayerService.service"
-import { EnumColorMapName } from "./util/colorMaps"
-import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
-import { tap, ignoreElements } from "rxjs/operators"
-import { merge, of } from "rxjs"
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./ui/databrowserModule/pure"
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
 import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
 import { generalActionError } from "./services/stateStore.helper"
 
@@ -289,42 +284,6 @@ describe('> glue.ts', () => {
         discardPeriodicTasks()
       }))
 
-      it('> on previewing nifti, thresholds, colormap and remove bg flag set properly', fakeAsync(() => {
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-
-        const layerService = TestBed.inject(NgLayersService)
-
-        const highThresholdMapSpy = spyOn(layerService.highThresholdMap, 'set').and.callThrough()
-        const lowThresholdMapSpy = spyOn(layerService.lowThresholdMap, 'set').and.callThrough()
-        const colorMapMapSpy = spyOn(layerService.colorMapMap, 'set').and.callThrough()
-        const bgFlagSpy = spyOn(layerService.removeBgMap, 'set').and.callThrough()
-
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: [ file1 ]
-          }
-        })
-
-        const { datasetId, filename } = file1
-        // debounce at 100ms
-        tick(200)
-
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
-        req.flush(nifti)
-
-        tick(200)
-        const { name, volumeMetadata } = nifti
-        const { min, max } = volumeMetadata
-        expect(highThresholdMapSpy).toHaveBeenCalledWith(name, max)
-        expect(lowThresholdMapSpy).toHaveBeenCalledWith(name, min)
-        expect(colorMapMapSpy).toHaveBeenCalledWith(name, EnumColorMapName.VIRIDIS)
-        expect(bgFlagSpy).toHaveBeenCalledWith(name, true)
-        discardPeriodicTasks()
-      }))
-
       it('> if returns 404, should be handled gracefully', fakeAsync(() => {
 
         const ctrl = TestBed.inject(HttpTestingController)
@@ -510,328 +469,6 @@ describe('> glue.ts', () => {
       
     })
     
-    describe('> selectedRegionPreview$', () => {
-      it('> when one region with origindataset is selected, emits correctly', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-        const ctrl = TestBed.inject(HttpTestingController)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [region1]
-          }
-        })
-        
-        const { kgSchema, kgId, filename } = region1.originDatasets[0]
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
-        req.flush(nifti)
-        tick(200)
-        expect(glue.selectedRegionPreview$).toBeObservable(
-          hot('a', {
-            a: region1.originDatasets
-          })
-        )
-
-        discardPeriodicTasks()
-      }))
-
-      it('> when regions are selected without originDatasets, emits empty array', () => {
-
-        const store = TestBed.inject(MockStore)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [{
-              ...region0,
-              originDatasets: []
-            }, {
-              ...region1,
-              originDatasets: []
-            }]
-          }
-        })
-        
-        expect(glue.selectedRegionPreview$).toBeObservable(
-          hot('a', {
-            a: []
-          })
-        )
-      })
-
-      it('> if multiple region, each with origin datasets are selected, emit array', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-        const ctrl = TestBed.inject(HttpTestingController)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [region0, region1]
-          }
-        })
-        
-        const expectedOriginDatasets = [
-          ...region0.originDatasets,
-          ...region1.originDatasets,
-        ]
-
-        for (const { kgSchema, kgId, filename } of expectedOriginDatasets) {
-          const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
-          req.flush(nifti)
-        }
-        tick(200)
-        expect(glue.selectedRegionPreview$).toBeObservable(
-          hot('a', {
-            a: expectedOriginDatasets
-          })
-        )
-
-        discardPeriodicTasks()
-      }))
-
-      it('> if regions with multiple originDatasets are selected, emit array containing all origindatasets', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-        const ctrl = TestBed.inject(HttpTestingController)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-        const originDatasets0 = [
-          ...region0.originDatasets,
-          {
-            kgId: getRandomHex(),
-            kgSchema: 'minds/core/dataset/v1.0.0',
-            filename: getRandomHex()
-          }
-        ]
-        const origindataset1 = [
-          ...region1.originDatasets,
-          {
-            kgSchema: 'minds/core/dataset/v1.0.0',
-            kgId: getRandomHex(),
-            filename: getRandomHex()
-          }
-        ]
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [{
-              ...region0,
-              originDatasets: originDatasets0
-            }, {
-              ...region1,
-              originDatasets: origindataset1
-            }]
-          }
-        })
-        
-        const expectedOriginDatasets = [
-          ...originDatasets0,
-          ...origindataset1,
-        ]
-
-        for (const { kgSchema, kgId, filename } of expectedOriginDatasets) {
-          const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
-          req.flush(nifti)
-        }
-        tick(200)
-        expect(glue.selectedRegionPreview$).toBeObservable(
-          hot('a', {
-            a: expectedOriginDatasets
-          })
-        )
-        discardPeriodicTasks()
-      }))
-    })
-
-    describe('> onRegionSelectChangeShowPreview$', () => {
-      it('> calls getDatasetPreviewFromId for each of the selectedRegion', fakeAsync(() => {
-
-        /**
-         * Testing Store observable 
-         * https://stackoverflow.com/a/61871144/6059235
-         */
-        const store = TestBed.inject(MockStore)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-        const ctrl = TestBed.inject(HttpTestingController)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-
-        const getDatasetPreviewFromIdSpy = spyOn(glue, 'getDatasetPreviewFromId').and.callThrough()
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [region1]
-          }
-        })
-        
-        const { kgSchema, kgId, filename } = region1.originDatasets[0]
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent(kgSchema)}/${kgId}/${encodeURIComponent(filename)}`)
-        req.flush(nifti)
-        tick(200)
-
-        for (const { kgId, kgSchema, filename } of region1.originDatasets) {
-          expect(getDatasetPreviewFromIdSpy).toHaveBeenCalledWith({
-            datasetId: kgId,
-            datasetSchema: kgSchema,
-            filename
-          })
-        }
-
-        expect(glue.onRegionSelectChangeShowPreview$).toBeObservable(
-          hot('a', {
-            a: [ {
-              ...nifti,
-              filename: region1.originDatasets[0].filename,
-              datasetId: region1.originDatasets[0].kgId,
-              datasetSchema: kgSchema,
-            } ]
-          })
-        )
-
-        discardPeriodicTasks()
-      }))
-    })
-
-    describe('> onRegionDeselectRemovePreview$', () => {
-      it('> on region selected [ region ] > [], emits', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        store.overrideSelector(ngViewerSelectorClearView, false)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        const regionsSelected$ = hot('bab', {
-          a: [region1],
-          b: []
-        })
-
-        const spy = spyOn(glue, 'getDatasetPreviewFromId')
-        spy.and.returnValue(of({
-          ...nifti,
-          filename: region1.originDatasets[0].filename,
-          datasetId: region1.originDatasets[0].kgId,
-        }))
-
-        const src$ = merge(
-          regionsSelected$.pipe(
-            tap(regionsSelected => store.setState({
-              ...initialState,
-              viewerState: {
-                regionsSelected
-              }
-            })),
-            ignoreElements()
-          ),
-          glue.onRegionDeselectRemovePreview$
-        )
-
-        src$.subscribe()
-
-        expect(glue.onRegionDeselectRemovePreview$).toBeObservable(
-          hot('bba', {
-            a: [{
-              ...nifti,
-              filename: region1.originDatasets[0].filename,
-              datasetId: region1.originDatasets[0].kgId,
-            }],
-            b: []
-          })
-        )
-
-        tick(200)
-        discardPeriodicTasks()
-      }))
-    })
-
-    describe('> onClearviewRemovePreview$', () => {
-      it('> on regions selected [ region ] > clear view selector returns true, emits ', fakeAsync(() => {
-        const store = TestBed.inject(MockStore)
-        store.overrideSelector(ngViewerSelectorClearView, true)
-
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        const spy = spyOn(glue, 'getDatasetPreviewFromId')
-        spy.and.returnValue(of({
-          ...nifti,
-          filename: region1.originDatasets[0].filename,
-          datasetId: region1.originDatasets[0].kgId,
-        }))
-
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [region1]
-          }
-        })
-
-        expect(glue.onClearviewRemovePreview$).toBeObservable(
-          hot('a', {
-            a: [{
-              ...nifti,
-              filename: region1.originDatasets[0].filename,
-              datasetId: region1.originDatasets[0].kgId,
-            }],
-            b: []
-          })
-        )
-
-        tick(200)
-        discardPeriodicTasks()
-      }))
-    })
-
-    describe('> onClearviewAddPreview$', () => {
-      it('> on region selected [ region ] > clear view selector returns false, emits', fakeAsync(() => {
-        const store = TestBed.inject(MockStore)
-        const overridenSelector = store.overrideSelector(ngViewerSelectorClearView, true)
-
-        /**
-         * skips first false
-         */
-        const overridenSelector$ = hot('bab', {
-          a: true,
-          b: false
-        })
-
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        const spy = spyOn(glue, 'getDatasetPreviewFromId')
-        spy.and.returnValue(of({
-          ...nifti,
-          filename: region1.originDatasets[0].filename,
-          datasetId: region1.originDatasets[0].kgId,
-        }))
-
-        store.setState({
-          ...initialState,
-          viewerState: {
-            regionsSelected: [region1]
-          }
-        })
-
-        overridenSelector$.subscribe(flag => {
-          overridenSelector.setResult(flag)
-          store.refreshState()
-        })
-
-        expect(glue.onClearviewAddPreview$).toBeObservable(
-          hot('--a', {
-            a: [{
-              ...nifti,
-              filename: region1.originDatasets[0].filename,
-              datasetId: region1.originDatasets[0].kgId,
-            }],
-            b: []
-          })
-        )
-
-        tick(200)
-        discardPeriodicTasks()
-      }))
-    })
   })
 
 
@@ -1211,65 +848,51 @@ describe('> glue.ts', () => {
     /**
      * TODO finish writing the test for ClickInterceptorService
      */
+    let interceptorService: ClickInterceptorService
 
-    it('can obtain override fn', () => {
-
+    beforeEach(() => {
+      interceptorService = new ClickInterceptorService()
     })
 
-    describe('> if getUserToSelectRegion.length === 0', () => {
-
-      it('by default, next fn will be called', () => {
-
+    describe('> # callRegFns', () => {
+      let spy1: jasmine.Spy,
+        spy2: jasmine.Spy,
+        spy3: jasmine.Spy
+      beforeEach(() => {
+        spy1 = jasmine.createSpy('spy1')
+        spy2 = jasmine.createSpy('spy2')
+        spy3 = jasmine.createSpy('spy3')
+        interceptorService['callbacks'] = [
+          spy1,
+          spy2,
+          spy3,
+        ]
+        spy1.and.returnValue(true)
+        spy2.and.returnValue(true)
+        spy3.and.returnValue(true)
       })
-  
-      it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
+      it('> fns are all called', () => {
 
+        interceptorService.callRegFns('stuff')
+        expect(spy1).toHaveBeenCalled()
+        expect(spy2).toHaveBeenCalled()
+        expect(spy3).toHaveBeenCalled()
       })
-    })
-    describe('> if getUserToSelectRegion.length > 0', () => {
-      it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
-        
+      it('> will run fns from first idx to last idx', () => {
+
+        interceptorService.callRegFns('stuff')
+        expect(spy1).toHaveBeenCalledBefore(spy2)
+        expect(spy2).toHaveBeenCalledBefore(spy3)
       })
-      it('if multiple getUserToSelectRegion handler exists, it resolves in a LIFO manner', () => {
+      it('> will stop at when next is not called', () => {
 
-      })
+        spy2.and.returnValue(false)
+        interceptorService.callRegFns('stuff')
 
-      describe('> if spec is not set (defaults to parcellation region mode)', () => {
-
-        it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
-
-        })
-      })
-
-      describe('> if spec is set', () => {
-        describe('> if spec is set to PARCELLATION_REGION', () => {
-
-          it('> mouseoversegment.length === 0, will not call next, will not rs, will not call rj', () => {
-
-          })
-          
-          it('> mouseoversegment.length > 0, will not call next, will call rs', () => {
-
-          })
-        })
-
-        describe('> if spec is set to POINT', () => {
-          it('> rs is called if mouseoversegment.length === 0', () => {
-
-          })
-          it('> rs is called with correct arg if mouseoversegment.length > 0', () => {
-
-          })
-        })
-
-        describe('> if multiple getUserToSelectRegion exist', () => {
-          it('> only the last Promise will be evaluated', () => {
-
-      
-          })
-        })
+        expect(spy1).toHaveBeenCalled()
+        expect(spy2).toHaveBeenCalled()
+        expect(spy3).not.toHaveBeenCalled()
       })
     })
-
   })
 })

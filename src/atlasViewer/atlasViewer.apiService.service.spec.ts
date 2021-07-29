@@ -5,7 +5,7 @@ import { defaultRootState } from "src/services/stateStore.service";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { WidgetModule } from 'src/widget';
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
-import { PluginServices } from "./pluginUnit";
+import { PluginServices } from "src/plugin";
 
 describe('atlasViewer.apiService.service.ts', () => {
 
