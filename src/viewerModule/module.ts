@@ -25,6 +25,7 @@ import { map } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
 import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
 import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bsFeatures/kgRegionalFeature";
+import { LayerBrowserModule } from "src/ui/layerbrowser";
 
 @NgModule({
   imports: [
@@ -47,6 +48,7 @@ import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bs
     ContextMenuModule,
     ViewerStateBreadCrumbModule,
     KgRegionalFeatureModule,
+    LayerBrowserModule,
   ],
   declarations: [
     ViewerCmp,

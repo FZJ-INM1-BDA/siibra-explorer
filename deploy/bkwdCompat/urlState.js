@@ -202,8 +202,8 @@ module.exports = (query, _warningCb) => {
       // ignore region selected and move on
     }
   }
-
-  let redirectUrl = '/#'
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  let redirectUrl = `${HOST_PATHNAME}/#`
   if (standaloneVolumes) {
     searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav

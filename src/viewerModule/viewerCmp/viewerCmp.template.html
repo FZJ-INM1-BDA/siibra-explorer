@@ -213,9 +213,14 @@
         'invisible overflow-hidden h-0': overlaySidenav$ | async,
         'h-100': !(overlaySidenav$ | async)
       }" class="position-relative d-flex flex-column">
+        
+        <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
+          <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
+            <ng-template [ngTemplateOutlet]="voiTmpl">
 
-        <ng-container *ngTemplateOutlet="sidenavRegionTmpl">
-        </ng-container>
+            </ng-template>
+          </ng-template>
+        </ng-template>
 
         <!-- TODO dataset preview will become deprecated in the future.
         Regional feature/data feature will replace it -->
@@ -403,6 +408,59 @@
       <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
     </span>
   </button>
+</ng-template>
+
+<!-- VOI sidenav tmpl -->
+<ng-template #voiTmpl>
+
+  <!-- back btn -->
+  <button mat-button
+    (click)="clearVoi()"
+    [attr.aria-label]="ARIA_LABELS.CLOSE"
+    class="position-absolute z-index-10 m-2">
+    <i class="fas fa-chevron-left"></i>
+    <span class="ml-1">
+      Back
+    </span>
+  </button>
+
+  <mat-card class="sidenav-cover-header-container">
+    <div class="sidenav-cover-header-container">
+      <mat-card-title>
+        {{ _pliTitle }}
+      </mat-card-title>
+
+      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+        <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+        <span>
+          Dataset preview
+        </span>
+
+        <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
+
+        <a [href]="_pliLink"
+          mat-icon-button
+          matTooltip="Explore in EBRAINS Knowledge Graph"
+          target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+
+      </mat-card-subtitle>
+    </div>
+
+    <small class="text-muted iv-custom-comp darker-bg">
+      {{ _pliDesc }}
+    </small>
+
+    <mat-expansion-panel class="sidenav-cover-header-container">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Registered Volumes
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <layer-browser></layer-browser>
+    </mat-expansion-panel>
+  </mat-card>
 </ng-template>
 
 <!-- region sidenav tmpl -->
