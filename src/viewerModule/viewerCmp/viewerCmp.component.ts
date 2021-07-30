@@ -1,6 +1,6 @@
 import { Component, ComponentFactory, ComponentFactoryResolver, ElementRef, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, merge, Observable, of, Subject, Subscription} from "rxjs";
+import {combineLatest, merge, NEVER, Observable, of, Subject, Subscription} from "rxjs";
 import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
@@ -23,6 +23,8 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { ComponentStore } from "../componentStore";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GenericInfoCmp } from "src/atlasComponents/regionalFeatures/bsFeatures/genericInfo";
+import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
+import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -115,7 +117,10 @@ export function ROIFactory(store: Store<any>, svc: PureContantService){
 })
 
 export class ViewerCmp implements OnDestroy {
-
+  public _pliTitle = "Fiber structures of a human hippocampus based on joint DMRI, 3D-PLI, and TPFM acquisitions"
+  public _pliDesc = "The collected datasets provide real multimodal, multiscale structural connectivity insights into the human hippocampus. One post mortem hippocampus was scanned with Anatomical and Diffusion MRI (dMRI) [1], 3D Polarized Light Imaging (3D-PLI) [2], and Two-Photon Fluorescence Microscopy (TPFM) [3] using protocols specifically developed during SGA1 and SGA2, rendering joint tissue imaging possible. MRI scanning was performed with a 11.7 T Preclinical MRI system (gradients: 760 mT/m, slew rate: 9500 T/m/s) yielding T1-w and T2-w maps at 200 µm and dMRI-based maps at 300 µm resolution. During tissue sectioning (60 µm thickness) blockface (en-face) images were acquired from the surface of the frozen brain block, serving as reference for data integration/co-alignment. 530 brain sections were scanned with 3D-PLI. HPC-based image analysis provided transmittance, retardation, and fiber orientation maps at 1.3 µm in-plane resolution. TPFM was finally applied to selected brain sections utilizing autofluorescence properties of the fibrous tissue which appears after PBS washing (MAGIC protocol). The TPFM measurements provide a resolution of 0.44 µm x 0.44 µm x 1 µm."
+  public _pliLink = "https://doi.org/10.25493/JQ30-E08"
+  
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
@@ -215,17 +220,36 @@ export class ViewerCmp implements OnDestroy {
   private getRegionFromlabelIndexId: Function
 
   private genericInfoCF: ComponentFactory<GenericInfoCmp>
+
+  public pliVol$ = this._pliVol$ || NEVER
+  public clearVoi(){
+    this.store$.dispatch(
+      uiActionSetPreviewingDatasetFiles({
+        previewingDatasetFiles: []
+      })
+    )
+  }
   constructor(
     private store$: Store<any>,
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     private cStore: ComponentStore<TCStoreViewerCmp>,
     cfr: ComponentFactoryResolver,
+    @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
 
     this.genericInfoCF = cfr.resolveComponentFactory(GenericInfoCmp)
 
     this.subscriptions.push(
+      this.pliVol$.subscribe(val => {
+        if (val.length > 0) {
+          this.sidenavTopSwitch && this.sidenavTopSwitch.open()
+          this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
+        } else {
+          this.sidenavTopSwitch && this.sidenavTopSwitch.close()
+          this.sidenavLeftSwitch && this.sidenavLeftSwitch.close()
+        }
+      }),
       this.selectedRegions$.subscribe(() => {
         this.clearPreviewingDataset()
       }),

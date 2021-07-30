@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, from, merge, NEVER, Observable, of, Subject, Subscription } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { getRgb, IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
 import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
@@ -12,6 +12,7 @@ import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
 import { serialiseParcellationRegion } from 'common/util'
+import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -36,7 +37,9 @@ export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
   return returnVal
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NehubaLayerControlService implements OnDestroy{
 
   static PMAP_LAYER_NAME = 'regional-pmap'
@@ -144,10 +147,25 @@ export class NehubaLayerControlService implements OnDestroy{
     while (this.sub.length > 0) this.sub.pop().unsubscribe()
   }
 
+  private pliVol$: Observable<string[]> = this._pliVol$
+  ? this._pliVol$.pipe(
+      map(arr => {
+        const output = []
+        for (const item of arr) {
+          for (const volume of item.data["iav-registered-volumes"].volumes) {
+            output.push(volume.name)
+          }
+        }
+        return output
+      })
+    )
+  : NEVER
   constructor(
     private store$: Store<any>,
+    @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) roi$: Observable<TRegionDetail>
   ){
+
     if (roi$) {
 
       this.sub.push(
@@ -285,10 +303,10 @@ export class NehubaLayerControlService implements OnDestroy{
     shareReplay(1)
   )
 
-  public visibleLayer$: Observable<string[]> = combineLatest([
+  public expectedLayerNames$ = combineLatest([
     this.selectedTemplateSelector$,
     this.auxMeshes$,
-    this.selParcNgIdMap$
+    this.selParcNgIdMap$,
   ]).pipe(
     map(([ tmpl, auxMeshes, parcNgIdMap ]) => {
       const ngIdSet = new Set<string>()
@@ -301,6 +319,18 @@ export class NehubaLayerControlService implements OnDestroy{
       for (const ngId of parcNgIdMap.keys()) {
         ngIdSet.add(ngId)
       }
+      return Array.from(ngIdSet)
+    })
+  )
+
+  public visibleLayer$: Observable<string[]> = combineLatest([
+    this.expectedLayerNames$,
+    this.pliVol$.pipe(
+      startWith([])
+    ),
+  ]).pipe(
+    map(([ expectedLayerNames, layerNames ]) => {
+      const ngIdSet = new Set<string>([...layerNames, ...expectedLayerNames])
       return Array.from(ngIdSet)
     })
   )

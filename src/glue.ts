@@ -11,7 +11,6 @@ import { HttpClient } from "@angular/common/http"
 import { DS_PREVIEW_URL } from 'src/util/constants'
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState.store.helper"
 import { ARIA_LABELS } from 'common/constants'
-import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
 import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
@@ -245,6 +244,13 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     shareReplay(1),
   )
 
+  public _volumePreview$ = this.previewingDatasetFiles$.pipe(
+    switchMap(arr => arr.length > 0
+      ? forkJoin(arr.map(v => this.getDatasetPreviewFromId(v)))
+      : of([])),
+    map(arr => arr.filter(v => determinePreviewFileType(v) === EnumPreviewFileTypes.VOLUMES))
+  )
+
   private diffPreviewingDatasetFiles$= this.previewingDatasetFiles$.pipe(
     debounceTime(100),
     startWith([] as IDatasetPreviewData[]),
@@ -319,7 +325,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   constructor(
     private store$: Store<any>,
     private http: HttpClient,
-    private layersService: NgLayersService,
     @Optional() @Inject(ACTION_TO_WIDGET_TOKEN) private actionOnWidget: TypeActionToWidget<any>
   ){
     if (!this.actionOnWidget) console.warn(`actionOnWidget not provided in DatasetPreviewGlue. Did you forget to provide it?`)
@@ -351,7 +356,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           distinctUntilChanged(),
         ))
       ).subscribe(([ { prvToShow, prvToDismiss }, templateSelected ]) => {
-
         const filterdPrvs = prvToShow.filter(prv => DatasetPreviewGlue.PreviewFileIsInCorrectSpace(prv, templateSelected))
         for (const prv of filterdPrvs) {
           const { volumes } = prv['data']['iav-registered-volumes']
@@ -389,7 +393,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
 
   private openDatasetPreviewWidget(data: IDatasetPreviewData) {
     const { datasetId: kgId, filename } = data
-
     if (!!this.actionOnWidget) {
       const previewId = DatasetPreviewGlue.GetDatasetPreviewId(data)
 
@@ -543,3 +546,28 @@ export class ClickInterceptorService extends RegDeregController<any, boolean>{
     // called when the call has not been intercepted
   }
 }
+
+export type _TPLIVal = {
+  name: string
+  filename: string
+  datasetSchema: string
+  datasetId: string
+  data: {
+    'iav-registered-volumes': {
+      volumes: {
+        name: string
+        source: string
+        shader: string
+        transform: any
+        opacity: string
+      }[]
+    }
+  }
+  referenceSpaces: {
+    name: string
+    fullId: string
+  }[]
+  mimetype: 'application/json'
+}
+
+export const _PLI_VOLUME_INJ_TOKEN = new InjectionToken<Observable<_TPLIVal[]>>('_PLI_VOLUME_INJ_TOKEN')
