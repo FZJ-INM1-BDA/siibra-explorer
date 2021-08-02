@@ -148,7 +148,7 @@ export class NehubaLayerControlService implements OnDestroy{
   }
 
   private pliVol$: Observable<string[]> = this._pliVol$
-  ? this._pliVol$.pipe(
+    ? this._pliVol$.pipe(
       map(arr => {
         const output = []
         for (const item of arr) {
@@ -159,7 +159,7 @@ export class NehubaLayerControlService implements OnDestroy{
         return output
       })
     )
-  : NEVER
+    : NEVER
   constructor(
     private store$: Store<any>,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
