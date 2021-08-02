@@ -64,7 +64,7 @@ const templateMap = {
         id: 'juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c'
       },
       'Cytoarchitectonic maps - v1.18': {
-        id: 'juelich/iav/atlas/v1.0.0/8'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
       },
       'Long Bundle': {
         id: 'juelich/iav/atlas/v1.0.0/5'
@@ -94,7 +94,7 @@ const templateMap = {
     id: 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992',
     parc: {
       'Cytoarchitectonic Maps - v1.18': {
-        id: 'juelich/iav/atlas/v1.0.0/8'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
       }
     }
   },
