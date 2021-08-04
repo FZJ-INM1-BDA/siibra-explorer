@@ -446,7 +446,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     }),
     catchError((err, obs) => of([])),
     tap((arr: any[]) => this.totalAtlasesLength = arr.length),
-    scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 1001) - (b.order || 1000)), []),
+    scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 0) - (b.order || 0)), []),
     shareReplay(1)
   )
 
