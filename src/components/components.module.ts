@@ -8,9 +8,8 @@ import {  MarkdownDom } from './markdown/markdown.component';
 import { CommonModule } from '@angular/common';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { UtilModule } from 'src/util';
-import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
-import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
-import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
+import { SafeHtmlPipe } from './safeHtml.pipe'
+import { TreeSearchPipe } from './treeSearch.pipe';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
@@ -69,7 +68,6 @@ import { SpinnerCmp } from './spinner/spinner.component';
 
     /* pipes */
     SafeHtmlPipe,
-    SearchResultPaginationPipe,
     TreeSearchPipe,
     FlattenTreePipe,
     RenderPipe,
@@ -98,7 +96,6 @@ import { SpinnerCmp } from './spinner/spinner.component';
     DynamicMaterialBtn,
     SpinnerCmp,
 
-    SearchResultPaginationPipe,
     TreeSearchPipe,
 
     HoverableBlockDirective,

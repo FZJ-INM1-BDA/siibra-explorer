@@ -1,5 +1,7 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
+// TODO use getProperty pipe instead
+
 @Pipe({
   name: 'getNthElement'
 })

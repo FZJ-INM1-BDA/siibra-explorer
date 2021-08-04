@@ -1,11 +1,10 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, Subscription, of, forkJoin, fromEvent, combineLatest } from "rxjs";
+import { Observable, Subscription, of, forkJoin, combineLatest } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, distinctUntilChanged, mapTo } from "rxjs/operators";
+import { shareReplay, tap, scan, catchError, filter, switchMap, map, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT } from "src/util/constants";
@@ -185,15 +184,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     return this._backendUrl
   }
 
-  /**
-   * TODO remove
-   * when removing, also remove relevant worker code
-   */
-  private workerUpdateParcellation$ = fromEvent(this.workerService.worker, 'message').pipe(
-    filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
-    map(({ data }) => data)
-  )
-
   public getRegionDetail(atlasId: string, parcId: string, spaceId: string, region: any) {
     return this.http.get<TRegionDetail>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions/${encodeURIComponent(region.name)}`,
@@ -330,7 +320,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     private store: Store<any>,
     private http: HttpClient,
     private log: LoggingService,
-    private workerService: AtlasWorkerService,
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
     this.darktheme$ = this.store.pipe(

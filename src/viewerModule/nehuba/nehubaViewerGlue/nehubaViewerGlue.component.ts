@@ -128,6 +128,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     }))),
   )
 
+  public filterCustomLandmark(lm: any){
+    return !!lm['showInSliceView']
+  }
+
   public panelOrder$ = this.store$.pipe(
     select(ngViewerSelectorPanelOrder),
     distinctUntilChanged(),
