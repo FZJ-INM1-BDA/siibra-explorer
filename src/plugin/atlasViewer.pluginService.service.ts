@@ -6,7 +6,6 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, from, merge, Observable, of } from "rxjs";
 import { catchError, filter, map, mapTo, shareReplay, switchMap, switchMapTo, take, tap } from "rxjs/operators";
 import { LoggingService } from 'src/logging';
-import { PluginHandler } from 'src/util/pluginHandler';
 import { WidgetUnit, WidgetServices } from "src/widget";
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN, getHttpHeader } from 'src/util/constants';
 import { PluginFactoryDirective } from './pluginFactory.directive';
@@ -17,6 +16,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PureContantService } from 'src/util';
 
 const requiresReloadMd = `\n\n***\n\n**warning**: interactive atlas viewer **will** be reloaded in order for the change to take effect.`
+
+class PluginHandler {
+  public onShutdown: (callback: () => void) => void
+  public blink: (sec?: number) => void
+  public shutdown: () => void
+
+  public initState?: any
+  public initStateUrl?: string
+
+  public setInitManifestUrl: (url: string|null) => void
+
+  public setProgressIndicator: (progress: number) => void
+}
 
 export const registerPluginFactoryDirectiveFactory = (pSer: PluginServices) => {
   return (pFactoryDirective: PluginFactoryDirective) => {

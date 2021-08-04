@@ -167,21 +167,6 @@ export class DatabrowserService implements OnDestroy {
       }),
     )
 
-    this.subscriptions.push(
-      fromEvent(this.workerService.worker, 'message').pipe(
-        filter((message: MessageEvent) => message && message.data && message.data.type === 'RETURN_REBUILT_REGION_SELECTION_TREE'),
-        map(message => message.data),
-      ).subscribe((payload: any) => {
-        /**
-         * rebuiltSelectedRegion contains super region that are
-         * selected as a result of all of its children that are selectted
-         */
-        const { rebuiltSelectedRegions, rebuiltSomeSelectedRegions } = payload
-        /**
-         * apply filter and populate databrowser instances
-         */
-      }),
-    )
   }
 
   public ngOnDestroy() {
@@ -335,14 +320,6 @@ export class DatabrowserService implements OnDestroy {
            */
         }
       })
-  }
-
-  public rebuildRegionTree(selectedRegions, regions) {
-    this.workerService.worker.postMessage({
-      type: 'BUILD_REGION_SELECTION_TREE',
-      selectedRegions,
-      regions,
-    })
   }
 
   public getModalityFromDE = getModalityFromDE

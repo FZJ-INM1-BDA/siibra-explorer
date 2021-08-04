@@ -27,7 +27,7 @@
 <ng-template #electrodeTmpl let-electrode>
 
   <mat-expansion-panel
-    [expanded]="openElectrode$ | async | arrayContains : electrode"
+    [expanded]="openElectrode$ | async | includes : electrode"
     (opened)="handleDatumExpansion(electrode, true)"
     (closed)="handleDatumExpansion(electrode, false)"
     togglePosition="before">

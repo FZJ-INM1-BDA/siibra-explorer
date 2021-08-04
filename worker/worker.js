@@ -17,7 +17,6 @@ if (typeof self.importScripts === 'function')  self.importScripts('./worker-plot
 const validTypes = [
   'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
-  'BUILD_REGION_SELECTION_TREE',
   'PROPAGATE_PARC_REGION_ATTR'
 ]
 
@@ -32,8 +31,6 @@ const VALID_METHODS = [
 const validOutType = [
   'ASSEMBLED_LANDMARKS_VTK',
   'ASSEMBLED_USERLANDMARKS_VTK',
-  'RETURN_REBUILT_REGION_SELECTION_TREE',
-  'UPDATE_PARCELLATION_REGIONS'
 ]
 
 const getVertexHeader = (numVertex) => `POINTS ${numVertex} float`
@@ -229,80 +226,6 @@ const getuserLandmarksVtk = (action) => {
   })
 }
 
-const rebuildSelectedRegion = (payload) => {
-  const { selectedRegions, regions } = payload
-
-  /**
-   * active tree branch
-   * branch is active if ALL children are active
-   */
-  const activeTreeBranch = []
-  const isRegionActive = (region) => selectedRegions.some(r => r.name === region.name)
-    || region.children && region.children.length > 0 && region.children.every(isRegionActive)
-
-  /**
-   * some active tree branch
-   * branch is active if SOME children are active
-   */
-  const someActiveTreeBranch = []
-  const isSomeRegionActive = (region) => selectedRegions.some(r => r.name === region.name)
-    || region.children && region.children.length > 0 && region.children.some(isSomeRegionActive)
-
-  const handleRegion = (r) => {
-    isRegionActive(r) ? activeTreeBranch.push(r) : {}
-    isSomeRegionActive(r) ? someActiveTreeBranch.push(r) : {}
-    if (r.children && r.children.length > 0)
-      r.children.forEach(handleRegion)
-  }
-  regions.forEach(handleRegion)
-  postMessage({
-    type: 'RETURN_REBUILT_REGION_SELECTION_TREE',
-    rebuiltSelectedRegions: activeTreeBranch,
-    rebuiltSomeSelectedRegions: someActiveTreeBranch
-  })
-}
-const recursivePropagateAttri = (region, inheritAttrsOpts) => {
-
-  const inheritAttrs = Object.keys(inheritAttrsOpts)
-
-  const returnRegion = {
-    ...region
-  }
-  const newInhAttrsOpts = {}
-  for (const attr of inheritAttrs){
-    returnRegion[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
-    newInhAttrsOpts[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
-  }
-  returnRegion.children = returnRegion.children && Array.isArray(returnRegion.children)
-    ? returnRegion.children.map(c => recursivePropagateAttri(c, newInhAttrsOpts))
-    : null
-  return returnRegion
-}
-
-const propagateAttri = (parcellation, inheritAttrsOpts) => {
-  const inheritAttrs = Object.keys(inheritAttrsOpts)
-  if (inheritAttrs.indexOf('children') >= 0) throw new Error(`children attr cannot be inherited`)
-
-  const regions = Array.isArray(parcellation.regions)
-    ? parcellation.regions.map(r => recursivePropagateAttri(r, inheritAttrsOpts))
-    : []
-
-  return {
-    ...parcellation,
-    regions
-  }
-}
-
-const processParcRegionAttr = (payload) => {
-  const { parcellation, inheritAttrsOpts } = payload
-  const p = propagateAttri(parcellation, inheritAttrsOpts)
-  postMessage({
-    ...payload,
-    type: 'UPDATE_PARCELLATION_REGIONS',
-    parcellation: p
-  })
-}
-
 let plotyVtkUrl
 
 onmessage = (message) => {
@@ -354,12 +277,6 @@ onmessage = (message) => {
         return
       case 'GET_USERLANDMARKS_VTK':
         getuserLandmarksVtk(message.data)
-        return
-      case 'BUILD_REGION_SELECTION_TREE':
-        rebuildSelectedRegion(message.data)
-        return
-      case 'PROPAGATE_PARC_REGION_ATTR':
-        processParcRegionAttr(message.data)
         return
       default:
         console.warn('unhandled worker action', message)

@@ -4,22 +4,13 @@ import { ComponentsModule } from "src/components/components.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 
-import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
-import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
-
-import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
-import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
 import { CitationsContainer } from "./citation/citations.component";
 
 import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
-import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
-import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
 import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
-import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
 
 
 import { DatabrowserModule } from "../atlasComponents/databrowserModule/databrowser.module";
@@ -29,9 +20,6 @@ import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.com
 import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
-import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
-import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
-import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
 
 import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
@@ -77,19 +65,8 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     ActionDialog,
 
     /* pipes */
-    GroupDatasetByRegion,
-    FilterRegionDataEntries,
-    FlatmapArrayPipe,
-    GetLayerNameFromDatasets,
-    SortDataEntriesToRegion,
-    SpatialLandmarksToDataBrowserItemPipe,
-    AppendtooltipTextPipe,
     MobileControlNubStylePipe,
-    PluginBtnFabColorPipe,
-    KgSearchBtnColorPipe,
-    GetFileExtension,
 
-    TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
 
