@@ -17,6 +17,7 @@ import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlas
 import { switchMapWaitFor } from "src/util/fn";
 
 const pZoomFactor = 5e3
+const preferredFsMode = 'pial'
 
 type THandlingCustomEv = {
   regions: ({ name?: string, error?: string })[]
@@ -492,8 +493,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         }
       }
       
-      // load mode0 by default
-      this.loadMode(this.config.modes[0])
+      // load preferredFsMode or mode0 by default
+      const loadMode = this.config.modes.find(m => m.name === preferredFsMode) || this.config.modes[0]
+      this.loadMode(loadMode)
 
       this.viewerEvent.emit({
         type: EnumViewerEvt.VIEWERLOADED,
