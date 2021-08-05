@@ -1,4 +1,4 @@
-import { Directive, HostBinding, HostListener, Input } from "@angular/core";
+import { Directive, HostBinding, HostListener, Input, SecurityContext } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
 @Directive({
@@ -39,29 +39,29 @@ export class HoverableBlockDirective {
   public opacity: number = 0.9
 
   @HostBinding('style.transform')
-  public transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
+  public transform = this.sanitizer.sanitize(SecurityContext.STYLE, `translateY(0px)`)
 
   @HostBinding('style.box-shadow')
-  public boxShadow = this.sanitizer.bypassSecurityTrustStyle('0 4px 6px 0 rgba(5,5,5,0.1)')
+  public boxShadow = this.sanitizer.sanitize(SecurityContext.STYLE, '0 4px 6px 0 rgba(5,5,5,0.1)')
 
   @HostListener('mouseenter')
   public onMouseenter() {
     if (this._disable) { return }
     this.opacity = 1.0
-    this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.25)`)
+    this.boxShadow = this.sanitizer.sanitize(SecurityContext.STYLE, `0 4px 6px 0 rgba(5,5,5,0.25)`)
     /**
      * n.b. risk of XSS. But sincle translate Y is passed through Number, and corerced into a number,
      * and using 5 as a fallback, it should be safe
      */
-    this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(${this._translateY}px)`)
+    this.transform = this.sanitizer.sanitize(SecurityContext.STYLE, `translateY(${this._translateY}px)`)
   }
 
   @HostListener('mouseleave')
   public onmouseleave() {
     if (this._disable) { return }
     this.opacity = 0.9
-    this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.1)`)
-    this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
+    this.boxShadow = this.sanitizer.sanitize(SecurityContext.STYLE, `0 4px 6px 0 rgba(5,5,5,0.1)`)
+    this.transform = this.sanitizer.sanitize(SecurityContext.STYLE, `translateY(0px)`)
   }
 
   constructor(private sanitizer: DomSanitizer) {

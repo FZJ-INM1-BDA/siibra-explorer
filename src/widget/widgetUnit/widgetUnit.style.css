@@ -30,25 +30,14 @@ div[widgetUnitHeading]
     margin-left:0.5em;
   }
 
-panel-component[widgetUnitPanel]
+.widget-body
 {
-  display:block;
   min-width:280px;
 }
 
 :host-context([state='floating']) div[widgetUnitHeading]:hover
 {
   cursor : move;
-}
-
-:host > panel-component
-{
-  max-width: 100%;
-  width: 300px;
-  border-width: 1px !important;
-  border: solid;
-  border-color: rgba(0, 0, 0, 0);
-  box-sizing: border-box;
 }
 
 @keyframes blinkDark

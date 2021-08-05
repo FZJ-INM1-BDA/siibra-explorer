@@ -1,16 +1,12 @@
-div[content]
+div.readmore-content
 {
   overflow:hidden;
 }
-div[sliver]
+div.readmore-sliver
 {
   width:100%;
   display:flex;
   flex-direction: column;
   align-items: center;
-}
-
-div[sliver]
-{
   background-color: rgba(128,128,128,0.1);
 }

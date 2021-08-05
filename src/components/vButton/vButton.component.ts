@@ -1,4 +1,8 @@
 import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { Subject } from "rxjs";
+import { map, startWith } from "rxjs/operators";
+
+type TIVBColor = 'default' | 'primary' | 'accent' | 'warn'
 
 @Component({
   selector: 'iav-v-button',
@@ -11,8 +15,15 @@ import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 })
 
 export class IAVVerticalButton{
-  @Input() color: 'default' | 'primary' | 'accent' | 'warng' = 'default'
-  get class(){
-    return `d-flex flex-column align-items-center iv-custom-comp ${this.color} h-100`
+
+  private color$ = new Subject<TIVBColor>()
+  public class$ = this.color$.pipe(
+    startWith('default'),
+    map(colorCls => `d-flex flex-column align-items-center iv-custom-comp ${colorCls} h-100`)
+  )
+
+  @Input()
+  set color(val: TIVBColor){
+    this.color$.next(val)
   }
 }

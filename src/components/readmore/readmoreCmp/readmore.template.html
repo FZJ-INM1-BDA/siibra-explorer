@@ -1,6 +1,6 @@
 <div
   [@collapseState] = "{ value : show ? 'visible' : 'collapsed', params : { collapsedHeight: collapsedHeight, fullHeight: fullHeight, animationLength: animationLength } }"
-  content>
+  class="readmore-content">
   <div #contentContainer>
     <ng-content>
     </ng-content>
@@ -8,7 +8,7 @@
 </div>
 <div 
   (click)="toggle($event)" 
-  sliver
+  class="readmore-sliver"
   [hoverable]="{translateY:-1}">
 
   <i 
