@@ -389,9 +389,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
 
   private openDatasetPreviewWidget(data: IDatasetPreviewData) {
     const { datasetId: kgId, filename } = data
-
-    if (!!this.actionOnWidget) {
-    }
   }
   
   public datasetPreviewDisplayed(file: DatasetPreview, dataset?: IKgDataEntry){

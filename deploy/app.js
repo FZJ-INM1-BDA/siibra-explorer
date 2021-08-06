@@ -8,7 +8,6 @@ const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
 const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
-const { router: datasetRouter } = require('./datasets')
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -234,9 +233,6 @@ const jsonMiddleware = (req, res, next) => {
 /**
  * resources endpoints
  */
-const atlasesRouter = require('./atlas')
-const templateRouter = require('./templates')
-const nehubaConfigRouter = require('./nehubaConfig')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
@@ -245,10 +241,14 @@ const setResLocalMiddleWare = routePathname => (req, res, next) => {
   next()
 }
 
-app.use('/atlases', setResLocalMiddleWare('atlases'), atlasesRouter)
-app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
-app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
-app.use('/datasets', jsonMiddleware, datasetRouter)
+const deprecated = (req, res) => {
+  res.status(404).send(`Route has been removed.`)
+}
+
+app.use('/atlases', deprecated)
+app.use('/templates', deprecated)
+app.use('/nehubaConfig', deprecated)
+app.use('/datasets', deprecated)
 app.use('/regionalFeatures', jsonMiddleware, regionalFeaturesRouter)
 app.use('/plugins', jsonMiddleware, pluginRouter)
 app.use('/preview', jsonMiddleware, previewRouter)
