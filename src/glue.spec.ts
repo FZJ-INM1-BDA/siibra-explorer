@@ -1,6 +1,5 @@
 import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/testing"
 import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects, ClickInterceptorService } from "./glue"
-import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex, getIdObj } from 'common/util'
 import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
@@ -117,10 +116,6 @@ describe('> glue.ts', () => {
           provideMockStore({
             initialState
           }),
-          {
-            provide: ACTION_TO_WIDGET_TOKEN,
-            useValue: actionOnWidgetSpy
-          },
           NgLayersService
         ]
       })
@@ -303,172 +298,6 @@ describe('> glue.ts', () => {
         discardPeriodicTasks()
       }))
     })
-
-    describe('> #actionOnWidget', () => {
-
-      it('> on init, does not call either open/close', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: []
-          }
-        })
-        tick(200)
-        expect(actionOnWidgetSpy).not.toHaveBeenCalled()
-        discardPeriodicTasks()
-      }))
-
-      it('> correctly calls actionOnWidgetSpy on create', fakeAsync(() => {
-        
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: [ file1 ]
-          }
-        })
-
-        // debounce at 100ms
-        tick(200)
-        const req = ctrl.expectOne({})
-        req.flush(chart)
-
-        expect(actionOnWidgetSpy).toHaveBeenCalled()
-        const args = actionOnWidgetSpy.calls.allArgs()
-        
-        expect(args.length).toEqual(1)
-
-        const [ type, cmp, option, ...rest ] = args[0]
-        expect(type).toEqual(EnumActionToWidget.OPEN)
-        discardPeriodicTasks()
-      }))
-  
-      it('> correctly calls actionOnWidgetSpy twice when needed', fakeAsync(() => {
-        
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: [
-              file1, file2
-            ]
-          }
-        })
-
-        // debounce at 100ms
-        tick(200)
-
-        const reqs = ctrl.match({})
-        expect(reqs.length).toEqual(2)
-        for (const req of reqs) {
-          req.flush(chart)
-        }
-
-        expect(actionOnWidgetSpy).toHaveBeenCalled()
-        const args = actionOnWidgetSpy.calls.allArgs()
-        
-        expect(args.length).toEqual(2)
-
-        const [ type0, cmp0, option0, ...rest0 ] = args[0]
-        expect(type0).toEqual(EnumActionToWidget.OPEN)
-        const { data: data0 } = option0
-
-        expect(data0.kgId).toEqual(file1.datasetId)
-        expect(data0.filename).toEqual(file1.filename)
-
-        const [ type1, cmp1, option1, ...rest1 ] = args[1]
-        expect(type1).toEqual(EnumActionToWidget.OPEN)
-        const { data: data1 } = option1
-        expect(data1.kgId).toEqual(file2.datasetId)
-        expect(data1.filename).toEqual(file2.filename)
-
-        expect(cmp0).toBeTruthy()
-        expect(cmp0).toBe(cmp1)
-        discardPeriodicTasks()
-      }))
-
-      it('> correctly calls actionOnWidgetSpy on change of state', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: [
-              file1, file2
-            ]
-          }
-        })
-
-        // debounce timer
-        tick(200)
-
-        const reqs = ctrl.match({})
-        expect(reqs.length).toEqual(2)
-        for (const req of reqs) {
-          req.flush(chart)
-        }
-
-        actionOnWidgetSpy.calls.reset()
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: []
-          }
-        })
-        
-        // debounce at 100ms
-        tick(200)
-        expect(actionOnWidgetSpy).toHaveBeenCalled()
-        const args = actionOnWidgetSpy.calls.allArgs()
-        
-        expect(args.length).toEqual(2)
-
-        const [ type0, cmp0, option0, ...rest0 ] = args[0]
-        expect(type0).toEqual(EnumActionToWidget.CLOSE)
-        expect(cmp0).toBe(null)
-        expect(option0.id).toEqual(mockActionOnSpyReturnVal0.id)
-
-        const [ type1, cmp1, option1, ...rest1 ] = args[1]
-        expect(type1).toEqual(EnumActionToWidget.CLOSE)
-        expect(cmp1).toBe(null)
-        expect(option1.id).toEqual(mockActionOnSpyReturnVal1.id)
-        discardPeriodicTasks()
-      }))
-
-
-      it('> if no UI preview file is added, does not call actionOnWidget', fakeAsync(() => {
-
-        const store = TestBed.inject(MockStore)
-        const ctrl = TestBed.inject(HttpTestingController)
-        const glue = TestBed.inject(DatasetPreviewGlue)
-
-        store.setState({
-          uiState: {
-            previewingDatasetFiles: [ file1 ]
-          }
-        })
-
-        // debounce at 100ms
-        tick(200)
-        const req = ctrl.expectOne({})
-        req.flush(nifti)
-
-        expect(actionOnWidgetSpy).not.toHaveBeenCalled()
-        discardPeriodicTasks()
-      }))
-      
-    })
-    
   })
 
 

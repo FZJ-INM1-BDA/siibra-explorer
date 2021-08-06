@@ -11,6 +11,7 @@ import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
 import { BSFeatureModule } from "../regionalFeatures/bsFeatures";
 import { RegionAccordionTooltipTextPipe } from "./regionAccordionTooltipText.pipe";
 import { AtlasCmptConnModule } from "../connectivity";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { AtlasCmptConnModule } from "../connectivity";
     ComponentsModule,
     BSFeatureModule,
     AtlasCmptConnModule,
+    HttpClientModule,
   ],
   declarations: [
     RegionMenuComponent,
