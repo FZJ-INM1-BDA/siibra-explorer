@@ -42,7 +42,10 @@ const templateMap = {
     id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
     parc: {
       'Cytoarchitectonic Maps - v2.4': {
-        id: 'juelich/iav/atlas/v1.0.0/7'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
+      },
+      'Cytoarchitectonic Maps': {
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
       },
       'Cortical Layers Segmentation': {
         id: 'juelich/iav/atlas/v1.0.0/3'
