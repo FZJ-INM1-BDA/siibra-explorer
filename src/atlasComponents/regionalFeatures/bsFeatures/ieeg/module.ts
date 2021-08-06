@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { BsFeatureService } from "../service";
 import { BsFeatureIEEGCmp } from "./ieegCmp/ieeg.component";

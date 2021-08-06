@@ -1,6 +1,6 @@
 import { TestBed, async } from "@angular/core/testing"
 import { RegionMenuComponent } from "./regionMenu.component"
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
+import { AngularMaterialModule } from "src/sharedModules"
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
 import { provideMockStore } from "@ngrx/store/testing"

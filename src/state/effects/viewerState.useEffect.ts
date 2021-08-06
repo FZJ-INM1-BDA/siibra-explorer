@@ -28,7 +28,7 @@ export const defaultNavigationObject = {
 }
 
 export const defaultNehubaConfigObject = {
-  perspectiveOrientation: [0, 0, 0, 1],
+  perspectiveOrientation: [0.5, -0.5, -0.5, 0.5],
   perspectiveZoom: 1e6,
   navigation: {
     pose: {

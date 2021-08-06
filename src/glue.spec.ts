@@ -9,7 +9,7 @@ import { HttpClientTestingModule, HttpTestingController } from "@angular/common/
 import { glueActionToggleDatasetPreview } from './glue'
 import { DS_PREVIEW_URL } from 'src/util/constants'
 import { NgLayersService } from "./ui/layerbrowser/ngLayerService.service"
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./databrowser.fallback"
 import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
 import { generalActionError } from "./services/stateStore.helper"
 

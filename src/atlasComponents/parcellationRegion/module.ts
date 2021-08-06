@@ -1,8 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
-import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { RenderViewOriginDatasetLabelPipe } from "./region.base";
 import { RegionDirective } from "./region.directive";
@@ -17,7 +16,6 @@ import { AtlasCmptConnModule } from "../connectivity";
   imports: [
     CommonModule,
     UtilModule,
-    DatabrowserModule,
     AngularMaterialModule,
     ComponentsModule,
     BSFeatureModule,

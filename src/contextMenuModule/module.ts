@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { CtxMenuHost } from "./ctxMenuHost.directive";
 import { DismissCtxMenuDirective } from "./dismissCtxMenu.directive";
 

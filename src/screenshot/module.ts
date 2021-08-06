@@ -2,7 +2,7 @@ import { FullscreenOverlayContainer, OverlayContainer } from "@angular/cdk/overl
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
-import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { ScreenshotCmp } from "./screenshotCmp/screenshot.component";
 import { ScreenshotSwitch } from "./screenshotSwitch.directive";
 

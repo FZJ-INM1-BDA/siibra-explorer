@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { StoreModule, ActionReducer } from "@ngrx/store";
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
@@ -12,9 +12,8 @@ import { UIModule } from "./ui/ui.module";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, CANCELLABLE_DIALOG, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
-import { LOAD_MESH_TOKEN, ILoadMesh, WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
+import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
@@ -24,7 +23,6 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/atlasComponents/databrowserModule";
 import { ViewerStateControllerUseEffect } from "src/state";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
@@ -39,7 +37,6 @@ import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
-import { IAV_DATASET_PREVIEW_ACTIVE } from 'src/atlasComponents/databrowserModule'
 
 import 'hammerjs'
 import 'src/res/css/extra_styles.css'
@@ -59,6 +56,9 @@ import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
+import { of } from 'rxjs';
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, kgTos, IAV_DATASET_PREVIEW_ACTIVE } from './databrowser.fallback'
+import { CANCELLABLE_DIALOG } from './util/interfaces';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -77,8 +77,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     ComponentsModule,
     DragDropModule,
     UIModule,
-    DatabrowserModule,
-    DataBrowserFeatureStore,
+    
     AngularMaterialModule,
     UtilModule,
     WidgetModule,
@@ -138,7 +137,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     ConfirmDialogComponent,
   ],
   providers : [
-    AtlasViewerAPIServices,
     AtlasWorkerService,
     AuthService,
     LocalFileService,
@@ -204,19 +202,9 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     
     {
       provide: TOS_OBS_INJECTION_TOKEN,
-      useFactory: (dbService: DatabrowserService) => dbService.kgTos$,
-      deps: [ DatabrowserService ]
+      useValue: of(kgTos)
     },
 
-    /**
-     * TODO
-     * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
-     */
-    {
-      provide: API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
-      useFactory: setViewerHandleFactory,
-      deps: [ AtlasViewerAPIServices ]
-    },
     {
       provide: CLICK_INTERCEPTOR_INJECTOR,
       useFactory: (clickIntService: ClickInterceptorService) => {
@@ -235,15 +223,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       },
       deps: [
         ClickInterceptorService
-      ]
-    },
-    {
-      provide: LOAD_MESH_TOKEN,
-      useFactory: (apiService: AtlasViewerAPIServices) => {
-        return (loadMeshParam: ILoadMesh) => apiService.loadMesh$.next(loadMeshParam)
-      },
-      deps: [
-        AtlasViewerAPIServices
       ]
     },
     {

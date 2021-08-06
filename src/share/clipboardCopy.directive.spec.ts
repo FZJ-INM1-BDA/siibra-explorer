@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { async, TestBed } from "@angular/core/testing";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { ClipboardCopy } from "./clipboardCopy.directive";
 import { By } from "@angular/platform-browser";
 import { Clipboard } from "@angular/cdk/clipboard";

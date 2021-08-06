@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {  MarkdownDom } from './markdown/markdown.component';
 
 import { CommonModule } from '@angular/common';
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
+import { AngularMaterialModule } from 'src/sharedModules';
 import { UtilModule } from 'src/util';
 import { SafeHtmlPipe } from './safeHtml.pipe'
 import { TreeSearchPipe } from './treeSearch.pipe';

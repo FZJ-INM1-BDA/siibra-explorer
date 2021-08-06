@@ -1,6 +1,6 @@
 import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
-import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
+import { DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./databrowser.fallback"
 import { Subscription, Observable, forkJoin, of, merge, combineLatest } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
 import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError } from "rxjs/operators"
@@ -391,39 +391,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     const { datasetId: kgId, filename } = data
 
     if (!!this.actionOnWidget) {
-      const previewId = DatasetPreviewGlue.GetDatasetPreviewId(data)
-
-      const onClose = () => {
-        this.store$.dispatch(
-          glueActionRemoveDatasetPreview({ datasetPreviewFile: data })
-        )
-      }
-
-      const allPreviewCWs = Array.from(this.openedPreviewMap).map(([key, { matDialogRef }]) => matDialogRef.componentInstance as PreviewComponentWrapper)
-      let newUntouchedIndex = 0
-      while(allPreviewCWs.findIndex(({ touched, untouchedIndex }) => !touched && untouchedIndex === newUntouchedIndex) >= 0){
-        newUntouchedIndex += 1
-      }
-
-      const { id:widgetId, matDialogRef } = this.actionOnWidget(
-        EnumActionToWidget.OPEN,
-        PreviewComponentWrapper,
-        {
-          data: { filename, kgId },
-          onClose,
-          overrideMatDialogConfig: {
-            ...DatasetPreviewGlue.DEFAULT_DIALOG_OPTION,
-            position: {
-              left: `${5 + (30 * newUntouchedIndex)}px`
-            }
-          }
-        }
-      )
-
-      const previewWrapper = (matDialogRef.componentInstance as PreviewComponentWrapper)
-      previewWrapper.untouchedIndex = newUntouchedIndex
-
-      this.openedPreviewMap.set(previewId, {id: widgetId, matDialogRef})
     }
   }
   

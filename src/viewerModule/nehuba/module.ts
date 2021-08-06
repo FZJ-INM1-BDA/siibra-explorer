@@ -13,7 +13,7 @@ import { UtilModule } from "src/util";
 import { LayoutModule } from "src/layouts/layout.module";
 import { TouchSideClass } from "./touchSideClass.directive";
 import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { MaximisePanelButton } from "./maximisePanelButton/maximisePanelButton.component";
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module";
 import { MouseoverModule } from "src/mouseoverModule";

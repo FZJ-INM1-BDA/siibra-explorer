@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
 import { UtilModule } from "src/util";
-import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 
 @NgModule({

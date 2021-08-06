@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { Observable } from "rxjs";
-import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { BSFeatureModule, BS_DARKTHEME,  } from "src/atlasComponents/regionalFeatures/bsFeatures";
@@ -10,7 +9,7 @@ import { AtlasCmpUiSelectorsModule } from "src/atlasComponents/uiSelectors";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { TopMenuModule } from "src/ui/topMenu/module";
 import { CONTEXT_MENU_ITEM_INJECTOR, TContextMenu, UtilModule } from "src/util";
 import { VIEWERMODULE_DARKTHEME } from "./constants";
@@ -25,6 +24,8 @@ import { map } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
 import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
 import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bsFeatures/kgRegionalFeature";
+import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, AtlasViewerAPIServices, setViewerHandleFactory } from "src/atlasViewer/atlasViewer.apiService.service";
+import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
 
 @NgModule({
   imports: [
@@ -32,7 +33,6 @@ import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bs
     NehubaModule,
     ThreeSurferModule,
     LayoutModule,
-    DatabrowserModule,
     AtlasCmpUiSelectorsModule,
     AngularMaterialModule,
     SplashUiModule,
@@ -80,6 +80,21 @@ import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bs
       },
       deps: [ ContextMenuService ]
     },
+    {
+      provide: API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
+      useFactory: setViewerHandleFactory,
+      deps: [ AtlasViewerAPIServices ]
+    },
+    {
+      provide: LOAD_MESH_TOKEN,
+      useFactory: (apiService: AtlasViewerAPIServices) => {
+        return (loadMeshParam: ILoadMesh) => apiService.loadMesh$.next(loadMeshParam)
+      },
+      deps: [
+        AtlasViewerAPIServices
+      ]
+    },
+    AtlasViewerAPIServices,
   ],
   exports: [
     ViewerCmp,

@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { GenericInfoCmp, GenericInfoModule } from "./genericInfo";
 import { BsFeatureIEEGModule } from "./ieeg/module";
 import { KgRegionalFeatureModule } from "./kgRegionalFeature";

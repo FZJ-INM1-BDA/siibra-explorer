@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { WidgetServices } from "./widgetService.service";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { CommonModule } from "@angular/common";
 import { ComponentsModule } from "src/components";
 import { ACTION_TO_WIDGET_TOKEN, TypeActionToWidget, EnumActionToWidget } from "./constants";

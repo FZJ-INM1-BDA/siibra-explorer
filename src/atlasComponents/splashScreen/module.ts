@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
 import { KgTosModule } from "src/ui/kgtos/module";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { GetTemplateImageSrcPipe, SplashScreen } from "./splashScreen/splashScreen.component";
 

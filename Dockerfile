@@ -61,10 +61,6 @@ COPY --from=builder /iv/deploy .
 # Copy built interactive viewer
 COPY --from=compressor /iv ./public
 
-# Copy the resources files needed to respond to queries
-# is this even necessary any more?
-COPY --from=compressor /iv/res/json ./res
-
 RUN chown -R node:node /iv-app
 
 USER node

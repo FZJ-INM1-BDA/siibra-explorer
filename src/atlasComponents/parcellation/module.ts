@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
 import { RegionTextSearchAutocomplete } from "./regionSearch/regionSearch.component";

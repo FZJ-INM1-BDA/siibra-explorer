@@ -1,39 +1,53 @@
-import { cvtNehubaConfigToNavigationObj, ViewerStateControllerUseEffect, defaultNavigationObject } from './viewerState.useEffect'
+import { cvtNehubaConfigToNavigationObj, ViewerStateControllerUseEffect, defaultNavigationObject, defaultNehubaConfigObject } from './viewerState.useEffect'
 import { Observable, of, throwError } from 'rxjs'
-import { TestBed, async } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { defaultRootState, generalActionError } from 'src/services/stateStore.service'
 import { Injectable } from '@angular/core'
 import { TemplateCoordinatesTransformation, ITemplateCoordXformResp } from 'src/services/templateCoordinatesTransformation.service'
 import { hot } from 'jasmine-marbles'
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { AngularMaterialModule } from 'src/sharedModules'
 import { HttpClientModule } from '@angular/common/http'
-import { WidgetModule } from 'src/widget'
-import { PluginModule } from 'src/plugin'
 import { viewerStateFetchedTemplatesSelector, viewerStateNavigateToRegion, viewerStateNavigationStateSelector, viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSelectTemplateWithName } from 'src/services/state/viewerState.store.helper'
 import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from 'src/services/state/viewerState/selectors'
 import { CONST } from 'common/constants'
 import { PureContantService } from 'src/util'
 import { viewerStateChangeNavigation } from 'src/services/state/viewerState/actions'
 
-const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
-const bigBrainNehubaConfig = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
-const colinJson = require('!json-loader!src/res/ext/colin.json')
-const colinJsonNehubaConfig = require('!json-loader!src/res/ext/colinNehubaConfig.json')
-const reconstitutedColin = JSON.parse(JSON.stringify(
-  {
-    ...colinJson,
-    nehubaConfig: colinJsonNehubaConfig
-  }
-))
-const reconstitutedBigBrain = JSON.parse(JSON.stringify(
-  {
-    ...bigbrainJson,
-    nehubaConfig: bigBrainNehubaConfig
-  }
-))
 let returnPosition = null
+const dummyParc1 = {
+  name: 'dummyParc1'
+}
+const dummyTmpl1 = {
+  '@id': 'dummyTmpl1-id',
+  name: 'dummyTmpl1',
+  parcellations: [dummyParc1],
+  nehubaConfig: {
+    dataset: {
+      initialNgState: {
+        ...defaultNehubaConfigObject
+      }
+    }
+  }
+}
+
+const dummyParc2 = {
+  name: 'dummyParc2'
+}
+const dummyTmpl2 = {
+  '@id': 'dummyTmpl2-id',
+  name: 'dummyTmpl2',
+  parcellations: [dummyParc2],
+  nehubaConfig: {
+    dataset: {
+      initialNgState: {
+        ...defaultNehubaConfigObject
+      }
+    }
+  }
+}
+
 @Injectable()
 class MockCoordXformService{
   getPointCoordinatesForTemplate(src:string, tgt: string, pos: [number, number, number]): Observable<ITemplateCoordXformResp>{
@@ -44,11 +58,12 @@ class MockCoordXformService{
 }
 
 const initialState = JSON.parse(JSON.stringify( defaultRootState ))
-initialState.viewerState.fetchedTemplates = [
-  reconstitutedBigBrain,
-  reconstitutedColin
+const mockFetchedTemplates = [
+  dummyTmpl2,
+  dummyTmpl1
 ]
-initialState.viewerState.templateSelected = initialState.viewerState.fetchedTemplates[0]
+initialState.viewerState.fetchedTemplates = mockFetchedTemplates
+initialState.viewerState.templateSelected = dummyTmpl2
 const currentNavigation = {
   position: [4, 5, 6],
   orientation: [0, 0, 0, 1],
@@ -72,7 +87,8 @@ describe('> viewerState.useEffect.ts', () => {
   describe('> ViewerStateControllerUseEffect', () => {
     let actions$: Observable<any>
     let spy: jasmine.Spy
-    beforeEach(async(() => {
+    let mockStore: MockStore
+    beforeEach(() => {
 
       const mock = new MockCoordXformService()
       spy = spyOn(mock, 'getPointCoordinatesForTemplate').and.callThrough()
@@ -82,8 +98,6 @@ describe('> viewerState.useEffect.ts', () => {
         imports: [
           AngularMaterialModule,
           HttpClientModule,
-          WidgetModule,
-          PluginModule,
         ],
         providers: [
           ViewerStateControllerUseEffect,
@@ -98,16 +112,23 @@ describe('> viewerState.useEffect.ts', () => {
             useValue: mockPureConstantService
           }
         ]
-      }).compileComponents()
-    }))
+      })
+
+      mockStore = TestBed.inject(MockStore)
+    })
 
     describe('> selectTemplate$', () => {
       beforeEach(() => {
-
+        mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, mockFetchedTemplates)
+        mockStore.overrideSelector(viewerStateSelectedParcellationSelector, dummyParc1)
         actions$ = hot(
           'a',
           {
-            a: viewerStateSelectTemplateWithName({ payload: reconstitutedColin })
+            a: viewerStateSelectTemplateWithName({
+                payload: {
+                  name: dummyTmpl1.name
+                }
+              })
           }
         )
       })
@@ -123,15 +144,15 @@ describe('> viewerState.useEffect.ts', () => {
                 'a',
                 {
                   a: viewerStateNewViewer({
-                      selectTemplate: reconstitutedColin,
-                      selectParcellation: reconstitutedColin.parcellations[0],
+                      selectTemplate: dummyTmpl1,
+                      selectParcellation: dummyTmpl1.parcellations[0],
                     })
                 }
               )
             )
             expect(spy).toHaveBeenCalledWith(
-              reconstitutedBigBrain.name,
-              reconstitutedColin.name,
+              dummyTmpl2.name,
+              dummyTmpl1.name,
               initialState.viewerState.navigation.position
             )
           })
@@ -151,17 +172,17 @@ describe('> viewerState.useEffect.ts', () => {
                 'a',
                 {
                   a: viewerStateNewViewer({
-                      selectTemplate: reconstitutedColin,
-                      selectParcellation: reconstitutedColin.parcellations[0],
+                      selectTemplate: dummyTmpl1,
+                      selectParcellation: dummyTmpl1.parcellations[0],
                     })
                 }
               )
             )
-            const { position } = cvtNehubaConfigToNavigationObj(reconstitutedBigBrain.nehubaConfig.dataset.initialNgState)
+            const { position } = cvtNehubaConfigToNavigationObj(dummyTmpl2.nehubaConfig.dataset.initialNgState)
 
             expect(spy).toHaveBeenCalledWith(
-              reconstitutedBigBrain.name,
-              reconstitutedColin.name,
+              dummyTmpl2.name,
+              dummyTmpl1.name,
               position
             )
           })
@@ -179,17 +200,17 @@ describe('> viewerState.useEffect.ts', () => {
                 'a',
                 {
                   a: viewerStateNewViewer({
-                      selectTemplate: reconstitutedColin,
-                      selectParcellation: reconstitutedColin.parcellations[0],
+                      selectTemplate: dummyTmpl1,
+                      selectParcellation: dummyTmpl1.parcellations[0],
                     })
                 }
               )
             )
-            const { position } = cvtNehubaConfigToNavigationObj(reconstitutedBigBrain.nehubaConfig.dataset.initialNgState)
+            const { position } = cvtNehubaConfigToNavigationObj(dummyTmpl2.nehubaConfig.dataset.initialNgState)
 
             expect(spy).toHaveBeenCalledWith(
-              reconstitutedBigBrain.name,
-              reconstitutedColin.name,
+              dummyTmpl2.name,
+              dummyTmpl1.name,
               position
             )
           })
@@ -206,8 +227,8 @@ describe('> viewerState.useEffect.ts', () => {
             'a',
             {
               a: viewerStateNewViewer({
-                  selectTemplate: reconstitutedColin,
-                  selectParcellation: reconstitutedColin.parcellations[0],
+                  selectTemplate: dummyTmpl1,
+                  selectParcellation: dummyTmpl1.parcellations[0],
                 })
             }
           )
@@ -218,7 +239,7 @@ describe('> viewerState.useEffect.ts', () => {
         returnPosition = [ 1.11e6, 2.22e6, 3.33e6 ]
 
         const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        const updatedColin = JSON.parse( JSON.stringify( reconstitutedColin ) )
+        const updatedColin = JSON.parse( JSON.stringify( dummyTmpl1 ) )
         const initialNgState = updatedColin.nehubaConfig.dataset.initialNgState
         const updatedColinNavigation = updatedColin.nehubaConfig.dataset.initialNgState.navigation
 
@@ -699,7 +720,7 @@ describe('> viewerState.useEffect.ts', () => {
       })
       it('> if malformed', () => {
         
-        const obj = cvtNehubaConfigToNavigationObj(reconstitutedBigBrain)
+        const obj = cvtNehubaConfigToNavigationObj(dummyTmpl2)
         expect(obj).toEqual(defaultNavigationObject)
 
         const obj2 = cvtNehubaConfigToNavigationObj({})
@@ -707,21 +728,8 @@ describe('> viewerState.useEffect.ts', () => {
       })
     })
     it('> converts nehubaConfig object to navigation object', () => {
-
-      const obj = cvtNehubaConfigToNavigationObj(reconstitutedBigBrain.nehubaConfig.dataset.initialNgState)
-      expect(obj).toEqual({
-        orientation: [0, 0, 0, 1],
-        perspectiveOrientation: [
-          0.3140767216682434,
-          -0.7418519854545593,
-          0.4988985061645508,
-          -0.3195493221282959
-        ],
-        perspectiveZoom: 1922235.5293810747,
-        zoom: 350000,
-        position: [ -463219.89446663484, 325772.3617553711, 601535.3736234978 ],
-        positionReal: true
-      })
+      const obj = cvtNehubaConfigToNavigationObj(dummyTmpl2.nehubaConfig.dataset.initialNgState)
+      expect(obj).toEqual(defaultNavigationObject)
     })
   })
 
