@@ -22,6 +22,7 @@
     PIN_DATASET: 'Toggle pinning dataset',
     TEXT_INPUT_SEARCH_REGION: 'Search for any region of interest in the atlas selected',
     CLEAR_SELECTED_REGION: 'Clear selected region',
+    VIEW_PINNED: `View pinned datasets.`,
     BULK_DOWNLOAD: `Download all pinned data`,
     NO_BULK_DOWNLOAD: `No datasets pinned`,
 
