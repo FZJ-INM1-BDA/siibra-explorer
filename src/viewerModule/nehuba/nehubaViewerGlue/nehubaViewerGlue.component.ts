@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, merge, Observable, of, Subject } from "rxjs";
+import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
 import { ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
@@ -23,9 +23,14 @@ import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
-import { switchMapWaitFor } from "src/util/fn";
+import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { INavObj } from "../navigation.service";
 import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { getShader } from "src/util/constants";
+import { EnumColorMapName } from "src/util/colorMaps";
+
+export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
 @Component({
   selector: 'iav-cmp-viewer-nehuba-glue',
@@ -162,10 +167,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     this.setQuickTourPos()
 
     const { 
-      mouseOverSegments,
-      navigationEmitter,
-      mousePosEmitter,
-    } = this.nehubaContainerDirective
+      mouseOverSegments = NEVER,
+      navigationEmitter = NEVER,
+      mousePosEmitter = NEVER,
+    } = this.nehubaContainerDirective || {}
     const sub = combineLatest([
       mouseOverSegments,
       navigationEmitter,
@@ -301,6 +306,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     private store$: Store<any>,
     private el: ElementRef,
     private log: LoggingService,
+    private snackbar: MatSnackBar,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
@@ -695,6 +701,56 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       element.removeChild(element.firstElementChild)
     }
     return element
+  }
+
+  private droppedLayerNames: {
+    layerName: string
+    resourceUrl: string
+  }[] = []
+  private dismissAllAddedLayers(){
+    while (this.droppedLayerNames.length) {
+      const { resourceUrl, layerName } = this.droppedLayerNames.pop()
+      this.layerCtrlService.removeNgLayers([ layerName ])
+      URL.revokeObjectURL(resourceUrl)
+    }
+  }
+  public handleFileDrop(files: File[]){
+    if (files.length !== 1) {
+      this.snackbar.open(INVALID_FILE_INPUT, 'Dismiss', {
+        duration: 5000
+      })
+      return
+    }
+    const randomUuid = getUuid()
+    const file = files[0]
+
+    /**
+     * TODO check extension?
+     */
+    
+    this.dismissAllAddedLayers()
+    
+    const url = URL.createObjectURL(file)
+    this.droppedLayerNames.push({
+      layerName: randomUuid,
+      resourceUrl: url
+    })
+    this.layerCtrlService.addNgLayer([{
+      name: randomUuid,
+      mixability: 'mixable',
+      source: `nifti://${url}`,
+      shader: getShader({
+        colormap: EnumColorMapName.MAGMA
+      })
+    }])
+
+    this.snackbar.open(
+      `Viewing ${file.name}`,
+      'Clear',
+      { duration: 0 }
+    ).afterDismissed().subscribe(() => {
+      this.dismissAllAddedLayers()
+    })
   }
 
 

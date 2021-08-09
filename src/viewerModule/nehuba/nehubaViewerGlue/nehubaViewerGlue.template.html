@@ -1,5 +1,6 @@
 <div class="d-block w-100 h-100"
   (touchmove)="$event.preventDefault()"
+  (drag-drop-file)="handleFileDrop($event)"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
@@ -168,7 +169,6 @@
   <!-- NB must not lazy load. key listener needs to work even when component is not yet rendered -->
   <!-- stop propagation is needed, or else click will result in dismiss of menu -->
   <viewer-ctrl-component class="d-block m-2 ml-3 mr-3"
-    #viewerCtrlCmp="viewerCtrlCmp"
     (click)="$event.stopPropagation()">
   </viewer-ctrl-component>
 </mat-menu>

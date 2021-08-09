@@ -36,13 +36,14 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
     ev.preventDefault()
     this.reset()
 
-    this.dragDropOnDrop.emit(Array.from(ev.dataTransfer.files))
+    this.dragDropOnDrop.emit(Array.from(ev?.dataTransfer?.files || []))
   }
 
   public reset() {
     if (this.snackbarRef) {
       this.snackbarRef.dismiss()
     }
+    this.snackbarRef = null
     this.opacity = null
   }
 
@@ -54,7 +55,16 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
         debounceTime(16),
       ).subscribe(flag => {
         if (flag) {
-          this.snackbarRef = this.snackBar.open(this.snackText || `Drop file(s) here.`)
+          this.snackbarRef = this.snackBar.open(this.snackText || `Drop file(s) here.`, 'Dismiss')
+
+          /**
+           * In buggy scenarios, user could at least dismiss by action
+           */
+          this.snackbarRef.afterDismissed().subscribe(reason => {
+            if (reason.dismissedByAction) {
+              this.reset()
+            }
+          })
           this.opacity = 0.2
         } else {
           this.reset()

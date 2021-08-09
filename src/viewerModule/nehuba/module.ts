@@ -26,6 +26,7 @@ import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
+import { DragDropFileModule } from "src/dragDropFile/module";
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { ViewerCtrlModule } from "./viewerCtrl";
     ShareModule,
     WindowResizeModule,
     ViewerCtrlModule,
+    DragDropFileModule,
 
     /**
      * should probably break this into its own...
