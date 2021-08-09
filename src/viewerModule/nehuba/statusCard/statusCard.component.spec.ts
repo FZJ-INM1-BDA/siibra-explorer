@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing"
 import { CommonModule } from "@angular/common"
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
+import { AngularMaterialModule } from "src/sharedModules"
 import { StatusCardComponent } from "./statusCard.component"
 import { Directive, Component } from "@angular/core"
 import { Observable, of } from "rxjs"

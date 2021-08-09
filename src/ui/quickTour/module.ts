@@ -2,7 +2,7 @@ import { FullscreenOverlayContainer, OverlayContainer } from "@angular/cdk/overl
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
-import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { QuickTourThis } from "src/ui/quickTour/quickTourThis.directive";
 import { QuickTourService } from "src/ui/quickTour/quickTour.service";
 import { QuickTourComponent } from "src/ui/quickTour/quickTourComponent/quickTour.component";

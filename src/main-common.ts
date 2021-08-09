@@ -34,8 +34,6 @@ if (PRODUCTION) enableProdMode()
 if (PRODUCTION) { console.log(`Interactive Atlas Viewer: ${VERSION}`) }
 
 const requireAll = (r: any) => {r.keys().forEach(r)}
-requireAll(require.context('./res/ext', false, /\.json$/))
-requireAll(require.context('./res/ext/atlas', false, /\.json$/))
 requireAll(require.context('./res/images', true, /\.jpg$|\.png$|\.svg$/))
 requireAll(require.context(`./plugin_examples`, true))
 

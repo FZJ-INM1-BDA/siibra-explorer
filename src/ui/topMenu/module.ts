@@ -1,17 +1,16 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { DatabrowserModule } from "src/atlasComponents/databrowserModule";
 import { AuthModule } from "src/auth";
 import { ComponentsModule } from "src/components";
 import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 import { PluginModule } from "src/plugin";
 import { UtilModule } from "src/util";
-import { ConfigModule } from "../config/module";
-import { CookieModule } from "../cookieAgreement/module";
-import { HelpModule } from "../help/module";
-import { KgTosModule } from "../kgtos/module";
-import { ScreenshotModule } from "../screenshot";
-import { AngularMaterialModule } from "../sharedModules/angularMaterial.module";
+import { ConfigModule } from "src/ui/config/module";
+import { CookieModule } from "src/ui/cookieAgreement/module";
+import { HelpModule } from "src/ui/help/module";
+import { KgTosModule } from "src/ui/kgtos/module";
+import { ScreenshotModule } from "src/screenshot";
+import { AngularMaterialModule } from "src/sharedModules";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
@@ -21,7 +20,6 @@ import { QuickTourModule } from "src/ui/quickTour/module";
     CommonModule,
     UtilModule,
     AngularMaterialModule,
-    DatabrowserModule,
     FabSpeedDialModule,
     ComponentsModule,
     CookieModule,

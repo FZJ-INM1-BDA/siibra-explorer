@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { ConnectivityBrowserComponent } from "./connectivityBrowser/connectivityBrowser.component";
 import {HasConnectivity} from "src/atlasComponents/connectivity/hasConnectivity.directive";
 import {KgDatasetModule} from "src/atlasComponents/regionalFeatures/bsFeatures/kgDataset";

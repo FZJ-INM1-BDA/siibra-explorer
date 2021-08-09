@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, Inject, NgModule, Optional } from "@angular/core";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "../kgDataset/showDataset/showDataset.directive";
 import { GenericInfoCmp } from "./genericInfoCmp/genericInfo.component";

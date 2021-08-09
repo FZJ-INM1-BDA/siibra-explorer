@@ -239,10 +239,8 @@
       <span>
         Pinned Datasets
       </span>
-      <iav-datamodule-bulkdownload-cmp
-        [kgIds]="favDataEntries$ | async | iavDatamoduleTransformDsToIdPipe">
 
-      </iav-datamodule-bulkdownload-cmp>
+      <!-- bulk download btn -->
     </h3>
 
     <!-- place holder when no fav data is available -->
@@ -260,14 +258,7 @@
       *ngFor="let ds of (favDataEntries$ | async)"
       role="listitem">
 
-      <single-dataset-list-view
-        class="d-block pt-1 pb-1 w-100"
-        [kgSchema]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[0]"
-        [kgId]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[1]"
-        [dataset]="ds"
-        [ripple]="true">
-
-      </single-dataset-list-view>
+      <!-- TODO render fav dataset -->
 
     </mat-list-item>
   </mat-list>

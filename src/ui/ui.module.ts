@@ -4,16 +4,11 @@ import { ComponentsModule } from "src/components/components.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 
-import { CitationsContainer } from "./citation/citations.component";
-
 import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { AngularMaterialModule } from 'src/sharedModules'
 import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
-
-
-import { DatabrowserModule } from "../atlasComponents/databrowserModule/databrowser.module";
 
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
@@ -33,7 +28,7 @@ import { DOCUMENT } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionalFeaturesModule } from "../atlasComponents/regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
-import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "./screenshot";
+import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 
@@ -45,7 +40,6 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     ReactiveFormsModule,
     LayoutModule,
     ComponentsModule,
-    DatabrowserModule,
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
@@ -58,7 +52,6 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
   ],
   declarations : [
     
-    CitationsContainer,
     LogoContainer,
     MobileOverlay,
 
@@ -141,7 +134,6 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     ActionDialog,
   ],
   exports : [
-    CitationsContainer,
     // NehubaContainer,
     
     LogoContainer,

@@ -1,7 +1,7 @@
 import { CommonModule, DOCUMENT } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { LoggingModule } from "src/logging";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { appendScriptFactory, APPEND_SCRIPT_TOKEN, removeScriptFactory, REMOVE_SCRIPT_TOKEN } from "src/util/constants";
 import { PluginServices, registerPluginFactoryDirectiveFactory } from "./atlasViewer.pluginService.service";

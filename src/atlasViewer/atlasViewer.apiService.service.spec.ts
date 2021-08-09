@@ -1,11 +1,12 @@
-import { AtlasViewerAPIServices, CANCELLABLE_DIALOG } from "src/atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
 import { async, TestBed, fakeAsync, tick } from "@angular/core/testing";
 import { provideMockStore } from "@ngrx/store/testing";
 import { defaultRootState } from "src/services/stateStore.service";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { WidgetModule } from 'src/widget';
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { PluginServices } from "src/plugin";
+import { CANCELLABLE_DIALOG } from "src/util/interfaces";
 
 describe('atlasViewer.apiService.service.ts', () => {
 

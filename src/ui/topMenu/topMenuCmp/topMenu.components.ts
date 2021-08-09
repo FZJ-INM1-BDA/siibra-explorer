@@ -4,11 +4,9 @@ import {
   Input,
   TemplateRef,
 } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
-import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { CONST, QUICKTOUR_DESC } from 'common/constants'
@@ -46,7 +44,7 @@ export class TopMenuCmp {
 
   public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
-  public favDataEntries$: Observable<Partial<IDataEntry>[]>
+  public favDataEntries$: Observable<Partial<any>[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
@@ -58,7 +56,6 @@ export class TopMenuCmp {
   }
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
@@ -71,10 +68,7 @@ export class TopMenuCmp {
         : `Not logged in`),
     )
 
-    this.favDataEntries$ = this.store$.pipe(
-      select('dataStore'),
-      select('favDataEntries'),
-    )
+    this.favDataEntries$ = of([])
   }
 
   private dialogRef: MatDialogRef<any>

@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { LandmarkUnit } from "./landmarkUnit/landmarkUnit.component";
-import { FlatLMCmp } from "./landmarkUnitMkII/flatLm.component";
+import { FlatLMCmp } from "./flatLm/flatLm.component";
 import { SafeStylePipe } from "./safeStyle.pipe";
 
 @NgModule({
@@ -9,7 +8,6 @@ import { SafeStylePipe } from "./safeStyle.pipe";
     CommonModule,
   ],
   declarations: [
-    LandmarkUnit,
     FlatLMCmp,
 
     /**
@@ -18,7 +16,6 @@ import { SafeStylePipe } from "./safeStyle.pipe";
     SafeStylePipe,
   ],
   exports: [
-    LandmarkUnit,
     FlatLMCmp,
   ]
 })

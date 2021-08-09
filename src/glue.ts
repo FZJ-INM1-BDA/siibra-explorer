@@ -1,27 +1,20 @@
 import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
-import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
-import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./atlasComponents/databrowserModule/pure"
+import { OnDestroy, Injectable, Inject, InjectionToken } from "@angular/core"
+import { DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./databrowser.fallback"
 import { Subscription, Observable, forkJoin, of, merge, combineLatest } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
 import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError } from "rxjs/operators"
-import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
 import { getIdObj } from 'common/util'
 import { MatDialogRef } from "@angular/material/dialog"
 import { HttpClient } from "@angular/common/http"
 import { DS_PREVIEW_URL } from 'src/util/constants'
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState.store.helper"
 import { ARIA_LABELS } from 'common/constants'
-import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
 import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
 import { generalActionError } from "./services/stateStore.helper"
 import { RegDeregController } from "./util/regDereg.base"
-
-const PREVIEW_FILE_TYPES_NO_UI = [
-  EnumPreviewFileTypes.NIFTI,
-  EnumPreviewFileTypes.VOLUMES
-]
 
 const prvFilterNull = ({ prvToDismiss, prvToShow }) => ({
   prvToDismiss: prvToDismiss.filter(v => !!v),
@@ -319,25 +312,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   constructor(
     private store$: Store<any>,
     private http: HttpClient,
-    private layersService: NgLayersService,
-    @Optional() @Inject(ACTION_TO_WIDGET_TOKEN) private actionOnWidget: TypeActionToWidget<any>
   ){
-    if (!this.actionOnWidget) console.warn(`actionOnWidget not provided in DatasetPreviewGlue. Did you forget to provide it?`)
-    
-    // managing dataset files preview requiring an UI
-    this.subscriptions.push(
-      this.getDiffDatasetFilesPreviews(
-        dsPrv => !PREVIEW_FILE_TYPES_NO_UI.includes(determinePreviewFileType(dsPrv))
-      ).subscribe(({ prvToDismiss: prvWgtToDismiss, prvToShow: prvWgtToShow }) => {
-        for (const obj of prvWgtToShow) {
-          this.openDatasetPreviewWidget(obj)
-        }
-        for (const obj of prvWgtToDismiss) {
-          this.closeDatasetPreviewWidget(obj)
-        }
-      })
-    )
-
 
     // managing dataset previews without UI
 
@@ -368,63 +343,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
         }
       })
     )
-  }
-
-  private closeDatasetPreviewWidget(data: IDatasetPreviewData){
-    const previewId = DatasetPreviewGlue.GetDatasetPreviewId(data)
-    const { id:widgetId } = this.openedPreviewMap.get(previewId)
-    if (!widgetId) return
-    try {
-      this.actionOnWidget(
-        EnumActionToWidget.CLOSE,
-        null,
-        { id: widgetId }
-      )
-    } catch (e) {
-      // It is possible that widget is already closed by the time that the state is reflected
-      // This happens when user closes the dialog
-    }
-    this.openedPreviewMap.delete(previewId)
-  }
-
-  private openDatasetPreviewWidget(data: IDatasetPreviewData) {
-    const { datasetId: kgId, filename } = data
-
-    if (!!this.actionOnWidget) {
-      const previewId = DatasetPreviewGlue.GetDatasetPreviewId(data)
-
-      const onClose = () => {
-        this.store$.dispatch(
-          glueActionRemoveDatasetPreview({ datasetPreviewFile: data })
-        )
-      }
-
-      const allPreviewCWs = Array.from(this.openedPreviewMap).map(([key, { matDialogRef }]) => matDialogRef.componentInstance as PreviewComponentWrapper)
-      let newUntouchedIndex = 0
-      while(allPreviewCWs.findIndex(({ touched, untouchedIndex }) => !touched && untouchedIndex === newUntouchedIndex) >= 0){
-        newUntouchedIndex += 1
-      }
-
-      const { id:widgetId, matDialogRef } = this.actionOnWidget(
-        EnumActionToWidget.OPEN,
-        PreviewComponentWrapper,
-        {
-          data: { filename, kgId },
-          onClose,
-          overrideMatDialogConfig: {
-            ...DatasetPreviewGlue.DEFAULT_DIALOG_OPTION,
-            position: {
-              left: `${5 + (30 * newUntouchedIndex)}px`
-            }
-          }
-        }
-      )
-
-      const previewWrapper = (matDialogRef.componentInstance as PreviewComponentWrapper)
-      previewWrapper.untouchedIndex = newUntouchedIndex
-
-      this.openedPreviewMap.set(previewId, {id: widgetId, matDialogRef})
-    }
   }
   
   public datasetPreviewDisplayed(file: DatasetPreview, dataset?: IKgDataEntry){
