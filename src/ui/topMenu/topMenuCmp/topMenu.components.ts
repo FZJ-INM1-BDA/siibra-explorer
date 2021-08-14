@@ -3,6 +3,7 @@ import {
   Component,
   Input,
   TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -11,7 +12,7 @@ import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST, QUICKTOUR_DESC } from 'common/constants'
+import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 @Component({
@@ -25,6 +26,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 export class TopMenuCmp {
 
+  public ARIA_LABELS = ARIA_LABELS
   public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
 
   public matBtnStyle = 'mat-icon-button'
@@ -55,6 +57,14 @@ export class TopMenuCmp {
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
+  }
+
+  public pinnedDsNotAvail = 'We are reworking pinned dataset feature. Please check back later.'
+  @ViewChild('savedDatasets', { read: TemplateRef })
+  private savedDatasetTmpl: TemplateRef<any>
+
+  public openPinnedDatasets(){
+    // this.bottomSheet.open(this.savedDatasetTmpl)
   }
 
   constructor(

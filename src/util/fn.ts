@@ -287,14 +287,41 @@ export class MultiDimMap{
   }
 }
 
-export function recursiveMutate<T>(arr: T[], getChildren: (obj: T) => T[], mutateFn: (obj: T) => void){
+export function mutateDeepMerge(toObj: any, fromObj: any){
+  if (typeof toObj !== 'object') throw new Error(`toObj needs to be object`)
+  if (typeof fromObj !== 'object') throw new Error(`fromObj needs to be object`)
+
+  for (const key in fromObj) {
+    if (!toObj[key]) {
+      toObj[key] = fromObj[key]
+      continue
+    }
+    if (Array.isArray(toObj[key])) {
+      const objToAppend = Array.isArray(fromObj[key])
+        ? fromObj[key]
+        : [fromObj[key]]
+      toObj[key].push(...objToAppend)
+      continue
+    }
+    if (typeof toObj[key] === typeof fromObj[key] && typeof toObj[key] === 'object') {
+      mutateDeepMerge(toObj[key], fromObj[key])
+      continue
+    }
+    throw new Error(`cannot mutate ${key} typeof ${typeof fromObj[key]}`)
+  }
+  
+  return toObj
+}
+
+export function recursiveMutate<T>(arr: T[], getChildren: (obj: T) => T[], mutateFn: (obj: T) => void, depthFirst = false){
   for (const obj of arr) {
-    mutateFn(obj)
+    if (!depthFirst) mutateFn(obj)
     recursiveMutate(
       getChildren(obj),
       getChildren,
       mutateFn
     )
+    if (depthFirst) mutateFn(obj)
   }
 }
 

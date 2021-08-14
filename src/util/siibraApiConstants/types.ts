@@ -18,6 +18,7 @@ interface IVolumeTypeDetail {
   'nii': null
   'neuroglancer/precomputed': {
     'neuroglancer/precomputed': {
+      'labelIndex': number
       'transform': TNgTransform
     }
   }
