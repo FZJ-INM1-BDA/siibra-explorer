@@ -14,7 +14,7 @@ import { viewerStateSetSelectedRegions } from "src/services/state/viewerState.st
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module"
 import { QuickTourModule } from "src/ui/quickTour"
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
+import { AngularMaterialModule } from "src/sharedModules/angularMaterial.module"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util"
 import { WindowResizeModule } from "src/util/windowResize"
 import { NehubaLayerControlService } from "../layerCtrl.service"
@@ -250,10 +250,10 @@ describe('> nehubaViewerGlue.component.ts', () => {
       fixture.detectChanges()
 
       addNgLayerSpy = spyOn(fixture.componentInstance['layerCtrlService'], 'addNgLayer').and.callFake(() => {
-        
+
       })
       removeNgLayersSpy = spyOn(fixture.componentInstance['layerCtrlService'], 'removeNgLayers').and.callFake(() => {
-        
+
       })
     })
     afterEach(() => {
@@ -266,7 +266,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
         desc: 'too few files',
         inp: []
       }, {
-        desc: 'too many files', 
+        desc: 'too many files',
         inp: [dummyFile1, dummyFile2]
       }]
 
@@ -274,20 +274,20 @@ describe('> nehubaViewerGlue.component.ts', () => {
         describe(`> ${desc}`, () => {
           beforeEach(() => {
             input = inp
-  
+
             const cmp = fixture.componentInstance
             cmp.handleFileDrop(input)
           })
-  
+
           it('> should not call addnglayer', () => {
             expect(removeNgLayersSpy).not.toHaveBeenCalled()
             expect(addNgLayerSpy).not.toHaveBeenCalled()
           })
-  
+
           // TODO having a difficult time getting snackbar harness
           // it('> snackbar should show error message', async () => {
           //   console.log('get harness')
-            
+
           //   rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture)
           //   const loader = TestbedHarnessEnvironment.loader(fixture)
           //   fixture.detectChanges()
