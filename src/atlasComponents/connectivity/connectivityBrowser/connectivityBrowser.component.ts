@@ -277,10 +277,6 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       )
 
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'collapsedMenuChanged', {capture: true})
-          .subscribe((e: CustomEvent) => {
-            this.expandMenuIndex = e.detail
-          }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', {capture: true})
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
@@ -288,6 +284,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
               const a = document.querySelector('hbp-connectivity-matrix-row')
               a.downloadCSV()
             }
+          }),
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
+          .subscribe((e: CustomEvent) => {
+            this.navigateToRegion(e.detail.name)
           }),
       )
     }
