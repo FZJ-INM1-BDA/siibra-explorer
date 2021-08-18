@@ -1,6 +1,5 @@
 const common = require('./webpack.common.js')
 const merge = require('webpack-merge')
-const Uglify = require('uglifyjs-webpack-plugin')
 const path = require('path')
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
 const ngAssets = require('./webpack.ngassets')

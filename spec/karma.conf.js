@@ -3,8 +3,17 @@
 
 const merge = require('webpack-merge')
 const webpackTest = require('../webpack/webpack.test')
-const webpackConfig = require('../webpack/webpack.dev')
-const fullWebpack = merge(webpackTest, webpackConfig)
+const webpackConfig = require('../webpack/webpack.aot-common')
+const { AngularWebpackPlugin } = require('@ngtools/webpack')
+const fullWebpack = merge(webpackTest, webpackConfig, {
+  plugins: [
+    new AngularWebpackPlugin({
+      tsConfigPath: 'tsconfig.spec.json',
+      // entryModule: 'src/main.module#MainModule',
+      // directTemplateLoading: true
+    }),
+  ]
+})
 
 const singleRun = process.env.NODE_ENV === 'test'
 const browsers = process.env.NODE_ENV === 'test'
@@ -22,6 +31,13 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
 
+    client: {
+      jasmine: {},
+      clearContext: false
+    },
+    jasmineHtmlReporter: {
+      suppressAll: true // removes the duplicated traces
+    },
 
     // list of files / patterns to load in the browser
     files: [
@@ -66,6 +82,8 @@ module.exports = function(config) {
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['progress'],
+
+    restartOnFileChange: true,
 
 
     // web server port

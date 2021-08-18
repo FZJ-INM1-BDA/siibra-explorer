@@ -22,10 +22,10 @@ export class AnnotationMode implements OnDestroy{
       name: string
       iconClass: string
     }
-    onClick: Function
+    onClick: () => void
   }[] = []
 
-  private onDestroyCb: Function[] = []
+  private onDestroyCb: (() => void)[] = []
 
   constructor(
     private store$: Store<any>,

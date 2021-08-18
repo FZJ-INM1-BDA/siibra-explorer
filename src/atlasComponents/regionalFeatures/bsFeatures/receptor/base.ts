@@ -1,6 +1,7 @@
-import { Input } from "@angular/core";
+import { Directive, Input } from "@angular/core";
 import { TBSDetail } from "./type";
 
+@Directive()
 export class BsFeatureReceptorBase {
   @Input()
   bsFeature: TBSDetail

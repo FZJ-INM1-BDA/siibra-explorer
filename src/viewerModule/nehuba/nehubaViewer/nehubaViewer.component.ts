@@ -134,8 +134,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   public ondestroySubscriptions: Subscription[] = []
 
-  private createNehubaPromiseRs: Function
-  private createNehubaPromise = new Promise(rs => {
+  private createNehubaPromiseRs: () => void
+  private createNehubaPromise = new Promise<void>(rs => {
     this.createNehubaPromiseRs = rs
   })
 

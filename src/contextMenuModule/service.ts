@@ -18,7 +18,7 @@ type TSimple = {
 
 type TTmplRef = (TTmpl | TSimple) & {
   order?: number
-  onClick?: Function
+  onClick?: (...arg: any) => void
 }
 
 type CtxMenuInterArg<T> = {

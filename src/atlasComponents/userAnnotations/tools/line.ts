@@ -12,7 +12,7 @@ import {
   TCallbackFunction,
 } from "./type";
 import { Point, TPointJsonSpec } from './point'
-import { OnDestroy } from "@angular/core";
+import { Directive, Injectable, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
@@ -182,6 +182,7 @@ export class Line extends IAnnotationGeometry{
 
 export const LINE_ICON_CLASS = 'fas fa-slash'
 
+@Directive()
 export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_line_preview'
   public name = 'Line'

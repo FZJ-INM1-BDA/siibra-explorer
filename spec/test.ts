@@ -10,13 +10,12 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-declare const require: any;
-
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
+  platformBrowserDynamicTesting(),
+  { teardown: { destroyAfterEach: true }},
+)
 
 const testContext = require.context('../src', true, /\.spec\.ts$/)
 testContext.keys().map(testContext)

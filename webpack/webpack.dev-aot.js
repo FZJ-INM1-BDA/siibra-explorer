@@ -1,8 +1,9 @@
 const merge = require('webpack-merge')
 const aotCommon = require('./webpack.aot-common')
 const path = require('path')
+const inputOutput = require('./webpack.entry-output')
 
-module.exports = merge(aotCommon, {
+module.exports = merge(inputOutput, aotCommon, {
   mode: 'development',
   devtool:'source-map',
   devServer: {

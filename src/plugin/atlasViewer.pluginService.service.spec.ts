@@ -11,6 +11,7 @@ import { PureContantService } from "src/util"
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN } from "src/util/constants"
 import { WidgetModule, WidgetServices } from "src/widget"
 import { PluginServices } from "./atlasViewer.pluginService.service"
+import { PluginModule } from "./plugin.module"
 import { PluginUnit } from "./pluginUnit/pluginUnit.component"
 
 const MOCK_PLUGIN_MANIFEST = {
@@ -18,20 +19,6 @@ const MOCK_PLUGIN_MANIFEST = {
   templateURL: 'http://localhost:10001/template.html',
   scriptURL: 'http://localhost:10001/script.js'
 }
-
-@NgModule({
-  declarations: [
-    PluginUnit,
-  ],
-  entryComponents: [
-    PluginUnit
-  ],
-  exports: [
-    PluginUnit
-  ]
-})
-
-class PluginUnitModule{}
 
 const spyfn = {
   appendSrc: jasmine.createSpy('appendSrc')
@@ -52,7 +39,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
           AngularMaterialModule,
           CommonModule,
           WidgetModule,
-          PluginUnitModule,
+          PluginModule,
           HttpClientTestingModule,
           ComponentsModule,
         ],

@@ -55,8 +55,8 @@ describe('> nehubaViewerGlue.component.ts', () => {
   let mockStore: MockStore
   let rootLoader: HarnessLoader
   let fixture: ComponentFixture<NehubaGlueCmp>
-  beforeEach( async(() => {
-    TestBed.configureTestingModule({
+  beforeEach( async () => {
+    await TestBed.configureTestingModule({
       imports: [
         CommonModule,
         AngularMaterialModule,
@@ -116,7 +116,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
         }
       ]
     }).compileComponents()
-  }))
+  })
 
   beforeEach(() => {
     mockStore = TestBed.inject(MockStore)

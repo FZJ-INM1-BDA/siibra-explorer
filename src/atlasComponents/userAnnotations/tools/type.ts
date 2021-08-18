@@ -6,6 +6,8 @@ import { TLineJsonSpec } from "./line"
 import { TPointJsonSpec } from "./point"
 import { TPolyJsonSpec } from "./poly"
 
+type TRecord = Record<string, unknown>
+
 /**
  * base class to be extended by all annotation tools
  * TODO perhaps split into drawing subclass/utility subclass
@@ -158,11 +160,11 @@ export type TToolType = 'selecting' | 'drawing' | 'deletion'
 
 export type TCallback = {
   paintingEnd: {
-    callArg: {}
+    callArg: TRecord
     returns: void
   }
   requestManAnnStream: {
-    callArg: {}
+    callArg: TRecord
     returns: Observable<IAnnotationGeometry[]>
   }
   message: {
@@ -174,7 +176,7 @@ export type TCallback = {
     returns: void
   }
   showList: {
-    callArg: {}
+    callArg: TRecord
     returns: void
   }
 }
@@ -273,7 +275,7 @@ export abstract class IAnnotationGeometry extends Highlightable {
 
   abstract getNgAnnotationIds(): string[]
   abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
-  abstract toJSON(): object
+  abstract toJSON(): TRecord
   abstract toString(): string
   abstract toSands(): ISandsAnnotation[keyof ISandsAnnotation]
 

@@ -5,12 +5,17 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2015",
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "paths": {
       "third_party/*" : ["third_party/*"],
       "src/*" : ["src/*"],
       "common/*": ["common/*"]
     }
+  },
+  "angularCompilerOptions":{
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
+    "annotateForClosureCompiler" : true
   }
 }

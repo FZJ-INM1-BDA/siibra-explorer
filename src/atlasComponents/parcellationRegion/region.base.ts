@@ -1,4 +1,4 @@
-import { EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
+import { Directive, EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
 import { distinctUntilChanged, switchMap, filter, map, withLatestFrom, tap } from "rxjs/operators";
@@ -9,6 +9,7 @@ import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewe
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
 import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
+@Directive()
 export class RegionBase {
 
   public rgbString: string
