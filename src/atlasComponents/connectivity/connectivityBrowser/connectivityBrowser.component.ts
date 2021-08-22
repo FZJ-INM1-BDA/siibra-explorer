@@ -7,7 +7,7 @@ import {
   Output,
   ViewChild,
   Input,
-  OnInit, Inject,
+  OnInit, Inject, TemplateRef,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
@@ -23,6 +23,7 @@ import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
 import {getIdFromKgIdObj} from "common/util";
 import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
@@ -137,6 +138,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public selectedDatasetKgId: string = ''
     public selectedDatasetKgSchema: string = ''
     public connectedAreas = []
+    public fullGridPixelSize = 10
 
     private selectedParcellationFlatRegions$ = this.store$.pipe(
       select(viewerStateAllRegionsFlattenedRegionSelector)
@@ -152,11 +154,16 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
-
+    
+    @ViewChild('fullGridTmp') public fullGridTmp: TemplateRef<any>
+  
+    private fullGridDialogRef: MatDialogRef<any>
+  
     constructor(
         private store$: Store<any>,
         private changeDetectionRef: ChangeDetectorRef,
-        private httpClient: HttpClient,
+        private httpClient: HttpClient, 
+        private matDialog: MatDialog,
         @Inject(BS_ENDPOINT) private siibraApiUrl: string,
     ) {
 
@@ -164,6 +171,14 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         select(viewerStateOverwrittenColorMapSelector),
         distinctUntilChanged()
       )
+    }
+
+    expandFullGridDialog() {
+      this.fullGridDialogRef = this.matDialog.open(this.fullGridTmp, {
+        // autoFocus: false,
+        panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
+        // ...overwriteConfig
+      })
     }
 
     public loadUrl: string

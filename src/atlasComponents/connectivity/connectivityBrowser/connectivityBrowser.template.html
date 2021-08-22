@@ -48,6 +48,12 @@
                     </button>
                     <button class="flex-grow-0 flex-shrink-0"
                             mat-icon-button
+                            (click)="expandFullGridDialog()"
+                    >
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="flex-grow-0 flex-shrink-0"
+                            mat-icon-button
                             (click)="exportFullConnectivity()"
                             matTooltip="Export full connectivity profile">
                         <i class="fas fa-download"></i>
@@ -88,10 +94,38 @@
             </button>
         </div>
     </hbp-connectivity-matrix-row>
-    <full-connectivity-grid #fullConnectivityGrid
-                            [loadurl]="fullConnectivityLoadUrl"
-                            [name]="selectedDataset"
-                            [description]="selectedDatasetDescription"
-                            onlyExport="true">
-    </full-connectivity-grid>
+<!--    <full-connectivity-grid #fullConnectivityGrid-->
+<!--                            [loadurl]="fullConnectivityLoadUrl"-->
+<!--                            [name]="selectedDataset"-->
+<!--                            [description]="selectedDatasetDescription"-->
+<!--                            onlyExport="true">-->
+<!--    </full-connectivity-grid>-->
 </div>
+
+<ng-template #fullGridTmp>
+    <div class="d-flex flex-column align-content-start">
+        <div class="d-block">
+            <div class="d-flex align-items-center">
+                <mat-slider
+                        class="mr-4"
+                        [max]="10"
+                        [min]="1"
+                        [step]="1"
+                        [thumbLabel]="fullGridPixelSize"
+                        [tickInterval]="1"
+                        [(ngModel)]="fullGridPixelSize"
+                        [vertical]="false"
+                        aria-labelledby="Connectivity grid slider, to change pixel size.">
+                </mat-slider>
+                <span class="text-nowrap">{{selectedDataset}}</span>
+            </div>
+        </div>
+        <div class="d-block">
+            <full-connectivity-grid #fullConnectivityGrid
+                                    theme="dark"
+                                    [pixelsize]="fullGridPixelSize"
+                                    [loadurl]="fullConnectivityLoadUrl">
+            </full-connectivity-grid>
+        </div>
+    </div>
+</ng-template>

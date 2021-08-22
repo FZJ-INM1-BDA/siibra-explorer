@@ -4,10 +4,12 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { ConnectivityBrowserComponent } from "./connectivityBrowser/connectivityBrowser.component";
 import {HasConnectivity} from "src/atlasComponents/connectivity/hasConnectivity.directive";
 import {KgDatasetModule} from "src/atlasComponents/regionalFeatures/bsFeatures/kgDataset";
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     KgDatasetModule,
     AngularMaterialModule
   ],
