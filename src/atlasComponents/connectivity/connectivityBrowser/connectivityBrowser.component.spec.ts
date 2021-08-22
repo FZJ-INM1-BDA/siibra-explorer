@@ -9,6 +9,7 @@ import {Observable, of} from "rxjs";
 import { viewerStateAllRegionsFlattenedRegionSelector, viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import {BS_ENDPOINT} from "src/util/constants";
+import {MatDialogModule} from "@angular/material/dialog";
 
 /**
  * injecting databrowser module is bad idea
@@ -59,6 +60,7 @@ describe('ConnectivityComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
+                MatDialogModule
             ],
             providers: [
                 provideMockActions(() => actions$),
