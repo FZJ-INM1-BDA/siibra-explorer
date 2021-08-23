@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -v \
             -X POST \
-            -H "Authorization: Token ${{ github.token }}" \
+            -H "Authorization: Bearer ${{ github.token }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${URL_ROOT}/statuses/${SHA} \
             -d '{
@@ -106,7 +106,7 @@ jobs:
           [[ '${{ needs.e2e.outputs.failure-state }}' = 'true' ]] && state=failure || state=success &&
           curl -v \
             -X POST \
-            -H "Authorization: Token ${{ github.token }}" \
+            -H "Authorization: Bearer ${{ github.token }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${URL_ROOT}/statuses/${SHA} \
             -d '{
