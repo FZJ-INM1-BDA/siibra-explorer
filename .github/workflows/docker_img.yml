@@ -157,7 +157,7 @@ jobs:
 
           curl -v \
             -X POST \
-            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
             -d '{
