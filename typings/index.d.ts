@@ -10,7 +10,3 @@ declare module '*.css' {
 
 declare module '*.md'
 
-// declare module '!!raw-loader!*' {
-//   const contents: string;
-//   export = contents;
-// }
