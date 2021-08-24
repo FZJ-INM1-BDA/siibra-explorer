@@ -413,12 +413,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     const getCondition = (label: number) => `if(label > ${label - 0.1} && label < ${label + 0.1} ){${FRAGMENT_EMIT_RED}}`
     const newShader = `void main(){ ${labels.map(getCondition).join('else ')}else {${FRAGMENT_EMIT_WHITE}} }`
     if (!this.nehubaViewer) {
-      if (!PRODUCTION) { this.log.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined') }
+      this.log.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined')
       return
     }
     const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(NG_LANDMARK_LAYER_NAME)
     if (!landmarkLayer) {
-      if (!PRODUCTION) { this.log.warn('landmark layer could not be found ... will not update colour map') }
+      this.log.warn('landmark layer could not be found ... will not update colour map')
       return
     }
     if (labels.length === 0) {

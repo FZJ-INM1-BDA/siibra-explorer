@@ -9,8 +9,3 @@ kg-ds-prv-regional-feature-view
   display: block;
   min-height: 20em;
 }
-
-kg-ds-prv-regional-feature-view >>> div
-{
-  min-height: 20em;
-}

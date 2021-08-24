@@ -150,8 +150,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     public noDataReceived = false
 
-    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
-    @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
+    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
+    @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
 
     constructor(
         private store$: Store<any>,
@@ -281,8 +281,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
               // ToDo Fix in future to use component
-              const a = document.querySelector('hbp-connectivity-matrix-row')
-              a.downloadCSV()
+              const a = document.querySelector('hbp-connectivity-matrix-row');
+              (a as any).downloadCSV()
             }
           }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
@@ -432,8 +432,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     exportConnectivityProfile() {
-      const a = document.querySelector('hbp-connectivity-matrix-row')
-      a.downloadCSV()
+      const a = document.querySelector('hbp-connectivity-matrix-row');
+      (a as any).downloadCSV()
     }
 
     public exportFullConnectivity() {

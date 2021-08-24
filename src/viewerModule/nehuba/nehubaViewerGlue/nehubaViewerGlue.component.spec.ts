@@ -1,9 +1,9 @@
 import { CommonModule } from "@angular/common"
 import { Component, Directive } from "@angular/core"
-import { async, ComponentFixture, TestBed } from "@angular/core/testing"
+import { ComponentFixture, TestBed } from "@angular/core/testing"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { NEVER, of, Subject } from "rxjs"
+import { NEVER, Subject } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { ClickInterceptorService } from "src/glue"
 import { LayoutModule } from "src/layouts/layout.module"
@@ -25,6 +25,8 @@ import { selectorAuxMeshes } from "../store"
 import { TouchSideClass } from "../touchSideClass.directive"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { HarnessLoader } from "@angular/cdk/testing"
+import { NehubaModule } from "../module"
+import { NEHUBA_VIEWER_FEATURE_KEY } from "../constants"
 
 
 @Component({
@@ -68,6 +70,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
         WindowResizeModule,
         FormsModule,
         ReactiveFormsModule,
+        // NehubaModule,
       ],
       declarations: [
         NehubaGlueCmp,

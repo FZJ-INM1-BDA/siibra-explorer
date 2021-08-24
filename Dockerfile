@@ -24,6 +24,9 @@ ENV MATOMO_ID=${MATOMO_ID}
 COPY . /iv
 WORKDIR /iv
 
+# angular 12 echo the env var into src/environments/environment.prod.ts
+RUN node ./src/environments/parseEnv.js
+
 # When building in local, where node_module already exist, prebuilt binary may throw an error
 RUN rm -rf ./node_modules
 

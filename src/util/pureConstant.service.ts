@@ -7,7 +7,7 @@ import { HttpClient } from "@angular/common/http";
 import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
 import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { BS_ENDPOINT } from "src/util/constants";
+import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
 import { flattenReducer } from 'common/util'
 import { TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate } from "./fn";
@@ -178,7 +178,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
 
   private atlasParcSpcRegionMap = new MultiDimMap()
 
-  private _backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
+  private _backendUrl = (BACKENDURL && `${BACKENDURL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
   get backendUrl() {
     console.warn(`something is using backendUrl`)
     return this._backendUrl

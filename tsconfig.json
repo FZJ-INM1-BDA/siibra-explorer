@@ -4,7 +4,7 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "module": "esnext",
-    "target": "es2015",
+    "target": "es2020",
     "sourceMap": false,
     "baseUrl": ".",
     "paths": {

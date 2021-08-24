@@ -112,10 +112,10 @@ describe('> layerDetail.component.ts', () => {
       })
   
       it('> on bind input, if input is truthy, calls get on layerService maps', () => {
-        const service = TestBed.inject(NgLayersService)
         TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
           useValue: {}
         })
+        const service = TestBed.inject(NgLayersService)
         const {
           brightnessMapGetSpy,
           contractMapGetSpy,

@@ -229,6 +229,8 @@ const getuserLandmarksVtk = (action) => {
 let plotyVtkUrl
 
 onmessage = (message) => {
+  // in dev environment, webpack ok is sent
+  if (message.data.type === 'webpackOk') return
 
   if (message.data.method && VALID_METHODS.indexOf(message.data.method) >= 0) {
     const { id } = message.data

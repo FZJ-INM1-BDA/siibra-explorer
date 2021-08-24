@@ -35,6 +35,7 @@ import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
+import { environment } from 'src/environments/environment'
 
 /**
  * TODO
@@ -149,7 +150,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
 
-    if (KIOSK_MODE) {
+    if (environment.KIOSK_MODE) {
 
       this.subscriptions.push(
         merge(
@@ -330,7 +331,7 @@ If you have any comments or need further support, please contact us at [${this.p
   }
 
   @HostBinding('attr.version')
-  public _version: string = VERSION
+  public _version: string = environment.VERSION
 }
 
 export interface INgLayerInterface {

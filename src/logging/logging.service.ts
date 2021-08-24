@@ -1,6 +1,7 @@
 // tslint:disable:no-console
 
 import { Injectable } from "@angular/core";
+import { environment } from 'src/environments/environment'
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Injectable } from "@angular/core";
 export class LoggingService {
 
   get loggingFlag(){
-    return window['__IAV_LOGGING_FLAG__'] || !PRODUCTION
+    return window['__IAV_LOGGING_FLAG__'] || !environment.PRODUCTION
   }
 
   public log(...arg) {
