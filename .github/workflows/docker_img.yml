@@ -157,11 +157,11 @@ jobs:
 
           curl -v \
             -X POST \
-            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
             -d '{
-              "target_url":"$DEPLOY_URL",
+              "target_url":"'$DEPLOY_URL'",
               "name": "Deployed at OKD",
               "state": "success"
             }'
