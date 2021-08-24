@@ -161,7 +161,7 @@ jobs:
             -H 'accept: application/vnd.github.v3+json' \
             ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
             -d '{
-              "target_url":"$DEPLOY_URL",
+              "target_url":"'$DEPLOY_URL'",
               "name": "Deployed at OKD",
               "state": "success"
             }'
