@@ -8,7 +8,7 @@ A live version of the Interactive Atlas Viewer is available at [https://interact
 
 ### General information
 
-Interactive atlas viewer is built with [Angular (v9.0)](https://angular.io/), [Bootstrap (v4)](http://getbootstrap.com/), and [fontawesome icons](https://fontawesome.com/). Some other notable packages used are [ngrx/store](https://github.com/ngrx/platform) for state management. 
+Interactive atlas viewer is built with [Angular (v12.0)](https://angular.io/), [Bootstrap (v4)](http://getbootstrap.com/), and [fontawesome icons](https://fontawesome.com/). Some other notable packages used are [ngrx/store](https://github.com/ngrx/platform) for state management. 
 
 Releases newer than [v0.2.9](https://github.com/HumanBrainProject/interactive-viewer/tree/v0.2.9) also uses a nodejs backend, which uses [passportjs](http://www.passportjs.org/) for user authentication, [express](https://expressjs.com/) as a http framework.
 
@@ -16,7 +16,7 @@ Releases newer than [v0.2.9](https://github.com/HumanBrainProject/interactive-vi
 
 #### Prerequisites
 
-- node >= 12
+- latest version of node 12.x.x or node 14.x.x
 
 #### Environments
 

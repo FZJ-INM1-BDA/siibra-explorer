@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common'
-import { async, TestBed } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { ComponentsModule } from 'src/components'
 import { AngularMaterialModule } from 'src/sharedModules'
-import { PureContantService, UtilModule } from 'src/util'
+import { QuickTourModule } from 'src/ui/quickTour'
+import { PureContantService } from 'src/util'
+import { UtilModule } from 'src/util/util.module'
 import { HelpOnePager } from './helpOnePager.component'
 
 describe('> helpOnePager.component.ts', () => {
   describe('> HelpOnePager', () => {
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    beforeEach(async() => {
+      await TestBed.configureTestingModule({
         imports: [
           ComponentsModule,
           CommonModule,
@@ -17,6 +19,7 @@ describe('> helpOnePager.component.ts', () => {
            */
           UtilModule,
           AngularMaterialModule,
+          QuickTourModule
         ],
         declarations: [
           HelpOnePager,
@@ -28,7 +31,7 @@ describe('> helpOnePager.component.ts', () => {
           }
         ]
       }).compileComponents()
-    }))
+    })
     it('> should render a table', () => {
       const fixture = TestBed.createComponent(HelpOnePager)
       fixture.detectChanges()

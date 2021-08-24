@@ -1,7 +1,9 @@
 import { Component, Optional } from "@angular/core";
-import QUICK_STARTER from '!!raw-loader!common/helpOnePager.md'
 import { PureContantService } from "src/util";
 import { ARIA_LABELS } from 'common/constants'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { default: QUICK_STARTER } = require('!!raw-loader!common/helpOnePager.md')
 
 @Component({
   selector: 'help-one-pager',

@@ -1,7 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import info from '!!raw-loader!../data/info.md'
-import readmore from '!!raw-loader!../data/readmore.md'
-import matomoInfo from '!!raw-loader!../data/aboutMatomo.md'
+import { environment } from 'src/environments/environment'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { default: info } = require('!!raw-loader!../data/info.md')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { default: readmore } = require('!!raw-loader!../data/readmore.md')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { default: matomoInfo } = require('!!raw-loader!../data/aboutMatomo.md')
 
 @Component({
   selector: 'cookie-agreement',
@@ -16,7 +21,7 @@ export class CookieAgreement {
   public showMore: boolean = false
   public showMamoto: boolean = false
 
-  public matomoUrl: string = MATOMO_URL
+  public matomoUrl: string = environment.MATOMO_URL
 
   public markdownInfo: string = info
   public markdownReadmore: string = readmore

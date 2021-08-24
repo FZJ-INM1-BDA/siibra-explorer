@@ -231,7 +231,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       const { register, deregister } = clickInterceptor
       register(handleClick)
       this.onDestroyCb.push(
-        () => deregister(register)
+        () => { deregister(register) }
       )
     }
     

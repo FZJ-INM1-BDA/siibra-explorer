@@ -42,40 +42,26 @@ const serviceStub = {
   ])
 }
 
-@NgModule({
-  declarations: [
-    FeatureContainer,
-    DummyComponent,
-  ],
-  entryComponents: [
-    DummyComponent
-  ],
-  providers: [
-    {
-      provide: RegionalFeaturesService,
-      useValue: serviceStub
-    }
-  ],
-  exports: [
-    FeatureContainer,
-    DummyComponent,
-  ]
-})
-
-class DummyModule{}
-
 describe('> featureContainer.component.ts', () => {
   describe('> FeatureContainer', () => {
 
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    beforeEach(async () => {
+
+      await TestBed.configureTestingModule({
         imports: [
           CommonModule,
-          DummyModule,
         ],
         declarations: [
+          FeatureContainer,
+          DummyComponent,
           HostCmp,
         ],
+        providers: [
+          {
+            provide: RegionalFeaturesService,
+            useValue: serviceStub
+          }
+        ]
       }).overrideComponent(HostCmp, {
         set: {
           template: `
@@ -87,7 +73,7 @@ describe('> featureContainer.component.ts', () => {
         }
       }).compileComponents()
 
-    }))
+    })
 
     it('> can be created', () => {
       const fixture = TestBed.createComponent(HostCmp)

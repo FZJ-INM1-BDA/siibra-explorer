@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders, HttpErrorResponse} from "@angular/common/http";
 import { catchError, timeout, map } from "rxjs/operators";
 import { of, Observable } from "rxjs";
+import { environment } from 'src/environments/environment'
 
 export interface ITemplateCoordXformResp{
   status: 'pending' | 'error' | 'completed'
@@ -28,7 +29,7 @@ export class TemplateCoordinatesTransformation {
 
   constructor(private httpClient: HttpClient) {}
 
-  public url = `${SPATIAL_TRANSFORM_BACKEND.replace(/\/$/, '')}/v1/transform-points`
+  public url = `${environment.SPATIAL_TRANSFORM_BACKEND.replace(/\/$/, '')}/v1/transform-points`
 
   // jasmine marble cannot test promise properly
   // see https://github.com/ngrx/platform/issues/498#issuecomment-337465179

@@ -23,6 +23,11 @@ import '!!file-loader?context=src/res&name=icons/iav-icons.svg!src/res/icons/iav
  */
 import '!!file-loader?context=src/res/favicons&name=favicon-128-light.png!src/res/favicons/favicon-128-light.png'
 
+/**
+ * version css
+ */
+import '!!file-loader?name=version.css!src/version.css'
+
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
 
@@ -30,12 +35,11 @@ import * as ConnectivityComponent from 'hbp-connectivity-component/dist/loader'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 
+import { environment } from 'src/environments/environment'
+const { PRODUCTION, VERSION } = environment
 if (PRODUCTION) enableProdMode()
 if (PRODUCTION) { console.log(`Interactive Atlas Viewer: ${VERSION}`) }
 
-const requireAll = (r: any) => {r.keys().forEach(r)}
-requireAll(require.context('./res/images', true, /\.jpg$|\.png$|\.svg$/))
-requireAll(require.context(`./plugin_examples`, true))
 
 platformBrowserDynamic().bootstrapModule(MainModule)
 

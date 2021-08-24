@@ -96,13 +96,7 @@ describe('> nehubaViewer.component.ts', () => {
         providers:[
           {
             provide: IMPORT_NEHUBA_INJECT_TOKEN,
-            useFactory: importNehubaFactory,
-            deps: [ APPEND_SCRIPT_TOKEN ]
-          },
-          {
-            provide: APPEND_SCRIPT_TOKEN,
-            useFactory: appendScriptFactory,
-            deps: [ DOCUMENT ]
+            useValue: () => Promise.resolve(),
           },
           {
             provide: SET_MESHES_TO_LOAD,
@@ -185,8 +179,10 @@ describe('> nehubaViewer.component.ts', () => {
         it('> navtive loadMeshes method will not trigger loadMesh call',fakeAsync(() => {
 
           const fixture = TestBed.createComponent(NehubaViewerUnit)
+          fixture.detectChanges()
+          const setMeshToLoadSpy = jasmine.createSpy('setMeshesToLoad').and.returnValue(null)
           fixture.componentInstance.nehubaViewer = {
-            setMeshesToLoad: jasmine.createSpy('setMeshesToLoad').and.returnValue(null),
+            setMeshesToLoad: setMeshToLoadSpy,
             dispose: () => {}
           }
   
@@ -198,7 +194,7 @@ describe('> nehubaViewer.component.ts', () => {
             labelIndicies: [1,2,3]
           })
           tick(1000)
-          expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).not.toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
+          expect(setMeshToLoadSpy).not.toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
         }))
 
         it('> when injected obs emits, will trigger loadMesh call', fakeAsync(() => {
@@ -275,30 +271,37 @@ describe('> nehubaViewer.component.ts', () => {
           tick(640)
         }
         describe('> emits []', () => {
-          it('> call manage layers', fakeAsync(() => {
+          beforeEach(fakeAsync(() => {
             setup()
-            expect(managedLayersSpy).toHaveBeenCalled()
           }))
+          it('> call manage layers', () => {
+            expect(managedLayersSpy).toHaveBeenCalled() 
+          })
           it('> layers have visibility set off', fakeAsync(() => {
-            setup()
             expect(managedLayer.setVisible).toHaveBeenCalledWith(false)
           }))
         })
 
         describe('> emits ["something"]', () => {
-          it('> calls getLayerByname',fakeAsync(() => {
-            setup(['something'])
-            expect(layerManager.getLayerByName).toHaveBeenCalledWith('something')
-          }))
-
-          it('> if returns layer, expects setVisible to be called', fakeAsync(() => {
+          let layerSetVisibleSpy: jasmine.Spy
+          beforeEach(fakeAsync(() => {
+            layerSetVisibleSpy = jasmine.createSpy()
             const layer = {
-              setVisible: jasmine.createSpy()
+              setVisible: layerSetVisibleSpy
             }
             getLayerByNameSpy.and.returnValue(layer)
             setup(['something'])
-            expect(layer.setVisible).toHaveBeenCalledWith(true)
           }))
+          it('> calls getLayerByname', () => {
+            expect(layerManager.getLayerByName).toHaveBeenCalledWith('something')
+          })
+
+          it('> getLayerByNameSpy called', () => {
+            expect(getLayerByNameSpy).toHaveBeenCalled()
+          })
+          it('> if returns layer, expects setVisible to be called', () => {
+            expect(layerSetVisibleSpy).toHaveBeenCalledWith(true)
+          })
         })
       })
     })
@@ -313,7 +316,8 @@ describe('> nehubaViewer.component.ts', () => {
          * set nehubaViewer, since some methods check viewer is loaded
          */
          fixture.componentInstance.nehubaViewer = {
-           ngviewer: {}
+           ngviewer: {},
+           dispose: () => {}
          }
         fixture.detectChanges()
         prvSetCMSpy = spyOn<any>(fixture.componentInstance, 'setColorMap').and.callFake(() => {})
@@ -322,15 +326,21 @@ describe('> nehubaViewer.component.ts', () => {
       beforeEach(() => {
         provideSetColorObs = true
       })
-      it('> if obs does not emit, does not call setcolormap', fakeAsync(() => {
-        setup()
-        tick(320)
-        expect(prvSetCMSpy).not.toHaveBeenCalled()
-      }))
+      describe('> obs does not emit', () => {
+        beforeEach(fakeAsync(() => {
+          setup()
+          tick(320)
+        }))
+        it('> does not call set colormap', () => {
+          expect(prvSetCMSpy).not.toHaveBeenCalled()
+        })
+      })
 
       describe('> if obs does emit', () => {
-        it('> setcolormap gets called', fakeAsync(() => {
+        beforeEach(() => {
           setup()
+        })
+        it('> setcolormap gets called', fakeAsync(() => {
           setcolorMap$.next({
             'foo-bar': {
               1: { red: 100, green: 100, blue: 100 },
@@ -346,7 +356,6 @@ describe('> nehubaViewer.component.ts', () => {
         }))
 
         it('> call arg is as expected', fakeAsync(() => {
-          setup()
           setcolorMap$.next({
             'foo-bar': {
               1: { red: 100, green: 100, blue: 100 },

@@ -60,7 +60,8 @@ export class MessagingService {
     }
 
     window.addEventListener('message', async ({ data, origin, source }) => {
-      
+      if (/^webpack/.test(data.type)) return
+      if (data === '') return
       const src = source as Window
       const { id } = data
       try {

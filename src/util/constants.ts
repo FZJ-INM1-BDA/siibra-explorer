@@ -1,4 +1,5 @@
 import { HttpHeaders } from "@angular/common/http"
+import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
@@ -14,8 +15,9 @@ export const LOCAL_STORAGE_CONST = {
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
-export const DS_PREVIEW_URL = DATASET_PREVIEW_URL
+export const DS_PREVIEW_URL = environment.DATASET_PREVIEW_URL
 export const BACKENDURL = (() => {
+  const { BACKEND_URL } = environment
   if (!BACKEND_URL) return `http://localhost:3000/`
   if (/^http/.test(BACKEND_URL)) return BACKEND_URL
 

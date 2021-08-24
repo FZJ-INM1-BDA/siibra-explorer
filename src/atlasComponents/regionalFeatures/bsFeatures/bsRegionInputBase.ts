@@ -3,8 +3,9 @@ import { map, switchMap } from "rxjs/operators";
 import { TRegion, IBSSummaryResponse, IBSDetailResponse } from "./type";
 import { BsFeatureService, TFeatureCmpInput } from "./service";
 import { flattenReducer } from 'common/util'
-import { Input } from "@angular/core";
+import { Directive, Input } from "@angular/core";
 
+@Directive()
 export class BsRegionInputBase{
 
   protected region$ = new BehaviorSubject<TRegion>(null)

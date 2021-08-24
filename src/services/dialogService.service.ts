@@ -22,7 +22,7 @@ export class DialogService {
     })
     return new Promise((resolve, reject) => this.confirmDialogRef.afterClosed()
       .subscribe(val => {
-        if (val) { resolve() } else { reject('User cancelled') }
+        if (val) { resolve('Success') } else { reject('User cancelled') }
       },
       reject,
       () => this.confirmDialogRef = null))

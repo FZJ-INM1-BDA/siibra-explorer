@@ -44,7 +44,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   public loadMesh$ = new Subject<ILoadMesh>()
 
-  private onDestoryCb: Function[] = []
+  private onDestoryCb: (() => void)[] = []
   private loadedTemplates$: Observable<any>
   private selectParcellation$: Observable<any>
   public interactiveViewer: IInteractiveViewerInterface
@@ -64,7 +64,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   }
 
-  private dismissDialog: Function
+  private dismissDialog: () => void
   public getUserToSelectRegion: IGetUserSelectRegionPr[] = []
   public getUserToSelectRegionUI$: Subject<IGetUserSelectRegionPr[]> = new Subject()
 

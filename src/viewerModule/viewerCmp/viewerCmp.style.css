@@ -41,11 +41,6 @@
   bottom: 0.5rem;
 }
 
-:host >>> .mat-chip-list-wrapper
-{
-  flex-wrap: nowrap;
-}
-
 mat-drawer
 {
   overflow-x: hidden;

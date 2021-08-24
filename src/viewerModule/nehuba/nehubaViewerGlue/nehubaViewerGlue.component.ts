@@ -84,7 +84,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
   public viewerLoaded: boolean = false
 
   private onhoverSegments = []
-  private onDestroyCb: Function[] = []
+  private onDestroyCb: (() => void)[] = []
   private viewerUnit: NehubaViewerUnit
   private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>>
 

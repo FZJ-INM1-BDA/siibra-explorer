@@ -13,15 +13,6 @@ mat-card
   z-index: 10;
 }
 
-.custom-svg >>> svg
-{
-  pointer-events: none;
-  stroke-width: 3px;
-  stroke: rgb(255, 255, 255);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .progress-dot
 {
   transition: opacity ease-in-out 300ms;

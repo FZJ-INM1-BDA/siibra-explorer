@@ -1,9 +1,10 @@
-import { EventEmitter, Input, Output, SimpleChanges } from "@angular/core"
+import { Directive, EventEmitter, Input, Output, SimpleChanges } from "@angular/core"
 import { BehaviorSubject, forkJoin, Observable, of } from "rxjs"
 import { catchError, shareReplay, switchMap, tap } from "rxjs/operators"
 import { IHasId } from "src/util/interfaces"
 import { IFeature, RegionalFeaturesService } from "../../regionalFeature.service"
 
+@Directive()
 export class RegionFeatureBase{
 
   private _feature: IFeature

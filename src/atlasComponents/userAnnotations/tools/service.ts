@@ -80,7 +80,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private selectedTmpl$ = this.store.pipe(
     select(viewerStateSelectedTemplatePureSelector),
   )
-  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
+  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: () => void}[] = []
   private managedAnnotationsStream$ = new Subject<{
     tool: string
     annotations: IAnnotationGeometry[]
@@ -157,7 +157,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     editCmp?: ClassInterface<any>
   }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
-    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: Function }
+    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({
