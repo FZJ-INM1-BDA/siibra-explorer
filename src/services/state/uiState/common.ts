@@ -17,7 +17,7 @@ export interface IUiState{
 
   focusedSidePanel: string | null
 
-  snackbarMessage: string
+  snackbarMessage: Symbol
 
   agreedCookies: boolean
   agreedKgTos: boolean

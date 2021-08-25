@@ -144,9 +144,6 @@ for (const key in parsed){
  * The constraint is that the cipher needs to be commpatible with URI encoding
  * and a URI compatible separator is required. 
  * 
- * The implementation below came from 
- * https://stackoverflow.com/a/6573119/6059235
- * 
  * While a faster solution exist in the same post, this operation is expected to be done:
  * - once per 1 sec frequency
  * - on < 1000 numbers
@@ -159,10 +156,9 @@ export const separator = "."
 const negString = '~'
 
 const encodeInt = number => {
-  if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
-  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) throw 'The input is not valid'
+  if (number % 1 !== 0) { throw new Error('cannot encodeInt on a float. Ensure float flag is set') }
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) { throw new Error('The input is not valid') }
 
-  let rixit // like 'digit', only in some non-decimal radix 
   let residual
   let result = ''
 
@@ -174,18 +170,13 @@ const encodeInt = number => {
   }
 
   while (true) {
-    rixit = residual % 64
-    // console.log("rixit : " + rixit)
-    // console.log("result before : " + result)
-    result = cipher.charAt(rixit) + result
-    // console.log("result after : " + result)
-    // console.log("residual before : " + residual)
+    result = cipher.charAt(residual % 64) + result
     residual = Math.floor(residual / 64)
-    // console.log("residual after : " + residual)
 
-    if (residual == 0)
-      break;
+    if (residual === 0) {
+      break
     }
+  }
   return result
 }
 
