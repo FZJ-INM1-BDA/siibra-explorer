@@ -77,7 +77,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private newViewer$: Observable<any>
 
   private snackbarRef: MatSnackBarRef<any>
-  public snackbarMessage$: Observable<Symbol>
+  public snackbarMessage$: Observable<symbol>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
