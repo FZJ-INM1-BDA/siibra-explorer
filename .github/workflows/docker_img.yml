@@ -14,7 +14,7 @@ jobs:
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
       SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v1_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v1_0'
-      SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0'
+      SIIBRA_API_LATEST: 'https://siibra-api-stable.apps.hbp.eu/v1_0'
 
     steps:
     - uses: actions/checkout@v2
