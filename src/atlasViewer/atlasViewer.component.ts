@@ -77,7 +77,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private newViewer$: Observable<any>
 
   private snackbarRef: MatSnackBarRef<any>
-  public snackbarMessage$: Observable<string>
+  public snackbarMessage$: Observable<symbol>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
@@ -205,8 +205,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
         if (!messageSymbol) { return }
 
-        // https://stackoverflow.com/a/48191056/6059235
-        const message = messageSymbol.toString().slice(7, -1)
+        const message = messageSymbol.description
         this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
           duration: 5000,
         })
