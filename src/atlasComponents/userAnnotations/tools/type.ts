@@ -16,9 +16,9 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
   public abstract name: string
   public abstract iconClass: string
 
-  public abstract addAnnotation(annotation: T): void
   public abstract removeAnnotation(id: string): void
-  public abstract managedAnnotations$: Observable<T[]>
+  public abstract managedAnnotations$: Subject<T[]>
+  protected abstract managedAnnotations: T[] = []
 
   abstract subs: Subscription[]
   protected space: TBaseAnnotationGeomtrySpec['space']
@@ -152,6 +152,14 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
       }),
     ))
   )
+
+  public addAnnotation(geom: T) {
+    const found = this.managedAnnotations.find(ann => ann.id === geom.id)
+    if (found) found.remove()
+    geom.remove = () => this.removeAnnotation(geom.id)
+    this.managedAnnotations.push(geom)
+    this.managedAnnotations$.next(this.managedAnnotations)
+  }
 }
 
 export type TToolType = 'selecting' | 'drawing' | 'deletion'
