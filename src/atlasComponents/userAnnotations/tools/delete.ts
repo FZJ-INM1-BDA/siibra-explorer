@@ -7,6 +7,7 @@ import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools,
 export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
 
   public subs: Subscription[] = []
+  protected managedAnnotations = []
   toolType: TToolType = 'deletion'
   iconClass = 'fas fa-trash'
   name = 'Delete'

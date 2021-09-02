@@ -89,7 +89,7 @@ export class Polygon extends IAnnotationGeometry{
   }
 
   toString() {
-    return `Points: ${JSON.stringify(this.points.map(p => p.toString()))}, edges: ${JSON.stringify(this.edges)}.`
+    return `Name: ${this.name}, Desc: ${this.desc}, Points: ${JSON.stringify(this.points.map(p => p.toString()))}, edges: ${JSON.stringify(this.edges)}.`
   }
 
   toSands(): TSandsPolyLine{
@@ -233,7 +233,7 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
   private selectedPoly: Polygon
   private lastAddedPoint: Point
 
-  private managedAnnotations: Polygon[] = []
+  protected managedAnnotations: Polygon[] = []
   public managedAnnotations$ = new Subject<Polygon[]>()
 
   public subs: Subscription[] = []
@@ -401,14 +401,6 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
         this.managedAnnotations$.next(this.managedAnnotations)
       }),
     )
-  }
-
-  addAnnotation(poly: Polygon){
-    const idx = this.managedAnnotations.findIndex(ann => ann.id === poly.id)
-    if (idx >= 0) throw new Error(`Polygon already added.`)
-    poly.remove = () => this.removeAnnotation(poly.id)
-    this.managedAnnotations.push(poly)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   removeAnnotation(id: string) {

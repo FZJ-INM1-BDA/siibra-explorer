@@ -1,5 +1,5 @@
 import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TCallbackFunction, TNgAnnotationEv, TSandsPoint, TToolType } from "./type";
-import { merge, Observable, Subject, Subscription } from "rxjs";
+import { Observable, Subject, Subscription } from "rxjs";
 import { OnDestroy } from "@angular/core";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 
@@ -108,7 +108,7 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
   public iconClass = POINT_ICON_CLASS
   
   public subs: Subscription[] = []
-  private managedAnnotations: Point[] = []
+  protected managedAnnotations: Point[] = []
   public managedAnnotations$ = new Subject<Point[]>()
 
   constructor(
@@ -174,14 +174,6 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
         }
       }),
     )
-  }
-
-  addAnnotation(point: Point){
-    const found = this.managedAnnotations.find(p => p.id === point.id)
-    if (found) throw new Error(`Point annotation already added`)
-    point.remove = () => this.removeAnnotation(point.id)
-    this.managedAnnotations.push(point)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   /**

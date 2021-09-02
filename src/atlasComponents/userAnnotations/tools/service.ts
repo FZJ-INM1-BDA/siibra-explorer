@@ -26,6 +26,17 @@ const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': [1000000, 1000000, 1000000]
 }
 
+type TAnnotationMetadata = {
+  id: string
+  name: string
+  desc: string
+}
+
+const descType: 'siibra-ex/meta/desc' = 'siibra-ex/meta/desc'
+type TTypedAnnMetadata = {
+  '@type': 'siibra-ex/meta/desc'
+} & TAnnotationMetadata
+
 function scanCollapse<T>(){
   return (src: Observable<{
     tool: string
@@ -551,13 +562,28 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const anns: IAnnotationGeometry[] = []
     for (const obj of arr) {
       const geometry = this.parseAnnotationObject(obj)
-      anns.push(geometry)
+      if (geometry) anns.push(geometry)
     }
     
     for (const ann of anns) {
       this.importAnnotation(ann)
     }
   }
+
+  public exportAnnotationMetadata(ann: IAnnotationGeometry): TAnnotationMetadata & { '@type': 'siibra-ex/meta/desc' } {
+    return {
+      '@type': descType,
+      id: ann.id,
+      name: ann.name,
+      desc: ann.desc,
+    }
+  }
+
+  /**
+   * stop gap measure when exporting/import annotations in sands format
+   * metadata (name/desc) will be saved in a separate metadata file
+   */
+  private metadataMap = new Map<string, TAnnotationMetadata>()
 
   private storeAnnotation(anns: IAnnotationGeometry[]){
     const arr = []
@@ -626,25 +652,49 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     })
   }
 
-  parseAnnotationObject(json: TSands | TGeometryJson): IAnnotationGeometry{
+  parseAnnotationObject(json: TSands | TGeometryJson | TTypedAnnMetadata): IAnnotationGeometry | null{
+    let returnObj: IAnnotationGeometry
     if (json['@type'] === 'tmp/poly') {
-      return Polygon.fromSANDS(json)
+      returnObj = Polygon.fromSANDS(json)
     }
     if (json['@type'] === 'tmp/line') {
-      return Line.fromSANDS(json)
+      returnObj = Line.fromSANDS(json)
     }
     if (json['@type'] === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
-      return Point.fromSANDS(json)
+      returnObj = Point.fromSANDS(json)
     }
     if (json['@type'] === 'siibra-ex/annotation/point') {
-      return Point.fromJSON(json)
+      returnObj = Point.fromJSON(json)
     }
     if (json['@type'] === 'siibra-ex/annotation/line') {
-      return Line.fromJSON(json)
+      returnObj = Line.fromJSON(json)
     }
     if (json['@type'] === 'siibra-ex/annotation/polyline') {
-      return Polygon.fromJSON(json)
+      returnObj = Polygon.fromJSON(json)
     }
+    if (json['@type'] === descType) {
+      const existingAnn = this.managedAnnotations.find(ann => json.id === ann.id)
+      if (existingAnn) {
+
+        // potentially overwriting existing name and desc...
+        // maybe should show warning?
+        existingAnn.setName(json.name)
+        existingAnn.setDesc(json.desc)
+        return existingAnn
+      } else {
+        const { id, name, desc } = json
+        this.metadataMap.set(id, { id, name, desc })
+        return
+      }
+    } else {
+      const metadata = this.metadataMap.get(returnObj.id)
+      if (returnObj && metadata) {
+        returnObj.setName(metadata?.name || null)
+        returnObj.setDesc(metadata?.desc || null)
+        this.metadataMap.delete(returnObj.id)
+      }
+    }
+    if (returnObj) return returnObj
     throw new Error(`cannot parse annotation object`)
   }
 

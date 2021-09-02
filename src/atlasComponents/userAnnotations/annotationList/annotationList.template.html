@@ -26,7 +26,7 @@
 
             <!-- export -->
             <button mat-icon-button
-                [zip-files-output]="filesExport$ | async"
+                [zip-files-output]="filesExport$"
                 zip-files-output-zip-filename="exported_annotations.zip"
                 [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
                 [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
