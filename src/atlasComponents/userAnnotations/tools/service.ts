@@ -570,7 +570,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
-  public exportAnnotationMetadata(ann: IAnnotationGeometry):TAnnotationMetadata & { '@type': 'siibra-ex/meta/desc' } {
+  public exportAnnotationMetadata(ann: IAnnotationGeometry): TAnnotationMetadata & { '@type': 'siibra-ex/meta/desc' } {
     return {
       '@type': descType,
       id: ann.id,
