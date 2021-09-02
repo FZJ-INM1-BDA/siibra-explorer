@@ -10,6 +10,7 @@ export class ToolSelect extends AbsToolClass<Point> implements IAnnotationTools,
   toolType: TToolType = 'selecting'
   iconClass = 'fas fa-mouse-pointer'
   name = 'Select'
+  protected managedAnnotations = []
 
   onMouseMoveRenderPreview(){
     return []

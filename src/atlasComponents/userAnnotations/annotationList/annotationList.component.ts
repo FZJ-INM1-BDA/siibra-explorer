@@ -3,7 +3,7 @@ import {ARIA_LABELS} from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { IAnnotationGeometry, TExportFormats } from "../tools/type";
 import { ComponentStore } from "src/viewerModule/componentStore";
-import { map, startWith, tap } from "rxjs/operators";
+import { map, shareReplay, startWith } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { TFileInputEvent } from "src/getFileInput/type";
@@ -11,7 +11,7 @@ import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
 
-const README = 'EXAMPLE OF READ ME TEXT'
+const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`
 
 @Component({
   selector: 'annotation-list',
@@ -39,6 +39,7 @@ export class AnnotationList {
 
   public filesExport$: Observable<TZipFileConfig[]> = this.managedAnnotations$.pipe(
     startWith([] as IAnnotationGeometry[]),
+    shareReplay(1),
     map(manAnns => {
       const readme = {
         filename: 'README.md',
@@ -50,7 +51,13 @@ export class AnnotationList {
           filecontent: JSON.stringify(ann.toSands(), null, 2),
         }
       })
-      return [ readme, ...annotationSands ]
+      const annotationDesc = manAnns.map(ann => {
+        return {
+          filename: `${ann.id}.desc.json`,
+          filecontent: JSON.stringify(this.annotSvc.exportAnnotationMetadata(ann), null, 2)
+        }
+      })
+      return [ readme, ...annotationSands, ...annotationDesc ]
     })
   )
   constructor(
@@ -71,7 +78,7 @@ export class AnnotationList {
   private parseAndAddAnnotation(input: string) {
     const json = JSON.parse(input)
     const annotation = this.annotSvc.parseAnnotationObject(json)
-    this.annotSvc.importAnnotation(annotation)
+    if (annotation) this.annotSvc.importAnnotation(annotation)
   }
 
   async handleImportEvent(ev: TFileInputEvent<'text' | 'file'>){

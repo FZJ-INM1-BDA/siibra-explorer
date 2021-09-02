@@ -192,7 +192,7 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
   
   subs: Subscription[] = []
 
-  private managedAnnotations: Line[] = []
+  protected managedAnnotations: Line[] = []
   public managedAnnotations$ = new Subject<Line[]>()
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
@@ -309,14 +309,6 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
 
   ngOnDestroy(){
     this.subs.forEach(s => s.unsubscribe())
-  }
-
-  addAnnotation(line: Line) {
-    const idx = this.managedAnnotations.findIndex(ann => ann.id === line.id)
-    if (idx >= 0) throw new Error(`Line annotation has already been added`)
-    line.remove = () => this.removeAnnotation(line.id)
-    this.managedAnnotations.push(line)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   removeAnnotation(id: string){
