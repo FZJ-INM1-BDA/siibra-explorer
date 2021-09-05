@@ -62,7 +62,7 @@ import { HoverableModule } from './hoverable';
     ClusteringPipe,
     FilterCollapsePipe,
   ],
-  exports : [
+  exports: [
     BrowserAnimationsModule,
     ReadmoreModule,
     HoverableModule,
@@ -78,6 +78,7 @@ import { HoverableModule } from './hoverable';
 
     TreeSearchPipe,
     TreeBaseDirective,
+    HighlightPipe,
   ],
 })
 
