@@ -35,9 +35,7 @@ export class RegionTreeComponent {
   public dataSource: MatTreeFlatDataSource<any, any>
   public lineHeight = 42
   public selectedRegion: any = {}
-
-  constructor() {}
-
+  
   toggleNode(node) {
     if (this.treeControl.isExpanded(node)) {
       this.treeControl.collapseDescendants(node)
