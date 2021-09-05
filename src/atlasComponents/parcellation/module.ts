@@ -8,6 +8,7 @@ import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 import { UtilModule } from "src/util";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components";
+import {RegionTreeComponent} from "src/atlasComponents/parcellation/regionHierachy/region-tree/region-tree.component";
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { ComponentsModule } from "src/components";
     RegionTextSearchAutocomplete,
 
     FilterNameBySearch,
+    RegionTreeComponent
   ],
   exports: [
     RegionHierarchy,
