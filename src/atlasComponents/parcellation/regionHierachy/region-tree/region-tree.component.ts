@@ -47,16 +47,16 @@ export class RegionTreeComponent {
   filterChanged(filterText: string) {
     const filter = (array, text) => {
       const getChildren = (result, object) => {
+        const nameString = object.name.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
+        const textString = text.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
 
-        const objectNameArray = object.name.toLowerCase().split(' ')
-        const textArray = text.toLowerCase().split(' ')
+        const nameArray = nameString.split(' ')
+        const textArray = textString.split(' ')
 
-
-        if (object.name.toLowerCase().includes(text.toLowerCase())) {
+        if (textArray.every(t => nameArray.find(n => n.includes(t)))) {
           result.push(object)
           return result
         }
-
 
         if (Array.isArray(object.children)) {
           const children = object.children.reduce(getChildren, [])
@@ -108,24 +108,9 @@ export class RegionTreeComponent {
           }
         }
       }
-
-
       const nodeIsLast = this.treeControl.dataNodes
         .findIndex((dn, dnIndex) => dnIndex > i && dn.level === node.level) < 0
-
-      // if (node.name ==='diencephalon') {
-      //   console.log(node)
-      //   console.log(this.treeControl.dataNodes
-      //     .findIndex((dn, dnIndex) => dnIndex > i && dn.level === node.level)
-      //   )
-      // }
-
-      // console.log(nodeIsLast)
-
       if (nodeIsLast) {
-
-        // console.log(node.name)
-
         for (let j = i+1; j < this.treeControl.dataNodes.length; j++) {
           this.treeControl.dataNodes[j] = {
             ...this.treeControl.dataNodes[j],
@@ -136,7 +121,6 @@ export class RegionTreeComponent {
           }
         }
       }
-
     }
 
     this.treeControl.expandAll()
