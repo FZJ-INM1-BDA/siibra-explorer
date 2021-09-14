@@ -33,7 +33,7 @@ export class RegionTreeComponent {
 
   public treeControl: FlatTreeControl<any> = new FlatTreeControl<any>((e => e.level), (e => e.hasChildren))
   public dataSource: MatTreeFlatDataSource<any, any>
-  public lineHeight = 42
+  public lineHeight = 30
   public selectedRegion: any = {}
   
   toggleNode(node) {
@@ -47,10 +47,17 @@ export class RegionTreeComponent {
   filterChanged(filterText: string) {
     const filter = (array, text) => {
       const getChildren = (result, object) => {
+
+        const objectNameArray = object.name.toLowerCase().split(' ')
+        const textArray = text.toLowerCase().split(' ')
+
+
         if (object.name.toLowerCase().includes(text.toLowerCase())) {
           result.push(object)
           return result
         }
+
+
         if (Array.isArray(object.children)) {
           const children = object.children.reduce(getChildren, [])
           if (children.length) result.push({ ...object, children })
@@ -76,6 +83,62 @@ export class RegionTreeComponent {
       )
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, treeFlattener)
     this.dataSource.data = filteredItems
+
+    for (let i = 0; i < this.treeControl.dataNodes.length; i++) {
+
+      const node = this.treeControl.dataNodes[i]
+
+
+      const nextItemIndex = this.treeControl.dataNodes.findIndex((dn, dnIndex) => {
+        return dnIndex > i
+          && dn.level <= node.level
+      })
+
+      // Add property for hiding dashes
+      if (nextItemIndex>0 && this.treeControl.dataNodes[nextItemIndex].level < node.level) {
+        for (let j = i+1; j < nextItemIndex; j++) {
+          if (this.treeControl.dataNodes[j].children) {
+            this.treeControl.dataNodes[j] = {
+              ...this.treeControl.dataNodes[j],
+              missBorderPaintingLevels: this.treeControl.dataNodes[j].missBorderPaintingLevels ? [
+                ...this.treeControl.dataNodes[j].missBorderPaintingLevels,
+                node.level
+              ] : [node.level]
+            }
+          }
+        }
+      }
+
+
+      const nodeIsLast = this.treeControl.dataNodes
+        .findIndex((dn, dnIndex) => dnIndex > i && dn.level === node.level) < 0
+
+      // if (node.name ==='diencephalon') {
+      //   console.log(node)
+      //   console.log(this.treeControl.dataNodes
+      //     .findIndex((dn, dnIndex) => dnIndex > i && dn.level === node.level)
+      //   )
+      // }
+
+      // console.log(nodeIsLast)
+
+      if (nodeIsLast) {
+
+        // console.log(node.name)
+
+        for (let j = i+1; j < this.treeControl.dataNodes.length; j++) {
+          this.treeControl.dataNodes[j] = {
+            ...this.treeControl.dataNodes[j],
+            missBorderPaintingLevels: this.treeControl.dataNodes[j].missBorderPaintingLevels ? [
+              ...this.treeControl.dataNodes[j].missBorderPaintingLevels,
+              node.level
+            ] : [node.level]
+          }
+        }
+      }
+
+    }
+
     this.treeControl.expandAll()
   }
 
