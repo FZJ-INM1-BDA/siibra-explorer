@@ -1,4 +1,4 @@
-<img align="right" src="https://github.com/FZJ-INM1-BDA/siibra-explorer/tree/master/docs/images/siibra-explorer-square.jpeg" width="200">
+<img align="right" src="https://raw.githubusercontent.com/FZJ-INM1-BDA/siibra-explorer/master/docs/images/siibra-explorer-square.jpeg" width="200">
 
 [![Documentation Status](https://readthedocs.org/projects/siibra-python/badge/?version=latest)](https://interactive-viewer.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
