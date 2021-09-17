@@ -1,6 +1,6 @@
-# Interactive Atlas Viewer
+# siibra-explorer - Interactive viewer for multilevel brain atlases
 
-Interactive Atlas Viewer is an frontend module wrapping around [nehuba](https://github.com/HumanBrainProject/nehuba). It provides additional features, such as metadata integration, data visualisation and a robust plugin system.
+`siibra-explorer` is an frontend module wrapping around [nehuba](https://github.com/HumanBrainProject/nehuba) for visualizing volumetric brain volumes at possible high resolutions, and connecting to `siibra-api` for offering access to brain atlases of different species, including to navigate their brain region hierarchies, maps in different coordinate spaces, and linked regional data features. It provides metadata integration with the [EBRAINS knowledge graph](https://kg.ebrains.eu), different forms of data visualisation, and a structured plugin system for implementing custom extensions.
 
 ## Getting Started
 
