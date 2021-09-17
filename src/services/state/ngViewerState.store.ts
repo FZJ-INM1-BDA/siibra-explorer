@@ -352,7 +352,7 @@ export class NgViewerUseEffect implements OnDestroy {
     )
 
     this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
-      filter((ev: KeyboardEvent) => ev.key === ' '),
+      filter((ev: KeyboardEvent) => ev.key === ' ' && (ev.target as HTMLElement).classList.contains('neuroglancer-panel')),
       withLatestFrom(this.panelMode$),
       filter(([_ , panelMode]) => panelMode === PANELS.SINGLE_PANEL),
       mapTo({
