@@ -1,9 +1,13 @@
-<img align="right" src="https://github.com/FZJ-INM1-BDA/siibra-explorer/tree/master/docs/images" width="200">
+<img align="right" src="https://github.com/FZJ-INM1-BDA/siibra-explorer/tree/master/docs/images/siibra-explorer-square.jpeg" width="200">
 
 [![Documentation Status](https://readthedocs.org/projects/siibra-python/badge/?version=latest)](https://interactive-viewer.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # siibra-explorer - Interactive viewer for multilevel brain atlases
+
+*Authors: Big Data Analytics Group, Institute of Neuroscience and Medicine (INM-1), Forschungszentrum Jülich GmbH*
+
+Copyright 2020-2021, Forschungszentrum Jülich GmbH
 
 `siibra-explorer` is an frontend module wrapping around [nehuba](https://github.com/HumanBrainProject/nehuba) for visualizing volumetric brain volumes at possible high resolutions, and connecting to `siibra-api` for offering access to brain atlases of different species, including to navigate their brain region hierarchies, maps in different coordinate spaces, and linked regional data features. It provides metadata integration with the [EBRAINS knowledge graph](https://kg.ebrains.eu), different forms of data visualisation, and a structured plugin system for implementing custom extensions.
 
@@ -122,3 +126,9 @@ Commit history prior to v0.2.0 is available in the [legacy-v0.2.0](https://githu
 ## License
 
 Apache-2.0
+
+## Acknowledgements
+
+This software code is funded from the European Union’s Horizon 2020 Framework
+Programme for Research and Innovation under the Specific Grant Agreement No.
+945539 (Human Brain Project SGA3).
