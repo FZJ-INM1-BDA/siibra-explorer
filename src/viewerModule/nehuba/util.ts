@@ -158,6 +158,17 @@ export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, H
   return makeRow(majorContainer, minorContainer)
 }
 
+export const getCutPanels = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
+  washPanels(panels)
+
+  panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.CUT_VIEW))
+
+  const sliceContainer = (panels[0])
+  const cutContainer = (panels[1])
+
+  return makeRow(sliceContainer, cutContainer)
+}
+
 export const isIdentityQuat = ori => Math.abs(ori[0]) < 1e-6
   && Math.abs(ori[1]) < 1e-6
   && Math.abs(ori[2]) < 1e-6

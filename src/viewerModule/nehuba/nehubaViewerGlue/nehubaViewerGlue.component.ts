@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
+import {ngViewerActionToggleMax, ngViewerToggleCutView} from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
@@ -17,7 +17,16 @@ import { getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../consta
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
-import { cvtNavigationObjToNehubaConfig, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, scanSliceViewRenderFn, takeOnePipe } from "../util";
+import {
+  cvtNavigationObjToNehubaConfig,
+  getFourPanel,
+  getHorizontalOneThree,
+  getSinglePanel,
+  getCutPanels,
+  getVerticalOneThree,
+  scanSliceViewRenderFn,
+  takeOnePipe
+} from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
@@ -29,6 +38,7 @@ import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/l
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
+import {CutSliceViewService} from "src/viewerModule/nehuba/cutSliceView.service";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -310,6 +320,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
+    public cutService: CutSliceViewService
   ){
 
     /**
@@ -367,6 +378,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       case PANELS.SINGLE_PANEL: {
         const element = this.removeExistingPanels()
         const newEl = getSinglePanel(viewPanels)
+        element.appendChild(newEl)
+        break;
+      }
+      case PANELS.CUT_VIEW: {
+        const element = this.removeExistingPanels()
+        const newEl = getCutPanels(viewPanels)
         element.appendChild(newEl)
         break;
       }

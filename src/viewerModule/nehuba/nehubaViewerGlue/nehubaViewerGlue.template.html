@@ -40,6 +40,10 @@
     [quick-tour-order]="quickTour3dViewSlide.order">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
+
+  <div class="w-100 h-100 position-relative" style="z-index: 100" cut-control>
+    <ng-container *ngTemplateOutlet="cutControlTmp"></ng-container>
+  </div>
 </current-layout>
 
 <!-- slice view overlay tmpl -->
@@ -156,6 +160,17 @@
       <i class="fas fa-search-minus"></i>
     </button>
 
+    <!-- cut brain view -->
+    <ng-container *ngIf="panelIndex !== 3">
+      <button mat-icon-button
+              color="primary"
+              (click)="cutService.toggle(panelIndex)"
+              >
+        <i class="fas fa-cut"></i>
+      </button>
+
+    </ng-container>
+
     <maximise-panel-button
       (click)="toggleMaximiseMinimise(panelIndex)"
       [touch-side-class]="panelIndex">
@@ -189,4 +204,29 @@
       <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </svg>
+</ng-template>
+
+<ng-template #cutControlTmp>
+
+  <div class="d-inline-flex flex-column align-items-center pe-all mr-n5">
+    <mat-slider [vertical]="true"
+                *ngIf="cutService.panelIndex >=0 && cutService.templateTransform"
+                [min]="cutService.templateTransform[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                [max]="-cutService.templateTransform[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                [value]="cutService.navPosVoxel[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                (input)="cutService.navigate($event)"></mat-slider> <!--[step]="1000"-->
+
+    <button mat-icon-button
+            color="primary"
+            (click)="cutService.rotate()"
+    >
+      <i class="fas fa-sync"></i>
+    </button>
+    <button mat-icon-button
+            color="primary"
+            (click)="cutService.toggle(-1)"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 </ng-template>
