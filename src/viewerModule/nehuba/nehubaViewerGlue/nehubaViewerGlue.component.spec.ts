@@ -27,6 +27,7 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { HarnessLoader } from "@angular/cdk/testing"
 import { NehubaModule } from "../module"
 import { NEHUBA_VIEWER_FEATURE_KEY } from "../constants"
+import {CutSliceViewService} from "src/viewerModule/nehuba/cutSliceView.service";
 
 
 @Component({
@@ -116,7 +117,8 @@ describe('> nehubaViewerGlue.component.ts', () => {
           useValue: {
             loadMeshes$: new Subject()
           }
-        }
+        },
+        CutSliceViewService
       ]
     }).compileComponents()
   })
