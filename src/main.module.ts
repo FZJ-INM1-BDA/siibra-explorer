@@ -270,7 +270,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     },
     {
       provide: BS_ENDPOINT,
-      useValue: (BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v1_0`).replace(/\/$/, '')
+      useValue: (BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
   ],
   bootstrap : [
