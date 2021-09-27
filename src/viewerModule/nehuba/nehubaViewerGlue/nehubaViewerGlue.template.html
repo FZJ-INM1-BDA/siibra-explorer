@@ -1,6 +1,7 @@
 <div class="d-block w-100 h-100"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
+  [snackTemplate]="snackTemplate"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
@@ -189,4 +190,14 @@
       <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </svg>
+</ng-template>
+
+<ng-template #snackTemplate>
+  <div>Please drop <i>.nii</i> or <i>.nii.gz</i> file</div>
+  <div class="d-flex flex-column">
+    <b>The limitations to the nifti volume to be superimposed are: </b>
+    <small>1. The xyzt_units must be defined (mm, sec) or it will default to (nm, sec);</small>
+    <small>2. The datatype must be other than float64 (float64 datatype cannot be rendered);</small>
+    <small>3. In the nifti header, both dim[4] (time series) and dim[5] (num of channel) must be set to 1.</small>
+  </div>
 </ng-template>

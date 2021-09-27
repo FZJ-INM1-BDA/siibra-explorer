@@ -1,4 +1,15 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  TemplateRef
+} from "@angular/core";
 import { fromEvent, merge, Observable, of, Subscription } from "rxjs";
 import { debounceTime, map, scan, switchMap } from "rxjs/operators";
 import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
@@ -13,6 +24,8 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
   @Input()
   public snackText: string
 
+  @Input() public snackTemplate: TemplateRef<any>
+
   @Output('drag-drop-file')
   public dragDropOnDrop: EventEmitter<File[]> = new EventEmitter()
 
@@ -22,7 +35,7 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
   @HostBinding('style.opacity')
   public opacity = null
 
-  public snackbarRef: MatSnackBarRef<SimpleSnackBar>
+  public snackbarRef: MatSnackBarRef<any>
 
   private dragover$: Observable<boolean>
 
@@ -55,7 +68,11 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
         debounceTime(16),
       ).subscribe(flag => {
         if (flag) {
-          this.snackbarRef = this.snackBar.open(this.snackText || `Drop file(s) here.`, 'Dismiss')
+          if (this.snackTemplate) {
+            this.snackbarRef = this.snackBar.openFromTemplate(this.snackTemplate)
+          } else {
+            this.snackbarRef = this.snackBar.open(this.snackText || `Drop file(s) here.`, 'Dismiss')
+          }
 
           /**
            * In buggy scenarios, user could at least dismiss by action
