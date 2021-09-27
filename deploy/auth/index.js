@@ -10,16 +10,12 @@ const ready = async () => isReady
 
 const configureAuth = async (app) => {
   console.log('configure Auth')
-  const hbpOidc = require('./hbp-oidc')
   const { bootstrapApp: boostrapOidcV2 } = require('./hbp-oidc-v2')
   
   const { initPassportJs, objStoreDb } = require('./util')
 
   initPassportJs(app)
 
-  await retry(async () => {
-    await hbpOidc(app)
-  }, { timeout: 1000, retries: 3 })
   await retry(async () => {
     await boostrapOidcV2(app)
   }, { timeout: 1000, retries: 3 })
