@@ -593,21 +593,21 @@
 
       <!-- Multi regions include -->
       <ng-template #multiRegionInclTmpl>
-        <mat-chip-list>
-          <mat-chip *ngFor="let r of regions"
-            iav-region
-            [region]="r"
-            [ngClass]="{
-              'darktheme':regionDirective.rgbDarkmode === true,
-              'lighttheme': regionDirective.rgbDarkmode === false
-            }"
-            [style.backgroundColor]="regionDirective.rgbString"
-            #regionDirective="iavRegion">
-            <span class="iv-custom-comp text text-truncate d-inline pl-4">
-              {{ r.name }}
-            </span>
-          </mat-chip>
-        </mat-chip-list>
+
+        <mat-chip *ngFor="let r of regions"
+          iav-region
+          [region]="r"
+          class="m-1"
+          [ngClass]="{
+            'darktheme':regionDirective.rgbDarkmode === true,
+            'lighttheme': regionDirective.rgbDarkmode === false
+          }"
+          [style.backgroundColor]="regionDirective.rgbString"
+          #regionDirective="iavRegion">
+          <span class="iv-custom-comp text text-truncate d-inline">
+            {{ r.name }}
+          </span>
+        </mat-chip>
       </ng-template>
 
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
