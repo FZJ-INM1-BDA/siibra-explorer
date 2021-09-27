@@ -33,6 +33,7 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this._region)
+    this.hasContext$.next(!!this._region.context)
 
     this.position = null
     // bug the centroid returned is currently nonsense
@@ -61,6 +62,7 @@ export class RegionBase {
     return this._region
   }
 
+  public hasContext$: BehaviorSubject<boolean> = new BehaviorSubject(false)
   public region$: BehaviorSubject<any> = new BehaviorSubject(null)
 
   @Input()
@@ -89,7 +91,7 @@ export class RegionBase {
 
     this.regionInOtherTemplates$ = this.region$.pipe(
       distinctUntilChanged(),
-      filter(v => !!v),
+      filter(v => !!v && !!v.context),
       switchMap(region => this.store$.pipe(
         select(
           regionInOtherTemplateSelector,
