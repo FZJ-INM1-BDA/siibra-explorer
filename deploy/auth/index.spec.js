@@ -1,8 +1,6 @@
 const sinon = require('sinon')
 const { assert, expect } = require('chai')
 const initPassportJsStub = sinon.stub()
-
-const hbpOidcStub = sinon.stub()
 const hbpOidcV2Stub = sinon.stub()
 
 const appGetStub = sinon.stub()
@@ -11,9 +9,6 @@ describe('auth/index.js', () => {
   before(() => {
     require.cache[require.resolve('./util')] = {
       exports: { initPassportJs: initPassportJsStub }
-    }
-    require.cache[require.resolve('./hbp-oidc')] = {
-      exports: hbpOidcStub
     }
     require.cache[require.resolve('./hbp-oidc-v2')] = {
       exports: {
@@ -24,9 +19,7 @@ describe('auth/index.js', () => {
 
   beforeEach(() => {
     delete require.cache[require.resolve('./index.js')]
-    hbpOidcStub.returns({})
     hbpOidcV2Stub.returns({})
-    hbpOidcStub.resetHistory()
     hbpOidcV2Stub.resetHistory()
   })
 
@@ -37,11 +30,6 @@ describe('auth/index.js', () => {
       const dummyObj = { get: appGetStub }
       await configureAuth(dummyObj)
       
-      assert(
-        hbpOidcStub.called,
-        'hbpOidc called'
-      )
-
       assert(
         hbpOidcV2Stub.called,
         'hbpOidcV2 called'
@@ -58,7 +46,7 @@ describe('auth/index.js', () => {
       const { configureAuth } = require('./index.js')
       const dummyObj = { get: appGetStub }
 
-      hbpOidcStub.throws(`throw error`)
+      hbpOidcV2Stub.throws(`throw error`)
 
       try {
 
@@ -76,14 +64,10 @@ describe('auth/index.js', () => {
       } catch (e) {
         
         assert(
-          hbpOidcStub.calledThrice,
-          'hbpOidc called thrice'
+          hbpOidcV2Stub.calledThrice,
+          'hbpOidcv2 called thrice'
         )
   
-        assert(
-          !hbpOidcV2Stub.called,
-          'hbpOidcV2 not called'
-        )
       }
     })
   })
@@ -105,7 +89,7 @@ describe('auth/index.js', () => {
       const { configureAuth, ready } = require('./index.js')
       const dummyObj = { get: appGetStub }
 
-      hbpOidcStub.throws(`throw error`)
+      hbpOidcV2Stub.throws(`throw error`)
 
       try {
         await (() => new Promise((rs, rj) => {

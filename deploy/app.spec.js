@@ -25,13 +25,6 @@ describe('authentication', () => {
     const authConfigureAuthStub = sinon.stub(auth, 'configureAuth')
     const authIsReadyStub = sinon.stub(auth, 'ready')
   
-    require.cache[require.resolve('./datasets')] = {
-      exports: {
-        router: (req, res, next) => next(),
-        ready: async () => true
-      }
-    }
-  
     require.cache[require.resolve('./saneUrl')] = {
       exports: {
         router: (req, res, next) => next(),
@@ -61,7 +54,6 @@ describe('authentication', () => {
   })
 
   after(() => {
-    delete require.cache[require.resolve('./datasets')]
     delete require.cache[require.resolve('./saneUrl')]
     delete require.cache[require.resolve('./user')]
     delete require.cache[require.resolve('./constants')]
