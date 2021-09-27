@@ -7,8 +7,7 @@ const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
-const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
-const { router: datasetRouter } = require('./datasets')
+const deprecated = (_req, res) => res.status(410).end()
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -203,11 +202,9 @@ app.use('/logo', require('./logo'))
 
 app.get('/ready', async (req, res) => {
   const authIsReady = authReady ? await authReady() : false
-  const regionalFeatureReady = await regionalFeatureIsReady()
 
   const allReady = [ 
     authIsReady,
-    regionalFeatureReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -234,24 +231,15 @@ const jsonMiddleware = (req, res, next) => {
 /**
  * resources endpoints
  */
-const atlasesRouter = require('./atlas')
-const templateRouter = require('./templates')
-const nehubaConfigRouter = require('./nehubaConfig')
 const pluginRouter = require('./plugins')
-const previewRouter = require('./preview')
 
-const setResLocalMiddleWare = routePathname => (req, res, next) => {
-  res.locals.routePathname = routePathname
-  next()
-}
-
-app.use('/atlases', setResLocalMiddleWare('atlases'), atlasesRouter)
-app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
-app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
-app.use('/datasets', jsonMiddleware, datasetRouter)
-app.use('/regionalFeatures', jsonMiddleware, regionalFeaturesRouter)
+app.use('/atlases', deprecated)
+app.use('/templates', deprecated)
+app.use('/nehubaConfig', deprecated)
+app.use('/datasets', deprecated)
+app.use('/regionalFeatures', deprecated)
 app.use('/plugins', jsonMiddleware, pluginRouter)
-app.use('/preview', jsonMiddleware, previewRouter)
+app.use('/preview', deprecated)
 
 const catchError = require('./catchError')
 app.use(catchError)
