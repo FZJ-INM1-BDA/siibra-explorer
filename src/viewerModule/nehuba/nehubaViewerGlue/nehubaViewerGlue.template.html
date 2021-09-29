@@ -1,7 +1,7 @@
 <div class="d-block w-100 h-100"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
-  [snackTemplate]="snackTemplate"
+  [drag-drop-custom-template]="snackTemplate"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"

@@ -21,10 +21,11 @@ import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/sna
 
 export class DragDropFileDirective implements OnInit, OnDestroy {
 
-  @Input()
+  @Input('drag-drop-snackText')
   public snackText: string
 
-  @Input() public snackTemplate: TemplateRef<any>
+  @Input('drag-drop-custom-template')
+  public snackTemplate: TemplateRef<any>
 
   @Output('drag-drop-file')
   public dragDropOnDrop: EventEmitter<File[]> = new EventEmitter()
