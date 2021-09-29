@@ -21,7 +21,7 @@ import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/sna
 
 export class DragDropFileDirective implements OnInit, OnDestroy {
 
-  @Input('drag-drop-snackText')
+  @Input('drag-drop-snack-text')
   public snackText: string
 
   @Input('drag-drop-custom-template')
