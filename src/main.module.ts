@@ -234,7 +234,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     },
     {
       provide: BS_ENDPOINT,
-      useValue: (environment.BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v1_0`).replace(/\/$/, '')
+      useValue: ('https://siibra-api-edge.apps-dev.hbp.eu/v1_0' || environment.BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v1_0`).replace(/\/$/, '')
     },
   ],
   bootstrap : [
