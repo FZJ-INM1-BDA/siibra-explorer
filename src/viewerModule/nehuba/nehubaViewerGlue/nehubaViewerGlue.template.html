@@ -10,6 +10,8 @@
     iav-nehuba-viewer-container
     #iavContainer="iavNehubaViewerContainer"
     iav-mouse-hover
+    [iav-key-listener]="[{ type: 'keydown', key: ' ', target: 'document', capture: true }]"
+    (iav-key-event)="handleCycleViewEvent()"
     (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
 
   </div>
