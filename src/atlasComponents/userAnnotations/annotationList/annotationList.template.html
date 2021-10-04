@@ -33,6 +33,15 @@
                 [disabled]="!(manAnnExists$ | async)">
                 <i class="fas fa-download"></i>
             </button>
+
+            <!-- delete all annotations -->
+            <button mat-icon-button
+                color="warn"
+                (click)="deleteAllAnnotation()"
+                [matTooltip]="ARIA_LABELS.BULK_DELETE_ANNOTATIONS"
+                [disabled]="!(manAnnExists$ | async)">
+                <i class="fas fa-trash"></i>
+            </button>
         </mat-card-subtitle>
     </div>
 

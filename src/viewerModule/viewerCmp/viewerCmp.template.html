@@ -16,7 +16,7 @@
         [autoFocus]="false"
         [disableClose]="true"
         class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
-        <annotation-list></annotation-list>
+        <annotation-list #annListCmp="annotationListCmp"></annotation-list>
       </mat-drawer>
 
       <mat-drawer-content class="visible position-relative pe-none">
@@ -30,7 +30,8 @@
                 matColor: 'primary',
                 fontIcon: 'fa-list',
                 tooltip: 'Annotation list',
-                click: annotationDrawer.toggle.bind(annotationDrawer)
+                click: annotationDrawer.toggle.bind(annotationDrawer),
+                badge: annListCmp?.badge$ | async
               }">
               </ng-container>
             </div>
@@ -58,7 +59,6 @@
 
       </mat-drawer-content>
     </mat-drawer-container>
-    <!-- <annotation-message></annotation-message> -->
   </div>
 
   <!-- top drawer -->
@@ -390,6 +390,8 @@
   let-customColor="customColor"
   let-customColorDarkmode="customColorDarkmode"
   let-tooltip="tooltip"
+  let-badge="badge"
+  let-badgeColor="badgeColor"
   let-click="click">
   <!-- (click)="sideNavMasterSwitch.toggle()" -->
   <button mat-raised-button
@@ -402,7 +404,9 @@
     }"
     (click)="click && click()"
     [style.backgroundColor]="customColor"
-    [color]="(!customColor && matColor) ? matColor : null">
+    [color]="(!customColor && matColor) ? matColor : null"
+    [matBadge]="badge"
+    [matBadgeColor]="badgeColor || 'warn'">
 
     <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
       <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
