@@ -33,6 +33,7 @@ export class AnnotationList {
   private subs: Subscription[] = []
   private managedAnnotations: IAnnotationGeometry[] = []
   public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
+  public annotationInOtherSpaces$ = this.annotSvc.otherSpaceManagedAnnotations$
 
   public badge$ = this.managedAnnotations$.pipe(
     map(mann => mann.length > 0 ? mann.length : null)

@@ -77,18 +77,21 @@
 
                     <!-- single annotation edit body -->
                     <ng-template matExpansionPanelContent>
-                        <div class="d-flex">
-
+                        <div class="single-annotation-grid-container">
                             <!-- spacer for inset single-annotation-unit -->
-                            <div class="w-3em flex-grow-0 flex-shrink-0"></div>
-
-                            <single-annotation-unit [single-annotation-unit-annotation]="managedAnnotation"
-                                class="flex-grow-1 flex-shrink-1">
+                            <div></div>
+                            <single-annotation-unit [single-annotation-unit-annotation]="managedAnnotation">
                             </single-annotation-unit>
                         </div>
                     </ng-template>
                 </mat-expansion-panel>
             </mat-accordion>
+        </ng-template>
+
+        <ng-template [ngIf]="annotationInOtherSpaces$ | async" let-annsInOtherSpace>
+            <div *ngIf="annsInOtherSpace.length > 0" class="p-4 text-muted">
+                {{ annsInOtherSpace.length }} annotations found in other reference spaces, and not shown here.
+            </div>
         </ng-template>
 
         <!-- place holder when no annotations exist -->
