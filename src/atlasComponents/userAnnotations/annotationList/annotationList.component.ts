@@ -1,15 +1,16 @@
-import {Component, ViewChild} from "@angular/core";
-import {ARIA_LABELS} from "common/constants";
+import { Component, Optional, ViewChild } from "@angular/core";
+import { ARIA_LABELS, CONST } from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { IAnnotationGeometry, TExportFormats } from "../tools/type";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { map, shareReplay, startWith } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { TFileInputEvent } from "src/getFileInput/type";
 import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
+import { DialogService } from "src/services/dialogService.service";
 
 const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`
 
@@ -26,11 +27,17 @@ export class AnnotationList {
 
   public ARIA_LABELS = ARIA_LABELS
 
-
   @ViewChild(FileInputDirective)
   fileInput: FileInputDirective
 
+  private subs: Subscription[] = []
+  private managedAnnotations: IAnnotationGeometry[] = []
   public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
+  public annotationInOtherSpaces$ = this.annotSvc.otherSpaceManagedAnnotations$
+
+  public badge$ = this.managedAnnotations$.pipe(
+    map(mann => mann.length > 0 ? mann.length : null)
+  )
 
   public manAnnExists$ = this.managedAnnotations$.pipe(
     map(arr => !!arr && arr.length > 0),
@@ -64,10 +71,15 @@ export class AnnotationList {
     private annotSvc: ModularUserAnnotationToolService,
     private snackbar: MatSnackBar,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
+    @Optional() private dialogSvc: DialogService,
   ) {
     cStore.setState({
       useFormat: 'sands'
     })
+
+    this.subs.push(
+      this.managedAnnotations$.subscribe(anns => this.managedAnnotations = anns)
+    )
   }
 
   public hiddenAnnotations$ = this.annotSvc.hiddenAnnotations$
@@ -82,6 +94,11 @@ export class AnnotationList {
   }
 
   async handleImportEvent(ev: TFileInputEvent<'text' | 'file'>){
+
+    const { abort } = this.dialogSvc.blockUserInteraction({
+      title: CONST.LOADING_TXT,
+      markdown: CONST.LOADING_ANNOTATION_MSG,
+    })
     try {
       const clearFileInputAndInform = () => {
         if (this.fileInput) {
@@ -135,6 +152,31 @@ export class AnnotationList {
       this.snackbar.open(`Error importing: ${e.toString()}`, 'Dismiss', {
         duration: 3000
       })
+    } finally {
+      abort()
+    }
+  }
+
+  async deleteAllAnnotation(){
+    if (this.dialogSvc) {
+      try {
+        await this.dialogSvc.getUserConfirm({
+          markdown: CONST.DELETE_ALL_ANNOTATION_CONFIRMATION_MSG
+        })
+
+        for (const ann of this.managedAnnotations) {
+          ann.remove()
+        }
+      } catch (e) {
+        // aborted
+      }
+    } else {
+      if (window.confirm(CONST.DELETE_ALL_ANNOTATION_CONFIRMATION_MSG)) {
+
+        for (const ann of this.managedAnnotations) {
+          ann.remove()
+        }
+      }
     }
   }
 }

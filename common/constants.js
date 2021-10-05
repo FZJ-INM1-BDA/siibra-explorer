@@ -70,7 +70,8 @@
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'Delete annotation',
     GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
-    EXIT_ANNOTATION_MODE: 'Exit annotation mode'
+    EXIT_ANNOTATION_MODE: 'Exit annotation mode',
+    BULK_DELETE_ANNOTATIONS: 'Delete all user annotations'
   }
 
   exports.IDS = {
@@ -79,6 +80,8 @@
   }
 
   exports.CONST = {
+    LOADING_TXT: `Loading ...`,
+
     CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
     DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
@@ -103,6 +106,9 @@
     QUICKTOUR_OK: `Start`,
     QUICKTOUR_NEXTTIME: `Not now`,
     QUICKTOUR_CANCEL: `Dismiss`,
+
+    DELETE_ALL_ANNOTATION_CONFIRMATION_MSG: `Are you sure you want to delete all annotations?`,
+    LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`
   }
 
   exports.QUICKTOUR_DESC ={

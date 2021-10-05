@@ -1,6 +1,6 @@
 {
   "name": "interactive-viewer",
-  "version": "2.4.7",
+  "version": "2.4.8",
   "description": "HBP interactive atlas viewer. Integrating KG query, dataset previews & more. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
     "build-aot": "PRODUCTION=true GIT_HASH=`node -e 'console.log(require(\"./package.json\").version)'` webpack --config ./webpack/webpack.aot.js && node ./third_party/matomo/processMatomo.js",
