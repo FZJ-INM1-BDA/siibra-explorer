@@ -21,14 +21,8 @@ const validVolumeType = new Set([
 ])
 
 function getNgId(atlasId: string, tmplId: string, parcId: string, regionKey: string){
-  // console.log(
-  //   'getNgId',
-  //   ...arguments
-  // )
   const proxyId = MultiDimMap.GetProxyKeyMatch(atlasId, tmplId, parcId, regionKey)
-  if (proxyId) {
-    console.log('proxyid', proxyId)
-    return proxyId}
+  if (proxyId) return proxyId
   return '_' + MultiDimMap.GetKey(atlasId, tmplId, parcId, regionKey)
 }
 
@@ -517,7 +511,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                 return
                               }
                               const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
-                              console.log('ngId', hemispheredNgId)
                               region['ngId'] = hemispheredNgId
                             }
                           }  
