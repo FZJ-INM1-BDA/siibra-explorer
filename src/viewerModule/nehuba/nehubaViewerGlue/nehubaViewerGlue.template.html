@@ -190,3 +190,36 @@
     </g>
   </svg>
 </ng-template>
+
+<ng-template #layerCtrlTmpl let-data>
+  <div class="grid grid-col-3">
+
+    <span class="ml-2 text-truncate v-center-text-span">
+      <i class="fas fa-file"></i>
+      {{ data.filename }}
+    </span>
+    
+    <button
+      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
+      mat-icon-button
+      [color]="data.moreInfoFlag ? 'primary' : 'basic'"
+      (click)="data.moreInfoFlag = !data.moreInfoFlag">
+      <i class="fas fa-sliders-h"></i>
+    </button>
+
+    <button
+      [matTooltip]="ARIA_LABELS.CLOSE"
+      color="warn"
+      mat-icon-button
+      mat-dialog-close>
+      <i class="fas fa-trash"></i>
+    </button>
+
+    <div *ngIf="data.moreInfoFlag"
+      class="iv-custom-comp darker-bg overflow-hidden grid-wide-3">
+      <ng-layer-tune [ngLayerName]="data.layerName">
+      </ng-layer-tune>
+    </div>
+
+  </div>
+</ng-template>

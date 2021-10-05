@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
 import { ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
@@ -29,6 +29,7 @@ import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/l
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
+import { MatDialog } from "@angular/material/dialog";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -71,6 +72,8 @@ export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 })
 
 export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, AfterViewInit {
+
+  @ViewChild('layerCtrlTmpl', { read: TemplateRef }) layerCtrlTmpl: TemplateRef<any>
 
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
@@ -307,6 +310,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     private el: ElementRef,
     private log: LoggingService,
     private snackbar: MatSnackBar,
+    private dialog: MatDialog,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
@@ -744,13 +748,28 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       })
     }])
 
-    this.snackbar.open(
-      `Viewing ${file.name}`,
-      'Clear',
-      { duration: 0 }
-    ).afterDismissed().subscribe(() => {
-      this.dismissAllAddedLayers()
-    })
+    this.dialog.open(
+      this.layerCtrlTmpl,
+      {
+        data: {
+          layerName: randomUuid,
+          filename: file.name,
+          moreInfoFlag: false
+        },
+        hasBackdrop: false,
+        disableClose: true,
+        position: {
+          top: '0em'
+        },
+        autoFocus: false,
+        panelClass: [
+          'no-padding-dialog',
+          'w-100'
+        ]
+      }
+    ).afterClosed().subscribe(
+      () => this.dismissAllAddedLayers()
+    )
   }
 
 
