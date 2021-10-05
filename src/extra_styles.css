@@ -340,11 +340,6 @@ markdown-dom p
   max-width: 20em!important;
 }
 
-.w-90
-{
-  width: 90%!important;
-}
-
 .w-20em
 {
   width: 20em!important;
@@ -858,9 +853,7 @@ mat-list.sm mat-list-item
 
 .no-padding-dialog > mat-dialog-container
 {
-  padding-top:0 !important;
-  padding-right:0 !important;
-  padding-left:0 !important;
+  padding:0 !important;
 }
 .h-50px
 {
@@ -869,4 +862,27 @@ mat-list.sm mat-list-item
 .scale-80
 {
   transform: scale(0.8);
+}
+
+.grid
+{
+  display: grid;
+}
+
+.grid.grid-col-3
+{
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.2rem 0.2rem;
+}
+
+.grid > .grid-wide-3
+{
+  grid-column: 1 / 4;
+}
+
+.v-center-text-span
+{
+  margin-top: auto;
+  margin-bottom: auto;
 }
