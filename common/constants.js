@@ -69,7 +69,10 @@
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'Delete annotation',
     GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
-    EXIT_ANNOTATION_MODE: 'Exit annotation mode'
+    EXIT_ANNOTATION_MODE: 'Exit annotation mode',
+
+    // volume tuning specific
+    VOLUME_TUNING_EXPAND: 'Expand volume tuning widget'
   }
 
   exports.IDS = {

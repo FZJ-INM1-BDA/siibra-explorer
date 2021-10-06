@@ -44,18 +44,23 @@ export type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
   map_type: string
 }
 
-type TSimpleInfo = {
+export type TSimpleInfo = {
   "@type": 'fzj/tmp/simpleOriginInfo/v0.0.1'
   name: string
   description: string
 }
 
-type TDatasetSpec = TVolumeSrc<keyof IVolumeTypeDetail> | TSimpleInfo
 
 type TKgIdentifier = {
   kgSchema: string
   kgId: string
 }
+
+export type TKgInfo = {
+  '@type': 'minds/core/dataset/v1.0.0'
+} & TKgIdentifier
+
+type TDatasetSpec = TVolumeSrc<keyof IVolumeTypeDetail> | TSimpleInfo | TKgInfo
 
 type TVersion = {
   name: string
