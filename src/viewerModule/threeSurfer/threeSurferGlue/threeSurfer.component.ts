@@ -14,8 +14,19 @@ import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CONST } from 'common/constants'
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
-import { switchMapWaitFor } from "src/util/fn";
+import { getUuid, switchMapWaitFor } from "src/util/fn";
+import { TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 
+const viewerType = 'ThreeSurfer'
+type TInternalState = {
+  camera: {
+    x: number
+    y: number
+    z: number
+  }
+  mode: string
+  hemisphere: 'left' | 'right' | 'both'
+}
 const pZoomFactor = 5e3
 
 type THandlingCustomEv = {
@@ -88,6 +99,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   private localCameraNav: TCameraOrientation = null
 
   public allKeys: {name: string, checked: boolean}[] = []
+  private internalStateNext: (arg: TInteralStatePayload<TInternalState>) => void
 
   private regionMap: Map<string, Map<number, any>> = new Map()
   private mouseoverRegions = []
@@ -96,10 +108,29 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     private store$: Store<any>,
     private navStateStoreRelay: ComponentStore<{ perspectiveOrientation: [number, number, number, number], perspectiveZoom: number }>,
     private snackbar: MatSnackBar,
+    @Optional() intViewerStateSvc: ViewerInternalStateSvc,
     @Optional() @Inject(REGION_OF_INTEREST) private roi$: Observable<any>,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
   ){
+    if (intViewerStateSvc) {
+      const {
+        done,
+        next,
+      } = intViewerStateSvc.registerEmitter({
+        "@type": 'TViewerInternalStateEmitter',
+        viewerType,
+        applyState: arg => {
+          // type check
+          if (arg.viewerType !== viewerType) return
+          this.toTsRef(tsRef => {
+            tsRef.camera.position.copy((arg.payload as any).camera)
+          })
+        }
+      })
+      this.internalStateNext = next
+      this.onDestroyCb.push(() => done())
+    }
 
     // set viewer handle
     // the API won't be 100% compatible with ngviewer
@@ -474,7 +505,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
             this.tsRef.dispose()
             this.tsRef = null
           }
-        );
+        )
         this.tsRef.control.enablePan = false
         while (this.tsRefInitCb.length > 0) this.tsRefInitCb.pop()(this.tsRef)
       }
@@ -574,6 +605,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
 
   private cameraEv$ = new Subject<{ position: { x: number, y: number, z: number }, zoom: number }>()
   private handleCustomCameraEvent(detail: any){
+    if (this.internalStateNext) {
+      this.internalStateNext({
+        "@id": getUuid(),
+        "@type": 'TViewerInternalStateEmitterEvent',
+        viewerType,
+        payload: {
+          mode: this.selectedMode,
+          camera: detail.position,
+          hemisphere: 'both'
+        }
+      })
+    }
     this.cameraEv$.next(detail)
   }
 

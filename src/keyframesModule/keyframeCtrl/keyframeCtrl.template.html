@@ -1,0 +1,61 @@
+<ng-template #noCurrStateTmpl>
+  No current state recorded
+</ng-template>
+
+<ng-template
+  [ngIf]="currState"
+  [ngIfElse]="noCurrStateTmpl">
+
+  <button
+    (click)="addKeyFrame()"
+    matTooltip="Add key frame. Shortcut: [a]"
+    mat-button
+    color="primary">
+    Add Key Frame
+  </button>
+
+  <mat-slide-toggle [(ngModel)]="loopFlag">Loop</mat-slide-toggle>
+  <mat-slide-toggle [(ngModel)]="linearFlag">Linear Camera</mat-slide-toggle>
+
+  <button mat-icon-button
+    (click)="togglePlay()">
+    <i class="fas fa-play"></i>
+  </button>
+
+  <span *ngIf="false">
+    <span *ngFor="let obj of currState | keyvalue">
+      {{ obj['key'] }}
+    </span>
+  </span>
+</ng-template>
+
+<mat-list cdkDropList (cdkDropListDropped)="drop($event)">
+  <mat-list-item *ngFor="let state of internalStates" cdkDrag>
+    <button mat-icon-button
+    cdkDragHandle>
+      <i class="fas fa-grip-vertical"></i>
+    </button>
+
+    <mat-form-field>
+      <mat-label>name</mat-label>
+      <input type="text" matInput [(ngModel)]="state.name">
+    </mat-form-field>
+    
+    <mat-form-field class="duration-container">
+      <mat-label>ms</mat-label>
+      <input type="number" matInput [(ngModel)]="state.duration">
+    </mat-form-field>
+    
+    <button mat-icon-button
+      (click)="gotoFrame(state)">
+      <i class="fas fa-map-marker-alt"></i>
+    </button>
+    
+    <button mat-icon-button
+      color="warn"
+      (click)="removeFrame(state)">
+      <i class="fas fa-trash"></i>
+    </button>
+    
+  </mat-list-item>
+</mat-list>

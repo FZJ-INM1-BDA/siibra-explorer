@@ -448,6 +448,17 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
             return forkJoin(
               templateSpaces.map(
                 tmpl => {
+                  // hardcode 
+                  // see https://github.com/FZJ-INM1-BDA/siibra-python/issues/98
+                  if (
+                    tmpl.id === 'minds/core/referencespace/v1.0.0/tmp-fsaverage'
+                    && !tmpl.availableParcellations.find(p => p.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290')  
+                  ) {
+                    tmpl.availableParcellations.push({
+                      id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
+                      name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
+                    })
+                  }
                   ngLayerObj[tmpl.id] = {}
                   return tmpl.availableParcellations.map(
                     parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(

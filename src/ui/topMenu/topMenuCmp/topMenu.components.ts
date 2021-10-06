@@ -49,7 +49,8 @@ export class TopMenuCmp {
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
   public annotateTooltipText: string = 'Start annotating'
-
+  public keyFrameText = `Start KeyFrames`
+  
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
