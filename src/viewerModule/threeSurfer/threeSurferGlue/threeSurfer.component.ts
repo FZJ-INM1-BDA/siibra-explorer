@@ -688,4 +688,10 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
   ngOnDestroy() {
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
+
+  toggleMode(){
+    const currIdx = this.modes.findIndex(m => m.name === this.selectedMode)
+    const newIdx = (currIdx + 1) % this.modes.length
+    this.loadMode(this.modes[newIdx])
+  }
 }
