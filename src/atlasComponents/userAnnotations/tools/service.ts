@@ -103,6 +103,20 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     scanCollapse(),
     shareReplay(1),
   )
+
+  public otherSpaceManagedAnnotations$ = combineLatest([
+    this.selectedTmpl$,
+    this.managedAnnotations$
+  ]).pipe(
+    map(([tmpl, annts]) => {
+      return this.filterAnnotationBySpacePipe.transform(
+        annts,
+        tmpl,
+        { reverse: true }
+      )
+    })
+  )
+
   public spaceFilteredManagedAnnotations$ = combineLatest([
     this.selectedTmpl$,
     this.managedAnnotations$
