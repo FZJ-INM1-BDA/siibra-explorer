@@ -104,7 +104,7 @@ module.exports = {
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
           'https://unpkg.com/three-surfer@0.0.10/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
-          'https://unpkg.com/ng-layer-tune@0.0.1/dist/ng-layer-tune/ng-layer-tune.esm.js', // needed for ng layer control
+          'https://unpkg.com/ng-layer-tune@0.0.2/dist/ng-layer-tune/ng-layer-tune.esm.js', // needed for ng layer control
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,

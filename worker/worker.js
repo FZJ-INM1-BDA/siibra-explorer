@@ -8,6 +8,7 @@ globalThis.constants = {
 }
 
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-plotly.js')
+if (typeof self.importScripts === 'function')  self.importScripts('./worker-nifti.js')
 
 /**
  * TODO migrate processing functionalities to other scripts
@@ -21,11 +22,13 @@ const validTypes = [
 ]
 
 const VALID_METHOD = {
-  PROCESS_PLOTLY: `PROCESS_PLOTLY`
+  PROCESS_PLOTLY: `PROCESS_PLOTLY`,
+  PROCESS_NIFTI: 'PROCESS_NIFTI',
 }
 
 const VALID_METHODS = [
-  VALID_METHOD.PROCESS_PLOTLY
+  VALID_METHOD.PROCESS_PLOTLY,
+  VALID_METHOD.PROCESS_NIFTI,
 ]
 
 const validOutType = [
@@ -258,6 +261,32 @@ onmessage = (message) => {
           error: {
             code: 401,
             message: `malformed plotly param: ${e.toString()}`
+          }
+        })
+      }
+    }
+
+    if (message.data.method === VALID_METHOD.PROCESS_NIFTI) {
+      try {
+        const { nifti } = message.data.param
+        const {
+          meta,
+          buffer
+        } = self.nifti.convert(nifti)
+
+        postMessage({
+          id,
+          result: {
+            meta,
+            buffer
+          }
+        }, [ buffer ])
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `nifti error: ${e.toString()}`
           }
         })
       }
