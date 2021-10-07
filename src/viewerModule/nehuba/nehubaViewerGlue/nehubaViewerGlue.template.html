@@ -217,8 +217,14 @@
 
     <div *ngIf="data.moreInfoFlag"
       class="iv-custom-comp darker-bg overflow-hidden grid-wide-3">
-      <ng-layer-tune [ngLayerName]="data.layerName">
+      <ng-layer-tune
+        [ngLayerName]="data.layerName"
+        [thresholdMin]="data.min"
+        [thresholdMax]="data.max">
       </ng-layer-tune>
+      <ul>
+        <li *ngFor="let warn of data.warning">{{ warn }}</li>
+      </ul>
     </div>
 
   </div>
