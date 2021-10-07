@@ -19,3 +19,8 @@ mat-form-field
 {
   width: 3.5rem;
 }
+
+.controller-container > *
+{
+  display: block;
+}

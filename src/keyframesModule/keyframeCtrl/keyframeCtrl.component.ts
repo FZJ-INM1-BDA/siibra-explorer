@@ -4,7 +4,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Subscription } from "rxjs";
 import { getUuid } from "src/util/fn";
 import { timedValues } from "src/util/generator";
-import { TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
+import { AUTO_ROTATE, TAutoRotatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 
 type TStoredState = {
   name: string
@@ -65,19 +65,67 @@ export class KeyFrameCtrlCmp implements OnDestroy {
     ]
   }
 
+  private _autoRotateSpeed = 2
+  get autoRotateSpeed(){
+    return this._autoRotateSpeed
+  }
+  set autoRotateSpeed(val: number){
+    this._autoRotateSpeed = val
+    this.updateAutoRotate()
+  }
+
+  private _autoRotateReverse = false
+  get autoRotateReverse(){
+    return this._autoRotateReverse
+  }
+  set autoRotateReverse(val: boolean){
+    this._autoRotateReverse = val
+    this.updateAutoRotate()
+  }
+
+  private _autoRotateFlag = false
+  get autoRotateFlag(){
+    return this._autoRotateFlag
+  }
+  set autoRotateFlag(val: boolean){
+    this._autoRotateFlag = val
+    this.updateAutoRotate()
+  }
+
+  private updateAutoRotate(){
+    this.viewerInternalSvc.applyInternalState<TAutoRotatePayload>({
+      "@id": getUuid(),
+      "@type": 'TViewerInternalStateEmitterEvent',
+      payload: {
+        play: this._autoRotateFlag,
+        speed: this._autoRotateSpeed,
+        reverse: this._autoRotateReverse
+      },
+      viewerType: AUTO_ROTATE
+    })
+  }
+
   private raf: number
   
-  private isPlaying = false
+  public isPlaying = false
   async togglePlay(){
     if (this.isPlaying) {
       this.isPlaying = false
       return
     }
+
+    if (this.internalStates.length === 0) {
+      return
+    }
+
     this.isPlaying = true
 
     let idx = 0
     this.gotoFrame(this.internalStates[0])
+
+    // eslint-disable-next-line no-constant-condition
     while (true) {
+      if (!this.isPlaying) break
       try {
         await this.animateFrame(
           this.internalStates[idx % this.internalStates.length],
@@ -88,6 +136,7 @@ export class KeyFrameCtrlCmp implements OnDestroy {
       } catch (e) {
         // user interrupted
         console.log(e)
+        break
       }
     }
     this.isPlaying = false

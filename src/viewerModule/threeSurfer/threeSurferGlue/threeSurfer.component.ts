@@ -15,7 +15,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { CONST } from 'common/constants'
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { getUuid, switchMapWaitFor } from "src/util/fn";
-import { TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
+import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 
 const viewerType = 'ThreeSurfer'
 type TInternalState = {
@@ -103,6 +103,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
 
   private regionMap: Map<string, Map<number, any>> = new Map()
   private mouseoverRegions = []
+  
+  private raf: number
   constructor(
     private el: ElementRef,
     private store$: Store<any>,
@@ -121,7 +123,16 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         "@type": 'TViewerInternalStateEmitter',
         viewerType,
         applyState: arg => {
-          // type check
+          if (arg.viewerType === AUTO_ROTATE) {
+            const autoPlayFlag = (arg.payload as any).play
+            const reverseFlag = (arg.payload as any).reverse
+            const autoplaySpeed = (arg.payload as any).speed
+            this.toTsRef(tsRef => {
+              tsRef.control.autoRotate = autoPlayFlag
+              tsRef.control.autoRotateSpeed = autoplaySpeed * (reverseFlag ? -1 : 1)
+            })
+            return
+          }
           if (arg.viewerType !== viewerType) return
           this.toTsRef(tsRef => {
             tsRef.camera.position.copy((arg.payload as any).camera)

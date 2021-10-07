@@ -1,6 +1,13 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 
+export const AUTO_ROTATE = `[special] autoRotate`
+export type TAutoRotatePayload = {
+  play: boolean
+  speed?: number
+  reverse?: boolean
+}
+
 export type TInteralStatePayload<TPayloadShape> = {
   '@type': 'TViewerInternalStateEmitterEvent'
   '@id': string
@@ -8,10 +15,10 @@ export type TInteralStatePayload<TPayloadShape> = {
   payload: TPayloadShape
 }
 
-type TViewerInternalStateEmitter<TPayloadShape> = {
+type TViewerInternalStateEmitter = {
   '@type': 'TViewerInternalStateEmitter'
   viewerType: string
-  applyState: (arg: TInteralStatePayload<TPayloadShape>) => void
+  applyState: <T>(arg: TInteralStatePayload<T>) => void
 }
 
 type TEmitterCallbacks<TPayloadShape> = {
@@ -24,16 +31,16 @@ export class ViewerInternalStateSvc{
 
   public viewerInternalState$ = new BehaviorSubject<TInteralStatePayload<any>>(null)
 
-  private registeredEmitter: TViewerInternalStateEmitter<any>
+  private registeredEmitter: TViewerInternalStateEmitter
 
-  applyInternalState(arg: TInteralStatePayload<any>){
+  applyInternalState<T>(arg: TInteralStatePayload<T>){
     if (!this.registeredEmitter) {
       throw new Error(`No emitter registered. Aborting.`)
     }
     this.registeredEmitter.applyState(arg)
   }
 
-  registerEmitter<T>(emitter: TViewerInternalStateEmitter<T>): TEmitterCallbacks<T>{
+  registerEmitter<T>(emitter: TViewerInternalStateEmitter): TEmitterCallbacks<T>{
     this.registeredEmitter = emitter
     return {
       next: arg => {
@@ -42,7 +49,7 @@ export class ViewerInternalStateSvc{
       done: () => this.deregisterEmitter(emitter)
     }
   }
-  deregisterEmitter(emitter: TViewerInternalStateEmitter<any>){
+  deregisterEmitter(emitter: TViewerInternalStateEmitter){
     if (emitter === this.registeredEmitter) {
       this.viewerInternalState$.next(null)
       this.registeredEmitter = null
