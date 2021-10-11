@@ -422,7 +422,10 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       responseType: 'json'
     }
   ).pipe(
-    shareReplay(1)
+    map(arr => {
+      return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
+    }),
+    shareReplay(1),
   )
 
   public fetchedAtlases$: Observable<TIAVAtlas[]> = this.getAtlases$.pipe(
