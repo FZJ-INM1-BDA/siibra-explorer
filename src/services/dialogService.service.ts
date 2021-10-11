@@ -3,6 +3,10 @@ import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDial
 import { DialogComponent } from "src/components/dialog/dialog.component";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
+type TCancellable = {
+  abort: () => void
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -14,6 +18,19 @@ export class DialogService {
 
   constructor(private dialog: MatDialog) {
 
+  }
+
+  public blockUserInteraction(config: Partial<DialogConfig>): TCancellable {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        ...config,
+        hideActionBar: true
+      },
+      hasBackdrop: true,
+      disableClose: true
+    })
+    const abort = () => dialogRef.close()
+    return { abort }
   }
 
   public getUserConfirm(config: Partial<DialogConfig> = {}): Promise<string> {

@@ -154,9 +154,11 @@
         Copy link to this view
       </span>
     </mat-list-item>
-    <mat-list-item (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL })"
+    <mat-list-item
       [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
-      [attr.tab-index]="10">
+      [attr.tab-index]="10"
+      [matTooltip]="saneUrlDeprecated"
+      class="text-muted">
       <mat-icon
         class="mr-4"
         fontSet="fas"

@@ -24,23 +24,26 @@ jobs:
 
         echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         
+        echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
+        echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
         then
           echo "Either master, using prod env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
         elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either staging, using staging env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
-          echo "Using dev env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_DEV }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
-          echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          if [[ "$GITHUB_REF" == *hotfix* ]]
+          then
+            echo "Hotfix branch, using prod env..."
+            echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
+          else
+            echo "Using dev env..."
+            echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          fi
         fi
 
     - name: 'Set version variable & expmt feature flag'

@@ -32,10 +32,7 @@ export class AuthService implements OnDestroy {
    * TODO build it dynamically, or at least possible to configure via env var
    */
   public loginMethods: IAuthMethod[] = [{
-    name: 'HBP OIDC',
-    href: 'hbp-oidc/auth'
-  }, {
-    name: 'HBP OIDC v2 (beta)',
+    name: 'HBP OIDC v2',
     href: 'hbp-oidc-v2/auth'
   }]
 

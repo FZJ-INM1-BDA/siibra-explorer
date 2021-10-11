@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
+import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
@@ -78,6 +78,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
 
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
+
+  private currentPanelMode: PANELS
 
   @ViewChild(NehubaViewerContainerDirective, { static: true })
   public nehubaContainerDirective: NehubaViewerContainerDirective
@@ -341,6 +343,9 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     ]).pipe(
       switchMap(this.waitForNehuba.bind(this))
     ).subscribe(([mode, panelOrder]) => {
+      
+      this.currentPanelMode = mode
+
       const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
 
       /**
@@ -650,6 +655,13 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       select(viewerStateNavigationStateSelector)
     ).subscribe(nav => this.navigation = nav)
     this.onDestroyCb.push(() => navSub.unsubscribe())
+  }
+
+  handleCycleViewEvent(){
+    if (this.currentPanelMode !== PANELS.SINGLE_PANEL) return
+    this.store$.dispatch(
+      ngViewerActionCycleViews()
+    )
   }
 
   handleViewerLoadedEvent(flag: boolean) {

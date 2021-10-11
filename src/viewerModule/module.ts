@@ -28,6 +28,7 @@ import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, AtlasViewerAPIServices, setViewerH
 import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { ViewerInternalStateSvc } from "./viewerInternalState.service";
+import { LayerBrowserModule } from "src/ui/layerbrowser";
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { ViewerInternalStateSvc } from "./viewerInternalState.service";
     ViewerStateBreadCrumbModule,
     KgRegionalFeatureModule,
     KeyFrameModule,
+    LayerBrowserModule,
   ],
   declarations: [
     ViewerCmp,

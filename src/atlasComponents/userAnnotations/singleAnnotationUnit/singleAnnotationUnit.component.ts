@@ -115,7 +115,7 @@ export class SingleAnnotationNamePipe implements PipeTransform{
   public transform(ann: IAnnotationGeometry, name?: string): string{
     if (name) return name
     if (ann instanceof Polygon) return `Unnamed Polygon`
-    if (ann instanceof Point) return `Unname Point`
+    if (ann instanceof Point) return `Unnamed Point`
     if (ann instanceof Line) return `Unnamed Line`
     return `Unnamed geometry`
   }

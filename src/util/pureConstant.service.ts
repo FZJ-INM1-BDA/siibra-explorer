@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, Subscription, of, forkJoin, combineLatest } from "rxjs";
+import { Observable, Subscription, of, forkJoin, combineLatest, from } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
 import { shareReplay, tap, scan, catchError, filter, switchMap, map, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
@@ -10,7 +10,8 @@ import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector 
 import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
 import { flattenReducer } from 'common/util'
 import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
-import { MultiDimMap, recursiveMutate } from "./fn";
+import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
+import { patchRegions } from './patchPureConstants'
 
 
 const validVolumeType = new Set([
@@ -204,6 +205,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     )
   }
 
+  private patchRegions$ = forkJoin(
+    patchRegions.map(patch => from(patch))
+  ).pipe(
+    shareReplay(1)
+  )
+
   private getRegions(atlasId: string, parcId: string, spaceId: string){
     return this.http.get<TRegion[]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions`,
@@ -213,6 +220,53 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
         },
         responseType: 'json'
       }
+    ).pipe(
+      switchMap(regions => this.patchRegions$.pipe(
+        map(patchRegions => {
+          for (const p of patchRegions) {
+            if (
+              p.targetParcellation !== '*'
+              && Array.isArray(p.targetParcellation)
+              && p.targetParcellation.every(p => p["@id"] !== parcId)
+            ) {
+              continue
+            }
+            if (
+              p.targetSpace !== '*'
+              && Array.isArray(p.targetSpace)
+              && p.targetSpace.every(sp => sp['@id'] !== spaceId)
+            ) {
+              continue
+            }
+
+            recursiveMutate(
+              regions,
+              r => r.children || [],
+              region => {
+
+                if (p["@type"] === 'julich/siibra/append-region/v0.0.1') {
+                  if (p.parent['name'] === region.name) {
+                    if (!region.children) region.children = []
+                    region.children.push(
+                      p.payload as TRegion
+                    )
+                  }
+                }
+                if (p['@type'] === 'julich/siibra/patch-region/v0.0.1') {
+                  if (p.target['name'] === region.name) {
+                    mutateDeepMerge(
+                      region,
+                      p.payload
+                    )
+                  }
+                }
+              },
+              true
+            )
+          }
+          return regions
+        })
+      ))
     )
   }
 
@@ -435,7 +489,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     }),
     catchError((err, obs) => of([])),
     tap((arr: any[]) => this.totalAtlasesLength = arr.length),
-    scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 1001) - (b.order || 1000)), []),
+    scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 0) - (b.order || 0)), []),
     shareReplay(1)
   )
 

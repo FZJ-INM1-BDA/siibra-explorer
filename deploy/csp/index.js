@@ -39,12 +39,24 @@ const defaultAllowedSites = [
 
 const connectSrc = [
   "'self'",
+
+  // needed by ad hoc generation of URL resources
   "blob:",
+
+  // siibra-api endpoints
+  'siibra-api-latest.apps-dev.hbp.eu',
+  'siibra-api-rc.apps.hbp.eu',
+  'siibra-api-stable.apps.hbp.eu',
+  
+  // chunk servers
   'neuroglancer.humanbrainproject.org',
   'neuroglancer.humanbrainproject.eu',
-  'connectivity-query-v1-1-connectivity.apps-dev.hbp.eu',
   'object.cscs.ch',
-  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/', // required for dataset previews
+
+  // required for dataset previews
+  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/',
+
+  // injected by env var
   ...CSP_CONNECT_SRC
 ]
 
@@ -125,6 +137,7 @@ module.exports = {
       } else {
         console.warn(`CSP Violation: no data received!`)
       }
+      res.status(204).end()
     })
   }
 }

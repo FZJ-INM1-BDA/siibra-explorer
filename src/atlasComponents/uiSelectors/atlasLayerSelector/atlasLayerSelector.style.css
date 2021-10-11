@@ -38,6 +38,8 @@
 
 .selector-container
 {
+    overflow-y:scroll;
+    max-height: 80vh;
     width: 21rem;
     bottom: 4rem;
     z-index: 5;

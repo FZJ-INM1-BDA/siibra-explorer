@@ -107,16 +107,19 @@
 <!-- pinned dataset btn -->
 <ng-template #pinnedDatasetBtnTmpl>
   <div class="btnWrapper"
-    (click)="bottomSheet.open(savedDatasets)"
+    (click)="openPinnedDatasets()"
     [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
     matBadgeColor="accent"
     matBadgePosition="above after"
     [matBadgeDescription]="PINNED_DATASETS_BADGE_DESC"
-    matTooltip="Pinned datasets">
+    [matTooltip]="pinnedDsNotAvail"
+    aria-disabled="true"
+    role="button">
     <iav-dynamic-mat-button
       [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
       [iav-dynamic-mat-button-style]="matBtnStyle"
       [iav-dynamic-mat-button-color]="matBtnColor"
+      [iav-dynamic-mat-button-disabled]="true"
       iav-dynamic-mat-button-aria-label="Show pinned datasets">
 
       <i class="fas fa-thumbtack"></i>

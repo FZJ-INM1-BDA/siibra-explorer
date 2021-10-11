@@ -70,7 +70,6 @@
 | `REDIS_PORT` | fall back to `REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT` |
 | `REDIS_USERNAME` |
 | `REDIS_PASSWORD` |
-| `DISABLE_LIMITER` | disable rate limiting (maybe required for automated tests) |
 
 ##### SaneUrl
 
