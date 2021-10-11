@@ -49,10 +49,10 @@ async function getInterpolatedPatchObj(targetName: string, labelIndex: number){
       "volumeSrc": {
         'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': {
           "collect": [{
-            "@type": "fzj/tmp/volume_type/v0.0.1" as "fzj/tmp/volume_type/v0.0.1",
+            "@type": "fzj/tmp/volume_type/v0.0.1" as const,
             "@id": "fzj/tmp/volume_type/v0.0.1/interpolated",
             "name": "Julich Brain v2.5 interpolated map",
-            "volume_type": "neuroglancer/precomputed" as "neuroglancer/precomputed",
+            "volume_type": "neuroglancer/precomputed" as const,
             "url": "https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
             "detail": {
               "neuroglancer/precomputed": {
@@ -93,10 +93,10 @@ async function getIndividualMap(parentName: string, regionName: string, url: str
       "volumeSrc": {
         'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': {
           "collect": [{
-            "@type": "fzj/tmp/volume_type/v0.0.1" as "fzj/tmp/volume_type/v0.0.1",
+            "@type": "fzj/tmp/volume_type/v0.0.1" as const,
             "@id": `fzj/tmp/volume_type/v0.0.1/${volumeId}`,
             "name": "Julich Brain v2.5 detailed map",
-            "volume_type": "neuroglancer/precomputed" as "neuroglancer/precomputed",
+            "volume_type": "neuroglancer/precomputed" as const,
             "url": url,
             "detail": {
               "neuroglancer/precomputed": {

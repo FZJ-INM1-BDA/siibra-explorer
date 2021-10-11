@@ -33,7 +33,7 @@ type TAnnotationMetadata = {
   desc: string
 }
 
-const descType: 'siibra-ex/meta/desc' = 'siibra-ex/meta/desc'
+const descType = 'siibra-ex/meta/desc'
 type TTypedAnnMetadata = {
   '@type': 'siibra-ex/meta/desc'
 } & TAnnotationMetadata
