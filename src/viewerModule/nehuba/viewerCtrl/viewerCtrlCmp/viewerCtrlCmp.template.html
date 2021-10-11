@@ -41,3 +41,35 @@
   </form>
 </ng-container>
 
+<ng-container>
+  <button mat-menu-item [mat-menu-trigger-for]="perspectiveOrientationMenu">
+    Change orientation to
+  </button>
+
+  <mat-menu #perspectiveOrientationMenu="matMenu" >
+
+    <button mat-menu-item clas class="d-flex align-items-center"
+            (click)="$event.stopPropagation(); setPerspectiveOrientation([0,-1,1,0])">
+      Coronal view
+      <button mat-icon-button (click)="$event.stopPropagation(); setPerspectiveOrientation([-1,0,0,1])" class="ml-2">
+        <i class="fas fa-arrows-alt-h" ></i>
+      </button>
+    </button>
+    <button mat-menu-item clas class="d-flex align-items-center"
+            (click)="$event.stopPropagation(); setPerspectiveOrientation([-1,-1,1,1])"> <!--{side: 'Sagittal'}-->
+      Sagittal view
+      <button mat-icon-button (click)="$event.stopPropagation(); setPerspectiveOrientation([-1,1,-1,1])" class="ml-2">
+        <i class="fas fa-arrows-alt-h" ></i>
+      </button>
+    </button>
+    <button mat-menu-item clas class="d-flex align-items-center"
+            (click)="$event.stopPropagation(); setPerspectiveOrientation([0,0,1,0])">
+      Axial view
+      <button mat-icon-button (click)="$event.stopPropagation(); setPerspectiveOrientation([1,0,0,0])" class="ml-2">
+        <i class="fas fa-arrows-alt-h" ></i>
+      </button>
+    </button>
+
+  </mat-menu>
+</ng-container>
+

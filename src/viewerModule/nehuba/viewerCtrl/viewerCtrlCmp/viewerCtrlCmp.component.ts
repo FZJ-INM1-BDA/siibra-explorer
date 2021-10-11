@@ -10,6 +10,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -188,5 +189,18 @@ export class ViewerCtrlCmp{
 
   public trackByAtId(_idx: number, obj: { ['@id']: string }) {
     return obj['@id']
+  }
+
+  public setPerspectiveOrientation(orientation) {
+
+
+
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          perspectiveOrientation: orientation,
+        }
+      })
+    )
   }
 }
