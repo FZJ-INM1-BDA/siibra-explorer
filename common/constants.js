@@ -60,6 +60,7 @@
 
     //Viewer mode
     VIEWER_MODE_ANNOTATING: 'annotating',
+    VIEWER_MODE_KEYFRAME: 'key frame',
 
     // Annotations
     USER_ANNOTATION_LIST: 'user annotations footer',

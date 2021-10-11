@@ -163,6 +163,18 @@
       Annotation mode
     </span>
   </button>
+
+  <button mat-menu-item
+    *ngIf="EXPERIMENTAL_FEATURE_FLAG"
+    [disabled]="!viewerLoaded"
+    key-frame-play-now
+    [matTooltip]="keyFrameText">
+    <mat-icon fontSet="fas" fontIcon="fa-play"></mat-icon>
+    <span>
+      KeyFrames
+    </span>
+  </button>
+  
   <plugin-banner></plugin-banner>
 </mat-menu>
 

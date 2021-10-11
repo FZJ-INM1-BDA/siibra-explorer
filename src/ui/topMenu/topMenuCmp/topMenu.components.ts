@@ -11,6 +11,7 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dial
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { CONST, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'top-menu-cmp',
@@ -22,6 +23,8 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 })
 
 export class TopMenuCmp {
+
+  public EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
 
   public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
 
@@ -49,7 +52,8 @@ export class TopMenuCmp {
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
   public annotateTooltipText: string = 'Start annotating'
-
+  public keyFrameText = `Start KeyFrames`
+  
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
