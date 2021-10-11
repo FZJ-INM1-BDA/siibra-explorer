@@ -165,6 +165,7 @@
   </button>
 
   <button mat-menu-item
+    *ngIf="EXPERIMENTAL_FEATURE_FLAG"
     [disabled]="!viewerLoaded"
     key-frame-play-now
     [matTooltip]="keyFrameText">
