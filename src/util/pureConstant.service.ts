@@ -12,6 +12,7 @@ import { flattenReducer } from 'common/util'
 import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
+import { environment } from "src/environments/environment";
 
 
 const validVolumeType = new Set([
@@ -423,6 +424,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     }
   ).pipe(
     map(arr => {
+      const { EXPERIMENTAL_FEATURE_FLAG } = environment
+      if (EXPERIMENTAL_FEATURE_FLAG) return arr
       return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
     }),
     shareReplay(1),
