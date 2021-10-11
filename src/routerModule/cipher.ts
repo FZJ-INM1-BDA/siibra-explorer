@@ -3,9 +3,6 @@
  * The constraint is that the cipher needs to be commpatible with URI encoding
  * and a URI compatible separator is required.
  *
- * The implementation below came from
- * https://stackoverflow.com/a/6573119/6059235
- *
  * While a faster solution exist in the same post, this operation is expected to be done:
  * - once per 1 sec frequency
  * - on < 1000 numbers
@@ -21,8 +18,7 @@ const encodeInt = (number: number) => {
   if (number % 1 !== 0) { throw new Error('cannot encodeInt on a float. Ensure float flag is set') }
   if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) { throw new Error('The input is not valid') }
 
-  let rixit // like 'digit', only in some non-decimal radix
-  let residual
+  let residual: number
   let result = ''
 
   if (number < 0) {
@@ -34,17 +30,11 @@ const encodeInt = (number: number) => {
 
   /* eslint-disable-next-line no-constant-condition */
   while (true) {
-    rixit = residual % 64
-    // this.log.log("rixit : " + rixit)
-    // this.log.log("result before : " + result)
-    result = cipher.charAt(rixit) + result
-    // this.log.log("result after : " + result)
-    // this.log.log("residual before : " + residual)
+    result = cipher.charAt(residual % 64) + result
     residual = Math.floor(residual / 64)
-    // this.log.log("residual after : " + residual)
 
     if (residual === 0) {
-      break;
+      break
     }
   }
   return result

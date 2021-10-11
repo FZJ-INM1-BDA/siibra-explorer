@@ -1,5 +1,6 @@
-import { Input } from "@angular/core"
+import { Directive, Input } from "@angular/core"
 
+@Directive()
 export class LandmarkUnitBase{
   @Input() public positionX: number = 0
   @Input() public positionY: number = 0

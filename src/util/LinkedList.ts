@@ -1,4 +1,7 @@
-export interface IDoublyLinkedItem<T extends object> {
+// eslint-disable-next-line @typescript-eslint/ban-types
+type TNonePrimitive = object
+
+export interface IDoublyLinkedItem<T extends TNonePrimitive> {
   next: IDoublyLinkedItem<T>
   prev: IDoublyLinkedItem<T>
   thisObj: T
@@ -6,7 +9,7 @@ export interface IDoublyLinkedItem<T extends object> {
   list: DoublyLinkedList<T>
 }
 
-export class DoublyLinkedList<T extends object>{
+export class DoublyLinkedList<T extends TNonePrimitive>{
   
   public first: IDoublyLinkedItem<T>
   public last: IDoublyLinkedItem<T>
@@ -99,7 +102,7 @@ export class DoublyLinkedList<T extends object>{
   }
 }
 
-export function FindInLinkedList<T extends object>(list: DoublyLinkedList<T>, predicate: (element: IDoublyLinkedItem<T>) => boolean){
+export function FindInLinkedList<T extends TNonePrimitive>(list: DoublyLinkedList<T>, predicate: (element: IDoublyLinkedItem<T>) => boolean){
   let compareObj = list.first,
     returnObj: IDoublyLinkedItem<T> = null
 

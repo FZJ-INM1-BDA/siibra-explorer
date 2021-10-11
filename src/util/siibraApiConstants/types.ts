@@ -14,7 +14,7 @@ type TAuxMesh = {
   labelIndicies: number[]
 }
 
-interface IVolumeTypeDetail {
+export interface IVolumeTypeDetail {
   'nii': null
   'neuroglancer/precomputed': {
     'neuroglancer/precomputed': {
@@ -29,21 +29,39 @@ interface IVolumeTypeDetail {
     }
   }
   'detailed maps': null
+  'threesurfer/gii': any
+  'threesurfer/gii-label': any
 }
 
-type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
+export type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
   '@id': string
   '@type': 'fzj/tmp/volume_type/v0.0.1'
   name: string
   url: string
   volume_type: TVolumeType
   detail: IVolumeTypeDetail[VolumeType]
+
+  space_id: string
+  map_type: string
 }
+
+export type TSimpleInfo = {
+  "@type": 'fzj/tmp/simpleOriginInfo/v0.0.1'
+  name: string
+  description: string
+}
+
 
 type TKgIdentifier = {
   kgSchema: string
   kgId: string
 }
+
+export type TKgInfo = {
+  '@type': 'minds/core/dataset/v1.0.0'
+} & TKgIdentifier
+
+type TDatasetSpec = TVolumeSrc<keyof IVolumeTypeDetail> | TSimpleInfo | TKgInfo
 
 type TVersion = {
   name: string
@@ -92,17 +110,18 @@ export type TSpaceFull = {
   id: string
   name: string
   key: string //???
-  type: string //???
-  url: string //???
-  ziptarget: string //???
+  _dataset_specs: TDatasetSpec[]
+  _datasets_cached: null
+  extends: null
   src_volume_type: TSpaceType
-  volume_src: TVolumeSrc<keyof IVolumeTypeDetail>[]
+  type: string //???
   availableParcellations: TParcSummary[]
+
   links: {
     templates: THref
     parcellation_maps: THref
+    features: THref
   }
-  originDatainfos: TDatainfos[]
 }
 
 export type TParc = {
@@ -113,19 +132,20 @@ export type TParc = {
   availableSpaces: {
     id: string
     name: string
+    extends: null
+    key: string
+    src_volume_type: 'histology' | 'mri'
+    type: 'neuroglancer/precomputed' | 'nii'
+    _dataset_specs: TDatasetSpec[]
   }[]
   links: {
     self: THref
   }
   regions: THref
+  features: THref
   modality: TParcModality
   version: TVersion
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
-  }
-  originDatainfos: TDatainfos[]
+  _dataset_specs: TDatasetSpec[]
 }
 
 export type TRegionDetail = {

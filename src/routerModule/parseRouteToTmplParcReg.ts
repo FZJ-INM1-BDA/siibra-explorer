@@ -18,7 +18,7 @@ export const PARSE_ERROR = {
 export const encodeId = (id: string) => id && id.replace(/\//g, ':')
 export const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
 
-export function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>, fullPath: UrlTree, state: any, warnCb: Function) {
+export function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>, fullPath: UrlTree, state: any, warnCb: (arg: string) => void) {
 
   /**
    * TODO if search param of either template or parcellation is incorrect, wrong things are searched

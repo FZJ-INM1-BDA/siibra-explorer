@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "**/*.spec.ts",
+    "./spec/*",
+    "src/atlasViewerExports/*"
+  ],
+  "files": [
+    "src/main-aot.ts"
+  ]
+}

@@ -36,7 +36,7 @@
       </button>
   
       <mat-list>
-        <ng-container *ngFor="let csp of pluginCsp['pluginCsp'] | objToArray">
+        <ng-container *ngFor="let csp of pluginCsp['pluginCsp'] | keyvalue">
           <span mat-subheader>
             {{ csp['key'] }}
           </span>

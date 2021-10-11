@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
 import { IMPORT_NEHUBA_INJECT_TOKEN, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
@@ -13,7 +13,7 @@ import { UtilModule } from "src/util";
 import { LayoutModule } from "src/layouts/layout.module";
 import { TouchSideClass } from "./touchSideClass.directive";
 import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { MaximisePanelButton } from "./maximisePanelButton/maximisePanelButton.component";
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module";
 import { MouseoverModule } from "src/mouseoverModule";
@@ -26,6 +26,7 @@ import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
+import { DragDropFileModule } from "src/dragDropFile/module";
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { ViewerCtrlModule } from "./viewerCtrl";
     ShareModule,
     WindowResizeModule,
     ViewerCtrlModule,
+    DragDropFileModule,
 
     /**
      * should probably break this into its own...
@@ -79,6 +81,9 @@ import { ViewerCtrlModule } from "./viewerCtrl";
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)
     }
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

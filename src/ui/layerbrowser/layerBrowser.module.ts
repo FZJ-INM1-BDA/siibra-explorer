@@ -5,7 +5,7 @@ import {
 } from './layerBrowserComponent/layerbrowser.component'
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AngularMaterialModule } from '../sharedModules/angularMaterial.module';
+import { AngularMaterialModule } from 'src/sharedModules';
 import { LayerDetailComponent } from './layerDetail/layerDetail.component';
 import { FormsModule } from '@angular/forms';
 import { UtilModule } from 'src/util';

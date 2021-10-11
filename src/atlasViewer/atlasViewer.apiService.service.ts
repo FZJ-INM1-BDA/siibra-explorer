@@ -8,7 +8,6 @@ import { DialogService } from "src/services/dialogService.service";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import {
   viewerStateFetchedTemplatesSelector,
-  viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
@@ -20,7 +19,7 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
 import { ILoadMesh } from 'src/messaging/types'
-import {ARIA_LABELS} from "common/constants";
+import { CANCELLABLE_DIALOG } from "src/util/interfaces";
 
 declare let window
 
@@ -37,8 +36,6 @@ interface IGetUserSelectRegionPr{
   rj: (reject: IRejectUserInput) => void
 }
 
-export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
-
 @Injectable({
   providedIn : 'root'
 })
@@ -47,7 +44,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   public loadMesh$ = new Subject<ILoadMesh>()
 
-  private onDestoryCb: Function[] = []
+  private onDestoryCb: (() => void)[] = []
   private loadedTemplates$: Observable<any>
   private selectParcellation$: Observable<any>
   public interactiveViewer: IInteractiveViewerInterface
@@ -67,7 +64,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
   }
 
-  private dismissDialog: Function
+  private dismissDialog: () => void
   public getUserToSelectRegion: IGetUserSelectRegionPr[] = []
   public getUserToSelectRegionUI$: Subject<IGetUserSelectRegionPr[]> = new Subject()
 

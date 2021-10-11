@@ -157,11 +157,9 @@ export interface IavRootStoreInterface {
   userConfigState: UserConfigStateInterface
 }
 
-import { DATASTORE_DEFAULT_STATE } from 'src/atlasComponents/databrowserModule'
-
 export const defaultRootState: any = {
   pluginState: pluginDefaultState,
-  dataStore: DATASTORE_DEFAULT_STATE,
+  dataStore: {},
   ngViewerState: ngViewerDefaultState,
   uiState: uiDefaultState,
   userConfigState: userConfigDefaultState,

@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Inject, NgModule, Optional } from "@angular/core";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { KgRegSummaryCmp } from "./kgRegSummary/kgRegSummary.component";
 import { KgRegionalFeaturesList } from "./kgRegList/kgRegList.component";
 import { KgRegionalFeaturesListDirective } from "./kgRegList/kgReglist.directive";

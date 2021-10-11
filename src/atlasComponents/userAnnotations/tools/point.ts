@@ -1,6 +1,6 @@
 import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TCallbackFunction, TNgAnnotationEv, TSandsPoint, TToolType } from "./type";
 import { Observable, Subject, Subscription } from "rxjs";
-import { OnDestroy } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 
 export type TPointJsonSpec = {
@@ -101,6 +101,7 @@ export class Point extends IAnnotationGeometry {
 
 export const POINT_ICON_CLASS='fas fa-circle'
 
+@Directive()
 export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_point_preview'
   public name = 'Point'

@@ -171,6 +171,9 @@ export class RegionTextSearchAutocomplete {
   public autocompleteList$: Observable<any[]>
   public formControl = new FormControl()
 
+  public filterNullFn(item: any){
+    return !!item
+  }
   public regionsSelected$: Observable<any>
   public parcellationSelected$: Observable<any>
 

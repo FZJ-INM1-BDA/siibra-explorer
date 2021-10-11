@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 })
 
 export class GetPropertyPipe implements PipeTransform{
-  public transform(input, property = '@id') {
+  public transform(input: any, property: any = '@id') {
     return input && input[property]
   }
 }

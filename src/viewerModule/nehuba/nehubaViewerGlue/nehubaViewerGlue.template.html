@@ -1,5 +1,6 @@
 <div class="d-block w-100 h-100"
   (touchmove)="$event.preventDefault()"
+  (drag-drop-file)="handleFileDrop($event)"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
@@ -27,19 +28,19 @@
     [quick-tour-order]="quickTourSliceViewSlide.order"
     [quick-tour-overwrite-arrow]="sliceViewArrow"
     [quick-tour-overwrite-position]="quickTourOverwritingPos">
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 0 | parseAsNumber }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 0 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-ii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 1 | parseAsNumber }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 1 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 2 | parseAsNumber }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 2 | parseAsNumber }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iv
     quick-tour
     [quick-tour-description]="quickTour3dViewSlide.description"
     [quick-tour-order]="quickTour3dViewSlide.order">
-    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber }"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
 </current-layout>
 
@@ -86,7 +87,7 @@
 
       <!-- customLandmarks -->
       <!-- only show landmarks in slice views -->
-      <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterByProperty : 'showInSliceView')"
+      <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterArray : filterCustomLandmark)"
         (mouseenter)="handleMouseEnterCustomLandmark(lm)"
         (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
         [color]="lm.color || [255, 255, 255]"
@@ -170,7 +171,6 @@
   <!-- NB must not lazy load. key listener needs to work even when component is not yet rendered -->
   <!-- stop propagation is needed, or else click will result in dismiss of menu -->
   <viewer-ctrl-component class="d-block m-2 ml-3 mr-3"
-    #viewerCtrlCmp="viewerCtrlCmp"
     (click)="$event.stopPropagation()">
   </viewer-ctrl-component>
 </mat-menu>
@@ -191,4 +191,43 @@
       <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </svg>
+</ng-template>
+
+<ng-template #layerCtrlTmpl let-data>
+  <div class="grid grid-col-3">
+
+    <span class="ml-2 text-truncate v-center-text-span">
+      <i class="fas fa-file"></i>
+      {{ data.filename }}
+    </span>
+    
+    <button
+      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
+      mat-icon-button
+      [color]="data.moreInfoFlag ? 'primary' : 'basic'"
+      (click)="data.moreInfoFlag = !data.moreInfoFlag">
+      <i class="fas fa-sliders-h"></i>
+    </button>
+
+    <button
+      [matTooltip]="ARIA_LABELS.CLOSE"
+      color="warn"
+      mat-icon-button
+      mat-dialog-close>
+      <i class="fas fa-trash"></i>
+    </button>
+
+    <div *ngIf="data.moreInfoFlag"
+      class="iv-custom-comp darker-bg overflow-hidden grid-wide-3">
+      <ng-layer-tune
+        [ngLayerName]="data.layerName"
+        [thresholdMin]="data.min"
+        [thresholdMax]="data.max">
+      </ng-layer-tune>
+      <ul>
+        <li *ngFor="let warn of data.warning">{{ warn }}</li>
+      </ul>
+    </div>
+
+  </div>
 </ng-template>

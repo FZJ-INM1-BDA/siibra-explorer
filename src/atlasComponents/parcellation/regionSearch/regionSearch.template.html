@@ -74,7 +74,7 @@
 <ng-template #regionHierarchy>
   <region-hierarchy
     [useMobileUI]="useMobileUI$ | async"
-    [selectedRegions]="regionsSelected$ | async | filterNull"
+    [selectedRegions]="regionsSelected$ | async | filterArray : filterNullFn"
     (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
     (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
     (clearAllRegions)="deselectAllRegions($event)"

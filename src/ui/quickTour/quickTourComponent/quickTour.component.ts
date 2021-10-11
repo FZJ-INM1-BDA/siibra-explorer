@@ -14,6 +14,7 @@ import { QuickTourThis } from "../quickTourThis.directive";
 import { clamp } from "src/util/generator";
 
 @Component({
+  selector: 'quick-tour-unit',
   templateUrl : './quickTour.template.html',
   styleUrls : [
     './quickTour.style.css'

@@ -3,7 +3,7 @@
   <mat-accordion
     class="ml-24px-n mr-24px-n d-block">
     <mat-expansion-panel *ngFor="let datum of (data$ | async)"
-      [expanded]="openElectrodeId$ | async | arrayContains : datum['@id']"
+      [expanded]="openElectrodeId$ | async | includes : datum['@id']"
       (opened)="handleDatumExpansion(datum['@id'], true)"
       (closed)="handleDatumExpansion(datum['@id'], false)"
       togglePosition="before">

@@ -20,7 +20,7 @@ const selectedColor = [ 255, 0, 0 ]
 
 export class IEEGRecordingsCmp extends RegionFeatureBase implements ISingleFeature{
   private landmarksLoaded: IHasId[] = []
-  private onDestroyCb: Function[] = []
+  private onDestroyCb: (() => void)[] = []
   private sub: Subscription[] = []
 
   constructor(

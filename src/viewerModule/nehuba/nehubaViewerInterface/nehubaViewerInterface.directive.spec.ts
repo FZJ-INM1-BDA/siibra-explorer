@@ -33,12 +33,6 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         providers: [
           provideMockStore({ initialState: {} })
         ]
-      }).overrideModule(BrowserDynamicTestingModule,{
-        set: {
-          entryComponents: [
-            NehubaViewerUnit
-          ]
-        }
       }).overrideComponent(DummyCmp, {
         set: {
           template: `

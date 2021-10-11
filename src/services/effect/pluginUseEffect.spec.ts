@@ -10,7 +10,7 @@ import { PLUGINSTORE_CONSTANTS, PLUGINSTORE_ACTION_TYPES } from '../state/plugin
 import { Injectable } from "@angular/core";
 import { getRandomHex } from 'common/util'
 import { PluginServices } from "src/plugin";
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { hot } from "jasmine-marbles";
 import { BS_ENDPOINT } from "src/util/constants";
 

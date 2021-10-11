@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components";
 
-import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { MessagingService } from "./service";
 
 

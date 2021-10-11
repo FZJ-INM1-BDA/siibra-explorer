@@ -1,0 +1,18 @@
+<div
+  [@collapseState] = "{ value : show ? 'visible' : 'collapsed', params : { collapsedHeight: collapsedHeight, fullHeight: fullHeight, animationLength: animationLength } }"
+  class="readmore-content">
+  <div #contentContainer>
+    <ng-content>
+    </ng-content>
+  </div>
+</div>
+<div 
+  (click)="toggle($event)" 
+  class="readmore-sliver"
+  [hoverable]="{translateY:-1}">
+
+  <i 
+    [ngClass] = "show ? 'fa-chevron-up' : 'fa-chevron-down'" 
+    class = "fas">
+  </i>
+</div>

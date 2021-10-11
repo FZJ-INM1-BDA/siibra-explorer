@@ -3,7 +3,7 @@ import { async, TestBed } from '@angular/core/testing'
 import { NgLayersService } from '../ngLayerService.service'
 import { By } from '@angular/platform-browser'
 import * as CONSTANT from 'src/util/constants'
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { AngularMaterialModule } from 'src/sharedModules'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
@@ -112,10 +112,10 @@ describe('> layerDetail.component.ts', () => {
       })
   
       it('> on bind input, if input is truthy, calls get on layerService maps', () => {
-        const service = TestBed.inject(NgLayersService)
         TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
           useValue: {}
         })
+        const service = TestBed.inject(NgLayersService)
         const {
           brightnessMapGetSpy,
           contractMapGetSpy,

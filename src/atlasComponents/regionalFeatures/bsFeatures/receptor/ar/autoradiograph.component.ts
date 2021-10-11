@@ -2,6 +2,7 @@ import { Component, Input, OnChanges } from "@angular/core";
 import { BsFeatureReceptorBase } from "../base";
 import { CONST } from 'common/constants'
 import { TBSDetail } from "../type";
+import { environment } from 'src/environments/environment'
 
 const { RECEPTOR_AR_CAPTION } = CONST
 
@@ -21,7 +22,7 @@ export function isAr(detail: TBSDetail, label: string){
 export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChanges {
 
   public RECEPTOR_AR_CAPTION = RECEPTOR_AR_CAPTION
-  private DS_PREVIEW_URL = DATASET_PREVIEW_URL
+  private DS_PREVIEW_URL = environment.DATASET_PREVIEW_URL
 
   @Input()
   bsLabel: string

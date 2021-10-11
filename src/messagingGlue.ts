@@ -1,4 +1,4 @@
-import { OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { IMessagingActionTmpl, IWindowMessaging } from "./messaging/types";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState/actions";
@@ -6,6 +6,7 @@ import { viewerStateSelectAtlas } from "./services/state/viewerState/actions";
 import { viewerStateFetchedAtlasesSelector } from "./services/state/viewerState/selectors";
 import { generalActionError } from "./services/stateStore.helper";
 
+@Injectable()
 export class MessagingGlue implements IWindowMessaging, OnDestroy {
 
   private onDestroyCb: (() => void)[] = []

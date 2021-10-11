@@ -20,6 +20,10 @@
   margin-top: 1.5rem;
 }
 
+.tab-toggle-container > *
+{
+  display: block;
+}
 
 .tab-toggle
 {
@@ -39,11 +43,6 @@
   z-index: 10;
   position: sticky;
   bottom: 0.5rem;
-}
-
-:host >>> .mat-chip-list-wrapper
-{
-  flex-wrap: nowrap;
 }
 
 mat-drawer

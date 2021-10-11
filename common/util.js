@@ -47,10 +47,6 @@
     return true
   }
 
-  /**
-   *
-   * https://stackoverflow.com/a/16348977/6059235
-   */
   exports.strToRgb = str => {
     if (typeof str !== 'string') throw new Error(`strToRgb input must be typeof string !`)
 

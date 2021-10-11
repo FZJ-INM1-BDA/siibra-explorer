@@ -4,34 +4,17 @@ import { ComponentsModule } from "src/components/components.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 
-import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
-import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
-
-import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
-import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
-import { CitationsContainer } from "./citation/citations.component";
-
 import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
-import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
-import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
+import { AngularMaterialModule } from 'src/sharedModules'
 import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
-import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
-
-
-import { DatabrowserModule } from "../atlasComponents/databrowserModule/databrowser.module";
 
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
-import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
-import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
-import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
 
 import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
@@ -45,7 +28,7 @@ import { DOCUMENT } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionalFeaturesModule } from "../atlasComponents/regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
-import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "./screenshot";
+import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 
@@ -57,7 +40,6 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     ReactiveFormsModule,
     LayoutModule,
     ComponentsModule,
-    DatabrowserModule,
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
@@ -70,26 +52,14 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
   ],
   declarations : [
     
-    CitationsContainer,
     LogoContainer,
     MobileOverlay,
 
     ActionDialog,
 
     /* pipes */
-    GroupDatasetByRegion,
-    FilterRegionDataEntries,
-    FlatmapArrayPipe,
-    GetLayerNameFromDatasets,
-    SortDataEntriesToRegion,
-    SpatialLandmarksToDataBrowserItemPipe,
-    AppendtooltipTextPipe,
     MobileControlNubStylePipe,
-    PluginBtnFabColorPipe,
-    KgSearchBtnColorPipe,
-    GetFileExtension,
 
-    TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
 
@@ -164,7 +134,6 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     ActionDialog,
   ],
   exports : [
-    CitationsContainer,
     // NehubaContainer,
     
     LogoContainer,

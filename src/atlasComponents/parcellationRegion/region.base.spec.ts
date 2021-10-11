@@ -2,7 +2,9 @@ import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { viewerStateSelectTemplateWithId } from 'src/services/state/viewerState/actions'
 import { RegionBase, regionInOtherTemplateSelector, getRegionParentParcRefSpace } from './region.base'
-const  util = require('common/util')
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const util = require('common/util')
 
 /**
  * regions

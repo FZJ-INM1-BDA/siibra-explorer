@@ -257,28 +257,6 @@ export class AtlasLayerSelector implements OnInit {
     }
 }
 
-import "src/res/images/atlas-selection/bigbrain.png"
-import 'src/res/images/atlas-selection/icbm2009c.png'
-import 'src/res/images/atlas-selection/colin27.png'
-import 'src/res/images/atlas-selection/cytoarchitectonic-maps.png'
-import 'src/res/images/atlas-selection/cortical-layers.png'
-import 'src/res/images/atlas-selection/grey-white-matter.png'
-import 'src/res/images/atlas-selection/firbe-long.png'
-import 'src/res/images/atlas-selection/firbe-short.png'
-import 'src/res/images/atlas-selection/difumo-64.png'
-import 'src/res/images/atlas-selection/difumo-128.png'
-import 'src/res/images/atlas-selection/difumo-256.png'
-import 'src/res/images/atlas-selection/difumo-512.png'
-import 'src/res/images/atlas-selection/difumo-1024.png'
-import 'src/res/images/atlas-selection/allen-mouse.png'
-import 'src/res/images/atlas-selection/allen-mouse-2017.png'
-import 'src/res/images/atlas-selection/allen-mouse-2015.png'
-import 'src/res/images/atlas-selection/waxholm.png'
-import 'src/res/images/atlas-selection/waxholm-v3.png'
-import 'src/res/images/atlas-selection/waxholm-v2.png'
-import 'src/res/images/atlas-selection/waxholm-v1.png'
-import 'src/res/images/atlas-selection/short-bundle-hcp.png'
-import 'src/res/images/atlas-selection/freesurfer.png'
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 
 const previewImgMap = new Map([
@@ -329,6 +307,6 @@ export class GetPreviewUrlPipe implements PipeTransform{
     if (!filename) {
       console.log(tile)
     }
-    return filename && `res/image/${filename}`
+    return filename && `assets/images//atlas-selection/${filename}`
   }
 }

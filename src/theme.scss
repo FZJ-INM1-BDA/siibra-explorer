@@ -1,17 +1,17 @@
-@import '~@angular/material/theming';
-@import '~@angular/cdk/overlay-prebuilt.css';
+@use 'sass:map';
+@use '~@angular/material' as mat;
 
-@include  mat-core();
+@include mat.core();
 
 @mixin custom-cmp($theme) {
+  $color-config: mat.get-color-config($theme);
 
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
-  $background-color: map-get($background, background);
 
-  $primary: map-get($theme, primary);
-  $accent: map-get($theme, accent);
-  $warn: map-get($theme, warn);
+  $primary: map-get($color-config, primary);
+  $accent: map-get($color-config, accent);
+  $warn: map-get($color-config, warn);
 
   [iv-custom-comp],
   .iv-custom-comp
@@ -40,62 +40,75 @@
     &[bg],
     &.bg
     {
-      background-color: mat-color($background, background);
+      background-color: mat.get-color-from-palette($background, background);
     }
 
     &[darker-bg],
     &.darker-bg
     {
-      background-color: $background-color;
+      background-color: mat.get-color-from-palette($background, background);
     }
 
     &[text],
     &.text
     {
-      color: mat-color($foreground, text);
+      color: mat.get-color-from-palette($foreground, text);
     }
     &[primary],
     &.primary
     {
-      color: mat-color($primary);
+      color: mat.get-color-from-palette($primary, 500);
     }
 
     &[accent],
     &.accent
     {
-      color: mat-color($accent);
+      color: mat.get-color-from-palette($accent, 500);
     }
 
     &[warn],
     &.warn
     {
-      color: mat-color($warn);
+      color: mat.get-color-from-palette($warn, 500);
     }
 
     &.hoverable
     {
       &:hover
       {
-        background-color: mat-color($background, hover);
+        // background-color: mat-color($background, hover);
         cursor: pointer;
       }
     }
   }
 }
 
-$iv-theme-primary: mat-palette($mat-indigo);
-$iv-theme-accent: mat-palette($mat-amber);
-$iv-theme-warn: mat-palette($mat-red);
+$iv-theme-primary:  mat.define-palette(mat.$indigo-palette);
+$iv-theme-accent:   mat.define-palette(mat.$amber-palette);
+$iv-theme-warn:     mat.define-palette(mat.$red-palette);
 
-$iv-theme: mat-light-theme($iv-theme-primary, $iv-theme-accent, $iv-theme-warn);
+$iv-theme: mat.define-light-theme((
+  color: (
+    primary: $iv-theme-primary,
+    accent: $iv-theme-accent,
+    warn: $iv-theme-warn,
+  )
+));
 
-@include angular-material-theme($iv-theme);
+@include mat.all-component-themes($iv-theme);
 @include custom-cmp($iv-theme);
 
-$iv-dark-theme-primary: mat-palette($mat-blue);
-$iv-dark-theme-accent:  mat-palette($mat-amber, A200, A100, A400);
-$iv-dark-theme-warn:    mat-palette($mat-red);
-$iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, $iv-dark-theme-warn);
+$iv-dark-theme-primary: mat.define-palette(mat.$blue-palette);
+$iv-dark-theme-accent:  mat.define-palette(mat.$amber-palette, A200, A100, A400);
+$iv-dark-theme-warn:    mat.define-palette(mat.$red-palette);
+
+$iv-dark-theme:   mat.define-dark-theme((
+  color: (
+    primary: $iv-dark-theme-primary,
+    accent: $iv-dark-theme-accent,
+    warn: $iv-dark-theme-warn,
+  )
+));
 
 /**
   * attribute has lower priority than class
@@ -105,14 +118,14 @@ $iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, 
 [darktheme=true],
 .darktheme.darktheme
 {
-  @include angular-material-theme($iv-dark-theme);
+  @include mat.all-component-themes($iv-dark-theme);
   @include custom-cmp($iv-dark-theme);
 }
 
 [darktheme=false],
 .lighttheme.lighttheme
 {
-  @include angular-material-theme($iv-theme);
+  @include mat.all-component-themes($iv-theme);
   @include custom-cmp($iv-theme);
 }
 

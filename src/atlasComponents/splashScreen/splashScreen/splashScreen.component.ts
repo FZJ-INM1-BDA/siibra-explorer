@@ -21,6 +21,10 @@ export class SplashScreen {
 
   public loadedAtlases$: Observable<any[]>
 
+  public filterNullFn(atlas: any){
+    return !!atlas
+  }
+
   @ViewChild('parentContainer', {read: ElementRef})
   public activatedTemplate$: Subject<any> = new Subject()
 

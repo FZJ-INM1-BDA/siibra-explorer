@@ -23,7 +23,8 @@ const IAV_VOXEL_SIZES_NM = {
   'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8': [39062.5, 39062.5, 39062.5],
   'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': [21166.666015625, 20000, 21166.666015625],
   'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992': [1000000, 1000000, 1000000,],
-  'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': [1000000, 1000000, 1000000]
+  'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': [1000000, 1000000, 1000000],
+  'minds/core/referencespace/v1.0.0/MEBRAINS_T1.masked': [1000000, 1000000, 1000000]
 }
 
 type TAnnotationMetadata = {
@@ -91,7 +92,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private selectedTmpl$ = this.store.pipe(
     select(viewerStateSelectedTemplatePureSelector),
   )
-  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: Function}[] = []
+  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: () => void}[] = []
   private managedAnnotationsStream$ = new Subject<{
     tool: string
     annotations: IAnnotationGeometry[]
@@ -127,6 +128,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         tmpl
       )
     })
+  )
+
+  public badges$ = this.spaceFilteredManagedAnnotations$.pipe(
+    map(mann => mann.length > 0 ? mann.length : null)
   )
 
   private registeredTools: {
@@ -182,7 +187,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     editCmp?: ClassInterface<any>
   }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
-    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: Function }
+    const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
     const { name, iconClass, onMouseMoveRenderPreview } = newTool
     
     this.moduleAnnotationTypes.push({

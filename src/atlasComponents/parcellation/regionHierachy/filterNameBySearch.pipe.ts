@@ -9,8 +9,9 @@ export class FilterNameBySearch implements PipeTransform {
     try {
       return searchFields.some(searchField => new RegExp(searchTerm, 'i').test(searchField))
     } catch (e) {
-      /* https://stackoverflow.com/a/9310752/6059235 */
-      return searchFields.some(searchField => new RegExp(searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')).test(searchField))
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+      // CC0 or MIT
+      return searchFields.some(searchField => new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(searchField))
     }
   }
 }
