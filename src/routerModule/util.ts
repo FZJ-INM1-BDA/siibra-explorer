@@ -34,7 +34,7 @@ const decodePath = (path: string) => {
   }
 }
 
-export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: Function) => {
+export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (arg: string) => void) => {
 
   const warnCb = _warnCb || ((...e: any[]) => console.warn(...e))
   const pathFragments: UrlSegment[] = fullPath.root.hasChildren()

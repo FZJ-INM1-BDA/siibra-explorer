@@ -35,10 +35,6 @@ export class AnnotationList {
   public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
   public annotationInOtherSpaces$ = this.annotSvc.otherSpaceManagedAnnotations$
 
-  public badge$ = this.managedAnnotations$.pipe(
-    map(mann => mann.length > 0 ? mann.length : null)
-  )
-
   public manAnnExists$ = this.managedAnnotations$.pipe(
     map(arr => !!arr && arr.length > 0),
     startWith(false)

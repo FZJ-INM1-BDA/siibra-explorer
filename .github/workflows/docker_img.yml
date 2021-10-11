@@ -46,7 +46,7 @@ jobs:
           fi
         fi
 
-    - name: 'Set version variable'
+    - name: 'Set version variable & expmt feature flag'
       run: |
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
@@ -55,6 +55,7 @@ jobs:
         else
           echo "Using git hash"
           VERSION=$(git rev-parse --short HEAD)
+          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
         fi
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: 'Build docker image'
@@ -66,6 +67,7 @@ jobs:
           --build-arg MATOMO_URL=$MATOMO_URL \
           --build-arg MATOMO_ID=$MATOMO_ID \
           --build-arg BS_REST_URL=$BS_REST_URL \
+          --build-arg EXPERIMENTAL_FEATURE_FLAG=$EXPERIMENTAL_FEATURE_FLAG \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
@@ -160,11 +162,11 @@ jobs:
 
           curl -v \
             -X POST \
-            -H "Authorization: Token ${{ secrets.WORKFLOW_TOKEN }}" \
+            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H 'accept: application/vnd.github.v3+json' \
             ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
             -d '{
-              "target_url":"$DEPLOY_URL",
+              "target_url":"'$DEPLOY_URL'",
               "name": "Deployed at OKD",
               "state": "success"
             }'

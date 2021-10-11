@@ -5,6 +5,7 @@ import { PureContantService } from "src/util";
 import { RegionFeatureBase } from "../../base/regionFeature.base";
 import { ISingleFeature } from "../../interfaces";
 import { CONST } from 'common/constants'
+import { environment } from 'src/environments/environment'
 
 const {
   RECEPTOR_FP_CAPTION,
@@ -24,7 +25,7 @@ export class ReceptorDensityFeatureCmp extends RegionFeatureBase implements ISin
   public RECEPTOR_PR_CAPTION = RECEPTOR_PR_CAPTION
   public RECEPTOR_AR_CAPTION = RECEPTOR_AR_CAPTION
 
-  public DS_PREVIEW_URL = DATASET_PREVIEW_URL
+  public DS_PREVIEW_URL = environment.DATASET_PREVIEW_URL
   viewChanged: EventEmitter<null> = new EventEmitter()
 
   private WEB_COMPONENT_MOUSEOVER_EVENT_NAME = 'kg-ds-prv-regional-feature-mouseover'

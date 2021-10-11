@@ -81,12 +81,13 @@ describe('> url parsing', () => {
       .filter(({ message }) => !/Access-Control-Allow-Origin/.test(message))
 
     // expecting some errors in the console. In catastrophic event, there will most likely be looped errors (on each render cycle)
-    // capture logs and write to spec https://stackoverflow.com/a/24980483/6059235
+    // capture logs and write to spec
     expect(
       filteredLog.length
+    ).withContext(
+      JSON.stringify(filteredLog)
     ).toBeLessThan(
       50,
-      JSON.stringify(filteredLog)
     )
   })
 

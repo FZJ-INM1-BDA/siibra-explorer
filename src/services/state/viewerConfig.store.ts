@@ -43,12 +43,10 @@ const animation = lsAnimationFlag && lsAnimationFlag === 'true'
 // get mobile ui setting
 // UA sniff only if not useMobileUI not explicitly set
 const getIsMobile = () => {
-  const ua = window && window.navigator && window.navigator.userAgent
-    ? window.navigator.userAgent
-    : ''
-
-  /* https://stackoverflow.com/a/25394023/6059235 */
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
+  // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/maxTouchPoints
+  // CC0 or MIT
+  // msMaxTouchPoints is not needed, since IE is not supported
+  return 'maxTouchPoints' in navigator && navigator.maxTouchPoints > 0
 }
 const useMobileUIStroageValue = window && window.localStorage && window.localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI)
 

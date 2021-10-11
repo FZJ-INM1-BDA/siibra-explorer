@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { UtilModule } from "src/util";
-import { AngularMaterialModule } from "../../ui/sharedModules/angularMaterial.module";
+import { AngularMaterialModule } from "src/sharedModules";
 import { FeatureContainer } from "./featureContainer/featureContainer.component";
 import { FilterRegionalFeaturesByTypePipe } from "./pipes/filterRegionalFeaturesByType.pipe";
 import { FilterRegionFeaturesById } from "./pipes/filterRegionFeaturesById.pipe";

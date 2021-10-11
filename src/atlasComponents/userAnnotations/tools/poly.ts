@@ -1,6 +1,6 @@
 import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
 import { Point, TPointJsonSpec } from './point'
-import { OnDestroy } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { merge, Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
@@ -22,7 +22,7 @@ export class Polygon extends IAnnotationGeometry{
   }
 
   private ptWkMp = new WeakMap<Point, {
-    onremove: Function
+    onremove: () => void
   }>()
 
   public removePoint(p: Point) {
@@ -223,6 +223,7 @@ export class Polygon extends IAnnotationGeometry{
 
 export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
 
+@Directive()
 export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_poly_preview'
 

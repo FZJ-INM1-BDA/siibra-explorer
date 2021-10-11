@@ -1,0 +1,36 @@
+iav-cmp-viewer-container
+{
+
+  .mat-chip-list-wrapper
+  {
+    flex-wrap: nowrap;
+  }
+
+  poly-update-cmp
+  {
+    .mat-chip-list-wrapper
+    {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+quick-tour-unit
+{
+  svg
+  {
+    pointer-events: none;
+    stroke-width: 3px;
+    stroke: rgb(255, 255, 255);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+kg-ds-prv-regional-feature-view
+{
+  div
+  {
+    min-height: 20em;
+  }
+}

@@ -8,13 +8,10 @@
 //   TOGGLE_FRONTAL_OCTANT
 // } = ARIA_LABELS
 
-// const _bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
-// const _bigbrainNehubaConfigJson = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
 // const bigbrainJson = {
 //   ..._bigbrainJson,
 //   nehubaConfig: _bigbrainNehubaConfigJson
 // }
-// const humanAtlas = require('!json-loader!src/res/ext/atlas/atlas_multiLevelHuman.json')
 // const importNehubaSpy = jasmine.createSpy('importNehubaSpy').and.returnValue(Promise.reject())
 
 describe('> nehubaContainer.component.ts', () => {
@@ -30,7 +27,6 @@ describe('> nehubaContainer.component.ts', () => {
     //       AngularMaterialModule,
     //       LayoutModule,
     //       UtilModule,
-    //       DatabrowserModule,
     //       NehubaModule,
     //       AuthModule,
     //       StateModule,

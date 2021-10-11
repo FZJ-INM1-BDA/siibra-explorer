@@ -150,8 +150,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
     public noDataReceived = false
 
-    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
-    @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
+    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
+    @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
 
     constructor(
         private store$: Store<any>,
@@ -277,17 +277,17 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       )
 
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'collapsedMenuChanged', {capture: true})
-          .subscribe((e: CustomEvent) => {
-            this.expandMenuIndex = e.detail
-          }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', {capture: true})
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
               // ToDo Fix in future to use component
-              const a = document.querySelector('hbp-connectivity-matrix-row')
-              a.downloadCSV()
+              const a = document.querySelector('hbp-connectivity-matrix-row');
+              (a as any).downloadCSV()
             }
+          }),
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
+          .subscribe((e: CustomEvent) => {
+            this.navigateToRegion(e.detail.name)
           }),
       )
     }
@@ -432,8 +432,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     exportConnectivityProfile() {
-      const a = document.querySelector('hbp-connectivity-matrix-row')
-      a.downloadCSV()
+      const a = document.querySelector('hbp-connectivity-matrix-row');
+      (a as any).downloadCSV()
     }
 
     public exportFullConnectivity() {

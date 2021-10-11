@@ -59,7 +59,9 @@ async function getInterpolatedPatchObj(targetName: string, labelIndex: number){
                 "labelIndex": labelIndex,
                 "transform": [[1,0,0,-70677184],[0,1,0,-51990000],[0,0,1,-58788284],[0,0,0,1]]
               }
-            }
+            },
+            "space_id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
+            map_type: 'labelled'
           }]
         }
       }
@@ -101,7 +103,9 @@ async function getIndividualMap(parentName: string, regionName: string, url: str
                 "labelIndex": labelIndex,
                 "transform": transform
               }
-            }
+            },
+            space_id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
+            map_type: 'labelled'
           }]
         }
       }

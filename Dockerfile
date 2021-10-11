@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:14 as builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
@@ -21,8 +21,14 @@ ENV MATOMO_URL=${MATOMO_URL}
 ARG MATOMO_ID
 ENV MATOMO_ID=${MATOMO_ID}
 
+ARG EXPERIMENTAL_FEATURE_FLAG
+ENV EXPERIMENTAL_FEATURE_FLAG=${EXPERIMENTAL_FEATURE_FLAG:-false}
+
 COPY . /iv
 WORKDIR /iv
+
+# angular 12 echo the env var into src/environments/environment.prod.ts
+RUN node ./src/environments/parseEnv.js
 
 # When building in local, where node_module already exist, prebuilt binary may throw an error
 RUN rm -rf ./node_modules
@@ -60,10 +66,6 @@ COPY --from=builder /iv/deploy .
 
 # Copy built interactive viewer
 COPY --from=compressor /iv ./public
-
-# Copy the resources files needed to respond to queries
-# is this even necessary any more?
-COPY --from=compressor /iv/res/json ./res
 
 RUN chown -R node:node /iv-app
 

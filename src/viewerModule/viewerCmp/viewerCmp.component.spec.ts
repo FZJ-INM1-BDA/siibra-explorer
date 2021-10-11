@@ -87,7 +87,7 @@ describe('> viewerCmp.component.ts', () => {
       // and that null is not emitted
       it('> returns as expected', () => {
         expect(returnVal).toBeObservable(
-          hot('b', {
+          hot('(ab)', {
             a: null,
             b: {
               ...mockRegion,
@@ -107,7 +107,7 @@ describe('> viewerCmp.component.ts', () => {
       it('> if getRegionDetail throws, at least return original region', () => {
         getRegionDetailSpy.and.callFake(() => throwError('blabla'))
         expect(returnVal).toBeObservable(
-          hot('b', {
+          hot('(ab)', {
             a: null,
             b: mockRegion
           })

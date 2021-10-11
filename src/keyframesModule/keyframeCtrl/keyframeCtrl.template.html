@@ -1,0 +1,85 @@
+<ng-template #noCurrStateTmpl>
+  No current state recorded
+</ng-template>
+
+<div *ngIf="currState; else noCurrStateTmpl"
+  class="controller-container m-4">
+
+  <mat-slide-toggle [(ngModel)]="autoRotateFlag">Auto Rotate</mat-slide-toggle>
+
+  <div>
+    <mat-slider
+      min="1"
+      max="10"
+      step="0.2"
+      [disabled]="!autoRotateFlag"
+      [(ngModel)]="autoRotateSpeed">
+    </mat-slider>
+    <span>Speed</span>
+  </div>
+
+  <mat-slide-toggle
+    [(ngModel)]="autoRotateReverse"
+    [disabled]="!autoRotateFlag">
+    Reverse
+  </mat-slide-toggle>
+
+  <mat-divider class="m-2"></mat-divider>
+
+  <mat-slide-toggle [(ngModel)]="loopFlag">Loop</mat-slide-toggle>
+  <mat-slide-toggle [(ngModel)]="linearFlag">Linear Camera</mat-slide-toggle>
+
+  <button mat-button
+    (click)="togglePlay()">
+    <ng-template [ngIf]="isPlaying" [ngIfElse]="isNotPlayingTmpl">
+      <i class="fas fa-stop"></i>
+      Stop
+    </ng-template>
+    <ng-template #isNotPlayingTmpl>
+      <i class="fas fa-play"></i>
+      Play
+    </ng-template>
+  </button>
+
+  <mat-divider class="m-2"></mat-divider>
+
+  <button
+    (click)="addKeyFrame()"
+    matTooltip="Add key frame. Shortcut: [a]"
+    mat-button
+    color="primary">
+    <i class="fas fa-plus"></i>
+    Add Key Frame
+  </button>
+</div>
+
+<mat-list cdkDropList (cdkDropListDropped)="drop($event)">
+  <mat-list-item *ngFor="let state of internalStates" cdkDrag>
+    <button mat-icon-button
+    cdkDragHandle>
+      <i class="fas fa-grip-vertical"></i>
+    </button>
+
+    <mat-form-field>
+      <mat-label>name</mat-label>
+      <input type="text" matInput [(ngModel)]="state.name">
+    </mat-form-field>
+    
+    <mat-form-field class="duration-container">
+      <mat-label>ms</mat-label>
+      <input type="number" matInput [(ngModel)]="state.duration">
+    </mat-form-field>
+    
+    <button mat-icon-button
+      (click)="gotoFrame(state)">
+      <i class="fas fa-map-marker-alt"></i>
+    </button>
+    
+    <button mat-icon-button
+      color="warn"
+      (click)="removeFrame(state)">
+      <i class="fas fa-trash"></i>
+    </button>
+    
+  </mat-list-item>
+</mat-list>

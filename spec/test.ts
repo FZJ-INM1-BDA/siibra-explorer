@@ -10,20 +10,20 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-declare const require: any;
-
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
+  platformBrowserDynamicTesting(),
+  { teardown: { destroyAfterEach: true }},
+)
 
-// const testContext = require.context('../src', true, /\.spec\.ts$/)
-// testContext.keys().map(testContext)
+declare const require: any
 
-// const workerCtx = require.context('../worker', true, /\.spec\.js$/)
-// workerCtx.keys().map(workerCtx)
+const testContext = require.context('../src', true, /\.spec\.ts$/)
+testContext.keys().map(testContext)
 
-// require('../common/util.spec.js')
+const workerCtx = require.context('../worker', true, /\.spec\.js$/)
+workerCtx.keys().map(workerCtx)
 
-require('../src/util/directives/keyDownListener.directive.spec')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('../common/util.spec.js')

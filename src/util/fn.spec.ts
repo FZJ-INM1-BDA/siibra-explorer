@@ -8,22 +8,44 @@ import { isSame, getGetRegionFromLabelIndexId, switchMapWaitFor, bufferUntil } f
 describe(`> util/fn.ts`, () => {
 
   describe('> #getGetRegionFromLabelIndexId', () => {
-    const colinsJson = require('!json-loader!../res/ext/colin.json')
     
     const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V25_LEFT_NG_SPLIT_HEMISPHERE`
-    const COLIN_V25_ID = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26'
-    
+    const LABEL_INDEX = 12
+    const dummyParc = {
+      regions: [
+        {
+          name: 'foo-bar',
+          children: [
+            {
+              name: 'foo-bar-region-ba',
+              ngId: `${COLIN_JULICHBRAIN_LAYER_NAME}-ba`,
+              labelIndex: LABEL_INDEX
+            },
+            {
+              name: 'foo-bar-region+1',
+              ngId: COLIN_JULICHBRAIN_LAYER_NAME,
+              labelIndex: LABEL_INDEX + 1
+            },
+            {
+              name: 'foo-bar-region',
+              ngId: COLIN_JULICHBRAIN_LAYER_NAME,
+              labelIndex: LABEL_INDEX
+            }
+          ]
+        }
+      ]
+    }
     it('translateds hoc1 from labelIndex to region', () => {
 
       const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({
         parcellation: {
-          ...colinsJson.parcellations.find(p => p['@id'] === COLIN_V25_ID),
+          ...dummyParc,
           updated: true,
         },
       })
-      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: `${COLIN_JULICHBRAIN_LAYER_NAME}#116` })
+      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: `${COLIN_JULICHBRAIN_LAYER_NAME}#${LABEL_INDEX}` })
       expect(fetchedRegion).toBeTruthy()
-      expect(fetchedRegion.fullId.kg.kgId).toEqual('c9753e82-80ca-4074-a704-9dd2c4c0d58b')
+      expect(fetchedRegion.name).toEqual('foo-bar-region')
       
     })
   })

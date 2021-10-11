@@ -173,7 +173,7 @@
   let-iavNgIf="iavNgIf"
   let-content="content">
   <mat-expansion-panel
-    [expanded]="activePanelTitles$ | async | arrayContains : title"
+    [expanded]="activePanelTitles$ | async | includes : title"
     [attr.data-opened]="expansionPanel.expanded"
     [attr.data-mat-expansion-title]="title"
     (closed)="handleExpansionPanelClosedEv(title)"

@@ -6,37 +6,46 @@
 <layout-floating-container [zIndex]="10">
 
   <!-- Annotation mode -->
-  <div *ngIf="(viewerMode$ | async) === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-    <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    <mat-drawer-container *ngIf="viewerMode$ | async as viewerMode"
+      class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
       [hasBackdrop]="false">
-      <mat-drawer #annotationDrawer="matDrawer"
+      
+      <mat-drawer #viewerModeDrawer="matDrawer"
         mode="side"
-        (annotation-event-directive)="annotationDrawer.open()"
+        (annotation-event-directive)="viewerModeDrawer.open()"
         [annotation-event-directive-filter]="['showList']"
         [autoFocus]="false"
         [disableClose]="true"
         class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
-        <annotation-list #annListCmp="annotationListCmp"></annotation-list>
-      </mat-drawer>
 
+        <!-- annotation -->
+        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+          <annotation-list></annotation-list>
+        </ng-template>
+
+        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+          <key-frame-controller></key-frame-controller>
+        </ng-template>
+
+      </mat-drawer>
       <mat-drawer-content class="visible position-relative pe-none">
 
-        <iav-layout-fourcorners>
-
+        <!-- annotation specific -->
+        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
           <!-- pullable tab top right corner -->
           <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
-            <div>
-              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
-                matColor: 'primary',
-                fontIcon: 'fa-list',
-                tooltip: 'Annotation list',
-                click: annotationDrawer.toggle.bind(annotationDrawer),
-                badge: annListCmp?.badge$ | async
-              }">
-              </ng-container>
-            </div>
 
-            <annotating-tools-panel class="z-index-10">
+            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+              matColor: 'primary',
+              fontIcon: 'fa-list',
+              tooltip: 'Annotation list',
+              click: viewerModeDrawer.toggle.bind(viewerModeDrawer),
+              badge: toolPanel?.annBadges$ | async
+            }">
+            </ng-container>
+
+            <annotating-tools-panel class="z-index-10"
+              #toolPanel="annoToolsPanel">
             </annotating-tools-panel>
           </div>
 
@@ -54,12 +63,41 @@
               </button>
             </mat-card>
           </div>
+
         </iav-layout-fourcorners>
 
 
+        <!-- key frame specific -->
+        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+          <!-- pullable tab top right corner -->
+          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
+
+            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+              matColor: 'primary',
+              fontIcon: 'fa-play',
+              tooltip: 'Annotation list',
+              click: viewerModeDrawer.toggle.bind(viewerModeDrawer)
+            }">
+            </ng-container>
+          </div>
+
+          <div iavLayoutFourCornersTopRight>
+            <mat-card class="mat-card-sm pe-all m-4">
+              <span>
+                Key Frame
+              </span>
+              <button mat-icon-button
+                color="warn"
+                key-frame-play-now="off">
+                <i class="fas fa-times"></i>
+              </button>
+            </mat-card>
+          </div>
+
+        </iav-layout-fourcorners>
       </mat-drawer-content>
+
     </mat-drawer-container>
-  </div>
 
   <!-- top drawer -->
   <mat-drawer-container

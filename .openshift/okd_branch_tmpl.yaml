@@ -28,15 +28,13 @@ objects:
             - name: SESSION_SECRET
               value: ${SESSION_SECRET}
             - name: HOSTNAME
-              value: https://siibra-explorer.apps-dev.hbp.eu
+              value: https://siibra-explorer.apps${PATH_POSTFIX}.hbp.eu
             - name: HOST_PATHNAME
               value: /${SANITIZED_BRANCH_NAME}
             - name: IAV_STAGE
               value: ${SANITIZED_BRANCH_NAME}
             - name: BUILD_TEXT
               value: ${BUILD_TEXT}
-            - name: SCRIPT_SRC
-              value: '["stats-dev.humanbrainproject.eu"]'
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:

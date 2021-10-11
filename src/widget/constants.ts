@@ -20,4 +20,3 @@ interface TypeActionWidgetReturnVal<T>{
 
 export type TypeActionToWidget<T> = (type: EnumActionToWidget, obj: T, option: IActionWidgetOption) => TypeActionWidgetReturnVal<T>
 
-export const ACTION_TO_WIDGET_TOKEN = new InjectionToken<TypeActionToWidget<unknown>>('ACTION_TO_WIDGET_TOKEN')

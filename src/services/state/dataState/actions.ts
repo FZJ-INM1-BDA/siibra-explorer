@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { IKgDataEntry } from "src/atlasComponents/databrowserModule";
+import { IKgDataEntry } from "src/databrowser.fallback";
 
 export const datastateActionToggleFav = createAction(
   `[datastate] toggleFav`,

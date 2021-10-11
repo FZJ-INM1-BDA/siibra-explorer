@@ -5,78 +5,196 @@ import {
   viewerStateParcVersionSelector,
 } from './selectors'
 
-const waxholmAtlasJson = require('!json-loader!src/res/ext/atlas/atlas_waxholmRat.json')
-const humanAtlasJson = require('!json-loader!src/res/ext/atlas/atlas_multiLevelHuman.json')
-const allenAtlasJson = require('!json-loader!src/res/ext/atlas/atlas_allenMouse.json')
 
-const waxholmTemplates = require('!json-loader!src/res/ext/waxholmRatV2_0.json')
-const allenTemplates = require('!json-loader!src/res/ext/allenMouse.json')
-const colinTemplates = require('!json-loader!src/res/ext/colin.json')
-const mniTemplates = require('!json-loader!src/res/ext/MNI152.json')
-const bbTemplates = require('!json-loader!src/res/ext/bigbrain.json')
-const freesurfer = require('!json-loader!src/res/ext/freesurfer.json')
+const atlas1 = {
+  '@id': 'atlas-1',
+  name: 'atlas-1-name',
+  templateSpaces: [
+    {
+      '@id': 'atlas-1-tmpl-1',
+      name: 'atlas-1-tmpl-1',
+      availableIn: [
+        {
+          '@id': 'atlas-1-parc-1',
+          name: 'atlas-1-parc-1'
+        },
+        {
+          '@id': 'atlas-1-parc-2',
+          name: 'atlas-1-parc-2'
+        }
+      ]
+    }
+  ],
+  parcellations: [
+    {
+      '@id': 'atlas-1-parc-1',
+      name: 'atlas-1-parc-1',
+      baseLayer: true
+    },
+    {
+      '@id': 'atlas-1-parc-2',
+      name: 'atlas-1-parc-2'
+    }
+  ]
+}
+
+const tmpl1 = {
+  '@id': 'atlas-1-tmpl-1',
+  name: 'atlas-1-tmpl-1',
+  parcellations: [
+    {
+      '@id': 'atlas-1-parc-1',
+      name: 'atlas-1-parc-1'
+    },
+    {
+      '@id': 'atlas-1-parc-2',
+      name: 'atlas-1-parc-2'
+    }
+  ]
+}
+
+const atlas2 = {
+  '@id': 'atlas-2',
+  name: 'atlas-2-name',
+  templateSpaces: [
+    {
+      '@id': 'atlas-2-tmpl-1',
+      name: 'atlas-2-tmpl-1',
+      availableIn: [
+        {
+          '@id': 'atlas-2-parc-1',
+          name: 'atlas-2-parc-1'
+        },
+        {
+          '@id': 'atlas-2-parc-2',
+          name: 'atlas-2-parc-2'
+        }
+      ]
+    },
+    {
+      '@id': 'atlas-2-tmpl-2',
+      name: 'atlas-2-tmpl-2',
+      availableIn: [
+        {
+          '@id': 'atlas-2-parc-1',
+          name: 'atlas-2-parc-1'
+        },
+        {
+          '@id': 'atlas-2-parc-2',
+          name: 'atlas-2-parc-2'
+        }
+      ]
+    }
+  ],
+  parcellations: [
+    {
+      '@id': 'atlas-2-parc-1',
+      name: 'atlas-2-parc-1',
+      "@version": {
+        "@next": "atlas-2-parc-2",
+        "@this": "atlas-2-parc-1",
+        "name": "atlas-2-parc-1",
+        "@previous": null
+      }
+    },
+    {
+      '@id': 'atlas-2-parc-2',
+      name: 'atlas-2-parc-2',
+      "@version": {
+        "@next": null,
+        "@this": "atlas-2-parc-2",
+        "name": "atlas-2-parc-2",
+        "@previous": "atlas-2-parc-1"
+      }
+    }
+  ]
+}
+
+const tmpl2 = {
+  '@id': 'atlas-2-tmpl-1',
+  name: 'atlas-2-tmpl-1',
+  parcellations: [
+    {
+      '@id': 'atlas-2-parc-1',
+      name: 'atlas-2-parc-1'
+    },
+    {
+      '@id': 'atlas-2-parc-2',
+      name: 'atlas-2-parc-2'
+    }
+  ]
+}
+
+
+const tmpl2_2 = {
+  '@id': 'atlas-2-tmpl-2',
+  name: 'atlas-2-tmpl-2',
+  parcellations: [
+    {
+      '@id': 'atlas-2-parc-1',
+      name: 'atlas-2-parc-1'
+    },
+    {
+      '@id': 'atlas-2-parc-2',
+      name: 'atlas-2-parc-2'
+    }
+  ]
+}
 
 const fetchedAtlases = [
-  waxholmAtlasJson,
-  humanAtlasJson,
-  allenAtlasJson,
+  atlas1,
+  atlas2
 ]
 
 const fetchedTemplates = [
-  waxholmTemplates,
-  allenTemplates,
-  colinTemplates,
-  mniTemplates,
-  bbTemplates,
-  freesurfer,
+  tmpl1,
+  tmpl2,
+  tmpl2_2
 ]
 
 describe('viewerState/selector.ts', () => {
   describe('> viewerStateGetOverlayingAdditionalParcellations', () => {
-    describe('> if atlas has no basic layer, should return empty array', () => {
-      it('> true for waxholm', () => {
-        const waxholmParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+    describe('> if atlas has no basic layer', () => {
+      it('> should return empty array', () => {
+
+        const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
           fetchedAtlases,
-          selectedAtlasId: waxholmAtlasJson['@id']
+          selectedAtlasId: atlas2['@id']
         }, {
-          parcellationSelected: waxholmAtlasJson.parcellations[0]
+          parcellationSelected: tmpl2.parcellations[0]
         })
         
-        expect(waxholmParcs).toEqual([])
+        expect(parcs).toEqual([])
       })
-      it('> true for allen', () => {
-  
-        const allenParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-          fetchedAtlases,
-          selectedAtlasId: allenAtlasJson['@id']
-        }, {
-          parcellationSelected: allenAtlasJson.parcellations[0]
+    })
+
+    describe('> if atlas has basic layer', () => {
+      describe('> if non basiclayer is selected', () => {
+        it('> should return non empty array', () => {
+          const parc = atlas1.parcellations.find(p => !p['baseLayer'])
+          const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+            fetchedAtlases,
+            selectedAtlasId: atlas1['@id']
+          }, {
+            parcellationSelected: parc
+          })
+          expect(parcs.length).toEqual(1)
+          expect(parcs[0]['@id']).toEqual(parc['@id'])
         })
-        expect(allenParcs).toEqual([])
       })
-    })
 
-
-    it('> if atlas has basic layer, should return non empty array, if non basic layer is selected', () => {
-      const parc = humanAtlasJson.parcellations.find(p => !p['baseLayer'])
-      const multihumanParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-        fetchedAtlases,
-        selectedAtlasId: humanAtlasJson['@id']
-      }, {
-        parcellationSelected: parc
+      describe('> if basic layer is selected', () => {
+        it('> should return empty array', () => {
+          const parc = atlas1.parcellations.find(p => !!p['baseLayer'])
+          const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+            fetchedAtlases,
+            selectedAtlasId: atlas1['@id']
+          }, {
+            parcellationSelected: parc
+          })
+          expect(parcs.length).toEqual(0)
+        })
       })
-      expect(multihumanParcs.length).toEqual(1)
-      expect(multihumanParcs[0]['@id']).toEqual(parc['@id'])
-    })
-
-    it('> if atlas has basic layer, but has basic layer selected, should return empty array', () => {
-      const multihumanParcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-        fetchedAtlases,
-        selectedAtlasId: humanAtlasJson['@id']
-      }, {
-        parcellationSelected: humanAtlasJson.parcellations[0]
-      })
-      expect(multihumanParcs.length).toEqual(0)
     })
   })
 
@@ -101,46 +219,24 @@ describe('viewerState/selector.ts', () => {
         //TODO compare strict equality of firsthalf+secondhalf with parc
       }
     }
-    describe('> should work', () => {
-      it('> for waxholm', () => {
-        check(waxholmAtlasJson, [waxholmTemplates])
-      })
-      it('> for allen', () => {
-        check(allenAtlasJson, [allenTemplates])
-      })
-      it('> for human', () => {
-        check(humanAtlasJson, [
-          bbTemplates,
-          mniTemplates,
-          colinTemplates,
-          freesurfer
-        ])
-      })
+
+    it('> should work', () => {
+      check(atlas1, [tmpl1, tmpl2, tmpl2_2])
+      check(atlas2, [tmpl1, tmpl2, tmpl2_2])
     })
   })
 
   describe('> viewerStateAtlasLatestParcellationSelector', () => {
-    it('> for waxholm and allen, sould only show 1 parc', () => {
-      const waxholmParcs = viewerStateAtlasLatestParcellationSelector.projector(waxholmAtlasJson.parcellations)
-      expect(waxholmParcs.length).toEqual(1)
-      const allenparcs = viewerStateAtlasLatestParcellationSelector.projector(allenAtlasJson.parcellations)
-      expect(allenparcs.length).toEqual(1)
+    it('> should only show 1 parc', () => {
+      const parcs = viewerStateAtlasLatestParcellationSelector.projector(atlas2.parcellations)
+      expect(parcs.length).toEqual(1)
     })
   })
 
   describe('> viewerStateParcVersionSelector', () => {
-    it('> for waxholm, should show 3 parc ordered correctly', () => {
-      const parcs = viewerStateParcVersionSelector.projector(waxholmAtlasJson.parcellations, {
-        parcellationSelected: waxholmAtlasJson.parcellations[0]
-      })
-      expect(parcs.length).toEqual(3)
-
-      expect(parcs[0]['@version']['@next']).toBeFalsy()
-      expect(parcs[parcs.length-1]['@version']['@previous']).toBeFalsy()
-    })
-    it('> for allen, should show 2 parc ordered correctly', () => {
-      const parcs = viewerStateParcVersionSelector.projector(allenAtlasJson.parcellations, {
-        parcellationSelected: allenAtlasJson.parcellations[0]
+    it('> should work', () => {
+      const parcs = viewerStateParcVersionSelector.projector(atlas2.parcellations, {
+        parcellationSelected: atlas2.parcellations[0]
       })
       expect(parcs.length).toEqual(2)
 

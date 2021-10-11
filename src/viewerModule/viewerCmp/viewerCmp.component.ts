@@ -217,7 +217,7 @@ export class ViewerCmp implements OnDestroy {
 
   public context: TContextArg<TSupportedViewers>
   private templateSelected: any
-  private getRegionFromlabelIndexId: Function
+  private getRegionFromlabelIndexId: (arg: {labelIndexId: string}) => any
 
   private genericInfoCF: ComponentFactory<GenericInfoCmp>
 

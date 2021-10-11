@@ -6,11 +6,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {  MarkdownDom } from './markdown/markdown.component';
 
 import { CommonModule } from '@angular/common';
-import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
+import { AngularMaterialModule } from 'src/sharedModules';
 import { UtilModule } from 'src/util';
-import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
-import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
-import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
+import { SafeHtmlPipe } from './safeHtml.pipe'
+import { TreeSearchPipe } from './treeSearch.pipe';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
@@ -20,20 +19,13 @@ import { FlattenTreePipe } from './flatTree/flattener.pipe';
 import { FlatTreeComponent } from './flatTree/flatTree.component';
 import { HighlightPipe } from './flatTree/highlight.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
-import { HoverableBlockDirective } from './hoverableBlock.directive';
-import { PaginationComponent } from './pagination/pagination.component';
-import { PanelComponent } from './panel/panel.component';
-import { PillComponent } from './pill/pill.component';
-import { ProgressBar } from './progress/progress.component';
-import { RadioList } from './radiolist/radiolist.component';
-import { ReadmoreComponent } from './readmoore/readmore.component';
-import { SleightOfHand } from './sleightOfHand/soh.component';
-import { TimerComponent } from './timer/timer.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
 import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
 import { SpinnerCmp } from './spinner/spinner.component';
+import { ReadmoreModule } from './readmore';
+import { HoverableModule } from './hoverable';
 
 @NgModule({
   imports : [
@@ -43,20 +35,14 @@ import { SpinnerCmp } from './spinner/spinner.component';
     BrowserAnimationsModule,
     AngularMaterialModule,
     UtilModule,
+    ReadmoreModule,
+    HoverableModule,
   ],
   declarations : [
     /* components */
     MarkdownDom,
-    ReadmoreComponent,
     TreeComponent,
-    PanelComponent,
-    PaginationComponent,
     FlatTreeComponent,
-    TimerComponent,
-    PillComponent,
-    RadioList,
-    ProgressBar,
-    SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
@@ -64,12 +50,10 @@ import { SpinnerCmp } from './spinner/spinner.component';
     SpinnerCmp,
 
     /* directive */
-    HoverableBlockDirective,
     TreeBaseDirective,
 
     /* pipes */
     SafeHtmlPipe,
-    SearchResultPaginationPipe,
     TreeSearchPipe,
     FlattenTreePipe,
     RenderPipe,
@@ -80,28 +64,19 @@ import { SpinnerCmp } from './spinner/spinner.component';
   ],
   exports : [
     BrowserAnimationsModule,
+    ReadmoreModule,
+    HoverableModule,
 
     MarkdownDom,
-    ReadmoreComponent,
     TreeComponent,
-    PanelComponent,
-    PaginationComponent,
     FlatTreeComponent,
-    TimerComponent,
-    PillComponent,
-    RadioList,
-    ProgressBar,
-    SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
     DynamicMaterialBtn,
     SpinnerCmp,
 
-    SearchResultPaginationPipe,
     TreeSearchPipe,
-
-    HoverableBlockDirective,
     TreeBaseDirective,
   ],
 })

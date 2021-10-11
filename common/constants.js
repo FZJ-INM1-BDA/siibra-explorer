@@ -61,6 +61,7 @@
 
     //Viewer mode
     VIEWER_MODE_ANNOTATING: 'annotating',
+    VIEWER_MODE_KEYFRAME: 'key frame',
 
     // Annotations
     USER_ANNOTATION_LIST: 'user annotations footer',
@@ -71,7 +72,10 @@
     USER_ANNOTATION_DELETE: 'Delete annotation',
     GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
     EXIT_ANNOTATION_MODE: 'Exit annotation mode',
-    BULK_DELETE_ANNOTATIONS: 'Delete all user annotations'
+
+    // volume tuning specific
+    VOLUME_TUNING_EXPAND: 'Expand volume tuning widget',
+    BULK_DELETE_ANNOTATIONS: 'Delete all user annotations',
   }
 
   exports.IDS = {

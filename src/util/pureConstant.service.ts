@@ -1,18 +1,26 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, Subscription, of, forkJoin, fromEvent, combineLatest, from } from "rxjs";
+import { Observable, Subscription, of, forkJoin, combineLatest, from } from "rxjs";
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, switchMap, map, take, distinctUntilChanged, mapTo } from "rxjs/operators";
+import { shareReplay, tap, scan, catchError, filter, switchMap, map, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { BS_ENDPOINT } from "src/util/constants";
+import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
 import { flattenReducer } from 'common/util'
-import { TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
-import { MultiDimMap, mutateDeepMerge, recursiveMutate } from "./fn";
+import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
+import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
+import { environment } from "src/environments/environment";
+
+
+const validVolumeType = new Set([
+  'neuroglancer/precomputed',
+  'neuroglancer/precompmesh',
+  'threesurfer/gii',
+  'threesurfer/gii-label',
+])
 
 function getNgId(atlasId: string, tmplId: string, parcId: string, regionKey: string){
   const proxyId = MultiDimMap.GetProxyKeyMatch(atlasId, tmplId, parcId, regionKey)
@@ -180,20 +188,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
 
   private atlasParcSpcRegionMap = new MultiDimMap()
 
-  private _backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
+  private _backendUrl = (BACKENDURL && `${BACKENDURL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
   get backendUrl() {
     console.warn(`something is using backendUrl`)
     return this._backendUrl
   }
-
-  /**
-   * TODO remove
-   * when removing, also remove relevant worker code
-   */
-  private workerUpdateParcellation$ = fromEvent(this.workerService.worker, 'message').pipe(
-    filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
-    map(({ data }) => data)
-  )
 
   public getRegionDetail(atlasId: string, parcId: string, spaceId: string, region: any) {
     return this.http.get<TRegionDetail>(
@@ -328,15 +327,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
          * select only parcellations that contain renderable volume(s)
          */
         const filteredParcellations = parcellations.filter(p => {
-          for (const spaceKey in p.volumeSrc) {
-            for (const hemisphereKey in p.volumeSrc[spaceKey]) {
-              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'neuroglancer/precomputed')) return true
-              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'neuroglancer/precompmesh')) return true
-              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'threesurfer/gii')) return true
-              if (p.volumeSrc[spaceKey][hemisphereKey].some(vol => vol.volume_type === 'threesurfer/gii-label')) return true
-            }
-          }
-          return false
+          return p._dataset_specs.some(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && validVolumeType.has(spec.volume_type))
         })
 
         /**
@@ -384,7 +375,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     private store: Store<any>,
     private http: HttpClient,
     private log: LoggingService,
-    private workerService: AtlasWorkerService,
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
     this.darktheme$ = this.store.pipe(
@@ -433,7 +423,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       responseType: 'json'
     }
   ).pipe(
-    shareReplay(1)
+    map(arr => {
+      const { EXPERIMENTAL_FEATURE_FLAG } = environment
+      if (EXPERIMENTAL_FEATURE_FLAG) return arr
+      return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
+    }),
+    shareReplay(1),
   )
 
   public fetchedAtlases$: Observable<TIAVAtlas[]> = this.getAtlases$.pipe(
@@ -455,7 +450,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         name: parc.name
                       }
                     }),
-                    originDatainfos: tmpl.originDatainfos || []
+                    originDatainfos: (tmpl._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
                   }
                 }),
                 parcellations: parcellations.filter(p => {
@@ -485,7 +480,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         // }]
                       }
                     }),
-                    originDatainfos: parc.originDatainfos || []
+                    originDatainfos: (parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
                   }
                 })
               }
@@ -513,6 +508,17 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
             return forkJoin(
               templateSpaces.map(
                 tmpl => {
+                  // hardcode 
+                  // see https://github.com/FZJ-INM1-BDA/siibra-python/issues/98
+                  if (
+                    tmpl.id === 'minds/core/referencespace/v1.0.0/tmp-fsaverage'
+                    && !tmpl.availableParcellations.find(p => p.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290')  
+                  ) {
+                    tmpl.availableParcellations.push({
+                      id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
+                      name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
+                    })
+                  }
                   ngLayerObj[tmpl.id] = {}
                   return tmpl.availableParcellations.map(
                     parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
@@ -575,7 +581,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                 region.children = []
                                 return
                               }
-
                               const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
                               region['ngId'] = hemispheredNgId
                             }
@@ -589,20 +594,44 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                          * populate maps for parc
                          */
                         for (const parc of parcellations) {
-                          if (tmpl.id in (parc.volumeSrc || {})) {
-                            // key: 'left hemisphere' | 'right hemisphere' | 'whole brain'
-                            for (const key in (parc.volumeSrc[tmpl.id] || {})) {
-                              for (const vol of parc.volumeSrc[tmpl.id][key]) {
-                                if (vol.volume_type === 'neuroglancer/precomputed') {
-                                  const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                                  ngLayerObj[tmpl.id][ngIdKey] = {
-                                    source: `precomputed://${vol.url}`,
-                                    type: "segmentation",
-                                    transform: vol.detail['neuroglancer/precomputed'].transform
-                                  }
-                                }
+                          const precomputedVols = parc._dataset_specs.filter(
+                            spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
+                              && spec.volume_type === 'neuroglancer/precomputed'
+                              && spec.space_id === tmpl.id
+                          ) as TVolumeSrc<'neuroglancer/precomputed'>[]
+
+                          if (precomputedVols.length === 1) {
+                            const vol = precomputedVols[0]
+                            const key = 'whole brain'
+
+                            const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
+                            ngLayerObj[tmpl.id][ngIdKey] = {
+                              source: `precomputed://${vol.url}`,
+                              type: "segmentation",
+                              transform: vol.detail['neuroglancer/precomputed'].transform
+                            }
+                          }
+
+                          if (precomputedVols.length === 2) {
+                            const mapIndexKey = [{
+                              mapIndex: 0,
+                              key: 'left hemisphere'
+                            }, {
+                              mapIndex: 1,
+                              key: 'right hemisphere'
+                            }]
+                            for (const { key, mapIndex } of mapIndexKey) {
+                              const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
+                              ngLayerObj[tmpl.id][ngIdKey] = {
+                                source: `precomputed://${precomputedVols[mapIndex].url}`,
+                                type: "segmentation",
+                                transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
                               }
                             }
+                          }
+
+                          if (precomputedVols.length > 2) {
+                            console.error(`precomputedVols.length > 0, most likely an error`)
                           }
                         }
                       }),
@@ -622,10 +651,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
 
               // configuring three-surfer
               let threeSurferConfig = {}
-              const threeSurferVolSrc = tmpl.volume_src.find(v => v.volume_type === 'threesurfer/gii')
+              const volumes  = tmpl._dataset_specs.filter(v => v["@type"] === 'fzj/tmp/volume_type/v0.0.1') as TVolumeSrc<keyof IVolumeTypeDetail>[]
+              const threeSurferVolSrc = volumes.find(v => v.volume_type === 'threesurfer/gii')
               if (threeSurferVolSrc) {
                 const foundP = parcellations.find(p => {
-                  return !!p.volumeSrc[tmpl.id]
+                  return p._dataset_specs.some(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.space_id === tmpl.id)
                 })
                 const url = threeSurferVolSrc.url
                 const { surfaces } = threeSurferVolSrc.detail['threesurfer/gii'] as { surfaces: {mode: string, hemisphere: 'left' | 'right', url: string}[] }
@@ -658,12 +688,16 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                   /**
                    * only concat first matching gii map
                    */
+                  const mapIndex = hemisphereKey === 'left hemisphere'
+                    ? 0
+                    : 1
+                  const labelMaps = foundP._dataset_specs.filter(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.volume_type === 'threesurfer/gii-label') as TVolumeSrc<'threesurfer/gii-label'>[]
                   const key = surface.mode
                   const modeToConcat = {
                     mesh: surface.url,
                     hemisphere: surface.hemisphere,
                     colormap: (() => {
-                      const lbl = foundP.volumeSrc[tmpl.id][hemisphereKey].find(v => v.volume_type === 'threesurfer/gii-label')
+                      const lbl = labelMaps[mapIndex]
                       return lbl?.url
                     })()
                   }
@@ -698,7 +732,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const tmplNgId = tmpl.name
               const tmplAuxMesh = `${tmpl.name} auxmesh`
 
-              const precomputed = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precomputed')
+              const precomputed = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>
               if (precomputed) {
                 initialLayers[tmplNgId] = {
                   type: "image",
@@ -712,7 +746,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               // https://github.com/FZJ-INM1-BDA/siibra-python/pull/55
               // use url to determine for now
               // const precompmesh = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precompmesh')
-              const precompmesh = tmpl.volume_src.find(src => !!src.detail?.['neuroglancer/precompmesh'])
+              const precompmesh = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && !!src.detail?.['neuroglancer/precompmesh']) as TVolumeSrc<'neuroglancer/precompmesh'>
               const auxMeshes = []
               if (precompmesh){
                 initialLayers[tmplAuxMesh] = {
@@ -756,7 +790,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                     '@id': parc.id,
                     name: parc.name,
                     regions,
-                    originDatainfos: fullParcInfo?.originDatainfos || []
+                    originDatainfos: (fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
                   }
                 }),
                 ...threeSurferConfig

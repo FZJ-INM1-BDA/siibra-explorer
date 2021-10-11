@@ -21,3 +21,4 @@ export const OVERWRITE_SHOW_DATASET_DIALOG_TOKEN = new InjectionToken<TOverwrite
 export type TRegionOfInterest = { ['fullId']: string }
 
 export const REGION_OF_INTEREST = new InjectionToken<Observable<TRegionOfInterest>>('RegionOfInterest')
+export const CANCELLABLE_DIALOG = new InjectionToken('CANCELLABLE_DIALOG')
