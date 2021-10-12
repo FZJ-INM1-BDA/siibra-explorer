@@ -14,7 +14,7 @@ import { SIIBRA_FEATURE_KEY } from './type'
 
 export class BsFeatureIEEGDirective extends BsRegionInputBase implements IRegionalFeatureReadyDirective, OnDestroy{
 
-  public results$: Observable<IBSSummaryResponse['IEEG_Dataset'][]>  = this.region$.pipe(
+  public results$: Observable<IBSSummaryResponse['IEEG_Session'][]>  = this.region$.pipe(
     switchMap(() => this.getFeatureInstancesList(SIIBRA_FEATURE_KEY).pipe(
       catchError(() => of([]))
     )),

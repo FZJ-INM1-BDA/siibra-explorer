@@ -14,6 +14,7 @@ import { CONST } from 'common/constants'
 import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
+import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -401,16 +402,12 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         }
         return this.pureService.getRegionDetail(selectedAtlas['@id'], selectedParcellation['@id'], selectedTemplate['@id'], region).pipe(
           map(regDetail => {
-            const pos = (() => {
-              if (!regDetail) throw new Error(`region detail not found!`)
-              if (!regDetail.props) throw new Error(`region does not have props defined!`)
-              if (!regDetail.props.length) throw new Error(`region props not found!`)
-              return regDetail.props[0].centroid_mm
-            })()
+            const position = getPosFromRegion(regDetail)
+            if (!position) throw new Error(`region does not have props defined!`)
             
             return viewerStateChangeNavigation({
               navigation: {
-                position: pos.map(v => v * 1e6),
+                position,
                 animation: {},
               }
             })
