@@ -50,7 +50,6 @@ export type TBSDetail = TBSSummary & {
       [key: string]: string
     }
     __fingerprint: TBSFingerprint
-    __profile_unit: string
   }
 }
 
