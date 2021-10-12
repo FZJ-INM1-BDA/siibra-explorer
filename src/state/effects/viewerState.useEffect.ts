@@ -402,15 +402,12 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         }
         return this.pureService.getRegionDetail(selectedAtlas['@id'], selectedParcellation['@id'], selectedTemplate['@id'], region).pipe(
           map(regDetail => {
-            const pos = (() => {
-              const position = getPosFromRegion(regDetail)
-              if (!position) throw new Error(`centroid not found`)
-              return position
-            })()
+            const position = getPosFromRegion(regDetail)
+            if (!position) throw new Error(`region does not have props defined!`)
             
             return viewerStateChangeNavigation({
               navigation: {
-                position: pos,
+                position,
                 animation: {},
               }
             })
