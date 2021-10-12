@@ -284,6 +284,8 @@ const previewImgMap = new Map([
   ['minds/core/referencespace/v1.0.0/tmp-fsaverage', 'freesurfer.png'],
   ['minds/core/referencespace/v1.0.0/tmp-fsaverage6', 'freesurfer.png'],
   ['minds/core/referencespace/v1.0.0/tmp-hcp32k', 'freesurfer.png'],
+  ['minds/core/referencespace/v1.0.0/MEBRAINS_T1.masked', 'primate.png'],
+  ['minds/core/parcellationatlas/v1.0.0/mebrains-tmp-id', 'primate-parc.png'],
 ])
 
 /**
