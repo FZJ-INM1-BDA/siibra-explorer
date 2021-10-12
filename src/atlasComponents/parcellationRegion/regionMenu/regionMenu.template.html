@@ -47,7 +47,7 @@
       </button>
 
       <!-- explore doi -->
-      <ng-template let-infos [ngIf]="region?.originDatainfos">
+      <ng-template let-infos [ngIf]="originDatainfos">
         <ng-container *ngFor="let info of infos">
           <a *ngFor="let url of info.urls"
             [href]="url.doi | doiParserPipe"
@@ -67,8 +67,8 @@
 <mat-accordion class="d-block mt-2">
 
   <!-- description -->
-  <ng-template [ngIf]="(region.originDatainfos || []).length > 0">
-    <ng-container *ngFor="let originData of region.originDatainfos">
+  <ng-template [ngIf]="(originDatainfos || []).length > 0">
+    <ng-container *ngFor="let originData of originDatainfos">
       <ng-template #descTmpl>
         <markdown-dom [markdown]="originData.description"
           class="text-muted text-sm">

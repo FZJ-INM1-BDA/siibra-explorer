@@ -59,6 +59,11 @@ export class RegionBase {
     this.rgbDarkmode = l < 0.4
   }
 
+  get originDatainfos(){
+    if (!this._region) return []
+    return this._region._dataset_specs || this._region.originDatainfos
+  }
+
   get region(){
     return this._region
   }
