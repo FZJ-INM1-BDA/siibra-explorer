@@ -381,7 +381,7 @@ describe('> viewerState.useEffect.ts', () => {
           ).toBeObservable(
             hot('a', {
               a: generalActionError({
-                message: 'Fetching region detail error: Error: region detail not found!'
+                message: 'Fetching region detail error: Error: region does not have props defined!'
               })
             })
           )
@@ -398,7 +398,7 @@ describe('> viewerState.useEffect.ts', () => {
               ).toBeObservable(
                 hot('a', {
                   a: generalActionError({
-                    message: 'Fetching region detail error: Error: region detail not found!'
+                    message: 'Fetching region detail error: Error: region does not have props defined!'
                   })
                 })
               )
@@ -451,7 +451,7 @@ describe('> viewerState.useEffect.ts', () => {
             beforeEach(() => {
               getRegionDetailSpy.and.callFake(() => of({
                 name: 'foo-bar',
-                props: []
+                props: {}
               }))
             })
 
@@ -462,7 +462,7 @@ describe('> viewerState.useEffect.ts', () => {
               ).toBeObservable(
                 hot('a', {
                   a: generalActionError({
-                    message: `Fetching region detail error: Error: region props not found!`
+                    message: `Fetching region detail error: Error: region does not have props defined!`
                   })
                 })
               )
@@ -476,9 +476,11 @@ describe('> viewerState.useEffect.ts', () => {
             beforeEach(() => {
               getRegionDetailSpy.and.callFake(() => of({
                 name: 'foo-bar',
-                props: [{
-                  centroid_mm: [1,2,3]
-                }]
+                props: {
+                  components: {
+                    centroid: [1,2,3]
+                  }
+                }
               }))
             })
 

@@ -63,6 +63,11 @@ export class RegionBase {
     return this._region
   }
 
+  get originDatainfos(){
+    if (!this._region) return []
+    return this._region._dataset_specs || this._region.originDatainfos
+  }
+
   public hasContext$: BehaviorSubject<boolean> = new BehaviorSubject(false)
   public region$: BehaviorSubject<any> = new BehaviorSubject(null)
 

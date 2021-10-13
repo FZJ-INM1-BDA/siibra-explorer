@@ -133,6 +133,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public regionHemisphere: string = null
     public datasetList: any[] = []
     public selectedDataset: any
+    public selectedDatasetName: any
     public selectedDatasetDescription: string = ''
     public selectedDatasetKgId: string = ''
     public selectedDatasetKgSchema: string = ''
@@ -175,6 +176,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res
         this.selectedDataset = this.datasetList[0]?.['@id']
+        this.selectedDatasetName = this.datasetList[0]?.['src_name']
         this.selectedDatasetDescription = this.datasetList[0]?.['src_info']
         // this.selectedDatasetKgId = this.datasetList[0]?.kgId || null
         // this.selectedDatasetKgSchema = this.datasetList[0]?.kgSchema || null
@@ -306,7 +308,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     private setConnectivityUrl() {
-      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionId || this.regionName)}/features/ConnectivityProfile`
+      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionName)}/features/ConnectivityProfile`
     }
 
     private setProfileLoadUrl() {
@@ -334,6 +336,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       if (event) {
         this.selectedDataset = event.value
         const foundDataset = this.datasetList.find(d => d['@id'] === this.selectedDataset)
+        this.selectedDatasetName = foundDataset?.['src_name']
         this.selectedDatasetDescription = foundDataset?.['src_info']
         // this.selectedDatasetKgId = foundDataset?.kgId || null
         // this.selectedDatasetKgSchema = foundDataset?.kgSchema || null
@@ -341,7 +344,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       if (this.datasetList.length && this.selectedDataset) {
         this.setProfileLoadUrl()
 
-        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDataset)}`
+        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDatasetName)}`
       }
     }
 
