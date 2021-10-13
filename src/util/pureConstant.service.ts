@@ -532,20 +532,16 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                              * this should work for both fully mapped and interpolated
                              * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
                              */
-                            if (
-                              tmpl.id in (region.volumeSrc || {})
-                              && 'collect' in region.volumeSrc[tmpl.id]
-                            ) {
-                              const dedicatedMap = region.volumeSrc[tmpl.id]['collect'].filter(v => v.volume_type === 'neuroglancer/precomputed')
-                              if (dedicatedMap.length === 1) {
-                                const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
-                                region['ngId'] = ngId
-                                region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                                ngLayerObj[tmpl.id][ngId] = {
-                                  source: `precomputed://${dedicatedMap[0].url}`,
-                                  type: "segmentation",
-                                  transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
-                                }
+
+                            const dedicatedMap = region._dataset_specs.filter(spec => spec.space_id === tmpl.id && spec['volume_type'] === 'neuroglancer/precomputed')
+                            if (dedicatedMap.length === 1) {
+                              const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
+                              region['ngId'] = ngId
+                              region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
+                              ngLayerObj[tmpl.id][ngId] = {
+                                source: `precomputed://${dedicatedMap[0].url}`,
+                                type: "segmentation",
+                                transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
                               }
                             }
   
@@ -579,10 +575,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                 && hemisphereKey === 'whole brain'
                               ) {
                                 region.children = []
-                                return
                               }
-                              const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
-                              region['ngId'] = hemispheredNgId
+                              if (!region['ngId']) {
+                                const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
+                                region['ngId'] = hemispheredNgId
+                              }
                             }
                           }  
                         )
