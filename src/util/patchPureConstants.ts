@@ -46,25 +46,21 @@ async function getInterpolatedPatchObj(targetName: string, labelIndex: number){
       '@id': 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
     }],
     "payload": {
-      "volumeSrc": {
-        'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': {
-          "collect": [{
-            "@type": "fzj/tmp/volume_type/v0.0.1" as const,
-            "@id": "fzj/tmp/volume_type/v0.0.1/interpolated",
-            "name": "Julich Brain v2.5 interpolated map",
-            "volume_type": "neuroglancer/precomputed" as const,
-            "url": "https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
-            "detail": {
-              "neuroglancer/precomputed": {
-                "labelIndex": labelIndex,
-                "transform": [[1,0,0,-70677184],[0,1,0,-51990000],[0,0,1,-58788284],[0,0,0,1]]
-              }
-            },
-            "space_id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
-            map_type: 'labelled'
-          }]
-        }
-      }
+      _dataset_specs: [{
+        "@type": "fzj/tmp/volume_type/v0.0.1" as const,
+        "@id": "fzj/tmp/volume_type/v0.0.1/interpolated",
+        "name": "Julich Brain v2.5 interpolated map",
+        "volume_type": "neuroglancer/precomputed" as const,
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
+        "detail": {
+          "neuroglancer/precomputed": {
+            "labelIndex": labelIndex,
+            "transform": [[1,0,0,-70677184],[0,1,0,-51990000],[0,0,1,-58788284],[0,0,0,1]]
+          }
+        },
+        "space_id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
+        map_type: 'labelled'
+      }],
     }
   }
   const hex = await getShaDigest(JSON.stringify(returnObj))
@@ -78,9 +74,9 @@ async function getIndividualMap(parentName: string, regionName: string, url: str
   const volumeId = await getShaDigest(url)
   const returnObj: TPatchRegion = {
     '@id': '',
-    "@type": 'julich/siibra/append-region/v0.0.1',
-    "parent": {
-      "name": parentName
+    "@type": 'julich/siibra/patch-region/v0.0.1',
+    "target": {
+      "name": regionName
     },
     "targetParcellation": [{
       "@id": 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
@@ -89,26 +85,21 @@ async function getIndividualMap(parentName: string, regionName: string, url: str
       '@id': 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
     }],
     "payload": {
-      "name": regionName,
-      "volumeSrc": {
-        'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': {
-          "collect": [{
-            "@type": "fzj/tmp/volume_type/v0.0.1" as const,
-            "@id": `fzj/tmp/volume_type/v0.0.1/${volumeId}`,
-            "name": "Julich Brain v2.5 detailed map",
-            "volume_type": "neuroglancer/precomputed" as const,
-            "url": url,
-            "detail": {
-              "neuroglancer/precomputed": {
-                "labelIndex": labelIndex,
-                "transform": transform
-              }
-            },
-            space_id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
-            map_type: 'labelled'
-          }]
-        }
-      }
+      '_dataset_specs': [{
+        "@type": "fzj/tmp/volume_type/v0.0.1" as const,
+        "@id": `fzj/tmp/volume_type/v0.0.1/${volumeId}`,
+        "name": "Julich Brain v2.5 detailed map",
+        "volume_type": "neuroglancer/precomputed" as const,
+        "url": url,
+        "detail": {
+          "neuroglancer/precomputed": {
+            "labelIndex": labelIndex,
+            "transform": transform
+          }
+        },
+        space_id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
+        map_type: 'labelled'
+      }],
     }
   }
   const hex = await getShaDigest(JSON.stringify(returnObj))
