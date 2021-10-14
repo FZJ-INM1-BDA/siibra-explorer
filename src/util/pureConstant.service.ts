@@ -13,7 +13,10 @@ import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFu
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
+export const SIIBRA_API_VERSION_HEADER_KEY='X-Siibra-Api-Version'
+export const SIIBRA_API_VERSION = '0.1.5'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -375,6 +378,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     private store: Store<any>,
     private http: HttpClient,
     private log: LoggingService,
+    private snackbar: MatSnackBar,
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
     this.darktheme$ = this.store.pipe(
@@ -420,10 +424,19 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   private getAtlases$ = this.http.get<TAtlas[]>(
     `${this.bsEndpoint}/atlases`,
     {
-      responseType: 'json'
+      observe: 'response'
     }
   ).pipe(
-    map(arr => {
+    map(resp => {
+      const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
+      if (respVersion !== SIIBRA_API_VERSION) {
+        this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
+          duration: 5000
+        })
+      }
+      console.log(`siibra-api::version::${respVersion}`)
+      console.log(`expecting::${SIIBRA_API_VERSION}`)
+      const arr = resp.body
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
       return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
