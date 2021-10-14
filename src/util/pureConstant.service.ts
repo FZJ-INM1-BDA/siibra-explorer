@@ -427,7 +427,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       observe: 'response'
     }
   ).pipe(
-    map(resp => {
+    tap(resp => {
       const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
       if (respVersion !== SIIBRA_API_VERSION) {
         this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
@@ -436,6 +436,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       }
       console.log(`siibra-api::version::${respVersion}`)
       console.log(`expecting::${SIIBRA_API_VERSION}`)
+    }),
+    map(resp => {
       const arr = resp.body
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
