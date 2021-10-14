@@ -180,14 +180,17 @@ export type TRegionDetail = {
 export type TRegion = {
   name: string
   children: TRegion[]
+  volumeSrc: {
+    [key: string]: {
+      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
+    }
+  }
 
   labelIndex?: number
   rgb?: number[]
   id?: {
     kg: TKgIdentifier
   }
-
-  _dataset_specs: TVolumeSrc<keyof IVolumeTypeDetail>[]
 
   /**
    * missing 
