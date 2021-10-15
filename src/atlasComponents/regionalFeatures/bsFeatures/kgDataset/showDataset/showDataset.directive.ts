@@ -2,7 +2,7 @@ import { Directive, HostListener, Inject, Input, Optional } from "@angular/core"
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
-import { TRegion as TSiibraRegion } from "src/util/siibraApiConstants/types";
+import { TRegionDetail as TSiibraRegion } from "src/util/siibraApiConstants/types";
 import { TRegion as TContextRegion } from 'src/atlasComponents/regionalFeatures/bsFeatures/type'
 
 export const IAV_DATASET_SHOW_DATASET_DIALOG_CMP = 'IAV_DATASET_SHOW_DATASET_DIALOG_CMP'

@@ -9,7 +9,7 @@ import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
 import { flattenReducer } from 'common/util'
-import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
+import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
@@ -216,7 +216,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   )
 
   private getRegions(atlasId: string, parcId: string, spaceId: string){
-    return this.http.get<TRegion[]>(
+    return this.http.get<TRegionSummary[]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions`,
       {
         params: {
@@ -252,7 +252,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                   if (p.parent['name'] === region.name) {
                     if (!region.children) region.children = []
                     region.children.push(
-                      p.payload as TRegion
+                      p.payload as TRegionSummary
                     )
                   }
                 }
@@ -547,7 +547,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                              * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
                              */
 
-                            const dedicatedMap = region._dataset_specs.filter(spec => spec.space_id === tmpl.id && spec['volume_type'] === 'neuroglancer/precomputed')
+                            const dedicatedMap = region._dataset_specs.filter(
+                              spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
+                              && spec.space_id === tmpl.id
+                              && spec['volume_type'] === 'neuroglancer/precomputed'
+                            ) as TVolumeSrc<'neuroglancer/precomputed'>[]
                             if (dedicatedMap.length === 1) {
                               const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                               region['ngId'] = ngId
