@@ -149,9 +149,8 @@ jobs:
             oc new-app --template ${{ env.OC_TEMPLATE_NAME }} \
               -p BRANCH_NAME=$BRANCH_NAME \
               -p DEPLOY_ID=$DEPLOY_ID \
-              -p PATH_POSTFIX=$PATH_POSTFIX \
               -p ROUTE_HOST=$ROUTE_HOST \
-              -p ROUTE_PATH=$DEPLOY_ID \
+              -p ROUTE_PATH=$ROUTE_PATH \
               -p BUILD_TEXT=$BUILD_TEXT
           fi
       - name: 'Update status badge'
