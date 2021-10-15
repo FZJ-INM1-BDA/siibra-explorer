@@ -114,13 +114,13 @@ jobs:
             echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_PROD_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-viewer" >> $GITHUB_ENV
-            echo "ROUTE_HOST=https://siibra-explorer.apps.hbp.eu" >> $GITHUB_ENV
+            echo "ROUTE_HOST=siibra-explorer.apps.hbp.eu" >> $GITHUB_ENV
             echo "Deploy on prod cluster..."
           else
             echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
-            echo "ROUTE_HOST=https://siibra-explorer.apps-dev.hbp.eu" >> $GITHUB_ENV
+            echo "ROUTE_HOST=siibra-explorer.apps-dev.hbp.eu" >> $GITHUB_ENV
             echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
             echo "Deploy on dev cluster..."
           fi
