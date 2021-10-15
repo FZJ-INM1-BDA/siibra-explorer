@@ -15,7 +15,7 @@ import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
-export const SIIBRA_API_VERSION_HEADER_KEY='X-Siibra-Api-Version'
+export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.1.5'
 
 const validVolumeType = new Set([
@@ -434,8 +434,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
           duration: 5000
         })
       }
-      console.log(`siibra-api::version::${respVersion}`)
-      console.log(`expecting::${SIIBRA_API_VERSION}`)
+      console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
     }),
     map(resp => {
       const arr = resp.body
