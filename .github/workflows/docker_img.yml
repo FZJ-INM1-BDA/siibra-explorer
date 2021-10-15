@@ -157,7 +157,7 @@ jobs:
         if: success()
         run: |
 
-          DEPLOY_URL=$ROUTE_HOST$ROUTE_PATH
+          DEPLOY_URL=https://$ROUTE_HOST$ROUTE_PATH
           curl -v \
             -X POST \
             -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -166,5 +166,7 @@ jobs:
             -d '{
               "target_url":"'$DEPLOY_URL'",
               "name": "Deployed at OKD",
+              "description": "Deployed at OKD",
+              "context": "[ebrains-okd-deploy] Deployed at OKD",
               "state": "success"
             }'
