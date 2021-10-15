@@ -15,7 +15,6 @@ jobs:
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v1_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0'
 
-      OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
 
     steps:
     - uses: actions/checkout@v2
@@ -90,7 +89,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_API_ROOT: https://api.github.com/repos/fzj-inm1-bda/siibra-explorer
-      
+      OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
+
     needs: build-docker-img
     steps:
       - uses: actions/checkout@v2
