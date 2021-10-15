@@ -133,7 +133,7 @@ jobs:
           DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
           echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
           
-          ROUTE_PATH=$DEPLOY_ID
+          ROUTE_PATH=/$DEPLOY_ID
           echo "ROUTE_PATH=$ROUTE_PATH" >> $GITHUB_ENV
 
           echo "Working branch name: $BRANCH_NAME, deploy_id: $DEPLOY_ID"
