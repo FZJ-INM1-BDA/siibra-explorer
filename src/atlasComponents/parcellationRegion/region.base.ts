@@ -18,7 +18,7 @@ export class RegionBase {
   public rgbDarkmode: boolean
 
   private _region: TRegionDetail & {  
-    context: {
+    context?: {
       atlas: IHasId
       template: IHasId
       parcellation: IHasId
