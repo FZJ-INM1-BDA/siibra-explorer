@@ -143,7 +143,6 @@ Per [deployment template](./okd-branch-tmpl.yaml), a number of parameters may be
 | name | required | desc | 
 | --- | --- | --- |
 | `SESSION_SECRET` | | Random strings to encrypt sessions. Not currently used. |
-| `DOCKER_IMAGE_TAG` | true | Dictates which image tag to pull. Currently, possible values are `{latest\|rc\|stable}`. |
 | `BRANCH_NAME` | true | Determines the tag of the image to pull. |
 | `SANITIZED_BRANCH_NAME` | true | Strip all special characters from `BRANCH_NAME`. Acts similar to deploy ID. Distinguishes one deployment from another. Also affects routes: `siibra-explorer-{SANITIZED_BRANCH_NAME}.apps{PATH_POSTFIX}.hbp.eu` |
 | `PATH_POSTFIX` | | Dictates if postfix, if any, should be added to the route: `siibra-explorer-{DEPLOY_FLAVOUR}.apps{PATH_POSTFIX}.hbp.eu`. Defaults to `''` (empty string). Possible value: `-dev`|
