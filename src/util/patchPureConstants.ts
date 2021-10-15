@@ -6,7 +6,7 @@
  */
 
 import { IHasId } from "./interfaces";
-import { TRegion } from "./siibraApiConstants/types";
+import { TRegionSummary } from "./siibraApiConstants/types";
 
 type TAppend = {
   parent: IHasId | { name: string }
@@ -22,7 +22,7 @@ type TPatchRegion = {
   '@id': string
   targetSpace: IHasId[] | '*'
   targetParcellation: IHasId[] | '*'
-  payload: Partial<TRegion>
+  payload: Partial<TRegionSummary>
 } & (TAppend | TPatch)
 
 const encoder = new TextEncoder()

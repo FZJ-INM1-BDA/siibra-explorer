@@ -7,7 +7,7 @@ import { distinctUntilChanged, map } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
-import { TDatainfos, TParc, TSimpleInfo } from "src/util/siibraApiConstants/types";
+import { TDatainfosDetail } from "src/util/siibraApiConstants/types";
 
 @Component({
   selector: 'viewer-state-breadcrumb',
@@ -120,10 +120,11 @@ export class ViewerStateBreadCrumb {
 })
 
 export class OriginalDatainfoPipe implements PipeTransform{
-  public transform(arr: TDatainfos[]): TDatainfos[]{
+  public transform(arr: TDatainfosDetail[]): TDatainfosDetail[]{
     if (arr.length > 0) {
       return arr.map(d => {
         return {
+          '@type': 'minds/core/dataset/v1.0.0',
           name: d.name,
           description: d.name,
           urls: [],

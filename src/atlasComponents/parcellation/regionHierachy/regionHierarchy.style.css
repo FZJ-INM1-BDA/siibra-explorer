@@ -58,16 +58,6 @@ input[type="text"]
   height:4rem;
 }
 
-.horizontal-mode .cdk-viewport-wrapper region-list-simple-view
-{
-  width: 200px;
-}
-
-.cdk-viewport-wrapper region-list-simple-view
-{
-  width: 100%;
-}
-
 .cdk-virtual-scroll-viewport-container.horizontal-mode
 {
   height: 6rem;

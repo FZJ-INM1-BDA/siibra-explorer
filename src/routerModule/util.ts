@@ -183,12 +183,14 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
     returnState['viewerState']['regionsSelected'] = regionsSelected
     returnState['viewerState']['templateSelected'] = templateSelected
 
-    const { scale } = spaceMiscInfoMap.get(templateSelected.id) || { scale: 1 }
-    returnState['viewerState']['navigation'] = parsedNavObj || ({
-      ...DEFAULT_NAV,
-      zoom: 350000 * scale,
-      perspectiveZoom: 1922235.5293810747 * scale
-    })
+    if (templateSelected) {
+      const { scale } = spaceMiscInfoMap.get(templateSelected.id) || { scale: 1 }
+      returnState['viewerState']['navigation'] = parsedNavObj || ({
+        ...DEFAULT_NAV,
+        zoom: 350000 * scale,
+        perspectiveZoom: 1922235.5293810747 * scale
+      })
+    }
   } catch (e) {
     // if error, show error on UI?
     warnCb(`parse template, parc, region error`, e)
