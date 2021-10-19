@@ -71,15 +71,6 @@
     {
       color: mat.get-color-from-palette($warn, 500);
     }
-
-    &.hoverable
-    {
-      &:hover
-      {
-        // background-color: mat-color($background, hover);
-        cursor: pointer;
-      }
-    }
   }
 }
 

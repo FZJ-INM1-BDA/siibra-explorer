@@ -1,0 +1,11 @@
+:host
+{
+  display: grid;
+  grid-template-rows: min-content 1fr;
+  height: 100%;
+}
+
+div.image-container
+{
+  background: no-repeat center / contain;
+}

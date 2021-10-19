@@ -57,6 +57,7 @@ import { of } from 'rxjs';
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, kgTos, IAV_DATASET_PREVIEW_ACTIVE } from './databrowser.fallback'
 import { CANCELLABLE_DIALOG } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
+import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -123,6 +124,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   ],
   declarations : [
     AtlasViewer,
+    NotSupportedCmp,
     TryMeComponent,
 
     /* directives */

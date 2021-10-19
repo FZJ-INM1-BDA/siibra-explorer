@@ -122,13 +122,13 @@ export const BS_ENDPOINT = new InjectionToken<string>('BS_ENDPOINT')
 
 export const UNSUPPORTED_PREVIEW = [{
   text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',
-  previewSrc: './res/image/1.png',
+  previewSrc: 'assets/images/1.png',
 }, {
   text: 'Preview of Big Brain 2015 Release',
-  previewSrc: './res/image/2.png',
+  previewSrc: 'assets/images/2.png',
 }, {
   text: 'Preview of Waxholm Rat V2.0',
-  previewSrc: './res/image/3.png',
+  previewSrc: 'assets/images/3.png',
 }]
 
 export const UNSUPPORTED_INTERVAL = 7000

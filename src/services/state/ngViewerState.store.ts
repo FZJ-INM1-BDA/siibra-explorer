@@ -14,6 +14,7 @@ import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
 import { TUserRouteError } from 'src/auth/auth.service';
+import { viewerStateSelectedTemplateSelector } from './viewerState.store.helper';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -352,8 +353,8 @@ export class NgViewerUseEffect implements OnDestroy {
      * simplify with layer browser
      */
     const baseNgLayerName$ = this.store$.pipe(
-      select('viewerState'),
-      select('templateSelected'),
+      select(viewerStateSelectedTemplateSelector),
+      
       map(templateSelected => {
         if (!templateSelected) { return [] }
 
