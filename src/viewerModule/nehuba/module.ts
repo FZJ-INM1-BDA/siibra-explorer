@@ -27,6 +27,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
 import { DragDropFileModule } from "src/dragDropFile/module";
+import {CutSliceViewService} from "src/viewerModule/nehuba/cutSliceView.service";
 
 @NgModule({
   imports: [
@@ -80,7 +81,8 @@ import { DragDropFileModule } from "src/dragDropFile/module";
     {
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)
-    }
+    },
+    CutSliceViewService
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

@@ -42,6 +42,10 @@
     [quick-tour-order]="quickTour3dViewSlide.order">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
+
+  <div class="w-100 h-100 position-relative" style="z-index: 100" cut-control>
+    <ng-container *ngTemplateOutlet="cutControlTmp"></ng-container>
+  </div>
 </current-layout>
 
 <!-- slice view overlay tmpl -->
@@ -158,6 +162,17 @@
       <i class="fas fa-search-minus"></i>
     </button>
 
+    <!-- cut brain view -->
+    <ng-container *ngIf="panelIndex !== 3">
+      <button mat-icon-button
+              color="primary"
+              (click)="cutService.toggle(panelIndex)"
+              >
+        <i class="fas fa-cut"></i>
+      </button>
+
+    </ng-container>
+
     <maximise-panel-button
       (click)="toggleMaximiseMinimise(panelIndex)"
       [touch-side-class]="panelIndex">
@@ -193,6 +208,30 @@
   </svg>
 </ng-template>
 
+<ng-template #cutControlTmp>
+
+  <div class="d-inline-flex flex-column align-items-center pe-all mr-n5">
+    <mat-slider [vertical]="true"
+                *ngIf="cutService.panelIndex >=0 && cutService.templateTransform"
+                [min]="cutService.templateTransform[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                [max]="-cutService.templateTransform[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                [value]="cutService.navPosVoxel[cutService.panelIndex === 0? 1 : cutService.panelIndex === 1? 0 : 2]"
+                (input)="cutService.navigate($event)"></mat-slider> <!--[step]="1000"-->
+
+    <button mat-icon-button
+            color="primary"
+            (click)="cutService.rotate()"
+    >
+      <i class="fas fa-sync"></i>
+    </button>
+    <button mat-icon-button
+            color="primary"
+            (click)="cutService.toggle(-1)"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</ng-template>
 <ng-template #layerCtrlTmpl let-data>
   <div class="grid grid-col-3">
 
