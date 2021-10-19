@@ -18,7 +18,6 @@ import {
   isDefined,
   safeFilter,
 } from "../services/stateStore.service";
-import { UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "src/util/constants";
 import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
@@ -31,7 +30,6 @@ import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS, CONST } from 'common/constants'
 
-import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
@@ -82,11 +80,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
   private subscriptions: Subscription[] = []
-
-  public unsupportedPreviewIdx: number = 0
-  public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
-
-  public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
 
   private selectedParcellation$: Observable<any>
   public selectedParcellation: any
@@ -173,23 +166,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       )
     }
 
-    if (!this.meetsRequirement) {
-      merge(
-        of(-1),
-        interval(UNSUPPORTED_INTERVAL),
-      ).pipe(
-        map(v => {
-          let idx = v
-          while (idx < 0) {
-            idx = v + this.unsupportedPreviews.length
-          }
-          return idx % this.unsupportedPreviews.length
-        }),
-      ).subscribe(val => {
-        this.unsupportedPreviewIdx = val
-      })
-    }
-
     this.subscriptions.push(
       this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
     )
@@ -220,7 +196,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscriptions.push(
       this.pureConstantService.darktheme$.subscribe(flag => {
-        this.rd.setAttribute(document.body, 'darktheme', flag.toString())
+        this.rd.setAttribute(document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
     )
   }

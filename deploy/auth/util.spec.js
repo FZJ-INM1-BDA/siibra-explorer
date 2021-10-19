@@ -113,43 +113,6 @@ describe('util.js', async () => {
       cleanup()
     })
 
-    it('> configureAuth and refresh called with correct param', async () => {
-      const { getPublicAccessToken } = require('./util')
-      const token = await getPublicAccessToken()
-
-      const {
-        access_token,
-        refresh_token,
-        id_token,
-        configureAuthStub,
-        refreshSpy,
-        jwtDecodeReturn,
-        jwtDecodeStub
-      } = oidcStub
-      const { HBP_CLIENTID, HBP_CLIENTSECRET, HOSTNAME, HOST_PATHNAME, REFRESH_TOKEN } = env
-      
-      // configuAuthStub
-      assert(
-        configureAuthStub.called,
-        'expect configureAuthStub to have been called once'
-      )
-      const { args } = configureAuthStub.firstCall
-      const arg = args[0]
-      expect(arg).to.include({
-        clientId: HBP_CLIENTID,
-        clientSecret: HBP_CLIENTSECRET,
-        redirectUri: `${HOSTNAME}${HOST_PATHNAME}/hbp-oidc/cb`
-      })
-
-      // refresh spy
-      assert(refreshSpy.calledWith(REFRESH_TOKEN))
-      
-      // jwtStub
-      assert(jwtDecodeStub.calledWith(access_token))
-
-      // return val
-      expect(token).to.be.equal(access_token)
-    })
   })
 
   describe('> if refresh token is missing', () => {
@@ -184,15 +147,5 @@ describe('util.js', async () => {
       cleanup()
     })
 
-    it('> refresh getPublicAccessToken will reject', async () => {
-      const { getPublicAccessToken } = require('./util')
-
-      try {
-        await getPublicAccessToken()
-        assert(false, 'get public access token should be rejected')
-      } catch (e) {
-        assert(true)
-      }
-    })
   })
 })

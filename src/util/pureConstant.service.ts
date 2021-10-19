@@ -9,11 +9,15 @@ import { LoggingService } from "src/logging";
 import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
 import { flattenReducer } from 'common/util'
-import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegion, TRegionDetail, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
+import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { TTemplateImage } from "./interfaces";
 
+export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
+export const SIIBRA_API_VERSION = '0.1.5'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -52,7 +56,7 @@ type TIAVAtlas = {
   } & THasId)[]
 } & THasId
 
-const spaceMiscInfoMap = new Map([
+export const spaceMiscInfoMap = new Map([
   ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', {
     name: 'bigbrain',
     scale: 1,
@@ -213,7 +217,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   )
 
   private getRegions(atlasId: string, parcId: string, spaceId: string){
-    return this.http.get<TRegion[]>(
+    return this.http.get<TRegionSummary[]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations/${encodeURIComponent(parcId)}/regions`,
       {
         params: {
@@ -249,7 +253,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                   if (p.parent['name'] === region.name) {
                     if (!region.children) region.children = []
                     region.children.push(
-                      p.payload as TRegion
+                      p.payload as TRegionSummary
                     )
                   }
                 }
@@ -375,6 +379,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     private store: Store<any>,
     private http: HttpClient,
     private log: LoggingService,
+    private snackbar: MatSnackBar,
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
     this.darktheme$ = this.store.pipe(
@@ -420,13 +425,24 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   private getAtlases$ = this.http.get<TAtlas[]>(
     `${this.bsEndpoint}/atlases`,
     {
-      responseType: 'json'
+      observe: 'response'
     }
   ).pipe(
-    map(arr => {
+    tap(resp => {
+      const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
+      if (respVersion !== SIIBRA_API_VERSION) {
+        this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
+          duration: 5000
+        })
+      }
+      console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
+    }),
+    map(resp => {
+      const arr = resp.body
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
-      return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
+      return arr
+      // return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
     }),
     shareReplay(1),
   )
@@ -532,20 +548,20 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                              * this should work for both fully mapped and interpolated
                              * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
                              */
-                            if (
-                              tmpl.id in (region.volumeSrc || {})
-                              && 'collect' in region.volumeSrc[tmpl.id]
-                            ) {
-                              const dedicatedMap = region.volumeSrc[tmpl.id]['collect'].filter(v => v.volume_type === 'neuroglancer/precomputed')
-                              if (dedicatedMap.length === 1) {
-                                const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
-                                region['ngId'] = ngId
-                                region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                                ngLayerObj[tmpl.id][ngId] = {
-                                  source: `precomputed://${dedicatedMap[0].url}`,
-                                  type: "segmentation",
-                                  transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
-                                }
+
+                            const dedicatedMap = region._dataset_specs.filter(
+                              spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
+                              && spec.space_id === tmpl.id
+                              && spec['volume_type'] === 'neuroglancer/precomputed'
+                            ) as TVolumeSrc<'neuroglancer/precomputed'>[]
+                            if (dedicatedMap.length === 1) {
+                              const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
+                              region['ngId'] = ngId
+                              region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
+                              ngLayerObj[tmpl.id][ngId] = {
+                                source: `precomputed://${dedicatedMap[0].url}`,
+                                type: "segmentation",
+                                transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
                               }
                             }
   
@@ -579,10 +595,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                 && hemisphereKey === 'whole brain'
                               ) {
                                 region.children = []
-                                return
                               }
-                              const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
-                              region['ngId'] = hemispheredNgId
+                              if (!region['ngId']) {
+                                const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
+                                region['ngId'] = hemispheredNgId
+                              }
                             }
                           }  
                         )
@@ -729,16 +746,30 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const nehubaConfig = getNehubaConfig(tmpl)
               const initialLayers = nehubaConfig.dataset.initialNgState.layers
               
-              const tmplNgId = tmpl.name
               const tmplAuxMesh = `${tmpl.name} auxmesh`
 
-              const precomputed = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>
-              if (precomputed) {
-                initialLayers[tmplNgId] = {
+              const precomputedArr = tmpl._dataset_specs.filter(src => src['@type'] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>[]
+              let visible = true
+              let tmplNgId: string
+              let templateImages: TTemplateImage[] = []
+              for (const precomputedItem of precomputedArr) {
+                const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+                initialLayers[ngIdKey] = {
                   type: "image",
-                  source: `precomputed://${precomputed.url}`,
-                  transform: precomputed.detail['neuroglancer/precomputed'].transform
+                  source: `precomputed://${precomputedItem.url}`,
+                  transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
+                  visible
                 }
+                templateImages.push({
+                  "@id": precomputedItem['@id'],
+                  name: precomputedItem.name,
+                  ngId: ngIdKey,
+                  visible
+                })
+                if (visible) {
+                  tmplNgId = ngIdKey
+                }
+                visible = false
               }
 
               // TODO
@@ -776,6 +807,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 useTheme: darkTheme ? 'dark' : 'light',
                 ngId: tmplNgId,
                 nehubaConfig,
+                templateImages,
                 auxMeshes,
                 /**
                  * only populate the parcelltions made available

@@ -54,12 +54,6 @@ layout-floating-container > *
   max-width: 100%;
 }
 
-div[imageContainer]
-{
-  flex-grow: 1;
-  background: no-repeat center / contain;
-}
-
 div.displayCard
 {
   opacity: 0.8;
