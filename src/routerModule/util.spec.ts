@@ -6,6 +6,8 @@ import { cvtFullRouteToState, cvtStateToHashedRoutes, DummyCmp, routes } from '.
 import { encodeNumber } from './cipher'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
+import * as parsedRoute from './parseRouteToTmplParcReg'
+import { spaceMiscInfoMap } from 'src/util/pureConstant.service'
 
 describe('> util.ts', () => {
   describe('> cvtFullRouteToState', () => {
@@ -61,6 +63,53 @@ describe('> util.ts', () => {
       })
     })
 
+    describe('> navigation', () => {
+      let parseSpy: jasmine.Spy
+      let mapGetSpy: jasmine.Spy
+      beforeEach(() => {
+        parseSpy = spyOnProperty(parsedRoute, 'parseSearchParamForTemplateParcellationRegion')
+        mapGetSpy = spyOn(spaceMiscInfoMap, 'get')
+      })
+      it('> if not present, should show something palatable', () => {
+        parseSpy.and.returnValue(() => ({
+          parcellationSelected: {
+            id: 'dummpy-id-parc'
+          },
+          regionsSelected: [],
+          templateSelected: {
+            id: 'dummpy-id-tmpl-sel'
+          },
+        }))
+
+        const scale = 0.25
+
+        mapGetSpy.and.returnValue({ scale })
+
+        const router = TestBed.inject(Router)
+        const route = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2/p:minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-290`
+        const parsedUrl = router.parseUrl(route)
+        const { viewerState = {} } = cvtFullRouteToState(parsedUrl, {}) || {}
+        const { navigation } = viewerState
+        const {
+          orientation,
+          perspectiveOrientation,
+          position,
+          zoom,
+          perspectiveZoom,
+        } = navigation
+
+        expect(orientation).toEqual([0,0,0,1])
+        expect(perspectiveOrientation).toEqual([
+          0.3140767216682434,
+          -0.7418519854545593,
+          0.4988985061645508,
+          -0.3195493221282959
+        ])
+        expect(position).toEqual([0,0,0])
+        expect(zoom).toEqual(350000 * scale)
+        expect(perspectiveZoom).toEqual(1922235.5293810747 * scale)
+      })
+    })
   })
 
   describe('> cvtStateToHashedRoutes', () => {

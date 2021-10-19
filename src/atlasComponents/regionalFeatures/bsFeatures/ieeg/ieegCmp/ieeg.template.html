@@ -4,21 +4,12 @@
 
 <ng-template #contenttmpl>
   <ng-container *ngFor="let result of results$ | async">
-    <ng-container *ngFor="let subjectKeyVal of result | getProperty : 'electrodes' | keyvalue">
+    <ng-container *ngFor="let electrodeKeyVal of result | getProperty : 'electrodes' | keyvalue">
+      <ng-template [ngIf]="electrodeKeyVal.value.inRoi">
+        <ng-container *ngTemplateOutlet="electrodeTmpl; context: { $implicit: electrodeKeyVal.value }">
+        </ng-container>
+      </ng-template>
 
-      <ng-container *ngFor="let electrodeKeyVal of subjectKeyVal.value | keyvalue; let first = first">
-
-        <!-- subject id -->
-        <!-- <h4 *ngIf="first" class="mat-h4">
-          {{ subjectKeyVal.key }}
-        </h4> -->
-
-        <!-- electrodes -->
-        <ng-template [ngIf]="electrodeKeyVal.value.inRoi">
-          <ng-container *ngTemplateOutlet="electrodeTmpl; context: { $implicit: electrodeKeyVal.value }">
-          </ng-container>
-        </ng-template>
-      </ng-container>
     </ng-container>
   </ng-container>
 </ng-template>

@@ -39,7 +39,7 @@
                     <button class="flex-grow-0 flex-shrink-0"
                             mat-icon-button
                             iav-dataset-show-dataset-dialog
-                            [iav-dataset-show-dataset-dialog-name]="selectedDataset"
+                            [iav-dataset-show-dataset-dialog-name]="selectedDatasetName"
                             [iav-dataset-show-dataset-dialog-description]="selectedDatasetDescription"
                             [iav-dataset-show-dataset-dialog-kgid]="selectedDatasetKgId? selectedDatasetKgId : null"
                             [iav-dataset-show-dataset-dialog-kgschema]="selectedDatasetKgSchema? selectedDatasetKgSchema : null"
@@ -92,6 +92,6 @@
                             [loadurl]="fullConnectivityLoadUrl"
                             [name]="selectedDataset"
                             [description]="selectedDatasetDescription"
-                            onlyExport="true">
+                            only-export="true">
     </full-connectivity-grid>
 </div>

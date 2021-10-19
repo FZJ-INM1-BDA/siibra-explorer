@@ -5,14 +5,14 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { TBSSummary } from "../../kgDataset";
 import { BsFeatureService } from "../../service";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { TDatainfos } from "src/util/siibraApiConstants/types";
+import { TDatainfosDetail } from "src/util/siibraApiConstants/types";
 import { TRegion } from "../../type";
 
 /**
  * this component is specifically used to render side panel ebrains dataset view
  */
 
-export type TInjectableData = TDatainfos & {
+export type TInjectableData = TDatainfosDetail & {
   dataType?: string
   view?: ViewRef | TemplateRef<any>
   region?: TRegion

@@ -1,14 +1,14 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { HoverableModule } from "../hoverable";
+import { AngularMaterialModule } from "src/sharedModules";
 import { ReadmoreComponent } from "./readmoreCmp/readmore.component";
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserAnimationsModule,
-    HoverableModule,
+    AngularMaterialModule,
   ],
   declarations: [
     ReadmoreComponent

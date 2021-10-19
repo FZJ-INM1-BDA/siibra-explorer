@@ -5,7 +5,6 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { RenderViewOriginDatasetLabelPipe } from "./region.base";
 import { RegionDirective } from "./region.directive";
-import { RegionListSimpleViewComponent } from "./regionListSimpleView/regionListSimpleView.component";
 import { RegionMenuComponent } from "./regionMenu/regionMenu.component";
 import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
 import { BSFeatureModule } from "../regionalFeatures/bsFeatures";
@@ -25,7 +24,6 @@ import { HttpClientModule } from "@angular/common/http";
   ],
   declarations: [
     RegionMenuComponent,
-    RegionListSimpleViewComponent,
     SimpleRegionComponent,
 
     RegionDirective,
@@ -34,7 +32,6 @@ import { HttpClientModule } from "@angular/common/http";
   ],
   exports: [
     RegionMenuComponent,
-    RegionListSimpleViewComponent,
     SimpleRegionComponent,
 
     RegionDirective,

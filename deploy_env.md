@@ -47,7 +47,6 @@
 | `FLUENT_HOST` | host for fluent logging | `localhost` |
 | `FLUENT_PORT` | port for fluent logging | 24224 |
 | `IAV_NAME` | application name to be logged | `IAV` | 
-| `IAV_STAGE` | deploy of the application | `unnamed-stage` |
 
 ##### CSP
 

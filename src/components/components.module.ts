@@ -25,7 +25,6 @@ import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
 import { SpinnerCmp } from './spinner/spinner.component';
 import { ReadmoreModule } from './readmore';
-import { HoverableModule } from './hoverable';
 
 @NgModule({
   imports : [
@@ -36,7 +35,6 @@ import { HoverableModule } from './hoverable';
     AngularMaterialModule,
     UtilModule,
     ReadmoreModule,
-    HoverableModule,
   ],
   declarations : [
     /* components */
@@ -65,7 +63,6 @@ import { HoverableModule } from './hoverable';
   exports : [
     BrowserAnimationsModule,
     ReadmoreModule,
-    HoverableModule,
 
     MarkdownDom,
     TreeComponent,

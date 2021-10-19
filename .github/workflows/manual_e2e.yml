@@ -1,0 +1,32 @@
+name: '[manual-e2e]'
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  hide_previous_if_exists:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: 'master'
+    - uses: actions/github-script@v5
+      with:
+        script: |
+          const script = require('./.github/workflows/code/minimise-all-checklist-comments.js')
+          await script({github, context})
+          
+  add_e2e_checklist:
+    needs: hide_previous_if_exists
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 'Add checklist comment'
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const script = require('./.github/workflows/code/create-checklist-comment.js')
+          await script({github, context})

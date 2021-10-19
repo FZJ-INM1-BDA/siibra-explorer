@@ -96,7 +96,14 @@ export type TParcSummary = {
   name: string
 }
 
-export type TDatainfos = {
+export type TDatainfoSummary = {
+  '@type': 'minds/core/dataset/v1.0.0'
+  kgSchema: string
+  kgId: string
+}
+
+export type TDatainfosDetail = {
+  '@type': 'minds/core/dataset/v1.0.0'
   name: string
   description: string
   urls: {
@@ -148,56 +155,44 @@ export type TParc = {
   _dataset_specs: TDatasetSpec[]
 }
 
+export type TRegionSummary = {
+  name: string
+  labelIndex: number
+  rgb: [number, number, number]
+  id: number
+  availableIn: {
+    id: string
+    name: string
+  }[]
+  _dataset_specs: (TVolumeSrc<keyof IVolumeTypeDetail> | TDatainfoSummary)[]
+  children: TRegionSummary[]
+}
+
 export type TRegionDetail = {
   name: string
-  children: TRegionDetail[]
-  rgb: number[]
-  id: string
   labelIndex: number
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
+  rgb: [number, number, number]
+  id: {
+    kg: TKgIdentifier
   }
   availableIn: {
     id: string
     name: string
   }[]
+  _dataset_specs: (TVolumeSrc<keyof IVolumeTypeDetail> | TDatainfosDetail)[]
+
+  children: TRegionDetail[]
   hasRegionalMap: boolean
-  props: {
-    centroid_mm: [number, number, number]
-    volume_mm: number
-    surface_mm: number
-    is_cortical: number
-  }[]
   links: {
     [key: string]: string
   }
-  originDatainfos: TDatainfos[]
+  props: {
+    components: {
+      centroid: [number, number, number]
+      volume: number
+    }[]
+    space: any
+  }
+  
 }
 
-export type TRegion = {
-  name: string
-  children: TRegion[]
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
-  }
-
-  labelIndex?: number
-  rgb?: number[]
-  id?: {
-    kg: TKgIdentifier
-  }
-
-  /**
-   * missing 
-   */
-
-  originDatasets?: ({
-    filename: string
-  } & TKgIdentifier) []
-
-  position?: number[]
-}

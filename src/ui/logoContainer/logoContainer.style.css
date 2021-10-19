@@ -1,11 +1,11 @@
-[hbpLogoContainer]
+.hbpLogoContainer
 {
   display:inline-block;
   background-size: cover;
   height: 100%;
 }
 
-[hbpLogoContainer] > img
+.hbpLogoContainer > img
 {
   visibility: hidden;
   height: 100%;
