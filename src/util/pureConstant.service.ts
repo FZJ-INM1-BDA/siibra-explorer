@@ -14,6 +14,7 @@ import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { TTemplateImage } from "./interfaces";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.1.5'
@@ -744,16 +745,30 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const nehubaConfig = getNehubaConfig(tmpl)
               const initialLayers = nehubaConfig.dataset.initialNgState.layers
               
-              const tmplNgId = tmpl.name
               const tmplAuxMesh = `${tmpl.name} auxmesh`
 
-              const precomputed = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>
-              if (precomputed) {
-                initialLayers[tmplNgId] = {
+              const precomputedArr = tmpl._dataset_specs.filter(src => src['@type'] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>[]
+              let visible = true
+              let tmplNgId: string
+              let templateImages: TTemplateImage[] = []
+              for (const precomputedItem of precomputedArr) {
+                const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+                initialLayers[ngIdKey] = {
                   type: "image",
-                  source: `precomputed://${precomputed.url}`,
-                  transform: precomputed.detail['neuroglancer/precomputed'].transform
+                  source: `precomputed://${precomputedItem.url}`,
+                  transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
+                  visible
                 }
+                templateImages.push({
+                  "@id": precomputedItem['@id'],
+                  name: precomputedItem.name,
+                  ngId: ngIdKey,
+                  visible
+                })
+                if (visible) {
+                  tmplNgId = ngIdKey
+                }
+                visible = false
               }
 
               // TODO
@@ -791,6 +806,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 useTheme: darkTheme ? 'dark' : 'light',
                 ngId: tmplNgId,
                 nehubaConfig,
+                templateImages,
                 auxMeshes,
                 /**
                  * only populate the parcelltions made available
