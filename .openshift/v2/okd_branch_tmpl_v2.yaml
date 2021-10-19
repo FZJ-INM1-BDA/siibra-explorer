@@ -28,7 +28,7 @@ objects:
             - name: SESSION_SECRET
               value: ${SESSION_SECRET}
             - name: HOSTNAME
-              value: ${ROUTE_HOST}
+              value: https://${ROUTE_HOST}
             - name: HOST_PATHNAME
               value: ${ROUTE_PATH}
               
