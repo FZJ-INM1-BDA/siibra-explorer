@@ -28,7 +28,7 @@ import { HarnessLoader } from "@angular/cdk/testing"
 import { NehubaModule } from "../module"
 import { NEHUBA_VIEWER_FEATURE_KEY } from "../constants"
 import {CutSliceViewService} from "src/viewerModule/nehuba/cutSliceView.service";
-
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -118,7 +118,20 @@ describe('> nehubaViewerGlue.component.ts', () => {
             loadMeshes$: new Subject()
           }
         },
-        CutSliceViewService
+        CutSliceViewService,
+        {
+          provide: AtlasWorkerService,
+          useValue: {
+            sendMessage: async () => {
+              return {
+                result: {
+                  meta: {},
+                  buffer: null
+                }
+              }
+            }
+          }
+        }
       ]
     }).compileComponents()
   })
@@ -232,6 +245,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
   describe('> handleFileDrop', () => {
     let addNgLayerSpy: jasmine.Spy
     let removeNgLayersSpy: jasmine.Spy
+    let workerSendMessageSpy: jasmine.Spy
     let dummyFile1: File
     let dummyFile2: File
     let input: File[]
@@ -260,10 +274,19 @@ describe('> nehubaViewerGlue.component.ts', () => {
       removeNgLayersSpy = spyOn(fixture.componentInstance['layerCtrlService'], 'removeNgLayers').and.callFake(() => {
 
       })
+
+      workerSendMessageSpy = spyOn(fixture.componentInstance['worker'], 'sendMessage').and.callFake(async () => {
+        return {
+          result: {
+            meta: {}, buffer: null
+          }
+        }
+      })
     })
     afterEach(() => {
       addNgLayerSpy.calls.reset()
       removeNgLayersSpy.calls.reset()
+      workerSendMessageSpy.calls.reset()
     })
 
     describe('> malformed input', () => {
@@ -307,11 +330,11 @@ describe('> nehubaViewerGlue.component.ts', () => {
     })
 
     describe('> correct input', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         input = [dummyFile1]
 
         const cmp = fixture.componentInstance
-        cmp.handleFileDrop(input)
+        await cmp.handleFileDrop(input)
       })
 
       afterEach(() => {
@@ -323,9 +346,9 @@ describe('> nehubaViewerGlue.component.ts', () => {
         expect(removeNgLayersSpy).not.toHaveBeenCalled()
         expect(addNgLayerSpy).toHaveBeenCalledTimes(1)
       })
-      it('> on repeated input, both remove nglayer and remove ng layer called', () => {
+      it('> on repeated input, both remove nglayer and remove ng layer called', async () => {
         const cmp = fixture.componentInstance
-        cmp.handleFileDrop(input)
+        await cmp.handleFileDrop(input)
 
         expect(removeNgLayersSpy).toHaveBeenCalledTimes(1)
         expect(addNgLayerSpy).toHaveBeenCalledTimes(2)

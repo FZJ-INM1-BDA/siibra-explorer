@@ -39,7 +39,7 @@ import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService } from './glue';
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService, _PLI_VOLUME_INJ_TOKEN } from './glue';
 import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { UiEffects } from './services/state/uiState/ui.effects';
@@ -185,7 +185,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       },
       deps: [ UIService ]
     },
-
+    {
+      provide: _PLI_VOLUME_INJ_TOKEN,
+      useFactory: (glue: DatasetPreviewGlue) => glue._volumePreview$,
+      deps: [ DatasetPreviewGlue ]
+    },
     {
       provide: IAV_DATASET_PREVIEW_ACTIVE,
       useFactory: (glue: DatasetPreviewGlue) => glue.datasetPreviewDisplayed.bind(glue),
@@ -234,7 +238,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     },
     {
       provide: BS_ENDPOINT,
-      useValue: (environment.BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v1_0`).replace(/\/$/, '')
+      useValue: (environment.BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
   ],
   bootstrap : [

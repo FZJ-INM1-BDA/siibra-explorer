@@ -6,36 +6,46 @@
 <layout-floating-container [zIndex]="10">
 
   <!-- Annotation mode -->
-  <div *ngIf="(viewerMode$ | async) === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-    <mat-drawer-container class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    <mat-drawer-container *ngIf="viewerMode$ | async as viewerMode"
+      class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
       [hasBackdrop]="false">
-      <mat-drawer #annotationDrawer="matDrawer"
+      
+      <mat-drawer #viewerModeDrawer="matDrawer"
         mode="side"
-        (annotation-event-directive)="annotationDrawer.open()"
+        (annotation-event-directive)="viewerModeDrawer.open()"
         [annotation-event-directive-filter]="['showList']"
         [autoFocus]="false"
         [disableClose]="true"
         class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
-        <annotation-list></annotation-list>
-      </mat-drawer>
 
+        <!-- annotation -->
+        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+          <annotation-list></annotation-list>
+        </ng-template>
+
+        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+          <key-frame-controller></key-frame-controller>
+        </ng-template>
+
+      </mat-drawer>
       <mat-drawer-content class="visible position-relative pe-none">
 
-        <iav-layout-fourcorners>
-
+        <!-- annotation specific -->
+        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
           <!-- pullable tab top right corner -->
           <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
-            <div>
-              <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
-                matColor: 'primary',
-                fontIcon: 'fa-list',
-                tooltip: 'Annotation list',
-                click: annotationDrawer.toggle.bind(annotationDrawer)
-              }">
-              </ng-container>
-            </div>
 
-            <annotating-tools-panel class="z-index-10">
+            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+              matColor: 'primary',
+              fontIcon: 'fa-list',
+              tooltip: 'Annotation list',
+              click: viewerModeDrawer.toggle.bind(viewerModeDrawer),
+              badge: toolPanel?.annBadges$ | async
+            }">
+            </ng-container>
+
+            <annotating-tools-panel class="z-index-10"
+              #toolPanel="annoToolsPanel">
             </annotating-tools-panel>
           </div>
 
@@ -53,13 +63,41 @@
               </button>
             </mat-card>
           </div>
+
         </iav-layout-fourcorners>
 
 
+        <!-- key frame specific -->
+        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+          <!-- pullable tab top right corner -->
+          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
+
+            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+              matColor: 'primary',
+              fontIcon: 'fa-play',
+              tooltip: 'Annotation list',
+              click: viewerModeDrawer.toggle.bind(viewerModeDrawer)
+            }">
+            </ng-container>
+          </div>
+
+          <div iavLayoutFourCornersTopRight>
+            <mat-card class="mat-card-sm pe-all m-4">
+              <span>
+                Key Frame
+              </span>
+              <button mat-icon-button
+                color="warn"
+                key-frame-play-now="off">
+                <i class="fas fa-times"></i>
+              </button>
+            </mat-card>
+          </div>
+
+        </iav-layout-fourcorners>
       </mat-drawer-content>
+
     </mat-drawer-container>
-    <!-- <annotation-message></annotation-message> -->
-  </div>
 
   <!-- top drawer -->
   <mat-drawer-container
@@ -213,9 +251,14 @@
         'invisible overflow-hidden h-0': overlaySidenav$ | async,
         'h-100': !(overlaySidenav$ | async)
       }" class="position-relative d-flex flex-column">
+        
+        <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
+          <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
+            <ng-template [ngTemplateOutlet]="voiTmpl">
 
-        <ng-container *ngTemplateOutlet="sidenavRegionTmpl">
-        </ng-container>
+            </ng-template>
+          </ng-template>
+        </ng-template>
 
         <!-- TODO dataset preview will become deprecated in the future.
         Regional feature/data feature will replace it -->
@@ -385,6 +428,8 @@
   let-customColor="customColor"
   let-customColorDarkmode="customColorDarkmode"
   let-tooltip="tooltip"
+  let-badge="badge"
+  let-badgeColor="badgeColor"
   let-click="click">
   <!-- (click)="sideNavMasterSwitch.toggle()" -->
   <button mat-raised-button
@@ -397,12 +442,67 @@
     }"
     (click)="click && click()"
     [style.backgroundColor]="customColor"
-    [color]="(!customColor && matColor) ? matColor : null">
+    [color]="(!customColor && matColor) ? matColor : null"
+    [matBadge]="badge"
+    [matBadgeColor]="badgeColor || 'warn'">
 
     <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
       <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
     </span>
   </button>
+</ng-template>
+
+<!-- VOI sidenav tmpl -->
+<ng-template #voiTmpl>
+
+  <!-- back btn -->
+  <button mat-button
+    (click)="clearVoi()"
+    [attr.aria-label]="ARIA_LABELS.CLOSE"
+    class="position-absolute z-index-10 m-2">
+    <i class="fas fa-chevron-left"></i>
+    <span class="ml-1">
+      Back
+    </span>
+  </button>
+
+  <mat-card class="sidenav-cover-header-container">
+    <div class="sidenav-cover-header-container">
+      <mat-card-title>
+        {{ _pliTitle }}
+      </mat-card-title>
+
+      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+        <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+        <span>
+          Dataset preview
+        </span>
+
+        <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
+
+        <a [href]="_pliLink"
+          mat-icon-button
+          matTooltip="Explore in EBRAINS Knowledge Graph"
+          target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+
+      </mat-card-subtitle>
+    </div>
+
+    <small class="text-muted iv-custom-comp darker-bg">
+      {{ _pliDesc }}
+    </small>
+
+    <mat-expansion-panel class="sidenav-cover-header-container">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Registered Volumes
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <layer-browser></layer-browser>
+    </mat-expansion-panel>
+  </mat-card>
 </ng-template>
 
 <!-- region sidenav tmpl -->
@@ -535,21 +635,21 @@
 
       <!-- Multi regions include -->
       <ng-template #multiRegionInclTmpl>
-        <mat-chip-list>
-          <mat-chip *ngFor="let r of regions"
-            iav-region
-            [region]="r"
-            [ngClass]="{
-              'darktheme':regionDirective.rgbDarkmode === true,
-              'lighttheme': regionDirective.rgbDarkmode === false
-            }"
-            [style.backgroundColor]="regionDirective.rgbString"
-            #regionDirective="iavRegion">
-            <span class="iv-custom-comp text text-truncate d-inline pl-4">
-              {{ r.name }}
-            </span>
-          </mat-chip>
-        </mat-chip-list>
+
+        <mat-chip *ngFor="let r of regions"
+          iav-region
+          [region]="r"
+          class="m-1"
+          [ngClass]="{
+            'darktheme':regionDirective.rgbDarkmode === true,
+            'lighttheme': regionDirective.rgbDarkmode === false
+          }"
+          [style.backgroundColor]="regionDirective.rgbString"
+          #regionDirective="iavRegion">
+          <span class="iv-custom-comp text text-truncate d-inline">
+            {{ r.name }}
+          </span>
+        </mat-chip>
       </ng-template>
 
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {

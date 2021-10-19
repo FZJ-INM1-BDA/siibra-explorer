@@ -471,53 +471,51 @@ describe('> region.base.ts', () => {
       it('> does not populate if position property is absent', () => {
         regionBase.region = {
           ...mr0
-        }
+        } as any
         expect(regionBase.position).toBeFalsy()
       })
 
       describe('> does not populate if position property is malformed', () => {
-
-        it('> if position property is string', () => {
-          regionBase.region = {
-            ...mr0,
-            position: 'hello world'
-          }
+        it('> if region is falsy', () => {
+          regionBase.region = null
           expect(regionBase.position).toBeFalsy()
         })
-        it('> if position property is object', () => {
+        it('> if props is falsy', () => {
           regionBase.region = {
             ...mr0,
-            position: {
-              x: 0,
-              y: 0,
-              z: 0
+            props: null
+          } as any
+          expect(regionBase.position).toBeFalsy()
+        })
+        it('> if props.components is falsy', () => {
+          regionBase.region = {
+            ...mr0,
+            props: {
+              components: null
             }
-          }
+          } as any
+          expect(regionBase.position).toBeFalsy()
+        })
+        it('> if props.components[0] is falsy', () => {
+          regionBase.region = {
+            ...mr0,
+            props: {
+              components: []
+            }
+          } as any
           expect(regionBase.position).toBeFalsy()
         })
 
-        it('> if position property is array of incorrect length', () => {
+        it('> if props.components[0].centroid is falsy', () => {
+
           regionBase.region = {
             ...mr0,
-            position: []
-          }
-          expect(regionBase.position).toBeFalsy()
-        })
-
-        it('> if position property is array contain non number elements', () => {
-          regionBase.region = {
-            ...mr0,
-            position: [1, 2, 'hello world']
-          }
-          expect(regionBase.position).toBeFalsy()
-        })
-
-
-        it('> if position property is array contain NaN', () => {
-          regionBase.region = {
-            ...mr0,
-            position: [1, 2, NaN]
-          }
+            props: {
+              components: [{
+                centroid: null
+              }]
+            }
+          } as any
           expect(regionBase.position).toBeFalsy()
         })
       })
@@ -525,8 +523,12 @@ describe('> region.base.ts', () => {
       it('> populates if position property is array with length 3 and non NaN element', () => {
         regionBase.region = {
           ...mr0,
-          position: [1, 2, 3]
-        }
+          props: {
+            components: [{
+              centroid: [1, 2, 3]
+            }]
+          },
+        } as any
         expect(regionBase.position).toBeTruthy()
       })
     })
@@ -549,7 +551,7 @@ describe('> region.base.ts', () => {
         const regionBase = new RegionBase(mockStore)
         regionBase.region = {
           rgb: [100, 120, 140]
-        }
+        } as any
         expect(
           regionBase.rgbString
         ).toEqual(`rgb(100,120,140)`)
@@ -560,7 +562,7 @@ describe('> region.base.ts', () => {
         const regionBase = new RegionBase(mockStore)
         regionBase.region = {
           labelIndex: 65535
-        }
+        } as any
         expect(
           regionBase.rgbString
         ).toEqual(`rgb(255,255,255)`)
@@ -576,7 +578,7 @@ describe('> region.base.ts', () => {
               ngId: 'foo',
               name: 'bar',
               labelIndex: 152
-            }
+            } as any
             expect(strToRgbSpy).toHaveBeenCalledWith(`foo152`)
           })
           it('> if ngId is not defined, use name', () => {
@@ -585,7 +587,7 @@ describe('> region.base.ts', () => {
             regionBase.region = {
               name: 'bar',
               labelIndex: 152
-            }
+            } as any
             expect(strToRgbSpy).toHaveBeenCalledWith(`bar152`)
           })
         })
@@ -601,7 +603,7 @@ describe('> region.base.ts', () => {
           const regionBase = new RegionBase(mockStore)
           regionBase.region = {
             foo: 'bar'
-          }
+          } as any
           expect(
             regionBase.rgbString
           ).toEqual(`rgb(${arr.join(',')})`)
@@ -613,7 +615,7 @@ describe('> region.base.ts', () => {
           const regionBase = new RegionBase(mockStore)
           regionBase.region = {
             foo: 'bar'
-          }
+          } as any
           expect(
             regionBase.rgbString
           ).toEqual(`rgb(255,200,200)`)

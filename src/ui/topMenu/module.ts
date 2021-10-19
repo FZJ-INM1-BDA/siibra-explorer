@@ -14,6 +14,7 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
+import { KeyFrameModule } from "src/keyframesModule/module";
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { QuickTourModule } from "src/ui/quickTour/module";
     AuthModule,
     ScreenshotModule,
     UserAnnotationsModule,
+    KeyFrameModule,
     QuickTourModule,
   ],
   declarations: [

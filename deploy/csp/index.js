@@ -39,12 +39,24 @@ const defaultAllowedSites = [
 
 const connectSrc = [
   "'self'",
+
+  // needed by ad hoc generation of URL resources
   "blob:",
+
+  // siibra-api endpoints
+  'siibra-api-latest.apps-dev.hbp.eu',
+  'siibra-api-rc.apps.hbp.eu',
+  'siibra-api-stable.apps.hbp.eu',
+  
+  // chunk servers
   'neuroglancer.humanbrainproject.org',
   'neuroglancer.humanbrainproject.eu',
-  'connectivity-query-v1-1-connectivity.apps-dev.hbp.eu',
   'object.cscs.ch',
-  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/', // required for dataset previews
+
+  // required for dataset previews
+  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/',
+
+  // injected by env var
   ...CSP_CONNECT_SRC
 ]
 
@@ -104,6 +116,7 @@ module.exports = {
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
           'https://unpkg.com/three-surfer@0.0.10/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
+          'https://unpkg.com/ng-layer-tune@0.0.2/dist/ng-layer-tune/ng-layer-tune.esm.js', // needed for ng layer control
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,
@@ -124,6 +137,7 @@ module.exports = {
       } else {
         console.warn(`CSP Violation: no data received!`)
       }
+      res.status(204).end()
     })
   }
 }

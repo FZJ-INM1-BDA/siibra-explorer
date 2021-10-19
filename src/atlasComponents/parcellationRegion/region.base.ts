@@ -8,6 +8,8 @@ import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerSt
 import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
 import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
+import { TRegionDetail } from "src/util/siibraApiConstants/types";
+import { IHasId } from "src/util/interfaces";
 
 @Directive()
 export class RegionBase {
@@ -15,7 +17,14 @@ export class RegionBase {
   public rgbString: string
   public rgbDarkmode: boolean
 
-  private _region: any
+  private _region: TRegionDetail & {  
+    context?: {
+      atlas: IHasId
+      template: IHasId
+      parcellation: IHasId
+    }
+    ngId?: string
+  }
 
   private _position: [number, number, number]
   set position(val){
@@ -34,15 +43,12 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this._region)
+    this.hasContext$.next(!!this._region?.context)
 
     this.position = null
     // bug the centroid returned is currently nonsense
     // this.position = val?.props?.centroid_mm
     if (!this._region) return
-
-    if (val?.position) {
-      this.position = val?.position 
-    }
     const pos = getPosFromRegion(val)
     if (pos) {
       this.position = pos
@@ -62,6 +68,12 @@ export class RegionBase {
     return this._region
   }
 
+  get originDatainfos(){
+    if (!this._region) return []
+    return (this._region._dataset_specs || []).filter(spec => spec['@type'] === 'minds/core/dataset/v1.0.0')
+  }
+
+  public hasContext$: BehaviorSubject<boolean> = new BehaviorSubject(false)
   public region$: BehaviorSubject<any> = new BehaviorSubject(null)
 
   @Input()
@@ -90,7 +102,7 @@ export class RegionBase {
 
     this.regionInOtherTemplates$ = this.region$.pipe(
       distinctUntilChanged(),
-      filter(v => !!v),
+      filter(v => !!v && !!v.context),
       switchMap(region => this.store$.pipe(
         select(
           regionInOtherTemplateSelector,
@@ -285,7 +297,7 @@ export const regionInOtherTemplateSelector = createSelector(
     const otherTemplates = fetchedTemplates
       .filter(({ ['@id']: id }) => id !== regionOfInterest.context.template['@id']
           && atlasTemplateSpacesIds.includes(id)
-          && regionOfInterest.availableIn.map(ai => ai.id).includes(id))
+          && (regionOfInterest.availableIn || []).map(ai => ai.id).includes(id))
 
     for (const template of otherTemplates) {
       const parcellation = template.parcellations.find(p => p['@id'] === regionOfInterest.context.parcellation['@id'])

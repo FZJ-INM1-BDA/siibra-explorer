@@ -10,7 +10,6 @@
     <mat-card-title>
       <div class="position-relative region-name iv-custom-comp text">
         {{ region.name }}
-        <small *ngIf="region.status"> ({{region.status}})</small>
       </div>
     </mat-card-title>
 
@@ -22,20 +21,7 @@
       </span>
 
       <!-- origin datas format -->
-      <div *ngFor="let originDataset of (region.originDatasets || []); let index = index"
-        class="ml-2">
-        <i>&#183;</i>
-
-        <span *ngIf="originDataset?.format?.name as regionOrDsFormatName; else fallbackODsnameTmpl">
-          {{ regionOrDsFormatName }}
-        </span>
-        <ng-template #fallbackODsnameTmpl>
-          <span>
-            {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-          </span>
-        </ng-template>
-      </div>
-
+      
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
       <!-- position -->
@@ -47,7 +33,7 @@
       </button>
 
       <!-- explore doi -->
-      <ng-template let-infos [ngIf]="region?.originDatainfos">
+      <ng-template let-infos [ngIf]="originDatainfos">
         <ng-container *ngFor="let info of infos">
           <a *ngFor="let url of info.urls"
             [href]="url.doi | doiParserPipe"
@@ -67,8 +53,8 @@
 <mat-accordion class="d-block mt-2">
 
   <!-- description -->
-  <ng-template [ngIf]="(region.originDatainfos || []).length > 0">
-    <ng-container *ngFor="let originData of region.originDatainfos">
+  <ng-template [ngIf]="(originDatainfos || []).length > 0">
+    <ng-container *ngFor="let originData of originDatainfos">
       <ng-template #descTmpl>
         <markdown-dom [markdown]="originData.description"
           class="text-muted text-sm">
@@ -127,7 +113,7 @@
     content: kgRegionalFeatureList,
     desc: '',
     iconTooltip: 'Regional Features',
-    iavNgIf: true
+    iavNgIf: hasContext$ | async
   }">
   </ng-container>
 

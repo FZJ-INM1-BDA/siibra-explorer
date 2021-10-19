@@ -42,7 +42,10 @@ const templateMap = {
     id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
     parc: {
       'Cytoarchitectonic Maps - v2.4': {
-        id: 'juelich/iav/atlas/v1.0.0/7'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
+      },
+      'Cytoarchitectonic Maps': {
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
       },
       'Cortical Layers Segmentation': {
         id: 'juelich/iav/atlas/v1.0.0/3'
@@ -57,13 +60,14 @@ const templateMap = {
     id: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2',
     parc: {
       'Cytoarchitectonic Maps - v2.5.1': {
-        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26'
+        // redirect julich brain v251 to v290
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
       },
       'Short Fiber Bundles - HCP': {
         id: 'juelich/iav/atlas/v1.0.0/79cbeaa4ee96d5d3dfe2876e9f74b3dc3d3ffb84304fb9b965b1776563a1069c'
       },
       'Cytoarchitectonic maps - v1.18': {
-        id: 'juelich/iav/atlas/v1.0.0/8'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
       },
       'Long Bundle': {
         id: 'juelich/iav/atlas/v1.0.0/5'
@@ -93,7 +97,7 @@ const templateMap = {
     id: 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992',
     parc: {
       'Cytoarchitectonic Maps - v1.18': {
-        id: 'juelich/iav/atlas/v1.0.0/8'
+        id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
       }
     }
   },
@@ -202,8 +206,8 @@ module.exports = (query, _warningCb) => {
       // ignore region selected and move on
     }
   }
-
-  let redirectUrl = '/#'
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  let redirectUrl = `${HOST_PATHNAME}/#`
   if (standaloneVolumes) {
     searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav
@@ -222,7 +226,7 @@ module.exports = (query, _warningCb) => {
       }
       const { id: p } = parc[parcellationSelected] || {}
       if (p) redirectUrl += `/p:${encodeId(p)}`
-      if (r) redirectUrl += r
+      if (r && parcellationSelected !== 'Cytoarchitectonic Maps - v2.5.1') redirectUrl += r
       if (nav) redirectUrl += nav
       if (dsp) redirectUrl += dsp
       

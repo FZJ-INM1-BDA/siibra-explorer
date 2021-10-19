@@ -22,15 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
-import {
-  ngViewerActionToggleMax,
-  ngViewerActionClearView,
-  ngViewerActionSetPanelOrder,
-  ngViewerActionSwitchPanelMode,
-  ngViewerActionForceShowSegment,
-  ngViewerActionNehubaReady,
-  ngViewerToggleCutView
-} from './ngViewerState/actions';
+import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady, ngViewerActionCycleViews, ngViewerToggleCutView } from './ngViewerState/actions';
 import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
@@ -195,9 +187,6 @@ export class NgViewerUseEffect implements OnDestroy {
   public cycleViews$: Observable<any>
 
   @Effect()
-  public spacebarListener$: Observable<any>
-
-  @Effect()
   public removeAllNonBaseLayers$: Observable<any>
 
   private panelOrder$: Observable<string>
@@ -277,7 +266,7 @@ export class NgViewerUseEffect implements OnDestroy {
     )
 
     this.cycleViews$ = this.actions.pipe(
-      ofType(ACTION_TYPES.CYCLE_VIEWS),
+      ofType(ngViewerActionCycleViews.type),
       withLatestFrom(this.panelOrder$),
       map(([_, panelOrder]) => {
         return ngViewerActionSetPanelOrder({
@@ -371,15 +360,6 @@ export class NgViewerUseEffect implements OnDestroy {
       mapTo(uiActionSnackbarMessage({
         snackbarMessage: CYCLE_PANEL_MESSAGE
       })),
-    )
-
-    this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
-      filter((ev: KeyboardEvent) => ev.key === ' '),
-      withLatestFrom(this.panelMode$),
-      filter(([_ , panelMode]) => panelMode === PANELS.SINGLE_PANEL),
-      mapTo({
-        type: ACTION_TYPES.CYCLE_VIEWS,
-      }),
     )
 
     /**
@@ -477,7 +457,6 @@ export class NgViewerUseEffect implements OnDestroy {
 export { INgLayerInterface } 
 
 const ACTION_TYPES = {
-  CYCLE_VIEWS: 'CYCLE_VIEWS',
 
   REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,
 }

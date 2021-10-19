@@ -14,10 +14,11 @@ type TAuxMesh = {
   labelIndicies: number[]
 }
 
-interface IVolumeTypeDetail {
+export interface IVolumeTypeDetail {
   'nii': null
   'neuroglancer/precomputed': {
     'neuroglancer/precomputed': {
+      'labelIndex': number
       'transform': TNgTransform
     }
   }
@@ -28,21 +29,39 @@ interface IVolumeTypeDetail {
     }
   }
   'detailed maps': null
+  'threesurfer/gii': any
+  'threesurfer/gii-label': any
 }
 
-type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
+export type TVolumeSrc<VolumeType extends keyof IVolumeTypeDetail> = {
   '@id': string
   '@type': 'fzj/tmp/volume_type/v0.0.1'
   name: string
   url: string
   volume_type: TVolumeType
   detail: IVolumeTypeDetail[VolumeType]
+
+  space_id: string
+  map_type: string
 }
+
+export type TSimpleInfo = {
+  "@type": 'fzj/tmp/simpleOriginInfo/v0.0.1'
+  name: string
+  description: string
+}
+
 
 type TKgIdentifier = {
   kgSchema: string
   kgId: string
 }
+
+export type TKgInfo = {
+  '@type': 'minds/core/dataset/v1.0.0'
+} & TKgIdentifier
+
+type TDatasetSpec = TVolumeSrc<keyof IVolumeTypeDetail> | TSimpleInfo | TKgInfo
 
 type TVersion = {
   name: string
@@ -77,7 +96,14 @@ export type TParcSummary = {
   name: string
 }
 
-export type TDatainfos = {
+export type TDatainfoSummary = {
+  '@type': 'minds/core/dataset/v1.0.0'
+  kgSchema: string
+  kgId: string
+}
+
+export type TDatainfosDetail = {
+  '@type': 'minds/core/dataset/v1.0.0'
   name: string
   description: string
   urls: {
@@ -91,17 +117,18 @@ export type TSpaceFull = {
   id: string
   name: string
   key: string //???
-  type: string //???
-  url: string //???
-  ziptarget: string //???
+  _dataset_specs: TDatasetSpec[]
+  _datasets_cached: null
+  extends: null
   src_volume_type: TSpaceType
-  volume_src: TVolumeSrc<keyof IVolumeTypeDetail>[]
+  type: string //???
   availableParcellations: TParcSummary[]
+
   links: {
     templates: THref
     parcellation_maps: THref
+    features: THref
   }
-  originDatainfos: TDatainfos[]
 }
 
 export type TParc = {
@@ -112,71 +139,60 @@ export type TParc = {
   availableSpaces: {
     id: string
     name: string
+    extends: null
+    key: string
+    src_volume_type: 'histology' | 'mri'
+    type: 'neuroglancer/precomputed' | 'nii'
+    _dataset_specs: TDatasetSpec[]
   }[]
   links: {
     self: THref
   }
   regions: THref
+  features: THref
   modality: TParcModality
   version: TVersion
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
-  }
-  originDatainfos: TDatainfos[]
+  _dataset_specs: TDatasetSpec[]
+}
+
+export type TRegionSummary = {
+  name: string
+  labelIndex: number
+  rgb: [number, number, number]
+  id: number
+  availableIn: {
+    id: string
+    name: string
+  }[]
+  _dataset_specs: (TVolumeSrc<keyof IVolumeTypeDetail> | TDatainfoSummary)[]
+  children: TRegionSummary[]
 }
 
 export type TRegionDetail = {
   name: string
-  children: TRegionDetail[]
-  rgb: number[]
-  id: string
   labelIndex: number
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
+  rgb: [number, number, number]
+  id: {
+    kg: TKgIdentifier
   }
   availableIn: {
     id: string
     name: string
   }[]
+  _dataset_specs: (TVolumeSrc<keyof IVolumeTypeDetail> | TDatainfosDetail)[]
+
+  children: TRegionDetail[]
   hasRegionalMap: boolean
-  props: {
-    centroid_mm: [number, number, number]
-    volume_mm: number
-    surface_mm: number
-    is_cortical: number
-  }[]
   links: {
     [key: string]: string
   }
-  originDatainfos: TDatainfos[]
+  props: {
+    components: {
+      centroid: [number, number, number]
+      volume: number
+    }[]
+    space: any
+  }
+  
 }
 
-export type TRegion = {
-  name: string
-  children: TRegion[]
-  volumeSrc: {
-    [key: string]: {
-      [key: string]: TVolumeSrc<keyof IVolumeTypeDetail>[]
-    }
-  }
-
-  labelIndex?: number
-  rgb?: number[]
-  id?: {
-    kg: TKgIdentifier
-  }
-
-  /**
-   * missing 
-   */
-
-  originDatasets?: ({
-    filename: string
-  } & TKgIdentifier) []
-
-  position?: number[]
-}

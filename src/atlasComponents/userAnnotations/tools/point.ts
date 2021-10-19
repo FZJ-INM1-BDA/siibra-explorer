@@ -109,7 +109,7 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
   public iconClass = POINT_ICON_CLASS
   
   public subs: Subscription[] = []
-  private managedAnnotations: Point[] = []
+  protected managedAnnotations: Point[] = []
   public managedAnnotations$ = new Subject<Point[]>()
 
   constructor(
@@ -175,14 +175,6 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
         }
       }),
     )
-  }
-
-  addAnnotation(point: Point){
-    const found = this.managedAnnotations.find(p => p.id === point.id)
-    if (found) throw new Error(`Point annotation already added`)
-    point.remove = () => this.removeAnnotation(point.id)
-    this.managedAnnotations.push(point)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   /**
