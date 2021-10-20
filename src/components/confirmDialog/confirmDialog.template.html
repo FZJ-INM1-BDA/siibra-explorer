@@ -18,6 +18,6 @@
 <mat-divider></mat-divider>
 
 <mat-dialog-actions *ngIf="!hideActionBar" class="justify-content-start flex-row-reverse">
-    <button [mat-dialog-close]="true" mat-raised-button color="primary">{{ okBtnText }}</button>
-  <button [mat-dialog-close]="false" mat-button>{{ cancelBtnText }}</button>
+  <button [mat-dialog-close]="true" mat-raised-button color="primary">{{ okBtnText }}</button>
+  <button *ngIf="!confirmOnly" [mat-dialog-close]="false" mat-button>{{ cancelBtnText }}</button>
 </mat-dialog-actions>

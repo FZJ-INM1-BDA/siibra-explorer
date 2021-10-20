@@ -1,10 +1,11 @@
 import { Component, ComponentFactory, ComponentFactoryResolver, ElementRef, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import {combineLatest, merge, NEVER, Observable, of, Subject, Subscription} from "rxjs";
-import {catchError, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import {catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
+  viewerStateGetSelectedAtlas,
   viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplateSelector,
   viewerStateStandAloneVolumes,
@@ -25,6 +26,7 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GenericInfoCmp } from "src/atlasComponents/regionalFeatures/bsFeatures/genericInfo";
 import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
+import { DialogService } from "src/services/dialogService.service";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -112,7 +114,8 @@ export function ROIFactory(store: Store<any>, svc: PureContantService){
       },
       deps: [ ComponentStore ]
     },
-    ComponentStore
+    ComponentStore,
+    DialogService
   ]
 })
 
@@ -234,6 +237,7 @@ export class ViewerCmp implements OnDestroy {
     private viewerModuleSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
     private cStore: ComponentStore<TCStoreViewerCmp>,
     cfr: ComponentFactoryResolver,
+    private dialogSvc: DialogService,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
@@ -271,7 +275,44 @@ export class ViewerCmp implements OnDestroy {
             ? getGetRegionFromLabelIndexId({ parcellation: p })
             : null
         }
-      )
+      ),
+      combineLatest([
+        this.templateSelected$,
+        this.parcellationSelected$,
+        this.store$.pipe(
+          select(viewerStateGetSelectedAtlas)
+        )
+      ]).pipe(
+        debounceTime(160)
+      ).subscribe(async ([tmpl, parc, atlas]) => {
+        const regex = /pre.?release/i
+        const checkPrerelease = (obj: any) => {
+          if (obj?.name) return regex.test(obj.name)
+          return false
+        }
+        const message: string[] = []
+        if (checkPrerelease(atlas)) {
+          message.push(`- _${atlas.name}_`)
+        }
+        if (checkPrerelease(tmpl)) {
+          message.push(`- _${tmpl.name}_`)
+        }
+        if (checkPrerelease(parc)) {
+          message.push(`- _${parc.name}_`)
+        }
+        if (message.length > 0) {
+          message.unshift(`The following have been tagged pre-release, and may be updated frequently:`)
+          try {
+            await this.dialogSvc.getUserConfirm({
+              title: `Pre-release warning`,
+              markdown: message.join('\n\n'),
+              confirmOnly: true
+            })
+          } catch (e) {
+
+          }
+        }
+      })
     )
   }
 

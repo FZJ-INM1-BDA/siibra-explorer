@@ -754,9 +754,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               let templateImages: TTemplateImage[] = []
               for (const precomputedItem of precomputedArr) {
                 const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+                const precomputedUrl = 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211001-mebrain/precomputed/images/MEBRAINS_T1.masked' === precomputedItem.url
+                  ? 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211018-mebrains-masked-templates/precomputed/images/MEBRAINS_T1_masked'
+                  : precomputedItem.url
                 initialLayers[ngIdKey] = {
                   type: "image",
-                  source: `precomputed://${precomputedItem.url}`,
+                  source: `precomputed://${precomputedUrl}`,
                   transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
                   visible
                 }
