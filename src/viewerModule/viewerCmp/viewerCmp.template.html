@@ -3,133 +3,221 @@
   </ng-container>
 </div>
 
-<layout-floating-container [zIndex]="10">
 
-  <!-- Annotation mode -->
-    <mat-drawer-container *ngIf="viewerMode$ | async as viewerMode"
-      class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
-      [hasBackdrop]="false">
-      
-      <mat-drawer #viewerModeDrawer="matDrawer"
-        mode="side"
-        (annotation-event-directive)="viewerModeDrawer.open()"
-        [annotation-event-directive-filter]="['showList']"
-        [autoFocus]="false"
-        [disableClose]="true"
-        class="p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
+<!-- master draw container -->
+<mat-drawer-container
+  *ngIf="viewerLoaded"
+  iav-switch
+  [iav-switch-state]="!(onlyShowMiniTray$ | async)"
+  #showFullSidenavSwitch="iavSwitch"
+  class="position-absolute w-100 h-100 mat-drawer-content-overflow-visible invisible"
+  [hasBackdrop]="false">
+  
+  <!-- master drawer -->
+  <mat-drawer
+    mode="side"
+    #drawer="matDrawer"
+    [opened]="!(onlyShowMiniTray$ | async)"
+    [@openClose]="showFullSidenavSwitch && (showFullSidenavSwitch.switchState$ | async) ? 'open' : 'closed'"
+    (@openClose.start)="$event.toState === 'open' && drawer.open()"
+    (@openClose.done)="$event.toState === 'closed' && drawer.close()"
+    [autoFocus]="false"
+    [disableClose]="true"
+    class="iv-custom-comp darker-bg p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
 
-        <!-- annotation -->
-        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-          <annotation-list></annotation-list>
+    <!-- entry template -->
+    <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="regularTmpl">
+      <ng-template [ngTemplateOutlet]="alternateModeDrawerTmpl"
+        [ngTemplateOutletContext]="{
+          mode: mode
+        }"></ng-template>
+    </ng-template>
+
+    <!-- regular mode  -->
+    <ng-template #regularTmpl>
+      <ng-template
+        [ngTemplateOutlet]="regularModeDrawerTmpl"
+        [ngTemplateOutletContext]="{
+          drawer: drawer,
+          showFullSidenavSwitch: showFullSidenavSwitch
+        }">
+      </ng-template>
+    </ng-template>
+  </mat-drawer>
+
+  <!-- master content -->
+  <mat-drawer-content class="visible pe-none position-relative">
+    <iav-layout-fourcorners>
+
+      <!-- top left -->
+      <div iavLayoutFourCornersTopLeft class="ws-no-wrap">
+
+        <!-- special mode -->
+        <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="defaultTopLeftTmpl">
+          <ng-template [ngTemplateOutlet]="specialModeTopLeftTmpl"
+            [ngTemplateOutletContext]="{
+              mode: mode,
+              toggleMatDrawer: drawer.toggle.bind(drawer)
+            }">
+          </ng-template>
         </ng-template>
 
-        <ng-template [ngIf]="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-          <key-frame-controller></key-frame-controller>
+        <!-- default mode top left tmpl -->
+        <ng-template #defaultTopLeftTmpl>
+          <ng-template [ngTemplateOutlet]="defaultMainContentTopLeft"
+            [ngTemplateOutletContext]="{
+              isOpen: drawer.opened,
+              drawer: drawer,
+              showFullSidenavSwitch: showFullSidenavSwitch
+            }">
+          </ng-template>
         </ng-template>
-
-      </mat-drawer>
-      <mat-drawer-content class="visible position-relative pe-none">
-
-        <!-- annotation specific -->
-        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-          <!-- pullable tab top right corner -->
-          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
-
-            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
-              matColor: 'primary',
-              fontIcon: 'fa-list',
-              tooltip: 'Annotation list',
-              click: viewerModeDrawer.toggle.bind(viewerModeDrawer),
-              badge: toolPanel?.annBadges$ | async
-            }">
-            </ng-container>
-
-            <annotating-tools-panel class="z-index-10"
-              #toolPanel="annoToolsPanel">
-            </annotating-tools-panel>
-          </div>
-
-          <div iavLayoutFourCornersTopRight>
-            <mat-card class="mat-card-sm pe-all m-4">
-              <span>
-                Annotating
-              </span>
-              <button mat-icon-button
-                [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
-                color="warn"
-                annotation-switch
-                annotation-switch-mode="off">
-                <i class="fas fa-times"></i>
-              </button>
-            </mat-card>
-          </div>
-
-        </iav-layout-fourcorners>
-
-
-        <!-- key frame specific -->
-        <iav-layout-fourcorners *ngIf="viewerMode === ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-          <!-- pullable tab top right corner -->
-          <div iavLayoutFourCornersTopLeft class="tab-toggle-container">
-
-            <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
-              matColor: 'primary',
-              fontIcon: 'fa-play',
-              tooltip: 'Annotation list',
-              click: viewerModeDrawer.toggle.bind(viewerModeDrawer)
-            }">
-            </ng-container>
-          </div>
-
-          <div iavLayoutFourCornersTopRight>
-            <mat-card class="mat-card-sm pe-all m-4">
-              <span>
-                Key Frame
-              </span>
-              <button mat-icon-button
-                color="warn"
-                key-frame-play-now="off">
-                <i class="fas fa-times"></i>
-              </button>
-            </mat-card>
-          </div>
-
-        </iav-layout-fourcorners>
-      </mat-drawer-content>
-
-    </mat-drawer-container>
-
-  <!-- top drawer -->
-  <mat-drawer-container
-    [hidden]="viewerMode$ | async"
-    [iav-switch-initstate]="false"
-    iav-switch
-    #sideNavTopSwitch="iavSwitch"
-    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
-    [hasBackdrop]="false">
-
-    <!-- sidenav-content -->
-
-    <!-- (closedStart)="sideNavwFullLeftSwitch.switchState && matDrawerLeft.close()"
-    (openedStart)="sideNavFullLeftSwitch.switchState && matDrawerLeft.open()" -->
-    <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
-      mode="side"
-      [attr.data-mat-drawer-top-open]="matDrawerTop.opened"
-      [opened]="sideNavTopSwitch.switchState"
-      [autoFocus]="false"
-      [disableClose]="true"
-      (openedChange)="handleSideNavAnimationDone($event)"
-      #matDrawerTop="matDrawer">
-
-      <div class="h-0 w-100 region-text-search-autocomplete-position">
-        <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
-        </ng-container>
       </div>
 
+      <!-- top right -->
+      <div iavLayoutFourCornersTopRight class="ws-no-wrap">
+
+        <!-- exit special mode -->
+        <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="defaultTopRightTmpl">
+          <ng-template [ngTemplateOutlet]="specialTopRightTmpl"
+            [ngTemplateOutletContext]="{
+              mode: mode
+            }">
+          </ng-template>
+        </ng-template>
+        
+        <!-- default mode top right tmpl -->
+        <ng-template #defaultTopRightTmpl>
+          <ng-template [ngTemplateOutlet]="minDefaultMainContentTopRight">
+          </ng-template>
+        </ng-template>
+      </div>
+
+
+      <!-- bottom left -->
+      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap">
+
+        <!-- special bottom left -->
+        <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="localBottomLeftTmpl"></ng-template>
+        
+        <!-- default mode bottom left tmpl -->
+        <ng-template #localBottomLeftTmpl>
+
+          <!-- not the most elegant, but it's a hard problem to solve -->
+          <!-- on the one hand, showFullSidenavSwitch can be of two states -->
+          <!-- and drawer.opened can be of two states -->
+          <ng-template [ngTemplateOutlet]="bottomLeftTmpl"
+            [ngTemplateOutletContext]="{
+              showFullSideNav: (showFullSidenavSwitch.switchState$ | async)
+                ? drawer.open.bind(drawer)
+                : showFullSidenavSwitch.open.bind(showFullSidenavSwitch)
+            }">
+          </ng-template>
+        </ng-template>
+        
+      </div>
+    </iav-layout-fourcorners>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<!-- alternate mode drawer tmpl -->
+<ng-template #alternateModeDrawerTmpl let-mode="mode">
+  <ng-container [ngSwitch]="mode">
+    <annotation-list *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+    </annotation-list>
+    <key-frame-controller *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+    </key-frame-controller>
+    <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
+  </ng-container>
+</ng-template>
+
+
+<!-- regular mode drawer tmpl -->
+<ng-template #regularModeDrawerTmpl
+  let-drawer="drawer"
+  let-showFullSidenavSwitch="showFullSidenavSwitch">
+
+  <!-- check if preview volume -->
+  <ng-template [ngIf]="overlaySidenav$ | async" let-overlaySideNav>
+    
+    <!-- back btn -->
+    <button mat-button
+      (click)="clearPreviewingDataset()"
+      [attr.aria-label]="ARIA_LABELS.CLOSE"
+      class="position-absolute z-index-10 m-2">
+      <i class="fas fa-chevron-left"></i>
+      <span class="ml-1">
+        Back
+      </span>
+    </button>
+
+    <ng-template #genericInfoVCR>
+    </ng-template>
+  </ng-template>
+
+  <div [ngClass]="{
+    'invisible overflow-hidden h-0': overlaySidenav$ | async,
+    'h-100': !(overlaySidenav$ | async)
+  }" class="pe-all position-relative d-flex flex-column">
+    
+
+  <!-- if pli voi is visible, show pli template
+  otherwise show region tmpl -->
+  <ng-template
+    [ngTemplateOutlet]="(pliVol$ | async)?.[0]
+      ? voiTmpl
+      : sidenavRegionTmpl"
+    [ngTemplateOutletContext]="{
+      drawer: drawer,
+      showFullSidenavSwitch: showFullSidenavSwitch
+    }">
+  </ng-template>
+
+    <!-- <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
+      <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
+        <ng-template [ngTemplateOutlet]="voiTmpl">
+
+        </ng-template>
+      </ng-template>
+    </ng-template> -->
+
+    <!-- TODO dataset preview will become deprecated in the future.
+    Regional feature/data feature will replace it -->
+    <!-- <div class="hidden"
+      iav-shown-dataset
+      #iavShownDataset="iavShownDataset">
+    </div> -->
+
+  </div>
+</ng-template>
+
+
+<!-- minimal default drawer content -->
+<ng-template #minSearchTray
+  let-showFullSidenav="showFullSidenav"
+  let-drawer="drawer">
+
+  <div class="mt-2 d-inline-block vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2"
+    iav-switch
+    [iav-switch-state]="true"
+    #minTrayVisSwitch="iavSwitch"
+    [ngClass]="{
+      'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !(minTrayVisSwitch.switchState$ | async),
+      'transition-margin-left': !drawer.opened
+    }">
+
+    <div class="h-0 w-100 region-text-search-autocomplete-position">
+      <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
+      </ng-container>
+    </div>
+
+    <!-- such a gross implementation -->
+    <!-- TODO fix this -->
+    <div class="mt-1-n w-100 pl-2 pr-2 m-1px">
       <button mat-raised-button
-        *ngIf="!(alwaysHideMinorPanel$ | async)"
+        *ngIf="!(onlyShowMiniTray$ | async)"
         [attr.aria-label]="ARIA_LABELS.EXPAND"
-        (click)="sideNavFullLeftSwitch && sideNavFullLeftSwitch.open()"
+        (click)="showFullSidenav()"
         class="explore-btn pe-all w-100"
         [ngClass]="{
           'darktheme': iavRegion.rgbDarkmode === true,
@@ -145,215 +233,190 @@
           [region]="(selectedRegions$ | async) && (selectedRegions$ | async)[0]"
           #iavRegion="iavRegion">
         </div>
-
       </button>
-    </mat-drawer>
+    </div>
+  
+  </div>
 
-    <mat-drawer-content class="visible position-relative pe-none">
+  <!-- tab toggling hide/show of min search tray -->
+  <div class="tab-toggle-container d-inline-block v-align-top">
+    <ng-container *ngTemplateOutlet="tabTmpl; context: {
+      isOpen: minTrayVisSwitch.switchState$ | async,
+      regionSelected: selectedRegions$ | async,
+      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+    }">
+    </ng-container>
+  </div>
 
-      <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
-
-        <!-- pullable tab top left corner -->
-        <div iavLayoutFourCornersTopLeft class="d-flex flex-nowrap w-100">
-
-          <!-- top left -->
-          <div class="flex-grow-1 d-flex flex-nowrap align-items-start">
-
-            <div *ngIf="viewerLoaded"
-              class="pe-all tab-toggle-container"
-              (click)="sideNavTopSwitch && sideNavTopSwitch.toggle()"
-              quick-tour
-              [quick-tour-description]="quickTourRegionSearch.description"
-              [quick-tour-order]="quickTourRegionSearch.order"
-              #regionSearchQuickTour="quickTour">
-              <ng-container *ngTemplateOutlet="tabTmpl; context: {
-                isOpen: sideNavTopSwitch.switchState,
-                regionSelected: selectedRegions$ | async,
-                iavAdditionallayers: iavAdditionalLayers$ | async
-              }">
-              </ng-container>
-            </div>
-
-            <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
-              class="pe-all mt-2 muted-7">
-            </iav-cmp-viewer-nehuba-status>
-          </div>
-
-          <!-- top right -->
-          <div class="flex-grow-0 d-inline-flex align-items-start">
-
-            <!-- signin banner at top right corner -->
+</ng-template>
 
 
-            <top-menu-cmp class="mt-3 mr-2 d-inline-block"
-              [ismobile]="ismobile"
-              [viewerLoaded]="viewerLoaded">
-            </top-menu-cmp>
+<!-- top left -->
+<!-- default top left -->
+<ng-template #defaultMainContentTopLeft
+  let-isOpen="isOpen"
+  let-drawer="drawer"
+  let-showFullSidenavSwitch="showFullSidenavSwitch">
 
-            <div *ngIf="viewerLoaded"
-              class="iv-custom-comp bg card m-2 mat-elevation-z2"
-              quick-tour
-              [quick-tour-description]="quickTourAtlasSelector.description"
-              [quick-tour-order]="quickTourAtlasSelector.order">
-              <atlas-dropdown-selector class="pe-all mt-2">
-              </atlas-dropdown-selector>
-            </div>
-          </div>
-        </div>
+  <!-- min search tray -->
+  <ng-template [ngIf]="!(showFullSidenavSwitch.switchState$ | async)">
+    <ng-template
+      [ngTemplateOutlet]="minSearchTray"
+      [ngTemplateOutletContext]="{
+        showFullSidenav: showFullSidenavSwitch.open.bind(showFullSidenavSwitch),
+        drawer: drawer
+      }">
+    </ng-template>
+  </ng-template>
 
-      </iav-layout-fourcorners>
+  <!-- pullable tab top left corner -->
+  <div *ngIf="showFullSidenavSwitch.switchState$ | async"
+    class="v-align-top pe-all tab-toggle-container d-inline-block"
+    (click)="drawer.toggle()"
+    quick-tour
+    [quick-tour-description]="quickTourRegionSearch.description"
+    [quick-tour-order]="quickTourRegionSearch.order">
+    <ng-container *ngTemplateOutlet="tabTmpl; context: {
+      isOpen: isOpen,
+      regionSelected: selectedRegions$ | async
+    }">
+    </ng-container>
+  </div>
 
-    </mat-drawer-content>
-  </mat-drawer-container>
+  <!-- status panel for (for nehuba viewer) -->
+  <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
+    class="pe-all mt-2 muted-7 d-inline-block v-align-top">
+  </iav-cmp-viewer-nehuba-status>
+</ng-template>
 
-  <!-- full left drawer -->
-  <mat-drawer-container
-    [hidden]="viewerMode$ | async"
-    [iav-switch-initstate]="!(alwaysHideMinorPanel$ | async)"
-    iav-switch
-    #sideNavFullLeftSwitch="iavSwitch"
-    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
-    [hasBackdrop]="false">
 
-    <!-- sidenav-content -->
-    <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
-      mode="push"
-      [opened]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState"
-      [attr.data-mat-drawer-fullleft-open]="matDrawerLeft.opened"
-      [autoFocus]="false"
-      #matDrawerLeft="matDrawer"
-      (openedChange)="$event && sideNavFullLeftSwitch.open()"
-      [@openClose]="sideNavTopSwitch.switchState && sideNavFullLeftSwitch.switchState ? 'open' : 'closed'"
-      (@openClose.done)="$event.toState === 'closed' && matDrawerLeft.close()"
-      [disableClose]="true">
+<!-- special mode top left -->
+<ng-template #specialModeTopLeftTmpl
+  let-mode="mode"
+  let-toggleMatDrawer="toggleMatDrawer">
 
-      <!-- check if preview volume -->
-      <div *ngIf="overlaySidenav$ | async as overlaySideNav" class="position-relative d-flex flex-column h-100">
-        <div class="position-relative ml-15px-n mr-15px-n">
+  <div class="tab-toggle-container">
 
-          <!-- back btn -->
-          <button mat-button
-            (click)="clearPreviewingDataset()"
-            [attr.aria-label]="ARIA_LABELS.CLOSE"
-            class="position-absolute z-index-10 m-2">
-            <i class="fas fa-chevron-left"></i>
-            <span class="ml-1">
-              Back
-            </span>
-          </button>
+    <ng-container [ngSwitch]="mode">
+      <!-- annotating top left -->
+      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'primary',
+          fontIcon: 'fa-list',
+          tooltip: 'Annotation list',
+          click: toggleMatDrawer,
+          badge: toolPanel?.annBadges$ | async
+        }">
+        </ng-container>
+  
+        <annotating-tools-panel class="z-index-10 d-block"
+          #toolPanel="annoToolsPanel">
+        </annotating-tools-panel>
+      </ng-template>
+    </ng-container>
+  </div>
+</ng-template>
 
-          <ng-template #genericInfoVCR>
-          </ng-template>
-        </div>
-      </div>
 
-      <div [ngClass]="{
-        'invisible overflow-hidden h-0': overlaySidenav$ | async,
-        'h-100': !(overlaySidenav$ | async)
-      }" class="position-relative d-flex flex-column">
-        
-        <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
-          <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
-            <ng-template [ngTemplateOutlet]="voiTmpl">
+<!-- top right -->
+<!-- default top right -->
+<ng-template #minDefaultMainContentTopRight>
 
-            </ng-template>
-          </ng-template>
-        </ng-template>
+  <!-- signin banner at top right corner -->
+  <top-menu-cmp class="mt-3 mr-2 d-inline-block"
+    [ismobile]="ismobile"
+    [viewerLoaded]="viewerLoaded">
+  </top-menu-cmp>
 
-        <!-- TODO dataset preview will become deprecated in the future.
-        Regional feature/data feature will replace it -->
-        <!-- <div class="hidden"
-          iav-shown-dataset
-          #iavShownDataset="iavShownDataset">
-        </div> -->
+  <atlas-dropdown-selector
+    class="v-align-top pt-2 pe-all mt-2 iv-custom-comp bg card m-2 mat-elevation-z2 d-inline-block"
+    quick-tour
+    [quick-tour-description]="quickTourAtlasSelector.description"
+    [quick-tour-order]="quickTourAtlasSelector.order">
+  </atlas-dropdown-selector>
 
-      </div>
-    </mat-drawer>
+</ng-template>
 
-    <!-- main-content -->
-    <mat-drawer-content class="visible position-relative" [hidden]="viewerMode$ | async">
+<ng-template #specialTopRightTmpl let-mode="mode">
+  <mat-card class="mat-card-sm pe-all m-4">
+    <span>
+      {{ mode }}
+    </span>
+    <button mat-icon-button
+      color="warn"
+      (click)="exitSpecialViewMode()">
+      <i class="fas fa-times"></i>
+    </button>
+  </mat-card>
+</ng-template>
 
-      <iav-layout-fourcorners [iav-layout-fourcorners-cnr-cntr-ngclass]="{'w-100': true}">
+<!-- bottom left -->
+<ng-template #bottomLeftTmpl let-showFullSideNav="showFullSideNav">
 
-        <!-- bottom left corner (atlas selector and currently selected) -->
-        <div iavLayoutFourCornersBottomLeft class="d-inline-flex align-items-center mb-4 ml-2 w-100">
+  <!-- atlas selector -->
+  <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
+    #alSelector="atlasLayerSelector"
+    class="d-inline-block"
+    (iav-outsideClick)="alSelector.selectorExpanded = false">
+  </atlas-layer-selector>
 
-          <!-- atlas selector -->
-          <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
-            #alSelector="atlasLayerSelector"
-            (iav-outsideClick)="alSelector.selectorExpanded = false">
-          </atlas-layer-selector>
+  <!-- chips -->
+  <viewer-state-breadcrumb
+    *ngIf="parcellationSelected$ | async"
+    class="d-inline-block"
+    (on-item-click)="showFullSideNav()">
+  </viewer-state-breadcrumb>
+</ng-template>
 
-          <!-- chips -->
-          <div *ngIf="parcellationSelected$ | async" class="flex-grow-0 p-1 pr-2 flex-shrink-1 overflow-y-hidden overflow-x-auto pe-all">
-
-            <viewer-state-breadcrumb
-              (on-item-click)="handleChipClick()">
-            </viewer-state-breadcrumb>
-          </div>
-        </div>
-
-      </iav-layout-fourcorners>
-
-    </mat-drawer-content>
-  </mat-drawer-container>
-
-</layout-floating-container>
 
 <!-- viewer tmpl -->
 <ng-template #viewerTmpl>
+  <div class="position-absolute w-100 h-100 z-index-1">
+    
+    <ng-container [ngSwitch]="useViewer$ | async">
 
-  <iav-layout-fourcorners>
-    <div iavLayoutFourCornersContent
-      class="w-100 h-100 position-absolute">
-      <div class="h-100 w-100 overflow-hidden position-relative"
-        ctx-menu-host
-        [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
+      <!-- nehuba viewer -->
+      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
+        *ngSwitchCase="'nehuba'"
+        (viewerEvent)="handleViewerEvent($event)"
+        [selectedTemplate]="templateSelected$ | async"
+        [selectedParcellation]="parcellationSelected$ | async"
+        #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
+      </iav-cmp-viewer-nehuba-glue>
 
-        <ng-container [ngSwitch]="useViewer$ | async">
+      <!-- three surfer (free surfer viewer) -->
+      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
+        *ngSwitchCase="'threeSurfer'"
+        (viewerEvent)="handleViewerEvent($event)"
+        [selectedTemplate]="templateSelected$ | async"
+        [selectedParcellation]="parcellationSelected$ | async">
+      </three-surfer-glue-cmp>
 
-          <!-- nehuba viewer -->
-          <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
-            *ngSwitchCase="'nehuba'"
-            (viewerEvent)="handleViewerEvent($event)"
-            [selectedTemplate]="templateSelected$ | async"
-            [selectedParcellation]="parcellationSelected$ | async"
-            #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
-          </iav-cmp-viewer-nehuba-glue>
+      <!-- if not supported, show not supported message -->
+      <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
 
-          <!-- three surfer (free surfer viewer) -->
-          <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
-            *ngSwitchCase="'threeSurfer'"
-            (viewerEvent)="handleViewerEvent($event)"
-            [selectedTemplate]="templateSelected$ | async"
-            [selectedParcellation]="parcellationSelected$ | async">
-          </three-surfer-glue-cmp>
-
-          <!-- if not supported, show not supported message -->
-          <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
-
-          <!-- by default, show splash screen -->
-          <div *ngSwitchDefault>
-            <ui-splashscreen class="position-absolute left-0 top-0">
-            </ui-splashscreen>
-          </div>
-        </ng-container>
-
+      <!-- by default, show splash screen -->
+      <div *ngSwitchDefault>
+        <ui-splashscreen class="position-absolute left-0 top-0">
+        </ui-splashscreen>
       </div>
-    </div>
-  </iav-layout-fourcorners>
+    </ng-container>
+
+    <!-- <div class="h-100 w-100 overflow-hidden position-relative"
+      ctx-menu-host
+      [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
+    </div> -->
+  </div>
 </ng-template>
 
-<!-- auto complete search box -->
 
+<!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
-  <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
+  <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
 
-    <div class="w-100 h-100 position-absolute pe-none"
-      *ngIf="showTour"
-      #regionSelRef>
+    <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
     </div>
   </div>
 </ng-template>
@@ -362,15 +425,18 @@
 <ng-template #tabTmpl
   let-isOpen="isOpen"
   let-regionSelected="regionSelected"
-  let-iavAdditionallayers="iavAdditionallayers">
+  let-iavAdditionallayers="iavAdditionallayers"
+  let-click="click">
 
   <!-- if mat drawer is open -->
   <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
-    <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
-      matColor: 'basic',
-      fontIcon: 'fa-chevron-left'
-    }">
-    </ng-container>
+    <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl"
+      [ngTemplateOutletContext]="{
+        matColor: 'basic',
+        fontIcon: 'fa-chevron-left',
+        click: click
+      }">
+    </ng-template>
   </ng-template>
 
   <!-- if matdrawer is closed -->
@@ -381,7 +447,8 @@
       <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
         matColor: 'accent',
         fontIcon: 'fa-database',
-        tooltip: 'Explore dataset preview'
+        tooltip: 'Explore dataset preview',
+        click: click
       }">
       </ng-container>
     </ng-template>
@@ -402,7 +469,8 @@
           customColor: tabTmpl_iavRegion.rgbString,
           customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
           fontIcon: 'fa-brain',
-          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name
+          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name,
+          click: click
         }">
 
         </ng-container>
@@ -413,7 +481,8 @@
         <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
           matColor: 'primary',
           fontIcon: 'fa-sitemap',
-          tooltip: 'Explore regions'
+          tooltip: 'Explore regions',
+          click: click
         }">
         </ng-container>
       </ng-template>
@@ -422,6 +491,7 @@
 
 
 </ng-template>
+
 <ng-template #tabTmpl_defaultTmpl
   let-matColor="matColor"
   let-fontIcon="fontIcon"
@@ -466,31 +536,29 @@
     </span>
   </button>
 
-  <mat-card class="sidenav-cover-header-container">
-    <div class="sidenav-cover-header-container">
-      <mat-card-title>
-        {{ _pliTitle }}
-      </mat-card-title>
+  <mat-card class="_pli-container">
+    <mat-card-title>
+      {{ _pliTitle }}
+    </mat-card-title>
 
-      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-        <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
-        <span>
-          Dataset preview
-        </span>
+    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+      <span>
+        Dataset preview
+      </span>
 
-        <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
+      <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
-        <a [href]="_pliLink"
-          mat-icon-button
-          matTooltip="Explore in EBRAINS Knowledge Graph"
-          target="_blank">
-          <i class="fas fa-external-link-alt"></i>
-        </a>
+      <a [href]="_pliLink"
+        mat-icon-button
+        matTooltip="Explore in EBRAINS Knowledge Graph"
+        target="_blank">
+        <i class="fas fa-external-link-alt"></i>
+      </a>
 
-      </mat-card-subtitle>
-    </div>
+    </mat-card-subtitle>
 
-    <small class="text-muted iv-custom-comp darker-bg">
+    <small class="d-block text-muted iv-custom-comp darker-bg">
       {{ _pliDesc }}
     </small>
 
@@ -506,7 +574,9 @@
 </ng-template>
 
 <!-- region sidenav tmpl -->
-<ng-template #sidenavRegionTmpl>
+<ng-template #sidenavRegionTmpl
+  let-drawer="drawer"
+  let-showFullSidenavSwitch="showFullSidenavSwitch">
 
   <!-- region search autocomplete  -->
   <!-- [@openCloseAnchor]="sideNavFullLeftSwitch.switchState ? 'open' : 'closed'" -->
@@ -549,8 +619,11 @@
   </div>
 
   <!-- collapse btn -->
-  <ng-container *ngTemplateOutlet="collapseBtn">
-  </ng-container>
+  <ng-template [ngTemplateOutlet]="collapseBtn"
+    [ngTemplateOutletContext]="{
+      collapse: showFullSidenavSwitch.close.bind(showFullSidenavSwitch)
+    }">
+  </ng-template>
 </ng-template>
 
 
@@ -559,7 +632,7 @@
   <!-- region detail -->
   <region-menu
     [region]="region"
-    class="flex-grow-1 bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
+    class="flex-grow-1 bs-border-box mat-elevation-z4">
   </region-menu>
 </ng-template>
 
@@ -666,13 +739,13 @@
 </ng-template>
 
 <!-- collapse btn -->
-<ng-template #collapseBtn>
+<ng-template #collapseBtn let-collapse="collapse">
 
   <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
 
     <button mat-raised-button class="mat-elevation-z8"
       [attr.aria-label]="ARIA_LABELS.COLLAPSE"
-      (click)="sideNavFullLeftSwitch.close()"
+      (click)="collapse()"
       color="basic">
       <i class="fas fa-chevron-up"></i>
       <span>

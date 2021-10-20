@@ -8,10 +8,11 @@ import {
   TemplateRef,
   ViewChild,
   ElementRef,
+  Inject,
 } from "@angular/core";
-import { Store, select, ActionsSubject } from "@ngrx/store";
-import { Observable, Subscription, interval, merge, of, timer, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
+import { Store, select } from "@ngrx/store";
+import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import {
   IavRootStoreInterface,
@@ -21,8 +22,7 @@ import {
 import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
-import { AGREE_COOKIE, AGREE_KG_TOS } from "src/services/state/uiState.store";
-import { SHOW_KG_TOS } from 'src/services/state/uiState.store.helper'
+import { AGREE_COOKIE } from "src/services/state/uiState.store";
 import { isSame } from "src/util/fn";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
@@ -34,6 +34,7 @@ import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
 import { environment } from 'src/environments/environment'
+import { DOCUMENT } from "@angular/common";
 
 /**
  * TODO
@@ -61,8 +62,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
-  @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
-
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
@@ -85,20 +84,19 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
-  private kgTosDialogRef: MatDialogRef<any>
 
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
     private pureConstantService: PureContantService,
     private matDialog: MatDialog,
-    private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
     private slService: SlServiceService,
-    private clickIntService: ClickInterceptorService
+    private clickIntService: ClickInterceptorService,
+    @Inject(DOCUMENT) private document,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -147,7 +145,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
       this.subscriptions.push(
         merge(
-          fromEvent(window.document, 'mouseup'),
+          fromEvent(this.document, 'mouseup'),
           this.slService.onClick
         ).pipe(
           startWith(true),
@@ -196,7 +194,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscriptions.push(
       this.pureConstantService.darktheme$.subscribe(flag => {
-        this.rd.setAttribute(document.body, 'darktheme', this.meetsRequirement && flag.toString())
+        this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
     )
   }
@@ -212,12 +210,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       prefecthMainBundle.rel = 'preload'
       prefecthMainBundle.as = 'script'
       prefecthMainBundle.href = 'main.bundle.js'
-      this.rd.appendChild(document.head, prefecthMainBundle)
+      this.rd.appendChild(this.document.head, prefecthMainBundle)
     }
-
-    // this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
-    //   select('landmark')
-    // )
 
     /**
      * Show Cookie disclaimer if not yet agreed
@@ -234,18 +228,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
     })
 
-    this.dispatcher$.pipe(
-      filter(({type}) => type === SHOW_KG_TOS),
-      withLatestFrom(this.store.pipe(
-        select('uiState'),
-        select('agreedKgTos'),
-      )),
-      map(([_, agreed]) => agreed),
-      filter(flag => !flag),
-      delay(0),
-    ).subscribe(() => {
-      this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
-    })
   }
 
   /**
@@ -264,7 +246,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   public meetsRequirements(): boolean {
 
-    const canvas = document.createElement('canvas')
+    const canvas = this.document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
 
     if (!gl) {
@@ -278,13 +260,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     return true
-  }
-
-  public kgTosClickedOk() {
-    if (this.kgTosDialogRef) { this.kgTosDialogRef.close() }
-    this.store.dispatch({
-      type: AGREE_KG_TOS,
-    })
   }
 
   public cookieClickedOk() {

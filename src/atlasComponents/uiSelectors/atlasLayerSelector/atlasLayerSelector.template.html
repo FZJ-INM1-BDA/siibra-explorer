@@ -112,7 +112,7 @@
 
     <ng-template #tileContent>
         <div class="d-flex flex-column justify-content-start w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
-            [matTooltip]="getTooltipText(tileSrc)"
+            [matTooltip]="tileSrc | atlasLayerTooltip"
             matTooltipPosition="above"
             (click)="onClick && onClick()"
             [ngStyle]="{opacity: disabled ? '0.2': '1' }">

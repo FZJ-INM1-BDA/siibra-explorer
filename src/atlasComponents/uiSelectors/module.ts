@@ -6,6 +6,7 @@ import { AtlasDropdownSelector } from "./atlasDropdown/atlasDropdown.component";
 import { AtlasLayerSelector, GetPreviewUrlPipe } from "./atlasLayerSelector/atlasLayerSelector.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
+import { AtlaslayerTooltipPipe } from "./atlasLayerTooltip.pipe";
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
     AtlasDropdownSelector,
     AtlasLayerSelector,
     GetPreviewUrlPipe,
+    AtlaslayerTooltipPipe,
   ],
   exports: [
     AtlasDropdownSelector,
