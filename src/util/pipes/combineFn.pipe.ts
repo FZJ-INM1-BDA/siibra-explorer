@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from "@angular/core";
   pure: true
 })
 export class CombineFnPipe implements PipeTransform{
-  public transform(fns: Function[]): Function{
+  public transform(fns: CallableFunction[]): CallableFunction{
     return () => {
       for (const fn of fns) fn()
     }
