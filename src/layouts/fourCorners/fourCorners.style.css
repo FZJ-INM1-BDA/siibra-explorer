@@ -11,3 +11,27 @@
 {
   z-index: 5;
 }
+
+.grid-container
+{
+  height: 50%;
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.top-left
+{
+  place-self: start start;
+}
+.top-right
+{
+  place-self: start end;
+}
+.bottom-left
+{
+  place-self: end start;
+}
+.bottom-right
+{
+  place-self: end end;
+}

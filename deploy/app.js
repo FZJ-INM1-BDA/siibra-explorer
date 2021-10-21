@@ -197,9 +197,6 @@ app.get('/', (req, res, next) => {
   }
 })
 
-
-app.use('/logo', require('./logo'))
-
 app.get('/ready', async (req, res) => {
   const authIsReady = authReady ? await authReady() : false
 

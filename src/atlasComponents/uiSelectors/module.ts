@@ -3,9 +3,18 @@ import { NgModule } from "@angular/core";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { AtlasDropdownSelector } from "./atlasDropdown/atlasDropdown.component";
-import { AtlasLayerSelector, GetPreviewUrlPipe } from "./atlasLayerSelector/atlasLayerSelector.component";
+import { AtlasLayerSelector } from "./atlasLayerSelector/atlasLayerSelector.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
+import { AtlaslayerTooltipPipe } from "./pipes/atlasLayerTooltip.pipe";
+import { ComponentsModule } from "src/components";
+import { GetNonbaseParcPipe } from "./pipes/getNonBaseParc.pipe";
+import { GetIndividualParcPipe } from "./pipes/getIndividualParc.pipe";
+import { getGroupedParcPipe } from "./pipes/getGroupedParc.pipe";
+import { CurrentTmplSupportsParcPipe } from "./pipes/currTmplSupportsParc.pipe";
+import { GroupParcSelectedPipe } from "./pipes/groupParcSelected.pipe";
+import { GetPreviewUrlPipe } from "./pipes/getPreviewUrl.pipe";
+import { CurrParcSupportsTmplPipe } from "./pipes/currParcSupportsTmpl.pipe";
 
 @NgModule({
   imports: [
@@ -14,11 +23,19 @@ import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
     UtilModule,
     QuickTourModule,
     KgDatasetModule,
+    ComponentsModule,
   ],
   declarations: [
     AtlasDropdownSelector,
     AtlasLayerSelector,
     GetPreviewUrlPipe,
+    AtlaslayerTooltipPipe,
+    GetNonbaseParcPipe,
+    GetIndividualParcPipe,
+    getGroupedParcPipe,
+    CurrentTmplSupportsParcPipe,
+    GroupParcSelectedPipe,
+    CurrParcSupportsTmplPipe,
   ],
   exports: [
     AtlasDropdownSelector,

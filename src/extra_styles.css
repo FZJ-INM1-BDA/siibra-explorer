@@ -758,6 +758,16 @@ kg-dataset-previewer > img
   opacity: 1.0;
 }
 
+.m-15
+{
+  margin: 15px;
+}
+
+.m-1px
+{
+  margin:1px;
+}
+
 .ml-15px-n
 {
   margin-left: -15px!important;
@@ -805,6 +815,10 @@ kg-dataset-previewer > img
 {
   margin-top: -1rem!important;
 }
+.mt-1-n
+{
+  margin-top: -0.5rem!important;
+}
 
 .mb-6
 {
@@ -826,11 +840,6 @@ kg-dataset-previewer > img
 .fixed-top
 {
   bottom: unset!important;
-}
-
-.layerGroupMenu > .mat-menu-content
-{
-  width: 100%;
 }
 
 mat-list.sm mat-list-item
@@ -885,4 +894,9 @@ mat-list.sm mat-list-item
 {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.v-align-top
+{
+  vertical-align: top;
 }

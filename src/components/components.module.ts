@@ -25,6 +25,7 @@ import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
 import { SpinnerCmp } from './spinner/spinner.component';
 import { ReadmoreModule } from './readmore';
+import { TileCmp } from './tile/tile.component';
 
 @NgModule({
   imports : [
@@ -46,6 +47,7 @@ import { ReadmoreModule } from './readmore';
     IAVVerticalButton,
     DynamicMaterialBtn,
     SpinnerCmp,
+    TileCmp,
 
     /* directive */
     TreeBaseDirective,
@@ -72,6 +74,7 @@ import { ReadmoreModule } from './readmore';
     IAVVerticalButton,
     DynamicMaterialBtn,
     SpinnerCmp,
+    TileCmp,
 
     TreeSearchPipe,
     TreeBaseDirective,

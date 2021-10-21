@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 iav-cmp-viewer-container
 {
 
@@ -32,5 +34,40 @@ kg-ds-prv-regional-feature-view
   div
   {
     min-height: 20em;
+  }
+}
+
+// no prefix
+@for $i from 1 through 12 {
+  $vw: math.div(100vw * $i, 12);
+  .vw-col-#{$i} {
+    width: $vw;
+  }
+  .vw-col-#{$i}-nm {
+    margin-left: -1 * $vw;
+  }
+}
+
+$medias: "-sm","-md","-lg","-xl","-xxl";
+$media-map: (
+  "-sm": 576px,
+  "-md": 768px,
+  "-lg": 992px,
+  "-xl": 1200px,
+  "-xxl": 2000px,
+);
+
+@each $media in $medias {
+  $size: map-get($media-map, $media);
+  @media (min-width: $size) {
+    @for $i from 1 through 12 {
+      $vw: math.div(100vw * $i, 12);
+      .vw-col#{$media}-#{$i} {
+        width: $vw;
+      }
+      .vw-col#{$media}-#{$i}-nm {
+        margin-left: -1 * $vw;
+      }
+    }
   }
 }

@@ -1,0 +1,39 @@
+.info-button {
+  height: 20px;
+  width: 20px;
+  margin-top: 10px;
+  margin-right: 12px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.tile-selected {
+  border: 2px solid #FED363;
+}
+
+:host,
+img
+{
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+img
+{
+  border-radius: 10px;
+}
+
+.tile-text
+{
+  margin-top: 0.5rem;
+  text-align: center;
+  white-space: normal;
+  font-size: 80%;
+}
+
+.folder-container
+{
+    margin-right:0.5rem;
+    margin-bottom:-0.5rem;
+}

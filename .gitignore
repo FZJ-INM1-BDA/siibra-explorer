@@ -11,3 +11,4 @@ site
 
 *.log
 cachedKgDataset.json
+tmp

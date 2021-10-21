@@ -1,192 +1,164 @@
-<div class="position-relative d-flex flex-column justify-content-start">
+<!-- selector panel when expanded -->
 
-    <!-- selector panel when expanded -->
+<mat-card class="selector-container m-2 position-absolute"
+    [ngClass]="{'pe-all': selectorExpanded}"
+    [@toggleAtlasLayerSelector]="selectorExpanded"
+    (@toggleAtlasLayerSelector.done)="atlasSelectorTour?.attachTo(selectorExpanded ? selectorPanelTemplateRef : null)"
+    #selectorPanelTmpl>
+    <mat-card-content>
 
-    <mat-card class="selector-container position-absolute"
-        [ngClass]="{'pe-all': selectorExpanded}"
-        [@toggleAtlasLayerSelector]="selectorExpanded"
-        (@toggleAtlasLayerSelector.done)="atlasSelectorTour?.attachTo(selectorExpanded ? selectorPanelTemplateRef : null)"
-        #selectorPanelTmpl>
-        <mat-card-content>
+        <!-- templates -->
+        <mat-card-subtitle>
+            {{ CONST.ATLAS_SELECTOR_LABEL_SPACES }}
+        </mat-card-subtitle>
 
-            <!-- templates -->
-            <mat-card-subtitle>
-                Templates
-            </mat-card-subtitle>
-            <mat-grid-list cols="3" rowHeight="3:4">
-                <!-- template tiles -->
-                <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId"
-                    [attr.aria-checked]="selectedTemplateSpaceId === template['@id']">
-                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
-                        tileSrc: template,
-                        selected: selectedTemplateSpaceId === template['@id'],
-                        onClick: getTileTmplClickFnAsCtx(selectTemplateWithName, template)
-                    }">
-                    </ng-container>
-                </mat-grid-tile>
-            </mat-grid-list>
+        <!-- template grid and tiles -->
+        <mat-grid-list cols="3"
+            rowHeight="2:3"
+            gutterSize="16">
 
-            <mat-divider></mat-divider>
-
-            <!-- levels/maps/segregations -->
-            <mat-card-subtitle class="mt-2">
-                Levels
-            </mat-card-subtitle>
-
-            <mat-grid-list cols="3" rowHeight="3:4">
-
-                <!-- non grouped layers -->
-                <mat-grid-tile *ngFor="let layer of (nonGroupedLayers$ | async); trackBy: trackbyAtId"
-                    [attr.aria-checked]="selectedLayersIncludes(layer['@id'])">
-                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
-                        tileSrc: layer,
-                        selected: selectedLayersIncludes(layer['@id']),
-                        onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
-                        disabled: !currentTemplateIncludesLayer(layer)
-                    }">
-
-                    </ng-container>
-                </mat-grid-tile>
-
-                <!-- grouped layers -->
-                <mat-grid-tile *ngFor="let group of (groupedLayers$ | async); trackBy: trackbyName"
-                    [attr.aria-checked]="selectedOneOfTheLayers(group.parcellations)">
-                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
-                        tileSrc: group,
-                        selected: selectedOneOfTheLayers(group.parcellations),
-                        disabled: !templateIncludesGroup(group),
-                        menuTriggerFor: layerGroupMenu,
-                        menuTriggerData: { layerGroupItems: group.parcellations },
-                        isDirectory: true
-                    }">
-
-                    </ng-container>
-                </mat-grid-tile>
-            </mat-grid-list>
-        </mat-card-content>
-    </mat-card>
-
-    <!-- place holder when not expanded -->
-    <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all"
-        quick-tour
-        [quick-tour-description]="quickTourData.description"
-        [quick-tour-order]="quickTourData.order"
-        #atlasSelectorTour="quickTour">
-        <button color="primary"
-            matTooltip="Select layer"
-            mat-mini-fab
-            *ngIf="shouldShowRenderPlaceHolder$ | async"
-            [attr.aria-label]="TOGGLE_ATLAS_LAYER_SELECTOR"
-            (click)="toggleSelector()">
-            <i class="fas fa-layer-group"></i>
-        </button>
-    </div>
-
-</div>
-
-<!-- image tile tmpl -->
-<ng-template #tileTmpl
-    let-tileSrc="tileSrc"
-    let-selected="selected"
-    let-onClick="onClick"
-    let-disabled="disabled"
-    let-isDirectory="isDirectory"
-    let-menuTriggerFor="menuTriggerFor"
-    let-menuTriggerData="menuTriggerData">
-    <div *ngIf="menuTriggerFor; else noMatMenuTriggerTmpl"
-        iav-stop="click"
-        class="d-flex flex-column justify-content-start w-100 h-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
-        [matMenuTriggerFor]="menuTriggerFor"
-        [matMenuTriggerData]="menuTriggerData">
-
-        <ng-container *ngTemplateOutlet="tileContent">
-        </ng-container>
-    </div>
-
-    <ng-template #noMatMenuTriggerTmpl>
-        <div class="d-flex flex-column justify-content-start w-100 h-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer">
-            <ng-container *ngTemplateOutlet="tileContent">
-            </ng-container>
-        </div>
-    </ng-template>
-
-    <ng-template #tileContent>
-        <div class="d-flex flex-column justify-content-start w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
-            [matTooltip]="getTooltipText(tileSrc)"
-            matTooltipPosition="above"
-            (click)="onClick && onClick()"
-            [ngStyle]="{opacity: disabled ? '0.2': '1' }">
-
-            <div class="position-relative d-flex flex-column align-items-center">
-                <div class="position-relative">
-                    <!-- info icon btn -->
-                    <div class="position-absolute top-0 right-0 info-container"
-                        [ngClass]="{ 'darktheme': tileSrc.darktheme, 'lighttheme': !tileSrc.darktheme }">
-                        <ng-container *ngTemplateOutlet="infoBtn; context: { tileSrc: tileSrc}">
-
-                        </ng-container>
-                    </div>
-
-                    <!-- preview image -->
-                    <img [src]="tileSrc | getPreviewUrlPipe"
-                        alt="Preview of this tile"
-                        class="layer-image align-self-center"
-                        [ngClass]="{ 'selectedLayerBorder': selected }"
-                        draggable="false">
-
-                    <!-- if is directory, show directory icon -->
-                    <div *ngIf="isDirectory" class="position-absolute bottom-0 right-0">
-                        <i class="fas fa-folder folder-container fa-2x"></i>
-                    </div>
+            <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId"
+                [attr.aria-checked]="(selectedTemplate$ | async | getProperty : '@id')  === template['@id']">
+                
+                <div [hidden]
+                    iav-dataset-show-dataset-dialog
+                    [iav-dataset-show-dataset-dialog-name]="template.originDatainfos[0]?.name"
+                    [iav-dataset-show-dataset-dialog-description]="template.originDatainfos[0]?.description"
+                    [iav-dataset-show-dataset-dialog-urls]="template.originDatainfos[0]?.urls"
+                    #kgInfo="iavDatasetShowDatasetDialog">
                 </div>
-            </div>
+                <tile-cmp [tile-image-src]="template | getPreviewUrlPipe"
+                    class="cursor-pointer pe-all"
+                    tile-image-alt="Preview of this tile"
+                    [tile-text]="template.displayName || template.name"
+                    [tile-show-info]="template.originDatainfos?.length > 0"
+                    [tile-disabled]="!(selectedParcellation$ | async | currParcSupportsTmpl : template)"
+                    [tile-image-darktheme]="template.darktheme"
+                    [tile-selected]="(selectedTemplate$ | async | getProperty : '@id')  === template['@id']"
+                    (tile-on-click)="selectTemplatewithId(template['@id'])"
+                    (tile-on-info-click)="kgInfo && kgInfo.onClick()">
+                </tile-cmp>
+            </mat-grid-tile>
+        </mat-grid-list>
 
-            <!-- text container -->
-            <div class="d-flex justify-content-center">
-                <small class="iv-custom-comp text ml-1 mr-1 mt-2 text-break text-center">{{ tileSrc.displayName || tileSrc.name }}</small>
-            </div>
-        </div>
-    </ng-template>
-</ng-template>
+        <mat-divider></mat-divider>
 
-<ng-template #infoBtn let-tileSrc="tileSrc">
-    <ng-container *ngFor="let originDatainfo of tileSrc.originDatainfos">
-        <div mat-icon-button
-            iav-stop="click"
-            class="iv-custom-comp d-flex justify-content-center align-items-center infoButton"
-            [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
-            iav-dataset-show-dataset-dialog
-            [iav-dataset-show-dataset-dialog-name]="originDatainfo.name"
-            [iav-dataset-show-dataset-dialog-description]="originDatainfo.description"
-            [iav-dataset-show-dataset-dialog-urls]="originDatainfo.urls">
-            <small><i class="fas fa-info"></i></small>
-        </div>
-    </ng-container>
+        <!-- parcellations -->
+        <mat-card-subtitle class="mt-2">
+            {{ CONST.ATLAS_SELECTOR_LABEL_PARC_MAPS }}
+        </mat-card-subtitle>
 
-</ng-template>
+        <mat-grid-list cols="3"
+            rowHeight="2:3"
+            gutterSize="16">
+
+            <!-- non grouped layers -->
+            <mat-grid-tile *ngFor="let layer of (atlasLayersLatest$ | async | getNonbaseParc | getIndividualParc); trackBy: trackbyAtId"
+                [attr.aria-checked]="selectedParcellation$ | async | groupParcSelected : layer">
+
+                <div [hidden]
+                    iav-dataset-show-dataset-dialog
+                    [iav-dataset-show-dataset-dialog-name]="layer.originDatainfos[0]?.name"
+                    [iav-dataset-show-dataset-dialog-description]="layer.originDatainfos[0]?.description"
+                    [iav-dataset-show-dataset-dialog-urls]="layer.originDatainfos[0]?.urls"
+                    #kgInfo="iavDatasetShowDatasetDialog">
+                </div>
+                <tile-cmp [tile-image-src]="layer | getPreviewUrlPipe"
+                    class="cursor-pointer pe-all"
+                    tile-image-alt="Preview of this tile"
+                    [tile-text]="layer.displayName || layer.name"
+                    [tile-show-info]="layer.originDatainfos?.length > 0"
+                    [tile-disabled]="!(selectedTemplate$ | async | currentTemplateSupportsParcellation : layer)"
+                    [tile-image-darktheme]="layer.darktheme"
+
+                    [tile-selected]="selectedParcellation$ | async | groupParcSelected : layer"
+
+                    (tile-on-click)="selectParcellationWithName(layer)"
+                    (tile-on-info-click)="kgInfo && kgInfo.onClick()">
+                </tile-cmp>
+
+            </mat-grid-tile>
+
+            <!-- grouped layers -->
+            <mat-grid-tile *ngFor="let groupKeyVal of (atlasLayersLatest$ | async | getNonbaseParc | getGroupedParc | keyvalue); trackBy: trackKeyVal"
+                [attr.aria-checked]="false">
+
+                <!-- prevent click bubbling to document is necessary -->
+                <!-- or else, the outsideclick directive will fire immediately -->
+                <!-- resulting in immediate opening and closing of mat menu -->
+                <tile-cmp [tile-image-src]="groupKeyVal['value'][0] | getPreviewUrlPipe"
+                    class="cursor-pointer pe-all"
+                    tile-image-alt="Preview of this tile"
+                    [tile-text]="groupKeyVal['key']"
+                    [tile-show-info]="false"
+                    [tile-disabled]="!(selectedTemplate$ | async | currentTemplateSupportsParcellation : groupKeyVal['value'])"
+                    [tile-image-darktheme]="groupKeyVal['value'][0].darktheme"
+                    [tile-is-dir]="true"
+                    [matMenuTriggerFor]=layerGroupMenu
+                    [matMenuTriggerData]="{
+                        layerGroupItems: groupKeyVal['value']
+                    }"
+                    [tile-selected]="selectedParcellation$ | async | groupParcSelected : groupKeyVal['value']"
+                    iav-stop="click">
+                </tile-cmp>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </mat-card-content>
+</mat-card>
+
+<!-- place holder when not expanded -->
+<div class="position-relative m-2 cursor-pointer scale-up-bl pe-all"
+    quick-tour
+    [quick-tour-description]="quickTourData.description"
+    [quick-tour-order]="quickTourData.order"
+    #atlasSelectorTour="quickTour">
+    <!-- TODO check when do we disable atlas selector -->
+    <button color="primary"
+        *ngIf="true"
+        matTooltip="Select layer"
+        mat-mini-fab
+        [attr.aria-label]="ARIA_LABELS.TOGGLE_ATLAS_LAYER_SELECTOR"
+        (click)="toggleSelector()">
+        <i class="fas fa-layer-group"></i>
+    </button>
+</div>
 
 <!-- mat menu for grouped layer -->
 <mat-menu
     #layerGroupMenu="matMenu"
-    class="layerGroupMenu"
     hasBackdrop="false">
 
     <ng-template matMenuContent let-layerGroupItems="layerGroupItems">
         <mat-grid-list cols="1"
-            rowHeight="1:1"
+            rowHeight="6:7"
+            gutterSize="8"
             iav-stop="click"
             (iav-outsideClick)="collapseExpandedGroup()">
             <mat-grid-tile *ngFor="let layer of layerGroupItems"
-                [attr.aria-checked]="selectedLayersIncludes(layer['@id'])">
+                [attr.aria-checked]="selectedParcellation$ | async | groupParcSelected : layer">
 
-                <ng-container *ngTemplateOutlet="tileTmpl; context: {
-                    tileSrc: layer,
-                    onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
-                    selected: selectedLayersIncludes(layer['@id']),
-                    disabled: !currentTemplateIncludesLayer(layer)
-                } ">
+                <div [hidden]
+                    iav-dataset-show-dataset-dialog
+                    [iav-dataset-show-dataset-dialog-name]="layer.originDatainfos[0]?.name"
+                    [iav-dataset-show-dataset-dialog-description]="layer.originDatainfos[0]?.description"
+                    [iav-dataset-show-dataset-dialog-urls]="layer.originDatainfos[0]?.urls"
+                    #kgInfo="iavDatasetShowDatasetDialog">
+                </div>
 
-                </ng-container>
+                <tile-cmp [tile-image-src]="layer | getPreviewUrlPipe"
+                    class="iv-custom-comp text m-3 cursor-pointer pe-all"
+                    tile-image-alt="Preview of this tile"
+                    [tile-text]="layer.displayName || layer.name"
+                    [tile-show-info]="layer.originDatainfos?.length > 0"
+                    [tile-disabled]="!(selectedTemplate$ | async | currentTemplateSupportsParcellation : layer)"
+                    [tile-image-darktheme]="layer.darktheme"
+
+                    [tile-selected]="selectedParcellation$ | async | groupParcSelected : layer"
+
+                    (tile-on-click)="selectParcellationWithName(layer)"
+                    (tile-on-info-click)="kgInfo && kgInfo.onClick()">
+                </tile-cmp>
+
             </mat-grid-tile>
         </mat-grid-list>
 
