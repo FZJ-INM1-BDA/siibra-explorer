@@ -308,6 +308,7 @@ export class ViewerCmp implements OnDestroy {
               markdown: message.join('\n\n'),
               confirmOnly: true
             })
+          // eslint-disable-next-line @typescript-eslint/no-empty
           } catch (e) {
 
           }
