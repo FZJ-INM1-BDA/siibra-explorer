@@ -842,11 +842,6 @@ kg-dataset-previewer > img
   bottom: unset!important;
 }
 
-.layerGroupMenu > .mat-menu-content
-{
-  width: 100%;
-}
-
 mat-list.sm mat-list-item
 {
   height:2rem!important;
