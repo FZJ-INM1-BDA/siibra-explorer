@@ -12,7 +12,7 @@ export class ChangePerspectiveOrientationComponent implements OnInit {
   private viewOrientations = {
     coronal: [[0,-1,1,0], [-1,0,0,1]],
     sagittal: [[-1,-1,1,1], [-1,1,-1,1]],
-    axial: [[0,0,1,0], [0,0,1,0]]
+    axial: [[0,0,1,0], [1,0,0,0]]
   }
 
   constructor(private store$: Store<any>,) { }
