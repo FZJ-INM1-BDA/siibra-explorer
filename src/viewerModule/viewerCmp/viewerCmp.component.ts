@@ -195,9 +195,12 @@ export class ViewerCmp implements OnDestroy {
     this.selectedRegions$,
     this.pliVol$.pipe(
       startWith([])
-    )
+    ),
+    this.viewerMode$.pipe(
+      startWith(null as string)
+    ),
   ]).pipe(
-    map(([ regions, layers ]) => regions.length === 0 && layers.length === 0)
+    map(([ regions, layers, viewerMode ]) => regions.length === 0 && layers.length === 0 && !viewerMode)
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })

@@ -313,6 +313,17 @@
           #toolPanel="annoToolsPanel">
         </annotating-tools-panel>
       </ng-template>
+
+      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'primary',
+          fontIcon: 'fa-play',
+          tooltip: 'Annotation list',
+          click: toggleMatDrawer
+        }">
+        </ng-container>
+      </ng-template>
     </ng-container>
   </div>
 </ng-template>
