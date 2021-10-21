@@ -17,7 +17,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { TTemplateImage } from "./interfaces";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.1.5'
+export const SIIBRA_API_VERSION = '0.1.6'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
