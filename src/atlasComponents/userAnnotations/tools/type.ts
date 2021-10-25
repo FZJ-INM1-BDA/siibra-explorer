@@ -20,7 +20,7 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
 
   public abstract removeAnnotation(id: string): void
   public abstract managedAnnotations$: Subject<T[]>
-  protected abstract managedAnnotations: T[] = []
+  protected abstract managedAnnotations: T[]
 
   abstract subs: Subscription[]
   protected space: TBaseAnnotationGeomtrySpec['space']
@@ -281,6 +281,7 @@ export abstract class IAnnotationGeometry extends Highlightable {
 
   public space: TBaseAnnotationGeomtrySpec['space']
 
+  abstract annotationType: string
   abstract getNgAnnotationIds(): string[]
   abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
   abstract toJSON(): TRecord

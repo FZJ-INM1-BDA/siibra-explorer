@@ -93,7 +93,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         url?: string
       }
     }> = new EventEmitter()
-  @Output() public mouseoverLandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
+  @Output() public mouseoverLandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public regionSelectionEmitter: EventEmitter<{segment: number, layer: {name?: string, url?: string}}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()
