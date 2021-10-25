@@ -15,6 +15,8 @@ import { CurrentTmplSupportsParcPipe } from "./pipes/currTmplSupportsParc.pipe";
 import { GroupParcSelectedPipe } from "./pipes/groupParcSelected.pipe";
 import { GetPreviewUrlPipe } from "./pipes/getPreviewUrl.pipe";
 import { CurrParcSupportsTmplPipe } from "./pipes/currParcSupportsTmpl.pipe";
+import { AtlasCmpParcellationModule } from "../parcellation";
+import { SiibraExplorerTemplateModule } from "../template";
 
 @NgModule({
   imports: [
@@ -24,6 +26,8 @@ import { CurrParcSupportsTmplPipe } from "./pipes/currParcSupportsTmpl.pipe";
     QuickTourModule,
     KgDatasetModule,
     ComponentsModule,
+    AtlasCmpParcellationModule,
+    SiibraExplorerTemplateModule,
   ],
   declarations: [
     AtlasDropdownSelector,

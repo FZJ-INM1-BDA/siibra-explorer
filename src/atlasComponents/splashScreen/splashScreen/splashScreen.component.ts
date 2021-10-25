@@ -1,4 +1,4 @@
-import { Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription } from "rxjs";
@@ -13,6 +13,7 @@ import { CONST } from 'common/constants'
   styleUrls : [
     `./splashScreen.style.css`,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class SplashScreen {
@@ -33,10 +34,14 @@ export class SplashScreen {
   constructor(
     private store: Store<any>,
     private snack: MatSnackBar,
-    private pureConstantService: PureContantService
+    private pureConstantService: PureContantService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.subscriptions.push(
-      this.pureConstantService.allFetchingReady$.subscribe(flag => this.finishedLoading = flag)
+      this.pureConstantService.allFetchingReady$.subscribe(flag => {
+        this.finishedLoading = flag
+        this.cdr.markForCheck()
+      })
     )
 
     this.loadedAtlases$ = this.store.pipe(

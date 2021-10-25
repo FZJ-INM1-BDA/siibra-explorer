@@ -4,7 +4,6 @@ import { Observable } from "rxjs";
 import { startWith } from "rxjs/operators";
 import { SUPPORTED_PANEL_MODES } from "src/services/state/ngViewerState.store";
 import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'current-layout',
@@ -20,7 +19,7 @@ export class CurrentLayout {
   public panelMode$: Observable<string>
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
   ) {
     this.panelMode$ = this.store$.pipe(
       select(ngViewerSelectorPanelMode),

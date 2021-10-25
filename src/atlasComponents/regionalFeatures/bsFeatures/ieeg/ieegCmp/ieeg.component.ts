@@ -35,7 +35,6 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     this.subs.push(
       this.results$.subscribe(results => {
         this.results = results
-        console.log(results)
         this.loadLandmarks()
       })
     )

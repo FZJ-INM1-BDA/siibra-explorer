@@ -5,7 +5,8 @@ import { Component, EventEmitter, HostBinding, HostListener, Input, OnChanges, O
   templateUrl: './tile.template.html',
   styleUrls: [
     './tile.style.css'
-  ]
+  ],
+  exportAs: 'tileCmp'
 })
 
 export class TileCmp implements OnChanges{
