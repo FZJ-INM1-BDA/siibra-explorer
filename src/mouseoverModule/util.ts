@@ -10,7 +10,7 @@
  *
  *
  */
-export const temporalPositveScanFn = (acc: Array<{segments: any, landmark: any, userLandmark: any}>, curr: {segments: any, landmark: any, userLandmark: any}) => {
+export const temporalPositveScanFn = (acc: Array<{annotation: any, segments: any, landmark: any, userLandmark: any}>, curr: {segments: any, landmark: any, userLandmark: any}) => {
 
   const keys = Object.keys(curr)
 

@@ -751,7 +751,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const precomputedArr = tmpl._dataset_specs.filter(src => src['@type'] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>[]
               let visible = true
               let tmplNgId: string
-              let templateImages: TTemplateImage[] = []
+              const templateImages: TTemplateImage[] = []
               for (const precomputedItem of precomputedArr) {
                 const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
                 initialLayers[ngIdKey] = {

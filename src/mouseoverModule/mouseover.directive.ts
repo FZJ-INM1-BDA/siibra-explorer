@@ -7,6 +7,7 @@ import { uiStateMouseOverSegmentsSelector, uiStateMouseoverUserLandmark } from "
 import { viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors"
 import { deserialiseParcRegionId } from "common/util"
 import { temporalPositveScanFn } from "./util"
+import {ModularUserAnnotationToolService} from "src/atlasComponents/userAnnotations/tools/service";
 
 @Directive({
   selector: '[iav-mouse-hover]',
@@ -15,12 +16,13 @@ import { temporalPositveScanFn } from "./util"
 
 export class MouseHoverDirective {
 
-  public onHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
-  public currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
+  public onHoverObs$: Observable<{annotation: any, segments: any, landmark: any, userLandmark: any}>
+  public currentOnHoverObs$: Observable<{annotation: any, segments: any, landmark: any, userLandmark: any}>
 
   constructor(
     private store$: Store<any>,
     private log: LoggingService,
+    private annotSvc: ModularUserAnnotationToolService,
   ) {
 
     // TODO consider moving these into a single obs serviced by a DI service
@@ -69,11 +71,36 @@ export class MouseHoverDirective {
             && oSegment.segment === segment.segment))),
     )
 
+    const onHoverAnnotation$ = this.annotSvc.hoveringAnnotations$.pipe(
+      map(a => {
+        if (a) {
+          const annotationType = a.constructor.name
+          return {
+            name: a.name? a.name : `Unnamed ${annotationType.toLowerCase()}`,
+            icon: {
+              fontSet: 'fas',
+              fontIcon: annotationType === 'Polygon' ? 'fa-draw-polygon'
+                : annotationType === 'Point'? 'fa-circle'
+                  : annotationType === 'Line' ? 'fa-slash' : '',
+            }
+          }
+        } else {
+          return null
+        }
+      })
+    )
+
     const mergeObs = merge(
       onHoverSegments$.pipe(
         distinctUntilChanged(),
         map(segments => {
           return { segments }
+        }),
+      ),
+      onHoverAnnotation$.pipe(
+        distinctUntilChanged(),
+        map(annotation => {
+          return { annotation }
         }),
       ),
       onHoverLandmark$.pipe(
@@ -98,7 +125,7 @@ export class MouseHoverDirective {
           ...acc,
           ...curr,
         }
-      }, { segments: null, landmark: null, userLandmark: null }),
+      }, { annotation: null, segments: null, landmark: null, userLandmark: null }),
       shareReplay(1),
     )
 
@@ -108,6 +135,7 @@ export class MouseHoverDirective {
 
         let returnObj = {
           segments: null,
+          annotation: null,
           landmark: null,
           userLandmark: null,
         }

@@ -642,7 +642,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           map(({ segments }) => segments)
         ),
         mouseOverNehubaUI: this.mouseoverDirective.currentOnHoverObs$.pipe(
-          map(({ landmark, segments, userLandmark: customLandmark }) => ({ segments, landmark, customLandmark })),
+          map(({annotation, landmark, segments, userLandmark: customLandmark }) => ({annotation, segments, landmark, customLandmark })),
           shareReplay(1),
         ),
         getNgHash : this.nehubaContainerDirective.nehubaViewerInstance.getNgHash,

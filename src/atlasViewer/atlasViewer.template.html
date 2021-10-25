@@ -86,10 +86,9 @@
             <mat-list dense>
 
               <mat-list-item class="h-auto">
-
                 <mat-icon
-                  [fontSet]="(labelText.label | mouseOverIconPipe).fontSet"
-                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon"
+                  [fontSet]="labelText.icon? labelText.icon.fontSet : (labelText.label | mouseOverIconPipe).fontSet"
+                  [fontIcon]="labelText.icon? labelText.icon.fontIcon :(labelText.label | mouseOverIconPipe).fontIcon"
                   mat-list-icon>
 
                 </mat-icon>

@@ -3,7 +3,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
+import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take} from "rxjs/operators";
 import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
@@ -132,6 +132,18 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   public badges$ = this.spaceFilteredManagedAnnotations$.pipe(
     map(mann => mann.length > 0 ? mann.length : null)
+  )
+
+  public hoveringAnnotations$ = this.annotnEvSubj.pipe(
+    filter((e: any) => e.type==='hoverAnnotation'),
+    switchMap(e => {
+      return e.detail?
+        this.managedAnnotations$.pipe(
+          take(1),
+          map(a => a.find(an => an.id === e.detail.pickedAnnotationId.split('_')[0]))
+        ) : of(undefined)
+    }),
+    distinctUntilChanged()
   )
 
   private registeredTools: {

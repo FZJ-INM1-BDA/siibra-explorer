@@ -455,7 +455,7 @@ export interface IVIewerHandle {
   mouseEvent: Observable<{eventName: string, event: MouseEvent}>
   mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
   mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-  mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
+  mouseOverNehubaUI: Observable<{ annotation: any, segments: any, landmark: any, customLandmark: any }>
   getNgHash: () => string
 }
 

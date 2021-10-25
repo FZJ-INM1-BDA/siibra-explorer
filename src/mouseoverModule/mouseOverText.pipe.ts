@@ -15,6 +15,8 @@ export class MouseOverTextPipe implements PipeTransform {
 
   private renderText = ({ label, obj }): SafeHtml[] => {
     switch (label) {
+    case 'annotation':
+      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.name)]
     case 'landmark': {
       const { dataset = [] } = obj
       return [
@@ -37,7 +39,8 @@ export class MouseOverTextPipe implements PipeTransform {
     }
   }
 
-  public transform(inc: {segments: any, landmark: any, userLandmark: any}): Array<{label: string, text: SafeHtml[]}> {
+  public transform(inc: {annotation: any, segments: any, landmark: any, userLandmark: any})
+    : Array<{label: string, text: SafeHtml[], icon?: any}> {
     const keys = Object.keys(inc)
     return keys
       // if is segments, filter out if lengtth === 0
@@ -47,7 +50,8 @@ export class MouseOverTextPipe implements PipeTransform {
       .map(key => {
         return {
           label: key,
-          text: this.renderText({ label: key, obj: inc[key] })
+          text: this.renderText({ label: key, obj: inc[key]}),
+          icon: inc[key].icon
         }
       })
   }
