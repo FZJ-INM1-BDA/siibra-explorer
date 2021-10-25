@@ -95,7 +95,7 @@
 
 
       <!-- bottom left -->
-      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap">
+      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw pe-none align-items-center mb-4">
 
         <!-- special bottom left -->
         <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="localBottomLeftTmpl"></ng-template>
@@ -348,6 +348,8 @@
 
 </ng-template>
 
+
+<!-- special mode top right -->
 <ng-template #specialTopRightTmpl let-mode="mode">
   <mat-card class="mat-card-sm pe-all m-4">
     <span>
@@ -367,16 +369,18 @@
   <!-- atlas selector -->
   <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
     #alSelector="atlasLayerSelector"
-    class="d-inline-block"
+    class="d-inline-block flex-grow-0 flex-shrink-0 pe-all"
     (iav-outsideClick)="alSelector.selectorExpanded = false">
   </atlas-layer-selector>
 
   <!-- chips -->
-  <viewer-state-breadcrumb
-    *ngIf="parcellationSelected$ | async"
-    class="d-inline-block"
-    (on-item-click)="showFullSideNav()">
-  </viewer-state-breadcrumb>
+  <div *ngIf="parcellationSelected$ | async"
+    class="d-inline-block flex-grow-1 flex-shrink-1 pe-none overflow-x-auto overflow-y-hidden">
+
+    <viewer-state-breadcrumb class="d-inline-block pe-all" (on-item-click)="showFullSideNav()">
+    </viewer-state-breadcrumb>
+  </div>
+
 </ng-template>
 
 

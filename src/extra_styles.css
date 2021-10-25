@@ -320,6 +320,11 @@ markdown-dom p
   width: 20em!important;
 }
 
+.w-100vw
+{
+  width: 100vw!important;
+}
+
 .mw-100
 {
   max-width: 100%!important;
