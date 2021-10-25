@@ -33,7 +33,7 @@
     grid-template-areas: "." "vertical-center" ".";
 }
 
-.spinner
+.loading-overlay > .spinner
 {
     grid-column: 2;
     grid-row: 2;

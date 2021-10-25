@@ -78,7 +78,8 @@
     <ng-template #exploreInOtherTmpl>
       <mat-grid-list cols="3"
         rowHeight="2:3"
-        gutterSize="16">
+        gutterSize="16"
+        class="position-relative">
         <mat-grid-tile *ngFor="let otherTmpl of otherTmpls">
           
           <div [hidden]
@@ -86,6 +87,7 @@
               [iav-dataset-show-dataset-dialog-name]="otherTmpl.originDatainfos[0]?.name"
               [iav-dataset-show-dataset-dialog-description]="otherTmpl.originDatainfos[0]?.description"
               [iav-dataset-show-dataset-dialog-urls]="otherTmpl.originDatainfos[0]?.urls"
+              [iav-dataset-show-dataset-dialog-ignore-overwrite]="true"
               #kgInfo="iavDatasetShowDatasetDialog">
           </div>
           <tile-cmp [tile-image-src]="otherTmpl | getTemplatePreviewUrl"
@@ -93,14 +95,18 @@
               tile-image-alt="Preview of this tile"
               [tile-text]="otherTmpl.displayName || otherTmpl.name"
               [tile-show-info]="otherTmpl.originDatainfos?.length > 0"
-              [tile-image-darktheme]="otherTmpl.darktheme"
+              [tile-image-darktheme]="otherTmpl | templateIsDarkTheme"
               [tile-selected]="(selectedTemplate$ | async | getProperty : '@id') === otherTmpl['@id']"
-              (tile-on-click)="tileCmp.selected || changeView(otherTmpl)"
+              (tile-on-click)="(tileCmp.selected || changeView(otherTmpl)); (tileCmp.selected || intentToChgTmpl$.next(true))"
               (tile-on-info-click)="kgInfo && kgInfo.onClick()"
               #tileCmp="tileCmp">
           </tile-cmp>
         </mat-grid-tile>
       </mat-grid-list>
+
+      <div *ngIf="lockOtherTmpl$ | async" class="loading-overlay">
+        <spinner-cmp class="spinner"></spinner-cmp>
+      </div>
 
     </ng-template>
 
