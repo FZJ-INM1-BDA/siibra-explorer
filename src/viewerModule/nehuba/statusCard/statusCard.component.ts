@@ -50,7 +50,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public navVal$: Observable<string>
   public mouseVal$: Observable<string>
 
-  public useTouchInterface$: Observable<boolean>
 
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.STATUS_CARD,
@@ -72,7 +71,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
     private dialog: MatDialog,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ) {
-    this.useTouchInterface$ = of(true) //this.pureConstantService.useTouchUI$
 
     if (nehubaViewer$) {
       this.subscriptions.push(

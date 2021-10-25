@@ -11,6 +11,9 @@ import { BSFeatureModule } from "../regionalFeatures/bsFeatures";
 import { RegionAccordionTooltipTextPipe } from "./regionAccordionTooltipText.pipe";
 import { AtlasCmptConnModule } from "../connectivity";
 import { HttpClientModule } from "@angular/common/http";
+import { RegionInOtherTmplPipe } from "./regionInOtherTmpl.pipe";
+import { SiibraExplorerTemplateModule } from "../template";
+import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
 
 @NgModule({
   imports: [
@@ -21,6 +24,8 @@ import { HttpClientModule } from "@angular/common/http";
     BSFeatureModule,
     AtlasCmptConnModule,
     HttpClientModule,
+    SiibraExplorerTemplateModule,
+    KgDatasetModule,
   ],
   declarations: [
     RegionMenuComponent,
@@ -29,6 +34,7 @@ import { HttpClientModule } from "@angular/common/http";
     RegionDirective,
     RenderViewOriginDatasetLabelPipe,
     RegionAccordionTooltipTextPipe,
+    RegionInOtherTmplPipe,
   ],
   exports: [
     RegionMenuComponent,

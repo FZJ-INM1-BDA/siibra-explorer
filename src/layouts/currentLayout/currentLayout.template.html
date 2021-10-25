@@ -1,72 +1,72 @@
-<div [ngSwitch]="panelMode$ | async" class="w-100 h-100 d-flex flex-row">
+<ng-container [ngSwitch]="panelMode$ | async">
   <layout-four-panel
     *ngSwitchCase="supportedPanelModes[0]"
     class="d-block w-100 h-100">
-    <div class="w-100 h-100" cell-i>
+    <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-ii>
+    </ng-container>
+    <ng-container cell-ii>
       <ng-content *ngTemplateOutlet="cellii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iii>
+    </ng-container>
+    <ng-container cell-iii>
       <ng-content *ngTemplateOutlet="celliii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iv>
+    </ng-container>
+    <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
-    </div>
+    </ng-container>
   </layout-four-panel>
   <layout-horizontal-one-three
     *ngSwitchCase="supportedPanelModes[1]"
     class="d-block w-100 h-100">
-    <div class="w-100 h-100" cell-i>
+    <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-ii>
+    </ng-container>
+    <ng-container cell-ii>
       <ng-content *ngTemplateOutlet="cellii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iii>
+    </ng-container>
+    <ng-container cell-iii>
       <ng-content *ngTemplateOutlet="celliii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iv>
+    </ng-container>
+    <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
-    </div>
+    </ng-container>
   </layout-horizontal-one-three>
   <layout-vertical-one-three
     *ngSwitchCase="supportedPanelModes[2]"
     class="d-block w-100 h-100">
-    <div class="w-100 h-100" cell-i>
+    <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-ii>
+    </ng-container>
+    <ng-container cell-ii>
       <ng-content *ngTemplateOutlet="cellii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iii>
+    </ng-container>
+    <ng-container cell-iii>
       <ng-content *ngTemplateOutlet="celliii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iv>
+    </ng-container>
+    <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
-    </div>
+    </ng-container>
   </layout-vertical-one-three>
   <layout-single-panel
     *ngSwitchCase="supportedPanelModes[3]"
     class="d-block w-100 h-100">
-    <div class="w-100 h-100" cell-i>
+    <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-ii>
+    </ng-container>
+    <ng-container cell-ii>
       <ng-content *ngTemplateOutlet="cellii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iii>
+    </ng-container>
+    <ng-container cell-iii>
       <ng-content *ngTemplateOutlet="celliii"></ng-content>
-    </div>
-    <div class="w-100 h-100" cell-iv>
+    </ng-container>
+    <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
-    </div>
+    </ng-container>
   </layout-single-panel>
   <div *ngSwitchDefault>
     A panel mode which I have never seen before ...
   </div>
-</div>
+</ng-container>
 
 <ng-template #celli>
   <ng-content select="[cell-i]"></ng-content>
