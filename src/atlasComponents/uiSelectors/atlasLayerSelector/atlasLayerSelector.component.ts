@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChildren, QueryList, HostBinding, ViewChild, ElementRef, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay } from "rxjs/operators";
-import { Observable, Subscription } from "rxjs";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, mapTo, tap } from "rxjs/operators";
+import { merge, Observable, Subject, Subscription } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
@@ -77,6 +77,19 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
       return fullInfoTemplates.find(t => t['@id'] === selectedTmpl['@id'])
     })
   )
+  private showOverlayIntent$ = new Subject()
+  public showLoadingOverlay$ = merge(
+    this.showOverlayIntent$.pipe(
+      mapTo(true)
+    ),
+    this.selectedTemplate$.pipe(
+      mapTo(false)
+    )
+  ).pipe(
+    distinctUntilChanged(),
+    tap(val => console.log(val))
+  )
+
   public selectedParcellation$ = this.store$.pipe(
     select(viewerStateSelectedParcellationSelector),
   )
@@ -111,6 +124,7 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
   }
 
   selectTemplatewithId(templateId: string) {
+    this.showOverlayIntent$.next(true)
     this.store$.dispatch(viewerStateSelectTemplateWithId({
       payload: {
         '@id': templateId

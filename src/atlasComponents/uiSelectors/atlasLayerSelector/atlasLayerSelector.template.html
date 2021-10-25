@@ -104,6 +104,11 @@
             </mat-grid-tile>
         </mat-grid-list>
     </mat-card-content>
+
+    <div [hidden]="!(showLoadingOverlay$ | async)"
+        class="loading-overlay">
+        <spinner-cmp class="spinner"></spinner-cmp>
+    </div>
 </mat-card>
 
 <!-- place holder when not expanded -->
