@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, QueryList, HostBinding, ViewChild, ElementRef, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, mapTo, tap } from "rxjs/operators";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, mapTo } from "rxjs/operators";
 import { merge, Observable, Subject, Subscription } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -87,7 +87,6 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
     )
   ).pipe(
     distinctUntilChanged(),
-    tap(val => console.log(val))
   )
 
   public selectedParcellation$ = this.store$.pipe(
