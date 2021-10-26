@@ -12,7 +12,7 @@ import {
   TCallbackFunction,
 } from "./type";
 import { Point, TPointJsonSpec } from './point'
-import { Directive, Injectable, OnDestroy } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
@@ -24,6 +24,7 @@ export type TLineJsonSpec = {
 
 export class Line extends IAnnotationGeometry{
   public id: string
+  public annotationType = 'Line'
 
   public points: Point[] = []
 
