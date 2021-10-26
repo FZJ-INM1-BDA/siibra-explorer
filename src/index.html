@@ -11,7 +11,10 @@
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="version.css">
   <link rel="icon" type="image/png" href="res/favicons/favicon-128-light.png"/>
-  
+  <script>
+    // disable zone patching of raf. This hampers NG performance significantly
+    window['__Zone_disable_requestAnimationFrame'] = true
+  </script>
   <script src="https://unpkg.com/kg-dataset-previewer@1.2.0/dist/kg-dataset-previewer/kg-dataset-previewer.js" defer>
   </script>
   <script src="https://unpkg.com/three-surfer@0.0.10/dist/bundle.js" defer></script>
