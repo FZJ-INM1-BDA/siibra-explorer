@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 import {Store} from "@ngrx/store";
 
@@ -7,7 +7,7 @@ import {Store} from "@ngrx/store";
   templateUrl: './changePerspectiveOrientation.component.html',
   styleUrls: ['./changePerspectiveOrientation.component.sass']
 })
-export class ChangePerspectiveOrientationComponent implements OnInit {
+export class ChangePerspectiveOrientationComponent {
 
   private viewOrientations = {
     coronal: [[0,-1,1,0], [-1,0,0,1]],
@@ -16,9 +16,6 @@ export class ChangePerspectiveOrientationComponent implements OnInit {
   }
 
   constructor(private store$: Store<any>,) { }
-
-  ngOnInit(): void {
-  }
 
   public set3DViewPoint(plane: 'coronal' | 'sagittal' | 'axial', view: 'first' | 'second') {
 
