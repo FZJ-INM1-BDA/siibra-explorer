@@ -7,7 +7,7 @@ import { distinctUntilChanged, map } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
-import { TDatainfosDetail } from "src/util/siibraApiConstants/types";
+import { TDatainfosDetail, TSimpleInfo } from "src/util/siibraApiConstants/types";
 
 @Component({
   selector: 'viewer-state-breadcrumb',
@@ -120,8 +120,12 @@ export class ViewerStateBreadCrumb {
 })
 
 export class OriginalDatainfoPipe implements PipeTransform{
-  public transform(arr: TDatainfosDetail[]): TDatainfosDetail[]{
-    if (arr.length > 0) {
+  public transform(arr: (TSimpleInfo | TDatainfosDetail)[]): TDatainfosDetail[]{
+    const detailedInfos = arr.filter(item => item['@type'] === 'minds/core/dataset/v1.0.0') as TDatainfosDetail[]
+    const simpleInfos = arr.filter(item => item['@type'] === 'fzj/tmp/simpleOriginInfo/v0.0.1') as TSimpleInfo[]
+
+    if (detailedInfos.length > 0) return detailedInfos
+    if (simpleInfos.length > 0) {
       return arr.map(d => {
         return {
           '@type': 'minds/core/dataset/v1.0.0',
