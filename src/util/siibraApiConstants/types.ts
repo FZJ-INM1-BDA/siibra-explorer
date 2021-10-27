@@ -147,9 +147,10 @@ export type TParc = {
   }[]
   links: {
     self: THref
+    regions: THref
+    features: THref
   }
-  regions: THref
-  features: THref
+  infos: TDatainfosDetail[]
   modality: TParcModality
   version: TVersion
   _dataset_specs: TDatasetSpec[]
