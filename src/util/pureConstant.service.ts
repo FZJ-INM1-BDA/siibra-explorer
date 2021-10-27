@@ -17,7 +17,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { TTemplateImage } from "./interfaces";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.1.6'
+export const SIIBRA_API_VERSION = '0.1.7'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -496,7 +496,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         // }]
                       }
                     }),
-                    originDatainfos: (parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...(parc.infos || []), ...(parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 })
               }
@@ -806,7 +806,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                     '@id': parc.id,
                     name: parc.name,
                     regions,
-                    originDatainfos: (fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...fullParcInfo.infos, ...(fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 }),
                 ...threeSurferConfig

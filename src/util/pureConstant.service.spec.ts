@@ -68,7 +68,7 @@ describe('> pureConstant.service.ts', () => {
         const exp = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases`)
         exp.flush([mockAtlas], {
           headers: {
-            [SIIBRA_API_VERSION_HEADER_KEY]: '0.1.5'
+            [SIIBRA_API_VERSION_HEADER_KEY]: '0.1.7'
           }
         })
         service.allFetchingReady$.subscribe()
