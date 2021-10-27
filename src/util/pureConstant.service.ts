@@ -275,7 +275,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     )
   }
 
-  public getParcs(atlasId: string){
+  private getParcs(atlasId: string){
     return this.http.get<TParc[]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/parcellations`,
       { responseType: 'json' }
@@ -291,7 +291,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     )
   }
 
-  public getSpaces(atlasId: string){
+  private getSpaces(atlasId: string){
     return this.http.get<TSpaceSummary[]>(
       `${this.bsEndpoint}/atlases/${encodeURIComponent(atlasId)}/spaces`,
       { responseType: 'json' }
