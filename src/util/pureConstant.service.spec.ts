@@ -73,8 +73,10 @@ describe('> pureConstant.service.ts', () => {
         })
         service.allFetchingReady$.subscribe()
 
+        service.getSpaces(mockAtlas.id).subscribe()
         const expT1 = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases/${encodeURIComponent(mockAtlas.id)}/spaces`)
         expT1.flush([])
+        service.getParcs(mockAtlas.id).subscribe()
         const expP1 = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases/${encodeURIComponent(mockAtlas.id)}/parcellations`)
         expP1.flush([])
       })
