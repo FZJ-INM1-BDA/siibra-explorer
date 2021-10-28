@@ -1,6 +1,13 @@
 name: '[docker image]'
 
-on: [ 'push' ]
+on:
+  push:
+    # do not rebuild if...
+    paths-ignore:
+      # changes to .openshift directory... mostly devops config
+      - '.openshift/*'
+      # docs (docs are built on readthedocs any way)
+      - 'docs/*'
 
 jobs:
   build-docker-img:
