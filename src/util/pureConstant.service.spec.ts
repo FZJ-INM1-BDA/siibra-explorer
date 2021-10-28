@@ -75,6 +75,7 @@ describe('> pureConstant.service.ts', () => {
 
         const expT1 = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases/${encodeURIComponent(mockAtlas.id)}/spaces`)
         expT1.flush([])
+
         const expP1 = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases/${encodeURIComponent(mockAtlas.id)}/parcellations`)
         expP1.flush([])
       })
