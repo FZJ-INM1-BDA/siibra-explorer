@@ -47,7 +47,6 @@
 | `FLUENT_HOST` | host for fluent logging | `localhost` |
 | `FLUENT_PORT` | port for fluent logging | 24224 |
 | `IAV_NAME` | application name to be logged | `IAV` | 
-| `IAV_STAGE` | deploy of the application | `unnamed-stage` |
 
 ##### CSP
 
@@ -70,7 +69,6 @@
 | `REDIS_PORT` | fall back to `REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT` |
 | `REDIS_USERNAME` |
 | `REDIS_PASSWORD` |
-| `DISABLE_LIMITER` | disable rate limiting (maybe required for automated tests) |
 
 ##### SaneUrl
 

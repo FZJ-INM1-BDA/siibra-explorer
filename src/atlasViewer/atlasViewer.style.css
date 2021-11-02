@@ -34,17 +34,13 @@ layout-floating-container > *
   top: 0;
 }
 
-[signinWrapper]
+mat-list[dense].contextual-block
 {
-  margin: 0.8em 0.4em;
-}
-
-[contextualBlock]
-{
+  display: inline-block;
   background-color:rgba(200,200,200,0.8);
 }
 
-:host-context([darktheme="true"]) [contextualBlock]
+:host-context([darktheme="true"]) mat-list[dense].contextual-block
 {
   background-color : rgba(30,30,30,0.8);
 }
@@ -52,12 +48,6 @@ layout-floating-container > *
 [fixedMouseContextualContainerDirective]
 {
   max-width: 100%;
-}
-
-div[imageContainer]
-{
-  flex-grow: 1;
-  background: no-repeat center / contain;
 }
 
 div.displayCard

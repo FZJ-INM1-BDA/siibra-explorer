@@ -100,7 +100,7 @@ export interface KeyListenerConfig {
   key: string
   target?: 'document'
   capture?: boolean
-  stop: boolean
+  stop?: boolean
   // fromEvent seems to be a passive listener, wheather or not { passive: false } flag is set or not
   // so preventDefault cannot be called anyway
 }

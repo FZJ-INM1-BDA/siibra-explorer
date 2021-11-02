@@ -26,7 +26,7 @@ export const uiStateShowBottomSheet = createAction(
 
 export const uiActionMouseoverLandmark = createAction(
   `[uiState] mouseoverLandmark`,
-  props<{ landmark: any }>()
+  props<{ landmark: string }>()
 )
 
 export const uiActionMouseoverSegments = createAction(

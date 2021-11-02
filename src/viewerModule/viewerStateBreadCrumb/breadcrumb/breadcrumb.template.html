@@ -181,7 +181,7 @@
     </span>
 
     <!-- info icon -->
-    <ng-container *ngFor="let originDatainfo of ((parcel?.originDatainfos || []) | originalDatainfoPriorityPipe)">
+    <ng-container *ngFor="let originDatainfo of (parcel.originDatainfos | originalDatainfoPriorityPipe)">
       
       <mat-icon
         fontSet="fas"

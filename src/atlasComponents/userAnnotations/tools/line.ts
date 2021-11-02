@@ -12,7 +12,7 @@ import {
   TCallbackFunction,
 } from "./type";
 import { Point, TPointJsonSpec } from './point'
-import { Directive, Injectable, OnDestroy } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
@@ -24,6 +24,7 @@ export type TLineJsonSpec = {
 
 export class Line extends IAnnotationGeometry{
   public id: string
+  public annotationType = 'Line'
 
   public points: Point[] = []
 
@@ -193,7 +194,7 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
   
   subs: Subscription[] = []
 
-  private managedAnnotations: Line[] = []
+  protected managedAnnotations: Line[] = []
   public managedAnnotations$ = new Subject<Line[]>()
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
@@ -310,14 +311,6 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
 
   ngOnDestroy(){
     this.subs.forEach(s => s.unsubscribe())
-  }
-
-  addAnnotation(line: Line) {
-    const idx = this.managedAnnotations.findIndex(ann => ann.id === line.id)
-    if (idx >= 0) throw new Error(`Line annotation has already been added`)
-    line.remove = () => this.removeAnnotation(line.id)
-    this.managedAnnotations.push(line)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   removeAnnotation(id: string){

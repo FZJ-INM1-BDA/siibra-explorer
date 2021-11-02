@@ -1,11 +1,11 @@
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { TestBed } from "@angular/core/testing"
+import { MatSnackBarModule } from "@angular/material/snack-bar"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { hot } from "jasmine-marbles"
 import { BS_ENDPOINT } from "src/atlasComponents/regionalFeatures/bsFeatures"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { viewerStateFetchedAtlasesSelector, viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors"
-import { PureContantService } from "./pureConstant.service"
+import { PureContantService, SIIBRA_API_VERSION_HEADER_KEY } from "./pureConstant.service"
 import { TAtlas } from "./siibraApiConstants/types"
 
 const MOCK_BS_ENDPOINT = `http://localhost:1234`
@@ -17,6 +17,7 @@ describe('> pureConstant.service.ts', () => {
       TestBed.configureTestingModule({
         imports:[
           HttpClientTestingModule,
+          MatSnackBarModule,
         ],
         providers: [
           provideMockStore(),
@@ -65,7 +66,11 @@ describe('> pureConstant.service.ts', () => {
       it('> can be init, and configuration emits allFetchingReady$', () => {
         const service = TestBed.inject(PureContantService)
         const exp = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases`)
-        exp.flush([mockAtlas])
+        exp.flush([mockAtlas], {
+          headers: {
+            [SIIBRA_API_VERSION_HEADER_KEY]: '0.1.5'
+          }
+        })
         service.allFetchingReady$.subscribe()
 
         const expT1 = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases/${encodeURIComponent(mockAtlas.id)}/spaces`)

@@ -1,3 +1,14 @@
+import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type"
+import { TMouseOverSegment } from "./type"
+
+export type TOnHoverObj = {
+  segments: TMouseOverSegment[]
+  annotation: IAnnotationGeometry
+  landmark: {
+    landmarkName: number
+  }
+  userLandmark: any
+}
 
 /**
  * Scan function which prepends newest positive (i.e. defined) value
@@ -10,7 +21,7 @@
  *
  *
  */
-export const temporalPositveScanFn = (acc: Array<{segments: any, landmark: any, userLandmark: any}>, curr: {segments: any, landmark: any, userLandmark: any}) => {
+export const temporalPositveScanFn = (acc: Array<TOnHoverObj>, curr: Partial<TOnHoverObj>) => {
 
   const keys = Object.keys(curr)
 
@@ -21,6 +32,6 @@ export const temporalPositveScanFn = (acc: Array<{segments: any, landmark: any, 
   )
 
   return isPositive
-    ? [curr, ...(acc.filter(item => !keys.some(key => !!item[key])))] as Array<{segments?: any, landmark?: any, userLandmark?: any}>
+    ? [curr, ...(acc.filter(item => !keys.some(key => !!item[key])))] as Array<TOnHoverObj>
     : acc.filter(item => !keys.some(key => !!item[key]))
 }

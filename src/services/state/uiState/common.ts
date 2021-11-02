@@ -12,7 +12,7 @@ export interface IUiState{
   sidePanelExploreCurrentViewIsOpen: boolean
   mouseOverSegment: any | number
 
-  mouseOverLandmark: any
+  mouseOverLandmark: string
   mouseOverUserLandmark: any
 
   focusedSidePanel: string | null

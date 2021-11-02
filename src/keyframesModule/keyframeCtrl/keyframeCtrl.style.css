@@ -1,0 +1,26 @@
+.cdk-drop-list-dragging :not(.cdk-drag-placeholder)
+{
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.cdk-drag-placeholder {
+  opacity: 0.2;
+}
+[cdkDragHandle]
+{
+  cursor:ns-resize;
+}
+
+mat-form-field
+{
+  margin-right: 0.25rem;
+}
+
+.duration-container
+{
+  width: 3.5rem;
+}
+
+.controller-container > *
+{
+  display: block;
+}

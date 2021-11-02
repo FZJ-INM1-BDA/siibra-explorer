@@ -26,6 +26,10 @@ export class HasConnectivity implements OnInit, OnDestroy {
     }
 
     checkConnectivity(region) {
+      if (!region.context) {
+        this.hasConnectivity = false
+        return
+      }
       const {atlas, parcellation, template} = region.context
       if (region.name) {
         const connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(atlas['@id'])}/parcellations/${encodeURIComponent(parcellation['@id'])}/regions/${encodeURIComponent(region.name)}/features/ConnectivityProfile`

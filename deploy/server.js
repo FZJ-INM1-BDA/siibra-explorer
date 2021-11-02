@@ -7,9 +7,10 @@ if (process.env.NODE_ENV !== 'production') {
 
 if (process.env.FLUENT_HOST) {
   const Logger = require('./logging')
+  const os = require('os')
 
   const name = process.env.IAV_NAME || 'IAV'
-  const stage = process.env.IAV_STAGE || 'unnamed-stage'
+  const stage = os.hostname() || 'unknown-host'
 
   const protocol = process.env.FLUENT_PROTOCOL || 'http'
   const host = process.env.FLUENT_HOST || 'localhost'

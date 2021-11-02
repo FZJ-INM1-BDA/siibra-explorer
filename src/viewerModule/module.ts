@@ -26,6 +26,9 @@ import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
 import { KgRegionalFeatureModule } from "src/atlasComponents/regionalFeatures/bsFeatures/kgRegionalFeature";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, AtlasViewerAPIServices, setViewerHandleFactory } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
+import { KeyFrameModule } from "src/keyframesModule/module";
+import { ViewerInternalStateSvc } from "./viewerInternalState.service";
+import { LayerBrowserModule } from "src/ui/layerbrowser";
 
 @NgModule({
   imports: [
@@ -47,6 +50,8 @@ import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
     ContextMenuModule,
     ViewerStateBreadCrumbModule,
     KgRegionalFeatureModule,
+    KeyFrameModule,
+    LayerBrowserModule,
   ],
   declarations: [
     ViewerCmp,
@@ -95,6 +100,7 @@ import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
       ]
     },
     AtlasViewerAPIServices,
+    ViewerInternalStateSvc,
   ],
   exports: [
     ViewerCmp,

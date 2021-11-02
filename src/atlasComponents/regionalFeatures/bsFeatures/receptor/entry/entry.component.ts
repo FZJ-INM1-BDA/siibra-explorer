@@ -40,7 +40,7 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   )
 
   public hasPrAr$: Observable<boolean> = this.selectedReceptor$.pipe(
-    map(detail => detail.__files.some(f => isPr(f))),
+    map(detail => !!detail.__data.__profiles),
   )
 
   ngOnDestroy(){

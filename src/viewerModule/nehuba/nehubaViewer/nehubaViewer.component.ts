@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional } from "@angular/core";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer, Subject } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip, tap } from "rxjs/operators";
+import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { LoggingService } from "src/logging";
@@ -61,6 +61,8 @@ export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
   styleUrls : [
     './nehubaViewer.style.css',
   ],
+  // OnPush seems to improve performance significantly
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class NehubaViewerUnit implements OnInit, OnDestroy {
@@ -93,7 +95,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         url?: string
       }
     }> = new EventEmitter()
-  @Output() public mouseoverLandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
+  @Output() public mouseoverLandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public regionSelectionEmitter: EventEmitter<{segment: number, layer: {name?: string, url?: string}}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()

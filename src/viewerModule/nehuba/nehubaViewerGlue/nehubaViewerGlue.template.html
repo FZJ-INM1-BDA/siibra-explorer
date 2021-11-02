@@ -1,4 +1,4 @@
-<div class="d-block w-100 h-100"
+<div class="d-block w-100 h-100 nehuba-viewer-container-parent"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
   iav-viewer-touch-interface
@@ -11,6 +11,8 @@
     iav-nehuba-viewer-container
     #iavContainer="iavNehubaViewerContainer"
     iav-mouse-hover
+    [iav-key-listener]="[{ type: 'keydown', key: ' ', target: 'document', capture: true }]"
+    (iav-key-event)="handleCycleViewEvent()"
     (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
 
   </div>
@@ -120,7 +122,7 @@
   let-panelIndex="panelIndex"
   let-visible="visible">
 
-  <div class="opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
+  <div class="ws-no-wrap opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }"
     [attr.data-viewer-controller-visible]="visible"
     [attr.data-viewer-controller-index]="panelIndex">
@@ -189,4 +191,44 @@
       <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </svg>
+</ng-template>
+
+<ng-template #layerCtrlTmpl let-data>
+  <div class="grid grid-col-3">
+
+    <span class="ml-2 text-truncate v-center-text-span">
+      <i class="fas fa-file"></i>
+      {{ data.filename }}
+    </span>
+    
+    <button
+      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
+      mat-icon-button
+      [color]="data.moreInfoFlag ? 'primary' : 'basic'"
+      (click)="data.moreInfoFlag = !data.moreInfoFlag">
+      <i class="fas fa-sliders-h"></i>
+    </button>
+
+    <button
+      [matTooltip]="ARIA_LABELS.CLOSE"
+      color="warn"
+      mat-icon-button
+      mat-dialog-close>
+      <i class="fas fa-trash"></i>
+    </button>
+
+    <div *ngIf="data.moreInfoFlag"
+      class="iv-custom-comp darker-bg overflow-hidden grid-wide-3">
+      <ng-layer-tune
+        advanced-control="true"
+        [ngLayerName]="data.layerName"
+        [thresholdMin]="data.min"
+        [thresholdMax]="data.max">
+      </ng-layer-tune>
+      <ul>
+        <li *ngFor="let warn of data.warning">{{ warn }}</li>
+      </ul>
+    </div>
+
+  </div>
 </ng-template>

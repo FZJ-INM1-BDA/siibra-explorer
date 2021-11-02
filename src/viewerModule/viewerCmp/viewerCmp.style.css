@@ -20,6 +20,10 @@
   margin-top: 1.5rem;
 }
 
+.tab-toggle-container > *
+{
+  display: block;
+}
 
 .tab-toggle
 {
@@ -44,4 +48,14 @@
 mat-drawer
 {
   overflow-x: hidden;
+}
+
+.transition-margin-left
+{
+  transition: margin-left 200ms cubic-bezier(0.35, 0, 0.25, 1);
+}
+
+._pli-container
+{
+  padding-top: 5rem;
 }

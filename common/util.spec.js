@@ -1,4 +1,4 @@
-import { getIdFromFullId, strToRgb } from './util'
+import { getIdFromFullId, strToRgb, verifyPositionArg } from './util'
 
 describe('common/util.js', () => {
   describe('getIdFromFullId', () => {
@@ -75,5 +75,46 @@ describe('common/util.js', () => {
       }).toThrow()
     })
   
+  })
+
+  describe('verifyPositionArg', () => {
+    describe('malformed input', () => {
+      let input
+      it('> if props.components[0] is string', () => {
+        input= 'hello world'
+        expect(verifyPositionArg(input)).toBeFalsy()
+      })
+      it('> if position property is object', () => {
+        input={
+          x: 0,
+          y: 0,
+          z: 0
+        }
+        expect(verifyPositionArg(input)).toBeFalsy()
+      })
+
+      it('> if position property is array of incorrect length', () => {
+        input=[]
+        expect(verifyPositionArg(input)).toBeFalsy()
+      })
+
+      it('> if position property is array contain non number elements', () => {
+        input = [1, 2, 'hello world']
+        expect(verifyPositionArg(input)).toBeFalsy()
+      })
+
+      it('> if position property is array contain NaN', () => {
+        input=[1,2,NaN]
+        expect(verifyPositionArg(input)).toBeFalsy()
+      })
+
+    })
+
+    describe('correct input', () => {
+      let input
+      it('> return true', () => {
+        expect(verifyPositionArg([1,2,3])).toBeTruthy()
+      })
+    })
   })
 })

@@ -7,6 +7,8 @@
 
   <!-- selector & configurator -->
   <button mat-icon-button
+    [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document' }]"
+    (iav-key-event)="toggleMode()"
     color="primary"
     class="pe-all"
     [matMenuTriggerFor]="fsModeSelMenu">
@@ -39,5 +41,9 @@
     <span>
       {{ mode.name }}
     </span>
+    <markdown-dom *ngIf="mode.name === selectedMode"
+      class="d-inline-block"
+      markdown="`[q]`">
+    </markdown-dom>
   </button>
 </mat-menu>

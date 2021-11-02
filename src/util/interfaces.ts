@@ -22,3 +22,10 @@ export type TRegionOfInterest = { ['fullId']: string }
 
 export const REGION_OF_INTEREST = new InjectionToken<Observable<TRegionOfInterest>>('RegionOfInterest')
 export const CANCELLABLE_DIALOG = new InjectionToken('CANCELLABLE_DIALOG')
+
+export type TTemplateImage = {
+  name: string
+  '@id': string
+  ngId: string
+  visible: boolean
+}

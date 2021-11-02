@@ -1,7 +1,7 @@
 import { IHasId } from "src/util/interfaces";
 import { TBSDetail as TReceptorDetail, TBSSummary as TReceptorSummary } from "./receptor/type";
 import { KG_REGIONAL_FEATURE_KEY, TBSDetail as TKGDetail, TBSSummary as TKGSummary } from './kgRegionalFeature/type'
-import { SIIBRA_FEATURE_KEY, TBSSummary as TIEEGSummary, TBSDEtail as TIEEGDetail } from './ieeg/type'
+import { SIIBRA_FEATURE_KEY, TBSSummary as TIEEGSummary, TBSIeegSessionDetail as TIEEGDetail } from './ieeg/type'
 import { Observable } from "rxjs";
 import { InjectionToken } from "@angular/core";
 

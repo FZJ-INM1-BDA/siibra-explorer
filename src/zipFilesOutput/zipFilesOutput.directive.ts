@@ -2,6 +2,8 @@ import { Directive, HostListener, Inject, Input } from "@angular/core";
 import { TZipFileConfig } from "./type";
 import * as JSZip from "jszip";
 import { DOCUMENT } from "@angular/common";
+import { isObservable, Observable } from "rxjs";
+import { take } from "rxjs/operators";
 
 @Directive({
   selector: '[zip-files-output]',
@@ -10,15 +12,15 @@ import { DOCUMENT } from "@angular/common";
 
 export class ZipFilesOutput {
   @Input('zip-files-output')
-  zipFiles: TZipFileConfig[] = []
+  zipFiles: Observable<TZipFileConfig[]> | TZipFileConfig[] = []
 
   @Input('zip-files-output-zip-filename')
   zipFilename = 'archive.zip'
 
-  @HostListener('click')
-  async onClick(){
+  private async zipArray(arrZipConfig: TZipFileConfig[]){
+
     const zip = new JSZip()
-    for (const zipFile of this.zipFiles) {
+    for (const zipFile of arrZipConfig) {
       const { filecontent, filename, base64 } = zipFile
       zip.file(filename, filecontent, { base64 })
     }
@@ -31,6 +33,21 @@ export class ZipFilesOutput {
     anchor.click()
     this.doc.body.removeChild(anchor)
     URL.revokeObjectURL(anchor.href)
+  }
+
+  @HostListener('click')
+  async onClick(){
+    if (Array.isArray(this.zipFiles)) {
+      await this.zipArray(this.zipFiles)
+      return
+    }
+    if (isObservable(this.zipFiles)) {
+      const zipFiles = await this.zipFiles.pipe(
+        take(1)
+      ).toPromise()
+      await this.zipArray(zipFiles)
+      return
+    }
   }
   constructor(
     @Inject(DOCUMENT) private doc: Document

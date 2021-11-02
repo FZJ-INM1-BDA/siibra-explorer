@@ -7,7 +7,7 @@ const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
-const { router: regionalFeaturesRouter, regionalFeatureIsReady } = require('./regionalFeatures')
+const deprecated = (_req, res) => res.status(410).end()
 
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
@@ -197,16 +197,11 @@ app.get('/', (req, res, next) => {
   }
 })
 
-
-app.use('/logo', require('./logo'))
-
 app.get('/ready', async (req, res) => {
   const authIsReady = authReady ? await authReady() : false
-  const regionalFeatureReady = await regionalFeatureIsReady()
 
   const allReady = [ 
     authIsReady,
-    regionalFeatureReady,
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
@@ -234,24 +229,14 @@ const jsonMiddleware = (req, res, next) => {
  * resources endpoints
  */
 const pluginRouter = require('./plugins')
-const previewRouter = require('./preview')
-
-const setResLocalMiddleWare = routePathname => (req, res, next) => {
-  res.locals.routePathname = routePathname
-  next()
-}
-
-const deprecated = (req, res) => {
-  res.status(404).send(`Route has been removed.`)
-}
 
 app.use('/atlases', deprecated)
 app.use('/templates', deprecated)
 app.use('/nehubaConfig', deprecated)
 app.use('/datasets', deprecated)
-app.use('/regionalFeatures', jsonMiddleware, regionalFeaturesRouter)
+app.use('/regionalFeatures', deprecated)
 app.use('/plugins', jsonMiddleware, pluginRouter)
-app.use('/preview', jsonMiddleware, previewRouter)
+app.use('/preview', deprecated)
 
 const catchError = require('./catchError')
 app.use(catchError)

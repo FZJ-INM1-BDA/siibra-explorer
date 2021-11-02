@@ -9,6 +9,7 @@ import { UtilModule } from "src/util";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components";
 import {RegionTreeComponent} from "src/atlasComponents/parcellation/regionHierachy/region-tree/region-tree.component";
+import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
 
 @NgModule({
   imports: [
@@ -26,11 +27,13 @@ import {RegionTreeComponent} from "src/atlasComponents/parcellation/regionHierac
 
     FilterNameBySearch,
     RegionTreeComponent
+    GetParcPreviewUrlPipe,
   ],
   exports: [
     RegionHierarchy,
     RegionTextSearchAutocomplete,
     FilterNameBySearch,
+    GetParcPreviewUrlPipe,
   ]
 })
 export class AtlasCmpParcellationModule{}

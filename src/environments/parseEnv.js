@@ -13,7 +13,8 @@ const main = async () => {
     MATOMO_ID,
     BS_REST_URL,
     VERSION,
-    GIT_HASH
+    GIT_HASH,
+    EXPERIMENTAL_FEATURE_FLAG
   } = process.env
   const version = JSON.stringify(
     VERSION || GIT_HASH || 'unspecificied hash'
@@ -30,6 +31,7 @@ export const environment = {
   STRICT_LOCAL: ${JSON.stringify(STRICT_LOCAL)},
   MATOMO_URL: ${JSON.stringify(MATOMO_URL)},
   MATOMO_ID: ${JSON.stringify(MATOMO_ID)},
+  EXPERIMENTAL_FEATURE_FLAG: ${EXPERIMENTAL_FEATURE_FLAG}
 }
 `
   await asyncWrite(pathToEnvFile, outputTxt, 'utf-8')

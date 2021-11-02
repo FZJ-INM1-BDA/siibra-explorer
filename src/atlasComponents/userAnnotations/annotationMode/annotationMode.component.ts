@@ -11,9 +11,12 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 @Component({
   selector: 'annotating-tools-panel',
   templateUrl: './annotationMode.template.html',
-  styleUrls: ['./annotationMode.style.css']
+  styleUrls: ['./annotationMode.style.css'],
+  exportAs: 'annoToolsPanel'
 })
 export class AnnotationMode implements OnDestroy{
+
+  public annBadges$ = this.modularToolSvc.badges$
 
   public ARIA_LABELS = ARIA_LABELS
 

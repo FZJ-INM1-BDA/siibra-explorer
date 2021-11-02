@@ -1,4 +1,5 @@
 import { createSelector } from "@ngrx/store";
+import { TMouseOverSegment } from "src/mouseoverModule/type";
 import { IUiState } from './common'
 
 export const uiStatePreviewingDatasetFilesSelector = createSelector(
@@ -7,19 +8,13 @@ export const uiStatePreviewingDatasetFilesSelector = createSelector(
 )
 
 export const uiStateMouseOverSegmentsSelector = createSelector(
-  state => state['uiState']['mouseOverSegments'],
-  mouseOverSegments => {
-    /**
-     * filter out the regions explicitly declared `unselectable`
-     */
-    return mouseOverSegments
-      .filter(({ segment }) => {
-        if (typeof segment === 'object' && segment !== null) {
-          if (segment.unselectable) return false
-        }
-        return true
-      })
-  }
+  state => state['uiState'],
+  uiState => uiState['mouseOverSegments'] as TMouseOverSegment[]
+)
+
+export const uiStateMouseOverLandmarkSelector = createSelector(
+  state => state['uiState'],
+  uiState => uiState['mouseOverLandmark'] as string
 )
 
 export const uiStateMouseoverUserLandmark = createSelector(
