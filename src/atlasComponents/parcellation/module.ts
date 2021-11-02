@@ -26,7 +26,7 @@ import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
     RegionTextSearchAutocomplete,
 
     FilterNameBySearch,
-    RegionTreeComponent
+    RegionTreeComponent,
     GetParcPreviewUrlPipe,
   ],
   exports: [
