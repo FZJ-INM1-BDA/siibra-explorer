@@ -62,7 +62,7 @@ import { TileCmp } from './tile/tile.component';
     ClusteringPipe,
     FilterCollapsePipe,
   ],
-  exports : [
+  exports: [
     BrowserAnimationsModule,
     ReadmoreModule,
 
@@ -78,6 +78,7 @@ import { TileCmp } from './tile/tile.component';
 
     TreeSearchPipe,
     TreeBaseDirective,
+    HighlightPipe,
   ],
 })
 

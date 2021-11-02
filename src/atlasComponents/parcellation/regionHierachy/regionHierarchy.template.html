@@ -26,16 +26,20 @@
       <div
         *ngIf="parcellationSelected && parcellationSelected.regions as regions"
         class="tree-body">
-        <flat-tree-component
-          (treeNodeClick)="handleClickRegion($event)"
-          (totalRenderedListChanged)="handleTotalRenderedListChanged($event)"
-          [inputItem]="aggregatedRegionTree"
-          [renderNode]="displayTreeNode"
-          [searchFilter]="filterTreeBySearch">
-          
-        </flat-tree-component>
+
+<!--        ToDo  Needs refactor of goToregion and selec region
+             Navigate icon should only visible when position exists-->
+        <app-region-tree
+                [regions]="regions"
+                [inputItem]="[aggregatedRegionTree]"
+                (navigateToRegion)="gotoRegion($event)"
+                (selectRegion)="selectRegion($event)"
+                [searchString]="searchTerm"
+        >
+
+        </app-region-tree>
+
       </div> 
     </div>
   </div>
 </div>
-  

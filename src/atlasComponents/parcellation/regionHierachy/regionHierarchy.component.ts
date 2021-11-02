@@ -228,9 +228,11 @@ export class RegionHierarchy implements OnInit, AfterViewInit {
     this.doubleClickRegion.emit(region)
   }
 
-  public deselectRegion(region: any) {
+  public selectRegion(region: any) {
     this.singleClickRegion.emit(region)
   }
+
+
 }
 
 export function trackRegionBy(index: number, region: any) {
