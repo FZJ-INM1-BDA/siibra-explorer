@@ -3,14 +3,16 @@ import {
   Component,
   Input,
   TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { CONST, QUICKTOUR_DESC } from 'common/constants'
+import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'top-menu-cmp',
@@ -23,6 +25,9 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 
 export class TopMenuCmp {
 
+  public EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
+
+  public ARIA_LABELS = ARIA_LABELS
   public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
 
   public matBtnStyle = 'mat-icon-button'
@@ -49,10 +54,19 @@ export class TopMenuCmp {
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
   public annotateTooltipText: string = 'Start annotating'
-
+  public keyFrameText = `Start KeyFrames`
+  
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
+  }
+
+  public pinnedDsNotAvail = 'We are reworking pinned dataset feature. Please check back later.'
+  @ViewChild('savedDatasets', { read: TemplateRef })
+  private savedDatasetTmpl: TemplateRef<any>
+
+  public openPinnedDatasets(){
+    // this.bottomSheet.open(this.savedDatasetTmpl)
   }
 
   constructor(

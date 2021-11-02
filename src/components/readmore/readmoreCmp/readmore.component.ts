@@ -14,7 +14,7 @@ export class ReadmoreComponent implements OnChanges, AfterContentChecked {
   @Input() public collapsedHeight: number = 45
   @Input() public show: boolean = false
   @Input() public animationLength: number = 180
-  @ViewChild('contentContainer') public contentContainer: ElementRef
+  @ViewChild('contentContainer', { read: ElementRef, static: true }) public contentContainer: ElementRef
 
   public fullHeight: number = 200
 

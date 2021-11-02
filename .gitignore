@@ -1,6 +1,5 @@
 node_modules
 dist
-package-lock.json
 src/res/raw
 src/plugin_examples/*/
 .vscode
@@ -12,3 +11,4 @@ site
 
 *.log
 cachedKgDataset.json
+tmp

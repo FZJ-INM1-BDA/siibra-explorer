@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core'
 import * as showdown from 'showdown'
 
 @Component({
@@ -10,7 +10,7 @@ import * as showdown from 'showdown'
   changeDetection : ChangeDetectionStrategy.OnPush,
 })
 
-export class MarkdownDom implements AfterViewChecked {
+export class MarkdownDom implements OnChanges {
 
   @Input() public markdown: string = ``
   public innerHtml: string = ``
@@ -21,6 +21,7 @@ export class MarkdownDom implements AfterViewChecked {
   constructor(
     private cdr: ChangeDetectorRef
   ) {
+    this.cdr.detach()
     this.converter.setFlavor('github')
   }
 
@@ -30,7 +31,7 @@ export class MarkdownDom implements AfterViewChecked {
     return ''
   }
 
-  public ngAfterViewChecked(){
+  ngOnChanges(){
     this.innerHtml = this.converter.makeHtml(
       this.getMarkdown()
     )

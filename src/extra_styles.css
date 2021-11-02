@@ -320,6 +320,11 @@ markdown-dom p
   width: 20em!important;
 }
 
+.w-100vw
+{
+  width: 100vw!important;
+}
+
 .mw-100
 {
   max-width: 100%!important;
@@ -338,11 +343,6 @@ markdown-dom p
 .mw-20em
 {
   max-width: 20em!important;
-}
-
-.w-90
-{
-  width: 90%!important;
 }
 
 .w-20em
@@ -763,6 +763,16 @@ kg-dataset-previewer > img
   opacity: 1.0;
 }
 
+.m-15
+{
+  margin: 15px;
+}
+
+.m-1px
+{
+  margin:1px;
+}
+
 .ml-15px-n
 {
   margin-left: -15px!important;
@@ -810,6 +820,10 @@ kg-dataset-previewer > img
 {
   margin-top: -1rem!important;
 }
+.mt-1-n
+{
+  margin-top: -0.5rem!important;
+}
 
 .mb-6
 {
@@ -833,11 +847,6 @@ kg-dataset-previewer > img
   bottom: unset!important;
 }
 
-.layerGroupMenu > .mat-menu-content
-{
-  width: 100%;
-}
-
 mat-list.sm mat-list-item
 {
   height:2rem!important;
@@ -858,9 +867,7 @@ mat-list.sm mat-list-item
 
 .no-padding-dialog > mat-dialog-container
 {
-  padding-top:0 !important;
-  padding-right:0 !important;
-  padding-left:0 !important;
+  padding:0 !important;
 }
 .h-50px
 {
@@ -869,4 +876,32 @@ mat-list.sm mat-list-item
 .scale-80
 {
   transform: scale(0.8);
+}
+
+.grid
+{
+  display: grid;
+}
+
+.grid.grid-col-3
+{
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.2rem 0.2rem;
+}
+
+.grid > .grid-wide-3
+{
+  grid-column: 1 / 4;
+}
+
+.v-center-text-span
+{
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.v-align-top
+{
+  vertical-align: top;
 }

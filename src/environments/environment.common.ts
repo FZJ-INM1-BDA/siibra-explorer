@@ -14,4 +14,7 @@ export const environment = {
 
   // invite user to touch/interact after 5 min of inactivity
   KIOSK_MODE: false,
+
+  // experimental feature flag
+  EXPERIMENTAL_FEATURE_FLAG: false,
 }

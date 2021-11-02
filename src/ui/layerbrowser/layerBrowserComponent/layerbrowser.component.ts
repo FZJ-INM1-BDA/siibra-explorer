@@ -13,6 +13,16 @@ import { ARIA_LABELS } from 'common/constants'
 
 import { INgLayerInterface } from "../index";
 
+const SHOW_LAYER_NAMES = [
+  'PLI Fiber Orientation Red Channel',
+  'PLI Fiber Orientation Green Channel',
+  'PLI Fiber Orientation Blue Channel',
+  'Blockface Image',
+  'PLI Transmittance',
+  'T2w MRI',
+  'MRI Labels'
+]
+
 @Component({
   selector : 'layer-browser',
   templateUrl : './layerbrowser.template.html',
@@ -98,7 +108,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
     ).pipe(
       map(([baseNgLayerNames, loadedNgLayers]) => {
         const baseNameSet = new Set(baseNgLayerNames)
-        return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
+        return loadedNgLayers.filter(l => SHOW_LAYER_NAMES.includes(l.name))
       }),
       distinctUntilChanged()
     )

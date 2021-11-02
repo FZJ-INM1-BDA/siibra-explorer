@@ -1,41 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const RateLimit = require('express-rate-limit')
-const RedisStore = require('rate-limit-redis')
 const { FallbackStore: Store, NotFoundError } = require('./store')
-const lruStore = require('../lruStore')
 const { Store: DepcStore } = require('./depcObjStore')
-const { readUserData, saveUserData } = require('../user/store')
 
 const store = new Store()
 const depStore = new DepcStore()
 
-const { DISABLE_LIMITER, HOSTNAME, HOST_PATHNAME } = process.env
-
-
-let limiter
-const getLimiter = async () => {
-  if (DISABLE_LIMITER) return passthrough
-  
-  if (!!limiter) return limiter
-
-  await lruStore._initPr
-  if (lruStore.redisURL) {
-    limiter = new RateLimit({
-      windowMs: 1e3 * 5,
-      max: 5,
-      store: new RedisStore({ redisURL })
-    })
-  } else {
-    limiter = new RateLimit({
-      windowMs: 1e3 * 5,
-      max: 5,
-    })
-  }
-  return limiter
-}
-
-const passthrough = (_, __, next) => next()
+const { HOSTNAME, HOST_PATHNAME } = process.env
 
 const acceptHtmlProg = /text\/html/i
 
@@ -64,6 +35,11 @@ const getFile = async name => {
   return value
 }
 
+const hardCodedMap = new Map([
+  ['whs4', '#/a:minds:core:parcellationatlas:v1.0.0:522b368e-49a3-49fa-88d3-0870a307974a/t:minds:core:referencespace:v1.0.0:d5717c4a-0fa1-46e6-918c-b8003069ade8/p:minds:core:parcellationatlas:v1.0.0:ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..kxV..0.0.0..8Yu'],
+  ['mebrains', '#/a:juelich:iav:atlas:v1.0.0:monkey/t:minds:core:referencespace:v1.0.0:MEBRAINS_T1.masked/p:minds:core:parcellationatlas:v1.0.0:mebrains-tmp-id/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..0.0.0..1LSm']
+])
+
 router.get('/:name', async (req, res) => {
   const { name } = req.params
   const { headers } = req
@@ -71,12 +47,19 @@ router.get('/:name', async (req, res) => {
   const redirectFlag = acceptHtmlProg.test(headers['accept'])
     
   try {
+    const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
+    const hardcodedRedir = hardCodedMap.get(name)
+    if (hardcodedRedir) {
+      if (redirectFlag) res.redirect(`${REAL_HOSTNAME}${hardcodedRedir}`)
+      else res.status(200).send(hardcodedRedir)
+      return
+    }
+
     const value = await getFile(name)
     if (!value) throw new NotFoundError()
     const json = JSON.parse(value)
     const { queryString } = json
 
-    const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
 
     if (redirectFlag) res.redirect(`${REAL_HOSTNAME}?${queryString}`)
     else res.status(200).send(value)
@@ -105,52 +88,7 @@ router.get('/:name', async (req, res) => {
 })
 
 router.post('/:name',
-  getLimiter,
-  async (req, res, next) => {
-    const { name } = req.params
-    try {
-      const exist = await getFile(name)
-      if (!exist) throw new NotFoundError()
-      return res.status(409).send(`filename already exists`)
-    } catch (e) {
-      if (e instanceof NotFoundError) return next()
-      else return res.status(500).send(e)
-    }
-  },
-  express.json(),
-  async (req, res) => {
-    const { name } = req.params
-    const { body, user } = req
-    
-    try {
-      const payload = {
-        ...body,
-        userId: user && user.id,
-        expiry: !user && (Date.now() + 1e3 * 60 * 60 * 72)
-      }
-
-      await store.set(name, JSON.stringify(payload))
-      res.status(200).end()
-
-      try {
-        if (!user) return
-        const { savedCustomLinks = [], ...rest } = await readUserData(user)
-        await saveUserData(user, {
-          ...rest,
-          savedCustomLinks: [
-            ...savedCustomLinks,
-            name
-          ]
-        })
-      } catch (e) {
-        console.error(`reading/writing user data error ${user && user.id}, ${name}`, e)
-      }
-    } catch (e) {
-      console.error(`saneUrl /POST error`, e)
-      const { statusCode, statusMessage } = e
-      res.status(statusCode || 500).send(statusMessage || 'Error encountered.')
-    }
-  }
+  (_req, res) => res.status(410).end()
 )
 
 router.use((_, res) => {

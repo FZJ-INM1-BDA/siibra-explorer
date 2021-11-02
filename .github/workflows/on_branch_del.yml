@@ -10,6 +10,8 @@ on:
 jobs:
   remove-deploy:
     runs-on: ubuntu-latest
+    env:
+      OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
     steps:
     - name: 'Set env var'
       run: |
@@ -26,14 +28,12 @@ jobs:
         oc login $OKD_URL --token=$OKD_SECRET
         oc project $OKD_PROJECT
         # sanitized branchname == remove _ / and lowercase everything
-        SANITIZED_BRANCH_NAME=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-        echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
-        echo "Working branch name: $BRANCH_NAME, sanitized branch name: $SANITIZED_BRANCH_NAME"
+        DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
+        echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+        echo "Working branch name: $BRANCH_NAME, sanitized branch name: $DEPLOY_ID"
     - name: 'List and delete all labelled resoures'
       run: |
         oc get all \
-          -l template=siibra-explorer-branch-deploy-template \
-          -l app=siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
+          -l app=${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID
         oc delete all \
-          -l template=siibra-explorer-branch-deploy-template \
-          -l app=siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
+          -l app=${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID

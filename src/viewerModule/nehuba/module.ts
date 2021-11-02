@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
 import { IMPORT_NEHUBA_INJECT_TOKEN, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
@@ -83,6 +83,9 @@ import {CutSliceViewService} from "src/viewerModule/nehuba/cutSliceView.service"
       useValue: new BehaviorSubject(null)
     },
     CutSliceViewService
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

@@ -44,14 +44,17 @@ export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChan
       return
     }
 
-    const url = this.bsFeature.__data.__autoradiographs[this.bsLabel]
-    if (!url) {
-      this.error = `ar cannot be found`
-      return
+    try {
+      const url = this.bsFeature.__data.__autoradiographs[this.bsLabel]
+      
+      if (!url) throw new Error(`autoradiograph cannot be found`)
+      this.urls = [{ url }]
+      const query = url.replace('https://object.cscs.ch/v1', '')
+      this.imgUrl = `${this.DS_PREVIEW_URL}/imageProxy/v1?u=${encodeURIComponent(query)}`
+    
+    } catch (e) {
+      this.error = e.toString()
     }
-    this.urls = [{ url }]
-    const query = url.replace('https://object.cscs.ch/v1', '')
-    this.imgUrl = `${this.DS_PREVIEW_URL}/imageProxy/v1?u=${encodeURIComponent(query)}`
     
   }
 }

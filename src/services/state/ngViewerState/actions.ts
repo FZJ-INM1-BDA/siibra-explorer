@@ -70,3 +70,7 @@ export const ngViewerActionClearView = createAction(
   `[ngViewerAction] clearView`,
   props<{ payload: { [key: string]: boolean }}>()
 )
+
+export const ngViewerActionCycleViews = createAction(
+  `[ngViewerAction] cycleView`
+)

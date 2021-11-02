@@ -1,20 +1,27 @@
 name: '[docker image]'
 
-on: [ 'push' ]
+on:
+  push:
+    # do not rebuild if...
+    paths-ignore:
+      # changes to .openshift directory... mostly devops config
+      - '.openshift/*'
+      # docs (docs are built on readthedocs any way)
+      - 'docs/*'
 
 jobs:
   build-docker-img:
     runs-on: ubuntu-latest
     env:
-      MATOMO_ID_DEV: '7'
-      MATOMO_URL_DEV: 'https://stats-dev.humanbrainproject.eu/'
       MATOMO_ID_PROD: '12'
       MATOMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+
       SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v1_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v1_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0'
+
 
     steps:
     - uses: actions/checkout@v2
@@ -24,26 +31,29 @@ jobs:
 
         echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         
+        echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
+        echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
+
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
         then
           echo "Either master, using prod env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
         elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either staging, using staging env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
           echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
-          echo "Using dev env..."
-          echo "MATOMO_URL=${{ env.MATOMO_URL_DEV }}" >> $GITHUB_ENV
-          echo "MATOMO_ID=${{ env.MATOMO_ID_DEV }}" >> $GITHUB_ENV
-          echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          if [[ "$GITHUB_REF" == *hotfix* ]]
+          then
+            echo "Hotfix branch, using prod env..."
+            echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
+          else
+            echo "Using dev env..."
+            echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          fi
         fi
 
-    - name: 'Set version variable'
+    - name: 'Set version variable & expmt feature flag'
       run: |
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
@@ -52,7 +62,9 @@ jobs:
         else
           echo "Using git hash"
           VERSION=$(git rev-parse --short HEAD)
+          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
         fi
+        echo "Setting VERSION: $VERSION"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: 'Build docker image'
       run: |
@@ -63,6 +75,7 @@ jobs:
           --build-arg MATOMO_URL=$MATOMO_URL \
           --build-arg MATOMO_ID=$MATOMO_ID \
           --build-arg BS_REST_URL=$BS_REST_URL \
+          --build-arg EXPERIMENTAL_FEATURE_FLAG=$EXPERIMENTAL_FEATURE_FLAG \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
@@ -83,7 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_API_ROOT: https://api.github.com/repos/fzj-inm1-bda/siibra-explorer
-      
+      OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
+
     needs: build-docker-img
     steps:
       - uses: actions/checkout@v2
@@ -107,13 +121,13 @@ jobs:
             echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_PROD_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-viewer" >> $GITHUB_ENV
-            echo "PATH_POSTFIX=" >> $GITHUB_ENV
+            echo "ROUTE_HOST=siibra-explorer.apps.hbp.eu" >> $GITHUB_ENV
             echo "Deploy on prod cluster..."
           else
             echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
             echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
             echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
-            echo "PATH_POSTFIX=-dev" >> $GITHUB_ENV
+            echo "ROUTE_HOST=siibra-explorer.apps-dev.hbp.eu" >> $GITHUB_ENV
             echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
             echo "Deploy on dev cluster..."
           fi
@@ -122,39 +136,35 @@ jobs:
           oc login $OKD_URL --token=$OKD_SECRET
           oc project $OKD_PROJECT
 
-          # sanitized branchname == remove _ / and lowercase everything
-          SANITIZED_BRANCH_NAME=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-          echo "SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME" >> $GITHUB_ENV
-          echo "Working branch name: $BRANCH_NAME, sanitized branch name: $SANITIZED_BRANCH_NAME"
+          # DEPLOY_ID == remove _ / and lowercase everything from branch
+          DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+          
+          ROUTE_PATH=/$DEPLOY_ID
+          echo "ROUTE_PATH=$ROUTE_PATH" >> $GITHUB_ENV
+
+          echo "Working branch name: $BRANCH_NAME, deploy_id: $DEPLOY_ID"
 
           # check if the deploy already exist
-          if oc get dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME; then
+          if oc get dc ${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID; then
             # trigger redeploy if deployconfig exists already
-            echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME already exist, redeploy..."
-            oc rollout latest dc/siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME
+            echo "dc ${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID already exist, redeploy..."
+            oc rollout latest dc/${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID
           else 
             # create new app if deployconfig does not yet exist
-            echo "dc siibra-explorer-branch-deploy-$SANITIZED_BRANCH_NAME does not yet exist, create new app..."
-            oc new-app --template siibra-explorer-branch-deploy \
+            echo "dc ${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID does not yet exist, create new app..."
+            oc new-app --template ${{ env.OC_TEMPLATE_NAME }} \
               -p BRANCH_NAME=$BRANCH_NAME \
-              -p SANITIZED_BRANCH_NAME=$SANITIZED_BRANCH_NAME \
-              -p PATH_POSTFIX=$PATH_POSTFIX \
+              -p DEPLOY_ID=$DEPLOY_ID \
+              -p ROUTE_HOST=$ROUTE_HOST \
+              -p ROUTE_PATH=$ROUTE_PATH \
               -p BUILD_TEXT=$BUILD_TEXT
           fi
       - name: 'Update status badge'
         if: success()
         run: |
 
-          if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
-          then
-            DEPLOY_URL="https://siibra-explorer.apps.hbp.eu/master"
-          elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
-          then
-            DEPLOY_URL="https://siibra-explorer.apps.hbp.eu/staging"
-          else
-            DEPLOY_URL="https://siibra-explorer.apps-dev.hbp.eu/${{ env.SANITIZED_BRANCH_NAME }}"
-          fi
-
+          DEPLOY_URL=https://$ROUTE_HOST$ROUTE_PATH
           curl -v \
             -X POST \
             -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -163,5 +173,7 @@ jobs:
             -d '{
               "target_url":"'$DEPLOY_URL'",
               "name": "Deployed at OKD",
+              "description": "Deployed at OKD",
+              "context": "[ebrains-okd-deploy] Deployed at OKD",
               "state": "success"
             }'

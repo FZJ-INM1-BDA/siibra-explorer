@@ -2,6 +2,9 @@ import { Component } from "@angular/core";
 import { PureContantService } from "src/util";
 import { Subscription } from "rxjs";
 
+const imageDark = 'assets/logo/ebrains-logo-dark.svg'
+const imageLight = 'assets/logo/ebrains-logo-light.svg'
+
 @Component({
   selector : 'logo-container',
   templateUrl : './logoContainer.template.html',
@@ -12,10 +15,10 @@ import { Subscription } from "rxjs";
 
 export class LogoContainer {
   // only used to define size
-  public imgSrc = `${this.pureConstantService.backendUrl}logo`
+  public imgSrc = imageDark
   
   public containerStyle = {
-    backgroundImage: `url('${this.pureConstantService.backendUrl}logo')`
+    backgroundImage: `url('${this.imgSrc}')`
   }
 
   private subscriptions: Subscription[] = []
@@ -25,7 +28,7 @@ export class LogoContainer {
     this.subscriptions.push(
       pureConstantService.darktheme$.subscribe(flag => {
         this.containerStyle = {
-          backgroundImage: `url('${this.pureConstantService.backendUrl}logo${!!flag ? '?darktheme=true' : ''}')`
+          backgroundImage: `url('${flag ? imageLight : imageDark}')`
         }
       })
     )

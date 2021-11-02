@@ -6,7 +6,7 @@ import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewreStateRe
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../../service";
-import { TBSDEtail, TBSSummary, SIIBRA_FEATURE_KEY, TContactPoint, TElectrode } from '../type'
+import { SIIBRA_FEATURE_KEY, TContactPoint, TElectrode, TBSIeegSessionDetail } from '../type'
 import { ARIA_LABELS, CONST } from 'common/constants'
 
 @Component({
@@ -24,7 +24,7 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
 
   private featureId: string
 
-  private results: (TBSSummary & TBSDEtail)[] = []
+  private results: TBSIeegSessionDetail[] = []
   constructor(
     private store: Store<any>,
     svc: BsFeatureService,
@@ -40,7 +40,7 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     )
   }
 
-  public results$: Observable<(TBSSummary & TBSDEtail)[]>  = this.region$.pipe(
+  public results$: Observable<TBSIeegSessionDetail[]>  = this.region$.pipe(
     switchMap(() => this.getFeatureInstancesList(SIIBRA_FEATURE_KEY).pipe(
       switchMap(arr => forkJoin(arr.filter(it => {
         if (!this.featureId) return true
@@ -109,23 +109,21 @@ export class BsFeatureIEEGCmp extends BsRegionInputBase implements OnDestroy{
     }[]
 
     for (const detail of this.results) {
-      for (const subjectKey in detail.electrodes){
-        const electrodes = detail.electrodes[subjectKey]
-        for (const electrodId in electrodes) {
-          const electrode = electrodes[electrodId]
-          if (!electrode.inRoi) continue
-          
-          for (const cpKey in electrode.contact_points) {
-            const cp = electrode.contact_points[cpKey]
-            lms.push({
-              "@id": `${detail.name}:${subjectKey}#${cpKey}`,
-              id: `${detail.name}:${subjectKey}#${cpKey}`,
-              name: `${detail.name}:${subjectKey}#${cpKey}`,
-              position: cp.location,
-              color: cp.inRoi ? [255, 100, 100]: [255, 255, 255],
-              showInSliceView: this.openElectrodeSet.has(electrode)
-            })
-          }
+      const subjectKey = detail.sub_id
+      for (const electrodeId in detail.electrodes){
+        const electrode = detail.electrodes[electrodeId]
+        if (!electrode.inRoi) continue
+        for (const cpKey in electrode.contact_points) {
+          const cp = electrode.contact_points[cpKey]
+          const id=`${detail.name}:${subjectKey}#${cpKey}`
+          lms.push({
+            "@id": id,
+            id: id,
+            name: id,
+            position: cp.location,
+            color: cp.inRoi ? [255, 100, 100]: [255, 255, 255],
+            showInSliceView: this.openElectrodeSet.has(electrode)
+          })
         }
       }
     }

@@ -18,6 +18,7 @@ import {
   parseSearchParamForTemplateParcellationRegion,
   encodeId,
 } from './parseRouteToTmplParcReg'
+import { spaceMiscInfoMap } from "src/util/pureConstant.service"
 
 const endcodePath = (key: string, val: string|string[]) =>
   key[0] === '?'
@@ -32,6 +33,17 @@ const decodePath = (path: string) => {
     key: re[1],
     val: re[2].split('::').map(v => decodeURI(v))
   }
+}
+
+export const DEFAULT_NAV = {
+  orientation: [0, 0, 0, 1],
+  perspectiveOrientation: [
+    0.3140767216682434,
+    -0.7418519854545593,
+    0.4988985061645508,
+    -0.3195493221282959
+  ],
+  position: [0, 0, 0],
 }
 
 export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (arg: string) => void) => {
@@ -78,7 +90,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
 
   // nav obj is almost always defined, regardless if standaloneVolume or not
   const cViewerState = returnObj['@'] && returnObj['@'][0]
-  let parsedNavObj = {}
+  let parsedNavObj: any
   if (cViewerState) {
     try {
       const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
@@ -171,7 +183,14 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
     returnState['viewerState']['regionsSelected'] = regionsSelected
     returnState['viewerState']['templateSelected'] = templateSelected
 
-    returnState['viewerState']['navigation'] = parsedNavObj
+    if (templateSelected) {
+      const { scale } = spaceMiscInfoMap.get(templateSelected.id) || { scale: 1 }
+      returnState['viewerState']['navigation'] = parsedNavObj || ({
+        ...DEFAULT_NAV,
+        zoom: 350000 * scale,
+        perspectiveZoom: 1922235.5293810747 * scale
+      })
+    }
   } catch (e) {
     // if error, show error on UI?
     warnCb(`parse template, parc, region error`, e)

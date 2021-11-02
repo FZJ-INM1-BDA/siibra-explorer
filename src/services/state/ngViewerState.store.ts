@@ -22,20 +22,13 @@ import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
-import {
-  ngViewerActionToggleMax,
-  ngViewerActionClearView,
-  ngViewerActionSetPanelOrder,
-  ngViewerActionSwitchPanelMode,
-  ngViewerActionForceShowSegment,
-  ngViewerActionNehubaReady,
-  ngViewerToggleCutView
-} from './ngViewerState/actions';
+import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady, ngViewerToggleCutView, ngViewerActionCycleViews } from './ngViewerState/actions';
 import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
 import { TUserRouteError } from 'src/auth/auth.service';
 import * as ngViewerActions from './ngViewerState/actions';
+import { viewerStateSelectedTemplateSelector } from './viewerState.store.helper';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -195,9 +188,6 @@ export class NgViewerUseEffect implements OnDestroy {
   public cycleViews$: Observable<any>
 
   @Effect()
-  public spacebarListener$: Observable<any>
-
-  @Effect()
   public removeAllNonBaseLayers$: Observable<any>
 
   private panelOrder$: Observable<string>
@@ -277,7 +267,7 @@ export class NgViewerUseEffect implements OnDestroy {
     )
 
     this.cycleViews$ = this.actions.pipe(
-      ofType(ACTION_TYPES.CYCLE_VIEWS),
+      ofType(ngViewerActionCycleViews.type),
       withLatestFrom(this.panelOrder$),
       map(([_, panelOrder]) => {
         return ngViewerActionSetPanelOrder({
@@ -373,21 +363,12 @@ export class NgViewerUseEffect implements OnDestroy {
       })),
     )
 
-    this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
-      filter((ev: KeyboardEvent) => ev.key === ' '),
-      withLatestFrom(this.panelMode$),
-      filter(([_ , panelMode]) => panelMode === PANELS.SINGLE_PANEL),
-      mapTo({
-        type: ACTION_TYPES.CYCLE_VIEWS,
-      }),
-    )
-
     /**
      * simplify with layer browser
      */
     const baseNgLayerName$ = this.store$.pipe(
-      select('viewerState'),
-      select('templateSelected'),
+      select(viewerStateSelectedTemplateSelector),
+      
       map(templateSelected => {
         if (!templateSelected) { return [] }
 
@@ -477,7 +458,6 @@ export class NgViewerUseEffect implements OnDestroy {
 export { INgLayerInterface } 
 
 const ACTION_TYPES = {
-  CYCLE_VIEWS: 'CYCLE_VIEWS',
 
   REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,
 }
