@@ -21,6 +21,10 @@ export const ngViewerActionToggleMax = createAction(
   props<{ payload: { index: number } }>()
 )
 
+export const ngViewerToggleCutView = createAction(`[ngViewerAction] toggle cut view`,
+  props<{ payload: { index: number } }>()
+)
+
 export const ngViewerActionSetPanelOrder = createAction(
   `[ngViewerAction] setPanelOrder`,
   props<{ payload: { panelOrder: string } }>()

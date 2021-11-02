@@ -63,6 +63,23 @@
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
     </ng-container>
   </layout-single-panel>
+  <layout-cut-panel
+    *ngSwitchCase="supportedPanelModes[4]"
+    class="d-block w-100 h-100">
+    <div class="w-100 h-100" cell-i>
+      <ng-content *ngTemplateOutlet="celli"></ng-content>
+    </div>
+    <div class="w-100 h-100" cell-ii>
+      <ng-content *ngTemplateOutlet="cutcontrol"></ng-content>
+      <ng-content *ngTemplateOutlet="cellii"></ng-content>
+    </div>
+    <div class="w-100 h-100" cell-iii>
+      <ng-content *ngTemplateOutlet="celliii"></ng-content>
+    </div>
+    <div class="w-100 h-100" cell-iv>
+      <ng-content *ngTemplateOutlet="celliv"></ng-content>
+    </div>
+  </layout-cut-panel>
   <div *ngSwitchDefault>
     A panel mode which I have never seen before ...
   </div>
@@ -79,4 +96,7 @@
 </ng-template>
 <ng-template #celliv>
   <ng-content select="[cell-iv]"></ng-content>
+</ng-template>
+<ng-template #cutcontrol>
+  <ng-content select="[cut-control]"></ng-content>
 </ng-template>

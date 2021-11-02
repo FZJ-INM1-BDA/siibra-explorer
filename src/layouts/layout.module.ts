@@ -9,6 +9,7 @@ import { FourPanelLayout } from "./layouts/fourPanel/fourPanel.component";
 import { HorizontalOneThree } from "./layouts/h13/h13.component";
 import { SinglePanel } from "./layouts/single/single.component";
 import { VerticalOneThree } from "./layouts/v13/v13.component";
+import {CutPanelLayout} from "src/layouts/layouts/cut/cutPanel.component";
 
 @NgModule({
   imports : [
@@ -25,6 +26,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     HorizontalOneThree,
     SinglePanel,
     VerticalOneThree,
+    CutPanelLayout,
   ],
   exports : [
     BrowserAnimationsModule,
@@ -35,6 +37,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     HorizontalOneThree,
     SinglePanel,
     VerticalOneThree,
+    CutPanelLayout,
   ],
 })
 

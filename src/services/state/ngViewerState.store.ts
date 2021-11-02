@@ -1,7 +1,20 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, combineLatest, fromEvent, Subscription, of } from 'rxjs';
-import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
+import {Effect, Actions, ofType, createEffect} from '@ngrx/effects';
+import {
+  withLatestFrom,
+  map,
+  distinctUntilChanged,
+  scan,
+  shareReplay,
+  filter,
+  mapTo,
+  debounceTime,
+  catchError,
+  skip,
+  throttleTime,
+  tap, concatMap, mergeMap
+} from 'rxjs/operators';
 import { getNgIds } from 'src/util/fn';
 import { Action, select, Store, createReducer, on } from '@ngrx/store'
 import { CYCLE_PANEL_MESSAGE } from 'src/util/constants';
@@ -9,11 +22,12 @@ import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
-import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady, ngViewerActionCycleViews } from './ngViewerState/actions';
+import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady, ngViewerToggleCutView, ngViewerActionCycleViews } from './ngViewerState/actions';
 import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
 import { TUserRouteError } from 'src/auth/auth.service';
+import * as ngViewerActions from './ngViewerState/actions';
 import { viewerStateSelectedTemplateSelector } from './viewerState.store.helper';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
@@ -406,6 +420,34 @@ export class NgViewerUseEffect implements OnDestroy {
     )
   }
 
+  toggleCutView$ = createEffect(() => this.actions.pipe(
+    ofType(ngViewerActions.ngViewerToggleCutView),
+    concatMap(action => of(action).pipe(withLatestFrom(
+      combineLatest([
+        this.panelOrder$,
+        this.panelMode$,
+      ]),
+    ))),
+    // filter(([_action, [_panelOrder, panelMode]]) => panelMode !== PANELS.CUT_VIEW),
+    mergeMap(([ action, [ panelOrder, panelMode ] ]) => {
+      const index = action.payload.index
+      const newPanelOrder = panelMode === PANELS.CUT_VIEW? '0123' :
+        `${index}3${index === 0? '12' : index === 1? '02' : '01'}`
+
+      return [
+        ngViewerActionSetPanelOrder({
+          payload: { panelOrder: newPanelOrder },
+        }),
+        ngViewerActionSwitchPanelMode({
+          payload: {
+            panelMode: panelMode === PANELS.CUT_VIEW
+              ? PANELS.FOUR_PANEL : PANELS.CUT_VIEW,
+          },
+        })
+      ]
+    }),
+  ))
+
   public ngOnDestroy() {
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
@@ -425,6 +467,7 @@ export const SUPPORTED_PANEL_MODES = [
   PANELS.H_ONE_THREE,
   PANELS.V_ONE_THREE,
   PANELS.SINGLE_PANEL,
+  PANELS.CUT_VIEW,
 ]
 
 export const NG_VIEWER_ACTION_TYPES = ACTION_TYPES
