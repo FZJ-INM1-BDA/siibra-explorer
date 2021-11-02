@@ -156,6 +156,7 @@ export class ViewerCtrlCmp{
     const visibleParcLayers = ((window as any).viewer.layerManager.managedLayers)
       .slice(1)
       .filter(({ visible }) => visible)
+      .filter(({initialSpecification}) => !initialSpecification.type || initialSpecification.type !== 'annotation')
       .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
 
     if (this.flagDelin) {
