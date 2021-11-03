@@ -1,6 +1,7 @@
 export const environment = {
 
-  VERSION: 'unspecificied hash',
+  GIT_HASH: 'unknown hash',
+  VERSION: 'unknown version',
   PRODUCTION: true,
   BACKEND_URL: null,
   DATASET_PREVIEW_URL: 'https://hbp-kg-dataset-previewer.apps.hbp.eu/v2',

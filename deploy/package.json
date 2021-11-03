@@ -20,7 +20,7 @@
     "express-session": "^1.15.6",
     "got": "^10.5.5",
     "hbp-seafile": "^0.2.0",
-    "helmet-csp": "^2.8.0",
+    "helmet-csp": "^3.4.0",
     "lru-cache": "^5.1.1",
     "memorystore": "^1.6.1",
     "nomiseco": "0.0.2",

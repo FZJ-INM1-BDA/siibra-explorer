@@ -36,7 +36,9 @@ const getFile = async name => {
 }
 
 const hardCodedMap = new Map([
+  ['bigbrainGreyWhite', '#/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..gIW~.10AwC.B1KK~..1LSm'],
   ['whs4', '#/a:minds:core:parcellationatlas:v1.0.0:522b368e-49a3-49fa-88d3-0870a307974a/t:minds:core:referencespace:v1.0.0:d5717c4a-0fa1-46e6-918c-b8003069ade8/p:minds:core:parcellationatlas:v1.0.0:ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..kxV..0.0.0..8Yu'],
+  ['allen2017', '#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..kxV..0.0.0..8Yu'],
   ['mebrains', '#/a:juelich:iav:atlas:v1.0.0:monkey/t:minds:core:referencespace:v1.0.0:MEBRAINS_T1.masked/p:minds:core:parcellationatlas:v1.0.0:mebrains-tmp-id/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..0.0.0..1LSm']
 ])
 
