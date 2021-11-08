@@ -1,7 +1,7 @@
 import { Component, HostBinding, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, of, Subscription } from "rxjs";
-import { filter, map, pairwise, withLatestFrom } from "rxjs/operators";
+import {filter, map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
@@ -10,6 +10,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import {PureContantService} from "src/util";
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -26,6 +27,8 @@ export class ViewerCtrlCmp{
 
   @HostBinding('attr.darktheme')
   darktheme = false
+
+  private selectedTemplateId: string
 
   private _flagDelin = true
   get flagDelin(){
@@ -71,6 +74,7 @@ export class ViewerCtrlCmp{
   constructor(
     private store$: Store<any>,
     formBuilder: FormBuilder,
+    private pureConstantService: PureContantService,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,
   ){
 
@@ -97,6 +101,7 @@ export class ViewerCtrlCmp{
       this.store$.pipe(
         select(viewerStateSelectedTemplatePureSelector)
       ).subscribe(tmpl => {
+        this.selectedTemplateId = tmpl['@id']
         const { useTheme } = tmpl || {}
         this.darktheme = useTheme === 'dark'
       }),
@@ -156,7 +161,7 @@ export class ViewerCtrlCmp{
     const visibleParcLayers = ((window as any).viewer.layerManager.managedLayers)
       .slice(1)
       .filter(({ visible }) => visible)
-      .filter(({initialSpecification}) => !initialSpecification.type || initialSpecification.type !== 'annotation')
+      .filter(l => Object.keys(this.pureConstantService.ngLayerObj[this.selectedTemplateId]).includes(l.name))
       .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
 
     if (this.flagDelin) {
