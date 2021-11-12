@@ -27,10 +27,9 @@
     <!-- explore -->
     <ng-container>
 
-      <a *ngFor="let kgRef of (urls || [])"
+      <a *ngFor="let kgRef of (doiUrls || [])"
         [href]="kgRef.doi | doiParserPipe"
         class="color-inherit"
-        mat-icon-button
         [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
         target="_blank">
         <iav-dynamic-mat-button
