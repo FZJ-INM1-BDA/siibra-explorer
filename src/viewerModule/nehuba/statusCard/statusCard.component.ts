@@ -57,8 +57,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
     order: 6,
   }
 
-  public saneUrlDeprecated = `Custom URL is going away. New custom URLs can no longer be created. Custom URLs you generated in the past will continue to work.`
-
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
   public SHARE_CUSTOM_URL_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL

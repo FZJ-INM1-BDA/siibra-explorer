@@ -157,8 +157,9 @@
     <mat-list-item
       [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
       [attr.tab-index]="10"
-      [matTooltip]="saneUrlDeprecated"
-      class="text-muted">
+      (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_ARIA_LABEL })"
+      [matTooltip]="SHARE_CUSTOM_URL_ARIA_LABEL"
+      >
       <mat-icon
         class="mr-4"
         fontSet="fas"
@@ -212,7 +213,7 @@
     </div>
 
     <iav-sane-url iav-state-aggregator
-      [stateTobeSaved]="stateAggregator.jsonifiedSstate$ | async"
+      [stateTobeSaved]="stateAggregator.jsonifiedState$ | async"
       #stateAggregator="iavStateAggregator">
     </iav-sane-url>
   </div>
