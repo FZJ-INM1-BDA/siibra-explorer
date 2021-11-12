@@ -56,6 +56,11 @@ export class GenericInfoCmp extends BsRegionInputBase implements OnChanges, Afte
     doi: string
   }[]
 
+  public doiUrls: {
+    cite: string
+    doi: string
+  }[]
+
   template: TemplateRef<any>
   viewref: ViewRef
 
@@ -72,6 +77,7 @@ export class GenericInfoCmp extends BsRegionInputBase implements OnChanges, Afte
       this.description = description
       this.name = name
       this.urls = urls
+      this.doiUrls = this.urls.filter(d => !!d.doi)
       this.useClassicUi = useClassicUi
       if (dataType) this.dataType = dataType
       if (typeof isGdprProtected !== 'undefined') this.isGdprProtected = isGdprProtected
