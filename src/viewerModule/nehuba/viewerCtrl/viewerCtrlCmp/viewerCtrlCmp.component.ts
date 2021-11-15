@@ -165,7 +165,6 @@ export class ViewerCtrlCmp{
     const templateLayers = this.pureConstantService.getNehubaConfigFromAtlasTmplIds(this.selectedAtlasId, this.selectedTemplateId)
     const visibleParcLayers = templateLayers?
       ((window as any).viewer.layerManager.managedLayers)
-        .slice(1)
         .filter(({ visible }) => visible)
         .filter(l => Object.keys(templateLayers).includes(l.name))
         .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
