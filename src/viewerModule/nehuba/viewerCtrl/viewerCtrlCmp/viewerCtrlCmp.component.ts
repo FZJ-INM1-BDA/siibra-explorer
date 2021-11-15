@@ -101,7 +101,7 @@ export class ViewerCtrlCmp{
     this.sub.push(
       this.store$.select(viewerStateGetSelectedAtlas)
         .pipe(filter(a => !!a))
-        .subscribe(sa => this.selectedAtlasId = sa.id),
+        .subscribe(sa => this.selectedAtlasId = sa['@id']),
       this.store$.pipe(
         select(viewerStateSelectedTemplatePureSelector)
       ).subscribe(tmpl => {
@@ -167,7 +167,7 @@ export class ViewerCtrlCmp{
       .filter(({ visible }) => visible)
 
       .filter(l => {
-        const layers = this.pureConstantService.getNgLayers(this.selectedTemplateId)
+        const layers = this.pureConstantService.getNehubaConfigFromTemplateId(this.selectedAtlasId, this.selectedTemplateId)
         return layers && Object.keys(layers).includes(l.name)
       })
       .filter(layer => !this.auxMeshesNamesSet.has(layer.name))

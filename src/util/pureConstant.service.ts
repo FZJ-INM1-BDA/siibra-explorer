@@ -59,9 +59,11 @@ type TIAVAtlas = {
 type NgLayerObj = {
   [key: string]: {
     [key: string]: {
-      source: string
-      transform: number[][]
-      type: 'segmentation' | 'image'
+      [key: string]: {
+        source: string
+        transform: number[][]
+        type: 'segmentation' | 'image'
+      }
     }
   }
 }
@@ -525,11 +527,13 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     shareReplay(1)
   )
 
+  //ToDo improve the readability
   private ngLayerObj: NgLayerObj = {}
 
-  getNgLayers(templateId: string) {
-    return this.ngLayerObj && this.ngLayerObj[templateId]
-      ? this.ngLayerObj[templateId] : []
+  getNehubaConfigFromTemplateId(atlasId: string, templateId: string) {
+    const atlasLayers = this.ngLayerObj[atlasId]
+    const templateLayers = atlasLayers && atlasLayers[templateId]
+    return templateLayers || {}
   }
 
   public initFetchTemplate$ = this.fetchedAtlases$.pipe(
@@ -537,6 +541,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       return forkJoin(
         atlases.map(atlas => this.getSpacesAndParc(atlas['@id']).pipe(
           switchMap(({ templateSpaces, parcellations }) => {
+            this.ngLayerObj[atlas["@id"]] = {}
             return forkJoin(
               templateSpaces.map(
                 tmpl => {
@@ -551,7 +556,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                       name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
                     })
                   }
-                  this.ngLayerObj[tmpl.id] = {}
+                  this.ngLayerObj[atlas["@id"]][tmpl.id] = {}
                   return tmpl.availableParcellations.map(
                     parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
                       tap(regions => {
@@ -574,7 +579,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                               const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                               region['ngId'] = ngId
                               region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                              this.ngLayerObj[tmpl.id][ngId] = {
+                              this.ngLayerObj[atlas["@id"]][tmpl.id][ngId] = {
                                 source: `precomputed://${dedicatedMap[0].url}`,
                                 type: "segmentation",
                                 transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
@@ -638,7 +643,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             const key = 'whole brain'
 
                             const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                            this.ngLayerObj[tmpl.id][ngIdKey] = {
+                            this.ngLayerObj[atlas["@id"]][tmpl.id][ngIdKey] = {
                               source: `precomputed://${vol.url}`,
                               type: "segmentation",
                               transform: vol.detail['neuroglancer/precomputed'].transform
@@ -655,7 +660,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             }]
                             for (const { key, mapIndex } of mapIndexKey) {
                               const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                              this.ngLayerObj[tmpl.id][ngIdKey] = {
+                              this.ngLayerObj[atlas["@id"]][tmpl.id][ngIdKey] = {
                                 source: `precomputed://${precomputedVols[mapIndex].url}`,
                                 type: "segmentation",
                                 transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
@@ -812,8 +817,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 }
               }
 
-              for (const key in (ngLayerObj[tmpl.id] || {})) {
-                initialLayers[key] = ngLayerObj[tmpl.id][key]
+              for (const key in (ngLayerObj[atlas["@id"]][tmpl.id] || {})) {
+                initialLayers[key] = ngLayerObj[atlas["@id"]][tmpl.id][key]
               }
 
               return {
