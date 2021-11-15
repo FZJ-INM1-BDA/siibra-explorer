@@ -162,15 +162,14 @@ export class ViewerCtrlCmp{
   }
 
   private toggleParcVsbl(){
-    const visibleParcLayers = ((window as any).viewer.layerManager.managedLayers)
-      .slice(1)
-      .filter(({ visible }) => visible)
-
-      .filter(l => {
-        const layers = this.pureConstantService.getNehubaConfigFromTemplateId(this.selectedAtlasId, this.selectedTemplateId)
-        return layers && Object.keys(layers).includes(l.name)
-      })
-      .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
+    const templateLayers = this.pureConstantService.getNehubaConfigFromAtlasTmplIds(this.selectedAtlasId, this.selectedTemplateId)
+    const visibleParcLayers = templateLayers?
+      ((window as any).viewer.layerManager.managedLayers)
+        .slice(1)
+        .filter(({ visible }) => visible)
+        .filter(l => Object.keys(templateLayers).includes(l.name))
+        .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
+      : []
 
     if (this.flagDelin) {
       for (const name of this.hiddenLayerNames) {

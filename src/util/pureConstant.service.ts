@@ -530,7 +530,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   //ToDo improve the readability
   private ngLayerObj: NgLayerObj = {}
 
-  getNehubaConfigFromTemplateId(atlasId: string, templateId: string) {
+  getNehubaConfigFromAtlasTmplIds(atlasId: string, templateId: string) {
     const atlasLayers = this.ngLayerObj[atlasId]
     const templateLayers = atlasLayers && atlasLayers[templateId]
     return templateLayers || {}
