@@ -7,7 +7,7 @@ import { ComponentsModule } from "src/components"
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState.store.helper"
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors"
 import { AngularMaterialModule } from "src/sharedModules"
-import { UtilModule } from "src/util"
+import {PureContantService, UtilModule} from "src/util"
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
 import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
@@ -44,6 +44,12 @@ describe('> viewerCtrlCmp.component.ts', () => {
           {
             provide: NEHUBA_INSTANCE_INJTKN,
             useValue: new BehaviorSubject(mockNehubaViewer)
+          },
+          {
+            provide: PureContantService,
+            useValue: {
+              backendUrl: `http://localhost:3000/`
+            }
           }
         ]
       }).compileComponents()

@@ -4,7 +4,7 @@ import { combineLatest, merge, Observable, of, Subscription } from "rxjs";
 import {filter, map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateCustomLandmarkSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
@@ -28,6 +28,7 @@ export class ViewerCtrlCmp{
   @HostBinding('attr.darktheme')
   darktheme = false
 
+  private selectedAtlasId: string
   private selectedTemplateId: string
 
   private _flagDelin = true
@@ -98,6 +99,9 @@ export class ViewerCtrlCmp{
     }
 
     this.sub.push(
+      this.store$.select(viewerStateGetSelectedAtlas)
+        .pipe(filter(a => !!a))
+        .subscribe(sa => this.selectedAtlasId = sa.id),
       this.store$.pipe(
         select(viewerStateSelectedTemplatePureSelector)
       ).subscribe(tmpl => {
@@ -161,7 +165,11 @@ export class ViewerCtrlCmp{
     const visibleParcLayers = ((window as any).viewer.layerManager.managedLayers)
       .slice(1)
       .filter(({ visible }) => visible)
-      .filter(l => Object.keys(this.pureConstantService.ngLayerObj[this.selectedTemplateId]).includes(l.name))
+
+      .filter(l => {
+        const layers = this.pureConstantService.getNgLayers(this.selectedTemplateId)
+        return layers && Object.keys(layers).includes(l.name)
+      })
       .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
 
     if (this.flagDelin) {
