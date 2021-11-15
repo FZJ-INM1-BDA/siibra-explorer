@@ -27,6 +27,8 @@ const passthrough = (_, __, next) => next()
 
 const acceptHtmlProg = /text\/html/i
 
+const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
+
 router.get('/:name', async (req, res) => {
   const { name } = req.params
   const { headers } = req
@@ -34,7 +36,6 @@ router.get('/:name', async (req, res) => {
   const redirectFlag = acceptHtmlProg.test(headers['accept'])
     
   try {
-    const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
 
     const json = await NotExactlyPromiseAny([
       ProxyStore.StaticGet(depStore, req, name),

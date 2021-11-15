@@ -697,8 +697,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
         // potentially overwriting existing name and desc...
         // maybe should show warning?
-        existingAnn.setName(json.name)
-        existingAnn.setDesc(json.desc)
+        existingAnn.name = json.name
+        existingAnn.desc = json.desc
         return existingAnn
       } else {
         const { id, name, desc } = json
@@ -708,8 +708,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     } else {
       const metadata = this.metadataMap.get(returnObj.id)
       if (returnObj && metadata) {
-        returnObj.setName(metadata?.name || null)
-        returnObj.setDesc(metadata?.desc || null)
+        returnObj.name = metadata?.name || null
+        returnObj.desc = metadata?.desc || null
         this.metadataMap.delete(returnObj.id)
       }
     }

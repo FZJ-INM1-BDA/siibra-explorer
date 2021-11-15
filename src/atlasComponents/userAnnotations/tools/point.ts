@@ -95,7 +95,7 @@ export class Point extends IAnnotationGeometry {
     this.x += x
     this.y += y
     this.z += z
-    this.updateSignal$.next(this.toString())
+    this.changed()
   }
 }
 
@@ -175,20 +175,6 @@ export class ToolPoint extends AbsToolClass<Point> implements IAnnotationTools, 
         }
       }),
     )
-  }
-
-  /**
-   * @description remove managed annotation via id
-   * @param id id of annotation
-   */
-  removeAnnotation(id: string) {
-    const idx = this.managedAnnotations.findIndex(ann => id === ann.id)
-    if (idx < 0){
-      throw new Error(`cannot find point idx ${idx}`)
-      return
-    }
-    this.managedAnnotations.splice(idx, 1)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   onMouseMoveRenderPreview(pos: [number, number, number]) {
