@@ -314,8 +314,8 @@ export const decodeCustomState = (fullPath: UrlTree) => {
   const returnObj: Record<string, string> = {}
   
   const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
-  ? fullPath.root.children['primary'].segments
-  : []
+    ? fullPath.root.children['primary'].segments
+    : []
   
   for (const f of pathFragments) {
     if (!verifyCustomState(f.path)) continue

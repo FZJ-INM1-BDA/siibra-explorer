@@ -26,8 +26,8 @@ export class RoutedAnnotationService{
       switchMap(
         saneUrlKey => {
           return saneUrlKey
-          ? saneUrlSvc.getKeyVal(saneUrlKey)
-          : NEVER
+            ? saneUrlSvc.getKeyVal(saneUrlKey)
+            : NEVER
         }
       )
     ).subscribe(val => {
