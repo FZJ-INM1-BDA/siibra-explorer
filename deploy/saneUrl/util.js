@@ -41,14 +41,25 @@ class ProxyStore {
 
 const NotExactlyPromiseAny = async arg => {
   const errs = []
-  for (const pr of arg) {
-    try{
-      return await pr
-    } catch (e) {
-      errs.push(e)
+  let resolvedFlag = false
+  return await new Promise((rs, rj) => {
+    let totalCounter = 0
+    for (const pr of arg) {
+      totalCounter ++
+      pr.then(val => {
+        if (!resolvedFlag) {
+          resolvedFlag = true
+          rs(val)
+        }
+      }).catch(e => {
+        errs.push(e)
+        totalCounter --
+        if (totalCounter <= 0) {
+          rj(new NotFoundError(errs))
+        }
+      })
     }
-  }
-  throw new NotFoundError(errs)
+  })
 }
 
 module.exports = {

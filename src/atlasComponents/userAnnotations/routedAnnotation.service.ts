@@ -20,9 +20,7 @@ export class RoutedAnnotationService{
     routerSvc.customRoute$.pipe(
       debounceTime(160),
       take(1),
-      map(obj => {
-        return obj[userAnnotationRouteKey]
-      }),
+      map(obj => obj[userAnnotationRouteKey]),
       switchMap(
         saneUrlKey => {
           return saneUrlKey

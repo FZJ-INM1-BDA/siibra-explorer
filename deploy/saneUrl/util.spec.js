@@ -188,7 +188,7 @@ describe('> saneUrl/util.js', () => {
       })
     })
     describe('> something resolves', () => {
-      it('> returns the first in list order', async () => {
+      it('> returns the first to resolve', async () => {
         try {
 
           const result = await NotExactlyPromiseAny([
@@ -196,7 +196,7 @@ describe('> saneUrl/util.js', () => {
             new Promise(rs => setTimeout(() => rs('hello world'), 100)),
             Promise.resolve('foo-bar')
           ])
-          assert(result == 'hello world', 'expecting first in list to resolve successfully')
+          assert(result == 'foo-bar', 'expecting first to resolve')
         } catch (e) {
           assert(false, 'not expecting to throw')
         }
