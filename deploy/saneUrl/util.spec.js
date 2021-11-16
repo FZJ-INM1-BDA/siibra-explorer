@@ -36,9 +36,7 @@ describe('> saneUrl/util.js', () => {
       describe('> if not hit', () => {
         const err = new NotFoundError('not found')
         beforeEach(() => {
-          store.get.returns(
-            Promise.reject(err)
-          )
+          store.get.rejects(err)
         })
         it('should throw same error', async () => {
           try{
@@ -181,7 +179,7 @@ describe('> saneUrl/util.js', () => {
               throw new Error(`not here`)
             })(),
             new Promise((rs, rj) => setTimeout(rj, 100)),
-            Promise.reject('uhoh')
+            new Promise((rs, rj) => rj('uhoh'))
           ])
           assert(false, 'expected to throw')
         } catch (e) {
@@ -194,7 +192,7 @@ describe('> saneUrl/util.js', () => {
         try {
 
           const result = await NotExactlyPromiseAny([
-            Promise.reject('uhoh'),
+            new Promise((rs, rj) => rj('uhoh')),
             new Promise(rs => setTimeout(() => rs('hello world'), 100)),
             Promise.resolve('foo-bar')
           ])
