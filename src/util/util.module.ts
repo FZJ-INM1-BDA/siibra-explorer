@@ -20,6 +20,7 @@ import { GetPropertyPipe } from "./pipes/getProperty.pipe";
 import { FilterArrayPipe } from "./pipes/filterArray.pipe";
 import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { GetFilenamePipe } from "./pipes/getFilename.pipe";
+import { MergeObjPipe } from "./mergeObj.pipe";
 
 @NgModule({
   imports:[
@@ -45,6 +46,7 @@ import { GetFilenamePipe } from "./pipes/getFilename.pipe";
     FilterArrayPipe,
     DoiParserPipe,
     GetFilenamePipe,
+    MergeObjPipe,
   ],
   exports: [
     FilterRowsByVisbilityPipe,
@@ -66,6 +68,7 @@ import { GetFilenamePipe } from "./pipes/getFilename.pipe";
     FilterArrayPipe,
     DoiParserPipe,
     GetFilenamePipe,
+    MergeObjPipe,
   ]
 })
 

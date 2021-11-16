@@ -1,7 +1,5 @@
 import { Component, Inject, OnDestroy, Optional } from "@angular/core";
-import { Store } from "@ngrx/store";
 import { ModularUserAnnotationToolService } from "../tools/service";
-import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS } from 'common/constants'
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, TContextMenu } from "src/util";
 import { TContextArg } from "src/viewerModule/viewer.interface";
@@ -31,7 +29,6 @@ export class AnnotationMode implements OnDestroy{
   private onDestroyCb: (() => void)[] = []
 
   constructor(
-    private store$: Store<any>,
     private modularToolSvc: ModularUserAnnotationToolService,
     snackbar: MatSnackBar,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
@@ -59,13 +56,6 @@ export class AnnotationMode implements OnDestroy{
       })
   }
 
-  exitAnnotationMode(){
-    this.store$.dispatch(
-      viewerStateSetViewerMode({
-        payload: null
-      })
-    )
-  }
   deselectTools(){
     this.modularToolSvc.deselectTools()
   }

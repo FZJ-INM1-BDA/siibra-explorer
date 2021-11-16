@@ -306,6 +306,34 @@ export const cvtStateToHashedRoutes = (state): string => {
     : `${routesArr.join('/')}?${searchParam.toString()}`
 }
 
+export const verifyCustomState = (key: string) => {
+  return /^x-/.test(key)
+}
+
+export const decodeCustomState = (fullPath: UrlTree) => {
+  const returnObj: Record<string, string> = {}
+  
+  const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
+  ? fullPath.root.children['primary'].segments
+  : []
+  
+  for (const f of pathFragments) {
+    if (!verifyCustomState(f.path)) continue
+    const { key, val } = decodePath(f.path) || {}
+    if (!key || !val) continue
+    returnObj[key] = val[0]
+  }
+  return returnObj
+}
+
+export const encodeCustomState = (key: string, value: string) => {
+  if (!verifyCustomState(key)) {
+    throw new Error(`custom state must start with x-`)
+  }
+  if (!value) return null
+  return endcodePath(key, value)
+}
+
 @Component({
   template: ''
 })

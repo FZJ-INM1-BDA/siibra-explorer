@@ -3,6 +3,7 @@ import { discardPeriodicTasks, fakeAsync, TestBed, tick } from "@angular/core/te
 import { Router } from "@angular/router"
 import { RouterTestingModule } from '@angular/router/testing'
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
+import { cold } from "jasmine-marbles"
 import { of } from "rxjs"
 import { PureContantService } from "src/util"
 import { RouterService } from "./router.service"
@@ -289,6 +290,115 @@ describe('> router.service.ts', () => {
           }))
         })
       })
+    })
+
+    describe('> customRoute$', () => {
+      let decodeCustomStateSpy: jasmine.Spy
+      beforeEach(() => {
+        decodeCustomStateSpy = jasmine.createSpy('decodeCustomState')
+        spyOnProperty(util, 'decodeCustomState').and.returnValue(decodeCustomStateSpy)
+
+        router = TestBed.inject(Router)
+      })
+
+      afterEach(() => {
+        decodeCustomStateSpy.calls.reset()
+      })
+      
+      it('> emits return record from decodeCustomState', fakeAsync(() => {
+        const value = {
+          'x-foo': 'bar'
+        }
+        decodeCustomStateSpy.and.returnValue(value)
+        const rService = TestBed.inject(RouterService)
+        router.navigate(['foo'])
+        tick(320)
+        
+        expect(rService.customRoute$).toBeObservable(
+          cold('a', {
+            a: {
+              'x-foo': 'bar'
+            }
+          })
+        )
+        discardPeriodicTasks()
+      }))
+      it('> merges observable from _customRoutes$', fakeAsync(() => {
+        decodeCustomStateSpy.and.returnValue({})
+        const rService = TestBed.inject(RouterService)
+        rService.setCustomRoute('x-fizz', 'buzz')
+        tick(320)
+        
+        expect(rService.customRoute$).toBeObservable(
+          cold('(ba)', {
+            a: {
+              'x-fizz': 'buzz'
+            },
+            b: {}
+          })
+        )
+        discardPeriodicTasks()
+      }))
+
+      it('> merges from both sources', fakeAsync(() => {
+        const value = {
+          'x-foo': 'bar'
+        }
+        decodeCustomStateSpy.and.returnValue(value)
+        const rService = TestBed.inject(RouterService)
+        rService.setCustomRoute('x-fizz', 'buzz')
+        tick(320)
+        
+        expect(rService.customRoute$).toBeObservable(
+          cold('(ba)', {
+            a: {
+              'x-fizz': 'buzz',
+              'x-foo': 'bar'
+            },
+            b: {
+              'x-foo': 'bar'
+            }
+          })
+        )
+        discardPeriodicTasks()
+      }))
+
+      it('> subsequent emits overwrites', fakeAsync(() => {
+        decodeCustomStateSpy.and.returnValue({})
+        const rService = TestBed.inject(RouterService)
+        spyOn(router, 'navigateByUrl').and.callFake((() => {
+          console.log('navigate by url')
+        }) as any)
+
+        const customRouteSpy = jasmine.createSpy('customRouteSpy')
+        rService.customRoute$.subscribe(customRouteSpy)
+        
+        rService.setCustomRoute('x-fizz', 'buzz')
+        tick(20)
+        rService.setCustomRoute('x-foo', 'bar')
+        tick(20)
+        rService.setCustomRoute('x-foo', null)
+
+        tick(320)
+
+        const expectedCalls = {
+          z: {
+            'x-fizz': 'buzz',
+            'x-foo': null
+          },
+          a: {
+            'x-fizz': 'buzz',
+            'x-foo': 'bar'
+          },
+          b: {
+            'x-fizz': 'buzz'
+          }
+        }
+        for (const c in expectedCalls) {
+          expect(customRouteSpy).toHaveBeenCalledWith(expectedCalls[c])
+        }
+        discardPeriodicTasks()
+      }))
     })
   })
 })
