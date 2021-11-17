@@ -18,3 +18,4 @@ jobs:
         - destination_repo: ${{ secrets.GITLAB_MIRROR_EBRAINS_DEST }}
         - destination_branch: ${{ env.GITHUB_REF_NAME }}
         - destination_ssh_private_key: ${{ secrets.GITLAB_MIRROR_EBRAINS_SSH }}
+
