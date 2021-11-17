@@ -13,9 +13,9 @@ jobs:
     - uses: actions/checkout@v2
     - uses: wei/git-sync@v3
       with:
-        - source_repo: ${{ env.GITHUB_REPOSITORY }}
-        - source_branch: ${{ env.GITHUB_REF_NAME }}
-        - destination_repo: ${{ secrets.GITLAB_MIRROR_EBRAINS_DEST }}
-        - destination_branch: ${{ env.GITHUB_REF_NAME }}
-        - destination_ssh_private_key: ${{ secrets.GITLAB_MIRROR_EBRAINS_SSH }}
+        source_repo: ${{ env.GITHUB_REPOSITORY }}
+        source_branch: ${{ env.GITHUB_REF_NAME }}
+        destination_repo: ${{ secrets.GITLAB_MIRROR_EBRAINS_DEST }}
+        destination_branch: ${{ env.GITHUB_REF_NAME }}
+        destination_ssh_private_key: ${{ secrets.GITLAB_MIRROR_EBRAINS_SSH }}
 
