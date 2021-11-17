@@ -18,9 +18,8 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
   public abstract name: string
   public abstract iconClass: string
 
-  public abstract removeAnnotation(id: string): void
   public abstract managedAnnotations$: Subject<T[]>
-  protected abstract managedAnnotations: T[] = []
+  protected managedAnnotations: T[] = []
 
   abstract subs: Subscription[]
   protected space: TBaseAnnotationGeomtrySpec['space']
@@ -158,8 +157,24 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
   public addAnnotation(geom: T) {
     const found = this.managedAnnotations.find(ann => ann.id === geom.id)
     if (found) found.remove()
-    geom.remove = () => this.removeAnnotation(geom.id)
+    const sub = geom.updateSignal$.subscribe(() => {
+      this.managedAnnotations$.next(this.managedAnnotations)
+    })
+    geom.remove = () => {
+      this.removeAnnotation(geom)
+      sub.unsubscribe()
+    }
     this.managedAnnotations.push(geom)
+    this.managedAnnotations$.next(this.managedAnnotations)
+  }
+
+  public removeAnnotation(geom: T) {
+    const idx = this.managedAnnotations.findIndex(ann => ann.id === geom.id)
+    if (idx < 0) {
+      console.warn(`removeAnnotation error: cannot annotation with id: ${geom.id}`)
+      return
+    }
+    this.managedAnnotations.splice(idx, 1)
     this.managedAnnotations$.next(this.managedAnnotations)
   }
 }
@@ -276,8 +291,25 @@ export abstract class Highlightable {
 export abstract class IAnnotationGeometry extends Highlightable {
   public id: string
   
-  public name: string
-  public desc: string
+  private _name: string
+  set name(val: string) {
+    if (val === this._name) return
+    this._name = val
+    this.changed()
+  }
+  get name(): string {
+    return this._name
+  }
+
+  private _desc: string
+  set desc(val: string) {
+    if (val === this._desc) return
+    this._desc = val
+    this.changed()
+  }
+  get desc(): string {
+    return this._desc
+  }
 
   public space: TBaseAnnotationGeomtrySpec['space']
 
@@ -290,7 +322,13 @@ export abstract class IAnnotationGeometry extends Highlightable {
   public remove() {
     throw new Error(`The remove method needs to be overwritten by the tool manager`)
   }
-  public updateSignal$ = new Subject()
+
+  private _updateSignal$ = new Subject()
+
+  public updateSignal$ = this._updateSignal$.asObservable()
+  protected changed(){
+    this._updateSignal$.next(Date.now())
+  }
 
   constructor(spec?: TBaseAnnotationGeomtrySpec){
     super()
@@ -298,15 +336,6 @@ export abstract class IAnnotationGeometry extends Highlightable {
     this.space = spec?.space
     this.name = spec?.name
     this.desc = spec?.desc
-  }
-
-  setName(name: string) {
-    this.name = name
-    this.updateSignal$.next(this.toString())
-  }
-  setDesc(desc: string) {
-    this.desc = desc
-    this.updateSignal$.next(this.toString())
   }
 }
 

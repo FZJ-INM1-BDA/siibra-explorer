@@ -37,7 +37,7 @@ export class Polygon extends IAnnotationGeometry{
     this.edges = this.edges.filter(([ idx1, idx2 ]) => idx1 !== ptIdx && idx2 !== ptIdx)
     this.points.splice(ptIdx, 1)
 
-    this.sendUpdateSignal()
+    this.changed()
   }
 
   public addPoint(p: Point | {x: number, y: number, z: number}, linkTo?: Point): Point {
@@ -56,7 +56,7 @@ export class Polygon extends IAnnotationGeometry{
     if (!this.hasPoint(pointToBeAdded)) {
       this.points.push(pointToBeAdded)
       const sub = pointToBeAdded.updateSignal$.subscribe(
-        () => this.sendUpdateSignal()
+        () => this.changed()
       )
       this.ptWkMp.set(pointToBeAdded, {
         onremove: () => {
@@ -71,7 +71,7 @@ export class Polygon extends IAnnotationGeometry{
       ] as [number, number]
       this.edges.push(newEdge)
     }
-    this.sendUpdateSignal()
+    this.changed()
     return pointToBeAdded
   }
 
@@ -209,15 +209,11 @@ export class Polygon extends IAnnotationGeometry{
     this.edges = edges
   }
 
-  private sendUpdateSignal(){
-    this.updateSignal$.next(this.toString())
-  }
-
   public translate(x: number, y: number, z: number) {
     for (const p of this.points){
       p.translate(x, y, z)
     }
-    this.sendUpdateSignal()
+    this.changed()
   }
 }
 
@@ -307,7 +303,7 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
            * if edges < 3, discard poly
            */
           if (edges.length < 3) {
-            this.removeAnnotation(this.selectedPoly.id)
+            this.removeAnnotation(this.selectedPoly)
           }
         }
 
@@ -402,15 +398,6 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
         this.managedAnnotations$.next(this.managedAnnotations)
       }),
     )
-  }
-
-  removeAnnotation(id: string) {
-    const idx = this.managedAnnotations.findIndex(ann => ann.id === id)
-    if (idx < 0) {
-      return
-    }
-    this.managedAnnotations.splice(idx, 1)
-    this.managedAnnotations$.next(this.managedAnnotations)
   }
 
   ngOnDestroy(){

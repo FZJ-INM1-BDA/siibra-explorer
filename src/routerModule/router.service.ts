@@ -3,10 +3,12 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, filter, map, shareReplay, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
 import { generalApplyState } from "src/services/stateStore.helper";
 import { PureContantService } from "src/util";
-import { cvtStateToHashedRoutes, cvtFullRouteToState } from "./util";
+import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
+import { BehaviorSubject, combineLatest, merge, Observable } from 'rxjs'
+import { scan } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +18,21 @@ export class RouterService {
 
   private logError(...e: any[]) {
     console.log(...e)
+  }
+
+  private _customRoute$ = new BehaviorSubject<{
+    [key: string]: string
+  }>({})
+
+  public customRoute$: Observable<Record<string, any>>
+
+  setCustomRoute(key: string, state: string){
+    if (!verifyCustomState(key)) {
+      throw new Error(`custom state key must start with x- `)
+    }
+    this._customRoute$.next({
+      [key]: state
+    })
   }
 
   constructor(
@@ -38,6 +55,40 @@ export class RouterService {
       filter(flag => !!flag),
       take(1),
       shareReplay(1),
+    )
+
+    this.customRoute$ = ready$.pipe(
+      switchMapTo(
+        merge(
+          navEnd$.pipe(
+            map((ev: NavigationEnd) => {
+              const fullPath = ev.urlAfterRedirects
+              const customState = decodeCustomState(
+                router.parseUrl(fullPath)
+              )
+              return customState || {}
+            }),
+          ),
+          this._customRoute$
+        ).pipe(
+          scan<Record<string, string>>((acc, curr) => {
+            return {
+              ...acc,
+              ...curr
+            }
+          }, {}),
+          // TODO add obj eql distinctuntilchanged check
+          distinctUntilChanged((o, n) => {
+            if (Object.keys(o).length !== Object.keys(n).length) {
+              return false
+            }
+            for (const key in o) {
+              if (o[key] !== n[key]) return false
+            }
+            return true
+          }),
+        )
+      ),
     )
 
     ready$.pipe(
@@ -70,15 +121,28 @@ export class RouterService {
     // which may or many not be 
     ready$.pipe(
       switchMapTo(
-        store$.pipe(
-          debounceTime(160),
-          map(state => {
-            try {
-              return cvtStateToHashedRoutes(state)
-            } catch (e) {
-              this.logError(e)
-              return ``
+        combineLatest([
+          store$.pipe(
+            debounceTime(160),
+            map(state => {
+              try {
+                return cvtStateToHashedRoutes(state)
+              } catch (e) {
+                this.logError(e)
+                return ``
+              }
+            })
+          ),
+          this.customRoute$,
+        ]).pipe(
+          map(([ routePath, customPath ]) => {
+            let returnPath = routePath
+            for (const key in customPath) {
+              const customStatePath = encodeCustomState(key, customPath[key])
+              if (!customStatePath) continue
+              returnPath += `/${customStatePath}`
             }
+            return returnPath
           })
         )
       )
