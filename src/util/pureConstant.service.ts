@@ -56,17 +56,19 @@ type TIAVAtlas = {
   } & THasId)[]
 } & THasId
 
-type NgLayerObj = {
-  [key: string]: {
-    [key: string]: {
-      [key: string]: {
-        source: string
-        transform: number[][]
-        type: 'segmentation' | 'image'
-      }
-    }
-  }
-}
+type TNehubaConfig = Record<string, {
+  source: string
+  transform: number[][]
+  type: 'segmentation' | 'image'
+}>
+
+type TViewerConfig = TNehubaConfig
+
+/**
+ * key value pair of
+ * atlasId -> templateId -> viewerConfig
+ */
+type TAtlasTmplViewerConfig = Record<string, Record<string, TViewerConfig>>
 
 export const spaceMiscInfoMap = new Map([
   ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', {
@@ -527,11 +529,10 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     shareReplay(1)
   )
 
-  //ToDo improve the readability
-  private ngLayerObj: NgLayerObj = {}
+  private atlasTmplConfig: TAtlasTmplViewerConfig = {}
 
-  getNehubaConfigFromAtlasTmplIds(atlasId: string, templateId: string) {
-    const atlasLayers = this.ngLayerObj[atlasId]
+  async getViewerConfig(atlasId: string, templateId: string, parcId: string) {
+    const atlasLayers = this.atlasTmplConfig[atlasId]
     const templateLayers = atlasLayers && atlasLayers[templateId]
     return templateLayers || {}
   }
@@ -541,7 +542,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       return forkJoin(
         atlases.map(atlas => this.getSpacesAndParc(atlas['@id']).pipe(
           switchMap(({ templateSpaces, parcellations }) => {
-            this.ngLayerObj[atlas["@id"]] = {}
+            this.atlasTmplConfig[atlas["@id"]] = {}
             return forkJoin(
               templateSpaces.map(
                 tmpl => {
@@ -556,7 +557,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                       name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
                     })
                   }
-                  this.ngLayerObj[atlas["@id"]][tmpl.id] = {}
+                  this.atlasTmplConfig[atlas["@id"]][tmpl.id] = {}
                   return tmpl.availableParcellations.map(
                     parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
                       tap(regions => {
@@ -579,7 +580,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                               const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                               region['ngId'] = ngId
                               region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                              this.ngLayerObj[atlas["@id"]][tmpl.id][ngId] = {
+                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngId] = {
                                 source: `precomputed://${dedicatedMap[0].url}`,
                                 type: "segmentation",
                                 transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
@@ -643,7 +644,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             const key = 'whole brain'
 
                             const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                            this.ngLayerObj[atlas["@id"]][tmpl.id][ngIdKey] = {
+                            this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
                               source: `precomputed://${vol.url}`,
                               type: "segmentation",
                               transform: vol.detail['neuroglancer/precomputed'].transform
@@ -660,7 +661,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             }]
                             for (const { key, mapIndex } of mapIndexKey) {
                               const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                              this.ngLayerObj[atlas["@id"]][tmpl.id][ngIdKey] = {
+                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
                                 source: `precomputed://${precomputedVols[mapIndex].url}`,
                                 type: "segmentation",
                                 transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
@@ -681,7 +682,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 }
               ).reduce(flattenReducer, [])
             ).pipe(
-              mapTo({ templateSpaces, parcellations, ngLayerObj: this.ngLayerObj })
+              mapTo({ templateSpaces, parcellations, ngLayerObj: this.atlasTmplConfig })
             )
           }),
           map(({ templateSpaces, parcellations, ngLayerObj }) => {

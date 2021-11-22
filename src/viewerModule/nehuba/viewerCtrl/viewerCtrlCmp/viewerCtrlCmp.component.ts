@@ -72,6 +72,12 @@ export class ViewerCtrlCmp{
     select(selectorAuxMeshes),
   )
 
+  private nehubaInst: NehubaViewerUnit
+
+  get ngViewer() {
+    return this.nehubaInst?.nehubaViewer.ngviewer || (window as any).viewer
+  }
+
   constructor(
     private store$: Store<any>,
     formBuilder: FormBuilder,
@@ -88,11 +94,12 @@ export class ViewerCtrlCmp{
           this.customLandmarks$,
           this.nehubaInst$,
         ]).pipe(
-          filter(([_, neubaInst]) => !!neubaInst),
+          filter(([_, nehubaInst]) => !!nehubaInst),
         ).subscribe(([landmarks, nehubainst]) => {
           this.setOctantRemoval(landmarks.length === 0)
           nehubainst.updateUserLandmarks(landmarks)
-        })
+        }),
+        this.nehubaInst$.subscribe(nehubaInst => this.nehubaInst = nehubaInst)
       )
     } else {
       console.warn(`NEHUBA_INSTANCE_INJTKN not provided`)
@@ -161,32 +168,32 @@ export class ViewerCtrlCmp{
     )
   }
 
-  private toggleParcVsbl(){
-    const templateLayers = this.pureConstantService.getNehubaConfigFromAtlasTmplIds(this.selectedAtlasId, this.selectedTemplateId)
-    const visibleParcLayers = templateLayers?
-      ((window as any).viewer.layerManager.managedLayers)
-        .filter(({ visible }) => visible)
-        .filter(l => Object.keys(templateLayers).includes(l.name))
-        .filter(layer => !this.auxMeshesNamesSet.has(layer.name))
-      : []
+  private async toggleParcVsbl(){
+    const viewerConfig = await this.pureConstantService.getViewerConfig(this.selectedAtlasId, this.selectedTemplateId, null)
 
     if (this.flagDelin) {
       for (const name of this.hiddenLayerNames) {
-        const l = (window as any).viewer.layerManager.getLayerByName(name)
+        const l = this.ngViewer.layerManager.getLayerByName(name)
         l && l.setVisible(true)
       }
       this.hiddenLayerNames = []
     } else {
       this.hiddenLayerNames = []
-      for (const { name } of visibleParcLayers) {
-        const l = (window as any).viewer.layerManager.getLayerByName(name)
+      const segLayerNames: string[] = []
+      for (const layer of this.ngViewer.layerManager.managedLayers) {
+        if (layer.visible && layer.name in viewerConfig) {
+          segLayerNames.push(layer.name)
+        }
+      }
+      for (const name of segLayerNames) {
+        const l = this.ngViewer.layerManager.getLayerByName(name)
         l && l.setVisible(false)
         this.hiddenLayerNames.push( name )
       }
     }
-    
-    setTimeout(() => {
-      (window as any).viewer.display.scheduleRedraw()
+
+    requestAnimationFrame(() => {
+      this.ngViewer.display.scheduleRedraw()
     })
   }
 
