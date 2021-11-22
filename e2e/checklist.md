@@ -54,3 +54,4 @@
 - [ ] Waxholm
   - [ ] v4 are visible
   - [ ] on hover, show correct region name(s)
+  - [ ] whole mesh loads

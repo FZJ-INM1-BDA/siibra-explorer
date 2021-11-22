@@ -48,22 +48,26 @@ jobs:
 
     - name: 'Set version variable & expmt feature flag'
       run: |
-        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
-        then
-          echo "Either master or staging, using package.json"
-          VERSION=$(jq -r '.version' package.json)
-        else
-          echo "Using git hash"
-          VERSION=$(git rev-parse --short HEAD)
-          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
-        fi
+        GIT_HASH=$(git rev-parse --short HEAD)
+        echo "Setting GIT_HASH: $GIT_HASH"
+        echo "GIT_HASH=$GIT_HASH" >> $GITHUB_ENV
+
+        VERSION=$(jq -r '.version' package.json)
         echo "Setting VERSION: $VERSION"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
+        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        then
+          echo "prod/staging build, do not enable experimental features"
+        else
+          echo "dev bulid, enable experimental features"
+          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
+        fi
     - name: 'Build docker image'
       run: |
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
+          --build-arg GIT_HASH=$GIT_HASH \
           --build-arg VERSION=$VERSION \
           --build-arg MATOMO_URL=$MATOMO_URL \
           --build-arg MATOMO_ID=$MATOMO_ID \

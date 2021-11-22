@@ -1,26 +1,49 @@
-import { TestBed, async, fakeAsync, tick, flush } from '@angular/core/testing'
+import { TestBed, fakeAsync, tick, flush } from '@angular/core/testing'
 import { ShareModule } from '../share.module'
 import { SaneUrl } from './saneUrl.component'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { BACKENDURL } from 'src/util/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { SaneUrlSvc } from './saneUrl.service'
+import { AngularMaterialModule } from 'src/sharedModules'
+import { CUSTOM_ELEMENTS_SCHEMA, Directive } from '@angular/core'
+import { of } from 'rxjs'
 
 const inputCss = `input[aria-label="Custom link"]`
 const submitCss = `button[aria-label="Create custom link"]`
 const copyBtnCss = `button[aria-label="Copy created custom URL to clipboard"]`
 
+@Directive({
+  selector: '[iav-auth-auth-state]',
+  exportAs: 'iavAuthAuthState'
+})
+
+class AuthStateDummy {
+  user$ = of(null)
+}
+
 describe('> saneUrl.component.ts', () => {
   describe('> SaneUrl', () => {
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
         imports: [
-          ShareModule,
           HttpClientTestingModule,
           NoopAnimationsModule,
+          AngularMaterialModule,
+        ],
+        providers: [
+          SaneUrlSvc,
+        ],
+        declarations: [
+          SaneUrl,
+          AuthStateDummy
+        ],
+        schemas: [
+          CUSTOM_ELEMENTS_SCHEMA
         ]
       }).compileComponents()
-    }))
+    })
 
     afterEach(() => {
       const ctrl = TestBed.inject(HttpTestingController)
@@ -65,8 +88,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('true')
 
     }))
 
@@ -89,8 +110,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('false')
     })
 
     it('> on entering string in input, makes debounced GET request', fakeAsync(() => {
@@ -139,8 +158,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('true')
 
       const submit = fixture.debugElement.query( By.css( submitCss ) )
       const disabled = !!submit.attributes['disabled']
@@ -173,8 +190,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('false')
 
       const submit = fixture.debugElement.query( By.css( submitCss ) )
       const disabled = !!submit.attributes['disabled']
@@ -207,8 +222,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('true')
 
       const submit = fixture.debugElement.query( By.css( submitCss ) )
       const disabled = !!submit.attributes['disabled']
@@ -307,8 +320,6 @@ describe('> saneUrl.component.ts', () => {
       fixture.detectChanges()
 
       const input = fixture.debugElement.query( By.css( inputCss ) )
-      const invalid = input.attributes['aria-invalid']
-      expect(invalid.toString()).toEqual('true')
 
     }))
   })

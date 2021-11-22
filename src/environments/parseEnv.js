@@ -13,17 +13,21 @@ const main = async () => {
     MATOMO_ID,
     BS_REST_URL,
     VERSION,
-    GIT_HASH,
+    GIT_HASH = 'unknown hash',
     EXPERIMENTAL_FEATURE_FLAG
   } = process.env
   const version = JSON.stringify(
-    VERSION || GIT_HASH || 'unspecificied hash'
-  ) 
+    VERSION || 'unknown version'
+  )
+  const gitHash = JSON.stringify(
+    GIT_HASH || 'unknown hash'
+  )
 
   const outputTxt = `
 import { environment as commonEnv } from './environment.common'
 export const environment = {
   ...commonEnv,
+  GIT_HASH: ${gitHash},
   VERSION: ${version},
   BS_REST_URL: ${JSON.stringify(BS_REST_URL)},
   BACKEND_URL: ${JSON.stringify(BACKEND_URL)},

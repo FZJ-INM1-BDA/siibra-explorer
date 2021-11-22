@@ -157,8 +157,9 @@
     <mat-list-item
       [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
       [attr.tab-index]="10"
-      [matTooltip]="saneUrlDeprecated"
-      class="text-muted">
+      (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_ARIA_LABEL })"
+      [matTooltip]="SHARE_CUSTOM_URL_ARIA_LABEL"
+      >
       <mat-icon
         class="mr-4"
         fontSet="fas"
@@ -179,40 +180,8 @@
   </h2>
 
   <div mat-dialog-content>
-    <div iav-auth-auth-state
-      #authState="iavAuthAuthState">
-
-      <!-- Logged in. Explain that links will not expire, offer to logout -->
-      <ng-container *ngIf="authState.user$ | async as user; else otherTmpl">
-        <span>
-          Logged in as {{ user.name }}
-        </span>
-        <button mat-button
-          color="warn"
-          tabindex="-1">
-          <i class="fas fa-sign-in-alt"></i>
-          <span>
-            Logout
-          </span>
-        </button>
-      </ng-container>
-
-      <!-- Not logged in. Offer to login -->
-      <ng-template #otherTmpl>
-        <span>
-          Not logged in
-        </span>
-        <signin-modal></signin-modal>
-      </ng-template>
-    </div>
-
-    <!-- explain links expiration -->
-    <div class="text-muted mat-small">
-      {{ (authState.user$ | async) ? 'Links you generate will not expire' : 'Links you generate will expire after 72 hours' }}
-    </div>
-
     <iav-sane-url iav-state-aggregator
-      [stateTobeSaved]="stateAggregator.jsonifiedSstate$ | async"
+      [stateTobeSaved]="stateAggregator.jsonifiedState$ | async"
       #stateAggregator="iavStateAggregator">
     </iav-sane-url>
   </div>

@@ -10,8 +10,9 @@ import { deserialiseParcRegionId } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
-import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
-import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
+/**
+ * import of nehuba js files moved to angular.json
+ */
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'

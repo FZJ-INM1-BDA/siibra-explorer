@@ -1,16 +1,18 @@
-import { Component, Optional, ViewChild } from "@angular/core";
+import { Component, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { ARIA_LABELS, CONST } from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { IAnnotationGeometry, TExportFormats } from "../tools/type";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { map, shareReplay, startWith } from "rxjs/operators";
-import { Observable, Subscription } from "rxjs";
+import { combineLatest, Observable, Subscription } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { TFileInputEvent } from "src/getFileInput/type";
 import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
 import { DialogService } from "src/services/dialogService.service";
+import { MatDialog } from "@angular/material/dialog";
+import { userAnnotationRouteKey } from "../constants";
 
 const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`
 
@@ -24,6 +26,8 @@ const README = `{id}.sands.json file contains the data of annotations. {id}.desc
   exportAs: 'annotationListCmp'
 })
 export class AnnotationList {
+
+  public userAnnRoute = {}
 
   public ARIA_LABELS = ARIA_LABELS
 
@@ -66,6 +70,7 @@ export class AnnotationList {
   constructor(
     private annotSvc: ModularUserAnnotationToolService,
     private snackbar: MatSnackBar,
+    private dialog: MatDialog,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() private dialogSvc: DialogService,
   ) {
@@ -74,7 +79,22 @@ export class AnnotationList {
     })
 
     this.subs.push(
-      this.managedAnnotations$.subscribe(anns => this.managedAnnotations = anns)
+      this.managedAnnotations$.subscribe(anns => this.managedAnnotations = anns),
+      combineLatest([
+        this.managedAnnotations$.pipe(
+          startWith([])
+        ),
+        this.annotationInOtherSpaces$.pipe(
+          startWith([])
+        )
+      ]).subscribe(([ann, annOther]) => {
+        this.userAnnRoute = {
+          [userAnnotationRouteKey]: [
+            ...ann.map(a => a.toJSON()),
+            ...annOther.map(a => a.toJSON()),
+          ]
+        }
+      })
     )
   }
 
@@ -174,5 +194,9 @@ export class AnnotationList {
         }
       }
     }
+  }
+
+  public openDialog(template: TemplateRef<any>) {
+    this.dialog.open(template)
   }
 }

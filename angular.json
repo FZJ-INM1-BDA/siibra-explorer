@@ -34,9 +34,43 @@
               "src/overwrite.scss",
               "src/extra_styles.css"
             ],
-            "scripts": [
-              "worker/worker.js"
-            ]
+            "scripts": [{
+              "input": "worker/worker.js",
+              "inject": false,
+              "bundleName": "worker"
+            },{
+              "input": "worker/worker-plotly.js",
+              "inject": false,
+              "bundleName": "worker-plotly"
+            },{
+              "input": "worker/worker-nifti.js",
+              "inject": false,
+              "bundleName": "worker-nifti"
+            },
+            
+            {
+              "input": "third_party/catchSyntaxError.js",
+              "inject": false,
+              "bundleName": "catchSyntaxError"
+            },{
+              "input": "third_party/syntaxError.js",
+              "inject": false,
+              "bundleName": "syntaxError"
+            },
+          
+            {
+              "input": "third_party/vanilla_nehuba.js",
+              "inject": false,
+              "bundleName": "vanilla_nehuba"
+            },{
+              "input": "export-nehuba/dist/min/main.bundle.js",
+              "inject": false,
+              "bundleName": "main.bundle"
+            },{
+              "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
+              "inject": false,
+              "bundleName": "chunk_worker.bundle"
+            }]
           },
           "configurations": {
             "production": {
@@ -47,7 +81,14 @@
                 }
               ],
               "buildOptimizer": true,
-              "optimization": false,
+              "optimization": {
+                "scripts": true,
+                "fonts": true,
+                "styles": {
+                  "inlineCritical": false,
+                  "minify": true
+                }
+              },
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": false,

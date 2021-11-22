@@ -277,6 +277,7 @@ const previewImgMap = new Map([
   ['minds/core/parcellationatlas/v1.0.0/05655b58-3b6f-49db-b285-64b5a0276f83', 'allen-mouse-2017.png'],
   ['minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f', 'allen-mouse-2015.png'],
   ['minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8', 'waxholm.png'],
+  ['minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4', 'waxholm-v4.png'],
   ['minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe', 'waxholm-v3.png'],
   ['minds/core/parcellationatlas/v1.0.0/2449a7f0-6dd0-4b5a-8f1e-aec0db03679d', 'waxholm-v2.png'],
   ['minds/core/parcellationatlas/v1.0.0/11017b35-7056-4593-baad-3934d211daba', 'waxholm-v1.png'],

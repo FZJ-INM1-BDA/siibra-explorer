@@ -24,6 +24,12 @@ ENV MATOMO_ID=${MATOMO_ID}
 ARG EXPERIMENTAL_FEATURE_FLAG
 ENV EXPERIMENTAL_FEATURE_FLAG=${EXPERIMENTAL_FEATURE_FLAG:-false}
 
+ARG GIT_HASH
+ENV GIT_HASH=${GIT_HASH:-unknownhash}
+
+ARG VERSION
+ENV VERSION=${VERSION:-unknownversion}
+
 COPY . /iv
 WORKDIR /iv
 
@@ -33,8 +39,6 @@ RUN node ./src/environments/parseEnv.js
 # When building in local, where node_module already exist, prebuilt binary may throw an error
 RUN rm -rf ./node_modules
 
-ARG VERSION
-ENV VERSION=${VERSION}
 
 RUN npm i
 RUN npm run build-aot

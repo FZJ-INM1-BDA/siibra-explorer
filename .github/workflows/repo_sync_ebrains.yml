@@ -1,0 +1,20 @@
+name: "[repo-sync] repo-sync gitlab.ebrains.eu"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: wei/git-sync@v3
+      with:
+        source_repo: ${GITHUB_REPOSITORY}
+        source_branch: ${GITHUB_REF_NAME}
+        destination_repo: ${{ secrets.GITLAB_MIRROR_EBRAINS_DEST }}
+        destination_branch: ${GITHUB_REF_NAME}
+        destination_ssh_private_key: ${{ secrets.GITLAB_MIRROR_EBRAINS_SSH }}
+
