@@ -83,12 +83,12 @@ describe('> viewerCtrlCmp.component.ts', () => {
       mockStore.overrideSelector(viewerStateSelectedTemplatePureSelector, {})
       mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
       mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
+      mockStore.overrideSelector(selectorAuxMeshes, [])
     })
 
     describe('> can be init', () => {
 
       beforeEach(() => {
-        mockStore.overrideSelector(selectorAuxMeshes, [])
         fixture = TestBed.createComponent(ViewerCtrlCmp)
         fixture.detectChanges()
         loader = TestbedHarnessEnvironment.loader(fixture)
