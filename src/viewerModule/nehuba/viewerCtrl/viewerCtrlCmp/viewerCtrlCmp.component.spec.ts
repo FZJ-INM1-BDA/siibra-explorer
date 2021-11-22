@@ -329,6 +329,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
 
         it('> calls schedulRedraw', async () => {
           await fixture.componentInstance['toggleParcVsbl']()
+          await new Promise(rs => requestAnimationFrame(rs))
           expect(mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw).toHaveBeenCalled()
         })
 
