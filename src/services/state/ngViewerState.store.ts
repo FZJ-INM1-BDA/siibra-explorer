@@ -191,29 +191,6 @@ export class NgViewerUseEffect implements OnDestroy {
     private http: HttpClient,
   ){
 
-    // TODO either split backend user to be more granular, or combine the user config into a single subscription
-    this.subscriptions.push(
-      this.store$.pipe(
-        select('ngViewerState'),
-        debounceTime(200),
-        skip(1),
-        // Max frequency save once every second
-
-        // properties to be saved
-        map(({ panelMode, panelOrder }) => {
-          return { panelMode, panelOrder }
-        }),
-        distinctUntilChanged(),
-        throttleTime(1000)
-      ).subscribe(ngViewerState => {
-        this.http.post(`${this.pureConstantService.backendUrl}user/config`, JSON.stringify({ ngViewerState }),  {
-          headers: {
-            'Content-type': 'application/json'
-          }
-        })
-      })
-    )
-
     this.applySavedUserConfig$ = this.http.get<TUserConfigResp>(`${this.pureConstantService.backendUrl}user/config`).pipe(
       map(json => {
         if (json.error) {
