@@ -53,10 +53,14 @@ export class PluginBannerUI {
     try {
       await this.pluginServices.addPluginViaManifestUrl(manifestUrl)
       this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Adding plugin successful`)
+      this.matSnackbar.open(`Adding plugin successful`, 'Dismiss', {
+        duration: 5000
+      })
     } catch (e) {
       this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Error adding plugin: ${e.toString()}`)
+      this.matSnackbar.open(`Error adding plugin: ${e.toString()}`, 'Dismiss', {
+        duration: 5000
+      })
     }
   }
 }

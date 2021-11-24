@@ -2,6 +2,7 @@ const { NotFoundError } = require('./store')
 
 class ProxyStore {
   static async StaticGet(store, req, name) {
+    if (!store) throw new Error(`store is falsy`)
     const payload = JSON.parse(await store.get(name))
     const { expiry, value, ...rest } = payload
     if (expiry && (Date.now() > expiry)) {
@@ -21,6 +22,7 @@ class ProxyStore {
   }
 
   async set(req, name, value) {
+    if (!this.store) throw new Error(`store is falsy`)
     const supplementary = req.user
     ? {
         userId: req.user.id,

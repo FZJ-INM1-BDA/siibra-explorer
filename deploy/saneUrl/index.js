@@ -7,7 +7,12 @@ const RedisStore = require('rate-limit-redis')
 const { redisURL } = require('../lruStore')
 const { ProxyStore, NotExactlyPromiseAny } = require('./util')
 
-const store = new Store()
+let store
+try {
+  store = new Store()
+} catch (e) {
+  console.error(`Failed to new store.`, e)
+}
 const depStore = new DepcStore()
 
 const proxyStore = new ProxyStore(store)
