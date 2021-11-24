@@ -8,7 +8,7 @@ const appGetStub = sinon.stub()
 describe('auth/index.js', () => {
   before(() => {
     require.cache[require.resolve('./util')] = {
-      exports: { initPassportJs: initPassportJsStub }
+      exports: { initPassportJs: initPassportJsStub, objStoreDb: new Map() }
     }
     require.cache[require.resolve('./hbp-oidc-v2')] = {
       exports: {

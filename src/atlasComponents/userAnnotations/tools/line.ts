@@ -46,7 +46,7 @@ export class Line extends IAnnotationGeometry{
       })
     if (!this.points[0]) this.points[0] = point
     else this.points[1] = point
-    this.sendUpdateSignal()
+    this.changed()
     return point
   }
 
@@ -173,11 +173,7 @@ export class Line extends IAnnotationGeometry{
     for (const p of this.points){
       p.translate(x, y, z)
     }
-    this.sendUpdateSignal()
-  }
-
-  private sendUpdateSignal(){
-    this.updateSignal$.next(this.toString())
+    this.changed()
   }
 }
 
@@ -245,7 +241,7 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
          * it only has a single point, and should be removed
          */
         if (this.selectedLine) {
-          this.removeAnnotation(this.selectedLine.id)
+          this.removeAnnotation(this.selectedLine)
         }
         this.selectedLine = null
       }),
@@ -312,14 +308,4 @@ export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, On
   ngOnDestroy(){
     this.subs.forEach(s => s.unsubscribe())
   }
-
-  removeAnnotation(id: string){
-    const idx = this.managedAnnotations.findIndex(ann => ann.id === id)
-    if (idx < 0) {
-      return
-    }
-    this.managedAnnotations.splice(idx, 1)
-    this.managedAnnotations$.next(this.managedAnnotations)
-  }
-
 }

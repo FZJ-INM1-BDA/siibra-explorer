@@ -17,7 +17,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { TTemplateImage } from "./interfaces";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.1.5'
+export const SIIBRA_API_VERSION = '0.1.8'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -456,7 +456,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
       return arr
-      // return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
     }),
     shareReplay(1),
   )
@@ -510,7 +509,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         // }]
                       }
                     }),
-                    originDatainfos: (parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...(parc.infos || []), ...(parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 })
               }
@@ -599,25 +598,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                   ? 'right hemisphere'
                                   : 'whole brain'
 
-                              /**
-                               * TODO fix in siibra-api
-                               */
-                              if (
-                                tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
-                                && hemisphereKey === 'whole brain'
-                              ) {
-                                region.labelIndex = null
-                                return
-                              }
-
-                              if (
-                                tmpl.id === 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
-                                && hemisphereKey === 'whole brain'
-                              ) {
-                                region.children = []
-                              }
                               if (!region['ngId']) {
                                 const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
                                 region['ngId'] = hemispheredNgId
@@ -776,9 +756,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const templateImages: TTemplateImage[] = []
               for (const precomputedItem of precomputedArr) {
                 const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+                const precomputedUrl = 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211001-mebrain/precomputed/images/MEBRAINS_T1.masked' === precomputedItem.url
+                  ? 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211018-mebrains-masked-templates/precomputed/images/MEBRAINS_T1_masked'
+                  : precomputedItem.url
                 initialLayers[ngIdKey] = {
                   type: "image",
-                  source: `precomputed://${precomputedItem.url}`,
+                  source: `precomputed://${precomputedUrl}`,
                   transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
                   visible
                 }
@@ -844,7 +827,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                     '@id': parc.id,
                     name: parc.name,
                     regions,
-                    originDatainfos: (fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...fullParcInfo.infos, ...(fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 }),
                 ...threeSurferConfig

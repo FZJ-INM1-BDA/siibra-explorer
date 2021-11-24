@@ -34,6 +34,15 @@
                 <i class="fas fa-download"></i>
             </button>
 
+            <!-- share -->
+            <button mat-icon-button
+                [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
+                (click)="openDialog(saneUrlTmpl)"
+                iav-state-aggregator
+                #stateAggregator="iavStateAggregator">
+                <i class="fas fa-share-square"></i>
+            </button>
+
             <!-- delete all annotations -->
             <button mat-icon-button
                 color="warn"
@@ -102,3 +111,23 @@
         </ng-template>
     </mat-card-content>
 </mat-card>
+
+
+<!-- sane url template -->
+<ng-template #saneUrlTmpl>
+    <h2 mat-dialog-title>
+        Create custom URL
+    </h2>
+    <div mat-dialog-content>
+        <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async | mergeObj : userAnnRoute">
+        </iav-sane-url>
+    </div>
+
+    <div mat-dialog-actions
+        class="d-flex justify-content-center">
+        <button mat-button
+            mat-dialog-close>
+            close
+        </button>
+    </div>
+</ng-template>

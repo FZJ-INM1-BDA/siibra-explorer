@@ -15,6 +15,7 @@ import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 
@@ -502,6 +503,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       store.pipe(
         select(viewerStateViewerModeSelector)
       ).subscribe(viewerMode => {
+        this.currMode = viewerMode
         if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
           if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(true)
           else {
@@ -709,8 +711,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
         // potentially overwriting existing name and desc...
         // maybe should show warning?
-        existingAnn.setName(json.name)
-        existingAnn.setDesc(json.desc)
+        existingAnn.name = json.name
+        existingAnn.desc = json.desc
         return existingAnn
       } else {
         const { id, name, desc } = json
@@ -720,8 +722,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     } else {
       const metadata = this.metadataMap.get(returnObj.id)
       if (returnObj && metadata) {
-        returnObj.setName(metadata?.name || null)
-        returnObj.setDesc(metadata?.desc || null)
+        returnObj.name = metadata?.name || null
+        returnObj.desc = metadata?.desc || null
         this.metadataMap.delete(returnObj.id)
       }
     }
@@ -741,6 +743,25 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   ngOnDestroy(){
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
+  }
+
+  private currMode: string
+  switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
+
+    let payload = null
+    if (mode === 'on') payload = ARIA_LABELS.VIEWER_MODE_ANNOTATING
+    if (mode === 'off') {
+      if (this.currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) payload = null
+      else return
+    }
+    if (mode === 'toggle') {
+      payload = this.currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING
+        ? null
+        : ARIA_LABELS.VIEWER_MODE_ANNOTATING
+    }
+    this.store.dispatch(
+      viewerStateSetViewerMode({ payload })
+    )
   }
 }
 

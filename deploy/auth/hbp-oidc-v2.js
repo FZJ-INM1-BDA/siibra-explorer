@@ -78,8 +78,4 @@ module.exports = {
       console.error('oidcv2 auth error', e)
     }
   },
-  getClient: async () => {
-    await memoizedInit()
-    return client
-  }
 }

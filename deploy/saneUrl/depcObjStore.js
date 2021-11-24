@@ -21,6 +21,10 @@ class Store {
     })
   }
 
+  async del(id){
+    // noop
+  }
+
   async set(id, val){
     throw new Error(`Object store is deprecated. Please use seafile storage instead`)
   }

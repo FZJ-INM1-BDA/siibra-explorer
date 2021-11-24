@@ -1,14 +1,14 @@
-import { Directive } from "@angular/core";
+import { Directive, OnDestroy } from "@angular/core";
 import { NavigationEnd, Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { filter, map } from "rxjs/operators";
+import { Observable, Subscription } from "rxjs";
+import { filter, map, startWith } from "rxjs/operators";
 
 const jsonVersion = '1.0.0'
 // ver 0.0.1 === query param
 
 interface IJsonifiedState {
   ver: string
-  queryString: any
+  hashPath: string
 }
 
 @Directive({
@@ -16,20 +16,30 @@ interface IJsonifiedState {
   exportAs: 'iavStateAggregator'
 })
 
-export class StateAggregator{
+export class StateAggregator implements OnDestroy{
 
-  public jsonifiedSstate$: Observable<IJsonifiedState>
+  public jsonifiedState: IJsonifiedState
+  public jsonifiedState$: Observable<IJsonifiedState> = this.router.events.pipe(
+    filter(ev => ev instanceof NavigationEnd),
+    map((ev: NavigationEnd) => ev.urlAfterRedirects),
+    startWith(this.router.url),
+    map((path: string) => {
+      return {
+        ver: jsonVersion,
+        hashPath: path
+      }
+    }),
+  )
   constructor(
-    router: Router
+    private router: Router
   ){
-    this.jsonifiedSstate$ = router.events.pipe(
-      filter(ev => ev instanceof NavigationEnd),
-      map((ev: NavigationEnd) => {
-        return {
-          ver: jsonVersion,
-          queryString: ev.urlAfterRedirects
-        }
-      })
+    this.subscriptions.push(
+      this.jsonifiedState$.subscribe(val => this.jsonifiedState = val)
     )
+  }
+
+  private subscriptions: Subscription[] = []
+  ngOnDestroy(){
+    while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
   }
 }

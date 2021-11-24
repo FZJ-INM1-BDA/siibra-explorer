@@ -1,12 +1,12 @@
 import { Component, OnDestroy, Input } from "@angular/core";
-import { HttpClient } from '@angular/common/http'
-import { BACKENDURL } from 'src/util/constants'
 import { Observable, merge, of, Subscription, BehaviorSubject, combineLatest } from "rxjs";
 import { startWith, mapTo, map, debounceTime, switchMap, catchError, shareReplay, filter, tap, takeUntil, distinctUntilChanged } from "rxjs/operators";
 import { FormControl } from "@angular/forms";
 import { ErrorStateMatcher } from "@angular/material/core";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { SaneUrlSvc } from "./saneUrl.service";
+import { NotFoundError } from "../type";
 
 export class SaneUrlErrorStateMatcher implements ErrorStateMatcher{
   isErrorState(ctrl: FormControl | null){
@@ -43,6 +43,8 @@ enum ESavingStatus {
 
 export class SaneUrl implements OnDestroy{
 
+  public saneUrlRoot = this.svc.saneUrlRoot
+
   @Input() stateTobeSaved: any
 
   private subscriptions: Subscription[] = []
@@ -62,9 +64,9 @@ export class SaneUrl implements OnDestroy{
   public saved$: Observable<boolean>
 
   constructor(
-    private http: HttpClient,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
+    private svc: SaneUrlSvc,
   ){
 
     const validatedValueInput$ = this.customUrl.valueChanges.pipe(
@@ -84,11 +86,10 @@ export class SaneUrl implements OnDestroy{
       debounceTime(500),
       switchMap(val => val === ''
         ? of(false)
-        : this.http.get(`${this.saneUrlRoot}${val}`).pipe(
+        : this.svc.getKeyVal(val).pipe(
           mapTo(false),
           catchError((err, obs) => {
-            const { status } = err
-            if (status === 404) return of(true)
+            if (err instanceof NotFoundError) return of(true)
             return of(false)
           })
         )
@@ -105,10 +106,10 @@ export class SaneUrl implements OnDestroy{
       )
     )
 
-    this.btnHintTxt$ = combineLatest(
+    this.btnHintTxt$ = combineLatest([
       this.savingStatus$,
       this.savingProgress$,
-    ).pipe(
+    ]).pipe(
       map(([savingStatus, savingProgress]) => {
         if (savingProgress === ESavingProgress.DONE) return EBtnTxt.CREATED
         if (savingProgress === ESavingProgress.INPROGRESS) return EBtnTxt.CREATING
@@ -123,10 +124,10 @@ export class SaneUrl implements OnDestroy{
       startWith(true)
     )
 
-    this.iconClass$ = combineLatest(
+    this.iconClass$ = combineLatest([
       this.savingStatus$,
       this.savingProgress$,
-    ).pipe(
+    ]).pipe(
       map(([savingStatus, savingProgress]) => {
         if (savingProgress === ESavingProgress.DONE) return `fas fa-check`
         if (savingProgress === ESavingProgress.INPROGRESS) return `fas fa-spinner fa-spin`
@@ -159,8 +160,8 @@ export class SaneUrl implements OnDestroy{
   saveLink(){
     this.savingProgress$.next(ESavingProgress.INPROGRESS)
     this.customUrl.disable()
-    this.http.post(
-      `${this.saneUrlRoot}${this.customUrl.value}`,
+    this.svc.setKeyVal(
+      this.customUrl.value,
       this.stateTobeSaved
     ).subscribe(
       resp => {
@@ -184,6 +185,4 @@ export class SaneUrl implements OnDestroy{
       { duration: 1000 }
     )
   }
-
-  public saneUrlRoot = `${BACKENDURL}saneUrl/`
 }

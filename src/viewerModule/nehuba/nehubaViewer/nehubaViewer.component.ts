@@ -1,17 +1,18 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer, Subject } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip } from "rxjs/operators";
+import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip, tap, distinctUntilChanged } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { LoggingService } from "src/logging";
 import { bufferUntil, getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
 import { NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
-import { deserialiseParcRegionId } from 'common/util'
+import { deserialiseParcRegionId, arrayOrderedEql } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
-import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
-import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
+/**
+ * import of nehuba js files moved to angular.json
+ */
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
@@ -311,6 +312,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.ondestroySubscriptions.push(
         this.layerVis$.pipe(
           switchMap(switchMapWaitFor({ condition: () => !!(this.nehubaViewer?.ngviewer) })),
+          distinctUntilChanged(arrayOrderedEql),
           debounceTime(160),
         ).subscribe((layerNames: string[]) => {
           /**

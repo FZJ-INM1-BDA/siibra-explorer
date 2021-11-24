@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { uiStatePreviewingDatasetFilesSelector } from 'src/services/state/uiState/selectors'
 import { viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation, viewerStateSelectorStandaloneVolumes } from 'src/services/state/viewerState/selectors'
-import { cvtFullRouteToState, cvtStateToHashedRoutes, DummyCmp, routes } from './util'
+import { cvtFullRouteToState, cvtStateToHashedRoutes, DummyCmp, encodeCustomState, routes, verifyCustomState } from './util'
 import { encodeNumber } from './cipher'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
@@ -155,6 +155,37 @@ describe('> util.ts', () => {
         }])
         const s = cvtStateToHashedRoutes({})
         expect(s).toContain(`r:foobar%25281%2529::${encodeNumber(labelIndex, { float: false })}`)
+      })
+    })
+  })
+
+  describe('> verifyCustomState', () => {
+    it('> should return false on bad custom state', () => {
+      expect(verifyCustomState('hello')).toBeFalse()
+    })
+    it('> should return true on valid custom state', () => {
+      expect(verifyCustomState('x-test')).toBeTrue()
+    })
+  })
+
+  describe('> encodeCustomState', () => {
+    describe('> malformed values', () => {
+      describe('> bad key', () => {
+        it('> throws', () => {
+          expect(() => {
+            encodeCustomState('hello', 'world')
+          }).toThrow()
+        })
+      })
+      describe('> falsy value', () => {
+        it('> returns falsy value', () => {
+          expect(encodeCustomState('x-test', null)).toBeFalsy()
+        })
+      })
+    })
+    describe('> correct values', () => {
+      it('> encodes correctly', () => {
+        expect(encodeCustomState('x-test', 'foo-bar')).toEqual('x-test:foo-bar')
       })
     })
   })

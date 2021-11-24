@@ -5,6 +5,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { SaneUrl } from "./saneUrl/saneUrl.component";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
+import { AuthModule } from "src/auth";
 
 @NgModule({
   imports: [
@@ -13,6 +14,7 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    AuthModule,
   ],
   declarations: [
     ClipboardCopy,
