@@ -15,7 +15,45 @@
       {{ plugin.displayName ? plugin.displayName : plugin.name }}
     </span>
   </button>
+
+  <button mat-menu-item *ngIf="EXPERIMENTAL_FEATURE_FLAG"
+    (click)="showTmpl(thirdPartyPluginTmpl)">
+    <span>
+      Add third party plugin
+    </span>
+  </button>
 </mat-action-list>
+
+<ng-template #thirdPartyPluginTmpl>
+  <h2 mat-dialog-title>
+    Add thirdparty plugin
+  </h2>
+
+  <mat-dialog-content>
+    <form>
+      <mat-form-field class="d-block">
+        <mat-label>
+          manifest.json URL
+        </mat-label>
+        <input type="text" matInput placeholder="https://example.com/manifest.json" #urlInput>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button (click)="addThirdPartyPlugin(urlInput.value)"
+      mat-raised-button
+      [disabled]="loadingThirdpartyPlugin"
+      color="primary">
+      Load
+    </button>
+    <button mat-dialog-close
+      mat-button>
+      cancel
+    </button>
+  </mat-dialog-actions>
+
+</ng-template>
 
 <ng-template #pluginInfoTmpl let-manifest>
   <h1 mat-dialog-title>
