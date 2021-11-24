@@ -375,6 +375,18 @@ export class PluginServices {
 
     return handler
   }
+
+  public async addPluginViaManifestUrl(manifestUrl: string){
+    try {
+      const json = await this.fetch(manifestUrl)
+      this.fetchedPluginManifests = [
+        ...this.fetchedPluginManifests,
+        json
+      ]
+    } catch (e) {
+      throw new Error(e.statusText)
+    }
+  }
 }
 
 export interface IPluginManifest {

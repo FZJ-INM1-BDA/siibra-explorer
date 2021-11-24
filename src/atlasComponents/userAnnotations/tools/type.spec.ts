@@ -2,6 +2,7 @@ import { Subject, Subscription } from "rxjs"
 import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, TAnnotationEvent } from "./type"
 
 class TmpCls extends IAnnotationGeometry{
+  annotationType: 'tmpl-cls'
   getNgAnnotationIds(){
     return []
   }
@@ -110,6 +111,7 @@ describe('> types.ts', () => {
 
     describe('> updateSignal$', () => {
       class TmpCls extends IAnnotationGeometry{
+        annotationType = 'tmp-cls'
         getNgAnnotationIds(){
           return []
         }
