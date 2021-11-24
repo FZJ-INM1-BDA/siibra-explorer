@@ -42,11 +42,16 @@ router.get('/:name', async (req, res) => {
       proxyStore.get(req, name)
     ])
 
-    const { queryString, hashPath } = json
+    const { queryString, hashPath, ...rest } = json
+
+    const xtraRoutes = []
+    for (const key in rest) {
+      if (/^x-/.test(key)) xtraRoutes.push(`${key}:${name}`)
+    }
 
     if (redirectFlag) {
       if (queryString) return res.redirect(`${REAL_HOSTNAME}?${queryString}`)
-      if (hashPath) return res.redirect(`${REAL_HOSTNAME}#${hashPath}`)
+      if (hashPath) return res.redirect(`${REAL_HOSTNAME}#${hashPath}/${xtraRoutes.join('/')}`)
     } else {
       return res.status(200).send(json)
     }

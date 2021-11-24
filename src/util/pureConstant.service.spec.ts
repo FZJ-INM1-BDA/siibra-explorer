@@ -5,7 +5,7 @@ import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { BS_ENDPOINT } from "src/atlasComponents/regionalFeatures/bsFeatures"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { viewerStateFetchedAtlasesSelector, viewerStateFetchedTemplatesSelector } from "src/services/state/viewerState/selectors"
-import { PureContantService, SIIBRA_API_VERSION_HEADER_KEY } from "./pureConstant.service"
+import { PureContantService, SIIBRA_API_VERSION_HEADER_KEY, SIIBRA_API_VERSION } from "./pureConstant.service"
 import { TAtlas } from "./siibraApiConstants/types"
 
 const MOCK_BS_ENDPOINT = `http://localhost:1234`
@@ -68,7 +68,7 @@ describe('> pureConstant.service.ts', () => {
         const exp = httpController.expectOne(`${MOCK_BS_ENDPOINT}/atlases`)
         exp.flush([mockAtlas], {
           headers: {
-            [SIIBRA_API_VERSION_HEADER_KEY]: '0.1.7'
+            [SIIBRA_API_VERSION_HEADER_KEY]: SIIBRA_API_VERSION
           }
         })
         service.allFetchingReady$.subscribe()

@@ -442,7 +442,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
       return arr
-      // return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
     }),
     shareReplay(1),
   )
