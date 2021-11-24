@@ -1,4 +1,4 @@
-import { getIdFromFullId, strToRgb, verifyPositionArg } from './util'
+import { getIdFromFullId, strToRgb, verifyPositionArg, arrayOrderedEql } from './util'
 
 describe('common/util.js', () => {
   describe('getIdFromFullId', () => {
@@ -114,6 +114,39 @@ describe('common/util.js', () => {
       let input
       it('> return true', () => {
         expect(verifyPositionArg([1,2,3])).toBeTruthy()
+      })
+    })
+  })
+
+  describe('> arrayOrderedEql', () => {
+    describe('> if array eql', () => {
+      it('> returns true', () => {
+        expect(
+          arrayOrderedEql(['foo', 3], ['foo', 3])
+        ).toBeTrue()
+      })
+    })
+    describe('> if array not eql', () => {
+      describe('> not ordered eql', () => {
+        it('> returns false', () => {
+          expect(
+            arrayOrderedEql(['foo', 'bar'], ['bar', 'foo'])
+          ).toBeFalse()
+        })
+      })
+      describe('> item not eql', () => {
+        it('> returns false', () => {
+          expect(
+            arrayOrderedEql(['foo', null], ['foo', undefined])
+          ).toBeFalse()
+        })
+      })
+      describe('> size not eql', () => {
+        it('> returns false', () => {
+          expect(
+            arrayOrderedEql([], [1])
+          ).toBeFalse()
+        })
       })
     })
   })
