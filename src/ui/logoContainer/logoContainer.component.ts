@@ -3,6 +3,9 @@ import { PureContantService } from "src/util";
 import { Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
+const imageDark = 'assets/logo/ebrains-logo-dark.svg'
+const imageLight = 'assets/logo/ebrains-logo-light.svg'
+
 @Component({
   selector : 'logo-container',
   templateUrl : './logoContainer.template.html',
@@ -13,10 +16,10 @@ import { distinctUntilChanged } from "rxjs/operators";
 
 export class LogoContainer {
   // only used to define size
-  public imgSrc = `${this.pureConstantService.backendUrl}logo`
+  public imgSrc = imageDark
   
   public containerStyle = {
-    backgroundImage: `url('${this.pureConstantService.backendUrl}logo')`
+    backgroundImage: `url('${this.imgSrc}')`
   }
 
   private subscriptions: Subscription[] = []
@@ -28,7 +31,7 @@ export class LogoContainer {
         distinctUntilChanged()
       ).subscribe(flag => {
         this.containerStyle = {
-          backgroundImage: `url('${this.pureConstantService.backendUrl}logo${!!flag ? '?darktheme=true' : ''}')`
+          backgroundImage: `url('${flag ? imageLight : imageDark}')`
         }
       })
     )

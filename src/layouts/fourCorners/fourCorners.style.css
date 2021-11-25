@@ -9,5 +9,33 @@
 
 .corner-container
 {
-  z-index: 5;
+  max-width: 100%;
+}
+
+.grid-container
+{
+  height: 50%;
+  display: grid;
+  grid-template-columns: minmax(auto, 100%) minmax(auto, 100%);
+}
+
+.top-left
+{
+  place-self: start start;
+  z-index: 2;
+}
+.top-right
+{
+  place-self: start end;
+  z-index: 1;
+}
+.bottom-left
+{
+  place-self: end start;
+  z-index: 2;
+}
+.bottom-right
+{
+  place-self: end end;
+  z-index: 1;
 }

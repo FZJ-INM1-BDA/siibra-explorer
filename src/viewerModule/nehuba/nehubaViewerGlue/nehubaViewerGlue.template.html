@@ -1,4 +1,4 @@
-<div class="d-block w-100 h-100"
+<div class="d-block w-100 h-100 nehuba-viewer-container-parent"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
   iav-viewer-touch-interface
@@ -122,7 +122,7 @@
   let-panelIndex="panelIndex"
   let-visible="visible">
 
-  <div class="opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
+  <div class="ws-no-wrap opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }"
     [attr.data-viewer-controller-visible]="visible"
     [attr.data-viewer-controller-index]="panelIndex">
@@ -220,6 +220,7 @@
     <div *ngIf="data.moreInfoFlag"
       class="iv-custom-comp darker-bg overflow-hidden grid-wide-3">
       <ng-layer-tune
+        advanced-control="true"
         [ngLayerName]="data.layerName"
         [thresholdMin]="data.min"
         [thresholdMax]="data.max">

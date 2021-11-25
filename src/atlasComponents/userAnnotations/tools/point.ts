@@ -16,6 +16,7 @@ export class Point extends IAnnotationGeometry {
   y: number
   z: number
 
+  public annotationType = 'Point'
   static threshold = 1e-6
   static eql(p1: Point, p2: Point) {
     return Math.abs(p1.x - p2.x) < Point.threshold

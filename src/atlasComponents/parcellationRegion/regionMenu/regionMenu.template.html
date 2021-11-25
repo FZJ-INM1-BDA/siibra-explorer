@@ -74,32 +74,53 @@
 
 
   <!-- Explore in other template -->
-  <ng-container *ngIf="regionInOtherTemplates$ | async as regionInOtherTemplates">
-
+  <ng-template [ngIf]="region$ | async | regionInOtherTmpl" let-otherTmpls>
     <ng-template #exploreInOtherTmpl>
-      <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
-        class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer"
-        (click)="changeView(sameRegion)"
-        [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
-        mat-ripple>
-        <small>
-          {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
-        </small>
-      </mat-card>
+      <mat-grid-list cols="3"
+        rowHeight="2:3"
+        gutterSize="16"
+        class="position-relative">
+        <mat-grid-tile *ngFor="let otherTmpl of otherTmpls">
+          
+          <div [hidden]
+              iav-dataset-show-dataset-dialog
+              [iav-dataset-show-dataset-dialog-name]="otherTmpl.originDatainfos[0]?.name"
+              [iav-dataset-show-dataset-dialog-description]="otherTmpl.originDatainfos[0]?.description"
+              [iav-dataset-show-dataset-dialog-urls]="otherTmpl.originDatainfos[0]?.urls"
+              [iav-dataset-show-dataset-dialog-ignore-overwrite]="true"
+              #kgInfo="iavDatasetShowDatasetDialog">
+          </div>
+          <tile-cmp [tile-image-src]="otherTmpl | getTemplatePreviewUrl"
+              class="cursor-pointer pe-all"
+              tile-image-alt="Preview of this tile"
+              [tile-text]="otherTmpl.displayName || otherTmpl.name"
+              [tile-show-info]="otherTmpl.originDatainfos?.length > 0"
+              [tile-image-darktheme]="otherTmpl | templateIsDarkTheme"
+              [tile-selected]="(selectedTemplate$ | async | getProperty : '@id') === otherTmpl['@id']"
+              (tile-on-click)="(tileCmp.selected || changeView(otherTmpl)); (tileCmp.selected || intentToChgTmpl$.next(true))"
+              (tile-on-info-click)="kgInfo && kgInfo.onClick()"
+              #tileCmp="tileCmp">
+          </tile-cmp>
+        </mat-grid-tile>
+      </mat-grid-list>
+
+      <div *ngIf="lockOtherTmpl$ | async" class="loading-overlay">
+        <spinner-cmp class="spinner"></spinner-cmp>
+      </div>
+
     </ng-template>
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: 'Explore in other templates',
-      desc: regionInOtherTemplates.length,
+      desc: otherTmpls.length,
       iconClass: 'fas fa-brain',
-      iconTooltip: regionInOtherTemplates.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
-      iavNgIf: regionInOtherTemplates.length,
+      iconTooltip: otherTmpls.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
+      iavNgIf: otherTmpls.length > 0,
       content: exploreInOtherTmpl
     }">
-
-
     </ng-container>
-  </ng-container>
+  </ng-template>
+
 
   <!-- kg regional features list -->
   <ng-template #kgRegionalFeatureList>

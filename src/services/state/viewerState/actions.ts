@@ -98,7 +98,7 @@ export const viewerStateSetViewerMode = createAction(
 
 export const viewerStateDblClickOnViewer = createAction(
   `[viewerState] dblClickOnViewer`,
-  props<{ payload: { segments: any, landmark: any, userLandmark: any } }>()
+  props<{ payload: { annotation: any, segments: any, landmark: any, userLandmark: any } }>()
 )
 
 export const viewerStateAddUserLandmarks = createAction(

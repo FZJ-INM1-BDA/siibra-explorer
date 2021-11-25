@@ -183,9 +183,10 @@ describe('> nehubaViewerGlue.component.ts', () => {
       const testObj0 = {
         segment: 'hello world'
       }
+      const testObj1 = 'hello world'
       beforeEach(() => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
-        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, ['hello world', testObj0])
+        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [testObj1, testObj0] as any)
         TestBed.createComponent(NehubaGlueCmp)
         clickIntServ.callRegFns(null)
       })
@@ -214,7 +215,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       }
       beforeEach(() => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
-        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [testObj0, testObj1, testObj2])
+        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [testObj0, testObj1, testObj2] as any)
 
       })
       afterEach(() => {

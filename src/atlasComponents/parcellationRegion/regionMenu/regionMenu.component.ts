@@ -1,9 +1,10 @@
 import { Component, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { Observable, Subscription } from "rxjs";
+import { merge, Observable, Subject, Subscription } from "rxjs";
 import { RegionBase } from '../region.base'
 import { CONST, ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
+import { distinctUntilChanged, mapTo } from "rxjs/operators";
 
 @Component({
   selector: 'region-menu',
@@ -19,6 +20,19 @@ export class RegionMenuComponent extends RegionBase implements OnDestroy {
 
   public activePanelTitles$: Observable<string[]>
   private activePanelTitles: string[] = []
+
+  public intentToChgTmpl$ = new Subject()
+  public lockOtherTmpl$ = merge(
+    this.selectedTemplate$.pipe(
+      mapTo(false)
+    ),
+    this.intentToChgTmpl$.pipe(
+      mapTo(true)
+    )
+  ).pipe(
+    distinctUntilChanged()
+  )
+
   constructor(
     store$: Store<any>,
     private viewerCmpLocalUiStore: ComponentStore<{ activePanelsTitle: string[] }>,

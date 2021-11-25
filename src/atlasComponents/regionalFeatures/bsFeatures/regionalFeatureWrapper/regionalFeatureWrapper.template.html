@@ -33,8 +33,16 @@
       [attr.aria-label]="ARIA_LABELS.LIST_OF_DATASETS_ARIA_LABEL">
 
       <!-- if busy, show spinner -->
-      <ng-template [ngIf]="busy$ | async">
+      <ng-template [ngIf]="busy$ | async" [ngIfElse]="notBusyTmpl">
         <ng-template [ngTemplateOutlet]="busyTmpl"></ng-template>
+      </ng-template>
+
+      <ng-template #notBusyTmpl>
+        <ng-template [ngIf]="registeredFeatures.length === 0">
+          <span class="text-muted">
+            No regional features found.
+          </span>
+        </ng-template>
       </ng-template>
       <div *ngFor="let feature of registeredFeatures; let index = index"
         class="overflow-hidden">
