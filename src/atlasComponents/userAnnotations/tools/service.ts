@@ -479,6 +479,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             this.deleteNgAnnotationById(annotation.id)
             continue
           }
+          if (!this.ngAnnotationLayer) continue
           const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
           const annRef = localAnnotations.references.get(annotation.id)
           const annSpec = parseNgAnnotation(annotation)
