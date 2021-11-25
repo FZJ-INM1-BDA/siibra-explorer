@@ -48,6 +48,7 @@ export class ViewerCtrlCmp{
     return this._removeOctantFlag
   }
   set removeOctantFlag(val){
+    if (val === this._removeOctantFlag) return
     this._removeOctantFlag = val
     this.setOctantRemoval(this._removeOctantFlag)
   }

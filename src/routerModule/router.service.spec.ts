@@ -267,27 +267,56 @@ describe('> router.service.ts', () => {
             discardPeriodicTasks()
           }))
 
-          it('> ... returns same value, does not dispatches', fakeAsync(() => {
-            const fakeParsedState = {
-              bizz: 'buzz'
-            }
-            cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
-            cvtStateToHashedRoutesSpy.and.callFake(() => {
-              return `foo/bar`
-            })
-            router = TestBed.inject(Router)
-            router.navigate(['foo', 'bar'])
-    
-            const service = TestBed.inject(RouterService)
-            const store = TestBed.inject(MockStore)
-            const dispatchSpy = spyOn(store, 'dispatch')
-            
-            tick(320)
+          describe('> returns the same value', () => {
+            it('> ... returns same value, does not dispatches', fakeAsync(() => {
+              const fakeParsedState = {
+                bizz: 'buzz'
+              }
+              cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
+              cvtStateToHashedRoutesSpy.and.callFake(() => {
+                return `foo/bar`
+              })
+              router = TestBed.inject(Router)
+              router.navigate(['foo', 'bar'])
+      
+              const service = TestBed.inject(RouterService)
+              const store = TestBed.inject(MockStore)
+              const dispatchSpy = spyOn(store, 'dispatch')
+              
+              tick(320)
 
-            expect(dispatchSpy).not.toHaveBeenCalled()
-    
-            discardPeriodicTasks()
-          }))
+              expect(dispatchSpy).not.toHaveBeenCalled()
+      
+              discardPeriodicTasks()
+            }))
+            
+            it('> takes into account of customRoute', fakeAsync(() => {
+              const fakeParsedState = {
+                bizz: 'buzz'
+              }
+              cvtFullRouteToStateSpy.and.callFake(() => fakeParsedState)
+              cvtStateToHashedRoutesSpy.and.callFake(() => {
+                return `foo/bar`
+              })
+      
+              const service = TestBed.inject(RouterService)
+              service.customRoute$ = of({
+                'x-foo': 'hello'
+              })
+
+              router = TestBed.inject(Router)
+              router.navigate(['foo', 'bar', 'x-foo:hello'])
+
+              const store = TestBed.inject(MockStore)
+              const dispatchSpy = spyOn(store, 'dispatch')
+              
+              tick(320)
+
+              expect(dispatchSpy).not.toHaveBeenCalled()
+      
+              discardPeriodicTasks()
+            }))
+          })
         })
       })
     })

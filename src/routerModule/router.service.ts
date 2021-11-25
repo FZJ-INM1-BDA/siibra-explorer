@@ -7,7 +7,7 @@ import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith
 import { generalApplyState } from "src/services/stateStore.helper";
 import { PureContantService } from "src/util";
 import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, merge, Observable } from 'rxjs'
+import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs'
 import { scan } from 'rxjs/operators'
 
 @Injectable({
@@ -45,7 +45,7 @@ export class RouterService {
     // could be navigation (history api)
     // could be on init
     const navEnd$ = router.events.pipe(
-      filter(ev => ev instanceof NavigationEnd),
+      filter<NavigationEnd>(ev => ev instanceof NavigationEnd),
       shareReplay(1)
     )
 
@@ -94,10 +94,17 @@ export class RouterService {
     ready$.pipe(
       switchMapTo(
         navEnd$.pipe(
-          withLatestFrom(store$)
+          withLatestFrom(
+            store$,
+            this.customRoute$.pipe(
+              startWith({})
+            )
+          )
         )
       )
-    ).subscribe(([ev, state]: [NavigationEnd, any]) => {
+    ).subscribe(arg => {
+      const [ev, state, customRoutes] = arg
+      
       const fullPath = ev.urlAfterRedirects
       const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
       let routeFromState: string
@@ -105,6 +112,12 @@ export class RouterService {
         routeFromState = cvtStateToHashedRoutes(state)
       } catch (_e) {
         routeFromState = ``
+      }
+
+      for (const key in customRoutes) {
+        const customStatePath = encodeCustomState(key, customRoutes[key])
+        if (!customStatePath) continue
+        routeFromState += `/${customStatePath}`
       }
 
       if ( fullPath !== `/${routeFromState}`) {
@@ -135,10 +148,10 @@ export class RouterService {
           ),
           this.customRoute$,
         ]).pipe(
-          map(([ routePath, customPath ]) => {
+          map(([ routePath, customRoutes ]) => {
             let returnPath = routePath
-            for (const key in customPath) {
-              const customStatePath = encodeCustomState(key, customPath[key])
+            for (const key in customRoutes) {
+              const customStatePath = encodeCustomState(key, customRoutes[key])
               if (!customStatePath) continue
               returnPath += `/${customStatePath}`
             }
