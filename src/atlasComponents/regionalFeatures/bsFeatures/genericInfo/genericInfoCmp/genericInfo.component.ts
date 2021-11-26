@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, Input, OnChanges, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef, ViewRef } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnChanges, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef, ViewRef } from "@angular/core";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { KG_REGIONAL_FEATURE_KEY, TBSDetail, UNDER_REVIEW } from "../../kgRegionalFeature/type";
 import { ARIA_LABELS, CONST } from 'common/constants'
@@ -69,6 +69,7 @@ export class GenericInfoCmp extends BsRegionInputBase implements OnChanges, Afte
 
   constructor(
     svc: BsFeatureService,
+    private cdr: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) data: TInjectableData
   ){
     super(svc)
@@ -130,6 +131,7 @@ export class GenericInfoCmp extends BsRegionInputBase implements OnChanges, Afte
       },
       () => {
         this.loadingFlag = false
+        this.cdr.markForCheck()
       }
     )
   }
