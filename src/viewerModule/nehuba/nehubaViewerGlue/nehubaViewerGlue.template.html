@@ -248,7 +248,7 @@
            [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
-                    * maximiseService.maximisedPanelIndex === 0? -1 : 1"
+                    * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
            (input)="maximiseService.navigate(custom3DRangeInput.value)"
            class="custom-slider-3d mini-perspective-viewer"
            id="customSliderFor3d">

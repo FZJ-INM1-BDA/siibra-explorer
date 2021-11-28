@@ -15,9 +15,6 @@ export class ChangePerspectiveOrientationService {
     constructor(private store$: Store<any>,) { }
 
     public set3DViewPoint(plane: 'coronal' | 'sagittal' | 'axial', view: 'first' | 'second', zoom: any = '') {
-
-      console.log(zoom)
-
       const orientation = this.viewOrientations[plane][view === 'first'? 0 : 1]
 
       this.store$.dispatch(

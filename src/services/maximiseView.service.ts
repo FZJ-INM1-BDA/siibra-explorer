@@ -1,16 +1,15 @@
 import {Inject, Injectable, OnDestroy, Optional} from "@angular/core";
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import {getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
-import {Observable, Subscription} from "rxjs";
+import {combineLatest, Observable, of, Subscription} from "rxjs";
 import {viewerStateSelectedTemplatePureSelector} from "src/services/state/viewerState/selectors";
 import {IavRootStoreInterface} from "src/services/stateStore.service";
 import {select, Store} from "@ngrx/store";
-import {distinctUntilChanged, filter, map} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, filter, map, switchMap} from "rxjs/operators";
 import {ngViewerActionSetPerspOctantRemoval} from "src/services/state/ngViewerState/actions";
 import {ChangePerspectiveOrientationService} from "src/viewerModule/nehuba/viewerCtrl/change-perspective-orientation/changePerspectiveOrientation.service";
 import {ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder} from "src/services/state/ngViewerState/selectors";
 import {PANELS} from "src/services/state/ngViewerState/constants";
-import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +30,7 @@ export class MaximiseViewService implements OnDestroy {
     public templateTransform = []
 
     private panelMode$: Observable<string>
-    private panelOrder: string = ''
+    private panelOrder: []
 
     public isMaximised: boolean = false
 
@@ -40,21 +39,14 @@ export class MaximiseViewService implements OnDestroy {
                 @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>) {
       if (nehubaViewer$) {
         this.subscriptions.push(
-          nehubaViewer$.subscribe(
-            viewer => {
-              if (viewer && !this.nehubaViewer) {
-                this.subscriptions.push(
-                  viewer.viewerPosInVoxel$.subscribe(p =>
-                    this.navPosVoxel = p
-                  ),
-                  // viewer.viewerOrientation$.subscribe(vo => {
-                  //   this.currentOrientation = vo
-                  // })
-
-                )
-              }
-
+          nehubaViewer$.pipe(
+            switchMap(viewer => {
               this.nehubaViewer = viewer
+              return viewer? viewer.viewerPosInVoxel$ : of(null)
+            })
+          ).subscribe(
+            pos => {
+              this.navPosVoxel = pos
             }
           ),
 
@@ -84,34 +76,35 @@ export class MaximiseViewService implements OnDestroy {
         distinctUntilChanged(),
       ),
 
-      this.store$.pipe(
-        select(ngViewerSelectorPanelOrder),
-        distinctUntilChanged(),
-      ).subscribe(po => {
-        this.panelOrder = po
-        if (this.isMaximised) {
-          this.maximise(Number(po[0]), po)
-        }
-      })
-        
       this.subscriptions.push(
-        this.panelMode$.pipe(
-          map(panelMode => panelMode === PANELS.SINGLE_PANEL),
-        ).subscribe(m => {
-          if (!this.isMaximised && m) {
-            if (this.panelOrder[0] === '0') {
-              this.maximise(0, this.panelOrder)
-            }
+        combineLatest([
+          this.panelMode$.pipe(
+            map(panelMode => panelMode === PANELS.SINGLE_PANEL),
+            distinctUntilChanged(),
+          ),
+          this.store$.pipe(
+            select(ngViewerSelectorPanelOrder),
+            distinctUntilChanged(),
+            debounceTime(500)
+          )
+        ]).subscribe(([singlePanel, order]) => {
+          if (singlePanel && this.panelOrder !== order) {
             this.isMaximised = true
-          } else if (this.isMaximised && !m) {
-            this.isMaximised = false
-            this.minimise()
+
+            this.panelOrder = order
+
+            order = order.split('').map(o => Number(o))
+
+
+            this.maximise(order[0], order)
+
           } else {
             this.isMaximised = false
+            this.minimise()
           }
-        }),
-          
+        }) 
       )
+
     }
 
     maximise(panelIndex, panelOrder = '') {
@@ -127,18 +120,13 @@ export class MaximiseViewService implements OnDestroy {
     }
 
     setPerspectivePanelState(panelOrder) {
-      // this.store$.dispatch(
-      //   ngViewerActionSetPerspOctantRemoval({
-      //     octantRemovalFlag: false
-      //   })
-      // )
-      if (panelOrder[0] == '0') {
+      if (panelOrder[0] === 0) {
         this.poService.set3DViewPoint('sagittal', 'first', 
           defaultZoom[this.selectedTemplateId][this.maximisedPanelIndex])
-      } else if (panelOrder[0] == '1') {
+      } else if (panelOrder[0] === 1) {
         this.poService.set3DViewPoint('coronal', 'first',
           defaultZoom[this.selectedTemplateId][this.maximisedPanelIndex])
-      } else if (panelOrder[0] == '2') {
+      } else if (panelOrder[0] === 2) {
         this.poService.set3DViewPoint('coronal', 'first',
           defaultZoom[this.selectedTemplateId][this.maximisedPanelIndex])
       }
@@ -146,6 +134,7 @@ export class MaximiseViewService implements OnDestroy {
     
     minimise() {
       this.maximisedPanelIndex = null
+      this.panelOrder = null
       this.store$.dispatch(
         ngViewerActionSetPerspOctantRemoval({
           octantRemovalFlag: true
