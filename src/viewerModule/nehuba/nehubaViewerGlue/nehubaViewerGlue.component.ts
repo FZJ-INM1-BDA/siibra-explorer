@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
+import {ngViewerActionCycleViews, ngViewerActionToggleMax} from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
@@ -31,6 +31,7 @@ import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import {MaximiseViewService} from "src/services/maximiseView.service";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -113,6 +114,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
   public viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   private findPanelIndex = (panel: HTMLElement) => this.viewPanelWeakMap.get(panel)
   public nanometersToOffsetPixelsFn: Array<(...arg) => any> = []
+
+  public panelOrder: string
 
   public quickTourSliceViewSlide: IQuickTourData = {
     order: 1,
@@ -315,6 +318,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
+    public maximiseService: MaximiseViewService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
@@ -345,6 +349,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     ).subscribe(([mode, panelOrder]) => {
       
       this.currentPanelMode = mode
+      this.panelOrder = panelOrder
 
       const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
 
@@ -377,7 +382,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       }
       case PANELS.SINGLE_PANEL: {
         const element = this.removeExistingPanels()
-        const newEl = getSinglePanel(viewPanels)
+        const newEl = getSinglePanel(viewPanels, panelOrder.split('').map(v => Number(v)))
         element.appendChild(newEl)
         break;
       }

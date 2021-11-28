@@ -1,3 +1,9 @@
-<div class="w-100 h-100">
+<div class="w-100 h-100 position-relative">
   <ng-content select="[cell-i]"></ng-content>
+
+  <div class="position-absolute"
+       style="bottom: 50px; right: 50px;">
+    <ng-content select="[mini-perspective-view]"></ng-content>
+  </div>
+
 </div>

@@ -42,6 +42,9 @@
     [quick-tour-order]="quickTour3dViewSlide.order">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: panelOrder$ | async | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
+  <div class="w-100 h-100 position-relative" style="z-index: 100" mini-perspective-view>
+    <ng-container *ngTemplateOutlet="miniPerspectiveTmp"></ng-container>
+  </div>
 </current-layout>
 
 <!-- slice view overlay tmpl -->
@@ -230,5 +233,24 @@
       </ul>
     </div>
 
+  </div>
+</ng-template>
+
+
+<ng-template #miniPerspectiveTmp>
+
+  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer">
+
+    <input type="range"
+           #custom3DRangeInput
+           [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
+           *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
+           [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
+           [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
+           [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
+                    * maximiseService.maximisedPanelIndex === 0? -1 : 1"
+           (input)="maximiseService.navigate(custom3DRangeInput.value)"
+           class="custom-slider-3d mini-perspective-viewer"
+           id="customSliderFor3d">
   </div>
 </ng-template>
