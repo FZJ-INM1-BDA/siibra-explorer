@@ -174,5 +174,5 @@ const defaultZoom = {
   "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": [2100000, 2170000, 1800000] ,
   "minds/core/referencespace/v1.0.0/MEBRAINS": [3800000,3000000,1800000],
   "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": [0,180000,140000],
-  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": [600000,250000,0],
+  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": [600000,250000,300000],
 }
