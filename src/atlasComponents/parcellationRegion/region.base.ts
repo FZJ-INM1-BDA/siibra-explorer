@@ -1,15 +1,16 @@
 import { Directive, EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { distinctUntilChanged, switchMap, filter, map, withLatestFrom, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
-import { flattenRegions, getIdFromKgIdObj, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateNewViewer, isNewerThan, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
-import { viewerStateFetchedTemplatesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { strToRgb, verifyPositionArg, getRegionHemisphere } from 'common/util'
+import { rgbToHsl } from 'common/util'
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
+import { viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
+import { strToRgb, verifyPositionArg } from 'common/util'
 import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 import { TRegionDetail } from "src/util/siibraApiConstants/types";
 import { IHasId } from "src/util/interfaces";
+import { TSiibraExTemplate } from "./type";
 
 @Directive()
 export class RegionBase {
@@ -83,74 +84,15 @@ export class RegionBase {
 
   @Output() public closeRegionMenu: EventEmitter<boolean> = new EventEmitter()
 
-  public sameRegionTemplate: any[] = []
-  public regionInOtherTemplates$: Observable<any[]>
   public regionOriginDatasetLabels$: Observable<{ name: string }[]>
   public selectedAtlas$: Observable<any> = this.store$.pipe(
     select(viewerStateGetSelectedAtlas)
   )
 
-  public selectedTemplateFullInfo$: Observable<any[]>
 
   constructor(
     private store$: Store<any>,
   ) {
-
-    this.selectedTemplateFullInfo$ = this.store$.pipe(
-      select(viewerStateSelectedTemplateFullInfoSelector),
-    )
-
-    this.regionInOtherTemplates$ = this.region$.pipe(
-      distinctUntilChanged(),
-      filter(v => !!v && !!v.context),
-      switchMap(region => this.store$.pipe(
-        select(
-          regionInOtherTemplateSelector,
-          { region }
-        ),
-        withLatestFrom(
-          this.store$.pipe(
-            select(viewerStateGetSelectedAtlas)
-          )
-        ),
-        map(([ regionsInOtherTemplates, selectedatlas ]) => {
-          const { parcellations } = selectedatlas
-          const filteredRsInOtherTmpls = []
-          for (const bundledObj of regionsInOtherTemplates) {
-            const { template, parcellation, region } = bundledObj
-
-            /**
-             * trying to find duplicate region
-             * with same templateId, and same hemisphere
-             */
-            const sameEntityIdx = filteredRsInOtherTmpls.findIndex(({ template: _template, region: _region }) => {
-              return _template['@id'] === template['@id']
-                && getRegionHemisphere(_region) === getRegionHemisphere(region)
-            })
-            /**
-             * if doesn't exist, just push to output
-             */
-            if ( sameEntityIdx < 0 ) {
-              filteredRsInOtherTmpls.push(bundledObj)
-            } else {
-
-              /**
-               * if exists, only append the latest version
-               */
-              const { parcellation: currentParc } = filteredRsInOtherTmpls[sameEntityIdx]
-              /**
-               * if the new element is newer than existing item
-               */
-              if (isNewerThan(parcellations, parcellation, currentParc)) {
-                filteredRsInOtherTmpls.splice(sameEntityIdx, 1)
-                filteredRsInOtherTmpls.push(bundledObj)
-              }
-            }
-          }
-          return filteredRsInOtherTmpls
-        })
-      ))
-    )
 
     this.regionOriginDatasetLabels$ = combineLatest([
       this.store$,
@@ -161,6 +103,9 @@ export class RegionBase {
     )
   }
 
+  public selectedTemplate$ = this.store$.pipe(
+    select(viewerStateSelectedTemplatePureSelector),
+  )
 
   public navigateToRegion() {
     this.closeRegionMenu.emit()
@@ -190,13 +135,14 @@ export class RegionBase {
     )
   }
 
-  changeView(sameRegion) {
-    const {
-      template,
-      parcellation,
-    } = sameRegion
+  changeView(template: TSiibraExTemplate) {
+
     this.closeRegionMenu.emit()
 
+    const {
+      parcellation
+    } = (this.region?.context || {})
+    
     /**
      * TODO use createAction in future
      * for now, not importing const because it breaks tests
@@ -278,83 +224,5 @@ export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
       return `${originDatasetlabels[index]['name']}`
     }
     return `origin dataset`
-  }
-}
-
-export const regionInOtherTemplateSelector = createSelector(
-  viewerStateGetSelectedAtlas,
-  viewerStateFetchedTemplatesSelector,
-  (atlas, fetchedTemplates, prop) => {
-    const atlasTemplateSpacesIds = atlas.templateSpaces.map(a => a['@id'])
-    const { region: regionOfInterest } = prop
-    const returnArr = []
-
-    const regionOfInterestHemisphere = getRegionHemisphere(regionOfInterest)
-
-    // need to ensure that the templates are defined in atlas definition
-    // atlas is the single source of truth
-
-    const otherTemplates = fetchedTemplates
-      .filter(({ ['@id']: id }) => id !== regionOfInterest.context.template['@id']
-          && atlasTemplateSpacesIds.includes(id)
-          && (regionOfInterest.availableIn || []).map(ai => ai.id).includes(id))
-
-    for (const template of otherTemplates) {
-      const parcellation = template.parcellations.find(p => p['@id'] === regionOfInterest.context.parcellation['@id'])
-
-      const flattenedRegions = flattenRegions(parcellation.regions)
-      const selectableRegions = flattenedRegions.filter(({ labelIndex }) => !!labelIndex)
-
-      for (const region of selectableRegions) {
-        if (regionsEqual(regionOfInterest, region)) {
-
-          const regionHemisphere = getRegionHemisphere(region)
-
-          /**
-             * if both hemisphere metadatas are defined
-             */
-          if (
-            !!regionOfInterestHemisphere &&
-              !!regionHemisphere
-          ) {
-            if (regionHemisphere === regionOfInterestHemisphere) {
-              returnArr.push({
-                template,
-                parcellation,
-                region,
-              })
-            }
-          } else {
-            returnArr.push({
-              template,
-              parcellation,
-              region,
-              hemisphere: regionHemisphere
-            })
-          }
-        }
-      }
-
-    }
-    return returnArr
-  }
-)
-
-const regionsEqual = (region1, region2) => {
-  const region1Hemisphere = getRegionHemisphere(region1)
-  const region2Hemisphere = getRegionHemisphere(region2)
-
-  if (region1.id && region1.id.kg && region2.id && region2.id.kg) {
-    return getIdFromKgIdObj(region1.id.kg) === getIdFromKgIdObj(region2.id.kg)
-        // If both has hemispheres, they should be equal
-        && (!(region1Hemisphere && region2Hemisphere) || region1Hemisphere === region2Hemisphere)
-  }
-
-  if (region1Hemisphere && region2Hemisphere) {
-    return region1.name === region2.name
-  } else {
-    const region1NameBasis = region1Hemisphere? region1.name.substring(0, region1.name.lastIndexOf(' ')) : region1.name
-    const region2NameBasis = region2Hemisphere? region2.name.substring(0, region2.name.lastIndexOf(' ')) : region2.name
-    return region1NameBasis === region2NameBasis
   }
 }

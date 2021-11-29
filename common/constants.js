@@ -112,7 +112,10 @@
     QUICKTOUR_CANCEL: `Dismiss`,
 
     DELETE_ALL_ANNOTATION_CONFIRMATION_MSG: `Are you sure you want to delete all annotations?`,
-    LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`
+    LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`,
+
+    ATLAS_SELECTOR_LABEL_SPACES: `Spaces`,
+    ATLAS_SELECTOR_LABEL_PARC_MAPS: `Parcellation maps`
   }
 
   exports.QUICKTOUR_DESC ={

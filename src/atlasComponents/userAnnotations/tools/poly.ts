@@ -13,6 +13,7 @@ export type TPolyJsonSpec = {
 
 export class Polygon extends IAnnotationGeometry{
   public id: string
+  public annotationType = 'Polygon'
 
   public points: Point[] = []
   public edges: [number, number][] = []

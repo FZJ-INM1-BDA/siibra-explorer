@@ -1,25 +1,13 @@
+
+<!-- required for manufacturing plugin templates -->
+<div pluginFactoryDirective>
+</div>
+
 <ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
   <ng-container *ngTemplateOutlet="viewerBody">
   </ng-container>
 </ng-container>
-
-<!-- kg tos -->
-<ng-template #kgToS>
-  <h2 mat-dialog-title>Knowledge Graph ToS</h2>
-  <mat-dialog-content>
-    <small>
-      <kgtos-component>
-      </kgtos-component>
-    </small>
-  </mat-dialog-content>
-
-  <mat-dialog-actions class="justify-content-end">
-    <button color="primary" mat-raised-button (click)="kgTosClickedOk()" cdkFocusInitial>
-      Ok
-    </button>
-  </mat-dialog-actions>
-</ng-template>
 
 <!-- cookie -->
 <ng-template #cookieAgreementComponent>
@@ -40,7 +28,7 @@
 
 <!-- atlas template -->
 <ng-template #viewerBody>
-  <div class="atlas-container w-100 h-100"
+  <div class="w-100 h-100"
     iav-media-query
     quick-tour
     [quick-tour-position]="quickTourFinale.position"
@@ -65,41 +53,33 @@
       <div floatingContainerDirective>
       </div>
 
-      <div
-        *ngIf="(media.mediaBreakPoint$ | async) < 3"
+      <div *ngIf="(media.mediaBreakPoint$ | async) < 3"
         class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
         <ng-container *ngTemplateOutlet="logoTmpl">
         </ng-container>
       </div>
 
-      <div floatingMouseContextualContainerDirective>
+      <div *ngIf="!ismobile" floatingMouseContextualContainerDirective>
 
-        <div *ngIf="!ismobile"
-          class="d-inline-block"
+        <div class="h-0"
           iav-mouse-hover
-          #iavMouseHoverContextualBlock="iavMouseHover"
-          contextualBlock>
-
-          <ng-container
-            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe">
-
-            <mat-list dense>
-
-              <mat-list-item class="h-auto">
-
-                <mat-icon
-                  [fontSet]="(labelText.label | mouseOverIconPipe).fontSet"
-                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon"
-                  mat-list-icon>
-
-                </mat-icon>
-
-                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text"></div>
-
-              </mat-list-item>
-            </mat-list>
-          </ng-container>
+          #iavMouseHoverContextualBlock="iavMouseHover">
         </div>
+        <mat-list dense class="contextual-block">
+
+          <mat-list-item *ngFor="let cvtOutput of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseoverCvt"
+            class="h-auto">
+
+            <mat-icon
+              [fontSet]="cvtOutput.icon.fontSet"
+              [fontIcon]="cvtOutput.icon.fontIcon"
+              mat-list-icon>
+            </mat-icon>
+
+            <div matLine>{{ cvtOutput.text }}</div>
+
+          </mat-list-item>
+        </mat-list>
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
@@ -113,10 +93,6 @@
       </div>
 
     </layout-floating-container>
-
-    <!-- required for manufacturing plugin templates -->
-    <div pluginFactoryDirective>
-    </div>
   </div>
 </ng-template>
 

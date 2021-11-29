@@ -2,7 +2,7 @@ import { Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector
 import { IBSSummaryResponse, TContextedFeature, TRegion } from "../type";
 import { BsFeatureService, TFeatureCmpInput } from "../service";
 import { combineLatest, Observable, Subject } from "rxjs";
-import { debounceTime, map, shareReplay, startWith, tap } from "rxjs/operators";
+import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../constants";
 import { ARIA_LABELS } from 'common/constants'
 import {

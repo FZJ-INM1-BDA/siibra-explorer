@@ -39,6 +39,9 @@ export class ShowDatasetDialogDirective{
     doi: string
   }[] = []
 
+  @Input('iav-dataset-show-dataset-dialog-ignore-overwrite')
+  ignoreOverwrite = false
+
   @Input('iav-dataset-show-dataset-dialog-contexted-region')
   region: TSiibraRegion & TContextRegion
 
@@ -67,7 +70,7 @@ export class ShowDatasetDialogDirective{
       return this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
     }
 
-    if (this.overwriteFn) {
+    if (!this.ignoreOverwrite && this.overwriteFn) {
       return this.overwriteFn(data)
     }
 

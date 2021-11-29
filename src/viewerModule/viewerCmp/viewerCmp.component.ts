@@ -1,7 +1,7 @@
-import { Component, ComponentFactory, ComponentFactoryResolver, ElementRef, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {combineLatest, merge, NEVER, Observable, of, Subject, Subscription} from "rxjs";
-import {catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
+import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
@@ -14,9 +14,7 @@ import {
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, REGION_OF_INTEREST } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
-import { SwitchDirective } from "src/util/directives/switch.directive";
-import { QuickTourThis, IQuickTourData } from "src/ui/quickTour";
-import { MatDrawer } from "@angular/material/sidenav";
+import { IQuickTourData } from "src/ui/quickTour";
 import { PureContantService } from "src/util";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { getGetRegionFromLabelIndexId, switchMapWaitFor } from "src/util/fn";
@@ -26,6 +24,7 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GenericInfoCmp } from "src/atlasComponents/regionalFeatures/bsFeatures/genericInfo";
 import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
+import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 import { DialogService } from "src/services/dialogService.service";
 
 type TCStoreViewerCmp = {
@@ -116,7 +115,8 @@ export function ROIFactory(store: Store<any>, svc: PureContantService){
     },
     ComponentStore,
     DialogService
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ViewerCmp implements OnDestroy {
@@ -126,12 +126,6 @@ export class ViewerCmp implements OnDestroy {
   
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
-
-  @ViewChild('sideNavTopSwitch', { static: true })
-  private sidenavTopSwitch: SwitchDirective
-
-  @ViewChild('sideNavFullLeftSwitch', { static: true })
-  private sidenavLeftSwitch: SwitchDirective
 
   @ViewChild('genericInfoVCR', { read: ViewContainerRef })
   genericInfoVCR: ViewContainerRef
@@ -172,6 +166,7 @@ export class ViewerCmp implements OnDestroy {
 
   public viewerMode$: Observable<string> = this.store$.pipe(
     select(viewerStateViewerModeSelector),
+    shareReplay(1),
   )
 
   public overlaySidenav$ = this.cStore.select(s => s.overlaySideNav).pipe(
@@ -190,12 +185,8 @@ export class ViewerCmp implements OnDestroy {
       return 'notsupported'
     })
   )
-
-  /**
-   * TODO may need to be deprecated
-   * in favour of regional feature/data feature
-   */
-  public iavAdditionalLayers$ = new Subject<any[]>()
+  
+  public pliVol$ = this._pliVol$ || NEVER
 
   /**
    * if no regions are selected, nor any additional layers (being deprecated)
@@ -203,13 +194,16 @@ export class ViewerCmp implements OnDestroy {
    * and the full left side bar should not be expandable
    * if it is already expanded, it should collapse
    */
-  public alwaysHideMinorPanel$: Observable<boolean> = combineLatest([
+  public onlyShowMiniTray$: Observable<boolean> = combineLatest([
     this.selectedRegions$,
-    this.iavAdditionalLayers$.pipe(
+    this.pliVol$.pipe(
       startWith([])
-    )
+    ),
+    this.viewerMode$.pipe(
+      startWith(null as string)
+    ),
   ]).pipe(
-    map(([ regions, layers ]) => regions.length === 0 && layers.length === 0)
+    map(([ regions, layers, viewerMode ]) => regions.length === 0 && layers.length === 0 && !viewerMode)
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
@@ -224,7 +218,6 @@ export class ViewerCmp implements OnDestroy {
 
   private genericInfoCF: ComponentFactory<GenericInfoCmp>
 
-  public pliVol$ = this._pliVol$ || NEVER
   public clearVoi(){
     this.store$.dispatch(
       uiActionSetPreviewingDatasetFiles({
@@ -238,6 +231,7 @@ export class ViewerCmp implements OnDestroy {
     private cStore: ComponentStore<TCStoreViewerCmp>,
     cfr: ComponentFactoryResolver,
     private dialogSvc: DialogService,
+    private cdr: ChangeDetectorRef,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
@@ -245,23 +239,8 @@ export class ViewerCmp implements OnDestroy {
     this.genericInfoCF = cfr.resolveComponentFactory(GenericInfoCmp)
 
     this.subscriptions.push(
-      this.pliVol$.subscribe(val => {
-        if (val.length > 0) {
-          this.sidenavTopSwitch && this.sidenavTopSwitch.open()
-          this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
-        } else {
-          this.sidenavTopSwitch && this.sidenavTopSwitch.close()
-          this.sidenavLeftSwitch && this.sidenavLeftSwitch.close()
-        }
-      }),
       this.selectedRegions$.subscribe(() => {
         this.clearPreviewingDataset()
-      }),
-      this.alwaysHideMinorPanel$.pipe(
-        distinctUntilChanged(),
-        filter(flag => !flag),
-      ).subscribe(() => {
-        this.openSideNavs()
       }),
       this.viewerModuleSvc.context$.subscribe(
         (ctx: any) => this.context = ctx
@@ -397,7 +376,7 @@ export class ViewerCmp implements OnDestroy {
 
         this.genericInfoVCR.clear()
         this.genericInfoVCR.createComponent(this.genericInfoCF, null, injector)
-
+        this.cdr.markForCheck()
       })
     )
   }
@@ -415,13 +394,12 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public handleChipClick(){
-    this.openSideNavs()
-  }
-
-  private openSideNavs() {
-    this.sidenavLeftSwitch && this.sidenavLeftSwitch.open()
-    this.sidenavTopSwitch && this.sidenavTopSwitch.open()
+  public exitSpecialViewMode(){
+    this.store$.dispatch(
+      viewerStateSetViewerMode({
+        payload: null
+      })
+    )
   }
 
   public clearPreviewingDataset(){
@@ -431,21 +409,6 @@ export class ViewerCmp implements OnDestroy {
     this.cStore.setState({
       overlaySideNav: null
     })
-  }
-
-  @ViewChild('regionSelRef', { read: ElementRef })
-  regionSelRef: ElementRef<any>
-
-  @ViewChild('regionSearchQuickTour', { read: QuickTourThis })
-  regionSearchQuickTour: QuickTourThis
-
-  @ViewChild('matDrawerLeft', { read: MatDrawer })
-  matDrawerLeft: MatDrawer
-
-  handleSideNavAnimationDone(sideNavExpanded: boolean) {
-    this.regionSearchQuickTour?.attachTo(
-      !sideNavExpanded ? null : this.regionSelRef
-    )
   }
 
   public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>){

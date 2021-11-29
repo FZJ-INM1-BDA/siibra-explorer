@@ -1,12 +1,11 @@
-import { Component, Inject, OnDestroy, Optional } from "@angular/core";
-import { Observable, of, Subject, Subscription } from "rxjs";
+import { ChangeDetectorRef, Component, Inject, OnDestroy, Optional } from "@angular/core";
+import { BehaviorSubject, Observable, of, Subscription } from "rxjs";
 import { filter, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { BsRegionInputBase } from "../../bsRegionInputBase";
 import { REGISTERED_FEATURE_INJECT_DATA } from "../../constants";
 import { BsFeatureService, TFeatureCmpInput } from "../../service";
 import { TBSDetail } from "../type";
 import { ARIA_LABELS } from 'common/constants'
-import { isPr } from "../profile/profile.component";
 
 @Component({
   selector: 'bs-features-receptor-entry',
@@ -21,7 +20,7 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   private sub: Subscription[] = []
   public ARIA_LABELS = ARIA_LABELS
 
-  private selectedREntryId$ = new Subject<string>()
+  private selectedREntryId$ = new BehaviorSubject<string>(null)
   private _selectedREntryId: string
   set selectedREntryId(id: string){
     this.selectedREntryId$.next(id)
@@ -50,13 +49,6 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   public receptorsSummary$ = this.region$.pipe(
     filter(v => !!v),
     switchMap(() => this.getFeatureInstancesList('ReceptorDistribution')),
-    tap(arr => {
-      if (arr && arr.length > 0) {
-        this.selectedREntryId = arr[0]['@id']
-      } else {
-        this.selectedREntryId = null
-      }
-    }),
     startWith([]),
     shareReplay(1),
   )
@@ -75,11 +67,21 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
 
   constructor(
     svc: BsFeatureService,
+    cdr: ChangeDetectorRef,
     @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput
   ){
     super(svc, data)
     this.sub.push(
-      this.selectedReceptor$.subscribe()
+      this.selectedReceptor$.subscribe(() => {
+        cdr.markForCheck()
+      }),
+      this.receptorsSummary$.subscribe(arr => {
+        if (arr && arr.length > 0) {
+          this.selectedREntryId = arr[0]['@id']
+        } else {
+          this.selectedREntryId = null
+        }
+      })
     )
   }
 }

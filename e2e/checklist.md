@@ -55,3 +55,10 @@
   - [ ] v4 are visible
   - [ ] on hover, show correct region name(s)
   - [ ] whole mesh loads
+## saneURL
+- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/bigbrainGreyWhite) redirects to big brain
+- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/julichbrain) redirects to julich brain (colin 27)
+- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/whs4) redirects to waxholm v4
+- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/allen2017) redirects to allen 2017
+- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/mebrains) redirects to monkey
+

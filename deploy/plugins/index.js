@@ -7,6 +7,16 @@ const express = require('express')
 const lruStore = require('../lruStore')
 const got = require('got')
 const router = express.Router()
+const DEV_PLUGINS = (() => {
+  try {
+    return JSON.parse(
+      process.env.DEV_PLUGINS || `[]`
+    )
+  } catch (e) {
+    console.warn(`Parsing DEV_PLUGINS failed: ${e}`)
+    return []
+  }
+})()
 const PLUGIN_URLS = (process.env.PLUGIN_URLS && process.env.PLUGIN_URLS.split(';')) || []
 const STAGING_PLUGIN_URLS = (process.env.STAGING_PLUGIN_URLS && process.env.STAGING_PLUGIN_URLS.split(';')) || []
 
@@ -44,7 +54,7 @@ router.get('/manifests', async (_req, res) => {
   }))
 
   res.status(200).json(
-    allManifests.filter(v => !!v)
+    [...DEV_PLUGINS, ...allManifests.filter(v => !!v)]
   )
 })
 

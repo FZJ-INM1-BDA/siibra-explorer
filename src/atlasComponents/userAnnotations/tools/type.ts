@@ -313,6 +313,7 @@ export abstract class IAnnotationGeometry extends Highlightable {
 
   public space: TBaseAnnotationGeomtrySpec['space']
 
+  abstract annotationType: string
   abstract getNgAnnotationIds(): string[]
   abstract toNgAnnotation(): INgAnnotationTypes[keyof INgAnnotationTypes][]
   abstract toJSON(): TRecord

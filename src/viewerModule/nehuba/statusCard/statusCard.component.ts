@@ -11,7 +11,7 @@ import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subscription, of, combineLatest } from "rxjs";
-import { map, filter, startWith } from "rxjs/operators";
+import { map, filter, startWith, throttleTime } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -50,7 +50,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public navVal$: Observable<string>
   public mouseVal$: Observable<string>
 
-  public useTouchInterface$: Observable<boolean>
 
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.STATUS_CARD,
@@ -70,7 +69,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
     private dialog: MatDialog,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ) {
-    this.useTouchInterface$ = of(true) //this.pureConstantService.useTouchUI$
 
     if (nehubaViewer$) {
       this.subscriptions.push(
@@ -128,10 +126,12 @@ export class StatusCardComponent implements OnInit, OnChanges{
       this.mouseVal$ = combineLatest([
         this.statusPanelRealSpace$,
         this.nehubaViewer.mousePosInReal$.pipe(
-          filter(v => !!v)
+          filter(v => !!v),
+          throttleTime(16)
         ),
         this.nehubaViewer.mousePosInVoxel$.pipe(
-          filter(v => !!v)
+          filter(v => !!v),
+          throttleTime(16)
         )
       ]).pipe(
         map(([realFlag, real, voxel]) => realFlag

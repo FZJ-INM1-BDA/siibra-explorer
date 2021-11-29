@@ -50,11 +50,12 @@ describe('temporalPositveScanFn', () => {
     ]).pipe(
       take(1),
     ).subscribe(([ arr1, arr2, arr3, arr4 ]) => {
-      expect(arr1).toEqual([ segmentsPositive ])
-      expect(arr2).toEqual([ userLandmarkPostive, segmentsPositive ])
-      expect(arr3).toEqual([ userLandmarkPostive ])
+      expect(arr1).toEqual([ segmentsPositive ] as any)
+      expect(arr2).toEqual([ userLandmarkPostive, segmentsPositive ] as any)
+      expect(arr3).toEqual([ userLandmarkPostive ] as any)
       expect(arr4).toEqual([])
-    }, null, () => done() )
+      done()
+    })
 
     source.next(segmentsPositive)
     source.next(userLandmarkPostive)
