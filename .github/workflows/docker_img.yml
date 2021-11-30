@@ -120,6 +120,10 @@ jobs:
             echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
           fi
 
+          # DEPLOY_ID == remove _ / and lowercase everything from branch
+          DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+
           if [[ "$BRANCH_NAME" == 'master' ]] || [[ "$BRANCH_NAME" == 'staging' ]]
           then
             echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
@@ -159,15 +163,12 @@ jobs:
         run: |
           oc login $OKD_URL --token=$OKD_SECRET
           oc project $OKD_PROJECT
-
-          # DEPLOY_ID == remove _ / and lowercase everything from branch
-          DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
           
           ROUTE_PATH=/$DEPLOY_ID
           echo "ROUTE_PATH=$ROUTE_PATH" >> $GITHUB_ENV
 
           echo "Working branch name: $BRANCH_NAME, deploy_id: $DEPLOY_ID"
+          echo "full deploy id: $FULL_DEPLOY_ID, secondary deploy id: $FULL_DEPLOY_ID2"
 
           # check if the deploy already exist
 
