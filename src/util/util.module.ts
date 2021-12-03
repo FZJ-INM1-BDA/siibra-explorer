@@ -21,6 +21,7 @@ import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
 import {SafeStylePipe} from "src/util/pipes/safeStyle.pipe";
+import { MergeObjPipe } from "./mergeObj.pipe";
 
 @NgModule({
   imports:[
@@ -47,6 +48,7 @@ import {SafeStylePipe} from "src/util/pipes/safeStyle.pipe";
     GetFilenamePipe,
     CombineFnPipe,
     SafeStylePipe,
+    MergeObjPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -69,6 +71,7 @@ import {SafeStylePipe} from "src/util/pipes/safeStyle.pipe";
     GetFilenamePipe,
     CombineFnPipe,
     SafeStylePipe,
+    MergeObjPipe,
   ]
 })
 

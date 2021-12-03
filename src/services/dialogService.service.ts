@@ -82,4 +82,5 @@ export interface DialogConfig {
   message: string
   markdown?: string
   iconClass: string
+  confirmOnly: boolean
 }

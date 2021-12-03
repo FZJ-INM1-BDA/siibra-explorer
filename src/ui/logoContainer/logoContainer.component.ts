@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { PureContantService } from "src/util";
 import { Subscription } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
 
 const imageDark = 'assets/logo/ebrains-logo-dark.svg'
 const imageLight = 'assets/logo/ebrains-logo-light.svg'
@@ -26,7 +27,9 @@ export class LogoContainer {
     private pureConstantService: PureContantService
   ){
     this.subscriptions.push(
-      pureConstantService.darktheme$.subscribe(flag => {
+      pureConstantService.darktheme$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag => {
         this.containerStyle = {
           backgroundImage: `url('${flag ? imageLight : imageDark}')`
         }

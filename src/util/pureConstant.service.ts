@@ -17,7 +17,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { TTemplateImage } from "./interfaces";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.1.5'
+export const SIIBRA_API_VERSION = '0.1.8'
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -55,6 +55,20 @@ type TIAVAtlas = {
     }
   } & THasId)[]
 } & THasId
+
+type TNehubaConfig = Record<string, {
+  source: string
+  transform: number[][]
+  type: 'segmentation' | 'image'
+}>
+
+type TViewerConfig = TNehubaConfig
+
+/**
+ * key value pair of
+ * atlasId -> templateId -> viewerConfig
+ */
+type TAtlasTmplViewerConfig = Record<string, Record<string, TViewerConfig>>
 
 export const spaceMiscInfoMap = new Map([
   ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', {
@@ -442,7 +456,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       const { EXPERIMENTAL_FEATURE_FLAG } = environment
       if (EXPERIMENTAL_FEATURE_FLAG) return arr
       return arr
-      // return arr.filter(atlas => !/pre.?release/i.test(atlas.name))
     }),
     shareReplay(1),
   )
@@ -496,7 +509,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                         // }]
                       }
                     }),
-                    originDatainfos: (parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...(parc.infos || []), ...(parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 })
               }
@@ -515,12 +528,20 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     shareReplay(1)
   )
 
+  private atlasTmplConfig: TAtlasTmplViewerConfig = {}
+
+  async getViewerConfig(atlasId: string, templateId: string, parcId: string) {
+    const atlasLayers = this.atlasTmplConfig[atlasId]
+    const templateLayers = atlasLayers && atlasLayers[templateId]
+    return templateLayers || {}
+  }
+
   public initFetchTemplate$ = this.fetchedAtlases$.pipe(
     switchMap(atlases => {
       return forkJoin(
         atlases.map(atlas => this.getSpacesAndParc(atlas['@id']).pipe(
           switchMap(({ templateSpaces, parcellations }) => {
-            const ngLayerObj = {}
+            this.atlasTmplConfig[atlas["@id"]] = {}
             return forkJoin(
               templateSpaces.map(
                 tmpl => {
@@ -535,7 +556,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                       name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
                     })
                   }
-                  ngLayerObj[tmpl.id] = {}
+                  this.atlasTmplConfig[atlas["@id"]][tmpl.id] = {}
                   return tmpl.availableParcellations.map(
                     parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
                       tap(regions => {
@@ -558,7 +579,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                               const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
                               region['ngId'] = ngId
                               region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                              ngLayerObj[tmpl.id][ngId] = {
+                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngId] = {
                                 source: `precomputed://${dedicatedMap[0].url}`,
                                 type: "segmentation",
                                 transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
@@ -577,25 +598,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                                   ? 'right hemisphere'
                                   : 'whole brain'
 
-                              /**
-                               * TODO fix in siibra-api
-                               */
-                              if (
-                                tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
-                                && hemisphereKey === 'whole brain'
-                              ) {
-                                region.labelIndex = null
-                                return
-                              }
-
-                              if (
-                                tmpl.id === 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-                                && parc.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
-                                && hemisphereKey === 'whole brain'
-                              ) {
-                                region.children = []
-                              }
                               if (!region['ngId']) {
                                 const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
                                 region['ngId'] = hemispheredNgId
@@ -622,7 +624,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             const key = 'whole brain'
 
                             const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                            ngLayerObj[tmpl.id][ngIdKey] = {
+                            this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
                               source: `precomputed://${vol.url}`,
                               type: "segmentation",
                               transform: vol.detail['neuroglancer/precomputed'].transform
@@ -639,7 +641,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                             }]
                             for (const { key, mapIndex } of mapIndexKey) {
                               const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                              ngLayerObj[tmpl.id][ngIdKey] = {
+                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
                                 source: `precomputed://${precomputedVols[mapIndex].url}`,
                                 type: "segmentation",
                                 transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
@@ -660,7 +662,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 }
               ).reduce(flattenReducer, [])
             ).pipe(
-              mapTo({ templateSpaces, parcellations, ngLayerObj })
+              mapTo({ templateSpaces, parcellations, ngLayerObj: this.atlasTmplConfig })
             )
           }),
           map(({ templateSpaces, parcellations, ngLayerObj }) => {
@@ -754,9 +756,12 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
               const templateImages: TTemplateImage[] = []
               for (const precomputedItem of precomputedArr) {
                 const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+                const precomputedUrl = 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211001-mebrain/precomputed/images/MEBRAINS_T1.masked' === precomputedItem.url
+                  ? 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211018-mebrains-masked-templates/precomputed/images/MEBRAINS_T1_masked'
+                  : precomputedItem.url
                 initialLayers[ngIdKey] = {
                   type: "image",
-                  source: `precomputed://${precomputedItem.url}`,
+                  source: `precomputed://${precomputedUrl}`,
                   transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
                   visible
                 }
@@ -796,8 +801,8 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                 }
               }
 
-              for (const key in (ngLayerObj[tmpl.id] || {})) {
-                initialLayers[key] = ngLayerObj[tmpl.id][key]
+              for (const key in (ngLayerObj[atlas["@id"]][tmpl.id] || {})) {
+                initialLayers[key] = ngLayerObj[atlas["@id"]][tmpl.id][key]
               }
 
               return {
@@ -822,7 +827,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                     '@id': parc.id,
                     name: parc.name,
                     regions,
-                    originDatainfos: (fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+                    originDatainfos: [...fullParcInfo.infos, ...(fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
                   }
                 }),
                 ...threeSurferConfig
