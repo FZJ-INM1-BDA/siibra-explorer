@@ -7,7 +7,7 @@
             </div>
 
             <div *ngIf="node.hasChildren; else lastChildTmp">
-                <button mat-button (click)="toggleNode(node)"
+                <button mat-button (click)="toggleNodeExpansion(node)"
                         [attr.aria-label]="'Toggle ' + node.name"
                         class="d-flex align-items-center tree-item-height">
                     <i [ngClass]="!treeControl.isExpanded(node) ? 'r-270' : ''" class="fas fa-chevron-down mr-1"></i>
@@ -17,7 +17,7 @@
             <ng-template #lastChildTmp>
                 <div class="d-flex align-items-center pl-1">
 
-                    <button (click)="toggleNode(node)"
+                    <button (click)="toggleNodeExpansion(node)"
                             mat-button
                             [attr.aria-label]="'Select ' + node.name"
                             [ngClass]="selectedRegion && selectedRegion.name === node.name? 'border' : ''"

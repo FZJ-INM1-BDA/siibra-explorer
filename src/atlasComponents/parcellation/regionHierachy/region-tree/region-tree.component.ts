@@ -12,8 +12,6 @@ export class RegionTreeComponent {
 
   public ARIA_LABELS = ARIA_LABELS
 
-  @Input() regions: any
-
   @Input() public inputItem: any = [{
     name : 'Untitled',
     children : [],
@@ -36,7 +34,23 @@ export class RegionTreeComponent {
   public dataSource: MatTreeFlatDataSource<any, any>
   public lineHeight = 20
 
-  toggleNode(node) {
+
+
+  public treeFlattener =
+    new MatTreeFlattener<any, any>(
+      ((node: any, level: number) => ({
+        ...node,
+        level,
+        hasChildren: node.children?.length > 0,
+      })),
+      (e => e.level),
+      (e => e.hasChildren),
+      (e => e.children),
+    )
+
+
+
+  toggleNodeExpansion(node) {
     if (this.treeControl.isExpanded(node)) {
       this.treeControl.collapseDescendants(node)
     } else {
@@ -45,23 +59,8 @@ export class RegionTreeComponent {
   }
 
   filterChanged(filterText: string) {
-
     const filteredItems = filterText? this.filter(this.inputItem, filterText) : this.inputItem
-
-    const treeFlattener =
-      new MatTreeFlattener<any, any>(
-        ((node: any, level: number) => ({
-          ...node,
-          level,
-          hasChildren: node.children.length > 0,
-        })),
-        (e => e.level),
-        (e => e.hasChildren),
-        (e => e.children),
-      )
-
-
-    this.dataSource = new MatTreeFlatDataSource(this.treeControl, treeFlattener)
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener)
     this.dataSource.data = filteredItems
 
     this.correctToggledItems()
