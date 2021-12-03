@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core";
-import { FilterRowsByVisbilityPipe } from "src/components/flatTree/filterRowsByVisibility.pipe";
 import { KeyListner } from "./directives/keyDownListener.directive";
 
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
@@ -21,13 +20,13 @@ import { FilterArrayPipe } from "./pipes/filterArray.pipe";
 import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
+import {SafeStylePipe} from "src/util/pipes/safeStyle.pipe";
 
 @NgModule({
   imports:[
     LayoutModule
   ],
   declarations: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
     IncludesPipe,
@@ -47,9 +46,9 @@ import { CombineFnPipe } from "./pipes/combineFn.pipe";
     DoiParserPipe,
     GetFilenamePipe,
     CombineFnPipe,
+    SafeStylePipe,
   ],
   exports: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
     IncludesPipe,
@@ -69,6 +68,7 @@ import { CombineFnPipe } from "./pipes/combineFn.pipe";
     DoiParserPipe,
     GetFilenamePipe,
     CombineFnPipe,
+    SafeStylePipe,
   ]
 })
 

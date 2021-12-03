@@ -10,6 +10,9 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components";
 import {RegionTreeComponent} from "src/atlasComponents/parcellation/regionHierachy/region-tree/region-tree.component";
 import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
+import {PreSizedArrayPipe} from "src/atlasComponents/parcellation/regionHierachy/region-tree/pre-sized-array.pipe";
+import {HighlightPipe} from "src/atlasComponents/parcellation/regionHierachy/region-tree/highlight.pipe";
+import {TreeDashesPipe} from "src/atlasComponents/parcellation/regionHierachy/region-tree/tree-dashes.pipe";
 
 @NgModule({
   imports: [
@@ -28,6 +31,9 @@ import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
     FilterNameBySearch,
     RegionTreeComponent,
     GetParcPreviewUrlPipe,
+    HighlightPipe,
+    PreSizedArrayPipe,
+    TreeDashesPipe,
   ],
   exports: [
     RegionHierarchy,

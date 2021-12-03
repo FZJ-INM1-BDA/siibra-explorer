@@ -76,7 +76,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     ComponentsModule,
     DragDropModule,
     UIModule,
-    
+
     AngularMaterialModule,
     UtilModule,
     WidgetModule,
@@ -114,7 +114,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       uiState,
       userConfigState,
     },{
-      metaReducers: [ 
+      metaReducers: [
         // debug,
         ...viewerStateMetaReducers,
         datasetPreviewMetaReducer,

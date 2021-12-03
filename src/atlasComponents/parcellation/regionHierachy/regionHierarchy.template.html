@@ -29,15 +29,16 @@
 
 <!--        ToDo  Needs refactor of goToregion and selec region
              Navigate icon should only visible when position exists-->
-        <app-region-tree
+        <iav-mat-region-tree
                 [regions]="regions"
+                [selectedRegion]="selectedRegions[0] || null"
                 [inputItem]="[aggregatedRegionTree]"
                 (navigateToRegion)="gotoRegion($event)"
                 (selectRegion)="selectRegion($event)"
                 [searchString]="searchTerm"
         >
 
-        </app-region-tree>
+        </iav-mat-region-tree>
 
       </div> 
     </div>

@@ -1,40 +1,40 @@
 <cdk-virtual-scroll-viewport class="h-100 overflow-y-auto overflow-x-hidden" [itemSize]="lineHeight">
-    <mat-radio-group [(ngModel)]="selectedRegion">
     <ng-container *cdkVirtualFor="let node of dataSource; let i = index;">
-        <!-- Note that the [style.padding-left] is essentially what cdkTreeNodePadding is doing under the hood -->
-        <div class="d-flex" [style.height]="lineHeight + 'px'">
+        <div class="d-flex tree-item-height">
 
-            <div *ngFor="let level of [].constructor(node.level); let last = last; let j = index"
-                 [style.height]="lineHeight + 'px'"
-                 [ngStyle]="{borderBottom: last? '1px dashed' : '',
-                             borderLeft: node['missBorderPaintingLevels']
-                                && node['missBorderPaintingLevels'].includes(j+1)? '' : '1px dashed',
-                             marginTop: - lineHeight/2 + 'px'}"
-                 style="width: 20px">
+            <div *ngFor="let level of node.level | preSizedArray; let last = last; let j = index"
+                 class="tree-item-dashes" [style]="node | treeDashes : last : j">
             </div>
 
             <div *ngIf="node.hasChildren; else lastChildTmp">
                 <button mat-button (click)="toggleNode(node)"
-                        [style.height]="lineHeight + 'px'"
-                        [attr.aria-label]="'Toggle ' + node.name" class="d-flex align-items-center">
+                        [attr.aria-label]="'Toggle ' + node.name"
+                        class="d-flex align-items-center tree-item-height">
                     <i [ngClass]="!treeControl.isExpanded(node) ? 'r-270' : ''" class="fas fa-chevron-down mr-1"></i>
                     <span [innerHTML]="node.name | highlightPipe: searchString"></span>
                 </button>
             </div>
             <ng-template #lastChildTmp>
-                <div class="d-flex align-items-center pl-4">
-                    <mat-radio-button [value]="node" (click)="toggleSelection($event, node)" class="align-self-end">
-                        <span [innerHTML]="node.name | highlightPipe: searchString"></span>
-                    </mat-radio-button>
-<!--                    <button mat-icon-button-->
-<!--                            (click)="navigateToRegion.emit(node)"-->
-<!--                            [style.height]="lineHeight + 'px'">-->
-<!--                        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">-->
-<!--                        </mat-icon>-->
-<!--                    </button>-->
+                <div class="d-flex align-items-center pl-1">
+
+                    <button (click)="toggleNode(node)"
+                            mat-button
+                            [attr.aria-label]="'Select ' + node.name"
+                            [ngClass]="selectedRegion && selectedRegion.name === node.name? 'border' : ''"
+                            class="d-flex align-items-center tree-item-height">
+
+                        <span [innerHTML]="node.name | highlightPipe: searchString"
+                              (click)="toggleSelection($event, node)"></span>
+                    </button>
+
+                    <small>
+                        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt"
+                              class="cursor-pointer ml-2 tree-item-height"
+                              (click)="navigateToRegion.emit(node)">
+                        </mat-icon>
+                    </small>
                 </div>
             </ng-template>
         </div>
     </ng-container>
-    </mat-radio-group>
 </cdk-virtual-scroll-viewport>

@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MatTreeFlatDataSource, MatTreeFlattener} from "@angular/material/tree";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import { ARIA_LABELS } from 'common/constants'
 
 @Component({
-  selector: 'app-region-tree',
+  selector: 'iav-mat-region-tree',
   templateUrl: './region-tree.component.html',
   styleUrls: ['./region-tree.component.css']
 })
@@ -19,8 +19,9 @@ export class RegionTreeComponent {
     children : [],
   }]
   @Input() public childrenExpanded: boolean = true
+  @Input() selectedRegion: any = {}
 
-  public _searchString: string
+  private _searchString: string
   @Input()
   set searchString(ss: string) {
     this._searchString = ss
@@ -33,9 +34,8 @@ export class RegionTreeComponent {
 
   public treeControl: FlatTreeControl<any> = new FlatTreeControl<any>((e => e.level), (e => e.hasChildren))
   public dataSource: MatTreeFlatDataSource<any, any>
-  public lineHeight = 30
-  public selectedRegion: any = {}
-  
+  public lineHeight = 20
+
   toggleNode(node) {
     if (this.treeControl.isExpanded(node)) {
       this.treeControl.collapseDescendants(node)
@@ -45,30 +45,8 @@ export class RegionTreeComponent {
   }
 
   filterChanged(filterText: string) {
-    const filter = (array, text) => {
-      const getChildren = (result, object) => {
-        const nameString = object.name.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
-        const textString = text.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
 
-        const nameArray = nameString.split(' ')
-        const textArray = textString.split(' ')
-
-        if (textArray.every(t => nameArray.find(n => n.includes(t)))) {
-          result.push(object)
-          return result
-        }
-
-        if (Array.isArray(object.children)) {
-          const children = object.children.reduce(getChildren, [])
-          if (children.length) result.push({ ...object, children })
-        }
-        return result
-      }
-
-      return array.reduce(getChildren, [])
-    }
-
-    const filteredItems = filterText? filter(this.inputItem, filterText) : this.inputItem
+    const filteredItems = filterText? this.filter(this.inputItem, filterText) : this.inputItem
 
     const treeFlattener =
       new MatTreeFlattener<any, any>(
@@ -81,9 +59,42 @@ export class RegionTreeComponent {
         (e => e.hasChildren),
         (e => e.children),
       )
+
+
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, treeFlattener)
     this.dataSource.data = filteredItems
 
+    this.correctToggledItems()
+
+    this.treeControl.expandAll()
+  }
+
+
+
+  filter = (array, text) => {
+    const getChildren = (result, object) => {
+      const nameString = object.name.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
+      const textString = text.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
+
+      const nameArray = nameString.split(' ')
+      const textArray = textString.split(' ')
+
+      if (textArray.every(t => nameArray.find(n => n.includes(t)))) {
+        result.push(object)
+        return result
+      }
+
+      if (Array.isArray(object.children)) {
+        const children = object.children.reduce(getChildren, [])
+        if (children.length) result.push({ ...object, children })
+      }
+      return result
+    }
+
+    return array.reduce(getChildren, [])
+  }
+
+  correctToggledItems() {
     for (let i = 0; i < this.treeControl.dataNodes.length; i++) {
 
       const node = this.treeControl.dataNodes[i]
@@ -122,17 +133,10 @@ export class RegionTreeComponent {
         }
       }
     }
-
-    this.treeControl.expandAll()
   }
 
   toggleSelection(event, node) {
     event.preventDefault()
-    if (JSON.stringify(node) === JSON.stringify(this.selectedRegion)) {
-      this.selectedRegion = {}
-    } else {
-      this.selectedRegion = node
-    }
     this.selectRegion.emit(node)
   }
 

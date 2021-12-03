@@ -12,13 +12,6 @@ import { SafeHtmlPipe } from './safeHtml.pipe'
 import { TreeSearchPipe } from './treeSearch.pipe';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
 import { DialogComponent } from './dialog/dialog.component';
-import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
-import { ClusteringPipe } from './flatTree/clustering.pipe';
-import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
-import { FlattenTreePipe } from './flatTree/flattener.pipe';
-import { FlatTreeComponent } from './flatTree/flatTree.component';
-import { HighlightPipe } from './flatTree/highlight.pipe';
-import { RenderPipe } from './flatTree/render.pipe';
 import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
 import { IAVVerticalButton } from './vButton/vButton.component';
@@ -41,7 +34,6 @@ import { TileCmp } from './tile/tile.component';
     /* components */
     MarkdownDom,
     TreeComponent,
-    FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
@@ -55,12 +47,6 @@ import { TileCmp } from './tile/tile.component';
     /* pipes */
     SafeHtmlPipe,
     TreeSearchPipe,
-    FlattenTreePipe,
-    RenderPipe,
-    HighlightPipe,
-    AppendSiblingFlagPipe,
-    ClusteringPipe,
-    FilterCollapsePipe,
   ],
   exports: [
     BrowserAnimationsModule,
@@ -68,7 +54,6 @@ import { TileCmp } from './tile/tile.component';
 
     MarkdownDom,
     TreeComponent,
-    FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
@@ -78,7 +63,6 @@ import { TileCmp } from './tile/tile.component';
 
     TreeSearchPipe,
     TreeBaseDirective,
-    HighlightPipe,
   ],
 })
 

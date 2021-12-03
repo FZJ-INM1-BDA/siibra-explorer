@@ -1,0 +1,13 @@
+.tree-item-height {
+    height: 20px;
+}
+
+.tree-item-dashes {
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+}
+
+::ng-deep .mat-button-wrapper {
+    line-height: 20px;
+}
