@@ -5,6 +5,7 @@
 .tree-item-dashes {
     width: 20px;
     height: 20px;
+    border-color: grey !important;
 }
 
 .arrow-alignment {
