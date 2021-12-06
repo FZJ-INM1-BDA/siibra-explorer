@@ -5,7 +5,10 @@
 .tree-item-dashes {
     width: 20px;
     height: 20px;
-    margin-top: -10px;
+}
+
+.arrow-alignment {
+    margin-left: -6px;
 }
 
 ::ng-deep .mat-button-wrapper {

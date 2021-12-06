@@ -1,38 +1,41 @@
 <cdk-virtual-scroll-viewport class="h-100 overflow-y-auto overflow-x-hidden" [itemSize]="lineHeight">
     <ng-container *cdkVirtualFor="let node of dataSource; let i = index;">
-        <div class="d-flex tree-item-height">
+        <div class="d-flex tree-item-height p-2">
 
             <div *ngFor="let level of node.level | preSizedArray; let last = last; let j = index"
-                 class="tree-item-dashes" [style]="node | treeDashes : last : j">
+                 class="tree-item-dashes" [style]="node | treeDashes : last : j: treeControl.isExpanded(node)"
+            >
             </div>
 
-            <div *ngIf="node.hasChildren; else lastChildTmp">
+            <div *ngIf="node.hasChildren; else lastChildTmp" class="arrow-alignment" >
                 <button mat-button (click)="toggleNodeExpansion(node)"
                         [attr.aria-label]="'Toggle ' + node.name"
-                        class="d-flex align-items-center tree-item-height">
+                        class="d-flex align-items-center tree-item-height pl-0">
                     <i [ngClass]="!treeControl.isExpanded(node) ? 'r-270' : ''" class="fas fa-chevron-down mr-1"></i>
                     <span [innerHTML]="node.name | highlightPipe: searchString"></span>
                 </button>
             </div>
             <ng-template #lastChildTmp>
-                <div class="d-flex align-items-center pl-1">
+                <div>
+                    <div class="d-flex align-items-center pl-1">
 
-                    <button (click)="toggleNodeExpansion(node)"
-                            mat-button
-                            [attr.aria-label]="'Select ' + node.name"
-                            [ngClass]="selectedRegion && selectedRegion.name === node.name? 'border' : ''"
-                            class="d-flex align-items-center tree-item-height">
+                        <button (click)="toggleNodeExpansion(node)"
+                                mat-button
+                                [attr.aria-label]="'Select ' + node.name"
+                                class="d-flex align-items-center tree-item-height pl-0">
 
                         <span [innerHTML]="node.name | highlightPipe: searchString"
+                              [ngClass]="selectedRegion && selectedRegion.name === node.name? 'regionSelected' : ''"
                               (click)="toggleSelection($event, node)"></span>
-                    </button>
+                        </button>
 
-                    <small>
-                        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt"
-                              class="cursor-pointer ml-2 tree-item-height"
-                              (click)="navigateToRegion.emit(node)">
-                        </mat-icon>
-                    </small>
+                        <small>
+                            <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt"
+                                      class="cursor-pointer ml-2 tree-item-height"
+                                      (click)="navigateToRegion.emit(node)">
+                            </mat-icon>
+                        </small>
+                    </div>
                 </div>
             </ng-template>
         </div>

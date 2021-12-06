@@ -155,7 +155,7 @@ label.perspective-panel-show-slice-views:hover
   background-color:hsla(0,0%,60%,0.2);
 }
 
-span.regionSelected
+.regionSelected
 {
   color : rgba(219, 181, 86,1);
 }
