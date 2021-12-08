@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RegionTreeComponent } from './region-tree.component';
+import { SearchableTreeComponent } from './searchable-tree.component';
 import {AngularMaterialModule} from "src/sharedModules";
 
 describe('RegionTreeComponent', () => {
@@ -27,19 +27,19 @@ describe('RegionTreeComponent', () => {
       }]
     }]
   }]
-  let component: RegionTreeComponent;
-  let fixture: ComponentFixture<RegionTreeComponent>;
+  let component: SearchableTreeComponent;
+  let fixture: ComponentFixture<SearchableTreeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AngularMaterialModule],
-      declarations: [ RegionTreeComponent ]
+      declarations: [ SearchableTreeComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RegionTreeComponent);
+    fixture = TestBed.createComponent(SearchableTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     component.inputItem = treeData

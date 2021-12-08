@@ -12,6 +12,6 @@
     margin-left: -6px;
 }
 
-::ng-deep .mat-button-wrapper {
-    line-height: 20px;
+::ng-deep cdk-virtual-scroll-viewport.searchable-tree > div {
+    padding-bottom: 10px;
 }

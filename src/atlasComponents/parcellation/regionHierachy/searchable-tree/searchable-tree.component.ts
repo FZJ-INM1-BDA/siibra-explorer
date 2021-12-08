@@ -5,10 +5,10 @@ import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'iav-mat-region-tree',
-  templateUrl: './region-tree.component.html',
-  styleUrls: ['./region-tree.component.css']
+  templateUrl: './searchable-tree.component.html',
+  styleUrls: ['./searchable-tree.component.css']
 })
-export class RegionTreeComponent {
+export class SearchableTreeComponent {
 
   public ARIA_LABELS = ARIA_LABELS
 
@@ -36,7 +36,7 @@ export class RegionTreeComponent {
 
 
 
-  public treeFlattener =
+  private treeFlattener =
     new MatTreeFlattener<any, any>(
       ((node: any, level: number) => ({
         ...node,
@@ -63,14 +63,14 @@ export class RegionTreeComponent {
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener)
     this.dataSource.data = filteredItems
 
-    this.correctToggledItems()
+    this.addmissBorderPaintingLevels()
 
     this.treeControl.expandAll()
   }
 
 
 
-  filter = (array, text) => {
+  private filter = (array, text): MatTreeFlattener<any, any> => {
     const getChildren = (result, object) => {
       const nameString = object.name.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
       const textString = text.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, '')
@@ -87,13 +87,14 @@ export class RegionTreeComponent {
         const children = object.children.reduce(getChildren, [])
         if (children.length) result.push({ ...object, children })
       }
+
       return result
     }
 
     return array.reduce(getChildren, [])
   }
 
-  correctToggledItems() {
+  private addmissBorderPaintingLevels() {
     for (let i = 0; i < this.treeControl.dataNodes.length; i++) {
 
       const node = this.treeControl.dataNodes[i]
@@ -135,7 +136,6 @@ export class RegionTreeComponent {
   }
 
   toggleSelection(event, node) {
-    event.preventDefault()
     this.selectRegion.emit(node)
   }
 

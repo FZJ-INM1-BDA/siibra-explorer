@@ -1,0 +1,29 @@
+<cdk-virtual-scroll-viewport class="searchable-tree h-100 overflow-y-auto overflow-x-hidden" [itemSize]="lineHeight">
+    <ng-container *cdkVirtualFor="let node of dataSource; let i = index;">
+        <div class="d-flex tree-item-height p-2">
+
+            <div *ngFor="let level of node.level | preSizedArray; let last = last; let j = index"
+                 class="tree-item-dashes" [style]="node | treeDashes : last : j: treeControl.isExpanded(node)"
+            >
+            </div>
+
+            <div *ngIf="node.hasChildren; else lastChildTmp" class="arrow-alignment" >
+                <div (click)="toggleNodeExpansion(node)"
+                        [attr.aria-label]="'Toggle ' + node.name"
+                        class="d-flex align-items-center tree-item-height pl-0 cursor-pointer">
+                    <i [ngClass]="!treeControl.isExpanded(node) ? 'r-270' : ''" class="fas fa-chevron-down mr-1"></i>
+                    <span class="text-truncate" [innerHTML]="node.name | highlightPipe: searchString"></span>
+                </div>
+            </div>
+            <ng-template #lastChildTmp>
+                <div (click)="toggleNodeExpansion(node)"
+                     [attr.aria-label]="'Select ' + node.name"
+                     class="d-flex align-items-center tree-item-height pl-0 cursor-pointer">
+                    <span [innerHTML]="node.name | highlightPipe: searchString"
+                          [ngClass]="selectedRegion && selectedRegion.name === node.name? 'regionSelected' : ''"
+                          (click)="toggleSelection($event, node)"></span>
+                </div>
+            </ng-template>
+        </div>
+    </ng-container>
+</cdk-virtual-scroll-viewport>

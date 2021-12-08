@@ -29,7 +29,6 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 
 import { ClipboardModule } from '@angular/cdk/clipboard'
 import {MatTreeModule} from "@angular/material/tree";
-import {MatRadioModule} from "@angular/material/radio";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -63,7 +62,6 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatToolbarModule,
     ClipboardModule,
     MatTreeModule,
-    MatRadioModule
   ],
   exports: [
     MatButtonModule,
@@ -94,7 +92,6 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatToolbarModule,
     ClipboardModule,
     MatTreeModule,
-    MatRadioModule
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

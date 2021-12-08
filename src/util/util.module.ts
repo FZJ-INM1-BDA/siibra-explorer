@@ -20,7 +20,6 @@ import { FilterArrayPipe } from "./pipes/filterArray.pipe";
 import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
-import {SafeStylePipe} from "src/util/pipes/safeStyle.pipe";
 import { MergeObjPipe } from "./mergeObj.pipe";
 
 @NgModule({
@@ -47,7 +46,6 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     DoiParserPipe,
     GetFilenamePipe,
     CombineFnPipe,
-    SafeStylePipe,
     MergeObjPipe,
   ],
   exports: [
@@ -70,7 +68,6 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     DoiParserPipe,
     GetFilenamePipe,
     CombineFnPipe,
-    SafeStylePipe,
     MergeObjPipe,
   ]
 })
