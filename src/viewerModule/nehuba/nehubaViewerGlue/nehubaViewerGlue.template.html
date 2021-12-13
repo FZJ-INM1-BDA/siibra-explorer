@@ -252,5 +252,8 @@
            (input)="maximiseService.navigate(custom3DRangeInput.value)"
            class="custom-slider-3d mini-perspective-viewer"
            id="customSliderFor3d">
+    <div class="position-absolute iv-custom-comp text range-value">
+      {{(maximiseService.navPosReal[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2] / 1e6).toFixed(3)}}mm
+    </div>
   </div>
 </ng-template>

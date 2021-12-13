@@ -5,11 +5,12 @@ import {combineLatest, Observable, of, Subscription} from "rxjs";
 import {viewerStateSelectedTemplatePureSelector} from "src/services/state/viewerState/selectors";
 import {IavRootStoreInterface} from "src/services/stateStore.service";
 import {select, Store} from "@ngrx/store";
-import {debounceTime, distinctUntilChanged, filter, map, switchMap} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged, filter, map, mergeMap, switchMap} from "rxjs/operators";
 import {ngViewerActionSetPerspOctantRemoval} from "src/services/state/ngViewerState/actions";
 import {ChangePerspectiveOrientationService} from "src/viewerModule/nehuba/viewerCtrl/change-perspective-orientation/changePerspectiveOrientation.service";
 import {ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder} from "src/services/state/ngViewerState/selectors";
 import {PANELS} from "src/services/state/ngViewerState/constants";
+import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class MaximiseViewService implements OnDestroy {
     public defaultZoomLevels
 
     public navPosVoxel: any
+    public navPosReal: any
     public defaultOrientation: any
     public templateTransform = []
 
@@ -34,27 +36,46 @@ export class MaximiseViewService implements OnDestroy {
 
     public isMaximised: boolean = false
 
+    private perspectivePanel: any
+
+    private get viewer(){
+      return this.injectedViewer || (window as any).viewer
+    }
+
     constructor(private store$: Store<IavRootStoreInterface>,
                 private poService: ChangePerspectiveOrientationService,
-                @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>) {
+                @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
+                @Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer) {
+
       if (nehubaViewer$) {
         this.subscriptions.push(
           nehubaViewer$.pipe(
-            switchMap(viewer => {
+            filter(viewer => !!viewer),
+            mergeMap(viewer => {
               this.nehubaViewer = viewer
-              return viewer? viewer.viewerPosInVoxel$ : of(null)
+              if (viewer){
+                return combineLatest([
+                  viewer.viewerPosInReal$.pipe(filter(v => !!v)), 
+                  viewer.viewerPosInVoxel$.pipe(filter(v => !!v))
+                ])
+              } else {
+                of([null, null])
+              }
             })
           ).subscribe(
-            pos => {
-              this.navPosVoxel = pos
+            ([real, voxel]) => {
+              this.navPosVoxel = voxel
+              this.navPosReal = real
             }
           ),
-
 
           this.store$.pipe(
             select(viewerStateSelectedTemplatePureSelector),
             filter((t: any) => !!t)
           ).subscribe(t => {
+            if (t && this.selectedTemplateId !== t['@id']) {
+              this.minimise()
+            }
             this.selectedTemplateId = t['@id']
             const navigationState = getNavigationStateFromConfig(t.nehubaConfig)
             this.defaultOrientation = navigationState.orientation
@@ -62,9 +83,6 @@ export class MaximiseViewService implements OnDestroy {
               this.minimise()
             }
           }),
-
-            
-
         )
       } else {
         console.warn(`NEHUBA_INSTANCE_INJTKN not injected!`)
@@ -89,14 +107,15 @@ export class MaximiseViewService implements OnDestroy {
           )
         ]).subscribe(([singlePanel, order]) => {
           if (singlePanel && this.panelOrder !== order) {
-            this.isMaximised = true
-
             this.panelOrder = order
 
             order = order.split('').map(o => Number(o))
-
-
-            this.maximise(order[0], order)
+            
+            if (order[0] === 3) {
+              this.formatMiniPerspectiveView(true)
+            } else {
+              this.maximise(order[0], order)
+            } 
 
           } else {
             this.isMaximised = false
@@ -109,13 +128,37 @@ export class MaximiseViewService implements OnDestroy {
 
     maximise(panelIndex, panelOrder = '') {
       this.maximisedPanelIndex = panelIndex
-      
+      this.formatMiniPerspectiveView()
       this.setPerspectivePanelState(panelOrder)
 
         
       this.defaultZoomLevels = this.nehubaViewer.config.layout.useNehubaPerspective.drawZoomLevels
       const firstLayer: any = Object.values(this.nehubaViewer.config.dataset.initialNgState.layers)[0]
       this.templateTransform = firstLayer.transform.map(t => t[3])
+
+
+    }
+    
+    formatMiniPerspectiveView(clear = false) {
+      this.store$.dispatch(
+        ngViewerActionSetPerspOctantRemoval({
+          octantRemovalFlag: clear
+        })
+      )
+      if (this.viewer) {
+        this.perspectivePanel = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
+        this.perspectivePanel.viewer.orthographicProjection.value = !clear
+
+        // Toggle scale bar
+        if ((this.perspectivePanel.viewer.showScaleBar.value && !clear)
+            || !this.perspectivePanel.viewer.showScaleBar.value && clear) {
+          this.perspectivePanel.viewer.showScaleBar.toggle()
+        }
+
+      }
+
+      // this.nehubaViewer.ngviewer.showScaleBar.toggle()
+
 
     }
 
@@ -135,12 +178,7 @@ export class MaximiseViewService implements OnDestroy {
     minimise() {
       this.maximisedPanelIndex = null
       this.panelOrder = null
-      this.store$.dispatch(
-        ngViewerActionSetPerspOctantRemoval({
-          octantRemovalFlag: true
-        })
-      )
-
+      this.formatMiniPerspectiveView(true)
     }
 
     public navigate(value) {
@@ -158,10 +196,10 @@ export class MaximiseViewService implements OnDestroy {
 }
 
 const defaultZoom = {
-  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": [3500000, 2800000, 2300000],
-  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": [3200000, 2200000, 2100000],
-  "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": [2100000, 2170000, 1800000] ,
-  "minds/core/referencespace/v1.0.0/MEBRAINS": [3800000,3000000,1800000],
-  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": [0,180000,140000],
-  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": [600000,250000,300000],
+  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": [3300000, 2350000, 1950000],
+  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": [2700000, 1850000, 1650000],
+  "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": [1700000, 1750000, 1450000] ,
+  "minds/core/referencespace/v1.0.0/MEBRAINS": [3450000,2700000,1300000],
+  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": [165000,140000,100000],
+  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": [600000,240000,240000],
 }

@@ -79,3 +79,8 @@ current-layout
 :host-context([darktheme="false"]) .custom-slider-3d::-moz-range-thumb {
   background: black;
 }
+
+.range-value {
+  right: 10px;
+  bottom: 5px;
+}
