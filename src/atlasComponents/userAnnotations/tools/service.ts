@@ -172,7 +172,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       const d = (arg as TCallback['message']['callArg'] & { type: any })
       const { message, actionCallback, action = null } = d
       this.snackbar.open(message, action, {
-        duration: 3000
+        duration: 5000
       }).afterDismissed().subscribe(({ dismissedByAction }) => {
         if (dismissedByAction && actionCallback) actionCallback()
       })
