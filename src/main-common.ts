@@ -21,11 +21,6 @@ import '!!file-loader?context=src/res&name=icons/iav-icons.woff!src/res/icons/ia
 import '!!file-loader?context=src/res&name=icons/iav-icons.svg!src/res/icons/iav-icons.svg'
 
 /**
- * favicons
- */
-import '!!file-loader?context=src/res/favicons&name=favicon-128-light.png!src/res/favicons/favicon-128-light.png'
-
-/**
  * version css
  */
 import '!!file-loader?name=version.css!src/version.css'

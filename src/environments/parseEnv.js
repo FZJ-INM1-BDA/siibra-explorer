@@ -16,6 +16,18 @@ const main = async () => {
     GIT_HASH = 'unknown hash',
     EXPERIMENTAL_FEATURE_FLAG
   } = process.env
+  
+  console.log(`[parseEnv.js] parse envvar:`, {
+    BACKEND_URL,
+    DATASET_PREVIEW_URL,
+    STRICT_LOCAL,
+    MATOMO_URL,
+    MATOMO_ID,
+    BS_REST_URL,
+    VERSION,
+    GIT_HASH,
+    EXPERIMENTAL_FEATURE_FLAG,
+  })
   const version = JSON.stringify(
     VERSION || 'unknown version'
   )
