@@ -156,7 +156,23 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
 
   public addAnnotation(geom: T) {
     const found = this.managedAnnotations.find(ann => ann.id === geom.id)
-    if (found) found.remove()
+    if (found) {
+      this.callback({
+        type: "message",
+        message: `Annotation with id ${found.id} already exist under the name ${found.name}. Replaced with ${geom.name}`,
+        action: "Learn more",
+        actionCallback: () => {
+          // see issue https://github.com/FZJ-INM1-BDA/siibra-explorer/issues/1128
+          const a = document.createElement("a")
+          a.href = "https://github.com/FZJ-INM1-BDA/siibra-explorer/issues/1128"
+          a.target = "_blank"
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+        }
+      })
+      found.remove()
+    }
     const sub = geom.updateSignal$.subscribe(() => {
       this.managedAnnotations$.next(this.managedAnnotations)
     })

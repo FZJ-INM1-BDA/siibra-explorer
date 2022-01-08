@@ -44,7 +44,7 @@ RUN npm i
 RUN npm run build-aot
 
 # gzipping container
-FROM ubuntu:20.10 as compressor
+FROM ubuntu:22.04 as compressor
 RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv

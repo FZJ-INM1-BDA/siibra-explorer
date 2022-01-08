@@ -29,7 +29,6 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "assets": [
-              "src/favicon.ico",
               "src/assets"
             ],
             "styles": [
@@ -60,7 +59,11 @@
               "inject": false,
               "bundleName": "syntaxError"
             },
-          
+            {
+              "input": "third_party/extra_js.js",
+              "inject": false,
+              "bundleName": "extra_js"
+            },
             {
               "input": "third_party/vanilla_nehuba.js",
               "inject": false,
