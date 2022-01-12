@@ -16,13 +16,6 @@ markdown_extensions:
 
 plugins:
   - search
-  # - errandkun:
-  #     extract_path: docs/autogen_images
-  #     external_resources:
-  #     - type: github
-  #       owner: fzj-inm1-bda
-  #       repo: interactive-viewer
-  #       workflow_name: e2e
 
 pages:
   - Home: 'index.md'
@@ -40,6 +33,7 @@ pages:
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.6.3: 'releases/v2.6.3.md'
     - v2.6.2: 'releases/v2.6.2.md'
     - v2.6.1: 'releases/v2.6.1.md'
     - v2.6.0: 'releases/v2.6.0.md'
