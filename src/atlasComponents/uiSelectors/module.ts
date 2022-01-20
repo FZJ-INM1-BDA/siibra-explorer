@@ -10,7 +10,7 @@ import { AtlaslayerTooltipPipe } from "./pipes/atlasLayerTooltip.pipe";
 import { ComponentsModule } from "src/components";
 import { GetNonbaseParcPipe } from "./pipes/getNonBaseParc.pipe";
 import { GetIndividualParcPipe } from "./pipes/getIndividualParc.pipe";
-import { getGroupedParcPipe } from "./pipes/getGroupedParc.pipe";
+import { GetGroupedParcPipe } from "./pipes/getGroupedParc.pipe";
 import { CurrentTmplSupportsParcPipe } from "./pipes/currTmplSupportsParc.pipe";
 import { GroupParcSelectedPipe } from "./pipes/groupParcSelected.pipe";
 import { GetPreviewUrlPipe } from "./pipes/getPreviewUrl.pipe";
@@ -36,7 +36,7 @@ import { SiibraExplorerTemplateModule } from "../template";
     AtlaslayerTooltipPipe,
     GetNonbaseParcPipe,
     GetIndividualParcPipe,
-    getGroupedParcPipe,
+    GetGroupedParcPipe,
     CurrentTmplSupportsParcPipe,
     GroupParcSelectedPipe,
     CurrParcSupportsTmplPipe,

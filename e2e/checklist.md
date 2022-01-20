@@ -44,6 +44,10 @@
     - [ ] Explore in other templates exists, and has MNI152 and big brain
       - [ ] clicking on the respective space will load julich 2.9 in that space
       - [ ] the navigation should be preserved
+  - [ ] switching template/parc
+    - [ ] mni152 julich brain 29 (big brain) -> big brain julich brain 29
+    - [ ] mni152 julich brain 29 (cortical layer) -> big brain cortical layer
+    - [ ] mni152 long bundle (dismiss) -> mni152 julich brain 29
   - [ ] in big brain v2.9 (or latest)
     - [ ] high res hoc1, hoc2, hoc3, lam1-6 are visible
     - [ ] pli dataset [link](https://siibra-explorer.apps.hbp.eu/staging/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Grey%2FWhite+matter&cNavigation=0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..1uaTK.Bq5o~.lKmo~..NBW&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22minds%2Fcore%2Fdataset%2Fv1.0.0%2Fb08a7dbc-7c75-4ce7-905b-690b2b1e8957%22%2C%22filename%22%3A%22Overlay+of+data+modalities%22%7D%5D)
