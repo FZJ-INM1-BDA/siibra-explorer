@@ -2,7 +2,7 @@
 
 **use incognito browser**
 
-[home page](https://siibra-explorer.apps.hbp.eu/staging/)
+[home page](https://atlases.ebrains.eu/viewer-staging/)
 
 ## General
 
@@ -50,7 +50,7 @@
     - [ ] mni152 long bundle (dismiss) -> mni152 julich brain 29
   - [ ] in big brain v2.9 (or latest)
     - [ ] high res hoc1, hoc2, hoc3, lam1-6 are visible
-    - [ ] pli dataset [link](https://siibra-explorer.apps.hbp.eu/staging/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Grey%2FWhite+matter&cNavigation=0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..1uaTK.Bq5o~.lKmo~..NBW&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22minds%2Fcore%2Fdataset%2Fv1.0.0%2Fb08a7dbc-7c75-4ce7-905b-690b2b1e8957%22%2C%22filename%22%3A%22Overlay+of+data+modalities%22%7D%5D)
+    - [ ] pli dataset [link](https://atlases.ebrains.eu/viewer-staging/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Grey%2FWhite+matter&cNavigation=0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..1uaTK.Bq5o~.lKmo~..NBW&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22minds%2Fcore%2Fdataset%2Fv1.0.0%2Fb08a7dbc-7c75-4ce7-905b-690b2b1e8957%22%2C%22filename%22%3A%22Overlay+of+data+modalities%22%7D%5D)
       - [ ] redirects fine
       - [ ] shows fine
   - [ ] fsaverage
@@ -60,9 +60,9 @@
   - [ ] on hover, show correct region name(s)
   - [ ] whole mesh loads
 ## saneURL
-- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/bigbrainGreyWhite) redirects to big brain
-- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/julichbrain) redirects to julich brain (colin 27)
-- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/whs4) redirects to waxholm v4
-- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/allen2017) redirects to allen 2017
-- [ ] [saneUrl](https://siibra-explorer.apps.hbp.eu/staging/saneUrl/mebrains) redirects to monkey
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/bigbrainGreyWhite) redirects to big brain
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/julichbrain) redirects to julich brain (colin 27)
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/allen2017) redirects to allen 2017
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/mebrains) redirects to monkey
 

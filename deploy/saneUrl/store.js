@@ -48,6 +48,7 @@ class GitlabSnippetStore {
           'PRIVATE-TOKEN': this.token,
           ...headers
         },
+        qs: { per_page: 1000 },
         ...opt
       }, (err, resp, body) => {
         if (err) return rj(err)
