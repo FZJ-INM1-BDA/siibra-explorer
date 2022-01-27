@@ -28,10 +28,10 @@ export class AtlasWorkerService {
       ...data
     }, transfers)
     const message = await fromEvent(this.worker, 'message').pipe(
-      filter((message: MessageEvent) => message.data.id && message.data.id === newUuid),
+      filter((msg: MessageEvent) => msg.data.id && msg.data.id === newUuid),
       take(1)
     ).toPromise()
-    
+
     const { data: returnData } = message as MessageEvent
     const { id, error, ...rest } = returnData
     if (error) {

@@ -1,8 +1,9 @@
-import { Component, Input, OnChanges } from "@angular/core";
+import { Component, ElementRef, Input, OnChanges, ViewChild } from "@angular/core";
 import { BsFeatureReceptorBase } from "../base";
 import { CONST } from 'common/constants'
 import { TBSDetail } from "../type";
 import { environment } from 'src/environments/environment'
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
 const { RECEPTOR_AR_CAPTION } = CONST
 
@@ -27,12 +28,18 @@ export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChan
   @Input()
   bsLabel: string
 
-  public imgUrl: string
+  @ViewChild('arContainer', { read: ElementRef })
+  arContainer: ElementRef
 
-  constructor(){
+  private renderBuffer: Uint8ClampedArray
+  private width: number
+  private height: number
+  private pleaseRender = false
+
+  constructor(private worker: AtlasWorkerService){
     super()
   }
-  ngOnChanges(){
+  async ngOnChanges(){
     this.error = null
     this.urls = []
     if (!this.bsFeature) {
@@ -45,16 +52,69 @@ export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChan
     }
 
     try {
-      const url = this.bsFeature.__data.__autoradiographs[this.bsLabel]
-      
-      if (!url) throw new Error(`autoradiograph cannot be found`)
-      this.urls = [{ url }]
-      const query = url.replace('https://object.cscs.ch/v1', '')
-      this.imgUrl = `${this.DS_PREVIEW_URL}/imageProxy/v1?u=${encodeURIComponent(query)}`
-    
+      const {
+        "x-channel": channel,
+        "x-height": height,
+        "x-width": width,
+        content_type: contentType,
+        content_encoding: contentEncoding,
+        content,
+      } = this.bsFeature.__data.__autoradiographs[this.bsLabel]
+
+      if (contentType !== "application/octet-stream") {
+        throw new Error(`contentType expected to be application/octet-stream, but is instead ${contentType}`)
+      }
+      if (contentEncoding !== "gzip; base64") {
+        throw new Error(`contentEncoding expected to be gzip; base64, but is ${contentEncoding} instead.`)
+      }
+
+      const bin = atob(content)
+      const { pako } = (window as any).export_nehuba
+      const uint8array: Uint8Array = pako.inflate(bin)
+
+      this.width = width
+      this.height = height
+
+      const rgbaBuffer = await this.worker.sendMessage({
+        method: "PROCESS_TYPED_ARRAY",
+        param: {
+          inputArray: uint8array,
+          width,
+          height,
+          channel
+        },
+        transfers: [ uint8array.buffer ]
+      })
+
+      this.renderBuffer = rgbaBuffer.result.buffer
+      this.renderCanvas()
     } catch (e) {
       this.error = e.toString()
     }
-    
+  }
+
+  private renderCanvas(){
+    if (!this.arContainer) {
+      this.pleaseRender = true
+      return
+    }
+
+    const arContainer = (this.arContainer.nativeElement as HTMLElement)
+    while (arContainer.firstChild) {
+      arContainer.removeChild(arContainer.firstChild)
+    }
+
+    const canvas = document.createElement("canvas")
+    canvas.height = this.height
+    canvas.width = this.width
+    arContainer.appendChild(canvas)
+    const ctx = canvas.getContext("2d")
+    const imgData = ctx.createImageData(this.width, this.height)
+    imgData.data.set(this.renderBuffer)
+    ctx.putImageData(imgData, 0, 0)
+  }
+
+  ngAfterViewChecked(){
+    if (this.pleaseRender) this.renderCanvas()
   }
 }
