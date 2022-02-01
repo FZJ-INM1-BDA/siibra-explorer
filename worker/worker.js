@@ -9,6 +9,7 @@ globalThis.constants = {
 
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-plotly.js')
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-nifti.js')
+if (typeof self.importScripts === 'function')  self.importScripts('./worker-typedarray.js')
 
 /**
  * TODO migrate processing functionalities to other scripts
@@ -24,11 +25,13 @@ const validTypes = [
 const VALID_METHOD = {
   PROCESS_PLOTLY: `PROCESS_PLOTLY`,
   PROCESS_NIFTI: 'PROCESS_NIFTI',
+  PROCESS_TYPED_ARRAY: `PROCESS_TYPED_ARRAY`,
 }
 
 const VALID_METHODS = [
   VALID_METHOD.PROCESS_PLOTLY,
   VALID_METHOD.PROCESS_NIFTI,
+  VALID_METHOD.PROCESS_TYPED_ARRAY,
 ]
 
 const validOutType = [
@@ -287,6 +290,27 @@ onmessage = (message) => {
           error: {
             code: 401,
             message: `nifti error: ${e.toString()}`
+          }
+        })
+      }
+    }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY) {
+      try {
+        const { inputArray, width, height, channel } = message.data.param
+        const buffer = self.typedArray.fortranToRGBA(inputArray, width, height, channel)
+
+        postMessage({
+          id,
+          result: {
+            buffer
+          }
+        }, [ buffer.buffer ])
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
           }
         })
       }

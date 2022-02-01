@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
 import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
@@ -231,6 +231,7 @@ export class ViewerCmp implements OnDestroy {
     private cStore: ComponentStore<TCStoreViewerCmp>,
     cfr: ComponentFactoryResolver,
     private dialogSvc: DialogService,
+    private cdr: ChangeDetectorRef,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){
@@ -375,7 +376,7 @@ export class ViewerCmp implements OnDestroy {
 
         this.genericInfoVCR.clear()
         this.genericInfoVCR.createComponent(this.genericInfoCF, null, injector)
-
+        this.cdr.markForCheck()
       })
     )
   }

@@ -134,12 +134,13 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
   private currTmplSupportParcPipe = new CurrentTmplSupportsParcPipe()
 
   selectParcellationWithName(layer: any) {
-    const tmplChangeReq = this.currTmplSupportParcPipe.transform(this.selectedTemplate, layer)
+    const tmplChangeReq = !this.currTmplSupportParcPipe.transform(this.selectedTemplate, layer)
     if (!tmplChangeReq) {
       this.store$.dispatch(
         viewerStateToggleLayer({ payload: layer })
       )
     } else {
+      this.showOverlayIntent$.next(true)
       this.store$.dispatch(
         viewerStateSelectTemplateWithId({
           payload: layer.availableIn[0],

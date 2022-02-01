@@ -29,7 +29,6 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "assets": [
-              "src/favicon.ico",
               "src/assets"
             ],
             "styles": [
@@ -49,6 +48,10 @@
               "input": "worker/worker-nifti.js",
               "inject": false,
               "bundleName": "worker-nifti"
+            },{
+              "input": "worker/worker-typedarray.js",
+              "inject": false,
+              "bundleName": "worker-typedarray"
             },
             
             {
@@ -60,7 +63,11 @@
               "inject": false,
               "bundleName": "syntaxError"
             },
-          
+            {
+              "input": "third_party/extra_js.js",
+              "inject": false,
+              "bundleName": "extra_js"
+            },
             {
               "input": "third_party/vanilla_nehuba.js",
               "inject": false,
