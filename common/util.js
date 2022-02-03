@@ -1,5 +1,7 @@
 (function(exports) {
 
+  exports.camelToSnake = s => s.replace(/[A-Z]/g, s => `_${s.toLowerCase()}`)
+
   const flattenReducer = (acc, curr) => acc.concat(curr)
   exports.flattenReducer = flattenReducer
 

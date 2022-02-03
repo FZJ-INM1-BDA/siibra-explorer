@@ -173,21 +173,6 @@
     }">
   </ng-template>
 
-    <!-- <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
-      <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
-        <ng-template [ngTemplateOutlet]="voiTmpl">
-
-        </ng-template>
-      </ng-template>
-    </ng-template> -->
-
-    <!-- TODO dataset preview will become deprecated in the future.
-    Regional feature/data feature will replace it -->
-    <!-- <div class="hidden"
-      iav-shown-dataset
-      #iavShownDataset="iavShownDataset">
-    </div> -->
-
   </div>
 </ng-template>
 
@@ -206,9 +191,14 @@
       'transition-margin-left': !drawer.opened
     }">
 
+    <!-- collapsed side bar view -->
     <div class="h-0 w-100 region-text-search-autocomplete-position">
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
+      
+      <div *ngIf="!((selectedRegions$ | async)[0])" class="p-2 w-100">
+        <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
+      </div>
     </div>
 
     <!-- such a gross implementation -->
@@ -243,7 +233,8 @@
     <ng-container *ngTemplateOutlet="tabTmpl; context: {
       isOpen: minTrayVisSwitch.switchState$ | async,
       regionSelected: selectedRegions$ | async,
-      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
+      badge: (spatialFeatureBbox.features$ | async).length || null
     }">
     </ng-container>
   </div>
@@ -441,7 +432,8 @@
   let-isOpen="isOpen"
   let-regionSelected="regionSelected"
   let-iavAdditionallayers="iavAdditionallayers"
-  let-click="click">
+  let-click="click"
+  let-badge="badge">
 
   <!-- if mat drawer is open -->
   <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
@@ -449,7 +441,8 @@
       [ngTemplateOutletContext]="{
         matColor: 'basic',
         fontIcon: 'fa-chevron-left',
-        click: click
+        click: click,
+        badge: badge
       }">
     </ng-template>
   </ng-template>
@@ -497,7 +490,8 @@
           matColor: 'primary',
           fontIcon: 'fa-sitemap',
           tooltip: 'Explore regions',
-          click: click
+          click: click,
+          badge: badge
         }">
         </ng-container>
       </ng-template>
@@ -877,3 +871,31 @@
     </mat-list-item>
   </mat-list>
 </ng-template>
+
+<ng-template #spatialFeatureListViewTmpl>
+  <mat-card *ngIf="spatialFeatureBbox.busy$ | async; else notBusyTmpl" class="pe-all mat-elevation-z4">
+    <spinner-cmp></spinner-cmp>
+  </mat-card>
+
+  <ng-template #notBusyTmpl>
+    <mat-card *ngIf="(spatialFeatureBbox.features$ | async).length > 0" class="pe-all mat-elevation-z4">
+      <h2>
+        Volumes of interest
+      </h2>
+      <mat-list role="list">
+        <mat-list-item *ngFor="let feature of spatialFeatureBbox.features$ | async"
+          class="ws-normal">
+          {{ feature.name }}
+        </mat-list-item>
+      </mat-list>
+    </mat-card>
+  </ng-template>
+</ng-template>
+
+<div class="d-none"
+  sii-xp-spatial-feat-bbox
+  [sii-xp-spatial-feat-bbox-atlas-id]="selectedAtlas$ | async | getProperty : '@id'"
+  [sii-xp-spatial-feat-bbox-space-id]="templateSelected$ | async | getProperty : '@id'"
+  [sii-xp-spatial-feat-bbox-bbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
+  #spatialFeatureBbox="siiXpSpatialFeatBbox">
+</div>
