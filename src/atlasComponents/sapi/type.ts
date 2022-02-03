@@ -10,7 +10,7 @@ type Volume = {
   id: string
   name: string
   url: string
-  volume_type: "neuroglancer/precomputed",
+  volume_type: "neuroglancer/precomputed"
   detail: {
     "neuroglancer/precomputed": IVolumeTypeDetail["neuroglancer/precomputed"]
   }

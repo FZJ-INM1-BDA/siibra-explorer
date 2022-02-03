@@ -187,8 +187,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       ),
       mousePosEmitter.pipe(
         startWith(null as {
-          voxel: number[];
-          real: number[];
+          voxel: number[]
+          real: number[]
         })
       ),
     ]).pipe(

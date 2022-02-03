@@ -59,9 +59,9 @@ export class SpatialFeatureBBox implements OnDestroy{
   busy$ = new EventEmitter<boolean>()
 
   private spatialFeatureSpec$: Observable<{
-    atlasId: string,
-    spaceId: string,
-    bbox: BoundingBoxConcept,
+    atlasId: string
+    spaceId: string
+    bbox: BoundingBoxConcept
   }> = combineLatest([
     this.atlasId$,
     this.spaceId$,
