@@ -13,15 +13,12 @@ import { PureContantService } from 'src/util';
 import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
 import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors';
-import {VIEWER_INJECTION_TOKEN} from "src/ui/layerbrowser/layerDetail/layerDetail.component";
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
+import { ARIA_LABELS } from 'common/constants'
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
 const MOBILE_UI_TOOLTIP = `Mobile UI enables touch controls`
-const AXIS_LINE_TOOLTIP = `Show axis lines on the slice views`
-const BACKGROUND_COLORING_TOOLTIP = `Show ble background coloring on the perspective view`
-const SCALE_BAR = `Show scale bar`
 const ROOT_TEXT_ORDER: [string, string, string, string] = ['Coronal', 'Sagittal', 'Axial', '3D']
 const OBLIQUE_ROOT_TEXT_ORDER: [string, string, string, string] = ['Slice View 1', 'Slice View 2', 'Slice View 3', '3D']
 
@@ -38,9 +35,9 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
-  public AXIS_LINE_TOOLTIP = AXIS_LINE_TOOLTIP
-  public BACKGROUND_COLORING_TOOLTIP = BACKGROUND_COLORING_TOOLTIP
-  public SCALE_BAR = SCALE_BAR
+  public AXIS_LINE_TOOLTIP = ARIA_LABELS.AXIS_LINE_TOOLTIP
+  public BACKGROUND_COLORING_TOOLTIP = ARIA_LABELS.BACKGROUND_COLORING_TOOLTIP
+  public SCALE_BAR_TOOLTIP = ARIA_LABELS.SCALE_BAR_TOOLTIP
   public supportedPanelModes = SUPPORTED_PANEL_MODES
 
   /**
@@ -65,13 +62,12 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   private nehubaViewer: NehubaViewerUnit
   private get viewer(){
-    return this.injectedViewer || (window as any).viewer
+    return (window as any).viewer
   }
 
   constructor(
     private store: Store<IavRootStoreInterface>,
     private pureConstantService: PureContantService,
-    @Optional() @Inject(VIEWER_INJECTION_TOKEN) private injectedViewer,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ) {
 
@@ -206,15 +202,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public stepSize: number = 10
 
   public get axisLineVisible() {
-    const panel: any = Array.from(this.viewer.display.panels)[0]
-    return panel?.viewer?.showAxisLines?.value
+    return this.viewer.showAxisLines.value
   }
 
   public set axisLineVisible(value) {
-    const panel: any = Array.from(this.viewer.display.panels)[0]
-    if (panel && panel.viewer) {
-      panel.viewer.showAxisLines.value = value
-    }
+    this.viewer.showAxisLines.restoreState(value)
   }
 
   public toggleAxisLines(value) {
@@ -223,15 +215,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
 
   public get showScaleBar() {
-    const panel: any = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
-    return panel?.viewer?.showScaleBar?.value
+    return this.viewer.showScaleBar.value
   }
 
   public set showScaleBar(value) {
-    const panel: any = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
-    if (panel && panel.viewer) {
-      panel.viewer.showScaleBar.value = value
-    }
+    this.viewer.showScaleBar.restoreState(value)
   }
 
   public toggleScaleBar(value) {
@@ -246,15 +234,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
   
   public get sliceBackground() {
-    const panel: any = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
-    return panel?.config?.layout.useNehubaPerspective.drawSubstrates.color
+    return this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
   }
 
   public set sliceBackground(value) {
-    const panel: any = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
-    if (panel && panel.config) {
-      panel.config.layout.useNehubaPerspective.drawSubstrates.color = value
-    }
+    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value
     this.nehubaViewer.redraw()
   }
 
@@ -267,10 +251,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public set showBackground(value) {
-    const panel: any = Array.from(this.viewer.display.panels).find((p: any) => p.viewer?.orthographicProjection)
-    if (panel && panel.config) {
-      panel.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
-    }
+    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
     this.nehubaViewer.redraw()
   }
 
@@ -278,7 +259,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.showBackground = value
   }
 
-  public hexToRgb = hex => hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,(m, r, g, b) => '#' + r + r + g + g + b + b)
-    .substring(1).match(/.{2}/g).map(x => parseInt(x, 16))
+  public hexToRgb(hex) {
+    return hex.match(/\w\w/g).map(x => parseInt(x, 16))
+  }
 
 }
