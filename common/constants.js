@@ -128,5 +128,15 @@
     TOP_MENU: `These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.`,
     LAYER_SELECTOR: `This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.`,
     STATUS_CARD: `This is the coordinate navigator. Expand it to manipulate voxel and physical coordinates, to reset the view, or to create persistent links to the current view for sharing.`,
+    CITATION: `You will find a "chip" shaped label at the bottom-left of the screen (next to the layer selector) which indicates your currently selected parcellation map, e.g. Julich-Brain Cytoarchitectonic Maps 2.9. Click on (i), which will subsequently open up a description box with an "Explore" button (box-and-arrow icon) at the bottom. Click on this button, which will lead you to the EBRAINS Knowledge Graph webpage for the complete parcellation map dataset. Here you can click on the "How to cite" option on the left to access the appropriate citation for your selected parcellation/template. In addition, don't forget to also cite the siibra-explorer website: https://atlases.ebrains.eu/viewer/`,
+  }
+
+  exports.QUICKTOUR_DESC_MD = {
+    CITATION: `
+## How to cite from siibra-explorer
+
+You will find a "chip" shaped label at the bottom-left of the screen (next to the layer selector) which indicates your currently selected parcellation map, e.g. _Julich-Brain Cytoarchitectonic Maps 2.9_. Click on (i), which will subsequently open up a description box with an "Explore" button (box-and-arrow icon) at the bottom. Click on this button, which will lead you to the EBRAINS Knowledge Graph webpage for the complete parcellation map dataset. Here you can click on the "How to cite" option on the left to access the appropriate citation for your selected parcellation/template. In addition, don't forget to also cite the _siibra-explorer_ website: <https://atlases.ebrains.eu/viewer/>
+
+`
   }
 })(typeof exports === 'undefined' ? module.exports : exports)
