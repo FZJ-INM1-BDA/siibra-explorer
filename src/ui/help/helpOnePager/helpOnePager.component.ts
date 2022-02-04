@@ -1,6 +1,8 @@
+import { MatDialog } from '@angular/material/dialog';
 import { Component, Optional } from "@angular/core";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS } from 'common/constants'
+import { HowToCite } from '../howToCite/howToCite.component';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { default: QUICK_STARTER } = require('!!raw-loader!common/helpOnePager.md')
@@ -19,11 +21,16 @@ export class HelpOnePager{
   public extQuickStarter: string
   public userDoc: string
   constructor(
-    @Optional() pConstService: PureContantService
+    @Optional() pConstService: PureContantService,
+    private dialog: MatDialog,
   ){
     this.extQuickStarter = `quickstart.html`
     if (pConstService) {
       this.userDoc = pConstService.docUrl
     }
+  }
+
+  howToCite(){
+    this.dialog.open(HowToCite)
   }
 }

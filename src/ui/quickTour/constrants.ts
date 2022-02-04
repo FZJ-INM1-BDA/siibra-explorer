@@ -10,6 +10,7 @@ type TCustomPosition = {
 export interface IQuickTourData {
     order: number
     description: string
+    descriptionMd?: string
     tourPosition?: TPosition
     overwritePosition?: IQuickTourOverwritePosition
     overwriteArrow?: TemplateRef<any> | string
