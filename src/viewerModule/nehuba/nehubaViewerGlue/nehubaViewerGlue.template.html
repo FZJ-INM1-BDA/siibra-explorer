@@ -1,6 +1,7 @@
 <div class="d-block w-100 h-100 nehuba-viewer-container-parent"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
+  [snackTemplate]="snackTemplate"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
@@ -230,5 +231,15 @@
       </ul>
     </div>
 
+  </div>
+</ng-template>
+
+<ng-template #snackTemplate>
+  <div>Please drop <i>.nii</i> or <i>.nii.gz</i> file</div>
+  <div class="d-flex flex-column">
+    <b>The limitations to the nifti volume to be superimposed are: </b>
+    <small>1. The xyzt_units must be defined (mm, sec) or it will default to (nm, sec);</small>
+    <small>2. The datatype must be other than float64 (float64 datatype cannot be rendered);</small>
+    <small>3. In the nifti header, both dim[4] (time series) and dim[5] (num of channel) must be set to 1.</small>
   </div>
 </ng-template>
