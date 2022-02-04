@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { default: HOWTOCITE } = require('!!raw-loader!common/howToCite.md')
 
 @Component({
