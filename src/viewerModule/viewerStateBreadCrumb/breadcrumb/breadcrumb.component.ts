@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, Pipe, PipeTransform } from "@angular/core";
 import { IQuickTourData } from "src/ui/quickTour";
-import { CONST, ARIA_LABELS, QUICKTOUR_DESC, QUICKTOUR_DESC_MD } from 'common/constants'
+import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { select, Store } from "@ngrx/store";
 import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
 import { distinctUntilChanged, map } from "rxjs/operators";
@@ -34,12 +34,6 @@ export class ViewerStateBreadCrumb {
   public quickTourChips: IQuickTourData = {
     order: 5,
     description: QUICKTOUR_DESC.CHIPS,
-  }
-
-  public quickTourCitation: IQuickTourData = {
-    order: 5.1,
-    description: QUICKTOUR_DESC.CITATION,
-    descriptionMd: QUICKTOUR_DESC_MD.CITATION,
   }
 
   public clearViewKeys$ = this.store$.pipe(

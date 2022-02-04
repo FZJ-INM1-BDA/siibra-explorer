@@ -187,9 +187,9 @@ function getNehubaConfig(space: TSpaceFull) {
 export class PureContantService implements OnDestroy{
   
   private subscriptions: Subscription[] = []
-  public repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
+  public repoUrl = `https://github.com/FZJ-INM1-BDA/siibra-explorer`
   public supportEmailAddress = `support@ebrains.eu`
-  public docUrl = `https://interactive-viewer.readthedocs.io/en/latest/`
+  public docUrl = `https://siibra-explorer.readthedocs.io/`
 
   public showHelpSupportText: string = `Did you encounter an issue?
 Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>
