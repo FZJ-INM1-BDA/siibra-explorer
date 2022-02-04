@@ -3,10 +3,13 @@
 You will find a "chip" shaped label at the bottom-left of the screen (next to the layer selector) which indicates your currently selected parcellation map, e.g. _Julich-Brain Cytoarchitectonic Maps 2.9_. 
 
 
+Click on (i)
+
 
 [![Chip shaped label](assets/images/how-to-cite-1.png)](assets/images/how-to-cite-1.png)
 
-Click on (i), which will subsequently open up a description box with an "Explore" button (box-and-arrow icon) at the bottom. 
+
+This will subsequently open up a description box with an "Explore" button (box-and-arrow icon) at the bottom. 
 
 ---
 
