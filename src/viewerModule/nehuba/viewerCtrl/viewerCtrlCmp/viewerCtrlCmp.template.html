@@ -1,24 +1,3 @@
-<h3 class="iv-custom-comp text mat-h3">
-  Volumes
-</h3>
-
-<mat-slide-toggle [(ngModel)]="flagDelin"
-  #delinToggle="matSlideToggle"
-  [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
-  (iav-key-event)="delinToggle.toggle()"
-  name="toggle-delineation">
-
-  <markdown-dom class="d-inline-block iv-custom-comp text"
-    markdown="Show delineations `[q]`">
-  </markdown-dom>
-</mat-slide-toggle>
-
-<mat-divider class="mt-2 mb-2"></mat-divider>
-
-<h3 class="iv-custom-comp text mat-h3">
-  Perspective View
-</h3>
-
 <mat-slide-toggle [(ngModel)]="removeOctantFlag"
   [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
   name="remove-frontal-octant">

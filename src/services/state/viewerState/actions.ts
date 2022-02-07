@@ -66,6 +66,18 @@ export const viewerStateSelectParcellation = createAction(
   props<{ selectParcellation: any }>()
 )
 
+export const viewerStateToggleParcellationVisibility = createAction(
+  `[viewerState] toggleParcellationVisibility`,
+)
+export const viewerStateSetParcellationVisibility = createAction(
+  `[viewerState] setParcellationVisibility`,
+  props<{ payload: boolean }>()
+)
+export const viewerStateSetHiddenLayerNames = createAction(
+  `[viewerState] setHiddenLayerNames`,
+  props<{ payload: any[] }>()
+)
+
 export const viewerStateSelectTemplateWithName = createAction(
   `[viewerState] selectTemplateWithName`,
   props<{ payload: { name: string } }>()

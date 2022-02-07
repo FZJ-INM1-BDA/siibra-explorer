@@ -4,7 +4,11 @@ import { combineLatest, merge, Observable, of, Subscription } from "rxjs";
 import {filter, map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
+import {
+  viewerStateCustomLandmarkSelector,
+  viewerStateGetSelectedAtlas,
+  viewerStateSelectedTemplatePureSelector
+} from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
@@ -31,17 +35,7 @@ export class ViewerCtrlCmp{
   private selectedAtlasId: string
   private selectedTemplateId: string
 
-  private _flagDelin = true
-  get flagDelin(){
-    return this._flagDelin
-  }
-  set flagDelin(flag){
-    this._flagDelin = flag
-    this.toggleParcVsbl()
-  }
-
   private sub: Subscription[] = []
-  private hiddenLayerNames: string[] = []
 
   private _removeOctantFlag: boolean
   get removeOctantFlag(){
@@ -167,35 +161,6 @@ export class ViewerCtrlCmp{
         }
       })
     )
-  }
-
-  private async toggleParcVsbl(){
-    const viewerConfig = await this.pureConstantService.getViewerConfig(this.selectedAtlasId, this.selectedTemplateId, null)
-
-    if (this.flagDelin) {
-      for (const name of this.hiddenLayerNames) {
-        const l = this.ngViewer.layerManager.getLayerByName(name)
-        l && l.setVisible(true)
-      }
-      this.hiddenLayerNames = []
-    } else {
-      this.hiddenLayerNames = []
-      const segLayerNames: string[] = []
-      for (const layer of this.ngViewer.layerManager.managedLayers) {
-        if (layer.visible && layer.name in viewerConfig) {
-          segLayerNames.push(layer.name)
-        }
-      }
-      for (const name of segLayerNames) {
-        const l = this.ngViewer.layerManager.getLayerByName(name)
-        l && l.setVisible(false)
-        this.hiddenLayerNames.push( name )
-      }
-    }
-
-    requestAnimationFrame(() => {
-      this.ngViewer.display.scheduleRedraw()
-    })
   }
 
   public setOctantRemoval(octantRemovalFlag: boolean) {

@@ -2,12 +2,23 @@ import { Component, EventEmitter, Output, Pipe, PipeTransform } from "@angular/c
 import { IQuickTourData } from "src/ui/quickTour";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { select, Store } from "@ngrx/store";
-import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
+import {
+  viewerStateContextedSelectedRegionsSelector,
+  viewerStateGetOverlayingAdditionalParcellations,
+  viewerStateParcellationVisible,
+  viewerStateParcVersionSelector,
+  viewerStateSelectedParcellationSelector
+} from "src/services/state/viewerState/selectors";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { TDatainfosDetail, TSimpleInfo } from "src/util/siibraApiConstants/types";
+import {
+  viewerStateSetHiddenLayerNames,
+  viewerStateToggleParcellationVisibility
+} from "src/services/state/viewerState/actions";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'viewer-state-breadcrumb',
@@ -30,6 +41,8 @@ export class ViewerStateBreadCrumb {
 
   @Output('on-item-click')
   onChipClick = new EventEmitter()
+
+  public parcellationVisible$: Observable<boolean>
 
   public quickTourChips: IQuickTourData = {
     order: 5,
@@ -66,7 +79,9 @@ export class ViewerStateBreadCrumb {
 
 
   constructor(private store$: Store<any>){
-
+    this.parcellationVisible$ = this.store$.pipe(
+      select(viewerStateParcellationVisible)
+    )
   }
 
   handleChipClick(){
@@ -95,6 +110,10 @@ export class ViewerStateBreadCrumb {
         payload: layer
       })
     )
+  }
+
+  public toggleParcVsbl() {
+    this.store$.dispatch(viewerStateToggleParcellationVisibility())
   }
 
   public selectParcellation(parc: any) {

@@ -11,8 +11,8 @@ import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerSta
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
 import { CONST } from 'common/constants'
-import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
+import {viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas, viewerStateHiddenLayerNames, viewerStateParcellationVisible} from "src/services/state/viewerState/selectors";
+import {viewerStateChangeNavigation, viewerStateSetHiddenLayerNames, viewerStateSetParcellationVisibility, viewerStateToggleParcellationVisibility} from "src/services/state/viewerState/actions";
 import { cvtNavigationObjToNehubaConfig } from 'src/viewerModule/nehuba/util'
 import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
 
@@ -150,6 +150,9 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
 
   @Effect()
   public selectParcellation$: Observable<any>
+
+  @Effect()
+  public toggleParcellationVisibility$: Observable<any>
 
   private selectTemplateIntent$: Observable<any> = merge(
     this.actions$.pipe(
@@ -376,6 +379,54 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           selectParcellation: newParcellation,
         }
       })
+    )
+    
+    this.toggleParcellationVisibility$ = this.actions$.pipe(
+      ofType(viewerStateToggleParcellationVisibility),
+      withLatestFrom(
+        this.store$.pipe(
+          select(viewerStateParcellationVisible)
+        ),
+        this.store$.pipe(
+          select(viewerStateHiddenLayerNames)
+        ),
+        this.store$.pipe(
+          select(viewerStateGetSelectedAtlas),
+          map(a => a && a['@id'])
+        ),
+        this.store$.pipe(
+          select(viewerStateSelectedTemplateSelector),
+          map(t => t && t['@id'])
+        )
+      ),
+      switchMap(([_, visible, hiddenLayerNames,  selectedAtlasId, selectedTemplateId ]) => {
+        return this.pureService.getViewerConfig(selectedAtlasId, selectedTemplateId, null).then(viewerConfig => {
+          if (!visible) {
+            for (const name of hiddenLayerNames) {
+              const l = (window as any).viewer.layerManager.getLayerByName(name)
+              l && l.setVisible(true)
+            }
+            this.store$.dispatch(viewerStateSetHiddenLayerNames({payload: []}))
+          } else {
+            this.store$.dispatch(viewerStateSetHiddenLayerNames({payload: []}))
+            const segLayerNames: string[] = []
+            for (const layer of (window as any).viewer.layerManager.managedLayers) {
+              if (layer.visible && layer.name in viewerConfig) {
+                segLayerNames.push(layer.name)
+              }
+            }
+            const layerNamesToHide = []
+            for (const name of segLayerNames) {
+              const l = (window as any).viewer.layerManager.getLayerByName(name)
+              l && l.setVisible(false)
+              layerNamesToHide.push(name)
+            }
+            this.store$.dispatch(viewerStateSetHiddenLayerNames({payload: layerNamesToHide}))
+          }
+          return viewerStateSetParcellationVisibility({payload: !visible})
+
+        })
+      }),
     )
 
     this.navigateToRegion$ = this.actions$.pipe(

@@ -195,6 +195,14 @@
 
     </ng-container>
 
+    <!-- Hide icon-->
+    <mat-icon (click)="toggleParcVsbl(); $event.stopPropagation()"
+            class="mr-1 ml-1"
+            fontSet="far"
+            [matTooltip]="(parcellationVisible$ | async)? 'Hide' : 'Show'"
+            [fontIcon]="(parcellationVisible$ | async)? 'fa-eye' : 'fa-eye-slash'">
+    </mat-icon>
+
     <!-- dismiss icon -->
     <mat-icon
       *ngIf="dismissable"

@@ -55,6 +55,15 @@ export const viewerStateSelectedParcellationSelector = createSelector(
   viewerState => viewerState['parcellationSelected']
 )
 
+export const viewerStateParcellationVisible = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['parcellationVisible']
+)
+export const viewerStateHiddenLayerNames = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['hiddenLayerNames']
+)
+
 export const viewerStateNavigationStateSelector = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['navigation']
