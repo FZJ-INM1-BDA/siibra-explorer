@@ -138,6 +138,8 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       templateSelected : selectTemplate,
       parcellationSelected : parcellation,
+      parcellationVisible: true,
+      hiddenLayerNames: [],
       // taken care of by effect.ts
       // regionsSelected : [],
 
@@ -181,6 +183,8 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     return {
       ...prevState,
       parcellationSelected: selectParcellation,
+      parcellationVisible: true,
+      hiddenLayerNames: [],
       // taken care of by effect.ts
       // regionsSelected: []
     }
