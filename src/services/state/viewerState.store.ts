@@ -184,10 +184,9 @@ export const getStateStore = ({ state = defaultViewerState } = {}) => (prevState
       overwrittenColorMap: action.payload || '',
     }
   case actionViewerStateSelectFeature.type:
-    const { feature } = action as any
     return {
       ...prevState,
-      featureSelected: feature
+      featureSelected: (action as any).feature
     }
   default :
     return prevState
