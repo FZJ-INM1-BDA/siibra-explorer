@@ -144,7 +144,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
       describe('> toggle delineation', () => {
         
         let toggleDelination: jasmine.Spy
-        const toggleName = 'toggle-delineation'
+        // const toggleName = 'toggle-delineation'
         beforeEach(() => {
           toggleDelination = spyOn<any>(fixture.componentInstance, 'toggleParcVsbl')
         })
@@ -152,26 +152,26 @@ describe('> viewerCtrlCmp.component.ts', () => {
           toggleDelination.calls.reset()
         })
   
-        it('> toggleslider should exist', async () => {
-          const slideToggle = await loader.getAllHarnesses(
-            MatSlideToggleHarness.with({
-              name: toggleName,
-            })
-          )
-          expect(slideToggle.length).toBe(1)
-        })
-  
-        it('> toggling it should result in setOctantRemoval to be called', async () => {
-          const slideToggle = await loader.getAllHarnesses(
-            MatSlideToggleHarness.with({
-              name: toggleName,
-            })
-          )
-          await slideToggle[0].toggle()
-          expect(
-            toggleDelination
-          ).toHaveBeenCalled()
-        })
+        // it('> toggleslider should exist', async () => {
+        //   const slideToggle = await loader.getAllHarnesses(
+        //     MatSlideToggleHarness.with({
+        //       name: toggleName,
+        //     })
+        //   )
+        //   expect(slideToggle.length).toBe(1)
+        // })
+        //
+        // it('> toggling it should result in setOctantRemoval to be called', async () => {
+        //   const slideToggle = await loader.getAllHarnesses(
+        //     MatSlideToggleHarness.with({
+        //       name: toggleName,
+        //     })
+        //   )
+        //   await slideToggle[0].toggle()
+        //   expect(
+        //     toggleDelination
+        //   ).toHaveBeenCalled()
+        // })
       })
     })
 
@@ -237,119 +237,119 @@ describe('> viewerCtrlCmp.component.ts', () => {
       })
     })
 
-    describe('> flagDelin', () => {
-      let toggleParcVsblSpy: jasmine.Spy
-      beforeEach(() => {
-        fixture = TestBed.createComponent(ViewerCtrlCmp)
-        toggleParcVsblSpy = spyOn(fixture.componentInstance as any, 'toggleParcVsbl')
-        fixture.detectChanges()
-      })
-      it('> calls toggleParcVsbl', () => {
-        toggleParcVsblSpy.and.callFake(() => {})
-        fixture.componentInstance.flagDelin = false
-        expect(toggleParcVsblSpy).toHaveBeenCalled()
-      })
-    })
-    describe('> toggleParcVsbl', () => {
-      let getViewerConfigSpy: jasmine.Spy
-      let getLayerByNameSpy: jasmine.Spy
-      beforeEach(() => {
-        const pureCstSvc = TestBed.inject(PureContantService)
-        getLayerByNameSpy = mockNehubaViewer.nehubaViewer.ngviewer.layerManager.getLayerByName
-        getViewerConfigSpy = pureCstSvc.getViewerConfig as jasmine.Spy
-        fixture = TestBed.createComponent(ViewerCtrlCmp)
-        fixture.detectChanges()
-      })
-
-      it('> calls pureSvc.getViewerConfig', async () => {
-        getViewerConfigSpy.and.returnValue({})
-        await fixture.componentInstance['toggleParcVsbl']()
-        expect(getViewerConfigSpy).toHaveBeenCalled()
-      })
-
-      describe('> if _flagDelin is true', () => {
-        beforeEach(() => {
-          fixture.componentInstance['_flagDelin'] = true
-          fixture.componentInstance['hiddenLayerNames'] = [
-            'foo',
-            'bar',
-            'baz'
-          ]
-        })
-        it('> go through all hideen layer names and set them to true', async () => {
-          const setVisibleSpy = jasmine.createSpy('setVisible')
-          getLayerByNameSpy.and.returnValue({
-            setVisible: setVisibleSpy
-          })
-          await fixture.componentInstance['toggleParcVsbl']()
-          expect(getLayerByNameSpy).toHaveBeenCalledTimes(3)
-          for (const arg of ['foo', 'bar', 'baz']) {
-            expect(getLayerByNameSpy).toHaveBeenCalledWith(arg)
-          }
-          expect(setVisibleSpy).toHaveBeenCalledTimes(3)
-          expect(setVisibleSpy).toHaveBeenCalledWith(true)
-          expect(setVisibleSpy).not.toHaveBeenCalledWith(false)
-        })
-        it('> hiddenLayerNames resets', async () => {
-          await fixture.componentInstance['toggleParcVsbl']()
-          expect(fixture.componentInstance['hiddenLayerNames']).toEqual([])
-        })
-      })
-
-      describe('> if _flagDelin is false', () => {
-        let managedLayerSpyProp: jasmine.Spy
-        let setVisibleSpy: jasmine.Spy
-        beforeEach(() => {
-          fixture.componentInstance['_flagDelin'] = false
-          setVisibleSpy = jasmine.createSpy('setVisible')
-          getLayerByNameSpy.and.returnValue({
-            setVisible: setVisibleSpy
-          })
-          getViewerConfigSpy.and.resolveTo({
-            'foo': {},
-            'bar': {},
-            'baz': {}
-          })
-          managedLayerSpyProp = spyOnProperty(mockNehubaViewer.nehubaViewer.ngviewer.layerManager, 'managedLayers')
-          managedLayerSpyProp.and.returnValue([{
-            visible: true,
-            name: 'foo'
-          }, {
-            visible: false,
-            name: 'bar'
-          }, {
-            visible: true,
-            name: 'baz'
-          }])
-        })
-
-        afterEach(() => {
-          managedLayerSpyProp.calls.reset()
-        })
-
-        it('> calls schedulRedraw', async () => {
-          await fixture.componentInstance['toggleParcVsbl']()
-          await new Promise(rs => requestAnimationFrame(rs))
-          expect(mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw).toHaveBeenCalled()
-        })
-
-        it('> only calls setVisible false on visible layers', async () => {
-          await fixture.componentInstance['toggleParcVsbl']()
-          expect(getLayerByNameSpy).toHaveBeenCalledTimes(2)
-          
-          for (const arg of ['foo', 'baz']) {
-            expect(getLayerByNameSpy).toHaveBeenCalledWith(arg)
-          }
-          expect(setVisibleSpy).toHaveBeenCalledTimes(2)
-          expect(setVisibleSpy).toHaveBeenCalledWith(false)
-          expect(setVisibleSpy).not.toHaveBeenCalledWith(true)
-        })
-
-        it('> sets hiddenLayerNames correctly', async () => {
-          await fixture.componentInstance['toggleParcVsbl']()
-          expect(fixture.componentInstance['hiddenLayerNames']).toEqual(['foo', 'baz'])
-        })
-      })
-    })
+    // describe('> flagDelin', () => {
+    //   let toggleParcVsblSpy: jasmine.Spy
+    //   beforeEach(() => {
+    //     fixture = TestBed.createComponent(ViewerCtrlCmp)
+    //     toggleParcVsblSpy = spyOn(fixture.componentInstance as any, 'toggleParcVsbl')
+    //     fixture.detectChanges()
+    //   })
+    //   it('> calls toggleParcVsbl', () => {
+    //     toggleParcVsblSpy.and.callFake(() => {})
+    //     fixture.componentInstance.flagDelin = false
+    //     expect(toggleParcVsblSpy).toHaveBeenCalled()
+    //   })
+    // })
+    // describe('> toggleParcVsbl', () => {
+    //   let getViewerConfigSpy: jasmine.Spy
+    //   let getLayerByNameSpy: jasmine.Spy
+    //   beforeEach(() => {
+    //     const pureCstSvc = TestBed.inject(PureContantService)
+    //     getLayerByNameSpy = mockNehubaViewer.nehubaViewer.ngviewer.layerManager.getLayerByName
+    //     getViewerConfigSpy = pureCstSvc.getViewerConfig as jasmine.Spy
+    //     fixture = TestBed.createComponent(ViewerCtrlCmp)
+    //     fixture.detectChanges()
+    //   })
+    //
+    //   it('> calls pureSvc.getViewerConfig', async () => {
+    //     getViewerConfigSpy.and.returnValue({})
+    //     await fixture.componentInstance['toggleParcVsbl']()
+    //     expect(getViewerConfigSpy).toHaveBeenCalled()
+    //   })
+    //
+    //   describe('> if _flagDelin is true', () => {
+    //     beforeEach(() => {
+    //       fixture.componentInstance['_flagDelin'] = true
+    //       fixture.componentInstance['hiddenLayerNames'] = [
+    //         'foo',
+    //         'bar',
+    //         'baz'
+    //       ]
+    //     })
+    //     it('> go through all hideen layer names and set them to true', async () => {
+    //       const setVisibleSpy = jasmine.createSpy('setVisible')
+    //       getLayerByNameSpy.and.returnValue({
+    //         setVisible: setVisibleSpy
+    //       })
+    //       await fixture.componentInstance['toggleParcVsbl']()
+    //       expect(getLayerByNameSpy).toHaveBeenCalledTimes(3)
+    //       for (const arg of ['foo', 'bar', 'baz']) {
+    //         expect(getLayerByNameSpy).toHaveBeenCalledWith(arg)
+    //       }
+    //       expect(setVisibleSpy).toHaveBeenCalledTimes(3)
+    //       expect(setVisibleSpy).toHaveBeenCalledWith(true)
+    //       expect(setVisibleSpy).not.toHaveBeenCalledWith(false)
+    //     })
+    //     it('> hiddenLayerNames resets', async () => {
+    //       await fixture.componentInstance['toggleParcVsbl']()
+    //       expect(fixture.componentInstance['hiddenLayerNames']).toEqual([])
+    //     })
+    //   })
+    //
+    //   describe('> if _flagDelin is false', () => {
+    //     let managedLayerSpyProp: jasmine.Spy
+    //     let setVisibleSpy: jasmine.Spy
+    //     beforeEach(() => {
+    //       fixture.componentInstance['_flagDelin'] = false
+    //       setVisibleSpy = jasmine.createSpy('setVisible')
+    //       getLayerByNameSpy.and.returnValue({
+    //         setVisible: setVisibleSpy
+    //       })
+    //       getViewerConfigSpy.and.resolveTo({
+    //         'foo': {},
+    //         'bar': {},
+    //         'baz': {}
+    //       })
+    //       managedLayerSpyProp = spyOnProperty(mockNehubaViewer.nehubaViewer.ngviewer.layerManager, 'managedLayers')
+    //       managedLayerSpyProp.and.returnValue([{
+    //         visible: true,
+    //         name: 'foo'
+    //       }, {
+    //         visible: false,
+    //         name: 'bar'
+    //       }, {
+    //         visible: true,
+    //         name: 'baz'
+    //       }])
+    //     })
+    //
+    //     afterEach(() => {
+    //       managedLayerSpyProp.calls.reset()
+    //     })
+    //
+    //     it('> calls schedulRedraw', async () => {
+    //       await fixture.componentInstance['toggleParcVsbl']()
+    //       await new Promise(rs => requestAnimationFrame(rs))
+    //       expect(mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw).toHaveBeenCalled()
+    //     })
+    //
+    //     it('> only calls setVisible false on visible layers', async () => {
+    //       await fixture.componentInstance['toggleParcVsbl']()
+    //       expect(getLayerByNameSpy).toHaveBeenCalledTimes(2)
+    //
+    //       for (const arg of ['foo', 'baz']) {
+    //         expect(getLayerByNameSpy).toHaveBeenCalledWith(arg)
+    //       }
+    //       expect(setVisibleSpy).toHaveBeenCalledTimes(2)
+    //       expect(setVisibleSpy).toHaveBeenCalledWith(false)
+    //       expect(setVisibleSpy).not.toHaveBeenCalledWith(true)
+    //     })
+    //
+    //     it('> sets hiddenLayerNames correctly', async () => {
+    //       await fixture.componentInstance['toggleParcVsbl']()
+    //       expect(fixture.componentInstance['hiddenLayerNames']).toEqual(['foo', 'baz'])
+    //     })
+    //   })
+    // })
   })
 })
