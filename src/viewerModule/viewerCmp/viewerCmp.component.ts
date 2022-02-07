@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
 import {catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
-import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
+import { actionViewerStateSelectFeature, viewerStateChangeNavigation, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
   viewerStateGetSelectedAtlas,
   viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplateSelector,
+  viewerStateSelectorFeatureSelector,
   viewerStateStandAloneVolumes,
   viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors"
@@ -26,6 +27,7 @@ import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
 import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 import { DialogService } from "src/services/dialogService.service";
+import { SapiVoiResponse } from "src/atlasComponents/sapi/type"
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -188,6 +190,10 @@ export class ViewerCmp implements OnDestroy {
 
   public pliVol$ = this._pliVol$ || NEVER
 
+  public selectedFeature$ = this.store$.pipe(
+    select(viewerStateSelectorFeatureSelector)
+  )
+
   /**
    * if no regions are selected, nor any additional layers (being deprecated)
    * then the "explore" btn should not show
@@ -202,8 +208,9 @@ export class ViewerCmp implements OnDestroy {
     this.viewerMode$.pipe(
       startWith(null as string)
     ),
+    this.selectedFeature$,
   ]).pipe(
-    map(([ regions, layers, viewerMode ]) => regions.length === 0 && layers.length === 0 && !viewerMode)
+    map(([ regions, layers, viewerMode, selectedFeature ]) => regions.length === 0 && layers.length === 0 && !viewerMode && !selectedFeature)
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
@@ -427,5 +434,29 @@ export class ViewerCmp implements OnDestroy {
 
   public disposeCtxMenu(){
     this.viewerModuleSvc.dismissCtxMenu()
+  }
+
+  showSpatialDataset(feature: SapiVoiResponse) {
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          orientation: [0, 0, 0, 1],
+          position: feature.location.center.map(v => v * 1e6),
+          animation: {}
+        }
+      })
+    )
+
+    this.store$.dispatch(
+      actionViewerStateSelectFeature({ feature })
+    )
+  }
+
+  clearSelectedFeature(){
+    this.store$.dispatch(
+      actionViewerStateSelectFeature({
+        feature: null
+      })
+    )
   }
 }

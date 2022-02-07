@@ -246,4 +246,19 @@
     return `${year}${pad2(month)}${pad2(date)}_${pad2(hr)}${pad2(min)}`
   }
 
+  function isVec4(input) {
+    if (!Array.isArray(input)) return false
+    if (input.length !== 4) return false
+    return input.every(v => typeof v === "number")
+  }
+  function isMat4(input) {
+    if (!Array.isArray(input)) return false
+    if (input.length !== 4) return false
+    return input.every(isVec4)
+  }
+
+  exports.isVec4 = isVec4
+  exports.isMat4 = isMat4
+
+
 })(typeof exports === 'undefined' ? module.exports : exports)

@@ -1,12 +1,13 @@
 export interface INgLayerInterface {
   name: string // displayName
   source: string
-  mixability: string // base | mixable | nonmixable
+  mixability?: string //"base" | "mixable" | "nonmixable"
   annotation?: string //
   id?: string // unique identifier
   visible?: boolean
   shader?: string
   transform?: any
+  opacity?: number
 }
 
 export enum PANELS {

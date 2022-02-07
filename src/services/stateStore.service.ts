@@ -36,8 +36,8 @@ import {
 } from './state/viewerConfig.store'
 import {
   ActionInterface as ViewerActionInterface,
-  defaultState as viewerDefaultState,
-  StateInterface as ViewerStateInterface,
+  defaultViewerState,
+  IViewerState,
   stateStore as viewerState,
 } from './state/viewerState.store'
 
@@ -49,7 +49,7 @@ import {
 export { pluginState }
 export { viewerConfigState }
 export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
-export { ViewerStateInterface, ViewerActionInterface, viewerState }
+export { IViewerState, ViewerActionInterface, viewerState }
 export { IUiState, UIActionInterface, uiState }
 export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
@@ -133,14 +133,6 @@ export function getLabelIndexMap(regions: any[]): Map<number, any> {
   return returnMap
 }
 
-/**
- *
- * @param regions regions to deep iterate to find all ngId 's, filtering out falsy values
- * n.b. returns non unique list
- */
-export interface DedicatedViewState {
-  dedicatedView: string | null
-}
 
 // @TODO deprecate
 export function isDefined(obj) {
@@ -151,7 +143,7 @@ export interface IavRootStoreInterface {
   pluginState: PluginStateInterface
   viewerConfigState: ViewerConfigStateInterface
   ngViewerState: NgViewerStateInterface
-  viewerState: ViewerStateInterface
+  viewerState: IViewerState
   dataStore: any
   uiState: IUiState
   userConfigState: UserConfigStateInterface
@@ -164,6 +156,6 @@ export const defaultRootState: any = {
   uiState: uiDefaultState,
   userConfigState: userConfigDefaultState,
   viewerConfigState: viewerConfigDefaultState,
-  viewerState: viewerDefaultState,
+  viewerState: defaultViewerState,
   [viewerStateHelperStoreName]: defaultViewerHelperState
 }

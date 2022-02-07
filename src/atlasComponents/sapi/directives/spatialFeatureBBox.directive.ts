@@ -1,5 +1,5 @@
-import { combineLatest, Observable, BehaviorSubject, Subject, Subscription, of } from 'rxjs';
-import { debounceTime, map, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable, BehaviorSubject, Subject, Subscription, of, merge } from 'rxjs';
+import { debounceTime, map, distinctUntilChanged, switchMap, tap, startWith, filter } from 'rxjs/operators';
 import { Directive, EventEmitter, Input, OnDestroy, Output } from "@angular/core";
 import { BoundingBoxConcept, SapiVoiResponse } from '../type'
 import { SAPI } from '../sapi'
@@ -32,7 +32,7 @@ export class SpatialFeatureBBox implements OnDestroy{
     this.spaceId$.next(val)
   }
 
-  private bbox$ = new Subject<BoundingBoxConcept>()
+  public bbox$ = new BehaviorSubject<BoundingBoxConcept>(null)
   @Input('sii-xp-spatial-feat-bbox-bbox-spec')
   set bbox(val: string | BoundingBoxConcept) {
     if (typeof val === "string") {
@@ -75,26 +75,29 @@ export class SpatialFeatureBBox implements OnDestroy{
   constructor(private svc: SAPI){
     this.subscription.push(
       this.spatialFeatureSpec$.pipe(
-        debounceTime(160),
+        // experimental feature
+        // remove to enable in prod
+        filter(() => this.EXPERIMENTAL_FEATURE_FLAG),
         distinctUntilChanged(
           (prev, curr) => prev.atlasId === curr.atlasId
             && prev.spaceId === curr.spaceId
             && JSON.stringify(prev.bbox) === JSON.stringify(curr.bbox)
         ),
+        tap(() => {
+          this.busy$.emit(true)
+          this.featureOutput.emit([])
+          this.features$.next([])
+        }),
+        debounceTime(160),
         switchMap(({
           atlasId,
           spaceId,
           bbox,
         }) => {
-          if (!this.EXPERIMENTAL_FEATURE_FLAG) {
-            this.busy$.emit(false)
-            return of([])
-          }
           if (!atlasId || !spaceId || !bbox) {
             this.busy$.emit(false)
             return of([])
           }
-          this.busy$.emit(true)
           const space = this.svc.getSpace(atlasId, spaceId)
           return space.getFeatures(SpatialFeatureBBox.FEATURE_NAME, { bbox: JSON.stringify(bbox) })
         })

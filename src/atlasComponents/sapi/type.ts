@@ -22,17 +22,17 @@ export type SapiVoiResponse = {
   "@id": string
   name: string
   description: string
-  urls: {
+  url: {
     cite?: string
     doi: string
   }[]
   location: {
     space: {
       "@id": string
-      center: Point
-      minpoint: Point
-      maxpoint: Point
     }
+    center: Point
+    minpoint: Point
+    maxpoint: Point
   }
   volumes: Volume[]
 }

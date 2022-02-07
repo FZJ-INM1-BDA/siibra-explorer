@@ -166,10 +166,13 @@
   <ng-template
     [ngTemplateOutlet]="(pliVol$ | async)?.[0]
       ? voiTmpl
-      : sidenavRegionTmpl"
+      : (selectedFeature$ | async)
+        ? selectedFeatureTmpl
+        : sidenavRegionTmpl"
     [ngTemplateOutletContext]="{
       drawer: drawer,
-      showFullSidenavSwitch: showFullSidenavSwitch
+      showFullSidenavSwitch: showFullSidenavSwitch,
+      feature: selectedFeature$ | async
     }">
   </ng-template>
 
@@ -533,44 +536,19 @@
 
 <!-- VOI sidenav tmpl -->
 <ng-template #voiTmpl>
+  <ng-container *ngTemplateOutlet="sapiBaseFeatureTmpl; context: {
+    backCb: clearVoi.bind(this),
+    title: _pliTitle,
+    subtitle: 'Dataset preview',
+    description: _pliDesc,
+    url: [{
+      doi: _pliLink
+    }],
+    contentTmpl: pliDetailTmpl 
+  }">
+  </ng-container>
 
-  <!-- back btn -->
-  <button mat-button
-    (click)="clearVoi()"
-    [attr.aria-label]="ARIA_LABELS.CLOSE"
-    class="position-absolute z-index-10 m-2">
-    <i class="fas fa-chevron-left"></i>
-    <span class="ml-1">
-      Back
-    </span>
-  </button>
-
-  <mat-card class="_pli-container">
-    <mat-card-title>
-      {{ _pliTitle }}
-    </mat-card-title>
-
-    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
-      <span>
-        Dataset preview
-      </span>
-
-      <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
-
-      <a [href]="_pliLink"
-        mat-icon-button
-        matTooltip="Explore in EBRAINS Knowledge Graph"
-        target="_blank">
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-
-    </mat-card-subtitle>
-
-    <small class="d-block text-muted iv-custom-comp darker-bg">
-      {{ _pliDesc }}
-    </small>
-
+  <ng-template #pliDetailTmpl>
     <mat-expansion-panel class="sidenav-cover-header-container">
       <mat-expansion-panel-header>
         <mat-panel-title>
@@ -579,8 +557,9 @@
       </mat-expansion-panel-header>
       <layer-browser></layer-browser>
     </mat-expansion-panel>
-  </mat-card>
+  </ng-template>
 </ng-template>
+
 
 <!-- region sidenav tmpl -->
 <ng-template #sidenavRegionTmpl
@@ -812,7 +791,7 @@
       <ng-container *ngSwitchCase="'nehuba'">
         <mat-list-item>
           <span mat-line>
-            {{ data.context.payload.mouse.real | nmToMm | addUnitAndJoin : '' }} (mm)
+            {{ data.context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
           </span>
           <span mat-line class="text-muted">
             <i class="fas fa-map"></i>
@@ -872,22 +851,123 @@
   </mat-list>
 </ng-template>
 
-<ng-template #spatialFeatureListViewTmpl>
-  <mat-card *ngIf="spatialFeatureBbox.busy$ | async; else notBusyTmpl" class="pe-all mat-elevation-z4">
-    <spinner-cmp></spinner-cmp>
+<!-- feature tmpls -->
+<ng-template #sapiBaseFeatureTmpl
+  let-backCb="backCb"
+  let-title="title"
+  let-subtitle="subtitle"
+  let-urls="urls"
+  let-description="description"
+  let-contentTmpl="contentTmpl">
+
+  <!-- back btn -->
+  <button mat-button
+    *ngIf="backCb"
+    (click)="backCb()"
+    [attr.aria-label]="ARIA_LABELS.CLOSE"
+    class="position-absolute z-index-10 m-2">
+    <i class="fas fa-chevron-left"></i>
+    <span class="ml-1">
+      Back
+    </span>
+  </button>
+
+  <mat-card class="sapi-container">
+
+    <!-- title must exist -->
+    <mat-card-title>
+      {{ title }}
+    </mat-card-title>
+
+    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+      <span *ngIf="subtitle">
+        {{ subtitle }}
+      </span>
+
+
+      <ng-template [ngIf]="urls">
+        <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
+        <a [href]="url.doi | doiParserPipe"
+          *ngFor="let url of urls"
+          mat-icon-button
+          matTooltip="Explore in EBRAINS Knowledge Graph"
+          target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </ng-template>
+
+    </mat-card-subtitle>
+
+    <small *ngIf="description"
+      class="d-block text-muted iv-custom-comp darker-bg">
+      {{ description }}
+    </small>
+
+    <mat-card-content>
+      <ng-container *ngTemplateOutlet="contentTmpl">
+
+      </ng-container>
+    </mat-card-content>
   </mat-card>
+
+</ng-template>
+
+<!-- general feature tmpl -->
+
+<ng-template let-feature="feature" #selectedFeatureTmpl>
+  <!-- TODO differentiate between features (spatial, regional etc) -->
+  
+  <!-- spatial feature tmpl -->
+  <ng-container *ngTemplateOutlet="sapiBaseFeatureTmpl; context: {
+    backCb: clearSelectedFeature.bind(this),
+    title: feature.name,
+    subtitle: 'Spatial feature',
+    description: feature.description,
+    urls: feature.url,
+    contentTmpl: sapiVOITmpl
+  }">
+  </ng-container>
+
+  <ng-template #sapiVOITmpl>
+    <ng-layer-ctl *ngFor="let vol of feature.volumes"
+      class="d-block"
+      [ng-layer-ctl-name]="vol.name"
+      [ng-layer-ctl-src]="vol.url"
+      [ng-layer-ctl-transform]="vol | getProperty : 'detail' | getProperty: 'neuroglancer/precomputed' | getProperty : 'transform'">
+    </ng-layer-ctl>
+  </ng-template>
+
+</ng-template>
+
+<ng-template #spatialFeatureListViewTmpl>
+  <div *ngIf="spatialFeatureBbox.busy$ | async; else notBusyTmpl" class="fs-200">
+    <spinner-cmp></spinner-cmp>
+  </div>
 
   <ng-template #notBusyTmpl>
     <mat-card *ngIf="(spatialFeatureBbox.features$ | async).length > 0" class="pe-all mat-elevation-z4">
-      <h2>
+      <mat-card-title>
         Volumes of interest
-      </h2>
-      <mat-list role="list">
-        <mat-list-item *ngFor="let feature of spatialFeatureBbox.features$ | async"
-          class="ws-normal">
-          {{ feature.name }}
-        </mat-list-item>
-      </mat-list>
+      </mat-card-title>
+      <mat-card-subtitle class="overflow-hidden">
+        <ng-template let-bbox [ngIf]="spatialFeatureBbox.bbox$ | async" [ngIfElse]="bboxFallbackTmpl">
+          Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
+        </ng-template>
+        <ng-template #bboxFallbackTmpl>
+          Found nearby
+        </ng-template>
+        
+      </mat-card-subtitle>
+
+      <mat-divider></mat-divider>
+
+      <div *ngFor="let feature of spatialFeatureBbox.features$ | async"
+        mat-ripple
+        (click)="showSpatialDataset(feature)"
+        class="iv-custom-comp hoverable w-100 overflow-hidden text-overflow-ellipses">
+        {{ feature.name }}
+      </div>
     </mat-card>
   </ng-template>
 </ng-template>

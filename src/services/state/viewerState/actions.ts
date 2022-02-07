@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store"
 import { IRegion } from './constants'
+import { FeatureResponse } from "src/atlasComponents/sapi"
 
 export const viewerStateNewViewer = createAction(
   `[viewerState] newViewer`,
@@ -142,5 +143,13 @@ export const actionSelectLandmarks = createAction(
   `[viewerState] selectLandmarks`,
   props<{
     landmarks: any[]
+  }>()
+)
+
+
+export const actionViewerStateSelectFeature = createAction(
+  `[viewerState] selectFeature`,
+  props<{
+    feature: FeatureResponse
   }>()
 )

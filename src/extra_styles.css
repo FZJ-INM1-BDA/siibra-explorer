@@ -910,3 +910,8 @@ mat-list.sm mat-list-item
 {
   vertical-align: top;
 }
+
+.text-overflow-ellipses
+{
+  text-overflow: ellipsis;
+}

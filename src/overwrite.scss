@@ -71,3 +71,10 @@ $media-map: (
     }
   }
 }
+
+@for $i from 5 through 20 {
+  $fontsize: $i * 10;
+  .fs-#{$fontsize} {
+    font-size: $fontsize * 1%;
+  }
+}

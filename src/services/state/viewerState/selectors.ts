@@ -1,5 +1,6 @@
 import { createSelector } from "@ngrx/store"
 import { viewerStateHelperStoreName } from "../viewerState.store.helper"
+import { IViewerState } from "./type"
 
 export const viewerStateSelectedRegionsSelector = createSelector(
   state => state['viewerState'],
@@ -35,6 +36,11 @@ export const viewerStateSelectedTemplateSelector = createSelector(
 export const viewerStateSelectorStandaloneVolumes = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['standaloneVolumes']
+)
+
+export const viewerStateSelectorFeatureSelector = createSelector(
+  (state: any) => state.viewerState as IViewerState,
+  viewerState => viewerState.featureSelected
 )
 
 /**

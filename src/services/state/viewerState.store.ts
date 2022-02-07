@@ -28,31 +28,13 @@ import {
   viewerStateChangeNavigation,
   viewerStateNehubaLayerchanged,
   viewerStateSetViewerMode,
-  actionSelectLandmarks
+  actionSelectLandmarks,
+  actionViewerStateSelectFeature
 } from './viewerState/actions';
 import { serialiseParcellationRegion } from "common/util"
+import { IViewerState, defaultViewerState } from "./viewerState/type"
 
-export interface StateInterface {
-  fetchedTemplates: any[]
-
-  templateSelected: any | null
-  parcellationSelected: any | null
-  regionsSelected: any[]
-
-  viewerMode: string
-
-  landmarksSelected: any[]
-  userLandmarks: IUserLandmark[]
-
-  navigation: any | null
-  dedicatedView: string[]
-
-  loadedNgLayers: INgLayerInterface[]
-  connectivityRegion: string | null
-  overwrittenColorMap: string | null
-
-  standaloneVolumes: any[]
-}
+export { IViewerState, defaultViewerState }
 
 export interface ActionInterface extends Action {
   fetchedTemplate?: any[]
@@ -62,7 +44,6 @@ export interface ActionInterface extends Action {
   selectRegions?: any[]
   selectRegionIds: string[]
   deselectRegions?: any[]
-  dedicatedView?: string
 
   updatedParcellation?: any
 
@@ -76,44 +57,9 @@ export interface ActionInterface extends Action {
   connectivityRegion?: string
 }
 
-export const defaultState: StateInterface = {
 
-  landmarksSelected : [],
-  fetchedTemplates : [],
-  loadedNgLayers: [],
-  regionsSelected: [],
-  viewerMode: null,
-  userLandmarks: [],
-  dedicatedView: null,
-  navigation: null,
-  parcellationSelected: null,
-  templateSelected: null,
-  connectivityRegion: '',
-  overwrittenColorMap: null,
-  standaloneVolumes: []
-}
-
-export const getStateStore = ({ state = defaultState } = {}) => (prevState: Partial<StateInterface> = state, action: ActionInterface) => {
+export const getStateStore = ({ state = defaultViewerState } = {}) => (prevState: Partial<IViewerState> = state, action: ActionInterface) => {
   switch (action.type) {
-  /**
-     * TODO may be obsolete. test when nifti become available
-     */
-  case LOAD_DEDICATED_LAYER: {
-    const dedicatedView = prevState.dedicatedView
-      ? prevState.dedicatedView.concat(action.dedicatedView)
-      : [action.dedicatedView]
-    return {
-      ...prevState,
-      dedicatedView,
-    }
-  }
-  case UNLOAD_DEDICATED_LAYER:
-    return {
-      ...prevState,
-      dedicatedView : prevState.dedicatedView
-        ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
-        : [],
-    }
   case CLEAR_STANDALONE_VOLUMES:
     return {
       ...prevState,
@@ -137,7 +83,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       // taken care of by effect.ts
       // landmarksSelected : [],
       navigation : navigation || navigationFromTemplateSelected,
-      dedicatedView : null,
     }
   }
   case FETCHED_TEMPLATE : {
@@ -238,6 +183,12 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       overwrittenColorMap: action.payload || '',
     }
+  case actionViewerStateSelectFeature.type:
+    const { feature } = action as any
+    return {
+      ...prevState,
+      featureSelected: feature
+    }
   default :
     return prevState
   }
@@ -255,9 +206,6 @@ const defaultStateStore = getStateStore()
 export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
-
-export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
-export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
