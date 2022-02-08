@@ -19,6 +19,8 @@ import { TTemplateImage } from "./interfaces";
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.1.10'
 
+const { EXPERIMENTAL_FEATURE_FLAG } = environment
+
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
   'neuroglancer/precompmesh',
@@ -352,28 +354,31 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
          * remove parcellation versions that are marked as deprecated
          * and assign prev/next id accordingly
          */
-        for (const p of filteredParcellations) {
-          if (!p.version) continue
-          if (p.version.deprecated) {
-            const prevId = p.version.prev
-            const nextId = p.version.next
-
-            const prev = prevId && filteredParcellations.find(p => parseId(p.id) === prevId)
-            const next = nextId && filteredParcellations.find(p => parseId(p.id) === nextId)
-
-            const newPrevId = prev && parseId(prev.id)
-            const newNextId = next && parseId(next.id)
-
-            if (!!prev.version) {
-              prev.version.next = newNextId
-            }
-
-            if (!!next.version) {
-              next.version.prev = newPrevId
+        if (!EXPERIMENTAL_FEATURE_FLAG) {
+          for (const p of filteredParcellations) {
+            if (!p.version) continue
+            if (p.version.deprecated) {
+              const prevId = p.version.prev
+              const nextId = p.version.next
+  
+              const prev = prevId && filteredParcellations.find(p => parseId(p.id) === prevId)
+              const next = nextId && filteredParcellations.find(p => parseId(p.id) === nextId)
+  
+              const newPrevId = prev && parseId(prev.id)
+              const newNextId = next && parseId(next.id)
+  
+              if (!!prev.version) {
+                prev.version.next = newNextId
+              }
+  
+              if (!!next.version) {
+                next.version.prev = newPrevId
+              }
             }
           }
         }
         const removeDeprecatedParc = filteredParcellations.filter(p => {
+          if (EXPERIMENTAL_FEATURE_FLAG) return true
           if (!p.version) return true
           return !(p.version.deprecated)
         })
@@ -451,12 +456,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       }
       console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
     }),
-    map(resp => {
-      const arr = resp.body
-      const { EXPERIMENTAL_FEATURE_FLAG } = environment
-      if (EXPERIMENTAL_FEATURE_FLAG) return arr
-      return arr
-    }),
+    map(resp => resp.body),
     shareReplay(1),
   )
 
@@ -483,6 +483,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
                   }
                 }),
                 parcellations: parcellations.filter(p => {
+                  if (EXPERIMENTAL_FEATURE_FLAG) return true
                   if (p.version?.deprecated) return false
                   return true
                 }).map(parc => {
