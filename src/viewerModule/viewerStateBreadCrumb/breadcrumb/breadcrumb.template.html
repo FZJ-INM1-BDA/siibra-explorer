@@ -196,10 +196,14 @@
     </ng-container>
 
     <!-- Hide icon-->
-    <mat-icon class="mr-1 ml-1"
-              fontSet="far"
-              fontIcon="fa-eye"
-              toggle-parcellation>
+    <mat-icon #delinToggle="toggleParcellation"
+              class="mr-1 ml-1" fontSet="far"
+              s-xplr-parc-vis-ctrl
+              [fontIcon]="delinToggle.visible? 'fa-eye' : 'fa-eye-slash'"
+              (click)="$event.stopPropagation(); delinToggle.toggleParcellation()"
+              [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
+              (iav-key-event)="delinToggle.toggleParcellation()"
+    >
     </mat-icon>
 
     <!-- dismiss icon -->

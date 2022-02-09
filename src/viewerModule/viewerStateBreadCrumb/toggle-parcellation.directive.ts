@@ -1,19 +1,19 @@
-import {Directive, ElementRef, HostListener, OnDestroy, Renderer2} from "@angular/core";
+import {Directive, ElementRef, OnDestroy, Renderer2} from "@angular/core";
 import {PureContantService} from "src/util";
 import {Subscription} from "rxjs";
 import {
-  viewerStateGetSelectedAtlas,
+  viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplatePureSelector
 } from "src/services/state/viewerState/selectors";
 import {select, Store} from "@ngrx/store";
 
 @Directive({
-  selector: '[toggle-parcellation]',
+  selector: '[s-xplr-parc-vis-ctrl]',
   exportAs: 'toggleParcellation'
 })
 export class ToggleParcellationDirective implements OnDestroy {
 
-  private visible = true
+  public visible = true
   private hiddenLayerNames = []
   private selectedAtlasId: string
   private selectedTemplateId: string
@@ -28,33 +28,24 @@ export class ToggleParcellationDirective implements OnDestroy {
       this.store$.select(viewerStateGetSelectedAtlas)
         .subscribe(sa => this.selectedAtlasId = sa && sa['@id']),
       this.store$.pipe(select(viewerStateSelectedTemplatePureSelector))
-        .subscribe(tmpl => {this.selectedTemplateId = tmpl && tmpl['@id']})
+        .subscribe(tmpl => {this.selectedTemplateId = tmpl && tmpl['@id']}),
+      this.store$.pipe(select(viewerStateSelectedParcellationSelector))
+        .subscribe(tmpl => {
+          this.hiddenLayerNames = []
+          this.visible = true
+        })
     )
   }
 
-  @HostListener('document:keydown', ['$event.target', '$event.key']) listenQKey(target, key) {
-    if (key === 'q' && target.classList.contains('neuroglancer-panel')) {
-      this.toggleParcellation()
-    }
-  }
-
-  @HostListener('click', ['$event'])
-  mouseclick(event) {
-    event.stopPropagation()
-    this.toggleParcellation()
-  }
-
-  toggleParcellation() {
-    this.renderer.removeClass(this.el.nativeElement, this.visible? 'fa-eye' : 'fa-eye-slash')
-    this.renderer.addClass(this.el.nativeElement, this.visible? 'fa-eye-slash' : 'fa-eye')
-
+  public toggleParcellation = () => {
     this.pureService.getViewerConfig(this.selectedAtlasId, this.selectedTemplateId, null).then(viewerConfig => {
-      if (this.visible) {
+      if (!this.visible) {
         for (const name of this.hiddenLayerNames) {
           const l = (window as any).viewer.layerManager.getLayerByName(name)
           l && l.setVisible(true)
         }
         this.hiddenLayerNames = []
+        this.visible = true
 
       } else {
         this.hiddenLayerNames = []
@@ -69,6 +60,7 @@ export class ToggleParcellationDirective implements OnDestroy {
           l && l.setVisible(false)
           this.hiddenLayerNames.push( name )
         }
+        this.visible = false
       }
 
       requestAnimationFrame(() => {
@@ -76,7 +68,6 @@ export class ToggleParcellationDirective implements OnDestroy {
       })
     })
 
-    this.visible = !this.visible
   }
   
   ngOnDestroy() {

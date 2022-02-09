@@ -13,7 +13,6 @@ import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalL
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { TDatainfosDetail, TSimpleInfo } from "src/util/siibraApiConstants/types";
-import {Observable} from "rxjs";
 
 @Component({
   selector: 'viewer-state-breadcrumb',
@@ -98,10 +97,6 @@ export class ViewerStateBreadCrumb {
         payload: layer
       })
     )
-  }
-
-  public toggleParcVsbl() {
-    // this.store$.dispatch(viewerStateToggleParcellationVisibility())
   }
 
   public selectParcellation(parc: any) {
