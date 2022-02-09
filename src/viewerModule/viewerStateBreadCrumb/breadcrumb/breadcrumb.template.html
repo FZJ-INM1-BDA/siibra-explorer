@@ -196,13 +196,10 @@
     </ng-container>
 
     <!-- Hide icon-->
-    <mat-icon (click)="toggleParcVsbl(); $event.stopPropagation()"
-              [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
-              (iav-key-event)="toggleParcVsbl()"
-            class="mr-1 ml-1"
-            fontSet="far"
-            [matTooltip]="(parcellationVisible$ | async)? 'Hide' : 'Show'"
-            [fontIcon]="(parcellationVisible$ | async)? 'fa-eye' : 'fa-eye-slash'">
+    <mat-icon class="mr-1 ml-1 far fa-eye"
+              fontSet="far"
+              fontIcon="fa-eye"
+              toggle-parcellation>
     </mat-icon>
 
     <!-- dismiss icon -->

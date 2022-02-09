@@ -28,7 +28,7 @@ import {
   viewerStateChangeNavigation,
   viewerStateNehubaLayerchanged,
   viewerStateSetViewerMode,
-  actionSelectLandmarks, viewerStateSetParcellationVisibility, viewerStateSetHiddenLayerNames,
+  actionSelectLandmarks,
 } from './viewerState/actions';
 import { serialiseParcellationRegion } from "common/util"
 
@@ -37,8 +37,6 @@ export interface StateInterface {
 
   templateSelected: any | null
   parcellationSelected: any | null
-  parcellationVisible: boolean
-  hiddenLayerNames: any[]
   regionsSelected: any[]
 
   viewerMode: string
@@ -61,9 +59,6 @@ export interface ActionInterface extends Action {
 
   selectTemplate?: any
   selectParcellation?: any
-  toggleParcellationVisibility: any
-  setParcellationVisibility: any
-  setHiddenLayerNames: any
   selectRegions?: any[]
   selectRegionIds: string[]
   deselectRegions?: any[]
@@ -92,8 +87,6 @@ export const defaultState: StateInterface = {
   dedicatedView: null,
   navigation: null,
   parcellationSelected: null,
-  parcellationVisible: true,
-  hiddenLayerNames: [],
   templateSelected: null,
   connectivityRegion: '',
   overwrittenColorMap: null,
@@ -138,8 +131,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       templateSelected : selectTemplate,
       parcellationSelected : parcellation,
-      parcellationVisible: true,
-      hiddenLayerNames: [],
       // taken care of by effect.ts
       // regionsSelected : [],
 
@@ -156,20 +147,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     }
   }
 
-  case viewerStateSetParcellationVisibility.type: {
-    return {
-      ...prevState,
-      parcellationVisible: action.payload
-    }
-  }
-
-  case viewerStateSetHiddenLayerNames.type: {
-    return {
-      ...prevState,
-      hiddenLayerNames: action.payload
-    }
-  }
-
   case viewerStateChangeNavigation.type:
   case CHANGE_NAVIGATION : {
     return {
@@ -183,8 +160,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     return {
       ...prevState,
       parcellationSelected: selectParcellation,
-      parcellationVisible: true,
-      hiddenLayerNames: [],
       // taken care of by effect.ts
       // regionsSelected: []
     }

@@ -5,7 +5,6 @@ import { select, Store } from "@ngrx/store";
 import {
   viewerStateContextedSelectedRegionsSelector,
   viewerStateGetOverlayingAdditionalParcellations,
-  viewerStateParcellationVisible,
   viewerStateParcVersionSelector,
   viewerStateSelectedParcellationSelector
 } from "src/services/state/viewerState/selectors";
@@ -14,10 +13,6 @@ import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalL
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { TDatainfosDetail, TSimpleInfo } from "src/util/siibraApiConstants/types";
-import {
-  viewerStateSetHiddenLayerNames,
-  viewerStateToggleParcellationVisibility
-} from "src/services/state/viewerState/actions";
 import {Observable} from "rxjs";
 
 @Component({
@@ -41,8 +36,6 @@ export class ViewerStateBreadCrumb {
 
   @Output('on-item-click')
   onChipClick = new EventEmitter()
-
-  public parcellationVisible$: Observable<boolean>
 
   public quickTourChips: IQuickTourData = {
     order: 5,
@@ -77,12 +70,7 @@ export class ViewerStateBreadCrumb {
     }))
   )
 
-
-  constructor(private store$: Store<any>){
-    this.parcellationVisible$ = this.store$.pipe(
-      select(viewerStateParcellationVisible)
-    )
-  }
+  constructor(private store$: Store<any>){}
 
   handleChipClick(){
     this.onChipClick.emit(null)
@@ -113,7 +101,7 @@ export class ViewerStateBreadCrumb {
   }
 
   public toggleParcVsbl() {
-    this.store$.dispatch(viewerStateToggleParcellationVisibility())
+    // this.store$.dispatch(viewerStateToggleParcellationVisibility())
   }
 
   public selectParcellation(parc: any) {
