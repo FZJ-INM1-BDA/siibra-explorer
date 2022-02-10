@@ -1,11 +1,13 @@
-import {Directive, ElementRef, OnDestroy, Renderer2} from "@angular/core";
+import {Directive, ElementRef, Inject, OnDestroy, Optional, Renderer2} from "@angular/core";
 import {PureContantService} from "src/util";
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {
   viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplatePureSelector
 } from "src/services/state/viewerState/selectors";
 import {select, Store} from "@ngrx/store";
+import {NehubaViewerUnit} from "src/viewerModule/nehuba";
+import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 
 @Directive({
   selector: '[s-xplr-parc-vis-ctrl]',
@@ -19,11 +21,18 @@ export class ToggleParcellationDirective implements OnDestroy {
   private selectedTemplateId: string
 
   private subscriptions: Subscription[] = []
+
+  private nehubaInst: NehubaViewerUnit
+
+  get ngViewer() {
+    return this.nehubaInst?.nehubaViewer.ngviewer || (window as any).viewer
+  }
   
   constructor(private el: ElementRef,
               private renderer: Renderer2,
               private pureService: PureContantService,
-              private store$: Store<any>) {
+              private store$: Store<any>,
+              @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,) {
     this.subscriptions.push(
       this.store$.select(viewerStateGetSelectedAtlas)
         .subscribe(sa => this.selectedAtlasId = sa && sa['@id']),
@@ -33,40 +42,42 @@ export class ToggleParcellationDirective implements OnDestroy {
         .subscribe(tmpl => {
           this.hiddenLayerNames = []
           this.visible = true
-        })
+        }),
+      this.nehubaInst$.subscribe(nehubaInst => this.nehubaInst = nehubaInst)
     )
   }
 
-  public toggleParcellation = () => {
-    this.pureService.getViewerConfig(this.selectedAtlasId, this.selectedTemplateId, null).then(viewerConfig => {
-      if (!this.visible) {
-        for (const name of this.hiddenLayerNames) {
-          const l = (window as any).viewer.layerManager.getLayerByName(name)
-          l && l.setVisible(true)
-        }
-        this.hiddenLayerNames = []
-        this.visible = true
+  public toggleParcellation = async () => {
+    const viewerConfig = await this.pureService.getViewerConfig(this.selectedAtlasId, this.selectedTemplateId, null)
 
-      } else {
-        this.hiddenLayerNames = []
-        const segLayerNames: string[] = []
-        for (const layer of (window as any).viewer.layerManager.managedLayers) {
-          if (layer.visible && layer.name in viewerConfig) {
-            segLayerNames.push(layer.name)
-          }
-        }
-        for (const name of segLayerNames) {
-          const l = (window as any).viewer.layerManager.getLayerByName(name)
-          l && l.setVisible(false)
-          this.hiddenLayerNames.push( name )
-        }
-        this.visible = false
+    if (!this.visible) {
+      for (const name of this.hiddenLayerNames) {
+        const l = this.ngViewer.layerManager.getLayerByName(name)
+        l && l.setVisible(true)
       }
+      this.hiddenLayerNames = []
+      this.visible = true
 
-      requestAnimationFrame(() => {
-        (window as any).viewer.display.scheduleRedraw()
-      })
+    } else {
+      this.hiddenLayerNames = []
+      const segLayerNames: string[] = []
+      for (const layer of this.ngViewer.layerManager.managedLayers) {
+        if (layer.visible && layer.name in viewerConfig) {
+          segLayerNames.push(layer.name)
+        }
+      }
+      for (const name of segLayerNames) {
+        const l = this.ngViewer.layerManager.getLayerByName(name)
+        l && l.setVisible(false)
+        this.hiddenLayerNames.push( name )
+      }
+      this.visible = false
+    }
+
+    requestAnimationFrame(() => {
+      this.ngViewer.display.scheduleRedraw()
     })
+    
 
   }
   
