@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
-import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
+import {catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { actionViewerStateSelectFeature, viewerStateChangeNavigation, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
   viewerStateGetSelectedAtlas,
   viewerStateSelectedParcellationSelector,
   viewerStateSelectedTemplateSelector,
+  viewerStateSelectorFeatureSelector,
   viewerStateStandAloneVolumes,
   viewerStateViewerModeSelector
 } from "src/services/state/viewerState/selectors"
@@ -26,6 +27,7 @@ import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
 import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 import { DialogService } from "src/services/dialogService.service";
+import { SapiVoiResponse } from "src/atlasComponents/sapi/type"
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -105,7 +107,6 @@ export function ROIFactory(store: Store<any>, svc: PureContantService){
       provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
       useFactory: (cStore: ComponentStore<TCStoreViewerCmp>) => {
         return function overwriteShowDatasetDialog( arg: any ){
-          
           cStore.setState({
             overlaySideNav: arg
           })
@@ -123,7 +124,6 @@ export class ViewerCmp implements OnDestroy {
   public _pliTitle = "Fiber structures of a human hippocampus based on joint DMRI, 3D-PLI, and TPFM acquisitions"
   public _pliDesc = "The collected datasets provide real multimodal, multiscale structural connectivity insights into the human hippocampus. One post mortem hippocampus was scanned with Anatomical and Diffusion MRI (dMRI) [1], 3D Polarized Light Imaging (3D-PLI) [2], and Two-Photon Fluorescence Microscopy (TPFM) [3] using protocols specifically developed during SGA1 and SGA2, rendering joint tissue imaging possible. MRI scanning was performed with a 11.7 T Preclinical MRI system (gradients: 760 mT/m, slew rate: 9500 T/m/s) yielding T1-w and T2-w maps at 200 µm and dMRI-based maps at 300 µm resolution. During tissue sectioning (60 µm thickness) blockface (en-face) images were acquired from the surface of the frozen brain block, serving as reference for data integration/co-alignment. 530 brain sections were scanned with 3D-PLI. HPC-based image analysis provided transmittance, retardation, and fiber orientation maps at 1.3 µm in-plane resolution. TPFM was finally applied to selected brain sections utilizing autofluorescence properties of the fibrous tissue which appears after PBS washing (MAGIC protocol). The TPFM measurements provide a resolution of 0.44 µm x 0.44 µm x 1 µm."
   public _pliLink = "https://doi.org/10.25493/JQ30-E08"
-  
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
@@ -185,8 +185,14 @@ export class ViewerCmp implements OnDestroy {
       return 'notsupported'
     })
   )
-  
+
+  public viewerCtx$ = this.viewerModuleSvc.context$
+
   public pliVol$ = this._pliVol$ || NEVER
+
+  public selectedFeature$ = this.store$.pipe(
+    select(viewerStateSelectorFeatureSelector)
+  )
 
   /**
    * if no regions are selected, nor any additional layers (being deprecated)
@@ -202,8 +208,9 @@ export class ViewerCmp implements OnDestroy {
     this.viewerMode$.pipe(
       startWith(null as string)
     ),
+    this.selectedFeature$,
   ]).pipe(
-    map(([ regions, layers, viewerMode ]) => regions.length === 0 && layers.length === 0 && !viewerMode)
+    map(([ regions, layers, viewerMode, selectedFeature ]) => regions.length === 0 && layers.length === 0 && !viewerMode && !selectedFeature)
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
@@ -217,6 +224,10 @@ export class ViewerCmp implements OnDestroy {
   private getRegionFromlabelIndexId: (arg: {labelIndexId: string}) => any
 
   private genericInfoCF: ComponentFactory<GenericInfoCmp>
+
+  public selectedAtlas$ = this.store$.pipe(
+    select(viewerStateGetSelectedAtlas),
+  )
 
   public clearVoi(){
     this.store$.dispatch(
@@ -258,9 +269,7 @@ export class ViewerCmp implements OnDestroy {
       combineLatest([
         this.templateSelected$,
         this.parcellationSelected$,
-        this.store$.pipe(
-          select(viewerStateGetSelectedAtlas)
-        )
+        this.selectedAtlas$,
       ]).pipe(
         debounceTime(160)
       ).subscribe(async ([tmpl, parc, atlas]) => {
@@ -425,5 +434,29 @@ export class ViewerCmp implements OnDestroy {
 
   public disposeCtxMenu(){
     this.viewerModuleSvc.dismissCtxMenu()
+  }
+
+  showSpatialDataset(feature: SapiVoiResponse) {
+    this.store$.dispatch(
+      viewerStateChangeNavigation({
+        navigation: {
+          orientation: [0, 0, 0, 1],
+          position: feature.location.center.map(v => v * 1e6),
+          animation: {}
+        }
+      })
+    )
+
+    this.store$.dispatch(
+      actionViewerStateSelectFeature({ feature })
+    )
+  }
+
+  clearSelectedFeature(){
+    this.store$.dispatch(
+      actionViewerStateSelectFeature({
+        feature: null
+      })
+    )
   }
 }

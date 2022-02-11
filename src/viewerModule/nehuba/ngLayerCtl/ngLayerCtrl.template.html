@@ -1,0 +1,10 @@
+<div [ngClass]="{ 'text-muted': !visible }">
+
+  <button mat-icon-button (click)="toggleVisibility()">
+    <i [ngClass]="visible ? 'fa-eye' : 'fa-eye-slash'" class="far"></i>
+  </button>
+  
+  <span>
+    {{ name }}
+  </span>
+</div>

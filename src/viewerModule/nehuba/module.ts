@@ -27,6 +27,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
 import { DragDropFileModule } from "src/dragDropFile/module";
+import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 
 @NgModule({
   imports: [
@@ -64,12 +65,14 @@ import { DragDropFileModule } from "src/dragDropFile/module";
     TouchSideClass,
     MaximisePanelButton,
     StatusCardComponent,
+    NgLayerCtrlCmp,
   ],
   exports: [
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
     StatusCardComponent,
+    NgLayerCtrlCmp,
   ],
   providers: [
     {

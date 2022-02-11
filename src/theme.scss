@@ -16,6 +16,15 @@
   [iv-custom-comp],
   .iv-custom-comp
   {
+    &.hoverable
+    {
+      padding: 1rem 1.3rem;
+      &:hover
+      {
+        cursor: pointer;
+        background-color: mat.get-color-from-palette($background, 100);
+      }
+    }
 
     &[target="_blank"]
     {

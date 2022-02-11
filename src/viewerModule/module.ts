@@ -29,6 +29,8 @@ import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { ViewerInternalStateSvc } from "./viewerInternalState.service";
 import { LayerBrowserModule } from "src/ui/layerbrowser";
+import { SAPIModule } from 'src/atlasComponents/sapi';
+import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
 
 @NgModule({
   imports: [
@@ -52,9 +54,11 @@ import { LayerBrowserModule } from "src/ui/layerbrowser";
     KgRegionalFeatureModule,
     KeyFrameModule,
     LayerBrowserModule,
+    SAPIModule,
   ],
   declarations: [
     ViewerCmp,
+    NehubaVCtxToBbox,
   ],
   providers: [
     {

@@ -293,6 +293,11 @@ markdown-dom p
   transform: rotate(270deg)!important;
 }
 
+.ws-normal
+{
+  white-space: normal!important;
+}
+
 .ws-no-wrap
 {
   white-space: nowrap!important;
@@ -904,4 +909,9 @@ mat-list.sm mat-list-item
 .v-align-top
 {
   vertical-align: top;
+}
+
+.text-overflow-ellipses
+{
+  text-overflow: ellipsis;
 }

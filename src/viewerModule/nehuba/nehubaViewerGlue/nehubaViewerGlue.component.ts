@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject, Subscription } from "rxjs";
 import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
@@ -169,18 +169,28 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     }
   }
 
-  ngAfterViewInit(){
-    this.setQuickTourPos()
-
-    const { 
-      mouseOverSegments = NEVER,
-      navigationEmitter = NEVER,
-      mousePosEmitter = NEVER,
-    } = this.nehubaContainerDirective || {}
-    const sub = combineLatest([
+  private nehubaContainerSub: Subscription
+  private setupNehubaEvRelay() {
+    if (this.nehubaContainerSub) this.nehubaContainerSub.unsubscribe()
+    if (!this.nehubaContainerDirective) return
+    const {
       mouseOverSegments,
       navigationEmitter,
       mousePosEmitter,
+    } = this.nehubaContainerDirective
+    this.nehubaContainerSub = combineLatest([
+      mouseOverSegments.pipe(
+        startWith(null as TMouseoverEvent[])
+      ),
+      navigationEmitter.pipe(
+        startWith(null as INavObj)
+      ),
+      mousePosEmitter.pipe(
+        startWith(null as {
+          voxel: number[]
+          real: number[]
+        })
+      ),
     ]).pipe(
       throttleTime(16, asyncScheduler, { trailing: true })
     ).subscribe(([ seg, nav, mouse ]: [ TMouseoverEvent [], INavObj, { real: number[], voxel: number[] } ]) => {
@@ -202,8 +212,18 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       })
     })
     this.onDestroyCb.push(
-      () => sub.unsubscribe()
+      () => {
+        if (this.nehubaContainerSub) {
+          this.nehubaContainerSub.unsubscribe()
+          this.nehubaContainerSub = null
+        }
+      }
     )
+  }
+
+  ngAfterViewInit(){
+    this.setQuickTourPos()
+    this.setupNehubaEvRelay()
   }
 
   ngOnDestroy() {
