@@ -16,7 +16,7 @@ import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 export class ToggleParcellationDirective implements OnDestroy {
 
   public visible = true
-  private hiddenLayerNames = []
+  public hiddenLayerNames = []
   private selectedAtlasId: string
   private selectedTemplateId: string
 

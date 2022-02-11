@@ -8,6 +8,8 @@ import {PureContantService, UtilModule} from "src/util";
 import {viewerStateGetOverlayingAdditionalParcellations, viewerStateSelectedParcellationSelector} from "src/services/state/viewerState/selectors";
 import {HttpClientModule} from "@angular/common/http";
 import {By} from "@angular/platform-browser";
+import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
+import {BehaviorSubject} from "rxjs";
 
 
 class MockPureConstantService{
@@ -30,6 +32,26 @@ const addParc = [{
     originDatainfos: []
 }]
 
+let mockNehubaViewer = {
+    updateUserLandmarks: jasmine.createSpy(),
+    nehubaViewer: {
+        ngviewer: {
+            layerManager: {
+                getLayerByName: jasmine.createSpy('getLayerByName'),
+                get managedLayers() {
+                    return []
+                },
+                set managedLayers(val) {
+                    return
+                }
+            },
+            display: {
+                scheduleRedraw: jasmine.createSpy('scheduleRedraw')
+            }
+        }
+    }
+}
+
 describe('> viewerCtrlCmp.component.ts', () => {
     describe('> ViewerCtrlCmp', () => {
 
@@ -49,6 +71,12 @@ describe('> viewerCtrlCmp.component.ts', () => {
                 providers: [
                     provideMockStore(),
                     {
+                        provide: NEHUBA_INSTANCE_INJTKN,
+                        useFactory: () => {
+                            return new BehaviorSubject(mockNehubaViewer).asObservable()
+                        }
+                    },
+                    {
                         provide: PureContantService,
                         useValue: mockPureConstantService
                     }
@@ -59,6 +87,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
             await mockStore.overrideSelector(viewerStateGetOverlayingAdditionalParcellations, addParc)
 
             fixture = await TestBed.createComponent(ViewerStateBreadCrumb)
+            const toggleIcon = await fixture.debugElement.query(By.directive(ToggleParcellationDirective))
             component = fixture.componentInstance
             fixture.detectChanges()
         })
@@ -70,6 +99,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
 
         it('> hide delineation eye should be open by default', async () => {
             const toggleIcon = await fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+            console.log(toggleIcon)
             expect(toggleIcon.nativeElement.getAttribute('class')).toContain('fa-eye')
         })
 

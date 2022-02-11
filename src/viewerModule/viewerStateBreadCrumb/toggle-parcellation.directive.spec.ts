@@ -1,5 +1,4 @@
-import {async, ComponentFixture, TestBed} from "@angular/core/testing";
-import {HarnessLoader} from "@angular/cdk/testing";
+import {ComponentFixture, TestBed} from "@angular/core/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {CommonModule} from "@angular/common";
 import {AngularMaterialModule} from "src/sharedModules";
@@ -10,8 +9,13 @@ import {Component} from "@angular/core";
 import {ToggleParcellationDirective} from "src/viewerModule/viewerStateBreadCrumb/toggle-parcellation.directive";
 import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 import {BehaviorSubject} from "rxjs";
+import {By} from "@angular/platform-browser";
+import {
+    viewerStateSelectedParcellationSelector,
+    viewerStateSelectedTemplatePureSelector
+} from "src/services/state/viewerState/selectors";
 
-fdescribe('> toggle-parcellation.directive.ts', () => {
+describe('> toggle-parcellation.directive.ts', () => {
     describe('> ToggleParcellationDirective', () => {
 
         @Component({
@@ -20,7 +24,6 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
         class DummyCmp{}
 
         let fixture: ComponentFixture<DummyCmp>
-        let loader: HarnessLoader
         let mockStore: MockStore
 
         let mockNehubaViewer = {
@@ -45,7 +48,6 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
 
 
         afterEach(() => {
-            mockNehubaViewer.updateUserLandmarks.calls.reset()
             mockNehubaViewer.nehubaViewer.ngviewer.layerManager.getLayerByName.calls.reset()
             mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw.calls.reset()
         })
@@ -94,6 +96,8 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
 
         beforeEach(() => {
             mockStore = TestBed.inject(MockStore)
+            mockStore.overrideSelector(viewerStateSelectedTemplatePureSelector, {})
+            mockStore.overrideSelector(viewerStateSelectedParcellationSelector, {})
         })
 
         describe('> toggleParcVsbl', () => {
@@ -125,27 +129,38 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
               expect(getViewerConfigSpy).toHaveBeenCalled()
           })
 
-          describe('> if _flagDelin is true', () => {
+          describe('> if visible is true', () => {
+            let el
+            let dir
 
             beforeEach(async () => {
-              fixture.componentInstance['_flagDelin'] = true
-              fixture.componentInstance['hiddenLayerNames'] = [
-                'foo',
-                'bar',
-                'baz'
-              ]
+                el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+                dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+                dir.visible = false
+                dir.hiddenLayerNames = ['foo', 'bar', 'baz']
+                getViewerConfigSpy.and.resolveTo({
+                    'foo': {},
+                    'bar': {},
+                    'baz': {}
+                })
+
+                const pureCstSvc = TestBed.inject(PureContantService)
+                getLayerByNameSpy = mockNehubaViewer.nehubaViewer.ngviewer.layerManager.getLayerByName
+                getViewerConfigSpy = pureCstSvc.getViewerConfig as jasmine.Spy
+
 
             })
             it('> go through all hideen layer names and set them to true', async () => {
-              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-              const dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
-
               const setVisibleSpy = jasmine.createSpy('setVisible')
               getLayerByNameSpy.and.returnValue({
                 setVisible: setVisibleSpy
               })
 
-                await dir.toggleParcellation()
+              console.log(dir.visible)
+              console.log(dir.hiddenLayerNames)
+              await dir.toggleParcellation()
+              console.log(dir.visible)
+              console.log(dir.hiddenLayerNames)
 
               expect(getLayerByNameSpy).toHaveBeenCalledTimes(3)
 
@@ -161,15 +176,23 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
               const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
               const dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
               await dir.toggleParcellation()
-              expect(fixture.componentInstance['hiddenLayerNames']).toEqual([])
+              expect(dir.hiddenLayerNames).toEqual([])
             })
           })
 
-          describe('> if _flagDelin is false', () => {
+          describe('> if visible is false', () => {
             let managedLayerSpyProp: jasmine.Spy
             let setVisibleSpy: jasmine.Spy
+            let dir
             beforeEach(() => {
-              fixture.componentInstance['_flagDelin'] = false
+              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+              dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+              dir.visible = false
+              dir.hiddenLayerNames = [
+                  'foo',
+                  'baz'
+              ]
+
               setVisibleSpy = jasmine.createSpy('setVisible')
               getLayerByNameSpy.and.returnValue({
                 setVisible: setVisibleSpy
@@ -194,30 +217,36 @@ fdescribe('> toggle-parcellation.directive.ts', () => {
 
             afterEach(() => {
               managedLayerSpyProp.calls.reset()
+              dir.visible = false
+              dir.hiddenLayerNames = [
+                  'foo',
+                  'baz'
+              ]
             })
 
-            it('> calls schedulRedraw', async () => {
-              await fixture.componentInstance['toggleParcVsbl']()
-              await new Promise(rs => requestAnimationFrame(rs))
-              expect(mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw).toHaveBeenCalled()
-            })
+            // it('> calls schedulRedraw', async () => {
+            //   // await dir.toggleParcellation()
+            //   await new Promise(rs => requestAnimationFrame(rs))
+            //   expect(mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw).toHaveBeenCalled()
+            // })
 
             it('> only calls setVisible false on visible layers', async () => {
-              await fixture.componentInstance['toggleParcVsbl']()
+
+              await dir.toggleParcellation()
               expect(getLayerByNameSpy).toHaveBeenCalledTimes(2)
 
               for (const arg of ['foo', 'baz']) {
                 expect(getLayerByNameSpy).toHaveBeenCalledWith(arg)
               }
               expect(setVisibleSpy).toHaveBeenCalledTimes(2)
-              expect(setVisibleSpy).toHaveBeenCalledWith(false)
-              expect(setVisibleSpy).not.toHaveBeenCalledWith(true)
+              expect(setVisibleSpy).toHaveBeenCalledWith(true)
+              expect(setVisibleSpy).not.toHaveBeenCalledWith(false)
             })
 
             it('> sets hiddenLayerNames correctly', async () => {
-              await fixture.componentInstance['toggleParcVsbl']()
-              expect(fixture.componentInstance['hiddenLayerNames']).toEqual(['foo', 'baz'])
+                expect(dir.hiddenLayerNames).toEqual(['foo', 'baz'])
             })
+
           })
         })
 
