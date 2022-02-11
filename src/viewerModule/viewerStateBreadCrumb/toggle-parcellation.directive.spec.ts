@@ -156,11 +156,7 @@ describe('> toggle-parcellation.directive.ts', () => {
                 setVisible: setVisibleSpy
               })
 
-              console.log(dir.visible)
-              console.log(dir.hiddenLayerNames)
               await dir.toggleParcellation()
-              console.log(dir.visible)
-              console.log(dir.hiddenLayerNames)
 
               expect(getLayerByNameSpy).toHaveBeenCalledTimes(3)
 
