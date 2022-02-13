@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit, Optional} from '@angular/core'
+import { Component, Inject, OnDestroy, OnInit, Optional} from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
@@ -37,7 +37,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
   public AXIS_LINE_TOOLTIP = ARIA_LABELS.AXIS_LINE_TOOLTIP
   public BACKGROUND_COLORING_TOOLTIP = ARIA_LABELS.BACKGROUND_COLORING_TOOLTIP
-  public SCALE_BAR_TOOLTIP = ARIA_LABELS.SCALE_BAR_TOOLTIP
   public supportedPanelModes = SUPPORTED_PANEL_MODES
 
   /**
@@ -200,13 +199,18 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public stepSize: number = 10
+  private _axisLineVisible = true
+  private _sliceBackground
+  private _showBackground = true
+
 
   public get axisLineVisible() {
-    return this.viewer.showAxisLines.value
+    return this._axisLineVisible
   }
 
-  public set axisLineVisible(value) {
+  private set axisLineVisible(value) {
     this.viewer.showAxisLines.restoreState(value)
+    this._axisLineVisible = this.viewer.showAxisLines.value
   }
 
   public toggleAxisLines(value) {
@@ -214,32 +218,21 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
 
-  public get showScaleBar() {
-    return this.viewer.showScaleBar.value
-  }
-
-  public set showScaleBar(value) {
-    this.viewer.showScaleBar.restoreState(value)
-  }
-
-  public toggleScaleBar(value) {
-    this.showScaleBar = value
-  }
-  
-
   public get sliceBackgroundRgb() {
     const color = this.sliceBackground
     return '#' + [color[0], color[1], color[2]].map(x => x.toString(16).length === 1 ? '0' + x.toString(16) : x.toString(16))
       .join('')
   }
-  
+
   public get sliceBackground() {
-    return this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
+    return this._sliceBackground || this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
   }
 
   public set sliceBackground(value) {
     this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value
     this.nehubaViewer.redraw()
+
+    this._sliceBackground = this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
   }
 
   public setSliceBackground(value) {
@@ -247,19 +240,25 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public get showBackground() {
-    return this.sliceBackground[3] > 0
+    return this._showBackground
   }
 
   public set showBackground(value) {
     this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
+    // if (!value)
+    //   this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates = false
+    // else
+      // this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = 0.2
+
     this.nehubaViewer.redraw()
+    this._showBackground = !this.sliceBackground || this.sliceBackground[3] > 0
   }
 
   public toggleShowBackground(value) {
     this.showBackground = value
   }
 
-  public hexToRgb(hex) {
+  private hexToRgb(hex) {
     return hex.match(/\w\w/g).map(x => parseInt(x, 16))
   }
 
