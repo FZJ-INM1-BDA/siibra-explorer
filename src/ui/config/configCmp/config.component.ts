@@ -248,7 +248,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     // if (!value)
     //   this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates = false
     // else
-      // this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = 0.2
+    // this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = 0.2
 
     this.nehubaViewer.redraw()
     this._showBackground = !this.sliceBackground || this.sliceBackground[3] > 0
