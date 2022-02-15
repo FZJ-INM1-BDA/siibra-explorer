@@ -210,7 +210,7 @@
       <div class="d-flex mb-2 align-items-center">
         <mat-slide-toggle
                 [checked]="axisLineVisible"
-                (change)="toggleAxisLines($event.checked)">
+                (change)="setAxisLinesVisibility($event.checked)">
           Axis lines
         </mat-slide-toggle>
         <small iav-stop="click mousedown mouseup" [matTooltip]="AXIS_LINE_TOOLTIP" class="ml-2 fas fa-question"></small>
@@ -219,12 +219,12 @@
       <!-- Background colouring -->
       <div class="d-flex mb-2 align-items-center">
         <mat-slide-toggle
-                [checked]="showBackground"
-                (change)="toggleShowBackground($event.checked)">
+                [checked]="togglePerspectiveViewSubstrate"
+                (change)="setBackgroundVisibility($event.checked)">
           Background colouring
         </mat-slide-toggle>
         <small iav-stop="click mousedown mouseup" [matTooltip]="BACKGROUND_COLORING_TOOLTIP" class="ml-2 fas fa-question"></small>
-        <div *ngIf="showBackground" class="ml-3">
+        <div *ngIf="togglePerspectiveViewSubstrate" class="ml-3">
           <input type="color" id="backgroundColorPicker" name="backgroundColorPicker"
                  (change)="setSliceBackground(backgroundColorPicker.value)"
                  #backgroundColorPicker

@@ -121,6 +121,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.panelOrder$.subscribe(panelOrder => this.panelOrder = panelOrder),
     )
+
+    this.sliceBackground = this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color.map((v, i) => i===3? v : Math.floor(v*255))
   }
 
   public ngOnDestroy() {
@@ -199,9 +201,9 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public stepSize: number = 10
-  private _axisLineVisible = true
-  private _sliceBackground
-  private _showBackground = true
+  private _axisLineVisible: boolean = true
+  private _sliceBackground: any[] = []
+  private _togglePerspectiveViewSubstrate: boolean = true
 
 
   public get axisLineVisible() {
@@ -213,52 +215,47 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this._axisLineVisible = this.viewer.showAxisLines.value
   }
 
-  public toggleAxisLines(value) {
+  public setAxisLinesVisibility(value) {
     this.axisLineVisible = value
   }
 
 
-  public get sliceBackgroundRgb() {
+  public get sliceBackgroundRgb() : string {
     const color = this.sliceBackground
-    return '#' + [color[0], color[1], color[2]].map(x => x.toString(16).length === 1 ? '0' + x.toString(16) : x.toString(16))
-      .join('')
+    return color.length? '#' + [color[0], color[1], color[2]].map(x => x.toString(16).length === 1 ? '0' + x.toString(16) : x.toString(16)).join('')
+      : ''
   }
 
-  public get sliceBackground() {
-    return this._sliceBackground || this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
+  public get sliceBackground() : any[] {
+    return this._sliceBackground
   }
 
-  public set sliceBackground(value) {
-    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value
+  public set sliceBackground(value: any[]) {
+    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value.map((v, i) => i===3? v : v/255.0)
     this.nehubaViewer.redraw()
 
-    this._sliceBackground = this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
+    this._sliceBackground = value.length === 4? value : [...value, 0.2]
   }
 
   public setSliceBackground(value) {
     this.sliceBackground = [...this.hexToRgb(value), 0.2]
   }
 
-  public get showBackground() {
-    return this._showBackground
+  public get togglePerspectiveViewSubstrate() {
+    return this._togglePerspectiveViewSubstrate
   }
 
-  public set showBackground(value) {
+  public set togglePerspectiveViewSubstrate(value) {
     this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
-    // if (!value)
-    //   this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates = false
-    // else
-    // this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = 0.2
-
     this.nehubaViewer.redraw()
-    this._showBackground = !this.sliceBackground || this.sliceBackground[3] > 0
+    this._togglePerspectiveViewSubstrate = !this.sliceBackground.length || this.sliceBackground[3] > 0
   }
 
-  public toggleShowBackground(value) {
-    this.showBackground = value
+  public setBackgroundVisibility(value) {
+    this.togglePerspectiveViewSubstrate = value
   }
 
-  private hexToRgb(hex) {
+  private hexToRgb(hex) : any[] {
     return hex.match(/\w\w/g).map(x => parseInt(x, 16))
   }
 
