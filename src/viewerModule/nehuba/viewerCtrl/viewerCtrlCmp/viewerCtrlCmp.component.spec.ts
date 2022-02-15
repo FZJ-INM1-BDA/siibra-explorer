@@ -144,7 +144,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
       describe('> toggle delineation', () => {
         
         let toggleDelination: jasmine.Spy
-        // const toggleName = 'toggle-delineation'
+
         beforeEach(() => {
           toggleDelination = spyOn<any>(fixture.componentInstance, 'toggleParcVsbl')
         })

@@ -11,9 +11,9 @@ import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 
 @Directive({
   selector: '[s-xplr-parc-vis-ctrl]',
-  exportAs: 'toggleParcellation'
+  exportAs: 'sXplrParcVisCtrl'
 })
-export class ToggleParcellationDirective implements OnDestroy {
+export class ParcVisCtrlDirective implements OnDestroy {
 
   public visible = true
   public hiddenLayerNames = []
@@ -25,21 +25,19 @@ export class ToggleParcellationDirective implements OnDestroy {
   private nehubaInst: NehubaViewerUnit
 
   get ngViewer() {
-    return this.nehubaInst?.nehubaViewer.ngviewer || (window as any).viewer
+    return this.nehubaInst?.nehubaViewer.ngviewer
   }
   
-  constructor(private el: ElementRef,
-              private renderer: Renderer2,
-              private pureService: PureContantService,
+  constructor(private pureService: PureContantService,
               private store$: Store<any>,
               @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,) {
     this.subscriptions.push(
-      this.store$.select(viewerStateGetSelectedAtlas)
+      this.store$.pipe(select(viewerStateGetSelectedAtlas))
         .subscribe(sa => this.selectedAtlasId = sa && sa['@id']),
       this.store$.pipe(select(viewerStateSelectedTemplatePureSelector))
         .subscribe(tmpl => {this.selectedTemplateId = tmpl && tmpl['@id']}),
       this.store$.pipe(select(viewerStateSelectedParcellationSelector))
-        .subscribe(tmpl => {
+        .subscribe(() => {
           this.hiddenLayerNames = []
           this.visible = true
         }),

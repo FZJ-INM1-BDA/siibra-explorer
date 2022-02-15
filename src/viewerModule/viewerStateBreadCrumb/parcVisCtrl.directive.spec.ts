@@ -6,7 +6,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ComponentsModule} from "src/components";
 import {PureContantService, UtilModule} from "src/util";
 import {Component} from "@angular/core";
-import {ToggleParcellationDirective} from "src/viewerModule/viewerStateBreadCrumb/toggle-parcellation.directive";
+import {ParcVisCtrlDirective} from "src/viewerModule/viewerStateBreadCrumb/parcVisCtrl.directive";
 import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 import {BehaviorSubject} from "rxjs";
 import {By} from "@angular/platform-browser";
@@ -15,8 +15,8 @@ import {
     viewerStateSelectedTemplatePureSelector
 } from "src/services/state/viewerState/selectors";
 
-describe('> toggle-parcellation.directive.ts', () => {
-    describe('> ToggleParcellationDirective', () => {
+describe('> parcVisCtrl.directive.ts', () => {
+    describe('> ParcVisCtrlDirective', () => {
 
         @Component({
             template: ''
@@ -63,7 +63,7 @@ describe('> toggle-parcellation.directive.ts', () => {
                     UtilModule,
                 ],
                 declarations: [
-                    ToggleParcellationDirective,
+                    ParcVisCtrlDirective,
                     DummyCmp
                 ],
                 providers: [
@@ -116,15 +116,15 @@ describe('> toggle-parcellation.directive.ts', () => {
 
               const fixture = TestBed.createComponent(DummyCmp)
               fixture.detectChanges()
-              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-              const dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+              const el = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+              const dir = el.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
               expect(dir).toBeTruthy()
           })
 
           it('> calls pureSvc.getViewerConfig', async () => {
               getViewerConfigSpy.and.returnValue({})
-              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-              const dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+              const el = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+              const dir = el.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
               await dir.toggleParcellation()
               expect(getViewerConfigSpy).toHaveBeenCalled()
           })
@@ -134,8 +134,8 @@ describe('> toggle-parcellation.directive.ts', () => {
             let dir
 
             beforeEach(async () => {
-                el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-                dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+                el = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+                dir = el.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
                 dir.visible = false
                 dir.hiddenLayerNames = ['foo', 'bar', 'baz']
                 getViewerConfigSpy.and.resolveTo({
@@ -169,8 +169,8 @@ describe('> toggle-parcellation.directive.ts', () => {
             })
             it('> hiddenLayerNames resets', async () => {
 
-              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-              const dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+              const el = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+              const dir = el.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
               await dir.toggleParcellation()
               expect(dir.hiddenLayerNames).toEqual([])
             })
@@ -181,8 +181,8 @@ describe('> toggle-parcellation.directive.ts', () => {
             let setVisibleSpy: jasmine.Spy
             let dir
             beforeEach(() => {
-              const el = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-              dir = el.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+              const el = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+              dir = el.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
               dir.visible = false
               dir.hiddenLayerNames = [
                   'foo',

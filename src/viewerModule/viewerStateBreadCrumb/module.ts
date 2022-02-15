@@ -6,7 +6,7 @@ import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { OriginalDatainfoPipe, ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
-import {ToggleParcellationDirective} from "src/viewerModule/viewerStateBreadCrumb/toggle-parcellation.directive";
+import {ParcVisCtrlDirective} from "src/viewerModule/viewerStateBreadCrumb/parcVisCtrl.directive";
 
 @NgModule({
   imports: [
@@ -20,7 +20,7 @@ import {ToggleParcellationDirective} from "src/viewerModule/viewerStateBreadCrum
   declarations: [
     ViewerStateBreadCrumb,
     OriginalDatainfoPipe,
-    ToggleParcellationDirective
+    ParcVisCtrlDirective
   ],
   exports: [
     ViewerStateBreadCrumb,

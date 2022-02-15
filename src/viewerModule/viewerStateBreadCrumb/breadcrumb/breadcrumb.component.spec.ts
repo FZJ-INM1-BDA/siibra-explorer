@@ -1,6 +1,6 @@
 import {OriginalDatainfoPipe, ViewerStateBreadCrumb} from "src/viewerModule/viewerStateBreadCrumb/breadcrumb/breadcrumb.component";
 import {ComponentFixture, TestBed} from "@angular/core/testing";
-import {ToggleParcellationDirective} from "src/viewerModule/viewerStateBreadCrumb/toggle-parcellation.directive";
+import {ParcVisCtrlDirective} from "src/viewerModule/viewerStateBreadCrumb/parcVisCtrl.directive";
 import {CommonModule} from "@angular/common";
 import {AngularMaterialModule} from "src/sharedModules";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
@@ -65,7 +65,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
                 ],
                 declarations: [
                     ViewerStateBreadCrumb,
-                    ToggleParcellationDirective,
+                    ParcVisCtrlDirective,
                     OriginalDatainfoPipe
                 ],
                 providers: [
@@ -87,25 +87,25 @@ describe('> viewerCtrlCmp.component.ts', () => {
             await mockStore.overrideSelector(viewerStateGetOverlayingAdditionalParcellations, addParc)
 
             fixture = await TestBed.createComponent(ViewerStateBreadCrumb)
-            const toggleIcon = await fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+            const toggleIcon = await fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
             component = fixture.componentInstance
             fixture.detectChanges()
         })
 
         it('> hide delineation icon should exist', async () => {
-            const toggleIcon = await fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+            const toggleIcon = await fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
             expect(toggleIcon).toBeTruthy()
         })
 
         it('> hide delineation eye should be open by default', async () => {
-            const toggleIcon = await fixture.debugElement.query(By.directive(ToggleParcellationDirective))
+            const toggleIcon = await fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
             console.log(toggleIcon)
             expect(toggleIcon.nativeElement.getAttribute('class')).toContain('fa-eye')
         })
 
         it('> hide delineation eye should slashed if parcellation not visible', async () => {
-            const toggleIcon = fixture.debugElement.query(By.directive(ToggleParcellationDirective))
-            const dir = toggleIcon.injector.get(ToggleParcellationDirective) as ToggleParcellationDirective
+            const toggleIcon = fixture.debugElement.query(By.directive(ParcVisCtrlDirective))
+            const dir = toggleIcon.injector.get(ParcVisCtrlDirective) as ParcVisCtrlDirective
             dir.visible = false
             fixture.detectChanges()
             expect(toggleIcon.nativeElement.getAttribute('class')).toContain('fa-eye-slash')
