@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, of } from "rxjs";
-import {filter, find, switchMap, take} from "rxjs/operators";
+import {switchMap, withLatestFrom} from "rxjs/operators";
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { IMeshesToLoad } from '../constants'
 import { flattenReducer } from 'common/util'
@@ -79,22 +79,28 @@ export class NehubaMeshService implements OnDestroy {
     this.onDestroyCb.push(() => auxMeshSub.unsubscribe())
 
     // ToDo move logic to nehuba config
-    const selectedParcSub = this.selectedParc$.subscribe((p: any) => {
+    let greyMatterChanged: boolean = false
+    const selectedParcSub = this.selectedParc$.pipe(
+      withLatestFrom(this.store$.select(selectorAuxMeshes))
+    ).subscribe(([p, am]) => {
       const corticalId = 'juelich/iav/atlas/v1.0.0/3'
       const greyAuxMeshId = 'Big Brain auxmesh Grey matter'
-      if (p['@id'] === corticalId) {
-        this.store$.pipe(
-          select(selectorAuxMeshes), 
-          take(1),
-        ).subscribe((am: any) => {
-          console.log(am)
-          const greyMesh = am.find(a => a['@id'] === greyAuxMeshId)
-          if (greyMesh) {
-            greyMesh.visible=false
-            this.store$.dispatch(actionSetAuxMesh({payload: greyMesh}))
-          }
-        })
+      
+      const greyMatter = am.find(a => a['@id'] === greyAuxMeshId)
+      if (greyMatter) {
+        if (p['@id'] === corticalId) {
+          // Turn off grey matter when cortical layers selected
+          greyMatter.visible = false
+          this.store$.dispatch(actionSetAuxMesh({payload: greyMatter}))
+          greyMatterChanged = true
+        } else if (p['@id'] !== corticalId && greyMatterChanged) {
+          // Turn on grey matter on cortical layers disable
+          greyMatter.visible = true
+          this.store$.dispatch(actionSetAuxMesh({payload: greyMatter}))
+          greyMatterChanged = false
+        }
       }
+
     })
     this.onDestroyCb.push(() => selectedParcSub.unsubscribe())
 

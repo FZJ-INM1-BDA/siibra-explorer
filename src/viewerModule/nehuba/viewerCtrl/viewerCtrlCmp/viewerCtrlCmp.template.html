@@ -33,6 +33,7 @@
     <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
       [formControlName]="auxMesh['@id']"
       class="d-block"
+      (change)="changeAuxMeshToggle($event, auxMesh['@id'])"
       [name]="'toggle-aux-mesh-' + auxMesh['@id']">
       <span class="iv-custom-comp text">
         {{ auxMesh.displayName || auxMesh.name }}

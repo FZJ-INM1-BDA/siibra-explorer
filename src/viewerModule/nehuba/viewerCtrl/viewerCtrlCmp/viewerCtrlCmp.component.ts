@@ -1,14 +1,14 @@
 import { Component, HostBinding, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, of, Subscription } from "rxjs";
-import {filter, map, pairwise, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, filter, map, pairwise, skip, take, withLatestFrom} from "rxjs/operators";
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { viewerStateCustomLandmarkSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
-import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
+import {actionSetAuxMesh, actionSetAuxMeshes, selectorAuxMeshes} from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import {PureContantService} from "src/util";
 
@@ -142,31 +142,15 @@ export class ViewerCtrlCmp{
           this.auxMeshFormGroup.addControl(mesh['@id'], new FormControl(mesh.visible))
         }
       }),
-
-      this.auxMeshFormGroup.valueChanges.pipe(
-        withLatestFrom(this.auxMeshes$)
-      ).subscribe(([v, auxMeshes]) => {
-        if (!auxMeshes) return
-
-        let changed = false
-        const auxMeshesCopy = JSON.parse(JSON.stringify(auxMeshes))
-        for (const key in v) {
-          const found = auxMeshesCopy.find(mesh => mesh['@id'] === key)
-          if (found && found.visible !== v[key]) {
-            changed = true
-            found.visible = v[key]
-          }
-        }
-
-        if (changed) {
-          this.store$.dispatch(
-            actionSetAuxMeshes({
-              payload: auxMeshesCopy
-            })
-          )
-        }
-      })
     )
+  }
+
+  changeAuxMeshToggle(event, meshId) {
+    this.auxMeshes$.pipe(take(1)).subscribe(am => {
+      const auxMeshesh = am.find(a => a['@id'] === meshId)
+      auxMeshesh.visible = event.checked
+      this.store$.dispatch(actionSetAuxMesh({payload: auxMeshesh}))
+    })
   }
 
   private async toggleParcVsbl(){
