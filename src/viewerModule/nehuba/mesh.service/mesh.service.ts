@@ -1,11 +1,11 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, of } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import {filter, find, switchMap, take} from "rxjs/operators";
 import { viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { IMeshesToLoad } from '../constants'
 import { flattenReducer } from 'common/util'
-import { IAuxMesh, selectorAuxMeshes, actionSetAuxMeshes } from "../store";
+import {IAuxMesh, selectorAuxMeshes, actionSetAuxMeshes, actionSetAuxMesh} from "../store";
 
 interface IRegion {
   ngId?: string
@@ -77,6 +77,27 @@ export class NehubaMeshService implements OnDestroy {
       )
     })
     this.onDestroyCb.push(() => auxMeshSub.unsubscribe())
+
+    // ToDo move logic to nehuba config
+    const selectedParcSub = this.selectedParc$.subscribe((p: any) => {
+      const corticalId = 'juelich/iav/atlas/v1.0.0/3'
+      const greyAuxMeshId = 'Big Brain auxmesh Grey matter'
+      if (p['@id'] === corticalId) {
+        this.store$.pipe(
+          select(selectorAuxMeshes), 
+          take(1),
+        ).subscribe((am: any) => {
+          console.log(am)
+          const greyMesh = am.find(a => a['@id'] === greyAuxMeshId)
+          if (greyMesh) {
+            greyMesh.visible=false
+            this.store$.dispatch(actionSetAuxMesh({payload: greyMesh}))
+          }
+        })
+      }
+    })
+    this.onDestroyCb.push(() => selectedParcSub.unsubscribe())
+
   }
 
   ngOnDestroy(){
