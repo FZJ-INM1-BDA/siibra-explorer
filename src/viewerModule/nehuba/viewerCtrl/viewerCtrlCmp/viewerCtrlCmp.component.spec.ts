@@ -8,7 +8,7 @@ import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState.
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors"
 import { AngularMaterialModule } from "src/sharedModules"
 import {PureContantService, UtilModule} from "src/util"
-import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
+import {actionSetAuxMesh, actionSetAuxMeshes, selectorAuxMeshes} from "../../store"
 import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
@@ -224,14 +224,12 @@ describe('> viewerCtrlCmp.component.ts', () => {
         expect(
           dispatchSpy
         ).toHaveBeenCalledWith(
-          actionSetAuxMeshes({
-            payload: [
+          actionSetAuxMesh({
+            payload:
               {
                 ...auxMesh,
-                visible: !auxMesh.visible
-              },
-              auxMesh2
-            ]
+                visible: auxMesh.visible
+              }
           })
         )
       })
