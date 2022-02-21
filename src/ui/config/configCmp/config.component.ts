@@ -16,6 +16,7 @@ import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/se
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import { ARIA_LABELS } from 'common/constants'
 import {ComponentStore} from "src/viewerModule/componentStore";
+import {ConfigStore} from "src/ui/config/configCmp/config.store";
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -60,20 +61,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   private viewerObliqueRotated$: Observable<boolean>
 
-  private nehubaViewer: NehubaViewerUnit
-  private get viewer(){
-    return (window as any).viewer
-  }
-
   constructor(
     private store: Store<IavRootStoreInterface>,
     private pureConstantService: PureContantService,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
+    public readonly configStore: ConfigStore,
   ) {
-
-    this.subscriptions.push(
-      nehubaViewer$.subscribe(viewer => this.nehubaViewer = viewer)
-    )
 
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
@@ -122,10 +114,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.panelOrder$.subscribe(panelOrder => this.panelOrder = panelOrder),
     )
-
-    this.sliceBackground = this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color.map((v, i) => i===3? v : Math.floor(v*255))
-    this.axisLineVisible = this.viewer.showAxisLines.value
-    this.togglePerspectiveViewSubstrate = this.sliceBackground.length && this.sliceBackground[3] > 0
   }
 
   public ngOnDestroy() {
@@ -204,62 +192,5 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public stepSize: number = 10
-  private _axisLineVisible: boolean
-  private _sliceBackground: any[] = []
-  private _togglePerspectiveViewSubstrate: boolean
-
-
-  public get axisLineVisible() {
-    return this._axisLineVisible
-  }
-
-  private set axisLineVisible(value) {
-    this.viewer.showAxisLines.restoreState(value)
-    this._axisLineVisible = this.viewer.showAxisLines.value
-  }
-
-  public setAxisLinesVisibility(value) {
-    this.axisLineVisible = value
-  }
-
-
-  public get sliceBackgroundRgb() : string {
-    const color = this.sliceBackground
-    return color.length? '#' + [color[0], color[1], color[2]].map(x => x.toString(16).length === 1 ? '0' + x.toString(16) : x.toString(16)).join('')
-      : ''
-  }
-
-  public get sliceBackground() : any[] {
-    return this._sliceBackground
-  }
-
-  public set sliceBackground(value: any[]) {
-    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value.map((v, i) => i===3? v : v/255.0)
-    this.nehubaViewer.redraw()
-
-    this._sliceBackground = value.length === 4? value : [...value, 0.2]
-  }
-
-  public setSliceBackground(value) {
-    this.sliceBackground = [...this.hexToRgb(value), 0.2]
-  }
-
-  public get togglePerspectiveViewSubstrate() {
-    return this._togglePerspectiveViewSubstrate
-  }
-
-  public set togglePerspectiveViewSubstrate(value) {
-    this._togglePerspectiveViewSubstrate = value
-  }
-
-  public setBackgroundVisibility(value) {
-    this.togglePerspectiveViewSubstrate = value
-    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
-    this.nehubaViewer.redraw()
-  }
-
-  private hexToRgb(hex) : any[] {
-    return hex.match(/\w\w/g).map(x => parseInt(x, 16))
-  }
 
 }
