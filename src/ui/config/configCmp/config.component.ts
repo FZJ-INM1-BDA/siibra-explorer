@@ -15,6 +15,7 @@ import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/servi
 import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors';
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import { ARIA_LABELS } from 'common/constants'
+import {ComponentStore} from "src/viewerModule/componentStore";
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -123,6 +124,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
 
     this.sliceBackground = this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color.map((v, i) => i===3? v : Math.floor(v*255))
+    this.axisLineVisible = this.viewer.showAxisLines.value
+    this.togglePerspectiveViewSubstrate = this.sliceBackground.length && this.sliceBackground[3] > 0
   }
 
   public ngOnDestroy() {
@@ -201,9 +204,9 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public stepSize: number = 10
-  private _axisLineVisible: boolean = true
+  private _axisLineVisible: boolean
   private _sliceBackground: any[] = []
-  private _togglePerspectiveViewSubstrate: boolean = true
+  private _togglePerspectiveViewSubstrate: boolean
 
 
   public get axisLineVisible() {
@@ -246,13 +249,13 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public set togglePerspectiveViewSubstrate(value) {
-    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
-    this.nehubaViewer.redraw()
-    this._togglePerspectiveViewSubstrate = !this.sliceBackground.length || this.sliceBackground[3] > 0
+    this._togglePerspectiveViewSubstrate = value
   }
 
   public setBackgroundVisibility(value) {
     this.togglePerspectiveViewSubstrate = value
+    this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
+    this.nehubaViewer.redraw()
   }
 
   private hexToRgb(hex) : any[] {
