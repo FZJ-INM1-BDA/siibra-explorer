@@ -27,6 +27,17 @@
   </span>
 </mat-slide-toggle>
 
+<mat-slide-toggle
+  [checked]="configStore.togglePerspectiveViewSubstrate$ | async"
+  (change)="configStore.setBackgroundVisibility($event.checked)"
+  name="remove-perspective-view-background">
+  <span class="iv-custom-comp text">
+    Remove background
+  </span>
+</mat-slide-toggle>
+
+
+
 <ng-container *ngIf="auxMeshes$ | async as auxMeshes">
   <mat-divider class="mt-1 mb-1"></mat-divider>
   <form [formGroup]="auxMeshFormGroup">

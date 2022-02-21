@@ -11,6 +11,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import {PureContantService} from "src/util";
+import {ConfigStore} from "src/ui/config/configCmp/config.store";
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -83,6 +84,7 @@ export class ViewerCtrlCmp{
     private store$: Store<any>,
     formBuilder: FormBuilder,
     private pureConstantService: PureContantService,
+    public readonly configStore: ConfigStore,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,
   ){
 

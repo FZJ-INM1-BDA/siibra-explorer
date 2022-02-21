@@ -1,9 +1,16 @@
-import {Inject, Injectable, Optional} from "@angular/core";
+import {Inject, Injectable, OnDestroy, Optional} from "@angular/core";
 import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import {ComponentStore} from "@ngrx/component-store";
-import {filter, take} from "rxjs/operators";
+import {filter, skipUntil, take, tap, withLatestFrom} from "rxjs/operators";
+import {
+  viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector,
+  viewerStateSelectedTemplateSelector
+} from "src/services/state/viewerState/selectors";
+import {Store} from "@ngrx/store";
+import {PureContantService} from "src/util";
+import {switchMapWaitFor} from "src/util/fn";
 
 export interface ConfigState {
     sliceBackground: any[]
@@ -16,7 +23,6 @@ export interface ConfigState {
 })
 export class ConfigStore extends ComponentStore<ConfigState> {
 
-
   private get viewer(){
     return (window as any).viewer
   }
@@ -25,29 +31,26 @@ export class ConfigStore extends ComponentStore<ConfigState> {
     return (window as any).nehubaViewer
   }
 
-  constructor(
-        @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nv$: Observable<NehubaViewerUnit>
-  ) {
+  constructor() {
     super({
       sliceBackground: [],
       axisLineVisible: false,
       togglePerspectiveViewSubstrate: false
     })
-    nv$.pipe(
-      filter(nv => nv && nv.config),
-      take(1)
-    ).subscribe(nv => {
-      this.setSliceBackground(
-        nv.config.layout.useNehubaPerspective.drawSubstrates.color
-          .map((v, i) => i===3? v : Math.floor(v*255))
-      )
 
-      this.select(state => state.sliceBackground).pipe(take(1)).subscribe(background => {
-        this.setBackgroundVisibility( background.length && background[3] > 0)
-      })
-
-      this.setAxisLineVisible((window as any).viewer.showAxisLines.value? true : false)
-    })
+    const nehubaInterval = setInterval(() => {
+      if (this.nehubaViewer && this.nehubaViewer.config) {
+        clearInterval(nehubaInterval)
+        this.setSliceBackground(
+          this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
+            .map((v, i) => i === 3 ? v : Math.floor(v * 255))
+        )
+        this.select(state => state.sliceBackground).pipe(take(1)).subscribe(background => {
+          this.setBackgroundVisibility(background.length && background[3] > 0)
+        })
+        this.setAxisLineVisible((window as any).viewer.showAxisLines.value ? true : false)
+      }
+    }, 1000)
   }
 
     readonly sliceBackground$: Observable<any[]> = this.select(state => state.sliceBackground)
