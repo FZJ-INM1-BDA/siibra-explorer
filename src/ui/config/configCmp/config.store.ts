@@ -1,17 +1,7 @@
-import {Inject, Injectable, OnDestroy, Optional} from "@angular/core";
-import {NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
-import {Observable, Subscription} from "rxjs";
-import {NehubaViewerUnit} from "src/viewerModule/nehuba";
+import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
 import {ComponentStore} from "@ngrx/component-store";
-import {filter, skipUntil, take, tap, withLatestFrom} from "rxjs/operators";
-import {
-  viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector,
-  viewerStateSelectedTemplateSelector
-} from "src/services/state/viewerState/selectors";
-import {Store} from "@ngrx/store";
-import {PureContantService} from "src/util";
-import {switchMapWaitFor} from "src/util/fn";
-
+import {take} from "rxjs/operators";
 export interface ConfigState {
     sliceBackground: any[]
     axisLineVisible: boolean
@@ -38,9 +28,9 @@ export class ConfigStore extends ComponentStore<ConfigState> {
       togglePerspectiveViewSubstrate: false
     })
 
-    const nehubaInterval = setInterval(() => {
+    // ToDo find better way to get nehubaviewer containing cofig
+    setTimeout(() => {
       if (this.nehubaViewer && this.nehubaViewer.config) {
-        clearInterval(nehubaInterval)
         this.setSliceBackground(
           this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color
             .map((v, i) => i === 3 ? v : Math.floor(v * 255))
@@ -50,7 +40,7 @@ export class ConfigStore extends ComponentStore<ConfigState> {
         })
         this.setAxisLineVisible((window as any).viewer.showAxisLines.value ? true : false)
       }
-    }, 1000)
+    })
   }
 
     readonly sliceBackground$: Observable<any[]> = this.select(state => state.sliceBackground)
