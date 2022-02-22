@@ -1,7 +1,7 @@
 <mat-tab-group>
   <!-- viewer preference -->
   <mat-tab *ngIf="false" label="Viewer Preference">
-    
+
     <div class="m-2">
       <div class="mat-h2">
         Rearrange Viewports
@@ -120,7 +120,7 @@
           <div class="border w-100 h-100" cell-iv></div>
         </layout-horizontal-one-three>
       </button> -->
-  
+
       <!-- vertical 1 3 card -->
       <!-- <button
         class="m-2 p-2"
@@ -203,12 +203,13 @@
   </mat-tab>
 
   <!-- viewer -->
-  <mat-tab label="Viewer">
+  <mat-tab label="Viewer" aria-label="viewer-tab">
     <div class="m-4">
 
       <!-- Show axis lines  -->
       <div class="d-flex mb-2 align-items-center">
         <mat-slide-toggle
+                name="axis-line-toggle"
                 [checked]="configStore.axisLineVisible$ | async"
                 (change)="configStore.setAxisLineVisible($event.checked)">
           Axis lines {{configStore.axisLineVisible$ | async}}
@@ -219,6 +220,7 @@
       <!-- Background colouring -->
       <div class="d-flex mb-2 align-items-center">
         <mat-slide-toggle
+                name="perspective-background-toggle"
                 [checked]="configStore.togglePerspectiveViewSubstrate$ | async"
                 (change)="configStore.setBackgroundVisibility($event.checked)">
           Background colouring

@@ -53,7 +53,7 @@ export class ConfigStore extends ComponentStore<ConfigState> {
 
 
     readonly setAxisLineVisible = this.updater((state, value: boolean) => {
-      this.viewer.showAxisLines.restoreState(value)
+      if (this.viewer) this.viewer.showAxisLines.restoreState(value)
       return {
         ...state,
         axisLineVisible: value
@@ -64,8 +64,10 @@ export class ConfigStore extends ComponentStore<ConfigState> {
       if (typeof value === 'string') value = this.hexToRgb(value)
       value = value.length === 4 ? value : [...value, 0.2]
 
-      this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value.map((v, i) => i===3? v : v/255.0)
-      this.nehubaViewer.redraw()
+      if (this.nehubaViewer) {
+        this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = value.map((v, i) => i === 3 ? v : v / 255.0)
+        this.nehubaViewer.redraw()
+      }
 
       return {
         ...state,
@@ -75,8 +77,10 @@ export class ConfigStore extends ComponentStore<ConfigState> {
 
     readonly setBackgroundVisibility = this.updater((state, value: boolean) => {
 
-      this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
-      this.nehubaViewer.redraw()
+      if (this.nehubaViewer) {
+        this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color[3] = value ? 0.2 : 0
+        this.nehubaViewer.redraw()
+      }
 
       return {
         ...state,
