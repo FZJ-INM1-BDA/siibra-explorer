@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, Inject, OnDestroy, OnInit, Optional} from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
@@ -6,13 +6,17 @@ import { SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
 import { ngViewerActionSetPanelOrder } from 'src/services/state/ngViewerState.store.helper';
 import { VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 import { IavRootStoreInterface } from 'src/services/stateStore.service';
-import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
+import {isIdentityQuat, NEHUBA_INSTANCE_INJTKN} from 'src/viewerModule/nehuba/util';
 import {MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {MatSliderChange} from "@angular/material/slider";
 import { PureContantService } from 'src/util';
 import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
 import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors';
+import {NehubaViewerUnit} from "src/viewerModule/nehuba";
+import { ARIA_LABELS } from 'common/constants'
+import {ComponentStore} from "src/viewerModule/componentStore";
+import {ConfigStore} from "src/ui/config/configCmp/config.store";
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -33,6 +37,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
+  public AXIS_LINE_TOOLTIP = ARIA_LABELS.AXIS_LINE_TOOLTIP
+  public BACKGROUND_COLORING_TOOLTIP = ARIA_LABELS.BACKGROUND_COLORING_TOOLTIP
   public supportedPanelModes = SUPPORTED_PANEL_MODES
 
   /**
@@ -58,6 +64,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<IavRootStoreInterface>,
     private pureConstantService: PureContantService,
+    public readonly configStore: ConfigStore,
   ) {
 
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
@@ -185,4 +192,5 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   public stepSize: number = 10
+
 }

@@ -76,6 +76,11 @@
     // volume tuning specific
     VOLUME_TUNING_EXPAND: 'Expand volume tuning widget',
     BULK_DELETE_ANNOTATIONS: 'Delete all user annotations',
+
+    // Config component
+    AXIS_LINE_TOOLTIP: `Show axis lines on the views`,
+    BACKGROUND_COLORING_TOOLTIP: `Show blue background coloring on the perspective view`,
+
   }
 
   exports.IDS = {
