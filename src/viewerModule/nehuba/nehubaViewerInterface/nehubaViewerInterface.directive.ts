@@ -3,87 +3,17 @@ import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaVi
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, fromEvent, asyncScheduler, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
-import { takeOnePipe } from "../util";
+import { serializeSegment, takeOnePipe } from "../util";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
-import { viewerStateMouseOverCustomLandmarkInPerspectiveView, viewerStateNehubaLayerchanged } from "src/services/state/viewerState/actions";
-import { viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { LoggingService } from "src/logging";
 import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
 import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj, NehubaNavigationService } from "../navigation.service";
+import { NehubaConfig, defaultNehubaConfig } from "../config.service";
+import { atlasSelection } from "src/state";
 
-const defaultNehubaConfig = {
-  "configName": "",
-  "globals": {
-    "hideNullImageValues": true,
-    "useNehubaLayout": {
-      "keepDefaultLayouts": false
-    },
-    "useNehubaMeshLayer": true,
-    "rightClickWithCtrlGlobal": false,
-    "zoomWithoutCtrlGlobal": false,
-    "useCustomSegmentColors": true
-  },
-  "zoomWithoutCtrl": true,
-  "hideNeuroglancerUI": true,
-  "rightClickWithCtrl": true,
-  "rotateAtViewCentre": true,
-  "enableMeshLoadingControl": true,
-  "zoomAtViewCentre": true,
-  "restrictUserNavigation": true,
-  "disableSegmentSelection": false,
-  "dataset": {
-    "imageBackground": [
-      1,
-      1,
-      1,
-      1
-    ],
-    "initialNgState": {
-      "showDefaultAnnotations": false,
-      "layers": {},
-    }
-  },
-  "layout": {
-    "views": "hbp-neuro",
-    "planarSlicesBackground": [
-      1,
-      1,
-      1,
-      1
-    ],
-    "useNehubaPerspective": {
-      "enableShiftDrag": false,
-      "doNotRestrictUserNavigation": false,
-      "perspectiveSlicesBackground": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "perspectiveBackground": [
-        1,
-        1,
-        1,
-        1
-      ],
-      "mesh": {
-        "backFaceColor": [
-          1,
-          1,
-          1,
-          1
-        ],
-        "removeBasedOnNavigation": true,
-        "flipRemovedOctant": true
-      },
-      "hideImages": false,
-      "waitForMesh": false,
-    }
-  }
-}
 
 const determineProtocol = (url: string) => {
   const re = /^([a-z0-9_-]{0,}):\/\//.exec(url)
@@ -266,7 +196,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
     this.subscriptions.push(
       this.store$.pipe(
-        select(viewerStateStandAloneVolumes),
+        select(atlasSelection.selectors.standaloneVolumes),
         filter(v => v && Array.isArray(v) && v.length > 0),
         distinctUntilChanged(arrayOfPrimitiveEqual)
       ).subscribe(async volumes => {
@@ -285,7 +215,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         function onInit() {
           this.overrideShowLayers = forceShowLayerNames
         }
-        this.createNehubaInstance({ nehubaConfig: copiedNehubaConfig }, { onInit })
+        this.createNehubaInstance(copiedNehubaConfig, { onInit })
       }),
 
       this.viewerPerformanceConfig$.pipe(
@@ -316,7 +246,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
-  createNehubaInstance(template: any, lifeCycle: INehubaLifecycleHook = {}){
+  createNehubaInstance(nehubaConfig: NehubaConfig, lifeCycle: INehubaLifecycleHook = {}){
     this.clear()
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.nehubaViewerFactory)
@@ -327,8 +257,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         positionReal: true
       }
     }
-
-    const { nehubaConfig, name } = template
 
     /**
      * apply viewer config such as gpu limit
@@ -344,18 +272,13 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       initialNgState.gpuMemoryLimit = gpuLimit
     }
 
-    /* TODO replace with id from KG */
-    this.nehubaViewerInstance.templateId = name
-
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewerInstance.errorEmitter.subscribe(e => {
         console.log(e)
       }),
 
       this.nehubaViewerInstance.layersChanged.subscribe(() => {
-        this.store$.dispatch(
-          viewerStateNehubaLayerchanged()
-        )
+
       }),
 
       this.nehubaViewerInstance.nehubaReady.subscribe(() => {
@@ -387,11 +310,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
         throttleTime(160, asyncScheduler, {trailing: true}),
       ).subscribe(label => {
-        this.store$.dispatch(
-          viewerStateMouseOverCustomLandmarkInPerspectiveView({
-            payload: { label }
-          })
-        )
+        const idx = Number(label.replace('label=', ''))
+        // TODO 
+        // this is exclusive for vtk layer
       }),
 
       this.nehubaViewerInstance.nehubaReady.pipe(
@@ -444,15 +365,10 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         layer: {
           name: ngId,
         },
-        segment: segment || `${ngId}#${segmentId}`,
+        segment: segment || serializeSegment(ngId, segmentId),
         segmentId
       }
     })
     this.mouseOverSegments.emit(payload)
-    this.store$.dispatch(
-      uiActionMouseoverSegments({
-        segments: payload
-      })
-    )
   }
 }

@@ -15,8 +15,8 @@ import { UtilModule } from "src/util"
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper"
 import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors"
 import * as util from '../util'
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions"
 import {QuickTourModule} from "src/ui/quickTour/module";
+import { actions } from "src/state/atlasSelection"
 
 @Directive({
   selector: '[iav-auth-auth-state]',
@@ -184,13 +184,13 @@ describe('> statusCard.component.ts', () => {
             if (method === 'position') overrideObj['position'] = mockNavState['position']
             if (method === 'zoom') overrideObj['zoom'] = mockNavState['zoom']
             expect(idspatchSpy).toHaveBeenCalledWith(
-              viewerStateChangeNavigation({
+              actions.navigateTo({
                 navigation: {
                   ...mockCurrNavigation,
                   ...overrideObj,
-                  positionReal: false,
-                  animation: {},
-                }
+                },
+                physical: true,
+                animation: true
               })
             )
           })

@@ -1,19 +1,18 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, merge } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap, withLatestFrom } from "rxjs/operators";
-import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
-import { CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PureContantService } from "src/util";
-import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { serialiseParcellationRegion } from "common/util"
-import { actionAddToRegionsSelectionWithIds } from "src/services/state/viewerState/actions";
+import { actions } from "src/state/atlasSelection";
+import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { atlasSelection } from "src/state";
+import { serializeSegment } from "src/viewerModule/nehuba/util";
 
 const filterRegionBasedOnText = searchTerm => region => `${region.name.toLowerCase()}${region.status? ' (' + region.status + ')' : null}`.includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -82,7 +81,7 @@ export class RegionTextSearchAutocomplete {
                 ...region,
                 ngId,
                 labelIndex,
-                labelIndexId: serialiseParcellationRegion({ ngId, labelIndex }),
+                labelIndexId: serializeSegment(ngId, labelIndex),
               })
             }
           }
@@ -92,17 +91,6 @@ export class RegionTextSearchAutocomplete {
           return []
         }
       }),
-      shareReplay(1),
-    )
-
-    this.regionsSelected$ = viewerState$.pipe(
-      select('regionsSelected'),
-      distinctUntilChanged(),
-      tap(regions => {
-        const arrLabelIndexId = regions.map(({ ngId, labelIndex }) => serialiseParcellationRegion({ ngId, labelIndex }))
-        this.selectedRegionLabelIndexSet = new Set(arrLabelIndexId)
-      }),
-      startWith([]),
       shareReplay(1),
     )
 
@@ -134,35 +122,10 @@ export class RegionTextSearchAutocomplete {
     )
   }
 
-  public toggleRegionWithId(id: string, removeFlag= false) {
-    if (removeFlag) {
-      this.store$.dispatch({
-        type: VIEWER_STATE_ACTION_TYPES.DESELECT_REGIONS_WITH_ID,
-        deselecRegionIds: [id],
-      })
-    } else {
-      this.store$.dispatch(
-        actionAddToRegionsSelectionWithIds({
-          selectRegionIds : [id],
-        })
-      )
-    }
-  }
-
-  public navigateTo(position) {
-    this.store$.dispatch({
-      type: CHANGE_NAVIGATION,
-      navigation: {
-        position,
-        animation: {},
-      },
-    })
-  }
-
-  public optionSelected(_ev?: MatAutocompleteSelectedEvent) {
+  public optionSelected(_ev: MatAutocompleteSelectedEvent) {
     this.store$.dispatch(
-      viewerStateSetSelectedRegionsWithIds({
-        selectRegionIds: _ev ? [ _ev.option.value ] : []
+      actions.toggleRegionSelectById({
+        id: _ev.option.value
       })
     )
   }
@@ -174,7 +137,9 @@ export class RegionTextSearchAutocomplete {
   public filterNullFn(item: any){
     return !!item
   }
-  public regionsSelected$: Observable<any>
+  public regionsSelected$: Observable<SapiRegionModel[]> = this.store$.pipe(
+    select(atlasSelection.selectors.selectedRegions)
+  )
   public parcellationSelected$: Observable<any>
 
   @Output()
@@ -189,26 +154,25 @@ export class RegionTextSearchAutocomplete {
     return this._focused
   }
 
-  public deselectAllRegions(_event: MouseEvent) {
-    this.store$.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: [],
-    })
+  public deselectAllRegions() {
+    this.store$.dispatch(
+      actions.clearSelectedRegions()
+    )
   }
 
   // TODO handle mobile
   public handleRegionClick({ mode = null, region = null } = {}) {
     if (mode === 'single') {
       this.store$.dispatch(
-        viewerStateToggleRegionSelect({
-          payload: { region }
+        actions.toggleRegionSelect({
+          region
         })
       )
     }
     if (mode === 'double') {
       this.store$.dispatch(
-        viewerStateNavigateToRegion({
-          payload: { region }
+        actions.navigateToRegion({
+          region
         })
       )
     }
@@ -243,8 +207,8 @@ export class RegionTextSearchAutocomplete {
 
   public deselectAndSelectRegion(region: any) {
     this.store$.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: [ region ]
+      actions.selectRegions({
+        regions: [ region ]
       })
     )
   }

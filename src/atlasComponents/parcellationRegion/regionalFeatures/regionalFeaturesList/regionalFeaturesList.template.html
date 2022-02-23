@@ -1,0 +1,9 @@
+<ng-template ngFor let-first="first" let-feature [ngForOf]="listOfFeatures$ | async">
+  
+  <mat-divider *ngIf="!first">
+  </mat-divider>
+
+  <div mat-ripple class="pt-4 cursor-default">
+    {{ feature.metadata.fullName }}
+  </div>
+</ng-template>

@@ -1,12 +1,10 @@
-import { viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectorNavigation, viewerStateSelectorStandaloneVolumes } from "src/services/state/viewerState/selectors"
 import { encodeNumber, decodeToNumber, separator, encodeURIFull } from './cipher'
 import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { mixNgLayers } from "src/services/state/ngViewerState.store"
-import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.helper'
-import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper"
 import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors"
 import { Component } from "@angular/core"
+import { atlasSelection, plugins } from "src/state"
 
 import {
   TUrlStandaloneVolume,
@@ -19,6 +17,7 @@ import {
   encodeId,
 } from './parseRouteToTmplParcReg'
 import { spaceMiscInfoMap } from "src/util/pureConstant.service"
+import { getRegionLabelIndex, getParcNgId } from "src/viewerModule/nehuba/config.service"
 
 const endcodePath = (key: string, val: string|string[]) =>
   key[0] === '?'
@@ -124,7 +123,7 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
   if (pluginStates) {
     try {
       const arrPluginStates = JSON.parse(pluginStates)
-      pluginState.initManifests = arrPluginStates.map(url => [PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC, url] as [string, string])
+      pluginState.initManifests = arrPluginStates.map(url => [plugins.INIT_MANIFEST_SRC, url] as [string, string])
     } catch (e) {
       /**
        * parsing plugin error
@@ -199,33 +198,21 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
   /**
    * parsing template to get atlasId
    */
-  (() => {
-
-    const viewreHelperState = returnState[viewerStateHelperStoreName] || {}
-    const { templateSelected, parcellationSelected } = returnState['viewerState']
-    const { fetchedAtlases, ...rest } = viewreHelperState
-    
-    const selectedAtlas = (fetchedAtlases || []).find(a => a['templateSpaces'].find(t => t['@id'] === (templateSelected && templateSelected['@id'])))
-    
-    const overlayLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
-
-    viewreHelperState['selectedAtlasId'] = selectedAtlas && selectedAtlas['@id']
-    viewreHelperState['overlayingAdditionalParcellations'] = (overlayLayer && !overlayLayer['baseLayer'])
-      ? [ overlayLayer ]
-      : []
-  })()
-
+  // TODO
   return returnState
 }
 
 export const cvtStateToHashedRoutes = (state): string => {
   // TODO check if this causes memleak
-  const selectedAtlas = viewerStateGetSelectedAtlas(state)
-  const selectedTemplate = viewerStateSelectedTemplateSelector(state)
-  const selectedParcellation = viewerStateSelectedParcellationSelector(state)
-  const selectedRegions = viewerStateSelectedRegionsSelector(state)
-  const standaloneVolumes = viewerStateSelectorStandaloneVolumes(state)
-  const navigation = viewerStateSelectorNavigation(state)
+  const {
+    atlas: selectedAtlas,
+    parcellation: selectedParcellation,
+    template: selectedTemplate,
+  } = atlasSelection.selectors.selectedATP(state)
+  
+  const selectedRegions = atlasSelection.selectors.selectedRegions(state)
+  const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
+  const navigation = atlasSelection.selectors.navigation(state)
 
   const previewingDatasetFiles = uiStatePreviewingDatasetFilesSelector(state)
   let dsPrvString: string
@@ -258,10 +245,12 @@ export const cvtStateToHashedRoutes = (state): string => {
   }
 
   // encoding selected regions
-  let selectedRegionsString
+  let selectedRegionsString: string
   if (selectedRegions.length === 1) {
     const region = selectedRegions[0]
-    const { ngId, labelIndex } = region
+    const labelIndex = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
+    
+    const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
     selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`
   }
   let routes: any

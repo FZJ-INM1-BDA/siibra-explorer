@@ -3,22 +3,18 @@ import { Observable, of, throwError } from 'rxjs'
 import { TestBed } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
-import { defaultRootState, generalActionError } from 'src/services/stateStore.service'
+import { defaultRootState } from 'src/services/stateStore.service'
 import { Injectable } from '@angular/core'
 import { TemplateCoordinatesTransformation, ITemplateCoordXformResp } from 'src/services/templateCoordinatesTransformation.service'
-import { hot } from 'jasmine-marbles'
 import { AngularMaterialModule } from 'src/sharedModules'
 import { HttpClientModule } from '@angular/common/http'
-import { viewerStateFetchedTemplatesSelector, viewerStateNavigateToRegion, viewerStateNavigationStateSelector, viewerStateNewViewer, viewerStateSelectAtlas, viewerStateSelectTemplateWithName } from 'src/services/state/viewerState.store.helper'
-import { viewerStateFetchedAtlasesSelector, viewerStateGetSelectedAtlas, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from 'src/services/state/viewerState/selectors'
-import { CONST } from 'common/constants'
 import { PureContantService } from 'src/util'
-import { viewerStateChangeNavigation } from 'src/services/state/viewerState/actions'
+
 
 let returnPosition = null
 const dummyParc1 = {
   name: 'dummyParc1'
-}
+} as any
 const dummyTmpl1 = {
   '@id': 'dummyTmpl1-id',
   name: 'dummyTmpl1',
@@ -30,7 +26,7 @@ const dummyTmpl1 = {
       }
     }
   }
-}
+} as any
 
 const dummyParc2 = {
   name: 'dummyParc2'
@@ -117,392 +113,6 @@ describe('> viewerState.useEffect.ts', () => {
       mockStore = TestBed.inject(MockStore)
     })
 
-    describe('> selectTemplate$', () => {
-      beforeEach(() => {
-        mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, mockFetchedTemplates)
-        mockStore.overrideSelector(viewerStateSelectedParcellationSelector, dummyParc1)
-        actions$ = hot(
-          'a',
-          {
-            a: viewerStateSelectTemplateWithName({
-                payload: {
-                  name: dummyTmpl1.name
-                }
-              })
-          }
-        )
-      })
-      describe('> when transiting from template A to template B', () => {
-        describe('> if the current navigation is correctly formed', () => {
-          it('> uses current navigation param', () => {
-
-            const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(
-              viewerStateCtrlEffect.selectTemplate$
-            ).toBeObservable(
-              hot(
-                'a',
-                {
-                  a: viewerStateNewViewer({
-                      selectTemplate: dummyTmpl1,
-                      selectParcellation: dummyTmpl1.parcellations[0],
-                    })
-                }
-              )
-            )
-            expect(spy).toHaveBeenCalledWith(
-              dummyTmpl2.name,
-              dummyTmpl1.name,
-              initialState.viewerState.navigation.position
-            )
-          })
-        })
-
-        describe('> if current navigation is malformed', () => {
-          it('> if current navigation is undefined, use nehubaConfig of last template', () => {
-
-            const mockStore = TestBed.inject(MockStore)
-            mockStore.overrideSelector(viewerStateNavigationStateSelector, null)
-            const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-
-            expect(
-              viewerStateCtrlEffect.selectTemplate$
-            ).toBeObservable(
-              hot(
-                'a',
-                {
-                  a: viewerStateNewViewer({
-                      selectTemplate: dummyTmpl1,
-                      selectParcellation: dummyTmpl1.parcellations[0],
-                    })
-                }
-              )
-            )
-            const { position } = cvtNehubaConfigToNavigationObj(dummyTmpl2.nehubaConfig.dataset.initialNgState)
-
-            expect(spy).toHaveBeenCalledWith(
-              dummyTmpl2.name,
-              dummyTmpl1.name,
-              position
-            )
-          })
-  
-          it('> if current navigation is empty object, use nehubaConfig of last template', () => {
-
-            const mockStore = TestBed.inject(MockStore)
-            mockStore.overrideSelector(viewerStateNavigationStateSelector, {})
-            const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-
-            expect(
-              viewerStateCtrlEffect.selectTemplate$
-            ).toBeObservable(
-              hot(
-                'a',
-                {
-                  a: viewerStateNewViewer({
-                      selectTemplate: dummyTmpl1,
-                      selectParcellation: dummyTmpl1.parcellations[0],
-                    })
-                }
-              )
-            )
-            const { position } = cvtNehubaConfigToNavigationObj(dummyTmpl2.nehubaConfig.dataset.initialNgState)
-
-            expect(spy).toHaveBeenCalledWith(
-              dummyTmpl2.name,
-              dummyTmpl1.name,
-              position
-            )
-          })
-        })
-  
-      })
-
-      it('> if coordXform returns error', () => {
-        const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        expect(
-          viewerStateCtrlEffect.selectTemplate$
-        ).toBeObservable(
-          hot(
-            'a',
-            {
-              a: viewerStateNewViewer({
-                  selectTemplate: dummyTmpl1,
-                  selectParcellation: dummyTmpl1.parcellations[0],
-                })
-            }
-          )
-        )
-      })
-
-      it('> if coordXform complete', () => {
-        returnPosition = [ 1.11e6, 2.22e6, 3.33e6 ]
-
-        const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        const updatedColin = JSON.parse( JSON.stringify( dummyTmpl1 ) )
-        const initialNgState = updatedColin.nehubaConfig.dataset.initialNgState
-        const updatedColinNavigation = updatedColin.nehubaConfig.dataset.initialNgState.navigation
-
-        const { zoom, orientation, perspectiveOrientation, position, perspectiveZoom } = currentNavigation
-
-        for (const idx of [0, 1, 2]) {
-          updatedColinNavigation.pose.position.voxelCoordinates[idx] = returnPosition[idx] / updatedColinNavigation.pose.position.voxelSize[idx]
-        }
-        updatedColinNavigation.zoomFactor = zoom
-        updatedColinNavigation.pose.orientation = orientation
-        initialNgState.perspectiveOrientation = perspectiveOrientation
-        initialNgState.perspectiveZoom = perspectiveZoom
-        
-        expect(
-          viewerStateCtrlEffect.selectTemplate$
-        ).toBeObservable(
-          hot(
-            'a',
-            {
-              a: viewerStateNewViewer({
-                  selectTemplate: updatedColin,
-                  selectParcellation: updatedColin.parcellations[0],
-                })
-            }
-          )
-        )
-      })
-
-    })
-  
-    describe('> navigateToRegion$', () => {
-      const setAction = region => {
-        actions$ = hot(
-          'a',
-          {
-            a: viewerStateNavigateToRegion({
-              payload: { region }
-            })
-          }
-        )
-      }
-      let mockStore: MockStore
-      beforeEach(() => {
-
-        mockStore = TestBed.inject(MockStore)
-          
-        mockStore.overrideSelector(viewerStateGetSelectedAtlas, { '@id': 'foo-bar-atlas'})
-        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, { '@id': 'foo-bar-template'})
-        mockStore.overrideSelector(viewerStateSelectedParcellationSelector, { '@id': 'foo-bar-parcellation'})
-      })
-      describe('> if atlas, template, parc is not set', () => {
-        beforeEach(() => {
-          const region = {
-            name: 'foo bar'
-          }
-          setAction(region)
-        })
-        describe('> if atlas is unset', () => {
-          beforeEach(() => {
-            mockStore.overrideSelector(viewerStateGetSelectedAtlas, null)
-          })
-          it('> returns general error', () => {
-            const effect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(effect.navigateToRegion$).toBeObservable(
-              hot('a', {
-                a: generalActionError({
-                  message: 'Go to region: region / atlas / template / parcellation not defined.'
-                })
-              })
-            )
-          })
-        })
-        describe('> if template is unset', () => {
-          beforeEach(() => {
-            mockStore.overrideSelector(viewerStateSelectedTemplateSelector, null)
-          })
-          it('> returns general error', () => {
-            const effect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(effect.navigateToRegion$).toBeObservable(
-              hot('a', {
-                a: generalActionError({
-                  message: 'Go to region: region / atlas / template / parcellation not defined.'
-                })
-              })
-            )
-          })
-        })
-        describe('> if parc is unset', () => {
-          beforeEach(() => {
-            mockStore.overrideSelector(viewerStateSelectedParcellationSelector, null)
-          })
-          it('> returns general error', () => {
-            const effect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(effect.navigateToRegion$).toBeObservable(
-              hot('a', {
-                a: generalActionError({
-                  message: 'Go to region: region / atlas / template / parcellation not defined.'
-                })
-              })
-            )
-          })
-        })
-      })
-      describe('> if atlas, template, parc is set, but region unset', () => {
-        beforeEach(() => {
-          setAction(null)
-        })
-        it('> returns general error', () => {
-          const effect = TestBed.inject(ViewerStateControllerUseEffect)
-          expect(effect.navigateToRegion$).toBeObservable(
-            hot('a', {
-              a: generalActionError({
-                message: 'Go to region: region / atlas / template / parcellation not defined.'
-              })
-            })
-          )
-        })
-      })
-
-      describe('> if inputs are fine', () => {
-        let getRegionDetailSpy: jasmine.Spy
-        const region = {
-          name: 'foo bar'
-        }
-        beforeEach(() => {
-          getRegionDetailSpy = spyOn(mockPureConstantService, 'getRegionDetail').and.callThrough()
-          setAction(region)
-        })
-        afterEach(() => {
-          getRegionDetailSpy.calls.reset()
-        })
-
-        it('> getRegionDetailSpy is called', () => {
-          const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-
-          // necessary to trigger the emit
-          expect(
-            ctrl.navigateToRegion$
-          ).toBeObservable(
-            hot('a', {
-              a: generalActionError({
-                message: 'Fetching region detail error: Error: region does not have props defined!'
-              })
-            })
-          )
-
-          expect(getRegionDetailSpy).toHaveBeenCalled()
-        })
-
-        describe('> mal formed return', () => {
-          describe('> returns null', () => {
-            it('> generalactionerror', () => {
-              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                ctrl.navigateToRegion$
-              ).toBeObservable(
-                hot('a', {
-                  a: generalActionError({
-                    message: 'Fetching region detail error: Error: region does not have props defined!'
-                  })
-                })
-              )
-            })
-          })
-          describe('> general throw', () => {
-            const msg = 'oh no!'
-            beforeEach(() => {
-              getRegionDetailSpy.and.callFake(() => throwError(msg))
-            })
-
-            it('> generalactionerror', () => {
-              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                ctrl.navigateToRegion$
-              ).toBeObservable(
-                hot('a', {
-                  a: generalActionError({
-                    message: `Fetching region detail error: ${msg}`
-                  })
-                })
-              )
-            })
-
-          })
-          describe('> does not contain props attr', () => {
-
-            beforeEach(() => {
-              getRegionDetailSpy.and.callFake(() => of({
-                name: 'foo-bar'
-              }))
-            })
-
-            it('> generalactionerror', () => {
-              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                ctrl.navigateToRegion$
-              ).toBeObservable(
-                hot('a', {
-                  a: generalActionError({
-                    message: `Fetching region detail error: Error: region does not have props defined!`
-                  })
-                })
-              )
-            })
-          })
-
-          describe('> does not contain props.length === 0', () => {
-
-            beforeEach(() => {
-              getRegionDetailSpy.and.callFake(() => of({
-                name: 'foo-bar',
-                props: {}
-              }))
-            })
-
-            it('> generalactionerror', () => {
-              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                ctrl.navigateToRegion$
-              ).toBeObservable(
-                hot('a', {
-                  a: generalActionError({
-                    message: `Fetching region detail error: Error: region does not have props defined!`
-                  })
-                })
-              )
-            })
-          })
-        })
-
-        describe('> wellformed response', () => {
-          beforeEach(() => {
-
-            beforeEach(() => {
-              getRegionDetailSpy.and.callFake(() => of({
-                name: 'foo-bar',
-                props: {
-                  components: {
-                    centroid: [1,2,3]
-                  }
-                }
-              }))
-            })
-
-            it('> emits viewerStateChangeNavigation', () => {
-              const ctrl = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                ctrl.navigateToRegion$
-              ).toBeObservable(
-                hot('a', {
-                  a: viewerStateChangeNavigation({
-                    navigation: {
-                      position: [1e6,2e6,3e6],
-                      animation: {}
-                    }
-                  })
-                })
-              )
-            })
-          })
-        })
-      })
-    })
   
     describe('> onSelectAtlasSelectTmplParc$', () => {
       let mockStore: MockStore
@@ -511,26 +121,7 @@ describe('> viewerState.useEffect.ts', () => {
       })
 
       it('> if atlas not found, return general error', () => {
-        mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [])
-        mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [])
-        actions$ = hot('a', {
-          a: viewerStateSelectAtlas({
-            atlas: {
-              ['@id']: 'foo-bar',
-            }
-          })
-        })
-        
-        const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        expect(
-          viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-        ).toBeObservable(
-          hot('a', {
-            a: generalActionError({
-              message: CONST.ATLAS_NOT_FOUND
-            })
-          })
-        )
+
       })
     
       describe('> if atlas found', () => {
@@ -560,66 +151,10 @@ describe('> viewerState.useEffect.ts', () => {
 
             it('> if fails, will return general error', () => {
 
-              mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
-                mockTmplSpc1
-              ])
-              mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
-                ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc ],
-                parcellations: [ mockParc0 ]
-              }])
-              actions$ = hot('a', {
-                a: viewerStateSelectAtlas({
-                  atlas: {
-                    ['@id']: 'foo-bar',
-                  }
-                })
-              })
-              
-              const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-              ).toBeObservable(
-                hot('a', {
-                  a: generalActionError({
-                    message: CONST.TEMPLATE_NOT_FOUND
-                  })
-                })
-              )
             })
           
             it('> if succeeds, will dispatch new viewer', () => {
-              const completeMocktmpl = {
-                ...mockTmplSpc1,
-                parcellations: [ mockParc1 ]
-              }
-              mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
-                completeMocktmpl
-              ])
-              mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
-                ['@id']: 'foo-bar',
-                templateSpaces: [ mockTmplSpc1 ],
-                parcellations: [ mockParc1 ]
-              }])
-              actions$ = hot('a', {
-                a: viewerStateSelectAtlas({
-                  atlas: {
-                    ['@id']: 'foo-bar',
-                  }
-                })
-              })
-              
-              const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-              expect(
-                viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-              ).toBeObservable(
-                hot('a', {
-                  a: viewerStateNewViewer({
-                    selectTemplate: completeMocktmpl,
-                    selectParcellation: mockParc1
-                  })
-                })
-              )
+
             })
       
           })
@@ -637,67 +172,12 @@ describe('> viewerState.useEffect.ts', () => {
           }
           beforeEach(() => {
 
-            mockStore.overrideSelector(viewerStateFetchedTemplatesSelector, [
-              completeMockTmpl,
-              completeMocktmpl1,
-            ])
-            mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [{
-              ['@id']: 'foo-bar',
-              templateSpaces: [ mockTmplSpc, mockTmplSpc1 ],
-              parcellations: [ mockParc0, mockParc1 ]
-            }])
           })
           it('> will select template.@id', () => {
-
-            actions$ = hot('a', {
-              a: viewerStateSelectAtlas({
-                atlas: {
-                  ['@id']: 'foo-bar',
-                  template: {
-                    ['@id']: mockTmplSpc1['@id']
-                  }
-                }
-              })
-            })
-            
-            const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(
-              viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-            ).toBeObservable(
-              hot('a', {
-                a: viewerStateNewViewer({
-                  selectTemplate: completeMocktmpl1,
-                  selectParcellation: mockParc1
-                })
-              })
-            )
 
           })
           
           it('> if template.@id is not defined, will fallback to first template', () => {
-
-            actions$ = hot('a', {
-              a: viewerStateSelectAtlas({
-                atlas: {
-                  ['@id']: 'foo-bar',
-                  template: {
-                    
-                  } as any
-                }
-              })
-            })
-
-            const viewerSTateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-            expect(
-              viewerSTateCtrlEffect.onSelectAtlasSelectTmplParc$
-            ).toBeObservable(
-              hot('a', {
-                a: viewerStateNewViewer({
-                  selectTemplate: completeMockTmpl,
-                  selectParcellation: mockParc0
-                })
-              })
-            )
 
           })
         })

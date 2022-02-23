@@ -10,19 +10,16 @@ import {
   OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
-import {distinctUntilChanged, filter, map} from "rxjs/operators";
-
-import { viewerStateNavigateToRegion, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
+import {fromEvent, Observable, Subscription, Subject, combineLatest, of} from "rxjs";
+import {distinctUntilChanged, filter, map, switchMap, switchMapTo} from "rxjs/operators";
 import { ngViewerSelectorClearViewEntries, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
-import {
-  viewerStateAllRegionsFlattenedRegionSelector,
-  viewerStateOverwrittenColorMapSelector
-} from "src/services/state/viewerState/selectors";
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
 import {getIdFromKgIdObj} from "common/util";
 import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
+import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
+import { actions } from "src/state/atlasSelection";
+import { atlasAppearance, atlasSelection } from "src/state";
 
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
@@ -139,8 +136,10 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public selectedDatasetKgSchema: string = ''
     public connectedAreas = []
 
+    // TODO this may be incompatible
     private selectedParcellationFlatRegions$ = this.store$.pipe(
-      select(viewerStateAllRegionsFlattenedRegionSelector)
+      select(atlasSelection.selectors.selectedATP),
+      switchMap(({ atlas, template, parcellation }) => this.sapi.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])) 
     )
     public overwrittenColorMap$: Observable<any>
 
@@ -159,10 +158,11 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         private changeDetectionRef: ChangeDetectorRef,
         private httpClient: HttpClient,
         @Inject(BS_ENDPOINT) private siibraApiUrl: string,
+        private sapi: SAPI
     ) {
 
       this.overwrittenColorMap$ = this.store$.pipe(
-        select(viewerStateOverwrittenColorMapSelector),
+        select(atlasAppearance.selectors.getOverwrittenColormap),
         distinctUntilChanged()
       )
     }
@@ -188,7 +188,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.store$.pipe(
-          select(viewerStateOverwrittenColorMapSelector),
+          select(atlasAppearance.selectors.getOverwrittenColormap),
         ).subscribe(value => {
           if (this.accordionIsExpanded) {
             this.setColorMap$.next(!!value)
@@ -348,18 +348,18 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
     }
 
-    navigateToRegion(region) {
+    navigateToRegion(region: SapiRegionModel) {
       this.store$.dispatch(
-        viewerStateNavigateToRegion({
-          payload: {region: this.getRegionWithName(region)}
+        atlasSelection.actions.navigateToRegion({
+          region
         })
       )
     }
 
-    selectRegion(region) {
+    selectRegion(region: SapiRegionModel) {
       this.store$.dispatch(
-        viewerStateSetSelectedRegions({
-          selectRegions: [ region ]
+        actions.selectRegions({
+          regions: [ region ]
         })
       )
     }

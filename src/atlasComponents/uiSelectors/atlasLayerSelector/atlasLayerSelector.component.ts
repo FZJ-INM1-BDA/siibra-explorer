@@ -1,15 +1,19 @@
-import { Component, OnInit, ViewChildren, QueryList, HostBinding, ViewChild, ElementRef, OnDestroy } from "@angular/core";
+import { Component, ViewChildren, QueryList, HostBinding, ViewChild, ElementRef, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, mapTo } from "rxjs/operators";
 import { merge, Observable, Subject, Subscription } from "rxjs";
-import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector, viewerStateSelectedTemplateFullInfoSelector, viewerStateSelectedTemplatePureSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
 import { ARIA_LABELS, CONST, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IHasId, OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { CurrentTmplSupportsParcPipe } from "../pipes/currTmplSupportsParc.pipe";
+import {
+  actions,
+  fromRootStore
+} from "src/state/atlasSelection"
+import { SAPI } from "src/atlasComponents/sapi";
+import { atlasSelection } from "src/state";
 
 @Component({
   selector: 'atlas-layer-selector',
@@ -43,7 +47,7 @@ import { CurrentTmplSupportsParcPipe } from "../pipes/currTmplSupportsParc.pipe"
     }
   ]
 })
-export class AtlasLayerSelector implements OnInit, OnDestroy {
+export class AtlasLayerSelector implements OnDestroy {
 
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
@@ -55,23 +59,22 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
   selectorPanelTemplateRef: ElementRef
 
   public selectedAtlas$: Observable<any> = this.store$.pipe(
-    select(viewerStateGetSelectedAtlas),
+    select(atlasSelection.selectors.selectedAtlas),
     distinctUntilChanged(),
     shareReplay(1)
   )
 
   public atlasLayersLatest$ = this.store$.pipe(
-    select(viewerStateAtlasLatestParcellationSelector),
+    fromRootStore.allAvailParcs(this.sapi),
     shareReplay(1),
   )
 
-  public availableTemplates$ = this.store$.pipe<any[]>(
-    select(viewerStateSelectedTemplateFullInfoSelector),
+  public availableTemplates$ = this.store$.pipe(
+    fromRootStore.allAvailSpaces(this.sapi),
   )
 
-  private selectedTemplate: any
   public selectedTemplate$ = this.store$.pipe(
-    select(viewerStateSelectedTemplatePureSelector),
+    select(atlasSelection.selectors.selectedTemplate),
     withLatestFrom(this.availableTemplates$),
     map(([selectedTmpl, fullInfoTemplates]) => {
       return fullInfoTemplates.find(t => t['@id'] === selectedTmpl['@id'])
@@ -90,7 +93,7 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
   )
 
   public selectedParcellation$ = this.store$.pipe(
-    select(viewerStateSelectedParcellationSelector),
+    select(atlasSelection.selectors.selectedParcellation),
   )
 
   private subscriptions: Subscription[] = []
@@ -103,15 +106,10 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
     description: QUICKTOUR_DESC.LAYER_SELECTOR,
   }
 
-  constructor(private store$: Store<any>) {}
-
-  ngOnInit(): void {
-    this.subscriptions.push(
-      this.selectedTemplate$.subscribe(st => {
-        this.selectedTemplate = st
-      }),
-    )
-  }
+  constructor(
+    private store$: Store<any>,
+    private sapi: SAPI,
+  ) {}
 
   ngOnDestroy() {
     while(this.subscriptions.length) this.subscriptions.pop().unsubscribe()
@@ -124,32 +122,21 @@ export class AtlasLayerSelector implements OnInit, OnDestroy {
 
   selectTemplatewithId(templateId: string) {
     this.showOverlayIntent$.next(true)
-    this.store$.dispatch(viewerStateSelectTemplateWithId({
-      payload: {
-        '@id': templateId
-      }
-    }))
+    this.store$.dispatch(
+      actions.selectATPById({
+        templateId
+      })
+    )
   }
 
   private currTmplSupportParcPipe = new CurrentTmplSupportsParcPipe()
 
-  selectParcellationWithName(layer: any) {
-    const tmplChangeReq = !this.currTmplSupportParcPipe.transform(this.selectedTemplate, layer)
-    if (!tmplChangeReq) {
-      this.store$.dispatch(
-        viewerStateToggleLayer({ payload: layer })
-      )
-    } else {
-      this.showOverlayIntent$.next(true)
-      this.store$.dispatch(
-        viewerStateSelectTemplateWithId({
-          payload: layer.availableIn[0],
-          config: {
-            selectParcellation: layer
-          }
-        })
-      )
-    }
+  selectParcellationWithId(id: string) {
+    this.store$.dispatch(
+      actions.selectATPById({
+        parcellationId: id
+      })
+    )
   }
 
   collapseExpandedGroup(){

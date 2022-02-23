@@ -1,5 +1,3 @@
-import { getGetRegionFromLabelIndexId } from 'src/util/fn'
-import { serialiseParcellationRegion } from "common/util"
 import { decodeToNumber, separator } from './cipher'
 
 import {
@@ -7,6 +5,7 @@ import {
   TUrlPathObj,
 } from './type'
 import { UrlTree } from '@angular/router'
+import { serializeSegment } from "src/viewerModule/nehuba/util"
 
 
 export const PARSE_ERROR = {
@@ -55,7 +54,7 @@ export function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<s
     // TODO deprecate. Fallback (defaultNgId) (should) already exist
     // if (!viewerState.parcellationSelected.updated) throw new Error(PARCELLATION_NOT_UPDATED)
 
-    const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({ parcellation: parcellationSelected })
+    
     /**
      * either or both parcellationToLoad and .regions maybe empty
      */
@@ -80,18 +79,19 @@ export function parseSearchParamForTemplateParcellationRegion(obj: TUrlPathObj<s
           }
         }).filter(v => !!v)
         for (const labelIndex of labelIndicies) {
-          selectRegionIds.push( serialiseParcellationRegion({ ngId, labelIndex }) )
+          selectRegionIds.push( serializeSegment(ngId, labelIndex) )
         }
       }
-      return selectRegionIds
-        .map(labelIndexId => {
-          const region = getRegionFromlabelIndexId({ labelIndexId })
-          if (!region) {
-            // cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
-          }
-          return region
-        })
-        .filter(r => !!r)
+      return [] 
+      // selectRegionIds
+      //   .map(labelIndexId => {
+      //     const region = getRegionFromlabelIndexId({ labelIndexId })
+      //     if (!region) {
+      //       // cb && cb({ type: ID_ERROR, message: `region with id ${labelIndexId} not found, and will be ignored.` })
+      //     }
+      //     return region
+      //   })
+      //   .filter(r => !!r)
 
     } catch (e) {
       /**

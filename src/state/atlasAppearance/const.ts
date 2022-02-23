@@ -1,0 +1,1 @@
+export const nameSpace = `[state.atlasAppearance]`

@@ -7,15 +7,14 @@ import { Observable, Subject } from "rxjs";
 import { debounceTime, filter, switchMap } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { viewerStateChangeNavigation, viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
-import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { REGION_OF_INTEREST } from "src/util/interfaces";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CONST } from 'common/constants'
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
+import { actions } from "src/state/atlasSelection";
+import { atlasSelection } from "src/state";
 
 const viewerType = 'ThreeSurfer'
 type TInternalState = {
@@ -39,7 +38,7 @@ type THandlingCustomEv = {
 }
 
 type TCameraOrientation = {
-  perspectiveOrientation: [number, number, number, number]
+  perspectiveOrientation: number[]
   perspectiveZoom: number
 }
 
@@ -112,7 +111,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
     private navStateStoreRelay: ComponentStore<{ perspectiveOrientation: [number, number, number, number], perspectiveZoom: number }>,
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
-    @Optional() @Inject(REGION_OF_INTEREST) private roi$: Observable<any>,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
   ){
@@ -193,7 +191,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
         hideSegment: nyi,
         mouseEvent: null, 
         mouseOverNehuba: null,
-        mouseOverNehubaLayers: null,
         mouseOverNehubaUI: null,
         moveToNavigationLoc: null,
         moveToNavigationOri: null,
@@ -211,40 +208,52 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
       () => setViewerHandle(null)
     )
 
-    if (this.roi$) {
-      const sub = this.roi$.pipe(
-        switchMap(switchMapWaitFor({
-          condition: () => this.colormapLoaded
-        }))
-      ).subscribe(r => {
-        try {
-          if (!r) throw new Error(`No region selected.`)
-          const cmap = this.getColormapCopy()
-          const hemisphere = getHemisphereKey(r)
-          if (!hemisphere) {
-            this.snackbar.open(CONST.CANNOT_DECIPHER_HEMISPHERE, 'Dismiss', {
-              duration: 3000
-            })
-            throw new Error(CONST.CANNOT_DECIPHER_HEMISPHERE)
-          }
-          for (const [ hem, m ] of cmap.entries()) {
-            for (const lbl of m.keys()) {
-              if (hem !== hemisphere || lbl !== r.labelIndex) {
-                m.set(lbl, [1, 1, 1])
-              }
-            }
-          }
-          this.internalHemisphLblColorMap = cmap
-        } catch (e) {
-          this.internalHemisphLblColorMap = null
-        }
+    const sub = this.store$.pipe(
+      select(atlasSelection.selectors.selectedRegions)
+    ).subscribe(() => {
 
-        this.applyColorMap()
-      })
-      this.onDestroyCb.push(
-        () => sub.unsubscribe()
-      )
-    }
+      /**
+       * TODO
+       * fix ... this?
+       */
+
+      // if (this.roi$) {
+      //   const sub = this.roi$.pipe(
+      //     switchMap(switchMapWaitFor({
+      //       condition: () => this.colormapLoaded
+      //     }))
+      //   ).subscribe(r => {
+      //     try {
+      //       if (!r) throw new Error(`No region selected.`)
+      //       const cmap = this.getColormapCopy()
+      //       const hemisphere = getHemisphereKey(r)
+      //       if (!hemisphere) {
+      //         this.snackbar.open(CONST.CANNOT_DECIPHER_HEMISPHERE, 'Dismiss', {
+      //           duration: 3000
+      //         })
+      //         throw new Error(CONST.CANNOT_DECIPHER_HEMISPHERE)
+      //       }
+      //       for (const [ hem, m ] of cmap.entries()) {
+      //         for (const lbl of m.keys()) {
+      //           if (hem !== hemisphere || lbl !== r.labelIndex) {
+      //             m.set(lbl, [1, 1, 1])
+      //           }
+      //         }
+      //       }
+      //       this.internalHemisphLblColorMap = cmap
+      //     } catch (e) {
+      //       this.internalHemisphLblColorMap = null
+      //     }
+
+      //     this.applyColorMap()
+      //   })
+      //   this.onDestroyCb.push(
+      //     () => sub.unsubscribe()
+      //   )
+      // }
+
+    })
+    this.onDestroyCb.push(() => sub.unsubscribe())
 
     /**
      * intercept click and act
@@ -264,10 +273,11 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
           })
           return true
         }
+
+        // TODO check why typing is all messed up here
+        const regions = this.mouseoverRegions.slice(0, 1) as any[]
         this.store$.dispatch(
-          viewerStateSetSelectedRegions({
-            selectRegions: this.mouseoverRegions
-          })
+          actions.selectRegions({ regions })
         )
         return true
       }
@@ -315,7 +325,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
      */
     const navStateSub = this.navStateStoreRelay.select(s => s).subscribe(v => {
       this.store$.dispatch(
-        viewerStateChangeNavigation({
+        actions.navigateTo({
           navigation: {
             position: [0, 0, 0],
             orientation: [0, 0, 0, 1],
@@ -335,7 +345,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, OnChanges, Af
      * subscribe to main store and negotiate with relay to set camera
      */
     const navSub = this.store$.pipe(
-      select(viewerStateSelectorNavigation)
+      select(atlasSelection.selectors.navigation)
     ).subscribe(nav => {
       const { perspectiveOrientation, perspectiveZoom } = nav
       this.mainStoreCameraNav = {

@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef, Inject, SecurityContext } from "@angular/core";
-import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.helper";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, from, merge, Observable, of } from "rxjs";
@@ -14,6 +13,7 @@ import { DialogService } from 'src/services/dialogService.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PureContantService } from 'src/util';
+import { actions } from "src/state/plugins"
 
 const requiresReloadMd = `\n\n***\n\n**warning**: interactive atlas viewer **will** be reloaded in order for the change to take effect.`
 
@@ -306,13 +306,12 @@ export class PluginServices {
       ? plugin.initStateUrl
       : null
 
-    handler.setInitManifestUrl = (url) => this.store.dispatch({
-      type : PLUGINSTORE_ACTION_TYPES.SET_INIT_PLUGIN,
-      manifest : {
-        name : plugin.name,
-        initManifestUrl : url,
-      },
-    })
+    handler.setInitManifestUrl = url => this.store.dispatch(
+      actions.setInitMan({
+        nameSpace: plugin.name,
+        url
+      })
+    )
 
     const shutdownCB = [
       () => {

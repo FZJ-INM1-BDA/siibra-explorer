@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { viewerStateSelectTemplateWithId } from 'src/services/state/viewerState/actions'
-import { RegionBase, getRegionParentParcRefSpace } from './region.base'
+import { RegionBase } from './region.base'
 import { TSiibraExRegion } from './type'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -39,7 +39,6 @@ describe('> region.base.ts', () => {
         ]
       })
       mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
     })
     describe('> position', () => {
       beforeEach(() => {
@@ -116,7 +115,6 @@ describe('> region.base.ts', () => {
       beforeEach(() => {
         strToRgbSpy = spyOn(util, 'strToRgb')
         mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
       })
 
       afterEach(() => {
@@ -278,7 +276,7 @@ describe('> region.base.ts', () => {
       //     })
 
       //     expect(dispatchSpy).toHaveBeenCalledWith(
-      //       viewerStateNewViewer({
+      //       actionViewerStateNewViewer({
       //         selectTemplate: fakeTmpl,
       //         selectParcellation: fakeParc,
       //         navigation: {}
@@ -320,7 +318,7 @@ describe('> region.base.ts', () => {
       //     })
 
       //     expect(dispatchSpy).toHaveBeenCalledWith(
-      //       viewerStateNewViewer({
+      //       actionViewerStateNewViewer({
       //         selectTemplate: fakeTmpl,
       //         selectParcellation: fakeParc,
       //         navigation: {

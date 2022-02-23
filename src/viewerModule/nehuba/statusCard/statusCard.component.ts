@@ -16,11 +16,11 @@ import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl } from "@angular/forms";
-import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { actions } from "src/state/atlasSelection";
+import { atlasSelection } from "src/state";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -90,13 +90,13 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
     this.subscriptions.push(
       this.store$.pipe(
-        select(viewerStateSelectedTemplatePureSelector)
+        select(atlasSelection.selectors.selectedTemplate)
       ).subscribe(n => this.selectedTemplatePure = n)
     )
 
     this.subscriptions.push(
       this.store$.pipe(
-        select(viewerStateNavigationStateSelector)
+        select(atlasSelection.selectors.navigation)
       ).subscribe(nav => this.currentNavigation = nav)
     )
   }
@@ -184,15 +184,15 @@ export class StatusCardComponent implements OnInit, OnChanges{
     } = getNavigationStateFromConfig(this.selectedTemplatePure.nehubaConfig)
 
     this.store$.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
           ...this.currentNavigation,
           ...(rotationFlag ? { orientation: orientation } : {}),
           ...(positionFlag ? { position: position } : {}),
           ...(zoomFlag ? { zoom: zoom } : {}),
-          positionReal : false,
-          animation : {},
-        }
+        },
+        physical: false,
+        animation: true
       })
     )
   }

@@ -1,0 +1,49 @@
+import { createSelector } from "@ngrx/store"
+import { nameSpace } from "./const"
+import { AtlasSelectionState } from "./store"
+
+export const viewerStateHelperStoreName = 'viewerStateHelper'
+
+const selectStore = (state: any) => state[nameSpace] as AtlasSelectionState
+
+export const selectedAtlas = createSelector(
+  selectStore,
+  state => state.selectedAtlas
+)
+
+export const selectedTemplate = createSelector(
+  selectStore,
+  state => state.selectedTemplate
+)
+
+export const selectedParcellation = createSelector(
+  selectStore,
+  state => state.selectedParcellation
+)
+
+export const selectedRegions = createSelector(
+  selectStore,
+  state => state.selectedRegions
+)
+
+export const selectedATP = createSelector(
+  selectedAtlas,
+  selectedTemplate,
+  selectedParcellation,
+  (atlas, template, parcellation) => ({ atlas, template, parcellation })
+)
+
+export const standaloneVolumes = createSelector(
+  selectStore,
+  state => state.standAloneVolumes
+)
+
+export const navigation = createSelector(
+  selectStore,
+  state => state.navigation
+)
+
+export const viewerMode = createSelector(
+  selectStore,
+  state => state.viewerMode
+)

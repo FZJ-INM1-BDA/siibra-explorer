@@ -3,6 +3,10 @@ import {
   viewerStateAtlasParcellationSelector,
   viewerStateAtlasLatestParcellationSelector,
   viewerStateParcVersionSelector,
+  selectorSelectedATP,
+  viewerStateGetSelectedAtlas,
+  viewerStateSelectedTemplateSelector,
+  viewerStateSelectedParcellationSelector,
 } from './selectors'
 
 
@@ -153,95 +157,133 @@ const fetchedTemplates = [
 ]
 
 describe('viewerState/selector.ts', () => {
-  describe('> viewerStateGetOverlayingAdditionalParcellations', () => {
-    describe('> if atlas has no basic layer', () => {
-      it('> should return empty array', () => {
+  // describe('> viewerStateGetOverlayingAdditionalParcellations', () => {
+  //   describe('> if atlas has no basic layer', () => {
+  //     it('> should return empty array', () => {
 
-        const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-          fetchedAtlases,
-          selectedAtlasId: atlas2['@id']
-        }, {
-          parcellationSelected: tmpl2.parcellations[0]
-        })
+  //       const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+  //         fetchedAtlases,
+  //         selectedAtlasId: atlas2['@id']
+  //       }, {
+  //         parcellationSelected: tmpl2.parcellations[0]
+  //       })
         
-        expect(parcs).toEqual([])
-      })
-    })
+  //       expect(parcs).toEqual([])
+  //     })
+  //   })
 
-    describe('> if atlas has basic layer', () => {
-      describe('> if non basiclayer is selected', () => {
-        it('> should return non empty array', () => {
-          const parc = atlas1.parcellations.find(p => !p['baseLayer'])
-          const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-            fetchedAtlases,
-            selectedAtlasId: atlas1['@id']
-          }, {
-            parcellationSelected: parc
-          })
-          expect(parcs.length).toEqual(1)
-          expect(parcs[0]['@id']).toEqual(parc['@id'])
-        })
-      })
+  //   describe('> if atlas has basic layer', () => {
+  //     describe('> if non basiclayer is selected', () => {
+  //       it('> should return non empty array', () => {
+  //         const parc = atlas1.parcellations.find(p => !p['baseLayer'])
+  //         const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+  //           fetchedAtlases,
+  //           selectedAtlasId: atlas1['@id']
+  //         }, {
+  //           parcellationSelected: parc
+  //         })
+  //         expect(parcs.length).toEqual(1)
+  //         expect(parcs[0]['@id']).toEqual(parc['@id'])
+  //       })
+  //     })
 
-      describe('> if basic layer is selected', () => {
-        it('> should return empty array', () => {
-          const parc = atlas1.parcellations.find(p => !!p['baseLayer'])
-          const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
-            fetchedAtlases,
-            selectedAtlasId: atlas1['@id']
-          }, {
-            parcellationSelected: parc
-          })
-          expect(parcs.length).toEqual(0)
-        })
-      })
-    })
-  })
+  //     describe('> if basic layer is selected', () => {
+  //       it('> should return empty array', () => {
+  //         const parc = atlas1.parcellations.find(p => !!p['baseLayer'])
+  //         const parcs = viewerStateGetOverlayingAdditionalParcellations.projector({
+  //           fetchedAtlases,
+  //           selectedAtlasId: atlas1['@id']
+  //         }, {
+  //           parcellationSelected: parc
+  //         })
+  //         expect(parcs.length).toEqual(0)
+  //       })
+  //     })
+  //   })
+  // })
 
-  describe('> viewerStateAtlasParcellationSelector', () => {
-    const check = (atlasJson, templates) => {
+  // describe('> viewerStateAtlasParcellationSelector', () => {
+  //   const check = (atlasJson, templates) => {
 
-      const parcs = viewerStateAtlasParcellationSelector.projector({
-        fetchedAtlases,
-        selectedAtlasId: atlasJson['@id']
-      }, {
-        fetchedTemplates
-      })
-      const templateParcs = []
-      for (const tmpl of templates) {
-        templateParcs.push(...tmpl.parcellations)
+  //     const parcs = viewerStateAtlasParcellationSelector.projector({
+  //       fetchedAtlases,
+  //       selectedAtlasId: atlasJson['@id']
+  //     }, {
+  //       fetchedTemplates
+  //     })
+  //     const templateParcs = []
+  //     for (const tmpl of templates) {
+  //       templateParcs.push(...tmpl.parcellations)
+  //     }
+  //     for (const parc of parcs) {
+  //       const firstHalf = templateParcs.find(p => p['@id'] === parc['@id'])
+  //       const secondHalf = atlasJson.parcellations.find(p => p['@id'] === parc['@id'])
+  //       expect(firstHalf).toBeTruthy()
+  //       expect(secondHalf).toBeTruthy()
+  //       //TODO compare strict equality of firsthalf+secondhalf with parc
+  //     }
+  //   }
+
+  //   it('> should work', () => {
+  //     check(atlas1, [tmpl1, tmpl2, tmpl2_2])
+  //     check(atlas2, [tmpl1, tmpl2, tmpl2_2])
+  //   })
+  // })
+
+  // describe('> viewerStateAtlasLatestParcellationSelector', () => {
+  //   it('> should only show 1 parc', () => {
+  //     const parcs = viewerStateAtlasLatestParcellationSelector.projector(atlas2.parcellations)
+  //     expect(parcs.length).toEqual(1)
+  //   })
+  // })
+
+  // describe('> viewerStateParcVersionSelector', () => {
+  //   it('> should work', () => {
+  //     const parcs = viewerStateParcVersionSelector.projector(atlas2.parcellations, {
+  //       parcellationSelected: atlas2.parcellations[0]
+  //     })
+  //     expect(parcs.length).toEqual(2)
+
+  //     expect(parcs[0]['@version']['@next']).toBeFalsy()
+  //     expect(parcs[parcs.length-1]['@version']['@previous']).toBeFalsy()
+  //   })
+  // })
+
+  describe("> viewerStateGetSelectedAtlas", () => {
+    it("> projects properly", () => {
+      const atlas1 = {
+        "@id": "atlas1"
       }
-      for (const parc of parcs) {
-        const firstHalf = templateParcs.find(p => p['@id'] === parc['@id'])
-        const secondHalf = atlasJson.parcellations.find(p => p['@id'] === parc['@id'])
-        expect(firstHalf).toBeTruthy()
-        expect(secondHalf).toBeTruthy()
-        //TODO compare strict equality of firsthalf+secondhalf with parc
+      const atlas2 = {
+        "@id": "atlas2"
       }
-    }
-
-    it('> should work', () => {
-      check(atlas1, [tmpl1, tmpl2, tmpl2_2])
-      check(atlas2, [tmpl1, tmpl2, tmpl2_2])
-    })
-  })
-
-  describe('> viewerStateAtlasLatestParcellationSelector', () => {
-    it('> should only show 1 parc', () => {
-      const parcs = viewerStateAtlasLatestParcellationSelector.projector(atlas2.parcellations)
-      expect(parcs.length).toEqual(1)
-    })
-  })
-
-  describe('> viewerStateParcVersionSelector', () => {
-    it('> should work', () => {
-      const parcs = viewerStateParcVersionSelector.projector(atlas2.parcellations, {
-        parcellationSelected: atlas2.parcellations[0]
+      const atlas3 = {
+        "@id": "atlas3"
+      }
+      const allAtlases = [ atlas1, atlas2, atlas3 ]
+      const result = viewerStateGetSelectedAtlas.projector({
+        fetchedAtlases: allAtlases,
+        overlayingAdditionalParcellations: [],
+        selectedAtlasId: atlas1["@id"]
       })
-      expect(parcs.length).toEqual(2)
+      expect(result).toEqual(atlas1 as any)
+    })
+  })
 
-      expect(parcs[0]['@version']['@next']).toBeFalsy()
-      expect(parcs[parcs.length-1]['@version']['@previous']).toBeFalsy()
+  describe("> selectorSelectedATP", () => {
+    const mockAtlas = {
+      "@id": "mock atlas"
+    } as any
+    const mockTmpl = {
+      "@id": "mock Tmpl"
+    } as any
+    const mockParc = {
+      "@id": "mock Parc"
+    } as any
+
+    it("> transforms the selectors properly", () => {
+      const result = selectorSelectedATP.projector(mockAtlas,mockTmpl,mockParc)
+      expect(result).toEqual({ atlas: mockAtlas, template: mockTmpl, parcellation: mockParc })
     })
   })
 })

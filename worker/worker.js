@@ -17,7 +17,6 @@ if (typeof self.importScripts === 'function')  self.importScripts('./worker-type
  */
 
 const validTypes = [
-  'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
   'PROPAGATE_PARC_REGION_ATTR'
 ]
@@ -35,7 +34,6 @@ const VALID_METHODS = [
 ]
 
 const validOutType = [
-  'ASSEMBLED_LANDMARKS_VTK',
   'ASSEMBLED_USERLANDMARKS_VTK',
 ]
 
@@ -170,32 +168,6 @@ const parseLmToVtk = (landmarks, scale) => {
     .concat(reduce.labelString.join('\n'))
 }
 
-let landmarkVtkUrl
-
-const getLandmarksVtk = (action) => {
-
-  // landmarks are array of triples in nm (array of array of numbers)
-  const landmarks = action.landmarks
-  const template = action.template
-  const scale = action.scale
-    ? action.scale
-    : 2.8
-
-  const vtk = parseLmToVtk(landmarks, scale)
-
-  if(!vtk) return
-
-  // when new set of landmarks are to be displayed, the old landmarks will be discarded
-  if(landmarkVtkUrl) URL.revokeObjectURL(landmarkVtkUrl)
-
-  landmarkVtkUrl = URL.createObjectURL(new Blob( [encoder.encode(vtk)], {type : 'application/octet-stream'} ))
-  postMessage({
-    type : 'ASSEMBLED_LANDMARKS_VTK',
-    template,
-    url : landmarkVtkUrl
-  })
-}
-
 let userLandmarkVtkUrl
 
 const getuserLandmarksVtk = (action) => {
@@ -327,9 +299,6 @@ onmessage = (message) => {
 
   if(validTypes.findIndex(type => type === message.data.type) >= 0){
     switch(message.data.type){
-      case 'GET_LANDMARKS_VTK':
-        getLandmarksVtk(message.data)
-        return
       case 'GET_USERLANDMARKS_VTK':
         getuserLandmarksVtk(message.data)
         return

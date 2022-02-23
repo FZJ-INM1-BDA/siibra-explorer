@@ -5,7 +5,6 @@ import { UtilModule } from "src/util";
 import { AtlasDropdownSelector } from "./atlasDropdown/atlasDropdown.component";
 import { AtlasLayerSelector } from "./atlasLayerSelector/atlasLayerSelector.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
-import { KgDatasetModule } from "../regionalFeatures/bsFeatures/kgDataset";
 import { AtlaslayerTooltipPipe } from "./pipes/atlasLayerTooltip.pipe";
 import { ComponentsModule } from "src/components";
 import { GetNonbaseParcPipe } from "./pipes/getNonBaseParc.pipe";
@@ -17,6 +16,7 @@ import { GetPreviewUrlPipe } from "./pipes/getPreviewUrl.pipe";
 import { CurrParcSupportsTmplPipe } from "./pipes/currParcSupportsTmpl.pipe";
 import { AtlasCmpParcellationModule } from "../parcellation";
 import { SiibraExplorerTemplateModule } from "../template";
+import { DialogInfoModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
@@ -24,10 +24,10 @@ import { SiibraExplorerTemplateModule } from "../template";
     AngularMaterialModule,
     UtilModule,
     QuickTourModule,
-    KgDatasetModule,
     ComponentsModule,
     AtlasCmpParcellationModule,
     SiibraExplorerTemplateModule,
+    DialogInfoModule,
   ],
   declarations: [
     AtlasDropdownSelector,

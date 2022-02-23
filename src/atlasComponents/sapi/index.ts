@@ -1,8 +1,21 @@
 export { SAPIModule } from './module'
 export { SpatialFeatureBBox } from './directives/spatialFeatureBBox.directive'
-import { SapiVoiResponse } from './type'
 
-export type SpatialFeatureResponse = SapiVoiResponse
+export {
+  SapiAtlasModel,
+  SapiParcellationModel,
+  SapiSpaceModel,
+  SapiRegionModel,
+  SapiVolumeModel,
+  SapiDatasetModel,
+  SapiRegionalFeatureModel,
+  SapiSpatialFeatureModel
+} from "./type"
 
-export type FeatureResponse = SpatialFeatureResponse
-
+export { SAPI } from "./sapi.service"
+export {
+  SAPIAtlas,
+  SAPISpace,
+  SAPIParcellation,
+  SAPIRegion
+} from "./core"

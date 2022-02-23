@@ -19,8 +19,6 @@ import { FlattenTreePipe } from './flatTree/flattener.pipe';
 import { FlatTreeComponent } from './flatTree/flatTree.component';
 import { HighlightPipe } from './flatTree/highlight.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
-import { TreeComponent } from './tree/tree.component';
-import { TreeBaseDirective } from './tree/treeBase.directive';
 import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
 import { SpinnerCmp } from './spinner/spinner.component';
@@ -40,7 +38,6 @@ import { TileCmp } from './tile/tile.component';
   declarations : [
     /* components */
     MarkdownDom,
-    TreeComponent,
     FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
@@ -48,9 +45,6 @@ import { TileCmp } from './tile/tile.component';
     DynamicMaterialBtn,
     SpinnerCmp,
     TileCmp,
-
-    /* directive */
-    TreeBaseDirective,
 
     /* pipes */
     SafeHtmlPipe,
@@ -67,7 +61,6 @@ import { TileCmp } from './tile/tile.component';
     ReadmoreModule,
 
     MarkdownDom,
-    TreeComponent,
     FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
@@ -77,7 +70,6 @@ import { TileCmp } from './tile/tile.component';
     TileCmp,
 
     TreeSearchPipe,
-    TreeBaseDirective,
   ],
 })
 

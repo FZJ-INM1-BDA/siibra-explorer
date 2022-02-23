@@ -1,8 +1,8 @@
 import { combineLatest, Observable, BehaviorSubject, Subject, Subscription, of, merge } from 'rxjs';
 import { debounceTime, map, distinctUntilChanged, switchMap, tap, startWith, filter } from 'rxjs/operators';
 import { Directive, EventEmitter, Input, OnDestroy, Output } from "@angular/core";
-import { BoundingBoxConcept, SapiVoiResponse } from '../type'
-import { SAPI } from '../sapi'
+import { BoundingBoxConcept, SapiSpatialFeatureModel, SapiVOIDataResponse } from '../type'
+import { SAPI } from '../sapi.service'
 import { environment } from "src/environments/environment"
 
 function validateBbox(input: any): boolean {
@@ -52,8 +52,8 @@ export class SpatialFeatureBBox implements OnDestroy{
   }
 
   @Output('sii-xp-spatial-feat-bbox-features')
-  featureOutput = new EventEmitter<SapiVoiResponse[]>()
-  features$ = new BehaviorSubject<SapiVoiResponse[]>([])
+  featureOutput = new EventEmitter<SapiVOIDataResponse[]>()
+  features$ = new BehaviorSubject<SapiVOIDataResponse[]>([])
 
   @Output('sii-xp-spatial-feat-bbox-busy')
   busy$ = new EventEmitter<boolean>()
@@ -96,12 +96,12 @@ export class SpatialFeatureBBox implements OnDestroy{
         }) => {
           if (!atlasId || !spaceId || !bbox) {
             this.busy$.emit(false)
-            return of([])
+            return of([] as SapiSpatialFeatureModel[])
           }
           const space = this.svc.getSpace(atlasId, spaceId)
           return space.getFeatures(SpatialFeatureBBox.FEATURE_NAME, { bbox: JSON.stringify(bbox) })
         })
-      ).subscribe(results => {
+      ).subscribe((results: SapiVOIDataResponse[]) => {
         this.featureOutput.emit(results)
         this.features$.next(results)
         this.busy$.emit(false)

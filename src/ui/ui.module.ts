@@ -26,11 +26,11 @@ import { ActionDialog } from "./actionDialog/actionDialog.component";
 import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { RegionalFeaturesModule } from "../atlasComponents/regionalFeatures";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
+import { DialogInfoModule } from "./dialogInfo"
 
 @NgModule({
   imports : [
@@ -45,10 +45,10 @@ import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
     AngularMaterialModule,
     ShareModule,
     AuthModule,
-    RegionalFeaturesModule,
     Landmark2DModule,
     ParcellationRegionModule,
     AtlasCmpParcellationModule,
+    DialogInfoModule,
   ],
   declarations : [
     

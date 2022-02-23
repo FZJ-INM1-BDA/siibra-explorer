@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { fromEvent, Subject, Subscription } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
-import { serialiseParcellationRegion } from "common/util"
+import { serializeSegment } from "src/viewerModule/nehuba/util";
 
 const insertHighlight: (name: string, searchTerm: string) => string = (name: string, searchTerm: string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
@@ -15,7 +15,7 @@ const getDisplayTreeNode: (searchTerm: string, selectedRegions: any[]) => (item:
   return !!labelIndex
     && !!ngId
     && selectedRegions.findIndex(re =>
-      serialiseParcellationRegion({ labelIndex: re.labelIndex, ngId: re.ngId }) === serialiseParcellationRegion({ ngId, labelIndex }),
+      serializeSegment(re.labelIndex, re.ngId) === serializeSegment(ngId, labelIndex),
     ) >= 0
     ? `<span class="cursor-default regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
     : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)

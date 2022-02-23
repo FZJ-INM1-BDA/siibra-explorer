@@ -4,7 +4,6 @@ import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import {map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
-import { viewerStateSelectedTemplatePureSelector, viewerStateViewerModeSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine, TCallback } from "./type";
@@ -15,7 +14,8 @@ import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
+import { actions } from "src/state/atlasSelection";
+import { atlasSelection } from "src/state";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 
@@ -91,7 +91,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private selectedTmpl: any
   private selectedTmpl$ = this.store.pipe(
-    select(viewerStateSelectedTemplatePureSelector),
+    select(atlasSelection.selectors.selectedTemplate),
   )
   public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: () => void}[] = []
   private managedAnnotationsStream$ = new Subject<{
@@ -502,7 +502,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      */
     this.subscription.push(
       store.pipe(
-        select(viewerStateViewerModeSelector)
+        select(atlasSelection.selectors.viewerMode)
       ).subscribe(viewerMode => {
         this.currMode = viewerMode
         if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
@@ -761,7 +761,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         : ARIA_LABELS.VIEWER_MODE_ANNOTATING
     }
     this.store.dispatch(
-      viewerStateSetViewerMode({ payload })
+      actions.setViewerMode({
+        viewerMode: "annotating"
+      })
     )
   }
 }

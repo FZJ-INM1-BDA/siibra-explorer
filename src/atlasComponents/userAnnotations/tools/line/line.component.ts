@@ -4,10 +4,10 @@ import { Store } from "@ngrx/store";
 import { Line, LINE_ICON_CLASS } from "../line";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { Point } from "../point";
 import { ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
+import { actions } from "src/state/atlasSelection";
 
 @Component({
   selector: 'line-update-cmp',
@@ -59,12 +59,12 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
       const { x, y, z } = roi
 
       this.store.dispatch(
-        viewerStateChangeNavigation({
+        actions.navigateTo({
           navigation: {
-            position: [x, y, z],
-            positionReal: true,
-            animation: {}
-          }
+            position: [x, y, z]
+          },
+          physical: true,
+          animation: true
         })
       )
       return
@@ -79,12 +79,12 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
     const { x, y, z } = this.updateAnnotation.points[0]
     
     this.store.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
-          position: [x, y, z],
-          positionReal: true,
-          animation: {}
-        }
+          position: [x, y, z]
+        },
+        physical: true,
+        animation: true
       })
     )
   }

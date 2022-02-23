@@ -1,13 +1,13 @@
-import { Component, EventEmitter, Output, Pipe, PipeTransform } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { IQuickTourData } from "src/ui/quickTour";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { select, Store } from "@ngrx/store";
-import { viewerStateContextedSelectedRegionsSelector, viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateSelectedParcellationSelector } from "src/services/state/viewerState/selectors";
 import { distinctUntilChanged, map } from "rxjs/operators";
-import { viewerStateHelperSelectParcellationWithId, viewerStateRemoveAdditionalLayer, viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
 import { ngViewerActionClearView, ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
-import { TDatainfosDetail, TSimpleInfo } from "src/util/siibraApiConstants/types";
+import { atlasSelection } from "src/state"
+import { NEVER, of } from "rxjs";
+import { SapiParcellationModel } from "src/atlasComponents/sapi";
 
 @Component({
   selector: 'viewer-state-breadcrumb',
@@ -40,33 +40,24 @@ export class ViewerStateBreadCrumb {
     select(ngViewerSelectorClearViewEntries)
   )
 
-  public selectedAdditionalLayers$ = this.store$.pipe(
-    select(viewerStateGetOverlayingAdditionalParcellations),
-  )
+  // TODO what is this observable anyway?
+  public selectedAdditionalLayers$ = of([])
 
   public parcellationSelected$ = this.store$.pipe(
-    select(viewerStateSelectedParcellationSelector),
+    select(atlasSelection.selectors.selectedParcellation),
     distinctUntilChanged(),
+    
   )
 
   public selectedRegions$ = this.store$.pipe(
-    select(viewerStateContextedSelectedRegionsSelector),
+    select(atlasSelection.selectors.selectedRegions),
     distinctUntilChanged(),
   )
 
-  public selectedLayerVersions$ = this.store$.pipe(
-    select(viewerStateParcVersionSelector),
-    map(arr => arr.map(item => {
-      const overwrittenName = item['@version'] && item['@version']['name']
-      return overwrittenName
-        ? { ...item, displayName: overwrittenName }
-        : item
-    }))
-  )
-
+  // TODO add version info in siibra-api/siibra-python
+  public selectedLayerVersions$ = NEVER
 
   constructor(private store$: Store<any>){
-
   }
 
   handleChipClick(){
@@ -75,9 +66,7 @@ export class ViewerStateBreadCrumb {
 
   public clearSelectedRegions(){
     this.store$.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: []
-      })
+      atlasSelection.actions.clearSelectedRegions()
     )
   }
 
@@ -91,16 +80,14 @@ export class ViewerStateBreadCrumb {
 
   public clearAdditionalLayer(layer: { ['@id']: string }){
     this.store$.dispatch(
-      viewerStateRemoveAdditionalLayer({
-        payload: layer
-      })
+      atlasSelection.actions.clearNonBaseParcLayer()
     )
   }
 
-  public selectParcellation(parc: any) {
+  public selectParcellationWithId(parcId: string) {
     this.store$.dispatch(
-      viewerStateHelperSelectParcellationWithId({
-        payload: parc
+      atlasSelection.actions.selectATPById({
+        parcellationId: parcId
       })
     )
   }
@@ -113,29 +100,4 @@ export class ViewerStateBreadCrumb {
     }
   }
 
-}
-
-@Pipe({
-  name: 'originalDatainfoPriorityPipe'
-})
-
-export class OriginalDatainfoPipe implements PipeTransform{
-  public transform(arr: (TSimpleInfo | TDatainfosDetail)[]): TDatainfosDetail[]{
-    const detailedInfos = arr.filter(item => item['@type'] === 'minds/core/dataset/v1.0.0') as TDatainfosDetail[]
-    const simpleInfos = arr.filter(item => item['@type'] === 'fzj/tmp/simpleOriginInfo/v0.0.1') as TSimpleInfo[]
-
-    if (detailedInfos.length > 0) return detailedInfos
-    if (simpleInfos.length > 0) {
-      return arr.map(d => {
-        return {
-          '@type': 'minds/core/dataset/v1.0.0',
-          name: d.name,
-          description: d.name,
-          urls: [],
-          useClassicUi: false
-        }
-      })
-    }
-    return []
-  }
 }

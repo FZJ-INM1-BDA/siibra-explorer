@@ -1,16 +1,11 @@
 import { Directive, EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
-import { select, Store, createSelector } from "@ngrx/store";
-import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { map, tap } from "rxjs/operators";
-import { Observable, BehaviorSubject, combineLatest } from "rxjs";
-import { rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
-import { viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
+import { select, Store } from "@ngrx/store";
+import { Observable, BehaviorSubject } from "rxjs";
+import { rgbToHsl, hexToRgb } from 'common/util'
 import { strToRgb, verifyPositionArg } from 'common/util'
-import { getPosFromRegion } from "src/util/siibraApiConstants/fn";
-import { TRegionDetail } from "src/util/siibraApiConstants/types";
-import { IHasId } from "src/util/interfaces";
-import { TSiibraExTemplate } from "./type";
+import { actions } from "src/state/atlasSelection";
+import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "../sapi";
+import { atlasSelection } from "src/state";
 
 @Directive()
 export class RegionBase {
@@ -18,16 +13,9 @@ export class RegionBase {
   public rgbString: string
   public rgbDarkmode: boolean
 
-  private _region: TRegionDetail & {  
-    context?: {
-      atlas: IHasId
-      template: IHasId
-      parcellation: IHasId
-    }
-    ngId?: string
-  }
+  private _region: SapiRegionModel
 
-  private _position: [number, number, number]
+  private _position: number[]
   set position(val){
     if (verifyPositionArg(val)) {
       this._position = val
@@ -40,39 +28,51 @@ export class RegionBase {
     return this._position
   }
 
+  public dois: string[] = []
+
+  @Input()
+  atlas: SapiAtlasModel
+
+  @Input()
+  parcellation: SapiParcellationModel
+
+  @Input()
+  template: SapiSpaceModel
+
   @Input()
   set region(val) {
     this._region = val
     this.region$.next(this._region)
-    this.hasContext$.next(!!this._region?.context)
+    this.hasContext$.next(false)
 
     this.position = null
     // bug the centroid returned is currently nonsense
     // this.position = val?.props?.centroid_mm
-    if (!this._region) return
-    const pos = getPosFromRegion(val)
+    if (!val) return
+    const pos = val?.hasAnnotation?.bestViewPoint?.coordinates?.map(v => v.value * 1e6)
     if (pos) {
       this.position = pos
     }
 
-    const rgb = this._region.rgb
-      || (this._region.labelIndex > 65500 && [255, 255, 255])
-      || strToRgb(`${this._region.ngId || this._region.name}${this._region.labelIndex}`)
-      || [255, 200, 200]
-
+    let rgb = [255, 200, 200]
+    if (val.hasAnnotation?.displayColor) {
+      rgb = hexToRgb(val?.hasAnnotation?.displayColor)
+    } else {
+      rgb = strToRgb(JSON.stringify(val))
+    }
     this.rgbString = `rgb(${rgb.join(',')})`
     const [_h, _s, l] = rgbToHsl(...rgb)
     this.rgbDarkmode = l < 0.4
+
+    this.dois = (val.hasAnnotation?.inspiredBy || [])
+      .map(insp => insp["@id"] as string)
+      .filter(id => /^https?:\/\/doi\.org/.test(id))
   }
 
   get region(){
     return this._region
   }
 
-  get originDatainfos(){
-    if (!this._region) return []
-    return (this._region._dataset_specs || []).filter(spec => spec['@type'] === 'minds/core/dataset/v1.0.0')
-  }
 
   public hasContext$: BehaviorSubject<boolean> = new BehaviorSubject(false)
   public region$: BehaviorSubject<any> = new BehaviorSubject(null)
@@ -84,9 +84,8 @@ export class RegionBase {
 
   @Output() public closeRegionMenu: EventEmitter<boolean> = new EventEmitter()
 
-  public regionOriginDatasetLabels$: Observable<{ name: string }[]>
   public selectedAtlas$: Observable<any> = this.store$.pipe(
-    select(viewerStateGetSelectedAtlas)
+    select(atlasSelection.selectors.selectedAtlas)
   )
 
 
@@ -94,24 +93,19 @@ export class RegionBase {
     private store$: Store<any>,
   ) {
 
-    this.regionOriginDatasetLabels$ = combineLatest([
-      this.store$,
-      this.region$
-    ]).pipe(
-      map(([state, region]) => getRegionParentParcRefSpace(state, { region })),
-      map(({ template }) => (template && template.originalDatasetFormats) || [])
-    )
   }
 
   public selectedTemplate$ = this.store$.pipe(
-    select(viewerStateSelectedTemplatePureSelector),
+    select(atlasSelection.selectors.selectedTemplate),
   )
 
   public navigateToRegion() {
     this.closeRegionMenu.emit()
     const { region } = this
     this.store$.dispatch(
-      viewerStateNavigateToRegion({ payload: { region } })
+      atlasSelection.actions.navigateToRegion({
+        region
+      })
     )
   }
 
@@ -119,100 +113,36 @@ export class RegionBase {
     this.closeRegionMenu.emit()
     const { region } = this
     this.store$.dispatch(
-      viewerStateToggleRegionSelect({ payload: { region } })
+      actions.toggleRegionSelect({
+        region
+      })
     )
   }
 
   public showConnectivity(regionName) {
     this.closeRegionMenu.emit()
     // ToDo trigger side panel opening with effect
-    this.store$.dispatch(uiStateOpenSidePanel())
-    this.store$.dispatch(uiStateExpandSidePanel())
-    this.store$.dispatch(uiActionShowSidePanelConnectivity())
+    // this.store$.dispatch(uiStateOpenSidePanel())
+    // this.store$.dispatch(uiStateExpandSidePanel())
+    // this.store$.dispatch(uiActionShowSidePanelConnectivity())
 
-    this.store$.dispatch(
-      viewerStateSetConnectivityRegion({ connectivityRegion: regionName })
-    )
+    // I think we can use viewerMode for this??
+    // this.store$.dispatch(
+    //   viewerStateSetConnectivityRegion({ connectivityRegion: regionName })
+    // )
   }
 
-  changeView(template: TSiibraExTemplate) {
+  changeView(template: SapiSpaceModel) {
 
     this.closeRegionMenu.emit()
-
-    const {
-      parcellation
-    } = (this.region?.context || {})
-    
-    /**
-     * TODO use createAction in future
-     * for now, not importing const because it breaks tests
-     */
     this.store$.dispatch(
-      viewerStateSelectTemplateWithId({
-        payload: {
-          '@id': template['@id'] || template['fullId']
-        },
-        config: {
-          selectParcellation: {
-            '@id': parcellation['@id'] || parcellation['fullId']
-          }
-        }
+      atlasSelection.actions.viewSelRegionInNewSpace({
+        region: this._region,
+        template,
       })
     )
   }
 }
-
-export const getRegionParentParcRefSpace = createSelector(
-  (state: any) => state.viewerState,
-  viewerStateGetSelectedAtlas,
-  (viewerState, selectedAtlas, prop) => {
-    const { region: regionOfInterest } = prop
-    /**
-     * if region is undefined, return null
-     */
-    if (!regionOfInterest || !viewerState.parcellationSelected || !viewerState.templateSelected) {
-      return {
-        template: null,
-        parcellation: null
-      }
-    }
-    /**
-     * first check if the region can be found in the currently selected parcellation
-     */
-    const checkRegions = regions => {
-      for (const region of regions) {
-
-        /**
-         * check ROI to iterating regions
-         */
-        if (region.name === regionOfInterest.name) return true
-
-        if (region && region.children && Array.isArray(region.children)) {
-          const flag = checkRegions(region.children)
-          if (flag) return true
-        }
-      }
-      return false
-    }
-    const regionInParcSelected = checkRegions(viewerState.parcellationSelected.regions)
-
-    if (regionInParcSelected) {
-      const p = selectedAtlas.parcellations.find(p => p['@id'] === viewerState.parcellationSelected['@id'])
-      if (p) {
-        const refSpace = p.availableIn.find(refSpace => refSpace['@id'] === viewerState.templateSelected['@id'])
-        return {
-          template: refSpace,
-          parcellation: p
-        }
-      }
-    }
-
-    return {
-      template: null,
-      parcellation: null
-    }
-  }
-)
 
 @Pipe({
   name: 'renderViewOriginDatasetlabel'

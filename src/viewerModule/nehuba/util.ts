@@ -4,6 +4,8 @@ import { filter, scan, take } from 'rxjs/operators'
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { getViewer } from 'src/util/fn'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
+import { NgConfigViewerState } from "./config.service"
+import { RecursivePartial } from './config.service/type'
 
 const flexContCmnCls = ['w-100', 'h-100', 'd-flex', 'justify-content-center', 'align-items-stretch']
 
@@ -290,7 +292,8 @@ export const takeOnePipe = () => {
 
 export const NEHUBA_INSTANCE_INJTKN = new InjectionToken<Observable<NehubaViewerUnit>>('NEHUBA_INSTANCE_INJTKN')
 
-export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
+
+export function cvtNavigationObjToNehubaConfig(navigationObj, ngNavigationObj: RecursivePartial<NgConfigViewerState>): Partial<NgConfigViewerState>{
   const {
     orientation = [0, 0, 0, 1],
     perspectiveOrientation = [0, 0, 0, 1],
@@ -300,15 +303,7 @@ export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
     positionReal = true,
   } = navigationObj || {}
 
-  const voxelSize = (() => {
-    const {
-      navigation = {}
-    } = nehubaConfigObj || {}
-    const { pose = {} } = navigation
-    const { position = {} } = pose
-    const { voxelSize = [1, 1, 1] } = position
-    return voxelSize
-  })()
+  const voxelSize = ngNavigationObj?.navigation?.pose?.position?.voxelSize || [1,1,1]
 
   return {
     perspectiveOrientation,
@@ -325,5 +320,23 @@ export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
       },
       zoomFactor: zoom
     }
+  }
+}
+
+export function serializeSegment(ngId: string, label: number | string){
+  return `${ngId}#${label}`
+}
+
+export function deserializeSegment(id: string) {
+  const split = id.split('#')
+  if (split.length !== 2) {
+    throw new Error(`deserializeSegment error at ${id}. expecting splitting # to result in length 2, got ${split.length}`)
+  }
+  if (isNaN(Number(split[1]))) {
+    throw new Error(`deserializeSegment error at ${id}. expecting second element to be numberable. It was not.`)
+  }
+  return {
+    ngId: split[0],
+    label: Number(split[1])
   }
 }

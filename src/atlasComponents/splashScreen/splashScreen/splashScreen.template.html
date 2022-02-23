@@ -7,7 +7,7 @@
     <mat-card
       (click)="selectAtlas(atlas)"
       matRipple
-      *ngFor="let atlas of loadedAtlases$ | async | filterArray : filterNullFn"
+      *ngFor="let atlas of atlases$ | async"
       class="m-3 col-md-12 col-lg-12 pe-all">
       <mat-card-header>
         <mat-card-title class="text-nowrap font-stretch">

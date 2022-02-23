@@ -12,18 +12,14 @@ import {
 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, switchMapTo, take, startWith } from "rxjs/operators";
+import { map, filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import {
   IavRootStoreInterface,
   isDefined,
-  safeFilter,
 } from "../services/stateStore.service";
-import { WidgetServices } from "src/widget";
 
-import { LocalFileService } from "src/services/localFile.service";
 import { AGREE_COOKIE } from "src/services/state/uiState.store";
-import { isSame } from "src/util/fn";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
@@ -71,27 +67,22 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
-  private newViewer$: Observable<any>
 
   private snackbarRef: MatSnackBarRef<any>
-  public snackbarMessage$: Observable<symbol>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
   private subscriptions: Subscription[] = []
 
-  private selectedParcellation$: Observable<any>
   public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private widgetServices: WidgetServices,
     private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private rd: Renderer2,
-    public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
     private slService: SlServiceService,
@@ -99,36 +90,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     @Inject(DOCUMENT) private document,
   ) {
 
-    this.snackbarMessage$ = this.store.pipe(
-      select('uiState'),
-      select("snackbarMessage"),
-    )
-
     this.sidePanelView$ = this.store.pipe(
       select('uiState'),
       filter(state => isDefined(state)),
       map(state => state.focusedSidePanel),
     )
 
-    this.newViewer$ = this.store.pipe(
-      select('viewerState'),
-      select('templateSelected'),
-      distinctUntilChanged(isSame),
-    )
-
-    this.selectedParcellation$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
-      distinctUntilChanged(),
-    )
-
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => {
-        this.selectedParcellation = parcellation
-      }),
-
-    )
 
     const error = this.el.nativeElement.getAttribute('data-error')
 
@@ -166,30 +133,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscriptions.push(
       this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
-    )
-
-    this.subscriptions.push(
-      this.snackbarMessage$.pipe(
-        // angular material issue
-        // see https://github.com/angular/angular/issues/15634
-        // and https://github.com/angular/components/issues/11357
-        delay(0),
-      ).subscribe(messageSymbol => {
-        if (this.snackbarRef) { this.snackbarRef.dismiss() }
-
-        if (!messageSymbol) { return }
-
-        const message = messageSymbol.description
-        this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
-          duration: 5000,
-        })
-      }),
-    )
-
-    this.subscriptions.push(
-      this.newViewer$.subscribe(() => {
-        this.widgetServices.clearAllWidgets()
-      }),
     )
 
     this.subscriptions.push(

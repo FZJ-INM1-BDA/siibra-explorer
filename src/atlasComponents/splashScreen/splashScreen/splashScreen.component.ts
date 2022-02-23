@@ -1,11 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { select, Store } from "@ngrx/store";
-import { Observable, Subject, Subscription } from "rxjs";
-import { filter } from 'rxjs/operators'
-import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
-import { PureContantService } from "src/util";
-import { CONST } from 'common/constants'
+import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { tap } from 'rxjs/operators'
+import { SAPI } from "src/atlasComponents/sapi/sapi.service";
+import { SapiAtlasModel } from "src/atlasComponents/sapi/type";
+import { atlasSelection } from "src/state"
 
 @Component({
   selector : 'ui-splashscreen',
@@ -20,56 +18,21 @@ export class SplashScreen {
 
   public finishedLoading: boolean = false
 
-  public loadedAtlases$: Observable<any[]>
-
-  public filterNullFn(atlas: any){
-    return !!atlas
-  }
-
-  @ViewChild('parentContainer', {read: ElementRef})
-  public activatedTemplate$: Subject<any> = new Subject()
-
-  private subscriptions: Subscription[] = []
+  public atlases$ = this.sapiSvc.atlases$.pipe(
+    tap(() => this.finishedLoading = true)
+  )
 
   constructor(
     private store: Store<any>,
-    private snack: MatSnackBar,
-    private pureConstantService: PureContantService,
-    private cdr: ChangeDetectorRef,
+    private sapiSvc: SAPI,
   ) {
-    this.subscriptions.push(
-      this.pureConstantService.allFetchingReady$.subscribe(flag => {
-        this.finishedLoading = flag
-        this.cdr.markForCheck()
-      })
-    )
-
-    this.loadedAtlases$ = this.store.pipe(
-      select(state => state[viewerStateHelperStoreName]),
-      select(state => state.fetchedAtlases),
-      filter(v => !!v)
-    )
   }
 
-  public selectAtlas(atlas: any){
-    if (!this.finishedLoading) {
-      this.snack.open(CONST.DATA_NOT_READY, null, {
-        duration: 3000
-      })
-      return
-    }
+  public selectAtlas(atlas: SapiAtlasModel){
     this.store.dispatch(
-      viewerStateSelectAtlas({ atlas })
+      atlasSelection.actions.selectAtlas({
+        atlas
+      })
     )
-  }
-}
-
-@Pipe({
-  name: 'getTemplateImageSrcPipe',
-})
-
-export class GetTemplateImageSrcPipe implements PipeTransform {
-  public transform(name: string): string {
-    return `./res/image/${name.replace(/[|&;$%@()+,\s./]/g, '')}.png`
   }
 }

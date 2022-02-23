@@ -33,17 +33,13 @@
       </button>
 
       <!-- explore doi -->
-      <ng-template let-infos [ngIf]="originDatainfos">
-        <ng-container *ngFor="let info of infos">
-          <a *ngFor="let url of info.urls"
-            [href]="url.doi | doiParserPipe"
-            [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-            target="_blank"
-            mat-icon-button>
-            <i class="fas fa-external-link-alt"></i>
-          </a>
-        </ng-container>
-      </ng-template>
+      <a *ngFor="let doi of dois"
+        [href]="doi | doiParserPipe"
+        [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
+        target="_blank"
+        mat-icon-button>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
 
     </mat-card-subtitle>
 
@@ -53,7 +49,8 @@
 <mat-accordion class="d-block mt-2">
 
   <!-- description -->
-  <ng-template [ngIf]="(originDatainfos || []).length > 0">
+  <!-- TODO how are we going to get desc for PEV? -->
+  <!-- <ng-template [ngIf]="(originDatainfos || []).length > 0">
     <ng-container *ngFor="let originData of originDatainfos">
       <ng-template #descTmpl>
         <markdown-dom [markdown]="originData.description"
@@ -70,62 +67,22 @@
 
       </ng-container>
     </ng-container>
-  </ng-template>
+  </ng-template> -->
 
 
   <!-- Explore in other template -->
-  <ng-template [ngIf]="region$ | async | regionInOtherTmpl" let-otherTmpls>
-    <ng-template #exploreInOtherTmpl>
-      <mat-grid-list cols="3"
-        rowHeight="2:3"
-        gutterSize="16"
-        class="position-relative">
-        <mat-grid-tile *ngFor="let otherTmpl of otherTmpls">
-          
-          <div [hidden]
-              iav-dataset-show-dataset-dialog
-              [iav-dataset-show-dataset-dialog-name]="otherTmpl.originDatainfos[0]?.name"
-              [iav-dataset-show-dataset-dialog-description]="otherTmpl.originDatainfos[0]?.description"
-              [iav-dataset-show-dataset-dialog-urls]="otherTmpl.originDatainfos[0]?.urls"
-              [iav-dataset-show-dataset-dialog-ignore-overwrite]="true"
-              #kgInfo="iavDatasetShowDatasetDialog">
-          </div>
-          <tile-cmp [tile-image-src]="otherTmpl | getTemplatePreviewUrl"
-              class="cursor-pointer pe-all"
-              tile-image-alt="Preview of this tile"
-              [tile-text]="otherTmpl.displayName || otherTmpl.name"
-              [tile-show-info]="otherTmpl.originDatainfos?.length > 0"
-              [tile-image-darktheme]="otherTmpl | templateIsDarkTheme"
-              [tile-selected]="(selectedTemplate$ | async | getProperty : '@id') === otherTmpl['@id']"
-              (tile-on-click)="(tileCmp.selected || changeView(otherTmpl)); (tileCmp.selected || intentToChgTmpl$.next(true))"
-              (tile-on-info-click)="kgInfo && kgInfo.onClick()"
-              #tileCmp="tileCmp">
-          </tile-cmp>
-        </mat-grid-tile>
-      </mat-grid-list>
-
-      <div *ngIf="lockOtherTmpl$ | async" class="loading-overlay">
-        <spinner-cmp class="spinner"></spinner-cmp>
-      </div>
-
-    </ng-template>
-
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: 'Explore in other templates',
-      desc: otherTmpls.length,
-      iconClass: 'fas fa-brain',
-      iconTooltip: otherTmpls.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
-      iavNgIf: otherTmpls.length > 0,
-      content: exploreInOtherTmpl
-    }">
-    </ng-container>
-  </ng-template>
+  TODO reimplmenent explore in other templates
+  perhaps extract the tile into a separate ui component (?)
 
 
   <!-- kg regional features list -->
   <ng-template #kgRegionalFeatureList>
-    <regional-feature-wrapper [region]="region$ | async">
-    </regional-feature-wrapper>
+    <regional-features-list
+      [region]="region$ | async"
+      [atlas]="atlas"
+      [template]="template"
+      [parcellation]="parcellation">
+    </regional-features-list>
   </ng-template>
 
   <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
@@ -134,7 +91,7 @@
     content: kgRegionalFeatureList,
     desc: '',
     iconTooltip: 'Regional Features',
-    iavNgIf: hasContext$ | async
+    iavNgIf: true
   }">
   </ng-container>
 

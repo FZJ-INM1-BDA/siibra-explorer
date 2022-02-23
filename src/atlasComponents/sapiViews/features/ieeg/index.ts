@@ -1,0 +1,1 @@
+export { IEEGSessionCmp } from "./ieegSession/ieegSession.component"

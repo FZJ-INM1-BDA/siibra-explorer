@@ -6,8 +6,6 @@ import { IHasId } from "./util/interfaces"
  * TODO gradually move to relevant.
  */
 
-export const OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN = new InjectionToken<(file: any, dataset: any) => void>('OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN')
-export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME = new InjectionToken<({ datasetSchema, datasetId, filename }) => Observable<any|null>>('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')
 export const kgTos = `The interactive viewer queries HBP Knowledge Graph Data Platform ("KG") for published datasets.
 
 
@@ -85,7 +83,6 @@ export interface IKgDataEntry {
 }
 
 export type TypePreviewDispalyed = (file, dataset) => Observable<boolean>
-export const IAV_DATASET_PREVIEW_ACTIVE = new InjectionToken<TypePreviewDispalyed>('IAV_DATASET_PREVIEW_ACTIVE')
 
 
 export enum EnumPreviewFileTypes{

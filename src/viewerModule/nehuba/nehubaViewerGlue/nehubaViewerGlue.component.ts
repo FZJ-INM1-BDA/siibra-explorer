@@ -1,19 +1,14 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { asyncScheduler, combineLatest, fromEvent, merge, NEVER, Observable, of, Subject, Subscription } from "rxjs";
+import { asyncScheduler, BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
-import { viewerStateAddUserLandmarks, viewerStateChangeNavigation, viewerStateMouseOverCustomLandmark, viewerStateSelectRegionWithIdDeprecated, viewerStateSetSelectedRegions, viewreStateRemoveUserLandmarks } from "src/services/state/viewerState/actions";
+import { viewerStateAddUserLandmarks, viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
 import { ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector } from "src/services/state/viewerState/selectors";
-import { serialiseParcellationRegion } from 'common/util'
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
-
-import { getMultiNgIdsRegionsLabelIndexMap, SET_MESHES_TO_LOAD } from "../constants";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
@@ -31,6 +26,12 @@ import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, getParcNgId, getRegionLabelIndex } from "../config.service";
+import { generalActionError } from "src/services/stateStore.helper";
+import { SET_MESHES_TO_LOAD } from "../constants";
+import { actions } from "src/state/atlasSelection";
+import { annotation, atlasSelection, userInteraction } from "src/state";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -72,7 +73,7 @@ export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
   ]
 })
 
-export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, AfterViewInit {
+export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewInit {
 
   @ViewChild('layerCtrlTmpl', { read: TemplateRef }) layerCtrlTmpl: TemplateRef<any>
 
@@ -89,19 +90,49 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
 
   public viewerLoaded: boolean = false
 
-  private onhoverSegments = []
+  private onhoverSegments: SapiRegionModel[] = []
   private onDestroyCb: (() => void)[] = []
   private viewerUnit: NehubaViewerUnit
-  private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>>
+  private multiNgIdsRegionsLabelIndexMap = new Map<string, Map<number, SapiRegionModel>>()
 
+  private selectedParcellation$ = new BehaviorSubject<SapiParcellationModel>(null)
+  private _selectedParcellation: SapiParcellationModel
+  get selectedParcellation(){
+    return this._selectedParcellation
+  }
   @Input()
-  public selectedParcellation: any
+  set selectedParcellation(val: SapiParcellationModel) {
+    this._selectedParcellation = val
+    this.selectedParcellation$.next(val)
+  }
 
+
+  private selectedTemplate$ = new BehaviorSubject<SapiSpaceModel>(null)
+  private _selectedTemplate: SapiSpaceModel
+  get selectedTemplate(){
+    return this._selectedTemplate
+  }
   @Input()
-  public selectedTemplate: any
+  set selectedTemplate(val: SapiSpaceModel) {
+    this._selectedTemplate = val
+    this.selectedTemplate$.next(val)
+  }
 
+
+  private selectedAtlas$ = new BehaviorSubject<SapiAtlasModel>(null)
+  private _selectedAtlas: SapiAtlasModel
+  get selectedAtlas(){
+    return this._selectedAtlas
+  }
+  @Input()
+  set selectedAtlas(val: SapiAtlasModel) {
+    this._selectedAtlas = val
+    this.selectedAtlas$.next(val)
+  }
+  
+
+  public nehubaConfig: NehubaConfig
   private navigation: any
-
   private newViewer$ = new Subject()
 
   public showPerpsectiveScreen$: Observable<string>
@@ -129,14 +160,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     description: QUICKTOUR_DESC.VIEW_ICONS,
   }
 
-  public customLandmarks$: Observable<any> = this.store$.pipe(
-    select(viewerStateCustomLandmarkSelector),
-    map(lms => lms.map(lm => ({
-      ...lm,
-      geometry: {
-        position: lm.position
-      }
-    }))),
+  public customLandmarks$ = this.store$.pipe(
+    select(annotation.selectors.annotations),
   )
 
   public filterCustomLandmark(lm: any){
@@ -148,26 +173,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     distinctUntilChanged(),
     shareReplay(1),
   )
-
-  ngOnChanges(sc: SimpleChanges){
-    const {
-      selectedParcellation,
-      selectedTemplate
-    } = sc
-    if (selectedTemplate) {
-      if (selectedTemplate?.currentValue?.['@id'] !== selectedTemplate?.previousValue?.['@id']) {
-
-        if (selectedTemplate?.previousValue) {
-          this.unloadTmpl(selectedTemplate?.previousValue)
-        }
-        if (selectedTemplate?.currentValue?.['@id']) {
-          this.loadTmpl(selectedTemplate.currentValue, selectedParcellation.currentValue)
-        }
-      }
-    }else if (selectedParcellation && selectedParcellation.currentValue !== selectedParcellation.previousValue) {
-      this.loadParc(selectedParcellation.currentValue)
-    }
-  }
 
   private nehubaContainerSub: Subscription
   private setupNehubaEvRelay() {
@@ -201,10 +206,15 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           payload: {
             nav,
             mouse,
-            nehuba: seg.map(v => {
+            nehuba: seg && seg.map(v => {
               return {
                 layerName: v.layer.name,
-                labelIndices: [ Number(v.segmentId) ]
+                labelIndices: [ Number(v.segmentId) ],
+                regions: (() => {
+                  const map = this.multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
+                  if (!map) return []
+                  return [map.get(Number(v.segmentId))]
+                })()
               }
             })
           }
@@ -230,22 +240,25 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
-  private loadParc(parcellation: any) {
+  private async loadParc(atlas: SapiAtlasModel, parcellation: SapiParcellationModel, space: SapiSpaceModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
     /**
-     * parcellaiton may be undefined
+     * parcellation may be undefined
      */
-    if ( !(parcellation && parcellation.regions)) {
+    if ( !parcellation) {
       return
     }
+    const pevs = await this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], space["@id"])
 
-    this.multiNgIdsRegionsLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
-
-    this.viewerUnit.multiNgIdsLabelIndexMap = this.multiNgIdsRegionsLabelIndexMap
-    this.viewerUnit.auxilaryMeshIndices = parcellation.auxillaryMeshIndices || []
-
+    const ngIdSegmentsMap: Record<string, number[]> = {}
+    for (const key in ngLayers) {
+      if ((ngLayers[key] as NgSegLayerSpec).labelIndicies) {
+        ngIdSegmentsMap[key] = (ngLayers[key] as NgSegLayerSpec).labelIndicies
+      }
+    }
+    this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
   }
 
-  private unloadTmpl(tmpl: any) {
+  private unloadTmpl() {
     /**
      * clear existing container
      */
@@ -253,36 +266,45 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     this.nehubaContainerDirective.clear()
 
     /* on selecting of new template, remove additional nglayers */
-    const baseLayerNames = Object.keys(tmpl.nehubaConfig.dataset.initialNgState.layers)
-    this.layerCtrlService.removeNgLayers(baseLayerNames)
+    if (this.nehubaConfig) {
+      const baseLayerNames = Object.keys(this.nehubaConfig.dataset.initialNgState.layers)
+      this.layerCtrlService.removeNgLayers(baseLayerNames)
+    }
   }
 
-  private async loadTmpl(_template: any, parcellation: any) {
+  private async loadTmpl(atlas: SapiAtlasModel, _template: SapiSpaceModel, parcellation: SapiParcellationModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
 
     if (!_template) return
     /**
      * recalcuate zoom
      */
-    const template = (() => {
+    const validSpaceIds = parcellation.brainAtlasVersions.map(bas => bas.coordinateSpace["@id"] as string)
+    let template: SapiSpaceModel
+    if (validSpaceIds.indexOf(_template["@id"]) >= 0) {
+      template = _template
+    } else {
+      /**
+       * selected parc does not have space as a valid output
+       */
+      this.store$.dispatch(generalActionError({
+        message: `space ${_template.fullName} is not defined in parcellation ${parcellation.brainAtlasVersions[0].fullName}`
+      }))
+      template = await this.sapiSvc.getSpaceDetail(this.selectedAtlas["@id"], parcellation.brainAtlasVersions[0].coordinateSpace["@id"] as string)
+    }
+    const config = getNehubaConfig(template)
+    config.dataset.initialNgState.layers = ngLayers
+    const overwritingInitState = this.navigation
+      ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
+      : {}
 
-      const deepCopiedState = JSON.parse(JSON.stringify(_template))
-      const initialNgState = deepCopiedState.nehubaConfig.dataset.initialNgState
+      config.dataset.initialNgState = {
+      ...config.dataset.initialNgState,
+      ...overwritingInitState,
+    }
 
-      if (!initialNgState || !this.navigation) {
-        return deepCopiedState
-      }
-      const overwritingInitState = this.navigation
-        ? cvtNavigationObjToNehubaConfig(this.navigation, initialNgState)
-        : {}
+    this.nehubaConfig = config
 
-      deepCopiedState.nehubaConfig.dataset.initialNgState = {
-        ...initialNgState,
-        ...overwritingInitState,
-      }
-      return deepCopiedState
-    })()
-
-    this.nehubaContainerDirective.createNehubaInstance(template)
+    this.nehubaContainerDirective.createNehubaInstance(config)
     this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
     this.sliceRenderEvent$.pipe(
       takeOnePipe()
@@ -296,19 +318,17 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
         this.nanometersToOffsetPixelsFn[idx] = e.detail.nanometersToOffsetPixels
       }
     })
-    const foundParcellation = parcellation
-      && template?.parcellations?.find(p => parcellation.name === p.name)
-    this.loadParc(foundParcellation || template.parcellations[0])
 
-    const nehubaConfig = template.nehubaConfig
-    const initialSpec = nehubaConfig.dataset.initialNgState
+    await this.loadParc(atlas, parcellation, template, ngLayers)
+
+    const initialSpec = config.dataset.initialNgState
     const {layers} = initialSpec
 
-    const dispatchLayers = Object.keys(layers).map(key => {
+    const dispatchLayers = Object.keys(layers).map((key, idx) => {
       const layer = {
         name : key,
         source : layers[key].source,
-        mixability : layers[key].type === 'image'
+        mixability : idx === 0
           ? 'base'
           : 'mixable',
         visible : typeof layers[key].visible === 'undefined'
@@ -338,6 +358,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
+    private sapiSvc: SAPI,
   ){
 
     /**
@@ -349,6 +370,22 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion))
     }
+
+    /**
+     * subscribe to ngIdtolblIdxToRegion
+     */
+    const ngIdSub = this.layerCtrlService.selectedATPR$.subscribe(({ atlas, parcellation, template, regions }) => {
+      this.multiNgIdsRegionsLabelIndexMap.clear()
+      for (const r of regions) {
+        const ngId = getParcNgId(atlas, template, parcellation, r)
+        const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
+        if (!this.multiNgIdsRegionsLabelIndexMap.has(ngId)) {
+          this.multiNgIdsRegionsLabelIndexMap.set(ngId, new Map())
+        }
+        this.multiNgIdsRegionsLabelIndexMap.get(ngId).set(labelIndex, r)
+      }
+    })
+    this.onDestroyCb.push(() => ngIdSub.unsubscribe())
 
     /**
      * on layout change
@@ -418,11 +455,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
      * on hover segment
      */
     const onhovSegSub = this.store$.pipe(
-      select(uiStateMouseOverSegmentsSelector),
+      select(userInteraction.selectors.mousingOverRegions),
       distinctUntilChanged(),
     ).subscribe(arr => {
-      const segments = arr.map(({ segment }) => segment).filter(v => !!v)
-      this.onhoverSegments = segments
+      this.onhoverSegments = arr
     })
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
 
@@ -508,6 +544,36 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
       shareReplay(1),
     )
 
+    const newTmplSub = this.store$.pipe(
+      select(atlasSelection.selectors.selectedATP),
+      distinctUntilChanged((o, n) => {
+        return o?.template?.["@id"] === n?.template?.["@id"]
+      }),
+      switchMap(ATP => {
+        return this.store$.pipe(
+          fromRootStore.getNgLayers(this.store$, this.sapiSvc),
+          map(ngLayers => ({ ATP, ngLayers }))
+        )
+      }
+      )
+    ).subscribe(({ ATP, ngLayers }) => {
+      const { template, parcellation, atlas } = ATP
+      const { tmplNgLayers, tmplAuxNgLayers, parcNgLayers } = ngLayers
+      
+
+      // clean up previous tmpl
+      this.unloadTmpl()
+
+      const layerObj = {
+        ...tmplNgLayers,
+        ...tmplAuxNgLayers,
+        ...parcNgLayers,
+      }
+      this.loadTmpl(atlas, template, parcellation, layerObj)
+    })
+
+    this.onDestroyCb.push(() => newTmplSub.unsubscribe())
+
     const setupViewerApiSub = this.newViewer$.pipe(
       tap(() => {
         setViewerHandle && setViewerHandle(null)
@@ -519,14 +585,13 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           position : coord,
           positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
         }),
-        /* TODO introduce animation */
         moveToNavigationLoc : (coord, _realSpace?) => {
           this.store$.dispatch(
-            viewerStateChangeNavigation({
+            actions.navigateTo({
               navigation: {
-                position: coord,
-                animation: {},
-              }
+                position: coord
+              },
+              animation: true
             })
           )
         },
@@ -542,12 +607,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
            * TODO reenable with updated select_regions api
            */
           this.log.warn(`showSegment is temporarily disabled`)
-
-          // if(!this.selectedRegionIndexSet.has(labelIndex))
-          //   this.store.dispatch({
-          //     type : SELECT_REGIONS,
-          //     selectRegions :  [labelIndex, ...this.selectedRegionIndexSet]
-          //   })
         },
         add3DLandmarks : landmarks => {
           // TODO check uniqueness of ID
@@ -566,9 +625,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
           }))
         },
         remove3DLandmarks : landmarkIds => {
-          this.store$.dispatch(viewreStateRemoveUserLandmarks({
-            payload: { landmarkIds }
-          }))
+          this.store$.dispatch(
+            annotation.actions.rmAnnotations({
+              annotations: landmarkIds.map(id => ({ "@id": id }))
+            })
+          )
         },
         hideSegment : (_labelIndex) => {
           /**
@@ -576,28 +637,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
            */
           this.log.warn(`hideSegment is temporarily disabled`)
 
-          // if(this.selectedRegionIndexSet.has(labelIndex)){
-          //   this.store.dispatch({
-          //     type :SELECT_REGIONS,
-          //     selectRegions : [...this.selectedRegionIndexSet].filter(num=>num!==labelIndex)
-          //   })
-          // }
         },
         showAllSegments : () => {
-          const selectRegionIds = []
-          this.multiNgIdsRegionsLabelIndexMap.forEach((map, ngId) => {
-            Array.from(map.keys()).forEach(labelIndex => {
-              selectRegionIds.push(serialiseParcellationRegion({ ngId, labelIndex }))
-            })
-          })
-          this.store$.dispatch(viewerStateSelectRegionWithIdDeprecated({
-            selectRegionIds
-          }))
         },
         hideAllSegments : () => {
-          this.store$.dispatch(viewerStateSelectRegionWithIdDeprecated({
-            selectRegionIds: []
-          }))
         },
         getLayersSegmentColourMap: () => {
           if (!this.layerCtrlService) {
@@ -658,11 +701,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
         mouseOverNehuba : of(null).pipe(
           tap(() => console.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.')),
         ),
-        mouseOverNehubaLayers: this.mouseoverDirective.currentOnHoverObs$.pipe(
-          map(({ segments }) => segments)
-        ),
         mouseOverNehubaUI: this.mouseoverDirective.currentOnHoverObs$.pipe(
-          map(({annotation, landmark, segments, userLandmark: customLandmark }) => ({annotation, segments, landmark, customLandmark })),
+          map(({annotation, landmark, userLandmark: customLandmark }) => ({annotation, landmark, customLandmark })),
           shareReplay(1),
         ),
         getNgHash : this.nehubaContainerDirective.nehubaViewerInstance.getNgHash,
@@ -672,8 +712,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
 
     // listen to navigation change from store
     const navSub = this.store$.pipe(
-      select(viewerStateNavigationStateSelector)
-    ).subscribe(nav => this.navigation = nav)
+      select(atlasSelection.selectors.navigation)
+    ).subscribe(nav => {
+      this.navigation = nav
+    })
     this.onDestroyCb.push(() => navSub.unsubscribe())
   }
 
@@ -699,8 +741,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnChanges, OnDestroy, A
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: trueOnhoverSegments.slice(0, 1)
+      actions.selectRegions({
+        regions: trueOnhoverSegments.slice(0, 1)
       })
     )
     return true

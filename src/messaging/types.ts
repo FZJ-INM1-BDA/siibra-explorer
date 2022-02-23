@@ -8,10 +8,10 @@ interface IResourceType {
   swc: string
 }
 
-export type TVec4 = [number, number, number, number]
-export type TVec3 = [number, number, number]
-export type TMat3 = [TVec3, TVec3, TVec3]
-export type TMat4 = [TVec4, TVec4, TVec4, TVec4]
+export type TVec4 = number[]
+export type TVec3 = number[]
+export type TMat3 = TVec3[]
+export type TMat4 = TVec4[]
 
 interface ICommonResParam {
   transform: TMat4

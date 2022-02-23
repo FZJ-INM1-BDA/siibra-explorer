@@ -1,10 +1,9 @@
 import { Component } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { distinctUntilChanged } from "rxjs/operators";
-import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS } from 'common/constants'
-import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
+import { atlasSelection } from "src/state"
+import { SAPI } from "src/atlasComponents/sapi";
 
 @Component({
   selector: 'atlas-dropdown-selector',
@@ -21,23 +20,20 @@ export class AtlasDropdownSelector{
 
   public SELECT_ATLAS_ARIA_LABEL = ARIA_LABELS.SELECT_ATLAS
 
-  constructor(private store$: Store<any>){
-    this.fetchedAtlases$ = this.store$.pipe(
-      select(viewerStateHelperStoreName),
-      select('fetchedAtlases'),
-      distinctUntilChanged()
-    )
+  constructor(
+    private store$: Store<any>,
+    private sapi: SAPI,
+  ){
+    this.fetchedAtlases$ = this.sapi.atlases$
     this.selectedAtlas$ = this.store$.pipe(
-      select(viewerStateGetSelectedAtlas)
+      select(atlasSelection.selectors.selectedAtlas)
     )
   }
 
   handleChangeAtlas({ value }) {
     this.store$.dispatch(
-      viewerStateSelectAtlas({
-        atlas: {
-          ['@id']: value
-        }
+      atlasSelection.actions.selectATPById({
+        atlasId: value
       })
     )
   }

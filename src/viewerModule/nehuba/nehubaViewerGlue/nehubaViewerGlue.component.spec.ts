@@ -9,8 +9,6 @@ import { ClickInterceptorService } from "src/glue"
 import { LayoutModule } from "src/layouts/layout.module"
 import { PANELS } from "src/services/state/ngViewerState/constants"
 import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors"
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors"
-import { viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper"
 import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module"
 import { QuickTourModule } from "src/ui/quickTour"
@@ -139,7 +137,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
     mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
     mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
     mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [])
-    mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [])
     mockStore.overrideSelector(viewerStateNavigationStateSelector, null)
 
     mockStore.overrideSelector(selectorAuxMeshes, [])
@@ -186,7 +183,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
       const testObj1 = 'hello world'
       beforeEach(() => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
-        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [testObj1, testObj0] as any)
         TestBed.createComponent(NehubaGlueCmp)
         clickIntServ.callRegFns(null)
       })
@@ -215,7 +211,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
       }
       beforeEach(() => {
         fallbackSpy = spyOn(clickIntServ, 'fallback')
-        mockStore.overrideSelector(uiStateMouseOverSegmentsSelector, [testObj0, testObj1, testObj2] as any)
 
       })
       afterEach(() => {
@@ -225,11 +220,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
         TestBed.createComponent(NehubaGlueCmp)
         clickIntServ.callRegFns(null)
         const { segment } = testObj1
-        expect(dispatchSpy).toHaveBeenCalledWith(
-          viewerStateSetSelectedRegions({
-            selectRegions: [segment]
-          } as any)
-        )
       })
       it('> fallback called (does not intercept)', () => {
         TestBed.createComponent(NehubaGlueCmp)

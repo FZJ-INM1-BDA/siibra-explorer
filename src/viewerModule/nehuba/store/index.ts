@@ -16,3 +16,5 @@ export {
   INehubaFeature,
   INgLayerInterface
 } from './type'
+
+export { fromRootStore } from './util'

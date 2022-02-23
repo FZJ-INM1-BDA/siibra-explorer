@@ -3,23 +3,20 @@ import {Injectable, NgZone, Optional, Inject, OnDestroy, InjectionToken} from "@
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
-import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take } from "rxjs/operators";
+import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
-import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
-import {
-  viewerStateFetchedTemplatesSelector,
-} from "src/services/state/viewerState/selectors";
 import {
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
   IavRootStoreInterface,
-  safeFilter
 } from "src/services/stateStore.service";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
 import { ILoadMesh } from 'src/messaging/types'
 import { CANCELLABLE_DIALOG } from "src/util/interfaces";
+import { atlasSelection, userInteraction } from "src/state"
+import { SapiRegionModel } from "src/atlasComponents/sapi";
 
 declare let window
 
@@ -88,9 +85,11 @@ export class AtlasViewerAPIServices implements OnDestroy{
     const { rs, spec } = this.getNextUserRegionSelectHandler() || {}
     if (!!rs) {
 
-      let moSegments
+      let moSegments: SapiRegionModel
       this.store.pipe(
-        select(uiStateMouseOverSegmentsSelector),
+        select(userInteraction.selectors.mousingOverRegions),
+        filter(val => val.length > 0),
+        map(val => val[0]),
         take(1)
       ).subscribe(val => moSegments = val)
 
@@ -203,38 +202,29 @@ export class AtlasViewerAPIServices implements OnDestroy{
       )
     }
 
-    this.loadedTemplates$ = this.store.pipe(
-      select(viewerStateFetchedTemplatesSelector)
-    )
-
     this.selectParcellation$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
+      select(atlasSelection.selectors.selectedParcellation),
+      shareReplay(1),
     )
 
     this.interactiveViewer = {
       metadata : {
         selectedTemplateBSubject : this.store.pipe(
-          select('viewerState'),
-          safeFilter('templateSelected'),
-          map(state => state.templateSelected)),
-
-        selectedParcellationBSubject : this.store.pipe(
-          select('viewerState'),
-          safeFilter('parcellationSelected'),
-          map(state => state.parcellationSelected)),
-
-        selectedRegionsBSubject : this.store.pipe(
-          select('viewerState'),
-          safeFilter('regionsSelected'),
-          map(state => state.regionsSelected),
-          distinctUntilChanged((arr1, arr2) =>
-            arr1.length === arr2.length &&
-            (arr1 as any[]).every((item, index) => item.name === arr2[index].name)),
+          select(atlasSelection.selectors.selectedTemplate),
+          shareReplay(1),
         ),
 
-        loadedTemplates : [],
+        selectedParcellationBSubject : this.selectParcellation$,
+
+        selectedRegionsBSubject : this.store.pipe(
+          select(atlasSelection.selectors.selectedRegions),
+          shareReplay(1),
+        ),
+
+        get loadedTemplates(){
+          throw new Error(`loadedTemplates is being deprecated`)
+          return []
+        },
 
         // TODO deprecate
         regionsLabelIndexMap : new Map(),
@@ -338,7 +328,6 @@ export class AtlasViewerAPIServices implements OnDestroy{
   }
 
   private init() {
-    this.loadedTemplates$.subscribe(templates => this.interactiveViewer.metadata.loadedTemplates = templates)
     this.selectParcellation$.pipe(
       filter(p => !!p && p.regions),
       distinctUntilChanged()
@@ -454,8 +443,7 @@ export interface IVIewerHandle {
 
   mouseEvent: Observable<{eventName: string, event: MouseEvent}>
   mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
-  mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-  mouseOverNehubaUI: Observable<{ annotation: any, segments: any, landmark: any, customLandmark: any }>
+  mouseOverNehubaUI: Observable<{ annotation: any, landmark: any, customLandmark: any }>
   getNgHash: () => string
 }
 

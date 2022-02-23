@@ -7,7 +7,7 @@ import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
-import { ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
+import { ngViewerState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState } from "./services/stateStore.service";
 import { UIModule } from "./ui/ui.module";
 
 import { HttpClientModule } from "@angular/common/http";
@@ -18,29 +18,22 @@ import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
-import { UseEffects } from "./services/effect/effect";
-import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
-import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { ViewerStateControllerUseEffect } from "src/state";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { UiStateUseEffect } from "src/services/state/uiState.store";
-import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
-import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
 import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService, _PLI_VOLUME_INJ_TOKEN } from './glue';
-import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
+import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
@@ -54,10 +47,18 @@ import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, kgTos, IAV_DATASET_PREVIEW_ACTIVE } from './databrowser.fallback'
+import { kgTos } from './databrowser.fallback'
 import { CANCELLABLE_DIALOG } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
+
+import {
+  atlasSelection,
+  annotation,
+  userInterface,
+  userInteraction,
+  plugins,
+} from "./state"
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -93,31 +94,26 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     QuickTourModule,
     
     EffectsModule.forRoot([
-      UseEffects,
       UserConfigStateUseEffect,
-      ViewerStateControllerUseEffect,
-      ViewerStateUseEffect,
       NgViewerUseEffect,
-      PluginServiceUseEffect,
+      plugins.Effects,
       UiStateUseEffect,
-      NewTemplateUseEffect,
-      ViewerStateHelperEffect,
-      GlueEffects,
       UiEffects,
+      atlasSelection.Effect,
     ]),
     StoreModule.forRoot({
-      pluginState,
       viewerConfigState,
       ngViewerState,
-      viewerState,
-      viewerStateHelper: viewerStateHelperReducer,
       uiState,
       userConfigState,
+      [atlasSelection.nameSpace]: atlasSelection.reducer,
+      [userInterface.nameSpace]: userInterface.reducer,
+      [userInteraction.nameSpace]: userInteraction.reducer,
+      [annotation.nameSpace]: annotation.reducer,
+      [plugins.nameSpace]: plugins.reducer,
     },{
       metaReducers: [ 
         // debug,
-        ...viewerStateMetaReducers,
-        datasetPreviewMetaReducer,
       ]
     }),
     HttpClientModule,
@@ -139,16 +135,10 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   providers : [
     AtlasWorkerService,
     AuthService,
-    LocalFileService,
     DialogService,
     UIService,
     TemplateCoordinatesTransformation,
     ClickInterceptorService,
-    {
-      provide: OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
-      useFactory: (glue: IDatasetPreviewGlue) => glue.displayDatasetPreview.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
     {
       provide: CANCELLABLE_DIALOG,
       useFactory: (uiService: UIService) => {
@@ -187,23 +177,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       },
       deps: [ UIService ]
     },
-    {
-      provide: _PLI_VOLUME_INJ_TOKEN,
-      useFactory: (glue: DatasetPreviewGlue) => glue._volumePreview$,
-      deps: [ DatasetPreviewGlue ]
-    },
-    {
-      provide: IAV_DATASET_PREVIEW_ACTIVE,
-      useFactory: (glue: DatasetPreviewGlue) => glue.datasetPreviewDisplayed.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
-    {
-      provide: GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
-      useFactory: (glue: DatasetPreviewGlue) => glue.getDatasetPreviewFromId.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
-    DatasetPreviewGlue,
-    
     {
       provide: TOS_OBS_INJECTION_TOKEN,
       useValue: of(kgTos)
@@ -252,9 +225,6 @@ export class MainModule {
 
   constructor(
     authServce: AuthService,
-    // bandaid fix: required to init glueService on startup
-    // TODO figure out why, then init service without this hack
-    glueService: DatasetPreviewGlue
   ) {
     authServce.authReloadState()
   }

@@ -1,8 +1,8 @@
+import { SapiRegionModel } from "src/atlasComponents/sapi"
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type"
-import { TMouseOverSegment } from "./type"
 
 export type TOnHoverObj = {
-  segments: TMouseOverSegment[]
+  regions: SapiRegionModel[]
   annotation: IAnnotationGeometry
   landmark: {
     landmarkName: number

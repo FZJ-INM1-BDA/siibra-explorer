@@ -1,11 +1,12 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
-import { KgDatasetModule } from "src/atlasComponents/regionalFeatures/bsFeatures/kgDataset";
 import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
-import { OriginalDatainfoPipe, ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
+import { ViewerStateBreadCrumb } from "./breadcrumb/breadcrumb.component";
+import { OriginalDatainfoPipe } from "./pipes/originDataInfo.pipe"
+import { DialogInfoModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
@@ -13,8 +14,8 @@ import { OriginalDatainfoPipe, ViewerStateBreadCrumb } from "./breadcrumb/breadc
     AngularMaterialModule,
     QuickTourModule,
     ParcellationRegionModule,
-    KgDatasetModule,
     UtilModule,
+    DialogInfoModule,
   ],
   declarations: [
     ViewerStateBreadCrumb,

@@ -22,9 +22,7 @@
                 
                 <div [hidden]
                     iav-dataset-show-dataset-dialog
-                    [iav-dataset-show-dataset-dialog-name]="template.originDatainfos[0]?.name"
-                    [iav-dataset-show-dataset-dialog-description]="template.originDatainfos[0]?.description"
-                    [iav-dataset-show-dataset-dialog-urls]="template.originDatainfos[0]?.urls"
+                    [iav-dataset-show-dataset-dialog-name]="template.fullName"
                     #kgInfo="iavDatasetShowDatasetDialog">
                 </div>
                 <tile-cmp [tile-image-src]="template | getPreviewUrlPipe"
@@ -53,10 +51,10 @@
             gutterSize="16">
 
             <!-- non grouped layers -->
-            <mat-grid-tile *ngFor="let layer of (atlasLayersLatest$ | async | getNonbaseParc | getIndividualParc); trackBy: trackbyAtId"
+            <mat-grid-tile *ngFor="let layer of (atlasLayersLatest$ | async ); trackBy: trackbyAtId"
                 [attr.aria-checked]="selectedParcellation$ | async | groupParcSelected : layer">
-
-                <div [hidden]
+                {{ layer.name }}
+                <!-- <div [hidden]
                     iav-dataset-show-dataset-dialog
                     [iav-dataset-show-dataset-dialog-name]="layer.originDatainfos[0]?.name"
                     [iav-dataset-show-dataset-dialog-description]="layer.originDatainfos[0]?.description"
@@ -75,7 +73,7 @@
 
                     (tile-on-click)="selectParcellationWithName(layer)"
                     (tile-on-info-click)="kgInfo && kgInfo.onClick()">
-                </tile-cmp>
+                </tile-cmp> -->
 
             </mat-grid-tile>
 
@@ -159,8 +157,7 @@
                     [tile-image-darktheme]="layer.darktheme"
 
                     [tile-selected]="selectedParcellation$ | async | groupParcSelected : layer"
-
-                    (tile-on-click)="selectParcellationWithName(layer)"
+                    (tile-on-click)="selectParcellationWithId(layer)"
                     (tile-on-info-click)="kgInfo && kgInfo.onClick()">
                 </tile-cmp>
 

@@ -4,13 +4,13 @@ import { combineLatest, merge, Observable, of, Subscription } from "rxjs";
 import {filter, map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
-import { viewerStateCustomLandmarkSelector, viewerStateGetSelectedAtlas, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import {PureContantService} from "src/util";
+import { atlasSelection } from "src/state";
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -57,16 +57,6 @@ export class ViewerCtrlCmp{
     select(ngViewerSelectorOctantRemoval),
   )
 
-  public customLandmarks$: Observable<any> = this.store$.pipe(
-    select(viewerStateCustomLandmarkSelector),
-    map(lms => lms.map(lm => ({
-      ...lm,
-      geometry: {
-        position: lm.position
-      }
-    }))),
-  )
-
   public auxMeshFormGroup: FormGroup
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
@@ -89,34 +79,33 @@ export class ViewerCtrlCmp{
     this.auxMeshFormGroup = formBuilder.group({})
   
 
-    if (this.nehubaInst$) {
-      this.sub.push(
-        combineLatest([
-          this.customLandmarks$,
-          this.nehubaInst$,
-        ]).pipe(
-          filter(([_, nehubaInst]) => !!nehubaInst),
-        ).subscribe(([landmarks, nehubainst]) => {
-          this.setOctantRemoval(landmarks.length === 0)
-          nehubainst.updateUserLandmarks(landmarks)
-        }),
-        this.nehubaInst$.subscribe(nehubaInst => this.nehubaInst = nehubaInst)
-      )
-    } else {
-      console.warn(`NEHUBA_INSTANCE_INJTKN not provided`)
-    }
+    // TODO move this to... nehubadirective?
+    // if (this.nehubaInst$) {
+    //   this.sub.push(
+    //     combineLatest([
+    //       this.customLandmarks$,
+    //       this.nehubaInst$,
+    //     ]).pipe(
+    //       filter(([_, nehubaInst]) => !!nehubaInst),
+    //     ).subscribe(([landmarks, nehubainst]) => {
+    //       this.setOctantRemoval(landmarks.length === 0)
+    //       nehubainst.updateUserLandmarks(landmarks)
+    //     }),
+    //     this.nehubaInst$.subscribe(nehubaInst => this.nehubaInst = nehubaInst)
+    //   )
+    // } else {
+    //   console.warn(`NEHUBA_INSTANCE_INJTKN not provided`)
+    // }
 
     this.sub.push(
-      this.store$.select(viewerStateGetSelectedAtlas)
-        .pipe(filter(a => !!a))
-        .subscribe(sa => this.selectedAtlasId = sa['@id']),
       this.store$.pipe(
-        select(viewerStateSelectedTemplatePureSelector)
-      ).subscribe(tmpl => {
-        this.selectedTemplateId = tmpl['@id']
-        const { useTheme } = tmpl || {}
-        this.darktheme = useTheme === 'dark'
+        select(atlasSelection.selectors.selectedATP)
+      ).subscribe(({ atlas, parcellation, template }) => {
+        this.selectedAtlasId = atlas["@id"]
+        this.selectedTemplateId = template["@id"]
       }),
+
+      this.pureConstantService.darktheme$.subscribe(darktheme => this.darktheme = darktheme),
 
       this.nehubaViewerPerspectiveOctantRemoval$.subscribe(
         flag => this.removeOctantFlag = flag

@@ -12,7 +12,7 @@ import {MatSliderChange} from "@angular/material/slider";
 import { PureContantService } from 'src/util';
 import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
-import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors';
+import { atlasSelection } from 'src/state';
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -84,7 +84,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
 
     this.viewerObliqueRotated$ = this.store.pipe(
-      select(viewerStateSelectorNavigation),
+      select(atlasSelection.selectors.navigation),
       map(navigation => (navigation && navigation.orientation) || [0, 0, 0, 1]),
       debounceTime(100),
       map(isIdentityQuat),

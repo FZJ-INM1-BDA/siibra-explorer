@@ -36,16 +36,7 @@
                         </mat-select>
                     </mat-form-field>
                 <ng-container *ngIf="selectedDataset && (selectedDatasetDescription || selectedDatasetKgId)" >
-                    <button class="flex-grow-0 flex-shrink-0"
-                            mat-icon-button
-                            iav-dataset-show-dataset-dialog
-                            [iav-dataset-show-dataset-dialog-name]="selectedDatasetName"
-                            [iav-dataset-show-dataset-dialog-description]="selectedDatasetDescription"
-                            [iav-dataset-show-dataset-dialog-kgid]="selectedDatasetKgId? selectedDatasetKgId : null"
-                            [iav-dataset-show-dataset-dialog-kgschema]="selectedDatasetKgSchema? selectedDatasetKgSchema : null"
-                            >
-                        <i class="fas fa-info"></i>
-                    </button>
+                    TODO please reimplmenent button to explore KG dataset
                     <button class="flex-grow-0 flex-shrink-0"
                             mat-icon-button
                             (click)="exportFullConnectivity()"

@@ -151,6 +151,8 @@
 
   exports.flattenRegions = flattenRegions
 
+  exports.hexToRgb = hex => hex && hex.match(/[a-fA-F0-9]{2}/g).map(v => parseInt(v, 16))
+  exports.rgbToHex = rgb => rgb && `#${rgb.map(color => color.toString(16).padStart(2, '0')).join("")}`
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 
   /**
@@ -191,37 +193,6 @@
         !Number.isNaN(n)
       )
     )
-  }
-
-  exports.serialiseParcellationRegion = ({ ngId, labelIndex }) => {
-    if (!ngId) {
-      throw new Error(`#serialiseParcellationRegion error: ngId must be defined`)
-    }
-
-    if (!labelIndex) {
-      throw new Error(`#serialiseParcellationRegion error labelIndex must be defined`)
-    }
-
-    return `${ngId}#${labelIndex}`
-  }
-
-  const deserialiseParcRegionId = labelIndexId => {
-    const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
-    const ngId = _.length > 1
-      ? _[0]
-      : null
-    const labelIndex = _.length > 1
-      ? Number(_[1])
-      : _.length === 0
-        ? null
-        : Number(_[0])
-    return { labelIndex, ngId }
-  }
-
-  exports.deserialiseParcRegionId = deserialiseParcRegionId
-
-  exports.deserialiseParcellationRegion = ({ region, labelIndexId, inheritedNgId = 'root' }) => {
-    const { labelIndex, ngId } = deserialiseParcRegionId(labelIndexId)
   }
 
   const getPad = ({ length, pad }) => {

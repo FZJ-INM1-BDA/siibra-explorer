@@ -18,7 +18,7 @@
       <button *ngIf="(regionsSelected$ | async)?.length > 0"
         mat-icon-button
         [attr.aria-label]="CLEAR_SELECTED_REGION"
-        (click)="optionSelected()"  
+        (click)="deselectAllRegions()"  
         matSuffix>
         <i class="fas fa-times"></i>
       </button>
@@ -77,7 +77,7 @@
     [selectedRegions]="regionsSelected$ | async | filterArray : filterNullFn"
     (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
     (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
-    (clearAllRegions)="deselectAllRegions($event)"
+    (clearAllRegions)="deselectAllRegions()"
     [parcellationSelected]="parcellationSelected$ | async">
   
   </region-hierarchy>

@@ -1,7 +1,4 @@
-import { OnDestroy, Pipe, PipeTransform } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { Subscription } from "rxjs";
-import { viewerStateSelectedTemplateFullInfoSelector } from "src/services/state/viewerState/selectors";
+import { Pipe, PipeTransform } from "@angular/core";
 import { IHasId } from "src/util/interfaces";
 
 @Pipe({
@@ -9,25 +6,9 @@ import { IHasId } from "src/util/interfaces";
   pure: true,
 })
 
-export class TemplateIsDarkThemePipe implements OnDestroy, PipeTransform{
-
-  private templateFullInfo: any[] = []
-  constructor(store: Store<any>){
-    this.sub.push(
-      store.pipe(
-        select(viewerStateSelectedTemplateFullInfoSelector)
-      ).subscribe(val => this.templateFullInfo = val)
-    )
-  }
-
-  private sub: Subscription[] = []
-
-  ngOnDestroy(){
-    while(this.sub.length) this.sub.pop().unsubscribe()
-  }
+export class TemplateIsDarkThemePipe implements PipeTransform{
 
   public transform(template: IHasId): boolean{
-    const found = this.templateFullInfo.find(t => t['@id'] === template["@id"])
-    return found && found.darktheme
+    return template["@id"] !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
   }
 }

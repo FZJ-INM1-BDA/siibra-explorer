@@ -1,9 +1,5 @@
 import { filter } from 'rxjs/operators';
 
-export {
-  recursiveFindRegionWithLabelIndexId
-} from 'src/util/fn'
-
 export { getNgIds } from 'src/util/fn'
 
 import {
@@ -12,11 +8,6 @@ import {
   StateInterface as NgViewerStateInterface,
   stateStore as ngViewerState,
 } from './state/ngViewerState.store'
-import {
-  defaultState as pluginDefaultState,
-  StateInterface as PluginStateInterface,
-  stateStore as pluginState,
-} from './state/pluginState.store'
 import {
   ActionInterface as UIActionInterface,
   defaultState as uiDefaultState,
@@ -34,28 +25,14 @@ import {
   StateInterface as ViewerConfigStateInterface,
   stateStore as viewerConfigState,
 } from './state/viewerConfig.store'
-import {
-  ActionInterface as ViewerActionInterface,
-  defaultViewerState,
-  IViewerState,
-  stateStore as viewerState,
-} from './state/viewerState.store'
 
-import { 
-  defaultState as defaultViewerHelperState,
-  viewerStateHelperStoreName
-} from './state/viewerState.store.helper'
 
-export { pluginState }
 export { viewerConfigState }
 export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
-export { IViewerState, ViewerActionInterface, viewerState }
 export { IUiState, UIActionInterface, uiState }
 export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
-export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
-export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, IProperty, IPublication, IReferenceSpace, IFile, IFileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
+export { MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export { GENERAL_ACTION_TYPES, generalActionError } from './stateStore.helper'
@@ -140,22 +117,17 @@ export function isDefined(obj) {
 }
 
 export interface IavRootStoreInterface {
-  pluginState: PluginStateInterface
   viewerConfigState: ViewerConfigStateInterface
   ngViewerState: NgViewerStateInterface
-  viewerState: IViewerState
   dataStore: any
   uiState: IUiState
   userConfigState: UserConfigStateInterface
 }
 
 export const defaultRootState: any = {
-  pluginState: pluginDefaultState,
   dataStore: {},
   ngViewerState: ngViewerDefaultState,
   uiState: uiDefaultState,
   userConfigState: userConfigDefaultState,
   viewerConfigState: viewerConfigDefaultState,
-  viewerState: defaultViewerState,
-  [viewerStateHelperStoreName]: defaultViewerHelperState
 }

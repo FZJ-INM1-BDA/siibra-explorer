@@ -28,6 +28,8 @@ import { WindowResizeModule } from "src/util/windowResize";
 import { ViewerCtrlModule } from "./viewerCtrl";
 import { DragDropFileModule } from "src/dragDropFile/module";
 import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
+import { EffectsModule } from "@ngrx/effects";
+import { MeshEffects } from "./mesh.effects/mesh.effects";
 
 @NgModule({
   imports: [
@@ -55,6 +57,9 @@ import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
       NEHUBA_VIEWER_FEATURE_KEY,
       reducer
     ),
+    EffectsModule.forFeature([
+      MeshEffects
+    ]),
     QuickTourModule
   ],
   declarations: [
@@ -75,6 +80,7 @@ import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
     NgLayerCtrlCmp,
   ],
   providers: [
+    
     {
       provide: IMPORT_NEHUBA_INJECT_TOKEN,
       useFactory: importNehubaFactory,

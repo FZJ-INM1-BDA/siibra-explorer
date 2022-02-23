@@ -7,7 +7,7 @@ import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith
 import { generalApplyState } from "src/services/stateStore.helper";
 import { PureContantService } from "src/util";
 import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs'
+import { BehaviorSubject, combineLatest, merge, NEVER, Observable, of } from 'rxjs'
 import { scan } from 'rxjs/operators'
 
 @Injectable({
@@ -51,7 +51,8 @@ export class RouterService {
 
     navEnd$.subscribe()
 
-    const ready$ = pureConstantService.allFetchingReady$.pipe(
+    // TODO fix
+    const ready$ = NEVER.pipe(
       filter(flag => !!flag),
       take(1),
       shareReplay(1),

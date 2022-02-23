@@ -88,6 +88,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiS
       ...prevState,
       sidePanelIsOpen: true,
     }
+  // src/state/userInteraction/actions.closeSidePanel
   case uiStateCloseSidePanel.type:
   case CLOSE_SIDE_PANEL:
     return {
@@ -174,14 +175,6 @@ export class UiStateUseEffect implements OnDestroy{
 
   private subscriptions: Subscription[] = []
 
-  private numRegionSelectedWithHistory$: Observable<any[]>
-
-  @Effect()
-  public sidePanelOpen$: Observable<any>
-
-  @Effect()
-  public viewCurrentOpen$: Observable<any>
-
   private bottomSheetRef: MatBottomSheetRef
 
   constructor(
@@ -189,27 +182,6 @@ export class UiStateUseEffect implements OnDestroy{
     actions$: Actions,
     bottomSheet: MatBottomSheet
   ) {
-    this.numRegionSelectedWithHistory$ = store$.pipe(
-      select('viewerState'),
-      select('regionsSelected'),
-      map(arr => arr.length),
-      startWith(0),
-      scan((acc, curr) => [curr, ...acc], []),
-    )
-
-    this.sidePanelOpen$ = this.numRegionSelectedWithHistory$.pipe(
-      filter(([curr, prev]) => prev === 0 && curr > 0),
-      mapTo({
-        type: OPEN_SIDE_PANEL,
-      }),
-    )
-
-    this.viewCurrentOpen$ = this.numRegionSelectedWithHistory$.pipe(
-      filter(([curr, prev]) => prev === 0 && curr > 0),
-      mapTo({
-        type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
-      }),
-    )
     
     this.subscriptions.push(
       actions$.pipe(

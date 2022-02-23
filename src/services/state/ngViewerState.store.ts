@@ -14,7 +14,6 @@ import { generalApplyState } from '../stateStore.helper';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 import { uiActionSnackbarMessage } from './uiState/actions';
 import { TUserRouteError } from 'src/auth/auth.service';
-import { viewerStateSelectedTemplateSelector } from './viewerState.store.helper';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -173,9 +172,6 @@ export class NgViewerUseEffect implements OnDestroy {
   @Effect()
   public cycleViews$: Observable<any>
 
-  @Effect()
-  public removeAllNonBaseLayers$: Observable<any>
-
   private panelOrder$: Observable<string>
   private panelMode$: Observable<string>
 
@@ -325,62 +321,6 @@ export class NgViewerUseEffect implements OnDestroy {
         snackbarMessage: CYCLE_PANEL_MESSAGE
       })),
     )
-
-    /**
-     * simplify with layer browser
-     */
-    const baseNgLayerName$ = this.store$.pipe(
-      select(viewerStateSelectedTemplateSelector),
-      
-      map(templateSelected => {
-        if (!templateSelected) { return [] }
-
-        const { ngId , otherNgIds = []} = templateSelected
-
-        return [
-          ngId,
-          ...otherNgIds,
-          ...templateSelected.parcellations.reduce((acc, curr) => {
-            return acc.concat([
-              curr.ngId,
-              ...getNgIds(curr.regions),
-            ])
-          }, []),
-        ]
-      }),
-      /**
-       * get unique array
-       */
-      map(nonUniqueArray => Array.from(new Set(nonUniqueArray))),
-      /**
-       * remove falsy values
-       */
-      map(arr => arr.filter(v => !!v)),
-    )
-
-    const allLoadedNgLayers$ = this.store$.pipe(
-      select('viewerState'),
-      select('loadedNgLayers'),
-    )
-
-    this.removeAllNonBaseLayers$ = this.actions.pipe(
-      ofType(ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS),
-      withLatestFrom(
-        combineLatest(
-          baseNgLayerName$,
-          allLoadedNgLayers$,
-        ),
-      ),
-      map(([_, [baseNgLayerNames, loadedNgLayers] ]) => {
-        const baseNameSet = new Set(baseNgLayerNames)
-        return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
-      }),
-      map(layer => {
-        return ngViewerActionRemoveNgLayer({
-          layer
-        })
-      }),
-    )
   }
 
   public ngOnDestroy() {
@@ -392,11 +332,6 @@ export class NgViewerUseEffect implements OnDestroy {
 
 export { INgLayerInterface } 
 
-const ACTION_TYPES = {
-
-  REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,
-}
-
 export const SUPPORTED_PANEL_MODES = [
   PANELS.FOUR_PANEL,
   PANELS.H_ONE_THREE,
@@ -404,4 +339,3 @@ export const SUPPORTED_PANEL_MODES = [
   PANELS.SINGLE_PANEL,
 ]
 
-export const NG_VIEWER_ACTION_TYPES = ACTION_TYPES

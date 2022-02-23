@@ -15,7 +15,6 @@ export {
 
 export {
   uiStatePreviewingDatasetFilesSelector,
-  uiStateMouseOverSegmentsSelector,
   uiStateMouseoverUserLandmark,
 } from './uiState/selectors'
 

@@ -24,6 +24,9 @@ export class NehubaVCtxToBbox implements PipeTransform{
       divisor = 1e6
     }
     const { payload } = event as TContextArg<'nehuba'>
+    
+    if (!payload.nav) return null
+
     const { position, zoom } = payload.nav
     // position is in nm
     // zoom can be directly applied as a multiple

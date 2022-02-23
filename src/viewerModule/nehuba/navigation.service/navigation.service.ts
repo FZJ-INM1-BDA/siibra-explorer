@@ -3,12 +3,12 @@ import { select, Store } from "@ngrx/store";
 import { Observable, ReplaySubject, Subscription } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
-import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
 import { timedValues } from 'src/util/generator'
 import { INavObj, navAdd, navMul, navObjEqual } from './navigation.util'
+import { actions } from "src/state/atlasSelection";
+import { atlasSelection } from "src/state";
 
 @Injectable()
 export class NehubaNavigationService implements OnDestroy{
@@ -52,56 +52,25 @@ export class NehubaNavigationService implements OnDestroy{
     this.subscriptions.push(
       // realtime state nav state
       this.store$.pipe(
-        select(viewerStateSelectorNavigation)
+        select(atlasSelection.selectors.navigation)
       ).subscribe(v => {
         this.storeNav = v
         // if stored nav differs from viewerNav
         if (!this.viewerNavLock && this.nehubaViewerInstance) {
           const navEql = navObjEqual(this.storeNav, this.viewerNav)
           if (!navEql) {
-            this.navigateViewer({
-              ...this.storeNav,
-              positionReal: true
-            })
+            this.navigateViewer(this.storeNav)
           }
         }
       })
     )
   }
 
-  navigateViewer(navigation: INavObj & { positionReal?: boolean, animation?: any }){
+  navigateViewer(navigation: INavObj){
     if (!navigation) return
-    const { animation, ...rest } = navigation
-    if (animation && this.globalAnimationFlag) {
-
-      const gen = timedValues()
-      const src = this.viewerNav
-
-      const dest = {
-        ...src,
-        ...navigation
-      }
-
-      const delta = navAdd(dest, navMul(src, -1))
-
-      const animate = () => {
-        const next = gen.next()
-        const d =  next.value
-
-        const n = navAdd(src, navMul(delta, d))
-        this.nehubaViewerInstance.setNavigationState({
-          ...n,
-          positionReal: true
-        })
-
-        if ( !next.done ) {
-          this.rafRef = requestAnimationFrame(() => animate())
-        }
-      }
-      this.rafRef = requestAnimationFrame(() => animate())
-    } else {
-      this.nehubaViewerInstance.setNavigationState(rest)
-    }
+    // TODO
+    // readd consider how to do animation
+    this.nehubaViewerInstance.setNavigationState(navigation)
   }
 
   setupViewerSub(){
@@ -134,7 +103,7 @@ export class NehubaNavigationService implements OnDestroy{
         
         if (!navEql) {
           this.store$.dispatch(
-            viewerStateChangeNavigation({
+            actions.navigateTo({
               navigation: roundedNav
             })
           )

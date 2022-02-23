@@ -4,20 +4,14 @@ import { Observable, Subscription, of, forkJoin, combineLatest, from } from "rxj
 import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
 import { shareReplay, tap, scan, catchError, filter, switchMap, map, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
-import { viewerStateFetchedTemplatesSelector, viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
 import { LoggingService } from "src/logging";
-import { viewerStateFetchedAtlasesSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
-import { flattenReducer } from 'common/util'
-import { IVolumeTypeDetail, TAtlas, TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
+import { TAtlas, TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { environment } from "src/environments/environment";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { TTemplateImage } from "./interfaces";
-
-export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.1.11'
+import { atlasSelection } from "src/state";
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -93,93 +87,6 @@ export const spaceMiscInfoMap = new Map([
   }],
 ])
 
-function getNehubaConfig(space: TSpaceFull) {
-
-  const darkTheme = space.src_volume_type === 'mri'
-  const { scale } = spaceMiscInfoMap.get(space.id) || { scale: 1 }
-  const backgrd = darkTheme
-    ? [0,0,0,1]
-    : [1,1,1,1]
-
-  const rmPsp = darkTheme
-    ? {"mode":"<","color":[0.1,0.1,0.1,1]}
-    :{"color":[1,1,1,1],"mode":"=="}
-  const drawSubstrates = darkTheme
-    ? {"color":[0.5,0.5,1,0.2]}
-    : {"color":[0,0,0.5,0.15]}
-  const drawZoomLevels = darkTheme
-    ? {"cutOff":150000 * scale }
-    : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
-
-  // enable surface parcellation
-  // otherwise, on segmentation selection, the unselected meshes will also be invisible
-  const surfaceParcellation = space.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
-  return {
-    "configName": "",
-    "globals": {
-      "hideNullImageValues": true,
-      "useNehubaLayout": {
-        "keepDefaultLayouts": false
-      },
-      "useNehubaMeshLayer": true,
-      "rightClickWithCtrlGlobal": false,
-      "zoomWithoutCtrlGlobal": false,
-      "useCustomSegmentColors": true
-    },
-    "zoomWithoutCtrl": true,
-    "hideNeuroglancerUI": true,
-    "rightClickWithCtrl": true,
-    "rotateAtViewCentre": true,
-    "enableMeshLoadingControl": true,
-    "zoomAtViewCentre": true,
-    // "restrictUserNavigation": true,
-    "dataset": {
-      "imageBackground": backgrd,
-      "initialNgState": {
-        "showDefaultAnnotations": false,
-        "layers": {},
-        "navigation": {
-          "zoomFactor": 350000 * scale,
-        },
-        "perspectiveOrientation": [
-          0.3140767216682434,
-          -0.7418519854545593,
-          0.4988985061645508,
-          -0.3195493221282959
-        ],
-        "perspectiveZoom": 1922235.5293810747 * scale
-      }
-    },
-    "layout": {
-      "useNehubaPerspective": {
-        "perspectiveSlicesBackground": backgrd,
-        "removePerspectiveSlicesBackground": rmPsp,
-        "perspectiveBackground": backgrd,
-        "fixedZoomPerspectiveSlices": {
-          "sliceViewportWidth": 300,
-          "sliceViewportHeight": 300,
-          "sliceZoom": 563818.3562426177 * scale,
-          "sliceViewportSizeMultiplier": 2
-        },
-        "mesh": {
-          "backFaceColor": backgrd,
-          "removeBasedOnNavigation": true,
-          "flipRemovedOctant": true,
-          surfaceParcellation
-        },
-        "centerToOrigin": true,
-        "drawSubstrates": drawSubstrates,
-        "drawZoomLevels": drawZoomLevels,
-        "restrictZoomLevel": {
-          "minZoom": 1200000 * scale,
-          "maxZoom": 3500000 * scale
-        }
-      }
-    }
-  }
-  
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -201,10 +108,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   public darktheme$: Observable<boolean>
 
   public totalAtlasesLength: number
-
-  public allFetchingReady$: Observable<boolean>
-
-  private atlasParcSpcRegionMap = new MultiDimMap()
 
   private _backendUrl = (BACKENDURL && `${BACKENDURL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
   get backendUrl() {
@@ -396,9 +299,11 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     private snackbar: MatSnackBar,
     @Inject(BS_ENDPOINT) private bsEndpoint: string,
   ){
+
+    // TODO how do we find out which theme to use now?
     this.darktheme$ = this.store.pipe(
-      select(viewerStateSelectedTemplateSelector),
-      map(tmpl => tmpl?.useTheme === 'dark')
+      select(atlasSelection.selectors.selectedTemplate),
+      map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'))
     )
 
     this.useTouchUI$ = this.store.pipe(
@@ -406,127 +311,95 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
       shareReplay(1)
     )
 
-    this.subscriptions.push(
-      this.fetchedAtlases$.subscribe(fetchedAtlases => 
-        this.store.dispatch(
-          viewerStateSetFetchedAtlases({ fetchedAtlases })
-        )
-      )
-    )
-
-    this.allFetchingReady$ = combineLatest([
-      this.initFetchTemplate$.pipe(
-        filter(v => !!v),
-        map(arr => arr.length),
-      ),
-      this.store.pipe(
-        select(viewerStateFetchedTemplatesSelector),
-        map(arr => arr.length),
-      ),
-      this.store.pipe(
-        select(viewerStateFetchedAtlasesSelector),
-        map(arr => arr.length),
-      )
-    ]).pipe(
-      map(([ expNumTmpl, actNumTmpl, actNumAtlas ]) => {
-        return expNumTmpl === actNumTmpl && actNumAtlas === this.totalAtlasesLength
-      }),
-      distinctUntilChanged(),
-      shareReplay(1),
-    )
+    // this.allFetchingReady$ = combineLatest([
+    //   this.initFetchTemplate$.pipe(
+    //     filter(v => !!v),
+    //     map(arr => arr.length),
+    //   ),
+    //   this.store.pipe(
+    //     select(viewerStateFetchedTemplatesSelector),
+    //     map(arr => arr.length),
+    //   ),
+    //   this.store.pipe(
+    //     select(viewerStateFetchedAtlasesSelector),
+    //     map(arr => arr.length),
+    //   )
+    // ]).pipe(
+    //   map(([ expNumTmpl, actNumTmpl, actNumAtlas ]) => {
+    //     return expNumTmpl === actNumTmpl && actNumAtlas === this.totalAtlasesLength
+    //   }),
+    //   distinctUntilChanged(),
+    //   shareReplay(1),
+    // )
   }
 
-  private getAtlases$ = this.http.get<TAtlas[]>(
-    `${this.bsEndpoint}/atlases`,
-    {
-      observe: 'response'
-    }
-  ).pipe(
-    tap(resp => {
-      const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
-      if (respVersion !== SIIBRA_API_VERSION) {
-        this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
-          duration: 5000
-        })
-      }
-      console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
-    }),
-    map(resp => {
-      const arr = resp.body
-      const { EXPERIMENTAL_FEATURE_FLAG } = environment
-      if (EXPERIMENTAL_FEATURE_FLAG) return arr
-      return arr
-    }),
-    shareReplay(1),
-  )
-
-  public fetchedAtlases$: Observable<TIAVAtlas[]> = this.getAtlases$.pipe(
-    switchMap(atlases => {
-      return forkJoin(
-        atlases.map(
-          atlas => this.getSpacesAndParc(atlas.id).pipe(
-            map(({ templateSpaces, parcellations }) => {
-              return {
-                '@id': atlas.id,
-                name: atlas.name,
-                templateSpaces: templateSpaces.map(tmpl => {
-                  return {
-                    '@id': tmpl.id,
-                    name: tmpl.name,
-                    availableIn: tmpl.availableParcellations.map(parc => {
-                      return {
-                        '@id': parc.id,
-                        name: parc.name
-                      }
-                    }),
-                    originDatainfos: (tmpl._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
-                  }
-                }),
-                parcellations: parcellations.filter(p => {
-                  if (p.version?.deprecated) return false
-                  return true
-                }).map(parc => {
-                  return {
-                    '@id': parseId(parc.id),
-                    name: parc.name,
-                    baseLayer: parc.modality === 'cytoarchitecture',
-                    '@version': {
-                      '@next': parc.version?.next,
-                      '@previous': parc.version?.prev,
-                      'name': parc.version?.name,
-                      '@this': parseId(parc.id)
-                    },
-                    groupName: parc.modality || null,
-                    availableIn: parc.availableSpaces.map(space => {
-                      return {
-                        '@id': space.id,
-                        name: space.name,
-                        /**
-                         * TODO need original data format
-                         */
-                        // originalDatasetFormats: [{
-                        //   name: "probability map"
-                        // }]
-                      }
-                    }),
-                    originDatainfos: [...(parc.infos || []), ...(parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
-                  }
-                })
-              }
-            }),
-            catchError((err, obs) => {
-              console.error(err)
-              return of(null)
-            })
-          )
-        )
-      )
-    }),
-    catchError((err, obs) => of([])),
-    tap((arr: any[]) => this.totalAtlasesLength = arr.length),
-    scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 0) - (b.order || 0)), []),
-    shareReplay(1)
-  )
+  // public fetchedAtlases$: Observable<TIAVAtlas[]> = this.getAtlases$.pipe(
+  //   switchMap(atlases => {
+  //     return forkJoin(
+  //       atlases.map(
+  //         atlas => this.getSpacesAndParc(atlas.id).pipe(
+  //           map(({ templateSpaces, parcellations }) => {
+  //             return {
+  //               '@id': atlas.id,
+  //               name: atlas.name,
+  //               templateSpaces: templateSpaces.map(tmpl => {
+  //                 return {
+  //                   '@id': tmpl.id,
+  //                   name: tmpl.name,
+  //                   availableIn: tmpl.availableParcellations.map(parc => {
+  //                     return {
+  //                       '@id': parc.id,
+  //                       name: parc.name
+  //                     }
+  //                   }),
+  //                   originDatainfos: (tmpl._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')
+  //                 }
+  //               }),
+  //               parcellations: parcellations.filter(p => {
+  //                 if (p.version?.deprecated) return false
+  //                 return true
+  //               }).map(parc => {
+  //                 return {
+  //                   '@id': parseId(parc.id),
+  //                   name: parc.name,
+  //                   baseLayer: parc.modality === 'cytoarchitecture',
+  //                   '@version': {
+  //                     '@next': parc.version?.next,
+  //                     '@previous': parc.version?.prev,
+  //                     'name': parc.version?.name,
+  //                     '@this': parseId(parc.id)
+  //                   },
+  //                   groupName: parc.modality || null,
+  //                   availableIn: parc.availableSpaces.map(space => {
+  //                     return {
+  //                       '@id': space.id,
+  //                       name: space.name,
+  //                       /**
+  //                        * TODO need original data format
+  //                        */
+  //                       // originalDatasetFormats: [{
+  //                       //   name: "probability map"
+  //                       // }]
+  //                     }
+  //                   }),
+  //                   originDatainfos: [...(parc.infos || []), ...(parc._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
+  //                 }
+  //               })
+  //             }
+  //           }),
+  //           catchError((err, obs) => {
+  //             console.error(err)
+  //             return of(null)
+  //           })
+  //         )
+  //       )
+  //     )
+  //   }),
+  //   catchError((err, obs) => of([])),
+  //   tap((arr: any[]) => this.totalAtlasesLength = arr.length),
+  //   scan((acc, curr) => acc.concat(curr).sort((a, b) => (a.order || 0) - (b.order || 0)), []),
+  //   shareReplay(1)
+  // )
 
   private atlasTmplConfig: TAtlasTmplViewerConfig = {}
 
@@ -536,316 +409,316 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     return templateLayers || {}
   }
 
-  public initFetchTemplate$ = this.fetchedAtlases$.pipe(
-    switchMap(atlases => {
-      return forkJoin(
-        atlases.map(atlas => this.getSpacesAndParc(atlas['@id']).pipe(
-          switchMap(({ templateSpaces, parcellations }) => {
-            this.atlasTmplConfig[atlas["@id"]] = {}
-            return forkJoin(
-              templateSpaces.map(
-                tmpl => {
-                  // hardcode 
-                  // see https://github.com/FZJ-INM1-BDA/siibra-python/issues/98
-                  if (
-                    tmpl.id === 'minds/core/referencespace/v1.0.0/tmp-fsaverage'
-                    && !tmpl.availableParcellations.find(p => p.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290')  
-                  ) {
-                    tmpl.availableParcellations.push({
-                      id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
-                      name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
-                    })
-                  }
-                  this.atlasTmplConfig[atlas["@id"]][tmpl.id] = {}
-                  return tmpl.availableParcellations.map(
-                    parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
-                      tap(regions => {
-                        recursiveMutate(
-                          regions,
-                          region => region.children,
-                          region => {
-                            /**
-                             * individual map(s)
-                             * this should work for both fully mapped and interpolated
-                             * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
-                             */
+  // public initFetchTemplate$ = this.fetchedAtlases$.pipe(
+  //   switchMap(atlases => {
+  //     return forkJoin(
+  //       atlases.map(atlas => this.getSpacesAndParc(atlas['@id']).pipe(
+  //         switchMap(({ templateSpaces, parcellations }) => {
+  //           this.atlasTmplConfig[atlas["@id"]] = {}
+  //           return forkJoin(
+  //             templateSpaces.map(
+  //               tmpl => {
+  //                 // hardcode 
+  //                 // see https://github.com/FZJ-INM1-BDA/siibra-python/issues/98
+  //                 if (
+  //                   tmpl.id === 'minds/core/referencespace/v1.0.0/tmp-fsaverage'
+  //                   && !tmpl.availableParcellations.find(p => p.id === 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290')  
+  //                 ) {
+  //                   tmpl.availableParcellations.push({
+  //                     id: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290',
+  //                     name: 'Julich-Brain Probabilistic Cytoarchitectonic Maps (v2.9)'
+  //                   })
+  //                 }
+  //                 this.atlasTmplConfig[atlas["@id"]][tmpl.id] = {}
+  //                 return tmpl.availableParcellations.map(
+  //                   parc => this.getRegions(atlas['@id'], parc.id, tmpl.id).pipe(
+  //                     tap(regions => {
+  //                       recursiveMutate(
+  //                         regions,
+  //                         region => region.children,
+  //                         region => {
+  //                           /**
+  //                            * individual map(s)
+  //                            * this should work for both fully mapped and interpolated
+  //                            * in the case of interpolated, it sucks that the ngLayerObj will be set multiple times
+  //                            */
 
-                            const dedicatedMap = region._dataset_specs.filter(
-                              spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
-                              && spec.space_id === tmpl.id
-                              && spec['volume_type'] === 'neuroglancer/precomputed'
-                            ) as TVolumeSrc<'neuroglancer/precomputed'>[]
-                            if (dedicatedMap.length === 1) {
-                              const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
-                              region['ngId'] = ngId
-                              region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
-                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngId] = {
-                                source: `precomputed://${dedicatedMap[0].url}`,
-                                type: "segmentation",
-                                transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
-                              }
-                            }
+  //                           const dedicatedMap = region._dataset_specs.filter(
+  //                             spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
+  //                             && spec.space_id === tmpl.id
+  //                             && spec['volume_type'] === 'neuroglancer/precomputed'
+  //                           ) as TVolumeSrc<'neuroglancer/precomputed'>[]
+  //                           if (dedicatedMap.length === 1) {
+  //                             const ngId = getNgId(atlas['@id'], tmpl.id, parc.id, dedicatedMap[0]['@id'])
+  //                             region['ngId'] = ngId
+  //                             region['labelIndex'] = dedicatedMap[0].detail['neuroglancer/precomputed'].labelIndex
+  //                             this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngId] = {
+  //                               source: `precomputed://${dedicatedMap[0].url}`,
+  //                               type: "segmentation",
+  //                               transform: dedicatedMap[0].detail['neuroglancer/precomputed'].transform
+  //                             }
+  //                           }
   
-                            /**
-                             * if label index is defined
-                             */
-                            if (!!region.labelIndex) {
-                              const hemisphereKey = /left hemisphere|left/.test(region.name)
-                                // these two keys are, unfortunately, more or less hardcoded
-                                // which is less than ideal
-                                ? 'left hemisphere'
-                                : /right hemisphere|right/.test(region.name)
-                                  ? 'right hemisphere'
-                                  : 'whole brain'
+  //                           /**
+  //                            * if label index is defined
+  //                            */
+  //                           if (!!region.labelIndex) {
+  //                             const hemisphereKey = /left hemisphere|left/.test(region.name)
+  //                               // these two keys are, unfortunately, more or less hardcoded
+  //                               // which is less than ideal
+  //                               ? 'left hemisphere'
+  //                               : /right hemisphere|right/.test(region.name)
+  //                                 ? 'right hemisphere'
+  //                                 : 'whole brain'
 
-                              if (!region['ngId']) {
-                                const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
-                                region['ngId'] = hemispheredNgId
-                              }
-                            }
-                          }  
-                        )
-                        this.atlasParcSpcRegionMap.set(
-                          atlas['@id'], tmpl.id, parc.id, regions
-                        )
+  //                             if (!region['ngId']) {
+  //                               const hemispheredNgId = getNgId(atlas['@id'], tmpl.id, parc.id, hemisphereKey)
+  //                               region['ngId'] = hemispheredNgId
+  //                             }
+  //                           }
+  //                         }  
+  //                       )
+  //                       this.atlasParcSpcRegionMap.set(
+  //                         atlas['@id'], tmpl.id, parc.id, regions
+  //                       )
   
-                        /**
-                         * populate maps for parc
-                         */
-                        for (const parc of parcellations) {
-                          const precomputedVols = parc._dataset_specs.filter(
-                            spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
-                              && spec.volume_type === 'neuroglancer/precomputed'
-                              && spec.space_id === tmpl.id
-                          ) as TVolumeSrc<'neuroglancer/precomputed'>[]
+  //                       /**
+  //                        * populate maps for parc
+  //                        */
+  //                       for (const parc of parcellations) {
+  //                         const precomputedVols = parc._dataset_specs.filter(
+  //                           spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1'
+  //                             && spec.volume_type === 'neuroglancer/precomputed'
+  //                             && spec.space_id === tmpl.id
+  //                         ) as TVolumeSrc<'neuroglancer/precomputed'>[]
 
-                          if (precomputedVols.length === 1) {
-                            const vol = precomputedVols[0]
-                            const key = 'whole brain'
+  //                         if (precomputedVols.length === 1) {
+  //                           const vol = precomputedVols[0]
+  //                           const key = 'whole brain'
 
-                            const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                            this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
-                              source: `precomputed://${vol.url}`,
-                              type: "segmentation",
-                              transform: vol.detail['neuroglancer/precomputed'].transform
-                            }
-                          }
+  //                           const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
+  //                           this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
+  //                             source: `precomputed://${vol.url}`,
+  //                             type: "segmentation",
+  //                             transform: vol.detail['neuroglancer/precomputed'].transform
+  //                           }
+  //                         }
 
-                          if (precomputedVols.length === 2) {
-                            const mapIndexKey = [{
-                              mapIndex: 0,
-                              key: 'left hemisphere'
-                            }, {
-                              mapIndex: 1,
-                              key: 'right hemisphere'
-                            }]
-                            for (const { key, mapIndex } of mapIndexKey) {
-                              const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
-                              this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
-                                source: `precomputed://${precomputedVols[mapIndex].url}`,
-                                type: "segmentation",
-                                transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
-                              }
-                            }
-                          }
+  //                         if (precomputedVols.length === 2) {
+  //                           const mapIndexKey = [{
+  //                             mapIndex: 0,
+  //                             key: 'left hemisphere'
+  //                           }, {
+  //                             mapIndex: 1,
+  //                             key: 'right hemisphere'
+  //                           }]
+  //                           for (const { key, mapIndex } of mapIndexKey) {
+  //                             const ngIdKey = getNgId(atlas['@id'], tmpl.id, parseId(parc.id), key)
+  //                             this.atlasTmplConfig[atlas["@id"]][tmpl.id][ngIdKey] = {
+  //                               source: `precomputed://${precomputedVols[mapIndex].url}`,
+  //                               type: "segmentation",
+  //                               transform: precomputedVols[mapIndex].detail['neuroglancer/precomputed'].transform
+  //                             }
+  //                           }
+  //                         }
 
-                          if (precomputedVols.length > 2) {
-                            console.error(`precomputedVols.length > 0, most likely an error`)
-                          }
-                        }
-                      }),
-                      catchError((err, obs) => {
-                        return of(null)
-                      })
-                    )
-                  )
-                }
-              ).reduce(flattenReducer, [])
-            ).pipe(
-              mapTo({ templateSpaces, parcellations, ngLayerObj: this.atlasTmplConfig })
-            )
-          }),
-          map(({ templateSpaces, parcellations, ngLayerObj }) => {
-            return templateSpaces.map(tmpl => {
+  //                         if (precomputedVols.length > 2) {
+  //                           console.error(`precomputedVols.length > 0, most likely an error`)
+  //                         }
+  //                       }
+  //                     }),
+  //                     catchError((err, obs) => {
+  //                       return of(null)
+  //                     })
+  //                   )
+  //                 )
+  //               }
+  //             ).reduce(flattenReducer, [])
+  //           ).pipe(
+  //             mapTo({ templateSpaces, parcellations, ngLayerObj: this.atlasTmplConfig })
+  //           )
+  //         }),
+  //         map(({ templateSpaces, parcellations, ngLayerObj }) => {
+  //           return templateSpaces.map(tmpl => {
 
-              // configuring three-surfer
-              let threeSurferConfig = {}
-              const volumes  = tmpl._dataset_specs.filter(v => v["@type"] === 'fzj/tmp/volume_type/v0.0.1') as TVolumeSrc<keyof IVolumeTypeDetail>[]
-              const threeSurferVolSrc = volumes.find(v => v.volume_type === 'threesurfer/gii')
-              if (threeSurferVolSrc) {
-                const foundP = parcellations.find(p => {
-                  return p._dataset_specs.some(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.space_id === tmpl.id)
-                })
-                const url = threeSurferVolSrc.url
-                const { surfaces } = threeSurferVolSrc.detail['threesurfer/gii'] as { surfaces: {mode: string, hemisphere: 'left' | 'right', url: string}[] }
-                const modObj = {}
-                for (const surface of surfaces) {
+  //             // configuring three-surfer
+  //             let threeSurferConfig = {}
+  //             const volumes  = tmpl._dataset_specs.filter(v => v["@type"] === 'fzj/tmp/volume_type/v0.0.1') as TVolumeSrc<keyof IVolumeTypeDetail>[]
+  //             const threeSurferVolSrc = volumes.find(v => v.volume_type === 'threesurfer/gii')
+  //             if (threeSurferVolSrc) {
+  //               const foundP = parcellations.find(p => {
+  //                 return p._dataset_specs.some(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.space_id === tmpl.id)
+  //               })
+  //               const url = threeSurferVolSrc.url
+  //               const { surfaces } = threeSurferVolSrc.detail['threesurfer/gii'] as { surfaces: {mode: string, hemisphere: 'left' | 'right', url: string}[] }
+  //               const modObj = {}
+  //               for (const surface of surfaces) {
                   
-                  const hemisphereKey = surface.hemisphere === 'left'
-                    ? 'left hemisphere'
-                    : 'right hemisphere'
+  //                 const hemisphereKey = surface.hemisphere === 'left'
+  //                   ? 'left hemisphere'
+  //                   : 'right hemisphere'
 
 
-                  /**
-                   * concating all available gii maps
-                   */
-                  // const allFreesurferLabels = foundP.volumeSrc[tmpl.id][hemisphereKey].filter(v => v.volume_type === 'threesurfer/gii-label')
-                  // for (const lbl of allFreesurferLabels) {
-                  //   const modeToConcat = {
-                  //     mesh: surface.url,
-                  //     hemisphere: surface.hemisphere,
-                  //     colormap: lbl.url
-                  //   }
+  //                 /**
+  //                  * concating all available gii maps
+  //                  */
+  //                 // const allFreesurferLabels = foundP.volumeSrc[tmpl.id][hemisphereKey].filter(v => v.volume_type === 'threesurfer/gii-label')
+  //                 // for (const lbl of allFreesurferLabels) {
+  //                 //   const modeToConcat = {
+  //                 //     mesh: surface.url,
+  //                 //     hemisphere: surface.hemisphere,
+  //                 //     colormap: lbl.url
+  //                 //   }
 
-                  //   const key = `${surface.mode} - ${lbl.name}`
-                  //   if (!modObj[key]) {
-                  //     modObj[key] = []
-                  //   }
-                  //   modObj[key].push(modeToConcat)
-                  // }
+  //                 //   const key = `${surface.mode} - ${lbl.name}`
+  //                 //   if (!modObj[key]) {
+  //                 //     modObj[key] = []
+  //                 //   }
+  //                 //   modObj[key].push(modeToConcat)
+  //                 // }
 
-                  /**
-                   * only concat first matching gii map
-                   */
-                  const mapIndex = hemisphereKey === 'left hemisphere'
-                    ? 0
-                    : 1
-                  const labelMaps = foundP._dataset_specs.filter(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.volume_type === 'threesurfer/gii-label') as TVolumeSrc<'threesurfer/gii-label'>[]
-                  const key = surface.mode
-                  const modeToConcat = {
-                    mesh: surface.url,
-                    hemisphere: surface.hemisphere,
-                    colormap: (() => {
-                      const lbl = labelMaps[mapIndex]
-                      return lbl?.url
-                    })()
-                  }
-                  if (!modObj[key]) {
-                    modObj[key] = []
-                  }
-                  modObj[key].push(modeToConcat)
+  //                 /**
+  //                  * only concat first matching gii map
+  //                  */
+  //                 const mapIndex = hemisphereKey === 'left hemisphere'
+  //                   ? 0
+  //                   : 1
+  //                 const labelMaps = foundP._dataset_specs.filter(spec => spec["@type"] === 'fzj/tmp/volume_type/v0.0.1' && spec.volume_type === 'threesurfer/gii-label') as TVolumeSrc<'threesurfer/gii-label'>[]
+  //                 const key = surface.mode
+  //                 const modeToConcat = {
+  //                   mesh: surface.url,
+  //                   hemisphere: surface.hemisphere,
+  //                   colormap: (() => {
+  //                     const lbl = labelMaps[mapIndex]
+  //                     return lbl?.url
+  //                   })()
+  //                 }
+  //                 if (!modObj[key]) {
+  //                   modObj[key] = []
+  //                 }
+  //                 modObj[key].push(modeToConcat)
 
-                }
-                foundP[tmpl.id]
-                threeSurferConfig = {
-                  "three-surfer": {
-                    '@context': {
-                      root: url
-                    },
-                    modes: Object.keys(modObj).map(name => {
-                      return {
-                        name,
-                        meshes: modObj[name]
-                      }
-                    })
-                  },
-                  nehubaConfig: null,
-                  nehubaConfigURL: null,
-                  useTheme: 'dark'
-                }
-              }
-              const darkTheme = tmpl.src_volume_type === 'mri'
-              const nehubaConfig = getNehubaConfig(tmpl)
-              const initialLayers = nehubaConfig.dataset.initialNgState.layers
+  //               }
+  //               foundP[tmpl.id]
+  //               threeSurferConfig = {
+  //                 "three-surfer": {
+  //                   '@context': {
+  //                     root: url
+  //                   },
+  //                   modes: Object.keys(modObj).map(name => {
+  //                     return {
+  //                       name,
+  //                       meshes: modObj[name]
+  //                     }
+  //                   })
+  //                 },
+  //                 nehubaConfig: null,
+  //                 nehubaConfigURL: null,
+  //                 useTheme: 'dark'
+  //               }
+  //             }
+  //             const darkTheme = tmpl.src_volume_type === 'mri'
+  //             const nehubaConfig = getNehubaConfig(tmpl)
+  //             const initialLayers = nehubaConfig.dataset.initialNgState.layers
               
-              const tmplAuxMesh = `${tmpl.name} auxmesh`
+  //             const tmplAuxMesh = `${tmpl.name} auxmesh`
 
-              const precomputedArr = tmpl._dataset_specs.filter(src => src['@type'] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>[]
-              let visible = true
-              let tmplNgId: string
-              const templateImages: TTemplateImage[] = []
-              for (const precomputedItem of precomputedArr) {
-                const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
-                const precomputedUrl = 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211001-mebrain/precomputed/images/MEBRAINS_T1.masked' === precomputedItem.url
-                  ? 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211018-mebrains-masked-templates/precomputed/images/MEBRAINS_T1_masked'
-                  : precomputedItem.url
-                initialLayers[ngIdKey] = {
-                  type: "image",
-                  source: `precomputed://${precomputedUrl}`,
-                  transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
-                  visible
-                }
-                templateImages.push({
-                  "@id": precomputedItem['@id'],
-                  name: precomputedItem.name,
-                  ngId: ngIdKey,
-                  visible
-                })
-                if (visible) {
-                  tmplNgId = ngIdKey
-                }
-                visible = false
-              }
+  //             const precomputedArr = tmpl._dataset_specs.filter(src => src['@type'] === 'fzj/tmp/volume_type/v0.0.1' && src.volume_type === 'neuroglancer/precomputed') as TVolumeSrc<'neuroglancer/precomputed'>[]
+  //             let visible = true
+  //             let tmplNgId: string
+  //             const templateImages: TTemplateImage[] = []
+  //             for (const precomputedItem of precomputedArr) {
+  //               const ngIdKey = MultiDimMap.GetKey(precomputedItem["@id"])
+  //               const precomputedUrl = 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211001-mebrain/precomputed/images/MEBRAINS_T1.masked' === precomputedItem.url
+  //                 ? 'https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/20211018-mebrains-masked-templates/precomputed/images/MEBRAINS_T1_masked'
+  //                 : precomputedItem.url
+  //               initialLayers[ngIdKey] = {
+  //                 type: "image",
+  //                 source: `precomputed://${precomputedUrl}`,
+  //                 transform: precomputedItem.detail['neuroglancer/precomputed'].transform,
+  //                 visible
+  //               }
+  //               templateImages.push({
+  //                 "@id": precomputedItem['@id'],
+  //                 name: precomputedItem.name,
+  //                 ngId: ngIdKey,
+  //                 visible
+  //               })
+  //               if (visible) {
+  //                 tmplNgId = ngIdKey
+  //               }
+  //               visible = false
+  //             }
 
-              // TODO
-              // siibra-python accidentally left out volume type of precompmesh
-              // https://github.com/FZJ-INM1-BDA/siibra-python/pull/55
-              // use url to determine for now
-              // const precompmesh = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precompmesh')
-              const precompmesh = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && !!src.detail?.['neuroglancer/precompmesh']) as TVolumeSrc<'neuroglancer/precompmesh'>
-              const auxMeshes = []
-              if (precompmesh){
-                initialLayers[tmplAuxMesh] = {
-                  source: `precompmesh://${precompmesh.url}`,
-                  type: "segmentation",
-                  transform: precompmesh.detail['neuroglancer/precompmesh'].transform
-                }
-                for (const auxMesh of precompmesh.detail['neuroglancer/precompmesh'].auxMeshes) {
+  //             // TODO
+  //             // siibra-python accidentally left out volume type of precompmesh
+  //             // https://github.com/FZJ-INM1-BDA/siibra-python/pull/55
+  //             // use url to determine for now
+  //             // const precompmesh = tmpl.volume_src.find(src => src.volume_type === 'neuroglancer/precompmesh')
+  //             const precompmesh = tmpl._dataset_specs.find(src => src["@type"] === 'fzj/tmp/volume_type/v0.0.1' && !!src.detail?.['neuroglancer/precompmesh']) as TVolumeSrc<'neuroglancer/precompmesh'>
+  //             const auxMeshes = []
+  //             if (precompmesh){
+  //               initialLayers[tmplAuxMesh] = {
+  //                 source: `precompmesh://${precompmesh.url}`,
+  //                 type: "segmentation",
+  //                 transform: precompmesh.detail['neuroglancer/precompmesh'].transform
+  //               }
+  //               for (const auxMesh of precompmesh.detail['neuroglancer/precompmesh'].auxMeshes) {
 
-                  auxMeshes.push({
-                    ...auxMesh,
-                    ngId: tmplAuxMesh,
-                    '@id': `${tmplAuxMesh} ${auxMesh.name}`,
-                    visible: true
-                  })
-                }
-              }
+  //                 auxMeshes.push({
+  //                   ...auxMesh,
+  //                   ngId: tmplAuxMesh,
+  //                   '@id': `${tmplAuxMesh} ${auxMesh.name}`,
+  //                   visible: true
+  //                 })
+  //               }
+  //             }
 
-              for (const key in (ngLayerObj[atlas["@id"]][tmpl.id] || {})) {
-                initialLayers[key] = ngLayerObj[atlas["@id"]][tmpl.id][key]
-              }
+  //             for (const key in (ngLayerObj[atlas["@id"]][tmpl.id] || {})) {
+  //               initialLayers[key] = ngLayerObj[atlas["@id"]][tmpl.id][key]
+  //             }
 
-              return {
-                name: tmpl.name,
-                '@id': tmpl.id,
-                fullId: tmpl.id,
-                useTheme: darkTheme ? 'dark' : 'light',
-                ngId: tmplNgId,
-                nehubaConfig,
-                templateImages,
-                auxMeshes,
-                /**
-                 * only populate the parcelltions made available
-                 */
-                parcellations: tmpl.availableParcellations.filter(
-                  p => parcellations.some(p2 => parseId(p2.id) === p.id)
-                ).map(parc => {
-                  const fullParcInfo = parcellations.find(p => parseId(p.id) === parc.id)
-                  const regions = this.atlasParcSpcRegionMap.get(atlas['@id'], tmpl.id, parc.id) || []
-                  return {
-                    fullId: parc.id,
-                    '@id': parc.id,
-                    name: parc.name,
-                    regions,
-                    originDatainfos: [...fullParcInfo.infos, ...(fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
-                  }
-                }),
-                ...threeSurferConfig
-              }
-            })
-          })
-        ))
-      )
-    }),
-    map(arr => {
-      return arr.reduce(flattenReducer, [])
-    }),
-    catchError((err) => {
-      this.log.warn(`fetching templates error`, err)
-      return of(null)
-    }),
-    shareReplay(1),
-  )
+  //             return {
+  //               name: tmpl.name,
+  //               '@id': tmpl.id,
+  //               fullId: tmpl.id,
+  //               useTheme: darkTheme ? 'dark' : 'light',
+  //               ngId: tmplNgId,
+  //               nehubaConfig,
+  //               templateImages,
+  //               auxMeshes,
+  //               /**
+  //                * only populate the parcelltions made available
+  //                */
+  //               parcellations: tmpl.availableParcellations.filter(
+  //                 p => parcellations.some(p2 => parseId(p2.id) === p.id)
+  //               ).map(parc => {
+  //                 const fullParcInfo = parcellations.find(p => parseId(p.id) === parc.id)
+  //                 const regions = this.atlasParcSpcRegionMap.get(atlas['@id'], tmpl.id, parc.id) || []
+  //                 return {
+  //                   fullId: parc.id,
+  //                   '@id': parc.id,
+  //                   name: parc.name,
+  //                   regions,
+  //                   originDatainfos: [...fullParcInfo.infos, ...(fullParcInfo?._dataset_specs || []).filter(spec => spec["@type"] === 'fzj/tmp/simpleOriginInfo/v0.0.1')]
+  //                 }
+  //               }),
+  //               ...threeSurferConfig
+  //             }
+  //           })
+  //         })
+  //       ))
+  //     )
+  //   }),
+  //   map(arr => {
+  //     return arr.reduce(flattenReducer, [])
+  //   }),
+  //   catchError((err) => {
+  //     this.log.warn(`fetching templates error`, err)
+  //     return of(null)
+  //   }),
+  //   shareReplay(1),
+  // )
 
   ngOnDestroy(){
     while(this.subscriptions.length > 0) this.subscriptions.pop().unsubscribe()
