@@ -5,7 +5,7 @@ export const environment = {
   PRODUCTION: true,
   BACKEND_URL: null,
   DATASET_PREVIEW_URL: 'https://hbp-kg-dataset-previewer.apps.hbp.eu/v2',
-  BS_REST_URL: 'https://siibra-api-latest.apps-dev.hbp.eu/v1_0',
+  BS_REST_URL: 'https://siibra-api-rc.apps.hbp.eu/v1_0',
   SPATIAL_TRANSFORM_BACKEND: 'https://hbp-spatial-backend.apps.hbp.eu',
   MATOMO_URL: null,
   MATOMO_ID: null,

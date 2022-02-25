@@ -1,4 +1,5 @@
-.ar-container > img
+/* canvas created by createElement does not have encapsulation applied */
+.ar-container >>> canvas
 {
   width: 100%;
 }

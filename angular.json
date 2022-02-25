@@ -48,6 +48,10 @@
               "input": "worker/worker-nifti.js",
               "inject": false,
               "bundleName": "worker-nifti"
+            },{
+              "input": "worker/worker-typedarray.js",
+              "inject": false,
+              "bundleName": "worker-typedarray"
             },
             
             {
