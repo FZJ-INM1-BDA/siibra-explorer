@@ -106,7 +106,7 @@ const _ = (async () => {
   const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
   
   for (const route of vipRoutes) {
-    app.get(route, (req, res) => res.redirect(`${HOST_PATHNAME}/go/${route}`))
+    app.get(`/${route}`, (req, res) => res.redirect(`${HOST_PATHNAME}/go/${route}`))
   }
 })()
 
