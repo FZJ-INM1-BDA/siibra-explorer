@@ -7,20 +7,12 @@ const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
-const deprecated = (_req, res) => res.status(410).end()
-
 const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
 
-
-const DOC_PUBLIC_PATH = process.env.NODE_ENV === 'production'
-  ? path.join(__dirname, 'docs')
-  : path.join(__dirname, '..', 'site')
-
-app.use('/docs', express.static(DOC_PUBLIC_PATH))
 app.use('/quickstart', require('./quickstart'))
 
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')
@@ -28,7 +20,7 @@ const hash = string => crypto.createHash('sha256').update(string).digest('hex')
 app.use((req, _, next) => {
   if (/main\.bundle\.js$/.test(req.originalUrl)){
     const xForwardedFor = req.headers['x-forwarded-for']
-    const ip = req.connection.remoteAddress
+    const ip = req.socket.remoteAddress
     console.log({
       type: 'visitorLog',
       method: 'main.bundle.js',
@@ -107,8 +99,15 @@ const _ = (async () => {
   /**
    * saneUrl end points
    */
-  const { router: saneUrlRouter } = require('./saneUrl')
+  const { router: saneUrlRouter, vipRoutes } = require('./saneUrl')
   app.use('/saneUrl', saneUrlRouter)
+  app.use('/go', saneUrlRouter)
+
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  
+  for (const route of vipRoutes) {
+    app.get(route, (req, res) => res.redirect(`${HOST_PATHNAME}/go/${route}`))
+  }
 })()
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
@@ -230,13 +229,7 @@ const jsonMiddleware = (req, res, next) => {
  */
 const pluginRouter = require('./plugins')
 
-app.use('/atlases', deprecated)
-app.use('/templates', deprecated)
-app.use('/nehubaConfig', deprecated)
-app.use('/datasets', deprecated)
-app.use('/regionalFeatures', deprecated)
 app.use('/plugins', jsonMiddleware, pluginRouter)
-app.use('/preview', deprecated)
 
 const catchError = require('./catchError')
 app.use(catchError)

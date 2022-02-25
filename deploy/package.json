@@ -30,7 +30,7 @@
     "rate-limit-redis": "^2.1.0",
     "redis": "^3.1.2",
     "request": "^2.88.2",
-    "showdown": "^1.9.1",
+    "showdown": "^2.0.0",
     "soswrap": "^0.0.2",
     "through2": "^3.0.1"
   },
@@ -40,7 +40,7 @@
     "cookie": "^0.4.0",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
-    "mocha": "^9.1.3",
+    "mocha": "^9.2.1",
     "nock": "^12.0.3",
     "sinon": "^8.0.2"
   }

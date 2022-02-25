@@ -118,7 +118,10 @@ const ready = async () => {
   return await store.healthCheck()
 }
 
+const vipRoutes = ["human", "monkey", "rat", "mouse"]
+
 module.exports = {
   router,
   ready,
+  vipRoutes,
 }
