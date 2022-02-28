@@ -1,4 +1,3 @@
-import { FeatureResponse } from "src/atlasComponents/sapi"
 import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 
@@ -8,7 +7,6 @@ export interface IViewerState {
   templateSelected: any | null
   parcellationSelected: any | null
   regionsSelected: any[]
-  featureSelected: FeatureResponse
 
   viewerMode: string
 
@@ -31,7 +29,6 @@ export const defaultViewerState: IViewerState = {
   fetchedTemplates : [],
   loadedNgLayers: [],
   regionsSelected: [],
-  featureSelected: null,
   viewerMode: null,
   userLandmarks: [],
   navigation: null,

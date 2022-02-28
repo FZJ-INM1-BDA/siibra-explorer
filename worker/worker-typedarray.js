@@ -1,4 +1,16 @@
 (function(exports){
+  const packNpArray = (inputArray, dtype, width, height) => {
+    if (dtype === "float32") {
+      
+    }
+    if (dtype === "int32") {
+
+    }
+    if (dtype === "uint8") {
+
+    }
+  }
+
   exports.typedArray = {
     fortranToRGBA(inputArray, width, height, channel) {
       if (channel !== 1 && channel !== 3) {

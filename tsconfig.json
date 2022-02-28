@@ -11,7 +11,13 @@
       "third_party/*" : ["third_party/*"],
       "src/*" : ["src/*"],
       "common/*": ["common/*"]
-    }
+    },
+    /**
+    * related: https://github.com/storybookjs/storybook/issues/9241
+    * related: https://stackoverflow.com/questions/63457043/error-ts2314-generic-type-modulewithproviderst-requires-1-type-arguments
+    * if shedding storybookjs dev dependency, maybe shed this as well
+    */
+    "skipLibCheck": true
   },
   "angularCompilerOptions":{
     "fullTemplateTypeCheck": true,

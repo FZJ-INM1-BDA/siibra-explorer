@@ -8,27 +8,20 @@ const {
   IEEGSessionCmp
 } = ieeg
 const {
-  Autoradiography,
-  Fingerprint,
-  Profile,
+  ReceptorViewModule
 } = receptor
 
 @NgModule({
   imports: [
     CommonModule,
-    AngularMaterialModule
+    ReceptorViewModule,
+    AngularMaterialModule,
   ],
   declarations: [
     IEEGSessionCmp,
-    Autoradiography,
-    Fingerprint,
-    Profile,
   ],
   exports: [
     IEEGSessionCmp,
-    Autoradiography,
-    Fingerprint,
-    Profile,
   ]
 })
 export class SapiViewsFeaturesModule{}

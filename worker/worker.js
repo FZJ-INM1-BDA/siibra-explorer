@@ -25,12 +25,14 @@ const VALID_METHOD = {
   PROCESS_PLOTLY: `PROCESS_PLOTLY`,
   PROCESS_NIFTI: 'PROCESS_NIFTI',
   PROCESS_TYPED_ARRAY: `PROCESS_TYPED_ARRAY`,
+  PROCESS_TYPED_ARRAY_F2RGBA: `PROCESS_TYPED_ARRAY_F2RGBA`,
 }
 
 const VALID_METHODS = [
   VALID_METHOD.PROCESS_PLOTLY,
   VALID_METHOD.PROCESS_NIFTI,
   VALID_METHOD.PROCESS_TYPED_ARRAY,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA,
 ]
 
 const validOutType = [
@@ -267,6 +269,27 @@ onmessage = (message) => {
       }
     }
     if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY) {
+      try {
+        const { inputArray, dtype, width, height, channel } = message.data.param
+        const array = self.typedArray.packNpArray(inputArray, dtype, width, height, channel)
+
+        postMessage({
+          id,
+          result: {
+            array
+          }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA) {
       try {
         const { inputArray, width, height, channel } = message.data.param
         const buffer = self.typedArray.fortranToRGBA(inputArray, width, height, channel)

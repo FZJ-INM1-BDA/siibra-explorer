@@ -23,7 +23,7 @@
     (@openClose.done)="$event.toState === 'closed' && drawer.close()"
     [autoFocus]="false"
     [disableClose]="true"
-    class="iv-custom-comp darker-bg p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
+    class="iv-custom-comp darker-bg sxplr-p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
 
     <!-- entry template -->
     <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="regularTmpl">
@@ -197,14 +197,14 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <div *ngIf="!((selectedRegions$ | async)[0])" class="p-2 w-100">
+      <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
         <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
       </div>
     </div>
 
     <!-- such a gross implementation -->
     <!-- TODO fix this -->
-    <div class="mt-1-n w-100 pl-2 pr-2 m-1px">
+    <div class="mt-1-n w-100 sxplr-pl-2 sxplr-pr-2 m-1px">
       <button mat-raised-button
         *ngIf="!(onlyShowMiniTray$ | async)"
         [attr.aria-label]="ARIA_LABELS.EXPAND"
@@ -332,7 +332,7 @@
   </top-menu-cmp>
 
   <atlas-dropdown-selector
-    class="v-align-top pt-2 pe-all mt-2 iv-custom-comp bg card m-2 mat-elevation-z2 d-inline-block"
+    class="v-align-top sxplr-pt-2 pe-all mt-2 iv-custom-comp bg card m-2 mat-elevation-z2 d-inline-block"
     quick-tour
     [quick-tour-description]="quickTourAtlasSelector.description"
     [quick-tour-order]="quickTourAtlasSelector.order">
@@ -383,7 +383,7 @@
     <ng-container [ngSwitch]="useViewer$ | async">
 
       <!-- nehuba viewer -->
-      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
+      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'nehuba'"
         (viewerEvent)="handleViewerEvent($event)"
         [selectedTemplate]="templateSelected$ | async"
@@ -393,7 +393,7 @@
       </iav-cmp-viewer-nehuba-glue>
 
       <!-- three surfer (free surfer viewer) -->
-      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
+      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'threeSurfer'"
         (viewerEvent)="handleViewerEvent($event)"
         [selectedTemplate]="templateSelected$ | async"
@@ -405,7 +405,7 @@
 
       <!-- by default, show splash screen -->
       <div *ngSwitchDefault>
-        <ui-splashscreen class="position-absolute left-0 top-0">
+        <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
         </ui-splashscreen>
       </div>
     </ng-container>
@@ -421,7 +421,7 @@
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
   <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all">
-    <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
+    <region-text-search-autocomplete class="w-100 sxplr-pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
 
     <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
@@ -730,7 +730,7 @@
 
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
-  <mat-card class="p-0 d-flex flex-column"
+  <mat-card class="sxplr-p-0 d-flex flex-column"
     [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">

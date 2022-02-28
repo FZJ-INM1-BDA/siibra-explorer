@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { filter, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
+import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { filter, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 
 @Component({
@@ -11,19 +11,22 @@ import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, 
   ]
 })
 
-export class RegionalFeaturesList implements OnChanges, OnInit{
+export class RegionalFeaturesList implements OnChanges{
 
-  @Input()
+  @Input('regional-features-list-atlas')
   atlas: SapiAtlasModel
 
-  @Input()
+  @Input('regional-features-list-template')
   template: SapiSpaceModel
 
-  @Input()
+  @Input('regional-features-list-parcellation')
   parcellation: SapiParcellationModel
 
-  @Input()
+  @Input('regional-features-list-region')
   region: SapiRegionModel
+
+  @Output('regional-features-list-feat-clicked')
+  featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
 
   private ATPR$ = new BehaviorSubject<{
     atlas: SapiAtlasModel
@@ -48,10 +51,10 @@ export class RegionalFeaturesList implements OnChanges, OnInit{
     this.ATPR$.next({ atlas, template, parcellation, region })
   }
 
-  ngOnInit(): void {
-    // this.ngOnChanges()
-  }
+  constructor(private sapi: SAPI){}
 
-  constructor(private sapi: SAPI){
+  showFeature(feat: SapiRegionalFeatureModel){
+    this.featureClicked.emit(feat)
+    console.log('emitting bla')
   }
 }

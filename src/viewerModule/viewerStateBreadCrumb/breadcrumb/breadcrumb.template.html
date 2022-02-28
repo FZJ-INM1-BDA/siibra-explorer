@@ -68,7 +68,7 @@
         selected
         (click)="handleChipClick()"
         class="pe-all position-relative z-index-1 ml-8-n">
-        <span class="iv-custom-comp text text-truncate d-inline pl-4">
+        <span class="iv-custom-comp text text-truncate d-inline sxplr-pl-4">
           {{ CONST.MULTI_REGION_SELECTION }}
         </span>
         <mat-icon
@@ -97,7 +97,7 @@
           [style.backgroundColor]="regionDirective.rgbString"
           iav-region
           #regionDirective="iavRegion">
-          <span class="iv-custom-comp text text-truncate d-inline pl-4">
+          <span class="iv-custom-comp text text-truncate d-inline sxplr-pl-4">
             {{ r.name }}
           </span>
           <mat-icon
@@ -115,7 +115,7 @@
           <mat-chip *ngFor="let key of clearViewKeys$ | async"
             (click)="handleChipClick()"
             class="pe-all position-relative ml-8-n">
-            <span class="pl-4">
+            <span class="sxplr-pl-4">
               {{ key }}
             </span>
             <mat-icon (click)="unsetClearViewByKey(key)"

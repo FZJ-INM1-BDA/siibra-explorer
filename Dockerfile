@@ -42,6 +42,7 @@ RUN rm -rf ./node_modules
 
 RUN npm i
 RUN npm run build-aot
+RUN npm run build-storybook
 
 # gzipping container
 FROM ubuntu:22.04 as compressor
@@ -49,6 +50,7 @@ RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv
 COPY --from=builder /iv/dist/aot /iv
+COPY --from=builder /iv/storybook-static /iv/storybook-static
 WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done

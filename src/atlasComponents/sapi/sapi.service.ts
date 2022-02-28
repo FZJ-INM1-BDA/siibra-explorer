@@ -3,11 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { BS_ENDPOINT } from 'src/util/constants';
 import { map, shareReplay, take, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "./type";
+import { SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel } from "./type";
 import { CachedFunction } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.2.0'
@@ -16,8 +17,9 @@ type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 @Injectable()
 export class SAPI{
+  static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v1_0`
 
-  public bsEndpoint = 'https://siibra-api-dev.apps-dev.hbp.eu/v1_0'
+  public bsEndpoint = SAPI.bsEndpoint
   
   registry = {
     _map: {} as Record<string, {
@@ -115,6 +117,7 @@ export class SAPI{
   constructor(
     public http: HttpClient,
     private snackbar: MatSnackBar,
+    private workerSvc: AtlasWorkerService,
     // @Inject(BS_ENDPOINT) public bsEndpoint: string,
   ){
     this.atlases$.subscribe(atlases => {
@@ -129,5 +132,48 @@ export class SAPI{
         }
       }
     })
+  }
+
+  async processNpArrayData(input: SpyNpArrayDataModel) {
+
+    const supportedDtype = [
+      "uint8",
+      "int32",
+      "float32"
+    ]
+    const {
+      "x-channel": channel,
+      "x-width": width,
+      "x-height": height,
+      content,
+      dtype,
+      content_encoding: contentEncoding, 
+      content_type: contentType
+    } = input
+    
+    if (contentType !== "application/octet-stream") {
+      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting content_type to be "application/octet-stream", but is ${contentType}`)
+    }
+    if (contentEncoding !== "gzip; base64") {
+      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting content_encoding to be "gzip; base64", but is ${contentEncoding}`)
+    }
+    if (supportedDtype.indexOf(dtype) < 0) {
+      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting dtype to be in ${JSON.stringify(supportedDtype)}, but is ${dtype}`)
+    }
+
+    try {
+      const bin = atob(content)
+      const { pako } = (window as any).export_nehuba
+      const array = pako.inflate(bin)
+      this.workerSvc.sendMessage({
+        method: "",
+        param: {
+          
+        },
+        transfers: [ array.buffer ]
+      })
+    } catch (e) {
+      throw new Error(`sapi.service#decodeNpArrayDataModel error: ${e}`)
+    }
   }
 }

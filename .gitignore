@@ -12,3 +12,5 @@ site
 *.log
 cachedKgDataset.json
 tmp
+storybook-static
+documentation.json

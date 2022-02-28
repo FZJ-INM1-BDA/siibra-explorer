@@ -32,6 +32,8 @@ export type SapiVOIDataResponse = components["schemas"]["VOIDataModel"]
 export type SapiVolumeModel = components["schemas"]["VolumeModel"]
 export type SapiDatasetModel = components["schemas"]["DatasetJsonModel"]
 
+export type SpyNpArrayDataModel = components["schemas"]["NpArrayDataModel"]
+
 export const guards = {
   isSapiVolumeModel: (val: SapiVolumeModel) => val.type === "siibra/base-dataset"
     && val.data.detail["neuroglancer/precomputed"]
@@ -40,7 +42,8 @@ export const guards = {
 /**
  * datafeatures
  */
-export type SapiRegionalFeatureModel = components["schemas"]["BaseDatasetJsonModel"] | components["schemas"]["ReceptorDatasetModel"]
+export type SapiRegionalFeatureReceptorModel = components["schemas"]["ReceptorDatasetModel"]
+export type SapiRegionalFeatureModel = components["schemas"]["BaseDatasetJsonModel"] | SapiRegionalFeatureReceptorModel
 
 export function guardPipe<
   InputType,

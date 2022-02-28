@@ -22,7 +22,7 @@ export class SAPIRegion{
     ).toPromise()
   }
 
-  getFeatureInstance(instanceId: string, spaceId: string): Promise<SapiRegionalFeatureModel> {
+  getFeatureInstance(instanceId: string, spaceId: string = null): Promise<SapiRegionalFeatureModel> {
     return this.sapi.http.get<SapiRegionalFeatureModel>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcId)}/regions/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
       {

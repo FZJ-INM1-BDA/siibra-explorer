@@ -1,5 +1,7 @@
 @use 'sass:math';
 
+$nsp: "sxplr";
+
 iav-cmp-viewer-container
 {
 
@@ -76,5 +78,66 @@ $media-map: (
   $fontsize: $i * 10;
   .fs-#{$fontsize} {
     font-size: $fontsize * 1%;
+  }
+}
+
+
+@for $i from 4 through 10 {
+  $maxheight: $i * 10;
+  .max-#{$maxheight}-vh {
+    max-height: $maxheight * 1vh;
+  }
+}
+
+$overflow-directive: hidden, scroll, auto, visible;
+@each $directive in $overflow-directive {
+  .of-x-#{$directive} {
+    overflow-x: $directive
+  }
+  .of-y-#{$directive} {
+    overflow-y: $directive
+  }
+  .of-#{$directive} {
+    overflow: $directive
+  }
+}
+
+@for $scale from 5 through 10 {
+
+  $scale-var: $scale * 10;
+  .scale-#{$scale-var}
+  {
+    color: red;
+    transform: scale($scale * 0.1);
+  }
+}
+
+$transform-origin-vars: "left-center", "center";
+$transform-origin-maps: (
+  "left-center": 0% 50%,
+  "center": 50% 50%
+);
+
+@each $var in $transform-origin-vars {
+  .transform-origin-#{$var} {
+    transform-origin: map-get($transform-origin-maps, $var);
+  }
+}
+
+@for $unit from 0 through 4 {
+  .#{$nsp}-pt-#{$unit} {
+    padding-top: $unit * 0.5rem;
+  }
+  .#{$nsp}-pb-#{$unit} {
+    padding-bottom: $unit * 0.5rem;
+  }
+  .#{$nsp}-pl-#{$unit} {
+    padding-left: $unit * 0.5rem;
+  }
+  .#{$nsp}-pr-#{$unit} {
+    padding-right: $unit * 0.5rem;
+  }
+  .#{$nsp}-p-#{$unit} {
+    padding: $unit * 0.5rem;
   }
 }
