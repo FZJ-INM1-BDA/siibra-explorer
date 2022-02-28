@@ -79,10 +79,10 @@
   <ng-template #kgRegionalFeatureList>
     <regional-features-list
       class="fs-80 max-50-vh d-block of-y-scroll of-x-hidden"
-      [region]="region$ | async"
-      [atlas]="atlas"
-      [template]="template"
-      [parcellation]="parcellation">
+      [regional-features-list-region]="region$ | async"
+      [regional-features-list-atlas]="atlas"
+      [regional-features-list-template]="template"
+      [regional-features-list-parcellation]="parcellation">
     </regional-features-list>
   </ng-template>
 

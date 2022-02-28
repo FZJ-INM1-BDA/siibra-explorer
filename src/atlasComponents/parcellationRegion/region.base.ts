@@ -30,16 +30,16 @@ export class RegionBase {
 
   public dois: string[] = []
 
-  @Input('region-menu-atlas')
+  @Input('region-base-atlas')
   atlas: SapiAtlasModel
 
-  @Input('region-menu-parcellation')
+  @Input('region-base-parcellation')
   parcellation: SapiParcellationModel
 
-  @Input('region-menu-template')
+  @Input('region-base-template')
   template: SapiSpaceModel
 
-  @Input('region-menu-region')
+  @Input('region-base-region')
   set region(val) {
     this._region = val
     this.region$.next(this._region)

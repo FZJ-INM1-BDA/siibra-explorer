@@ -37,7 +37,7 @@
         [value]="region.labelIndexId">
 
         <simple-region
-          [region]="region"
+          [region-base-region]="region"
           [isSelected]="regionsSelected$ | async | includes : region : compareFn">
 
         </simple-region>
