@@ -7,7 +7,7 @@ export interface IViewerConfigState {
   useMobileUI: boolean
 }
 
-export const viewerConfigSelectorUseMobileUi = createSelector(
-  state => state[VIEWER_CONFIG_FEATURE_KEY],
-  viewerConfigState => viewerConfigState.useMobileUI
-)
+// export const viewerConfigSelectorUseMobileUi = createSelector(
+//   state => state[VIEWER_CONFIG_FEATURE_KEY],
+//   viewerConfigState => viewerConfigState.useMobileUI
+// )

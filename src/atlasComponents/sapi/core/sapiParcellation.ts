@@ -1,6 +1,6 @@
 import { SapiVolumeModel } from ".."
 import { SAPI } from "../sapi.service"
-import { SapiParcellationModel, SapiRegionModel } from "../type"
+import { SapiParcellationFeatureModel, SapiParcellationModel, SapiRegionModel } from "../type"
 
 export class SAPIParcellation{
   constructor(private sapi: SAPI, public atlasId: string, public id: string){
@@ -25,5 +25,23 @@ export class SAPIParcellation{
     return this.sapi.cachedGet<SapiVolumeModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/volumes`
     )
+  }
+
+  getFeatures(): Promise<SapiParcellationFeatureModel[]> {
+    return this.sapi.http.get<SapiParcellationFeatureModel[]>(
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
+      {
+        params: {
+          per_page: 5,
+          page: 0,
+        }
+      }
+    ).toPromise()
+  }
+
+  getFeatureInstance(instanceId: string): Promise<SapiParcellationFeatureModel> {
+    return this.sapi.http.get<SapiParcellationFeatureModel>(
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
+    ).toPromise()
   }
 }

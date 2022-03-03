@@ -1,7 +1,7 @@
 import { createAction, props } from "@ngrx/store"
 import { nameSpace } from "./const"
 import * as atlasSelection from "../atlasSelection"
-import { SapiRegionModel } from "src/atlasComponents/sapi"
+import { SapiRegionModel, SapiSpatialFeatureModel, SapiVolumeModel } from "src/atlasComponents/sapi"
 import * as userInterface from "../userInterface"
 
 export const {
@@ -30,4 +30,15 @@ export const mouseoverRegions = createAction(
   props<{
     regions: SapiRegionModel[]
   }>()
+)
+
+export const showFeature = createAction(
+  `${nameSpace} showFeature`,
+  props<{
+    feature: SapiSpatialFeatureModel
+  }>()
+)
+
+export const clearShownFeature = createAction(
+  `${nameSpace} clearShownFeature`,
 )

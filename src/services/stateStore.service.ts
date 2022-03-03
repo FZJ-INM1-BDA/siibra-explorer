@@ -119,13 +119,11 @@ export function isDefined(obj) {
 export interface IavRootStoreInterface {
   viewerConfigState: ViewerConfigStateInterface
   ngViewerState: NgViewerStateInterface
-  dataStore: any
   uiState: IUiState
   userConfigState: UserConfigStateInterface
 }
 
 export const defaultRootState: any = {
-  dataStore: {},
   ngViewerState: ngViewerDefaultState,
   uiState: uiDefaultState,
   userConfigState: userConfigDefaultState,

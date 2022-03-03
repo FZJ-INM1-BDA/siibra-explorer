@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { Actions, Effect, ofType } from "@ngrx/effects";
+import { Actions, createEffect, Effect, ofType } from "@ngrx/effects";
 import { Action, createAction, createReducer, props, select, Store, on, createSelector } from "@ngrx/store";
 import { of, Subscription } from "rxjs";
 import { catchError, filter, map } from "rxjs/operators";
@@ -7,8 +7,8 @@ import { LOCAL_STORAGE_CONST } from "src/util//constants";
 // Get around the problem of importing duplicated string (ACTION_TYPES), even using ES6 alias seems to trip up the compiler
 // TODO file bug and reverse
 import { HttpClient } from "@angular/common/http";
-import { actionSetMobileUi } from "./viewerState/actions";
 import { PureContantService } from "src/util";
+import * as stateCtrl from "src/state"
 
 interface ICsp{
   'connect-src'?: string[]
@@ -94,6 +94,13 @@ export class UserConfigStateUseEffect implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
+  storeUseMobileInLocalStorage = createEffect(() => this.actions$.pipe(
+    ofType(stateCtrl.userInterface.actions.useModileUi),
+    map(({ flag }) => {
+      window.localStorage.setItem(LOCAL_STORAGE_CONST.MOBILE_UI, JSON.stringify(flag))
+    })
+  ), { dispatch: false })
+
   constructor(
     private actions$: Actions,
     private store$: Store<any>,
@@ -114,21 +121,6 @@ export class UserConfigStateUseEffect implements OnDestroy {
         }
       }),
     )
-
-    this.subscriptions.push(
-      this.actions$.pipe(
-        ofType(actionSetMobileUi.type),
-        map((action: any) => {
-          const { payload } = action
-          const { useMobileUI } = payload
-          return useMobileUI
-        }),
-        filter(bool => bool !== null),
-      ).subscribe((bool: boolean) => {
-        window.localStorage.setItem(LOCAL_STORAGE_CONST.MOBILE_UI, JSON.stringify(bool))
-      }),
-    )
-
   }
 
   public ngOnDestroy() {

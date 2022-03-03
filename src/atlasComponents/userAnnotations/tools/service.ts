@@ -7,7 +7,7 @@ import {map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine, TCallback } from "./type";
-import { switchMapWaitFor } from "src/util/fn";
+import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
@@ -583,14 +583,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const bin = atob(encoded)
     
     await retry(() => {
-      if (!!(window as any).export_nehuba) return true
+      if (!!getExportNehuba()) return true
       else throw new Error(`export nehuba not yet ready`)
     }, {
       timeout: 1000,
       retries: 10
     })
     
-    const { pako } = (window as any).export_nehuba
+    const { pako } = getExportNehuba()
     const decoded = pako.inflate(bin, { to: 'string' })
     const arr = JSON.parse(decoded)
     const anns: IAnnotationGeometry[] = []
@@ -626,8 +626,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       arr.push(json)
     }
     const stringifiedJSON = JSON.stringify(arr)
-    if (!(window as any).export_nehuba) return
-    const { pako } = (window as any).export_nehuba
+    const exportNehuba = getExportNehuba()
+    if (!exportNehuba) return
+    const { pako } = exportNehuba
     const compressed = pako.deflate(stringifiedJSON)
     let out = ''
     for (const num of compressed) {

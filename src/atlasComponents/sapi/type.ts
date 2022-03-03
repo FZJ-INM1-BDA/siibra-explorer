@@ -40,10 +40,18 @@ export const guards = {
 }
 
 /**
+ * serialization error type
+ */
+export type SapiSerializationErrorModel = components["schemas"]["SerializationErrorModel"]
+
+/**
  * datafeatures
  */
 export type SapiRegionalFeatureReceptorModel = components["schemas"]["ReceptorDatasetModel"]
 export type SapiRegionalFeatureModel = components["schemas"]["BaseDatasetJsonModel"] | SapiRegionalFeatureReceptorModel
+
+export type SapiParcellationFeatureMatrixModel = components["schemas"]["ConnectivityMatrixDataModel"]
+export type SapiParcellationFeatureModel = SapiParcellationFeatureMatrixModel | SapiSerializationErrorModel
 
 export function guardPipe<
   InputType,

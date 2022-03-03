@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core'
 import { Observable, pipe } from 'rxjs'
 import { filter, scan, take } from 'rxjs/operators'
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
-import { getViewer } from 'src/util/fn'
+import { getExportNehuba, getViewer } from 'src/util/fn'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { NgConfigViewerState } from "./config.service"
 import { RecursivePartial } from './config.service/type'
@@ -213,7 +213,7 @@ export const userLmUnchanged = (oldlms, newlms) => {
 export const importNehubaFactory = appendSrc => {
   let pr: Promise<any>
   return () => {
-    if ((window as any).export_nehuba) return Promise.resolve()
+    if (getExportNehuba()) return Promise.resolve()
 
     if (pr) return pr
     pr = appendSrc('main.bundle.js')

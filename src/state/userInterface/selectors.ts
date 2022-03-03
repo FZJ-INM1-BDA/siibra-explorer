@@ -4,7 +4,7 @@ import { UiStore } from "./store"
 
 const selectStore = state => state[nameSpace] as UiStore
 
-export const selectedFeature = createSelector(
+export const useMobileUi = createSelector(
   selectStore,
-  state => state.selectedFeature
+  state => state.useMobileUi
 )

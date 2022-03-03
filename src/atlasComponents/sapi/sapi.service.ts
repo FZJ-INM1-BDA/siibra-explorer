@@ -4,11 +4,12 @@ import { BS_ENDPOINT } from 'src/util/constants';
 import { map, shareReplay, take, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel } from "./type";
-import { CachedFunction } from "src/util/fn";
+import { CachedFunction, getExportNehuba } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { EnumColorMapName } from "src/util/colorMaps";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.2.0'
@@ -133,8 +134,8 @@ export class SAPI{
       }
     })
   }
-
-  async processNpArrayData(input: SpyNpArrayDataModel) {
+  
+  async processNpArrayData<T extends keyof ProcessTypedArrayResult>(input: SpyNpArrayDataModel, method: PARSE_TYPEDARRAY = PARSE_TYPEDARRAY.RAW_ARRAY, params: ProcessTypedArrayResult[T]['input'] = null): Promise<ProcessTypedArrayResult[T]['output']> {
 
     const supportedDtype = [
       "uint8",
@@ -163,17 +164,84 @@ export class SAPI{
 
     try {
       const bin = atob(content)
-      const { pako } = (window as any).export_nehuba
+      const { pako } = getExportNehuba()
       const array = pako.inflate(bin)
-      this.workerSvc.sendMessage({
-        method: "",
+      let workerMsg: string
+      switch (method) {
+      case PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA: {
+        workerMsg = "PROCESS_TYPED_ARRAY_F2RGBA"
+        break
+      }
+      case PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA: {
+        workerMsg = "PROCESS_TYPED_ARRAY_CM2RGBA"
+        break
+      }
+      case PARSE_TYPEDARRAY.RAW_ARRAY: {
+        workerMsg = "PROCESS_TYPED_ARRAY_RAW"
+        break
+      }
+      default:{
+        throw new Error(`sapi.service#decodeNpArrayDataModel: method cannot be deciphered: ${method}`)
+      }
+      }
+      const { result } = await this.workerSvc.sendMessage({
+        method: workerMsg,
         param: {
-          
+          inputArray: array,
+          width,
+          height,
+          channel,
+          dtype,
+          processParams: params
         },
         transfers: [ array.buffer ]
       })
+      const { buffer, outputArray, min, max } = result
+      return {
+        type: method,
+        result: buffer,
+        rawArray: outputArray,
+        min,
+        max
+      }
     } catch (e) {
       throw new Error(`sapi.service#decodeNpArrayDataModel error: ${e}`)
+    }
+  }
+}
+
+export enum PARSE_TYPEDARRAY {
+  CANVAS_FORTRAN_RGBA="CANVAS_FORTRAN_RGBA",
+  CANVAS_COLORMAP_RGBA="CANVAS_COLORMAP_RGBA",
+  RAW_ARRAY="RAW_ARRAY",
+}
+
+type ProcessTypedArrayResult = {
+  [PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA]: {
+    input: null
+    output: {
+      type: PARSE_TYPEDARRAY
+      result: Uint8ClampedArray
+    }
+  }
+  [PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA]: {
+    input?: {
+      colormap?: EnumColorMapName
+      log?: boolean
+    }
+    output: {
+      type: PARSE_TYPEDARRAY
+      result: Uint8ClampedArray
+      max: number
+      min: number
+    }
+  }
+  [PARSE_TYPEDARRAY.RAW_ARRAY]: {
+    input: null
+    output: {
+      rawArray: number[][]
+      min: number
+      max: number
     }
   }
 }

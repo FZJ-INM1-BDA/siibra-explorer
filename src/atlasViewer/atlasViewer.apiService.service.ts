@@ -231,11 +231,6 @@ export class AtlasViewerAPIServices implements OnDestroy{
 
         layersRegionLabelIndexMap: new Map(),
 
-        datasetsBSubject : this.store.pipe(
-          select('dataStore'),
-          select('fetchedDataEntries'),
-          startWith([])
-        ),
       },
       uiHandle : {
         getModalHandler : () => {
@@ -369,7 +364,6 @@ export interface IInteractiveViewerInterface {
     loadedTemplates: any[]
     regionsLabelIndexMap: Map<number, any> | null
     layersRegionLabelIndexMap: Map<string, Map<number, any>>
-    datasetsBSubject: Observable<any[]>
   }
 
   viewerHandle?: IVIewerHandle

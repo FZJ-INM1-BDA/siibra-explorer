@@ -26,6 +26,8 @@ const VALID_METHOD = {
   PROCESS_NIFTI: 'PROCESS_NIFTI',
   PROCESS_TYPED_ARRAY: `PROCESS_TYPED_ARRAY`,
   PROCESS_TYPED_ARRAY_F2RGBA: `PROCESS_TYPED_ARRAY_F2RGBA`,
+  PROCESS_TYPED_ARRAY_CM2RGBA: "PROCESS_TYPED_ARRAY_CM2RGBA",
+  PROCESS_TYPED_ARRAY_RAW: "PROCESS_TYPED_ARRAY_RAW",
 }
 
 const VALID_METHODS = [
@@ -33,6 +35,8 @@ const VALID_METHODS = [
   VALID_METHOD.PROCESS_NIFTI,
   VALID_METHOD.PROCESS_TYPED_ARRAY,
   VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_RAW,
 ]
 
 const validOutType = [
@@ -310,11 +314,57 @@ onmessage = (message) => {
         })
       }
     }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA) {
+      try {
+        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { buffer, min, max } = self.typedArray.cm2rgba(inputArray, width, height, channel, dtype, processParams)
+
+        postMessage({
+          id,
+          result: {
+            buffer,
+            min,
+            max,
+          }
+        }, [ buffer.buffer ])
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_RAW) {
+      try {
+        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { outputArray, min, max } = self.typedArray.rawArray(inputArray, width, height, channel, dtype, processParams)
+
+        postMessage({
+          id,
+          result: {
+            outputArray,
+            min,
+            max,
+          }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
     postMessage({
       id,
       error: {
         code: 404,
-        message: `worker method not found`
+        message: `worker method not found. ${message.data.method}`
       }
     })
     return

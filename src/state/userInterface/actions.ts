@@ -4,17 +4,11 @@ import { MatSnackBarConfig } from "@angular/material/snack-bar";
 import { createAction, props } from "@ngrx/store";
 import { nameSpace } from "./const"
 
-export const showFeature = createAction(
-  `${nameSpace} showFeature`,
+export const useModileUi = createAction(
+  `${nameSpace} useMobileUi`,
   props<{
-    feature: {
-      "@id": string
-    }
+    flag: boolean
   }>()
-)
-
-export const clearShownFeature = createAction(
-  `${nameSpace} clearShownFeature`,
 )
 
 export const openSidePanel = createAction(

@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs"
-import { getUuid } from "src/util/fn"
+import { getExportNehuba, getUuid } from "src/util/fn"
 import { IMessagingActions, IMessagingActionTmpl, TVec4, TMat4 } from "../types"
 import { INmvTransform } from "./type"
 
@@ -110,7 +110,7 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       }
     })
 
-    await waitFor(() => !!(window as any).export_nehuba)
+    await waitFor(() => !!getExportNehuba())
 
     const b64Encoded = encoding.indexOf('base64') >= 0
     const isGzipped = encoding.indexOf('gzip') >= 0
@@ -119,7 +119,7 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       data = atob(data)
     }
     if (isGzipped) {
-      data = (window as any).export_nehuba.pako.inflate(data)
+      data = getExportNehuba().pako.inflate(data)
     }
     let output = ``
     for (let i = 0; i < data.length; i++) {
@@ -146,7 +146,7 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     ]
     // NG translation works on nm scale
     const scaleUmToNm = 1e3
-    const { mat3, vec3 } = (window as any).export_nehuba
+    const { mat3, vec3 } = getExportNehuba()
     const modA = mat3.fromValues(
       scaleUmToVoxelFixed[0], 0, 0,
       0, scaleUmToVoxelFixed[1], 0,

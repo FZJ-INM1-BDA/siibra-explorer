@@ -1,6 +1,7 @@
 import { forkJoin } from "rxjs"
 import { map, switchMap, withLatestFrom } from "rxjs/operators"
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "."
+import { SapiParcellationFeatureModel } from "./type"
 
 /**
  * base class used to generate wrapper class for storybook
@@ -88,4 +89,8 @@ export async function getHoc1Left(): Promise<SapiRegionModel> {
 
 export async function getHoc1Features(): Promise<SapiRegionalFeatureModel[]> {
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left/features`)).json()
+}
+
+export async function getJba29Features(): Promise<SapiParcellationFeatureModel[]> {
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/features`)).json()
 }

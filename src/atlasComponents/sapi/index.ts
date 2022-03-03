@@ -12,6 +12,9 @@ export {
   SapiSpatialFeatureModel
 } from "./type"
 
+import { SapiRegionalFeatureModel, SapiSpatialFeatureModel } from "./type"
+export type SapiFeatureModel = SapiRegionalFeatureModel | SapiSpatialFeatureModel
+
 export { SAPI } from "./sapi.service"
 export {
   SAPIAtlas,

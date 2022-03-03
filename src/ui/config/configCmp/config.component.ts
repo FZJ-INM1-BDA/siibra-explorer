@@ -13,6 +13,7 @@ import { PureContantService } from 'src/util';
 import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
 import { atlasSelection } from 'src/state';
+import * as stateCtrl from "src/state"
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -115,12 +116,11 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   public toggleMobileUI(ev: MatSlideToggleChange) {
     const { checked } = ev
-    this.store.dispatch({
-      type: VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI,
-      payload: {
-        useMobileUI: checked,
-      },
-    })
+    this.store.dispatch(
+      stateCtrl.userInterface.actions.useModileUi({
+        flag: checked
+      })
+    )
   }
 
   public toggleAnimationFlag(ev: MatSlideToggleChange ) {

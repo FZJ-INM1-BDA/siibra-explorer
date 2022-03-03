@@ -1,33 +1,23 @@
 import { createReducer, on } from "@ngrx/store";
-import { SapiVolumeModel } from "src/atlasComponents/sapi";
 import * as actions from "./actions"
 
 export type UiStore = {
-  selectedFeature: SapiVolumeModel
+  useMobileUi: boolean
 }
 
 const defaultStore: UiStore = {
-  selectedFeature: null
+  useMobileUi: false
 }
 
 export const reducer = createReducer(
   defaultStore,
   on(
-    actions.showFeature,
-    (state, { feature }) => {
+    actions.useModileUi,
+    (state, { flag }) => {
       return {
         ...state,
-        feature
+        useMobileUi: flag
       }
     }
   ),
-  on(
-    actions.clearShownFeature,
-    state => {
-      return {
-        ...state,
-        feature: null
-      }
-    }
-  )
 )

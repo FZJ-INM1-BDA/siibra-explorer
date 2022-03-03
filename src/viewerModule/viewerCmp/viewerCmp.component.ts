@@ -166,7 +166,7 @@ export class ViewerCmp implements OnDestroy {
   public viewerCtx$ = this.ctxMenuSvc.context$
 
   public selectedFeature$ = this.store$.pipe(
-    select(userInterface.selectors.selectedFeature)
+    select(userInteraction.selectors.selectedFeature)
   )
 
   /**
@@ -375,7 +375,7 @@ export class ViewerCmp implements OnDestroy {
     )
 
     this.store$.dispatch(
-      userInterface.actions.showFeature({
+      userInteraction.actions.showFeature({
         feature
       })
     )
@@ -383,7 +383,7 @@ export class ViewerCmp implements OnDestroy {
 
   clearSelectedFeature(){
     this.store$.dispatch(
-      userInterface.actions.clearShownFeature()
+      userInteraction.actions.clearShownFeature()
     )
   }
 }

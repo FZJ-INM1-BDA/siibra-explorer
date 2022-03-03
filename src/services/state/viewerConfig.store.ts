@@ -2,7 +2,6 @@ import { Action } from "@ngrx/store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 
 import { IViewerConfigState as StateInterface } from './viewerConfig.store.helper'
-import { actionSetMobileUi } from "./viewerState/actions";
 export { StateInterface }
 
 interface ViewerConfigurationAction extends Action {
@@ -23,7 +22,6 @@ export const CONFIG_CONSTANTS = {
 export const VIEWER_CONFIG_ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
-  SET_MOBILE_UI: actionSetMobileUi.type,
 }
 
 // get gpu limit
@@ -58,14 +56,6 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ViewerConfigurationAction) => {
   switch (action.type) {
-  case VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI: {
-    const { payload } = action
-    const { useMobileUI } = payload
-    return {
-      ...prevState,
-      useMobileUI,
-    }
-  }
   case VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG:
     return {
       ...prevState,

@@ -1,17 +1,15 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, Subscription, of, forkJoin, combineLatest, from } from "rxjs";
-import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, switchMap, map, distinctUntilChanged, mapTo } from "rxjs/operators";
+import { Observable, Subscription, of, forkJoin, from } from "rxjs";
+import { shareReplay, switchMap, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { LoggingService } from "src/logging";
 import { BS_ENDPOINT, BACKENDURL } from "src/util/constants";
-import { TAtlas, TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary, TVolumeSrc } from "./siibraApiConstants/types";
+import { TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary } from "./siibraApiConstants/types";
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
-import { environment } from "src/environments/environment";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { atlasSelection } from "src/state";
+import { atlasSelection, userInterface } from "src/state";
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -307,7 +305,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     )
 
     this.useTouchUI$ = this.store.pipe(
-      select(viewerConfigSelectorUseMobileUi),
+      select(userInterface.selectors.useMobileUi),
       shareReplay(1)
     )
 

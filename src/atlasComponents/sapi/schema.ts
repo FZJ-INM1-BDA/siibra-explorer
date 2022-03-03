@@ -197,11 +197,11 @@ export interface components {
       "@id": string;
       /** Name */
       name: string;
-      matrix: components["schemas"]["NpArrayDataModel"];
-      /** Columns */
-      columns: string[];
       /** Parcellations */
       parcellations: { [key: string]: string }[];
+      matrix?: components["schemas"]["NpArrayDataModel"];
+      /** Columns */
+      columns?: string[];
     };
     /** DatasetJsonModel */
     DatasetJsonModel: {
@@ -330,6 +330,17 @@ export interface components {
         [key: string]: components["schemas"]["IEEGElectrodeModel"];
       };
     };
+    /** NeurotransmitterMarkupModel */
+    NeurotransmitterMarkupModel: {
+      /** Latex */
+      latex: string;
+      /** Markdown */
+      markdown: string;
+      /** Name */
+      name: string;
+      /** Label */
+      label: string;
+    };
     /** NiiMetadataModel */
     NiiMetadataModel: {
       /** Min */
@@ -428,6 +439,10 @@ export interface components {
       fingerprints: {
         [key: string]: components["schemas"]["FingerPrintDataModel"];
       };
+      /** Receptor Symbols */
+      receptor_symbols: {
+        [key: string]: components["schemas"]["SymbolMarkupClass"];
+      };
     };
     /** ReceptorDatasetModel */
     ReceptorDatasetModel: {
@@ -442,6 +457,15 @@ export interface components {
       /** Urls */
       urls: components["schemas"]["Url"][];
       data?: components["schemas"]["ReceptorDataModel"];
+    };
+    /** ReceptorMarkupModel */
+    ReceptorMarkupModel: {
+      /** Latex */
+      latex: string;
+      /** Markdown */
+      markdown: string;
+      /** Name */
+      name: string;
     };
     /** RelationAssessmentItem */
     RelationAssessmentItem: {
@@ -604,6 +628,16 @@ export interface components {
        */
       versionIdentifier: string;
     };
+    /** SerializationErrorModel */
+    SerializationErrorModel: {
+      /**
+       * Type
+       * @constant
+       */
+      type?: "spy/serialization-error";
+      /** Message */
+      message: string;
+    };
     /** SiibraAtIdModel */
     SiibraAtIdModel: {
       /** @Id */
@@ -660,6 +694,11 @@ export interface components {
       synonym?: string[];
       /** Kgv1Id */
       kgV1Id: string;
+    };
+    /** SymbolMarkupClass */
+    SymbolMarkupClass: {
+      receptor: components["schemas"]["ReceptorMarkupModel"];
+      neurotransmitter: components["schemas"]["NeurotransmitterMarkupModel"];
     };
     /** Url */
     Url: {
@@ -1448,7 +1487,10 @@ export interface operations {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["ConnectivityMatrixDataModel"];
+          "application/json": Partial<
+            components["schemas"]["ConnectivityMatrixDataModel"]
+          > &
+            Partial<components["schemas"]["SerializationErrorModel"]>;
         };
       };
       /** Validation Error */
@@ -1466,12 +1508,19 @@ export interface operations {
         atlas_id: string;
         parcellation_id: string;
       };
+      query: {
+        per_page?: number;
+        page?: number;
+      };
     };
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["ConnectivityMatrixDataModel"][];
+          "application/json": (Partial<
+            components["schemas"]["ConnectivityMatrixDataModel"]
+          > &
+            Partial<components["schemas"]["SerializationErrorModel"]>)[];
         };
       };
       /** Validation Error */
