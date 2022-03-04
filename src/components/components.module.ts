@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
-import {  MarkdownDom } from './markdown/markdown.component';
+import {  MarkdownModule } from './markdown';
 
 import { CommonModule } from '@angular/common';
 import { AngularMaterialModule } from 'src/sharedModules';
@@ -21,7 +21,7 @@ import { HighlightPipe } from './flatTree/highlight.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
 import { IAVVerticalButton } from './vButton/vButton.component';
 import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
-import { SpinnerCmp } from './spinner/spinner.component';
+import { SpinnerModule } from "./spinner"
 import { ReadmoreModule } from './readmore';
 import { TileCmp } from './tile/tile.component';
 
@@ -34,16 +34,16 @@ import { TileCmp } from './tile/tile.component';
     AngularMaterialModule,
     UtilModule,
     ReadmoreModule,
+    SpinnerModule,
+    MarkdownModule,
   ],
   declarations : [
     /* components */
-    MarkdownDom,
     FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
     DynamicMaterialBtn,
-    SpinnerCmp,
     TileCmp,
 
     /* pipes */
@@ -59,14 +59,14 @@ import { TileCmp } from './tile/tile.component';
   exports : [
     BrowserAnimationsModule,
     ReadmoreModule,
-
-    MarkdownDom,
+    SpinnerModule,
+    MarkdownModule,
+    
     FlatTreeComponent,
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
     DynamicMaterialBtn,
-    SpinnerCmp,
     TileCmp,
 
     TreeSearchPipe,

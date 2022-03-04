@@ -1,0 +1,29 @@
+<mat-card *ngIf="!dataset">
+  Dataset not specified.
+</mat-card>
+
+<mat-card *ngIf="dataset"
+  class="mat-elevation-z4 sxplr-z-index-4">
+  <mat-card-title>
+    {{ dataset.metadata.fullName }}
+  </mat-card-title>
+
+  <mat-card-subtitle class="sxplr-d-inline-flex sxplr-align-items-stretch">
+    <mat-icon class="sxplr-m-a" fontSet="fas" fontIcon="fa-database"></mat-icon>
+    <span class="sxplr-m-a">
+      EBRAINS dataset
+    </span>
+    <mat-divider class="sxplr-pl-1" [vertical]="true"></mat-divider>
+
+    <a mat-icon-button *ngFor="let url of dataset.urls" [href]="url.doi | parseDoi" target="_blank">
+      <i class="fas fa-external-link-alt"></i>
+    </a>
+  </mat-card-subtitle>
+</mat-card>
+
+<mat-card *ngIf="dataset" class="sxplr-z-index-0">
+  <mat-card-content>
+    <markdown-dom class="sxplr-muted" [markdown]="dataset?.metadata?.description">
+    </markdown-dom>
+  </mat-card-content>
+</mat-card>

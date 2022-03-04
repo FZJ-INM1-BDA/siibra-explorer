@@ -1,8 +1,9 @@
-import { Input, SimpleChanges } from "@angular/core";
+import { Directive, Input, SimpleChanges } from "@angular/core";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
 
-export class BaseReceptor{
+@Directive()
+export abstract class BaseReceptor{
   
   @Input('sxplr-sapiviews-features-receptor-atlas')
   atlas: SapiAtlasModel
@@ -19,23 +20,40 @@ export class BaseReceptor{
   @Input('sxplr-sapiviews-features-receptor-featureid')
   featureId: string
 
+  @Input('sxplr-sapiviews-features-receptor-data')
   receptorData: SapiRegionalFeatureReceptorModel
 
   error: string
 
-  protected baseInputChanged(simpleChanges: SimpleChanges) {
-    const {
-      atlas,
-      parcellation,
-      template,
-      region,
-      featureId,
-    } = simpleChanges
-    return atlas
-      || parcellation
-      || template
-      || region
-      || featureId
+  async ngOnChanges(simpleChanges: SimpleChanges) {
+    if (simpleChanges.receptorData?.currentValue) {
+      this.rerender()
+      return
+    }
+    if (this.canFetch) {
+      this.receptorData = await this.fetchReceptorData()
+      this.rerender()
+    }
+  }
+
+  private get canFetch() {
+    if (!this.atlas) {
+      this.error = `atlas needs to be defined, but is not`
+      return false
+    }
+    if (!this.parcellation) {
+      this.error = `parcellation needs to be defined, but is not`
+      return false
+    }
+    if (!this.region) {
+      this.error = `region needs to be defined, but is not`
+      return false
+    }
+    if (!this.featureId) {
+      this.error = `featureId needs to be defined, but is not`
+      return false
+    }
+    return true
   }
 
   protected async fetchReceptorData() {
@@ -60,8 +78,10 @@ export class BaseReceptor{
     if (result.type !== "siibra/receptor") {
       throw new Error(`BaseReceptor Error. Expected .type to be "siibra/receptor", but was "${result.type}"`)
     }
-    this.receptorData = result
+    return result
   }
+
+  abstract rerender(): void
 
   constructor(
     protected sapi: SAPI

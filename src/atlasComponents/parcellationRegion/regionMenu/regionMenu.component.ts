@@ -1,10 +1,11 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, EventEmitter, OnDestroy, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { merge, Observable, Subject, Subscription } from "rxjs";
 import { RegionBase } from '../region.base'
 import { CONST, ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { distinctUntilChanged, mapTo } from "rxjs/operators";
+import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
 
 @Component({
   selector: 'region-menu',
@@ -13,6 +14,9 @@ import { distinctUntilChanged, mapTo } from "rxjs/operators";
   providers: [ ComponentStore ]
 })
 export class RegionMenuComponent extends RegionBase implements OnDestroy {
+
+  @Output('region-menu-feat-clicked')
+  featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
@@ -83,5 +87,9 @@ export class RegionMenuComponent extends RegionBase implements OnDestroy {
       }
     }
     this.busyFlag = false
+  }
+
+  handleRegionalFeatureClicked(feat: SapiRegionalFeatureModel){
+    this.featureClicked.emit(feat)
   }
 }

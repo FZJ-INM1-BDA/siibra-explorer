@@ -856,3 +856,22 @@ mat-list.sm mat-list-item
 {
   text-overflow: ellipsis;
 }
+
+iav-cmp-viewer-container .mat-chip-list-wrapper
+{
+  flex-wrap: nowrap;
+}
+
+iav-cmp-viewer-container poly-update-cmp .mat-chip-list-wrapper
+{
+  flex-wrap: wrap;
+}
+
+quick-tour-unit svg
+{
+  pointer-events: none;
+  stroke-width: 3px;
+  stroke: rgb(255, 255, 255);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

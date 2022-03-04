@@ -3,6 +3,7 @@ import { nameSpace } from "./const"
 import * as atlasSelection from "../atlasSelection"
 import { SapiRegionModel, SapiSpatialFeatureModel, SapiVolumeModel } from "src/atlasComponents/sapi"
 import * as userInterface from "../userInterface"
+import { SapiFeatureModel } from "src/atlasComponents/sapi/type"
 
 export const {
   clearSelectedRegions,
@@ -35,7 +36,7 @@ export const mouseoverRegions = createAction(
 export const showFeature = createAction(
   `${nameSpace} showFeature`,
   props<{
-    feature: SapiSpatialFeatureModel
+    feature: SapiFeatureModel
   }>()
 )
 

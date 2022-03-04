@@ -1,0 +1,9 @@
+<div [ngSwitch]="feature?.type">
+  <sxplr-sapiviews-features-receptor-entry *ngSwitchCase="featureType.receptor"
+    [sxplr-sapiviews-features-receptor-atlas]="atlas"
+    [sxplr-sapiviews-features-receptor-parcellation]="parcellation"
+    [sxplr-sapiviews-features-receptor-template]="space"
+    [sxplr-sapiviews-features-receptor-region]="region"
+    [sxplr-sapiviews-features-receptor-featureid]="feature['@id']">
+  </sxplr-sapiviews-features-receptor-entry>
+</div>

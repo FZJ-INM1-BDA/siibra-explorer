@@ -5,7 +5,8 @@ import { FormsModule } from "@angular/forms"
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
-import { getHoc1Features, getHoc1Left, getHumanAtlas, getJba29, getMni152, HumanHoc1StoryBase } from "src/atlasComponents/sapi/stories.base"
+import { getHoc1FeatureDetail, getHoc1Features, getHoc1Left, getHumanAtlas, getJba29, getMni152 } from "src/atlasComponents/sapi/stories.base"
+import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type"
 import { AngularMaterialModule } from "src/sharedModules"
 import { Autoradiography } from "./autoradiography.component"
 
@@ -31,6 +32,7 @@ import { Autoradiography } from "./autoradiography.component"
     [sxplr-sapiviews-features-receptor-template]="template"
     [sxplr-sapiviews-features-receptor-region]="region"
     [sxplr-sapiviews-features-receptor-featureid]="featureId"
+    [sxplr-sapiviews-features-receptor-data]="feature"
     [sxplr-sapiviews-features-receptor-autoradiograph-selected-symbol]="selectedSymbol"
   >
   </sxplr-sapiviews-features-receptor-autoradiograph>
@@ -51,6 +53,8 @@ class AutoRadiographWrapperCls {
   parcellation: SapiParcellationModel
   template: SapiSpaceModel
   region: SapiRegionModel
+
+  feature: SapiRegionalFeatureReceptorModel
   featureId: string
 
   @ViewChild(Autoradiography)
@@ -59,7 +63,7 @@ class AutoRadiographWrapperCls {
   selectedSymbol: string
 
   get options(){
-    return Object.keys(this.ar?.receptorData?.data?.autoradiographs || {})
+    return Object.keys(this.feature?.data?.autoradiographs || this.ar?.receptorData?.data?.autoradiographs || {})
   }
 }
 
@@ -85,7 +89,7 @@ export default {
 } as Meta
 
 const Template: Story<AutoRadiographWrapperCls> = (args: AutoRadiographWrapperCls, { loaded }) => {
-  const { atlas, parc, space, region, receptorfeat } = loaded
+  const { atlas, parc, space, region, featureId, feature } = loaded
   return ({
     props: {
       ...args,
@@ -93,29 +97,50 @@ const Template: Story<AutoRadiographWrapperCls> = (args: AutoRadiographWrapperCl
       parcellation: parc,
       template: space,
       region: region,
-      featureId: receptorfeat["@id"]
+      feature,
+      featureId,
     },
   })
 }
 
-Template.loaders = [
-  async () => {
-    const atlas = await getHumanAtlas()
-    const parc = await getJba29()
-    const region = await getHoc1Left()
-    const space = await getMni152()
-    const features = await getHoc1Features()
-    const receptorfeat = features.find(f => f.type === "siibra/receptor")
-    return {
-      atlas, parc, space, region, receptorfeat
-    }
+const loadFeat = async () => {
+  const atlas = await getHumanAtlas()
+  const parc = await getJba29()
+  const region = await getHoc1Left()
+  const space = await getMni152()
+  const features = await getHoc1Features()
+  const receptorfeat = features.find(f => f.type === "siibra/receptor")
+  const feature = await getHoc1FeatureDetail(receptorfeat["@id"])
+  return {
+    atlas,
+    parc,
+    space,
+    region,
+    featureId: receptorfeat["@id"],
+    feature
   }
-]
+}
 
 export const Default = Template.bind({})
 Default.args = {
 
 }
 Default.loaders = [
-  ...Template.loaders
+  async () => {
+    const { atlas, parc, space, region, featureId } = await loadFeat()
+    return {
+      atlas, parc, space, region, featureId
+    }
+  }
+]
+
+export const LoadViaDirectlyInjectData = Template.bind({})
+LoadViaDirectlyInjectData.loaders = [
+  async () => {
+
+    const { feature } = await loadFeat()
+    return {
+      feature
+    }
+  }
 ]

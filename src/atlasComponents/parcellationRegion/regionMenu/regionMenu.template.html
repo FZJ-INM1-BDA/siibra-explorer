@@ -82,7 +82,9 @@
       [regional-features-list-region]="region$ | async"
       [regional-features-list-atlas]="atlas"
       [regional-features-list-template]="template"
-      [regional-features-list-parcellation]="parcellation">
+      [regional-features-list-parcellation]="parcellation"
+      (regional-features-list-feat-clicked)="handleRegionalFeatureClicked($event)"
+      >
     </regional-features-list>
   </ng-template>
 

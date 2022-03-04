@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { fromEvent, Subscription } from "rxjs";
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Inject, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { fromEvent, Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
+import { DARKTHEME } from "src/util/injectionTokens";
 import { BaseReceptor } from "../base";
 
 /**
@@ -54,20 +55,16 @@ export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewIni
 
   @HostListener('click')
   onClick(){
-    if (this.mouseOverReceptor) {
+    if (this.mouseOverReceptor)  {
       this.selectReceptor.emit(this.mouseOverReceptor)
     }
   }
 
   async ngOnChanges(simpleChanges: SimpleChanges) {
-    if (this.baseInputChanged(simpleChanges)) {
-      await this.fetchReceptorData()
-    }
-    if (this.receptorData) {
-      this.setDumbRadar()
-    }
+    await super.ngOnChanges(simpleChanges)
   }
-  constructor(sapi: SAPI, private el: ElementRef){
+
+  constructor(sapi: SAPI, private el: ElementRef, @Inject(DARKTHEME) public darktheme$: Observable<boolean>){
     super(sapi)
   }
 
@@ -85,7 +82,7 @@ export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewIni
 
   ngAfterViewInit(){
     if (this.setDumbRadarPlease) {
-      this.setDumbRadar()
+      this.rerender()
     }
 
     this.sub.push(
@@ -97,8 +94,9 @@ export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewIni
       })
     )
   }
-  
-  setDumbRadar(){
+
+  rerender(): void {
+   
     if (!this.dumbRadarCmp) {
       this.setDumbRadarPlease = true
       return
@@ -107,6 +105,6 @@ export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewIni
     this.dumbRadarCmp.metaBs = this.receptorData.data.receptor_symbols
     this.dumbRadarCmp.radar= transformRadar(this.receptorData.data.fingerprints)
 
-    this.setDumbRadarPlease = false
+    this.setDumbRadarPlease = false   
   }
 }

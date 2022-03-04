@@ -55,6 +55,5 @@ export class RegionalFeaturesList implements OnChanges{
 
   showFeature(feat: SapiRegionalFeatureModel){
     this.featureClicked.emit(feat)
-    console.log('emitting bla')
   }
 }

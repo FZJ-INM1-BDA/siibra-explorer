@@ -28,6 +28,7 @@ import { ViewerInternalStateSvc } from "./viewerInternalState.service";
 import { LayerBrowserModule } from "src/ui/layerbrowser";
 import { SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
+import { SapiViewsModule } from "src/atlasComponents/sapiViews";
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
     KeyFrameModule,
     LayerBrowserModule,
     SAPIModule,
+    SapiViewsModule,
   ],
   declarations: [
     ViewerCmp,

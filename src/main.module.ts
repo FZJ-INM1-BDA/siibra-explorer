@@ -2,7 +2,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, ActionReducer } from "@ngrx/store";
+import { StoreModule, ActionReducer, Store, select } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -59,6 +59,8 @@ import {
   userInteraction,
   plugins,
 } from "./state"
+import { DARKTHEME } from './util/injectionTokens';
+import { map } from 'rxjs/operators';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -215,6 +217,14 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: BS_ENDPOINT,
       useValue: (environment.BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
+    {
+      provide: DARKTHEME,
+      useFactory: (store: Store) => store.pipe(
+        select(atlasSelection.selectors.selectedTemplate),
+        map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
+      ),
+      deps: [ Store ]
+    }
   ],
   bootstrap : [
     AtlasViewer,

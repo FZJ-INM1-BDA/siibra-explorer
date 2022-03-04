@@ -11,7 +11,7 @@ export default {
     moduleMetadata({
       imports: [
         CommonModule,
-        AngularMaterialModule
+        AngularMaterialModule,
       ],
     })
   ],

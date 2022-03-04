@@ -1,6 +1,3 @@
-<div *ngIf="error">
-  {{ error }}
-</div>
-
-<kg-dataset-dumb-radar>
+<kg-dataset-dumb-radar
+  [attr.kg-ds-prv-darkmode]="darktheme$ | async">
 </kg-dataset-dumb-radar>

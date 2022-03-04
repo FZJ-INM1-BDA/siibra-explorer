@@ -9,7 +9,7 @@ import { BaseReceptor } from "../base";
   styleUrls: [
     './autoradiography.style.css'
   ],
-  exportAs: 'sxplrSapiviewsFeaturesReceptorAR'
+  exportAs: 'sxplrSapiViewsFeaturesReceptorAR'
 })
 
 export class Autoradiography extends BaseReceptor implements OnChanges, AfterViewInit{
@@ -24,11 +24,10 @@ export class Autoradiography extends BaseReceptor implements OnChanges, AfterVie
   renderBuffer: Uint8ClampedArray
 
   async ngOnChanges(simpleChanges: SimpleChanges) {
-    
-    if (this.baseInputChanged(simpleChanges)) {
-      await this.fetchReceptorData()
+    await super.ngOnChanges(simpleChanges)
+    if (!this.receptorData) {
+      return
     }
-
     if (this.selectedSymbol) {
       const fp = this.receptorData.data.autoradiographs[this.selectedSymbol]
       if (!fp) {
@@ -42,7 +41,7 @@ export class Autoradiography extends BaseReceptor implements OnChanges, AfterVie
 
       const { result } = await this.sapi.processNpArrayData<PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA>(fp, PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA)
       this.renderBuffer = result
-      this.renderCanvas()
+      this.rerender()
     }
   }
   constructor(sapi: SAPI, private el: ElementRef){
@@ -50,11 +49,11 @@ export class Autoradiography extends BaseReceptor implements OnChanges, AfterVie
   }
 
   ngAfterViewInit(): void {
-    if (this.pleaseRender) this.renderCanvas()
+    if (this.pleaseRender) this.rerender()
   }
 
-  private renderCanvas(){
-    if (!this.el) {
+  rerender(){
+    if (!this.el || !this.renderBuffer) {
       this.pleaseRender = true
       return
     }

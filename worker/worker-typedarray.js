@@ -34,9 +34,6 @@
     const cm = CM_CONST[colormap]
 
     function check(nv, current) {
-      if (!cm[current + 1] || !cm[current]) {
-        debugger
-      }
       const lower = cm[current].index <= nv
       const higher = nv <= cm[current + 1].index
       let returnVal = null
@@ -56,7 +53,6 @@
       while (true) {
         iter ++
         if (iter > 100) {
-          debugger
           throw new Error(`iter > 1000, something we`)
         }
         const [val, { lower, higher }] = check(nv, current)
@@ -193,7 +189,6 @@
         min,
         max,
        } = unpackToArray(inputArray, width, height, channel, dtype)
-       console.log({ outputArray })
        return {
           outputArray,
           min,

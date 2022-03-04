@@ -13,4 +13,8 @@ export const parameters = {
     },
   },
   docs: { inlineStories: true },
+  darkMode: {
+    // Set the initial theme
+    current: 'light'
+  }
 }

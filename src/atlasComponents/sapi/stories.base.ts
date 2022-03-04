@@ -1,43 +1,41 @@
-import { forkJoin } from "rxjs"
-import { map, switchMap, withLatestFrom } from "rxjs/operators"
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "."
 import { SapiParcellationFeatureModel } from "./type"
+import addons from '@storybook/addons';
+import { DARKTHEME } from "src/util/injectionTokens";
+import { APP_INITIALIZER, NgZone } from "@angular/core";
+import { DOCUMENT } from "@angular/common";
+import { BehaviorSubject } from "rxjs";
 
-/**
- * base class used to generate wrapper class for storybook
- */
-export class HumanHoc1StoryBase {
-
-  public humanAtlas$ = this.sapi.atlases$.pipe(
-    map(atlases => atlases.find(atlas => /human/i.test(atlas.name)))
-  )
-  public mni152$ = this.humanAtlas$.pipe(
-    switchMap(atlas => 
-      forkJoin(
-        atlas.spaces.map(spc => this.sapi.getSpaceDetail(atlas['@id'], spc['@id']))
-      ).pipe(
-        map(spaces => spaces.find(spc => /152/.test(spc.fullName)))
-      )
-    )
-  )
-  public jba29$ = this.humanAtlas$.pipe(
-    switchMap(atlas => 
-      forkJoin(
-        atlas.parcellations.map(parc => this.sapi.getParcDetail(atlas['@id'], parc['@id']))
-      ).pipe(
-        map(parc => parc.find(p => /2\.9/.test(p.name)))
-      )
-    )
-  )
-  public hoc1Left$ = this.jba29$.pipe(
-    withLatestFrom(this.humanAtlas$, this.mni152$),
-    switchMap(([ parc, atlas, space ]) => this.sapi.getParcRegions(atlas['@id'], parc['@id'], space['@id'])),
-    map(regions => regions.find(r => /hoc1/i.test(r.name) && /left/i.test(r.name) ))
-  )
-
-  constructor(protected sapi: SAPI){
-  }
+export function addAddonEventListener(eventName: string, callback: (...args: any[]) => void){
+  const channel = addons.getChannel()
+  channel.on(eventName, callback)
+  return () => channel.off(eventName, callback)
 }
+
+export const provideDarkTheme = [{
+  provide: DARKTHEME,
+  useFactory: (zone: NgZone, document: Document) => {
+    const useDarkTheme = document.body.getAttribute('darktheme') === "true"
+    const sub = new BehaviorSubject(useDarkTheme)
+    addAddonEventListener("DARK_MODE", flag => {
+      zone.run(() => {
+        sub.next(flag)
+      })
+    })
+    return sub
+  },
+  deps: [ NgZone, DOCUMENT ]
+}, {
+  provide: APP_INITIALIZER,
+  multi: true,
+  useFactory: (document: Document) => {
+    addAddonEventListener("DARK_MODE", flag => {
+      document.body.setAttribute('darktheme', flag.toString())
+    })
+    return () => Promise.resolve()
+  }, 
+  deps: [ DOCUMENT ]
+}]
 
 const atlasId = {
   human: 'juelich/iav/atlas/v1.0.0/1'
@@ -89,6 +87,10 @@ export async function getHoc1Left(): Promise<SapiRegionModel> {
 
 export async function getHoc1Features(): Promise<SapiRegionalFeatureModel[]> {
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left/features`)).json()
+}
+
+export async function getHoc1FeatureDetail(featId: string): Promise<SapiRegionalFeatureModel>{
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left/features/${encodeURIComponent(featId)}`)).json()
 }
 
 export async function getJba29Features(): Promise<SapiParcellationFeatureModel[]> {

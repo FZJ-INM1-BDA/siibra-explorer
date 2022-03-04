@@ -2,42 +2,6 @@
 
 $nsp: "sxplr";
 
-iav-cmp-viewer-container
-{
-
-  .mat-chip-list-wrapper
-  {
-    flex-wrap: nowrap;
-  }
-
-  poly-update-cmp
-  {
-    .mat-chip-list-wrapper
-    {
-      flex-wrap: wrap;
-    }
-  }
-}
-
-quick-tour-unit
-{
-  svg
-  {
-    pointer-events: none;
-    stroke-width: 3px;
-    stroke: rgb(255, 255, 255);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-}
-
-kg-ds-prv-regional-feature-view
-{
-  div
-  {
-    min-height: 20em;
-  }
-}
 
 // no prefix
 @for $i from 1 through 12 {
@@ -124,7 +88,20 @@ $transform-origin-maps: (
   }
 }
 
-@for $unit from 0 through 4 {
+@for $unit from 5 through 10 {
+  $width: $unit * 10;
+  .w-#{$width} {
+    width: $width * 1%;
+  }
+}
+
+@for $zlvl from 0 through 10 {
+  .#{$nsp}-z-index-#{$zlvl} {
+    z-index: $zlvl;
+  }
+}
+
+@for $unit from 0 through 8 {
   .#{$nsp}-pt-#{$unit} {
     padding-top: $unit * 0.5rem;
   }
@@ -140,4 +117,51 @@ $transform-origin-maps: (
   .#{$nsp}-p-#{$unit} {
     padding: $unit * 0.5rem;
   }
+
+  .#{$nsp}-mt-#{$unit} {
+    margin-top: $unit * 0.5rem;
+  }
+  .#{$nsp}-mb-#{$unit} {
+    margin-bottom: $unit * 0.5rem;
+  }
+  .#{$nsp}-ml-#{$unit} {
+    margin-left: $unit * 0.5rem;
+  }
+  .#{$nsp}-mr-#{$unit} {
+    margin-right: $unit * 0.5rem;
+  }
+  .#{$nsp}-m-#{$unit} {
+    margin: $unit * 0.5rem;
+  }
+}
+
+$display-vars: block, inline-block, flex, inline-flex;
+@each $display-var in $display-vars {
+  .d-#{$display-var}
+  {
+    display: $display-var!important;
+  }
+  .#{$nsp}-d-#{$display-var}
+  {
+    display: $display-var!important;
+  }
+}
+
+$align-items-vars: center, stretch;
+@each $align-items-var in $align-items-vars {
+  .align-items-#{$align-items-var} {
+    align-items: $align-items-var;
+  }
+  
+  .#{$nsp}-align-items-#{$align-items-var} {
+    align-items: $align-items-var;
+  }
+}
+
+.#{$nsp}-m-a {
+  margin: auto;
+}
+
+.#{$nsp}-muted {
+  opacity: 0.75;
 }

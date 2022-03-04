@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked, OnChanges } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked, OnChanges, SecurityContext } from '@angular/core'
+import { DomSanitizer } from '@angular/platform-browser'
 import * as showdown from 'showdown'
 
 @Component({
@@ -19,7 +20,8 @@ export class MarkdownDom implements OnChanges {
   })
 
   constructor(
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ds: DomSanitizer,
   ) {
     this.cdr.detach()
     this.converter.setFlavor('github')
@@ -32,8 +34,12 @@ export class MarkdownDom implements OnChanges {
   }
 
   ngOnChanges(){
-    this.innerHtml = this.converter.makeHtml(
+    const innerHtml = this.converter.makeHtml(
       this.getMarkdown()
+    )
+    this.innerHtml = this.ds.sanitize(
+      SecurityContext.HTML,
+      innerHtml
     )
     this.cdr.detectChanges()
   }

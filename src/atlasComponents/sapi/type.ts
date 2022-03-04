@@ -53,6 +53,8 @@ export type SapiRegionalFeatureModel = components["schemas"]["BaseDatasetJsonMod
 export type SapiParcellationFeatureMatrixModel = components["schemas"]["ConnectivityMatrixDataModel"]
 export type SapiParcellationFeatureModel = SapiParcellationFeatureMatrixModel | SapiSerializationErrorModel
 
+export type SapiFeatureModel = (SapiRegionalFeatureModel | SapiSpatialFeatureModel | SapiParcellationFeatureModel) & { type: string }
+
 export function guardPipe<
   InputType,
   GuardType extends InputType

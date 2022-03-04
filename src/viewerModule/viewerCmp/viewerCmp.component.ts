@@ -12,8 +12,8 @@ import { ComponentStore } from "../componentStore";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { actions } from "src/state/atlasSelection";
-import { atlasSelection, userInterface, userInteraction } from "src/state";
-import { SapiSpatialFeatureModel } from "src/atlasComponents/sapi/type";
+import { atlasSelection, userInteraction } from "src/state";
+import { SapiSpatialFeatureModel, SapiRegionalFeatureModel, SapiFeatureModel } from "src/atlasComponents/sapi/type";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -165,7 +165,7 @@ export class ViewerCmp implements OnDestroy {
 
   public viewerCtx$ = this.ctxMenuSvc.context$
 
-  public selectedFeature$ = this.store$.pipe(
+  public selectedFeature$: Observable<SapiFeatureModel> = this.store$.pipe(
     select(userInteraction.selectors.selectedFeature)
   )
 
@@ -193,7 +193,6 @@ export class ViewerCmp implements OnDestroy {
 
   public context: TContextArg<TSupportedViewers>
   private templateSelected: any
-  private getRegionFromlabelIndexId: (arg: {labelIndexId: string}) => any
 
   constructor(
     private store$: Store<any>,
@@ -213,11 +212,6 @@ export class ViewerCmp implements OnDestroy {
       ),
       this.templateSelected$.subscribe(
         t => this.templateSelected = t
-      ),
-      this.parcellationSelected$.subscribe(
-        p => {
-          this.getRegionFromlabelIndexId = null
-        }
       ),
       combineLatest([
         this.templateSelected$,
@@ -363,20 +357,23 @@ export class ViewerCmp implements OnDestroy {
     this.ctxMenuSvc.dismissCtxMenu()
   }
 
-  showSpatialDataset(feature: SapiSpatialFeatureModel) {
-    this.store$.dispatch(
-      actions.navigateTo({
-        navigation: {
-          orientation: [0, 0, 0, 1],
-          position: feature.location.center.coordinates.map(v => (v.unit as number) * 1e6)
-        },
-        animation: true
-      })
-    )
-
+  showDataset(feat: SapiFeatureModel) {
+    if ((feat as SapiSpatialFeatureModel).location) {
+      const feature = feat as SapiSpatialFeatureModel
+      this.store$.dispatch(
+        actions.navigateTo({
+          navigation: {
+            orientation: [0, 0, 0, 1],
+            position: feature.location.center.coordinates.map(v => (v.unit as number) * 1e6)
+          },
+          animation: true
+        })
+      )
+    }
+    
     this.store$.dispatch(
       userInteraction.actions.showFeature({
-        feature
+        feature: feat
       })
     )
   }

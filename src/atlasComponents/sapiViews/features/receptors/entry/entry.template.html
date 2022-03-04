@@ -1,0 +1,37 @@
+<mat-card>
+  <spinner-cmp *ngIf="loading"></spinner-cmp>
+
+  <sxplr-sapiviews-features-receptor-fingerprint
+    [sxplr-sapiviews-features-receptor-data]="receptorData"
+    (sxplr-sapiviews-features-receptor-fingerprint-receptor-selected)="setSelectedSymbol($event)"
+  >
+  </sxplr-sapiviews-features-receptor-fingerprint>
+
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-select [(ngModel)]="selectedSymbol">
+      <mat-option value="null" disabled>
+        --select--
+      </mat-option>
+
+      <mat-option [value]="option"
+        *ngFor="let option of symbolsOptions">
+        {{ option }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <ng-template [ngIf]="selectedSymbol">
+    
+    <sxplr-sapiviews-features-receptor-profile
+      [sxplr-sapiviews-features-receptor-data]="receptorData"
+      [sxplr-sapiviews-features-receptor-profile-selected-symbol]="selectedSymbol">
+    </sxplr-sapiviews-features-receptor-profile>
+
+    <sxplr-sapiviews-features-receptor-autoradiograph
+      [sxplr-sapiviews-features-receptor-data]="receptorData"
+      [sxplr-sapiviews-features-receptor-autoradiograph-selected-symbol]="selectedSymbol"
+    >
+    </sxplr-sapiviews-features-receptor-autoradiograph>
+  </ng-template>
+
+</mat-card>

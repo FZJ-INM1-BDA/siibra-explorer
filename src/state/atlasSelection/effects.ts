@@ -14,14 +14,15 @@ export class Effect {
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     filter(action => !!action.atlas),
-    switchMap(action => 
-      this.sapiSvc.getParcDetail(action.atlas["@id"], action.atlas.parcellations[0]["@id"], 100).then(
+    switchMap(action => {
+      const selectedParc = action.atlas.parcellations.find(p => /290/.test(p["@id"])) || action.atlas.parcellations[0]
+      return this.sapiSvc.getParcDetail(action.atlas["@id"], selectedParc["@id"], 100).then(
         parcellation => ({
           parcellation,
           atlas: action.atlas
         })
       )
-    ),
+    }),
     switchMap(({ atlas, parcellation }) => {
       const spacdIds = parcellation.brainAtlasVersions.map(bas => bas.coordinateSpace) as { "@id": string }[]
       return forkJoin(
@@ -32,16 +33,7 @@ export class Effect {
         )
       ).pipe(
         switchMap(spaces => {
-          const selectSpaceId = spaces[2]["@id"]
-          const selectedSpace = spaces.find(s => s["@id"] === selectSpaceId)
-          if (!selectedSpace) {
-            return of(
-              generalAction.generalActionError({
-                message: `space with id ${selectSpaceId} not found!`
-              })
-            )
-          }
-          
+          const selectedSpace = spaces.find(s => /152/.test(s.fullName)) || spaces[0]
           return of(
             actions.selectTemplate({
               template: selectedSpace
