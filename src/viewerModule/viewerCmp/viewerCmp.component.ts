@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, mapTo } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
@@ -26,6 +26,7 @@ import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
 import { uiActionSetPreviewingDatasetFiles } from "src/services/state/uiState.store.helper";
 import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
 import { DialogService } from "src/services/dialogService.service";
+import { RouterService } from "src/routerModule/router.service";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -124,6 +125,10 @@ export class ViewerCmp implements OnDestroy {
   public _pliDesc = "The collected datasets provide real multimodal, multiscale structural connectivity insights into the human hippocampus. One post mortem hippocampus was scanned with Anatomical and Diffusion MRI (dMRI) [1], 3D Polarized Light Imaging (3D-PLI) [2], and Two-Photon Fluorescence Microscopy (TPFM) [3] using protocols specifically developed during SGA1 and SGA2, rendering joint tissue imaging possible. MRI scanning was performed with a 11.7 T Preclinical MRI system (gradients: 760 mT/m, slew rate: 9500 T/m/s) yielding T1-w and T2-w maps at 200 µm and dMRI-based maps at 300 µm resolution. During tissue sectioning (60 µm thickness) blockface (en-face) images were acquired from the surface of the frozen brain block, serving as reference for data integration/co-alignment. 530 brain sections were scanned with 3D-PLI. HPC-based image analysis provided transmittance, retardation, and fiber orientation maps at 1.3 µm in-plane resolution. TPFM was finally applied to selected brain sections utilizing autofluorescence properties of the fibrous tissue which appears after PBS washing (MAGIC protocol). The TPFM measurements provide a resolution of 0.44 µm x 0.44 µm x 1 µm."
   public _pliLink = "https://doi.org/10.25493/JQ30-E08"
   
+  public _1umTitle = `Cellular level 3D reconstructed volumes at 1µm resolution within the human occipital cortex (v1.0)`
+  public _1umDesc = ``
+  public _1umLink = `https://search.kg.ebrains.eu/instances/d71d369a-c401-4d7e-b97a-3fb78eed06c5`
+
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
@@ -185,8 +190,33 @@ export class ViewerCmp implements OnDestroy {
       return 'notsupported'
     })
   )
-  
-  public pliVol$ = this._pliVol$ || NEVER
+
+  public viewerCtx$ = this.viewerModuleSvc.context$
+
+  private _1umVoi$ = this.routerSvc.customRoute$.pipe(
+    map(obj => obj[`x-voi`] === "d71d369a-c401-4d7e-b97a-3fb78eed06c5"),
+    distinctUntilChanged()
+  )
+
+  public pliVol$ = merge(
+    this._pliVol$?.pipe(
+      mapTo({
+        title: this._pliTitle,
+        description: this._pliDesc,
+        url: [{ doi: this._pliLink }]
+      })
+    ) || NEVER,
+    this._1umVoi$.pipe(
+      map(flag => flag
+        ? ({
+            title: this._1umTitle,
+            description: this._1umDesc,
+            url: [{ doi: this._1umLink }]
+          })
+        : null
+      )
+    )
+  )
 
   /**
    * if no regions are selected, nor any additional layers (being deprecated)
@@ -197,13 +227,13 @@ export class ViewerCmp implements OnDestroy {
   public onlyShowMiniTray$: Observable<boolean> = combineLatest([
     this.selectedRegions$,
     this.pliVol$.pipe(
-      startWith([])
+      startWith(null as { title: string, description: string, url: { doi: string }[] })
     ),
     this.viewerMode$.pipe(
       startWith(null as string)
     ),
   ]).pipe(
-    map(([ regions, layers, viewerMode ]) => regions.length === 0 && layers.length === 0 && !viewerMode)
+    map(([ regions, layers, viewerMode ]) => regions.length === 0 && !layers && !viewerMode)
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
@@ -224,6 +254,7 @@ export class ViewerCmp implements OnDestroy {
         previewingDatasetFiles: []
       })
     )
+    this.routerSvc.setCustomRoute('x-voi', null)
   }
   constructor(
     private store$: Store<any>,
@@ -232,6 +263,7 @@ export class ViewerCmp implements OnDestroy {
     cfr: ComponentFactoryResolver,
     private dialogSvc: DialogService,
     private cdr: ChangeDetectorRef,
+    private routerSvc: RouterService,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) public regionOfInterest$: Observable<any>
   ){

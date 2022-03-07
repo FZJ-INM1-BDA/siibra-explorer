@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, from, merge, NEVER, Observable, of, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 import { getRgb, IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
 import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
@@ -13,6 +13,7 @@ import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
 import { serialiseParcellationRegion } from 'common/util'
 import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
+import { RouterService } from "src/routerModule/router.service";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -162,6 +163,7 @@ export class NehubaLayerControlService implements OnDestroy{
     : NEVER
   constructor(
     private store$: Store<any>,
+    private routerSvc: RouterService,
     @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
     @Optional() @Inject(REGION_OF_INTEREST) roi$: Observable<TRegionDetail>
   ){
@@ -328,9 +330,15 @@ export class NehubaLayerControlService implements OnDestroy{
     this.pliVol$.pipe(
       startWith([])
     ),
+    this.routerSvc.customRoute$.pipe(
+      startWith({}),
+      map(val => val['x-voi'] === "d71d369a-c401-4d7e-b97a-3fb78eed06c5"
+        ? ["1um"]
+        : []),
+    )
   ]).pipe(
-    map(([ expectedLayerNames, layerNames ]) => {
-      const ngIdSet = new Set<string>([...layerNames, ...expectedLayerNames])
+    map(([ expectedLayerNames, layerNames, voiLayers ]) => {
+      const ngIdSet = new Set<string>([...layerNames, ...expectedLayerNames, ...voiLayers])
       return Array.from(ngIdSet)
     })
   )
