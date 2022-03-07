@@ -1,8 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, ActionReducer } from "@ngrx/store";
+import { StoreModule, ActionReducer, Store } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -54,10 +54,13 @@ import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
+import { debounceTime, filter, map } from 'rxjs/operators';
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, kgTos, IAV_DATASET_PREVIEW_ACTIVE } from './databrowser.fallback'
 import { CANCELLABLE_DIALOG } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
+import { RouterService } from './routerModule/router.service';
+import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from './services/state/ngViewerState.store.helper';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -242,6 +245,43 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: BS_ENDPOINT,
       useValue: (environment.BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
+    {
+      /**
+       * monkey patch 1um data as x-voi:d71d369a-c401-4d7e-b97a-3fb78eed06c5
+       */
+      provide: APP_INITIALIZER,
+      useFactory: (rSvc: RouterService, store: Store) => {
+        rSvc.customRoute$.pipe(
+          map(val => val[`x-voi`] === `d71d369a-c401-4d7e-b97a-3fb78eed06c5`),
+          debounceTime(160)
+        ).subscribe(flag => {
+          if (flag) {
+            store.dispatch(
+              ngViewerActionAddNgLayer({
+                layer: {
+                  name: `1um`,
+                  source: `precomputed://https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_1/precomputed`,
+                  shader: `void main(){ emitGrayscale(toNormalized(getDataValue()));}`,
+                  transform: [[1.002276062965393,0.1810370832681656,0.15283183753490448,-10704839],[-0.14879435300827026,-0.0360119566321373,1.018455982208252,-60994436],[0.18436983227729797,-1.0132216215133667,-0.008890812285244465,-2825862.75],[0,0,0,1]],
+                  opacity: 1,
+                }
+              })
+            )
+          } else {
+            store.dispatch(
+              ngViewerActionRemoveNgLayer({
+                layer: {
+                  name: `1um`
+                }
+              })
+            )
+          }
+        })
+        return () => Promise.resolve()
+      },
+      multi: true,
+      deps: [ RouterService, Store ]
+    }
   ],
   bootstrap : [
     AtlasViewer,
