@@ -25,7 +25,7 @@ export type AtlasSelectionState = {
   viewerMode: ViewerMode
 }
 
-const defaultState: AtlasSelectionState = {
+export const defaultState: AtlasSelectionState = {
   selectedAtlas: null,
   selectedParcellation: null,
   selectedRegions: [],

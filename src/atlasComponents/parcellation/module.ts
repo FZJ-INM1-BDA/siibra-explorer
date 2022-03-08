@@ -8,7 +8,6 @@ import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 import { UtilModule } from "src/util";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components";
-import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
 
 @NgModule({
   imports: [
@@ -25,13 +24,11 @@ import { GetParcPreviewUrlPipe } from "./getParcPreviewUrl.pipe";
     RegionTextSearchAutocomplete,
 
     FilterNameBySearch,
-    GetParcPreviewUrlPipe,
   ],
   exports: [
     RegionHierarchy,
     RegionTextSearchAutocomplete,
     FilterNameBySearch,
-    GetParcPreviewUrlPipe,
   ]
 })
 export class AtlasCmpParcellationModule{}

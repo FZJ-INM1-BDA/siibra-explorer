@@ -4,7 +4,6 @@ import { Observable } from "rxjs";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { SplashUiModule } from "src/atlasComponents/splashScreen";
-import { AtlasCmpUiSelectorsModule } from "src/atlasComponents/uiSelectors";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
@@ -28,7 +27,7 @@ import { ViewerInternalStateSvc } from "./viewerInternalState.service";
 import { LayerBrowserModule } from "src/ui/layerbrowser";
 import { SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
-import { SapiViewsModule } from "src/atlasComponents/sapiViews";
+import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 
 @NgModule({
   imports: [
@@ -36,7 +35,6 @@ import { SapiViewsModule } from "src/atlasComponents/sapiViews";
     NehubaModule,
     ThreeSurferModule,
     LayoutModule,
-    AtlasCmpUiSelectorsModule,
     AngularMaterialModule,
     SplashUiModule,
     TopMenuModule,
@@ -52,6 +50,7 @@ import { SapiViewsModule } from "src/atlasComponents/sapiViews";
     LayerBrowserModule,
     SAPIModule,
     SapiViewsModule,
+    SapiViewsUtilModule
   ],
   declarations: [
     ViewerCmp,

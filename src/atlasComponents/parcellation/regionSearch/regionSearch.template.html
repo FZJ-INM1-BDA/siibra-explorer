@@ -37,8 +37,8 @@
         [value]="region.labelIndexId">
 
         <simple-region
-          [region-base-region]="region"
-          [isSelected]="regionsSelected$ | async | includes : region : compareFn">
+          [region-base-region]="region">
+          <!-- [isSelected]="regionsSelected$ | async | includes : region : compareFn"> -->
 
         </simple-region>
       </mat-option>

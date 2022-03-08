@@ -37,19 +37,23 @@ export const provideDarkTheme = [{
   deps: [ DOCUMENT ]
 }]
 
-const atlasId = {
-  human: 'juelich/iav/atlas/v1.0.0/1'
+export const atlasId = {
+  human: 'juelich/iav/atlas/v1.0.0/1',
+  rat: "minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a",
+  mouse: "juelich/iav/atlas/v1.0.0/2",
+  monkey: "juelich/iav/atlas/v1.0.0/monkey"
 }
 
-const spaceId = {
+export const spaceId = {
   human: {
     mni152: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2'
   }
 }
 
-const parcId = {
+export const parcId = {
   human: {
-    jba29: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290"
+    jba29: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
+    longBundle: "juelich/iav/atlas/v1.0.0/5"
   }
 }
 
@@ -81,8 +85,11 @@ export async function getJba29(): Promise<SapiParcellationModel> {
   return await getParc(atlasId.human, parcId.human.jba29)
 }
 
-export async function getHoc1Left(): Promise<SapiRegionModel> {
-  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left`)).json()
+export async function getHoc1Left(spaceId=null): Promise<SapiRegionModel> {
+  if (!spaceId) {
+    return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left`)).json()
+  }
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function getHoc1Features(): Promise<SapiRegionalFeatureModel[]> {

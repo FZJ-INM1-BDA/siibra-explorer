@@ -1,0 +1,80 @@
+<!-- selector panel when expanded -->
+
+<mat-card class="selector-container m-2 position-absolute"
+  [ngClass]="{'pe-all': selectorExpanded}"
+  [@toggleAtlasLayerSelector]="selectorExpanded"
+  (@toggleAtlasLayerSelector.done)="atlasSelectorTour?.attachTo(selectorExpanded ? selectorPanelTemplateRef : null)"
+  #selectorPanelTmpl>
+  <mat-card-content>
+
+  <!-- templates -->
+  <mat-card-subtitle>
+    {{ CONST.ATLAS_SELECTOR_LABEL_SPACES }}
+  </mat-card-subtitle>
+
+  <!-- template grid and tiles -->
+  <mat-grid-list cols="3"
+    rowHeight="2:3"
+    gutterSize="16">
+
+    <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId"
+      [attr.aria-checked]="(selectedTemplate$ | async)?.['@id']  === template['@id']">
+      <sxplr-sapiviews-core-space-tile
+        [sxplr-sapiviews-core-space-tile-space]="template"
+        [sxplr-sapiviews-core-space-tile-selected]="(selectedTemplate$ | async)?.['@id'] === template['@id']"
+        (click)="selectTemplate(template)">
+      </sxplr-sapiviews-core-space-tile>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <mat-divider></mat-divider>
+
+  <!-- parcellations -->
+  <mat-card-subtitle class="mt-2">
+    {{ CONST.ATLAS_SELECTOR_LABEL_PARC_MAPS }}
+  </mat-card-subtitle>
+
+  <mat-grid-list cols="3"
+      rowHeight="2:3"
+      gutterSize="16">
+
+      <mat-grid-tile *ngFor="let parc of availableParcellations$ | async | filterUnsupportedParc | filterGroupedParcs">
+        <sxplr-sapiviews-core-parcellation-tile
+          [sxplr-sapiviews-core-parcellation-tile-parcellation]="parc"
+          (sxplr-sapiviews-core-parcellation-tile-onclick-parc)="selectParcellation($event)">
+
+        </sxplr-sapiviews-core-parcellation-tile>
+      </mat-grid-tile>
+
+      <mat-grid-tile *ngFor="let group of availableParcellations$ | async | filterUnsupportedParc | filterGroupedParcs : true | filterUnsupportedParc">
+        <sxplr-sapiviews-core-parcellation-tile
+          [sxplr-sapiviews-core-parcellation-tile-parcellation]="group"
+          (sxplr-sapiviews-core-parcellation-tile-onclick-parc)="selectParcellation($event)">
+
+        </sxplr-sapiviews-core-parcellation-tile>
+      </mat-grid-tile>
+  </mat-grid-list>
+</mat-card-content>
+
+<div [hidden]="!(showLoadingOverlay$ | async)"
+  class="loading-overlay">
+  <spinner-cmp class="spinner"></spinner-cmp>
+</div>
+</mat-card>
+
+<!-- place holder when not expanded -->
+<div class="position-relative m-2 cursor-pointer scale-up-bl pe-all sxplr-d-inline-block"
+  quick-tour
+  [quick-tour-description]="quickTourData.description"
+  [quick-tour-order]="quickTourData.order"
+  #atlasSelectorTour="quickTour">
+  <!-- TODO check when do we disable atlas selector -->
+  <button color="primary"
+    *ngIf="true"
+    matTooltip="Select layer"
+    mat-mini-fab
+    [attr.aria-label]="ARIA_LABELS.TOGGLE_ATLAS_LAYER_SELECTOR"
+    (click)="toggleSelector()">
+    <i class="fas fa-layer-group"></i>
+  </button>
+</div>

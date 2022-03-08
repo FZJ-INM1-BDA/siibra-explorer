@@ -1,3 +1,0 @@
-export {
-  RegionalFeaturesModule
-} from "./module"

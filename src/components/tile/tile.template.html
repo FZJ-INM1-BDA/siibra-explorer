@@ -1,7 +1,7 @@
-<div class="position-relative">
+<div class="sxplr-position-relative">
   <!-- info icon -->
   <div *ngIf="tileShowInfo"
-    class="position-absolute right-0">
+    class="sxplr-position-absolute right-0">
     <div mat-icon-button
       iav-stop="click"
       (click)="onInfoClick.emit($event)"
@@ -18,8 +18,12 @@
 
 
   <!-- directory icon -->
-  <div *ngIf="isDir" class="position-absolute bottom-0 right-0">
-    <i class="fas fa-folder folder-container fa-2x"></i>
+  <div *ngIf="isDir" class="sxplr-position-absolute bottom-0 right-0"
+    [ngClass]="{
+      'darktheme': darktheme,
+      'lighttheme': !darktheme
+    }">
+    <i class="fas fa-folder folder-container fa-2x iv-custom-comp text"></i>
   </div>
 
   <img [src]="tileImgSrc"
@@ -30,6 +34,6 @@
     draggable="false">
 </div>
 
-<div class="tile-text">
+<div class="tile-text mat-body">
   {{ tileText }}
 </div>

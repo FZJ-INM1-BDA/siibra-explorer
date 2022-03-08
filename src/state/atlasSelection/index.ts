@@ -1,6 +1,6 @@
 export * as selectors from "./selectors"
 export { fromRootStore } from "./util"
 export { nameSpace } from "./const"
-export { reducer } from "./store"
+export { reducer, AtlasSelectionState, defaultState } from "./store"
 export * as actions from "./actions"
 export { Effect } from "./effects"

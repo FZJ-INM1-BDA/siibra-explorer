@@ -1,0 +1,54 @@
+<mat-menu hasBackDrop="false" #matMenu="matMenu">
+
+  <ng-template matMenuContent let-subParcellations="subParcellations">
+    <div class="sxplr-ml-2 sxplr-mr-2">
+      <mat-grid-list
+        cols="1"
+        [rowHeight]="rowHeight"
+        [gutterSize]="gutterSize">
+
+        <mat-grid-tile
+          *ngFor="let parc of subParcellations">
+
+          <tile-cmp *ngIf="parc"
+            [tile-text]="parc.name"
+            [tile-image-src]="parc | previewParcellationUrl"
+            [tile-selected]="selected"
+            [tile-image-darktheme]="darktheme"
+            (click)="clickOnParcellation(parc)">
+    
+          </tile-cmp>
+    
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+  </ng-template>
+</mat-menu>
+
+<ng-template [ngIf]="parcellation">
+
+  <tile-cmp *ngIf="pureParc"
+    [tile-text]="pureParc.name"
+    [tile-image-src]="pureParc | previewParcellationUrl"
+    [tile-selected]="selected"
+    [tile-image-darktheme]="darktheme"
+    (click)="clickOnParcellation(pureParc)"
+    >
+
+  </tile-cmp>
+
+
+  <tile-cmp *ngIf="dirParc"
+    [tile-text]="dirParc.name"
+    [tile-image-src]="dirParc | previewParcellationUrl"
+    [tile-selected]="selected"
+    [tile-image-darktheme]="darktheme"
+    tile-is-dir="true"
+    [matMenuTriggerFor]="matMenu"
+    [matMenuTriggerData]="{
+        subParcellations: dirParc.parcellations || []
+    }"
+    >
+  </tile-cmp>
+
+</ng-template>

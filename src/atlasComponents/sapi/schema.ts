@@ -195,6 +195,11 @@ export interface components {
     ConnectivityMatrixDataModel: {
       /** @Id */
       "@id": string;
+      /**
+       * Type
+       * @constant
+       */
+      type?: "siibra/connectivity";
       /** Name */
       name: string;
       /** Parcellations */
@@ -545,6 +550,8 @@ export interface components {
       "@type"?: "minds/core/parcellationatlas/v1.0.0";
       /** Name */
       name: string;
+      /** Modality */
+      modality?: string;
       /** Datasets */
       datasets: components["schemas"]["DatasetJsonModel"][];
       /** Brainatlasversions */
@@ -1292,6 +1299,7 @@ export interface operations {
       };
       query: {
         space_id?: string;
+        find?: string;
       };
     };
     responses: {

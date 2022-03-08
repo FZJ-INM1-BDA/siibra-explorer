@@ -13,7 +13,7 @@ import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection, userInteraction } from "src/state";
-import { SapiSpatialFeatureModel, SapiRegionalFeatureModel, SapiFeatureModel } from "src/atlasComponents/sapi/type";
+import { SapiSpatialFeatureModel, SapiFeatureModel } from "src/atlasComponents/sapi/type";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any

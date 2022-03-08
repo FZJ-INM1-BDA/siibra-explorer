@@ -1,0 +1,7 @@
+<div *ngIf="region" matRipple [matRippleDisabled]="!ripple" class="sxplr-d-inline-flex">
+  <ng-content select="[prefix]"></ng-content>
+  <span class="mat-body">
+    {{ region.name }}
+  </span>
+  <ng-content select="[suffix]"></ng-content>
+</div>

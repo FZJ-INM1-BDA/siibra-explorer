@@ -1,0 +1,15 @@
+<div matRipple [matRippleDisabled]="!ripple"
+  class="sxplr-p-2">
+
+  <mat-chip-list [ngSwitch]="feature.type" class="scale-80 transform-origin-left-center">
+    <mat-chip *ngSwitchCase="'siibra/receptor'"
+      [color]="feature | featureBadgeColour"
+      selected>
+      {{ feature | featureBadgeName }}
+    </mat-chip>
+  </mat-chip-list>
+
+  <span class="d-block mat-body">
+    {{ label }}
+  </span>
+</div>

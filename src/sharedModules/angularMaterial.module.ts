@@ -28,11 +28,14 @@ import {MatMenuModule} from "@angular/material/menu";
 import { MatToolbarModule } from '@angular/material/toolbar'
 
 import { ClipboardModule } from '@angular/cdk/clipboard'
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
 @NgModule({
   imports: [
+    BrowserAnimationsModule,
+    
     MatButtonModule,
     MatSnackBarModule,
     MatCheckboxModule,

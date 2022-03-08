@@ -1,6 +1,5 @@
 import { OperatorFunction } from "rxjs"
 import { map } from "rxjs/operators"
-import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types"
 import { components } from "./schema"
 
 export type IdName = {
@@ -9,15 +8,6 @@ export type IdName = {
 }
 
 type Point = [number, number, number]
-type Volume = {
-  id: string
-  name: string
-  url: string
-  volume_type: "neuroglancer/precomputed"
-  detail: {
-    "neuroglancer/precomputed": IVolumeTypeDetail["neuroglancer/precomputed"]
-  }
-}
 
 export type BoundingBoxConcept = [Point, Point]
 
@@ -53,7 +43,7 @@ export type SapiRegionalFeatureModel = components["schemas"]["BaseDatasetJsonMod
 export type SapiParcellationFeatureMatrixModel = components["schemas"]["ConnectivityMatrixDataModel"]
 export type SapiParcellationFeatureModel = SapiParcellationFeatureMatrixModel | SapiSerializationErrorModel
 
-export type SapiFeatureModel = (SapiRegionalFeatureModel | SapiSpatialFeatureModel | SapiParcellationFeatureModel) & { type: string }
+export type SapiFeatureModel = SapiRegionalFeatureModel | SapiSpatialFeatureModel | SapiParcellationFeatureModel
 
 export function guardPipe<
   InputType,

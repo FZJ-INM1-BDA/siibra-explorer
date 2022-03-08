@@ -55,13 +55,13 @@ $media-map: (
 
 $overflow-directive: hidden, scroll, auto, visible;
 @each $directive in $overflow-directive {
-  .of-x-#{$directive} {
+  .#{$nsp}-of-x-#{$directive} {
     overflow-x: $directive
   }
-  .of-y-#{$directive} {
+  .#{$nsp}-of-y-#{$directive} {
     overflow-y: $directive
   }
-  .of-#{$directive} {
+  .#{$nsp}-of-#{$directive} {
     overflow: $directive
   }
 }
@@ -158,10 +158,24 @@ $align-items-vars: center, stretch;
   }
 }
 
+$justify-content-vars: end, center, space-between;
+@each $justify-content-var in $justify-content-vars {
+  .#{$nsp}-justify-content-#{$justify-content-var} {
+    justify-content: $justify-content-var;
+  }
+}
+
 .#{$nsp}-m-a {
   margin: auto;
 }
 
 .#{$nsp}-muted {
   opacity: 0.75;
+}
+
+$position-vars: relative, absolute;
+@each $position-var in $position-vars {
+  .#{$nsp}-position-#{$position-var} {
+    position: $position-var;
+  }
 }
