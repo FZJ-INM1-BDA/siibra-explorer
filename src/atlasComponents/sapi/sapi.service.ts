@@ -18,7 +18,7 @@ type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 @Injectable()
 export class SAPI{
-  static bsEndpoint = `http://localhost:5000/v1_0` // `https://siibra-api-dev.apps-dev.hbp.eu/v1_0`
+  static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v1_0`
 
   public bsEndpoint = SAPI.bsEndpoint
   
