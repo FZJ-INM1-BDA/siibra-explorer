@@ -209,12 +209,12 @@ export class ViewerCmp implements OnDestroy {
     this._1umVoi$.pipe(
       map(flag => flag
         ? ({
-            title: this._1umTitle,
-            description: this._1umDesc,
-            url: this._1umLink
-              ? [{ doi: this._1umLink }]
-              : []
-          })
+          title: this._1umTitle,
+          description: this._1umDesc,
+          url: this._1umLink
+            ? [{ doi: this._1umLink }]
+            : []
+        })
         : null
       )
     )
