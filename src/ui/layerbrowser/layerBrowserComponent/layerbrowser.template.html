@@ -14,6 +14,12 @@
       #expansionPanel>
       <mat-expansion-panel-header>
         <div class="align-items-center d-flex flex-nowrap pr-4 w-100">
+
+          <button mat-icon-button
+            [matTooltip]="ngLayer.name | getFilenamePipe">
+            <i class="fas fa-info"></i>
+          </button>
+
           <!-- toggle opacity -->
           <div matTooltip="opacity">
 
@@ -69,7 +75,7 @@
           <!-- layer description -->
           <mat-label
             [matTooltipPosition]="matTooltipPosition"
-            [matTooltip]="ngLayer.name | getFilenamePipe "
+            [matTooltip]="ngLayer.name | getFilenamePipe"
             [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate flex-grow-1 flex-shrink-1'">
             {{ ngLayer.name | getFilenamePipe }}
           </mat-label>

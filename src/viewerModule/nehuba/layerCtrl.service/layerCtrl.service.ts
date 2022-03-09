@@ -333,7 +333,7 @@ export class NehubaLayerControlService implements OnDestroy{
     this.routerSvc.customRoute$.pipe(
       startWith({}),
       map(val => val['x-voi'] === "d71d369a-c401-4d7e-b97a-3fb78eed06c5"
-        ? ["1um"]
+        ? ["VOI_1 (area V1)", "VOI_2 (area V2)"]
         : []),
     )
   ]).pipe(

@@ -125,9 +125,9 @@ export class ViewerCmp implements OnDestroy {
   public _pliDesc = "The collected datasets provide real multimodal, multiscale structural connectivity insights into the human hippocampus. One post mortem hippocampus was scanned with Anatomical and Diffusion MRI (dMRI) [1], 3D Polarized Light Imaging (3D-PLI) [2], and Two-Photon Fluorescence Microscopy (TPFM) [3] using protocols specifically developed during SGA1 and SGA2, rendering joint tissue imaging possible. MRI scanning was performed with a 11.7 T Preclinical MRI system (gradients: 760 mT/m, slew rate: 9500 T/m/s) yielding T1-w and T2-w maps at 200 µm and dMRI-based maps at 300 µm resolution. During tissue sectioning (60 µm thickness) blockface (en-face) images were acquired from the surface of the frozen brain block, serving as reference for data integration/co-alignment. 530 brain sections were scanned with 3D-PLI. HPC-based image analysis provided transmittance, retardation, and fiber orientation maps at 1.3 µm in-plane resolution. TPFM was finally applied to selected brain sections utilizing autofluorescence properties of the fibrous tissue which appears after PBS washing (MAGIC protocol). The TPFM measurements provide a resolution of 0.44 µm x 0.44 µm x 1 µm."
   public _pliLink = "https://doi.org/10.25493/JQ30-E08"
   
-  public _1umTitle = `Cellular level 3D reconstructed volumes at 1µm resolution within the human occipital cortex (v1.0)`
-  public _1umDesc = ``
-  public _1umLink = `https://search.kg.ebrains.eu/instances/d71d369a-c401-4d7e-b97a-3fb78eed06c5`
+  public _1umTitle = `Cellular level 3D reconstructed volumes at 1µm resolution within the BigBrain occipital cortex`
+  public _1umDesc = `This dataset contains two 6x6x6 mm3 volumes sampled from the occipital cortex of a human postmortem brain. The volumes were acquired by rescanning the original histological sections of the BigBrain model at an isotropic resolution of 1µm. The sections were linearly 3D reconstructed by aligning matched pairs of bisected cells. Subsequently, both reconstructed stacks were anchored into the 20µm 3D BigBrain space using a 3D similarity transformation.`
+  public _1umLink = null // `https://search.kg.ebrains.eu/instances/d71d369a-c401-4d7e-b97a-3fb78eed06c5`
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
@@ -208,7 +208,13 @@ export class ViewerCmp implements OnDestroy {
     ) || NEVER,
     this._1umVoi$.pipe(
       map(flag => flag
-        ? ({ title: this._1umTitle, description: this._1umDesc, url: [{ doi: this._1umLink }] })
+        ? ({
+            title: this._1umTitle,
+            description: this._1umDesc,
+            url: this._1umLink
+              ? [{ doi: this._1umLink }]
+              : []
+          })
         : null
       )
     )

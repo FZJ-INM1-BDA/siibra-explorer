@@ -258,21 +258,31 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
           if (flag) {
             store.dispatch(
               ngViewerActionAddNgLayer({
-                layer: {
-                  name: `1um`,
+                layer: [{
+                  name: `VOI_1 (area V1)`,
                   source: `precomputed://https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_1/precomputed`,
                   shader: `void main(){ emitGrayscale(toNormalized(getDataValue()));}`,
                   transform: [[1.002276062965393,0.1810370832681656,0.15283183753490448,-10704839],[-0.14879435300827026,-0.0360119566321373,1.018455982208252,-60994436],[0.18436983227729797,-1.0132216215133667,-0.008890812285244465,-2825862.75],[0,0,0,1]],
+                  visible: true,
                   opacity: 1,
-                }
+                },{
+                  name: `VOI_2 (area V2)`,
+                  source: `precomputed://https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_2/precomputed`,
+                  shader: `void main(){ emitGrayscale(toNormalized(getDataValue()));}`,
+                  // transform: [[1.002276062965393,0.1810370832681656,0.15283183753490448,-10704839],[-0.14879435300827026,-0.0360119566321373,1.018455982208252,-60994436],[0.18436983227729797,-1.0132216215133667,-0.008890812285244465,-2825862.75],[0,0,0,1]],
+                  visible: true,
+                  opacity: 1,
+                }]
               })
             )
           } else {
             store.dispatch(
               ngViewerActionRemoveNgLayer({
-                layer: {
-                  name: `1um`
-                }
+                layer: [{
+                  name: `VOI_1 (area V1)`
+                }, {
+                  name: `VOI_2 (area V2)`
+                }]
               })
             )
           }

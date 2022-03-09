@@ -21,7 +21,8 @@ const SHOW_LAYER_NAMES = [
   'PLI Transmittance',
   'T2w MRI',
   'MRI Labels',
-  '1um'
+  'VOI_1 (area V1)',
+  'VOI_2 (area V2)'
 ]
 
 @Component({
