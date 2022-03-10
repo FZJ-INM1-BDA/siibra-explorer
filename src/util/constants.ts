@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
-  ANIMATION: 'fzj.xg.iv.ANIMATION_FLAG',
+  ANIMATION: 'fzj.xg.iv.DISABLE_ANIMATION_FLAG',
   MOBILE_UI: 'fzj.xg.iv.MOBILE_UI',
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',

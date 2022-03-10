@@ -4,8 +4,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { BehaviorSubject, of } from "rxjs"
 import { ComponentsModule } from "src/components"
-import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState.store.helper"
-import { viewerStateCustomLandmarkSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors"
 import { AngularMaterialModule } from "src/sharedModules"
 import {PureContantService, UtilModule} from "src/util"
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
@@ -14,6 +12,8 @@ import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { HarnessLoader } from "@angular/cdk/testing"
 import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing'
+import { atlasAppearance } from "src/state"
+
 
 describe('> viewerCtrlCmp.component.ts', () => {
   describe('> ViewerCtrlCmp', () => {
@@ -81,7 +81,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
     beforeEach(() => {
       mockStore = TestBed.inject(MockStore)
       mockStore.overrideSelector(viewerStateSelectedTemplatePureSelector, {})
-      mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
+      mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
       mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
       mockStore.overrideSelector(selectorAuxMeshes, [])
     })

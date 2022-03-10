@@ -11,7 +11,7 @@ import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi";
 import { SAPISpace } from "src/atlasComponents/sapi/core";
 import { getParcNgId, fromRootStore as nehubaConfigSvcFromRootStore } from "../config.service"
 import { getRegionLabelIndex } from "../config.service/util";
-import { annotation, atlasSelection } from "src/state";
+import { annotation, atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 
 export const BACKUP_COLOR = {
@@ -160,6 +160,27 @@ export class NehubaLayerControlService implements OnDestroy{
   ){
 
     this.sub.push(
+
+      /**
+       * on store showdelin
+       * toggle parcnglayers visibility
+       */
+      this.store$.pipe(
+        select(atlasAppearance.selectors.showDelineation),
+        withLatestFrom(this.defaultNgLayers$)
+      ).subscribe(([flag, { parcNgLayers }]) => {
+        const layerObj = {}
+        for (const key in parcNgLayers) {
+          layerObj[key] = {
+            visible: flag
+          }
+        }
+
+        this.manualNgLayersControl$.next({
+          type: 'update',
+          payload: layerObj
+        })
+      }),
       this.store$.pipe(
         select(atlasSelection.selectors.selectedRegions)
       ).subscribe(() => {

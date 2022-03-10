@@ -156,7 +156,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/base-dataset";
+      type?: "siibra/core/dataset";
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
       /** Urls */
       urls: components["schemas"]["Url"][];
@@ -199,7 +199,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/connectivity";
+      type?: "siibra/features/connectivity";
       /** Name */
       name: string;
       /** Parcellations */
@@ -216,7 +216,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/base-dataset";
+      type?: "siibra/core/dataset";
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
       /** Urls */
       urls: components["schemas"]["Url"][];
@@ -327,6 +327,11 @@ export interface components {
     IEEGSessionModel: {
       /** @Id */
       "@id": string;
+      /**
+       * Type
+       * @constant
+       */
+      type?: "siibra/features/ieegSession";
       dataset: components["schemas"]["DatasetJsonModel"];
       /** Sub Id */
       sub_id: string;
@@ -457,7 +462,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/receptor";
+      type?: "siibra/features/receptor";
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
       /** Urls */
       urls: components["schemas"]["Url"][];
@@ -556,6 +561,7 @@ export interface components {
       datasets: components["schemas"]["DatasetJsonModel"][];
       /** Brainatlasversions */
       brainAtlasVersions: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Model"][];
+      version?: components["schemas"]["SiibraParcellationVersionModel"];
     };
     /** SapiSpaceModel */
     SapiSpaceModel: {
@@ -650,6 +656,15 @@ export interface components {
       /** @Id */
       "@id": string;
     };
+    /** SiibraParcellationVersionModel */
+    SiibraParcellationVersionModel: {
+      /** Name */
+      name: string;
+      /** Deprecated */
+      deprecated?: boolean;
+      prev?: components["schemas"]["SiibraAtIdModel"];
+      next?: components["schemas"]["SiibraAtIdModel"];
+    };
     /** SpeciesModel */
     SpeciesModel: {
       /**
@@ -722,7 +737,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/base-dataset";
+      type?: "siibra/features/voi";
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
       /** Urls */
       urls: components["schemas"]["Url"][];
@@ -772,7 +787,7 @@ export interface components {
        * Type
        * @constant
        */
-      type?: "siibra/base-dataset";
+      type?: "siibra/core/dataset";
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
       /** Urls */
       urls: components["schemas"]["Url"][];

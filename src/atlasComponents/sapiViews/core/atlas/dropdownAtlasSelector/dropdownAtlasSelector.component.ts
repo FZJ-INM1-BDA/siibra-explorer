@@ -26,7 +26,6 @@ export class SapiViewsCoreAtlasAtlasDropdownSelector{
     private store$: Store<any>,
     private sapi: SAPI,
   ){
-    this.selectedAtlas$.subscribe(val => console.log('sel atlas changed', val))
   }
 
   handleChangeAtlas({ value }) {

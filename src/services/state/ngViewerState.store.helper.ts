@@ -4,7 +4,7 @@ export { INgLayerInterface, PANELS } from './ngViewerState/constants'
 export {
   ngViewerActionAddNgLayer,
   ngViewerActionRemoveNgLayer,
-  ngViewerActionSetPerspOctantRemoval,
+  
   ngViewerActionToggleMax,
   ngViewerActionClearView,
   ngViewerActionSetPanelOrder,
@@ -15,8 +15,6 @@ export {
   ngViewerSelectorClearView,
   ngViewerSelectorClearViewEntries,
   ngViewerSelectorNehubaReady,
-  ngViewerSelectorOctantRemoval,
-  ngViewerSelectorPanelMode,
   ngViewerSelectorPanelOrder,
   ngViewerSelectorLayers,
 } from './ngViewerState/selectors'

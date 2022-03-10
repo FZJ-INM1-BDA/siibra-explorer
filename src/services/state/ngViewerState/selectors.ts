@@ -21,15 +21,6 @@ export const ngViewerSelectorPanelOrder = createSelector(
   ngViewerState => ngViewerState.panelOrder
 )
 
-export const ngViewerSelectorPanelMode = createSelector(
-  state => state['ngViewerState'],
-  ngViewerState => ngViewerState.panelMode
-)
-
-export const ngViewerSelectorOctantRemoval = createSelector(
-  state => state['ngViewerState'],
-  ngViewerState => ngViewerState.octantRemoval
-)
 
 export const ngViewerSelectorNehubaReady = createSelector(
   state => state['ngViewerState'],

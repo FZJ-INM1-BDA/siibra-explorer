@@ -86,28 +86,9 @@
       <ng-container *ngFor="let r of selectedRegions">
 
         <!-- region chip for discrete map -->
-        <mat-chip
-          (click)="handleChipClick()"
-          [region-base-region]="r"
-          class="pe-all position-relative z-index-1 ml-8-n"
-          [ngClass]="{
-            'darktheme':regionDirective.rgbDarkmode === true,
-            'lighttheme': regionDirective.rgbDarkmode === false
-          }"
-          [style.backgroundColor]="regionDirective.rgbString"
-          iav-region
-          #regionDirective="iavRegion">
-          <span class="iv-custom-comp text text-truncate d-inline sxplr-pl-4">
-            {{ r.name }}
-          </span>
-          <mat-icon
-            class="iv-custom-comp text"
-            (click)="clearSelectedRegions()"
-            fontSet="fas"
-            iav-stop="click"
-            fontIcon="fa-times">
-          </mat-icon>
-        </mat-chip>
+
+        <!-- TODO use actual region chip -->
+        <mat-chip>REGION PLACE HOLDER</mat-chip>
 
         <!-- chips for previewing origin datasets/continous map -->
         <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">

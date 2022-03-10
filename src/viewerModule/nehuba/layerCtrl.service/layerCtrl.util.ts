@@ -45,7 +45,7 @@ export interface INgLayerCtrl {
     [key: string]: INgLayerInterface
   }
   update: {
-    [key: string]: INgLayerInterface
+    [key: string]: Partial<INgLayerInterface>
   }
   setLayerTransparency: {
     [key: string]: number

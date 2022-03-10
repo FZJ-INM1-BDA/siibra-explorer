@@ -1,6 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
@@ -13,7 +12,6 @@ import { DialogInfoModule } from "src/ui/dialogInfo";
     CommonModule,
     AngularMaterialModule,
     QuickTourModule,
-    ParcellationRegionModule,
     UtilModule,
     DialogInfoModule,
   ],

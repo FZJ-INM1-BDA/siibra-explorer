@@ -205,25 +205,21 @@
     <!-- such a gross implementation -->
     <!-- TODO fix this -->
     <div class="mt-1-n w-100 sxplr-pl-2 sxplr-pr-2 m-1px">
+
+      <!-- TODO use sapiViews/core/region/base and fix the rest -->
       <button mat-raised-button
         *ngIf="!(onlyShowMiniTray$ | async)"
         [attr.aria-label]="ARIA_LABELS.EXPAND"
         (click)="showFullSidenav()"
         class="explore-btn pe-all w-100"
         [ngClass]="{
-          'darktheme': iavRegion.rgbDarkmode === true,
-          'lighttheme': iavRegion.rgbDarkmode === false
+          'darktheme': true,
+          'lighttheme': false
         }"
-        [style.backgroundColor]="iavRegion?.rgbString || 'accent'">
+        [style.backgroundColor]="'accent'">
         <span class="text iv-custom-comp">
           Explore
         </span>
-
-        <div class="hidden"
-          iav-region
-          [region-base-region]="(selectedRegions$ | async) && (selectedRegions$ | async)[0]"
-          #iavRegion="iavRegion">
-        </div>
       </button>
     </div>
   
@@ -362,19 +358,23 @@
   <sxplr-sapiviews-core-atlas-tmplparcselector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)">
   </sxplr-sapiviews-core-atlas-tmplparcselector>
 
-  <!-- <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
-    #alSelector="atlasLayerSelector"
-    class="d-inline-block flex-grow-0 flex-shrink-0 pe-all"
-    (iav-outsideClick)="alSelector.selectorExpanded = false">
-  </atlas-layer-selector> -->
+  <!-- selected parcellation chip -->
+  <sxplr-sapiviews-core-parcellation-smartchip
+    class="sxplr-pointer-events-all"
+    [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
+    [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
+    (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
+    (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
+    >
+  </sxplr-sapiviews-core-parcellation-smartchip>
 
   <!-- chips -->
-  <div *ngIf="parcellationSelected$ | async"
+  <!-- <div *ngIf="parcellationSelected$ | async"
     class="d-inline-block flex-grow-1 flex-shrink-1 pe-none overflow-x-auto overflow-y-hidden">
 
     <viewer-state-breadcrumb class="d-inline-block pe-all" (on-item-click)="showFullSideNav()">
     </viewer-state-breadcrumb>
-  </div>
+  </div> -->
 
 </ng-template>
 
@@ -471,13 +471,10 @@
 
       <!-- if region selected > 0 -->
       <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
-        <div class="hidden"
-          iav-region
-          [region-base-region]="regionSelected[0]"
-          #tabTmpl_iavRegion="iavRegion">
-        </div>
 
-        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+
+        <!-- TODO fix with sapiView/core/region directive -->
+        <!-- <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
           matColor: 'accent',
           customColor: tabTmpl_iavRegion.rgbString,
           customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
@@ -486,7 +483,7 @@
           click: click
         }">
 
-        </ng-container>
+        </ng-container> -->
       </ng-template>
 
       <!-- nothing is selected -->
@@ -558,8 +555,16 @@
       <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
         <!-- a series of bugs result in requiring this hacky -->
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
-        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: selectedRegions[0] }">
-        </ng-container>
+
+        <sxplr-sapiviews-core-region-region-rich
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+          [sxplr-sapiviews-core-region-region]="selectedRegions[0]"
+          (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
+        >
+          <div class="sapi-container" header></div>
+        </sxplr-sapiviews-core-region-region-rich>
       </ng-template>
 
       <!-- multi region wrapper -->
@@ -573,8 +578,7 @@
 
       <!-- place holder if length === 0 -->
       <ng-container *ngIf="selectedRegions.length === 0">
-        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: false }">
-        </ng-container>
+        no region selected
       </ng-container>
     </ng-container>
 
@@ -591,21 +595,6 @@
 </ng-template>
 
 
-<!-- single region tmpl -->
-<ng-template #singleRegionTmpl let-region="region">
-  <!-- region detail -->
-  <sxplr-sapiviews-core-region-region-rich
-    [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-    [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
-    [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
-    [sxplr-sapiviews-core-region-region]="region"
-    (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
-  >
-    <div class="sapi-container" header></div>
-  </sxplr-sapiviews-core-region-region-rich>
-</ng-template>
-
-
 <!-- expansion tmpl -->
 <ng-template #ngMatAccordionTmpl
   let-title="title"
@@ -614,37 +603,6 @@
   let-iconTooltip="iconTooltip"
   let-iavNgIf="iavNgIf"
   let-content="content">
-  <mat-expansion-panel
-    [attr.data-opened]="expansionPanel.expanded"
-    [attr.data-mat-expansion-title]="title"
-    hideToggle
-    *ngIf="iavNgIf"
-    #expansionPanel="matExpansionPanel">
-
-    <mat-expansion-panel-header>
-
-      <!-- title -->
-      <mat-panel-title>
-        {{ title }}
-      </mat-panel-title>
-
-      <!-- desc + icon -->
-      <mat-panel-description class="d-flex align-items-center justify-content-end"
-        [matTooltip]="iconTooltip">
-        <span class="mr-3">{{ desc }}</span>
-        <span class="accordion-icon d-inline-flex justify-content-center">
-          <i [class]="iconClass"></i>
-        </span>
-      </mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <!-- content -->
-    <ng-template matExpansionPanelContent>
-      <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
-      </ng-container>
-    </ng-template>
-  </mat-expansion-panel>
 </ng-template>
 
 <!-- select region error... for whatever reason -->
@@ -656,42 +614,42 @@
 <!-- multi region tmpl -->
 <ng-template #multiRegionTmpl let-regions="regions">
   <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
-    <!-- <region-menu
-      [region-base-region]="{ name: CONST.MULTI_REGION_SELECTION }"
-      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
-    </region-menu> -->
-    MULTI_REGION_SELECTION
 
     <!-- other regions detail accordion -->
     <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
 
       <!-- Multi regions include -->
-      <ng-template #multiRegionInclTmpl>
 
-        <mat-chip *ngFor="let r of regions"
-          iav-region
-          [region-base-region]="r"
-          class="m-1"
-          [ngClass]="{
-            'darktheme':regionDirective.rgbDarkmode === true,
-            'lighttheme': regionDirective.rgbDarkmode === false
-          }"
-          [style.backgroundColor]="regionDirective.rgbString"
-          #regionDirective="iavRegion">
-          <span class="iv-custom-comp text text-truncate d-inline">
-            {{ r.name }}
-          </span>
-        </mat-chip>
-      </ng-template>
+      <mat-expansion-panel
+        [attr.data-opened]="expansionPanel.expanded"
+        [attr.data-mat-expansion-title]="'Brain regions'"
+        hideToggle
+        #expansionPanel="matExpansionPanel">
 
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: 'Brain regions',
-        desc: regions.length,
-        iconClass: 'fas fa-brain',
-        iavNgIf: true,
-        content: multiRegionInclTmpl
-      }">
-      </ng-container>
+        <mat-expansion-panel-header>
+
+          <!-- title -->
+          <mat-panel-title>
+            Brain regions
+          </mat-panel-title>
+
+          <!-- desc + icon -->
+          <mat-panel-description class="d-flex align-items-center justify-content-end">
+            <span class="mr-3">{{ regions.length }}</span>
+            <span class="accordion-icon d-inline-flex justify-content-center">
+              <i class="fas fa-brain"></i>
+            </span>
+          </mat-panel-description>
+
+        </mat-expansion-panel-header>
+
+        <!-- content -->
+        <ng-template matExpansionPanelContent>
+          
+          <!-- TODO use actual region chip in sapiViews/core/region/chip -->
+          SOMETHING
+        </ng-template>
+      </mat-expansion-panel>
 
     </mat-accordion>
   </ng-template>

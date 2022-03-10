@@ -12,14 +12,8 @@ import {
 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
-import { map, filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
+import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
-import {
-  IavRootStoreInterface,
-  isDefined,
-} from "../services/stateStore.service";
-
-import { AGREE_COOKIE } from "src/services/state/uiState.store";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
@@ -31,6 +25,7 @@ import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
 import { environment } from 'src/environments/environment'
 import { DOCUMENT } from "@angular/common";
+import { userPreference } from "src/state"
 
 /**
  * TODO
@@ -66,8 +61,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
 
-  public sidePanelView$: Observable<string|null>
-
   private snackbarRef: MatSnackBarRef<any>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
@@ -79,7 +72,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private cookieDialogRef: MatDialogRef<any>
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
+    private store: Store<any>,
     private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private rd: Renderer2,
@@ -89,13 +82,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private clickIntService: ClickInterceptorService,
     @Inject(DOCUMENT) private document,
   ) {
-
-    this.sidePanelView$ = this.store.pipe(
-      select('uiState'),
-      filter(state => isDefined(state)),
-      map(state => state.focusedSidePanel),
-    )
-
 
     const error = this.el.nativeElement.getAttribute('data-error')
 
@@ -163,9 +149,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
      * TODO avoid creating new views in lifecycle hooks in general
      */
     this.store.pipe(
-      select('uiState'),
-      select('agreedCookies'),
-      filter(agreed => !agreed),
+      select(userPreference.selectors.agreedToCookie),
+      filter(val => !val),
       delay(0),
     ).subscribe(() => {
       this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
@@ -207,9 +192,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public cookieClickedOk() {
     if (this.cookieDialogRef) { this.cookieDialogRef.close() }
-    this.store.dispatch({
-      type: AGREE_COOKIE,
-    })
+    this.store.dispatch(
+      userPreference.actions.agreeCookie()
+    )
   }
 
   public quickTourFinale = {

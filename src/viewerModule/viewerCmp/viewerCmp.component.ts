@@ -11,9 +11,9 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { ComponentStore } from "../componentStore";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
-import { actions } from "src/state/atlasSelection";
+import { actions, fromRootStore } from "src/state/atlasSelection";
 import { atlasSelection, userInteraction } from "src/state";
-import { SapiSpatialFeatureModel, SapiFeatureModel } from "src/atlasComponents/sapi/type";
+import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -114,6 +114,10 @@ export class ViewerCmp implements OnDestroy {
   )
   public parcellationSelected$ = this.selectedATP.pipe(
     map(({ parcellation }) => parcellation)
+  )
+
+  public allAvailableParcellations$ = this.store$.pipe(
+    fromRootStore.allAvailParcs(this.sapi)
   )
 
   public selectedRegions$ = this.store$.pipe(
@@ -382,5 +386,12 @@ export class ViewerCmp implements OnDestroy {
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
     )
+  }
+
+  onDismissNonbaseLayer(){
+    
+  }
+  onSelectParcellation(parc: SapiParcellationModel){
+
   }
 }

@@ -8,3 +8,13 @@ export const getOverwrittenColormap = createSelector(
   selectStore,
   state => state.overwrittenColormap
 )
+
+export const octantRemoval = createSelector(
+  selectStore,
+  state => state.octantRemoval
+)
+
+export const showDelineation = createSelector(
+  selectStore,
+  state => state.showDelineation
+)

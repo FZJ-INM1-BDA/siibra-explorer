@@ -118,7 +118,7 @@ const loadFeat = async () => {
   const region = await getHoc1Left()
   const space = await getMni152()
   const features = await getHoc1Features()
-  const receptorfeat = features.find(f => f.type === "siibra/receptor")
+  const receptorfeat = features.find(f => f.type === "siibra/features/receptor")
   const feature = await getHoc1FeatureDetail(receptorfeat["@id"])
   return {
     atlas,

@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { ARIA_LABELS } from 'common/constants'
-import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
+import { userInterface } from "src/state"
 
 const {
   MAXIMISE_VIEW,
@@ -26,26 +26,18 @@ export class MaximisePanelButton {
 
   @Input() public panelIndex: number
 
-  private panelMode$: Observable<string>
-  private panelOrder$: Observable<string>
+  private panelMode$ = this.store$.pipe(
+    select(userInterface.selectors.panelMode),
+    distinctUntilChanged(),
+  )
 
-  public isMaximised$: Observable<boolean>
+  public isMaximised$ = this.panelMode$.pipe(
+    map(panelMode => panelMode === "SINGLE_PANEL"),
+  )
 
   constructor(
     private store$: Store<any>,
   ) {
-    this.panelMode$ = this.store$.pipe(
-      select(ngViewerSelectorPanelMode),
-      distinctUntilChanged(),
-    )
 
-    this.panelOrder$ = this.store$.pipe(
-      select(ngViewerSelectorPanelOrder),
-      distinctUntilChanged(),
-    )
-
-    this.isMaximised$ = this.panelMode$.pipe(
-      map(panelMode => panelMode === PANELS.SINGLE_PANEL),
-    )
   }
 }

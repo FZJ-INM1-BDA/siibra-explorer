@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { Observable } from "rxjs";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
-import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { SplashUiModule } from "src/atlasComponents/splashScreen";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
@@ -38,7 +37,6 @@ import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiVi
     AngularMaterialModule,
     SplashUiModule,
     TopMenuModule,
-    ParcellationRegionModule,
     UtilModule,
     AtlasCmpParcellationModule,
     ComponentsModule,

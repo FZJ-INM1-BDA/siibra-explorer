@@ -1,9 +1,8 @@
 import { Directive } from "@angular/core"
 import { select, Store } from "@ngrx/store"
-import { merge, Observable } from "rxjs"
+import { merge, NEVER, Observable, of } from "rxjs"
 import { distinctUntilChanged, map, scan, shareReplay } from "rxjs/operators"
 import { LoggingService } from "src/logging"
-import { uiStateMouseOverLandmarkSelector, uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors"
 import { TOnHoverObj, temporalPositveScanFn } from "./util"
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { userInteraction } from "src/state"
@@ -26,24 +25,26 @@ export class MouseHoverDirective {
     // TODO consider moving these into a single obs serviced by a DI service
     // can potentially net better performance
 
-    const onHoverUserLandmark$ = this.store$.pipe(
-      select(uiStateMouseoverUserLandmark)
-    )
+    const onHoverUserLandmark$ = NEVER
+    // this.store$.pipe(
+    //   select(uiStateMouseoverUserLandmark)
+    // )
 
-    const onHoverLandmark$ = this.store$.pipe(
-      select(uiStateMouseOverLandmarkSelector)
-    ).pipe(
-      map(landmark => {
-        if (landmark === null) { return null }
-        const idx = Number(landmark.replace('label=', ''))
-        if (isNaN(idx)) {
-          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
-          return {
-            landmarkName: idx,
-          }
-        } 
-      }),
-    )
+    const onHoverLandmark$ = NEVER
+    // this.store$.pipe(
+    //   select(uiStateMouseOverLandmarkSelector)
+    // ).pipe(
+    //   map(landmark => {
+    //     if (landmark === null) { return null }
+    //     const idx = Number(landmark.replace('label=', ''))
+    //     if (isNaN(idx)) {
+    //       this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+    //       return {
+    //         landmarkName: idx,
+    //       }
+    //     } 
+    //   }),
+    // )
 
     const onHoverSegments$ = this.store$.pipe(
       select(userInteraction.selectors.mousingOverRegions),

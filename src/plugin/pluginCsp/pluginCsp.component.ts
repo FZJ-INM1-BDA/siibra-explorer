@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { map } from "rxjs/operators";
 import { PluginServices } from "../atlasViewer.pluginService.service";
-import { selectorAllPluginsCspPermission } from "src/services/state/userConfigState.store";
+import { userPreference } from "src/state"
 
 @Component({
   selector: 'plugin-csp-controller',
@@ -15,7 +15,7 @@ import { selectorAllPluginsCspPermission } from "src/services/state/userConfigSt
 export class PluginCspCtrlCmp{
 
   public pluginCsp$ = this.store$.pipe(
-    select(selectorAllPluginsCspPermission),
+    select(userPreference.selectors.userCsp),
     map(pluginCsp => Object.keys(pluginCsp).map(key => ({ pluginKey: key, pluginCsp: pluginCsp[key] }))),
   )
 

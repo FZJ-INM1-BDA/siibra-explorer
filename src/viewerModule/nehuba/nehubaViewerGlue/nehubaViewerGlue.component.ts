@@ -5,7 +5,6 @@ import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
 import { viewerStateAddUserLandmarks, viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
-import { ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
@@ -31,7 +30,7 @@ import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMes
 import { generalActionError } from "src/services/stateStore.helper";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { actions } from "src/state/atlasSelection";
-import { annotation, atlasSelection, userInteraction } from "src/state";
+import { annotation, atlasSelection, userInteraction, userInterface } from "src/state";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -169,7 +168,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   public panelOrder$ = this.store$.pipe(
-    select(ngViewerSelectorPanelOrder),
+    select(userInterface.selectors.panelOrder),
     distinctUntilChanged(),
     shareReplay(1),
   )
@@ -392,7 +391,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
      */
     const redrawLayoutSub = combineLatest([
       this.store$.pipe(
-        select(ngViewerSelectorPanelMode),
+        select(userInterface.selectors.panelMode),
         distinctUntilChanged(),
         shareReplay(1),
       ),

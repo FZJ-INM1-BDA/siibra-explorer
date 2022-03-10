@@ -37,11 +37,11 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   }
 
   handleExpansionPanelClosedEv(title: string){
-    console.log("title", title)
+    
   }
 
   handleExpansionPanelAfterExpandEv(title: string) {
-    console.log("title", title)
+    
   }
 
   activePanelTitles$: Observable<string[]> = new Subject()

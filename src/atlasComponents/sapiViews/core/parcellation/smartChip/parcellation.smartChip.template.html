@@ -1,0 +1,49 @@
+<mat-menu #otherParcMenu="matMenu"
+  [hasBackdrop]="false"
+  class="sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none overwrite-max-width-80vw">
+  <div (iav-outsideClick)="menuTrigger.closeMenu()">
+
+    <sxplr-sapiviews-core-parcellation-chip *ngFor="let parc of otherVersions"
+      [sxplr-sapiviews-core-parcellation-chip-parcellation]="parc"
+      [sxplr-sapiviews-core-parcellation-chip-color]="parcellation === parc ? 'primary' : 'default'"
+      (click)="selectParcellation(parc)">
+
+    </sxplr-sapiviews-core-parcellation-chip>
+  </div>
+  
+</mat-menu>
+
+<sxplr-sapiviews-core-parcellation-chip
+  [ngClass]="{
+    'sxplr-muted': !(parcellationVisibility$ | async)
+  }"
+  class="sxplr-d-inline-block"
+  [sxplr-sapiviews-core-parcellation-chip-parcellation]="parcellation"
+  [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | parcellationIsBaseLayer) ? 'default' : 'primary'"
+  (sxplr-sapiviews-core-parcellation-chip-onclick)="menuTrigger.toggleMenu()"
+  [matMenuTriggerFor]="otherParcMenu"
+  #menuTrigger="matMenuTrigger"
+  >
+
+  <div prefix class="sxplr-scale-70">
+    <button mat-mini-fab
+      [color]="(parcellationVisibility$ | async) ? 'primary' : 'default'"
+      iav-stop="mousedown click"
+      (click)="toggleParcellationVisibility()">
+      <i class="fas"
+        [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye': 'fa-eye-slash'">
+      </i>
+    </button>
+  </div>
+
+  <div *ngIf="!(parcellation | parcellationIsBaseLayer)"
+    class="sxplr-scale-70"
+    suffix>
+    <button mat-mini-fab
+      color="primary"
+      iav-stop="mousedown click"
+      (click)="dismiss()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</sxplr-sapiviews-core-parcellation-chip>

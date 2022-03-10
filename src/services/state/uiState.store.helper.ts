@@ -13,10 +13,6 @@ export {
   uiActionMouseoverSegments,
 } from './uiState/actions'
 
-export {
-  uiStatePreviewingDatasetFilesSelector,
-  uiStateMouseoverUserLandmark,
-} from './uiState/selectors'
 
 export enum EnumWidgetTypes{
   DATASET_PREVIEW,

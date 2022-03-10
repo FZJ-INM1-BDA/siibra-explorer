@@ -28,7 +28,6 @@ import { DOCUMENT } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { Landmark2DModule } from "./nehubaContainer/2dLandmarks/module";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
-import { ParcellationRegionModule } from "src/atlasComponents/parcellationRegion";
 import { AtlasCmpParcellationModule } from "src/atlasComponents/parcellation";
 import { DialogInfoModule } from "./dialogInfo"
 
@@ -46,7 +45,6 @@ import { DialogInfoModule } from "./dialogInfo"
     ShareModule,
     AuthModule,
     Landmark2DModule,
-    ParcellationRegionModule,
     AtlasCmpParcellationModule,
     DialogInfoModule,
   ],

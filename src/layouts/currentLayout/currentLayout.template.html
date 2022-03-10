@@ -1,7 +1,7 @@
 <ng-container [ngSwitch]="panelMode$ | async">
   <layout-four-panel
-    *ngSwitchCase="supportedPanelModes[0]"
-    class="d-block w-100 h-100">
+    *ngSwitchCase="panelModes.FOUR_PANEL"
+    class="d-block sxplr-w-100 sxplr-h-100">
     <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
     </ng-container>
@@ -16,8 +16,8 @@
     </ng-container>
   </layout-four-panel>
   <layout-horizontal-one-three
-    *ngSwitchCase="supportedPanelModes[1]"
-    class="d-block w-100 h-100">
+    *ngSwitchCase="panelModes.H_ONE_THREE"
+    class="d-block sxplr-w-100 sxplr-h-100">
     <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
     </ng-container>
@@ -32,8 +32,8 @@
     </ng-container>
   </layout-horizontal-one-three>
   <layout-vertical-one-three
-    *ngSwitchCase="supportedPanelModes[2]"
-    class="d-block w-100 h-100">
+    *ngSwitchCase="panelModes.V_ONE_THREE"
+    class="d-block sxplr-w-100 sxplr-h-100">
     <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
     </ng-container>
@@ -48,8 +48,8 @@
     </ng-container>
   </layout-vertical-one-three>
   <layout-single-panel
-    *ngSwitchCase="supportedPanelModes[3]"
-    class="d-block w-100 h-100">
+    *ngSwitchCase="panelModes.SINGLE_PANEL"
+    class="d-block sxplr-w-100 sxplr-h-100">
     <ng-container cell-i>
       <ng-content *ngTemplateOutlet="celli"></ng-content>
     </ng-container>
@@ -64,7 +64,7 @@
     </ng-container>
   </layout-single-panel>
   <div *ngSwitchDefault>
-    A panel mode which I have never seen before ...
+    A panel mode which I have never seen before ... {{ panelMode$ | async }}
   </div>
 </ng-container>
 

@@ -1,31 +1,27 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, ActionReducer, Store, select } from "@ngrx/store";
+import { Store, select } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
-import { ngViewerState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState } from "./services/stateStore.service";
 import { UIModule } from "./ui/ui.module";
 
 import { HttpClientModule } from "@angular/common/http";
-import { EffectsModule } from "@ngrx/effects";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
-import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { UIService } from "./services/uiService.service";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
-import { UiStateUseEffect } from "src/services/state/uiState.store";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
@@ -35,9 +31,7 @@ import { AuthService } from './auth'
 import 'src/theme.scss'
 import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
-import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
-import { ParcellationRegionModule } from './atlasComponents/parcellationRegion';
 import { ViewerModule, VIEWERMODULE_DARKTHEME } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
@@ -54,22 +48,12 @@ import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 
 import {
   atlasSelection,
-  annotation,
-  userInterface,
-  userInteraction,
-  plugins,
+  RootEffecsModule,
+  RootStoreModule,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
 import { map } from 'rxjs/operators';
 
-export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
-  return function(state, action) {
-    console.log('state', state);
-    console.log('action', action);
- 
-    return reducer(state, action);
-  };
-}
 
 @NgModule({
   imports : [
@@ -88,36 +72,14 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     MesssagingModule,
     ViewerModule,
     SpotLightModule,
-    ParcellationRegionModule,
     CookieModule,
     KgTosModule,
     MouseoverModule,
     AtlasViewerRouterModule,
     QuickTourModule,
     
-    EffectsModule.forRoot([
-      UserConfigStateUseEffect,
-      NgViewerUseEffect,
-      plugins.Effects,
-      UiStateUseEffect,
-      UiEffects,
-      atlasSelection.Effect,
-    ]),
-    StoreModule.forRoot({
-      viewerConfigState,
-      ngViewerState,
-      uiState,
-      userConfigState,
-      [atlasSelection.nameSpace]: atlasSelection.reducer,
-      [userInterface.nameSpace]: userInterface.reducer,
-      [userInteraction.nameSpace]: userInteraction.reducer,
-      [annotation.nameSpace]: annotation.reducer,
-      [plugins.nameSpace]: plugins.reducer,
-    },{
-      metaReducers: [ 
-        // debug,
-      ]
-    }),
+    RootEffecsModule,
+    RootStoreModule,
     HttpClientModule,
   ],
   declarations : [
@@ -224,6 +186,15 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
         map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
       ),
       deps: [ Store ]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authSvc: AuthService) => {
+        authSvc.authReloadState()
+        return () => Promise.resolve()
+      },
+      multi: true,
+      deps: [ AuthService ]
     }
   ],
   bootstrap : [
@@ -231,11 +202,4 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   ],
 })
 
-export class MainModule {
-
-  constructor(
-    authServce: AuthService,
-  ) {
-    authServce.authReloadState()
-  }
-}
+export class MainModule {}

@@ -7,3 +7,17 @@ export const overwriteColorMap = createAction(
     colormap: Record<string, number[]>
   }>()
 )
+
+export const setOctantRemoval = createAction(
+  `${nameSpace} setOctantRemoval`,
+  props<{
+    flag: boolean
+  }>()
+)
+
+export const setShowDelineation = createAction(
+  `${nameSpace} setShowDelineation`,
+  props<{
+    flag: boolean
+  }>()
+)

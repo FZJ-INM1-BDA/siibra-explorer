@@ -11,11 +11,6 @@ export const ngViewerActionRemoveNgLayer = createAction(
   props<{ layer: Partial<INgLayerInterface>|Partial<INgLayerInterface>[] }>()
 )
 
-export const ngViewerActionSetPerspOctantRemoval = createAction(
-  `[ngViewerAction] setPerspectiveOctant`,
-  props<{ octantRemovalFlag: boolean }>()
-)
-
 export const ngViewerActionToggleMax = createAction(
   `[ngViewerAction] toggleMax`,
   props<{ payload: { index: number } }>()

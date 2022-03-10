@@ -75,8 +75,8 @@ export abstract class BaseReceptor{
       return
     }
     const result = await this.sapi.getRegion(this.atlas["@id"], this.parcellation["@id"], this.region.name).getFeatureInstance(this.featureId, this.template["@id"])
-    if (result.type !== "siibra/receptor") {
-      throw new Error(`BaseReceptor Error. Expected .type to be "siibra/receptor", but was "${result.type}"`)
+    if (result.type !== "siibra/features/receptor") {
+      throw new Error(`BaseReceptor Error. Expected .type to be "siibra/features/receptor", but was "${result.type}"`)
     }
     return result
   }

@@ -20,7 +20,7 @@ const hideGroup = [
 
 export class FilterUnsupportedParcPipe implements PipeTransform{
   public transform<T extends Filterables>(parcs: T[]): T[] {
-    return parcs.filter(p => {
+    return (parcs || []).filter(p => {
       if (p instanceof GroupedParcellation) {
         return hideGroup.indexOf(p.name) < 0
       }

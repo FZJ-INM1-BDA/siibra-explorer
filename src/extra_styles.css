@@ -875,3 +875,8 @@ quick-tour-unit svg
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.overwrite-max-width-80vw
+{
+  max-width: 80vw!important;
+}

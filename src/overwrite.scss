@@ -56,22 +56,21 @@ $media-map: (
 $overflow-directive: hidden, scroll, auto, visible;
 @each $directive in $overflow-directive {
   .#{$nsp}-of-x-#{$directive} {
-    overflow-x: $directive
+    overflow-x: $directive!important;
   }
   .#{$nsp}-of-y-#{$directive} {
-    overflow-y: $directive
+    overflow-y: $directive!important;
   }
   .#{$nsp}-of-#{$directive} {
-    overflow: $directive
+    overflow: $directive!important;
   }
 }
 
 @for $scale from 5 through 10 {
 
   $scale-var: $scale * 10;
-  .scale-#{$scale-var}
+  .#{$nsp}-scale-#{$scale-var}
   {
-    color: red;
     transform: scale($scale * 0.1);
   }
 }
@@ -135,7 +134,7 @@ $transform-origin-maps: (
   }
 }
 
-$display-vars: block, inline-block, flex, inline-flex;
+$display-vars: none, block, inline-block, flex, inline-flex;
 @each $display-var in $display-vars {
   .d-#{$display-var}
   {
@@ -147,7 +146,7 @@ $display-vars: block, inline-block, flex, inline-flex;
   }
 }
 
-$align-items-vars: center, stretch;
+$align-items-vars: center, stretch, start;
 @each $align-items-var in $align-items-vars {
   .align-items-#{$align-items-var} {
     align-items: $align-items-var;
@@ -178,4 +177,43 @@ $position-vars: relative, absolute;
   .#{$nsp}-position-#{$position-var} {
     position: $position-var;
   }
+}
+
+.#{$nsp}-bg-none
+{
+  background: none!important;
+}
+
+.#{$nsp}-box-shadow-none
+{
+  box-shadow: none!important;
+}
+
+
+$white-space-vars: nowrap;
+@each $white-space-var in $white-space-vars {
+  .#{$nsp}-white-space-#{$white-space-var}
+  {
+    white-space: $white-space-var!important;
+  }
+}
+
+$pointer-events-vars: all, none;
+@each $pointer-events-var in $pointer-events-vars {
+  .#{$nsp}-pointer-events-#{$pointer-events-var}
+  {
+    pointer-events: $pointer-events-var!important;
+  }
+}
+
+$width-pc-vars: 100;
+@each $width-pc-var in $width-pc-vars {
+  .#{$nsp}-w-#{$width-pc-var} {
+    width: $width-pc-var * 1%;
+  }
+}
+
+.#{$nsp}-border
+{
+  border-width: 1px;
 }

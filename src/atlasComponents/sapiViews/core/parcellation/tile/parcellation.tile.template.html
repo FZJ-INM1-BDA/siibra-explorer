@@ -11,6 +11,7 @@
           *ngFor="let parc of subParcellations">
 
           <tile-cmp *ngIf="parc"
+            class="iv-custom-comp text"
             [tile-text]="parc.name"
             [tile-image-src]="parc | previewParcellationUrl"
             [tile-selected]="selected"
