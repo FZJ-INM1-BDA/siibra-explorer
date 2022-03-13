@@ -80,7 +80,7 @@ export class NehubaLayerControlService implements OnDestroy{
 
         const returnVal: IColorMap = {}
         for (const r of regions) {
-          
+
           if (!r.hasAnnotation) continue
           if (!r.hasAnnotation.visualizedIn) continue
 
@@ -94,6 +94,7 @@ export class NehubaLayerControlService implements OnDestroy{
           }
           returnVal[ngId][labelIndex] = { red, green, blue }
         }
+        this.activeColorMap = returnVal
         return returnVal
       })
     ),

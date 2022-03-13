@@ -7,7 +7,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./region.base";
 import { RegionDirective } from "./region.directive";
 import { SimpleRegionComponent } from "./regionSimple/regionSimple.component";
 import { RegionAccordionTooltipTextPipe } from "./regionAccordionTooltipText.pipe";
-import { AtlasCmptConnModule } from "../connectivity";
 import { HttpClientModule } from "@angular/common/http";
 import { RegionInOtherTmplPipe } from "./regionInOtherTmpl.pipe";
 import { SiibraExplorerTemplateModule } from "../template";
@@ -18,7 +17,6 @@ import { SiibraExplorerTemplateModule } from "../template";
     UtilModule,
     AngularMaterialModule,
     ComponentsModule,
-    AtlasCmptConnModule,
     HttpClientModule,
     SiibraExplorerTemplateModule,
 

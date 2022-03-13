@@ -90,6 +90,7 @@
     DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
     REGIONAL_FEATURES: 'Regional features',
+    CONNECTIVITY: 'Connectivity',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
 
     ATLAS_NOT_FOUND: `Atlas not found. Maybe it is still loading. Try again in a few seconds?`,

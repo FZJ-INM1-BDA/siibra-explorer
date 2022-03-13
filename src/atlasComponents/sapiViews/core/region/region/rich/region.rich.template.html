@@ -70,6 +70,22 @@
   
 </ng-template>
 
+<!-- connectivity -->
+<ng-template #regionConnectivityTmp>
+  <connectivity-browser class="pe-all flex-shrink-1"
+                        [region]="region"
+                        [sxplr-sapiviews-features-connectivity-matrix-atlas]="atlas"
+                        [sxplr-sapiviews-features-connectivity-matrix-parcellation]="parcellation"
+                        [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY">
+  </connectivity-browser>
+<!--  <connectivity-browser class="pe-all flex-shrink-1"-->
+<!--                        [region]="region"-->
+<!--                        (setOpenState)="expansionPanel.expanded = $event"-->
+<!--                        [accordionExpanded]="expansionPanel.expanded"-->
+<!--                        (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">-->
+<!--  </connectivity-browser>-->
+</ng-template>
+
 
 <mat-accordion class="d-block mt-2">
 
@@ -84,6 +100,29 @@
   </ng-container>
 
 </mat-accordion>
+
+<mat-accordion class="d-block mt-2">
+
+  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+    title: CONST.CONNECTIVITY,
+    iconClass: 'fas fa-braille',
+    content: regionConnectivityTmp,
+    desc: hasConnectivityDirective.connectivityNumber,
+    iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
+    iavNgIf: hasConnectivityDirective.hasConnectivity
+  }">
+  </ng-container>
+
+  <div has-connectivity
+       [sxplr-sapiviews-features-connectivity-matrix-atlas]="atlas"
+       [sxplr-sapiviews-features-connectivity-matrix-parcellation]="parcellation"
+       [region]="region"
+       #hasConnectivityDirective="hasConnectivityDirective">
+  </div>
+
+</mat-accordion>
+
+
 
 </ng-template>
 

@@ -6,7 +6,6 @@ import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
-import { viewerStateOverwrittenColorMapSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import {BS_ENDPOINT} from "src/util/constants";
 
@@ -81,7 +80,7 @@ describe('ConnectivityComponent', () => {
 
     beforeEach(() => {
         const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(viewerStateOverwrittenColorMapSelector, null)
+        // mockStore.overrideSelector(viewerStateOverwrittenColorMapSelector, null)
         mockStore.overrideSelector(ngViewerSelectorClearViewEntries, [])
     })
 

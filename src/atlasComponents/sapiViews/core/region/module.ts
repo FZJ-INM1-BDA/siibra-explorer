@@ -7,13 +7,15 @@ import { SapiViewsCoreRegionRegionListItem } from "./region/listItem/region.list
 import { SapiViewsCoreRegionRegionBase } from "./region/region.base.directive";
 import { SapiViewsCoreRegionRegionalFeatureDirective } from "./region/region.features.directive";
 import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.component";
+import {SapiViewsFeatureConnectivityModule} from "src/atlasComponents/sapiViews/features/connectivity";
 
 @NgModule({
   imports: [
     CommonModule,
     AngularMaterialModule,
     SapiViewsUtilModule,
-    SapiViewsFeaturesModule
+    SapiViewsFeaturesModule,
+    SapiViewsFeatureConnectivityModule
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

@@ -1,9 +1,19 @@
-import { Component, EventEmitter, Inject, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Inject,
+  Output,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
+import {MatExpansionPanel} from "@angular/material/expansion";
 
 @Component({
   selector: 'sxplr-sapiviews-core-region-region-rich',
@@ -26,6 +36,8 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
   featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
 
+  public expandedPanel: string
+
   constructor(
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>
   ){
@@ -37,10 +49,12 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   }
 
   handleExpansionPanelClosedEv(title: string){
+    this.expandedPanel = ''
     console.log("title", title)
   }
 
   handleExpansionPanelAfterExpandEv(title: string) {
+    this.expandedPanel = title
     console.log("title", title)
   }
 

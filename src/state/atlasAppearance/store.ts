@@ -5,7 +5,7 @@ export type AtlasAppearanceStore = {
   overwrittenColormap: Record<string, number[]>
 }
 
-const defaultState: AtlasAppearanceStore = {
+export const defaultState: AtlasAppearanceStore = {
   overwrittenColormap: null
 }
 

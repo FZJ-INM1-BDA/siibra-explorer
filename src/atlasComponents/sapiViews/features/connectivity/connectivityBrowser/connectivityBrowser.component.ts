@@ -2,24 +2,23 @@ import {
   AfterViewInit, ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   OnDestroy,
-  Output,
   ViewChild,
   Input,
   OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Observable, Subscription, Subject, combineLatest, of} from "rxjs";
-import {distinctUntilChanged, filter, map, switchMap, switchMapTo} from "rxjs/operators";
+import {fromEvent, Observable, Subscription, Subject, combineLatest, BehaviorSubject} from "rxjs";
+import {distinctUntilChanged, filter, map, switchMap} from "rxjs/operators";
 import { ngViewerSelectorClearViewEntries, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
-import {getIdFromKgIdObj} from "common/util";
 import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
-import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
+import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
 import { actions } from "src/state/atlasSelection";
 import { atlasAppearance, atlasSelection } from "src/state";
+import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
+import {SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
@@ -36,6 +35,12 @@ const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 })
 export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDestroy {
 
+    @Input('sxplr-sapiviews-features-connectivity-matrix-atlas')
+    atlas: SapiAtlasModel
+
+    @Input('sxplr-sapiviews-features-connectivity-matrix-parcellation')
+    parcellation: SapiParcellationModel
+
     private setColorMap$: Subject<boolean> = new Subject()
 
     /**
@@ -44,9 +49,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      * setcolormaps$ is set by the presence/absence of clearviewqueue[CONNECTIVITY_NAME_PLATE]
      */
     private _isFirstUpdate = true
-
-    public connectivityUrl: string
-
+    
     private accordionIsExpanded = false
 
     @Input()
@@ -78,17 +81,6 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
     }
 
-    @Output()
-    connectivityDataReceived = new EventEmitter<any>()
-
-    @Output()
-    setOpenState: EventEmitter<boolean> = new EventEmitter()
-
-    @Output()
-    connectivityLoadUrl: EventEmitter<string> = new EventEmitter()
-
-    @Output() connectivityNumberReceived: EventEmitter<string> = new EventEmitter()
-
     @Input()
     set region(val) {
       const newRegionName = val && val.name
@@ -112,20 +104,14 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       }
 
       this.regionName = newRegionName
-      this.regionId = val.id? val.id.kg? getIdFromKgIdObj(val.id.kg) : val.id : null
-      this.atlasId = val.context.atlas['@id']
-      this.parcellationId = val.context.parcellation['@id']
 
       if(this.selectedDataset) {
-        this.setConnectivityUrl()
-        this.setProfileLoadUrl()
+        this.fetchConnectivity()  
       }
       // TODO may not be necessary
       this.changeDetectionRef.detectChanges()
     }
     public atlasId: any
-    public parcellationId: any
-    public regionId: string
     public regionName: string
     public regionHemisphere: string = null
     public datasetList: any[] = []
@@ -134,18 +120,20 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public selectedDatasetDescription: string = ''
     public selectedDatasetKgId: string = ''
     public selectedDatasetKgSchema: string = ''
-    public connectedAreas = []
+    public connectionsString: string
+    public connectedAreas: BehaviorSubject<any[]> = new BehaviorSubject([])
 
     // TODO this may be incompatible
     private selectedParcellationFlatRegions$ = this.store$.pipe(
       select(atlasSelection.selectors.selectedATP),
-      switchMap(({ atlas, template, parcellation }) => this.sapi.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])) 
+      switchMap(({ atlas, template, parcellation }) => this.sapi.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"]))
     )
     public overwrittenColorMap$: Observable<any>
 
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
     public allRegions = []
+    private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
 
     public noDataReceived = false
@@ -160,29 +148,26 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         @Inject(BS_ENDPOINT) private siibraApiUrl: string,
         private sapi: SAPI
     ) {
-
       this.overwrittenColorMap$ = this.store$.pipe(
         select(atlasAppearance.selectors.getOverwrittenColormap),
         distinctUntilChanged()
       )
     }
 
-    public loadUrl: string
     public fullConnectivityLoadUrl: string
 
     ngOnInit(): void {
-      this.setConnectivityUrl()
-
-      this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
-        this.datasetList = res
-        this.selectedDataset = this.datasetList[0]?.['@id']
-        this.selectedDatasetName = this.datasetList[0]?.['src_name']
-        this.selectedDatasetDescription = this.datasetList[0]?.['src_info']
-        // this.selectedDatasetKgId = this.datasetList[0]?.kgId || null
-        // this.selectedDatasetKgSchema = this.datasetList[0]?.kgSchema || null
-
-        this.changeDataset()
-      })
+      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatures()
+        .then(res => {
+          this.datasetList = res
+            .filter(r => ['siibra/features/connectivity', 'siibra/connectivity'].includes(r.type))
+            .map((r: any) => ({
+              ...r,
+              connectionType: r.name.substring(0, r.name.indexOf('{') - 1),
+              dataset: JSON.parse(r.name.substring(r.name.indexOf('{')).replace(/'/g, '"'))
+            }))
+          this.selectDataset(this.datasetList[0]['@id'])
+        })
     }
 
     public ngAfterViewInit(): void {
@@ -196,32 +181,32 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         })
       )
 
-      /**
-       * Listen to of clear view entries
-       * can come from within the component (when connectivity is not available for the dataset)
-       * --> do not collapse
-       * or outside (user clicks x in chip)
-       * --> collapse
-       */
-      this.subscriptions.push(
-        this.store$.pipe(
-          select(ngViewerSelectorClearViewEntries),
-          map(arr => arr.filter(v => v === CONNECTIVITY_NAME_PLATE)),
-          filter(arr => arr.length ===0),
-          distinctUntilChanged()
-        ).subscribe(() => {
-          if (!this.noDataReceived) {
-            this.setOpenState.emit(false)
-          }
-        })
-      )
+      // /**
+      //  * Listen to of clear view entries
+      //  * can come from within the component (when connectivity is not available for the dataset)
+      //  * --> do not collapse
+      //  * or outside (user clicks x in chip)
+      //  * --> collapse
+      //  */
+      // this.subscriptions.push(
+      //   this.store$.pipe(
+      //     select(ngViewerSelectorClearViewEntries),
+      //     map(arr => arr.filter(v => v === CONNECTIVITY_NAME_PLATE)),
+      //     filter(arr => arr.length ===0),
+      //     distinctUntilChanged()
+      //   ).subscribe(() => {
+      //     if (!this.noDataReceived) {
+      //       this.setOpenState.emit(false)
+      //     }
+      //   })
+      // )
 
 
-      this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
-        if (this.accordionIsExpanded && !ocm) {
-          this.setOpenState.emit(false)
-        }
-      }))
+      // this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
+      //   if (this.accordionIsExpanded && !ocm) {
+      //     this.setOpenState.emit(false)
+      //   }
+      // }))
 
       this.subscriptions.push(
         this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
@@ -234,20 +219,23 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
          * setting/restoring colormap
          */
       this.subscriptions.push(
-        combineLatest(
+        combineLatest([
           this.setColorMap$.pipe(
             distinctUntilChanged()
           ),
-          fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived').pipe(
-            map((e: CustomEvent) => {
-              if (e.detail !== 'No data') {
-                this.connectivityNumberReceived.emit(e.detail.length)
-              }
-              return e.detail
-            })
-          )
-        ).subscribe(([flag, connectedAreas]) => {
-          if (connectedAreas === 'No data') {
+          // fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived').pipe(
+          //   map((e: CustomEvent) => {
+          //     // if (e.detail !== 'No data') {
+          //     //   this.connectivityNumberReceived.emit(e.detail.length)
+          //     // }
+          //     return e.detail
+          //   })
+          // )
+          this.connectedAreas
+        ]).subscribe(([flag, connectedAreas]) => {
+            console.log('flag')
+            console.log(flag)
+          if (connectedAreas.length === 0) {
             this.noDataReceived = true
             return this.clearViewer()
           } else {
@@ -259,8 +247,9 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
               })
             )
             this.noDataReceived = false
-            this.connectivityNumberReceived.emit(connectedAreas.length)
-            this.connectedAreas = connectedAreas
+
+            // this.connectivityNumberReceived.emit(connectedAreas.length)
+            // this.connectedAreas = connectedAreas
 
             if (flag) {
               this.addNewColorMap()
@@ -289,33 +278,48 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
           .subscribe((e: CustomEvent) => {
-            this.navigateToRegion(e.detail.name)
+            this.navigateToRegion(this.getRegionWithName(e.detail.name))
           }),
       )
     }
 
-    public ngOnDestroy(): void {
-      this.connectivityNumberReceived.emit(null)
-      this.store$.dispatch(
-        ngViewerActionClearView({
-          payload: {
-            [CONNECTIVITY_NAME_PLATE]: false
-          }
+    selectDataset(datasetId) {
+      const dataset = this.datasetList.find(d => d['@id'] === datasetId)
+      this.selectedDataset = dataset['@id']
+      this.selectedDatasetName = dataset.dataset.name
+      this.selectedDatasetDescription = dataset.dataset.description
+      this.selectedDatasetKgId = dataset.dataset['dataset_id']
+
+      this.fetchConnectivity()
+    }
+
+    fetchConnectivity() {
+      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset)
+        .then(ds=> {
+          const matrixData = ds as SapiParcellationFeatureMatrixModel
+          this.regionIndexInMatrix =  (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
+          this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY)
+            .then(matrix => {
+              const areas = {}
+              matrix.rawArray[this.regionIndexInMatrix].forEach((value, i) => {
+                areas[matrixData.columns[i]] = value
+              })
+              this.connectionsString = JSON.stringify(areas)
+              this.connectedAreas.next(this.cleanConnectedAreas(areas))
+            })
+
         })
-      )
-      this.restoreDefaultColormap()
-      this.subscriptions.forEach(s => s.unsubscribe())
     }
 
-    private setConnectivityUrl() {
-      this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionName)}/features/ConnectivityProfile`
-    }
+    // private setConnectivityUrl() {
+    //   this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionName)}/features/ConnectivityProfile`
+    // }
 
-    private setProfileLoadUrl() {
-      const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
-      this.connectivityLoadUrl.emit(url)
-      this.loadUrl = url
-    }
+    // private setProfileLoadUrl() {
+    //   const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
+    //   this.connectivityLoadUrl.emit(url)
+    //   this.loadUrl = url
+    // }
 
     clearViewer() {
       this.store$.dispatch(
@@ -325,29 +329,12 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           }
         })
       )
-      this.connectedAreas = []
-      this.connectivityNumberReceived.emit('0')
+      this.connectedAreas.next([])
 
       return this.restoreDefaultColormap()
     }
 
-    // ToDo Affect on component
-    changeDataset(event = null) {
-      if (event) {
-        this.selectedDataset = event.value
-        const foundDataset = this.datasetList.find(d => d['@id'] === this.selectedDataset)
-        this.selectedDatasetName = foundDataset?.['src_name']
-        this.selectedDatasetDescription = foundDataset?.['src_info']
-        // this.selectedDatasetKgId = foundDataset?.kgId || null
-        // this.selectedDatasetKgSchema = foundDataset?.kgSchema || null
-      }
-      if (this.datasetList.length && this.selectedDataset) {
-        this.setProfileLoadUrl()
-
-        this.fullConnectivityLoadUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/features/ConnectivityMatrix/${encodeURIComponent(this.selectedDatasetName)}`
-      }
-    }
-
+    //ToDo navigateRegion action does not work any more
     navigateToRegion(region: SapiRegionModel) {
       this.store$.dispatch(
         atlasSelection.actions.navigateToRegion({
@@ -365,22 +352,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     getRegionWithName(region) {
-      return this.allRegions.find(ar => {
-        if (this.regionHemisphere) {
-          let regionName = region
-          let regionStatus = null
-          if (regionName.includes('left hemisphere')) {
-            regionStatus = 'left hemisphere'
-            regionName = regionName.replace(' - left hemisphere', '');
-          } else if (regionName.includes('right hemisphere')) {
-            regionStatus = 'right hemisphere'
-            regionName = regionName.replace(' - right hemisphere', '');
-          }
-          return ar.name === regionName && ar.status === regionStatus
-        }
-
-        return ar.name === region
-      })
+      return this.allRegions.find(r => r.name === region)
     }
 
     public restoreDefaultColormap() {
@@ -402,7 +374,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         }
       })
 
-      this.connectedAreas.forEach(area => {
+      this.connectedAreas.value.forEach(area => {
         const areaAsRegion = this.allRegions
           .filter(r => {
 
@@ -442,6 +414,93 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public exportFullConnectivity() {
       this.fullConnectivityGridElement?.nativeElement['downloadCSV']()
     }
+
+
+    public ngOnDestroy(): void {
+      this.store$.dispatch(
+        ngViewerActionClearView({
+          payload: {
+            [CONNECTIVITY_NAME_PLATE]: false
+          }
+        })
+      )
+      this.restoreDefaultColormap()
+      this.subscriptions.forEach(s => s.unsubscribe())
+    }
+
+
+
+
+
+
+
+
+
+    private floatConnectionNumbers
+
+    cleanConnectedAreas = (areas) => {
+      const cleanedObj = Object.keys(areas)
+        .map(key => ({name: key, numberOfConnections: areas[key]}))
+        .filter(f => f.numberOfConnections > 0)
+        .sort((a, b) => +b.numberOfConnections - +a.numberOfConnections)
+
+      this.floatConnectionNumbers = cleanedObj[0].numberOfConnections <= 1
+      const logMax = this.floatConnectionNumbers ? cleanedObj[0].numberOfConnections : Math.log(cleanedObj[0].numberOfConnections)
+      const colorAreas = []
+
+      cleanedObj.forEach((a, i) => {
+        if (a.name.includes(' - both hemispheres')) {
+
+          const rightTitle = a.name.replace(' - both hemispheres', ' - right hemisphere')
+          const rightHemisphereItemToAdd = {...a, name: rightTitle}
+          cleanedObj.splice(i + 1, 0, rightHemisphereItemToAdd)
+
+          cleanedObj[i] = {
+            ...cleanedObj[i],
+            name: cleanedObj[i].name.replace(' - both hemispheres', ' - left hemisphere')
+          }
+        }
+      })
+      cleanedObj.forEach((a) => {
+        colorAreas.push({
+          ...a,
+          color: {
+            r: this.colormap_red(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax),
+            g: this.colormap_green(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax),
+            b: this.colormap_blue(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax)
+          }
+        })
+      })
+      return colorAreas
+    }
+
+    clamp = val => Math.round(Math.max(0, Math.min(1.0, val)) * 255)
+
+    colormap_red = (x) => {
+      if (x < 0.7) {
+        return this.clamp(4.0 * x - 1.5);
+      } else {
+        return this.clamp(-4.0 * x + 4.5);
+      }
+    }
+
+    colormap_green = (x) => {
+      if (x < 0.5) {
+        return this.clamp(4.0 * x - 0.5);
+      } else {
+        return this.clamp(-4.0 * x + 3.5);
+      }
+    }
+
+    colormap_blue = (x) => {
+      if (x < 0.3) {
+        return this.clamp(4.0 * x + 0.5);
+      } else {
+        return this.clamp(-4.0 * x + 2.5);
+      }
+    }
+    
+    
 
 }
 

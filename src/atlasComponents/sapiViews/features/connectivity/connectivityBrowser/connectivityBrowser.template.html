@@ -1,11 +1,28 @@
 <div class="w-100 h-100 d-block d-flex flex-column sxplr-pb-2">
-    <hbp-connectivity-matrix-row
-            (connectivityDataReceived)="connectivityDataReceived.emit($event)"
+<!--    <hbp-connectivity-matrix-row-->
+<!--            (connectivityDataReceived)="connectivityDataReceived.emit($event)"-->
+<!--            #connectivityComponent-->
+<!--            *ngIf="regionName"-->
+<!--            [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"-->
+<!--            theme="dark"-->
+<!--            [loadurl]="loadUrl"-->
+<!--            show-export="true"-->
+<!--            show-source="false"-->
+<!--            show-title="false"-->
+<!--            show-toolbar="false"-->
+<!--            show-description="false"-->
+<!--            show-dataset-name="false"-->
+<!--            custom-dataset-selector="true"-->
+<!--            tools_showlog="true"-->
+<!--            [tools_custom]='[{"name": "exportslot", "type": "slot"}]'-->
+<!--            hide-export-view="true">-->
+
+           <hbp-connectivity-matrix-row
             #connectivityComponent
             *ngIf="regionName"
             [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
+            [connections]="connectionsString"
             theme="dark"
-            [loadurl]="loadUrl"
             show-export="true"
             show-source="false"
             show-title="false"
@@ -17,6 +34,9 @@
             [tools_custom]='[{"name": "exportslot", "type": "slot"}]'
             hide-export-view="true">
 
+
+
+
         <div slot="dataset">
             <div *ngIf="datasetList.length && selectedDataset"  class=" flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
                     <mat-form-field class="flex-grow-1 flex-shrink-1 w-0">
@@ -25,18 +45,18 @@
                         </mat-label>
 
                         <mat-select
-                                panelClass="no-max-width"
                                 [value]="selectedDataset"
-                                (selectionChange)="changeDataset($event)">
+                                (selectionChange)="selectDataset($event.value)">
                             <mat-option
+                                   [matTooltip]="dataset.dataset.name"
                                     *ngFor="let dataset of datasetList"
                                     [value]="dataset['@id']">
-                                {{ dataset['src_name'] }}
+                                {{ dataset.dataset.name }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
                 <ng-container *ngIf="selectedDataset && (selectedDatasetDescription || selectedDatasetKgId)" >
-                    TODO please reimplmenent button to explore KG dataset
+<!--                    TODO please reimplmenent button to explore KG dataset-->
                     <button class="flex-grow-0 flex-shrink-0"
                             mat-icon-button
                             (click)="exportFullConnectivity()"
@@ -79,10 +99,10 @@
             </button>
         </div>
     </hbp-connectivity-matrix-row>
-    <full-connectivity-grid #fullConnectivityGrid
-                            [loadurl]="fullConnectivityLoadUrl"
-                            [name]="selectedDataset"
-                            [description]="selectedDatasetDescription"
-                            only-export="true">
-    </full-connectivity-grid>
+<!--    <full-connectivity-grid #fullConnectivityGrid-->
+<!--                            [loadurl]="fullConnectivityLoadUrl"-->
+<!--                            [name]="selectedDataset"-->
+<!--                            [description]="selectedDatasetDescription"-->
+<!--                            only-exporselectedDatasett="true">-->
+<!--    </full-connectivity-grid>-->
 </div>

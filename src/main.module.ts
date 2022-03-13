@@ -54,6 +54,7 @@ import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 
 import {
   atlasSelection,
+  atlasAppearance,
   annotation,
   userInterface,
   userInteraction,
@@ -109,6 +110,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       uiState,
       userConfigState,
       [atlasSelection.nameSpace]: atlasSelection.reducer,
+      [atlasAppearance.nameSpace]: atlasAppearance.reducer,
       [userInterface.nameSpace]: userInterface.reducer,
       [userInteraction.nameSpace]: userInteraction.reducer,
       [annotation.nameSpace]: annotation.reducer,
