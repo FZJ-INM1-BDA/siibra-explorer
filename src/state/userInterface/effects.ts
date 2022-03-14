@@ -88,6 +88,25 @@ export class Effects{
     })
   ))
 
+  onCycleView = createEffect(() => this.action.pipe(
+    ofType(userInterface.actions.cyclePanelMode),
+    withLatestFrom(
+      this.store.pipe(
+        select(userInterface.selectors.panelMode)
+      ),
+      this.store.pipe(
+        select(userInterface.selectors.panelOrder)
+      ),
+    ),
+    filter(([_, panelMode, _1]) => panelMode === "SINGLE_PANEL"),
+    map(([_, _1, panelOrder]) => userInterface.actions.setPanelOrder({
+      order: [
+        ...panelOrder.split('').slice(1),
+        panelOrder[0]
+      ].join('')
+    }))
+  ))
+
   private bottomSheetRef: MatBottomSheetRef
   constructor(
     private store: Store,

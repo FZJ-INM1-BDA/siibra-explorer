@@ -1,4 +1,5 @@
 import { EventEmitter } from "@angular/core";
+import { RecursivePartial } from "./nehuba/config.service/type";
 import { TNehubaContextInfo } from "./nehuba/types";
 import { TThreeSurferContextInfo } from "./threeSurfer/types";
 
@@ -36,7 +37,7 @@ export interface IViewerCtx {
 
 export type TContextArg<K extends keyof IViewerCtx> = ({
   viewerType: K
-  payload: IViewerCtx[K]
+  payload: RecursivePartial<IViewerCtx[K]>
 })
 
 export enum EnumViewerEvt {

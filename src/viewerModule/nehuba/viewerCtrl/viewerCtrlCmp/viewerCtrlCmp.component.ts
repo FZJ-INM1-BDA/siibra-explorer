@@ -53,12 +53,6 @@ export class ViewerCtrlCmp{
     select(selectorAuxMeshes),
   )
 
-  private nehubaInst: NehubaViewerUnit
-
-  get ngViewer() {
-    return this.nehubaInst?.nehubaViewer.ngviewer || (window as any).viewer
-  }
-
   constructor(
     private store$: Store<any>,
     formBuilder: FormBuilder,
@@ -81,7 +75,6 @@ export class ViewerCtrlCmp{
         //   this.setOctantRemoval(landmarks.length === 0)
         //   nehubainst.updateUserLandmarks(landmarks)
         // }),
-        this.nehubaInst$.subscribe(nehubaInst => this.nehubaInst = nehubaInst)
       )
     } else {
       console.warn(`NEHUBA_INSTANCE_INJTKN not provided`)

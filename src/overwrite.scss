@@ -95,6 +95,15 @@ $transform-origin-maps: (
   .w-#{$width} {
     width: $width * 1%;
   }
+  .#{$nsp}-w-#{$width} {
+    width: $width * 1%;
+  }
+  .h-#{$width} {
+    width: $width * 1%;
+  }
+  .#{$nsp}-h-#{$width} {
+    height: $width * 1%;
+  }
 }
 
 @for $zlvl from 0 through 10 {

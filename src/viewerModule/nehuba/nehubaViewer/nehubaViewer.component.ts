@@ -72,8 +72,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   private sliceviewLoading$: Observable<boolean>
 
-  public overrideShowLayers: string[] = []
-
   public lifecycle: INehubaLifecycleHook
 
   public viewerPosInVoxel$ = new BehaviorSubject(null)
@@ -111,8 +109,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   /* only used to set initial navigation state */
   public initNav: any
-  public initRegions: any[]
-  public initNiftiLayers: any[] = []
 
   public config: any
   public nehubaViewer: any
@@ -436,12 +432,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     ? this.exportNehuba.getNgHash()
     : null
 
-  public redraw() {
-    this.nehubaViewer.redraw()
-  }
-
   public loadNehuba() {
-    this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err) => {
+    this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
       debugger
       this.log.error(err)
@@ -451,8 +443,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
      * Hide all layers except the base layer (template)
      * Then show the layers referenced in multiNgIdLabelIndexMap
      */
-
-    this.redraw()
 
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
@@ -868,16 +858,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     if (this.initNav) {
       this.setNavigationState(this.initNav)
       this.initNav = null
-    }
-
-    if (this.initRegions && this.initRegions.length > 0) {
-      this.hideAllSeg()
-      this.showSegs(this.initRegions)
-    }
-
-    if (this.initNiftiLayers.length > 0) {
-      this.initNiftiLayers.forEach(layer => this.loadLayer(layer))
-      this.hideAllSeg()
     }
 
     this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer }) => {

@@ -350,12 +350,14 @@ export class ViewerCmp implements OnDestroy {
       this.ctxMenuSvc.context$.next(event.data)
       if (event.data.viewerType === "nehuba") {
         const { nehuba } = (event.data as TContextArg<"nehuba">).payload
-        const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
-        this.store$.dispatch(
-          userInteraction.actions.mouseoverRegions({
-            regions: mousingOverRegions
-          })
-        )
+        if (nehuba) {
+          const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
+          this.store$.dispatch(
+            userInteraction.actions.mouseoverRegions({
+              regions: mousingOverRegions
+            })
+          )
+        }
       }
       break
     default:

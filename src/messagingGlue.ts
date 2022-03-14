@@ -68,7 +68,6 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
       const layer = {
         id: swcLayerUuid,
         source: `swc://${url}`,
-        // type: "customlayer/nglayer",
         segments: [
           "1"
         ],

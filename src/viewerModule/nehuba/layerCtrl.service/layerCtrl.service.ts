@@ -1,16 +1,17 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { IAuxMesh } from '../store'
 import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types";
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi";
 import { SAPISpace, SAPIRegion } from "src/atlasComponents/sapi/core";
-import { getParcNgId, fromRootStore as nehubaConfigSvcFromRootStore } from "../config.service"
+import { getParcNgId } from "../config.service"
 import { getRegionLabelIndex } from "../config.service/util";
 import { annotation, atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
+import { LayerCtrlEffects } from "./layerCtrl.effects";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -52,9 +53,7 @@ export class NehubaLayerControlService implements OnDestroy{
   )
 
 
-  private defaultNgLayers$ = this.store$.pipe(
-    nehubaConfigSvcFromRootStore.getNgLayers(this.store$, this.sapiSvc)
-  )
+  private defaultNgLayers$ = this.layerEffects.onATPDebounceNgLayers$
 
   private selectedATP$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedATP),
@@ -156,6 +155,7 @@ export class NehubaLayerControlService implements OnDestroy{
   constructor(
     private store$: Store<any>,
     private sapiSvc: SAPI,
+    private layerEffects: LayerCtrlEffects,
   ){
 
     this.sub.push(
@@ -321,18 +321,6 @@ export class NehubaLayerControlService implements OnDestroy{
    */
 
   private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
-  public removeNgLayers(layerNames: string[]) {
-    this.ngLayersRegister
-      .filter(layer => layerNames?.findIndex(l => l === layer.id) >= 0)
-      .map(l => l.id)
-      .forEach(layerName => {
-        this.store$.dispatch(
-          atlasAppearance.actions.removeCustomLayer({
-            id: layerName
-          })
-        )
-      })
-  }
 
   private ngLayers$ = this.store$.pipe(
     select(atlasAppearance.selectors.customLayers),

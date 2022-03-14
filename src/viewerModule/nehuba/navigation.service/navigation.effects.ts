@@ -1,9 +1,10 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subscription } from "rxjs";
-import { filter, tap, withLatestFrom } from "rxjs/operators";
-import { atlasSelection, MainState, userPreference } from "src/state"
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { filter, map, mapTo, tap, withLatestFrom } from "rxjs/operators";
+import { atlasSelection, MainState, userInterface, userPreference } from "src/state"
+import { CYCLE_PANEL_MESSAGE } from "src/util/constants";
 import { timedValues } from "src/util/generator";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
@@ -85,6 +86,23 @@ export class NehubaNavigationEffects implements OnDestroy{
 
     })
   ), { dispatch: false })
+
+  onMaximise = createEffect(() => combineLatest([
+    this.store.pipe(
+      select(userPreference.selectors.useMobileUi),
+    ),
+    this.store.pipe(
+      select(userInterface.selectors.panelMode),
+      map(mode => mode === "SINGLE_PANEL")
+    )
+  ]).pipe(
+    filter(([ useMobileUi, singlePanelMode ]) => singlePanelMode && !useMobileUi),
+    mapTo(
+      userInterface.actions.snackBarMessage({
+        message: CYCLE_PANEL_MESSAGE
+      })
+    )
+  ))
 
   constructor(
     private action: Actions,

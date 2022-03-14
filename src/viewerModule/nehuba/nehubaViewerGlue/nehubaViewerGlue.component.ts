@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnDe
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, takeUntil, tap, throttleTime } from "rxjs/operators";
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
 import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
@@ -26,6 +26,9 @@ import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpace
 import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, getParcNgId, getRegionLabelIndex } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface, generalActions } from "src/state";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { arrayEqual } from "src/util/array";
+import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -168,57 +171,79 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     shareReplay(1),
   )
 
-  private nehubaContainerSub: Subscription
+  private nehubaContainerSub: Subscription[] = []
   private setupNehubaEvRelay() {
-    if (this.nehubaContainerSub) this.nehubaContainerSub.unsubscribe()
+    while (this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
+    
     if (!this.nehubaContainerDirective) return
     const {
       mouseOverSegments,
       navigationEmitter,
       mousePosEmitter,
     } = this.nehubaContainerDirective
-    this.nehubaContainerSub = combineLatest([
+
+    this.nehubaContainerSub.push(
+
       mouseOverSegments.pipe(
         startWith(null as TMouseoverEvent[])
-      ),
+      ).subscribe(seg => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              nehuba: seg && seg.map(v => {
+                return {
+                  layerName: v.layer.name,
+                  labelIndices: [ Number(v.segmentId) ],
+                  regions: (() => {
+                    const map = this.multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
+                    if (!map) return []
+                    return [map.get(Number(v.segmentId))]
+                  })()
+                }
+              })
+            }
+          }
+        })
+      }),
+
       navigationEmitter.pipe(
         startWith(null as INavObj)
-      ),
+      ).subscribe(nav => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              nav
+            }
+          }
+        })
+      }),
+
       mousePosEmitter.pipe(
         startWith(null as {
           voxel: number[]
           real: number[]
         })
-      ),
-    ]).pipe(
-      throttleTime(16, asyncScheduler, { trailing: true })
-    ).subscribe(([ seg, nav, mouse ]: [ TMouseoverEvent [], INavObj, { real: number[], voxel: number[] } ]) => {
-      this.viewerEvent.emit({
-        type: EnumViewerEvt.VIEWER_CTX,
-        data: {
-          viewerType: 'nehuba',
-          payload: {
-            nav,
-            mouse,
-            nehuba: seg && seg.map(v => {
-              return {
-                layerName: v.layer.name,
-                labelIndices: [ Number(v.segmentId) ],
-                regions: (() => {
-                  const map = this.multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
-                  if (!map) return []
-                  return [map.get(Number(v.segmentId))]
-                })()
-              }
-            })
+      ).subscribe(mouse => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              mouse
+            }
           }
-        }
+        })
       })
-    })
+    )
+
     this.onDestroyCb.push(
       () => {
         if (this.nehubaContainerSub) {
-          this.nehubaContainerSub.unsubscribe()
+          while(this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
           this.nehubaContainerSub = null
         }
       }
@@ -234,82 +259,36 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
-  private async loadParc(atlas: SapiAtlasModel, parcellation: SapiParcellationModel, space: SapiSpaceModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
-    /**
-     * parcellation may be undefined
-     */
-    if ( !parcellation) {
-      return
-    }
-    const pevs = await this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], space["@id"])
 
-    const ngIdSegmentsMap: Record<string, number[]> = {}
-    for (const key in ngLayers) {
-      if ((ngLayers[key] as NgSegLayerSpec).labelIndicies) {
-        ngIdSegmentsMap[key] = (ngLayers[key] as NgSegLayerSpec).labelIndicies
-      }
-    }
-    this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
-  }
-
-  private unloadTmpl() {
+  private disposeViewer() {
     /**
      * clear existing container
      */
-    this.viewerUnit = null
-    this.nehubaContainerDirective.clear()
-
-    /* on selecting of new template, remove additional nglayers */
-    if (this.nehubaConfig) {
-      
-      const initialSpec = this.nehubaConfig.dataset.initialNgState
-      const { layers } = initialSpec
-
-      for (const layerName in layers) {
-        this.store$.dispatch(
-          atlasAppearance.actions.removeCustomLayer({
-            id: layerName
-          })
-        )
-      }
-    }
+     this.viewerUnit = null
+     this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
   }
 
-  private async loadTmpl(atlas: SapiAtlasModel, _template: SapiSpaceModel, parcellation: SapiParcellationModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
-    if (!_template) return
-    /**
-     * recalcuate zoom
-     */
-    const validSpaceIds = parcellation.brainAtlasVersions.map(bas => bas.coordinateSpace["@id"] as string)
-    let template: SapiSpaceModel
-    if (validSpaceIds.indexOf(_template["@id"]) >= 0) {
-      template = _template
-    } else {
-      /**
-       * selected parc does not have space as a valid output
-       */
-      this.store$.dispatch(
-        generalActions.generalActionError({
-          message: `space ${_template.fullName} is not defined in parcellation ${parcellation.brainAtlasVersions[0].fullName}`
-        })
-      )
-      template = await this.sapiSvc.getSpaceDetail(this.selectedAtlas["@id"], parcellation.brainAtlasVersions[0].coordinateSpace["@id"] as string)
+  private async loadNewViewer(ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }, baseLayers: NgLayerCustomLayer[]) {
+    const config = getNehubaConfig(ATP.template)
+    for (const baseLayer of baseLayers) {
+      config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
     }
-    const config = getNehubaConfig(template)
-    config.dataset.initialNgState.layers = ngLayers
-    const overwritingInitState = this.navigation
-      ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
-      : {}
 
-      config.dataset.initialNgState = {
+    const overwritingInitState = this.navigation
+    ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
+    : {}
+
+    config.dataset.initialNgState = {
       ...config.dataset.initialNgState,
       ...overwritingInitState,
     }
 
-    this.nehubaConfig = config
-
     await this.nehubaContainerDirective.createNehubaInstance(config)
     this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
+
+    /**
+     * map slice view to weakmap
+     */
     this.sliceRenderEvent$.pipe(
       takeOnePipe()
     ).subscribe(ev => {
@@ -323,27 +302,16 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       }
     })
 
-    await this.loadParc(atlas, parcellation, template, ngLayers)
-
-    const initialSpec = config.dataset.initialNgState
-    const { layers } = initialSpec
-
-    for (const layerName in layers) {
-      const l = layers[layerName]
-      const customLayer: atlasAppearance.NgLayerCustomLayer = {
-        id: layerName,
-        source: l.source,
-        visible: l.visible,
-        transform: l.transform,
-        clType: 'baselayer/nglayer'
-      }
-
-      this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer
-        })
-      )
-    }
+    /**
+     * map perspective to weakmap
+     */
+    fromEvent<CustomEvent>(this.el.nativeElement, 'perpspectiveRenderEvent').pipe(
+      take(1)
+    ).subscribe(ev => {
+      const perspPanel = ev.target as HTMLElement
+      this.viewPanels[3] = perspPanel
+      this.viewPanelWeakMap.set(perspPanel, 3)
+    })
 
     this.newViewer$.next(true)
   }
@@ -358,6 +326,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
+    private effect: LayerCtrlEffects,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
@@ -373,6 +342,50 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion))
     }
+
+    const onATPClear = this.store$.pipe(
+      select(atlasSelection.selectors.selectedATP)
+    ).subscribe(this.disposeViewer.bind(this))
+    this.onDestroyCb.push(() => onATPClear.unsubscribe())
+    
+    const onATPDebounceNgBaseLayers = this.store$.pipe(
+      select(atlasSelection.selectors.selectedATP),
+      debounceTime(16),
+      switchMap(ATP => this.store$.pipe(
+        select(atlasAppearance.selectors.customLayers),
+        debounceTime(16),
+        map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
+        distinctUntilChanged((o, n) => arrayEqual(o, n, (oi, ni) => oi.id === ni.id)),
+        filter(layers => layers.length > 0),
+        map(ngBaseLayers => {
+          return {
+            ATP,
+            ngBaseLayers
+          }
+        })
+      ))
+    ).subscribe(async ({ ATP, ngBaseLayers }) => {
+      await this.loadNewViewer(ATP, ngBaseLayers)
+
+      /**
+       * TODO this part is a little awkward. needs refactor
+       */
+      const {
+        parcNgLayers,
+        tmplAuxNgLayers,
+      } = await this.effect.onATPDebounceNgLayers$.pipe(
+        take(1)
+      ).toPromise()
+
+      const ngIdSegmentsMap: Record<string, number[]> = {} 
+
+      for (const key in parcNgLayers) {
+        ngIdSegmentsMap[key] = parcNgLayers[key].labelIndicies
+      }
+
+      this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
+    })
+    this.onDestroyCb.push(() => onATPDebounceNgBaseLayers.unsubscribe())
 
     /**
      * subscribe to ngIdtolblIdxToRegion
@@ -450,7 +463,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       // TODO needed to redraw?
       // see https://trello.com/c/oJOnlc6v/60-enlarge-panel-allow-user-rearrange-panel-position
       // further investigaation required
-      this.nehubaContainerDirective.nehubaViewerInstance.redraw()
     })
     this.onDestroyCb.push(() => redrawLayoutSub.unsubscribe())
 
@@ -464,17 +476,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       this.onhoverSegments = arr
     })
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
-
-    const perspectiveRenderEvSub = this.newViewer$.pipe(
-      switchMapTo(fromEvent<CustomEvent>(this.el.nativeElement, 'perpspectiveRenderEvent').pipe(
-        take(1)
-      ))
-    ).subscribe(ev => {
-      const perspPanel = ev.target as HTMLElement
-      this.viewPanels[3] = perspPanel
-      this.viewPanelWeakMap.set(perspPanel, 3)
-    })
-    this.onDestroyCb.push(() => perspectiveRenderEvSub.unsubscribe())
 
     this.sliceRenderEvent$ = fromEvent<CustomEvent>(this.el.nativeElement, 'sliceRenderEvent')
     this.sliceViewLoadingMain$ = this.sliceRenderEvent$.pipe(
@@ -546,36 +547,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       debounceTime(20),
       shareReplay(1),
     )
-
-    const newTmplSub = this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP),
-      distinctUntilChanged((o, n) => {
-        return o?.template?.["@id"] === n?.template?.["@id"]
-      }),
-      switchMap(ATP => {
-        return this.store$.pipe(
-          fromRootStore.getNgLayers(this.store$, this.sapiSvc),
-          map(ngLayers => ({ ATP, ngLayers }))
-        )
-      }
-      )
-    ).subscribe(({ ATP, ngLayers }) => {
-      const { template, parcellation, atlas } = ATP
-      const { tmplNgLayers, tmplAuxNgLayers, parcNgLayers } = ngLayers
-      
-
-      // clean up previous tmpl
-      this.unloadTmpl()
-
-      const layerObj = {
-        ...tmplNgLayers,
-        ...tmplAuxNgLayers,
-        ...parcNgLayers,
-      }
-      this.loadTmpl(atlas, template, parcellation, layerObj)
-    })
-
-    this.onDestroyCb.push(() => newTmplSub.unsubscribe())
 
     const setupViewerApiSub = this.newViewer$.pipe(
       tap(() => {

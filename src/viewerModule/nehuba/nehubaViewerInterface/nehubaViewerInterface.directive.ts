@@ -199,10 +199,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
             // TODO catch error
           }
         }
-        function onInit() {
-          this.overrideShowLayers = forceShowLayerNames
-        }
-        await this.createNehubaInstance(copiedNehubaConfig, { onInit })
+        await this.createNehubaInstance(copiedNehubaConfig)
       }),
 
       this.gpuLimit$.pipe(

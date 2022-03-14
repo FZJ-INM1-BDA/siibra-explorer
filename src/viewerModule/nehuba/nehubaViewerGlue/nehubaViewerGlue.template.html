@@ -1,4 +1,4 @@
-<div class="d-block w-100 h-100 nehuba-viewer-container-parent"
+<div class="sxplr-d-block sxplr-w-100 sxplr-h-100 nehuba-viewer-container-parent"
   (touchmove)="$event.preventDefault()"
   (drag-drop-file)="handleFileDrop($event)"
   iav-viewer-touch-interface
@@ -7,7 +7,7 @@
   [iav-viewer-touch-interface-ngviewer]="iavContainer?.nehubaViewerInstance?.nehubaViewer?.ngviewer"
   [iav-viewer-touch-interface-nehuba-config]="nehubaConfig">
 
-  <div class="d-block"
+  <div class="sxplr-d-block"
     iav-nehuba-viewer-container
     #iavContainer="iavNehubaViewerContainer"
     iav-mouse-hover
@@ -18,7 +18,8 @@
   </div>
 </div>
 
-<current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none tosxplr-p-0 left-0">
+<current-layout *ngIf="viewerLoaded"
+  class="position-absolute w-100 h-100 d-block pe-none top-0 left-0">
   <div class="w-100 h-100 position-relative" cell-i
     iav-window-resize
     [iav-window-resize-time]="64"

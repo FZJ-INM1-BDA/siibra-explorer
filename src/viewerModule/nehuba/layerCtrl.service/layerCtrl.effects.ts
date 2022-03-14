@@ -2,11 +2,13 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError } from "rxjs/operators";
+import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, take, shareReplay } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
+import { fromRootStore } from "../config.service";
 import { NehubaLayerControlService } from "./layerCtrl.service";
 
 @Injectable()
@@ -55,6 +57,69 @@ export class LayerCtrlEffects {
         id: NehubaLayerControlService.PMAP_LAYER_NAME
       })
     ))
+  ))
+
+  onATP$ = this.store.pipe(
+    select(atlasSelection.selectors.selectedATP)
+  )
+
+  onATPClearBaseLayers = createEffect(() => this.onATP$.pipe(
+    withLatestFrom(
+      this.store.pipe(
+        select(atlasAppearance.selectors.customLayers),
+        map(
+          cl => cl.filter(layer => layer.clType === "baselayer/nglayer" || layer.clType === "baselayer/colormap")
+        )
+      )
+    ),
+    switchMap(([_, layers]) => 
+      of(
+        ...layers.map(layer => 
+          atlasAppearance.actions.removeCustomLayer({
+            id: layer.id
+          })  
+        )
+      )
+    )
+  ))
+
+  onATPDebounceNgLayers$ = this.onATP$.pipe(
+    debounceTime(16),
+    switchMap(() => 
+      this.store.pipe(
+        fromRootStore.getNgLayers(this.store, this.sapi),
+        take(1)
+      )
+    ),
+    shareReplay(1)
+  )
+
+  onATPDebounceAddBaseLayers$ = createEffect(() => this.onATPDebounceNgLayers$.pipe(
+    switchMap(ngLayers => {
+      const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers } = ngLayers
+      
+      const customBaseLayers: NgLayerCustomLayer[] = []
+      for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
+        for (const key in layers) {
+          const { source, transform, opacity, visible } = layers[key]
+          customBaseLayers.push({
+            clType: "baselayer/nglayer",
+            id: key,
+            source,
+            transform,
+            opacity,
+            visible,
+          })
+        }
+      }
+      return of(
+        ...customBaseLayers.map(layer => 
+          atlasAppearance.actions.addCustomLayer({
+            customLayer: layer
+          })  
+        )
+      )
+    })
   ))
 
   constructor(
