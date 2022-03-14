@@ -1,8 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
-import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { ARIA_LABELS } from 'common/constants'
 import { userInterface } from "src/state"
 

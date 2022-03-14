@@ -211,12 +211,3 @@ If you have any comments or need further support, please contact us at [${this.p
   @HostBinding('attr.version')
   public _version: string = environment.VERSION
 }
-
-export interface INgLayerInterface {
-  name: string
-  visible: boolean
-  source: string
-  type: string // image | segmentation | etc ...
-  transform?: [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]] | null
-  // colormap : string
-}

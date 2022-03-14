@@ -5,7 +5,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { of } from "rxjs";
 import { filter, map, mapTo, pairwise, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
-import { generalActionError } from "src/services/stateStore.helper";
+import { generalActionError } from "../actions";
 import { userInterface } from "..";
 import { selectors } from "../atlasSelection"
 import * as actions from "./actions"

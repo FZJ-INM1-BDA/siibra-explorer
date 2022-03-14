@@ -718,10 +718,6 @@ kg-dataset-previewer > img
   margin: 15px;
 }
 
-.m-1px
-{
-  margin:1px;
-}
 
 .ml-15px-n
 {
@@ -874,9 +870,4 @@ quick-tour-unit svg
   stroke: rgb(255, 255, 255);
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.overwrite-max-width-80vw
-{
-  max-width: 80vw!important;
 }

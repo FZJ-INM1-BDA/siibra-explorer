@@ -41,19 +41,22 @@ import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
-import { kgTos } from './databrowser.fallback'
 import { CANCELLABLE_DIALOG } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
-
 import {
   atlasSelection,
-  RootEffecsModule,
   RootStoreModule,
+  getStoreEffects,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
 import { map } from 'rxjs/operators';
+import { EffectsModule } from '@ngrx/effects';
 
+// TODO check if there is a more logical place import put layerctrl effects ts
+import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerCtrl.effects';
+import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
+import { CONST } from "common/constants"
 
 @NgModule({
   imports : [
@@ -78,7 +81,11 @@ import { map } from 'rxjs/operators';
     AtlasViewerRouterModule,
     QuickTourModule,
     
-    RootEffecsModule,
+    EffectsModule.forRoot([
+      ...getStoreEffects(),
+      LayerCtrlEffects,
+      NehubaNavigationEffects,
+    ]),
     RootStoreModule,
     HttpClientModule,
   ],
@@ -143,7 +150,7 @@ import { map } from 'rxjs/operators';
     },
     {
       provide: TOS_OBS_INJECTION_TOKEN,
-      useValue: of(kgTos)
+      useValue: of(CONST.KG_TOS)
     },
 
     {

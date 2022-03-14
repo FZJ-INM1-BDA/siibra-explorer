@@ -1,6 +1,7 @@
 import { InjectionToken } from '@angular/core'
 import { strToRgb } from 'common/util'
 import { Observable } from 'rxjs'
+import { atlasAppearance } from 'src/state'
 
 export interface IColorMap {
   [key: string]: {
@@ -42,10 +43,10 @@ export interface INgLayerCtrl {
     names: string[]
   }
   add: {
-    [key: string]: INgLayerInterface
+    [key: string]: atlasAppearance.NgLayerCustomLayer
   }
   update: {
-    [key: string]: Partial<INgLayerInterface>
+    [key: string]: Partial<atlasAppearance.NgLayerCustomLayer>
   }
   setLayerTransparency: {
     [key: string]: number
@@ -61,14 +62,3 @@ export const SET_COLORMAP_OBS = new InjectionToken<Observable<IColorMap>>('SET_C
 export const SET_LAYER_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_LAYER_VISIBILITY')
 export const SET_SEGMENT_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_SEGMENT_VISIBILITY')
 export const NG_LAYER_CONTROL = new InjectionToken<TNgLayerCtrl<keyof INgLayerCtrl>>('NG_LAYER_CONTROL')
-
-export interface INgLayerInterface {
-  name: string // displayName
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  id?: string // unique identifier
-  visible?: boolean
-  shader?: string
-  transform?: any
-}

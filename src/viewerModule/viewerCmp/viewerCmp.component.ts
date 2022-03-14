@@ -287,7 +287,6 @@ export class ViewerCmp implements OnDestroy {
       if (context.viewerType === 'threeSurfer') {
         hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
       }
-      console.log('hoveredRegions', hoveredRegions)
 
       if (hoveredRegions.length > 0) {
         append({
@@ -311,6 +310,12 @@ export class ViewerCmp implements OnDestroy {
   ngOnDestroy() {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
+  }
+
+  public clearRoi(){
+    this.store$.dispatch(
+      actions.clearSelectedRegions()
+    )
   }
 
   public selectRoi(roi: SapiRegionModel) {
@@ -389,9 +394,25 @@ export class ViewerCmp implements OnDestroy {
   }
 
   onDismissNonbaseLayer(){
-    
+    this.store$.dispatch(
+      atlasSelection.actions.clearNonBaseParcLayer()
+    )
   }
-  onSelectParcellation(parc: SapiParcellationModel){
-
+  onSelectParcellation(parcellation: SapiParcellationModel){
+    this.store$.dispatch(
+      atlasSelection.actions.selectParcellation({
+        parcellation
+      })
+    )
+  }
+  navigateTo(position: number[]) {
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          position
+        },
+        animation: true,
+      })
+    )
   }
 }

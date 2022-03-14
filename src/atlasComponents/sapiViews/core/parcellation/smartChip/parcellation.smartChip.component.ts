@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { Observable } from "rxjs";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
+import { ARIA_LABELS } from "common/constants"
+import { getTraverseFunctions } from "../parcellationVersion.pipe";
 
 @Component({
   selector: `sxplr-sapiviews-core-parcellation-smartchip`,
@@ -12,6 +14,8 @@ import { ParcellationVisibilityService } from "../parcellationVis.service";
 })
 
 export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges{
+
+  public ARIA_LABELS = ARIA_LABELS
 
   @Input('sxplr-sapiviews-core-parcellation-smartchip-parcellation')
   parcellation: SapiParcellationModel
@@ -47,34 +51,13 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     }
 
     this.otherVersions = []
-    const getTraverse = (key: 'prev' | 'next') => (parc: SapiParcellationModel) => {
-      if (!parc.version) {
-        throw new Error(`parcellation ${parc.name} does not have version defined!`)
-      }
-      if (!parc.version[key]) {
-        return null
-      }
-      const found = this.parcellations.find(p => p["@id"] === parc.version[key]["@id"])
-      if (!found) {
-        throw new Error(`parcellation ${parc.name} references ${parc.version[key]['@id']} as ${key} version, but it cannot be found.`)
-      }
-      return found
-    }
 
-    const findNewer = getTraverse('next')
-    const findOlder = getTraverse('prev')
+    const {
+      findNewest,
+      findOlder
+    } = getTraverseFunctions(this.parcellations)
 
-    const newest = (() => {
-      let cursor = this.parcellation
-      let newest: SapiParcellationModel
-      while (cursor) {
-        newest = cursor
-        cursor = findNewer(cursor)
-      }
-      return newest
-    })()
-
-    let cursor: SapiParcellationModel = newest
+    let cursor: SapiParcellationModel = findNewest()
     while (cursor) {
       this.otherVersions.push(cursor)
       cursor = findOlder(cursor)
@@ -93,7 +76,6 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   selectParcellation(parc: SapiParcellationModel){
     if (parc === this.parcellation) return
-
-    console.log('select parcellation', parc)
+    this.onSelectParcellation.emit(parc)
   }
 }

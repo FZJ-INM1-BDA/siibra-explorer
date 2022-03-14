@@ -14,7 +14,6 @@ export const LOCAL_STORAGE_CONST = {
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
-export const DS_PREVIEW_URL = environment.DATASET_PREVIEW_URL
 export const BACKENDURL = (() => {
   const { BACKEND_URL } = environment
   if (!BACKEND_URL) return ``
@@ -83,7 +82,6 @@ export const getShader = ({
   removeBg = false
 } = {}): string => {
   const { header, main, premain } = mapKeyColorMap.get(colormap) || (() => {
-    console.warn(`colormap ${colormap} not found. Using default colormap instead`)
     return mapKeyColorMap.get(EnumColorMapName.GREYSCALE)
   })()
 

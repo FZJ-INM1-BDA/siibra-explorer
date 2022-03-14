@@ -35,8 +35,7 @@ export class NehubaMeshService implements OnDestroy {
   }
 
   private allRegions$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedATP),
-    switchMap(({ atlas, template, parcellation }) => this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"]))
+    select(atlasSelection.selectors.selectedParcAllRegions),
   )
 
   private selectedRegions$ = this.store$.pipe(

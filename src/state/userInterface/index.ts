@@ -1,5 +1,5 @@
 export * as actions from "./actions"
 export * as selectors from "./selectors"
 export { nameSpace, PanelMode } from "./const"
-export { reducer } from "./store"
+export { reducer, UiStore } from "./store"
 export { Effects } from "./effects"

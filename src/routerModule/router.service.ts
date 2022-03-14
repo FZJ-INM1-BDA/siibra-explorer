@@ -4,11 +4,11 @@ import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
-import { generalApplyState } from "src/services/stateStore.helper";
 import { PureContantService } from "src/util";
 import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
 import { BehaviorSubject, combineLatest, merge, NEVER, Observable, of } from 'rxjs'
 import { scan } from 'rxjs/operators'
+import { generalActions } from "src/state"
 
 @Injectable({
   providedIn: 'root'
@@ -123,7 +123,7 @@ export class RouterService {
 
       if ( fullPath !== `/${routeFromState}`) {
         store$.dispatch(
-          generalApplyState({
+          generalActions.generalApplyState({
             state: stateFromRoute
           })
         )

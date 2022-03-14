@@ -62,10 +62,6 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
 
   public selectedTemplate$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedTemplate),
-    withLatestFrom(this.availableTemplates$),
-    map(([selectedTmpl, fullInfoTemplates]) => {
-      return fullInfoTemplates.find(t => t['@id'] === selectedTmpl['@id'])
-    })
   )
 
   public selectedParcellation$ = this.store$.pipe(
@@ -105,6 +101,14 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
 
   toggleSelector() {
     this.selectorExpanded = !this.selectorExpanded
+  }
+
+  closeSelector(){
+    this.selectorExpanded = false
+  }
+  
+  openSelector() {
+    this.selectorExpanded = true
   }
 
   selectTemplate(tmpl: SapiSpaceModel) {

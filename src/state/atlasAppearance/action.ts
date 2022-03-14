@@ -1,12 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { nameSpace } from "./const"
-
-export const overwriteColorMap = createAction(
-  `${nameSpace} overwriteColorMap`,
-  props<{
-    colormap: Record<string, number[]>
-  }>()
-)
+import { CustomLayer, nameSpace } from "./const"
 
 export const setOctantRemoval = createAction(
   `${nameSpace} setOctantRemoval`,
@@ -19,5 +12,19 @@ export const setShowDelineation = createAction(
   `${nameSpace} setShowDelineation`,
   props<{
     flag: boolean
+  }>()
+)
+
+export const addCustomLayer = createAction(
+  `${nameSpace} addCustomLayer`,
+  props<{
+    customLayer: CustomLayer
+  }>()
+)
+
+export const removeCustomLayer = createAction(
+  `${nameSpace} removeCustomLayer`,
+  props<{
+    id: string
   }>()
 )

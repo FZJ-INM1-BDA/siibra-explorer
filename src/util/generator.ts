@@ -1,7 +1,7 @@
 export function* timedValues(ms: number = 500, mode: string = 'linear') {
   const startTime = Date.now()
 
-  const getValue = (fraction) => {
+  const getValue = (fraction: number) => {
     switch (mode) {
     case 'linear':
     default:

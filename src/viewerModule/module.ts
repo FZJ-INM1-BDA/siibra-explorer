@@ -18,12 +18,10 @@ import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type
 import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
 import { map } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
-import { ViewerStateBreadCrumbModule } from "./viewerStateBreadCrumb/module";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, AtlasViewerAPIServices, setViewerHandleFactory } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ILoadMesh, LOAD_MESH_TOKEN } from "src/messaging/types";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { ViewerInternalStateSvc } from "./viewerInternalState.service";
-import { LayerBrowserModule } from "src/ui/layerbrowser";
 import { SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
 import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
@@ -43,9 +41,7 @@ import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiVi
     UserAnnotationsModule,
     QuickTourModule,
     ContextMenuModule,
-    ViewerStateBreadCrumbModule,
     KeyFrameModule,
-    LayerBrowserModule,
     SAPIModule,
     SapiViewsModule,
     SapiViewsUtilModule

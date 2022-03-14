@@ -1,12 +1,12 @@
 <mat-menu #otherParcMenu="matMenu"
   [hasBackdrop]="false"
-  class="sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none overwrite-max-width-80vw">
+  class="sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
   <div (iav-outsideClick)="menuTrigger.closeMenu()">
 
     <sxplr-sapiviews-core-parcellation-chip *ngFor="let parc of otherVersions"
       [sxplr-sapiviews-core-parcellation-chip-parcellation]="parc"
       [sxplr-sapiviews-core-parcellation-chip-color]="parcellation === parc ? 'primary' : 'default'"
-      (click)="selectParcellation(parc)">
+      (sxplr-sapiviews-core-parcellation-chip-onclick)="selectParcellation(parc)">
 
     </sxplr-sapiviews-core-parcellation-chip>
   </div>
@@ -28,7 +28,10 @@
   <div prefix class="sxplr-scale-70">
     <button mat-mini-fab
       [color]="(parcellationVisibility$ | async) ? 'primary' : 'default'"
+      [matTooltip]="ARIA_LABELS.TOGGLE_DELINEATION"
       iav-stop="mousedown click"
+      [iav-key-listener]="[{'type': 'keydown', 'key': 'q', 'capture': true, 'target': 'document' }]"
+      (iav-key-event)="toggleParcellationVisibility()"
       (click)="toggleParcellationVisibility()">
       <i class="fas"
         [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye': 'fa-eye-slash'">

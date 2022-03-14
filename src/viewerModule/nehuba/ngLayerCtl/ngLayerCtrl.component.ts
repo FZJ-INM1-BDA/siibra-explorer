@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { isMat4 } from "common/util"
 import { Observable } from "rxjs";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
+import { atlasAppearance } from "src/state";
 import { NehubaViewerUnit } from "..";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
 
@@ -120,20 +120,21 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         this.removeLayer = null
       }
       this.store.dispatch(
-        ngViewerActionAddNgLayer({
-          layer: [{
-            name: name,
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            id: name,
             shader: this.shader,
             transform: this.transform,
+            clType: 'customlayer/nglayer',
             source: `precomputed://${this.source}`,
-            opacity: this.opacity
-          }]
+            opacity: this.opacity,
+          }
         })
       )
       this.removeLayer = () => {
         this.store.dispatch(
-          ngViewerActionRemoveNgLayer({
-            layer: [{ name }]
+          atlasAppearance.actions.removeCustomLayer({
+            id: name
           })
         )
       }

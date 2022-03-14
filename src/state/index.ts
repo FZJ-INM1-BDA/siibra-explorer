@@ -9,7 +9,6 @@ import * as atlasAppearance from "./atlasAppearance"
 import * as plugins from "./plugins"
 import * as userInteraction from "./userInteraction"
 import * as userPreference from "./userPreference"
-import { EffectsModule } from "@ngrx/effects"
 
 export {
   atlasSelection,
@@ -21,7 +20,9 @@ export {
   userPreference,
 }
 
-export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
+export * as generalActions from "./actions"
+
+function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
     console.log('state', state);
     console.log('action', action);
@@ -44,8 +45,19 @@ export const RootStoreModule = StoreModule.forRoot({
   ]
 })
 
-export const RootEffecsModule = EffectsModule.forRoot([
-  plugins.Effects,
-  atlasSelection.Effect,
-  userInterface.Effects,
-])
+/**
+ * 
+ * We have to use a function here. At import time, *.Effect(s) 
+ * would not yet be defined.
+ * 
+ * @returns Effects from state
+ */
+export function getStoreEffects() {
+  return [
+    plugins.Effects,
+    atlasSelection.Effect,
+    userInterface.Effects,
+  ]
+}
+
+export { MainState } from "./const"

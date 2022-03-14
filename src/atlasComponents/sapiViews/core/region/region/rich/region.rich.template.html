@@ -1,3 +1,15 @@
+<ng-template #headerTmpl>
+  <ng-content select="[header]"></ng-content>
+</ng-template>
+
+<ng-template [ngIf]="!region">
+  
+  <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+
+  <spinner-cmp *ngIf="fetchInProgress"></spinner-cmp>
+  <span *ngIf="!fetchInProgress"> Region must be provided! </span>
+</ng-template>
+
 <ng-template [ngIf]="region">
 
 <mat-card class="mat-elevation-z4">
@@ -9,7 +21,7 @@
       'lighttheme': regionDarkmode === false
     }">
 
-    <ng-content [select]="[header]"></ng-content>
+    <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
 
     <mat-card-title class="iv-custom-comp text">
       {{ region.name }}
@@ -60,6 +72,8 @@
     #rfDir="sapiViewsRegionalFeature"
     class="feature-list-container"
     >
+
+    <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
 
     <sxplr-sapiviews-features-entry-list-item
       *ngFor="let feat of rfDir.listOfFeatures$ | async"
@@ -133,10 +147,4 @@
       </ng-container>
     </ng-template>
   </mat-expansion-panel>
-</ng-template>
-
-<!-- fall back if region is not provided -->
-
-<ng-template [ngIf]="!region">
-  Region must be provided!
 </ng-template>

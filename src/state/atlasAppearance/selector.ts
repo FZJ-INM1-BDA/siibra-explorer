@@ -4,11 +4,6 @@ import { AtlasAppearanceStore } from "./store"
 
 const selectStore = state => state[nameSpace] as AtlasAppearanceStore
 
-export const getOverwrittenColormap = createSelector(
-  selectStore,
-  state => state.overwrittenColormap
-)
-
 export const octantRemoval = createSelector(
   selectStore,
   state => state.octantRemoval
@@ -17,4 +12,9 @@ export const octantRemoval = createSelector(
 export const showDelineation = createSelector(
   selectStore,
   state => state.showDelineation
+)
+
+export const customLayers = createSelector(
+  selectStore,
+  state => state.customLayers
 )

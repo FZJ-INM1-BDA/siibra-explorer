@@ -12,7 +12,6 @@ import { DownloadDirective } from "../util/directives/download.directive";
 
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
-import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 
@@ -56,7 +55,6 @@ import { DialogInfoModule } from "./dialogInfo"
     ActionDialog,
 
     /* pipes */
-    MobileControlNubStylePipe,
 
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,

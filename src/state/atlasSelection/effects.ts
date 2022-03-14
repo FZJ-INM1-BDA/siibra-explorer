@@ -1,12 +1,14 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, merge, of } from "rxjs";
-import { filter, map, mapTo, switchMap, withLatestFrom } from "rxjs/operators";
+import { forkJoin, from, merge, of } from "rxjs";
+import { filter, map, mapTo, switchMap, switchMapTo, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import * as actions from "./actions"
-import { actions as generalAction } from "../actions"
+import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
-import { selectors } from '.'
+import { selectors, actions } from '.'
+import { fromRootStore } from "./util";
+import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
+import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
 
 @Injectable()
 export class Effect {
@@ -47,6 +49,19 @@ export class Effect {
     }),
   ))
 
+  onATPSelectionGetAndSetAllRegions = createEffect(() => this.store.pipe(
+    select(selectors.selectedATP),
+    filter(({ atlas, template, parcellation }) => !!atlas && !!template && !!parcellation),
+    switchMap(({ atlas, template, parcellation }) => 
+      this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
+    ),
+    map(regions => 
+      actions.setSelectedParcellationAllRegions({
+        regions
+      })
+    )
+  ))
+
   onAtlasSelClearStandAloneVolumes = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     mapTo(actions.setStandAloneVolumes({
@@ -63,10 +78,22 @@ export class Effect {
 
   onNonBaseLayerRemoval = createEffect(() => this.action.pipe(
     ofType(actions.clearNonBaseParcLayer),
-    mapTo(generalAction.generalActionError({
-      message: `NYI`
-    }))
+    switchMapTo(
+      this.store.pipe(
+        fromRootStore.allAvailParcs(this.sapiSvc),
+        map(parcs => {
+          const baseLayers = parcs.filter(this.parcellationIsBaseLayerPipe.transform)
+          const newestLayer = this.orderParcellationByVersionPipe.transform(baseLayers)
+          return actions.selectParcellation({
+            parcellation: newestLayer
+          })
+        })  
+      )
+    )
   ))
+
+  private parcellationIsBaseLayerPipe = new ParcellationIsBaseLayer()
+  private orderParcellationByVersionPipe = new OrderParcellationByVersionPipe()
 
   onClearStandAloneVolumes = createEffect(() => this.action.pipe(
     ofType(actions.clearStandAloneVolumes),
@@ -82,22 +109,11 @@ export class Effect {
    */
   onSelectATPById = createEffect(() => this.action.pipe(
     ofType(actions.selectATPById),
-    mapTo(generalAction.generalActionError({
-      message: `NYI`
+    mapTo(mainActions.generalActionError({
+      message: `NYI, onSelectATPById`
     }))
   ))
-
-  /**
-   * consider what happens if it was nehuba viewer?
-   * what happens if it was three surfer viewer?
-   */
-  onNavigateTo = createEffect(() => this.action.pipe(
-    ofType(actions.navigateTo),
-    mapTo(generalAction.generalActionError({
-      message: `NYI`
-    }))
-  ))
-
+  
   onClearViewerMode = createEffect(() => this.action.pipe(
     ofType(actions.clearViewerMode),
     mapTo(actions.setViewerMode({ viewerMode: null }))
@@ -105,15 +121,15 @@ export class Effect {
 
   onToggleRegionSelectById = createEffect(() => this.action.pipe(
     ofType(actions.toggleRegionSelectById),
-    mapTo(generalAction.generalActionError({
-      message: `NYI`
+    mapTo(mainActions.generalActionError({
+      message: `NYI onToggleRegionSelectById`
     }))
   ))
 
   onNavigateToRegion = createEffect(() => this.action.pipe(
     ofType(actions.navigateToRegion),
-    mapTo(generalAction.generalActionError({
-      message: `NYI`
+    mapTo(mainActions.generalActionError({
+      message: `NYI onNavigateToRegion`
     }))
   ))
 
@@ -128,9 +144,16 @@ export class Effect {
       ofType(actions.selectParcellation)
     )
   ).pipe(
-    mapTo(actions.selectRegions({
-      regions: []
-    }))
+    switchMapTo(
+      of(
+        actions.selectRegions({
+          regions: []
+        }),
+        actions.setSelectedParcellationAllRegions({
+          regions: []
+        })
+      )
+    )
   ))
 
   onRegionToggleSelect = createEffect(() => this.action.pipe(

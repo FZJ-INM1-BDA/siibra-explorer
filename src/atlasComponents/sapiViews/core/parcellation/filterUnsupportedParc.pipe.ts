@@ -24,7 +24,13 @@ export class FilterUnsupportedParcPipe implements PipeTransform{
       if (p instanceof GroupedParcellation) {
         return hideGroup.indexOf(p.name) < 0
       }
-      return unsupportedIds.indexOf(p["@id"]) < 0
+      if (unsupportedIds.includes(p["@id"])) {
+        return false
+      }
+      if (p.version) {
+        return !p.version.deprecated
+      }
+      return true
     })
   }
 }

@@ -31,6 +31,6 @@ export class FeatureEntryCmp{
   feature: SapiFeatureModel
 
   featureType = {
-    receptor: "siibra/receptor"
+    receptor: "siibra/features/receptor"
   }
 }

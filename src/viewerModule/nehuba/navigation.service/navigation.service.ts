@@ -101,7 +101,7 @@ export class NehubaNavigationService implements OnDestroy{
         
         if (!navEql) {
           this.store$.dispatch(
-            actions.navigateTo({
+            actions.setNavigation({
               navigation: roundedNav
             })
           )

@@ -1,12 +1,9 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
-import { viewerStateAddUserLandmarks, viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
-import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
@@ -27,10 +24,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, getParcNgId, getRegionLabelIndex } from "../config.service";
-import { generalActionError } from "src/services/stateStore.helper";
 import { SET_MESHES_TO_LOAD } from "../constants";
-import { actions } from "src/state/atlasSelection";
-import { annotation, atlasSelection, userInteraction, userInterface } from "src/state";
+import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface, generalActions } from "src/state";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -79,7 +74,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
 
-  private currentPanelMode: PANELS
+  private currentPanelMode: userInterface.PanelMode
 
   @ViewChild(NehubaViewerContainerDirective, { static: true })
   public nehubaContainerDirective: NehubaViewerContainerDirective
@@ -266,13 +261,21 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
     /* on selecting of new template, remove additional nglayers */
     if (this.nehubaConfig) {
-      const baseLayerNames = Object.keys(this.nehubaConfig.dataset.initialNgState.layers)
-      this.layerCtrlService.removeNgLayers(baseLayerNames)
+      
+      const initialSpec = this.nehubaConfig.dataset.initialNgState
+      const { layers } = initialSpec
+
+      for (const layerName in layers) {
+        this.store$.dispatch(
+          atlasAppearance.actions.removeCustomLayer({
+            id: layerName
+          })
+        )
+      }
     }
   }
 
   private async loadTmpl(atlas: SapiAtlasModel, _template: SapiSpaceModel, parcellation: SapiParcellationModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
-
     if (!_template) return
     /**
      * recalcuate zoom
@@ -285,9 +288,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       /**
        * selected parc does not have space as a valid output
        */
-      this.store$.dispatch(generalActionError({
-        message: `space ${_template.fullName} is not defined in parcellation ${parcellation.brainAtlasVersions[0].fullName}`
-      }))
+      this.store$.dispatch(
+        generalActions.generalActionError({
+          message: `space ${_template.fullName} is not defined in parcellation ${parcellation.brainAtlasVersions[0].fullName}`
+        })
+      )
       template = await this.sapiSvc.getSpaceDetail(this.selectedAtlas["@id"], parcellation.brainAtlasVersions[0].coordinateSpace["@id"] as string)
     }
     const config = getNehubaConfig(template)
@@ -303,7 +308,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
     this.nehubaConfig = config
 
-    this.nehubaContainerDirective.createNehubaInstance(config)
+    await this.nehubaContainerDirective.createNehubaInstance(config)
     this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
     this.sliceRenderEvent$.pipe(
       takeOnePipe()
@@ -321,26 +326,25 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     await this.loadParc(atlas, parcellation, template, ngLayers)
 
     const initialSpec = config.dataset.initialNgState
-    const {layers} = initialSpec
+    const { layers } = initialSpec
 
-    const dispatchLayers = Object.keys(layers).map((key, idx) => {
-      const layer = {
-        name : key,
-        source : layers[key].source,
-        mixability : idx === 0
-          ? 'base'
-          : 'mixable',
-        visible : typeof layers[key].visible === 'undefined'
-          ? true
-          : layers[key].visible,
-        transform : typeof layers[key].transform === 'undefined'
-          ? null
-          : layers[key].transform,
+    for (const layerName in layers) {
+      const l = layers[layerName]
+      const customLayer: atlasAppearance.NgLayerCustomLayer = {
+        id: layerName,
+        source: l.source,
+        visible: l.visible,
+        transform: l.transform,
+        clType: 'baselayer/nglayer'
       }
-      return layer
-    })
 
-    this.layerCtrlService.addNgLayer(dispatchLayers)
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer
+        })
+      )
+    }
+
     this.newViewer$.next(true)
   }
 
@@ -400,7 +404,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       switchMap(this.waitForNehuba.bind(this))
     ).subscribe(([mode, panelOrder]) => {
       
-      this.currentPanelMode = mode
+      this.currentPanelMode = mode as userInterface.PanelMode
 
       const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
 
@@ -412,26 +416,26 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         return
       }
 
-      switch (mode) {
-      case PANELS.H_ONE_THREE: {
+      switch (this.currentPanelMode) {
+      case "H_ONE_THREE": {
         const element = this.removeExistingPanels()
         const newEl = getHorizontalOneThree(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.V_ONE_THREE: {
+      case "V_ONE_THREE": {
         const element = this.removeExistingPanels()
         const newEl = getVerticalOneThree(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.FOUR_PANEL: {
+      case "FOUR_PANEL": {
         const element = this.removeExistingPanels()
         const newEl = getFourPanel(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.SINGLE_PANEL: {
+      case "SINGLE_PANEL": {
         const element = this.removeExistingPanels()
         const newEl = getSinglePanel(viewPanels)
         element.appendChild(newEl)
@@ -586,7 +590,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         }),
         moveToNavigationLoc : (coord, _realSpace?) => {
           this.store$.dispatch(
-            actions.navigateTo({
+            atlasSelection.actions.navigateTo({
               navigation: {
                 position: coord
               },
@@ -618,10 +622,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
           if (!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3)) {
             throw new Error('position needs to be a length 3 tuple of numbers ')
           }
-
-          this.store$.dispatch(viewerStateAddUserLandmarks({
-            landmarks
-          }))
+          /**
+           * add implementation to user landmarks
+           */
+          console.warn(`adding landmark not yet implemented`)
         },
         remove3DLandmarks : landmarkIds => {
           this.store$.dispatch(
@@ -719,9 +723,9 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   handleCycleViewEvent(){
-    if (this.currentPanelMode !== PANELS.SINGLE_PANEL) return
+    if (this.currentPanelMode !== "SINGLE_PANEL") return
     this.store$.dispatch(
-      ngViewerActionCycleViews()
+      userInterface.actions.cyclePanelMode()
     )
   }
 
@@ -740,7 +744,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
-      actions.selectRegions({
+      atlasSelection.actions.selectRegions({
         regions: trueOnhoverSegments.slice(0, 1)
       })
     )
@@ -752,9 +756,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }) 
 
   public toggleMaximiseMinimise(index: number) {
-    this.store$.dispatch(ngViewerActionToggleMax({
-      payload: { index }
-    }))
+    this.store$.dispatch(
+      userInterface.actions.toggleMaximiseView({
+        targetIndex: index
+      })
+    )
   }
 
   public zoomNgView(panelIndex: number, factor: number) {
@@ -789,7 +795,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   private dismissAllAddedLayers(){
     while (this.droppedLayerNames.length) {
       const { resourceUrl, layerName } = this.droppedLayerNames.pop()
-      this.layerCtrlService.removeNgLayers([ layerName ])
+      this.store$.dispatch(
+        atlasAppearance.actions.removeCustomLayer({
+          id: layerName
+        })
+      )
+      
       URL.revokeObjectURL(resourceUrl)
     }
   }
@@ -835,17 +846,21 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         layerName: randomUuid,
         resourceUrl: url
       })
-      this.layerCtrlService.addNgLayer([{
-        name: randomUuid,
-        mixability: 'mixable',
-        source: `nifti://${url}`,
-        shader: getShader({
-          colormap: EnumColorMapName.MAGMA,
-          lowThreshold: meta.min || 0,
-          highThreshold: meta.max || 1
-        })
-      }])
 
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            id: randomUuid,
+            source: `nifti://${url}`,
+            shader: getShader({
+              colormap: EnumColorMapName.MAGMA,
+              lowThreshold: meta.min || 0,
+              highThreshold: meta.max || 1
+            }),
+            clType: 'customlayer/nglayer'
+          }
+        })
+      )
       this.dialog.open(
         this.layerCtrlTmpl,
         {
@@ -900,19 +915,13 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   public handleMouseEnterCustomLandmark(lm) {
-    this.store$.dispatch(
-      viewerStateMouseOverCustomLandmark({
-        payload: { userLandmark: lm }
-      })
-    )
+    console.log('handle enter custom landmark')
+
   }
 
   public handleMouseLeaveCustomLandmark(_lm) {
-    this.store$.dispatch(
-      viewerStateMouseOverCustomLandmark({
-        payload: { userLandmark: null }
-      })
-    )
+    console.log("handle leave custom landmark")
+
   }
 
   public quickTourOverwritingPos = {

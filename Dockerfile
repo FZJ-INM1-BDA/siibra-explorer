@@ -3,9 +3,6 @@ FROM node:14 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
-ARG DATASET_PREVIEW_URL
-ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
-
 ARG BS_REST_URL
 ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-stable.apps.hbp.eu/v1_0}
 

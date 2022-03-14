@@ -1,11 +1,7 @@
-import { fakeAsync, TestBed, tick } from "@angular/core/testing"
+import { fakeAsync, TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
-import { hot } from "jasmine-marbles"
-import { IColorMap } from "./layerCtrl.util"
-import { debounceTime } from "rxjs/operators"
-import { ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper"
 import {
   atlasSelection
 } from "src/state"

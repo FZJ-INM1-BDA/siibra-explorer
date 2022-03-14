@@ -1,14 +1,12 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, merge, Observable, Subject, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
-import { IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
+import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { IAuxMesh } from '../store'
 import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
-import { hexToRgb } from 'common/util'
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi";
-import { SAPISpace } from "src/atlasComponents/sapi/core";
+import { SAPISpace, SAPIRegion } from "src/atlasComponents/sapi/core";
 import { getParcNgId, fromRootStore as nehubaConfigSvcFromRootStore } from "../config.service"
 import { getRegionLabelIndex } from "../config.service/util";
 import { annotation, atlasAppearance, atlasSelection } from "src/state";
@@ -65,7 +63,8 @@ export class NehubaLayerControlService implements OnDestroy{
 
   public selectedATPR$ = this.selectedATP$.pipe(
     switchMap(({ atlas, template, parcellation }) => 
-      from(this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])).pipe(
+      this.store$.pipe(
+        select(atlasSelection.selectors.selectedParcAllRegions),
         map(regions => ({
           atlas, template, parcellation, regions
         })),
@@ -85,7 +84,7 @@ export class NehubaLayerControlService implements OnDestroy{
           if (!r.hasAnnotation.visualizedIn) continue
 
           const ngId = getParcNgId(atlas, template, parcellation, r)
-          const [ red, green, blue ] = hexToRgb(r.hasAnnotation.displayColor) || Object.keys(BACKUP_COLOR).map(key => BACKUP_COLOR[key])
+          const [ red, green, blue ] = SAPIRegion.GetDisplayColor(r)
           const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
           if (!labelIndex) continue
 
@@ -181,99 +180,21 @@ export class NehubaLayerControlService implements OnDestroy{
           payload: layerObj
         })
       }),
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedRegions)
-      ).subscribe(() => {
-        /**
-         * TODO
-         * below is the original code, but can be refactored.
-         * essentially, new workflow will be like the following:
-         * - get SapiRegion
-         * - getRegionalMap info (min/max)
-         * - dispatch new layer call
-         */
-
-        // if (roi$) {
-
-        //   this.sub.push(
-        //     roi$.pipe(
-        //       switchMap(roi => {
-        //         if (!roi || !roi.hasRegionalMap) {
-        //           // clear pmap
-        //           return of(null)
-        //         }
-                
-        //         const { links } = roi
-        //         const { regional_map: regionalMapUrl, regional_map_info: regionalMapInfoUrl } = links
-        //         return from(fetch(regionalMapInfoUrl).then(res => res.json())).pipe(
-        //           map(regionalMapInfo => {
-        //             return {
-        //               roi,
-        //               regionalMapUrl,
-        //               regionalMapInfo
-        //             }
-        //           })
-        //         )
-        //       })
-        //     ).subscribe(processedRoi => {
-        //       if (!processedRoi) {
-        //         this.store$.dispatch(
-        //           ngViewerActionRemoveNgLayer({
-        //             layer: {
-        //               name: NehubaLayerControlService.PMAP_LAYER_NAME
-        //             }
-        //           })
-        //         )
-        //         return
-        //       }
-        //       const { 
-        //         roi,
-        //         regionalMapUrl,
-        //         regionalMapInfo
-        //       } = processedRoi
-        //       const { min, max, colormap = EnumColorMapName.VIRIDIS } = regionalMapInfo || {} as any
-
-        //       const shaderObj = {
-        //         ...PMAP_DEFAULT_CONFIG,
-        //         ...{ colormap },
-        //         ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
-        //         ...( max ? { highThreshold: max } : { highThreshold: 1 } )
-        //       }
-
-        //       const layer = {
-        //         name: NehubaLayerControlService.PMAP_LAYER_NAME,
-        //         source : `nifti://${regionalMapUrl}`,
-        //         mixability : 'nonmixable',
-        //         shader : getShader(shaderObj),
-        //       }
-
-        //       this.store$.dispatch(
-        //         ngViewerActionAddNgLayer({ layer })
-        //       )
-
-        //       // this.layersService.highThresholdMap.set(layerName, highThreshold)
-        //       // this.layersService.lowThresholdMap.set(layerName, lowThreshold)
-        //       // this.layersService.colorMapMap.set(layerName, cmap)
-        //       // this.layersService.removeBgMap.set(layerName, removeBg)
-        //     })
-        //   )
-        // }
-
-      })
     )
 
     this.sub.push(
-      this.ngLayers$.subscribe(({ ngLayers }) => {
-        this.ngLayersRegister.layers = ngLayers
+      this.ngLayers$.subscribe(({ customLayers }) => {
+        this.ngLayersRegister = customLayers
       })
     )
 
     this.sub.push(
       this.store$.pipe(
-        select(ngViewerSelectorClearView),
+        select(atlasAppearance.selectors.customLayers),
+        map(cl => cl.filter(l => l.clType === "customlayer/colormap").length > 0),
         distinctUntilChanged()
       ).subscribe(flag => {
-        const pmapLayer = this.ngLayersRegister.layers.find(l => l.name === NehubaLayerControlService.PMAP_LAYER_NAME)
+        const pmapLayer = this.ngLayersRegister.find(l => l.id === NehubaLayerControlService.PMAP_LAYER_NAME)
         if (!pmapLayer) return
         const payload = {
           type: 'update',
@@ -369,21 +290,13 @@ export class NehubaLayerControlService implements OnDestroy{
      * if layer contains non mixable layer
      */
     this.store$.pipe(
-      select(ngViewerSelectorLayers),
-      map(layers => layers.findIndex(l => l.mixability === 'nonmixable') >= 0),
+      select(atlasAppearance.selectors.customLayers),
+      map(layers => layers.filter(l => l.clType === "customlayer/nglayer").length > 0),
     ),
-    /**
-     * clearviewqueue, indicating something is controlling colour map
-     * show all seg
-     */
-    this.store$.pipe(
-      select(ngViewerSelectorClearView),
-      distinctUntilChanged()
-    )
   ]).pipe(
     withLatestFrom(this.selectedATP$),
-    map(([[ regions, nonmixableLayerExists, clearViewFlag ], { atlas, parcellation, template }]) => {
-      if (nonmixableLayerExists && !clearViewFlag) {
+    map(([[ regions, nonmixableLayerExists ], { atlas, parcellation, template }]) => {
+      if (nonmixableLayerExists) {
         return null
       }
   
@@ -395,7 +308,7 @@ export class NehubaLayerControlService implements OnDestroy{
           return serializeSegment(ngId, label)
         })
       )
-      if (selectedRegionIndexSet.size > 0 && !clearViewFlag) {
+      if (selectedRegionIndexSet.size > 0) {
         return [...selectedRegionIndexSet]
       } else {
         return []
@@ -407,38 +320,33 @@ export class NehubaLayerControlService implements OnDestroy{
    * ngLayers controller
    */
 
-  private ngLayersRegister: {layers: INgLayerInterface[]} = {
-    layers: []
-  }
+  private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
   public removeNgLayers(layerNames: string[]) {
-    this.ngLayersRegister.layers
-      .filter(layer => layerNames?.findIndex(l => l === layer.name) >= 0)
-      .map(l => l.name)
+    this.ngLayersRegister
+      .filter(layer => layerNames?.findIndex(l => l === layer.id) >= 0)
+      .map(l => l.id)
       .forEach(layerName => {
-        this.store$.dispatch(ngViewerActionRemoveNgLayer({
-          layer: {
-            name: layerName
-          }
-        }))
+        this.store$.dispatch(
+          atlasAppearance.actions.removeCustomLayer({
+            id: layerName
+          })
+        )
       })
   }
-  public addNgLayer(layers: INgLayerInterface[]){
-    this.store$.dispatch(ngViewerActionAddNgLayer({
-      layer: layers
-    }))
-  }
+
   private ngLayers$ = this.store$.pipe(
-    select(ngViewerSelectorLayers),
-    map((ngLayers: INgLayerInterface[]) => {
-      const newLayers = ngLayers.filter(l => {
-        const registeredLayerNames = this.ngLayersRegister.layers.map(l => l.name)
-        return !registeredLayerNames.includes(l.name)
+    select(atlasAppearance.selectors.customLayers),
+    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    map(customLayers => {
+      const newLayers = customLayers.filter(l => {
+        const registeredLayerNames = this.ngLayersRegister.map(l => l.id)
+        return !registeredLayerNames.includes(l.id)
       })
-      const removeLayers = this.ngLayersRegister.layers.filter(l => {
-        const stateLayerNames = ngLayers.map(l => l.name)
-        return !stateLayerNames.includes(l.name)
+      const removeLayers = this.ngLayersRegister.filter(l => {
+        const stateLayerNames = customLayers.map(l => l.id)
+        return !stateLayerNames.includes(l.id)
       })
-      return { newLayers, removeLayers, ngLayers }
+      return { newLayers, removeLayers, customLayers }
     }),
     shareReplay(1)
   )
@@ -450,11 +358,9 @@ export class NehubaLayerControlService implements OnDestroy{
       map(newLayers => {
 
         const newLayersObj: any = {}
-        newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
+        newLayers.forEach(({ id, source, ...rest }) => newLayersObj[id] = {
           ...rest,
           source,
-          // source: getProxyUrl(source),
-          // ...getProxyOther({source})
         })
   
         return {
@@ -467,7 +373,7 @@ export class NehubaLayerControlService implements OnDestroy{
       map(({ removeLayers }) => removeLayers),
       filter(layers => layers.length > 0),
       map(removeLayers => {
-        const removeLayerNames = removeLayers.map(v => v.name)
+        const removeLayerNames = removeLayers.map(v => v.id)
         return {
           type: 'remove',
           payload: { names: removeLayerNames }

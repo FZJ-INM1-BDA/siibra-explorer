@@ -204,19 +204,26 @@
 
     <!-- such a gross implementation -->
     <!-- TODO fix this -->
-    <div class="mt-1-n w-100 sxplr-pl-2 sxplr-pr-2 m-1px">
+    <div class="sxplr-mt-1-n w-100 sxplr-pl-1 sxplr-pr-1"
+      sxplr-sapiviews-core-region
+      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-region-region]="(selectedRegions$ | async)[0]"
+      [sxplr-sapiviews-core-region-detail-flag]="true"
+      #sapiRegion="sapiViewsCoreRegion">
 
       <!-- TODO use sapiViews/core/region/base and fix the rest -->
       <button mat-raised-button
         *ngIf="!(onlyShowMiniTray$ | async)"
         [attr.aria-label]="ARIA_LABELS.EXPAND"
         (click)="showFullSidenav()"
-        class="explore-btn pe-all w-100"
+        class="sxplr-mt-9 sxplr-pe-all w-100"
         [ngClass]="{
-          'darktheme': true,
-          'lighttheme': false
+          'darktheme': sapiRegion.regionDarkmode,
+          'lighttheme': !sapiRegion.regionDarkmode
         }"
-        [style.backgroundColor]="'accent'">
+        [style.backgroundColor]="sapiRegion.regionRgbString">
         <span class="text iv-custom-comp">
           Explore
         </span>
@@ -355,26 +362,55 @@
 <ng-template #bottomLeftTmpl let-showFullSideNav="showFullSideNav">
 
   <!-- atlas selector -->
-  <sxplr-sapiviews-core-atlas-tmplparcselector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)">
+  <sxplr-sapiviews-core-atlas-tmplparcselector
+    *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
+    [iav-key-listener]="[{'type': 'keydown', 'key': 'Escape'}]"
+    (iav-key-event)="tmplParcSelector.closeSelector()"
+    (iav-outsideClick)="tmplParcSelector.closeSelector()"
+    #tmplParcSelector="sxplrSapiViewsCoreAtlasTmplparcselector">
   </sxplr-sapiviews-core-atlas-tmplparcselector>
 
-  <!-- selected parcellation chip -->
-  <sxplr-sapiviews-core-parcellation-smartchip
-    class="sxplr-pointer-events-all"
-    [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
-    [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
-    (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
-    (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
-    >
-  </sxplr-sapiviews-core-parcellation-smartchip>
+  <!-- scroll container -->
+  <div class="sxplr-d-inline-flex
+    sxplr-flex-wrap-nowrap
+    sxplr-mxw-80vw
+    sxplr-pe-all
+    sxplr-of-x-auto
+    sxplr-of-y-hidden">
 
-  <!-- chips -->
-  <!-- <div *ngIf="parcellationSelected$ | async"
-    class="d-inline-block flex-grow-1 flex-shrink-1 pe-none overflow-x-auto overflow-y-hidden">
+    <!-- selected parcellation chip -->
+    <sxplr-sapiviews-core-parcellation-smartchip
+      class="sxplr-z-2 sxplr-mr-1"
+      [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
+      (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
+      (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
+      >
+    </sxplr-sapiviews-core-parcellation-smartchip>
 
-    <viewer-state-breadcrumb class="d-inline-block pe-all" (on-item-click)="showFullSideNav()">
-    </viewer-state-breadcrumb>
-  </div> -->
+    <!-- selected region chip -->
+    <sxplr-sapiviews-core-region-region-chip
+      *ngFor="let region of selectedRegions$ | async"
+      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1"
+      (sxplr-sapiviews-core-region-region-chip-clicked)="showFullSideNav()"
+      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-region-region]="region">
+
+      <div prefix>
+      </div>
+
+      <div suffix class="sxplr-scale-70">
+        <button mat-mini-fab
+          color="primary"
+          iav-stop="mousedown click"
+          (click)="clearRoi()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </sxplr-sapiviews-core-region-region-chip>
+  </div>
 
 </ng-template>
 
@@ -472,18 +508,27 @@
       <!-- if region selected > 0 -->
       <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
 
+        <div sxplr-sapiviews-core-region
+          [sxplr-sapiviews-core-region-detail-flag]="true"
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+          [sxplr-sapiviews-core-region-region]="regionSelected[0]"
+          #tabTmpl_iavRegion="sapiViewsCoreRegion">
+
+        </div>
 
         <!-- TODO fix with sapiView/core/region directive -->
-        <!-- <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
           matColor: 'accent',
-          customColor: tabTmpl_iavRegion.rgbString,
-          customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
+          customColor: tabTmpl_iavRegion.regionRgbString,
+          customColorDarkmode: tabTmpl_iavRegion.regionDarkmode,
           fontIcon: 'fa-brain',
-          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name,
+          tooltip: 'Explore ' + regionSelected[0].name,
           click: click
         }">
 
-        </ng-container> -->
+        </ng-container>
       </ng-template>
 
       <!-- nothing is selected -->
@@ -562,6 +607,7 @@
           [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
           [sxplr-sapiviews-core-region-region]="selectedRegions[0]"
           (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
+          (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
         >
           <div class="sapi-container" header></div>
         </sxplr-sapiviews-core-region-region-rich>
@@ -798,20 +844,24 @@
   let-backCb="backCb"
   let-feature="feature">
 
-  <!-- back btn -->
-  <button mat-button
-    *ngIf="backCb"
-    (click)="backCb()"
-    [attr.aria-label]="ARIA_LABELS.CLOSE"
-    class="position-absolute z-index-10 m-2">
-    <i class="fas fa-chevron-left"></i>
-    <span class="ml-1">
-      Back
-    </span>
-  </button>
-
-  <sxplr-sapiviews-core-datasets-dataset class="sxplr-mt-8 sxplr-z-index-2 mat-elevation-z2"
+  <sxplr-sapiviews-core-datasets-dataset class="sxplr-z-2 mat-elevation-z2"
     [sxplr-sapiviews-core-datasets-dataset-input]="feature">
+
+    <div header>
+      <!-- back btn -->
+      <button mat-button
+        *ngIf="backCb"
+        (click)="backCb()"
+        [attr.aria-label]="ARIA_LABELS.CLOSE"
+        class="sxplr-mb-2"
+        >
+        <i class="fas fa-chevron-left"></i>
+        <span class="ml-1">
+          Back
+        </span>
+      </button>
+    </div>
+
   </sxplr-sapiviews-core-datasets-dataset>
   
   <sxplr-sapiviews-features-entry

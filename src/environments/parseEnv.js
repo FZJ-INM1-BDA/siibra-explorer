@@ -7,7 +7,6 @@ const main = async () => {
   const pathToEnvFile = path.join(__dirname, './environment.prod.ts')
   const {
     BACKEND_URL,
-    DATASET_PREVIEW_URL,
     STRICT_LOCAL,
     MATOMO_URL,
     MATOMO_ID,
@@ -19,7 +18,6 @@ const main = async () => {
   
   console.log(`[parseEnv.js] parse envvar:`, {
     BACKEND_URL,
-    DATASET_PREVIEW_URL,
     STRICT_LOCAL,
     MATOMO_URL,
     MATOMO_ID,
@@ -43,7 +41,6 @@ export const environment = {
   VERSION: ${version},
   BS_REST_URL: ${JSON.stringify(BS_REST_URL)},
   BACKEND_URL: ${JSON.stringify(BACKEND_URL)},
-  DATASET_PREVIEW_URL: ${JSON.stringify(DATASET_PREVIEW_URL)},
   STRICT_LOCAL: ${JSON.stringify(STRICT_LOCAL)},
   MATOMO_URL: ${JSON.stringify(MATOMO_URL)},
   MATOMO_ID: ${JSON.stringify(MATOMO_ID)},

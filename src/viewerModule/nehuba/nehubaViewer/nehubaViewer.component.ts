@@ -85,6 +85,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = []
 
+  private _nehubaReady = false
   @Output() public nehubaReady: EventEmitter<null> = new EventEmitter()
   @Output() public layersChanged: EventEmitter<null> = new EventEmitter()
   private layersChangedHandler: any
@@ -181,8 +182,19 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         this.patchNG()
         this.loadNehuba()
 
-        this.layersChangedHandler = this.nehubaViewer.ngviewer.layerManager.layersChanged.add(() => this.layersChanged.emit(null))
-        this.nehubaViewer.ngviewer.registerDisposer(this.layersChangedHandler)
+        const viewer = this.nehubaViewer.ngviewer
+        this.layersChangedHandler = viewer.layerManager.layersChanged.add(() => {
+          this.layersChanged.emit(null)
+          const readiedLayerNames: string[] = viewer.layerManager.managedLayers.filter(l => l.layer).map(l => l.name)
+          for (const layerName in this.ngIdSegmentsMap) {
+            if (!readiedLayerNames.includes(layerName)) {
+              return
+            }
+            this._nehubaReady = true
+            this.nehubaReady.emit(null)
+          }
+        })
+        viewer.registerDisposer(this.layersChangedHandler)
       })
       .then(() => {
         // all mutation to this.nehubaViewer should await createNehubaPromise
@@ -255,7 +267,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.ondestroySubscriptions.push(
         this.setColormap$.pipe(
           switchMap(switchMapWaitFor({
-            condition: () => !!(this.nehubaViewer?.ngviewer)
+            condition: () => this._nehubaReady
           })),
           debounceTime(160),
         ).subscribe(v => {
@@ -277,7 +289,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     if (this.layerVis$) {
       this.ondestroySubscriptions.push(
         this.layerVis$.pipe(
-          switchMap(switchMapWaitFor({ condition: () => !!(this.nehubaViewer?.ngviewer) })),
+          switchMap(switchMapWaitFor({
+            condition: () => this._nehubaReady
+          })),
           distinctUntilChanged(arrayOrderedEql),
           debounceTime(160),
         ).subscribe((layerNames: string[]) => {
@@ -307,12 +321,11 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         this.segVis$.pipe(
           switchMap(
             switchMapWaitFor({
-              condition: () => this.nehubaViewer?.ngviewer,
+              condition: () => this._nehubaReady,
               leading: true,
             })
           )
         ).subscribe(val => {
-          console.log(val)
           // null === hide all seg
           if (val === null) {
             this.hideAllSeg()
@@ -335,7 +348,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.ondestroySubscriptions.push(
         this.layerCtrl$.pipe(
           bufferUntil(({
-            condition: () => !!this.nehubaViewer?.ngviewer
+            condition: () => this._nehubaReady
           }))
         ).subscribe(messages => {
           for (const message of messages) {
@@ -430,6 +443,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err) => {
       /* print in debug mode */
+      debugger
       this.log.error(err)
     })
 
@@ -443,7 +457,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
       getViewer().display.panels.forEach(patchSliceViewPanel)
-      this.nehubaReady.emit(null)
     })
 
     this.newViewerInit()
@@ -691,7 +704,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public showAllSeg() {
     if (!this.nehubaViewer) { return }
     for (const ngId in this.ngIdSegmentsMap) {
-      console.log(ngId)
       for (const idx of this.ngIdSegmentsMap[ngId]) {
         this.nehubaViewer.showSegment(idx, {
           name: ngId,
@@ -964,7 +976,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this._s$.forEach(_s$ => {
       if (_s$) { _s$.unsubscribe() }
     })
-
   }
 
   private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {

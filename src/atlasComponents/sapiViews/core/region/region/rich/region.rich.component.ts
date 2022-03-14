@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Inject, Output } from "@angular/core";
-import { Observable, Subject } from "rxjs";
+import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
+import { Observable, Subject, Subscription } from "rxjs";
+import { filter } from "rxjs/operators"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 
 @Component({
   selector: 'sxplr-sapiviews-core-region-region-rich',
@@ -13,23 +15,20 @@ import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
   ]
 })
 
-export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase{
+export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase {
   
-  get ARIA_LABELS() {
-    return ARIA_LABELS
-  }
-
-  get CONST() {
-    return CONST
-  }
+  shouldFetchDetail = true
+  public ARIA_LABELS = ARIA_LABELS
+  public CONST = CONST
 
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
   featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
 
   constructor(
-    @Inject(DARKTHEME) public darktheme$: Observable<boolean>
+    sapi: SAPI,
+    @Inject(DARKTHEME) public darktheme$: Observable<boolean>,
   ){
-    super()
+    super(sapi)
   }
 
   handleRegionalFeatureClicked(feat: SapiRegionalFeatureModel) {

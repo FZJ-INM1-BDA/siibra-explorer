@@ -47,9 +47,12 @@ $media-map: (
 
 
 @for $i from 4 through 10 {
-  $maxheight: $i * 10;
-  .max-#{$maxheight}-vh {
-    max-height: $maxheight * 1vh;
+  $tensvar: $i * 10;
+  .#{$nsp}-mxh-#{$tensvar}vh {
+    max-height: $tensvar * 1vh;
+  }
+  .#{$nsp}-mxw-#{$tensvar}vw {
+    max-width: $tensvar * 1vw;
   }
 }
 
@@ -95,42 +98,42 @@ $transform-origin-maps: (
 }
 
 @for $zlvl from 0 through 10 {
-  .#{$nsp}-z-index-#{$zlvl} {
+  .#{$nsp}-z-#{$zlvl} {
     z-index: $zlvl;
   }
 }
 
-@for $unit from 0 through 8 {
-  .#{$nsp}-pt-#{$unit} {
-    padding-top: $unit * 0.5rem;
+@for $unit from 0 through 10 {
+  .#{$nsp}-pt-#{$unit}{
+    padding-top: $unit * 0.5rem!important;
   }
-  .#{$nsp}-pb-#{$unit} {
-    padding-bottom: $unit * 0.5rem;
+  .#{$nsp}-pb-#{$unit}{
+    padding-bottom: $unit * 0.5rem!important;
   }
-  .#{$nsp}-pl-#{$unit} {
-    padding-left: $unit * 0.5rem;
+  .#{$nsp}-pl-#{$unit}{
+    padding-left: $unit * 0.5rem!important;
   }
-  .#{$nsp}-pr-#{$unit} {
-    padding-right: $unit * 0.5rem;
+  .#{$nsp}-pr-#{$unit}{
+    padding-right: $unit * 0.5rem!important;
   }
-  .#{$nsp}-p-#{$unit} {
-    padding: $unit * 0.5rem;
+  .#{$nsp}-p-#{$unit}{
+    padding: $unit * 0.5rem!important;
   }
 
-  .#{$nsp}-mt-#{$unit} {
-    margin-top: $unit * 0.5rem;
+  .#{$nsp}-mt-#{$unit}{
+    margin-top: $unit * 0.5rem!important;
   }
-  .#{$nsp}-mb-#{$unit} {
-    margin-bottom: $unit * 0.5rem;
+  .#{$nsp}-mb-#{$unit}{
+    margin-bottom: $unit * 0.5rem!important;
   }
-  .#{$nsp}-ml-#{$unit} {
-    margin-left: $unit * 0.5rem;
+  .#{$nsp}-ml-#{$unit}{
+    margin-left: $unit * 0.5rem!important;
   }
-  .#{$nsp}-mr-#{$unit} {
-    margin-right: $unit * 0.5rem;
+  .#{$nsp}-mr-#{$unit}{
+    margin-right: $unit * 0.5rem!important;
   }
-  .#{$nsp}-m-#{$unit} {
-    margin: $unit * 0.5rem;
+  .#{$nsp}-m-#{$unit}{
+    margin: $unit * 0.5rem!important;
   }
 }
 
@@ -200,7 +203,7 @@ $white-space-vars: nowrap;
 
 $pointer-events-vars: all, none;
 @each $pointer-events-var in $pointer-events-vars {
-  .#{$nsp}-pointer-events-#{$pointer-events-var}
+  .#{$nsp}-pe-#{$pointer-events-var}
   {
     pointer-events: $pointer-events-var!important;
   }
@@ -216,4 +219,12 @@ $width-pc-vars: 100;
 .#{$nsp}-border
 {
   border-width: 1px;
+}
+
+// flex
+$flex-wrap-vars: nowrap, wrap, wrap-reverse;
+@each $flex-wrap-var in $flex-wrap-vars {
+  .#{$nsp}-flex-wrap-#{$flex-wrap-var} {
+    flex-wrap: $flex-wrap-var;
+  }
 }
