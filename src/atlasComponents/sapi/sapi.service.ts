@@ -24,7 +24,7 @@ export class SAPI{
   
   registry = {
     _map: {} as Record<string, {
-      func: (...arg: any[]) => RegistryType,
+      func: (...arg: any[]) => RegistryType
       args: string[]
     }>,
     get<T>(id: string): T {

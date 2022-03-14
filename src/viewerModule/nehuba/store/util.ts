@@ -83,8 +83,8 @@ export const fromRootStore = {
                 volumeMetadata: found,
               }
             }).filter(
-              v => !!v.volumeMetadata?.labelIndicies
-            )
+            v => !!v.volumeMetadata?.labelIndicies
+          )
         })
       )
     }),

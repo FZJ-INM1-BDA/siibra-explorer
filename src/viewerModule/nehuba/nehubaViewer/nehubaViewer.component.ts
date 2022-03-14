@@ -99,9 +99,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   @Output() public mouseoverLandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public regionSelectionEmitter: EventEmitter<{
-    segment: number,
+    segment: number
     layer: {
-      name?: string,
+      name?: string
       url?: string
   }}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()
@@ -435,7 +435,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
-      debugger
       this.log.error(err)
     })
 

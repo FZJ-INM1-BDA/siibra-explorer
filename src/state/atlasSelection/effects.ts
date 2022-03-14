@@ -16,12 +16,12 @@ export class Effect {
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     filter(action => !!action.atlas),
-    switchMap(action => {
-      const selectedParc = action.atlas.parcellations.find(p => /290/.test(p["@id"])) || action.atlas.parcellations[0]
-      return this.sapiSvc.getParcDetail(action.atlas["@id"], selectedParc["@id"], 100).then(
+    switchMap(({ atlas }) => {
+      const selectedParc = atlas.parcellations.find(p => /290/.test(p["@id"])) || atlas.parcellations[0]
+      return this.sapiSvc.getParcDetail(atlas["@id"], selectedParc["@id"], 100).then(
         parcellation => ({
           parcellation,
-          atlas: action.atlas
+          atlas
         })
       )
     }),

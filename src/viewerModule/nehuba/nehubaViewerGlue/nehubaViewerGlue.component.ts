@@ -264,8 +264,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     /**
      * clear existing container
      */
-     this.viewerUnit = null
-     this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
+    this.viewerUnit = null
+    this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
   }
 
   private async loadNewViewer(ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }, baseLayers: NgLayerCustomLayer[]) {
@@ -275,8 +275,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     }
 
     const overwritingInitState = this.navigation
-    ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
-    : {}
+      ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
+      : {}
 
     config.dataset.initialNgState = {
       ...config.dataset.initialNgState,

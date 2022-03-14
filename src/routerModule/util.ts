@@ -1,6 +1,5 @@
 import { encodeNumber, decodeToNumber, separator, encodeURIFull } from './cipher'
 import { UrlSegment, UrlTree } from "@angular/router"
-import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
 import { Component } from "@angular/core"
 import { atlasSelection, plugins } from "src/state"
 

@@ -8,9 +8,9 @@ import { SapiFeatureModel } from "src/atlasComponents/sapi";
 
 export class FeatureBadgeColourPipe implements PipeTransform{
   public transform(regionalFeature: SapiFeatureModel) {
-      if (regionalFeature.type === "siibra/features/receptor") {
-        return "accent"
-      }
-      return "default"
+    if (regionalFeature.type === "siibra/features/receptor") {
+      return "accent"
+    }
+    return "default"
   }
 }

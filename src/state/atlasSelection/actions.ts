@@ -85,7 +85,7 @@ export const clearSelectedRegions = createAction(
 export const selectATPById = createAction(
   `${nameSpace} selectATPById`,
   props<{
-    atlasId?: string,
+    atlasId?: string
     templateId?: string
     parcellationId?: string
   }>()

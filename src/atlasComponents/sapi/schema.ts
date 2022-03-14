@@ -6,93 +6,93 @@
 export interface paths {
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions": {
     /** Returns all regions for a given parcellation id. */
-    get: operations["get_all_regions_from_atlas_parc_space_atlases__atlas_id__parcellations__parcellation_id__regions_get"];
-  };
+    get: operations["get_all_regions_from_atlas_parc_space_atlases__atlas_id__parcellations__parcellation_id__regions_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/features": {
     /** Returns all regional features for a region. */
-    get: operations["get_all_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get"];
-  };
+    get: operations["get_all_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/features/{feature_id}": {
     /** Returns a feature for a region, as defined by by the modality and feature ID */
-    get: operations["get_regional_modality_by_id_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get"];
-  };
+    get: operations["get_regional_modality_by_id_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/regional_map/info": {
     /** Returns information about a regional map for given region name. */
-    get: operations["get_regional_map_info_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_info_get"];
-  };
+    get: operations["get_regional_map_info_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_info_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/regional_map/map": {
     /** Returns a regional map for given region name. */
-    get: operations["get_regional_map_file_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_map_get"];
-  };
+    get: operations["get_regional_map_file_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_map_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}": {
-    get: operations["get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get"];
-  };
+    get: operations["get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get"]
+  }
   "/atlases/{atlas_id}/parcellations": {
     /** Returns all parcellations that are defined in the siibra client for given atlas. */
-    get: operations["get_all_parcellations_atlases__atlas_id__parcellations_get"];
-  };
+    get: operations["get_all_parcellations_atlases__atlas_id__parcellations_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/features/{feature_id}": {
     /** Returns a global feature for a specific modality id. */
-    get: operations["get_single_global_feature_detail_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get"];
-  };
+    get: operations["get_single_global_feature_detail_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/features": {
     /** Returns all global features for a parcellation. */
-    get: operations["get_global_features_names_atlases__atlas_id__parcellations__parcellation_id__features_get"];
-  };
+    get: operations["get_global_features_names_atlases__atlas_id__parcellations__parcellation_id__features_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/volumes": {
     /** Returns one parcellation for given id. */
-    get: operations["get_volumes_by_id_atlases__atlas_id__parcellations__parcellation_id__volumes_get"];
-  };
+    get: operations["get_volumes_by_id_atlases__atlas_id__parcellations__parcellation_id__volumes_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}": {
     /** Returns one parcellation for given id. */
-    get: operations["get_parcellation_by_id_atlases__atlas_id__parcellations__parcellation_id__get"];
-  };
+    get: operations["get_parcellation_by_id_atlases__atlas_id__parcellations__parcellation_id__get"]
+  }
   "/atlases/{atlas_id}/spaces": {
     /** Returns all spaces that are defined in the siibra client. */
-    get: operations["get_all_spaces_atlases__atlas_id__spaces_get"];
-  };
+    get: operations["get_all_spaces_atlases__atlas_id__spaces_get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}/templates": {
     /** Returns a template for a given space id. */
-    get: operations["get_template_by_space_id_atlases__atlas_id__spaces__space_id__templates_get"];
-  };
+    get: operations["get_template_by_space_id_atlases__atlas_id__spaces__space_id__templates_get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}/parcellation_maps": {
     /** Returns all parcellation maps for a given space id. */
-    get: operations["get_parcellation_map_for_space_atlases__atlas_id__spaces__space_id__parcellation_maps_get"];
-  };
+    get: operations["get_parcellation_map_for_space_atlases__atlas_id__spaces__space_id__parcellation_maps_get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}/features/{feature_id}": {
     /**
      * Get a detailed view on a single spatial feature.
      * A parcellation id and region id can be provided optional to get more details.
      */
-    get: operations["get_single_spatial_feature_detail_atlases__atlas_id__spaces__space_id__features__feature_id__get"];
-  };
+    get: operations["get_single_spatial_feature_detail_atlases__atlas_id__spaces__space_id__features__feature_id__get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}/features": {
     /** Return all possible feature names and links to get more details */
-    get: operations["get_spatial_features_from_space_atlases__atlas_id__spaces__space_id__features_get"];
-  };
+    get: operations["get_spatial_features_from_space_atlases__atlas_id__spaces__space_id__features_get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}/volumes": {
-    get: operations["get_one_space_volumes_atlases__atlas_id__spaces__space_id__volumes_get"];
-  };
+    get: operations["get_one_space_volumes_atlases__atlas_id__spaces__space_id__volumes_get"]
+  }
   "/atlases/{atlas_id}/spaces/{space_id}": {
     /** Returns one space for given id, with links to further resources */
-    get: operations["get_one_space_by_id_atlases__atlas_id__spaces__space_id__get"];
-  };
+    get: operations["get_one_space_by_id_atlases__atlas_id__spaces__space_id__get"]
+  }
   "/atlases": {
     /** Get all atlases known by siibra. */
-    get: operations["get_all_atlases_atlases_get"];
-  };
+    get: operations["get_all_atlases_atlases_get"]
+  }
   "/atlases/{atlas_id}": {
     /** Get more information for a specific atlas with links to further objects. */
-    get: operations["get_atlas_by_id_atlases__atlas_id__get"];
-  };
+    get: operations["get_atlas_by_id_atlases__atlas_id__get"]
+  }
   "/genes": {
     /** Return all genes (name, acronym) in siibra */
-    get: operations["get_gene_names_genes_get"];
-  };
+    get: operations["get_gene_names_genes_get"]
+  }
   "/features": {
     /** Return all possible modalities */
-    get: operations["get_all_available_modalities_features_get"];
-  };
+    get: operations["get_all_available_modalities_features_get"]
+  }
 }
 
 export interface components {
@@ -103,1205 +103,1205 @@ export interface components {
        * Content Type
        * @default application/octet-stream
        */
-      content_type?: string;
+      content_type?: string
       /**
        * Content Encoding
        * @default gzip; base64
        */
-      content_encoding?: string;
+      content_encoding?: string
       /** X-Width */
-      "x-width": number;
+      "x-width": number
       /** X-Height */
-      "x-height": number;
+      "x-height": number
       /** X-Channel */
-      "x-channel": number;
+      "x-channel": number
       /** Dtype */
-      dtype: string;
+      dtype: string
       /** Content */
-      content: string;
-    };
+      content: string
+    }
     /** AxesOrigin */
     AxesOrigin: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * typeOfUncertainty
        * @description Distinct technique used to quantify the uncertainty of a measurement.
        */
-      typeOfUncertainty?: unknown;
+      typeOfUncertainty?: unknown
       /**
        * uncertainty
        * @description Quantitative value range defining the uncertainty of a measurement.
        */
-      uncertainty?: number[];
+      uncertainty?: number[]
       /**
        * unit
        * @description Determinate quantity adopted as a standard of measurement.
        */
-      unit?: unknown;
+      unit?: unknown
       /**
        * value
        * @description Entry for a property.
        */
-      value: number;
-    };
+      value: number
+    }
     /** BaseDatasetJsonModel */
     BaseDatasetJsonModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/core/dataset";
-      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
+      type?: "siibra/core/dataset"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
-      urls: components["schemas"]["Url"][];
-    };
+      urls: components["schemas"]["Url"][]
+    }
     /** BestViewPoint */
     BestViewPoint: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * coordinateSpace
        * @description Two or three dimensional geometric setting.
        */
-      coordinateSpace: unknown;
+      coordinateSpace: unknown
       /**
        * Coordinates
        * @description Structured information on a quantitative value.
        */
-      coordinates: components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates"][];
-    };
+      coordinates: components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates"][]
+    }
     /** BoundingBoxModel */
     BoundingBoxModel: {
       /** Space */
-      space: { [key: string]: string };
-      center: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"];
-      minpoint: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"];
-      maxpoint: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"];
+      space: { [key: string]: string }
+      center: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
+      minpoint: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
+      maxpoint: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
       /** Shape */
-      shape: number[];
+      shape: number[]
       /** Is Planar */
-      is_planar: boolean;
-    };
+      is_planar: boolean
+    }
     /** ConnectivityMatrixDataModel */
     ConnectivityMatrixDataModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/features/connectivity";
+      type?: "siibra/features/connectivity"
       /** Name */
-      name: string;
+      name: string
       /** Parcellations */
-      parcellations: { [key: string]: string }[];
-      matrix?: components["schemas"]["NpArrayDataModel"];
+      parcellations: { [key: string]: string }[]
+      matrix?: components["schemas"]["NpArrayDataModel"]
       /** Columns */
-      columns?: string[];
-    };
+      columns?: string[]
+    }
     /** DatasetJsonModel */
     DatasetJsonModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/core/dataset";
-      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
+      type?: "siibra/core/dataset"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
-      urls: components["schemas"]["Url"][];
-    };
+      urls: components["schemas"]["Url"][]
+    }
     /** FingerPrintDataModel */
     FingerPrintDataModel: {
       /** Mean */
-      mean: number;
+      mean: number
       /** Std */
-      std: number;
+      std: number
       /** Unit */
-      unit: string;
-    };
+      unit: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
+      detail?: components["schemas"]["ValidationError"][]
+    }
     /** HasAnnotation */
     HasAnnotation: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * Bestviewpoint
        * @description Structured information on a coordinate point.
        */
-      bestViewPoint?: components["schemas"]["BestViewPoint"];
+      bestViewPoint?: components["schemas"]["BestViewPoint"]
       /**
        * criteria
        * @description Aspects or standards on which a judgement or decision is based.
        */
-      criteria?: unknown;
+      criteria?: unknown
       /**
        * criteriaQualityType
        * @description Distinct class that defines how the judgement or decision was made for a particular criteria.
        */
-      criteriaQualityType: unknown;
+      criteriaQualityType: unknown
       /**
        * displayColor
        * @description Preferred coloring.
        */
-      displayColor?: string;
+      displayColor?: string
       /**
        * inspiredBy
        * @description Reference to an inspiring element.
        */
-      inspiredBy?: unknown[];
+      inspiredBy?: unknown[]
       /**
        * internalIdentifier
        * @description Term or code that identifies someone or something within a particular product.
        */
-      internalIdentifier: string;
+      internalIdentifier: string
       /**
        * laterality
        * @description Differentiation between a pair of lateral homologous parts of the body.
        */
-      laterality?: unknown[];
+      laterality?: unknown[]
       /**
        * visualizedIn
        * @description Reference to an image in which something is visible.
        */
-      visualizedIn?: unknown;
-    };
+      visualizedIn?: unknown
+    }
     /** HasTerminologyVersion */
     HasTerminologyVersion: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * definedIn
        * @description Reference to a file instance in which something is stored.
        */
-      definedIn?: unknown[];
+      definedIn?: unknown[]
       /** hasEntityVersion */
-      hasEntityVersion: unknown[];
+      hasEntityVersion: unknown[]
       /**
        * ontologyIdentifier
        * @description Term or code used to identify something or someone registered within a particular ontology.
        */
-      ontologyIdentifier?: string[];
-    };
+      ontologyIdentifier?: string[]
+    }
     /** HrefModel */
     HrefModel: {
       /** Href */
-      href: string;
-    };
+      href: string
+    }
     /** IEEGContactPointModel */
     IEEGContactPointModel: {
       /** Id */
-      id: string;
-      point: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"];
-    };
+      id: string
+      point: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
+    }
     /** IEEGElectrodeModel */
     IEEGElectrodeModel: {
       /** Electrode Id */
-      electrode_id: string;
+      electrode_id: string
       /** Contact Points */
       contact_points: {
-        [key: string]: components["schemas"]["IEEGContactPointModel"];
-      };
-    };
+        [key: string]: components["schemas"]["IEEGContactPointModel"]
+      }
+    }
     /** IEEGSessionModel */
     IEEGSessionModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/features/ieegSession";
-      dataset: components["schemas"]["DatasetJsonModel"];
+      type?: "siibra/features/ieegSession"
+      dataset: components["schemas"]["DatasetJsonModel"]
       /** Sub Id */
-      sub_id: string;
+      sub_id: string
       /** Electrodes */
       electrodes: {
-        [key: string]: components["schemas"]["IEEGElectrodeModel"];
-      };
-    };
+        [key: string]: components["schemas"]["IEEGElectrodeModel"]
+      }
+    }
     /** NeurotransmitterMarkupModel */
     NeurotransmitterMarkupModel: {
       /** Latex */
-      latex: string;
+      latex: string
       /** Markdown */
-      markdown: string;
+      markdown: string
       /** Name */
-      name: string;
+      name: string
       /** Label */
-      label: string;
-    };
+      label: string
+    }
     /** NiiMetadataModel */
     NiiMetadataModel: {
       /** Min */
-      min: number;
+      min: number
       /** Max */
-      max: number;
-    };
+      max: number
+    }
     /** NpArrayDataModel */
     NpArrayDataModel: {
       /**
        * Content Type
        * @default application/octet-stream
        */
-      content_type?: string;
+      content_type?: string
       /**
        * Content Encoding
        * @default gzip; base64
        */
-      content_encoding?: string;
+      content_encoding?: string
       /** X-Width */
-      "x-width": number;
+      "x-width": number
       /** X-Height */
-      "x-height": number;
+      "x-height": number
       /** X-Channel */
-      "x-channel": number;
+      "x-channel": number
       /** Dtype */
-      dtype: string;
+      dtype: string
       /** Content */
-      content: string;
-    };
+      content: string
+    }
     /** ProfileDataModel */
     ProfileDataModel: {
-      density: components["schemas"]["NpArrayDataModel"];
+      density: components["schemas"]["NpArrayDataModel"]
       /** Unit */
-      unit: string;
-    };
+      unit: string
+    }
     /** QuantitativeOverlapItem */
     QuantitativeOverlapItem: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * typeOfUncertainty
        * @description Distinct technique used to quantify the uncertainty of a measurement.
        */
-      typeOfUncertainty?: unknown;
+      typeOfUncertainty?: unknown
       /**
        * uncertainty
        * @description Quantitative value range defining the uncertainty of a measurement.
        */
-      uncertainty?: number[];
+      uncertainty?: number[]
       /**
        * unit
        * @description Determinate quantity adopted as a standard of measurement.
        */
-      unit?: unknown;
+      unit?: unknown
       /**
        * value
        * @description Entry for a property.
        */
-      value: number;
-    };
+      value: number
+    }
     /** QuantitativeOverlapItem1 */
     QuantitativeOverlapItem1: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * maxValue
        * @description Greatest quantity attained or allowed.
        */
-      maxValue: number;
+      maxValue: number
       /** maxValueUnit */
-      maxValueUnit?: unknown;
+      maxValueUnit?: unknown
       /**
        * minValue
        * @description Smallest quantity attained or allowed.
        */
-      minValue: number;
+      minValue: number
       /** minValueUnit */
-      minValueUnit?: unknown;
-    };
+      minValueUnit?: unknown
+    }
     /** ReceptorDataModel */
     ReceptorDataModel: {
       /** Autoradiographs */
       autoradiographs: {
-        [key: string]: components["schemas"]["AutoradiographyDataModel"];
-      };
+        [key: string]: components["schemas"]["AutoradiographyDataModel"]
+      }
       /** Profiles */
-      profiles: { [key: string]: components["schemas"]["ProfileDataModel"] };
+      profiles: { [key: string]: components["schemas"]["ProfileDataModel"] }
       /** Fingerprints */
       fingerprints: {
-        [key: string]: components["schemas"]["FingerPrintDataModel"];
-      };
+        [key: string]: components["schemas"]["FingerPrintDataModel"]
+      }
       /** Receptor Symbols */
       receptor_symbols: {
-        [key: string]: components["schemas"]["SymbolMarkupClass"];
-      };
-    };
+        [key: string]: components["schemas"]["SymbolMarkupClass"]
+      }
+    }
     /** ReceptorDatasetModel */
     ReceptorDatasetModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/features/receptor";
-      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
+      type?: "siibra/features/receptor"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
-      urls: components["schemas"]["Url"][];
-      data?: components["schemas"]["ReceptorDataModel"];
-    };
+      urls: components["schemas"]["Url"][]
+      data?: components["schemas"]["ReceptorDataModel"]
+    }
     /** ReceptorMarkupModel */
     ReceptorMarkupModel: {
       /** Latex */
-      latex: string;
+      latex: string
       /** Markdown */
-      markdown: string;
+      markdown: string
       /** Name */
-      name: string;
-    };
+      name: string
+    }
     /** RelationAssessmentItem */
     RelationAssessmentItem: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * criteria
        * @description Aspects or standards on which a judgement or decision is based.
        */
-      criteria?: unknown;
+      criteria?: unknown
       /**
        * inRelationTo
        * @description Reference to a related element.
        */
-      inRelationTo: unknown;
+      inRelationTo: unknown
       /**
        * qualitativeOverlap
        * @description Semantic characterization of how much two things occupy the same space.
        */
-      qualitativeOverlap: unknown;
-    };
+      qualitativeOverlap: unknown
+    }
     /** RelationAssessmentItem1 */
     RelationAssessmentItem1: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * criteria
        * @description Aspects or standards on which a judgement or decision is based.
        */
-      criteria?: unknown;
+      criteria?: unknown
       /**
        * inRelationTo
        * @description Reference to a related element.
        */
-      inRelationTo: unknown;
+      inRelationTo: unknown
       /** Quantitativeoverlap */
       quantitativeOverlap: Partial<
         components["schemas"]["QuantitativeOverlapItem"]
       > &
-        Partial<components["schemas"]["QuantitativeOverlapItem1"]>;
-    };
+        Partial<components["schemas"]["QuantitativeOverlapItem1"]>
+    }
     /** SapiAtlasModel */
     SapiAtlasModel: {
       /** Links */
-      links: { [key: string]: components["schemas"]["HrefModel"] };
+      links: { [key: string]: components["schemas"]["HrefModel"] }
       /** @Id */
-      "@id": string;
+      "@id": string
       /** Name */
-      name: string;
+      name: string
       /**
        * @Type
        * @constant
        */
-      "@type"?: "juelich/iav/atlas/v1.0.0";
+      "@type"?: "juelich/iav/atlas/v1.0.0"
       /** Spaces */
-      spaces: components["schemas"]["SiibraAtIdModel"][];
+      spaces: components["schemas"]["SiibraAtIdModel"][]
       /** Parcellations */
-      parcellations: components["schemas"]["SiibraAtIdModel"][];
-      species: components["schemas"]["SpeciesModel"];
-    };
+      parcellations: components["schemas"]["SiibraAtIdModel"][]
+      species: components["schemas"]["SpeciesModel"]
+    }
     /** SapiParcellationModel */
     SapiParcellationModel: {
       /** Links */
-      links: { [key: string]: components["schemas"]["HrefModel"] };
+      links: { [key: string]: components["schemas"]["HrefModel"] }
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * @Type
        * @constant
        */
-      "@type"?: "minds/core/parcellationatlas/v1.0.0";
+      "@type"?: "minds/core/parcellationatlas/v1.0.0"
       /** Name */
-      name: string;
+      name: string
       /** Modality */
-      modality?: string;
+      modality?: string
       /** Datasets */
-      datasets: components["schemas"]["DatasetJsonModel"][];
+      datasets: components["schemas"]["DatasetJsonModel"][]
       /** Brainatlasversions */
-      brainAtlasVersions: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Model"][];
-      version?: components["schemas"]["SiibraParcellationVersionModel"];
-    };
+      brainAtlasVersions: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Model"][]
+      version?: components["schemas"]["SiibraParcellationVersionModel"]
+    }
     /** SapiSpaceModel */
     SapiSpaceModel: {
       /** Links */
-      links: { [key: string]: components["schemas"]["HrefModel"] };
+      links: { [key: string]: components["schemas"]["HrefModel"] }
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
+      "@type": string
       /**
        * anatomicalAxesOrientation
        * @description Relation between reference planes used in anatomy and mathematics.
        */
-      anatomicalAxesOrientation: { [key: string]: unknown };
+      anatomicalAxesOrientation: { [key: string]: unknown }
       /**
        * Axesorigin
        * @description Structured information on a quantitative value.
        */
-      axesOrigin: components["schemas"]["AxesOrigin"][];
+      axesOrigin: components["schemas"]["AxesOrigin"][]
       /**
        * defaultImage
        * @description Two or three dimensional image that particluarly represents a specific coordinate space.
        */
-      defaultImage?: unknown[];
+      defaultImage?: unknown[]
       /**
        * digitalIdentifier
        * @description Digital handle to identify objects or legal persons.
        */
-      digitalIdentifier?: { [key: string]: unknown };
+      digitalIdentifier?: { [key: string]: unknown }
       /**
        * fullName
        * @description Whole, non-abbreviated name of something or somebody.
        */
-      fullName: string;
+      fullName: string
       /**
        * homepage
        * @description Main website of something or someone.
        */
-      homepage?: { [key: string]: unknown };
+      homepage?: { [key: string]: unknown }
       /**
        * howToCite
        * @description Preferred format for citing a particular object or legal person.
        */
-      howToCite?: string;
+      howToCite?: string
       /**
        * nativeUnit
        * @description Determinate quantity used in the original measurement.
        */
-      nativeUnit: { [key: string]: unknown };
+      nativeUnit: { [key: string]: unknown }
       /**
        * ontologyIdentifier
        * @description Term or code used to identify something or someone registered within a particular ontology.
        */
-      ontologyIdentifier?: string[];
+      ontologyIdentifier?: string[]
       /**
        * releaseDate
        * Format: date
        * @description Fixed date on which a product is due to become or was made available for the general public to see or buy
        */
-      releaseDate: string;
+      releaseDate: string
       /**
        * shortName
        * @description Shortened or fully abbreviated name of something or somebody.
        */
-      shortName: string;
+      shortName: string
       /**
        * versionIdentifier
        * @description Term or code used to identify the version of something.
        */
-      versionIdentifier: string;
-    };
+      versionIdentifier: string
+    }
     /** SerializationErrorModel */
     SerializationErrorModel: {
       /**
        * Type
        * @constant
        */
-      type?: "spy/serialization-error";
+      type?: "spy/serialization-error"
       /** Message */
-      message: string;
-    };
+      message: string
+    }
     /** SiibraAtIdModel */
     SiibraAtIdModel: {
       /** @Id */
-      "@id": string;
-    };
+      "@id": string
+    }
     /** SiibraParcellationVersionModel */
     SiibraParcellationVersionModel: {
       /** Name */
-      name: string;
+      name: string
       /** Deprecated */
-      deprecated?: boolean;
-      prev?: components["schemas"]["SiibraAtIdModel"];
-      next?: components["schemas"]["SiibraAtIdModel"];
-    };
+      deprecated?: boolean
+      prev?: components["schemas"]["SiibraAtIdModel"]
+      next?: components["schemas"]["SiibraAtIdModel"]
+    }
     /** SpeciesModel */
     SpeciesModel: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
+      "@type": string
       /**
        * definition
        * @description Short, but precise statement of the meaning of a word, word group, sign or a symbol.
        */
-      definition?: string;
+      definition?: string
       /**
        * description
        * @description Longer statement or account giving the characteristics of someone or something.
        */
-      description?: string;
+      description?: string
       /**
        * interlexIdentifier
        * @description Persistent identifier for a term registered in the InterLex project.
        */
-      interlexIdentifier?: string;
+      interlexIdentifier?: string
       /**
        * knowledgeSpaceLink
        * @description Persistent link to an encyclopedia entry in the Knowledge Space project.
        */
-      knowledgeSpaceLink?: string;
+      knowledgeSpaceLink?: string
       /**
        * name
        * @description Word or phrase that constitutes the distinctive designation of a being or thing.
        */
-      name: string;
+      name: string
       /**
        * preferredOntologyIdentifier
        * @description Persistent identifier of a preferred ontological term.
        */
-      preferredOntologyIdentifier?: string;
+      preferredOntologyIdentifier?: string
       /**
        * synonym
        * @description Words or expressions used in the same language that have the same or nearly the same meaning in some or all senses.
        */
-      synonym?: string[];
+      synonym?: string[]
       /** Kgv1Id */
-      kgV1Id: string;
-    };
+      kgV1Id: string
+    }
     /** SymbolMarkupClass */
     SymbolMarkupClass: {
-      receptor: components["schemas"]["ReceptorMarkupModel"];
-      neurotransmitter: components["schemas"]["NeurotransmitterMarkupModel"];
-    };
+      receptor: components["schemas"]["ReceptorMarkupModel"]
+      neurotransmitter: components["schemas"]["NeurotransmitterMarkupModel"]
+    }
     /** Url */
     Url: {
       /** Doi */
-      doi: string;
+      doi: string
       /** Cite */
-      cite?: string;
-    };
+      cite?: string
+    }
     /** VOIDataModel */
     VOIDataModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/features/voi";
-      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
+      type?: "siibra/features/voi"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
-      urls: components["schemas"]["Url"][];
+      urls: components["schemas"]["Url"][]
       /** Volumes */
-      volumes: components["schemas"]["VolumeModel"][];
-      location: components["schemas"]["BoundingBoxModel"];
-    };
+      volumes: components["schemas"]["VolumeModel"][]
+      location: components["schemas"]["BoundingBoxModel"]
+    }
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: string[];
+      loc: string[]
       /** Message */
-      msg: string;
+      msg: string
       /** Error Type */
-      type: string;
-    };
+      type: string
+    }
     /** VocabModel */
     VocabModel: {
       /** @Vocab */
-      "@vocab": string;
-    };
+      "@vocab": string
+    }
     /** VolumeDataModel */
     VolumeDataModel: {
       /** Type */
-      type: string;
+      type: string
       /** Is Volume */
-      is_volume: boolean;
+      is_volume: boolean
       /** Is Surface */
-      is_surface: boolean;
+      is_surface: boolean
       /** Detail */
-      detail: { [key: string]: unknown };
-      space: components["schemas"]["SiibraAtIdModel"];
+      detail: { [key: string]: unknown }
+      space: components["schemas"]["SiibraAtIdModel"]
       /** Url */
-      url?: string;
+      url?: string
       /** Url Map */
-      url_map?: { [key: string]: string };
+      url_map?: { [key: string]: string }
       /** Map Type */
-      map_type?: string;
+      map_type?: string
       /** Volume Type */
-      volume_type?: string;
-    };
+      volume_type?: string
+    }
     /** VolumeModel */
     VolumeModel: {
       /** @Id */
-      "@id": string;
+      "@id": string
       /**
        * Type
        * @constant
        */
-      type?: "siibra/core/dataset";
-      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"];
+      type?: "siibra/core/dataset"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
-      urls: components["schemas"]["Url"][];
-      data: components["schemas"]["VolumeDataModel"];
-    };
+      urls: components["schemas"]["Url"][]
+      data: components["schemas"]["VolumeDataModel"]
+    }
     /** Copyright */
     siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Copyright: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * holder
        * @description Legal person in possession of something.
        */
-      holder: unknown[];
+      holder: unknown[]
       /**
        * year
        * @description Cycle in the Gregorian calendar specified by a number and comprised of 365 or 366 days divided into 12 months beginning with January and ending with December.
        */
-      year: string;
-    };
+      year: string
+    }
     /** Model */
     siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Model: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
+      "@type": string
       /** abbreviation */
-      abbreviation?: string;
+      abbreviation?: string
       /**
        * accessibility
        * @description Level to which something is accessible to someone or something.
        */
-      accessibility: { [key: string]: unknown };
+      accessibility: { [key: string]: unknown }
       /** atlasType */
-      atlasType?: { [key: string]: unknown };
+      atlasType?: { [key: string]: unknown }
       /**
        * author
        * @description Creator of a literary or creative work, as well as a dataset publication.
        */
-      author?: unknown[];
+      author?: unknown[]
       /**
        * coordinateSpace
        * @description Two or three dimensional geometric setting.
        */
-      coordinateSpace: { [key: string]: unknown };
+      coordinateSpace: { [key: string]: unknown }
       /**
        * Copyright
        * @description Structured information on the copyright.
        */
-      copyright?: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Copyright"];
+      copyright?: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__Copyright"]
       /**
        * custodian
        * @description The 'custodian' is a legal person who is responsible for the content and quality of the data, metadata, and/or code of a research product.
        */
-      custodian?: unknown[];
+      custodian?: unknown[]
       /**
        * description
        * @description Longer statement or account giving the characteristics of someone or something.
        */
-      description?: string;
+      description?: string
       /**
        * digitalIdentifier
        * @description Digital handle to identify objects or legal persons.
        */
-      digitalIdentifier?: { [key: string]: unknown };
+      digitalIdentifier?: { [key: string]: unknown }
       /**
        * fullDocumentation
        * @description Non-abridged instructions, comments, and information for using a particular product.
        */
-      fullDocumentation: { [key: string]: unknown };
+      fullDocumentation: { [key: string]: unknown }
       /**
        * fullName
        * @description Whole, non-abbreviated name of something or somebody.
        */
-      fullName?: string;
+      fullName?: string
       /**
        * funding
        * @description Money provided by a legal person for a particular purpose.
        */
-      funding?: unknown[];
-      hasTerminologyVersion: components["schemas"]["HasTerminologyVersion"];
+      funding?: unknown[]
+      hasTerminologyVersion: components["schemas"]["HasTerminologyVersion"]
       /**
        * homepage
        * @description Main website of something or someone.
        */
-      homepage?: { [key: string]: unknown };
+      homepage?: { [key: string]: unknown }
       /**
        * howToCite
        * @description Preferred format for citing a particular object or legal person.
        */
-      howToCite?: string;
+      howToCite?: string
       /**
        * isAlternativeVersionOf
        * @description Reference to an original form where the essence was preserved, but presented in an alternative form.
        */
-      isAlternativeVersionOf?: unknown[];
+      isAlternativeVersionOf?: unknown[]
       /**
        * isNewVersionOf
        * @description Reference to a previous (potentially outdated) particular form of something.
        */
-      isNewVersionOf?: { [key: string]: unknown };
+      isNewVersionOf?: { [key: string]: unknown }
       /**
        * keyword
        * @description Significant word or concept that are representative of something or someone.
        */
-      keyword?: unknown[];
+      keyword?: unknown[]
       /**
        * license
        * @description Grant by a party to another party as an element of an agreement between those parties that permits to do, use, or own something.
        */
-      license: { [key: string]: unknown };
+      license: { [key: string]: unknown }
       /**
        * ontologyIdentifier
        * @description Term or code used to identify something or someone registered within a particular ontology.
        */
-      ontologyIdentifier?: string[];
+      ontologyIdentifier?: string[]
       /**
        * Othercontribution
        * @description Structured information on the contribution made to a research product.
        */
-      otherContribution?: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__OtherContribution"];
+      otherContribution?: components["schemas"]["siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__OtherContribution"]
       /**
        * relatedPublication
        * @description Reference to something that was made available for the general public to see or buy.
        */
-      relatedPublication?: unknown[];
+      relatedPublication?: unknown[]
       /**
        * releaseDate
        * Format: date
        * @description Fixed date on which a product is due to become or was made available for the general public to see or buy
        */
-      releaseDate: string;
+      releaseDate: string
       /**
        * repository
        * @description Place, room, or container where something is deposited or stored.
        */
-      repository?: { [key: string]: unknown };
+      repository?: { [key: string]: unknown }
       /**
        * shortName
        * @description Shortened or fully abbreviated name of something or somebody.
        */
-      shortName: string;
+      shortName: string
       /**
        * supportChannel
        * @description Way of communication used to interact with users or customers.
        */
-      supportChannel?: string[];
+      supportChannel?: string[]
       /**
        * versionIdentifier
        * @description Term or code used to identify the version of something.
        */
-      versionIdentifier: string;
+      versionIdentifier: string
       /**
        * versionInnovation
        * @description Documentation on what changed in comparison to a previously published form of something.
        */
-      versionInnovation: string;
-    };
+      versionInnovation: string
+    }
     /** OtherContribution */
     siibra__openminds__SANDS__v3__atlas__brainAtlasVersion__OtherContribution: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * contributionType
        * @description Distinct class of what was given or supplied as a part or share.
        */
-      contributionType: unknown[];
+      contributionType: unknown[]
       /**
        * contributor
        * @description Legal person that gave or supplied something as a part or share.
        */
-      contributor: unknown;
-    };
+      contributor: unknown
+    }
     /** Coordinates */
     siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * typeOfUncertainty
        * @description Distinct technique used to quantify the uncertainty of a measurement.
        */
-      typeOfUncertainty?: unknown;
+      typeOfUncertainty?: unknown
       /**
        * uncertainty
        * @description Quantitative value range defining the uncertainty of a measurement.
        */
-      uncertainty?: number[];
+      uncertainty?: number[]
       /**
        * unit
        * @description Determinate quantity adopted as a standard of measurement.
        */
-      unit?: unknown;
+      unit?: unknown
       /**
        * value
        * @description Entry for a property.
        */
-      value: number;
-    };
+      value: number
+    }
     /** Model */
     siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
-      hasAnnotation?: components["schemas"]["HasAnnotation"];
+      "@type": string
+      hasAnnotation?: components["schemas"]["HasAnnotation"]
       /**
        * hasParent
        * @description Reference to a parent object or legal person.
        */
-      hasParent?: unknown[];
+      hasParent?: unknown[]
       /** lookupLabel */
-      lookupLabel?: string;
+      lookupLabel?: string
       /**
        * name
        * @description Word or phrase that constitutes the distinctive designation of a being or thing.
        */
-      name?: string;
+      name?: string
       /**
        * ontologyIdentifier
        * @description Term or code used to identify something or someone registered within a particular ontology.
        */
-      ontologyIdentifier?: string[];
+      ontologyIdentifier?: string[]
       /** Relationassessment */
       relationAssessment?: Partial<
         components["schemas"]["RelationAssessmentItem"]
       > &
-        Partial<components["schemas"]["RelationAssessmentItem1"]>;
+        Partial<components["schemas"]["RelationAssessmentItem1"]>
       /**
        * versionIdentifier
        * @description Term or code used to identify the version of something.
        */
-      versionIdentifier: string;
+      versionIdentifier: string
       /**
        * versionInnovation
        * @description Documentation on what changed in comparison to a previously published form of something.
        */
-      versionInnovation?: string;
-    };
+      versionInnovation?: string
+    }
     /** Coordinates */
     siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * typeOfUncertainty
        * @description Distinct technique used to quantify the uncertainty of a measurement.
        */
-      typeOfUncertainty?: unknown;
+      typeOfUncertainty?: unknown
       /**
        * uncertainty
        * @description Quantitative value range defining the uncertainty of a measurement.
        */
-      uncertainty?: number[];
+      uncertainty?: number[]
       /**
        * unit
        * @description Determinate quantity adopted as a standard of measurement.
        */
-      unit?: unknown;
+      unit?: unknown
       /**
        * value
        * @description Entry for a property.
        */
-      value: number;
-    };
+      value: number
+    }
     /** Model */
     siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
+      "@type": string
       /**
        * coordinateSpace
        * @description Two or three dimensional geometric setting.
        */
-      coordinateSpace: { [key: string]: unknown };
+      coordinateSpace: { [key: string]: unknown }
       /**
        * Coordinates
        * @description Structured information on a quantitative value.
        */
-      coordinates: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates"][];
-    };
+      coordinates: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates"][]
+    }
     /** Copyright */
     siibra__openminds__core__v4__products__datasetVersion__Copyright: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * holder
        * @description Legal person in possession of something.
        */
-      holder: unknown[];
+      holder: unknown[]
       /**
        * year
        * @description Cycle in the Gregorian calendar specified by a number and comprised of 365 or 366 days divided into 12 months beginning with January and ending with December.
        */
-      year: string;
-    };
+      year: string
+    }
     /** Model */
     siibra__openminds__core__v4__products__datasetVersion__Model: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * @Id
        * @description Metadata node identifier.
        */
-      "@id": string;
+      "@id": string
       /** @Type */
-      "@type": string;
+      "@type": string
       /**
        * accessibility
        * @description Level to which something is accessible to someone or something.
        */
-      accessibility: { [key: string]: unknown };
+      accessibility: { [key: string]: unknown }
       /**
        * author
        * @description Creator of a literary or creative work, as well as a dataset publication.
        */
-      author?: unknown[];
+      author?: unknown[]
       /** behavioralProtocol */
-      behavioralProtocol?: unknown[];
+      behavioralProtocol?: unknown[]
       /**
        * Copyright
        * @description Structured information on the copyright.
        */
-      copyright?: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Copyright"];
+      copyright?: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Copyright"]
       /**
        * custodian
        * @description The 'custodian' is a legal person who is responsible for the content and quality of the data, metadata, and/or code of a research product.
        */
-      custodian?: unknown[];
+      custodian?: unknown[]
       /** dataType */
-      dataType: unknown[];
+      dataType: unknown[]
       /**
        * description
        * @description Longer statement or account giving the characteristics of someone or something.
        */
-      description?: string;
+      description?: string
       /**
        * digitalIdentifier
        * @description Digital handle to identify objects or legal persons.
        */
-      digitalIdentifier: { [key: string]: unknown };
+      digitalIdentifier: { [key: string]: unknown }
       /**
        * ethicsAssessment
        * @description Judgment about the applied principles of conduct governing an individual or a group.
        */
-      ethicsAssessment: { [key: string]: unknown };
+      ethicsAssessment: { [key: string]: unknown }
       /** experimentalApproach */
-      experimentalApproach: unknown[];
+      experimentalApproach: unknown[]
       /**
        * fullDocumentation
        * @description Non-abridged instructions, comments, and information for using a particular product.
        */
-      fullDocumentation: { [key: string]: unknown };
+      fullDocumentation: { [key: string]: unknown }
       /**
        * fullName
        * @description Whole, non-abbreviated name of something or somebody.
        */
-      fullName?: string;
+      fullName?: string
       /**
        * funding
        * @description Money provided by a legal person for a particular purpose.
        */
-      funding?: unknown[];
+      funding?: unknown[]
       /**
        * homepage
        * @description Main website of something or someone.
        */
-      homepage?: { [key: string]: unknown };
+      homepage?: { [key: string]: unknown }
       /**
        * howToCite
        * @description Preferred format for citing a particular object or legal person.
        */
-      howToCite?: string;
+      howToCite?: string
       /**
        * inputData
        * @description Data that is put into a process or machine.
        */
-      inputData?: unknown[];
+      inputData?: unknown[]
       /**
        * isAlternativeVersionOf
        * @description Reference to an original form where the essence was preserved, but presented in an alternative form.
        */
-      isAlternativeVersionOf?: unknown[];
+      isAlternativeVersionOf?: unknown[]
       /**
        * isNewVersionOf
        * @description Reference to a previous (potentially outdated) particular form of something.
        */
-      isNewVersionOf?: { [key: string]: unknown };
+      isNewVersionOf?: { [key: string]: unknown }
       /**
        * keyword
        * @description Significant word or concept that are representative of something or someone.
        */
-      keyword?: unknown[];
+      keyword?: unknown[]
       /**
        * license
        * @description Grant by a party to another party as an element of an agreement between those parties that permits to do, use, or own something.
        */
-      license: { [key: string]: unknown };
+      license: { [key: string]: unknown }
       /**
        * Othercontribution
        * @description Structured information on the contribution made to a research product.
        */
-      otherContribution?: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__OtherContribution"];
+      otherContribution?: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__OtherContribution"]
       /** preparationDesign */
-      preparationDesign?: unknown[];
+      preparationDesign?: unknown[]
       /**
        * relatedPublication
        * @description Reference to something that was made available for the general public to see or buy.
        */
-      relatedPublication?: unknown[];
+      relatedPublication?: unknown[]
       /**
        * releaseDate
        * Format: date
        * @description Fixed date on which a product is due to become or was made available for the general public to see or buy
        */
-      releaseDate: string;
+      releaseDate: string
       /**
        * repository
        * @description Place, room, or container where something is deposited or stored.
        */
-      repository?: { [key: string]: unknown };
+      repository?: { [key: string]: unknown }
       /**
        * shortName
        * @description Shortened or fully abbreviated name of something or somebody.
        */
-      shortName: string;
+      shortName: string
       /** studiedSpecimen */
-      studiedSpecimen?: unknown[];
+      studiedSpecimen?: unknown[]
       /**
        * studyTarget
        * @description Structure or function that was targeted within a study.
        */
-      studyTarget?: unknown[];
+      studyTarget?: unknown[]
       /**
        * supportChannel
        * @description Way of communication used to interact with users or customers.
        */
-      supportChannel?: string[];
+      supportChannel?: string[]
       /**
        * technique
        * @description Method of accomplishing a desired aim.
        */
-      technique: unknown[];
+      technique: unknown[]
       /**
        * versionIdentifier
        * @description Term or code used to identify the version of something.
        */
-      versionIdentifier: string;
+      versionIdentifier: string
       /**
        * versionInnovation
        * @description Documentation on what changed in comparison to a previously published form of something.
        */
-      versionInnovation: string;
-    };
+      versionInnovation: string
+    }
     /** OtherContribution */
     siibra__openminds__core__v4__products__datasetVersion__OtherContribution: {
       /**
        * @Context
        * @default [object Object]
        */
-      "@context"?: components["schemas"]["VocabModel"];
+      "@context"?: components["schemas"]["VocabModel"]
       /**
        * contributionType
        * @description Distinct class of what was given or supplied as a part or share.
        */
-      contributionType: unknown[];
+      contributionType: unknown[]
       /**
        * contributor
        * @description Legal person that gave or supplied something as a part or share.
        */
-      contributor: unknown;
-    };
-  };
+      contributor: unknown
+    }
+  }
 }
 
 export interface operations {
@@ -1309,41 +1309,41 @@ export interface operations {
   get_all_regions_from_atlas_parc_space_atlases__atlas_id__parcellations__parcellation_id__regions_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+      }
       query: {
-        space_id?: string;
-        find?: string;
-      };
-    };
+        space_id?: string
+        find?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"][];
-        };
-      };
+          "application/json": components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"][]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns all regional features for a region. */
   get_all_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        region_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+      }
       query: {
-        space_id?: string;
-      };
-    };
+        space_id?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1351,31 +1351,31 @@ export interface operations {
           "application/json": (Partial<
             components["schemas"]["ReceptorDatasetModel"]
           > &
-            Partial<components["schemas"]["BaseDatasetJsonModel"]>)[];
-        };
-      };
+            Partial<components["schemas"]["BaseDatasetJsonModel"]>)[]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns a feature for a region, as defined by by the modality and feature ID */
   get_regional_modality_by_id_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        region_id: string;
-        feature_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+        feature_id: string
+      }
       query: {
-        space_id?: string;
-        gene?: string;
-      };
-    };
+        space_id?: string
+        gene?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1383,129 +1383,129 @@ export interface operations {
           "application/json": Partial<
             components["schemas"]["ReceptorDatasetModel"]
           > &
-            Partial<components["schemas"]["BaseDatasetJsonModel"]>;
-        };
-      };
+            Partial<components["schemas"]["BaseDatasetJsonModel"]>
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns information about a regional map for given region name. */
   get_regional_map_info_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_info_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        region_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+      }
       query: {
-        space_id?: string;
-      };
-    };
+        space_id?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["NiiMetadataModel"];
-        };
-      };
+          "application/json": components["schemas"]["NiiMetadataModel"]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns a regional map for given region name. */
   get_regional_map_file_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_map_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        region_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+      }
       query: {
-        space_id?: string;
-      };
-    };
+        space_id?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-          "application/octet-stream": string;
-        };
-      };
+          "application/json": unknown
+          "application/octet-stream": string
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        region_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+      }
       query: {
-        space_id?: string;
-      };
-    };
+        space_id?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"];
-        };
-      };
+          "application/json": components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns all parcellations that are defined in the siibra client for given atlas. */
   get_all_parcellations_atlases__atlas_id__parcellations_get: {
     parameters: {
       path: {
-        atlas_id: string;
-      };
-    };
+        atlas_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiParcellationModel"][];
-        };
-      };
+          "application/json": components["schemas"]["SapiParcellationModel"][]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns a global feature for a specific modality id. */
   get_single_global_feature_detail_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-        feature_id: string;
-      };
-    };
+        atlas_id: string
+        parcellation_id: string
+        feature_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1513,29 +1513,29 @@ export interface operations {
           "application/json": Partial<
             components["schemas"]["ConnectivityMatrixDataModel"]
           > &
-            Partial<components["schemas"]["SerializationErrorModel"]>;
-        };
-      };
+            Partial<components["schemas"]["SerializationErrorModel"]>
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns all global features for a parcellation. */
   get_global_features_names_atlases__atlas_id__parcellations__parcellation_id__features_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-      };
+        atlas_id: string
+        parcellation_id: string
+      }
       query: {
-        per_page?: number;
-        page?: number;
-      };
-    };
+        per_page?: number
+        page?: number
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1543,133 +1543,133 @@ export interface operations {
           "application/json": (Partial<
             components["schemas"]["ConnectivityMatrixDataModel"]
           > &
-            Partial<components["schemas"]["SerializationErrorModel"]>)[];
-        };
-      };
+            Partial<components["schemas"]["SerializationErrorModel"]>)[]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns one parcellation for given id. */
   get_volumes_by_id_atlases__atlas_id__parcellations__parcellation_id__volumes_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-      };
-    };
+        atlas_id: string
+        parcellation_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["VolumeModel"][];
-        };
-      };
+          "application/json": components["schemas"]["VolumeModel"][]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns one parcellation for given id. */
   get_parcellation_by_id_atlases__atlas_id__parcellations__parcellation_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-        parcellation_id: string;
-      };
-    };
+        atlas_id: string
+        parcellation_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiParcellationModel"];
-        };
-      };
+          "application/json": components["schemas"]["SapiParcellationModel"]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns all spaces that are defined in the siibra client. */
   get_all_spaces_atlases__atlas_id__spaces_get: {
     parameters: {
       path: {
-        atlas_id: string;
-      };
-    };
+        atlas_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiSpaceModel"][];
-        };
-      };
+          "application/json": components["schemas"]["SapiSpaceModel"][]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns a template for a given space id. */
   get_template_by_space_id_atlases__atlas_id__spaces__space_id__templates_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        space_id: string;
-      };
-    };
+        atlas_id: string
+        space_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-          "application/octet-stream": string;
-        };
-      };
+          "application/json": unknown
+          "application/octet-stream": string
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns all parcellation maps for a given space id. */
   get_parcellation_map_for_space_atlases__atlas_id__spaces__space_id__parcellation_maps_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        space_id: string;
-      };
-    };
+        atlas_id: string
+        space_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-          "application/octet-stream": string;
-        };
-      };
+          "application/json": unknown
+          "application/octet-stream": string
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /**
    * Get a detailed view on a single spatial feature.
    * A parcellation id and region id can be provided optional to get more details.
@@ -1677,16 +1677,16 @@ export interface operations {
   get_single_spatial_feature_detail_atlases__atlas_id__spaces__space_id__features__feature_id__get: {
     parameters: {
       path: {
-        feature_id: string;
-        atlas_id: string;
-        space_id: string;
-      };
+        feature_id: string
+        atlas_id: string
+        space_id: string
+      }
       query: {
-        parcellation_id: string;
-        region: string;
-        bbox?: string;
-      };
-    };
+        parcellation_id: string
+        region: string
+        bbox?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1694,30 +1694,30 @@ export interface operations {
           "application/json": Partial<
             components["schemas"]["IEEGSessionModel"]
           > &
-            Partial<components["schemas"]["VOIDataModel"]>;
-        };
-      };
+            Partial<components["schemas"]["VOIDataModel"]>
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Return all possible feature names and links to get more details */
   get_spatial_features_from_space_atlases__atlas_id__spaces__space_id__features_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        space_id: string;
-      };
+        atlas_id: string
+        space_id: string
+      }
       query: {
-        parcellation_id?: string;
-        region?: string;
-        bbox?: string;
-      };
-    };
+        parcellation_id?: string
+        region?: string
+        bbox?: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
@@ -1725,117 +1725,117 @@ export interface operations {
           "application/json": (Partial<
             components["schemas"]["IEEGSessionModel"]
           > &
-            Partial<components["schemas"]["VOIDataModel"]>)[];
-        };
-      };
+            Partial<components["schemas"]["VOIDataModel"]>)[]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   get_one_space_volumes_atlases__atlas_id__spaces__space_id__volumes_get: {
     parameters: {
       path: {
-        atlas_id: string;
-        space_id: string;
-      };
-    };
+        atlas_id: string
+        space_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["VolumeModel"][];
-        };
-      };
+          "application/json": components["schemas"]["VolumeModel"][]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Returns one space for given id, with links to further resources */
   get_one_space_by_id_atlases__atlas_id__spaces__space_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-        space_id: string;
-      };
-    };
+        atlas_id: string
+        space_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiSpaceModel"];
-        };
-      };
+          "application/json": components["schemas"]["SapiSpaceModel"]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Get all atlases known by siibra. */
   get_all_atlases_atlases_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiAtlasModel"][];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["SapiAtlasModel"][]
+        }
+      }
+    }
+  }
   /** Get more information for a specific atlas with links to further objects. */
   get_atlas_by_id_atlases__atlas_id__get: {
     parameters: {
       path: {
-        atlas_id: string;
-      };
-    };
+        atlas_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SapiAtlasModel"];
-        };
-      };
+          "application/json": components["schemas"]["SapiAtlasModel"]
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   /** Return all genes (name, acronym) in siibra */
   get_gene_names_genes_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+          "application/json": unknown
+        }
+      }
+    }
+  }
   /** Return all possible modalities */
   get_all_available_modalities_features_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+          "application/json": unknown
+        }
+      }
+    }
+  }
 }
 
 export interface external {}

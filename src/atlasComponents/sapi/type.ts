@@ -65,7 +65,7 @@ export function guardPipe<
   InputType,
   GuardType extends InputType
 >(
-  guardFn: (input: InputType) => input is GuardType
+    guardFn: (input: InputType) => input is GuardType
 ): OperatorFunction<InputType, GuardType> {
   return src => src.pipe(
     map(val => {

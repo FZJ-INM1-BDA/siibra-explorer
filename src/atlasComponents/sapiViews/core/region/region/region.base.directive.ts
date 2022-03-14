@@ -75,7 +75,7 @@ export class SapiViewsCoreRegionRegionBase {
       /**
        * color
        */
-      let rgb = SAPIRegion.GetDisplayColor(this.region)
+      const rgb = SAPIRegion.GetDisplayColor(this.region)
       this.regionRgbString = `rgb(${rgb.join(',')})`
       const [_h, _s, l] = rgbToHsl(...rgb)
       this.regionDarkmode = l < 0.4

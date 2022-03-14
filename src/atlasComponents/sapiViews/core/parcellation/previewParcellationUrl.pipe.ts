@@ -31,7 +31,7 @@ const previewImgMap = new Map([
 /**
  * used for directories
  */
- const previewNameToPngMap = new Map([
+const previewNameToPngMap = new Map([
   ['fibre architecture', 'fibre-long.png'],
   ['functional modes', 'difumo-128.png']
 ])

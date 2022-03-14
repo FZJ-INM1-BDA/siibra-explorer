@@ -28,7 +28,7 @@ const fsAverageKeyVal = {
  * in order to maintain backwards compat with url encoding of selected regions
  * TODO setup a sentry to catch if these are ever used. if not, retire the hard coding 
  */
- const BACKCOMAP_KEY_DICT = {
+const BACKCOMAP_KEY_DICT = {
 
   // human multi level
   'juelich/iav/atlas/v1.0.0/1': {
@@ -260,7 +260,7 @@ export const fromRootStore = {
 
 export function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {
   const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
-  if (lblIdx === NaN) return null
+  if (isNaN(lblIdx)) return null
   return lblIdx
 }
 

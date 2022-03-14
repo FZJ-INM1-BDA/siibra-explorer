@@ -24,7 +24,7 @@ export type NgConfigViewerState = {
 export type NgConfig = {
   showDefaultAnnotations: boolean
   layers: Record<string, NgLayerSpec>
-  gpuMemoryLimit: number,
+  gpuMemoryLimit: number
 } & NgConfigViewerState
 
 interface _NehubaConfig {
@@ -50,9 +50,9 @@ interface _NehubaConfig {
   dataset: {
     imageBackground: Vec4
     initialNgState: NgConfig
-  },
+  }
   layout: {
-    views: string,
+    views: string
     planarSlicesBackground: Vec4
     useNehubaPerspective: {
       enableShiftDrag: boolean
@@ -70,11 +70,12 @@ interface _NehubaConfig {
         sliceViewportSizeMultiplier: number
       }
       mesh: {
-        backFaceColor: Vec4
+        removeOctant: Vec4
+        backFaceColor: Vec3
         removeBasedOnNavigation: boolean
         flipRemovedOctant: boolean
         surfaceParcellation: boolean
-      },
+      }
       centerToOrigin: boolean
       drawSubstrates: {
         color: Vec4
