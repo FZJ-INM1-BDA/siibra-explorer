@@ -1,12 +1,14 @@
 import { createReducer, on } from "@ngrx/store";
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as actions from "./actions"
-import { ViewerMode } from "./const"
+import { ViewerMode, BreadCrumb } from "./const"
 
 export type AtlasSelectionState = {
   selectedAtlas: SapiAtlasModel
   selectedTemplate: SapiSpaceModel
   selectedParcellation: SapiParcellationModel
+  selectedParcellationAllRegions: SapiRegionModel[]
+
   selectedRegions: SapiRegionModel[]
   standAloneVolumes: string[]
 
@@ -23,16 +25,19 @@ export type AtlasSelectionState = {
   }
 
   viewerMode: ViewerMode
+  breadcrumbs: BreadCrumb[]
 }
 
 export const defaultState: AtlasSelectionState = {
   selectedAtlas: null,
   selectedParcellation: null,
+  selectedParcellationAllRegions: [],
   selectedRegions: [],
   selectedTemplate: null,
   standAloneVolumes: [],
   navigation: null,
-  viewerMode: null
+  viewerMode: null,
+  breadcrumbs: []
 }
 
 const reducer = createReducer(
@@ -61,6 +66,15 @@ const reducer = createReducer(
       return {
         ...state,
         selectedParcellation: parcellation
+      }
+    }
+  ),
+  on(
+    actions.setSelectedParcellationAllRegions,
+    (state, { regions }) => {
+      return {
+        ...state,
+        selectedParcellationAllRegions: regions
       }
     }
   ),
@@ -97,6 +111,27 @@ const reducer = createReducer(
       return {
         ...state,
         viewerMode
+      }
+    }
+  ),
+  on(
+    actions.showBreadCrumb,
+    (state, { breadcrumb }) => {
+      return {
+        ...state,
+        breadcrumbs: [
+          ...state.breadcrumbs.filter(bc => bc.id !== breadcrumb.id),
+          breadcrumb
+        ]
+      }
+    }
+  ),
+  on(
+    actions.dismissBreadCrumb,
+    (state, { id }) => {
+      return {
+        ...state,
+        breadcrumbs: state.breadcrumbs.filter(bc => bc.id !== id)
       }
     }
   )

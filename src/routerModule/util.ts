@@ -1,8 +1,6 @@
 import { encodeNumber, decodeToNumber, separator, encodeURIFull } from './cipher'
 import { UrlSegment, UrlTree } from "@angular/router"
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants"
-import { mixNgLayers } from "src/services/state/ngViewerState.store"
-import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors"
 import { Component } from "@angular/core"
 import { atlasSelection, plugins } from "src/state"
 
@@ -60,25 +58,6 @@ export const cvtFullRouteToState = (fullPath: UrlTree, state: any, _warnCb?: (ar
     if (!key || !val) continue
     returnObj[key] = val
   }
-
-  // TODO deprecate
-  // but ensure bkwd compat?
-  const niftiLayers = fullPath.queryParams['niftiLayers']
-  if (niftiLayers) {
-    const layers = niftiLayers
-      .split('__')
-      .map(layer => {
-        return {
-          name : layer,
-          source : `nifti://${layer}`,
-          mixability : 'nonmixable',
-          shader : getShader(PMAP_DEFAULT_CONFIG),
-        } as any
-      })
-    const { ngViewerState } = returnState
-    ngViewerState.layers = mixNgLayers(ngViewerState.layers, layers)
-  }
-  // -- end deprecate
 
   // logical assignment. Use instead of above after typescript > v4.0.0
   // returnState['viewerState'] ||= {}
@@ -214,21 +193,8 @@ export const cvtStateToHashedRoutes = (state): string => {
   const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
   const navigation = atlasSelection.selectors.navigation(state)
 
-  const previewingDatasetFiles = uiStatePreviewingDatasetFilesSelector(state)
   let dsPrvString: string
   const searchParam = new URLSearchParams()
-
-  if (previewingDatasetFiles && Array.isArray(previewingDatasetFiles)) {
-    const dsPrvArr = []
-    const datasetPreviews = (previewingDatasetFiles as {datasetId: string, filename: string}[])
-    for (const preview of datasetPreviews) {
-      dsPrvArr.push(preview)
-    }
-
-    if (dsPrvArr.length === 1) {
-      dsPrvString = `${dsPrvArr[0].datasetId}::${dsPrvArr[0].filename}`
-    }
-  }
 
   let cNavString: string
   if (navigation) {

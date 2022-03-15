@@ -7,9 +7,6 @@ import { NEVER, Subject } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { ClickInterceptorService } from "src/glue"
 import { LayoutModule } from "src/layouts/layout.module"
-import { PANELS } from "src/services/state/ngViewerState/constants"
-import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors"
-import { viewerStateCustomLandmarkSelector, viewerStateNavigationStateSelector, viewerStateSelectedRegionsSelector } from "src/services/state/viewerState/selectors"
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module"
 import { QuickTourModule } from "src/ui/quickTour"
 import { AngularMaterialModule } from "src/sharedModules/angularMaterial.module"
@@ -24,7 +21,7 @@ import { TouchSideClass } from "../touchSideClass.directive"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { HarnessLoader } from "@angular/cdk/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
-
+import { userInterface, atlasSelection, userPreference, atlasAppearance } from "src/state"
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -132,12 +129,11 @@ describe('> nehubaViewerGlue.component.ts', () => {
 
   beforeEach(() => {
     mockStore = TestBed.inject(MockStore)
-    mockStore.overrideSelector(ngViewerSelectorPanelMode, PANELS.FOUR_PANEL)
-    mockStore.overrideSelector(ngViewerSelectorPanelOrder, '0123')
-    mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
-    mockStore.overrideSelector(viewerStateCustomLandmarkSelector, [])
-    mockStore.overrideSelector(viewerStateSelectedRegionsSelector, [])
-    mockStore.overrideSelector(viewerStateNavigationStateSelector, null)
+    mockStore.overrideSelector(userInterface.selectors.panelMode, "FOUR_PANEL")
+    mockStore.overrideSelector(userInterface.selectors.panelOrder, '0123')
+    mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
+    mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
+    mockStore.overrideSelector(atlasSelection.selectors.navigation, null)
 
     mockStore.overrideSelector(selectorAuxMeshes, [])
   })

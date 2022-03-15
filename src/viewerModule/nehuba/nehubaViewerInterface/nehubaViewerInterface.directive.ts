@@ -4,15 +4,11 @@ import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, fromEvent, asyncScheduler, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
 import { serializeSegment, takeOnePipe } from "../util";
-import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
-import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 import { LoggingService } from "src/logging";
-import { uiActionMouseoverLandmark, uiActionMouseoverSegments } from "src/services/state/uiState/actions";
-import { IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj, NehubaNavigationService } from "../navigation.service";
 import { NehubaConfig, defaultNehubaConfig } from "../config.service";
-import { atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, userPreference } from "src/state";
 
 
 const determineProtocol = (url: string) => {
@@ -162,25 +158,16 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     @Optional() private log: LoggingService,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
-
-    this.viewerPerformanceConfig$ = this.store$.pipe(
-      select('viewerConfigState'),
-      /**
-       * TODO: this is only a bandaid fix. Technically, we should also implement
-       * logic to take the previously set config to apply oninit
-       */
-      distinctUntilChanged(),
-    )
-
-    this.nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-      select(ngViewerSelectorOctantRemoval),
-    )
   }
 
-  private nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
+  private nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
+    select(atlasAppearance.selectors.octantRemoval),
+  )
 
-  private viewerPerformanceConfig$: Observable<IViewerConfigState>
-  private viewerConfig: Partial<IViewerConfigState> = {}
+  private gpuLimit$: Observable<number> = this.store$.pipe(
+    select(userPreference.selectors.gpuLimit)
+  )
+  private gpuLimit: number = null
 
   private nehubaViewerSubscriptions: Subscription[] = []
   private subscriptions: Subscription[] = []
@@ -212,18 +199,15 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
             // TODO catch error
           }
         }
-        function onInit() {
-          this.overrideShowLayers = forceShowLayerNames
-        }
-        this.createNehubaInstance(copiedNehubaConfig, { onInit })
+        await this.createNehubaInstance(copiedNehubaConfig)
       }),
 
-      this.viewerPerformanceConfig$.pipe(
-        debounceTime(200)
-      ).subscribe(config => {
-        this.viewerConfig = config
+      this.gpuLimit$.pipe(
+        debounceTime(200),
+      ).subscribe(limit => {
+        this.gpuLimit = limit
         if (this.nehubaViewerInstance && this.nehubaViewerInstance.nehubaViewer) {
-          this.nehubaViewerInstance.applyPerformanceConfig(config)
+          this.nehubaViewerInstance.applyGpuLimit(limit)
         }
       }),
       this.navService.viewerNav$.subscribe(v => {
@@ -246,8 +230,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
-  createNehubaInstance(nehubaConfig: NehubaConfig, lifeCycle: INehubaLifecycleHook = {}){
+  async createNehubaInstance(nehubaConfig: NehubaConfig, lifeCycle: INehubaLifecycleHook = {}){
     this.clear()
+
+    await new Promise((rs, rj) => setTimeout(rs, 0))
+
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.nehubaViewerFactory)
 
@@ -261,15 +248,14 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     /**
      * apply viewer config such as gpu limit
      */
-    const { gpuLimit = null } = this.viewerConfig
 
     this.nehubaViewerInstance.config = nehubaConfig
     this.nehubaViewerInstance.lifecycle = lifeCycle
 
-    if (gpuLimit) {
+    if (this.gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
       // the correct key is gpuMemoryLimit
-      initialNgState.gpuMemoryLimit = gpuLimit
+      initialNgState.gpuMemoryLimit = this.gpuLimit
     }
 
     this.nehubaViewerSubscriptions.push(
@@ -285,11 +271,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         /**
          * TODO when user selects new template, window.viewer
          */
-        this.store$.dispatch(
-          ngViewerActionNehubaReady({
-            nehubaReady: true,
-          })
-        )
       }),
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(
@@ -300,11 +281,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerInstance.mouseoverLandmarkEmitter.pipe(
         distinctUntilChanged()
       ).subscribe(label => {
-        this.store$.dispatch(
-          uiActionMouseoverLandmark({
-            landmark: label
-          })
-        )
+        console.warn(`mouseover landmark`, label)
       }),
 
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
@@ -338,12 +315,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     while(this.nehubaViewerSubscriptions.length > 0) {
       this.nehubaViewerSubscriptions.pop().unsubscribe()
     }
-
-    this.store$.dispatch(
-      ngViewerActionNehubaReady({
-        nehubaReady: false,
-      })
-    )
 
     this.iavNehubaViewerContainerViewerLoading.emit(false)
     if(this.cr) this.cr.destroy()

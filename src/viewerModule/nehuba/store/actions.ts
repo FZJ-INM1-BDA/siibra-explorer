@@ -1,14 +1,7 @@
 import { createAction, props } from "@ngrx/store";
-import { INgLayerInterface } from "src/services/state/ngViewerState.store";
+
 import { NEHUBA_VIEWER_FEATURE_KEY } from "../constants";
 import { IAuxMesh } from "./type";
-
-export const actionAddNgLayer = createAction(
-  `[${NEHUBA_VIEWER_FEATURE_KEY}] [addNgLayer]`,
-  props<{
-    layers: INgLayerInterface[]
-  }>()
-)
 
 export const actionSetAuxMesh = createAction(
   `[${NEHUBA_VIEWER_FEATURE_KEY}] [setAuxMesh]`,
@@ -29,8 +22,4 @@ export const actionSetAuxMeshes = createAction(
   props<{
     payload: IAuxMesh[]
   }>()
-)
-
-export const actionClearAuxMeshes = createAction(
-  `[${NEHUBA_VIEWER_FEATURE_KEY}] [clearAuxMeshes]`
 )

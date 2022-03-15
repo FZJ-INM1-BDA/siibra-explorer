@@ -2,13 +2,11 @@ import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, ReplaySubject, Subscription } from "rxjs";
 import { debounceTime } from "rxjs/operators";
-import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
-import { timedValues } from 'src/util/generator'
-import { INavObj, navAdd, navMul, navObjEqual } from './navigation.util'
+import { INavObj, navObjEqual } from './navigation.util'
 import { actions } from "src/state/atlasSelection";
-import { atlasSelection } from "src/state";
+import { atlasSelection, userPreference } from "src/state";
 
 @Injectable()
 export class NehubaNavigationService implements OnDestroy{
@@ -33,7 +31,7 @@ export class NehubaNavigationService implements OnDestroy{
   ){
     this.subscriptions.push(
       this.store$.pipe(
-        select(selectViewerConfigAnimationFlag)
+        select(userPreference.selectors.useAnimation)
       ).subscribe(flag => this.globalAnimationFlag = flag)
     )
 
@@ -103,7 +101,7 @@ export class NehubaNavigationService implements OnDestroy{
         
         if (!navEql) {
           this.store$.dispatch(
-            actions.navigateTo({
+            actions.setNavigation({
               navigation: roundedNav
             })
           )

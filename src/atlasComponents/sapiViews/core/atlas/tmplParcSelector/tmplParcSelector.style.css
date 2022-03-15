@@ -13,7 +13,7 @@
 
 .loading-overlay
 {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     top: 0;
@@ -31,4 +31,11 @@
 {
     grid-column: 2;
     grid-row: 2;
+}
+
+/* necessary to align the tiles to the start of grid tile */
+sxplr-sapiviews-core-space-tile,
+sxplr-sapiviews-core-parcellation-tile
+{
+    height: 100%;
 }

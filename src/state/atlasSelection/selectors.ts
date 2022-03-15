@@ -21,6 +21,11 @@ export const selectedParcellation = createSelector(
   state => state.selectedParcellation
 )
 
+export const selectedParcAllRegions = createSelector(
+  selectStore,
+  state => state.selectedParcellationAllRegions
+)
+
 export const selectedRegions = createSelector(
   selectStore,
   state => state.selectedRegions
@@ -46,4 +51,9 @@ export const navigation = createSelector(
 export const viewerMode = createSelector(
   selectStore,
   state => state.viewerMode
+)
+
+export const breadCrumbs = createSelector(
+  selectStore,
+  state => state.breadcrumbs
 )

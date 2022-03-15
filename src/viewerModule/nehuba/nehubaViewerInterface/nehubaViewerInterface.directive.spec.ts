@@ -1,16 +1,11 @@
 import { Component } from "@angular/core"
 import { TestBed, async, ComponentFixture, fakeAsync, tick } from "@angular/core/testing"
 import { By } from "@angular/platform-browser"
-import { BrowserDynamicTestingModule } from "@angular/platform-browser-dynamic/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors"
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component"
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directive"
-import { viewerStateSelectorNavigation, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 import { Subject } from "rxjs"
-import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions"
-import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions"
-import { selectViewerConfigAnimationFlag } from "src/services/state/viewerConfig/selectors"
+import { userPreference, atlasSelection, atlasAppearance } from "src/state"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   describe('> NehubaViewerContainerDirective', () => {
@@ -46,10 +41,10 @@ describe('> nehubaViewerInterface.directive.ts', () => {
 
     beforeEach(() => {
       const mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(ngViewerSelectorOctantRemoval, true)
-      mockStore.overrideSelector(viewerStateStandAloneVolumes, [])
-      mockStore.overrideSelector(viewerStateSelectorNavigation, null)
-      mockStore.overrideSelector(selectViewerConfigAnimationFlag, false)
+      mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
+      mockStore.overrideSelector(atlasSelection.selectors.standaloneVolumes, [])
+      mockStore.overrideSelector(atlasSelection.selectors.navigation, null)
+      mockStore.overrideSelector(userPreference.selectors.useAnimation, false)
     })
 
     it('> can be inited', () => {
@@ -133,16 +128,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
     
       describe('> on clear called', () => {
         it('> dispatches nehubaReady: false action', () => {
-          const mockStore = TestBed.inject(MockStore)
-          const mockStoreDispatchSpy = spyOn(mockStore, 'dispatch')
-          directiveInstance.clear()
-          expect(
-            mockStoreDispatchSpy
-          ).toHaveBeenCalledWith(
-            ngViewerActionNehubaReady({
-              nehubaReady: false
-            })
-          )
+
         })
 
         it('> iavNehubaViewerContainerViewerLoading emits false', () => {
@@ -209,82 +195,25 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         })
         it('> single null emits null', fakeAsync(() => {
 
-          directiveInstance.createNehubaInstance(template, lifecycle)
-          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
-
-          tick(200)
-          expect(dispatchSpy).toHaveBeenCalledWith(
-            viewerStateMouseOverCustomLandmarkInPerspectiveView({
-              payload: { label: null }
-            })
-          )
         }))
 
         it('> single value emits value', fakeAsync(() => {
 
-          directiveInstance.createNehubaInstance(template, lifecycle)
-          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
-
-          tick(200)
-          expect(dispatchSpy).toHaveBeenCalledWith(
-            viewerStateMouseOverCustomLandmarkInPerspectiveView({
-              payload: { label: "24" }
-            })
-          )
         }))
 
         describe('> double value in 140ms emits last value', () => {
 
           it('> null - 24 emits 24', fakeAsync(() => {
 
-            directiveInstance.createNehubaInstance(template, lifecycle)
-            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
-            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
-  
-            tick(200)
-            expect(dispatchSpy).toHaveBeenCalledWith(
-              viewerStateMouseOverCustomLandmarkInPerspectiveView({
-                payload: { label: "24" }
-              })
-            )
           }))
           it('> 24 - null emits null', fakeAsync(() => {
 
-            directiveInstance.createNehubaInstance(template, lifecycle)
-            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
-            spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
-  
-            tick(200)
-            expect(dispatchSpy).toHaveBeenCalledWith(
-              viewerStateMouseOverCustomLandmarkInPerspectiveView({
-                payload: { label: null }
-              })
-            )
+
           }))
         })
       
         it('> single value outside 140 ms emits separately', fakeAsync(() => {
 
-          directiveInstance.createNehubaInstance(template, lifecycle)
-          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next(null)
-          tick(200)
-          spyNehubaViewerInstance.mouseoverUserlandmarkEmitter.next("24")
-
-          tick(200)
-          expect(
-            dispatchSpy.calls.allArgs()
-          ).toEqual([
-            [
-              viewerStateMouseOverCustomLandmarkInPerspectiveView({
-                payload: { label: null }
-              })
-            ],
-            [
-              viewerStateMouseOverCustomLandmarkInPerspectiveView({
-                payload: { label: "24" }
-              })
-            ]
-          ])
         }))
       })
     })

@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
-import { getHoc1Left, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { atlasId, getHoc1Left, getHumanAtlas, getJba29, getJba29Regions, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
 import { SapiViewsCoreRegionModule } from "../../module"
 import { SapiViewsCoreRegionRegionRich } from "./region.rich.component"
 import { action } from '@storybook/addon-actions';
@@ -41,7 +41,6 @@ const Template: Story<SapiViewsCoreRegionRegionRich> = (args: SapiViewsCoreRegio
   const { contentProjection } = parameters
   return ({
     props: {
-      ...args,
       atlas: human, 
       template: mni152, 
       parcellation: jba29, 
@@ -63,7 +62,6 @@ const loadRegions = async () => {
   const mni152 = await getMni152()
   const jba29 = await getJba29()
   const hoc1left = await getHoc1Left(mni152["@id"])
-
   return {
     human,
     mni152,
@@ -101,3 +99,15 @@ HeaderContentProjection.loaders = [
 HeaderContentProjection.parameters = {
   contentProjection: `<div header>HEADER CONTENT PROJECTED</div>`
 }
+
+export const InjectionSimpleRegion = Template.bind({})
+InjectionSimpleRegion.loaders = [
+  ...HumanMni152Jba29Hoc1Left.loaders,
+  async () => {
+    const regions = await getJba29Regions()
+    const hoc1left = regions.find(r => /left/i.test(r.name) && /hoc1/i.test(r.name))
+    return {
+      hoc1left
+    }
+  }
+]

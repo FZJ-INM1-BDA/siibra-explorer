@@ -2,18 +2,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
-import { ngViewerActionSetPanelOrder } from 'src/services/state/ngViewerState.store.helper';
-import { VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'
-import { IavRootStoreInterface } from 'src/services/stateStore.service';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
-import {MatSlideToggleChange} from "@angular/material/slide-toggle";
-import {MatSliderChange} from "@angular/material/slider";
-import { PureContantService } from 'src/util';
-import { ngViewerActionSwitchPanelMode } from 'src/services/state/ngViewerState/actions';
-import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors';
-import { atlasSelection } from 'src/state';
-import * as stateCtrl from "src/state"
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatSliderChange } from "@angular/material/slider";
+import { atlasSelection, userPreference, userInterface } from 'src/state';
+import { environment } from "src/environments/environment"
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -34,14 +27,25 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
-  public supportedPanelModes = SUPPORTED_PANEL_MODES
+
+  public experimentalFlag = environment.EXPERIMENTAL_FEATURE_FLAG
+
+  public panelModes: Record<string, userInterface.PanelMode> = {
+    FOUR_PANEL: "FOUR_PANEL",
+    H_ONE_THREE: "H_ONE_THREE",
+    SINGLE_PANEL: "SINGLE_PANEL",
+    V_ONE_THREE: "V_ONE_THREE",
+  }
+
 
   /**
    * in MB
    */
   public gpuLimit$: Observable<number>
 
-  public useMobileUI$: Observable<boolean>
+  public useMobileUI$: Observable<boolean> = this.store.pipe(
+    select(userPreference.selectors.useMobileUi)
+  )
   public animationFlag$: Observable<boolean>
   private subscriptions: Subscription[] = []
 
@@ -57,31 +61,24 @@ export class ConfigComponent implements OnInit, OnDestroy {
   private viewerObliqueRotated$: Observable<boolean>
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
-    private pureConstantService: PureContantService,
+    private store: Store<any>,
   ) {
 
-    this.useMobileUI$ = this.pureConstantService.useTouchUI$
-
     this.gpuLimit$ = this.store.pipe(
-      select('viewerConfigState'),
-      map((config: ViewerConfiguration) => config.gpuLimit),
-      distinctUntilChanged(),
+      select(userPreference.selectors.gpuLimit),
       map(v => v / 1e6),
     )
 
     this.animationFlag$ = this.store.pipe(
-      select('viewerConfigState'),
-      map((config: ViewerConfiguration) => config.animation),
+      select(userPreference.selectors.useAnimation)
     )
 
     this.panelMode$ = this.store.pipe(
-      select(ngViewerSelectorPanelMode),
-      startWith(SUPPORTED_PANEL_MODES[0]),
+      select(userInterface.selectors.panelMode)
     )
 
     this.panelOrder$ = this.store.pipe(
-      select(ngViewerSelectorPanelOrder),
+      select(userInterface.selectors.panelOrder),
     )
 
     this.viewerObliqueRotated$ = this.store.pipe(
@@ -117,7 +114,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public toggleMobileUI(ev: MatSlideToggleChange) {
     const { checked } = ev
     this.store.dispatch(
-      stateCtrl.userInterface.actions.useModileUi({
+      userPreference.actions.useMobileUi({
         flag: checked
       })
     )
@@ -125,26 +122,25 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   public toggleAnimationFlag(ev: MatSlideToggleChange ) {
     const { checked } = ev
-    this.store.dispatch({
-      type: VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG,
-      config: {
-        animation: checked,
-      },
-    })
+    this.store.dispatch(
+      userPreference.actions.setAnimationFlag({
+        flag: checked
+      })
+    )
   }
 
   public handleMatSliderChange(ev: MatSliderChange) {
-    this.store.dispatch({
-      type: VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG,
-      config: {
-        gpuLimit: ev.value * 1e6,
-      },
-    })
-  }
-  public usePanelMode(panelMode: string) {
     this.store.dispatch(
-      ngViewerActionSwitchPanelMode({
-        payload: { panelMode }
+      userPreference.actions.setGpuLimit({
+        limit: ev.value * 1e6
+      })
+    )
+  }
+  public usePanelMode(panelMode: userInterface.PanelMode) {
+
+    this.store.dispatch(
+      userInterface.actions.setPanelMode({
+        panelMode
       })
     )
   }
@@ -160,8 +156,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
     [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]]
     this.store.dispatch(
-      ngViewerActionSetPanelOrder({
-        payload: { panelOrder: arr.join('') }
+      userInterface.actions.setPanelOrder({
+        order: arr.join('')
       })
     )
   }

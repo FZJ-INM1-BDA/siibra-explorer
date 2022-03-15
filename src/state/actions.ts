@@ -1,13 +1,16 @@
 import { createAction, props } from "@ngrx/store";
-import { nameSpace } from "./const"
+import { MainState, nameSpace } from "./const"
 
-const generalActionError = createAction(
+export const generalActionError = createAction(
   `${nameSpace} generalActionError`,
   props<{
     message: string
   }>()
 )
 
-export const actions = {
-  generalActionError
-}
+export const generalApplyState = createAction(
+  `${nameSpace} generalApplyState`,
+  props<{
+    state: MainState
+  }>()
+)

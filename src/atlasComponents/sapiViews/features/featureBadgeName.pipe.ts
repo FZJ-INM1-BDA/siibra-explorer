@@ -8,7 +8,7 @@ import { SapiFeatureModel } from "src/atlasComponents/sapi";
 
 export class FeatureBadgeNamePipe implements PipeTransform{
   public transform(regionalFeature: SapiFeatureModel) {
-      if (regionalFeature.type === "siibra/receptor") {
+      if (regionalFeature.type === "siibra/features/receptor") {
         return "receptor density"
       }
       return null

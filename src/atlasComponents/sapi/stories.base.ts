@@ -68,6 +68,9 @@ export async function getAtlas(id: string): Promise<SapiAtlasModel>{
 export async function getParc(atlasId: string, id: string): Promise<SapiParcellationModel>{
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId}/parcellations/${id}`)).json()
 }
+export async function getParcRegions(atlasId: string, id: string, spaceId: string): Promise<SapiRegionModel[]>{
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId}/parcellations/${id}/regions?space_id=${encodeURIComponent(spaceId)}`)).json()
+}
 
 export async function getSpace(atlasId: string, id: string): Promise<SapiSpaceModel> {
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId}/spaces/${id}`)).json()
@@ -85,11 +88,22 @@ export async function getJba29(): Promise<SapiParcellationModel> {
   return await getParc(atlasId.human, parcId.human.jba29)
 }
 
+export async function getJba29Regions(): Promise<SapiRegionModel[]> {
+  return await getParcRegions(atlasId.human, parcId.human.jba29, spaceId.human.mni152)
+}
+
 export async function getHoc1Left(spaceId=null): Promise<SapiRegionModel> {
   if (!spaceId) {
     return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left`)).json()
   }
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
+}
+
+export async function get44Left(spaceId=null): Promise<SapiRegionModel> {
+  if (!spaceId) {
+    return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left`)).json()
+  }
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function getHoc1Features(): Promise<SapiRegionalFeatureModel[]> {

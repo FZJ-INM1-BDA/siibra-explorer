@@ -11,9 +11,9 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { ComponentStore } from "../componentStore";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
-import { actions } from "src/state/atlasSelection";
+import { actions, fromRootStore } from "src/state/atlasSelection";
 import { atlasSelection, userInteraction } from "src/state";
-import { SapiSpatialFeatureModel, SapiFeatureModel } from "src/atlasComponents/sapi/type";
+import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
 
 type TCStoreViewerCmp = {
   overlaySideNav: any
@@ -114,6 +114,10 @@ export class ViewerCmp implements OnDestroy {
   )
   public parcellationSelected$ = this.selectedATP.pipe(
     map(({ parcellation }) => parcellation)
+  )
+
+  public allAvailableParcellations$ = this.store$.pipe(
+    fromRootStore.allAvailParcs(this.sapi)
   )
 
   public selectedRegions$ = this.store$.pipe(
@@ -283,7 +287,6 @@ export class ViewerCmp implements OnDestroy {
       if (context.viewerType === 'threeSurfer') {
         hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
       }
-      console.log('hoveredRegions', hoveredRegions)
 
       if (hoveredRegions.length > 0) {
         append({
@@ -307,6 +310,12 @@ export class ViewerCmp implements OnDestroy {
   ngOnDestroy() {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
+  }
+
+  public clearRoi(){
+    this.store$.dispatch(
+      actions.clearSelectedRegions()
+    )
   }
 
   public selectRoi(roi: SapiRegionModel) {
@@ -341,12 +350,14 @@ export class ViewerCmp implements OnDestroy {
       this.ctxMenuSvc.context$.next(event.data)
       if (event.data.viewerType === "nehuba") {
         const { nehuba } = (event.data as TContextArg<"nehuba">).payload
-        const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
-        this.store$.dispatch(
-          userInteraction.actions.mouseoverRegions({
-            regions: mousingOverRegions
-          })
-        )
+        if (nehuba) {
+          const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
+          this.store$.dispatch(
+            userInteraction.actions.mouseoverRegions({
+              regions: mousingOverRegions
+            })
+          )
+        }
       }
       break
     default:
@@ -381,6 +392,29 @@ export class ViewerCmp implements OnDestroy {
   clearSelectedFeature(){
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
+    )
+  }
+
+  onDismissNonbaseLayer(){
+    this.store$.dispatch(
+      atlasSelection.actions.clearNonBaseParcLayer()
+    )
+  }
+  onSelectParcellation(parcellation: SapiParcellationModel){
+    this.store$.dispatch(
+      atlasSelection.actions.selectParcellation({
+        parcellation
+      })
+    )
+  }
+  navigateTo(position: number[]) {
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          position
+        },
+        animation: true,
+      })
     )
   }
 }

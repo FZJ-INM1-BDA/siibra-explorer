@@ -21,5 +21,5 @@ export type TThreeSurferContextInfo = {
   faceIndex: number
   vertexIndices: number[]
   fsversion: string
-  _mouseoverRegion?: any[]
+  _mouseoverRegion: { name: string, error?: string }[]
 }

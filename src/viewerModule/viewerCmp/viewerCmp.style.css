@@ -3,11 +3,6 @@
   position: relative;
 }
 
-.explore-btn
-{
-  margin-top: 4.5rem;
-}
-
 .region-text-search-autocomplete-position
 {
   z-index: 10;
@@ -58,4 +53,14 @@ mat-drawer
 .sapi-container
 {
   padding-top: 5rem;
+}
+
+sxplr-sapiviews-core-region-region-chip
+{
+  margin-left:-5rem;
+}
+
+sxplr-sapiviews-core-region-region-chip [prefix]
+{
+  padding-left:5rem;
 }

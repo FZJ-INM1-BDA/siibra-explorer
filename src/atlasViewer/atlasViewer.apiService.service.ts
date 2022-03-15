@@ -5,11 +5,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo, take, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
-import {
-  getLabelIndexMap,
-  getMultiNgIdsRegionsLabelIndexMap,
-  IavRootStoreInterface,
-} from "src/services/stateStore.service";
+
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { FRAGMENT_EMIT_RED } from "src/viewerModule/nehuba/nehubaViewer/nehubaViewer.component";
 import { IPluginManifest, PluginServices } from "src/plugin";
@@ -149,7 +145,7 @@ export class AtlasViewerAPIServices implements OnDestroy{
   }
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
+    private store: Store<any>,
     private dialogService: DialogService,
     private snackbar: MatSnackBar,
     private zone: NgZone,
@@ -327,8 +323,9 @@ export class AtlasViewerAPIServices implements OnDestroy{
       filter(p => !!p && p.regions),
       distinctUntilChanged()
     ).subscribe(parcellation => {
-      this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
-      this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
+      // TODO rework plugin metadata
+      // this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
+      // this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
     })
 
     this.s.push(

@@ -15,6 +15,7 @@ export type SapiAtlasModel = components["schemas"]["SapiAtlasModel"]
 export type SapiSpaceModel = components["schemas"]["SapiSpaceModel"]
 export type SapiParcellationModel = components["schemas"]["SapiParcellationModel"]
 export type SapiRegionModel = components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"]
+export type SapiRegionMapInfoModel = components["schemas"]["NiiMetadataModel"]
 
 export type SapiSpatialFeatureModel = components["schemas"]["VOIDataModel"]
 export type SapiVOIDataResponse = components["schemas"]["VOIDataModel"]
@@ -24,9 +25,24 @@ export type SapiDatasetModel = components["schemas"]["DatasetJsonModel"]
 
 export type SpyNpArrayDataModel = components["schemas"]["NpArrayDataModel"]
 
-export const guards = {
-  isSapiVolumeModel: (val: SapiVolumeModel) => val.type === "siibra/base-dataset"
-    && val.data.detail["neuroglancer/precomputed"]
+
+export function FeatureTypeGuard(input: SapiFeatureModel) {
+  if (input.type === "siibra/core/dataset") {
+    return input as SapiDatasetModel
+  }
+  if (input.type === "siibra/features/connectivity") {
+    return input as SapiParcellationFeatureMatrixModel
+  }
+  if (input.type === "siibra/features/receptor") {
+    return input as SapiRegionalFeatureReceptorModel
+  }
+  if (input.type === "siibra/features/voi") {
+    return input as SapiVOIDataResponse
+  }
+  if (input.type === "spy/serialization-error") {
+    return input as SapiSerializationErrorModel
+  }
+  throw new Error(`cannot parse type: ${input}`)
 }
 
 /**

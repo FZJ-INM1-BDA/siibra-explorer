@@ -1,18 +1,16 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
-import { NgModule } from "@angular/core"
-import { async, fakeAsync, TestBed, tick } from "@angular/core/testing"
+import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { ComponentsModule } from "src/components"
 import { DialogService } from "src/services/dialogService.service"
-import { selectorPluginCspPermission } from "src/services/state/userConfigState.helper"
 import { AngularMaterialModule } from "src/sharedModules"
+import { userPreference } from "src/state"
 import { PureContantService } from "src/util"
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN } from "src/util/constants"
 import { WidgetModule, WidgetServices } from "src/widget"
 import { PluginServices } from "./atlasViewer.pluginService.service"
 import { PluginModule } from "./plugin.module"
-import { PluginUnit } from "./pluginUnit/pluginUnit.component"
 
 const MOCK_PLUGIN_MANIFEST = {
   name: 'fzj.xg.MOCK_PLUGIN_MANIFEST',
@@ -33,8 +31,8 @@ describe('> atlasViewer.pluginService.service.ts', () => {
     let httpMock: HttpTestingController
     let mockStore: MockStore
     
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
         imports: [
           AngularMaterialModule,
           CommonModule,
@@ -67,38 +65,37 @@ describe('> atlasViewer.pluginService.service.ts', () => {
             }
           }
         ]
-      }).compileComponents().then(() => {
-        
-        httpMock = TestBed.inject(HttpTestingController)
-        pluginService = TestBed.inject(PluginServices)
-        mockStore = TestBed.inject(MockStore)
-        pluginService.pluginViewContainerRef = {
-          createComponent: () => {
-            return {
-              onDestroy: () => {},
-              instance: {
-                elementRef: {
-                  nativeElement: {
-                    append: () => {}
-                  }
+      }).compileComponents()
+      
+      httpMock = TestBed.inject(HttpTestingController)
+      pluginService = TestBed.inject(PluginServices)
+      mockStore = TestBed.inject(MockStore)
+      pluginService.pluginViewContainerRef = {
+        createComponent: () => {
+          return {
+            onDestroy: () => {},
+            instance: {
+              elementRef: {
+                nativeElement: {
+                  append: () => {}
                 }
               }
             }
           }
-        } as any
-
-        httpMock.expectOne('http://localhost:3000/plugins/manifests').flush('[]')
-
-        const widgetService = TestBed.inject(WidgetServices)
-        /**
-         * widget service floatingcontainer not inst in this circumstance
-         * TODO fix widget service tests importing widget service are not as flaky
-         */
-        widgetService.addNewWidget = () => {
-          return {} as any
         }
-      })
-    }))
+      } as any
+
+      httpMock.expectOne('http://localhost:3000/plugins/manifests').flush('[]')
+
+      const widgetService = TestBed.inject(WidgetServices)
+      /**
+       * widget service floatingcontainer not inst in this circumstance
+       * TODO fix widget service tests importing widget service are not as flaky
+       */
+      widgetService.addNewWidget = () => {
+        return {} as any
+      }
+    })
 
     afterEach(() => {
       spyfn.appendSrc.calls.reset()
@@ -127,7 +124,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
     describe('#launchPlugin', () => {
 
       beforeEach(() => {
-        mockStore.overrideSelector(selectorPluginCspPermission, { value: false })
+        mockStore.overrideSelector(userPreference.selectors.userCsp, {})
       })
 
       describe('> basic fetching functionality', () => {
@@ -200,7 +197,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
 
           describe('> if user permission has been given', () => {
             beforeEach(fakeAsync(() => {
-              mockStore.overrideSelector(selectorPluginCspPermission, { value: true })
+              mockStore.overrideSelector(userPreference.selectors.userCsp, { 'fzj.xg.MOCK_PLUGIN_MANIFEST': {} })
               userConfirmSpy.and.callFake(() => Promise.reject())
               pluginService.launchPlugin({
                 ...cspManifest
@@ -222,7 +219,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
 
           describe('> if user permission has not yet been given', () => {
             beforeEach(() => {
-              mockStore.overrideSelector(selectorPluginCspPermission, { value: false })
+              mockStore.overrideSelector(userPreference.selectors.userCsp, {})
             })
             describe('> user permission', () => {
               beforeEach(fakeAsync(() => {

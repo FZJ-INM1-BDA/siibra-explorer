@@ -1,6 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { nameSpace, ViewerMode } from "./const"
+import { BreadCrumb, nameSpace, ViewerMode } from "./const"
 
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
@@ -20,6 +20,13 @@ export const selectParcellation = createAction(
   `${nameSpace} selectParcellation`,
   props<{
     parcellation: SapiParcellationModel
+  }>()
+)
+
+export const setSelectedParcellationAllRegions = createAction(
+  `${nameSpace} setSelectedParcellationAllRegions`,
+  props<{
+    regions: SapiRegionModel[]
   }>()
 )
 
@@ -57,6 +64,20 @@ export const setViewerMode = createAction(
   }>()
 )
 
+export const showBreadCrumb = createAction(
+  `${nameSpace} showBreadCrumb`,
+  props<{
+    breadcrumb: BreadCrumb
+  }>()
+)
+
+export const dismissBreadCrumb = createAction(
+  `${nameSpace} dismissBreadCrumb`,
+  props<{
+    id: string
+  }>()
+)
+
 export const clearSelectedRegions = createAction(
   `${nameSpace} clearSelectedRegions`
 )
@@ -78,6 +99,9 @@ export const clearStandAloneVolumes = createAction(
   `${nameSpace} clearStandAloneVolumes`
 )
 
+/**
+ * n.b. position in nm!
+ */
 export const navigateTo = createAction(
   `${nameSpace} navigateTo`,
   props<{

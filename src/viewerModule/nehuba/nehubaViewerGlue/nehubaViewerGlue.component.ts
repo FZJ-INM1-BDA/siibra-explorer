@@ -1,13 +1,9 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { asyncScheduler, BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { ngViewerActionCycleViews, ngViewerActionToggleMax } from "src/services/state/ngViewerState/actions";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, tap, throttleTime } from "rxjs/operators";
-import { viewerStateAddUserLandmarks, viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
-import { ngViewerSelectorPanelOrder, ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, startWith, switchMap, switchMapTo, take, takeUntil, tap, throttleTime } from "rxjs/operators";
 import { ARIA_LABELS, IDS, QUICKTOUR_DESC } from 'common/constants'
-import { PANELS } from "src/services/state/ngViewerState/constants";
 import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
@@ -28,10 +24,11 @@ import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, getParcNgId, getRegionLabelIndex } from "../config.service";
-import { generalActionError } from "src/services/stateStore.helper";
 import { SET_MESHES_TO_LOAD } from "../constants";
-import { actions } from "src/state/atlasSelection";
-import { annotation, atlasSelection, userInteraction } from "src/state";
+import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface, generalActions } from "src/state";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { arrayEqual } from "src/util/array";
+import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -80,7 +77,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
 
-  private currentPanelMode: PANELS
+  private currentPanelMode: userInterface.PanelMode
 
   @ViewChild(NehubaViewerContainerDirective, { static: true })
   public nehubaContainerDirective: NehubaViewerContainerDirective
@@ -169,62 +166,84 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   public panelOrder$ = this.store$.pipe(
-    select(ngViewerSelectorPanelOrder),
+    select(userInterface.selectors.panelOrder),
     distinctUntilChanged(),
     shareReplay(1),
   )
 
-  private nehubaContainerSub: Subscription
+  private nehubaContainerSub: Subscription[] = []
   private setupNehubaEvRelay() {
-    if (this.nehubaContainerSub) this.nehubaContainerSub.unsubscribe()
+    while (this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
+    
     if (!this.nehubaContainerDirective) return
     const {
       mouseOverSegments,
       navigationEmitter,
       mousePosEmitter,
     } = this.nehubaContainerDirective
-    this.nehubaContainerSub = combineLatest([
+
+    this.nehubaContainerSub.push(
+
       mouseOverSegments.pipe(
         startWith(null as TMouseoverEvent[])
-      ),
+      ).subscribe(seg => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              nehuba: seg && seg.map(v => {
+                return {
+                  layerName: v.layer.name,
+                  labelIndices: [ Number(v.segmentId) ],
+                  regions: (() => {
+                    const map = this.multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
+                    if (!map) return []
+                    return [map.get(Number(v.segmentId))]
+                  })()
+                }
+              })
+            }
+          }
+        })
+      }),
+
       navigationEmitter.pipe(
         startWith(null as INavObj)
-      ),
+      ).subscribe(nav => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              nav
+            }
+          }
+        })
+      }),
+
       mousePosEmitter.pipe(
         startWith(null as {
           voxel: number[]
           real: number[]
         })
-      ),
-    ]).pipe(
-      throttleTime(16, asyncScheduler, { trailing: true })
-    ).subscribe(([ seg, nav, mouse ]: [ TMouseoverEvent [], INavObj, { real: number[], voxel: number[] } ]) => {
-      this.viewerEvent.emit({
-        type: EnumViewerEvt.VIEWER_CTX,
-        data: {
-          viewerType: 'nehuba',
-          payload: {
-            nav,
-            mouse,
-            nehuba: seg && seg.map(v => {
-              return {
-                layerName: v.layer.name,
-                labelIndices: [ Number(v.segmentId) ],
-                regions: (() => {
-                  const map = this.multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
-                  if (!map) return []
-                  return [map.get(Number(v.segmentId))]
-                })()
-              }
-            })
+      ).subscribe(mouse => {
+        this.viewerEvent.emit({
+          type: EnumViewerEvt.VIEWER_CTX,
+          data: {
+            viewerType: 'nehuba',
+            payload: {
+              mouse
+            }
           }
-        }
+        })
       })
-    })
+    )
+
     this.onDestroyCb.push(
       () => {
         if (this.nehubaContainerSub) {
-          this.nehubaContainerSub.unsubscribe()
+          while(this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
           this.nehubaContainerSub = null
         }
       }
@@ -240,72 +259,36 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
-  private async loadParc(atlas: SapiAtlasModel, parcellation: SapiParcellationModel, space: SapiSpaceModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
-    /**
-     * parcellation may be undefined
-     */
-    if ( !parcellation) {
-      return
-    }
-    const pevs = await this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], space["@id"])
 
-    const ngIdSegmentsMap: Record<string, number[]> = {}
-    for (const key in ngLayers) {
-      if ((ngLayers[key] as NgSegLayerSpec).labelIndicies) {
-        ngIdSegmentsMap[key] = (ngLayers[key] as NgSegLayerSpec).labelIndicies
-      }
-    }
-    this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
-  }
-
-  private unloadTmpl() {
+  private disposeViewer() {
     /**
      * clear existing container
      */
-    this.viewerUnit = null
-    this.nehubaContainerDirective.clear()
-
-    /* on selecting of new template, remove additional nglayers */
-    if (this.nehubaConfig) {
-      const baseLayerNames = Object.keys(this.nehubaConfig.dataset.initialNgState.layers)
-      this.layerCtrlService.removeNgLayers(baseLayerNames)
-    }
+     this.viewerUnit = null
+     this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
   }
 
-  private async loadTmpl(atlas: SapiAtlasModel, _template: SapiSpaceModel, parcellation: SapiParcellationModel, ngLayers: Record<string, NgLayerSpec | NgPrecompMeshSpec | NgSegLayerSpec>) {
-
-    if (!_template) return
-    /**
-     * recalcuate zoom
-     */
-    const validSpaceIds = parcellation.brainAtlasVersions.map(bas => bas.coordinateSpace["@id"] as string)
-    let template: SapiSpaceModel
-    if (validSpaceIds.indexOf(_template["@id"]) >= 0) {
-      template = _template
-    } else {
-      /**
-       * selected parc does not have space as a valid output
-       */
-      this.store$.dispatch(generalActionError({
-        message: `space ${_template.fullName} is not defined in parcellation ${parcellation.brainAtlasVersions[0].fullName}`
-      }))
-      template = await this.sapiSvc.getSpaceDetail(this.selectedAtlas["@id"], parcellation.brainAtlasVersions[0].coordinateSpace["@id"] as string)
+  private async loadNewViewer(ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }, baseLayers: NgLayerCustomLayer[]) {
+    const config = getNehubaConfig(ATP.template)
+    for (const baseLayer of baseLayers) {
+      config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
     }
-    const config = getNehubaConfig(template)
-    config.dataset.initialNgState.layers = ngLayers
-    const overwritingInitState = this.navigation
-      ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
-      : {}
 
-      config.dataset.initialNgState = {
+    const overwritingInitState = this.navigation
+    ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
+    : {}
+
+    config.dataset.initialNgState = {
       ...config.dataset.initialNgState,
       ...overwritingInitState,
     }
 
-    this.nehubaConfig = config
-
-    this.nehubaContainerDirective.createNehubaInstance(config)
+    await this.nehubaContainerDirective.createNehubaInstance(config)
     this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
+
+    /**
+     * map slice view to weakmap
+     */
     this.sliceRenderEvent$.pipe(
       takeOnePipe()
     ).subscribe(ev => {
@@ -319,29 +302,17 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       }
     })
 
-    await this.loadParc(atlas, parcellation, template, ngLayers)
-
-    const initialSpec = config.dataset.initialNgState
-    const {layers} = initialSpec
-
-    const dispatchLayers = Object.keys(layers).map((key, idx) => {
-      const layer = {
-        name : key,
-        source : layers[key].source,
-        mixability : idx === 0
-          ? 'base'
-          : 'mixable',
-        visible : typeof layers[key].visible === 'undefined'
-          ? true
-          : layers[key].visible,
-        transform : typeof layers[key].transform === 'undefined'
-          ? null
-          : layers[key].transform,
-      }
-      return layer
+    /**
+     * map perspective to weakmap
+     */
+    fromEvent<CustomEvent>(this.el.nativeElement, 'perpspectiveRenderEvent').pipe(
+      take(1)
+    ).subscribe(ev => {
+      const perspPanel = ev.target as HTMLElement
+      this.viewPanels[3] = perspPanel
+      this.viewPanelWeakMap.set(perspPanel, 3)
     })
 
-    this.layerCtrlService.addNgLayer(dispatchLayers)
     this.newViewer$.next(true)
   }
 
@@ -355,6 +326,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
+    private effect: LayerCtrlEffects,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
     @Optional() private layerCtrlService: NehubaLayerControlService,
@@ -370,6 +342,50 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       register(selOnhoverRegion, { last: true })
       this.onDestroyCb.push(() => deregister(selOnhoverRegion))
     }
+
+    const onATPClear = this.store$.pipe(
+      select(atlasSelection.selectors.selectedATP)
+    ).subscribe(this.disposeViewer.bind(this))
+    this.onDestroyCb.push(() => onATPClear.unsubscribe())
+    
+    const onATPDebounceNgBaseLayers = this.store$.pipe(
+      select(atlasSelection.selectors.selectedATP),
+      debounceTime(16),
+      switchMap(ATP => this.store$.pipe(
+        select(atlasAppearance.selectors.customLayers),
+        debounceTime(16),
+        map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
+        distinctUntilChanged((o, n) => arrayEqual(o, n, (oi, ni) => oi.id === ni.id)),
+        filter(layers => layers.length > 0),
+        map(ngBaseLayers => {
+          return {
+            ATP,
+            ngBaseLayers
+          }
+        })
+      ))
+    ).subscribe(async ({ ATP, ngBaseLayers }) => {
+      await this.loadNewViewer(ATP, ngBaseLayers)
+
+      /**
+       * TODO this part is a little awkward. needs refactor
+       */
+      const {
+        parcNgLayers,
+        tmplAuxNgLayers,
+      } = await this.effect.onATPDebounceNgLayers$.pipe(
+        take(1)
+      ).toPromise()
+
+      const ngIdSegmentsMap: Record<string, number[]> = {} 
+
+      for (const key in parcNgLayers) {
+        ngIdSegmentsMap[key] = parcNgLayers[key].labelIndicies
+      }
+
+      this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
+    })
+    this.onDestroyCb.push(() => onATPDebounceNgBaseLayers.unsubscribe())
 
     /**
      * subscribe to ngIdtolblIdxToRegion
@@ -392,7 +408,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
      */
     const redrawLayoutSub = combineLatest([
       this.store$.pipe(
-        select(ngViewerSelectorPanelMode),
+        select(userInterface.selectors.panelMode),
         distinctUntilChanged(),
         shareReplay(1),
       ),
@@ -401,7 +417,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       switchMap(this.waitForNehuba.bind(this))
     ).subscribe(([mode, panelOrder]) => {
       
-      this.currentPanelMode = mode
+      this.currentPanelMode = mode as userInterface.PanelMode
 
       const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
 
@@ -413,26 +429,26 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         return
       }
 
-      switch (mode) {
-      case PANELS.H_ONE_THREE: {
+      switch (this.currentPanelMode) {
+      case "H_ONE_THREE": {
         const element = this.removeExistingPanels()
         const newEl = getHorizontalOneThree(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.V_ONE_THREE: {
+      case "V_ONE_THREE": {
         const element = this.removeExistingPanels()
         const newEl = getVerticalOneThree(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.FOUR_PANEL: {
+      case "FOUR_PANEL": {
         const element = this.removeExistingPanels()
         const newEl = getFourPanel(viewPanels)
         element.appendChild(newEl)
         break;
       }
-      case PANELS.SINGLE_PANEL: {
+      case "SINGLE_PANEL": {
         const element = this.removeExistingPanels()
         const newEl = getSinglePanel(viewPanels)
         element.appendChild(newEl)
@@ -447,7 +463,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       // TODO needed to redraw?
       // see https://trello.com/c/oJOnlc6v/60-enlarge-panel-allow-user-rearrange-panel-position
       // further investigaation required
-      this.nehubaContainerDirective.nehubaViewerInstance.redraw()
     })
     this.onDestroyCb.push(() => redrawLayoutSub.unsubscribe())
 
@@ -461,17 +476,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       this.onhoverSegments = arr
     })
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
-
-    const perspectiveRenderEvSub = this.newViewer$.pipe(
-      switchMapTo(fromEvent<CustomEvent>(this.el.nativeElement, 'perpspectiveRenderEvent').pipe(
-        take(1)
-      ))
-    ).subscribe(ev => {
-      const perspPanel = ev.target as HTMLElement
-      this.viewPanels[3] = perspPanel
-      this.viewPanelWeakMap.set(perspPanel, 3)
-    })
-    this.onDestroyCb.push(() => perspectiveRenderEvSub.unsubscribe())
 
     this.sliceRenderEvent$ = fromEvent<CustomEvent>(this.el.nativeElement, 'sliceRenderEvent')
     this.sliceViewLoadingMain$ = this.sliceRenderEvent$.pipe(
@@ -544,36 +548,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       shareReplay(1),
     )
 
-    const newTmplSub = this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP),
-      distinctUntilChanged((o, n) => {
-        return o?.template?.["@id"] === n?.template?.["@id"]
-      }),
-      switchMap(ATP => {
-        return this.store$.pipe(
-          fromRootStore.getNgLayers(this.store$, this.sapiSvc),
-          map(ngLayers => ({ ATP, ngLayers }))
-        )
-      }
-      )
-    ).subscribe(({ ATP, ngLayers }) => {
-      const { template, parcellation, atlas } = ATP
-      const { tmplNgLayers, tmplAuxNgLayers, parcNgLayers } = ngLayers
-      
-
-      // clean up previous tmpl
-      this.unloadTmpl()
-
-      const layerObj = {
-        ...tmplNgLayers,
-        ...tmplAuxNgLayers,
-        ...parcNgLayers,
-      }
-      this.loadTmpl(atlas, template, parcellation, layerObj)
-    })
-
-    this.onDestroyCb.push(() => newTmplSub.unsubscribe())
-
     const setupViewerApiSub = this.newViewer$.pipe(
       tap(() => {
         setViewerHandle && setViewerHandle(null)
@@ -587,7 +561,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         }),
         moveToNavigationLoc : (coord, _realSpace?) => {
           this.store$.dispatch(
-            actions.navigateTo({
+            atlasSelection.actions.navigateTo({
               navigation: {
                 position: coord
               },
@@ -619,10 +593,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
           if (!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3)) {
             throw new Error('position needs to be a length 3 tuple of numbers ')
           }
-
-          this.store$.dispatch(viewerStateAddUserLandmarks({
-            landmarks
-          }))
+          /**
+           * add implementation to user landmarks
+           */
+          console.warn(`adding landmark not yet implemented`)
         },
         remove3DLandmarks : landmarkIds => {
           this.store$.dispatch(
@@ -720,9 +694,9 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   handleCycleViewEvent(){
-    if (this.currentPanelMode !== PANELS.SINGLE_PANEL) return
+    if (this.currentPanelMode !== "SINGLE_PANEL") return
     this.store$.dispatch(
-      ngViewerActionCycleViews()
+      userInterface.actions.cyclePanelMode()
     )
   }
 
@@ -741,7 +715,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
-      actions.selectRegions({
+      atlasSelection.actions.selectRegions({
         regions: trueOnhoverSegments.slice(0, 1)
       })
     )
@@ -753,9 +727,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }) 
 
   public toggleMaximiseMinimise(index: number) {
-    this.store$.dispatch(ngViewerActionToggleMax({
-      payload: { index }
-    }))
+    this.store$.dispatch(
+      userInterface.actions.toggleMaximiseView({
+        targetIndex: index
+      })
+    )
   }
 
   public zoomNgView(panelIndex: number, factor: number) {
@@ -790,7 +766,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   private dismissAllAddedLayers(){
     while (this.droppedLayerNames.length) {
       const { resourceUrl, layerName } = this.droppedLayerNames.pop()
-      this.layerCtrlService.removeNgLayers([ layerName ])
+      this.store$.dispatch(
+        atlasAppearance.actions.removeCustomLayer({
+          id: layerName
+        })
+      )
+      
       URL.revokeObjectURL(resourceUrl)
     }
   }
@@ -836,17 +817,21 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         layerName: randomUuid,
         resourceUrl: url
       })
-      this.layerCtrlService.addNgLayer([{
-        name: randomUuid,
-        mixability: 'mixable',
-        source: `nifti://${url}`,
-        shader: getShader({
-          colormap: EnumColorMapName.MAGMA,
-          lowThreshold: meta.min || 0,
-          highThreshold: meta.max || 1
-        })
-      }])
 
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            id: randomUuid,
+            source: `nifti://${url}`,
+            shader: getShader({
+              colormap: EnumColorMapName.MAGMA,
+              lowThreshold: meta.min || 0,
+              highThreshold: meta.max || 1
+            }),
+            clType: 'customlayer/nglayer'
+          }
+        })
+      )
       this.dialog.open(
         this.layerCtrlTmpl,
         {
@@ -901,19 +886,13 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   public handleMouseEnterCustomLandmark(lm) {
-    this.store$.dispatch(
-      viewerStateMouseOverCustomLandmark({
-        payload: { userLandmark: lm }
-      })
-    )
+    console.log('handle enter custom landmark')
+
   }
 
   public handleMouseLeaveCustomLandmark(_lm) {
-    this.store$.dispatch(
-      viewerStateMouseOverCustomLandmark({
-        payload: { userLandmark: null }
-      })
-    )
+    console.log("handle leave custom landmark")
+
   }
 
   public quickTourOverwritingPos = {

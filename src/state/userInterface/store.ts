@@ -1,23 +1,39 @@
 import { createReducer, on } from "@ngrx/store";
 import * as actions from "./actions"
+import { PanelMode } from "./const"
 
 export type UiStore = {
-  useMobileUi: boolean
+  panelMode: PanelMode
+  panelOrder: string // permutation of 0123
+  octantRemoval: boolean
+  showDelineation: boolean
 }
 
 const defaultStore: UiStore = {
-  useMobileUi: false
+  panelMode: 'FOUR_PANEL',
+  panelOrder: '0123',
+  octantRemoval: false,
+  showDelineation: true,
 }
 
 export const reducer = createReducer(
   defaultStore,
   on(
-    actions.useModileUi,
-    (state, { flag }) => {
+    actions.setPanelMode,
+    (state, { panelMode }) => {
       return {
         ...state,
-        useMobileUi: flag
+        panelMode
       }
     }
   ),
+  on(
+    actions.setPanelOrder,
+    (state, { order }) => {
+      return {
+        ...state,
+        panelOrder: order
+      }
+    }
+  )
 )

@@ -9,7 +9,7 @@ import { TId, TParc, TRegionDetail, TRegionSummary, TSpaceFull, TSpaceSummary } 
 import { MultiDimMap, recursiveMutate, mutateDeepMerge } from "./fn";
 import { patchRegions } from './patchPureConstants'
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { atlasSelection, userInterface } from "src/state";
+import { atlasSelection, userPreference } from "src/state";
 
 const validVolumeType = new Set([
   'neuroglancer/precomputed',
@@ -305,7 +305,7 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
     )
 
     this.useTouchUI$ = this.store.pipe(
-      select(userInterface.selectors.useMobileUi),
+      select(userPreference.selectors.useMobileUi),
       shareReplay(1)
     )
 

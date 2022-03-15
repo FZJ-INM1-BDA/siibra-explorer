@@ -8,12 +8,12 @@ import { LoggingService } from 'src/logging';
 import { WidgetUnit, WidgetServices } from "src/widget";
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN, getHttpHeader } from 'src/util/constants';
 import { PluginFactoryDirective } from './pluginFactory.directive';
-import { selectorPluginCspPermission } from 'src/services/state/userConfigState.helper';
 import { DialogService } from 'src/services/dialogService.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PureContantService } from 'src/util';
 import { actions } from "src/state/plugins"
+import { userPreference } from 'src/state';
 
 const requiresReloadMd = `\n\n***\n\n**warning**: interactive atlas viewer **will** be reloaded in order for the change to take effect.`
 
@@ -229,10 +229,11 @@ export class PluginServices {
 
     await new Promise((rs, rj) => {
       this.store.pipe(
-        select(selectorPluginCspPermission, { key: pluginKey }),
+        select(userPreference.selectors.userCsp),
+        map(dict => !!dict[pluginKey]),
         take(1),
         switchMap(userAgreed => {
-          if (userAgreed.value) return of(true)
+          if (userAgreed) return of(true)
 
           /**
            * check if csp exists

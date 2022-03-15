@@ -3,7 +3,6 @@ import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subject, merge } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap, withLatestFrom } from "rxjs/operators";
-import { getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
@@ -72,24 +71,7 @@ export class RegionTextSearchAutocomplete {
       distinctUntilChanged(),
       filter(p => !!p && p.regions),
       map(parcellationSelected => {
-        try {
-          const returnArray = []
-          const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected, { ngId: 'root', relatedAreas: [], fullId: null })
-          for (const [ngId, labelIndexMap] of ngIdMap) {
-            for (const [labelIndex, region] of labelIndexMap) {
-              returnArray.push({
-                ...region,
-                ngId,
-                labelIndex,
-                labelIndexId: serializeSegment(ngId, labelIndex),
-              })
-            }
-          }
-          return returnArray
-        } catch (e) {
-          this.log.warn(`getMultiNgIdsRegionsLabelIndexMap error`, e)
-          return []
-        }
+        return []
       }),
       shareReplay(1),
     )

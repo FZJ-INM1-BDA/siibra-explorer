@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { SapiFeatureModel, SapiRegionalFeatureModel, SapiSpatialFeatureModel, SapiParcellationFeatureModel } from "src/atlasComponents/sapi";
-import { SapiParcellationFeatureMatrixModel } from "src/atlasComponents/sapi/type";
+import { SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatureReceptorModel, SapiSerializationErrorModel, SapiVOIDataResponse } from "src/atlasComponents/sapi/type";
 
 @Component({
   selector: `sxplr-sapiviews-features-entry-list-item`,
@@ -19,11 +19,21 @@ export class SapiViewsFeaturesEntryListItem{
 
   get label(): string{
     if (!this.feature) return null
-    if (this.feature.type === "siibra/base-dataset" || this.feature.type === "siibra/receptor") {
-      return (this.feature as (SapiRegionalFeatureModel | SapiSpatialFeatureModel)).metadata.fullName
+    const { type } = this.feature
+    if (
+      type === "siibra/core/dataset" ||
+      type === "siibra/features/receptor" ||
+      type === "siibra/features/voi"
+    ) {
+      return (this.feature as (SapiDatasetModel | SapiRegionalFeatureReceptorModel | SapiVOIDataResponse) ).metadata.fullName
     }
-    return (this.feature as SapiParcellationFeatureMatrixModel).name
-  }
-  constructor(){
+
+    if (type === "siibra/features/connectivity") {
+      return (this.feature as SapiParcellationFeatureMatrixModel).name
+    }
+    if (type === "spy/serialization-error") {
+      return (this.feature as SapiSerializationErrorModel).message
+    }
+    return "Unknown type"
   }
 }

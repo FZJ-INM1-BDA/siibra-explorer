@@ -2,14 +2,8 @@ import { TemplateRef } from "@angular/core";
 import { MatBottomSheetConfig } from "@angular/material/bottom-sheet";
 import { MatSnackBarConfig } from "@angular/material/snack-bar";
 import { createAction, props } from "@ngrx/store";
-import { nameSpace } from "./const"
+import { nameSpace, PanelMode } from "./const"
 
-export const useModileUi = createAction(
-  `${nameSpace} useMobileUi`,
-  props<{
-    flag: boolean
-  }>()
-)
 
 export const openSidePanel = createAction(
   `${nameSpace} openSidePanel`
@@ -36,5 +30,31 @@ export const snackBarMessage = createAction(
   props<{
     message: string
     config?: MatSnackBarConfig
+  }>()
+)
+
+
+export const setPanelMode = createAction(
+  `${nameSpace} setPanelMode`,
+  props<{
+    panelMode: PanelMode
+  }>()
+)
+
+export const cyclePanelMode = createAction(
+  `${nameSpace} cyclePanelMode`
+)
+
+export const toggleMaximiseView = createAction(
+  `${nameSpace} toggleMaximiseView`,
+  props<{
+    targetIndex: number
+  }>()
+)
+
+export const setPanelOrder = createAction(
+  `${nameSpace} setPanelOrder`,
+  props<{
+    order: string
   }>()
 )

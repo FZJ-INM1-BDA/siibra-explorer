@@ -1,9 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { IMessagingActionTmpl, IWindowMessaging } from "./messaging/types";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState/actions";
-import { generalActionError } from "./services/stateStore.helper";
-import { atlasSelection } from "src/state"
+import { atlasAppearance, atlasSelection, generalActions } from "src/state"
 import { SAPI } from "./atlasComponents/sapi";
 
 @Injectable()
@@ -43,7 +41,7 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     const atlasId = this.tmplSpIdToAtlasId.get(payload['@id'])
     if (!atlasId) {
       return this.store.dispatch(
-        generalActionError({
+        generalActions.generalActionError({
           message: `atlas id with the corresponding templateId ${payload['@id']} not found.`
         })
       )
@@ -68,29 +66,25 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     if (type === 'swc') {
       const { transform } = resourceParam
       const layer = {
-        name: swcLayerUuid,
         id: swcLayerUuid,
         source: `swc://${url}`,
-        mixability: 'mixable',
-        type: "segmentation",
-        "segments": [
+        segments: [
           "1"
         ],
-        transform,
+        transform: transform,
+        clType: 'customlayer/nglayer' as 'customlayer/nglayer'
       }
 
       this.store.dispatch(
-        ngViewerActionAddNgLayer({
-          layer
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: layer
         })
       )
 
       this.mapIdUnload.set(swcLayerUuid, () => {
         this.store.dispatch(
-          ngViewerActionRemoveNgLayer({
-            layer: {
-              name: swcLayerUuid
-            }
+          atlasAppearance.actions.removeCustomLayer({
+            id: swcLayerUuid
           })
         )
         unload()

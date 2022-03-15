@@ -8,12 +8,14 @@ import {
   ViewChild,
   ViewChildren
 } from "@angular/core";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, Subscription } from "rxjs";
+import { filter } from "rxjs/operators"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
 import {MatExpansionPanel} from "@angular/material/expansion";
+import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 
 @Component({
   selector: 'sxplr-sapiviews-core-region-region-rich',
@@ -23,15 +25,11 @@ import {MatExpansionPanel} from "@angular/material/expansion";
   ]
 })
 
-export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase{
+export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase {
   
-  get ARIA_LABELS() {
-    return ARIA_LABELS
-  }
-
-  get CONST() {
-    return CONST
-  }
+  shouldFetchDetail = true
+  public ARIA_LABELS = ARIA_LABELS
+  public CONST = CONST
 
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
   featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
@@ -39,9 +37,10 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   public expandedPanel: string
 
   constructor(
-    @Inject(DARKTHEME) public darktheme$: Observable<boolean>
+    sapi: SAPI,
+    @Inject(DARKTHEME) public darktheme$: Observable<boolean>,
   ){
-    super()
+    super(sapi)
   }
 
   handleRegionalFeatureClicked(feat: SapiRegionalFeatureModel) {
@@ -50,12 +49,10 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
 
   handleExpansionPanelClosedEv(title: string){
     this.expandedPanel = ''
-    console.log("title", title)
   }
 
   handleExpansionPanelAfterExpandEv(title: string) {
     this.expandedPanel = title
-    console.log("title", title)
   }
 
   activePanelTitles$: Observable<string[]> = new Subject()

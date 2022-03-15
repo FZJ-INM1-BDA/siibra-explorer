@@ -1,8 +1,8 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
-import { atlasSelection } from "src/state"
+import { atlasSelection, generalActions } from "src/state"
 import { SAPI, SapiAtlasModel } from "src/atlasComponents/sapi";
 
 @Component({
@@ -13,8 +13,10 @@ import { SAPI, SapiAtlasModel } from "src/atlasComponents/sapi";
   ]
 })
 
-export class SapiViewsCoreAtlasAtlasDropdownSelector{
+export class SapiViewsCoreAtlasAtlasDropdownSelector implements OnDestroy{
 
+  private subs: Subscription[] = []
+  private fetchedAtlases: SapiAtlasModel[] = []
   public fetchedAtlases$: Observable<SapiAtlasModel[]> = this.sapi.atlases$
   public selectedAtlas$: Observable<SapiAtlasModel> = this.store$.pipe(
     select(atlasSelection.selectors.selectedAtlas)
@@ -26,15 +28,29 @@ export class SapiViewsCoreAtlasAtlasDropdownSelector{
     private store$: Store<any>,
     private sapi: SAPI,
   ){
-    this.selectedAtlas$.subscribe(val => console.log('sel atlas changed', val))
+    this.subs.push(
+      this.fetchedAtlases$.subscribe(val => this.fetchedAtlases = val)
+    )
+  }
+
+  ngOnDestroy(): void {
+    this.subs.pop().unsubscribe()
   }
 
   handleChangeAtlas({ value }) {
-    this.store$.dispatch(
-      atlasSelection.actions.selectATPById({
-        atlasId: value
-      })
-    )
+    const found = this.fetchedAtlases.find(atlas => atlas["@id"] === value)
+    if (found) {
+      this.store$.dispatch(
+        atlasSelection.actions.selectAtlas({
+          atlas: found
+        })
+      )
+    } else {
+      this.store$.dispatch(
+        generalActions.generalActionError({
+          message: `Atlas with id ${value} not found.`
+        })
+      )
+    }
   }
 }
-

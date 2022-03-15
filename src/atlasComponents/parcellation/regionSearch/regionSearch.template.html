@@ -36,11 +36,12 @@
         *ngFor="let region of autocompleteList$ | async"
         [value]="region.labelIndexId">
 
-        <simple-region
-          [region-base-region]="region">
-          <!-- [isSelected]="regionsSelected$ | async | includes : region : compareFn"> -->
+        <!-- TODO replace with sapiViews/core/region/simple -->
+        <!-- <simple-region
+          [region-base-region]="region"
+          [isSelected]="regionsSelected$ | async | includes : region : compareFn">
 
-        </simple-region>
+        </simple-region> -->
       </mat-option>
     </mat-autocomplete>
   </form>

@@ -1,9 +1,7 @@
 import { Component } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { startWith } from "rxjs/operators";
-import { SUPPORTED_PANEL_MODES } from "src/services/state/ngViewerState.store";
-import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
+import { userInterface } from "src/state"
 
 @Component({
   selector: 'current-layout',
@@ -15,15 +13,20 @@ import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/sele
 
 export class CurrentLayout {
 
-  public supportedPanelModes = SUPPORTED_PANEL_MODES
-  public panelMode$: Observable<string>
+  public FOUR_PANEL: userInterface.PanelMode = "FOUR_PANEL"
+  
+  public panelModes: Record<string, userInterface.PanelMode> = {
+    FOUR_PANEL: "FOUR_PANEL",
+    H_ONE_THREE: "H_ONE_THREE",
+    SINGLE_PANEL: "SINGLE_PANEL",
+    V_ONE_THREE: "V_ONE_THREE"
+  }
+  public panelMode$: Observable<userInterface.PanelMode> = this.store$.pipe(
+    select(userInterface.selectors.panelMode)
+  )
 
   constructor(
     private store$: Store<any>,
   ) {
-    this.panelMode$ = this.store$.pipe(
-      select(ngViewerSelectorPanelMode),
-      startWith(SUPPORTED_PANEL_MODES[0]),
-    )
   }
 }

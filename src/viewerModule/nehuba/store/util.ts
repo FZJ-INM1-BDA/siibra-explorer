@@ -1,6 +1,6 @@
 import { select } from "@ngrx/store";
-import { forkJoin, pipe } from "rxjs";
-import { switchMap, map, take } from "rxjs/operators";
+import { forkJoin, of, pipe } from "rxjs";
+import { switchMap, map, take, filter } from "rxjs/operators";
 import { SAPI, SAPIParcellation, SapiParcellationModel, SAPISpace } from "src/atlasComponents/sapi";
 import { atlasSelection } from "src/state";
 import { getRegionLabelIndex } from "../config.service/util";
@@ -20,6 +20,7 @@ type NehubaRegionIdentifier = {
 export const fromRootStore = {
   getAuxMeshVolumes: (sapi: SAPI) => pipe(
     select(atlasSelection.selectors.selectedTemplate),
+    filter(template => !!template),
     switchMap(template => 
       sapi.registry.get<SAPISpace>(template["@id"])
         .getVolumes()
@@ -29,17 +30,19 @@ export const fromRootStore = {
   ),
   getTmplVolumes: (sapi: SAPI) => pipe(
     select(atlasSelection.selectors.selectedTemplate),
-    switchMap(template => 
-      sapi.registry.get<SAPISpace>(template["@id"])
+    filter(template => !!template),
+    switchMap(template => {
+      return sapi.registry.get<SAPISpace>(template["@id"])
         .getVolumes()
         .then(volumes => volumes.filter(vol => "neuroglancer/precomputed" in vol.data.detail))
-    ),
+    }),
     take(1),
   ),
   getParcVolumes: (sapi: SAPI) => pipe(
     select(atlasSelection.selectors.selectedATP),
-    switchMap(({ atlas, template, parcellation }) => 
-      forkJoin([
+    filter(({ parcellation }) => !!parcellation),
+    switchMap(({ atlas, template, parcellation }) => {
+      return forkJoin([
         sapi.registry.get<SAPIParcellation>(parcellation["@id"])
           .getRegions(template["@id"])
           .then(regions => {
@@ -84,7 +87,7 @@ export const fromRootStore = {
             )
         })
       )
-    ),
+    }),
     take(1),
   ),
 }
