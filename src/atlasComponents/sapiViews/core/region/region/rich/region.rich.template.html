@@ -1,3 +1,7 @@
+<ng-template #headerTmpl>
+  <ng-content select="[header]"></ng-content>
+</ng-template>
+
 <ng-template [ngIf]="region">
 
 <mat-card class="mat-elevation-z4">
@@ -80,12 +84,6 @@
                         [sxplr-sapiviews-features-connectivity-matrix-parcellation]="parcellation"
                         [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY">
   </connectivity-browser>
-<!--  <connectivity-browser class="pe-all flex-shrink-1"-->
-<!--                        [region]="region"-->
-<!--                        (setOpenState)="expansionPanel.expanded = $event"-->
-<!--                        [accordionExpanded]="expansionPanel.expanded"-->
-<!--                        (connectivityNumberReceived)="hasConnectivityDirective.connectivityNumber = $event">-->
-<!--  </connectivity-browser>-->
 </ng-template>
 
 

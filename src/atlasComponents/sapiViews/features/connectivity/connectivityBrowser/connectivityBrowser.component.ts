@@ -8,9 +8,8 @@ import {
   OnInit, Inject,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Observable, Subscription, Subject, combineLatest, BehaviorSubject} from "rxjs";
-import {distinctUntilChanged, filter, map, switchMap} from "rxjs/operators";
-import { ngViewerSelectorClearViewEntries, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
+import {fromEvent, Subscription, Subject, combineLatest, BehaviorSubject} from "rxjs";
+import {distinctUntilChanged, switchMap} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
 import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
@@ -62,13 +61,13 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         return
       }
       this.accordionIsExpanded = flag
-      this.store$.dispatch(
-        ngViewerActionClearView({
-          payload: {
-            [CONNECTIVITY_NAME_PLATE]: flag && !this.noDataReceived
-          }
-        })
-      )
+      // this.store$.dispatch(
+      //   ngViewerActionClearView({
+      //     payload: {
+      //       [CONNECTIVITY_NAME_PLATE]: flag && !this.noDataReceived
+      //     }
+      //   })
+      // )
       this.store$.dispatch({
         type: 'SET_OVERWRITTEN_COLOR_MAP',
         payload: flag? CONNECTIVITY_NAME_PLATE : false,
@@ -128,7 +127,6 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       select(atlasSelection.selectors.selectedATP),
       switchMap(({ atlas, template, parcellation }) => this.sapi.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"]))
     )
-    public overwrittenColorMap$: Observable<any>
 
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
@@ -147,15 +145,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         private httpClient: HttpClient,
         @Inject(BS_ENDPOINT) private siibraApiUrl: string,
         private sapi: SAPI
-    ) {
-      this.overwrittenColorMap$ = this.store$.pipe(
-        select(atlasAppearance.selectors.getOverwrittenColormap),
-        distinctUntilChanged()
-      )
-    }
-
-    public fullConnectivityLoadUrl: string
-
+    ) {}
+    
     ngOnInit(): void {
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatures()
         .then(res => {
@@ -171,42 +162,19 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     public ngAfterViewInit(): void {
-      this.subscriptions.push(
-        this.store$.pipe(
-          select(atlasAppearance.selectors.getOverwrittenColormap),
-        ).subscribe(value => {
-          if (this.accordionIsExpanded) {
-            this.setColorMap$.next(!!value)
-          }
-        })
-      )
-
-      // /**
-      //  * Listen to of clear view entries
-      //  * can come from within the component (when connectivity is not available for the dataset)
-      //  * --> do not collapse
-      //  * or outside (user clicks x in chip)
-      //  * --> collapse
-      //  */
       // this.subscriptions.push(
       //   this.store$.pipe(
-      //     select(ngViewerSelectorClearViewEntries),
-      //     map(arr => arr.filter(v => v === CONNECTIVITY_NAME_PLATE)),
-      //     filter(arr => arr.length ===0),
-      //     distinctUntilChanged()
-      //   ).subscribe(() => {
-      //     if (!this.noDataReceived) {
-      //       this.setOpenState.emit(false)
+      //     select(atlasAppearance.selectors.getOverwrittenColormap),
+      //   ).subscribe(value => {
+      //     if (this.accordionIsExpanded) {
+      //       this.setColorMap$.next(!!value)
       //     }
       //   })
       // )
 
-
-      // this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
-      //   if (this.accordionIsExpanded && !ocm) {
-      //     this.setOpenState.emit(false)
-      //   }
-      // }))
+      if (this.accordionIsExpanded) {
+        this.setColorMap$.next(true)
+      }
 
       this.subscriptions.push(
         this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
@@ -233,23 +201,19 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           // )
           this.connectedAreas
         ]).subscribe(([flag, connectedAreas]) => {
-            console.log('flag')
-            console.log(flag)
+
           if (connectedAreas.length === 0) {
             this.noDataReceived = true
             return this.clearViewer()
           } else {
-            this.store$.dispatch(
-              ngViewerActionClearView({
-                payload: {
-                  [CONNECTIVITY_NAME_PLATE]: true
-                }
-              })
-            )
+            // this.store$.dispatch(
+            //   ngViewerActionClearView({
+            //     payload: {
+            //       [CONNECTIVITY_NAME_PLATE]: true
+            //     }
+            //   })
+            // )
             this.noDataReceived = false
-
-            // this.connectivityNumberReceived.emit(connectedAreas.length)
-            // this.connectedAreas = connectedAreas
 
             if (flag) {
               this.addNewColorMap()
@@ -311,24 +275,14 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
         })
     }
 
-    // private setConnectivityUrl() {
-    //   this.connectivityUrl = `${this.siibraApiUrl}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcellationId)}/regions/${encodeURIComponent(this.regionName)}/features/ConnectivityProfile`
-    // }
-
-    // private setProfileLoadUrl() {
-    //   const url = `${this.connectivityUrl}/${encodeURIComponent(this.selectedDataset)}`
-    //   this.connectivityLoadUrl.emit(url)
-    //   this.loadUrl = url
-    // }
-
     clearViewer() {
-      this.store$.dispatch(
-        ngViewerActionClearView({
-          payload: {
-            [CONNECTIVITY_NAME_PLATE]: false
-          }
-        })
-      )
+      // this.store$.dispatch(
+      //   ngViewerActionClearView({
+      //     payload: {
+      //       [CONNECTIVITY_NAME_PLATE]: false
+      //     }
+      //   })
+      // )
       this.connectedAreas.next([])
 
       return this.restoreDefaultColormap()
@@ -417,23 +371,16 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
 
 
     public ngOnDestroy(): void {
-      this.store$.dispatch(
-        ngViewerActionClearView({
-          payload: {
-            [CONNECTIVITY_NAME_PLATE]: false
-          }
-        })
-      )
+      // this.store$.dispatch(
+      //   ngViewerActionClearView({
+      //     payload: {
+      //       [CONNECTIVITY_NAME_PLATE]: false
+      //     }
+      //   })
+      // )
       this.restoreDefaultColormap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
-
-
-
-
-
-
-
 
 
     private floatConnectionNumbers
