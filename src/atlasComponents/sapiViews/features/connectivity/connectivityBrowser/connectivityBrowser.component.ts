@@ -133,7 +133,8 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     public allRegions = []
     private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
-
+    public fetching: boolean = false
+    public matrixString: string
     public noDataReceived = false
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
@@ -258,6 +259,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
 
     fetchConnectivity() {
+      this.fetching = true
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset)
         .then(ds=> {
           const matrixData = ds as SapiParcellationFeatureMatrixModel
@@ -270,9 +272,12 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
               })
               this.connectionsString = JSON.stringify(areas)
               this.connectedAreas.next(this.cleanConnectedAreas(areas))
-            })
 
-        })
+              this.matrixString = JSON.stringify(matrixData.columns.map((mc, i) => ([mc, ...matrix.rawArray[i]])))
+              console.log(this.matrixString)
+            })
+          this.fetching = false
+        }).catch(() => this.fetching = false)
     }
 
     clearViewer() {

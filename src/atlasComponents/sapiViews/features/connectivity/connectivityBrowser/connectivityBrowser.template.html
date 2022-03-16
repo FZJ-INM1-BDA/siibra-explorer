@@ -22,6 +22,7 @@
             *ngIf="regionName"
             [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
             [connections]="connectionsString"
+            [data-is-loading]="fetching"
             theme="dark"
             show-export="true"
             show-source="false"
@@ -99,10 +100,10 @@
             </button>
         </div>
     </hbp-connectivity-matrix-row>
-<!--    <full-connectivity-grid #fullConnectivityGrid-->
-<!--                            [loadurl]="fullConnectivityLoadUrl"-->
-<!--                            [name]="selectedDataset"-->
-<!--                            [description]="selectedDatasetDescription"-->
-<!--                            only-exporselectedDatasett="true">-->
-<!--    </full-connectivity-grid>-->
+    <full-connectivity-grid #fullConnectivityGrid
+                            [matrix]="matrixString"
+                            [datasetName]="selectedDatasetName"
+                            [datasetDescription]="selectedDatasetDescription"
+                            only-export="true">
+    </full-connectivity-grid>
 </div>
