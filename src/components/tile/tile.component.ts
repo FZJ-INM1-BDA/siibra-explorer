@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostBinding, HostListener, Input, OnChanges, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, HostListener, Input, OnChanges, Output } from "@angular/core";
 
 @Component({
   selector: 'tile-cmp',
@@ -6,7 +6,8 @@ import { Component, EventEmitter, HostBinding, HostListener, Input, OnChanges, O
   styleUrls: [
     './tile.style.css'
   ],
-  exportAs: 'tileCmp'
+  exportAs: 'tileCmp',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class TileCmp implements OnChanges{

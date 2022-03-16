@@ -16,6 +16,8 @@
   [iv-custom-comp],
   .iv-custom-comp
   {
+    color: mat.get-color-from-palette($foreground, text);
+    
     &.hoverable
     {
       padding: 1rem 1.3rem;

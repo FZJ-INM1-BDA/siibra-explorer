@@ -1,5 +1,5 @@
 export {
   DialogInfoModule,
-  DialogDirective,
-  DialogCmp,
 } from "./module"
+
+export { DialogDirective } from "./dialog.directive"

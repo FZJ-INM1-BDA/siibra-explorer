@@ -146,6 +146,13 @@ $transform-origin-maps: (
   }
 }
 
+.#{$nsp}-mt-a {
+  margin-top: auto!important;
+}
+.#{$nsp}-mb-a {
+  margin-bottom: auto!important;
+}
+
 $display-vars: none, block, inline-block, flex, inline-flex;
 @each $display-var in $display-vars {
   .d-#{$display-var}

@@ -124,6 +124,10 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.selectedRegions),
   )
 
+  public allAvailableRegions$ = this.store$.pipe(
+    select(atlasSelection.selectors.selectedParcAllRegions)
+  )
+
   public isStandaloneVolumes$ = this.store$.pipe(
     select(atlasSelection.selectors.standaloneVolumes),
     map(v => v.length > 0)

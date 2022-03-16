@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { ARIA_LABELS } from 'common/constants'
@@ -15,6 +15,7 @@ const {
   styleUrls: [
     './maximisePanelButton.style.css',
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class MaximisePanelButton {

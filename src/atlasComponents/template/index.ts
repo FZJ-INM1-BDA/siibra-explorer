@@ -1,1 +1,0 @@
-export { SiibraExplorerTemplateModule } from './module'

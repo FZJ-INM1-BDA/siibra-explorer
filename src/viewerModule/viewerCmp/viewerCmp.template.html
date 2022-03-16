@@ -456,15 +456,63 @@
   </div>
 </ng-template>
 
+<!-- region-hierarchy-tmpl -->
+
+<ng-template #regionHierarchyTmpl>
+  <div class="sxplr-w-100 sxplr-h-100">
+    <sxplr-sapiviews-core-rich-regionshierarchy
+      class="sxplr-w-100 sxplr-h-100"
+      [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
+      (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="navigateTo($event)"
+      >
+    </sxplr-sapiviews-core-rich-regionshierarchy>
+  </div>
+</ng-template>
 
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
-  <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all">
-    <region-text-search-autocomplete class="w-100 sxplr-pt-2 flex-shrink-0 flex-grow-0">
-    </region-text-search-autocomplete>
+  <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
+    
+    <ng-template #selectedRegionCheckTmpl let-region>
+      <ng-template #fallbackTmpl>
+        <button mat-icon-button
+          class="sxplr-mt-a sxplr-mb-a">
+          <i class="far fa-square"></i>
+        </button>
+      </ng-template>
+
+      <button *ngIf="selectedRegions$ | async | includes : region; else fallbackTmpl"
+        mat-icon-button
+        color="primary"
+        class="sxplr-mt-a sxplr-mb-a">
+        <i class="far fa-check-square"></i>
+      </button>
+    </ng-template>
+
+    <sxplr-sapiviews-core-rich-regionlistsearch
+      [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
+      [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="selectedRegions$ | async | getProperty : 0 | getProperty : 'name'"
+      [sxplr-sapiviews-core-rich-regionlistsearch-region-template-ref]="selectedRegionCheckTmpl"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)">
+
+      <button mat-icon-button
+        search-input-suffix
+        *ngIf="selectedRegions$ | async | getProperty : 'length'"
+        (click)="clearRoi()">
+        <i class="fas fa-times"></i>
+      </button>
+    </sxplr-sapiviews-core-rich-regionlistsearch>
+
+    <button mat-icon-button
+      color="primary"
+      [sxplr-dialog]="regionHierarchyTmpl"
+      sxplr-dialog-size="xl">
+      <i class="fas fa-sitemap"></i>
+    </button>
 
     <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
     </div>
+
   </div>
 </ng-template>
 

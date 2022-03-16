@@ -1,0 +1,48 @@
+cdk-virtual-scroll-viewport
+{
+  height: 100%;
+  min-height: 24rem;
+  overflow-x: hidden;
+}
+
+.virtual-scroll-container
+{
+  display: flex;
+  align-items: center;
+}
+
+.ph-container
+{
+  transform: translate(20px, -50%);
+  flex: auto 0 0;
+  height: 100%;
+}
+
+.ph-container .ph
+{
+  height: 100%;
+  width: 2rem;
+  display: inline-block;
+}
+
+.ph-container .lvl:not(.lvl-hide-left-border)
+{
+  border-left: 1px dashed currentColor;
+}
+
+.ph-container .lvl:last-child
+{
+  border-bottom: 1px dashed currentColor;
+}
+
+
+cdk-tree-node .node-render-tmpl
+{
+  flex: 0 1 1;
+  display: inline-block;
+}
+
+.label-toggles:hover
+{
+  cursor: default;
+}

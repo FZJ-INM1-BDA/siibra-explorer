@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core";
-import { FilterRowsByVisbilityPipe } from "src/components/flatTree/filterRowsByVisibility.pipe";
 import { KeyListner } from "./directives/keyDownListener.directive";
 
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
@@ -26,7 +25,6 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     LayoutModule
   ],
   declarations: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
     SafeResourcePipe,
@@ -47,7 +45,6 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     MergeObjPipe,
   ],
   exports: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
     SafeResourcePipe,

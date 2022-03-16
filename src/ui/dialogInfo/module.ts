@@ -1,38 +1,19 @@
-import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { ComponentsModule } from "src/components";
-import { AngularMaterialModule } from "src/sharedModules";
-import { UtilModule } from "src/util";
-import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./const";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { DialogDirective } from "./dialog.directive"
-import { DialogCmp } from "./dialog/dialog.component"
 
 @NgModule({
   imports: [
-    CommonModule,
-    AngularMaterialModule,
-    UtilModule,
-    ComponentsModule,
+    MatSnackBarModule,
+    MatDialogModule,
   ],
   declarations: [
     DialogDirective,
-    DialogCmp,
   ],
   exports: [
     DialogDirective,
-    DialogCmp,
   ],
-  providers: [
-    {
-      provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
-      useValue: DialogCmp
-    }
-  ]
 })
 
-export class DialogInfoModule{}
-
-export {
-  DialogDirective,
-  DialogCmp,
-}
+export class DialogModule{}

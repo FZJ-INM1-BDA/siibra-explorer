@@ -1,0 +1,31 @@
+<form class="iv-custom-comp text sxplr-w-100">
+  <mat-form-field class="sxplr-w-100">
+    <input
+      [placeholder]="placeholderText"
+      type="text"
+      matInput
+      name="searchTerm"
+      [formControl]="searchFormControl"
+      autocomplete="off">
+
+    <!-- search input suffix -->
+    <div matSuffix>
+      <ng-content select="[search-input-suffix]"></ng-content>
+    </div>
+
+  </mat-form-field>
+</form>
+
+<ng-template #tmplRef let-region>
+  <div class="mat-body sxplr-d-flex sxplr-align-items-center sxplr-h-100 region-tmpl"
+    [innerHTML]="region.name | hightlightPipe : searchTerm">
+  </div>
+</ng-template>
+
+<sxplr-flat-hierarchy-tree-view
+  [sxplr-flat-hierarchy-nodes]="passedRegions"
+  [sxplr-flat-hierarchy-is-parent]="isParent"
+  [sxplr-flat-hierarchy-render-node-tmpl]="tmplRef"
+  [sxplr-flat-hierarchy-tree-view-expand-on-init]="true"
+  (sxplr-flat-hierarchy-tree-view-node-clicked)="nodeClicked.emit($event)">
+</sxplr-flat-hierarchy-tree-view>

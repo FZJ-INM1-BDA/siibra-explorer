@@ -1,8 +1,8 @@
 import { animate, state, style, transition, trigger } from "@angular/animations";
-import { Component, ElementRef, HostBinding, Input, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, map, mapTo, shareReplay, tap, withLatestFrom } from "rxjs/operators";
+import { distinctUntilChanged, mapTo, shareReplay } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
@@ -38,6 +38,7 @@ import { SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/
       ])
     ])
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SapiViewsCoreAtlasAtlasTmplParcSelector {

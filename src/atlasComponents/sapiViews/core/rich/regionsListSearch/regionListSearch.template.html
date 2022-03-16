@@ -1,0 +1,53 @@
+<form class="iv-custom-comp text sxplr-w-100">
+  <mat-form-field
+    class="sxplr-w-100"
+    floatLabel="never">
+    <input
+      placeholder="Search for regions"
+      [value]="currentSearch"
+      #trigger="matAutocompleteTrigger"
+      type="text"
+      (focus)="onInputFocus()"
+      matInput
+      name="searchTerm"
+      [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
+      [formControl]="searchFormControl"
+      [matAutocomplete]="auto">
+
+    <!-- search input suffix -->
+    <div matSuffix>
+      <ng-content select="[search-input-suffix]"></ng-content>
+    </div>
+
+  </mat-form-field>
+</form>
+
+
+<mat-autocomplete
+  panelWidth="auto"
+  (optionSelected)="optionSelected($event)"
+  autoActiveFirstOption
+  #auto="matAutocomplete"
+  [displayWith]="displayFn">
+  <mat-option
+    *ngFor="let region of autocompleteList$ | async"
+    [value]="region">
+
+    <div class="sxplr-d-flex sxplr-justify-content-space-between">
+
+      <sxplr-sapiviews-core-region-region-list-item
+        [sxplr-sapiviews-core-region-region]="region">
+      </sxplr-sapiviews-core-region-region-list-item>
+      
+      <ng-template
+        [ngIf]="regionTemplateRef"
+        [ngTemplateOutlet]="regionTemplateRef"
+        [ngTemplateOutletContext]="{
+          $implicit: region
+        }">
+        
+      </ng-template>
+    </div>
+
+  </mat-option>
+</mat-autocomplete>

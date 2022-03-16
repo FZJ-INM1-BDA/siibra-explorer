@@ -1,87 +1,58 @@
-import { Directive, HostListener, Inject, Input, Optional } from "@angular/core";
+import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN, TOverwriteShowDatasetDialog } from "src/util/interfaces";
-import { IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./const";
+
+type DialogSize = 's' | 'm' | 'l' | 'xl'
+
+const sizeDict: Record<DialogSize, Partial<MatDialogConfig>> = {
+  's': {
+    width: '25vw',
+    height: '25vh'
+  },
+  'm': {
+    width: '50vw',
+    height: '50vh'
+  },
+  'l': {
+    width: '75vw',
+    height: '75vh'
+  },
+  'xl': {
+    width: '90vw',
+    height: '90vh'
+  }
+}
 
 @Directive({
-  selector: `[iav-dataset-show-dataset-dialog]`,
-  exportAs: 'iavDatasetShowDatasetDialog',
+  selector: `[sxplr-dialog]`,
+  exportAs: 'sxplrDialog',
 })
 
 export class DialogDirective{
 
-  static defaultDialogConfig: MatDialogConfig = {
-    autoFocus: false
-  }
+  @Input('sxplr-dialog')
+  templateRef: TemplateRef<unknown>
 
-  @Input('iav-dataset-show-dataset-dialog-name')
-  name: string
+  @Input('sxplr-dialog-size')
+  size: DialogSize = 'm'
 
-  @Input('iav-dataset-show-dataset-dialog-description')
-  description: string
-
-  @Input('iav-dataset-show-dataset-dialog-kgschema')
-  set kgSchema(val) {
-    throw new Error(`setting kgschema & kgid has been deprecated`)
-  }
-
-  @Input('iav-dataset-show-dataset-dialog-kgid')
-  set kgId(val) {
-    throw new Error(`setting kgschema & kgid has been deprecated`)
-  }
-
-  @Input('iav-dataset-show-dataset-dialog-fullid')
-  set fullId(val) {
-    throw new Error(`setting fullid has been deprecated`)
-  }
-
-
-  @Input('iav-dataset-show-dataset-dialog-urls')
-  urls: {
-    cite: string
-    doi: string
-  }[] = []
-
-  @Input('iav-dataset-show-dataset-dialog-ignore-overwrite')
-  ignoreOverwrite = false
-
+  @Input('sxplr-dialog-data')
+  data: unknown
 
   constructor(
     private matDialog: MatDialog,
     private snackbar: MatSnackBar,
-    @Optional() @Inject(IAV_DATASET_SHOW_DATASET_DIALOG_CMP) private dialogCmp: any,
-    @Optional() @Inject(OVERWRITE_SHOW_DATASET_DIALOG_TOKEN) private overwriteFn: TOverwriteShowDatasetDialog
-  ){ }
+  ){
+  }
 
   @HostListener('click')
   onClick(){
-    const data = (() => {
-      if (this.fullId || (this.kgSchema && this.kgId)) {
-        return {
-          fullId: this.fullId || `${this.kgSchema}/${this.kgId}`
-        }
-      }
-      if (this.name || this.description) {
-        const { name, description, urls } = this
-        return { name, description, urls, useClassicUi: true }
-      }
-    })()
-
-    if (!data) {
-      return this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
+    if (!this.templateRef) {
+      return this.snackbar.open(`Cannot show dialog. sxplr-dialog template not provided`)
     }
-
-    if (!this.ignoreOverwrite && this.overwriteFn) {
-      return this.overwriteFn(data)
-    }
-
-    if (!this.dialogCmp) throw new Error(`IAV_DATASET_SHOW_DATASET_DIALOG_CMP not provided!`)
-    const { useClassicUi } = data
-    this.matDialog.open(this.dialogCmp, {
-      ...DialogDirective.defaultDialogConfig,
-      data,
-      ...(useClassicUi ? {} : { panelClass: ['no-padding-dialog'] })
+    this.matDialog.open(this.templateRef, {
+      data: this.data,
+      ...sizeDict[this.size]
     })
   }
 }

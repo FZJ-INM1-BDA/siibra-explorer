@@ -64,3 +64,20 @@ sxplr-sapiviews-core-region-region-chip [prefix]
 {
   padding-left:5rem;
 }
+
+.auto-complete-container
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.auto-complete-container > sxplr-sapiviews-core-rich-regionlistsearch
+{
+  flex: 1 1 0;
+}
+
+.auto-complete-container > button
+{
+  flex: 0 0 auto;
+}

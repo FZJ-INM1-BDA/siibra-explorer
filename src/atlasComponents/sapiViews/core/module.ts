@@ -4,6 +4,7 @@ import { SapiViewsCoreAtlasModule } from "./atlas/module";
 import { SapiViewsCoreDatasetModule } from "./datasets";
 import { SapiViewsCoreParcellationModule } from "./parcellation/module";
 import { SapiViewsCoreRegionModule } from "./region";
+import { SapiViewsCoreRichModule } from "./rich/module";
 import { SapiViewsCoreSpaceModule } from "./space";
 
 @NgModule({
@@ -14,6 +15,7 @@ import { SapiViewsCoreSpaceModule } from "./space";
     SapiViewsCoreAtlasModule,
     SapiViewsCoreSpaceModule,
     SapiViewsCoreParcellationModule,
+    SapiViewsCoreRichModule,
   ],
   exports: [
     SapiViewsCoreDatasetModule,
@@ -21,6 +23,7 @@ import { SapiViewsCoreSpaceModule } from "./space";
     SapiViewsCoreAtlasModule,
     SapiViewsCoreSpaceModule,
     SapiViewsCoreParcellationModule,
+    SapiViewsCoreRichModule,
   ]
 })
 
