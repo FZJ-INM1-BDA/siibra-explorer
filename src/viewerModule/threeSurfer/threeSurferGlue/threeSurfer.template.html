@@ -1,5 +1,5 @@
 <span *ngIf="mouseoverText"
-  class="mouseover iv-custom-comp text">
+  class="mouseover sxplr-custom-cmp text">
   {{ mouseoverText }}
 </span>
 
@@ -7,8 +7,6 @@
 
   <!-- selector & configurator -->
   <button mat-icon-button
-    [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document' }]"
-    (iav-key-event)="toggleMode()"
     color="primary"
     class="pe-all"
     [matMenuTriggerFor]="fsModeSelMenu">
@@ -20,30 +18,27 @@
 <!-- selector/configurator menu -->
 <mat-menu #fsModeSelMenu="matMenu">
 
-  <div class="iv-custom-comp text sxplr-pl-2 m-2">
-    <mat-checkbox *ngFor="let key of allKeys"
+  <div class="sxplr-custom-cmp text sxplr-pl-2 m-2">
+    <mat-checkbox *ngFor="let item of lateralityMeshRecord | keyvalue"
       class="d-block"
       iav-stop="click"
-      (ngModelChange)="handleCheckBox(key, $event)"
-      [(ngModel)]="key.checked">
-      {{ key.name }}
+      (change)="updateMeshVisibility()"
+      [(ngModel)]="item.value.visible">
+      {{ item.key }}
     </mat-checkbox>
   </div>
   <mat-divider></mat-divider>
-  <button *ngFor="let mode of modes"
+
+  <button *ngFor="let surfaceLayer of threeSurferSurfaceLayers$ | async"
     mat-menu-item
-    (click)="loadMode(mode)"
+    (click)="switchSurfaceLayer(surfaceLayer)"
     color="primary">
     <mat-icon
       fontSet="fas"
-      [fontIcon]="mode.name === selectedMode ? 'fa-circle' : 'fa-none'">
+      [fontIcon]="surfaceLayer['@id'] === (selectedSurfaceLayerId$ | async) ? 'fa-circle' : 'fa-none'">
     </mat-icon>
     <span>
-      {{ mode.name }}
+      {{ surfaceLayer.metadata.shortName }}
     </span>
-    <markdown-dom *ngIf="mode.name === selectedMode"
-      class="d-inline-block"
-      markdown="`[q]`">
-    </markdown-dom>
   </button>
 </mat-menu>

@@ -81,3 +81,11 @@ sxplr-sapiviews-core-region-region-chip [prefix]
 {
   flex: 0 0 auto;
 }
+
+.min-tray-explr-btn
+{
+  width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  margin-top: -1rem;
+}

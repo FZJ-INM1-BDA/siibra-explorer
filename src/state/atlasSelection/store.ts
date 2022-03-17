@@ -79,7 +79,31 @@ const reducer = createReducer(
     }
   ),
   on(
-    actions.selectRegions,
+    actions.selectRegion,
+    (state, { region }) => {
+      /**
+       * if roi does not have visualizedIn defined
+       * or internal identifier
+       * 
+       * ignore
+       */
+      if (
+        !region.hasAnnotation?.visualizedIn
+        && region.hasAnnotation?.internalIdentifier === 'unknown'
+      ) {
+        return { ...state }
+      }
+      const selected = state.selectedRegions.includes(region)
+      return {
+        ...state,
+        selectedRegions: selected
+          ? [ ]
+          : [ region ]
+      }
+    }
+  ),
+  on(
+    actions.setSelectedRegions,
     (state, { regions }) => {
       return {
         ...state,

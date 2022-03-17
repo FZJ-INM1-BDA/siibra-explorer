@@ -36,6 +36,9 @@ export class SapiViewsCoreRichRegionsHierarchy {
     )
   }
 
+  @Input('sxplr-sapiviews-core-rich-regionshierarchy-accent-regions')
+  accentedRegions: SapiRegionModel[] = []
+
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-placeholder')
   placeholderText: string = 'Search all regions'
 

@@ -1,4 +1,4 @@
-import { IContext } from './util'
+import { SapiRegionModel } from 'src/atlasComponents/sapi'
 
 export type TThreeSurferMesh = {
   colormap: string
@@ -6,20 +6,11 @@ export type TThreeSurferMesh = {
   hemisphere: 'left' | 'right'
 }
 
-export type TThreeSurferMode = {
-  name: string
-  meshes: TThreeSurferMesh[]
-}
-
-export type TThreeSurferConfig = {
-  ['@context']: IContext
-  modes: TThreeSurferMode[]
-}
-
 export type TThreeSurferContextInfo = {
   position: number[]
   faceIndex: number
   vertexIndices: number[]
   fsversion: string
-  _mouseoverRegion: { name: string, error?: string }[]
+  regions: SapiRegionModel[]
+  error?: string
 }

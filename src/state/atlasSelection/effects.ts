@@ -1,14 +1,15 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, from, merge, of } from "rxjs";
+import { forkJoin, merge, of } from "rxjs";
 import { filter, map, mapTo, switchMap, switchMapTo, withLatestFrom } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { SAPI, SAPIRegion, SapiRegionModel } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
 import { fromRootStore } from "./util";
 import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
 import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
+import { atlasAppearance } from "..";
 
 @Injectable()
 export class Effect {
@@ -62,6 +63,38 @@ export class Effect {
     )
   ))
 
+  onATPSelectionClearBaseLayerColorMap = createEffect(() => this.store.pipe(
+    select(selectors.selectedParcAllRegions),
+    withLatestFrom(
+      this.store.pipe(
+        select(atlasAppearance.selectors.customLayers),
+        map(layers => layers.filter(l => l.clType === "baselayer/colormap"))
+      )
+    ),
+    switchMap(([regions, layers]) => {
+      const map = new WeakMap<SapiRegionModel, number[]>()
+      for (const region of regions) {
+        map.set(region, SAPIRegion.GetDisplayColor(region))
+      }
+      const actions = [
+        ...layers.map(({ id }) =>
+          atlasAppearance.actions.removeCustomLayer({
+            id
+          })
+        ),
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            clType: "baselayer/colormap",
+            id: 'base-colormap-id',
+            colormap: map
+          }
+        })
+      ]
+      return of(...actions)
+    })
+  ))
+
+
   onAtlasSelClearStandAloneVolumes = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     mapTo(actions.setStandAloneVolumes({
@@ -71,7 +104,7 @@ export class Effect {
 
   onClearRegion = createEffect(() => this.action.pipe(
     ofType(actions.clearSelectedRegions),
-    mapTo(actions.selectRegions({
+    mapTo(actions.setSelectedRegions({
       regions: []
     }))
   ))
@@ -146,7 +179,7 @@ export class Effect {
   ).pipe(
     switchMapTo(
       of(
-        actions.selectRegions({
+        actions.setSelectedRegions({
           regions: []
         }),
         actions.setSelectedParcellationAllRegions({
@@ -166,7 +199,7 @@ export class Effect {
     map(([ { region }, regions ]) => {
       const selectedRegionsIndicies = regions.map(r => r["@id"])
       const roiIndex = selectedRegionsIndicies.indexOf(region["@id"])
-      return actions.selectRegions({
+      return actions.setSelectedRegions({
         regions: roiIndex >= 0
           ? [...regions.slice(0, roiIndex), ...regions.slice(roiIndex + 1)]
           : [...regions, region]

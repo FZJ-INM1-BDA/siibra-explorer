@@ -15,7 +15,7 @@ import { TreeNode } from "../const"
 
 export class SxplrFlatHierarchyTreeView<T extends object> implements OnChanges{
   @HostBinding('class')
-  class = 'iv-custom-comp'
+  class = 'sxplr-custom-cmp'
 
   @Input('sxplr-flat-hierarchy-nodes')
   nodes: T[] = []

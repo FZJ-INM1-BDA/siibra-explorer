@@ -13,8 +13,8 @@
   $accent: map-get($color-config, accent);
   $warn: map-get($color-config, warn);
 
-  [iv-custom-comp],
-  .iv-custom-comp
+  [sxplr-custom-cmp],
+  .sxplr-custom-cmp
   {
     color: mat.get-color-from-palette($foreground, text);
     

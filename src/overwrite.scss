@@ -244,3 +244,16 @@ $flex-wrap-vars: nowrap, wrap, wrap-reverse;
     flex-wrap: $flex-wrap-var;
   }
 }
+$flex-directions: row,column;
+@each $flex-direction in $flex-directions {
+  .#{$nsp}-flex-#{$flex-direction} {
+    flex-direction: $flex-direction;
+  }
+}
+.#{$nsp}-flex-var {
+  flex: 1 1 0px;
+}
+
+.#{$nsp}-flex-static {
+  flex: 0 0 auto;
+}

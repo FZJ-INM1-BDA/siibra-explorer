@@ -356,7 +356,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         select(atlasAppearance.selectors.customLayers),
         debounceTime(16),
         map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
-        distinctUntilChanged((o, n) => arrayEqual(o, n, (oi, ni) => oi.id === ni.id)),
+        distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
         filter(layers => layers.length > 0),
         map(ngBaseLayers => {
           return {
@@ -633,17 +633,17 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
           return newMainMap
         },
         applyLayersColourMap: (map) => {
-          if (!this.layerCtrlService) {
-            throw new Error(`layerCtrlService not injected. Cannot call getLayersSegmentColourMap`)
-          }
-          const obj: IColorMap = {}
-          for (const [ key, value ] of map.entries()) {
-            const cmap = obj[key] = {}
-            for (const [ labelIdx, rgb ] of value.entries()) {
-              cmap[Number(labelIdx)] = rgb
-            }
-          }
-          this.layerCtrlService.overwriteColorMap$.next(obj)
+          // if (!this.layerCtrlService) {
+          //   throw new Error(`layerCtrlService not injected. Cannot call getLayersSegmentColourMap`)
+          // }
+          // const obj: IColorMap = {}
+          // for (const [ key, value ] of map.entries()) {
+          //   const cmap = obj[key] = {}
+          //   for (const [ labelIdx, rgb ] of value.entries()) {
+          //     cmap[Number(labelIdx)] = rgb
+          //   }
+          // }
+          // this.layerCtrlService.overwriteColorMap$.next(obj)
         },
         /**
          * TODO go via layerCtrl.service
@@ -716,8 +716,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
-      atlasSelection.actions.selectRegions({
-        regions: trueOnhoverSegments.slice(0, 1)
+      atlasSelection.actions.selectRegion({
+        region: trueOnhoverSegments[0]
       })
     )
     return true

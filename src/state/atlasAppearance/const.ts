@@ -1,4 +1,4 @@
-import { SAPIRegion } from "src/atlasComponents/sapi/core"
+import { SapiRegionModel } from "src/atlasComponents/sapi"
 export const nameSpace = `[state.atlasAppearance]`
 
 type CustomLayerBase = {
@@ -7,7 +7,20 @@ type CustomLayerBase = {
 
 export type ColorMapCustomLayer = {
   clType: 'customlayer/colormap' | 'baselayer/colormap'
-  colormap: WeakMap<SAPIRegion, number[]>
+  colormap: WeakMap<SapiRegionModel, number[]>
+} & CustomLayerBase
+
+export type ThreeSurferCustomLayer = {
+  clType: 'baselayer/threesurfer'
+  source: string
+  laterality: 'left' | 'right'
+  name: string
+} & CustomLayerBase
+
+export type ThreeSurferCustomLabelLayer = {
+  clType: 'baselayer/threesurfer-label'
+  source: string
+  laterality: 'left' | 'right'
 } & CustomLayerBase
 
 export type NgLayerCustomLayer = {
@@ -36,4 +49,4 @@ export type NgLayerCustomLayer = {
  * - clType facilitates viewer on how to interprete the custom layer
  * - id allows custom layer to be removed, if necessary
  */
-export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer
+export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer | ThreeSurferCustomLayer | ThreeSurferCustomLabelLayer

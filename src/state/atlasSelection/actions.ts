@@ -30,8 +30,15 @@ export const setSelectedParcellationAllRegions = createAction(
   }>()
 )
 
-export const selectRegions = createAction(
-  `${nameSpace} selectRegions`,
+export const selectRegion = createAction(
+  `${nameSpace} selectRegion`,
+  props<{
+    region: SapiRegionModel
+  }>()
+)
+
+export const setSelectedRegions = createAction(
+  `${nameSpace} setSelectedRegions`,
   props<{
     regions: SapiRegionModel[]
   }>()

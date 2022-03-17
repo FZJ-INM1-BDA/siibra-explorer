@@ -59,9 +59,6 @@ export type TViewerEvent<T extends keyof IViewerCtx> = TViewerEventViewerLoaded 
 export type TSupportedViewers = keyof IViewerCtx
 
 export interface IViewer<K extends keyof IViewerCtx> {
-  
-  selectedTemplate: any
-  selectedParcellation: any
   viewerCtrlHandler?: IViewerCtrl
   viewerEvent: EventEmitter<TViewerEvent<K>>
 }

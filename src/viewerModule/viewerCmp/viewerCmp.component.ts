@@ -289,7 +289,7 @@ export class ViewerCmp implements OnDestroy {
       }
 
       if (context.viewerType === 'threeSurfer') {
-        hoveredRegions = (context as TContextArg<'threeSurfer'>).payload._mouseoverRegion
+        hoveredRegions = (context as TContextArg<'threeSurfer'>).payload.regions
       }
 
       if (hoveredRegions.length > 0) {
@@ -324,8 +324,8 @@ export class ViewerCmp implements OnDestroy {
 
   public selectRoi(roi: SapiRegionModel) {
     this.store$.dispatch(
-      actions.selectRegions({
-        regions: [ roi ]
+      actions.selectRegion({
+        region: roi
       })
     )
   }

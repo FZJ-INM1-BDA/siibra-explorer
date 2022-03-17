@@ -4,7 +4,7 @@ import { strToRgb, hexToRgb } from 'common/util'
 
 export class SAPIRegion{
 
-  static GetDisplayColor(region: SapiRegionModel){
+  static GetDisplayColor(region: SapiRegionModel): [number, number, number]{
     if (!region) {
       throw new Error(`region must be provided!`)
     }

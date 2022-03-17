@@ -167,6 +167,7 @@ const BACKCOMAP_KEY_DICT = {
 export function getTmplNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spaceVolumes: SapiVolumeModel[]): Record<string, NgLayerSpec>{
   const ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], "tmplImage")}`
   const tmplImage = spaceVolumes.find(v => "neuroglancer/precomputed" in v.data.detail)
+  if (!tmplImage) return {}
   return {
     [ngId]: {
       source: `precomputed://${tmplImage.data.url.replace(/^precomputed:\/\//, '')}`,
@@ -238,24 +239,26 @@ export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atl
 }
 
 export const fromRootStore = {
-  getNgLayers: (store: Store, sapiSvc: SAPI) => pipe(
-    select(atlasSelection.selectors.selectedATP),
-    switchMap(ATP => 
-      forkJoin({
-        tmplVolumes: store.pipe(
-          nehubaStoreFromRootStore.getTmplVolumes(sapiSvc),
-        ),
-        tmplAuxMeshVolumes: store.pipe(
-          nehubaStoreFromRootStore.getAuxMeshVolumes(sapiSvc),
-        ),
-        parcVolumes: store.pipe(
-          nehubaStoreFromRootStore.getParcVolumes(sapiSvc),
+  getNgLayers: (store: Store, sapiSvc: SAPI) => {
+    return pipe(
+      select(atlasSelection.selectors.selectedATP),
+      switchMap(ATP =>
+        forkJoin({
+          tmplVolumes: store.pipe(
+            nehubaStoreFromRootStore.getTmplVolumes(sapiSvc),
+          ),
+          tmplAuxMeshVolumes: store.pipe(
+            nehubaStoreFromRootStore.getAuxMeshVolumes(sapiSvc),
+          ),
+          parcVolumes: store.pipe(
+            nehubaStoreFromRootStore.getParcVolumes(sapiSvc),
+          )
+        }).pipe(
+          map(volumes => getNgLayersFromVolumesATP(volumes, ATP))
         )
-      }).pipe(
-        map(volumes => getNgLayersFromVolumesATP(volumes, ATP))
       )
     )
-  )
+  }
 }
 
 export function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {

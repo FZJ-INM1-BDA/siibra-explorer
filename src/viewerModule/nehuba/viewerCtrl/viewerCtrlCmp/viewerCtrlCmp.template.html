@@ -1,13 +1,13 @@
 <mat-divider class="mt-2 mb-2"></mat-divider>
 
-<h3 class="iv-custom-comp text mat-h3">
+<h3 class="sxplr-custom-cmp text mat-h3">
   Perspective View
 </h3>
 
 <mat-slide-toggle [(ngModel)]="removeOctantFlag"
   [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
   name="remove-frontal-octant">
-  <span class="iv-custom-comp text">
+  <span class="sxplr-custom-cmp text">
     Remove frontal octant
   </span>
 </mat-slide-toggle>
@@ -19,7 +19,7 @@
       [formControlName]="auxMesh['@id']"
       class="d-block"
       [name]="'toggle-aux-mesh-' + auxMesh['@id']">
-      <span class="iv-custom-comp text">
+      <span class="sxplr-custom-cmp text">
         {{ auxMesh.displayName || auxMesh.name }}
       </span>
     </mat-slide-toggle>

@@ -97,7 +97,6 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     provide: MAT_DIALOG_DEFAULT_OPTIONS,
     useValue: {
       ...defaultDialogOption,
-      panelClass: 'iav-dialog-class',
     },
   }],
 })

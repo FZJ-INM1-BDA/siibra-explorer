@@ -70,10 +70,6 @@ export class SapiViewsCoreRichRegionListSearch {
     return region?.name || ''
   }
 
-  onInputFocus(){
-    this.regions[0].name.includes('left')
-  }
-
   optionSelected(opt: MatAutocompleteSelectedEvent) {
     const selectedRegion = opt.option.value as SapiRegionModel
     this.onOptionSelected.emit(selectedRegion)

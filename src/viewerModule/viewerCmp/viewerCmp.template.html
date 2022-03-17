@@ -23,7 +23,7 @@
     (@openClose.done)="$event.toState === 'closed' && drawer.close()"
     [autoFocus]="false"
     [disableClose]="true"
-    class="iv-custom-comp darker-bg sxplr-p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
+    class="sxplr-custom-cmp darker-bg sxplr-p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
 
     <!-- entry template -->
     <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="regularTmpl">
@@ -204,7 +204,7 @@
 
     <!-- such a gross implementation -->
     <!-- TODO fix this -->
-    <div class="sxplr-mt-1-n w-100 sxplr-pl-1 sxplr-pr-1"
+    <div class="min-tray-explr-btn"
       sxplr-sapiviews-core-region
       [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
       [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
@@ -224,7 +224,7 @@
           'lighttheme': !sapiRegion.regionDarkmode
         }"
         [style.backgroundColor]="sapiRegion.regionRgbString">
-        <span class="text iv-custom-comp">
+        <span class="text sxplr-custom-cmp">
           Explore
         </span>
       </button>
@@ -335,7 +335,7 @@
   </top-menu-cmp>
 
   <sxplr-sapiviews-core-atlas-dropdown-selector
-    class="v-align-top sxplr-pt-2 pe-all mt-2 iv-custom-comp bg card m-2 mat-elevation-z2 d-inline-block"
+    class="v-align-top sxplr-pt-2 pe-all mt-2 sxplr-custom-cmp bg card m-2 mat-elevation-z2 d-inline-block"
     quick-tour
     [quick-tour-description]="quickTourAtlasSelector.description"
     [quick-tour-order]="quickTourAtlasSelector.order">
@@ -434,9 +434,7 @@
       <!-- three surfer (free surfer viewer) -->
       <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'threeSurfer'"
-        (viewerEvent)="handleViewerEvent($event)"
-        [selectedTemplate]="templateSelected$ | async"
-        [selectedParcellation]="parcellationSelected$ | async">
+        (viewerEvent)="handleViewerEvent($event)">
       </three-surfer-glue-cmp>
 
       <!-- if not supported, show not supported message -->
@@ -459,19 +457,24 @@
 <!-- region-hierarchy-tmpl -->
 
 <ng-template #regionHierarchyTmpl>
-  <div class="sxplr-w-100 sxplr-h-100">
+  <div class="sxplr-d-flex sxplr-flex-column sxplr-h-100">
     <sxplr-sapiviews-core-rich-regionshierarchy
-      class="sxplr-w-100 sxplr-h-100"
+      class="sxplr-w-100 sxplr-flex-var"
       [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
-      (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="navigateTo($event)"
+      [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="selectedRegions$ | async"
+      (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
       >
     </sxplr-sapiviews-core-rich-regionshierarchy>
+  
+    <mat-dialog-actions align="center" class="sxplr-flex-static">
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>
   </div>
 </ng-template>
 
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
-  <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
+  <div class="sxplr-custom-cmp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
     
     <ng-template #selectedRegionCheckTmpl let-region>
       <ng-template #fallbackTmpl>
@@ -620,7 +623,7 @@
     [matBadge]="badge"
     [matBadgeColor]="badgeColor || 'warn'">
 
-    <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+    <span [ngClass]="{'sxplr-custom-cmp  text': !!customColor}">
       <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
     </span>
   </button>
@@ -969,7 +972,7 @@
       <div *ngFor="let feature of spatialFeatureBbox.features$ | async"
         mat-ripple
         (click)="showDataset(feature)"
-        class="iv-custom-comp hoverable w-100 overflow-hidden text-overflow-ellipses">
+        class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
         {{ feature.name }}
       </div>
     </mat-card>
