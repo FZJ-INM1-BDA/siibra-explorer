@@ -60,4 +60,16 @@ export function getStoreEffects() {
   ]
 }
 
-export { MainState } from "./const"
+import { MainState } from "./const"
+
+export { MainState }
+
+export const defaultState: MainState = {
+  [userPreference.nameSpace]: userPreference.defaultState,
+  [atlasSelection.nameSpace]: atlasSelection.defaultState,
+  [userInterface.nameSpace]: userInterface.defaultState,
+  [userInteraction.nameSpace]: userInteraction.defaultState,
+  [annotation.nameSpace]: annotation.defaultState,
+  [plugins.nameSpace]: plugins.defaultState,
+  [atlasAppearance.nameSpace]: atlasAppearance.defaultState,
+}

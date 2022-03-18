@@ -43,9 +43,9 @@ export const fromRootStore = {
     filter(({ parcellation }) => !!parcellation),
     switchMap(({ atlas, template, parcellation }) => {
       return forkJoin([
-        sapi.registry.get<SAPIParcellation>(parcellation["@id"])
-          .getRegions(template["@id"])
-          .then(regions => {
+        sapi.registry.get<SAPIParcellation>(parcellation["@id"]).getRegions(template["@id"]).pipe(
+          map(regions => {
+
             const returnArr: ParcVolumeSpec[] = []
             for (const r of regions) {
               const source = r?.hasAnnotation?.visualizedIn?.["@id"]
@@ -71,7 +71,8 @@ export const fromRootStore = {
               })
             }
             return returnArr
-          }),
+          })
+        ),
         sapi.registry.get<SAPIParcellation>(parcellation["@id"]).getVolumes()
       ]).pipe(
         map(([ volumeSrcs, volumes ]) => {

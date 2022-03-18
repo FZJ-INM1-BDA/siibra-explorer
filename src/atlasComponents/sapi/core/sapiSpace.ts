@@ -2,7 +2,8 @@ import { Observable } from "rxjs"
 import { SAPI } from '../sapi.service'
 import { camelToSnake } from 'common/util'
 import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types"
-import { SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel } from "../type"
+import { SapiQueryParam, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel } from "../type"
+import { tap } from "rxjs/operators"
 
 type FeatureResponse = {
   features: {
@@ -37,9 +38,11 @@ export class SAPISpace{
 
   constructor(private sapi: SAPI, public atlasId: string, public id: string){}
 
-  getModalities(): Observable<FeatureResponse> {
-    return this.sapi.http.get<FeatureResponse>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`
+  getModalities(param?: SapiQueryParam): Observable<FeatureResponse> {
+    return this.sapi.httpGet<FeatureResponse>(
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`,
+      null,
+      param
     )
   }
 
@@ -56,9 +59,11 @@ export class SAPISpace{
     )
   }
 
-  getDetail(): Promise<SapiSpaceModel>{
-    return this.sapi.cachedGet<SapiSpaceModel>(
+  getDetail(param?: SapiQueryParam): Observable<SapiSpaceModel>{
+    return this.sapi.httpGet<SapiSpaceModel>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}`,
+      null,
+      param
     )
   }
 

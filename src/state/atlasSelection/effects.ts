@@ -19,10 +19,12 @@ export class Effect {
     filter(action => !!action.atlas),
     switchMap(({ atlas }) => {
       const selectedParc = atlas.parcellations.find(p => /290/.test(p["@id"])) || atlas.parcellations[0]
-      return this.sapiSvc.getParcDetail(atlas["@id"], selectedParc["@id"], 100).then(
-        parcellation => ({
-          parcellation,
-          atlas
+      return this.sapiSvc.getParcDetail(atlas["@id"], selectedParc["@id"], { priority: 10 }).pipe(
+        map(parcellation => {
+          return {
+            parcellation,
+            atlas
+          }
         })
       )
     }),

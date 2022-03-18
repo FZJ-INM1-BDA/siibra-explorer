@@ -3,13 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { BS_ENDPOINT } from 'src/util/constants';
 import { map, shareReplay, take, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel } from "./type";
+import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel } from "./type";
 import { CachedFunction, getExportNehuba } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
+import { PRIORITY_HEADER } from "src/util/priority";
+import { Observable } from "rxjs";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.2.0'
@@ -56,26 +58,17 @@ export class SAPI{
     return new SAPIRegion(this, atlasId, parcId, regionId)
   }
 
-  @CachedFunction({
-    serialization: (atlasId, spaceId, ...args) => `sapi::getSpaceDetail::${atlasId}::${spaceId}`
-  })
-  getSpaceDetail(atlasId: string, spaceId: string, priority = 0): Promise<SapiSpaceModel> {
-    return this.getSpace(atlasId, spaceId).getDetail()
+  getSpaceDetail(atlasId: string, spaceId: string, param?: SapiQueryParam): Observable<SapiSpaceModel> {
+    return this.getSpace(atlasId, spaceId).getDetail(param)
   }
 
-  @CachedFunction({
-    serialization: (atlasId, parcId, ...args) => `sapi::getParcDetail::${atlasId}::${parcId}`
-  })
-  getParcDetail(atlasId: string, parcId: string, priority = 0): Promise<SapiParcellationModel> {
-    return this.getParcellation(atlasId, parcId).getDetail()
+  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryParam): Observable<SapiParcellationModel> {
+    return this.getParcellation(atlasId, parcId).getDetail(param)
   }
 
-  @CachedFunction({
-    serialization: (atlasId, parcId, spaceId, ...args) => `sapi::getRegions::${atlasId}::${parcId}::${spaceId}`
-  })
-  getParcRegions(atlasId: string, parcId: string, spaceId: string, priority = 0): Promise<SapiRegionModel[]> {
+  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryParam): Observable<SapiRegionModel[]> {
     const parc = this.getParcellation(atlasId, parcId)
-    return parc.getRegions(spaceId)
+    return parc.getRegions(spaceId, queryParam)
   }
 
   @CachedFunction({
@@ -94,6 +87,21 @@ export class SAPI{
     return this.http.get<T>(url, option).toPromise()
   }
 
+  httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){
+    return this.http.get<T>(
+      url,
+      {
+        params: {
+          ...( params || {} ),
+          ...(
+            sapiParam?.priority
+              ? ({ [PRIORITY_HEADER]: sapiParam.priority })
+              : {}
+          )
+        }
+      }
+    )
+  }
 
   public atlases$ = this.http.get<SapiAtlasModel[]>(
     `${this.bsEndpoint}/atlases`,

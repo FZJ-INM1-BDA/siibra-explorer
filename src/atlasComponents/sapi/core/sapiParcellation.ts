@@ -1,24 +1,30 @@
+import { Observable } from "rxjs"
 import { SapiVolumeModel } from ".."
 import { SAPI } from "../sapi.service"
-import { SapiParcellationFeatureModel, SapiParcellationModel, SapiRegionModel } from "../type"
+import { SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryParam, SapiRegionModel } from "../type"
+
+type PaginationQuery = {}
 
 export class SAPIParcellation{
   constructor(private sapi: SAPI, public atlasId: string, public id: string){
 
   }
-  getDetail(): Promise<SapiParcellationModel>{
-    return this.sapi.cachedGet<SapiParcellationModel>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}`
+
+  getDetail(queryParam?: SapiQueryParam): Observable<SapiParcellationModel>{
+    return this.sapi.httpGet<SapiParcellationModel>(
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}`,
+      null,
+      queryParam
     )
   }
-  getRegions(spaceId: string): Promise<SapiRegionModel[]> {
-    return this.sapi.cachedGet<SapiRegionModel[]>(
+
+  getRegions(spaceId: string, queryParam?: SapiQueryParam): Observable<SapiRegionModel[]> {
+    return this.sapi.httpGet<SapiRegionModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/regions`,
       {
-        params: {
-          space_id: spaceId
-        }
-      }
+        space_id: spaceId
+      },
+      queryParam
     )
   }
   getVolumes(): Promise<SapiVolumeModel[]>{
@@ -27,16 +33,15 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatures(): Promise<SapiParcellationFeatureModel[]> {
-    return this.sapi.http.get<SapiParcellationFeatureModel[]>(
+  getFeatures(param?: PaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
+    return this.sapi.httpGet<SapiParcellationFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
-        params: {
-          per_page: 5,
-          page: 0,
-        }
-      }
-    ).toPromise()
+        per_page: '5',
+        page: '0',
+      },
+      queryParam
+    )
   }
 
   getFeatureInstance(instanceId: string): Promise<SapiParcellationFeatureModel> {

@@ -9,10 +9,6 @@ export type TUrlAtlas<T> = {
   r?: T  // region selected
 }
 
-export type TUrlPreviewDs<T> = {
-  dsp: T // dataset preview
-}
-
 export type TUrlPlugin<T> = {
   pl: T  // pluginState
 }
@@ -22,7 +18,6 @@ export type TUrlNav<T> = {
 }
 
 export type TConditional<T> = Partial<
-  TUrlPreviewDs<T> &
   TUrlPlugin<T> &
   TUrlNav<T>
 >

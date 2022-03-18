@@ -4,11 +4,10 @@ import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
-import { PureContantService } from "src/util";
-import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
+import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
 import { BehaviorSubject, combineLatest, merge, NEVER, Observable, of } from 'rxjs'
 import { scan } from 'rxjs/operators'
-import { generalActions } from "src/state"
+import { RouteStateTransformSvc } from "./routeStateTransform.service";
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +36,7 @@ export class RouterService {
 
   constructor(
     router: Router,
-    pureConstantService: PureContantService,
+    routeToStateTransformSvc: RouteStateTransformSvc,
     store$: Store<any>,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
@@ -106,28 +105,28 @@ export class RouterService {
     ).subscribe(arg => {
       const [ev, state, customRoutes] = arg
       
-      const fullPath = ev.urlAfterRedirects
-      const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
-      let routeFromState: string
-      try {
-        routeFromState = cvtStateToHashedRoutes(state)
-      } catch (_e) {
-        routeFromState = ``
-      }
+      // const fullPath = ev.urlAfterRedirects
+      // const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
+      // let routeFromState: string
+      // try {
+      //   routeFromState = cvtStateToHashedRoutes(state)
+      // } catch (_e) {
+      //   routeFromState = ``
+      // }
 
-      for (const key in customRoutes) {
-        const customStatePath = encodeCustomState(key, customRoutes[key])
-        if (!customStatePath) continue
-        routeFromState += `/${customStatePath}`
-      }
+      // for (const key in customRoutes) {
+      //   const customStatePath = encodeCustomState(key, customRoutes[key])
+      //   if (!customStatePath) continue
+      //   routeFromState += `/${customStatePath}`
+      // }
 
-      if ( fullPath !== `/${routeFromState}`) {
-        store$.dispatch(
-          generalActions.generalApplyState({
-            state: stateFromRoute
-          })
-        )
-      }
+      // if ( fullPath !== `/${routeFromState}`) {
+      //   store$.dispatch(
+      //     generalActions.generalApplyState({
+      //       state: stateFromRoute
+      //     })
+      //   )
+      // }
     })
     
     // TODO this may still be a bit finiky. 
@@ -140,7 +139,7 @@ export class RouterService {
             debounceTime(160),
             map(state => {
               try {
-                return cvtStateToHashedRoutes(state)
+                return `` //cvtStateToHashedRoutes(state)
               } catch (e) {
                 this.logError(e)
                 return ``

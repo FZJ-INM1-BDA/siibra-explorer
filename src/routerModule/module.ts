@@ -2,6 +2,7 @@ import { APP_BASE_HREF } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule } from '@angular/router'
 import { RouterService } from "./router.service";
+import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { routes } from "./util";
 
 
@@ -16,7 +17,8 @@ import { routes } from "./util";
       provide: APP_BASE_HREF,
       useValue: '/'
     },
-    RouterService
+    RouterService,
+    RouteStateTransformSvc,
   ],
   exports:[
     RouterModule
