@@ -200,6 +200,7 @@ export class ViewerCmp implements OnDestroy {
 
   public pliVol$ = merge(
     this._pliVol$?.pipe(
+      filter(arr => arr.length > 0),
       mapTo({
         title: this._pliTitle,
         description: this._pliDesc,
