@@ -871,3 +871,9 @@ quick-tour-unit svg
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+sxplr-sapiviews-features-receptor-autoradiograph canvas
+{
+  max-width: 100%;
+  max-height: 100%;
+}

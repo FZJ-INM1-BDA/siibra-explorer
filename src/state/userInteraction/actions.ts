@@ -1,21 +1,7 @@
 import { createAction, props } from "@ngrx/store"
 import { nameSpace } from "./const"
-import * as atlasSelection from "../atlasSelection"
-import { SapiRegionModel, SapiSpatialFeatureModel, SapiVolumeModel } from "src/atlasComponents/sapi"
-import * as userInterface from "../userInterface"
+import { SapiRegionModel } from "src/atlasComponents/sapi"
 import { SapiFeatureModel } from "src/atlasComponents/sapi/type"
-
-export const {
-  clearSelectedRegions,
-  clearStandAloneVolumes,
-  clearNonBaseParcLayer,
-} = atlasSelection.actions
-
-export const {
-  openSidePanel,
-  closeSidePanel,
-  expandSidePanelDetailView,
-} = userInterface.actions
 
 export const mouseOverAnnotations = createAction(
   `${nameSpace} mouseOverAnnotations`,

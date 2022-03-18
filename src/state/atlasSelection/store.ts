@@ -3,6 +3,12 @@ import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel 
 import * as actions from "./actions"
 import { ViewerMode, BreadCrumb } from "./const"
 
+function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {
+  const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
+  if (isNaN(lblIdx)) return null
+  return lblIdx
+}
+
 export type AtlasSelectionState = {
   selectedAtlas: SapiAtlasModel
   selectedTemplate: SapiSpaceModel
@@ -87,9 +93,10 @@ const reducer = createReducer(
        * 
        * ignore
        */
+      const { selectedAtlas, selectedParcellation, selectedTemplate } = state
       if (
         !region.hasAnnotation?.visualizedIn
-        && region.hasAnnotation?.internalIdentifier === 'unknown'
+        && !getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
       ) {
         return { ...state }
       }

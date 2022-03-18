@@ -15,7 +15,7 @@ export type UserPreference = {
   agreeKgTos: boolean
 }
 
-export const defaultUserPreferenceStore: UserPreference = {
+export const defaultState: UserPreference = {
   useMobileUi: JSON.parse(localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI)),
   gpuLimit: Number(localStorage.getItem(LOCAL_STORAGE_CONST.GPU_LIMIT)) || defaultGpuLimit,
   useAnimation: !localStorage.getItem(LOCAL_STORAGE_CONST.ANIMATION),
@@ -26,7 +26,7 @@ export const defaultUserPreferenceStore: UserPreference = {
 }
 
 export const reducer = createReducer(
-  defaultUserPreferenceStore,
+  defaultState,
   on(
     actions.setAnimationFlag,
     (state, { flag }) => {

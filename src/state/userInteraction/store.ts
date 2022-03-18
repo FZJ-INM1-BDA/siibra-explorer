@@ -7,7 +7,7 @@ export type UserInteraction = {
   selectedFeature: SapiFeatureModel
 }
 
-const defaultState: UserInteraction = {
+export const defaultState: UserInteraction = {
   selectedFeature: null,
   mouseoverRegions: []
 }

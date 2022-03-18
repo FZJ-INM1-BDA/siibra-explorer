@@ -11,8 +11,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { ComponentStore } from "../componentStore";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
-import { actions, fromRootStore } from "src/state/atlasSelection";
-import { atlasSelection, userInteraction } from "src/state";
+import { atlasSelection, userInteraction, } from "src/state";
 import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
 
 type TCStoreViewerCmp = {
@@ -117,7 +116,7 @@ export class ViewerCmp implements OnDestroy {
   )
 
   public allAvailableParcellations$ = this.store$.pipe(
-    fromRootStore.allAvailParcs(this.sapi)
+    atlasSelection.fromRootStore.allAvailParcs(this.sapi)
   )
 
   public selectedRegions$ = this.store$.pipe(
@@ -318,13 +317,13 @@ export class ViewerCmp implements OnDestroy {
 
   public clearRoi(){
     this.store$.dispatch(
-      actions.clearSelectedRegions()
+      atlasSelection.actions.clearSelectedRegions()
     )
   }
 
   public selectRoi(roi: SapiRegionModel) {
     this.store$.dispatch(
-      actions.selectRegion({
+      atlasSelection.actions.selectRegion({
         region: roi
       })
     )
@@ -332,7 +331,7 @@ export class ViewerCmp implements OnDestroy {
 
   public exitSpecialViewMode(){
     this.store$.dispatch(
-      actions.clearViewerMode()
+      atlasSelection.actions.clearViewerMode()
     )
   }
 
@@ -376,7 +375,7 @@ export class ViewerCmp implements OnDestroy {
     if ((feat as SapiSpatialFeatureModel).location) {
       const feature = feat as SapiSpatialFeatureModel
       this.store$.dispatch(
-        actions.navigateTo({
+        atlasSelection.actions.navigateTo({
           navigation: {
             orientation: [0, 0, 0, 1],
             position: feature.location.center.coordinates.map(v => (v.unit as number) * 1e6)

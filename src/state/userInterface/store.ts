@@ -9,7 +9,7 @@ export type UiStore = {
   showDelineation: boolean
 }
 
-const defaultStore: UiStore = {
+export const defaultState: UiStore = {
   panelMode: 'FOUR_PANEL',
   panelOrder: '0123',
   octantRemoval: false,
@@ -17,7 +17,7 @@ const defaultStore: UiStore = {
 }
 
 export const reducer = createReducer(
-  defaultStore,
+  defaultState,
   on(
     actions.setPanelMode,
     (state, { panelMode }) => {

@@ -9,7 +9,7 @@ export type AtlasAppearanceStore = {
   customLayers: CustomLayer[]
 }
 
-const defaultState: AtlasAppearanceStore = {
+export const defaultState: AtlasAppearanceStore = {
   octantRemoval: true,
   showDelineation: true,
   customLayers: []

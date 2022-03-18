@@ -6,7 +6,7 @@ export type PluginStore = {
   initManifests: Record<string, string>
 }
 
-const defaultState: PluginStore = {
+export const defaultState: PluginStore = {
   initManifests: {}
 }
 

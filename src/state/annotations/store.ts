@@ -8,7 +8,7 @@ export type AnnotationState = {
   annotations: Annotation[]
 }
 
-const defaultState: AnnotationState = {
+export const defaultState: AnnotationState = {
   annotations: []
 }
 
