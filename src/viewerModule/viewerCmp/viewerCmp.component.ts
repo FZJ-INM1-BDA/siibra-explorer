@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
-import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, mapTo } from "rxjs/operators";
+import {catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, mapTo, filter } from "rxjs/operators";
 import { viewerStateSetSelectedRegions } from "src/services/state/viewerState/actions";
 import {
   viewerStateContextedSelectedRegionsSelector,
@@ -207,16 +207,14 @@ export class ViewerCmp implements OnDestroy {
       })
     ) || NEVER,
     this._1umVoi$.pipe(
-      map(flag => flag
-        ? ({
-          title: this._1umTitle,
-          description: this._1umDesc,
-          url: this._1umLink
-            ? [{ doi: this._1umLink }]
-            : []
-        })
-        : null
-      )
+      filter(flag => flag),
+      map(() => ({
+        title: this._1umTitle,
+        description: this._1umDesc,
+        url: this._1umLink
+          ? [{ doi: this._1umLink }]
+          : []
+      }))
     )
   )
 

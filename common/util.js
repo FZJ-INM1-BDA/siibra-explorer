@@ -142,7 +142,7 @@
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
 
-  exports.race = async (fn, { timeout = defaultConfig.timeout }) => {
+  exports.race = async (fn, { timeout = defaultConfig.timeout } = {}) => {
     return Promise.race([
       fn(),
       new Promise((_rs, rj) => setTimeout(rj, timeout, `timed out: ${timeout}`))
