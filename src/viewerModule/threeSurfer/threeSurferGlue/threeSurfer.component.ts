@@ -140,7 +140,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   private latLblIdxToRegionRecord: LateralityRecord<Record<number, SapiRegionModel>> = {}
   private latLblIdxToRegionRecord$: Observable<LateralityRecord<Record<number, SapiRegionModel>>> = combineLatest([
     this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP)
+      atlasSelection.fromRootStore.distinctATP()
     ),
     this.store$.pipe(
       select(atlasSelection.selectors.selectedParcAllRegions),

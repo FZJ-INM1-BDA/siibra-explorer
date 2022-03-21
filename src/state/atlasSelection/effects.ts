@@ -9,7 +9,7 @@ import { selectors, actions } from '.'
 import { fromRootStore } from "./util";
 import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
 import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
-import { atlasAppearance } from "..";
+import { atlasAppearance, atlasSelection } from "..";
 
 @Injectable()
 export class Effect {
@@ -53,7 +53,7 @@ export class Effect {
   ))
 
   onATPSelectionGetAndSetAllRegions = createEffect(() => this.store.pipe(
-    select(selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     filter(({ atlas, template, parcellation }) => !!atlas && !!template && !!parcellation),
     switchMap(({ atlas, template, parcellation }) => 
       this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])

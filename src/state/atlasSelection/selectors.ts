@@ -31,13 +31,6 @@ export const selectedRegions = createSelector(
   state => state.selectedRegions
 )
 
-export const selectedATP = createSelector(
-  selectedAtlas,
-  selectedTemplate,
-  selectedParcellation,
-  (atlas, template, parcellation) => ({ atlas, template, parcellation })
-)
-
 export const standaloneVolumes = createSelector(
   selectStore,
   state => state.standAloneVolumes

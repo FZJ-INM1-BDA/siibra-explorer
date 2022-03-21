@@ -16,7 +16,7 @@ import { getHttpHeader } from "src/util/constants"
 @Injectable()
 export class Effects{
   onATPUpdateClearWidgets = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     map(() => {
       this.widgetSvc.clearAllWidgets()
     })

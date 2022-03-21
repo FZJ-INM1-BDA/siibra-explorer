@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, NEVER, Observable, of, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
@@ -101,7 +101,7 @@ export class ViewerCmp implements OnDestroy {
   public viewerLoaded: boolean = false
 
   private selectedATP = this.store$.pipe(
-    select(atlasSelection.selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     shareReplay(1)
   )
 
@@ -139,16 +139,16 @@ export class ViewerCmp implements OnDestroy {
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
     this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP),
+      atlasSelection.fromRootStore.distinctATP(),
       switchMap(({ atlas, template }) => atlas && template
         ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes()
         : of(null)),
       map(vols => {
+        if (!vols) return null
         const flags = {
           isNehuba: false,
           isThreeSurfer: false
         }
-        if (!vols) return null
         if (vols.find(vol => vol.data.volume_type === "neuroglancer/precomputed")) {
           flags.isNehuba = true
         }
@@ -161,13 +161,20 @@ export class ViewerCmp implements OnDestroy {
     ),
     this.isStandaloneVolumes$,
   ]).pipe(
-    map(([flags, isSv]) => {
+    distinctUntilChanged(([ prevFlags, prevIsSv ], [  currFlags, currIsSv ]) => {
+      const same = prevIsSv === currIsSv
+      && prevFlags?.isNehuba === currFlags?.isNehuba
+      && prevFlags?.isThreeSurfer === currFlags?.isThreeSurfer
+      return same
+    }),
+    map<unknown, TSupportedViewers | 'notsupported'>(([flags, isSv]) => {
       if (isSv) return 'nehuba'
       if (!flags) return null
       if (flags.isNehuba) return 'nehuba'
       if (flags.isThreeSurfer) return 'threeSurfer'
       return 'notsupported'
-    })
+    }),
+    shareReplay(1),
   )
 
   public viewerCtx$ = this.ctxMenuSvc.context$

@@ -56,7 +56,7 @@ export class NehubaLayerControlService implements OnDestroy{
   private defaultNgLayers$ = this.layerEffects.onATPDebounceNgLayers$
 
   private selectedATP$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     shareReplay(1),
   )
 

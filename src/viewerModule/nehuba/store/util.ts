@@ -39,7 +39,7 @@ export const fromRootStore = {
     take(1),
   ),
   getParcVolumes: (sapi: SAPI) => pipe(
-    select(atlasSelection.selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     filter(({ parcellation }) => !!parcellation),
     switchMap(({ atlas, template, parcellation }) => {
       return forkJoin([

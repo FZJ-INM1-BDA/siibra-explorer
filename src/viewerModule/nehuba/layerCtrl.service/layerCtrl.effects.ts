@@ -2,10 +2,11 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, take, shareReplay } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, take, shareReplay, distinctUntilChanged } from "rxjs/operators";
+import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
 import { fromRootStore } from "../config.service";
@@ -15,9 +16,9 @@ import { NehubaLayerControlService } from "./layerCtrl.service";
 export class LayerCtrlEffects {
   onRegionSelectClearPmapLayer = createEffect(() => this.store.pipe(
     select(atlasSelection.selectors.selectedRegions),
-    withLatestFrom(this.store.pipe(
-      select(atlasSelection.selectors.selectedATP)
-    )),
+    distinctUntilChanged(
+      arrayEqual((o, n) => o["@id"] === n["@id"])
+    ),
     mapTo(
       atlasAppearance.actions.removeCustomLayer({
         id: NehubaLayerControlService.PMAP_LAYER_NAME
@@ -30,7 +31,7 @@ export class LayerCtrlEffects {
     filter(regions => regions.length > 0),
     withLatestFrom(
       this.store.pipe(
-        select(atlasSelection.selectors.selectedATP)
+        atlasSelection.fromRootStore.distinctATP()
       )
     ),
     switchMap(([ regions, { atlas, parcellation, template } ]) => {
@@ -60,7 +61,8 @@ export class LayerCtrlEffects {
   ))
 
   onATP$ = this.store.pipe(
-    select(atlasSelection.selectors.selectedATP)
+    atlasSelection.fromRootStore.distinctATP(),
+    map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel })
   )
 
   onATPClearBaseLayers = createEffect(() => this.onATP$.pipe(

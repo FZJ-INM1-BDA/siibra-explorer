@@ -6,7 +6,7 @@ import { atlasSelection, defaultState, MainState, plugins } from "src/state";
 import { getParcNgId, getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
-import { decodePath, encodeId, endcodePath } from "./util";
+import { decodePath, encodeId, decodeId, endcodePath } from "./util";
 
 @Injectable()
 export class RouteStateTransformSvc {
@@ -18,12 +18,16 @@ export class RouteStateTransformSvc {
   }
 
   constructor(private sapi: SAPI){}
-
+  
   private async getATPR(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>){
-    const selectedAtlasId = RouteStateTransformSvc.GetOneAndOnlyOne(obj.a)
-    const selectedTemplateId = RouteStateTransformSvc.GetOneAndOnlyOne(obj.t)
-    const selectedParcellationId = RouteStateTransformSvc.GetOneAndOnlyOne(obj.p)
+    const selectedAtlasId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.a) )
+    const selectedTemplateId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.t) )
+    const selectedParcellationId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.p) )
     const selectedRegionIds = obj.r
+    
+    if (!selectedAtlasId || !selectedTemplateId || !selectedParcellationId) {
+      return {}
+    }
 
     const [
       selectedAtlas,
@@ -171,17 +175,16 @@ export class RouteStateTransformSvc {
       return returnState
     } catch (e) {
       // if any error occurs, parse rest per normal
-      console.error(`parse standalone volume error`, e)
     }
 
 
     try {
-      const { selectedAtlas, selectedParcellation, selectedRegions, selectedTemplate } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
+      const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
       returnState["[state.atlasSelection]"].selectedAtlas = selectedAtlas
       returnState["[state.atlasSelection]"].selectedParcellation = selectedParcellation
       returnState["[state.atlasSelection]"].selectedTemplate = selectedTemplate
       returnState["[state.atlasSelection]"].selectedRegions = selectedRegions
-      
+      returnState["[state.atlasSelection]"].navigation = parsedNavObj
     } catch (e) {
       // if error, show error on UI?
       console.error(`parse template, parc, region error`, e)
@@ -190,11 +193,10 @@ export class RouteStateTransformSvc {
   }
 
   cvtStateToRoute(state: MainState) {
-    const {
-      atlas: selectedAtlas,
-      parcellation: selectedParcellation,
-      template: selectedTemplate,
-    } = atlasSelection.selectors.selectedATP(state)
+
+    const selectedAtlas = atlasSelection.selectors.selectedAtlas(state)
+    const selectedParcellation = atlasSelection.selectors.selectedParcellation(state)
+    const selectedTemplate = atlasSelection.selectors.selectedTemplate(state)
     
     const selectedRegions = atlasSelection.selectors.selectedRegions(state)
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)

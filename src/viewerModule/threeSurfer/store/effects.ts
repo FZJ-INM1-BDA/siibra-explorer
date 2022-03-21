@@ -38,7 +38,7 @@ export const fromATP = {
 export class ThreeSurferEffects {
 
   private onATP$ = this.store.pipe(
-    select(atlasSelection.selectors.selectedATP)
+    atlasSelection.fromRootStore.distinctATP()
   )
 
   private selectedSurfaceId$ = this.store.pipe(

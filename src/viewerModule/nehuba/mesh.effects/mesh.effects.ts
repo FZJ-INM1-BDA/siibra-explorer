@@ -16,7 +16,7 @@ export class MeshEffects{
   }
 
   onATPSelectResetAuxMeshes = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedATP),
+    atlasSelection.fromRootStore.distinctATP(),
     mapTo(
       actionSetAuxMeshes({
         payload: []

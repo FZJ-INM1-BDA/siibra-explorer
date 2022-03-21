@@ -1,7 +1,8 @@
-import { select } from "@ngrx/store";
+import { createSelector, select } from "@ngrx/store";
 import { forkJoin, pipe } from "rxjs";
-import { switchMap } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
+import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { jsonEqual } from "src/util/json";
 import * as selectors from "./selectors"
 
 const allAvailSpaces = (sapi: SAPI) => pipe(
@@ -29,8 +30,24 @@ const allAvailSpacesParcs = (sapi: SAPI) => pipe(
   )
 )
 
+const nonDistinctATP = createSelector(
+  selectors.selectedAtlas,
+  selectors.selectedTemplate,
+  selectors.selectedParcellation,
+  (atlas, template, parcellation) => ({ atlas, template, parcellation })
+)
+
+const distinctATP = () => pipe(
+  select(nonDistinctATP),
+  distinctUntilChanged(
+    jsonEqual((o, n) => o?.["@id"] === n?.["@id"])
+  ),
+  map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel })
+)
+
 export const fromRootStore = {
   allAvailSpaces,
   allAvailParcs,
   allAvailSpacesParcs,
+  distinctATP,
 }

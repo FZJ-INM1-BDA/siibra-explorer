@@ -3,12 +3,15 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
 import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
 import { BehaviorSubject, combineLatest, merge, NEVER, Observable, of } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
-
+import { SAPI } from "src/atlasComponents/sapi";
+/**
+ * http://localhost:8080/#/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2/p:minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-290/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..0.14gY0~.14gY0..1LSm
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -19,11 +22,9 @@ export class RouterService {
     console.log(...e)
   }
 
-  private _customRoute$ = new BehaviorSubject<{
-    [key: string]: string
-  }>({})
+  private _customRoute$ = new BehaviorSubject<Record<string, string>>({})
 
-  public customRoute$: Observable<Record<string, any>>
+  public customRoute$: Observable<Record<string, string>>
 
   setCustomRoute(key: string, state: string){
     if (!verifyCustomState(key)) {
@@ -37,6 +38,7 @@ export class RouterService {
   constructor(
     router: Router,
     routeToStateTransformSvc: RouteStateTransformSvc,
+    sapi: SAPI,
     store$: Store<any>,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
@@ -50,8 +52,7 @@ export class RouterService {
 
     navEnd$.subscribe()
 
-    // TODO fix
-    const ready$ = NEVER.pipe(
+    const ready$ = sapi.atlases$.pipe(
       filter(flag => !!flag),
       take(1),
       shareReplay(1),
@@ -91,42 +92,64 @@ export class RouterService {
       ),
     )
 
-    ready$.pipe(
-      switchMapTo(
-        navEnd$.pipe(
-          withLatestFrom(
-            store$,
-            this.customRoute$.pipe(
-              startWith({})
-            )
+    /**
+     * does work too well =( 
+     */
+    console.log('current route', router.url)
+    navEnd$.pipe(
+      switchMap(navEvent => 
+        routeToStateTransformSvc.cvtRouteToState(
+          router.parseUrl(
+            navEvent.urlAfterRedirects
           )
+        ).then(state => {
+          return {
+            navEvent,
+            state
+          }
+        })
+      ),
+      withLatestFrom(
+        this.customRoute$.pipe(
+          startWith({})
         )
       )
     ).subscribe(arg => {
-      const [ev, state, customRoutes] = arg
+      const [{ state, navEvent }, customRoutes] = arg
       
-      // const fullPath = ev.urlAfterRedirects
-      // const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
-      // let routeFromState: string
-      // try {
-      //   routeFromState = cvtStateToHashedRoutes(state)
-      // } catch (_e) {
-      //   routeFromState = ``
-      // }
+      const fullPath = navEvent.urlAfterRedirects
+      
+      let routeFromState: string
+      try {
+        routeFromState = routeToStateTransformSvc.cvtStateToRoute(state)
+      } catch (_e) {
+        routeFromState = ``
+      }
 
-      // for (const key in customRoutes) {
-      //   const customStatePath = encodeCustomState(key, customRoutes[key])
-      //   if (!customStatePath) continue
-      //   routeFromState += `/${customStatePath}`
-      // }
+      for (const key in customRoutes) {
+        const customStatePath = encodeCustomState(key, customRoutes[key])
+        if (!customStatePath) continue
+        routeFromState += `/${customStatePath}`
+      }
 
-      // if ( fullPath !== `/${routeFromState}`) {
-      //   store$.dispatch(
-      //     generalActions.generalApplyState({
-      //       state: stateFromRoute
-      //     })
-      //   )
-      // }
+      if ( fullPath !== `/${routeFromState}`) {
+        console.log(
+          'dispatching general',
+        )
+        console.log(
+
+          fullPath,
+        )
+        console.log(
+
+          `/${routeFromState}`
+        )
+        // store$.dispatch(
+        //   generalActions.generalApplyState({
+        //     state: stateFromRoute
+        //   })
+        // )
+      }
     })
     
     // TODO this may still be a bit finiky. 
@@ -139,7 +162,7 @@ export class RouterService {
             debounceTime(160),
             map(state => {
               try {
-                return `` //cvtStateToHashedRoutes(state)
+                return routeToStateTransformSvc.cvtStateToRoute(state)
               } catch (e) {
                 this.logError(e)
                 return ``

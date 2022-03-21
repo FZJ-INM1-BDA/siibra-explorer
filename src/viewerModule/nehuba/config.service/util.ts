@@ -241,7 +241,7 @@ export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atl
 export const fromRootStore = {
   getNgLayers: (store: Store, sapiSvc: SAPI) => {
     return pipe(
-      select(atlasSelection.selectors.selectedATP),
+      atlasSelection.fromRootStore.distinctATP(),
       switchMap(ATP =>
         forkJoin({
           tmplVolumes: store.pipe(

@@ -28,6 +28,7 @@ import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface, generalActions } from "src/state";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
+import { jsonEqual } from "src/util/json"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
@@ -345,14 +346,14 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     }
 
     const onATPClear = this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP)
+      atlasSelection.fromRootStore.distinctATP()
     ).subscribe(this.disposeViewer.bind(this))
     this.onDestroyCb.push(() => onATPClear.unsubscribe())
     
     const onATPDebounceNgBaseLayers = this.store$.pipe(
-      select(atlasSelection.selectors.selectedATP),
+      atlasSelection.fromRootStore.distinctATP(),
       debounceTime(16),
-      switchMap(ATP => this.store$.pipe(
+      switchMap((ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }) => this.store$.pipe(
         select(atlasAppearance.selectors.customLayers),
         debounceTime(16),
         map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),

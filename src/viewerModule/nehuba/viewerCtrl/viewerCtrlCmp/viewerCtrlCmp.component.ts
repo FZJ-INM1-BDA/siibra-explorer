@@ -83,7 +83,7 @@ export class ViewerCtrlCmp{
     this.sub.push(
 
       this.store$.pipe(
-        select(atlasSelection.selectors.selectedATP)
+        atlasSelection.fromRootStore.distinctATP()
       ).subscribe(({ atlas, parcellation, template }) => {
         this.selectedAtlasId = atlas["@id"]
         this.selectedTemplateId = template["@id"]
