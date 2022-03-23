@@ -17,17 +17,19 @@ export const fromATP = {
       ),
       switchMap(({ atlas, template, parcellation }: {atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel}) => 
         forkJoin({
-          surfaces: sapi.getSpace(atlas["@id"], template["@id"])
-            .getVolumes()
-            .then(volumes => volumes.filter(vol => vol.data.type === "gii")),
-          labels: sapi.getParcellation(atlas["@id"], parcellation["@id"])
-            .getVolumes()
-            .then(volumes => 
-              volumes.filter(vol =>
+          surfaces: sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
+            map(
+              volumes => volumes.filter(vol => vol.data.type === "gii")
+            )
+          ),
+          labels: sapi.getParcellation(atlas["@id"], parcellation["@id"]).getVolumes().pipe(
+            map(
+              volumes => volumes.filter(vol =>
                 vol.data.type === "gii-label" &&
                 vol.data.space["@id"] === template["@id"]
               )
             )
+          )
         })
       )
     )

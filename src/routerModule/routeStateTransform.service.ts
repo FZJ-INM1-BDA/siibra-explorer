@@ -68,6 +68,7 @@ export class RouteStateTransformSvc {
           console.error(`could not find matching map for ${ngId}`)
           continue
         }
+        const filteredRegions = allParcellationRegions.filter(r => matchingMap.regex.test(r.name))
         
         const val = json[ngId]
         const labelIndicies = val.split(separator).map(n => {
@@ -87,7 +88,7 @@ export class RouteStateTransformSvc {
            * this method probably out performs creating a map
            * but with 2+ regions, creating a map would consistently be faster
            */
-          for (const r of allParcellationRegions) {
+          for (const r of filteredRegions) {
             const idx = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, r)
             if (idx === labelIndex) {
               return [ r ]

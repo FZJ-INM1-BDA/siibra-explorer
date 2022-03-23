@@ -19,27 +19,6 @@ export const BACKUP_COLOR = {
   blue: 255
 }
 
-export function getNgLayerName(parc: SapiParcellationModel){
-  return parc["@id"]
-}
-
-export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
-  const returnVal: IColorMap = {}
-  for (const auxMesh of auxMeshes as IAuxMesh[]) {
-    const { ngId, labelIndicies, rgb = [255, 255, 255] } = auxMesh
-    const auxMeshColorMap = returnVal[ngId] || {}
-    for (const lblIdx of labelIndicies) {
-      auxMeshColorMap[lblIdx as number] = {
-        red: rgb[0] as number,
-        green: rgb[1] as number,
-        blue: rgb[2] as number,
-      }
-    }
-    returnVal[ngId] = auxMeshColorMap
-  }
-  return returnVal
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -120,10 +99,9 @@ export class NehubaLayerControlService implements OnDestroy{
   
   private auxMeshes$: Observable<IAuxMesh[]> = this.selectedATP$.pipe(
     map(({ template }) => template),
-    switchMap(tmpl => {
-      return this.sapiSvc.registry.get<SAPISpace>(tmpl["@id"])
-        .getVolumes()
-        .then(tmplVolumes => {
+    switchMap(tmpl => this.sapiSvc.registry.get<SAPISpace>(tmpl["@id"]).getVolumes().pipe(
+      map(
+        tmplVolumes => {
           const auxMeshArr: IAuxMesh[] = []
           for (const vol of tmplVolumes) {
             if (vol.data.detail["neuroglancer/precompmesh"]) {
@@ -141,9 +119,9 @@ export class NehubaLayerControlService implements OnDestroy{
             }
           }
           return auxMeshArr
-        })
-    }
-    )
+        }
+      )
+    ))
   )
 
   private sub: Subscription[] = []

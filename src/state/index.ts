@@ -31,6 +31,22 @@ function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   };
 }
 
+function generalApplyStateReducer(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
+  return function(_state, action) {
+    let state = _state
+    if (action.type === generalApplyState.type) {
+      state = {
+        ...state,
+        /**
+         * typing is a bit scuffed, but works
+         */
+        ...(action as any).state
+      }
+    }
+    return reducer(state, action)
+  }
+}
+
 export const RootStoreModule = StoreModule.forRoot({
   [userPreference.nameSpace]: userPreference.reducer,
   [atlasSelection.nameSpace]: atlasSelection.reducer,
@@ -41,6 +57,7 @@ export const RootStoreModule = StoreModule.forRoot({
   [atlasAppearance.nameSpace]: atlasAppearance.reducer,
 },{
   metaReducers: [ 
+    generalApplyStateReducer,
     // debug,
   ]
 })
@@ -61,6 +78,7 @@ export function getStoreEffects() {
 }
 
 import { MainState } from "./const"
+import { generalApplyState } from "./actions"
 
 export { MainState }
 

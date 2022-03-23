@@ -13,7 +13,7 @@ import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlas
 import { MouseHoverDirective } from "src/mouseoverModule";
 import { NehubaMeshService } from "../mesh.service";
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { NehubaLayerControlService, IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
+import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { getExportNehuba, getUuid, switchMapWaitFor } from "src/util/fn";
 import { INavObj } from "../navigation.service";
 import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
@@ -23,12 +23,11 @@ import { EnumColorMapName } from "src/util/colorMaps";
 import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { NehubaConfig, getNehubaConfig, fromRootStore, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, getParcNgId, getRegionLabelIndex } from "../config.service";
+import { NehubaConfig, getNehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
-import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface, generalActions } from "src/state";
+import { annotation, atlasAppearance, atlasSelection, userInteraction, userInterface } from "src/state";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
-import { jsonEqual } from "src/util/json"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
@@ -284,7 +283,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       ...config.dataset.initialNgState,
       ...overwritingInitState,
     }
-
     await this.nehubaContainerDirective.createNehubaInstance(config)
     this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
 
@@ -462,9 +460,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
         (panel as HTMLElement).classList.add('neuroglancer-panel')
       }
 
-      // TODO needed to redraw?
-      // see https://trello.com/c/oJOnlc6v/60-enlarge-panel-allow-user-rearrange-panel-position
-      // further investigaation required
+      this.nehubaContainerDirective.redraw()
     })
     this.onDestroyCb.push(() => redrawLayoutSub.unsubscribe())
 

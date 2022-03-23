@@ -1,15 +1,16 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, take, shareReplay, distinctUntilChanged } from "rxjs/operators";
+import { forkJoin, of } from "rxjs";
+import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
-import { fromRootStore } from "../config.service";
+import { getNgLayersFromVolumesATP, getRegionLabelIndex } from "../config.service";
+import { ParcVolumeSpec } from "../store/util";
 import { NehubaLayerControlService } from "./layerCtrl.service";
 
 @Injectable()
@@ -85,12 +86,88 @@ export class LayerCtrlEffects {
     )
   ))
 
+  private getNgLayers(atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel){
+
+    if (!!parcellation && !template) {
+      throw new Error(`parcellation defined, but template not defined!`)
+    }
+    
+    const parcVolumes$ = !parcellation
+    ? of([])
+    : forkJoin([
+        this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getRegions(template["@id"]).pipe(
+          map(regions => {
+
+            const returnArr: ParcVolumeSpec[] = []
+            for (const r of regions) {
+              const source = r?.hasAnnotation?.visualizedIn?.["@id"]
+              if (!source) continue
+              if (source.indexOf("precomputed://") < 0) continue
+              const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
+              if (!labelIndex) continue
+              
+              const found = returnArr.find(v => v.volumeSrc === source)
+              if (found) {
+                found.labelIndicies.push(labelIndex)
+                continue
+              }
+
+              let laterality: "left hemisphere" | "right hemisphere" | "whole brain" = "whole brain"
+              if (r.name.indexOf("left") >= 0) laterality = "left hemisphere"
+              if (r.name.indexOf("right") >= 0) laterality = "right hemisphere"
+              returnArr.push({
+                volumeSrc: source,
+                labelIndicies: [labelIndex],
+                parcellation,
+                laterality,
+              })
+            }
+            return returnArr
+          })
+        ),
+        this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getVolumes()
+      ]).pipe(
+        map(([ volumeSrcs, volumes ]) => {
+          return volumes.map(
+            v => {
+              const found = volumeSrcs.find(volSrc => volSrc.volumeSrc.indexOf(v.data.url) >= 0)
+              return {
+                volume: v,
+                volumeMetadata: found,
+              }
+            }).filter(
+            v => !!v.volumeMetadata?.labelIndicies
+          )
+        })
+      )
+    
+    const spaceVols$ = !!template
+    ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
+        shareReplay(1),
+      )
+    : of([])
+    
+    return forkJoin({
+      tmplVolumes: spaceVols$.pipe(
+        map(
+          volumes => volumes.filter(vol => "neuroglancer/precomputed" in vol.data.detail)
+        ),
+      ),
+      tmplAuxMeshVolumes: spaceVols$.pipe(
+        map(
+          volumes => volumes.filter(vol => "neuroglancer/precompmesh" in vol.data.detail)
+        ),
+      ),
+      parcVolumes: parcVolumes$.pipe(
+      )
+    })
+  }
+
   onATPDebounceNgLayers$ = this.onATP$.pipe(
     debounceTime(16),
-    switchMap(() => 
-      this.store.pipe(
-        fromRootStore.getNgLayers(this.store, this.sapi),
-        take(1)
+    switchMap(({ atlas, parcellation, template }) => 
+      this.getNgLayers(atlas, parcellation, template).pipe(
+        map(volumes => getNgLayersFromVolumesATP(volumes, { atlas, parcellation, template }))
       )
     ),
     shareReplay(1)

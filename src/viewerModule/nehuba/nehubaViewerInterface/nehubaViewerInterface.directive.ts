@@ -216,6 +216,10 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     )
   }
 
+  redraw(){
+    this.nehubaViewerInstance.redraw()
+  }
+
   ngOnDestroy(){
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe()

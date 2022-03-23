@@ -1,8 +1,8 @@
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, mapTo, shareReplay } from "rxjs/operators";
+import { combineLatest, forkJoin, merge, Observable, Subject, Subscription } from "rxjs";
+import { distinctUntilChanged, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
@@ -52,6 +52,10 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   @ViewChild('selectorPanelTmpl', { read: ElementRef })
   selectorPanelTemplateRef: ElementRef
 
+  private atp$ = this.store$.pipe(
+    fromRootStore.distinctATP()
+  )
+
   public availableParcellations$ = this.store$.pipe(
     fromRootStore.allAvailParcs(this.sapi),
     shareReplay(1),
@@ -61,12 +65,42 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
     fromRootStore.allAvailSpaces(this.sapi),
   )
 
-  public selectedTemplate$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedTemplate),
+  public selectedTemplate$ = this.atp$.pipe(
+    map(({ template }) => template)
   )
 
-  public selectedParcellation$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedParcellation),
+  public selectedParcellation$ = this.atp$.pipe(
+    map(({ parcellation }) => parcellation)
+  )
+
+  public parcsAvailableInCurrentTmpl$: Observable<SapiParcellationModel[]> = combineLatest([
+    this.atp$,
+    this.availableParcellations$,
+  ]).pipe(
+    switchMap(([{ atlas, template }, parcs]) => 
+      forkJoin(
+        parcs.map(
+          parc => this.sapi.getParcellation(atlas["@id"], parc["@id"]).getVolumes().pipe(
+            map(
+              volumes => {
+                return {
+                  parcellation: parc,
+                  volumes
+                }
+              }
+            )
+          )
+        )
+      ).pipe(
+        map(arr => 
+          arr.filter(
+            item => item.volumes.find(vol => vol.data.space["@id"] === template["@id"])
+          ).map(
+            ({ parcellation }) => parcellation
+          )
+        )
+      )
+    )
   )
 
   private showOverlayIntent$ = new Subject()
@@ -85,18 +119,18 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
 
   @HostBinding('attr.data-opened')
   public selectorExpanded: boolean = false
-      
+
   public quickTourData: IQuickTourData = {
     order: 4,
     description: QUICKTOUR_DESC.LAYER_SELECTOR,
   }
 
 
-  constructor(private store$: Store, private sapi: SAPI){
+  constructor(private store$: Store, private sapi: SAPI) {
 
   }
   ngOnDestroy() {
-    while(this.subscriptions.length) this.subscriptions.pop().unsubscribe()
+    while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
   }
 
 
@@ -104,17 +138,17 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
     this.selectorExpanded = !this.selectorExpanded
   }
 
-  closeSelector(){
+  closeSelector() {
     this.selectorExpanded = false
   }
-  
+
   openSelector() {
     this.selectorExpanded = true
   }
 
   selectTemplate(tmpl: SapiSpaceModel) {
     this.showOverlayIntent$.next(true)
-    
+
     this.store$.dispatch(
       atlasSelection.actions.selectTemplate({
         template: tmpl
@@ -123,7 +157,7 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   }
 
   selectParcellation(parc: SapiParcellationModel) {
-    
+
     this.store$.dispatch(
       atlasSelection.actions.selectParcellation({
         parcellation: parc
@@ -131,16 +165,16 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
     )
   }
 
-  collapseExpandedGroup(){
+  collapseExpandedGroup() {
     this.matMenuTriggers.forEach(t => t.menuOpen && t.closeMenu())
   }
 
 
-  trackbyAtId(t){
+  trackbyAtId(t) {
     return t['@id']
   }
 
-  trackKeyVal(obj: {key: string, value: any}) {
+  trackKeyVal(obj: { key: string, value: any }) {
     return obj.key
   }
 }

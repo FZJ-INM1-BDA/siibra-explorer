@@ -1,11 +1,7 @@
-import { select, Store } from '@ngrx/store'
-import { forkJoin, pipe } from 'rxjs'
 import { SapiParcellationModel, SapiSpaceModel, SapiAtlasModel, SapiRegionModel, SAPI } from 'src/atlasComponents/sapi'
 import { SapiVolumeModel } from 'src/atlasComponents/sapi/type'
 import { MultiDimMap } from 'src/util/fn'
 import { ParcVolumeSpec } from "../store/util"
-import { fromRootStore as nehubaStoreFromRootStore } from "../store"
-import { map, switchMap } from 'rxjs/operators'
 import {
   NehubaConfig,
   NgConfig,
@@ -14,7 +10,6 @@ import {
   NgPrecompMeshSpec,
   NgSegLayerSpec,
 } from "./type"
-import { atlasSelection } from 'src/state'
 
 // fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
 const fsAverageKeyVal = {
@@ -165,6 +160,7 @@ const BACKCOMAP_KEY_DICT = {
 
 
 export function getTmplNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spaceVolumes: SapiVolumeModel[]): Record<string, NgLayerSpec>{
+  if (!atlas || !tmpl) return {}
   const ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], "tmplImage")}`
   const tmplImage = spaceVolumes.find(v => "neuroglancer/precomputed" in v.data.detail)
   if (!tmplImage) return {}
@@ -177,6 +173,7 @@ export function getTmplNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spac
 }
 
 export function getTmplAuxNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spaceVolumes: SapiVolumeModel[]): Record<string, NgPrecompMeshSpec>{
+  if (!atlas || !tmpl) return {}
   const ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], "auxLayer")}`
   const tmplImage = spaceVolumes.find(v => "neuroglancer/precompmesh" in v.data.detail)
   if (!tmplImage) return {}
@@ -235,29 +232,6 @@ export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atl
     tmplNgLayers: getTmplNgLayer(atlas, template, tmplVolumes),
     tmplAuxNgLayers: getTmplAuxNgLayer(atlas, template, tmplAuxMeshVolumes),
     parcNgLayers: getParcNgLayers(atlas, template, parcellation, parcVolumes)
-  }
-}
-
-export const fromRootStore = {
-  getNgLayers: (store: Store, sapiSvc: SAPI) => {
-    return pipe(
-      atlasSelection.fromRootStore.distinctATP(),
-      switchMap(ATP =>
-        forkJoin({
-          tmplVolumes: store.pipe(
-            nehubaStoreFromRootStore.getTmplVolumes(sapiSvc),
-          ),
-          tmplAuxMeshVolumes: store.pipe(
-            nehubaStoreFromRootStore.getAuxMeshVolumes(sapiSvc),
-          ),
-          parcVolumes: store.pipe(
-            nehubaStoreFromRootStore.getParcVolumes(sapiSvc),
-          )
-        }).pipe(
-          map(volumes => getNgLayersFromVolumesATP(volumes, ATP))
-        )
-      )
-    )
   }
 }
 

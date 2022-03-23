@@ -12,7 +12,6 @@ export {
   getTmplNgLayer,
   getNgLayersFromVolumesATP,
   getParcNgId,
-  fromRootStore,
   getRegionLabelIndex,
   getNehubaConfig,
   defaultNehubaConfig,

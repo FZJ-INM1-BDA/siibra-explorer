@@ -13,5 +13,3 @@ export {
   IAuxMesh,
   INehubaFeature,
 } from './type'
-
-export { fromRootStore } from './util'

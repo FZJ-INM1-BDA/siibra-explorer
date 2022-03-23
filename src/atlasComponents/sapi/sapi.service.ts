@@ -80,25 +80,16 @@ export class SAPI{
     return reg.getFeatures(spaceId)
   }
 
-  @CachedFunction({
-    serialization: (url, params) => `sapi::cachedGet::${url}::${JSON.stringify(params)}`
-  })
-  cachedGet<T>(url: string, option?: Record<string, any>) {
-    return this.http.get<T>(url, option).toPromise()
-  }
-
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){
+    const headers: Record<string, string> = {}
+    if (sapiParam?.priority) {
+      headers[PRIORITY_HEADER] = sapiParam.priority.toString()
+    }
     return this.http.get<T>(
       url,
       {
-        params: {
-          ...( params || {} ),
-          ...(
-            sapiParam?.priority
-              ? ({ [PRIORITY_HEADER]: sapiParam.priority })
-              : {}
-          )
-        }
+        headers,
+        params
       }
     )
   }

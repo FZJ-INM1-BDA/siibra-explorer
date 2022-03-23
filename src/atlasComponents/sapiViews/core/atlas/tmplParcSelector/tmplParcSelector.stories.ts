@@ -3,8 +3,8 @@ import { HttpClientModule } from "@angular/common/http"
 import { provideMockStore } from "@ngrx/store/testing"
 import { action } from "@storybook/addon-actions"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
-import { SAPI, SapiSpaceModel } from "src/atlasComponents/sapi"
-import { atlasId, spaceId, getAtlas, getSpace, provideDarkTheme, getHumanAtlas } from "src/atlasComponents/sapi/stories.base"
+import { SAPI } from "src/atlasComponents/sapi"
+import { spaceId, provideDarkTheme, getHumanAtlas, getMni152, getJba29 } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { atlasSelection } from "src/state"
 import { SapiViewsCoreAtlasModule } from "../module"
@@ -37,7 +37,9 @@ export default {
 
 const Template: Story<SapiViewsCoreAtlasAtlasTmplParcSelector> = (args: SapiViewsCoreAtlasAtlasTmplParcSelector, { loaded }) => {
   const { 
-    atlas
+    atlas,
+    template,
+    parcellation,
   } = loaded
 
   return ({
@@ -51,7 +53,9 @@ const Template: Story<SapiViewsCoreAtlasAtlasTmplParcSelector> = (args: SapiView
           initialState: {
             [atlasSelection.nameSpace]: {
               ...atlasSelection.defaultState,
-              selectedAtlas: atlas
+              selectedAtlas: atlas,
+              selectedTemplate: template,
+              selectedParcellation: parcellation,
             }
           }
         })
@@ -65,8 +69,12 @@ Template.loaders = [
 
 const asyncLoader = async () => {
   const atlas = await getHumanAtlas()
+  const template = await getMni152()
+  const parcellation = await getJba29()
   return {
-    atlas
+    atlas,
+    template,
+    parcellation,
   }
 }
 
@@ -78,10 +86,14 @@ Default.loaders = [
 
   async () => {
     const {
-      atlas
+      atlas,
+      template,
+      parcellation,
     } = await asyncLoader()
     return {
-      atlas
+      atlas,
+      template,
+      parcellation,
     }
   }
 ]

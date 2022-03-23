@@ -27,8 +27,8 @@ export class SAPIParcellation{
       queryParam
     )
   }
-  getVolumes(): Promise<SapiVolumeModel[]>{
-    return this.sapi.cachedGet<SapiVolumeModel[]>(
+  getVolumes(): Observable<SapiVolumeModel[]>{
+    return this.sapi.httpGet<SapiVolumeModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/volumes`
     )
   }

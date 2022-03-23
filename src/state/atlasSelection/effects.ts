@@ -54,14 +54,20 @@ export class Effect {
 
   onATPSelectionGetAndSetAllRegions = createEffect(() => this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
-    filter(({ atlas, template, parcellation }) => !!atlas && !!template && !!parcellation),
     switchMap(({ atlas, template, parcellation }) => 
-      this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
-    ),
-    map(regions => 
-      actions.setSelectedParcellationAllRegions({
-        regions
-      })
+      !!atlas && !!template && !!parcellation
+      ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"]).pipe(
+          map(regions => 
+            actions.setSelectedParcellationAllRegions({
+              regions
+            })
+          )
+      )
+      : of(
+        actions.setSelectedParcellationAllRegions({
+          regions: []
+        })
+      )
     )
   ))
 
@@ -74,7 +80,7 @@ export class Effect {
       )
     ),
     switchMap(([regions, layers]) => {
-      const map = new WeakMap<SapiRegionModel, number[]>()
+      const map = new Map<SapiRegionModel, number[]>()
       for (const region of regions) {
         map.set(region, SAPIRegion.GetDisplayColor(region))
       }
@@ -182,9 +188,6 @@ export class Effect {
     switchMapTo(
       of(
         actions.setSelectedRegions({
-          regions: []
-        }),
-        actions.setSelectedParcellationAllRegions({
           regions: []
         })
       )

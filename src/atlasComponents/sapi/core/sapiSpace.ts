@@ -1,9 +1,7 @@
 import { Observable } from "rxjs"
 import { SAPI } from '../sapi.service'
 import { camelToSnake } from 'common/util'
-import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types"
 import { SapiQueryParam, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel } from "../type"
-import { tap } from "rxjs/operators"
 
 type FeatureResponse = {
   features: {
@@ -22,18 +20,6 @@ type BBoxSpatialFEatureOpts = {
 
 type SpatialFeatureOpts = RegionalSpatialFeatureOpts | BBoxSpatialFEatureOpts
 
-
-type Point = [number, number, number]
-type Volume = {
-  id: string
-  name: string
-  url: string
-  volume_type: "neuroglancer/precomputed"
-  detail: {
-    "neuroglancer/precomputed": IVolumeTypeDetail["neuroglancer/precomputed"]
-  }
-}
-
 export class SAPISpace{
 
   constructor(private sapi: SAPI, public atlasId: string, public id: string){}
@@ -46,16 +32,14 @@ export class SAPISpace{
     )
   }
 
-  getFeatures(modalityId: string, opts: SpatialFeatureOpts): Promise<SapiSpatialFeatureModel[]> {
-    const query = {}
+  getFeatures(modalityId: string, opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel[]> {
+    const query: Record<string, string> = {}
     for (const [key, value] of Object.entries(opts)) {
       query[camelToSnake(key)] = value
     }
-    return this.sapi.cachedGet<SapiSpatialFeatureModel[]>(
+    return this.sapi.httpGet<SapiSpatialFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features/${encodeURIComponent(modalityId)}`,
-      {
-        params: query
-      }
+      query
     )
   }
 
@@ -67,8 +51,8 @@ export class SAPISpace{
     )
   }
 
-  getVolumes(): Promise<SapiVolumeModel[]>{
-    return this.sapi.cachedGet<SapiVolumeModel[]>(
+  getVolumes(): Observable<SapiVolumeModel[]>{
+    return this.sapi.httpGet<SapiVolumeModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/volumes`,
     )
   }

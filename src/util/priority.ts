@@ -1,14 +1,19 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http"
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
-import { interval, merge, Observable, Subject, timer } from "rxjs"
-import { filter, finalize, switchMap, switchMapTo, take, takeUntil, takeWhile } from "rxjs/operators"
+import { interval, merge, Observable, of, Subject, timer } from "rxjs"
+import { filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
 
 export const PRIORITY_HEADER = 'x-sxplr-http-priority'
 
-type PriorityReq = {
+type Result<T> = {
+  urlWithParams: string
+  result: HttpResponse<T>
+}
+
+type Queue = {
   urlWithParams: string
   priority: number
-  req: HttpRequest<any>
+  req: HttpRequest<unknown>
   next: HttpHandler
 }
 
@@ -17,10 +22,14 @@ type PriorityReq = {
 })
 export class PriorityHttpInterceptor implements HttpInterceptor{
 
-  private priorityQueue: PriorityReq[] = []
-  private currentJob: Set<string> = new Set()
+  private disablePriority = false
 
-  private priority$: Subject<PriorityReq> = new Subject()
+  private priorityQueue: Queue[] = []
+
+  private currentJob: Set<string> = new Set()
+  private archive: Map<string, HttpResponse<unknown>> = new Map()
+  private queue$: Subject<Queue> = new Subject()
+  private result$: Subject<Result<unknown>> = new Subject()
 
   private forceCheck$ = new Subject()
 
@@ -34,9 +43,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           timer(0),
           interval(16)
         ).pipe(
-          filter(() => {
-            return this.counter <= this.max
-          }),
+          filter(() => this.counter <= this.max),
           takeWhile(() => this.priorityQueue.length > 0)
         )
       )
@@ -44,7 +51,24 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
       const job = this.priorityQueue.pop()
       if (!job) return
       this.currentJob.add(job.urlWithParams)
-      this.priority$.next(job)
+      this.queue$.next(job)
+    })
+
+    this.queue$.subscribe(({ next, req, urlWithParams }) => {
+      this.counter ++
+      next.handle(req).pipe(
+        finalize(() => {
+          this.counter --
+        })
+      ).subscribe(val => {
+        if (val instanceof HttpResponse) {
+          this.archive.set(urlWithParams, val)
+          this.result$.next({
+            urlWithParams,
+            result: val
+          })
+        }
+      })
     })
   }
 
@@ -62,10 +86,15 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
     return true
   }
 
-  private insert(obj: PriorityReq) {
-    const { priority, urlWithParams } = obj
+  private insert(obj: Queue) {
+    const { priority, urlWithParams, req } = obj
     
+    if (this.archive.has(urlWithParams)) return
     if (this.currentJob.has(urlWithParams)) return
+
+    obj.req = req.clone({
+      headers: req.headers.delete(PRIORITY_HEADER)
+    })
 
     const existing = this.priorityQueue.find(q => q.urlWithParams === urlWithParams)
     if (existing) {
@@ -80,33 +109,33 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    
+    if (this.disablePriority) {
+      return next.handle(req)
+    }
+
     const { urlWithParams } = req
+    if (this.archive.has(urlWithParams)) {
+      return of(
+        this.archive.get(urlWithParams).clone()
+      )
+    }
     
     const priority = Number(req.headers.get(PRIORITY_HEADER) || 0)
-    const objToInsert: PriorityReq = {
+    const objToInsert: Queue = {
       priority,
       req,
       next,
       urlWithParams
     }
-    return next.handle(req)
-    
 
     this.insert(objToInsert)
     this.forceCheck$.next(true)
 
-    return this.priority$.pipe(
+    return this.result$.pipe(
       filter(v => v.urlWithParams === urlWithParams),
       take(1),
-      switchMap(({ next, req }) => {
-        console.log("handle!!")
-        this.counter ++  
-        return next.handle(req)
-      }),
-      finalize(() => {
-        console.log('finalize??')
-        this.counter --
-      }),
+      map(v => v.result)
     )
   }
 }

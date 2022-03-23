@@ -844,6 +844,10 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     }
   }
 
+  public redraw(){
+    this.nehubaViewer.redraw()
+  }
+
   private newViewerInit() {
 
     /* isn't this layer specific? */

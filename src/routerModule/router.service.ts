@@ -3,12 +3,13 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
 import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, merge, NEVER, Observable, of } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, EMPTY, merge, NEVER, Observable, of, timer } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";
+import { generalActions } from "src/state";
 /**
  * http://localhost:8080/#/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2/p:minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-290/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..0.14gY0~.14gY0..1LSm
  */
@@ -51,6 +52,30 @@ export class RouterService {
     )
 
     navEnd$.subscribe()
+
+    /**
+     * onload
+     */
+    const onload$ = navEnd$.pipe(
+      take(1),
+      filter(ev => ev.urlAfterRedirects !== '/'),
+      switchMap(ev => 
+        routeToStateTransformSvc.cvtRouteToState(
+          router.parseUrl(
+            ev.urlAfterRedirects
+          )
+        )
+      )
+    )
+    onload$.subscribe(
+      state => {
+        store$.dispatch(
+          generalActions.generalApplyState({
+            state
+          })
+        )
+      }
+    )
 
     const ready$ = sapi.atlases$.pipe(
       filter(flag => !!flag),
@@ -95,33 +120,34 @@ export class RouterService {
     /**
      * does work too well =( 
      */
-    console.log('current route', router.url)
     navEnd$.pipe(
-      switchMap(navEvent => 
+      map(navEv => navEv.urlAfterRedirects)
+    ).pipe(
+      switchMap(url =>
         routeToStateTransformSvc.cvtRouteToState(
           router.parseUrl(
-            navEvent.urlAfterRedirects
+            url
           )
-        ).then(state => {
+        ).then(stateFromRoute => {
           return {
-            navEvent,
-            state
+            url,
+            stateFromRoute
           }
         })
       ),
       withLatestFrom(
+        store$,
         this.customRoute$.pipe(
           startWith({})
         )
       )
     ).subscribe(arg => {
-      const [{ state, navEvent }, customRoutes] = arg
-      
-      const fullPath = navEvent.urlAfterRedirects
+      const [{ stateFromRoute, url }, currentState, customRoutes] = arg
+      const fullPath = url
       
       let routeFromState: string
       try {
-        routeFromState = routeToStateTransformSvc.cvtStateToRoute(state)
+        routeFromState = routeToStateTransformSvc.cvtStateToRoute(currentState)
       } catch (_e) {
         routeFromState = ``
       }
@@ -131,31 +157,34 @@ export class RouterService {
         if (!customStatePath) continue
         routeFromState += `/${customStatePath}`
       }
-
       if ( fullPath !== `/${routeFromState}`) {
-        console.log(
-          'dispatching general',
+        store$.dispatch(
+          generalActions.generalApplyState({
+            state: stateFromRoute
+          })
         )
-        console.log(
-
-          fullPath,
-        )
-        console.log(
-
-          `/${routeFromState}`
-        )
-        // store$.dispatch(
-        //   generalActions.generalApplyState({
-        //     state: stateFromRoute
-        //   })
-        // )
       }
     })
     
-    // TODO this may still be a bit finiky. 
-    // we rely on that update of store happens within 160ms
-    // which may or many not be 
-    ready$.pipe(
+    /**
+     * wait until onload completes
+     * wait for 160ms
+     * then start listening to store changes, and update route accordingly
+     * 
+     * this is so that initial state can be loaded
+     */
+    concat(
+      onload$.pipe(
+        mapTo(false)
+      ),
+      timer(160).pipe(
+        mapTo(false)
+      ),
+      ready$.pipe(
+        map(val => !!val)
+      )
+    ).pipe(
+      filter(flag => flag),
       switchMapTo(
         combineLatest([
           store$.pipe(
