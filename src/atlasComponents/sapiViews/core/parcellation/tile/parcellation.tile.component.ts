@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef } from "@angular/core";
 import { SapiParcellationModel } from "src/atlasComponents/sapi";
 import { GroupedParcellation } from "../groupedParcellation";
 
@@ -16,8 +16,18 @@ const lightthemeId = [
 })
 
 export class SapiViewsCoreParcellationParcellationTile implements OnChanges{
+  @Input('sxplr-sapiviews-core-parcellation-tile-groupmenu-parc-tmpl')
+  singleParcTmpl: TemplateRef<any>
+
+  private _parcellation: SapiParcellationModel | GroupedParcellation
   @Input('sxplr-sapiviews-core-parcellation-tile-parcellation')
-  parcellation: SapiParcellationModel | GroupedParcellation
+  set parcellation(val: SapiParcellationModel | GroupedParcellation) {
+    this._parcellation = val
+    this.ngOnChanges()
+  }
+  get parcellation(){
+    return this._parcellation
+  }
 
   @Input('sxplr-sapiviews-core-parcellation-tile-selected')
   selected: boolean = false

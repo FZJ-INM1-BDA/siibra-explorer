@@ -4,7 +4,7 @@ import { provideMockStore } from "@ngrx/store/testing"
 import { action } from "@storybook/addon-actions"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
-import { spaceId, provideDarkTheme, getHumanAtlas, getMni152, getJba29 } from "src/atlasComponents/sapi/stories.base"
+import { spaceId, provideDarkTheme, getHumanAtlas, getMni152, getJba29, getSpace, atlasId, getParc, parcId } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { atlasSelection } from "src/state"
 import { SapiViewsCoreAtlasModule } from "../module"
@@ -67,29 +67,66 @@ Template.loaders = [
 
 ]
 
-const asyncLoader = async () => {
-  const atlas = await getHumanAtlas()
-  const template = await getMni152()
-  const parcellation = await getJba29()
-  return {
-    atlas,
-    template,
-    parcellation,
-  }
+export const MNI152JBA29 = Template.bind({})
+MNI152JBA29.args = {
+  
 }
-
-export const Default = Template.bind({})
-Default.args = {
-  selected: spaceId.human.mni152
-}
-Default.loaders = [
-
+MNI152JBA29.loaders = [
   async () => {
-    const {
+    const atlas = await getHumanAtlas()
+    const template = await getMni152()
+    const parcellation = await getJba29()
+    return {
       atlas,
       template,
       parcellation,
-    } = await asyncLoader()
+    }
+  }
+]
+
+export const BigBrainJBA29 = Template.bind({})
+BigBrainJBA29.args = {
+  
+}
+BigBrainJBA29.loaders = [
+  async () => {
+    const atlas = await getHumanAtlas()
+    const template = await getSpace(atlasId.human, spaceId.human.bigbrain)
+    const parcellation = await getJba29()
+    return {
+      atlas,
+      template,
+      parcellation,
+    }
+  }
+]
+
+export const BigBrainCorticalLayers = Template.bind({})
+BigBrainCorticalLayers.args = {
+  
+}
+BigBrainCorticalLayers.loaders = [
+  async () => {
+    const atlas = await getHumanAtlas()
+    const template = await getSpace(atlasId.human, spaceId.human.bigbrain)
+    const parcellation = await getParc(atlasId.human, parcId.human.corticalLayers)
+    return {
+      atlas,
+      template,
+      parcellation,
+    }
+  }
+]
+
+export const MNI152LongBundle = Template.bind({})
+MNI152LongBundle.args = {
+  
+}
+MNI152LongBundle.loaders = [
+  async () => {
+    const atlas = await getHumanAtlas()
+    const template = await getMni152()
+    const parcellation = await getParc(atlasId.human, parcId.human.longBundle)
     return {
       atlas,
       template,

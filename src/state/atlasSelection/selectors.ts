@@ -1,6 +1,5 @@
 import { createSelector } from "@ngrx/store"
-import { nameSpace } from "./const"
-import { AtlasSelectionState } from "./store"
+import { nameSpace, AtlasSelectionState } from "./const"
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
 

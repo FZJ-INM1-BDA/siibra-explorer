@@ -1,7 +1,8 @@
 <mat-menu hasBackDrop="false" #matMenu="matMenu">
 
   <ng-template matMenuContent let-subParcellations="subParcellations">
-    <div class="sxplr-ml-2 sxplr-mr-2">
+
+    <div class="sxplr-custom-cmp sxplr-ml-2 sxplr-mr-2">
       <mat-grid-list
         cols="1"
         [rowHeight]="rowHeight"
@@ -10,15 +11,28 @@
         <mat-grid-tile
           *ngFor="let parc of subParcellations">
 
-          <tile-cmp *ngIf="parc"
-            class="sxplr-custom-cmp text"
-            [tile-text]="parc.name"
-            [tile-image-src]="parc | previewParcellationUrl"
-            [tile-selected]="selected"
-            [tile-image-darktheme]="darktheme"
-            (click)="clickOnParcellation(parc)">
-    
-          </tile-cmp>
+
+          <!-- if parent component injected template, use injected template -->
+          <ng-template
+            [ngIf]="singleParcTmpl"
+            [ngIfElse]="fallbackGrpParcTmpl"
+            [ngTemplateOutlet]="singleParcTmpl"
+            [ngTemplateOutletContext]="{
+              $implicit: parc
+            }">
+          </ng-template>
+
+          <ng-template #fallbackGrpParcTmpl>
+            <tile-cmp *ngIf="parc"
+              class="sxplr-custom-cmp text"
+              [tile-text]="parc.name"
+              [tile-image-src]="parc | previewParcellationUrl"
+              [tile-selected]="selected"
+              [tile-image-darktheme]="darktheme"
+              (click)="clickOnParcellation(parc)">
+      
+            </tile-cmp>
+          </ng-template>
     
         </mat-grid-tile>
       </mat-grid-list>

@@ -9,6 +9,7 @@
 
 .tile-selected {
   border: 2px solid #FED363;
+  box-sizing: border-box;
 }
 
 :host,

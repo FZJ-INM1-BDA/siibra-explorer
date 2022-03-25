@@ -1,37 +1,12 @@
 import { createReducer, on } from "@ngrx/store";
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as actions from "./actions"
-import { ViewerMode, BreadCrumb } from "./const"
+import { AtlasSelectionState } from "./const"
 
 function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {
   const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
   if (isNaN(lblIdx)) return null
   return lblIdx
-}
-
-export type AtlasSelectionState = {
-  selectedAtlas: SapiAtlasModel
-  selectedTemplate: SapiSpaceModel
-  selectedParcellation: SapiParcellationModel
-  selectedParcellationAllRegions: SapiRegionModel[]
-
-  selectedRegions: SapiRegionModel[]
-  standAloneVolumes: string[]
-
-  /**
-   * the navigation may mean something very different
-   * depending on if the user is using threesurfer/nehuba view
-   */
-  navigation: {
-    position: number[]
-    orientation: number[]
-    zoom: number
-    perspectiveOrientation: number[]
-    perspectiveZoom: number
-  }
-
-  viewerMode: ViewerMode
-  breadcrumbs: BreadCrumb[]
 }
 
 export const defaultState: AtlasSelectionState = {
@@ -49,29 +24,13 @@ export const defaultState: AtlasSelectionState = {
 const reducer = createReducer(
   defaultState,
   on(
-    actions.selectAtlas,
-    (state, { atlas }) => {
+    actions.setATP,
+    (state, { atlas, parcellation, template }) => {
       return {
         ...state,
-        selectedAtlas: atlas
-      }
-    }
-  ),
-  on(
-    actions.selectTemplate,
-    (state, { template }) => {
-      return {
-        ...state,
-        selectedTemplate: template
-      }
-    }
-  ),
-  on(
-    actions.selectParcellation,
-    (state, { parcellation }) => {
-      return {
-        ...state,
-        selectedParcellation: parcellation
+        selectedAtlas: atlas || state.selectedAtlas,
+        selectedTemplate: template || state.selectedTemplate,
+        selectedParcellation: parcellation || state.selectedParcellation,
       }
     }
   ),

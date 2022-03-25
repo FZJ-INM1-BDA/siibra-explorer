@@ -46,7 +46,8 @@ export const atlasId = {
 
 export const spaceId = {
   human: {
-    mni152: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2'
+    mni152: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2',
+    bigbrain: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
   },
   rat: {
     waxholm: "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8"
@@ -56,7 +57,9 @@ export const spaceId = {
 export const parcId = {
   human: {
     jba29: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
-    longBundle: "juelich/iav/atlas/v1.0.0/5"
+    longBundle: "juelich/iav/atlas/v1.0.0/5",
+    difumo256: "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235",
+    corticalLayers: "juelich/iav/atlas/v1.0.0/3"
   },
   rat: {
     v4: 'minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4'

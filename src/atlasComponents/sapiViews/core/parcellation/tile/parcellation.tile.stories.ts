@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Component, Input, Output, EventEmitter } from "@angular/core"
+import { provideMockStore } from "@ngrx/store/testing"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
 import { atlasId, parcId, getAtlas, provideDarkTheme, getParc } from "src/atlasComponents/sapi/stories.base"
@@ -10,6 +11,10 @@ import { SapiViewsCoreParcellationModule } from "../module"
 @Component({
   selector: `parc-tile-wrapper`,
   template: `
+  <ng-template #grpParcTmpl let-parc>
+    {{ parc.name }}
+  </ng-template>
+
   <mat-accordion>
     <mat-expansion-panel *ngFor="let item of parcs | keyvalue">
 
@@ -47,6 +52,24 @@ import { SapiViewsCoreParcellationModule } from "../module"
         </ng-container>
       </ng-template>
     </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        > grouped tmpl
+      </mat-expansion-panel-header>
+
+      <ng-template matExpansionPanelContent>
+        <ng-container *ngFor="let item of parcs | keyvalue">
+          <sxplr-sapiviews-core-parcellation-tile
+            *ngFor="let parc of (item.value | filterGroupedParcs : true)"
+            [sxplr-sapiviews-core-parcellation-tile-groupmenu-parc-tmpl]="grpParcTmpl"
+            [sxplr-sapiviews-core-parcellation-tile-parcellation]="parc"
+            class="sxplr-m-2"
+            (sxplr-sapiviews-core-parcellation-tile-onclick-parc)="parcClicked.emit($event)">
+          </sxplr-sapiviews-core-parcellation-tile>
+        </ng-container>
+      </ng-template>
+    </mat-expansion-panel>
   </mat-accordion>
   `,
   styles: [
@@ -76,6 +99,7 @@ export default {
         AngularMaterialModule,
       ],
       providers: [
+        provideMockStore(),
         SAPI,
         ...provideDarkTheme,
       ],

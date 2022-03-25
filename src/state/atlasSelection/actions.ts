@@ -1,6 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { BreadCrumb, nameSpace, ViewerMode } from "./const"
+import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
@@ -20,6 +20,28 @@ export const selectParcellation = createAction(
   `${nameSpace} selectParcellation`,
   props<{
     parcellation: SapiParcellationModel
+  }>()
+)
+
+/**
+ * setATP is called as a final step to (potentially) set:
+ * - selectedAtlas
+ * - selectedTemplate
+ * - selectedParcellation
+ * 
+ * It is up to the dispatcher to ensure that the selection makes sense.
+ * If any field is unset, it will take the default value from the store.
+ * It is **specifically** not setup to do **anymore** than atlas, template and parcellation
+ * 
+ * We may setup post hook for navigation adjustments/etc.
+ * Probably easier is simply subscribe to store and react to selectedTemplate selector
+ */
+export const setATP = createAction(
+  `${nameSpace} setATP`,
+  props<{
+    atlas?: SapiAtlasModel,
+    template?: SapiSpaceModel,
+    parcellation?: SapiParcellationModel,
   }>()
 )
 

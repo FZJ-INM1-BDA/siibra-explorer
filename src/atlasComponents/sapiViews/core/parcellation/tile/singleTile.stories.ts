@@ -1,9 +1,9 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
-import { Component, Input, Output, EventEmitter } from "@angular/core"
+import { provideMockStore } from "@ngrx/store/testing"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
-import { atlasId, parcId, getAtlas, provideDarkTheme, getParc, getHumanAtlas } from "src/atlasComponents/sapi/stories.base"
+import { parcId, provideDarkTheme, getParc, getHumanAtlas } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { FilterGroupedParcellationPipe } from "../filterGroupedParcellations.pipe"
 import { GroupedParcellation } from "../groupedParcellation"
@@ -21,13 +21,14 @@ export default {
         AngularMaterialModule,
       ],
       providers: [
+        provideMockStore(),
         SAPI,
         ...provideDarkTheme,
       ],
       declarations: [
         
-      ]
-    })
+      ],
+    }),
   ],
 } as Meta
 
@@ -45,7 +46,10 @@ const Template: Story<SapiViewsCoreParcellationParcellationTile> = (args: SapiVi
       gutterSize,
       rowHeight,
       parcellation: groups[1]
-    }
+    },
+    styles: [
+      `sxplr-sapiviews-core-parcellation-tile { display: inline-block; max-width: 8rem; }`
+    ]
   })
 }
 Template.loaders = [

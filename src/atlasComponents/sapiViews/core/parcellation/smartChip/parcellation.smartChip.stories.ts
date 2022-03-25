@@ -7,6 +7,7 @@ import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
 import { atlasId, getAtlas, provideDarkTheme, getParc, getAtlases } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { SapiViewsCoreParcellationModule } from "../module"
+import { provideMockStore } from "@ngrx/store/testing"
 
 @Component({
   selector: `parc-smart-chip-wrapper`,
@@ -54,6 +55,7 @@ export default {
         AngularMaterialModule,
       ],
       providers: [
+        provideMockStore(),
         SAPI,
         ...provideDarkTheme,
       ],

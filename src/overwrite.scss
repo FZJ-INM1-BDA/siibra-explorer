@@ -191,6 +191,14 @@ $justify-content-vars: end, center, space-between;
   opacity: 0.75;
 }
 
+.#{$nsp}-very-muted {
+  opacity: 0.5;
+}
+
+.#{$nsp}-extra-muted {
+  opacity: 0.25;
+}
+
 $position-vars: relative, absolute;
 @each $position-var in $position-vars {
   .#{$nsp}-position-#{$position-var} {

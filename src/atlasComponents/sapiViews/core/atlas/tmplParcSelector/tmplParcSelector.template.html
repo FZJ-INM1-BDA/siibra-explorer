@@ -18,10 +18,13 @@
       rowHeight="2:3"
       gutterSize="16">
 
-      <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackbyAtId"
+      <mat-grid-tile *ngFor="let template of availableTemplates$ | async; trackBy: trackTmpl"
         [attr.aria-checked]="(selectedTemplate$ | async)?.['@id']  === template['@id']">
         
         <sxplr-sapiviews-core-space-tile
+          [ngClass]="{
+            'sxplr-extra-muted': !(template | spaceSupportedInCurrentParcellation | async)
+          }"
           [sxplr-sapiviews-core-space-tile-space]="template"
           [sxplr-sapiviews-core-space-tile-selected]="(selectedTemplate$ | async)?.['@id'] === template['@id']"
           (click)="selectTemplate(template)">
@@ -40,16 +43,29 @@
         rowHeight="2:3"
         gutterSize="16">
 
-        <mat-grid-tile *ngFor="let parc of availableParcellations$ | async | filterUnsupportedParc | filterGroupedParcs">
+        <!-- using single parc template, since it's reused in non individual parcellation and tmpl for grp parcellation -->
+        <ng-template #singleParcTmpl let-parc>
           <sxplr-sapiviews-core-parcellation-tile
+            [ngClass]="{
+              'sxplr-extra-muted': !(parc | parcellationSupportedInCurrentSpace | async)
+            }"
+            [sxplr-sapiviews-core-parcellation-tile-selected]="(selectedParcellation$ | async)?.['@id'] === parc['@id']"
             [sxplr-sapiviews-core-parcellation-tile-parcellation]="parc"
             (sxplr-sapiviews-core-parcellation-tile-onclick-parc)="selectParcellation($event)">
 
           </sxplr-sapiviews-core-parcellation-tile>
+        </ng-template>
+
+        <mat-grid-tile *ngFor="let parc of availableParcellations$ | async | filterUnsupportedParc | filterGroupedParcs">
+          <ng-template
+            [ngTemplateOutlet]="singleParcTmpl"
+            [ngTemplateOutletContext]="{ $implicit: parc }">
+          </ng-template>
         </mat-grid-tile>
 
         <mat-grid-tile *ngFor="let group of availableParcellations$ | async | filterUnsupportedParc | filterGroupedParcs : true | filterUnsupportedParc">
           <sxplr-sapiviews-core-parcellation-tile
+            [sxplr-sapiviews-core-parcellation-tile-groupmenu-parc-tmpl]="singleParcTmpl"
             [sxplr-sapiviews-core-parcellation-tile-parcellation]="group"
             (sxplr-sapiviews-core-parcellation-tile-onclick-parc)="selectParcellation($event)">
 

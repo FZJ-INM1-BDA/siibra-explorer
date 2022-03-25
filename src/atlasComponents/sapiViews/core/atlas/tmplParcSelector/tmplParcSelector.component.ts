@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, QueryList, ViewChild, ViewChildren } from "@angular/core";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { combineLatest, forkJoin, merge, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
@@ -170,11 +170,7 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   }
 
 
-  trackbyAtId(t) {
+  trackTmpl(t:SapiSpaceModel) {
     return t['@id']
-  }
-
-  trackKeyVal(obj: { key: string, value: any }) {
-    return obj.key
   }
 }

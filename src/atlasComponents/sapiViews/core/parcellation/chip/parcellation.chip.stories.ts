@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
+import { provideMockStore } from "@ngrx/store/testing"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
 import { atlasId, getAtlas, provideDarkTheme, getParc } from "src/atlasComponents/sapi/stories.base"
@@ -19,6 +20,7 @@ export default {
         AngularMaterialModule,
       ],
       providers: [
+        provideMockStore(),
         SAPI,
         ...provideDarkTheme,
       ],

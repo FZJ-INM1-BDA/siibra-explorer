@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, merge, of } from "rxjs";
-import { filter, map, mapTo, switchMap, switchMapTo, withLatestFrom } from "rxjs/operators";
-import { SAPI, SAPIRegion, SapiRegionModel } from "src/atlasComponents/sapi";
+import { concat, forkJoin, merge, of } from "rxjs";
+import { filter, map, mapTo, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { SAPI, SapiParcellationModel, SAPIRegion, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
@@ -10,9 +10,102 @@ import { fromRootStore } from "./util";
 import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
 import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
 import { atlasAppearance, atlasSelection } from "..";
+import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
 
 @Injectable()
 export class Effect {
+
+  parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapiSvc)
+
+  onTemplateParcSelection = createEffect(() => merge<{ template: SapiSpaceModel, parcellation: SapiParcellationModel }>(
+    this.action.pipe(
+      ofType(actions.selectTemplate),
+      map(({ template }) => {
+        return {
+          template, 
+          parcellation: null
+        }
+      })
+    ),
+    this.action.pipe(
+      ofType(actions.selectParcellation),
+      map(({ parcellation }) => {
+        return {
+          template: null,
+          parcellation
+        }
+      })
+    )
+  ).pipe(
+    withLatestFrom(this.store),
+    switchMap(([ { template, parcellation }, store ]) => {
+      const currTmpl = selectors.selectedTemplate(store)
+      const currParc = selectors.selectedParcellation(store)
+      const currAtlas = selectors.selectedAtlas(store)
+      return this.parcSupportedInSpacePipe.transform(
+        parcellation || currParc,
+        template || currTmpl
+      ).pipe(
+        switchMap(flag => {
+          /**
+           * if desired parc is supported in tmpl, emit them
+           */
+          if (flag) {
+            return of({
+              template: template || currTmpl,
+              parcellation: parcellation || currParc,
+            })
+          }
+          /**
+           * if template is defined, find the first parcellation that is supported
+           */
+          if (!!template) {
+            return concat(
+              ...currAtlas.parcellations.map(
+                p => this.parcSupportedInSpacePipe.transform(p["@id"], template).pipe(
+                  filter(flag => flag),
+                  switchMap(() => this.sapiSvc.getParcDetail(currAtlas["@id"], p['@id'])),
+                )
+              )
+            ).pipe(
+              map(parcellation => {
+                return {
+                  template,
+                  parcellation
+                }
+              })
+            )
+          }
+          if (!!parcellation) {
+            return concat(
+              ...currAtlas.spaces.map(
+                sp => this.parcSupportedInSpacePipe.transform(parcellation["@id"], sp["@id"]).pipe(
+                  filter(flag => flag),
+                  switchMap(() => this.sapiSvc.getSpaceDetail(currAtlas["@id"], sp['@id'])),
+                )
+              )
+            ).pipe(
+              take(1),
+              map(template => {
+                return {
+                  template,
+                  parcellation
+                }
+              })
+            )
+          }
+          throw new Error(`neither template nor parcellation has been defined!`)
+        }),
+        map(({ parcellation, template }) =>
+          actions.setATP({
+            parcellation,
+            template
+          })
+        )
+      )
+    }),
+
+  ))
 
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
@@ -37,16 +130,13 @@ export class Effect {
           this.sapiSvc.getSpaceDetail(atlas["@id"], spaceId["@id"])
         )
       ).pipe(
-        switchMap(spaces => {
+        map(spaces => {
           const selectedSpace = spaces.find(s => /152/.test(s.fullName)) || spaces[0]
-          return of(
-            actions.selectTemplate({
-              template: selectedSpace
-            }),
-            actions.selectParcellation({
-              parcellation
-            })
-          )
+          return actions.setATP({
+            atlas,
+            template: selectedSpace,
+            parcellation
+          })
         })
       )
     }),
