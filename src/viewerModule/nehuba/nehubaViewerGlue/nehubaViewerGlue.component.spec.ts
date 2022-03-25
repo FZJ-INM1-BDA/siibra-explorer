@@ -13,11 +13,9 @@ import { AngularMaterialModule } from "src/sharedModules/angularMaterial.module"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util"
 import { WindowResizeModule } from "src/util/windowResize"
 import { NehubaLayerControlService } from "../layerCtrl.service"
-import { MaximisePanelButton } from "../maximisePanelButton/maximisePanelButton.component"
 import { NehubaMeshService } from "../mesh.service"
 import { NehubaViewerTouchDirective } from "../nehubaViewerInterface/nehubaViewerTouch.directive"
 import { selectorAuxMeshes } from "../store"
-import { TouchSideClass } from "../touchSideClass.directive"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { HarnessLoader } from "@angular/cdk/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
@@ -68,9 +66,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       ],
       declarations: [
         NehubaGlueCmp,
-        MaximisePanelButton,
         MockViewerCtrlCmp,
-        TouchSideClass,
 
         // TODO this may introduce a lot more dep
         MockNehubaViewerContainerDirective,

@@ -26,12 +26,7 @@ export class ViewerCtrlCmp{
   @HostBinding('attr.darktheme')
   darktheme = false
 
-  private selectedAtlasId: string
-  private selectedTemplateId: string
-
-
   private sub: Subscription[] = []
-  private hiddenLayerNames: string[] = []
 
   private _removeOctantFlag: boolean
   get removeOctantFlag(){
@@ -81,13 +76,6 @@ export class ViewerCtrlCmp{
     }
 
     this.sub.push(
-
-      this.store$.pipe(
-        atlasSelection.fromRootStore.distinctATP()
-      ).subscribe(({ atlas, parcellation, template }) => {
-        this.selectedAtlasId = atlas["@id"]
-        this.selectedTemplateId = template["@id"]
-      }),
 
       this.pureConstantService.darktheme$.subscribe(darktheme => this.darktheme = darktheme),
 

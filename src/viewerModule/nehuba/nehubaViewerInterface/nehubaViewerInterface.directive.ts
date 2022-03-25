@@ -1,5 +1,5 @@
 import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
-import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, fromEvent, asyncScheduler, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
@@ -134,8 +134,6 @@ const accumulatorFn: (
 })
 export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
-  public viewportToDatas: [any, any, any] = [null, null, null]
-
   @Output('iav-nehuba-viewer-container-mouseover')
   public mouseOverSegments = new EventEmitter<TMouseoverEvent[]>()
 
@@ -234,7 +232,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
-  async createNehubaInstance(nehubaConfig: NehubaConfig, lifeCycle: INehubaLifecycleHook = {}){
+  async createNehubaInstance(nehubaConfig: NehubaConfig){
     this.clear()
 
     await new Promise((rs, rj) => setTimeout(rs, 0))
@@ -254,7 +252,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
      */
 
     this.nehubaViewerInstance.config = nehubaConfig
-    this.nehubaViewerInstance.lifecycle = lifeCycle
 
     if (this.gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
@@ -294,13 +291,6 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         const idx = Number(label.replace('label=', ''))
         // TODO 
         // this is exclusive for vtk layer
-      }),
-
-      this.nehubaViewerInstance.nehubaReady.pipe(
-        switchMapTo(fromEvent(this.nehubaViewerInstance.elementRef.nativeElement, 'viewportToData')),
-        takeOnePipe()
-      ).subscribe((events: CustomEvent[]) => {
-        [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       }),
 
       combineLatest([

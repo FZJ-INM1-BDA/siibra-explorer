@@ -1,6 +1,4 @@
-import { Component } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { userInterface } from "src/state"
 
 @Component({
@@ -9,11 +7,13 @@ import { userInterface } from "src/state"
   styleUrls: [
     './currentLayout.style.css',
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class CurrentLayout {
 
-  public FOUR_PANEL: userInterface.PanelMode = "FOUR_PANEL"
+  @Input('current-layout-use-layout')
+  public useLayout: userInterface.PanelMode = "FOUR_PANEL"
   
   public panelModes: Record<string, userInterface.PanelMode> = {
     FOUR_PANEL: "FOUR_PANEL",
@@ -21,12 +21,8 @@ export class CurrentLayout {
     SINGLE_PANEL: "SINGLE_PANEL",
     V_ONE_THREE: "V_ONE_THREE"
   }
-  public panelMode$: Observable<userInterface.PanelMode> = this.store$.pipe(
-    select(userInterface.selectors.panelMode)
-  )
 
-  constructor(
-    private store$: Store<any>,
-  ) {
-  }
+  public panelMode: userInterface.PanelMode = null
+
+  constructor() {}
 }

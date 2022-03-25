@@ -4,7 +4,6 @@ import { merge, Observable, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
-import { atlasSelection } from "src/state";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 /**

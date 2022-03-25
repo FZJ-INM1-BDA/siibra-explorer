@@ -425,9 +425,6 @@
       <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'nehuba'"
         (viewerEvent)="handleViewerEvent($event)"
-        [selectedTemplate]="templateSelected$ | async"
-        [selectedParcellation]="parcellationSelected$ | async"
-        [selectedAtlas]="selectedAtlas$ | async"
         #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
       </iav-cmp-viewer-nehuba-glue>
 

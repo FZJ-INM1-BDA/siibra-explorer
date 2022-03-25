@@ -1,0 +1,172 @@
+<current-layout
+  [current-layout-use-layout]="currentPanelMode"
+  [iav-key-listener]="[{ type: 'keydown', key: ' ', target: 'document', capture: true }]"
+  (iav-key-event)="handleCycleViewEvent()">
+  <div class="layout-cell" cell-i
+    iav-window-resize
+    [iav-window-resize-time]="64"
+    (iav-window-resize-event)="setQuickTourPos()"
+    quick-tour
+    [quick-tour-description]="quickTourSliceViewSlide.description"
+    [quick-tour-order]="quickTourSliceViewSlide.order"
+    [quick-tour-overwrite-arrow]="sliceViewArrow"
+    [quick-tour-overwrite-position]="quickTourOverwritingPos">
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 0 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="layout-cell" cell-ii>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 1 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="layout-cell" cell-iii>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 2 | parseAsNumber }"></ng-content>
+  </div>
+  <div class="layout-cell" cell-iv
+    quick-tour
+    [quick-tour-description]="quickTour3dViewSlide.description"
+    [quick-tour-order]="quickTour3dViewSlide.order">
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 3 | parseAsNumber }"></ng-content>
+  </div>
+</current-layout>
+
+<!-- slice view overlay tmpl -->
+<ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
+
+  <!-- perspective view tmpl -->
+  <ng-template #overlayPerspectiveTmpl>
+    <layout-floating-container>
+
+      <!-- mesh loading is still weird -->
+      <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
+      <!-- TODO -->
+    </layout-floating-container>
+  </ng-template>
+
+  <iav-layout-fourcorners class="w-100 h-100 d-block">
+    <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl"
+      class="overflow-hidden"
+      iavLayoutFourCornersContent>
+      <!-- TODO add landmarks here -->
+
+
+      <!-- customLandmarks -->
+      <!-- only show landmarks in slice views -->
+      <!-- <landmark-2d-flat-cmp *ngFor="let lm of (customLandmarks$ | async | filterArray : filterCustomLandmark)"
+        (mouseenter)="handleMouseEnterCustomLandmark(lm)"
+        (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
+        [color]="lm.color || [255, 255, 255]"
+        [positionX]="getPositionX(panelIndex, lm)"
+        [positionY]="getPositionY(panelIndex, lm)"
+        [positionZ]="getPositionZ(panelIndex, lm)">
+
+      </landmark-2d-flat-cmp> -->
+    </layout-floating-container>
+
+    <!-- panel controller -->
+    <div iavLayoutFourCornersBottomRight class="position-relative honing">
+
+      <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+        panelIndex: panelIndex,
+        visible: currentHoveredIndex === panelIndex
+      }">
+      </ng-container>
+      
+      <div *ngIf="volumeChunkLoading$ | async"
+        class="position-absolute bottom-0 right-0">
+        <spinner-cmp></spinner-cmp>
+      </div>
+    </div>
+  </iav-layout-fourcorners>
+
+</ng-template>
+
+<!-- panel control template -->
+<ng-template
+  #panelCtrlTmpl
+  let-panelIndex="panelIndex"
+  let-visible="visible">
+  <div class="ws-no-wrap opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
+    [ngClass]="{ onHover: visible }"
+    [attr.data-viewer-controller-visible]="visible"
+    [attr.data-viewer-controller-index]="panelIndex">
+
+    <div class="position-absolute w-100 h-100 pe-none"
+      *ngIf="panelIndex === 1"
+      quick-tour
+      [quick-tour-description]="quickTourIconsSlide.description"
+      [quick-tour-order]="quickTourIconsSlide.order">
+    </div>
+
+    <!-- perspective specific control -->
+    <ng-container *ngIf="panelIndex === 3">
+
+      <button mat-icon-button color="primary"
+        (click)="detectChanges()"
+        [matMenuTriggerFor]="viewerCtrlMenu">
+        <i class="fas fa-cog"></i>
+      </button>
+
+    </ng-container>
+
+    <!-- factor < 1.0 === zoom in -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 0.9)"
+      [attr.aria-label]="ARIA_LABELS.ZOOM_IN">
+      <i class="fas fa-search-plus"></i>
+    </button>
+
+    <!-- factor > 1.0 === zoom out -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 1.1)"
+      [attr.aria-label]="ARIA_LABELS.ZOOM_OUT">
+      <i class="fas fa-search-minus"></i>
+    </button>
+
+    <ng-template
+      [ngTemplateOutlet]="maxBtnTmpl"
+      [ngTemplateOutletContext]="{ $implicit: panelIndex }">
+    </ng-template>
+  </div>
+</ng-template>
+
+<ng-template #maxBtnTmpl let-panelIndex>
+  <button
+    mat-icon-button
+    color="primary"
+    (click)="toggleMaximiseMinimise(panelIndex)">
+    <ng-template
+      [ngIf]="currentPanelMode === 'SINGLE_PANEL'"
+      [ngIfElse]="expandTmpl">
+      <i class="fas fa-compress"></i>
+    </ng-template>
+
+    <ng-template #expandTmpl>
+      <i class="fas fa-expand"></i>
+    </ng-template>
+  </button>
+</ng-template>
+
+
+<!-- viewer ctrl -->
+<mat-menu #viewerCtrlMenu>
+  <viewer-ctrl-component
+    class="d-block m-2 ml-3 mr-3"
+    (click)="$event.stopPropagation()">
+  </viewer-ctrl-component>
+</mat-menu>
+
+<ng-template #sliceViewArrow>
+  <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path id="quarter_circle" d="M22.6151 96.5C22.6151 96.5 18.5 84.1266 18.5 76.5C18.5001 62 18.1151 59.5 22.6151 47C27.115 34.5 39.3315 27.7229 47.5 25C56.5 22 63 22.5 72.5 24C83.1615 25.6834 83.5 26 91 29" />
+    <g id="arrow_top_left">
+      <path id="arrow_stem" d="M37 40C35.5882 38.5882 17.6863 20.6863 12 15" />
+      <path id="arrow_head" d="M6 24C6.38926 21.7912 6.68496 18.3286 6.71205 16.0803C6.73751 13.9665 6.632 13.6135 6.52632 11.5C6.46368 10.2469 6.52632 11.5 6 8C11 10 9.71916 9.74382 11 9.99999C13.5 10.5 13.743 10.7451 17 11C20 11.2348 21.1276 11 22 11"  stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="arrow_left">
+      <path id="arrow_stem_2" d="M29.4229 78.5771C27.1573 78.5771 18.3177 78.5771 9.19238 78.5771" />
+      <path id="arrow_head_2" d="M13.3137 89.6274C12.0271 87.7903 9.78778 85.1328 8.2171 83.5238C6.74048 82.0112 6.41626 81.8362 4.84703 80.4164C3.91668 79.5747 4.84703 80.4164 2 78.3137C6.94975 76.1924 5.86291 76.9169 6.94974 76.1924C9.07106 74.7782 9.41624 74.7797 11.8995 72.6569C14.1868 70.7016 14.8181 69.7382 15.435 69.1213"  stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="arrow_top">
+      <path id="arrow_stem_3" d="M77.0057 32.0057C77.0057 30.3124 77.0057 16.2488 77.0057 9.42862" />
+      <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </svg>
+</ng-template>

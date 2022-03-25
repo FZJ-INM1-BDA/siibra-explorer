@@ -1,10 +1,10 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable, race, timer, Subject } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, mapTo, switchMap, take, skip, tap, distinctUntilChanged } from "rxjs/operators";
+import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optional } from "@angular/core";
+import { fromEvent, Subscription, BehaviorSubject, Observable, Subject, of, interval } from 'rxjs'
+import { debounceTime, filter, map, scan, switchMap, take, distinctUntilChanged, debounce } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { LoggingService } from "src/logging";
 import { bufferUntil, getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
-import { deserializeSegment, NEHUBA_INSTANCE_INJTKN, scanSliceViewRenderFn } from "../util";
+import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
 import { arrayOrderedEql } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
@@ -35,10 +35,6 @@ interface LayerLabelIndex {
   labelIndicies: number[]
 }
 
-export interface INehubaLifecycleHook{
-  onInit?: () => void
-}
-
 export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
   const found = acc.find(layerLabelIndex => {
     return layerLabelIndex.layer.name === curr.layer.name
@@ -61,18 +57,12 @@ export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
   styleUrls : [
     './nehubaViewer.style.css',
   ],
-  // OnPush seems to improve performance significantly
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class NehubaViewerUnit implements OnInit, OnDestroy {
+export class NehubaViewerUnit implements OnDestroy {
 
 
   public ngIdSegmentsMap: Record<string, number[]> = {}
-
-  private sliceviewLoading$: Observable<boolean>
-
-  public lifecycle: INehubaLifecycleHook
 
   public viewerPosInVoxel$ = new BehaviorSubject(null)
   public viewerPosInReal$ = new BehaviorSubject(null)
@@ -186,9 +176,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
             if (!readiedLayerNames.includes(layerName)) {
               return
             }
-            this._nehubaReady = true
-            this.nehubaReady.emit(null)
           }
+          this._nehubaReady = true
+          this.nehubaReady.emit(null)
         })
         viewer.registerDisposer(this.layersChangedHandler)
       })
@@ -374,9 +364,33 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     } else {
       this.log.error(`NG_LAYER_CONTROL not provided`)
     }
-  }
 
-  public numMeshesToBeLoaded: number = 0
+    if (this.injSetMeshesToLoad$) {
+      this.subscriptions.push(
+        this.injSetMeshesToLoad$.pipe(
+          scan(scanFn, []),
+          debounceTime(16),
+          debounce(() => this._nehubaReady
+            ? of(true)
+            : interval(160).pipe(
+                filter(() => this._nehubaReady),
+                take(1),
+              )
+          ),
+        ).subscribe(layersLabelIndex => {
+          let totalMeshes = 0
+          for (const layerLayerIndex of layersLabelIndex) {
+            const { layer, labelIndicies } = layerLayerIndex
+            totalMeshes += labelIndicies.length
+            this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
+          }
+          // TODO implement total mesh to be loaded and mesh loading UI
+        }),
+      )
+    } else {
+      this.log.error(`SET_MESHES_TO_LOAD not provided`)
+    }
+  }
 
   public applyGpuLimit(gpuLimit: number) {
     if (gpuLimit && this.nehubaViewer) {
@@ -423,8 +437,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this._multiNgIdColorMap = val
   }
 
-  private loadMeshes$: ReplaySubject<{labelIndicies: number[], layer: { name: string }}> = new ReplaySubject()
-
   public mouseOverSegment: number | null
   public mouseOverLayer: {name: string, url: string}| null
 
@@ -435,6 +447,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
+      debugger
       this.log.error(err)
     })
 
@@ -454,52 +467,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     setNehubaViewer(this.nehubaViewer)
 
     this.onDestroyCb.push(() => setNehubaViewer(null))
-  }
-
-  public ngOnInit() {
-    this.sliceviewLoading$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
-      scan(scanSliceViewRenderFn, [ null, null, null ]),
-      map(arrOfFlags => arrOfFlags.some(flag => flag)),
-      startWith(true),
-    )
-
-    this.subscriptions.push(
-      (this.injSetMeshesToLoad$ || this.loadMeshes$).pipe(
-        scan(scanFn, []),
-        debounceTime(100),
-        switchMap(layerLabelIdx => 
-          /**
-           * sometimes (e.g. when all slice views are minimised), sliceviewlaoding will not emit
-           * so if sliceviewloading does not emit another value (except the initial true value)
-           * force start loading of mesh
-           */
-          race(
-            this.sliceviewLoading$.pipe(
-              skip(1)
-            ),
-            timer(500).pipe(
-              mapTo(false)
-            )
-          ).pipe(
-            filter(flag => !flag),
-            take(1),
-            mapTo(layerLabelIdx),
-          ) 
-        ),
-      ).subscribe(layersLabelIndex => {
-        let totalMeshes = 0
-        for (const layerLayerIndex of layersLabelIndex) {
-          const { layer, labelIndicies } = layerLayerIndex
-          totalMeshes += labelIndicies.length
-          this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
-        }
-        // TODO implement total mesh to be loaded and mesh loading UI
-        this.numMeshesToBeLoaded = totalMeshes
-      }),
-    )
-
-    const { onInit } = this.lifecycle || {}
-    onInit && onInit.call(this)
   }
 
   public ngOnDestroy() {

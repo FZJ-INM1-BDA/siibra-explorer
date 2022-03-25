@@ -10,11 +10,8 @@ import { NEHUBA_VIEWER_FEATURE_KEY } from "./constants";
 import { reducer } from "./store";
 import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
-import { LayoutModule } from "src/layouts/layout.module";
-import { TouchSideClass } from "./touchSideClass.directive";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { MaximisePanelButton } from "./maximisePanelButton/maximisePanelButton.component";
 import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module";
 import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
@@ -25,11 +22,11 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
-import { ViewerCtrlModule } from "./viewerCtrl";
 import { DragDropFileModule } from "src/dragDropFile/module";
 import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
+import { NehubaLayoutOverlayModule } from "./layoutOverlay";
 
 @NgModule({
   imports: [
@@ -37,14 +34,12 @@ import { MeshEffects } from "./mesh.effects/mesh.effects";
     FormsModule,
     ReactiveFormsModule,
     UtilModule,
-    LayoutModule,
     AngularMaterialModule,
     Landmark2DModule,
     ComponentsModule,
     MouseoverModule,
     ShareModule,
     WindowResizeModule,
-    ViewerCtrlModule,
     DragDropFileModule,
 
     /**
@@ -60,15 +55,14 @@ import { MeshEffects } from "./mesh.effects/mesh.effects";
     EffectsModule.forFeature([
       MeshEffects
     ]),
-    QuickTourModule
+    QuickTourModule,
+    NehubaLayoutOverlayModule,
   ],
   declarations: [
     NehubaViewerContainerDirective,
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
-    TouchSideClass,
-    MaximisePanelButton,
     StatusCardComponent,
     NgLayerCtrlCmp,
   ],

@@ -43,7 +43,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           timer(0),
           interval(16)
         ).pipe(
-          filter(() => this.counter <= this.max),
+          filter(() => this.counter < this.max),
           takeWhile(() => this.priorityQueue.length > 0)
         )
       )

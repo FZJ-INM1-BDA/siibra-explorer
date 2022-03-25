@@ -76,15 +76,6 @@ mapModeIdxClass.set("V_ONE_THREE", new Map([
   [3, { bottom, right }],
 ]))
 
-export const removeTouchSideClasses = (panel: HTMLElement) => {
-  panel.classList.remove(
-    `touch-top`,
-    `touch-left`,
-    `touch-right`,
-    `touch-bottom`)
-  return panel
-}
-
 /**
  * gives a clue of the approximate location of the panel, allowing position of checkboxes/scale bar to be placed in unobtrustive places
  */

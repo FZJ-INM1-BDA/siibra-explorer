@@ -1,8 +1,9 @@
-import { Directive, ElementRef, Input, OnDestroy } from "@angular/core";
+import { Directive, ElementRef, Inject, Input, OnDestroy } from "@angular/core";
 import { Observable, fromEvent, merge, Subscription } from "rxjs";
 import { map, filter, shareReplay, switchMap, pairwise, takeUntil, switchMapTo } from "rxjs/operators";
 import { getExportNehuba } from 'src/util/fn'
-import { computeDistance } from "../nehubaViewer/nehubaViewer.component";
+import { computeDistance, NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
+import { NEHUBA_INSTANCE_INJTKN, takeOnePipe } from "../util";
 
 @Directive({
   selector: '[iav-viewer-touch-interface]',
@@ -11,17 +12,12 @@ import { computeDistance } from "../nehubaViewer/nehubaViewer.component";
 
 export class NehubaViewerTouchDirective implements OnDestroy{
 
-  @Input('iav-viewer-touch-interface-v-panels')
-  viewerPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
-
   @Input('iav-viewer-touch-interface-vp-to-data')
-  viewportToData: [any, any, any, any]
+  viewportToData: any[] = []
 
-  @Input('iav-viewer-touch-interface-ngviewer')
-  ngViewer: any
-
-  @Input('iav-viewer-touch-interface-nehuba-config')
-  nehubaConfig: any
+  get ngViewer(){
+    return this.nehubaUnit?.nehubaViewer?.ngviewer
+  }
 
   private touchMove$: Observable<any>
   private singleTouchStart$: Observable<TouchEvent>
@@ -30,7 +26,11 @@ export class NehubaViewerTouchDirective implements OnDestroy{
 
   public translate$: Observable<any>
 
-  private findPanelIndex = (panel: HTMLElement) => this.viewerPanels.indexOf(panel)
+  private nehubaUnit: NehubaViewerUnit
+  private findPanelIndex(panel: HTMLElement){
+    if (!this.nehubaUnit) return null
+    return Array.from(this.nehubaUnit?.nehubaViewer?.ngviewer?.display?.panels || []).indexOf(panel)
+  }
 
   private _exportNehuba: any
   private get exportNehuba(){
@@ -41,11 +41,21 @@ export class NehubaViewerTouchDirective implements OnDestroy{
   }
 
   private s: Subscription[] = []
+  private nehubaSub: Subscription[] = []
 
   constructor(
     private el: ElementRef,
+    @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<NehubaViewerUnit>
   ){
+    if (nehuba$) {
 
+      this.s.push(
+        nehuba$.subscribe(unit => {
+          this.nehubaUnit = unit
+          this.onNewNehubaUnit(unit)
+        })
+      )
+    }
     /**
      * Touchend also needs to be listened to, as user could start
      * with multitouch, and end up as single touch
@@ -199,7 +209,7 @@ export class NehubaViewerTouchDirective implements OnDestroy{
           [ev1.touches[1].screenX, ev1.touches[1].screenY],
         )
         const factor = d1 / d2
-        const { minZoom = null, maxZoom = null } = this.nehubaConfig?.layout?.useNehubaPerspective?.restrictZoomLevel || {}
+        const { minZoom = null, maxZoom = null } = {}
         const { zoomFactor } = this.ngViewer.perspectiveNavigationState
         if (!!minZoom && zoomFactor.value * factor < minZoom) { return }
         if (!!maxZoom && zoomFactor.value * factor > maxZoom) { return }
@@ -249,9 +259,27 @@ export class NehubaViewerTouchDirective implements OnDestroy{
     )
   }
 
+  private onNewNehubaUnit(nehubaUnit: NehubaViewerUnit) {
+    while (this.nehubaSub.length > 0) this.nehubaSub.pop().unsubscribe()
+
+    if (!nehubaUnit) return
+
+    this.nehubaSub.push(
+      fromEvent<CustomEvent>(
+        nehubaUnit.elementRef.nativeElement,
+        'viewportToData'
+      ).pipe(
+        takeOnePipe()
+      ).subscribe((events: CustomEvent[]) => {
+        [0, 1, 2].forEach(idx => this.viewportToData[idx] = events[idx].detail.viewportToData)
+      })
+    )
+  }
+
   ngOnDestroy(){
     while(this.s.length > 0){
       this.s.pop().unsubscribe()
     }
+    while (this.nehubaSub.length > 0) this.nehubaSub.pop().unsubscribe()
   }
 }

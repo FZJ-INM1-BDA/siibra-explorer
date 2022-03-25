@@ -1,4 +1,4 @@
-<ng-container [ngSwitch]="panelMode$ | async">
+<ng-container [ngSwitch]="useLayout">
   <layout-four-panel
     *ngSwitchCase="panelModes.FOUR_PANEL"
     class="d-block sxplr-w-100 sxplr-h-100">
@@ -64,7 +64,7 @@
     </ng-container>
   </layout-single-panel>
   <div *ngSwitchDefault>
-    A panel mode which I have never seen before ... {{ panelMode$ | async }}
+    A panel mode which I have never seen before ... {{ useLayout }}
   </div>
 </ng-container>
 
