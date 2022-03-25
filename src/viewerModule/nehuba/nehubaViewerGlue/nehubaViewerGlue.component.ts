@@ -8,7 +8,6 @@ import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
-import { cvtNavigationObjToNehubaConfig } from "../util";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
@@ -170,7 +169,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       () => {
         if (this.nehubaContainerSub) {
           while(this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
-          this.nehubaContainerSub = null
         }
       }
     )
@@ -193,27 +191,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
   }
 
-  private async loadNewViewer(ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }, baseLayers: NgLayerCustomLayer[]) {
-    const config = getNehubaConfig(ATP.template)
-    for (const baseLayer of baseLayers) {
-      config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
-    }
-
-    const overwritingInitState = this.navigation
-      ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
-      : {}
-
-    config.dataset.initialNgState = {
-      ...config.dataset.initialNgState,
-      ...overwritingInitState,
-    }
-    await this.nehubaContainerDirective.createNehubaInstance(config)
-    this.viewerUnit = this.nehubaContainerDirective.nehubaViewerInstance
-
-
-    this.newViewer$.next(true)
-  }
-
   @Output()
   public viewerEvent = new EventEmitter<TViewerEvent<'nehuba'>>()
 
@@ -223,7 +200,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
-    private effect: LayerCtrlEffects,
     private cdr: ChangeDetectorRef,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
@@ -233,7 +209,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
      * This **massively** improve the performance of the viewer
      * TODO investigate why, and perhaps eventually remove the cdr.detach()
      */
-    this.cdr.detach()
+    // this.cdr.detach()
 
     /**
      * define onclick behaviour
@@ -250,45 +226,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     ).subscribe(this.disposeViewer.bind(this))
     this.onDestroyCb.push(() => onATPClear.unsubscribe())
     
-    const onATPDebounceNgBaseLayers = this.store$.pipe(
-      atlasSelection.fromRootStore.distinctATP(),
-      debounceTime(16),
-      switchMap((ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }) => this.store$.pipe(
-        select(atlasAppearance.selectors.customLayers),
-        debounceTime(16),
-        map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
-        distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
-        filter(layers => layers.length > 0),
-        map(ngBaseLayers => {
-          return {
-            ATP,
-            ngBaseLayers
-          }
-        })
-      ))
-    ).subscribe(async ({ ATP, ngBaseLayers }) => {
-      await this.loadNewViewer(ATP, ngBaseLayers)
-
-      /**
-       * TODO this part is a little awkward. needs refactor
-       */
-      const {
-        parcNgLayers,
-        tmplAuxNgLayers,
-      } = await this.effect.onATPDebounceNgLayers$.pipe(
-        take(1)
-      ).toPromise()
-
-      const ngIdSegmentsMap: Record<string, number[]> = {} 
-
-      for (const key in parcNgLayers) {
-        ngIdSegmentsMap[key] = parcNgLayers[key].labelIndicies
-      }
-
-      this.viewerUnit.ngIdSegmentsMap = ngIdSegmentsMap
-    })
-    this.onDestroyCb.push(() => onATPDebounceNgBaseLayers.unsubscribe())
-
     /**
      * subscribe to ngIdtolblIdxToRegion
      */

@@ -130,6 +130,11 @@ export const clearStandAloneVolumes = createAction(
 
 /**
  * n.b. position in nm!
+ * TODO this action currently sucks.
+ * it depends on nehuba being available
+ * and if so, potentially ease move there
+ * 
+ * should be moved to nehuba/store/navigateTo instead
  */
 export const navigateTo = createAction(
   `${nameSpace} navigateTo`,

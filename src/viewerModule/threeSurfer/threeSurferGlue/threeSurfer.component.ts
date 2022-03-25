@@ -347,11 +347,21 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       const t = new THREE.Vector3()
       const s = new THREE.Vector3()
 
+      /**
+       * ThreeJS interpretes the scene differently to neuroglancer in subtle ways. 
+       * At [0, 0, 0, 1] decomposed camera quaternion, for example,
+       * - ThreeJS: view from superior -> inferior, anterior as top, right hemisphere as right
+       * - NG: view from from inferior -> superior, posterior as top, left hemisphere as right
+       * 
+       * multiplying the exchange factor [-1, 0, 0, 0] converts ThreeJS convention to NG convention
+       */
       const cameraM = this.tsRef.camera.matrix
       cameraM.decompose(t, q, s)
+      const exchangeFactor = new THREE.Quaternion(-1, 0, 0, 0)
+
       try {
         this.navStateStoreRelay.setState({
-          perspectiveOrientation: q.toArray(),
+          perspectiveOrientation: q.multiply(exchangeFactor).toArray(),
           perspectiveZoom: t.length()
         })
       } catch (_e) {
@@ -368,11 +378,11 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
      */
     const navStateSub = this.navStateStoreRelay.select(s => s).subscribe(v => {
       this.store$.dispatch(
-        atlasSelection.actions.navigateTo({
+        atlasSelection.actions.setNavigation({
           navigation: {
             position: [0, 0, 0],
             orientation: [0, 0, 0, 1],
-            zoom: 1,
+            zoom: 1e6,
             perspectiveOrientation: v.perspectiveOrientation,
             perspectiveZoom: v.perspectiveZoom * pZoomFactor
           }
@@ -402,6 +412,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         
         const cameraQuat = new THREE.Quaternion(...this.mainStoreCameraNav.perspectiveOrientation)
         const cameraPos = new THREE.Vector3(0, 0, this.mainStoreCameraNav.perspectiveZoom / pZoomFactor)
+        
+        /**
+         * ThreeJS interpretes the scene differently to neuroglancer in subtle ways. 
+         * At [0, 0, 0, 1] decomposed camera quaternion, for example,
+         * - ThreeJS: view from superior -> inferior, anterior as top, right hemisphere as right
+         * - NG: view from from inferior -> superior, posterior as top, left hemisphere as right
+         * 
+         * multiplying the exchange factor [-1, 0, 0, 0] converts ThreeJS convention to NG convention
+         */
+        const exchangeFactor = new THREE.Quaternion(-1, 0, 0, 0)
+        cameraQuat.multiply(exchangeFactor)
+
         cameraPos.applyQuaternion(cameraQuat)
         this.toTsRef(tsRef => {
           tsRef.camera.position.copy(cameraPos)
@@ -627,7 +649,10 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       }
     )
     this.tsRef.control.enablePan = false
-    while (this.tsRefInitCb.length > 0) this.tsRefInitCb.pop()(this.tsRef)
+    while (this.tsRefInitCb.length > 0) {
+      const tsCb = this.tsRefInitCb.pop()
+      tsCb(this.tsRef)
+    }
 
     const meshSub = this.meshLayers$.pipe(
       distinctUntilChanged(),

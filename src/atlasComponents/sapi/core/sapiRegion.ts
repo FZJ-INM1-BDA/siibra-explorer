@@ -1,6 +1,7 @@
 import { SAPI } from "..";
 import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel } from "../type";
 import { strToRgb, hexToRgb } from 'common/util'
+import { Observable } from "rxjs";
 
 export class SAPIRegion{
 
@@ -62,14 +63,13 @@ export class SAPIRegion{
     return `${this.prefix}/regional_map/map?space_id=${encodeURI(spaceId)}`
   }
 
-  getDetail(spaceId: string): Promise<SapiRegionModel> {
-    return this.sapi.http.get<SapiRegionModel>(
-      `${this.prefix}/${this.id}`,
+  getDetail(spaceId: string): Observable<SapiRegionModel> {
+    const url = `${this.prefix}/${encodeURIComponent(this.id)}`
+    return this.sapi.httpGet<SapiRegionModel>(
+      url,
       {
-        params: {
-          space_id: spaceId
-        }
+        space_id: spaceId
       }
-    ).toPromise()
+    )
   }
 }

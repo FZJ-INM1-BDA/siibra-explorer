@@ -290,37 +290,6 @@ export const takeOnePipe = () => {
 
 export const NEHUBA_INSTANCE_INJTKN = new InjectionToken<Observable<NehubaViewerUnit>>('NEHUBA_INSTANCE_INJTKN')
 
-
-export function cvtNavigationObjToNehubaConfig(navigationObj, ngNavigationObj: RecursivePartial<NgConfigViewerState>): Partial<NgConfigViewerState>{
-  const {
-    orientation = [0, 0, 0, 1],
-    perspectiveOrientation = [0, 0, 0, 1],
-    perspectiveZoom = 1e6,
-    zoom = 1e6,
-    position = [0, 0, 0],
-    positionReal = true,
-  } = navigationObj || {}
-
-  const voxelSize = ngNavigationObj?.navigation?.pose?.position?.voxelSize || [1,1,1]
-
-  return {
-    perspectiveOrientation,
-    perspectiveZoom,
-    navigation: {
-      pose: {
-        position: {
-          voxelCoordinates: positionReal
-            ? [0, 1, 2].map(idx => position[idx] / voxelSize[idx])
-            : position,
-          voxelSize
-        },
-        orientation,
-      },
-      zoomFactor: zoom
-    }
-  }
-}
-
 export function serializeSegment(ngId: string, label: number | string){
   return `${ngId}#${label}`
 }

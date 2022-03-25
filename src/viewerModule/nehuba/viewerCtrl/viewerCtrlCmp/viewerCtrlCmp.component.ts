@@ -1,4 +1,4 @@
-import { Component, HostBinding, Inject, Optional } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, of, Subscription } from "rxjs";
 import { pairwise, withLatestFrom} from "rxjs/operators";
@@ -7,8 +7,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { ARIA_LABELS } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
-import { PureContantService } from "src/util";
-import { atlasSelection, atlasAppearance } from "src/state";
+import { atlasAppearance } from "src/state";
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -16,19 +15,17 @@ import { atlasSelection, atlasAppearance } from "src/state";
   styleUrls: [
     './viewerCtrlCmp.style.css'
   ],
-  exportAs: 'viewerCtrlCmp'
+  exportAs: 'viewerCtrlCmp',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ViewerCtrlCmp{
+export class ViewerCtrlCmp implements OnInit{
 
   public ARIA_LABELS = ARIA_LABELS
 
-  @HostBinding('attr.darktheme')
-  darktheme = false
-
   private sub: Subscription[] = []
 
-  private _removeOctantFlag: boolean
+  private _removeOctantFlag: boolean = true
   get removeOctantFlag(){
     return this._removeOctantFlag
   }
@@ -36,28 +33,21 @@ export class ViewerCtrlCmp{
     if (val === this._removeOctantFlag) return
     this._removeOctantFlag = val
     this.setOctantRemoval(this._removeOctantFlag)
+    this.cdr.detectChanges()
   }
 
   public nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
     select(atlasAppearance.selectors.octantRemoval),
   )
 
-  public auxMeshFormGroup: FormGroup
+  public auxMeshFormGroup: FormGroup = this.formBuilder.group({})
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
     select(selectorAuxMeshes),
   )
 
-  constructor(
-    private store$: Store<any>,
-    formBuilder: FormBuilder,
-    private pureConstantService: PureContantService,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,
-  ){
-
-    this.auxMeshFormGroup = formBuilder.group({})
-  
-
+  ngOnInit(): void {
+    
     // TODO move this to... nehubadirective?
     if (this.nehubaInst$) {
       this.sub.push(
@@ -76,8 +66,6 @@ export class ViewerCtrlCmp{
     }
 
     this.sub.push(
-
-      this.pureConstantService.darktheme$.subscribe(darktheme => this.darktheme = darktheme),
 
       this.nehubaViewerPerspectiveOctantRemoval$.subscribe(
         flag => this.removeOctantFlag = flag
@@ -102,6 +90,7 @@ export class ViewerCtrlCmp{
           this.auxMeshesNamesSet.add(mesh.ngId)
           this.auxMeshFormGroup.addControl(mesh['@id'], new FormControl(mesh.visible))
         }
+        this.cdr.detectChanges()
       }),
 
       this.auxMeshFormGroup.valueChanges.pipe(
@@ -126,8 +115,18 @@ export class ViewerCtrlCmp{
             })
           )
         }
+        this.cdr.detectChanges()
       })
     )
+  }
+
+  constructor(
+    private store$: Store<any>,
+    private formBuilder: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,
+  ){
+
   }
 
   public setOctantRemoval(octantRemovalFlag: boolean) {

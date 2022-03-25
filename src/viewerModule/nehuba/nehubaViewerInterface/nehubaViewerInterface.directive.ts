@@ -1,14 +1,19 @@
-import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter, Optional } from "@angular/core";
+import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef } from "@angular/core";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, fromEvent, asyncScheduler, combineLatest } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
-import { serializeSegment, takeOnePipe } from "../util";
+import { Subscription, Observable, asyncScheduler, combineLatest } from "rxjs";
+import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMap, take } from "rxjs/operators";
+import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj, NehubaNavigationService } from "../navigation.service";
-import { NehubaConfig, defaultNehubaConfig } from "../config.service";
+import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
+import { SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { arrayEqual } from "src/util/array";
+import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
+import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 
 const determineProtocol = (url: string) => {
@@ -132,7 +137,7 @@ const accumulatorFn: (
   exportAs: 'iavNehubaViewerContainer',
   providers: [ NehubaNavigationService ]
 })
-export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
+export class NehubaViewerContainerDirective implements OnDestroy{
 
   @Output('iav-nehuba-viewer-container-mouseover')
   public mouseOverSegments = new EventEmitter<TMouseoverEvent[]>()
@@ -148,38 +153,74 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   
   private nehubaViewerFactory: ComponentFactory<NehubaViewerUnit>
   private cr: ComponentRef<NehubaViewerUnit>
+  private navigation: atlasSelection.AtlasSelectionState['navigation']
   constructor(
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
     private store$: Store<any>,
     private navService: NehubaNavigationService,
+    private effect: LayerCtrlEffects,
+    private cdr: ChangeDetectorRef,
     @Optional() private log: LoggingService,
   ){
+    this.cdr.detach()
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
-  }
 
-  private nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-    select(atlasAppearance.selectors.octantRemoval),
-  )
-
-  private gpuLimit$: Observable<number> = this.store$.pipe(
-    select(userPreference.selectors.gpuLimit)
-  )
-  private gpuLimit: number = null
-
-  private nehubaViewerSubscriptions: Subscription[] = []
-  private subscriptions: Subscription[] = []
-
-  ngOnInit(){
     this.subscriptions.push(
       this.nehubaViewerPerspectiveOctantRemoval$.pipe(
         distinctUntilChanged()
       ).subscribe(flag =>{
         this.toggleOctantRemoval(flag)
-      })
-    )
+      }),
+      this.store$.pipe(
+        atlasSelection.fromRootStore.distinctATP(),
+        debounceTime(16),
+        switchMap((ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }) => this.store$.pipe(
+          select(atlasAppearance.selectors.customLayers),
+          debounceTime(16),
+          map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
+          distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
+          filter(layers => layers.length > 0),
+          map(ngBaseLayers => {
+            return {
+              ATP,
+              ngBaseLayers
+            }
+          })
+        ))
+      ).subscribe(async ({ ATP, ngBaseLayers }) => {
+        const config = getNehubaConfig(ATP.template)
+        for (const baseLayer of ngBaseLayers) {
+          config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
+        }
+    
+        const overwritingInitState = this.navigation
+          ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
+          : {}
+    
+        config.dataset.initialNgState = {
+          ...config.dataset.initialNgState,
+          ...overwritingInitState,
+        }
 
-    this.subscriptions.push(
+        const {
+          parcNgLayers,
+          tmplAuxNgLayers,
+        } = await this.effect.onATPDebounceNgLayers$.pipe(
+          take(1)
+        ).toPromise()
+
+        await this.createNehubaInstance(config)
+
+        const ngIdSegmentsMap: Record<string, number[]> = {} 
+  
+        for (const key in parcNgLayers) {
+          ngIdSegmentsMap[key] = parcNgLayers[key].labelIndicies
+        }
+  
+        this.nehubaViewerInstance.ngIdSegmentsMap = ngIdSegmentsMap
+      }),
+
       this.store$.pipe(
         select(atlasSelection.selectors.standaloneVolumes),
         filter(v => v && Array.isArray(v) && v.length > 0),
@@ -210,9 +251,24 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       }),
       this.navService.viewerNav$.subscribe(v => {
         this.navigationEmitter.emit(v)
-      })
+      }),
+      this.store$.pipe(
+        select(atlasSelection.selectors.navigation)
+      ).subscribe(nav => this.navigation = nav)
     )
   }
+
+  private nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
+    select(atlasAppearance.selectors.octantRemoval),
+  )
+
+  private gpuLimit$: Observable<number> = this.store$.pipe(
+    select(userPreference.selectors.gpuLimit)
+  )
+  private gpuLimit: number = null
+
+  private nehubaViewerSubscriptions: Subscription[] = []
+  private subscriptions: Subscription[] = []
 
   redraw(){
     this.nehubaViewerInstance.redraw()
@@ -221,6 +277,9 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   ngOnDestroy(){
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe()
+    }
+    while (this.nehubaViewerSubscriptions.length > 0) {
+      this.nehubaViewerSubscriptions.pop().unsubscribe()
     }
   }
 

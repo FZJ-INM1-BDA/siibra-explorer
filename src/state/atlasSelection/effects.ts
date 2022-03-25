@@ -68,6 +68,7 @@ export class Effect {
                 )
               )
             ).pipe(
+              take(1),
               map(parcellation => {
                 return {
                   template,
@@ -96,12 +97,12 @@ export class Effect {
           }
           throw new Error(`neither template nor parcellation has been defined!`)
         }),
-        map(({ parcellation, template }) =>
-          actions.setATP({
+        map(({ parcellation, template }) => {
+          return actions.setATP({
             parcellation,
             template
           })
-        )
+        })
       )
     }),
 

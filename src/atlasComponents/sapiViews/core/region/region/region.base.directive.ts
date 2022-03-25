@@ -99,7 +99,7 @@ export class SapiViewsCoreRegionRegionBase {
   }
 
   protected async fetchDetail(region: SapiRegionModel) {
-    return await this.sapi.getRegion(this.atlas["@id"],this.parcellation["@id"], region.name).getDetail(this.template["@id"])
+    return this.sapi.getRegion(this.atlas["@id"],this.parcellation["@id"], region.name).getDetail(this.template["@id"]).toPromise()
   }
 
   constructor(protected sapi: SAPI){
