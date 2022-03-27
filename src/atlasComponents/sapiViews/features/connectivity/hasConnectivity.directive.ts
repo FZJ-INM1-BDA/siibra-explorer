@@ -1,13 +1,12 @@
-import {Directive, Inject, Input, OnDestroy} from "@angular/core";
+import {Directive, Input, OnDestroy} from "@angular/core";
 import {from, of, Subscription} from "rxjs";
 import {switchMap} from "rxjs/operators";
-import {BS_ENDPOINT} from "src/util/constants";
 import {HttpClient} from "@angular/common/http";
 import {PARSE_TYPEDARRAY, SAPI} from "src/atlasComponents/sapi/sapi.service";
 import {SapiAtlasModel, SapiParcellationFeatureMatrixModel, SapiParcellationModel} from "src/atlasComponents/sapi/type";
 
 @Directive({
-  selector: '[has-connectivity]',
+  selector: '[sxplr-sapiviews-features-connectivity-check]',
   exportAs: 'hasConnectivityDirective'
 })
 
@@ -15,10 +14,10 @@ export class HasConnectivity implements OnDestroy {
 
     private subscriptions: Subscription[] = []
 
-    @Input('sxplr-sapiviews-features-connectivity-matrix-atlas')
+    @Input('sxplr-sapiviews-features-connectivity-check-atlas')
     atlas: SapiAtlasModel
 
-    @Input('sxplr-sapiviews-features-connectivity-matrix-parcellation')
+    @Input('sxplr-sapiviews-features-connectivity-check-parcellation')
     parcellation: SapiParcellationModel
 
     private _region: any
@@ -41,8 +40,7 @@ export class HasConnectivity implements OnDestroy {
     public hasConnectivity = false
     public connectivityNumber = 0
 
-    constructor(@Inject(BS_ENDPOINT) private siibraApiUrl: string,
-                private httpClient: HttpClient,
+    constructor(private httpClient: HttpClient,
                 private sapi: SAPI) {}
 
     checkConnectivity() {

@@ -8,6 +8,7 @@ import { FeatureBadgeColourPipe } from "./featureBadgeColor.pipe"
 import { FeatureBadgeNamePipe } from "./featureBadgeName.pipe"
 import * as ieeg from "./ieeg"
 import * as receptor from "./receptors"
+import {SapiViewsFeatureConnectivityModule} from "src/atlasComponents/sapiViews/features/connectivity";
 
 const {
   IEEGSessionCmp
@@ -21,6 +22,7 @@ const {
     CommonModule,
     ReceptorViewModule,
     AngularMaterialModule,
+    SapiViewsFeatureConnectivityModule,
   ],
   declarations: [
     IEEGSessionCmp,
@@ -40,6 +42,7 @@ const {
     IEEGSessionCmp,
     FeatureEntryCmp,
     SapiViewsFeaturesEntryListItem,
+    SapiViewsFeatureConnectivityModule,
   ]
 })
 export class SapiViewsFeaturesModule{}

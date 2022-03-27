@@ -1,23 +1,5 @@
 <div class="w-100 h-100 d-block d-flex flex-column sxplr-pb-2">
-<!--    <hbp-connectivity-matrix-row-->
-<!--            (connectivityDataReceived)="connectivityDataReceived.emit($event)"-->
-<!--            #connectivityComponent-->
-<!--            *ngIf="regionName"-->
-<!--            [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"-->
-<!--            theme="dark"-->
-<!--            [loadurl]="loadUrl"-->
-<!--            show-export="true"-->
-<!--            show-source="false"-->
-<!--            show-title="false"-->
-<!--            show-toolbar="false"-->
-<!--            show-description="false"-->
-<!--            show-dataset-name="false"-->
-<!--            custom-dataset-selector="true"-->
-<!--            tools_showlog="true"-->
-<!--            [tools_custom]='[{"name": "exportslot", "type": "slot"}]'-->
-<!--            hide-export-view="true">-->
-
-           <hbp-connectivity-matrix-row
+    <hbp-connectivity-matrix-row
             #connectivityComponent
             *ngIf="regionName"
             [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
@@ -34,9 +16,6 @@
             tools_showlog="true"
             [tools_custom]='[{"name": "exportslot", "type": "slot"}]'
             hide-export-view="true">
-
-
-
 
         <div slot="dataset">
             <div *ngIf="datasetList.length && selectedDataset"  class=" flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">

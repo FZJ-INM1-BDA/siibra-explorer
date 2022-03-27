@@ -23,7 +23,7 @@ import {SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type"
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
 @Component({
-  selector: 'connectivity-browser',
+  selector: 'sxplr-sapiviews-features-connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
   providers: [
     {
@@ -34,10 +34,10 @@ const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 })
 export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    @Input('sxplr-sapiviews-features-connectivity-matrix-atlas')
+    @Input('sxplr-sapiviews-features-connectivity-browser-atlas')
     atlas: SapiAtlasModel
 
-    @Input('sxplr-sapiviews-features-connectivity-matrix-parcellation')
+    @Input('sxplr-sapiviews-features-connectivity-browser-parcellation')
     parcellation: SapiParcellationModel
 
     private setColorMap$: Subject<boolean> = new Subject()
@@ -274,7 +274,6 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
               this.connectedAreas.next(this.cleanConnectedAreas(areas))
 
               this.matrixString = JSON.stringify(matrixData.columns.map((mc, i) => ([mc, ...matrix.rawArray[i]])))
-              console.log(this.matrixString)
             })
           this.fetching = false
         }).catch(() => this.fetching = false)
