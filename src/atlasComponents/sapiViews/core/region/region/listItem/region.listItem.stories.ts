@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
-import { getHoc1Left, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { getHoc1Right, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
 import { SapiViewsCoreRegionModule } from "../../module"
 import { SapiViewsCoreRegionRegionListItem } from "./region.listItem.component"
 
@@ -55,7 +55,7 @@ const loadRegions = async () => {
   const human = await getHumanAtlas()
   const mni152 = await getMni152()
   const jba29 = await getJba29()
-  const hoc1left = await getHoc1Left(mni152["@id"])
+  const hoc1left = await getHoc1Right(mni152["@id"])
 
   return {
     human,

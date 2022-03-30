@@ -32,13 +32,24 @@ export class SAPISpace{
     )
   }
 
-  getFeatures(modalityId: string, opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel[]> {
+  getFeatures(opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel[]> {
     const query: Record<string, string> = {}
     for (const [key, value] of Object.entries(opts)) {
       query[camelToSnake(key)] = value
     }
     return this.sapi.httpGet<SapiSpatialFeatureModel[]>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features/${encodeURIComponent(modalityId)}`,
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`,
+      query
+    )
+  }
+
+  getFeatureInstance(instanceId: string, opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel> {
+    const query: Record<string, string> = {}
+    for (const [key, value] of Object.entries(opts)) {
+      query[camelToSnake(key)] = value
+    }
+    return this.sapi.httpGet<SapiSpatialFeatureModel>(
+      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
       query
     )
   }

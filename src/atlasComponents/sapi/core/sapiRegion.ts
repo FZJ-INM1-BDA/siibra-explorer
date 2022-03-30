@@ -1,7 +1,8 @@
 import { SAPI } from "..";
-import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel } from "../type";
+import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel, cleanIeegSessionDatasets, SapiIeegSessionModel, CleanedIeegDataset } from "../type";
 import { strToRgb, hexToRgb } from 'common/util'
-import { Observable } from "rxjs";
+import { forkJoin, Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 
 export class SAPIRegion{
 
@@ -26,29 +27,45 @@ export class SAPIRegion{
     this.prefix = `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcId)}/regions/${encodeURIComponent(this.id)}`
   }
 
-  getFeatures(spaceId: string): Promise<SapiRegionalFeatureModel[]> {
-    return this.sapi.http.get<SapiRegionalFeatureModel[]>(
-      `${this.prefix}/features`,
-      {
-        params: {
+  getFeatures(spaceId: string): Observable<(SapiRegionalFeatureModel | CleanedIeegDataset)[]> {
+    return forkJoin({
+      regionalFeatures: this.sapi.httpGet<SapiRegionalFeatureModel[]>(
+        `${this.prefix}/features`,
+        {
           space_id: spaceId
         }
-      }
-    ).toPromise()
+      ).pipe(
+        catchError((err, obs) => of([]))
+      ),
+      spatialFeatures: spaceId
+        ? this.sapi.getSpace(this.atlasId, spaceId).getFeatures({ parcellationId: this.parcId, region: this.id }).pipe(
+          catchError((err, obs) => {
+            console.log('error caught')
+            return of([])
+          }),
+          map(feats => {
+            const ieegSessions: SapiIeegSessionModel[] = feats.filter(feat => feat["@type"] === "siibra/features/ieegSession")
+            return cleanIeegSessionDatasets(ieegSessions)
+          }),
+        )
+        : of([] as CleanedIeegDataset[])
+    }).pipe(
+      map(({ regionalFeatures, spatialFeatures }) => {
+        return [...spatialFeatures, ...regionalFeatures]
+      })
+    )
   }
 
-  getFeatureInstance(instanceId: string, spaceId: string = null): Promise<SapiRegionalFeatureModel> {
-    return this.sapi.http.get<SapiRegionalFeatureModel>(
+  getFeatureInstance(instanceId: string, spaceId: string = null): Observable<SapiRegionalFeatureModel> {
+    return this.sapi.httpGet<SapiRegionalFeatureModel>(
       `${this.prefix}/features/${encodeURIComponent(instanceId)}`,
       {
-        params: {
-          space_id: spaceId
-        }
+        space_id: spaceId
       }
-    ).toPromise()
+    )
   }
 
-  getMapInfo(spaceId: string): Promise<SapiRegionMapInfoModel> {
+  getMapInfo(spaceId: string): Observable<SapiRegionMapInfoModel> {
     return this.sapi.http.get<SapiRegionMapInfoModel>(
       `${this.prefix}/regional_map/info`,
       {
@@ -56,7 +73,7 @@ export class SAPIRegion{
           space_id: spaceId
         }
       }
-    ).toPromise()
+    )
   }
 
   getMapUrl(spaceId: string): string {

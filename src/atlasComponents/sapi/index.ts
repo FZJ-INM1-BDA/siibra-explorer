@@ -12,6 +12,9 @@ export {
   SapiSpatialFeatureModel,
   SapiFeatureModel,
   SapiParcellationFeatureModel,
+  CleanedIeegDataset,
+  SxplrCleanedFeatureModel,
+  CLEANED_IEEG_DATASET_TYPE,
 } from "./type"
 
 export { SAPI } from "./sapi.service"

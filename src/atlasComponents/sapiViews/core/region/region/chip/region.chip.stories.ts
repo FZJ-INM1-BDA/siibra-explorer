@@ -1,8 +1,8 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
-import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
-import { atlasId, getAtlas, provideDarkTheme, getParc, getHumanAtlas, getJba29, getMni152, getHoc1Left, get44Left } from "src/atlasComponents/sapi/stories.base"
+import { SAPI } from "src/atlasComponents/sapi"
+import { provideDarkTheme, getHumanAtlas, getJba29, getMni152, getHoc1Right, get44Left } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { SapiViewsCoreRegionModule } from "../../module"
 import { SapiViewsCoreRegionRegionChip } from "./region.chip.component"
@@ -72,7 +72,7 @@ Default.loaders = [
     const atlas = await getHumanAtlas()
     const parcellation = await getJba29()
     const template = await getMni152()
-    const region = await getHoc1Left()
+    const region = await getHoc1Right()
 
     return {
       atlas,

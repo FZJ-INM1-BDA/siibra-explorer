@@ -44,9 +44,9 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatureInstance(instanceId: string): Promise<SapiParcellationFeatureModel> {
+  getFeatureInstance(instanceId: string): Observable<SapiParcellationFeatureModel> {
     return this.sapi.http.get<SapiParcellationFeatureModel>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
-    ).toPromise()
+    )
   }
 }

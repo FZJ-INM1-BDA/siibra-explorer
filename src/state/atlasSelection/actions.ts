@@ -24,7 +24,7 @@ export const selectParcellation = createAction(
 )
 
 /**
- * setATP is called as a final step to (potentially) set:
+ * setAtlasSelectionState is called as a final step to (potentially) set:
  * - selectedAtlas
  * - selectedTemplate
  * - selectedParcellation
@@ -36,13 +36,9 @@ export const selectParcellation = createAction(
  * We may setup post hook for navigation adjustments/etc.
  * Probably easier is simply subscribe to store and react to selectedTemplate selector
  */
-export const setATP = createAction(
-  `${nameSpace} setATP`,
-  props<{
-    atlas?: SapiAtlasModel,
-    template?: SapiSpaceModel,
-    parcellation?: SapiParcellationModel,
-  }>()
+export const setAtlasSelectionState = createAction(
+  `${nameSpace} setAtlasSelectionState`,
+  props<Partial<AtlasSelectionState>>()
 )
 
 export const setSelectedParcellationAllRegions = createAction(

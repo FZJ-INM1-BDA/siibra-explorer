@@ -74,9 +74,9 @@ export abstract class BaseReceptor{
       this.error = `featureId needs to be defined, but is not`
       return
     }
-    const result = await this.sapi.getRegion(this.atlas["@id"], this.parcellation["@id"], this.region.name).getFeatureInstance(this.featureId, this.template["@id"])
-    if (result.type !== "siibra/features/receptor") {
-      throw new Error(`BaseReceptor Error. Expected .type to be "siibra/features/receptor", but was "${result.type}"`)
+    const result = await this.sapi.getRegion(this.atlas["@id"], this.parcellation["@id"], this.region.name).getFeatureInstance(this.featureId, this.template["@id"]).toPromise()
+    if (result["@type"] !== "siibra/features/receptor") {
+      throw new Error(`BaseReceptor Error. Expected .type to be "siibra/features/receptor", but was "${result['@type']}"`)
     }
     return result
   }

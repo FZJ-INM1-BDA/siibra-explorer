@@ -2,6 +2,7 @@ import { FlatTreeControl } from "@angular/cdk/tree";
 import { MatTreeFlatDataSource, MatTreeFlattener } from "@angular/material/tree"
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges, TemplateRef } from "@angular/core";
 import { TreeNode } from "../const"
+import { Tree } from "./treeControl"
 
 @Component({
   selector: `sxplr-flat-hierarchy-tree-view`,
@@ -13,15 +14,15 @@ import { TreeNode } from "../const"
   exportAs: 'flatHierarchyTreeView'
 })
 
-export class SxplrFlatHierarchyTreeView<T extends object> implements OnChanges{
+export class SxplrFlatHierarchyTreeView<T extends object> extends Tree<T> implements OnChanges{
   @HostBinding('class')
   class = 'sxplr-custom-cmp'
 
   @Input('sxplr-flat-hierarchy-nodes')
-  nodes: T[] = []
+  sxplrNodes: T[] = []
 
   @Input('sxplr-flat-hierarchy-is-parent')
-  isParent: (child: T, parent: T) => boolean
+  sxplrIsParent: (child: T, parent: T) => boolean
 
   @Input('sxplr-flat-hierarchy-render-node-tmpl')
   renderNodeTmplRef: TemplateRef<T>
@@ -42,57 +43,15 @@ export class SxplrFlatHierarchyTreeView<T extends object> implements OnChanges{
   nodeClicked = new EventEmitter<T>()
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.nodes) {
-
-      /**
-       * on new nodes passed, reset all maps
-       * otherwise, tree will show stale data and will not update
-       */
-      this.childrenWeakMap = new WeakMap()
-      this.parentWeakMap = new WeakMap()
-      this.nodeAncestorIsLast = new WeakMap()
-      
-      const root = this.nodes.filter(node => !this.getParent(node))
-      for (const el of root) {
-        this.parentWeakMap.set(el, null)
-        this.nodeAncestorIsLast.set(el, [])
-      }
-      this.dataSource.data = root
+    if (changes.sxplrNodes || changes.sxplrIsParent) {
+      this.nodes = this.sxplrNodes
+      this.isParent = this.sxplrIsParent
+      this.dataSource.data = this.rootNodes
       if (this.expandOnInit) {
         this.treeControl.expandAll()
       }
     }
   }
-  
-  private getLevel(node: T): number {
-    let level = -1, cursor = node
-    const maxLevel = 32
-    do {
-      if (level >= maxLevel) {
-        level = 0
-        break
-      }
-      level++
-      cursor = this.getParent(cursor)
-    } while (!!cursor)
-    return level
-  }
-
-  private getParent(node: T): T {
-    if (!this.parentWeakMap.has(node)) {
-      for (const parentNode of this.nodes) {
-        if (this.isParent(node, parentNode)) {
-          this.parentWeakMap.set(node, parentNode)
-          break
-        }
-      }
-    }
-    return this.parentWeakMap.get(node)
-  }
-
-  private childrenWeakMap = new WeakMap<T, T[]>()
-  private parentWeakMap = new WeakMap<T, T>()
-  private nodeAncestorIsLast = new WeakMap<T, boolean[]>()
 
   private getNodeAncestorIsLast(node: T, visited = new WeakSet<T>() ): boolean[] {
     if (!this.nodeAncestorIsLast.has(node)) {
@@ -114,16 +73,6 @@ export class SxplrFlatHierarchyTreeView<T extends object> implements OnChanges{
       this.nodeAncestorIsLast.set(node, [ ...ancestors, isLast ])
     }
     return this.nodeAncestorIsLast.get(node)
-  }
-  private getChildren(node: T): T[] {
-    if (!this.childrenWeakMap.has(node)) {
-      const children = this.nodes.filter(childNode => this.isParent(childNode, node))
-      this.childrenWeakMap.set(node, children)
-      for (const c of children) {
-        this.parentWeakMap.set(c, node)
-      }
-    }
-    return this.childrenWeakMap.get(node)
   }
 
   public treeControl = new FlatTreeControl<TreeNode<T>>(
@@ -177,6 +126,6 @@ export class SxplrFlatHierarchyTreeView<T extends object> implements OnChanges{
   }
 
   constructor(){
-    
+    super()
   }
 }

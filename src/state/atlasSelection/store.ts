@@ -24,13 +24,11 @@ export const defaultState: AtlasSelectionState = {
 const reducer = createReducer(
   defaultState,
   on(
-    actions.setATP,
-    (state, { atlas, parcellation, template }) => {
+    actions.setAtlasSelectionState,
+    (state, partialState) => {
       return {
         ...state,
-        selectedAtlas: atlas || state.selectedAtlas,
-        selectedTemplate: template || state.selectedTemplate,
-        selectedParcellation: parcellation || state.selectedParcellation,
+        ...partialState
       }
     }
   ),
@@ -113,6 +111,15 @@ const reducer = createReducer(
           ...state.breadcrumbs.filter(bc => bc.id !== breadcrumb.id),
           breadcrumb
         ]
+      }
+    }
+  ),
+  on(
+    actions.selectAtlas,
+    (state, { atlas }) => {
+      return {
+        ...state,
+        selectedAtlas: atlas
       }
     }
   ),

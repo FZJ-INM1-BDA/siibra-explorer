@@ -1,9 +1,22 @@
-<div [ngSwitch]="feature?.type">
-  <sxplr-sapiviews-features-receptor-entry *ngSwitchCase="featureType.receptor"
+<div [ngSwitch]="feature?.['@type']">
+  <sxplr-sapiviews-features-receptor-entry
+    *ngSwitchCase="featureType.receptor"
     [sxplr-sapiviews-features-receptor-atlas]="atlas"
     [sxplr-sapiviews-features-receptor-parcellation]="parcellation"
     [sxplr-sapiviews-features-receptor-template]="space"
     [sxplr-sapiviews-features-receptor-region]="region"
     [sxplr-sapiviews-features-receptor-featureid]="feature['@id']">
   </sxplr-sapiviews-features-receptor-entry>
+  <sxplr-sapiviews-features-ieeg-ieegdataset
+    *ngSwitchCase="featureType.ieeg"  
+    [sxplr-sapiviews-features-ieeg-ieegdataset-atlas]="atlas"
+    [sxplr-sapiviews-features-ieeg-ieegdataset-space]="space"
+    [sxplr-sapiviews-features-ieeg-ieegdataset-parcellation]="parcellation"
+    [sxplr-sapiviews-features-ieeg-ieegdataset-region]="region"
+    [sxplr-sapiviews-features-ieeg-ieegdataset-feature]="feature"
+    (sxplr-sapiviews-features-ieeg-ieegdataset-on-focus)="ieegOnFocus($event)"
+    (sxplr-sapiviews-features-ieeg-ieegdataset-on-defocus)="ieegOnDefocus($event)"
+  >
+
+  </sxplr-sapiviews-features-ieeg-ieegdataset>
 </div>

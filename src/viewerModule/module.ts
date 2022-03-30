@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { Observable } from "rxjs";
-import { SplashUiModule } from "src/atlasComponents/splashScreen";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
@@ -33,7 +32,6 @@ import { DialogModule } from "src/ui/dialogInfo/module";
     ThreeSurferModule,
     LayoutModule,
     AngularMaterialModule,
-    SplashUiModule,
     TopMenuModule,
     UtilModule,
     ComponentsModule,

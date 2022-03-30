@@ -35,13 +35,11 @@ function generalApplyStateReducer(reducer: ActionReducer<MainState>): ActionRedu
   return function(_state, action) {
     let state = _state
     if (action.type === generalApplyState.type) {
-      state = {
-        ...state,
-        /**
-         * typing is a bit scuffed, but works
-         */
-        ...(action as any).state
-      }
+      state = JSON.parse(
+        JSON.stringify(
+          (action as any).state
+        )
+      ) 
     }
     return reducer(state, action)
   }

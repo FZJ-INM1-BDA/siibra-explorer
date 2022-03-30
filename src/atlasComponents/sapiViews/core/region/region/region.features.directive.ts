@@ -2,6 +2,7 @@ import { Directive, OnChanges, SimpleChanges } from "@angular/core";
 import { BehaviorSubject, merge, Observable } from "rxjs";
 import { switchMap,  filter, startWith, shareReplay, mapTo, delay, tap } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
 import { SapiViewsCoreRegionRegionBase } from "./region.base.directive";
 
 @Directive({
@@ -27,7 +28,7 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
     super(sapi)
   }
 
-  private features$: Observable<SapiRegionalFeatureModel[]> = this.ATPR$.pipe(
+  private features$: Observable<(SapiRegionalFeatureModel|SxplrCleanedFeatureModel)[]> = this.ATPR$.pipe(
     filter(arg => {
       if (!arg) return false
       const { atlas, parcellation, region, template } = arg
@@ -36,7 +37,7 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
     switchMap(({ atlas, parcellation, region, template }) => this.sapi.getRegionFeatures(atlas["@id"], parcellation["@id"], template["@id"], region.name)),
   )
 
-  public listOfFeatures$: Observable<SapiRegionalFeatureModel[]> = this.features$.pipe(
+  public listOfFeatures$: Observable<(SapiRegionalFeatureModel|SxplrCleanedFeatureModel)[]> = this.features$.pipe(
     startWith([]),
     shareReplay(1),
   )

@@ -14,7 +14,7 @@ import { atlasSelection } from "src/state"
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class SplashScreen {
+export class SapiViewsCoreAtlasSplashScreen {
 
   public finishedLoading: boolean = false
 

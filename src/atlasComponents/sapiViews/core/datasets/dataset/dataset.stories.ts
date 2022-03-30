@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
-import { getHoc1FeatureDetail, getHoc1Features, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { getHoc1RightFeatureDetail, getHoc1RightFeatures, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
 import { SapiViewsCoreDatasetModule } from ".."
 import { DatasetView } from "./dataset.component"
 
@@ -35,9 +35,9 @@ const Template: Story<DatasetView> = (args: DatasetView, { loaded }) => {
 }
 
 const loadFeat = async () => {
-  const features = await getHoc1Features()
-  const receptorfeat = features.find(f => f.type === "siibra/core/dataset")
-  const feature = await getHoc1FeatureDetail(receptorfeat["@id"])
+  const features = await getHoc1RightFeatures()
+  const receptorfeat = features.find(f => f['@type'] === "siibra/core/dataset")
+  const feature = await getHoc1RightFeatureDetail(receptorfeat["@id"])
   return {
     feature
   }

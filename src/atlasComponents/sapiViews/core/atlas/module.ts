@@ -7,6 +7,7 @@ import { SapiViewsUtilModule } from "../../util";
 import { SapiViewsCoreParcellationModule } from "../parcellation";
 import { SapiViewsCoreSpaceModule } from "../space";
 import { SapiViewsCoreAtlasAtlasDropdownSelector } from "./dropdownAtlasSelector/dropdownAtlasSelector.component";
+import { SapiViewsCoreAtlasSplashScreen } from "./splashScreen/splashScreen.component";
 import { SapiViewsCoreAtlasAtlasTmplParcSelector } from "./tmplParcSelector/tmplParcSelector.component";
 
 @NgModule({
@@ -22,10 +23,12 @@ import { SapiViewsCoreAtlasAtlasTmplParcSelector } from "./tmplParcSelector/tmpl
   declarations: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
+    SapiViewsCoreAtlasSplashScreen,
   ],
   exports: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
+    SapiViewsCoreAtlasSplashScreen,
   ]
 })
 

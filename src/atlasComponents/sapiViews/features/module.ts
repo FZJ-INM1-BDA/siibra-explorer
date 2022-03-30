@@ -5,12 +5,13 @@ import { appendScriptFactory, APPEND_SCRIPT_TOKEN } from "src/util/constants"
 import { FeatureEntryCmp } from "./entry/entry.component"
 import { SapiViewsFeaturesEntryListItem } from "./entryListItem/entryListItem.component"
 import { FeatureBadgeColourPipe } from "./featureBadgeColor.pipe"
+import { FeatureBadgeFlagPipe } from "./featureBadgeFlag.pipe"
 import { FeatureBadgeNamePipe } from "./featureBadgeName.pipe"
 import * as ieeg from "./ieeg"
 import * as receptor from "./receptors"
 
 const {
-  IEEGSessionCmp
+  SxplrSapiViewsFeaturesIeegModule
 } = ieeg
 const {
   ReceptorViewModule
@@ -20,13 +21,14 @@ const {
   imports: [
     CommonModule,
     ReceptorViewModule,
+    SxplrSapiViewsFeaturesIeegModule,
     AngularMaterialModule,
   ],
   declarations: [
-    IEEGSessionCmp,
     FeatureEntryCmp,
     FeatureBadgeNamePipe,
     FeatureBadgeColourPipe,
+    FeatureBadgeFlagPipe,
     SapiViewsFeaturesEntryListItem,
   ],
   providers: [
@@ -37,7 +39,6 @@ const {
     }
   ],
   exports: [
-    IEEGSessionCmp,
     FeatureEntryCmp,
     SapiViewsFeaturesEntryListItem,
   ]

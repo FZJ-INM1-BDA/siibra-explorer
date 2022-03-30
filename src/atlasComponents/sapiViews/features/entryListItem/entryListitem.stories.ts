@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SapiFeatureModel } from "src/atlasComponents/sapi"
-import { getHoc1Features, getJba29Features, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { getHoc1RightFeatures, getHoc1RightSpatialFeatures, getJba29Features, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { SapiViewsFeaturesEntryListItem } from "./entryListItem.component"
 import { Component, EventEmitter, Input, Output } from "@angular/core"
@@ -66,7 +66,10 @@ RegionalFeatures.args = {
 }
 RegionalFeatures.loaders = [
   async () => {
-    const features = await getHoc1Features()
+    const features = [
+      ...(await getHoc1RightSpatialFeatures()),
+      ...(await getHoc1RightFeatures())
+    ]
     return {
       features
     }

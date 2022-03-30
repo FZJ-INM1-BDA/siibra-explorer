@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { SapiFeatureModel, SapiRegionalFeatureModel, SapiSpatialFeatureModel, SapiParcellationFeatureModel } from "src/atlasComponents/sapi";
-import { SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatureReceptorModel, SapiSerializationErrorModel, SapiVOIDataResponse } from "src/atlasComponents/sapi/type";
+import { CleanedIeegDataset, CLEANED_IEEG_DATASET_TYPE, SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatureReceptorModel, SapiSerializationErrorModel, SapiVOIDataResponse, SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
 
 @Component({
   selector: `sxplr-sapiviews-features-entry-list-item`,
@@ -12,23 +12,27 @@ import { SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatu
 
 export class SapiViewsFeaturesEntryListItem{
   @Input('sxplr-sapiviews-features-entry-list-item-feature')
-  feature: SapiFeatureModel
+  feature: SapiFeatureModel | SxplrCleanedFeatureModel
 
   @Input('sxplr-sapiviews-features-entry-list-item-ripple')
   ripple = true
 
   get label(): string{
     if (!this.feature) return null
-    const { type } = this.feature
+    const { '@type': type } = this.feature
     if (
       type === "siibra/core/dataset" ||
       type === "siibra/features/receptor" ||
-      type === "siibra/features/voi"
+      type === "siibra/features/voi" ||
+      type === CLEANED_IEEG_DATASET_TYPE
     ) {
-      return (this.feature as (SapiDatasetModel | SapiRegionalFeatureReceptorModel | SapiVOIDataResponse) ).metadata.fullName
+      return (this.feature as (SapiDatasetModel | SapiRegionalFeatureReceptorModel | SapiVOIDataResponse | CleanedIeegDataset) ).metadata.fullName
     }
 
-    if (type === "siibra/features/connectivity") {
+    if (
+      type === "siibra/features/connectivity" ||
+      type === "siibra/features/connectivity/streamlineCounts"
+    ) {
       return (this.feature as SapiParcellationFeatureMatrixModel).name
     }
     if (type === "spy/serialization-error") {

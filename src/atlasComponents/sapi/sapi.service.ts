@@ -1,10 +1,9 @@
-import { Inject, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { BS_ENDPOINT } from 'src/util/constants';
-import { map, shareReplay, take, tap } from "rxjs/operators";
+import { map, shareReplay, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
-import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel } from "./type";
-import { CachedFunction, getExportNehuba } from "src/util/fn";
+import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel, SxplrCleanedFeatureModel } from "./type";
+import { getExportNehuba } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
 import { MatSnackBar } from "@angular/material/snack-bar";
@@ -71,10 +70,7 @@ export class SAPI{
     return parc.getRegions(spaceId, queryParam)
   }
 
-  @CachedFunction({
-    serialization: (atlasId, parcId, spaceId, regionId, ...args) => `sapi::getRegions::${atlasId}::${parcId}::${spaceId}::${regionId}`
-  })
-  getRegionFeatures(atlasId: string, parcId: string, spaceId: string, regionId: string, priority = 0): Promise<SapiRegionalFeatureModel[]>{
+  getRegionFeatures(atlasId: string, parcId: string, spaceId: string, regionId: string, priority = 0): Observable<(SapiRegionalFeatureModel | SxplrCleanedFeatureModel)[]>{
 
     const reg = this.getRegion(atlasId, parcId, regionId)
     return reg.getFeatures(spaceId)

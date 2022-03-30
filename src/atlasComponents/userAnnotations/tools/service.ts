@@ -16,6 +16,8 @@ import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
+import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { AnnotationLayer } from "src/atlasComponents/annotations";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 
@@ -85,11 +87,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private previewNgAnnIds: string[] = []
 
-  private ngAnnotationLayer: any
+  private annotationLayer: AnnotationLayer
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
 
-  private selectedTmpl: any
+  private selectedTmpl: SapiSpaceModel
   private selectedTmpl$ = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
   )
@@ -321,7 +323,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      */
     this.subscription.push(
       nehubaViewer$.subscribe(() => {
-        this.ngAnnotationLayer = null
+        this.annotationLayer = null
       })
     )
 
@@ -411,23 +413,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           this.clearAllPreviewAnnotations()
         }
         for (let idx = 0; idx < previewNgAnnotation.length; idx ++) {
-          const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
-          const annSpec = {
-            ...parseNgAnnotation(previewNgAnnotation[idx]),
+          const spec = {
+            ...previewNgAnnotation[idx],
             id: `${ModularUserAnnotationToolService.TMP_PREVIEW_ANN_ID}_${idx}`
           }
-          const annRef = localAnnotations.references.get(annSpec.id)
-          if (annRef) {
-            localAnnotations.update(
-              annRef,
-              annSpec
-            )
-          } else {
-            localAnnotations.add(
-              annSpec
-            )
-          }
-          this.previewNgAnnIds[idx] = annSpec.id
+          this.annotationLayer.updateAnnotation(spec)
+          this.previewNgAnnIds[idx] = spec.id
         }
       })
     )
@@ -439,7 +430,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       this.forcedAnnotationRefresh$,
       this.spaceFilteredManagedAnnotations$.pipe(
         switchMap(switchMapWaitFor({
-          condition: () => !!this.ngAnnotationLayer,
+          condition: () => !!this.annotationLayer,
           leading: true
         })),
       )
@@ -479,20 +470,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             this.deleteNgAnnotationById(annotation.id)
             continue
           }
-          if (!this.ngAnnotationLayer) continue
-          const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
-          const annRef = localAnnotations.references.get(annotation.id)
-          const annSpec = parseNgAnnotation(annotation)
-          if (annRef) {
-            localAnnotations.update(
-              annRef,
-              annSpec
-            )
-          } else {
-            localAnnotations.add(
-              annSpec
-            )
-          }
+          if (!this.annotationLayer) continue
+          this.annotationLayer.updateAnnotation(annotation)
         }
       })
     )
@@ -506,26 +485,18 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       ).subscribe(viewerMode => {
         this.currMode = viewerMode
         if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
-          if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(true)
+          if (this.annotationLayer) this.annotationLayer.setVisible(true)
           else {
             const viewer = (window as any).viewer
-            const voxelSize = IAV_VOXEL_SIZES_NM[this.selectedTmpl.fullId]
-            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.fullId} cannot be found!`)
-            const layer = viewer.layerSpecification.getLayer(
+            const voxelSize = IAV_VOXEL_SIZES_NM[this.selectedTmpl["@id"]]
+            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl["@id"]} cannot be found!`)
+            if (this.annotationLayer) {
+              this.annotationLayer.dispose()
+            }
+            this.annotationLayer = new AnnotationLayer(
               ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
-              {
-                ...ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC,
-                // since voxel coordinates are no longer defined, so voxel size will always be 1/1/1
-                transform: [
-                  [1, 0, 0, 0],
-                  [0, 1, 0, 0],
-                  [0, 0, 1, 0],
-                  [0, 0, 0, 1],
-                ]
-              }
+              ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
             )
-            this.ngAnnotationLayer = viewer.layerManager.addManagedLayer(layer)
-
             /**
              * on template changes, the layer gets lost
              * force redraw annotations if layer needs to be recreated
@@ -533,7 +504,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             this.forcedAnnotationRefresh$.next(null)
           }
         } else {
-          if (this.ngAnnotationLayer) this.ngAnnotationLayer.setVisible(false)
+          if (this.annotationLayer) this.annotationLayer.setVisible(false)
         }
       })
     )
@@ -667,12 +638,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }
 
   private deleteNgAnnotationById(annId: string) {
-    const localAnnotations = this.ngAnnotationLayer.layer.localAnnotations
-    const annRef = localAnnotations.references.get(annId)
-    if (annRef) {
-      localAnnotations.delete(annRef)
-      localAnnotations.references.delete(annId)
-    }
+    this.annotationLayer.removeAnnotation({ id: annId })
   }
 
   public defaultTool: AbsToolClass<any>
@@ -750,7 +716,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private currMode: string
   switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
 
-    let payload = null
+    let payload: 'annotating' = null
     if (mode === 'on') payload = ARIA_LABELS.VIEWER_MODE_ANNOTATING
     if (mode === 'off') {
       if (this.currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) payload = null
@@ -763,7 +729,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
     this.store.dispatch(
       actions.setViewerMode({
-        viewerMode: "annotating"
+        viewerMode: payload
       })
     )
   }

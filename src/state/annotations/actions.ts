@@ -2,18 +2,20 @@ import { createAction, props } from "@ngrx/store"
 import { nameSpace } from "./const"
 import { Annotation } from "./store"
 
-const clearAllAnnotations = createAction(
+export const clearAllAnnotations = createAction(
   `${nameSpace} clearAllAnnotations`
 )
 
-const rmAnnotations = createAction(
-  `${nameSpace} rmAnnotation`,
+export const rmAnnotations = createAction(
+  `${nameSpace} rmAnnotations`,
   props<{
     annotations: Annotation[]
   }>()
 )
 
-export const actions = {
-  clearAllAnnotations,
-  rmAnnotations,
-}
+export const addAnnotations = createAction(
+  `${nameSpace} addAnnotations`,
+  props<{
+    annotations: Annotation[]
+  }>()
+)

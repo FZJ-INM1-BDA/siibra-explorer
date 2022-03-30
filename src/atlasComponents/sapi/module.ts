@@ -2,17 +2,15 @@ import { NgModule } from "@angular/core";
 import { SAPI } from "./sapi.service";
 import { SpatialFeatureBBox } from "./directives/spatialFeatureBBox.directive"
 import { CommonModule } from "@angular/common";
-import { EffectsModule } from "@ngrx/effects";
-import { SapiEffects } from "./sapi.effects";
-import { HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { PriorityHttpInterceptor } from "src/util/priority";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 
 @NgModule({
   imports: [
     CommonModule,
-    EffectsModule.forFeature([
-      SapiEffects
-    ])
+    HttpClientModule,
+    MatSnackBarModule,
   ],
   declarations: [
     SpatialFeatureBBox,

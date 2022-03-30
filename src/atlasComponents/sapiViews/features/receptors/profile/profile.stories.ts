@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { BehaviorSubject, Subject } from "rxjs"
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
-import { addAddonEventListener, getHoc1FeatureDetail, getHoc1Features, getHoc1Left, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { addAddonEventListener, getHoc1RightFeatureDetail, getHoc1RightFeatures, getHoc1Right, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
 import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type"
 import { AngularMaterialModule } from "src/sharedModules"
 import { appendScriptFactory, APPEND_SCRIPT_TOKEN } from "src/util/constants"
@@ -115,11 +115,11 @@ const Template: Story<ProfileWrapperCls> = (args: ProfileWrapperCls, { loaded })
 const loadFeat = async () => {
   const atlas = await getHumanAtlas()
   const parc = await getJba29()
-  const region = await getHoc1Left()
+  const region = await getHoc1Right()
   const space = await getMni152()
-  const features = await getHoc1Features()
-  const receptorfeat = features.find(f => f.type === "siibra/features/receptor")
-  const feature = await getHoc1FeatureDetail(receptorfeat["@id"])
+  const features = await getHoc1RightFeatures()
+  const receptorfeat = features.find(f => f['@type'] === "siibra/features/receptor")
+  const feature = await getHoc1RightFeatureDetail(receptorfeat["@id"])
   return {
     atlas,
     parc,

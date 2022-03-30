@@ -1,28 +1,62 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { concat, forkJoin, merge, of } from "rxjs";
+import { concat, forkJoin, merge, Observable, of } from "rxjs";
 import { filter, map, mapTo, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
-import { SAPI, SapiParcellationModel, SAPIRegion, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
 import { fromRootStore } from "./util";
+import { AtlasSelectionState } from "./const"
 import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
 import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
-import { atlasAppearance, atlasSelection } from "..";
+import { atlasAppearance } from "..";
 import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
+
+type OnTmplParcHookArg = {
+  previous: {
+    atlas: SapiAtlasModel
+    template: SapiSpaceModel
+    parcellation: SapiParcellationModel
+  }
+  current: {
+    atlas: SapiAtlasModel
+    template: SapiSpaceModel
+    parcellation: SapiParcellationModel
+  }
+}
 
 @Injectable()
 export class Effect {
 
-  parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapiSvc)
+  onTemplateParcSelectionPostHook: ((arg: OnTmplParcHookArg) => Observable<Partial<AtlasSelectionState>>)[] = [
+    /**
+     * This hook gets the region associated with the selected parcellation and template,
+     * and then set selectedParcellationAllRegions to it
+     */
+    ({ current }) => {
+      const { atlas, parcellation, template } = current
+      return (
+        !!atlas && !!parcellation && !!template
+        ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
+        : of([])
+      ).pipe(
+        map(regions => {
+          return {
+            selectedParcellationAllRegions: regions
+          }
+        })
+      )
+    }
+  ]
 
+  parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapiSvc)
   onTemplateParcSelection = createEffect(() => merge<{ template: SapiSpaceModel, parcellation: SapiParcellationModel }>(
     this.action.pipe(
       ofType(actions.selectTemplate),
       map(({ template }) => {
         return {
-          template, 
+          template,
           parcellation: null
         }
       })
@@ -52,6 +86,7 @@ export class Effect {
            */
           if (flag) {
             return of({
+              atlas: currAtlas,
               template: template || currTmpl,
               parcellation: parcellation || currParc,
             })
@@ -71,6 +106,7 @@ export class Effect {
               take(1),
               map(parcellation => {
                 return {
+                  atlas: currAtlas,
                   template,
                   parcellation
                 }
@@ -89,6 +125,7 @@ export class Effect {
               take(1),
               map(template => {
                 return {
+                  atlas: currAtlas,
                   template,
                   parcellation
                 }
@@ -97,15 +134,28 @@ export class Effect {
           }
           throw new Error(`neither template nor parcellation has been defined!`)
         }),
-        map(({ parcellation, template }) => {
-          return actions.setATP({
-            parcellation,
-            template
-          })
-        })
+        switchMap(({ atlas, template, parcellation }) => 
+          forkJoin(
+            this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: { atlas: currAtlas, template: currTmpl, parcellation: currParc }, current: { atlas, template, parcellation } }))
+          ).pipe(
+            map(partialStates => {
+              let returnState: Partial<AtlasSelectionState> = {
+                selectedAtlas: atlas,
+                selectedTemplate: template,
+                selectedParcellation: parcellation
+              }
+              for (const s of partialStates) {
+                returnState = {
+                  ...returnState,
+                  ...s,
+                }
+              }
+              return actions.setAtlasSelectionState(returnState)
+            })
+          )
+        )
       )
-    }),
-
+    })
   ))
 
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
@@ -131,35 +181,30 @@ export class Effect {
           this.sapiSvc.getSpaceDetail(atlas["@id"], spaceId["@id"])
         )
       ).pipe(
-        map(spaces => {
+        switchMap(spaces => {
           const selectedSpace = spaces.find(s => /152/.test(s.fullName)) || spaces[0]
-          return actions.setATP({
-            atlas,
-            template: selectedSpace,
-            parcellation
-          })
-        })
-      )
-    }),
-  ))
+          return forkJoin(
+            this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: null, current: { atlas, parcellation, template: selectedSpace } }))
+          ).pipe(
+            map(partialStates => {
 
-  onATPSelectionGetAndSetAllRegions = createEffect(() => this.store.pipe(
-    atlasSelection.fromRootStore.distinctATP(),
-    switchMap(({ atlas, template, parcellation }) => 
-      !!atlas && !!template && !!parcellation
-      ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"]).pipe(
-          map(regions => 
-            actions.setSelectedParcellationAllRegions({
-              regions
+              let returnState: Partial<AtlasSelectionState> = {
+                selectedAtlas: atlas,
+                selectedTemplate: selectedSpace,
+                selectedParcellation: parcellation
+              }
+              for (const s of partialStates) {
+                returnState = {
+                  ...returnState,
+                  ...s,
+                }
+              }
+              return actions.setAtlasSelectionState(returnState)
             })
           )
-      )
-      : of(
-        actions.setSelectedParcellationAllRegions({
-          regions: []
         })
       )
-    )
+    })
   ))
 
   onATPSelectionClearBaseLayerColorMap = createEffect(() => this.store.pipe(

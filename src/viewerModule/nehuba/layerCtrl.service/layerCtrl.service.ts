@@ -3,15 +3,13 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
-import { IAuxMesh } from '../store'
-import { IVolumeTypeDetail } from "src/util/siibraApiConstants/types";
-import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi";
-import { SAPISpace, SAPIRegion } from "src/atlasComponents/sapi/core";
+import { SAPIRegion } from "src/atlasComponents/sapi/core";
 import { getParcNgId } from "../config.service"
 import { getRegionLabelIndex } from "../config.service/util";
 import { annotation, atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
+import { arrayEqual } from "src/util/array";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -96,33 +94,6 @@ export class NehubaLayerControlService implements OnDestroy{
       ...cmAux
     }))
   )
-  
-  private auxMeshes$: Observable<IAuxMesh[]> = this.selectedATP$.pipe(
-    map(({ template }) => template),
-    switchMap(tmpl => this.sapiSvc.registry.get<SAPISpace>(tmpl["@id"]).getVolumes().pipe(
-      map(
-        tmplVolumes => {
-          const auxMeshArr: IAuxMesh[] = []
-          for (const vol of tmplVolumes) {
-            if (vol.data.detail["neuroglancer/precompmesh"]) {
-              const detail = vol.data.detail as IVolumeTypeDetail["neuroglancer/precompmesh"]
-              for (const auxMesh of detail["neuroglancer/precompmesh"].auxMeshes) {
-                auxMeshArr.push({
-                  "@id": `auxmesh-${tmpl["@id"]}-${auxMesh.name}`,
-                  labelIndicies: auxMesh.labelIndicies,
-                  name: auxMesh.name,
-                  ngId: '',
-                  rgb: [255, 255, 255],
-                  visible: auxMesh.name !== "Sulci"
-                })
-              }
-            }
-          }
-          return auxMeshArr
-        }
-      )
-    ))
-  )
 
   private sub: Subscription[] = []
 
@@ -132,7 +103,6 @@ export class NehubaLayerControlService implements OnDestroy{
 
   constructor(
     private store$: Store<any>,
-    private sapiSvc: SAPI,
     private layerEffects: LayerCtrlEffects,
   ){
 
@@ -166,43 +136,22 @@ export class NehubaLayerControlService implements OnDestroy{
       })
     )
 
-    this.sub.push(
-      this.store$.pipe(
-        select(atlasAppearance.selectors.customLayers),
-        map(cl => cl.filter(l => l.clType === "customlayer/colormap").length > 0),
-        distinctUntilChanged()
-      ).subscribe(flag => {
-        const pmapLayer = this.ngLayersRegister.find(l => l.id === NehubaLayerControlService.PMAP_LAYER_NAME)
-        if (!pmapLayer) return
-        const payload = {
-          type: 'update',
-          payload: {
-            [NehubaLayerControlService.PMAP_LAYER_NAME]: {
-              visible: !flag
-            }
-          }
-        } as TNgLayerCtrl<'update'>
-        this.manualNgLayersControl$.next(payload)
-      })
-    )
-
     /**
      * on custom landmarks loaded, set mesh transparency
      */
     this.sub.push(
       this.store$.pipe(
         select(annotation.selectors.annotations),
-        withLatestFrom(this.auxMeshes$)
-      ).subscribe(([landmarks, auxMeshes]) => {
-        
+        withLatestFrom(this.defaultNgLayers$)
+      ).subscribe(([landmarks, { tmplAuxNgLayers }]) => {
         const payload: {
           [key: string]: number
         } = {}
         const alpha = landmarks.length > 0
           ? 0.2
           : 1.0
-        for (const auxMesh of auxMeshes) {
-          payload[auxMesh.ngId] = alpha
+        for (const ngId in tmplAuxNgLayers) {
+          payload[ngId] = alpha
         }
         
         this.manualNgLayersControl$.next({
@@ -242,11 +191,28 @@ export class NehubaLayerControlService implements OnDestroy{
     })
   )
 
-  public visibleLayer$: Observable<string[]> = this.expectedLayerNames$.pipe(
-    map(expectedLayerNames => {
-      const ngIdSet = new Set<string>([...expectedLayerNames])
-      return Array.from(ngIdSet)
-    })
+  public visibleLayer$: Observable<string[]> = combineLatest([
+    this.expectedLayerNames$.pipe(
+      map(expectedLayerNames => {
+        const ngIdSet = new Set<string>([...expectedLayerNames])
+        return Array.from(ngIdSet)
+      })
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(cl => {
+        const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
+        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
+        return pmapExist && !otherColormapExist
+      }),
+      distinctUntilChanged(),
+      map(flag => flag
+        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
+        : []
+      )
+    )
+  ]).pipe(
+    map(([ expectedLayerNames, pmapLayer ]) => [...expectedLayerNames, ...pmapLayer])
   )
 
   /**
@@ -303,6 +269,9 @@ export class NehubaLayerControlService implements OnDestroy{
   private ngLayers$ = this.store$.pipe(
     select(atlasAppearance.selectors.customLayers),
     map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    distinctUntilChanged(
+      arrayEqual((o, n) => o.id === n.id)
+    ),
     map(customLayers => {
       const newLayers = customLayers.filter(l => {
         const registeredLayerNames = this.ngLayersRegister.map(l => l.id)

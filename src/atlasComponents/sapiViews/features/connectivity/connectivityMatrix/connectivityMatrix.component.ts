@@ -31,7 +31,7 @@ export class ConnectivityMatrixView implements OnChanges, AfterViewInit{
   
   private async fetchMatrixData(){
     this.matrixData = null
-    const matrix = await this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.featureId)
+    const matrix = await this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.featureId).toPromise()
     if ((matrix as SapiSerializationErrorModel)?.type === "spy/serialization-error") {
       return
     }

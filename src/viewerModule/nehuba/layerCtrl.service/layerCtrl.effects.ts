@@ -37,8 +37,8 @@ export class LayerCtrlEffects {
     ),
     switchMap(([ regions, { atlas, parcellation, template } ]) => {
       const sapiRegion = this.sapi.getRegion(atlas["@id"], parcellation["@id"], regions[0].name)
-      return sapiRegion.getMapInfo(template["@id"])
-        .then(val => 
+      return sapiRegion.getMapInfo(template["@id"]).pipe(
+        map(val => 
           atlasAppearance.actions.addCustomLayer({
             customLayer: {
               clType: "customlayer/nglayer",
@@ -52,13 +52,14 @@ export class LayerCtrlEffects {
               })
             }
           })
-        )
+        ),
+        catchError((err, obs) => of(
+          atlasAppearance.actions.removeCustomLayer({
+            id: NehubaLayerControlService.PMAP_LAYER_NAME
+          })
+        ))
+      )
     }),
-    catchError((err, obs) => of(
-      atlasAppearance.actions.removeCustomLayer({
-        id: NehubaLayerControlService.PMAP_LAYER_NAME
-      })
-    ))
   ))
 
   onATP$ = this.store.pipe(

@@ -2,11 +2,10 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { select, Store } from "@ngrx/store";
 import { Subject, Subscription } from "rxjs";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take } from "rxjs/operators";
+import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { ARIA_LABELS } from 'common/constants'
 import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
-import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaMeshService } from "../mesh.service";
@@ -19,13 +18,10 @@ import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { MatDialog } from "@angular/material/dialog";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { NehubaConfig, getNehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.service";
+import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { NehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction } from "src/state";
-import { NgLayerCustomLayer } from "src/state/atlasAppearance";
-import { arrayEqual } from "src/util/array";
-import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -80,14 +76,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
   private onhoverSegments: SapiRegionModel[] = []
   private onDestroyCb: (() => void)[] = []
-  private viewerUnit: NehubaViewerUnit
   private multiNgIdsRegionsLabelIndexMap = new Map<string, Map<number, SapiRegionModel>>()
 
   public nehubaConfig: NehubaConfig
-  private navigation: any
-  private newViewer$ = new Subject()
 
-  
   public customLandmarks$ = this.store$.pipe(
     select(annotation.selectors.annotations),
   )
@@ -187,7 +179,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     /**
      * clear existing container
      */
-    this.viewerUnit = null
     this.nehubaContainerDirective && this.nehubaContainerDirective.clear()
   }
 
@@ -256,14 +247,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     if (setViewerHandle) {
       console.warn(`NYI viewer handle is deprecated`)
     }
-
-    // listen to navigation change from store
-    const navSub = this.store$.pipe(
-      select(atlasSelection.selectors.navigation)
-    ).subscribe(nav => {
-      this.navigation = nav
-    })
-    this.onDestroyCb.push(() => navSub.unsubscribe())
   }
 
 

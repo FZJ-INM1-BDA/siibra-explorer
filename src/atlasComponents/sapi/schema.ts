@@ -10,11 +10,11 @@ export interface paths {
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/features": {
     /** Returns all regional features for a region. */
-    get: operations["get_all_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get"]
+    get: operations["get_all_regional_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/features/{feature_id}": {
     /** Returns a feature for a region, as defined by by the modality and feature ID */
-    get: operations["get_regional_modality_by_id_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get"]
+    get: operations["get_single_detailed_regional_feature_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/regional_map/info": {
     /** Returns information about a regional map for given region name. */
@@ -33,19 +33,19 @@ export interface paths {
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/features/{feature_id}": {
     /** Returns a global feature for a specific modality id. */
-    get: operations["get_single_global_feature_detail_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get"]
+    get: operations["get_single_detailed_global_feature_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/features": {
     /** Returns all global features for a parcellation. */
-    get: operations["get_global_features_names_atlases__atlas_id__parcellations__parcellation_id__features_get"]
+    get: operations["get_all_global_features_for_parcellation_atlases__atlas_id__parcellations__parcellation_id__features_get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/volumes": {
     /** Returns one parcellation for given id. */
-    get: operations["get_volumes_by_id_atlases__atlas_id__parcellations__parcellation_id__volumes_get"]
+    get: operations["get_volumes_for_parcellation_atlases__atlas_id__parcellations__parcellation_id__volumes_get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}": {
     /** Returns one parcellation for given id. */
-    get: operations["get_parcellation_by_id_atlases__atlas_id__parcellations__parcellation_id__get"]
+    get: operations["get_single_parcellation_detail_atlases__atlas_id__parcellations__parcellation_id__get"]
   }
   "/atlases/{atlas_id}/spaces": {
     /** Returns all spaces that are defined in the siibra client. */
@@ -64,18 +64,18 @@ export interface paths {
      * Get a detailed view on a single spatial feature.
      * A parcellation id and region id can be provided optional to get more details.
      */
-    get: operations["get_single_spatial_feature_detail_atlases__atlas_id__spaces__space_id__features__feature_id__get"]
+    get: operations["get_single_detailed_spatial_feature_atlases__atlas_id__spaces__space_id__features__feature_id__get"]
   }
   "/atlases/{atlas_id}/spaces/{space_id}/features": {
     /** Return all possible feature names and links to get more details */
-    get: operations["get_spatial_features_from_space_atlases__atlas_id__spaces__space_id__features_get"]
+    get: operations["get_all_spatial_features_for_space_atlases__atlas_id__spaces__space_id__features_get"]
   }
   "/atlases/{atlas_id}/spaces/{space_id}/volumes": {
-    get: operations["get_one_space_volumes_atlases__atlas_id__spaces__space_id__volumes_get"]
+    get: operations["get_volumes_for_space_atlases__atlas_id__spaces__space_id__volumes_get"]
   }
   "/atlases/{atlas_id}/spaces/{space_id}": {
     /** Returns one space for given id, with links to further resources */
-    get: operations["get_one_space_by_id_atlases__atlas_id__spaces__space_id__get"]
+    get: operations["get_single_space_detail_atlases__atlas_id__spaces__space_id__get"]
   }
   "/atlases": {
     /** Get all atlases known by siibra. */
@@ -153,10 +153,10 @@ export interface components {
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/core/dataset"
+      "@type"?: "siibra/core/dataset"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -181,6 +181,8 @@ export interface components {
     }
     /** BoundingBoxModel */
     BoundingBoxModel: {
+      /** @Type */
+      "@type": string
       /** Space */
       space: { [key: string]: string }
       center: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
@@ -195,11 +197,8 @@ export interface components {
     ConnectivityMatrixDataModel: {
       /** @Id */
       "@id": string
-      /**
-       * Type
-       * @constant
-       */
-      type?: "siibra/features/connectivity"
+      /** @Type */
+      "@type": string
       /** Name */
       name: string
       /** Parcellations */
@@ -213,10 +212,10 @@ export interface components {
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/core/dataset"
+      "@type"?: "siibra/core/dataset"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -310,12 +309,16 @@ export interface components {
     }
     /** IEEGContactPointModel */
     IEEGContactPointModel: {
+      /** Inroi */
+      inRoi?: boolean
       /** Id */
       id: string
       point: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
     }
     /** IEEGElectrodeModel */
     IEEGElectrodeModel: {
+      /** Inroi */
+      inRoi?: boolean
       /** Electrode Id */
       electrode_id: string
       /** Contact Points */
@@ -325,13 +328,15 @@ export interface components {
     }
     /** IEEGSessionModel */
     IEEGSessionModel: {
+      /** Inroi */
+      inRoi?: boolean
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/features/ieegSession"
+      "@type"?: "siibra/features/ieegSession"
       dataset: components["schemas"]["DatasetJsonModel"]
       /** Sub Id */
       sub_id: string
@@ -459,10 +464,10 @@ export interface components {
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/features/receptor"
+      "@type"?: "siibra/features/receptor"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -734,10 +739,10 @@ export interface components {
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/features/voi"
+      "@type"?: "siibra/features/voi"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -784,10 +789,10 @@ export interface components {
       /** @Id */
       "@id": string
       /**
-       * Type
+       * @Type
        * @constant
        */
-      type?: "siibra/core/dataset"
+      "@type"?: "siibra/core/dataset"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -1333,7 +1338,7 @@ export interface operations {
     }
   }
   /** Returns all regional features for a region. */
-  get_all_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get: {
+  get_all_regional_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1363,7 +1368,7 @@ export interface operations {
     }
   }
   /** Returns a feature for a region, as defined by by the modality and feature ID */
-  get_regional_modality_by_id_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get: {
+  get_single_detailed_regional_feature_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1498,7 +1503,7 @@ export interface operations {
     }
   }
   /** Returns a global feature for a specific modality id. */
-  get_single_global_feature_detail_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get: {
+  get_single_detailed_global_feature_atlases__atlas_id__parcellations__parcellation_id__features__feature_id__get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1525,7 +1530,7 @@ export interface operations {
     }
   }
   /** Returns all global features for a parcellation. */
-  get_global_features_names_atlases__atlas_id__parcellations__parcellation_id__features_get: {
+  get_all_global_features_for_parcellation_atlases__atlas_id__parcellations__parcellation_id__features_get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1555,7 +1560,7 @@ export interface operations {
     }
   }
   /** Returns one parcellation for given id. */
-  get_volumes_by_id_atlases__atlas_id__parcellations__parcellation_id__volumes_get: {
+  get_volumes_for_parcellation_atlases__atlas_id__parcellations__parcellation_id__volumes_get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1578,7 +1583,7 @@ export interface operations {
     }
   }
   /** Returns one parcellation for given id. */
-  get_parcellation_by_id_atlases__atlas_id__parcellations__parcellation_id__get: {
+  get_single_parcellation_detail_atlases__atlas_id__parcellations__parcellation_id__get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1674,7 +1679,7 @@ export interface operations {
    * Get a detailed view on a single spatial feature.
    * A parcellation id and region id can be provided optional to get more details.
    */
-  get_single_spatial_feature_detail_atlases__atlas_id__spaces__space_id__features__feature_id__get: {
+  get_single_detailed_spatial_feature_atlases__atlas_id__spaces__space_id__features__feature_id__get: {
     parameters: {
       path: {
         feature_id: string
@@ -1682,8 +1687,8 @@ export interface operations {
         space_id: string
       }
       query: {
-        parcellation_id: string
-        region: string
+        parcellation_id?: string
+        region?: string
         bbox?: string
       }
     }
@@ -1706,7 +1711,7 @@ export interface operations {
     }
   }
   /** Return all possible feature names and links to get more details */
-  get_spatial_features_from_space_atlases__atlas_id__spaces__space_id__features_get: {
+  get_all_spatial_features_for_space_atlases__atlas_id__spaces__space_id__features_get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1736,7 +1741,7 @@ export interface operations {
       }
     }
   }
-  get_one_space_volumes_atlases__atlas_id__spaces__space_id__volumes_get: {
+  get_volumes_for_space_atlases__atlas_id__spaces__space_id__volumes_get: {
     parameters: {
       path: {
         atlas_id: string
@@ -1759,7 +1764,7 @@ export interface operations {
     }
   }
   /** Returns one space for given id, with links to further resources */
-  get_one_space_by_id_atlases__atlas_id__spaces__space_id__get: {
+  get_single_space_detail_atlases__atlas_id__spaces__space_id__get: {
     parameters: {
       path: {
         atlas_id: string

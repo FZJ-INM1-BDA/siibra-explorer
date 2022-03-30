@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SapiFeatureModel } from "src/atlasComponents/sapi";
+import { SapiFeatureModel, SxplrCleanedFeatureModel, CLEANED_IEEG_DATASET_TYPE } from "src/atlasComponents/sapi";
 
 @Pipe({
   name: 'featureBadgeColour',
@@ -7,9 +7,12 @@ import { SapiFeatureModel } from "src/atlasComponents/sapi";
 })
 
 export class FeatureBadgeColourPipe implements PipeTransform{
-  public transform(regionalFeature: SapiFeatureModel) {
-    if (regionalFeature.type === "siibra/features/receptor") {
+  public transform(regionalFeature: SapiFeatureModel|SxplrCleanedFeatureModel) {
+    if (regionalFeature['@type'] === "siibra/features/receptor") {
       return "accent"
+    }
+    if (regionalFeature['@type'] === CLEANED_IEEG_DATASET_TYPE) {
+      return "primary"
     }
     return "default"
   }

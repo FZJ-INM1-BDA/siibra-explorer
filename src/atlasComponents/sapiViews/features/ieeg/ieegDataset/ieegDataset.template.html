@@ -1,0 +1,112 @@
+<spinner-cmp *ngIf="busy$ | async; else resultTmpl">
+</spinner-cmp>
+
+<ng-template #resultTmpl>
+
+  <mat-accordion *ngIf="!!detailedFeature">
+    <ng-template
+      ngFor
+      [ngForOf]="detailedFeature.sessions | keyvalue"
+      let-sessionKeyVal>
+  
+      <ng-template
+        [ngIf]="sessionKeyVal.value.inRoi"
+        [ngTemplateOutlet]="sessionTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: sessionKeyVal.value
+        }">
+  
+      </ng-template>
+  
+    </ng-template>
+  </mat-accordion>
+  
+</ng-template>
+
+<!-- session template -->
+<ng-template #sessionTmpl let-session>
+  <mat-expansion-panel
+    (opened)="onPanelOpen(session)"
+    (closed)="onPanelClose(session)">
+    <mat-expansion-panel-header>
+      SessionID: {{ session.sub_id }}
+    </mat-expansion-panel-header>
+
+    <ng-template matExpansionPanelContent>
+      <ng-template
+        ngFor
+        [ngForOf]="session.electrodes | keyvalue | inRoi"
+        let-electrodeKeyVal>
+        <ng-template
+          [ngTemplateOutlet]="electrodeTmpl"
+          [ngTemplateOutletContext]="{
+            electrode: electrodeKeyVal.value,
+            session: session
+          }">
+
+        </ng-template>
+      </ng-template>
+
+      <mat-divider></mat-divider>
+      <ng-template
+        ngFor
+        [ngForOf]="session.electrodes | keyvalue | inRoi : false"
+        let-electrodeKeyVal>
+        <div class="sxplr-very-muted">
+          <ng-template
+            [ngTemplateOutlet]="electrodeTmpl"
+            [ngTemplateOutletContext]="{
+              electrode: electrodeKeyVal.value,
+              session: session
+            }">
+
+          </ng-template>
+        </div>
+      </ng-template>
+    </ng-template>
+  </mat-expansion-panel>
+</ng-template>
+
+<!-- electrode template -->
+<ng-template
+  #electrodeTmpl
+  let-electrode="electrode"
+  let-session="session">
+  <mat-form-field appearance="fill">
+    <mat-label>
+      ElectrodeID: {{ electrode.electrode_id }}
+    </mat-label>
+    <mat-chip-list>
+      <ng-template
+        ngFor
+        [ngForOf]="electrode.contact_points | keyvalue"
+        let-contactPointKeyVal>
+
+        <ng-template
+          [ngTemplateOutlet]="contactPointTmpl"
+          [ngTemplateOutletContext]="{
+            contactPointKey: contactPointKeyVal.key,
+            contactPoint: contactPointKeyVal.value,
+            electrode: electrode,
+            session: session
+          }">
+        </ng-template>
+      </ng-template>
+    </mat-chip-list>
+  </mat-form-field>
+</ng-template>
+
+<!-- contact point template -->
+<ng-template
+  #contactPointTmpl
+  let-contactPoint="contactPoint"
+  let-key="contactPointKey"
+  let-electrode="electrode"
+  let-session="session">
+  <mat-chip
+    (click)="onContactPointClicked(contactPoint, electrode, session)"
+    [color]="contactPoint.inRoi ? 'primary' : 'default'"
+    selected>
+    {{ key }}
+  </mat-chip>
+</ng-template>

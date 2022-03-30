@@ -15,7 +15,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test-ci": "ng test --progress false --watch false --browsers=ChromeHeadless",
-    "sapi-schema": "npx openapi-typescript@5.1.1 http://localhost:5000/v1_0/openapi.json --output ./src/atlasComponents/sapi/schema.ts",
+    "sapi-schema": "npx openapi-typescript@5.1.1 http://localhost:5000/v1_0/openapi.json --output ./src/atlasComponents/sapi/schema.ts && eslint ./src/atlasComponents/sapi/schema.ts --no-ignore --fix",
     "docs:json": "compodoc -p ./tsconfig.json -e json -d .",
     "storybook": "npm run docs:json && start-storybook -p 6006",
     "build-storybook": "npm run docs:json && build-storybook"

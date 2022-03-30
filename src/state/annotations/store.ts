@@ -1,4 +1,5 @@
-import { createReducer } from "@ngrx/store"
+import { createReducer, on } from "@ngrx/store"
+import * as actions from "./actions"
 
 export type Annotation = {
   "@id": string
@@ -13,7 +14,29 @@ export const defaultState: AnnotationState = {
 }
 
 const reducer = createReducer(
-  defaultState
+  defaultState,
+  on(
+    actions.addAnnotations,
+    (state, { annotations }) => {
+      return {
+        ...state,
+        annotations: [
+          ...state.annotations,
+          ...annotations,
+        ]
+      }
+    }
+  ),
+  on(
+    actions.rmAnnotations,
+    (state, { annotations }) => {
+      const annIdToBeRemoved = annotations.map(ann => ann["@id"])
+      return {
+        ...state,
+        annotations: state.annotations.filter(ann => !annIdToBeRemoved.includes(ann["@id"]) )
+      }
+    }
+  )
 )
 
 export {

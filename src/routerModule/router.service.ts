@@ -3,7 +3,7 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, finalize, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
 import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
 import { BehaviorSubject, combineLatest, concat, EMPTY, merge, NEVER, Observable, of, timer } from 'rxjs'
 import { scan } from 'rxjs/operators'
@@ -120,9 +120,19 @@ export class RouterService {
     /**
      * does work too well =( 
      */
-    navEnd$.pipe(
-      map(navEv => navEv.urlAfterRedirects)
+     concat(
+      onload$.pipe(
+        mapTo(false)
+      ),
+      timer(160).pipe(
+        mapTo(false)
+      ),
+      ready$.pipe(
+        map(val => !!val)
+      )
     ).pipe(
+      switchMap(() => navEnd$),
+      map(navEv => navEv.urlAfterRedirects),
       switchMap(url =>
         routeToStateTransformSvc.cvtRouteToState(
           router.parseUrl(

@@ -1,5 +1,5 @@
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "."
-import { SapiParcellationFeatureModel } from "./type"
+import { cleanIeegSessionDatasets, SapiParcellationFeatureModel, SapiSpatialFeatureModel, SxplrCleanedFeatureModel } from "./type"
 import addons from '@storybook/addons';
 import { DARKTHEME } from "src/util/injectionTokens";
 import { APP_INITIALIZER, NgZone } from "@angular/core";
@@ -101,11 +101,11 @@ export async function getJba29Regions(): Promise<SapiRegionModel[]> {
   return await getParcRegions(atlasId.human, parcId.human.jba29, spaceId.human.mni152)
 }
 
-export async function getHoc1Left(spaceId=null): Promise<SapiRegionModel> {
+export async function getHoc1Right(spaceId=null): Promise<SapiRegionModel> {
   if (!spaceId) {
-    return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left`)).json()
+    return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right`)).json()
   }
-  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function get44Left(spaceId=null): Promise<SapiRegionModel> {
@@ -115,14 +115,37 @@ export async function get44Left(spaceId=null): Promise<SapiRegionModel> {
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
-export async function getHoc1Features(): Promise<SapiRegionalFeatureModel[]> {
-  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left/features`)).json()
+export async function getHoc1RightSpatialFeatures(): Promise<SxplrCleanedFeatureModel[]> {
+  const json: SapiSpatialFeatureModel[] = await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features?parcellation_id=2.9&region=hoc1%20right`)).json()
+  return cleanIeegSessionDatasets(json.filter(it => it['@type'] === "siibra/features/ieegSession"))
 }
 
-export async function getHoc1FeatureDetail(featId: string): Promise<SapiRegionalFeatureModel>{
-  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20left/features/${encodeURIComponent(featId)}`)).json()
+export async function getHoc1RightFeatures(): Promise<SapiRegionalFeatureModel[]> {
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features`)).json()
+}
+
+export async function getHoc1RightFeatureDetail(featId: string): Promise<SapiRegionalFeatureModel>{
+  return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features/${encodeURIComponent(featId)}`)).json()
 }
 
 export async function getJba29Features(): Promise<SapiParcellationFeatureModel[]> {
   return await (await fetch(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/features`)).json()
+}
+
+export async function getBigbrainSpatialFeatures(): Promise<SapiSpatialFeatureModel[]>{
+  const bbox = [
+    [-1000, -1000, -1000],
+    [1000, 1000, 1000]
+  ]
+  const url = new URL(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.bigbrain}/features`)
+  url.searchParams.set(`bbox`, JSON.stringify(bbox))
+  return await (await fetch(url.toString())).json()
+}
+
+export async function getMni152SpatialFeatureHoc1Right(): Promise<SapiSpatialFeatureModel[]>{
+  
+  const url = new URL(`${SAPI.bsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features`)
+  url.searchParams.set(`parcellation_id`, parcId.human.jba29)
+  url.searchParams.set("region", 'hoc1 right')
+  return await (await fetch(url.toString())).json()
 }

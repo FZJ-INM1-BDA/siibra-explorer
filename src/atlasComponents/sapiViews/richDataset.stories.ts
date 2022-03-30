@@ -3,9 +3,9 @@ import { HttpClientModule } from "@angular/common/http"
 import { Component } from "@angular/core"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
-import { getHoc1FeatureDetail, getHoc1Features, getHoc1Left, getHumanAtlas, getJba29, getMni152, provideDarkTheme } from "src/atlasComponents/sapi/stories.base"
+import { getHoc1RightFeatureDetail, getHoc1RightFeatures, getHoc1Right, getHumanAtlas, getJba29, getMni152, provideDarkTheme, getMni152SpatialFeatureHoc1Right } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
-import { SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "../sapi/type"
+import { cleanIeegSessionDatasets, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "../sapi/type"
 import { SapiViewsCoreDatasetModule } from "./core/datasets"
 import { SapiViewsFeaturesModule } from "./features"
 
@@ -88,7 +88,7 @@ const loadRegionMetadata = async () => {
   const atlas = await getHumanAtlas()
   const parcellation = await getJba29()
   const template = await getMni152()
-  const region = await getHoc1Left()
+  const region = await getHoc1Right()
   return {
     atlas, 
     parcellation, 
@@ -98,7 +98,7 @@ const loadRegionMetadata = async () => {
 }
 
 const loadFeat = async () => {
-  const features = await getHoc1Features()
+  const features = await getHoc1RightFeatures()
   return { features }
 }
 
@@ -112,10 +112,25 @@ ReceptorDataset.loaders = [
   },
   async () => {
     const { features } = await loadFeat()
-    const receptorfeat = features.find(f => f.type === "siibra/features/receptor")
-    const feature = await getHoc1FeatureDetail(receptorfeat["@id"])
-    return {
-      feature
-    }
+    const receptorfeat = features.find(f => f['@type'] === "siibra/features/receptor")
+    const feature = await getHoc1RightFeatureDetail(receptorfeat["@id"])
+    return { feature }
+  }
+]
+
+export const IeegDataset = Template.bind({})
+IeegDataset.args = {
+
+}
+IeegDataset.loaders = [
+  async () => {
+    return await loadRegionMetadata()
+  },
+  async () => {
+    const features = await getMni152SpatialFeatureHoc1Right()
+    const spatialFeats = features.filter(f => f["@type"] === "siibra/features/ieegSession")
+    const feature = cleanIeegSessionDatasets(spatialFeats)[0]
+    
+    return { feature }
   }
 ]

@@ -104,6 +104,7 @@ export class RouteStateTransformSvc {
       selectedTemplate,
       selectedParcellation,
       selectedRegions,
+      allParcellationRegions
     }
   }
 
@@ -180,11 +181,12 @@ export class RouteStateTransformSvc {
 
 
     try {
-      const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
+      const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate, allParcellationRegions } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
       returnState["[state.atlasSelection]"].selectedAtlas = selectedAtlas
       returnState["[state.atlasSelection]"].selectedParcellation = selectedParcellation
       returnState["[state.atlasSelection]"].selectedTemplate = selectedTemplate
-      returnState["[state.atlasSelection]"].selectedRegions = selectedRegions
+      returnState["[state.atlasSelection]"].selectedRegions = selectedRegions || []
+      returnState["[state.atlasSelection]"].selectedParcellationAllRegions = allParcellationRegions || []
       returnState["[state.atlasSelection]"].navigation = parsedNavObj
     } catch (e) {
       // if error, show error on UI?
@@ -193,7 +195,13 @@ export class RouteStateTransformSvc {
     return returnState
   }
 
-  cvtStateToRoute(state: MainState) {
+  cvtStateToRoute(_state: MainState) {
+    
+    /**
+     * need to create new references here
+     * or else, the memoized selector will spit out undefined
+     */
+    const state:MainState = JSON.parse(JSON.stringify(_state))
 
     const selectedAtlas = atlasSelection.selectors.selectedAtlas(state)
     const selectedParcellation = atlasSelection.selectors.selectedParcellation(state)
