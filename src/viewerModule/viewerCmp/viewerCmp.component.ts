@@ -1,3 +1,4 @@
+import { Subject } from "rxjs"
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactory, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, NEVER, Observable, of, Subscription } from "rxjs";
@@ -198,6 +199,7 @@ export class ViewerCmp implements OnDestroy {
     distinctUntilChanged()
   )
 
+  private voiForceOff = new Subject()
   public pliVol$ = merge(
     this._pliVol$?.pipe(
       filter(arr => arr.length > 0),
@@ -216,7 +218,8 @@ export class ViewerCmp implements OnDestroy {
           ? [{ doi: this._1umLink }]
           : []
       }))
-    )
+    ),
+    this.voiForceOff
   )
 
   /**
@@ -256,6 +259,7 @@ export class ViewerCmp implements OnDestroy {
       })
     )
     this.routerSvc.setCustomRoute('x-voi', null)
+    this.voiForceOff.next(false)
   }
   constructor(
     private store$: Store<any>,
