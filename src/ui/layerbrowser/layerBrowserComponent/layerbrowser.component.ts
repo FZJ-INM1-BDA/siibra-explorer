@@ -1,4 +1,4 @@
-import { Component,  EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform } from "@angular/core";
+import { ChangeDetectionStrategy, Component,  EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, startWith } from "rxjs/operators";
@@ -20,7 +20,9 @@ const SHOW_LAYER_NAMES = [
   'Blockface Image',
   'PLI Transmittance',
   'T2w MRI',
-  'MRI Labels'
+  'MRI Labels',
+  'VOI_1 (area V1)',
+  'VOI_2 (area V2)'
 ]
 
 @Component({
@@ -29,6 +31,7 @@ const SHOW_LAYER_NAMES = [
   styleUrls : [
     './layerbrowser.style.css',
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class LayerBrowser implements OnInit, OnDestroy {
@@ -137,7 +140,6 @@ export class LayerBrowser implements OnInit, OnDestroy {
       this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state),
     )
 
-    this.viewer = getViewer()
   }
 
   public ngOnDestroy() {
@@ -159,7 +161,9 @@ export class LayerBrowser implements OnInit, OnDestroy {
     }
   }
 
-  public viewer: any
+  get viewer() {
+    return getViewer()
+  }
 
   public toggleVisibility(layer: any) {
     const layerName = layer.name

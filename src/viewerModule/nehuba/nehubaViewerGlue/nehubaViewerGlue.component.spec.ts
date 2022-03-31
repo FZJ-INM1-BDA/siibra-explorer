@@ -26,6 +26,7 @@ import { TouchSideClass } from "../touchSideClass.directive"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { HarnessLoader } from "@angular/cdk/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
+import { RouterService } from "src/routerModule/router.service"
 
 
 @Component({
@@ -109,6 +110,11 @@ describe('> nehubaViewerGlue.component.ts', () => {
             visibleLayer$: new Subject(),
             segmentVis$: new Subject(),
             ngLayersController$: new Subject(),
+          }
+        },{
+          provide: RouterService,
+          useValue: {
+            customRoute$: NEVER
           }
         }, {
           provide: NehubaMeshService,

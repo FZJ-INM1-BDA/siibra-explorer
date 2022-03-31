@@ -7,6 +7,8 @@ import { hot } from "jasmine-marbles"
 import { IColorMap } from "./layerCtrl.util"
 import { debounceTime } from "rxjs/operators"
 import { ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper"
+import { RouterService } from "src/routerModule/router.service"
+import { NEVER } from "rxjs"
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -16,8 +18,14 @@ describe('> layerctrl.service.ts', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
+          {
+            provide: RouterService,
+            useValue: {
+              customRoute$: NEVER
+            }
+          },
           NehubaLayerControlService,
-          provideMockStore()
+          provideMockStore(),
         ]
       })
 

@@ -1,4 +1,4 @@
-import { getIdFromFullId, strToRgb, verifyPositionArg, arrayOrderedEql } from './util'
+import { race, getIdFromFullId, strToRgb, verifyPositionArg, arrayOrderedEql } from './util'
 
 describe('common/util.js', () => {
   describe('getIdFromFullId', () => {
@@ -147,6 +147,58 @@ describe('common/util.js', () => {
             arrayOrderedEql([], [1])
           ).toBeFalse()
         })
+      })
+    })
+  })
+
+  describe("> race", () => {
+    const defaultTimeout = 1000
+    describe("> without argument", () => {
+      it('> resolve should work', async () => {
+        await race(async () => {
+          await new Promise(rs => setTimeout(rs, 160, 'hello'))
+        })
+        expect(true).toEqual(true)
+      }),
+      it('> reject should work', async () => {
+        const start = performance.now()
+        try{
+          await race(async () => {
+            await new Promise(rs => setTimeout(rs, 5000, 'hello'))
+          })
+          expect(true).toEqual(false)
+        } catch (e) {
+
+        } finally {
+          const end = performance.now()
+          expect(end - start).toBeGreaterThan(defaultTimeout)
+          expect(end - start).toBeLessThan(defaultTimeout + 10)
+        }
+      })
+    })
+
+    describe("> with argument", () => {
+      const timeout = 500
+      it('> resolve should work', async () => {
+        await race(async () => {
+          await new Promise(rs => setTimeout(rs, 160, 'hello'))
+        }, { timeout })
+        expect(true).toEqual(true)
+      }),
+      it('> reject should work', async () => {
+        const start = performance.now()
+        try{
+          await race(async () => {
+            await new Promise(rs => setTimeout(rs, 1000, 'hello'))
+          }, { timeout } )
+          expect(true).toEqual(false)
+        } catch (e) {
+
+        } finally {
+          const end = performance.now()
+          expect(end - start).toBeGreaterThan(timeout)
+          expect(end - start).toBeLessThan(timeout + 10)
+        }
       })
     })
   })

@@ -39,7 +39,7 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   )
 
   public hasPrAr$: Observable<boolean> = this.selectedReceptor$.pipe(
-    map(detail => !!detail.__data.__profiles),
+    map(detail => !!detail.__data.__profiles && Object.keys(detail.__data.__profiles).length > 0),
   )
 
   ngOnDestroy(){
@@ -50,6 +50,11 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
     filter(v => !!v),
     switchMap(() => this.getFeatureInstancesList('ReceptorDistribution')),
     startWith([]),
+    map(
+      arr => this.data?.featureId
+        ? arr.filter(it => it['@id'] === this.data.featureId)
+        : arr
+    ),
     shareReplay(1),
   )
 
@@ -68,7 +73,7 @@ export class BsFeatureReceptorEntry extends BsRegionInputBase implements OnDestr
   constructor(
     svc: BsFeatureService,
     cdr: ChangeDetectorRef,
-    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) data: TFeatureCmpInput
+    @Optional() @Inject(REGISTERED_FEATURE_INJECT_DATA) private data: TFeatureCmpInput
   ){
     super(svc, data)
     this.sub.push(

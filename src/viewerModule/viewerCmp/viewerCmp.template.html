@@ -164,7 +164,7 @@
   <!-- if pli voi is visible, show pli template
   otherwise show region tmpl -->
   <ng-template
-    [ngTemplateOutlet]="(pliVol$ | async)?.[0]
+    [ngTemplateOutlet]="(pliVol$ | async)
       ? voiTmpl
       : sidenavRegionTmpl"
     [ngTemplateOutletContext]="{
@@ -553,7 +553,7 @@
 
   <mat-card class="_pli-container">
     <mat-card-title>
-      {{ _pliTitle }}
+      {{ pliVol$ | async | getProperty : 'title' }}
     </mat-card-title>
 
     <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
@@ -564,7 +564,7 @@
 
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
-      <a [href]="_pliLink"
+      <a *ngFor="let url of pliVol$ | async | getProperty : 'url'" [href]="url.doi"
         mat-icon-button
         matTooltip="Explore in EBRAINS Knowledge Graph"
         target="_blank">
@@ -574,7 +574,7 @@
     </mat-card-subtitle>
 
     <small class="d-block text-muted iv-custom-comp darker-bg">
-      {{ _pliDesc }}
+      {{ pliVol$ | async | getProperty : 'description' }}
     </small>
 
     <mat-expansion-panel class="sidenav-cover-header-container">
