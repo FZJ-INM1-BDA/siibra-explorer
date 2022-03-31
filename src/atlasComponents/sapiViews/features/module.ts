@@ -9,6 +9,7 @@ import { FeatureBadgeFlagPipe } from "./featureBadgeFlag.pipe"
 import { FeatureBadgeNamePipe } from "./featureBadgeName.pipe"
 import * as ieeg from "./ieeg"
 import * as receptor from "./receptors"
+import * as voi from "./voi"
 
 const {
   SxplrSapiViewsFeaturesIeegModule
@@ -16,6 +17,7 @@ const {
 const {
   ReceptorViewModule
 } = receptor
+const { SapiViewsFeaturesVoiModule } = voi
 
 @NgModule({
   imports: [
@@ -23,6 +25,7 @@ const {
     ReceptorViewModule,
     SxplrSapiViewsFeaturesIeegModule,
     AngularMaterialModule,
+    SapiViewsFeaturesVoiModule,
   ],
   declarations: [
     FeatureEntryCmp,
@@ -41,6 +44,7 @@ const {
   exports: [
     FeatureEntryCmp,
     SapiViewsFeaturesEntryListItem,
+    SapiViewsFeaturesVoiModule,
   ]
 })
 export class SapiViewsFeaturesModule{}

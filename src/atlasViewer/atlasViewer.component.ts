@@ -48,7 +48,6 @@ const compareFn = (it, item) => it.name === item.name
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
-  public CONTEXT_MENU_ARIA_LABEL = ARIA_LABELS.CONTEXT_MENU
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>

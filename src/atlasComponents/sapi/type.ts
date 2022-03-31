@@ -15,6 +15,7 @@ export type SapiAtlasModel = components["schemas"]["SapiAtlasModel"]
 export type SapiSpaceModel = components["schemas"]["SapiSpaceModel"]
 export type SapiParcellationModel = components["schemas"]["SapiParcellationModel"]
 export type SapiRegionModel = components["schemas"]["siibra__openminds__SANDS__v3__atlas__parcellationEntityVersion__Model"]
+export type OpenMINDSCoordinatePoint = components['schemas']['siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model']
 
 export type SapiRegionMapInfoModel = components["schemas"]["NiiMetadataModel"]
 export type SapiVOIDataResponse = components["schemas"]["VOIDataModel"]

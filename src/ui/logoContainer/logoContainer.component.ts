@@ -24,7 +24,7 @@ export class LogoContainer {
 
   private subscriptions: Subscription[] = []
   constructor(
-    private pureConstantService: PureContantService
+    pureConstantService: PureContantService
   ){
     this.subscriptions.push(
       pureConstantService.darktheme$.pipe(

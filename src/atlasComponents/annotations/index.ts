@@ -1,1 +1,1 @@
-export { AnnotationLayer, TNgAnnotationPoint } from "./annotation.service"
+export { TNgAnnotationAABBox, AnnotationLayer, TNgAnnotationPoint, TNgAnnotationLine } from "./annotation.service"

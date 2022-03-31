@@ -32,18 +32,14 @@
 
   <!-- perspective view tmpl -->
   <ng-template #overlayPerspectiveTmpl>
-    <layout-floating-container>
-
+    
       <!-- mesh loading is still weird -->
       <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
       <!-- TODO -->
-    </layout-floating-container>
   </ng-template>
 
   <iav-layout-fourcorners class="w-100 h-100 d-block">
-    <layout-floating-container *ngIf="panelIndex < 3; else overlayPerspectiveTmpl"
-      class="overflow-hidden"
-      iavLayoutFourCornersContent>
+
       <!-- TODO add landmarks here -->
 
 
@@ -58,7 +54,6 @@
         [positionZ]="getPositionZ(panelIndex, lm)">
 
       </landmark-2d-flat-cmp> -->
-    </layout-floating-container>
 
     <!-- panel controller -->
     <div iavLayoutFourCornersBottomRight class="position-relative honing">

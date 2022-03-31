@@ -17,8 +17,6 @@ import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
 import { UIService } from "./services/uiService.service";
-import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
-import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
@@ -35,7 +33,6 @@ import { MesssagingModule } from './messaging/module';
 import { ViewerModule, VIEWERMODULE_DARKTHEME } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
-import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
@@ -77,7 +74,6 @@ import { CONST } from "common/constants"
     SpotLightModule,
     CookieModule,
     KgTosModule,
-    MouseoverModule,
     AtlasViewerRouterModule,
     QuickTourModule,
     
@@ -95,8 +91,6 @@ import { CONST } from "common/constants"
     TryMeComponent,
 
     /* directives */
-    FloatingContainerDirective,
-    FloatingMouseContextualContainerDirective,
 
   ],
   entryComponents : [

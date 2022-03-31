@@ -10,7 +10,6 @@ import { AngularMaterialModule } from 'src/sharedModules'
 import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
 
-import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
@@ -44,8 +43,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     Landmark2DModule,
   ],
   declarations : [
-    
-    LogoContainer,
     MobileOverlay,
 
     ActionDialog,
@@ -127,8 +124,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
   ],
   exports : [
     // NehubaContainer,
-    
-    LogoContainer,
     MobileOverlay,
     
     // StatusCardComponent,

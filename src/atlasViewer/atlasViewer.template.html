@@ -29,82 +29,27 @@
 <!-- atlas template -->
 <ng-template #viewerBody>
   <div class="w-100 h-100"
-    iav-media-query
     quick-tour
     [quick-tour-position]="quickTourFinale.position"
     [quick-tour-description]="quickTourFinale.description"
     [quick-tour-description-md]="quickTourFinale.descriptionMd"
     [quick-tour-order]="quickTourFinale.order"
     [quick-tour-overwrite-arrow]="emptyArrowTmpl"
-    quick-tour-severity="low"
-    #media="iavMediaQuery">
+    quick-tour-severity="low">
     <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
     <iav-cmp-viewer-container
       class="w-100 h-100 d-block"
-      [ismobile]="(media.mediaBreakPoint$ | async) > 3"
       iav-captureClickListenerDirective
       [iav-captureClickListenerDirective-captureDocument]="true"
       (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
     </iav-cmp-viewer-container>
 
-    <!-- TODO move to viewerCmp.template.html -->
-    <layout-floating-container
-      zIndex="13"
-      #floatingOverlayContainer>
-      <div floatingContainerDirective>
-      </div>
-
-      <div *ngIf="(media.mediaBreakPoint$ | async) < 3"
-        class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
-        <ng-container *ngTemplateOutlet="logoTmpl">
-        </ng-container>
-      </div>
-
-      <div *ngIf="!ismobile" floatingMouseContextualContainerDirective>
-
-        <div class="h-0"
-          iav-mouse-hover
-          #iavMouseHoverContextualBlock="iavMouseHover">
-        </div>
-        <mat-list dense class="contextual-block">
-
-          <mat-list-item *ngFor="let cvtOutput of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseoverCvt"
-            class="h-auto">
-
-            <mat-icon
-              [fontSet]="cvtOutput.icon.fontSet"
-              [fontIcon]="cvtOutput.icon.fontIcon"
-              mat-list-icon>
-            </mat-icon>
-
-            <div matLine>{{ cvtOutput.text }}</div>
-
-          </mat-list-item>
-        </mat-list>
-        <!-- TODO Potentially implementing plugin contextual info -->
-      </div>
-
-      <div class="floating-container"
-        [attr.aria-label]="CONTEXT_MENU_ARIA_LABEL"
-        fixedMouseContextualContainerDirective
-        #fixedContainer="iavFixedMouseCtxContainer">
-
-        <!-- mouse on click context menu, currently not used -->
-
-      </div>
-
-    </layout-floating-container>
   </div>
 </ng-template>
 
 <!-- does not meet req template -->
 <ng-template #doesNotMeetReqTemplate>
   <not-supported-component></not-supported-component>
-</ng-template>
-
-<!-- logo tmpl -->
-<ng-template #logoTmpl>
-  <logo-container></logo-container>
 </ng-template>
 
 <ng-template #idleOverlay>

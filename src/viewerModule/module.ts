@@ -24,6 +24,9 @@ import { SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
 import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 import { DialogModule } from "src/ui/dialogInfo/module";
+import { MouseoverModule } from "src/mouseoverModule";
+import { LogoContainer } from "src/ui/logoContainer/logoContainer.component";
+import { FloatingMouseContextualContainerDirective } from "src/util/directives/floatingMouseContextualContainer.directive";
 
 @NgModule({
   imports: [
@@ -43,10 +46,13 @@ import { DialogModule } from "src/ui/dialogInfo/module";
     SapiViewsModule,
     SapiViewsUtilModule,
     DialogModule,
+    MouseoverModule,
   ],
   declarations: [
     ViewerCmp,
     NehubaVCtxToBbox,
+    LogoContainer,
+    FloatingMouseContextualContainerDirective,
   ],
   providers: [
     {

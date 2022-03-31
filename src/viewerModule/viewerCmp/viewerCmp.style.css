@@ -89,3 +89,32 @@ sxplr-sapiviews-core-region-region-chip [prefix]
   padding-right: 0.5rem;
   margin-top: -1rem;
 }
+
+.floating-ui
+{
+  display: block;
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+}
+
+logo-container
+{
+  height: 2rem;
+  opacity: 0.2;
+}
+
+mat-list[dense].contextual-block
+{
+  display: inline-block;
+  background-color:rgba(200,200,200,0.8);
+}
+
+:host-context([darktheme="true"]) mat-list[dense].contextual-block
+{
+  background-color : rgba(30,30,30,0.8);
+}

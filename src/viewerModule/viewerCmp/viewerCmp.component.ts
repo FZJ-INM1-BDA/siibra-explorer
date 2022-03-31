@@ -94,8 +94,6 @@ export class ViewerCmp implements OnDestroy {
     description: QUICKTOUR_DESC.ATLAS_SELECTOR,
   }
 
-  @Input() ismobile = false
-
   private subscriptions: Subscription[] = []
   private onDestroyCb: (() => void)[]  = []
   public viewerLoaded: boolean = false
@@ -385,7 +383,7 @@ export class ViewerCmp implements OnDestroy {
         atlasSelection.actions.navigateTo({
           navigation: {
             orientation: [0, 0, 0, 1],
-            position: feature.location.center.coordinates.map(v => (v.unit as number) * 1e6)
+            position: feature.location.center.coordinates.map(v => v.value * 1e6)
           },
           animation: true
         })

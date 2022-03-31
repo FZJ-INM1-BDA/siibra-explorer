@@ -2,10 +2,10 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { atlasAppearance, atlasSelection } from "src/state";
-import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise } from "rxjs/operators";
+import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SapiVOIDataResponse } from "src/atlasComponents/sapi/type";
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
@@ -67,12 +67,62 @@ export class LayerCtrlEffects {
     map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel })
   )
 
+  onShownFeature = createEffect(() => this.store.pipe(
+    select(userInteraction.selectors.selectedFeature),
+    startWith(null as SapiFeatureModel),
+    pairwise(),
+    map(([ prev, curr ]) => {
+      const removeLayers: atlasAppearance.NgLayerCustomLayer[] = []
+      const addLayers: atlasAppearance.NgLayerCustomLayer[] = []
+      if (prev?.["@type"] === "siibra/features/voi") {
+        removeLayers.push(
+          ...(prev as SapiVOIDataResponse).volumes.map(v => {
+            return {
+              id: v.metadata.fullName,
+              clType: "customlayer/nglayer",
+              source: v.data.url,
+              transform: v.data.detail['neuroglancer/precomputed']['transform'],
+              opacity: 1.0,
+              visible: true,
+              shader: v.data.detail['neuroglancer/precomputed']['shader'] || getShader()
+            } as atlasAppearance.NgLayerCustomLayer
+          })
+        )
+      }
+      if (curr?.["@type"] === "siibra/features/voi") {
+        addLayers.push(
+          ...(curr as SapiVOIDataResponse).volumes.map(v => {
+            return {
+              id: v.metadata.fullName,
+              clType: "customlayer/nglayer",
+              source: `precomputed://${v.data.url}`,
+              transform: v.data.detail['neuroglancer/precomputed']['transform'],
+              opacity: v.data.detail['neuroglancer/precomputed']['opacity'] || 1.0,
+              visible: true,
+              shader: v.data.detail['neuroglancer/precomputed']['shader'] || getShader()
+            } as atlasAppearance.NgLayerCustomLayer
+          })
+        )
+      }
+      return { removeLayers, addLayers }
+    }),
+    filter(({ removeLayers, addLayers }) => removeLayers.length !== 0 || addLayers.length !== 0),
+    switchMap(({ removeLayers, addLayers }) => of(...[
+      ...removeLayers.map(
+        l => atlasAppearance.actions.removeCustomLayer({ id: l.id })
+      ),
+      ...addLayers.map(
+        l => atlasAppearance.actions.addCustomLayer({ customLayer: l })
+      )
+    ]))
+  ))
+
   onATPClearBaseLayers = createEffect(() => this.onATP$.pipe(
     withLatestFrom(
       this.store.pipe(
         select(atlasAppearance.selectors.customLayers),
         map(
-          cl => cl.filter(layer => layer.clType === "baselayer/nglayer" || layer.clType === "baselayer/colormap")
+          cl => cl.filter(layer => layer.clType === "baselayer/nglayer" || "customlayer/nglayer")
         )
       )
     ),
@@ -178,7 +228,7 @@ export class LayerCtrlEffects {
     switchMap(ngLayers => {
       const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers } = ngLayers
       
-      const customBaseLayers: NgLayerCustomLayer[] = []
+      const customBaseLayers: atlasAppearance.NgLayerCustomLayer[] = []
       for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
         for (const key in layers) {
           const { source, transform, opacity, visible } = layers[key]

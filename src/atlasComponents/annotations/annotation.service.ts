@@ -1,4 +1,22 @@
+import { BehaviorSubject, Observable } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
+
+export type TNgAnnotationEv = {
+  pickedAnnotationId: string
+  pickedOffset: number
+}
+
+/**
+ * axis aligned bounding box
+ */
+export type TNgAnnotationAABBox = {
+  type: 'aabbox'
+  pointA: [number, number, number]
+  pointB: [number, number, number]
+  id: string
+  description?: string
+}
 
 export type TNgAnnotationLine = {
   type: 'line'
@@ -15,7 +33,7 @@ export type TNgAnnotationPoint = {
   description?: string
 }
 
-export type AnnotationSpec = TNgAnnotationLine | TNgAnnotationPoint
+export type AnnotationSpec = TNgAnnotationLine | TNgAnnotationPoint | TNgAnnotationAABBox
 type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
 type AnnotationRef = {}
 
@@ -37,7 +55,21 @@ interface NgAnnotationLayer {
 }
 
 export class AnnotationLayer {
+  static Map = new Map<string, AnnotationLayer>()
+  static Get(name: string, color: string){
+    if (AnnotationLayer.Map.has(name)) return AnnotationLayer.Map.get(name)
+    const layer = new AnnotationLayer(name, color)
+    AnnotationLayer.Map.set(name, layer)
+    return layer
+  }
+
+  private _onHover = new BehaviorSubject<{ id: string, offset: number }>(null)
+  public onHover: Observable<{ id: string, offset: number }> = this._onHover.asObservable().pipe(
+    distinctUntilChanged((o, n) => o?.id === n?.id)
+  )
+  private onDestroyCb: (() => void)[] = []
   private nglayer: NgAnnotationLayer
+  private idset = new Set<string>()
   constructor(
     private name: string = getUuid(),
     private color="#ffffff"
@@ -58,14 +90,32 @@ export class AnnotationLayer {
       }
     )
     this.nglayer = this.viewer.layerManager.addManagedLayer(layerSpec)
+    const mouseState = this.viewer.mouseState
+    const res: () => void = mouseState.changed.add(() => {
+      const payload = mouseState.active
+      && !!mouseState.pickedAnnotationId
+      && this.idset.has(mouseState.pickedAnnotationId)
+      ? {
+        id: mouseState.pickedAnnotationId,
+        offset: mouseState.pickedOffset
+      }
+      : null
+      this._onHover.next(payload)
+    })
+    this.onDestroyCb.push(res)
+    
     this.nglayer.layer.registerDisposer(() => {
-      this.nglayer = null
+      this.dispose()
     })
   }
   setVisible(flag: boolean){
     this.nglayer.setVisible(flag)
   }
   dispose() {
+    this.nglayer = null
+    AnnotationLayer.Map.delete(this.name)
+    this._onHover.complete()
+    while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     try {
       this.viewer.layerManager.removeManagedLayer(this.nglayer)
     } catch (e) {
@@ -75,6 +125,7 @@ export class AnnotationLayer {
 
   addAnnotation(spec: AnnotationSpec){
     const localAnnotations = this.nglayer.layer.localAnnotations
+    this.idset.add(spec.id)
     const annSpec = this.parseNgSpecType(spec)
     localAnnotations.add(
       annSpec
@@ -82,6 +133,7 @@ export class AnnotationLayer {
   }
   removeAnnotation(spec: { id: string }) {
     const { localAnnotations } = this.nglayer.layer
+    this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)
     if (ref) {
       localAnnotations.delete(ref)
@@ -98,6 +150,7 @@ export class AnnotationLayer {
         _spec
       )
     } else {
+      this.idset.add(_spec.id)
       localAnnotations.add(_spec)
     }
   }
@@ -111,6 +164,7 @@ export class AnnotationLayer {
     let overwritingType = null
     if (spec.type === 'point') overwritingType = 0
     if (spec.type === 'line') overwritingType = 1
+    if (spec.type === "aabbox") overwritingType = 2
     if (overwritingType === null) throw new Error(`overwrite type lookup failed for ${spec.type}`)
     return {
       ...spec,

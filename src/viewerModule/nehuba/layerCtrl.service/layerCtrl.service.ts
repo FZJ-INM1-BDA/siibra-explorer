@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { SAPIRegion } from "src/atlasComponents/sapi/core";
 import { getParcNgId } from "../config.service"
@@ -191,30 +191,6 @@ export class NehubaLayerControlService implements OnDestroy{
     })
   )
 
-  public visibleLayer$: Observable<string[]> = combineLatest([
-    this.expectedLayerNames$.pipe(
-      map(expectedLayerNames => {
-        const ngIdSet = new Set<string>([...expectedLayerNames])
-        return Array.from(ngIdSet)
-      })
-    ),
-    this.store$.pipe(
-      select(atlasAppearance.selectors.customLayers),
-      map(cl => {
-        const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
-        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
-        return pmapExist && !otherColormapExist
-      }),
-      distinctUntilChanged(),
-      map(flag => flag
-        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
-        : []
-      )
-    )
-  ]).pipe(
-    map(([ expectedLayerNames, pmapLayer ]) => [...expectedLayerNames, ...pmapLayer])
-  )
-
   /**
    * define when shown segments should be updated
    */
@@ -317,5 +293,33 @@ export class NehubaLayerControlService implements OnDestroy{
     ),
     this.manualNgLayersControl$,
   ).pipe(
+  )
+
+  public visibleLayer$: Observable<string[]> = combineLatest([
+    this.expectedLayerNames$.pipe(
+      map(expectedLayerNames => {
+        const ngIdSet = new Set<string>([...expectedLayerNames])
+        return Array.from(ngIdSet)
+      })
+    ),
+    this.ngLayers$.pipe(
+      map(({ customLayers }) => customLayers),
+      startWith([] as atlasAppearance.NgLayerCustomLayer[])
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(cl => {
+        const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
+        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
+        return pmapExist && !otherColormapExist
+      }),
+      distinctUntilChanged(),
+      map(flag => flag
+        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
+        : []
+      )
+    )
+  ]).pipe(
+    map(([ expectedLayerNames, customLayers, pmapLayer ]) => [...expectedLayerNames, ...customLayers.map(l => l.id), ...pmapLayer])
   )
 }

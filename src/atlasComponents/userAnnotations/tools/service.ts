@@ -328,35 +328,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     )
 
     /**
-     * on new nehubaViewer, listen to mouseState
-     */
-    let cb: () => void
-    this.subscription.push(
-      nehubaViewer$.pipe(
-        switchMap(switchMapWaitFor({
-          condition: nv => !!(nv?.nehubaViewer),
-        }))
-      ).subscribe(nehubaViewer => {
-        if (cb) cb()
-        if (nehubaViewer) {
-          const mouseState = nehubaViewer.nehubaViewer.ngviewer.mouseState
-          cb = mouseState.changed.add(() => {
-            const payload: IAnnotationEvents['hoverAnnotation'] = mouseState.active && !!mouseState.pickedAnnotationId
-              ? {
-                pickedAnnotationId: mouseState.pickedAnnotationId,
-                pickedOffset: mouseState.pickedOffset
-              }
-              : null
-            this.annotnEvSubj.next({
-              type: 'hoverAnnotation',
-              detail: payload
-            })
-          })
-        }
-      })
-    )
-
-    /**
      * get mouse real position
      */
     this.subscription.push(
@@ -497,6 +468,17 @@ export class ModularUserAnnotationToolService implements OnDestroy{
               ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
               ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
             )
+            this.annotationLayer.onHover.subscribe(val => {
+              this.annotnEvSubj.next({
+                type: 'hoverAnnotation',
+                detail: val
+                  ? {
+                    pickedAnnotationId: val.id,
+                    pickedOffset: val.offset
+                  }
+                  : null
+              })
+            })
             /**
              * on template changes, the layer gets lost
              * force redraw annotations if layer needs to be recreated
