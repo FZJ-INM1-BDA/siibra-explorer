@@ -43,10 +43,11 @@ export class SapiViewsCoreRichRegionsHierarchy {
   placeholderText: string = 'Search all regions'
 
   passedRegions: SapiRegionModel[] = []
+
+  private _regions: SapiRegionModel[] = []
   get regions(){
     return this._regions
   }
-  private _regions: SapiRegionModel[] = []
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-regions')
   set regions(val: SapiRegionModel[]){
     this._regions = val

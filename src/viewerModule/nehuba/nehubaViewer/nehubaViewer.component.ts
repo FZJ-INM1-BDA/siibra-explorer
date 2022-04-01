@@ -373,9 +373,9 @@ export class NehubaViewerUnit implements OnDestroy {
           debounce(() => this._nehubaReady
             ? of(true)
             : interval(160).pipe(
-                filter(() => this._nehubaReady),
-                take(1),
-              )
+              filter(() => this._nehubaReady),
+              take(1),
+            )
           ),
         ).subscribe(layersLabelIndex => {
           let totalMeshes = 0
@@ -447,7 +447,6 @@ export class NehubaViewerUnit implements OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
-      debugger
       this.log.error(err)
     })
 

@@ -23,6 +23,4 @@ export class CurrentLayout {
   }
 
   public panelMode: userInterface.PanelMode = null
-
-  constructor() {}
 }

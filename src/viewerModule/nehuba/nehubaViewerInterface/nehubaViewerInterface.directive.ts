@@ -319,19 +319,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     }
 
     this.nehubaViewerSubscriptions.push(
-      this.nehubaViewerInstance.errorEmitter.subscribe(e => {
-        console.log(e)
-      }),
-
-      this.nehubaViewerInstance.layersChanged.subscribe(() => {
-
-      }),
-
-      this.nehubaViewerInstance.nehubaReady.subscribe(() => {
-        /**
-         * TODO when user selects new template, window.viewer
-         */
-      }),
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(
         scan(accumulatorFn, new Map()),

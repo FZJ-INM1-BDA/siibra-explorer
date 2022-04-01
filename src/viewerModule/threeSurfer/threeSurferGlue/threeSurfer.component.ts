@@ -47,7 +47,7 @@ type TCameraOrientation = {
 type TThreeGeometry = {
   visible: boolean
 }
-type GiiInstance = {}
+type GiiInstance = unknown
 type TThreeSurfer = {
   loadMesh: (url: string) => Promise<TThreeGeometry>
   unloadMesh: (geom: TThreeGeometry) => void

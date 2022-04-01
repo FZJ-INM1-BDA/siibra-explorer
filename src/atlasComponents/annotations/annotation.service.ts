@@ -35,7 +35,7 @@ export type TNgAnnotationPoint = {
 
 export type AnnotationSpec = TNgAnnotationLine | TNgAnnotationPoint | TNgAnnotationAABBox
 type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
-type AnnotationRef = {}
+type AnnotationRef = Record<string, unknown>
 
 interface NgAnnotationLayer {
   layer: {
@@ -95,11 +95,11 @@ export class AnnotationLayer {
       const payload = mouseState.active
       && !!mouseState.pickedAnnotationId
       && this.idset.has(mouseState.pickedAnnotationId)
-      ? {
-        id: mouseState.pickedAnnotationId,
-        offset: mouseState.pickedOffset
-      }
-      : null
+        ? {
+          id: mouseState.pickedAnnotationId,
+          offset: mouseState.pickedOffset
+        }
+        : null
       this._onHover.next(payload)
     })
     this.onDestroyCb.push(res)
@@ -109,7 +109,7 @@ export class AnnotationLayer {
     })
   }
   setVisible(flag: boolean){
-    this.nglayer.setVisible(flag)
+    this.nglayer && this.nglayer.setVisible(flag)
   }
   dispose() {
     this.nglayer = null
@@ -118,12 +118,16 @@ export class AnnotationLayer {
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     try {
       this.viewer.layerManager.removeManagedLayer(this.nglayer)
+    // eslint-disable-next-line no-empty
     } catch (e) {
 
     }
   }
 
   addAnnotation(spec: AnnotationSpec){
+    if (!this.nglayer) {
+      throw new Error(`layer has already been disposed`)
+    }
     const localAnnotations = this.nglayer.layer.localAnnotations
     this.idset.add(spec.id)
     const annSpec = this.parseNgSpecType(spec)
@@ -132,6 +136,7 @@ export class AnnotationLayer {
     )
   }
   removeAnnotation(spec: { id: string }) {
+    if (!this.nglayer) return
     const { localAnnotations } = this.nglayer.layer
     this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)

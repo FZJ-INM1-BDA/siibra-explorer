@@ -1,7 +1,7 @@
 
 type IsParent<T> = (child: T, parent: T) => boolean
 
-export class Tree<T extends object>{
+export class Tree<T extends Record<string, unknown>>{
 
   private _nodes: T[] = []
   protected set nodes(nodes: T[]) {

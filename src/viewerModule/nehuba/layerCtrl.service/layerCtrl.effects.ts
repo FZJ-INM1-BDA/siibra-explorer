@@ -144,8 +144,8 @@ export class LayerCtrlEffects {
     }
     
     const parcVolumes$ = !parcellation
-    ? of([])
-    : forkJoin([
+      ? of([])
+      : forkJoin([
         this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getRegions(template["@id"]).pipe(
           map(regions => {
 
@@ -193,10 +193,10 @@ export class LayerCtrlEffects {
       )
     
     const spaceVols$ = !!template
-    ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
+      ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
         shareReplay(1),
       )
-    : of([])
+      : of([])
     
     return forkJoin({
       tmplVolumes: spaceVols$.pipe(

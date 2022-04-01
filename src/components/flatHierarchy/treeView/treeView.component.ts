@@ -14,7 +14,7 @@ import { Tree } from "./treeControl"
   exportAs: 'flatHierarchyTreeView'
 })
 
-export class SxplrFlatHierarchyTreeView<T extends object> extends Tree<T> implements OnChanges{
+export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> extends Tree<T> implements OnChanges{
   @HostBinding('class')
   class = 'sxplr-custom-cmp'
 

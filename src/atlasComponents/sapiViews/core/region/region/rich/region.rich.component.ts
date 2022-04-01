@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
-import { Observable, Subject, Subscription } from "rxjs";
-import { filter } from "rxjs/operators"
+import { Component, EventEmitter, Inject, Output } from "@angular/core";
+import { Observable, Subject } from "rxjs";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
@@ -35,10 +34,12 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
     this.featureClicked.emit(feat)
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-empty-function
   handleExpansionPanelClosedEv(title: string){
     
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-empty-function
   handleExpansionPanelAfterExpandEv(title: string) {
     
   }

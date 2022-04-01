@@ -120,7 +120,7 @@ export class RouterService {
     /**
      * does work too well =( 
      */
-     concat(
+    concat(
       onload$.pipe(
         mapTo(false)
       ),

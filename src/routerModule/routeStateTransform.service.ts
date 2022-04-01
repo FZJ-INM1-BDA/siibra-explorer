@@ -112,8 +112,8 @@ export class RouteStateTransformSvc {
 
     const returnState: MainState = defaultState
     const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
-    ? fullPath.root.children['primary'].segments
-    : []
+      ? fullPath.root.children['primary'].segments
+      : []
 
     const returnObj: Partial<TUrlPathObj<string[], unknown>> = {}
     for (const f of pathFragments) {

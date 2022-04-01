@@ -38,8 +38,8 @@ export class Effect {
       const { atlas, parcellation, template } = current
       return (
         !!atlas && !!parcellation && !!template
-        ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
-        : of([])
+          ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
+          : of([])
       ).pipe(
         map(regions => {
           return {

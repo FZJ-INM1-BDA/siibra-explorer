@@ -1,6 +1,6 @@
-import { Directive, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output } from "@angular/core";
-import { merge, Observable, of, Subject, Subscription } from "rxjs";
-import { debounceTime, pairwise, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
+import { Directive, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges } from "@angular/core";
+import { interval, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { debounce, debounceTime, filter, pairwise, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint, TNgAnnotationAABBox } from "src/atlasComponents/annotations";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { BoundingBoxConcept, SapiAtlasModel, SapiSpaceModel, SapiVOIDataResponse, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi/type";
@@ -64,7 +64,10 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
   private hoveredFeat: SapiVOIDataResponse
   private onDestroyCb: (() => void)[] = []
   private subscription: Subscription[] = []
-  ngOnChanges(): void {
+  ngOnChanges(simpleChanges: SimpleChanges): void {
+    if (simpleChanges.space) {
+      this.voiBBoxSvc = null
+    }
     const {
       atlas,
       space,
@@ -75,15 +78,17 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
   ngOnDestroy(): void {
     if (this.voiBBoxSvc) this.voiBBoxSvc.dispose()
     while (this.subscription.length > 0) this.subscription.pop().unsubscribe()
+    while (this.voiSubs.length > 0) this.voiSubs.pop().unsubscribe()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  handleOnHoverFeature(id: string){
+  handleOnHoverFeature({ id }: { id?: string }){
     const ann = this.annotationIdToFeature.get(id)
     this.hoveredFeat = ann
     this.onhover.emit(ann)
   }
 
+  private voiSubs: Subscription[] = []
   private _voiBBoxSvc: AnnotationLayer
   get voiBBoxSvc(): AnnotationLayer {
     if (this._voiBBoxSvc) return this._voiBBoxSvc
@@ -93,13 +98,21 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
         SapiViewsFeaturesVoiQuery.VOI_ANNOTATION_COLOR
       )
       this._voiBBoxSvc = layer
-      this.subscription.push(
-        layer.onHover.subscribe(val => this.handleOnHoverFeature(val?.id))
+      this.voiSubs.push(
+        layer.onHover.subscribe(val => this.handleOnHoverFeature(val || {}))
       )
       return layer
     } catch (e) {
       return null
     }
+  }
+  set voiBBoxSvc(val) {
+    if (!!val) {
+      throw new Error(`cannot set voiBBoxSvc directly`)
+    }
+    while (this.voiSubs.length > 0) this.voiSubs.pop().unsubscribe()
+    this._voiBBoxSvc && this._voiBBoxSvc.dispose()
+    this._voiBBoxSvc = null
   }
 
   constructor(
@@ -117,6 +130,12 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
     clickInterceptor.register(handle)
     this.subscription.push(
       this.features$.pipe(
+        debounce(() => 
+          interval(16).pipe(
+            filter(() => !!this.voiBBoxSvc),
+            take(1),
+          )
+        ),
         startWith([] as SapiVOIDataResponse[]),
         pairwise()
       ).subscribe(([ prev, curr ]) => {

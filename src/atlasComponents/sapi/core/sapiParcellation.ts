@@ -3,7 +3,10 @@ import { SapiVolumeModel } from ".."
 import { SAPI } from "../sapi.service"
 import { SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryParam, SapiRegionModel } from "../type"
 
-type PaginationQuery = {}
+type PaginationQuery = {
+  perPage: number
+  page: number
+}
 
 export class SAPIParcellation{
   constructor(private sapi: SAPI, public atlasId: string, public id: string){

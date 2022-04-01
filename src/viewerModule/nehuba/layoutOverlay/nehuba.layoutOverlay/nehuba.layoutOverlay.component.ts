@@ -247,8 +247,8 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
       ]).pipe(
         debounce(() => 
           nehubaUnit?.nehubaViewer?.ngviewer
-          ? of(true)
-          : interval(16).pipe(
+            ? of(true)
+            : interval(16).pipe(
               filter(() => nehubaUnit?.nehubaViewer?.ngviewer),
               take(1)
             )
