@@ -1,15 +1,13 @@
 import { Component, ElementRef, Input, OnChanges, ViewChild } from "@angular/core";
 import { BsFeatureReceptorBase } from "../base";
 import { CONST } from 'common/constants'
-import { TBSDetail } from "../type";
 import { environment } from 'src/environments/environment'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
 const { RECEPTOR_AR_CAPTION } = CONST
 
-export function isAr(detail: TBSDetail, label: string){
-  if (label) return !!detail.__data.__autoradiographs[label]
-  return !!detail.__data.__autoradiographs
+export function isAr(filename: string, label: string = ''){
+  return filename.indexOf(`_ar_${label}`) >= 0
 }
 
 @Component({
@@ -51,6 +49,11 @@ export class BsFeatureReceptorAR extends BsFeatureReceptorBase implements OnChan
       return
     }
 
+    this.urls = this.bsFeature.__files
+      .filter(url => isAr(url, this.bsLabel))
+      .map(url => {
+        return { url }
+      })
     try {
       const {
         "x-channel": channel,

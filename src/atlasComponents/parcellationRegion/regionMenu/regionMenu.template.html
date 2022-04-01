@@ -74,6 +74,13 @@
 
 
   <!-- Explore in other template -->
+
+  <!-- Disabling explore in other templates for now -->
+  <!-- rework before reenable
+  - identify the open todos (bigbrain hemisphere split, navigation to center coordinates in surface viewer, …) until the functionality is working
+  - put it in the development board -->
+  <ng-template [ngIf]="false">
+
   <ng-template [ngIf]="region$ | async | regionInOtherTmpl" let-otherTmpls>
     <ng-template #exploreInOtherTmpl>
       <mat-grid-list cols="3"
@@ -119,6 +126,7 @@
       content: exploreInOtherTmpl
     }">
     </ng-container>
+  </ng-template>
   </ng-template>
 
 
