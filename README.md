@@ -1,6 +1,6 @@
 <img align="right" src="https://raw.githubusercontent.com/FZJ-INM1-BDA/siibra-explorer/master/docs/images/siibra-explorer-square.jpeg" width="200">
 
-[![Documentation Status](https://readthedocs.org/projects/siibra-python/badge/?version=latest)](https://interactive-viewer.readthedocs.io/en/latest/)
+[![Documentation Status](https://readthedocs.org/projects/siibra-explorer/badge/?version=latest)](https://siibra-explorer.readthedocs.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # siibra-explorer - Interactive viewer for multilevel brain atlases
