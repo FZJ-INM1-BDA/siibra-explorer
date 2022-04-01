@@ -17,7 +17,7 @@ markdown_extensions:
 plugins:
   - search
 
-pages:
+nav:
   - Home: 'index.md'
   - System requirements: 'requirements.md'
   - User documentation:
@@ -33,6 +33,7 @@ pages:
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.6.7: 'releases/v2.6.7.md'
     - v2.6.6: 'releases/v2.6.6.md'
     - v2.6.5: 'releases/v2.6.5.md'
     - v2.6.4: 'releases/v2.6.4.md'
