@@ -24,7 +24,7 @@ export class NehubaMeshService implements OnDestroy {
   ){
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void {
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 

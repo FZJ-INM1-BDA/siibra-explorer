@@ -12,7 +12,6 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module";
 import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
@@ -35,7 +34,6 @@ import { NehubaLayoutOverlayModule } from "./layoutOverlay";
     ReactiveFormsModule,
     UtilModule,
     AngularMaterialModule,
-    Landmark2DModule,
     ComponentsModule,
     MouseoverModule,
     ShareModule,

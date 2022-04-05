@@ -53,7 +53,7 @@ export class LayerCtrlEffects {
             }
           })
         ),
-        catchError((err, obs) => of(
+        catchError(() => of(
           atlasAppearance.actions.removeCustomLayer({
             id: NehubaLayerControlService.PMAP_LAYER_NAME
           })

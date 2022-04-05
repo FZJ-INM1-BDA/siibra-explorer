@@ -33,7 +33,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
   private _nehubaViewer: NehubaViewerUnit;
 
-  get nehubaViewer(){
+  get nehubaViewer(): NehubaViewerUnit{
     return this._nehubaViewer
   }
   set nehubaViewer(v: NehubaViewerUnit) {
@@ -103,7 +103,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     )
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (this.nehubaViewer?.viewerPosInReal$ && this.nehubaViewer?.viewerPosInVoxel$) {
       this.navVal$ = combineLatest([
         this.statusPanelRealSpace$,
@@ -153,7 +153,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     startWith(true)
   )
 
-  public textNavigateTo(string: string) {
+  public textNavigateTo(string: string): void {
     if (string.split(/[\s|,]+/).length >= 3 && string.split(/[\s|,]+/).slice(0, 3).every(entry => !isNaN(Number(entry.replace(/mm/, ''))))) {
       const pos = (string.split(/[\s|,]+/).slice(0, 3).map((entry) => Number(entry.replace(/mm/, '')) * (this.statusPanelRealSpace ? 1000000 : 1)))
       this.nehubaViewer.setNavigationState({
@@ -165,7 +165,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     }
   }
 
-  showBottomSheet(tmpl: TemplateRef<any>){
+  showBottomSheet(tmpl: TemplateRef<any>): void{
     this.bottomSheet.open(tmpl)
   }
 
@@ -178,7 +178,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
    *
    * the info re: nehubaViewer can stay there, too
    */
-  public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
+  public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}): void {
     const config = getNehubaConfig(this.selectedTemplate)
     const {
       orientation,
@@ -202,7 +202,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     )
   }
 
-  openDialog(tmpl: TemplateRef<any>, options) {
+  openDialog(tmpl: TemplateRef<any>, options: { ariaLabel: string }): void {
     const { ariaLabel } = options
     this.dialog.open(tmpl, {
       ariaLabel

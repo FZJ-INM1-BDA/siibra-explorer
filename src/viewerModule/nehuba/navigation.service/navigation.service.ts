@@ -64,14 +64,14 @@ export class NehubaNavigationService implements OnDestroy{
     )
   }
 
-  navigateViewer(navigation: INavObj){
+  navigateViewer(navigation: INavObj): void {
     if (!navigation) return
     // TODO
     // readd consider how to do animation
     this.nehubaViewerInstance.setNavigationState(navigation)
   }
 
-  setupViewerSub(){
+  setupViewerSub(): void {
     this.viewerInstanceSubscriptions.push(
       // realtime viewer nav state
       this.nehubaViewerInstance.viewerPositionChange.subscribe(
@@ -110,11 +110,11 @@ export class NehubaNavigationService implements OnDestroy{
     )
   }
 
-  clearViewerSub(){
+  clearViewerSub(): void {
     while (this.viewerInstanceSubscriptions.length > 0) this.viewerInstanceSubscriptions.pop().unsubscribe()
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void {
     this.clearViewerSub()
     while (this.subscriptions.length > 0) this.subscriptions.pop().unsubscribe()
   }

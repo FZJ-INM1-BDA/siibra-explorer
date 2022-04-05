@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, NEVER, Observable, of, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap, tap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
@@ -264,7 +264,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit(): void{
     const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
 
       /**
@@ -315,18 +315,18 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  public clearRoi(){
+  public clearRoi(): void{
     this.store$.dispatch(
       atlasSelection.actions.clearSelectedRegions()
     )
   }
 
-  public selectRoi(roi: SapiRegionModel) {
+  public selectRoi(roi: SapiRegionModel): void {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -334,13 +334,13 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public exitSpecialViewMode(){
+  public exitSpecialViewMode(): void{
     this.store$.dispatch(
       atlasSelection.actions.clearViewerMode()
     )
   }
 
-  public clearPreviewingDataset(){
+  public clearPreviewingDataset(): void{
     /**
      * clear all preview
      */
@@ -349,7 +349,7 @@ export class ViewerCmp implements OnDestroy {
     })
   }
 
-  public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>){
+  public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>): void{
     switch(event.type) {
     case EnumViewerEvt.VIEWERLOADED:
       this.viewerLoaded = event.data
@@ -372,11 +372,11 @@ export class ViewerCmp implements OnDestroy {
     }
   }
 
-  public disposeCtxMenu(){
+  public disposeCtxMenu(): void{
     this.ctxMenuSvc.dismissCtxMenu()
   }
 
-  showDataset(feat: SapiFeatureModel) {
+  showDataset(feat: SapiFeatureModel): void {
     if ((feat as SapiSpatialFeatureModel).location) {
       const feature = feat as SapiSpatialFeatureModel
       this.store$.dispatch(
@@ -397,25 +397,25 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  clearSelectedFeature(){
+  clearSelectedFeature(): void{
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
     )
   }
 
-  onDismissNonbaseLayer(){
+  onDismissNonbaseLayer(): void{
     this.store$.dispatch(
       atlasSelection.actions.clearNonBaseParcLayer()
     )
   }
-  onSelectParcellation(parcellation: SapiParcellationModel){
+  onSelectParcellation(parcellation: SapiParcellationModel): void{
     this.store$.dispatch(
       atlasSelection.actions.selectParcellation({
         parcellation
       })
     )
   }
-  navigateTo(position: number[]) {
+  navigateTo(position: number[]): void {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {

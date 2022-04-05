@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { EMPTY, forkJoin, merge, Observable, of, pipe, throwError } from "rxjs";
-import { debounceTime, map, switchMap, withLatestFrom, filter, take, shareReplay, tap, distinctUntilChanged } from "rxjs/operators";
+import { debounceTime, map, switchMap, withLatestFrom, filter, shareReplay, distinctUntilChanged } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer } from "src/state/atlasAppearance/const";

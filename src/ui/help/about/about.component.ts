@@ -14,8 +14,4 @@ export class AboutCmp {
 
   public userDoc = `https://siibra-explorer.readthedocs.io/en/latest/`
   public repoUrl = `https://github.com/FZJ-INM1-BDA/siibra-explorer`
-
-  constructor(
-  ) {
-  }
 }

@@ -97,7 +97,7 @@ export class NehubaLayerControlService implements OnDestroy{
 
   private sub: Subscription[] = []
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     while (this.sub.length > 0) this.sub.pop().unsubscribe()
   }
 

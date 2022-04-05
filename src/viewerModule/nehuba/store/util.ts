@@ -1,9 +1,4 @@
-import { select } from "@ngrx/store";
-import { forkJoin, of, pipe } from "rxjs";
-import { switchMap, map, take, filter, shareReplay } from "rxjs/operators";
-import { SAPI, SAPIParcellation, SapiParcellationModel, SAPISpace } from "src/atlasComponents/sapi";
-import { atlasSelection } from "src/state";
-import { getRegionLabelIndex } from "../config.service/util";
+import { SapiParcellationModel } from "src/atlasComponents/sapi";
 
 export type ParcVolumeSpec = {
   volumeSrc: string

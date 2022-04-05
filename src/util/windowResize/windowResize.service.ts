@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { asyncScheduler, fromEvent } from "rxjs";
-import { debounceTime, shareReplay, tap, throttleTime } from "rxjs/operators";
+import { asyncScheduler, fromEvent, Observable } from "rxjs";
+import { debounceTime, shareReplay, throttleTime } from "rxjs/operators";
 
 interface IThrottleConfig {
   leading: boolean
@@ -16,13 +16,13 @@ export class ResizeObserverService {
     shareReplay(1)
   )
 
-  public getThrottledResize(time: number, config?: IThrottleConfig){
+  public getThrottledResize(time: number, config?: IThrottleConfig) : Observable<Event>{
     return this.windowResize.pipe(
       throttleTime(time, asyncScheduler, config || { leading: false, trailing: true }),
     )
   }
 
-  public getDebouncedResize(time: number) {
+  public getDebouncedResize(time: number): Observable<Event> {
     return this.windowResize.pipe(
       debounceTime(time)
     )

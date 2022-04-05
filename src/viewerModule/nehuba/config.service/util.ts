@@ -1,5 +1,6 @@
-import { SapiParcellationModel, SapiSpaceModel, SapiAtlasModel, SapiRegionModel, SAPI } from 'src/atlasComponents/sapi'
+import { SapiParcellationModel, SapiSpaceModel, SapiAtlasModel, SapiRegionModel } from 'src/atlasComponents/sapi'
 import { SapiVolumeModel } from 'src/atlasComponents/sapi/type'
+import { atlasSelection } from 'src/state'
 import { MultiDimMap } from 'src/util/fn'
 import { ParcVolumeSpec } from "../store/util"
 import {
@@ -185,7 +186,7 @@ export function getTmplAuxNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, s
   }
 }
 
-export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, _laterality: string | SapiRegionModel) {
+export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, _laterality: string | SapiRegionModel): string {
   let laterality: string
   if (typeof _laterality === "string") {
     laterality = _laterality
@@ -201,7 +202,7 @@ export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: S
   return ngId
 }
 
-export function getParcNgLayers(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[]){
+export function getParcNgLayers(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[]): Record<string, NgSegLayerSpec>{
   const returnVal: Record<string, NgSegLayerSpec> = {}
   for (const parcVol of parcVolumes) {
     const { volume, volumeMetadata } = parcVol
@@ -224,7 +225,11 @@ type CongregatedVolume = {
   parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[]
 }
 
-export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel }) => {
+export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel }): {
+  tmplNgLayers: Record<string, NgLayerSpec>
+  tmplAuxNgLayers: Record<string, NgPrecompMeshSpec>
+  parcNgLayers: Record<string, NgSegLayerSpec>
+} => {
   
   const { tmplVolumes, tmplAuxMeshVolumes, parcVolumes } = volumes
   const { atlas, template, parcellation } = ATP
@@ -235,7 +240,7 @@ export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atl
   }
 }
 
-export function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {
+export function getRegionLabelIndex(_atlas: SapiAtlasModel, _tmpl: SapiSpaceModel, _parc: SapiParcellationModel, region: SapiRegionModel): number {
   const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
   if (isNaN(lblIdx)) return null
   return lblIdx
@@ -422,14 +427,13 @@ export function getNehubaConfig(space: SapiSpaceModel): NehubaConfig {
 }
 
 
-export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj: RecursivePartial<NgConfig>): RecursivePartial<NgConfig>{
+export function cvtNavigationObjToNehubaConfig(navigationObj: atlasSelection.AtlasSelectionState['navigation'], nehubaConfigObj: RecursivePartial<NgConfig>): RecursivePartial<NgConfig>{
   const {
     orientation = [0, 0, 0, 1],
     perspectiveOrientation = [0, 0, 0, 1],
     perspectiveZoom = 1e6,
     zoom = 1e6,
     position = [0, 0, 0],
-    positionReal = true,
   } = navigationObj || {}
 
   const voxelSize = (() => {
@@ -448,9 +452,7 @@ export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj: R
     navigation: {
       pose: {
         position: {
-          voxelCoordinates: positionReal
-            ? [0, 1, 2].map(idx => position[idx] / voxelSize[idx])
-            : position,
+          voxelCoordinates: [0, 1, 2].map(idx => position[idx] / voxelSize[idx]),
           voxelSize
         },
         orientation,

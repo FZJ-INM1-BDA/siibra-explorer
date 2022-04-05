@@ -1,10 +1,9 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Subject, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { ARIA_LABELS } from 'common/constants'
-import { LoggingService } from "src/logging";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
@@ -84,10 +83,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     select(annotation.selectors.annotations),
   )
 
-  public filterCustomLandmark(lm: any){
-    return !!lm['showInSliceView']
-  }
-
   private nehubaContainerSub: Subscription[] = []
   private setupNehubaEvRelay() {
     while (this.nehubaContainerSub.length > 0) this.nehubaContainerSub.pop().unsubscribe()
@@ -166,11 +161,11 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     )
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit(): void {
     this.setupNehubaEvRelay()
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
   }
 
@@ -248,7 +243,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
 
-  handleViewerLoadedEvent(flag: boolean) {
+  handleViewerLoadedEvent(flag: boolean): void {
     this.viewerEvent.emit({
       type: EnumViewerEvt.VIEWERLOADED,
       data: flag
@@ -285,7 +280,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       URL.revokeObjectURL(resourceUrl)
     }
   }
-  public async handleFileDrop(files: File[]){
+  public async handleFileDrop(files: File[]): Promise<void> {
     if (files.length !== 1) {
       this.snackbar.open(INVALID_FILE_INPUT, 'Dismiss', {
         duration: 5000
@@ -312,7 +307,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     }
 
     try {
-      const { result, ...other } = await this.worker.sendMessage({
+      const { result } = await this.worker.sendMessage({
         method: 'PROCESS_NIFTI',
         param: {
           nifti: outbuf

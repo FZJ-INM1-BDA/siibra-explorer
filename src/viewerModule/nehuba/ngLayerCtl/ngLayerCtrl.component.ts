@@ -82,7 +82,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     if (!isMat4(xform)) {
       return
     }
-    this.transform = xform as Mat4
+    this.transform = parsedResult as Mat4
   }
 
   visible: boolean = true
@@ -141,7 +141,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     }
   }
 
-  toggleVisibility(){
+  toggleVisibility(): void{
     this.visible = !this.visible
     this.viewer.nehubaViewer.ngviewer.layerManager.getLayerByName(this.name).setVisible(this.visible)
   }

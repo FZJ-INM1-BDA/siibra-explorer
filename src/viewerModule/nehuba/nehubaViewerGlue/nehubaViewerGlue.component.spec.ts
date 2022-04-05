@@ -7,7 +7,6 @@ import { NEVER, Subject } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { ClickInterceptorService } from "src/glue"
 import { LayoutModule } from "src/layouts/layout.module"
-import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module"
 import { QuickTourModule } from "src/ui/quickTour"
 import { AngularMaterialModule } from "src/sharedModules/angularMaterial.module"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util"
@@ -69,7 +68,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
         UtilModule,
         WindowResizeModule,
         LayoutModule,
-        Landmark2DModule,
         SAPIModule,
       ],
       declarations: [

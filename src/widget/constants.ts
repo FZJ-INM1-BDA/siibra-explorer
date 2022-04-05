@@ -1,4 +1,3 @@
-import { InjectionToken } from "@angular/core";
 import { MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 
 export enum EnumActionToWidget{

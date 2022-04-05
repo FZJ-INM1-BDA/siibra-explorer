@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { map, mapTo } from "rxjs/operators";
 import { actionSetAuxMeshes, IAuxMesh } from "../store";
 import { atlasSelection } from "src/state"

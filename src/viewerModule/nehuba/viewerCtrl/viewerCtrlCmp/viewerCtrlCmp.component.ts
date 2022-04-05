@@ -26,10 +26,10 @@ export class ViewerCtrlCmp implements OnInit{
   private sub: Subscription[] = []
 
   private _removeOctantFlag: boolean = true
-  get removeOctantFlag(){
+  get removeOctantFlag(): boolean{
     return this._removeOctantFlag
   }
-  set removeOctantFlag(val){
+  set removeOctantFlag(val: boolean){
     if (val === this._removeOctantFlag) return
     this._removeOctantFlag = val
     this.setOctantRemoval(this._removeOctantFlag)
@@ -129,7 +129,7 @@ export class ViewerCtrlCmp implements OnInit{
 
   }
 
-  public setOctantRemoval(octantRemovalFlag: boolean) {
+  public setOctantRemoval(octantRemovalFlag: boolean): void {
     this.store$.dispatch(
       atlasAppearance.actions.setOctantRemoval({
         flag: octantRemovalFlag
@@ -137,7 +137,7 @@ export class ViewerCtrlCmp implements OnInit{
     )
   }
 
-  public trackByAtId(_idx: number, obj: { ['@id']: string }) {
+  public trackByAtId(_idx: number, obj: { ['@id']: string }): string {
     return obj['@id']
   }
 }

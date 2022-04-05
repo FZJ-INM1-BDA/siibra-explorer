@@ -1,7 +1,7 @@
-import { Component, Output, EventEmitter, ElementRef, OnChanges, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { combineLatest, Observable, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, tap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
@@ -626,7 +626,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     this.cameraEv$.next(detail)
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit(): void{
     const customEvHandler = (ev: CustomEvent) => {
       const { type, data } = ev.detail
       if (type === 'mouseover') {
@@ -724,7 +724,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     if (this.mouseoverText === '') this.mouseoverText = null
   }
 
-  public updateMeshVisibility(){
+  public updateMeshVisibility(): void{
 
     for (const key in this.lateralityMeshRecord) {
 
@@ -740,7 +740,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     }
   }
 
-  switchSurfaceLayer(layer: SapiVolumeModel){
+  switchSurfaceLayer(layer: SapiVolumeModel): void{
     this.store$.dispatch(
       actions.selectVolumeById({
         id: layer["@id"]
@@ -750,7 +750,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
   private onDestroyCb: (() => void) [] = []
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 }

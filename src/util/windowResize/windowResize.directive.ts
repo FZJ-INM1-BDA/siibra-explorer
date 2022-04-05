@@ -27,10 +27,10 @@ export class ResizeObserverDirective implements OnChanges, OnInit, OnDestroy {
 
   constructor(private svc: ResizeObserverService){}
 
-  ngOnInit(){
+  ngOnInit(): void {
     this.configure()
   }
-  ngOnChanges(){
+  ngOnChanges(): void {
     this.configure()
   }
 
@@ -38,7 +38,7 @@ export class ResizeObserverDirective implements OnChanges, OnInit, OnDestroy {
     while(this.sub.length > 0) this.sub.pop().unsubscribe()
   }
 
-  configure(){
+  configure(): void {
     while(this.sub.length > 0) this.sub.pop().unsubscribe()
 
     let sub: Subscription

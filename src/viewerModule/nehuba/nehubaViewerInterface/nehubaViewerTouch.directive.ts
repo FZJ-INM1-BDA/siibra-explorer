@@ -276,7 +276,7 @@ export class NehubaViewerTouchDirective implements OnDestroy{
     )
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     while(this.s.length > 0){
       this.s.pop().unsubscribe()
     }

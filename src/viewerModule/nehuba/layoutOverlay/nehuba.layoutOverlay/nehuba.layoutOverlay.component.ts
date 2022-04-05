@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription, timer } from "rxjs";
+import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "../../util";
@@ -48,14 +48,14 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
     this.setQuickTourPos()
   }
 
-  handleCycleViewEvent(){
+  handleCycleViewEvent(): void {
     if (this.currentPanelMode !== "SINGLE_PANEL") return
     this.store$.dispatch(
       userInterface.actions.cyclePanelMode()
     )
   }
 
-  public toggleMaximiseMinimise(index: number) {
+  public toggleMaximiseMinimise(index: number): void {
     this.store$.dispatch(
       userInterface.actions.toggleMaximiseView({
         targetIndex: index
@@ -63,7 +63,7 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
     )
   }
 
-  public zoomNgView(panelIndex: number, factor: number) {
+  public zoomNgView(panelIndex: number, factor: number): void {
     const ngviewer = this.nehubaUnit?.nehubaViewer?.ngviewer
     if (!ngviewer) throw new Error(`ngviewer not defined!`)
 
@@ -80,24 +80,6 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
     }
   }
 
-  public returnTruePos(quadrant: number, data: any) {
-    const pos = quadrant > 2
-      ? [0, 0, 0]
-      : this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant]
-        ? this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n => n * 1e6))
-        : [0, 0, 0]
-    return pos
-  }
-
-  public getPositionX(quadrant: number, data: any) {
-    return this.returnTruePos(quadrant, data)[0]
-  }
-  public getPositionY(quadrant: number, data: any) {
-    return this.returnTruePos(quadrant, data)[1]
-  }
-  public getPositionZ(quadrant: number, data: any) {
-    return this.returnTruePos(quadrant, data)[2]
-  }
   public quickTourOverwritingPos = {
     'dialog': {
       left: '0px',
@@ -109,7 +91,7 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
     }
   }
 
-  setQuickTourPos(){
+  setQuickTourPos(): void {
     const { innerWidth, innerHeight } = window
     this.quickTourOverwritingPos = {
       'dialog': {
@@ -121,13 +103,6 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
         top: `${innerHeight / 2 - 48}px`,
       }
     }
-  }
-  public handleMouseEnterCustomLandmark(lm) {
-    console.log('handle enter custom landmark')
-
-  }
-  public handleMouseLeaveCustomLandmark(_lm) {
-    console.log("handle leave custom landmark")
   }
 
   public panelMode$ = this.store$.pipe(
@@ -306,7 +281,7 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
     this.detectChanges()
   }
 
-  public detectChanges(){
+  public detectChanges(): void {
     this.cdr.detectChanges()
   }
   

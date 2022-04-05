@@ -269,11 +269,11 @@ export class NehubaViewerContainerDirective implements OnDestroy{
   private nehubaViewerSubscriptions: Subscription[] = []
   private subscriptions: Subscription[] = []
 
-  redraw(){
+  redraw(): void{
     this.nehubaViewerInstance.redraw()
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe()
     }
@@ -282,7 +282,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     }
   }
 
-  public toggleOctantRemoval(flag: boolean){
+  public toggleOctantRemoval(flag: boolean): void{
     if (!this.nehubaViewerInstance) {
       this.log.error(`this.nehubaViewerInstance is not yet available`)
       return
@@ -290,10 +290,10 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     this.nehubaViewerInstance.toggleOctantRemoval(flag)
   }
 
-  async createNehubaInstance(nehubaConfig: NehubaConfig){
+  async createNehubaInstance(nehubaConfig: NehubaConfig): Promise<void>{
     this.clear()
 
-    await new Promise((rs, rj) => setTimeout(rs, 0))
+    await new Promise(rs => setTimeout(rs, 0))
 
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.nehubaViewerFactory)
@@ -349,7 +349,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     )
   }
 
-  clear(){
+  clear(): void{
     while(this.nehubaViewerSubscriptions.length > 0) {
       this.nehubaViewerSubscriptions.pop().unsubscribe()
     }
@@ -360,15 +360,15 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     this.cr = null
   }
 
-  get nehubaViewerInstance(){
+  get nehubaViewerInstance(): NehubaViewerUnit{
     return this.cr && this.cr.instance
   }
 
-  isReady() {
+  isReady(): boolean {
     return !!(this.cr?.instance?.nehubaViewer?.ngviewer)
   }
 
-  handleMouseoverSegments(arrOfArr: [string, any][]) {
+  handleMouseoverSegments(arrOfArr: [string, any][]): void {
     const payload = arrOfArr.map( ([ngId, {segment, segmentId}]) => {
       return {
         layer: {

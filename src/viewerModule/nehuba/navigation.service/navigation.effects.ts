@@ -114,7 +114,7 @@ export class NehubaNavigationEffects implements OnDestroy{
     )
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void {
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
   }
 }

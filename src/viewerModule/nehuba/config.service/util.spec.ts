@@ -83,11 +83,11 @@ describe('> util.ts', () => {
         })
 
         it('> if navigation object is otherwise malformed', () => {
-          const v1 = cvtNavigationObjToNehubaConfig({foo: 'bar'}, bigbrainNehubaConfig)
+          const v1 = cvtNavigationObjToNehubaConfig({foo: 'bar'} as any, bigbrainNehubaConfig)
           const v2 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, bigbrainNehubaConfig)
           expect(v1).toEqual(v2)
 
-          const v3 = cvtNavigationObjToNehubaConfig({}, bigbrainNehubaConfig)
+          const v3 = cvtNavigationObjToNehubaConfig({} as any, bigbrainNehubaConfig)
           const v4 = cvtNavigationObjToNehubaConfig(defaultNavigationObject, bigbrainNehubaConfig)
           expect(v3).toEqual(v4)
         })
