@@ -17,9 +17,11 @@ import { NehubaMeshService } from "../mesh.service"
 import { NehubaViewerTouchDirective } from "../nehubaViewerInterface/nehubaViewerTouch.directive"
 import { selectorAuxMeshes } from "../store"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
-import { HarnessLoader } from "@angular/cdk/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
-import { userInterface, atlasSelection, userPreference, atlasAppearance } from "src/state"
+import { userInterface, atlasSelection, userPreference, atlasAppearance, annotation, userInteraction } from "src/state"
+import { SapiAtlasModel, SAPIModule, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
+import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
+import { NEHUBA_INSTANCE_INJTKN } from "../util"
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -47,22 +49,28 @@ class MockNehubaViewerContainerDirective{
 
 describe('> nehubaViewerGlue.component.ts', () => {
   let mockStore: MockStore
-  let rootLoader: HarnessLoader
   let fixture: ComponentFixture<NehubaGlueCmp>
+  const selectedATPR$ = new Subject<{
+    atlas: SapiAtlasModel,
+    parcellation: SapiParcellationModel,
+    template: SapiSpaceModel,
+    regions: SapiRegionModel[],
+  }>()
   beforeEach( async () => {
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
         AngularMaterialModule,
-        LayoutModule,
-        Landmark2DModule,
+        FormsModule,
+        ReactiveFormsModule,
+
         QuickTourModule,
         ComponentsModule,
         UtilModule,
         WindowResizeModule,
-        FormsModule,
-        ReactiveFormsModule,
-        // NehubaModule,
+        LayoutModule,
+        Landmark2DModule,
+        SAPIModule,
       ],
       declarations: [
         NehubaGlueCmp,
@@ -77,11 +85,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
          * TODO, figureout which dependency is selecting viewerState.parcellationSelected
          * then remove the inital state
          */
-        provideMockStore({
-          initialState: {
-            viewerState: {}
-          }
-        }),
+        provideMockStore(),
         {
           provide: CLICK_INTERCEPTOR_INJECTOR,
           useFactory: (clickIntService: ClickInterceptorService) => {
@@ -100,6 +104,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
             visibleLayer$: new Subject(),
             segmentVis$: new Subject(),
             ngLayersController$: new Subject(),
+            selectedATPR$
           }
         }, {
           provide: NehubaMeshService,
@@ -118,6 +123,15 @@ describe('> nehubaViewerGlue.component.ts', () => {
               }
             }
           }
+        },{
+          provide: NEHUBA_INSTANCE_INJTKN,
+          useValue: NEVER
+        },
+        {
+          provide: LayerCtrlEffects,
+          useValue: {
+            onATPDebounceNgLayers$: NEVER
+          }
         }
       ]
     }).compileComponents()
@@ -128,8 +142,18 @@ describe('> nehubaViewerGlue.component.ts', () => {
     mockStore.overrideSelector(userInterface.selectors.panelMode, "FOUR_PANEL")
     mockStore.overrideSelector(userInterface.selectors.panelOrder, '0123')
     mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
+
+    mockStore.overrideSelector(atlasSelection.selectors.selectedAtlas, null)
+    mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, null)
+    mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, null)
     mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
+    mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [])
+    mockStore.overrideSelector(userInteraction.selectors.mousingOverRegions, [])
+
     mockStore.overrideSelector(atlasSelection.selectors.navigation, null)
+    mockStore.overrideSelector(atlasAppearance.selectors.showDelineation, true)
+    mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
+    mockStore.overrideSelector(annotation.selectors.annotations, [])
 
     mockStore.overrideSelector(selectorAuxMeshes, [])
   })
@@ -222,14 +246,14 @@ describe('> nehubaViewerGlue.component.ts', () => {
   })
 
   describe('> handleFileDrop', () => {
-    let addNgLayerSpy: jasmine.Spy
-    let removeNgLayersSpy: jasmine.Spy
+    let dispatchSpy: jasmine.Spy
     let workerSendMessageSpy: jasmine.Spy
     let dummyFile1: File
     let dummyFile2: File
     let input: File[]
 
     beforeEach(() => {
+      dispatchSpy = spyOn(mockStore, 'dispatch')
       dummyFile1 = (() => {
         const bl: any = new Blob([], { type: 'text' })
         bl.name = 'filename1.txt'
@@ -247,13 +271,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
       fixture = TestBed.createComponent(NehubaGlueCmp)
       fixture.detectChanges()
 
-      addNgLayerSpy = spyOn(fixture.componentInstance['layerCtrlService'], 'addNgLayer').and.callFake(() => {
-
-      })
-      removeNgLayersSpy = spyOn(fixture.componentInstance['layerCtrlService'], 'removeNgLayers').and.callFake(() => {
-
-      })
-
       workerSendMessageSpy = spyOn(fixture.componentInstance['worker'], 'sendMessage').and.callFake(async () => {
         return {
           result: {
@@ -263,8 +280,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
       })
     })
     afterEach(() => {
-      addNgLayerSpy.calls.reset()
-      removeNgLayersSpy.calls.reset()
+      dispatchSpy.calls.reset()
       workerSendMessageSpy.calls.reset()
     })
 
@@ -287,8 +303,7 @@ describe('> nehubaViewerGlue.component.ts', () => {
           })
 
           it('> should not call addnglayer', () => {
-            expect(removeNgLayersSpy).not.toHaveBeenCalled()
-            expect(addNgLayerSpy).not.toHaveBeenCalled()
+            expect(dispatchSpy).not.toHaveBeenCalled()
           })
 
           // TODO having a difficult time getting snackbar harness
@@ -322,15 +337,28 @@ describe('> nehubaViewerGlue.component.ts', () => {
       })
 
       it('> should call addNgLayer', () => {
-        expect(removeNgLayersSpy).not.toHaveBeenCalled()
-        expect(addNgLayerSpy).toHaveBeenCalledTimes(1)
+        expect(dispatchSpy).toHaveBeenCalledTimes(1)
+        const arg = dispatchSpy.calls.argsFor(0)
+        expect(arg.length).toEqual(1)
+        expect(arg[0].type).toBe(atlasAppearance.actions.addCustomLayer.type)
       })
       it('> on repeated input, both remove nglayer and remove ng layer called', async () => {
         const cmp = fixture.componentInstance
         await cmp.handleFileDrop(input)
 
-        expect(removeNgLayersSpy).toHaveBeenCalledTimes(1)
-        expect(addNgLayerSpy).toHaveBeenCalledTimes(2)
+        expect(dispatchSpy).toHaveBeenCalledTimes(3)
+        
+        const arg0 = dispatchSpy.calls.argsFor(0)
+        expect(arg0.length).toEqual(1)
+        expect(arg0[0].type).toBe(atlasAppearance.actions.addCustomLayer.type)
+
+        const arg1 = dispatchSpy.calls.argsFor(1)
+        expect(arg1.length).toEqual(1)
+        expect(arg1[0].type).toBe(atlasAppearance.actions.removeCustomLayer.type)
+
+        const arg2 = dispatchSpy.calls.argsFor(2)
+        expect(arg2.length).toEqual(1)
+        expect(arg2[0].type).toBe(atlasAppearance.actions.addCustomLayer.type)
       })
     })
   })

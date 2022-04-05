@@ -1,12 +1,10 @@
-import { TestBed, async, fakeAsync, tick, ComponentFixture } from "@angular/core/testing"
-import { CommonModule, DOCUMENT } from "@angular/common"
+import { TestBed, fakeAsync, tick, ComponentFixture } from "@angular/core/testing"
+import { CommonModule } from "@angular/common"
 import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN, scanFn } from "./nehubaViewer.component"
-import { importNehubaFactory } from "../util"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { LoggingModule, LoggingService } from "src/logging"
-import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants"
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants"
-import { ReplaySubject, Subject } from "rxjs"
+import { Subject } from "rxjs"
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service"
 
 describe('> nehubaViewer.component.ts', () => {
@@ -78,14 +76,12 @@ describe('> nehubaViewer.component.ts', () => {
   })
 
   describe('> NehubaViewerUnit', () => {
-    let provideSetMeshToLoadCtrl = true
-    let provideLayerVisibility = true
-    let provideSetColorObs = true
     const setMeshToLoadCtl$ = new Subject<IMeshesToLoad>()
-    let setLayerVisibility$: Subject<string[]>
-    let setcolorMap$: Subject<IColorMap>
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    let setLayerVisibility$: Subject<string[]> = new Subject()
+    let setcolorMap$: Subject<IColorMap> = new Subject()
+    let fixture: ComponentFixture<NehubaViewerUnit>
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
         imports: [
           CommonModule,
           LoggingModule
@@ -100,111 +96,41 @@ describe('> nehubaViewer.component.ts', () => {
           },
           {
             provide: SET_MESHES_TO_LOAD,
-            useFactory: () => provideSetMeshToLoadCtrl
-              ? setMeshToLoadCtl$
-              : null
+            useFactory: () => setMeshToLoadCtl$
           },
           {
             provide: SET_LAYER_VISIBILITY,
-            useFactory: () => {
-              setLayerVisibility$ = provideLayerVisibility
-                ? new ReplaySubject(1)
-                : null
-              return setLayerVisibility$
-            } 
+            useValue: setLayerVisibility$
           },
           {
             provide: SET_COLORMAP_OBS,
-            useFactory: () => {
-              setcolorMap$ = provideSetColorObs
-                ? new ReplaySubject(1)
-                : null
-              return setcolorMap$
-            }
+            useValue: setcolorMap$
           },
           AtlasWorkerService,
           LoggingService,
         ]
       }).compileComponents()
-    }))
+    })
 
     it('> creates component', () => {
-      const fixture = TestBed.createComponent(NehubaViewerUnit)
+      fixture = TestBed.createComponent(NehubaViewerUnit)
       expect(fixture.componentInstance).toBeTruthy()
     })
 
-    describe('> on create', () => {
-      it('> calls onInit lifecycle param properly', () => {
-        const onInitSpy = jasmine.createSpy('onInit')
-        const fixture = TestBed.createComponent(NehubaViewerUnit)
-        fixture.componentInstance.lifecycle = {
-          onInit: onInitSpy
-        }
-
-        fixture.detectChanges()
-
-        expect(onInitSpy).toHaveBeenCalled()
-      })
-    })
-
     describe('> loading meshes', () => {
-      describe('> native', () => {
-        beforeAll(() => {
-          provideSetMeshToLoadCtrl = false
-        })
-        it('> on loadMeshes$ emit, calls nehubaViewer.setMeshesToLoad', fakeAsync(() => {
-
-          const fixture = TestBed.createComponent(NehubaViewerUnit)
-          fixture.componentInstance.nehubaViewer = {
-            setMeshesToLoad: jasmine.createSpy('setMeshesToLoad').and.returnValue(null),
-            dispose: () => {}
-          }
-  
-          fixture.detectChanges()
-          fixture.componentInstance['loadMeshes$'].next({
-            layer: {
-              name: 'foo-bar'
-            },
-            labelIndicies: [1,2,3]
-          })
-          tick(1000)
-          expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
-        }))
+      beforeEach(() => {
+        fixture = TestBed.createComponent(NehubaViewerUnit)
+        fixture.componentInstance.nehubaViewer = {
+          setMeshesToLoad: jasmine.createSpy('setMeshesToLoad').and.returnValue(null),
+          dispose: () => {}
+        }
+        fixture.componentInstance['_nehubaReady'] = true
       })
 
       describe('> injecting SET_MESHES_TO_LOAD', () => {
-        beforeAll(() => {
-          provideSetMeshToLoadCtrl = true
-        })
-        it('> navtive loadMeshes method will not trigger loadMesh call',fakeAsync(() => {
-
-          const fixture = TestBed.createComponent(NehubaViewerUnit)
-          fixture.detectChanges()
-          const setMeshToLoadSpy = jasmine.createSpy('setMeshesToLoad').and.returnValue(null)
-          fixture.componentInstance.nehubaViewer = {
-            setMeshesToLoad: setMeshToLoadSpy,
-            dispose: () => {}
-          }
-  
-          fixture.detectChanges()
-          fixture.componentInstance['loadMeshes$'].next({
-            layer: {
-              name: 'foo-bar'
-            },
-            labelIndicies: [1,2,3]
-          })
-          tick(1000)
-          expect(setMeshToLoadSpy).not.toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
-        }))
 
         it('> when injected obs emits, will trigger loadMesh call', fakeAsync(() => {
 
-          const fixture = TestBed.createComponent(NehubaViewerUnit)
-          fixture.componentInstance.nehubaViewer = {
-            setMeshesToLoad: jasmine.createSpy('setMeshesToLoad').and.returnValue(null),
-            dispose: () => {}
-          }
-  
           fixture.detectChanges()
           setMeshToLoadCtl$.next({
             labelIndicies: [1,2,3],
@@ -212,7 +138,7 @@ describe('> nehubaViewer.component.ts', () => {
               name: 'foo-bar'
             }
           })
-          tick(1000)
+          tick(400)
           expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
         }))
       })
@@ -250,12 +176,12 @@ describe('> nehubaViewer.component.ts', () => {
           dispose: () => {}
         }
 
-        provideLayerVisibility = true
+        fixture = TestBed.createComponent(NehubaViewerUnit)
+        fixture.componentInstance.nehubaViewer = nehubaViewerSpy
+        fixture.componentInstance['_nehubaReady'] = true
       })
 
       it('> if provided obs does not emit, does not call manage layers', fakeAsync(() => {
-        const fixture = TestBed.createComponent(NehubaViewerUnit)
-        fixture.componentInstance.nehubaViewer = nehubaViewerSpy
         fixture.detectChanges()
         tick(320)
         expect(managedLayersSpy).not.toHaveBeenCalled()
@@ -264,9 +190,7 @@ describe('> nehubaViewer.component.ts', () => {
       describe('> if provided obs does emit', () => {
 
         const setup = (emit = []) => {
-          const fixture = TestBed.createComponent(NehubaViewerUnit)
           setLayerVisibility$.next(emit)
-          fixture.componentInstance.nehubaViewer = nehubaViewerSpy
           fixture.detectChanges()
           tick(640)
         }
@@ -311,11 +235,13 @@ describe('> nehubaViewer.component.ts', () => {
       let prvSetCMSpy: jasmine.Spy
       const setup = () => {
 
-        const fixture = TestBed.createComponent(NehubaViewerUnit)
+        fixture = TestBed.createComponent(NehubaViewerUnit)
+        fixture.componentInstance['_nehubaReady'] = true
+
         /**
          * set nehubaViewer, since some methods check viewer is loaded
          */
-         fixture.componentInstance.nehubaViewer = {
+        fixture.componentInstance.nehubaViewer = {
            ngviewer: {},
            dispose: () => {}
          }
@@ -323,9 +249,6 @@ describe('> nehubaViewer.component.ts', () => {
         prvSetCMSpy = spyOn<any>(fixture.componentInstance, 'setColorMap').and.callFake(() => {})
       }
 
-      beforeEach(() => {
-        provideSetColorObs = true
-      })
       describe('> obs does not emit', () => {
         beforeEach(fakeAsync(() => {
           setup()

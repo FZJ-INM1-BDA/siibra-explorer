@@ -205,7 +205,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
 
         const {
           parcNgLayers,
-          tmplAuxNgLayers,
         } = await this.effect.onATPDebounceNgLayers$.pipe(
           take(1)
         ).toPromise()
@@ -242,7 +241,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }),
 
       this.gpuLimit$.pipe(
-        debounceTime(200),
+        debounceTime(160),
       ).subscribe(limit => {
         this.gpuLimit = limit
         if (this.nehubaViewerInstance && this.nehubaViewerInstance.nehubaViewer) {
@@ -306,18 +305,17 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }
     }
 
-    /**
-     * apply viewer config such as gpu limit
-     */
-
-    this.nehubaViewerInstance.config = nehubaConfig
-
     if (this.gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
       // the correct key is gpuMemoryLimit
       initialNgState.gpuMemoryLimit = this.gpuLimit
     }
 
+    /**
+     * apply viewer config such as gpu limit
+     */
+
+    this.nehubaViewerInstance.config = nehubaConfig
     this.nehubaViewerSubscriptions.push(
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(

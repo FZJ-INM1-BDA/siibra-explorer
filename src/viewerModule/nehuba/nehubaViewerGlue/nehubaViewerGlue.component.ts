@@ -187,14 +187,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
   constructor(
     private store$: Store<any>,
-    private log: LoggingService,
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
-    private cdr: ChangeDetectorRef,
+    private layerCtrlService: NehubaLayerControlService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
-    @Optional() private layerCtrlService: NehubaLayerControlService,
   ){
     /**
      * This **massively** improve the performance of the viewer

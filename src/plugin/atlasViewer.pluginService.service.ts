@@ -11,7 +11,6 @@ import { PluginFactoryDirective } from './pluginFactory.directive';
 import { DialogService } from 'src/services/dialogService.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { PureContantService } from 'src/util';
 import { actions } from "src/state/plugins"
 import { userPreference } from 'src/state';
 
@@ -69,7 +68,6 @@ export class PluginServices {
     private http: HttpClient,
     private log: LoggingService,
     private sanitizer: DomSanitizer,
-    private constantSvc: PureContantService,
     @Inject(APPEND_SCRIPT_TOKEN) private appendSrc: (src: string) => Promise<HTMLScriptElement>,
     @Inject(REMOVE_SCRIPT_TOKEN) private removeSrc: (src: HTMLScriptElement) => void,
   ) {
@@ -79,7 +77,7 @@ export class PluginServices {
     /**
      * TODO convert to rxjs streams, instead of Promise.all
      */
-    const pluginManifestsUrl = `${this.constantSvc.backendUrl}plugins/manifests`
+    const pluginManifestsUrl = `plugins/manifests`
 
     this.http.get<IPluginManifest[]>(pluginManifestsUrl, {
       responseType: 'json',
@@ -175,7 +173,7 @@ export class PluginServices {
       })
 
       this.http.delete(
-        `${this.constantSvc.backendUrl}user/pluginPermissions/${encodeURIComponent(pluginKey)}`, 
+        `user/pluginPermissions/${encodeURIComponent(pluginKey)}`, 
         {
           headers: getHttpHeader()
         }
@@ -253,7 +251,7 @@ export class PluginServices {
             catchError(() => of(false)),
             filter(v => !!v),
             switchMapTo(
-              this.http.post(`${this.constantSvc.backendUrl}user/pluginPermissions`, 
+              this.http.post(`user/pluginPermissions`, 
                 { [pluginKey]: csp },
                 {
                   responseType: 'json',

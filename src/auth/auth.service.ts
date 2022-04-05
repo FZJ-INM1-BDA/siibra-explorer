@@ -2,8 +2,6 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { Observable, of, Subscription } from "rxjs";
 import { catchError, map, shareReplay } from "rxjs/operators";
-import { PureContantService } from "src/util";
-import { BACKENDURL } from "src/util/constants";
 
 const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
 
@@ -38,9 +36,8 @@ export class AuthService implements OnDestroy {
 
   constructor(
     private httpClient: HttpClient,
-    private constantSvc: PureContantService,
   ) {
-    this.user$ = this.httpClient.get<TUserRouteResp>(`${this.constantSvc.backendUrl}user`).pipe(
+    this.user$ = this.httpClient.get<TUserRouteResp>(`user`).pipe(
       map(json => {
         if (json.error) {
           throw new Error(json.message || 'User not loggedin.')

@@ -34,8 +34,12 @@
       (iav-key-event)="toggleParcellationVisibility()"
       (click)="toggleParcellationVisibility()">
       <i class="fas"
-        [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye': 'fa-eye-slash'">
+        [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye': 'fa-eye-slash'"
+        aria-hidden="true">
       </i>
+      <span class="sr-only">
+        {{ ARIA_LABELS.TOGGLE_DELINEATION }}
+      </span>
     </button>
   </div>
 

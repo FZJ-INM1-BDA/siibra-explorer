@@ -17,10 +17,12 @@ import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl } from "@angular/forms";
 
-import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
+import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
+import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { getNehubaConfig } from "../config.service";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -43,7 +45,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public arialabel = ARIA_LABELS.STATUS_PANEL
   public showFull = false
 
-  private selectedTemplatePure: any
+  private selectedTemplate: SapiSpaceModel
   private currentNavigation: any
   private subscriptions: Subscription[] = []
 
@@ -91,7 +93,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     this.subscriptions.push(
       this.store$.pipe(
         select(atlasSelection.selectors.selectedTemplate)
-      ).subscribe(n => this.selectedTemplatePure = n)
+      ).subscribe(n => this.selectedTemplate = n)
     )
 
     this.subscriptions.push(
@@ -177,11 +179,14 @@ export class StatusCardComponent implements OnInit, OnChanges{
    * the info re: nehubaViewer can stay there, too
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
+    const config = getNehubaConfig(this.selectedTemplate)
     const {
       orientation,
-      position,
-      zoom
-    } = getNavigationStateFromConfig(this.selectedTemplatePure.nehubaConfig)
+      position
+    } = config.dataset.initialNgState.navigation.pose
+    const {
+      zoomFactor: zoom
+    } = config.dataset.initialNgState.navigation
 
     this.store$.dispatch(
       actions.navigateTo({
@@ -191,7 +196,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
           ...(positionFlag ? { position: position } : {}),
           ...(zoomFlag ? { zoom: zoom } : {}),
         },
-        physical: false,
+        physical: true,
         animation: true
       })
     )

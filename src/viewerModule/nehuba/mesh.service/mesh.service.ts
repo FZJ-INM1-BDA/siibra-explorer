@@ -33,8 +33,6 @@ export class NehubaMeshService implements OnDestroy {
     map(({ tmplAuxNgLayers }) => tmplAuxNgLayers)
   )
 
-  private ngLayers$ = this.effect.onATPDebounceNgLayers$
-
   public loadMeshes$: Observable<IMeshesToLoad> = merge(
     combineLatest([
       this.store$.pipe(
@@ -48,11 +46,6 @@ export class NehubaMeshService implements OnDestroy {
       )
     ]).pipe(
       switchMap(([{ atlas, template, parcellation }, regions, selectedRegions]) => {
-        const tree = new Tree(
-          regions,
-          (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
-        )
-
         const ngIdRecord: Record<string, number[]> = {}
         if (selectedRegions.length > 0) {
           for (const r of selectedRegions) {
@@ -64,6 +57,11 @@ export class NehubaMeshService implements OnDestroy {
             ngIdRecord[ngId].push(regionLabelIndex)
           }
         } else {
+          const tree = new Tree(
+            regions,
+            (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
+          )
+  
           for (const r of regions) {
             const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
             if (!regionLabelIndex) {
@@ -82,7 +80,7 @@ export class NehubaMeshService implements OnDestroy {
           }  
         }
         const arr: IMeshesToLoad[] = []
-  
+
         for (const ngId in ngIdRecord) {
           const labelIndicies = ngIdRecord[ngId]
           arr.push({

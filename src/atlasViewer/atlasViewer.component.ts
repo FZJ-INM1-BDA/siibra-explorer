@@ -21,11 +21,11 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS, CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
-import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
 import { environment } from 'src/environments/environment'
 import { DOCUMENT } from "@angular/common";
 import { userPreference } from "src/state"
+import { DARKTHEME } from "src/util/injectionTokens";
 
 /**
  * TODO
@@ -72,14 +72,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   constructor(
     private store: Store<any>,
-    private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private rd: Renderer2,
     private snackbar: MatSnackBar,
     private el: ElementRef,
     private slService: SlServiceService,
     private clickIntService: ClickInterceptorService,
-    @Inject(DOCUMENT) private document,
+    @Inject(DOCUMENT) private document: Document,
+    @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
 
     const error = this.el.nativeElement.getAttribute('data-error')
@@ -117,11 +117,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
+      this.store.pipe(
+        select(userPreference.selectors.useMobileUi),
+      ).subscribe(bool => this.ismobile = bool),
     )
 
     this.subscriptions.push(
-      this.pureConstantService.darktheme$.subscribe(flag => {
+      this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
     )
@@ -196,14 +198,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
+  private supportEmailAddress = `support@ebrains.eu`
   public quickTourFinale = {
     order: 1e6,
     descriptionMd: `That's it! We hope you enjoy your stay.
 
 ---
 
-If you have any comments or need further support, please contact us at [${this.pureConstantService.supportEmailAddress}](mailto:${this.pureConstantService.supportEmailAddress})`,
-    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.pureConstantService.supportEmailAddress}`,
+If you have any comments or need further support, please contact us at [${this.supportEmailAddress}](mailto:${this.supportEmailAddress})`,
+    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.supportEmailAddress}`,
     position: 'center'
   }
 

@@ -17,7 +17,7 @@ import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
 import { UIService } from "./services/uiService.service";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
@@ -30,7 +30,7 @@ import 'src/theme.scss'
 import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { MesssagingModule } from './messaging/module';
-import { ViewerModule, VIEWERMODULE_DARKTHEME } from './viewerModule';
+import { ViewerModule } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { AtlasViewerRouterModule } from './routerModule';
@@ -166,11 +166,6 @@ import { CONST } from "common/constants"
       deps: [
         ClickInterceptorService
       ]
-    },
-    {
-      provide: VIEWERMODULE_DARKTHEME,
-      useFactory: (pureConstantService: PureContantService) => pureConstantService.darktheme$,
-      deps: [ PureContantService ]
     },
     {
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,

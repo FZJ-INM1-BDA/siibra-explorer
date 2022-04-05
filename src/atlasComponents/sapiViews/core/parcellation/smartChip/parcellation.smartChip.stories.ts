@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
-import { Component, EventEmitter, Input, Output } from "@angular/core"
+import { Component, Input } from "@angular/core"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { action } from "@storybook/addon-actions"
 import { SAPI, SapiParcellationModel } from "src/atlasComponents/sapi"
@@ -8,6 +8,10 @@ import { atlasId, getAtlas, provideDarkTheme, getParc, getAtlases } from "src/at
 import { AngularMaterialModule } from "src/sharedModules"
 import { SapiViewsCoreParcellationModule } from "../module"
 import { provideMockStore } from "@ngrx/store/testing"
+import { within, userEvent } from '@storybook/testing-library';
+import { ARIA_LABELS } from "common/constants"
+import { ParcellationVisibilityService } from "../parcellationVis.service"
+import { of } from "rxjs"
 
 @Component({
   selector: `parc-smart-chip-wrapper`,
@@ -68,6 +72,7 @@ const Template: Story<ParcSmartChipWrapper> = (args: ParcSmartChipWrapper, { loa
   const { 
     parcRecords
   } = loaded
+  const { providers = [] } = parameters
 
   return ({
     props: {
@@ -75,6 +80,9 @@ const Template: Story<ParcSmartChipWrapper> = (args: ParcSmartChipWrapper, { loa
       selectParcellation: action("selectParcellation"),
       parcRecords
     },
+    moduleMetadata: {
+      providers
+    }
   })
 }
 Template.loaders = []
@@ -108,3 +116,28 @@ Default.loaders = [
     }
   }
 ]
+
+export const TestInteraction = Template.bind({})
+TestInteraction.loaders = [
+  ...Default.loaders
+]
+TestInteraction.parameters = {
+  providers: [
+    {
+      provide: ParcellationVisibilityService,
+      useValue: {
+        setVisibility: action('setVisibility'),
+        toggleVisibility: action('toggleVisibility'),
+        visibility$: of(true)
+      }
+    }
+  ]
+}
+TestInteraction.play = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement)
+
+  await userEvent.click(canvas.getByText("human"))
+  const allEye = canvas.getAllByText(ARIA_LABELS.TOGGLE_DELINEATION)
+  await userEvent.hover(allEye[0])
+  await userEvent.click(allEye[0])
+}

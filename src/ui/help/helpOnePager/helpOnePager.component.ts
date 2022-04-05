@@ -1,5 +1,4 @@
-import { Component, Optional } from "@angular/core";
-import { PureContantService } from "src/util";
+import { Component } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -17,13 +16,8 @@ export class HelpOnePager{
   public ARIA_LABELS = ARIA_LABELS
   public QUICK_STARTER_MD = QUICK_STARTER
   public extQuickStarter: string
-  public userDoc: string
-  constructor(
-    @Optional() pConstService: PureContantService
-  ){
+  public userDoc: string = `https://siibra-explorer.readthedocs.io/en/latest/`
+  constructor(){
     this.extQuickStarter = `quickstart.html`
-    if (pConstService) {
-      this.userDoc = pConstService.docUrl
-    }
   }
 }

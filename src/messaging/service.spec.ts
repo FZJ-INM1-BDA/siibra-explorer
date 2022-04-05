@@ -1,7 +1,6 @@
 import { TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
-import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors"
 import { AngularMaterialModule } from "src/sharedModules"
 import { getUuid } from "src/util/fn"
 import { IAV_POSTMESSAGE_NAMESPACE, MessagingService } from "./service"
@@ -39,8 +38,6 @@ describe('> service.ts', () => {
         ]
       })
 
-      const mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(viewerStateFetchedAtlasesSelector, [])
     })
 
     it('> can be inst', () => {

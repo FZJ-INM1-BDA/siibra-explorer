@@ -3,8 +3,12 @@ import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaLayerControlService } from "./layerCtrl.service"
 import * as layerCtrlUtil from '../constants'
 import {
+  annotation,
+  atlasAppearance,
   atlasSelection
 } from "src/state"
+import { LayerCtrlEffects } from "./layerCtrl.effects"
+import { NEVER } from "rxjs"
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -15,7 +19,13 @@ describe('> layerctrl.service.ts', () => {
       TestBed.configureTestingModule({
         providers: [
           NehubaLayerControlService,
-          provideMockStore()
+          provideMockStore(),
+          {
+            provide: LayerCtrlEffects,
+            useValue: {
+              onATPDebounceNgLayers$: NEVER
+            }
+          }
         ]
       })
 
@@ -25,6 +35,9 @@ describe('> layerctrl.service.ts', () => {
         layerCtrlUtil,
         'getMultiNgIdsRegionsLabelIndexMap'
       ).and.returnValue(() => getMultiNgIdsRegionsLabelIndexMapReturnVal)
+      mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
+      mockStore.overrideSelector(atlasAppearance.selectors.showDelineation, true)
+      mockStore.overrideSelector(annotation.selectors.annotations, [])
       mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
       mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)

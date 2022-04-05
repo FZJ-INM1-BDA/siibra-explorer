@@ -5,7 +5,7 @@ import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { BehaviorSubject, of } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { AngularMaterialModule } from "src/sharedModules"
-import {PureContantService, UtilModule} from "src/util"
+import { UtilModule } from "src/util"
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
 import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
@@ -64,14 +64,6 @@ describe('> viewerCtrlCmp.component.ts', () => {
             provide: NEHUBA_INSTANCE_INJTKN,
             useFactory: () => {
               return new BehaviorSubject(mockNehubaViewer).asObservable()
-            }
-          },
-          {
-            provide: PureContantService,
-            useFactory: () => {
-              return {
-                getViewerConfig: jasmine.createSpy('getViewerConfig')
-              }
             }
           }
         ]
@@ -137,39 +129,6 @@ describe('> viewerCtrlCmp.component.ts', () => {
           expect(
             setOctantRemovalSpy
           ).toHaveBeenCalledWith(!wasChecked)
-        })
-      })
-  
-      describe('> toggle delineation', () => {
-        
-        let toggleDelination: jasmine.Spy
-        const toggleName = 'toggle-delineation'
-        beforeEach(() => {
-          toggleDelination = spyOn<any>(fixture.componentInstance, 'toggleParcVsbl')
-        })
-        afterEach(() => {
-          toggleDelination.calls.reset()
-        })
-  
-        it('> toggleslider should exist', async () => {
-          const slideToggle = await loader.getAllHarnesses(
-            MatSlideToggleHarness.with({
-              name: toggleName,
-            })
-          )
-          expect(slideToggle.length).toBe(1)
-        })
-  
-        it('> toggling it should result in setOctantRemoval to be called', async () => {
-          const slideToggle = await loader.getAllHarnesses(
-            MatSlideToggleHarness.with({
-              name: toggleName,
-            })
-          )
-          await slideToggle[0].toggle()
-          expect(
-            toggleDelination
-          ).toHaveBeenCalled()
         })
       })
     })

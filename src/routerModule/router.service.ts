@@ -222,7 +222,12 @@ export class RouterService {
         )
       )
     ).subscribe(routePath => {
-      if (routePath === '') {
+      /**
+       * routePath may be falsy
+       * or empty string
+       * both can be caught by !routePath
+       */
+      if (!routePath) {
         router.navigate([ baseHref ])
       } else {
 

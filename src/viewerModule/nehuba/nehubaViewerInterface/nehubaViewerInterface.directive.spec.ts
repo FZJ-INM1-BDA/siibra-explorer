@@ -1,22 +1,26 @@
 import { Component } from "@angular/core"
-import { TestBed, async, ComponentFixture, fakeAsync, tick } from "@angular/core/testing"
+import { TestBed, ComponentFixture, fakeAsync, tick } from "@angular/core/testing"
 import { By } from "@angular/platform-browser"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component"
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directive"
-import { Subject } from "rxjs"
+import { NEVER, of, pipe, Subject } from "rxjs"
 import { userPreference, atlasSelection, atlasAppearance } from "src/state"
+import { NehubaNavigationService } from "../navigation.service"
+import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
+import { mapTo } from "rxjs/operators"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
+  let distinctATPSpy: jasmine.Spy
   describe('> NehubaViewerContainerDirective', () => {
-
     @Component({
       template: ''
     })
     class DummyCmp{}
 
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
+    beforeEach(async () => {
+      distinctATPSpy = spyOn(atlasSelection.fromRootStore, 'distinctATP')
+      await TestBed.configureTestingModule({
         imports: [
           
         ],
@@ -26,7 +30,20 @@ describe('> nehubaViewerInterface.directive.ts', () => {
           NehubaViewerUnit,
         ],
         providers: [
-          provideMockStore({ initialState: {} })
+          provideMockStore(),
+          {
+            provide: NehubaNavigationService,
+            useValue: {
+              viewerNav$: NEVER,
+              storeNav: null
+            }
+          },
+          {
+            provide: LayerCtrlEffects,
+            useValue: {
+              onATPDebounceNgLayers$: of({ parcNgLayers: {} })
+            }
+          }
         ]
       }).overrideComponent(DummyCmp, {
         set: {
@@ -37,10 +54,22 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         }
       }).compileComponents()
 
-    }))
+      distinctATPSpy.and.returnValue(
+        pipe(
+          mapTo({
+            atlas: null,
+            parcellation: null,
+            template: null
+          })
+        )
+      )
 
-    beforeEach(() => {
       const mockStore = TestBed.inject(MockStore)
+      // mockStore.overrideSelector(atlasSelection.selectors.selectedAtlas, null)
+      // mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, null)
+      // mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, null)
+
+      mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
       mockStore.overrideSelector(atlasSelection.selectors.standaloneVolumes, [])
       mockStore.overrideSelector(atlasSelection.selectors.navigation, null)
@@ -84,11 +113,17 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         destroy: jasmine.createSpy('destroy')
       }
 
-      beforeEach(() => {
+      const gpuLimit = 5e8
+      beforeEach(fakeAsync(() => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(userPreference.selectors.gpuLimit, gpuLimit)
+
         fixture = TestBed.createComponent(DummyCmp)
         const directive = fixture.debugElement.query(
           By.directive(NehubaViewerContainerDirective)
         )
+
+        tick(300)
         
         directiveInstance = directive.injector.get(NehubaViewerContainerDirective)
         
@@ -97,29 +132,27 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         // casting return value to any is not perfect, but since only 2 methods and 1 property is used, it's a quick way 
         // rather than allow component to be created
         elCreateComponentSpy = spyOn(directiveInstance['el'], 'createComponent').and.returnValue(spyComRef as any)
-      })
+      }))
 
       describe('> on createNehubaInstance called', () => {
-        const template = {}
-        const lifecycle = {}
-        it('> method el.clear gets called before el.createComponent', () => {
-          directiveInstance.createNehubaInstance(template, lifecycle)
+        const nehubaConfig = {
+          dataset: {
+            initialNgState: {
+              
+            }
+          }
+        }
+        it('> method el.clear gets called before el.createComponent', async () => {
+          await directiveInstance.createNehubaInstance(nehubaConfig)
           expect(elClearSpy).toHaveBeenCalledBefore(elCreateComponentSpy)
         })
 
-        it('> if viewerConfig has gpuLimit, gpuMemoryLimit will be in initialNgSTate', () => {
-          template['nehubaConfig'] = {
-            dataset: {
-              initialNgState: {}
-            }
-          }
-          directiveInstance['viewerConfig'] = {
-            gpuLimit: 5e8
-          }
-          directiveInstance.createNehubaInstance(template, lifecycle)
+        it('> if viewerConfig has gpuLimit, gpuMemoryLimit will be in initialNgSTate', async () => {
+          
+          await directiveInstance.createNehubaInstance(nehubaConfig)
           expect(
             directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuMemoryLimit
-          ).toEqual(5e8)
+          ).toEqual(gpuLimit)
           expect(
             directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuLimit
           ).toBeFalsy()

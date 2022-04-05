@@ -243,9 +243,9 @@ export class RouteStateTransformSvc {
       // for atlas
       a: selectedAtlas && encodeId(selectedAtlas['@id']),
       // for template
-      t: selectedTemplate && encodeId(selectedTemplate['@id'] || selectedTemplate['fullId']),
+      t: selectedTemplate && encodeId(selectedTemplate['@id']),
       // for parcellation
-      p: selectedParcellation && encodeId(selectedParcellation['@id'] || selectedParcellation['fullId']),
+      p: selectedParcellation && encodeId(selectedParcellation['@id']),
       // for regions
       r: selectedRegionsString && encodeURIFull(selectedRegionsString),
       // nav

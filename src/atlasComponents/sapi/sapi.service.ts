@@ -114,7 +114,6 @@ export class SAPI{
     public http: HttpClient,
     private snackbar: MatSnackBar,
     private workerSvc: AtlasWorkerService,
-    // @Inject(BS_ENDPOINT) public bsEndpoint: string,
   ){
     this.atlases$.subscribe(atlases => {
       for (const atlas of atlases) {

@@ -6,7 +6,6 @@ import { ComponentsModule } from "src/components"
 import { DialogService } from "src/services/dialogService.service"
 import { AngularMaterialModule } from "src/sharedModules"
 import { userPreference } from "src/state"
-import { PureContantService } from "src/util"
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN } from "src/util/constants"
 import { WidgetModule, WidgetServices } from "src/widget"
 import { PluginServices } from "./atlasViewer.pluginService.service"
@@ -15,7 +14,8 @@ import { PluginModule } from "./plugin.module"
 const MOCK_PLUGIN_MANIFEST = {
   name: 'fzj.xg.MOCK_PLUGIN_MANIFEST',
   templateURL: 'http://localhost:10001/template.html',
-  scriptURL: 'http://localhost:10001/script.js'
+  scriptURL: 'http://localhost:10001/script.js',
+  version: '0.1.0'
 }
 
 const spyfn = {
@@ -58,12 +58,6 @@ describe('> atlasViewer.pluginService.service.ts', () => {
               getUserConfirm: () => Promise.resolve()
             }
           },
-          {
-            provide: PureContantService,
-            useValue: {
-              backendUrl: `http://localhost:3000/`
-            }
-          }
         ]
       }).compileComponents()
       
@@ -85,7 +79,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
         }
       } as any
 
-      httpMock.expectOne('http://localhost:3000/plugins/manifests').flush('[]')
+      httpMock.expectOne('plugins/manifests').flush('[]')
 
       const widgetService = TestBed.inject(WidgetServices)
       /**
@@ -197,7 +191,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
 
           describe('> if user permission has been given', () => {
             beforeEach(fakeAsync(() => {
-              mockStore.overrideSelector(userPreference.selectors.userCsp, { 'fzj.xg.MOCK_PLUGIN_MANIFEST': {} })
+              mockStore.overrideSelector(userPreference.selectors.userCsp, { [`${MOCK_PLUGIN_MANIFEST.name}::${MOCK_PLUGIN_MANIFEST.version}`]: {} })
               userConfirmSpy.and.callFake(() => Promise.reject())
               pluginService.launchPlugin({
                 ...cspManifest
@@ -252,7 +246,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
               it('> calls /POST user/pluginPermissions', () => {
                 httpMock.expectOne({
                   method: 'POST',
-                  url: 'http://localhost:3000/user/pluginPermissions'
+                  url: 'user/pluginPermissions'
                 })
               })
             })
@@ -273,7 +267,7 @@ describe('> atlasViewer.pluginService.service.ts', () => {
               it('> calls /POST user/pluginPermissions', () => {
                 httpMock.expectNone({
                   method: 'POST',
-                  url: 'http://localhost:3000/user/pluginPermissions'
+                  url: 'user/pluginPermissions'
                 })
               })
             })

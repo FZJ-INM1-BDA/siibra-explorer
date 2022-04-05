@@ -163,36 +163,6 @@ export const isIdentityQuat = ori => Math.abs(ori[0]) < 1e-6
   && Math.abs(ori[2]) < 1e-6
   && Math.abs(ori[3] - 1) < 1e-6
 
-export const getNavigationStateFromConfig = nehubaConfig => {
-  const {
-    navigation = {},
-    perspectiveOrientation = [0, 0, 0, 1],
-    perspectiveZoom = 1e7
-  } = (nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState) || {}
-
-  const {
-    zoomFactor = 3e5,
-    pose = {}
-  } = navigation || {}
-
-  const {
-    voxelSize = [1e6, 1e6, 1e6],
-    voxelCoordinates = [0, 0, 0]
-  } = (pose && pose.position) || {}
-
-  const {
-    orientation = [0, 0, 0, 1]
-  } = pose || {}
-
-  return {
-    orientation,
-    perspectiveOrientation,
-    perspectiveZoom,
-    position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
-    zoom: zoomFactor
-  }
-}
-
 export const calculateSliceZoomFactor = (originalZoom) => originalZoom
   ? 700 * originalZoom / Math.min(window.innerHeight, window.innerWidth)
   : 1e7
