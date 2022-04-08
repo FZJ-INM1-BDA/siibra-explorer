@@ -47,7 +47,14 @@ export type TBSDetail = TBSSummary & {
       [key: string]: TProfile
     }
     __autoradiographs: {
-      [key: string]: string
+      [key: string]: {
+        content_type: string
+        content_encoding: string
+        ['x-width']: number
+        ['x-height']: number
+        ['x-channel']: number
+        content: string
+      }
     }
     __fingerprint: TBSFingerprint
   }

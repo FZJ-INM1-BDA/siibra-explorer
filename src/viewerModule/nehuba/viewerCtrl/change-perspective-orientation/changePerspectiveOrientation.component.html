@@ -4,8 +4,8 @@
 
 <mat-menu #perspectiveOrientationMenu="matMenu">
 
-    <div class="d-flex align-items-center text-light">
-        <button mat-button color="basic" class="flex-grow-1 text-left"
+    <div class="d-flex align-items-center iv-custom-comp text">
+        <button mat-button color="basic" class="flex-grow-1 text-left font-weight-normal"
                 (click)="poService.set3DViewPoint('coronal', 'first')">
             Coronal view
         </button>
@@ -15,8 +15,9 @@
         </button>
     </div>
 
-    <div class="d-flex align-items-center text-light"> <!--mat-menu-item-->
-        <button mat-button color="basic" class="flex-grow-1 text-left"
+
+    <div class="d-flex align-items-center iv-custom-comp text"> <!--mat-menu-item-->
+        <button mat-button color="basic" class="flex-grow-1 text-left font-weight-normal"
                 (click)="poService.set3DViewPoint('sagittal', 'first')">
             Sagittal view
         </button>
@@ -26,8 +27,8 @@
         </button>
     </div>
 
-    <div class="d-flex align-items-center text-light"> <!--mat-menu-item-->
-        <button mat-button color="basic" class="flex-grow-1 text-left"
+    <div class="d-flex align-items-center iv-custom-comp text"> <!--mat-menu-item-->
+        <button mat-button color="basic" class="flex-grow-1 text-left font-weight-normal"
                 (click)="poService.set3DViewPoint('axial', 'first')">
             Axial view
         </button>

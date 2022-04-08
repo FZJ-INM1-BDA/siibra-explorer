@@ -8,7 +8,7 @@ type TReturn = {
   name: 'getGroupedParc',
   pure: true
 })
-export class getGroupedParcPipe implements PipeTransform{
+export class GetGroupedParcPipe implements PipeTransform{
 
   public transform(arr: any[]):TReturn{
     const returnObj: TReturn = {}

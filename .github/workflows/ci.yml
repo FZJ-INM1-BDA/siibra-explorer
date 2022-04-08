@@ -2,10 +2,6 @@ name: '[ci]'
 
 on:
   push:
-    branches-ignore:
-    - 'dev'
-    - 'staging'
-    - 'master'
 
     # ignore changes to docs and mkdocs.yml
     paths-ignore:

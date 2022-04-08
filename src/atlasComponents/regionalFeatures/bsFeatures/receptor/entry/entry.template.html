@@ -8,8 +8,11 @@
   </mat-option>
 </mat-select>
 
-<ng-container *ngIf="selectedReceptor$ | async as selectedRec">
+<ng-template [ngIf]="!(selectedReceptor$ | async)">
+  <spinner-cmp></spinner-cmp>
+</ng-template>
 
+<ng-template let-selectedRec [ngIf]="selectedReceptor$ | async">
   <bs-features-receptor-fingerprint
     (onSelectReceptor)="onSelectReceptor($event)"
     [bsFeature]="selectedRec">
@@ -44,4 +47,4 @@
     </bs-features-receptor-autoradiograph>
   </ng-template>
 
-</ng-container>
+</ng-template>
