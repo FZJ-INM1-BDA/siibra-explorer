@@ -5,8 +5,8 @@ import {combineLatest, Observable, of, Subscription} from "rxjs";
 import {viewerStateSelectedTemplatePureSelector} from "src/services/state/viewerState/selectors";
 import {IavRootStoreInterface} from "src/services/stateStore.service";
 import {select, Store} from "@ngrx/store";
-import {debounceTime, distinctUntilChanged, filter, map, mergeMap, switchMap} from "rxjs/operators";
-import {ngViewerActionSetPerspOctantRemoval} from "src/services/state/ngViewerState/actions";
+import {debounceTime, distinctUntilChanged, filter, map, mergeMap} from "rxjs/operators";
+import {ngViewerActionSetPerspOctantRemoval, ngViewerActionToggleMax} from "src/services/state/ngViewerState/actions";
 import {ChangePerspectiveOrientationService} from "src/viewerModule/nehuba/viewerCtrl/change-perspective-orientation/changePerspectiveOrientation.service";
 import {ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder} from "src/services/state/ngViewerState/selectors";
 import {PANELS} from "src/services/state/ngViewerState/constants";
@@ -32,7 +32,7 @@ export class MaximiseViewService implements OnDestroy {
     public templateTransform = []
 
     private panelMode$: Observable<string>
-    private panelOrder: []
+    private panelOrder: any
 
     public isMaximised: boolean = false
 
@@ -73,15 +73,19 @@ export class MaximiseViewService implements OnDestroy {
             select(viewerStateSelectedTemplatePureSelector),
             filter((t: any) => !!t)
           ).subscribe(t => {
+            // Minimise automatically on template chenge
             if (t && this.selectedTemplateId !== t['@id']) {
-              this.minimise()
+              if (this.maximisedPanelIndex !== null && this.maximisedPanelIndex >= 0) {
+                this.store$.dispatch(ngViewerActionToggleMax({
+                  payload: { index: this.maximisedPanelIndex }
+                }))
+              }
+              this.cleanOnMinimise()
             }
+
             this.selectedTemplateId = t['@id']
             const navigationState = getNavigationStateFromConfig(t.nehubaConfig)
             this.defaultOrientation = navigationState.orientation
-            if (this.isMaximised) {
-              this.minimise()
-            }
           }),
         )
       } else {
@@ -107,19 +111,28 @@ export class MaximiseViewService implements OnDestroy {
           )
         ]).subscribe(([singlePanel, order]) => {
           if (singlePanel && this.panelOrder !== order) {
+
+            const firstExpand = !this.panelOrder
             this.panelOrder = order
 
+
             order = order.split('').map(o => Number(o))
-            
+
             if (order[0] === 3) {
               this.formatMiniPerspectiveView(true)
             } else {
               this.maximise(order[0], order)
-            } 
+              //  ToDo find better solution
+              if (firstExpand) {
+                setTimeout(() => this.fakeRedraw(), 500)
+              } else {
+                this.fakeRedraw()
+              }
+            }
 
           } else {
             this.isMaximised = false
-            this.minimise()
+            this.cleanOnMinimise()
           }
         }) 
       )
@@ -136,9 +149,8 @@ export class MaximiseViewService implements OnDestroy {
       const firstLayer: any = Object.values(this.nehubaViewer.config.dataset.initialNgState.layers)[0]
       this.templateTransform = firstLayer.transform.map(t => t[3])
 
-
     }
-    
+
     formatMiniPerspectiveView(clear = false) {
       this.store$.dispatch(
         ngViewerActionSetPerspOctantRemoval({
@@ -156,15 +168,11 @@ export class MaximiseViewService implements OnDestroy {
         }
 
       }
-
-      // this.nehubaViewer.ngviewer.showScaleBar.toggle()
-
-
     }
 
     setPerspectivePanelState(panelOrder) {
       if (panelOrder[0] === 0) {
-        this.poService.set3DViewPoint('sagittal', 'first', 
+        this.poService.set3DViewPoint('sagittal', 'first',
           defaultZoom[this.selectedTemplateId][this.maximisedPanelIndex])
       } else if (panelOrder[0] === 1) {
         this.poService.set3DViewPoint('coronal', 'first',
@@ -174,8 +182,27 @@ export class MaximiseViewService implements OnDestroy {
           defaultZoom[this.selectedTemplateId][this.maximisedPanelIndex])
       }
     }
+
+    //  ToDo find better solution
+    fakeRedraw() {
+
+      if (this.perspectivePanel) {
+        setTimeout(() => {
+          this.perspectivePanel.draw()
+        })
+      }
+
+      if (this.panelOrder && +this.panelOrder[0] !== 3) {
+        setTimeout(() => {
+          const fakeRedrawIndex = +this.panelOrder[1] !== 3 ? +this.panelOrder[1] : +this.panelOrder[2]
+          const a: any = Array.from(this.viewer.display.panels)[fakeRedrawIndex]
+          a.draw()
+        })
+      }
+
+    }
     
-    minimise() {
+    cleanOnMinimise() {
       this.maximisedPanelIndex = null
       this.panelOrder = null
       this.formatMiniPerspectiveView(true)
