@@ -62,6 +62,9 @@
     <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
     </ng-container>
+    <div mini-perspective-view>
+      <ng-content *ngTemplateOutlet="miniPerspectiveTmp"></ng-content>
+    </div>
   </layout-single-panel>
   <div *ngSwitchDefault>
     A panel mode which I have never seen before ...
@@ -79,4 +82,7 @@
 </ng-template>
 <ng-template #celliv>
   <ng-content select="[cell-iv]"></ng-content>
+</ng-template>
+<ng-template #miniPerspectiveTmp>
+  <ng-content select="[mini-perspective-view]"></ng-content>
 </ng-template>

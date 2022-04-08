@@ -27,7 +27,14 @@ const makeCol = (...els: HTMLElement[]) => {
 
 const washPanels = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
   for (const panel of panels) {
-    if (panel) { panel.className = `position-relative` }
+    if (panel) {
+      panel.className = `position-relative`
+      panel.style.width = null
+      panel.style.height = null
+      panel.style.bottom = null
+      panel.style.right = null
+      panel.style.border=null
+    }
   }
   return panels
 }
@@ -142,20 +149,40 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
   return makeCol(majorContainer, minorContainer)
 }
 
-export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
+export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement], panelOrder: number[]) => {
   washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, PANELS.SINGLE_PANEL))
 
   const majorContainer = makeRow(panels[0])
-  const minorContainer = makeRow(panels[1], panels[2], panels[3])
 
   majorContainer.style.flexBasis = '100%'
-  minorContainer.style.flexBasis = '0%'
 
-  minorContainer.className = ''
-  minorContainer.style.height = '0px'
-  return makeRow(majorContainer, minorContainer)
+  const perspectivePanelIndex = panelOrder.findIndex(po => po === 3)
+
+  let minorContainer
+  const perspectiveContainer = (panels[perspectivePanelIndex])
+
+  if (panelOrder[0] !== 3) {
+    perspectiveContainer.style.width = '200px'
+    perspectiveContainer.style.height = '200px'
+    perspectiveContainer.style.bottom = '50px'
+    perspectiveContainer.style.right = '50px'
+    perspectiveContainer.style.border='1px solid lightgrey'
+    perspectiveContainer.classList.add('position-absolute')
+
+  } else {
+    washPanels(panels)
+    majorContainer.style.flexBasis = '100%'
+    minorContainer = makeRow(panels[1], panels[2], panels[3])
+    minorContainer.style.flexBasis = '0%'
+    minorContainer.className = ''
+    minorContainer.style.height = '0px'
+
+  }
+
+  return panelOrder[0] !== 3 ? makeRow(majorContainer, perspectiveContainer)
+    : makeRow(majorContainer, minorContainer)
 }
 
 export const isIdentityQuat = ori => Math.abs(ori[0]) < 1e-6

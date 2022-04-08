@@ -39,3 +39,48 @@ current-layout
 {
   z-index: 2;
 }
+
+.mini-perspective-viewer {
+  width: 200px;
+  height: 200px;
+}
+.custom-slider-3d {
+  -webkit-appearance: none;
+  outline: none;
+  opacity: 0.7;
+  background-color: rgba(0,0,0,0);
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.custom-slider-3d:hover {
+  opacity: 1;
+}
+
+.custom-slider-3d::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 5px;
+  height: 200px;
+  background: white;
+  cursor: pointer;
+}
+:host-context([darktheme="false"]) .custom-slider-3d::-webkit-slider-thumb {
+  background: black;
+}
+
+.custom-slider-3d::-moz-range-thumb {
+  width: 5px;
+  height: 200px;
+  background: white;
+  cursor: pointer;
+}
+
+:host-context([darktheme="false"]) .custom-slider-3d::-moz-range-thumb {
+  background: black;
+}
+
+.range-value {
+  right: 10px;
+  bottom: 5px;
+}
