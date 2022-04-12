@@ -1,22 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, NEVER, Observable, of, Subscription } from "rxjs";
+import { combineLatest, Observable, of, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { OVERWRITE_SHOW_DATASET_DIALOG_TOKEN } from "src/util/interfaces";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
-import { ComponentStore } from "../componentStore";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { atlasSelection, userInteraction, } from "src/state";
 import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
-
-type TCStoreViewerCmp = {
-  overlaySideNav: any
-}
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -58,18 +52,6 @@ type TCStoreViewerCmp = {
     ]),
   ],
   providers: [
-    {
-      provide: OVERWRITE_SHOW_DATASET_DIALOG_TOKEN,
-      useFactory: (cStore: ComponentStore<TCStoreViewerCmp>) => {
-        return function overwriteShowDatasetDialog( arg: any ){
-          cStore.setState({
-            overlaySideNav: arg
-          })
-        }
-      },
-      deps: [ ComponentStore ]
-    },
-    ComponentStore,
     DialogService
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,8 +61,6 @@ export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
-
-  public overlaySidenav$ = NEVER
 
   @ViewChild('genericInfoVCR', { read: ViewContainerRef })
   genericInfoVCR: ViewContainerRef
@@ -209,16 +189,12 @@ export class ViewerCmp implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private ctxMenuSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
-    private cStore: ComponentStore<TCStoreViewerCmp>,
     private dialogSvc: DialogService,
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
   ){
 
     this.subscriptions.push(
-      this.selectedRegions$.subscribe(() => {
-        this.clearPreviewingDataset()
-      }),
       this.ctxMenuSvc.context$.subscribe(
         (ctx: any) => this.context = ctx
       ),
@@ -338,15 +314,6 @@ export class ViewerCmp implements OnDestroy {
     this.store$.dispatch(
       atlasSelection.actions.clearViewerMode()
     )
-  }
-
-  public clearPreviewingDataset(): void{
-    /**
-     * clear all preview
-     */
-    this.cStore.setState({
-      overlaySideNav: null
-    })
   }
 
   public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>): void{

@@ -3,9 +3,9 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, finalize, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, concat, EMPTY, merge, NEVER, Observable, of, timer } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, merge, Observable, timer } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";

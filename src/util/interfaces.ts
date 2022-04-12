@@ -16,8 +16,6 @@ export interface IHasFullId{
 
 export type TOverwriteShowDatasetDialog = (arg: any) => void
 
-export const OVERWRITE_SHOW_DATASET_DIALOG_TOKEN = new InjectionToken<TOverwriteShowDatasetDialog>('OVERWRITE_SHOW_DATASET_DIALOG_TOKEN')
-
 export type TRegionOfInterest = { ['fullId']: string }
 
 export const CANCELLABLE_DIALOG = new InjectionToken('CANCELLABLE_DIALOG')

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { atlasSelection, defaultState, MainState, plugins } from "src/state";
+import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
 import { getParcNgId, getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
@@ -179,6 +179,16 @@ export class RouteStateTransformSvc {
       // if any error occurs, parse rest per normal
     }
 
+    // try to get feature
+    try {
+      if (returnObj.f && returnObj.f.length === 1) {
+        const decodedFeatId = decodeId(returnObj.f[0])
+        const feature = await this.sapi.getFeature(decodedFeatId).detail$.toPromise()
+        returnState["[state.userInteraction]"].selectedFeature = feature
+      }
+    } catch (e) {
+      console.error(`fetching selected feature error`)
+    }
 
     try {
       const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate, allParcellationRegions } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
@@ -210,8 +220,8 @@ export class RouteStateTransformSvc {
     const selectedRegions = atlasSelection.selectors.selectedRegions(state)
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
     const navigation = atlasSelection.selectors.navigation(state)
+    const selectedFeature = userInteraction.selectors.selectedFeature(state)
   
-    let dsPrvString: string
     const searchParam = new URLSearchParams()
   
     let cNavString: string
@@ -237,9 +247,9 @@ export class RouteStateTransformSvc {
       const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
       selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`
     }
-    let routes: any
+    let routes: TUrlPathObj<string, TUrlAtlas<string>> | TUrlPathObj<string, TUrlStandaloneVolume<string>>
     
-    routes= {
+    routes = {
       // for atlas
       a: selectedAtlas && encodeId(selectedAtlas['@id']),
       // for template
@@ -250,9 +260,9 @@ export class RouteStateTransformSvc {
       r: selectedRegionsString && encodeURIFull(selectedRegionsString),
       // nav
       ['@']: cNavString,
-      // dataset file preview
-      dsp: dsPrvString && encodeURI(dsPrvString),
-    } as TUrlPathObj<string, TUrlAtlas<string>>
+      // showing dataset
+      f: selectedFeature && encodeId(selectedFeature["@id"])
+    }
   
     /**
      * if any params needs to overwrite previosu routes, put them here
@@ -262,7 +272,7 @@ export class RouteStateTransformSvc {
       routes = {
         // nav
         ['@']: cNavString,
-      } as TUrlPathObj<string|string[], TUrlStandaloneVolume<string[]>>
+      } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
     }
   
     const routesArr: string[] = []

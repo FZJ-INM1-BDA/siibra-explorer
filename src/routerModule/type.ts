@@ -17,9 +17,14 @@ export type TUrlNav<T> = {
   ['@']: T // navstring
 }
 
+export type TUrlViewFeat<T> = {
+  f: T
+}
+
 export type TConditional<T> = Partial<
   TUrlPlugin<T> &
-  TUrlNav<T>
+  TUrlNav<T> & 
+  TUrlViewFeat<T>
 >
 
 export type TUrlPathObj<T, V> = 

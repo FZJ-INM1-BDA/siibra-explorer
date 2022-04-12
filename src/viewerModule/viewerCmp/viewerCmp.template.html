@@ -190,32 +190,7 @@
   let-drawer="drawer"
   let-showFullSidenavSwitch="showFullSidenavSwitch">
 
-  <!-- check if preview volume -->
-  <ng-template [ngIf]="overlaySidenav$ | async" let-overlaySideNav>
-    
-    <!-- back btn -->
-    <button mat-button
-      (click)="clearPreviewingDataset()"
-      [attr.aria-label]="ARIA_LABELS.CLOSE"
-      class="position-absolute z-index-10 m-2">
-      <i class="fas fa-chevron-left"></i>
-      <span class="ml-1">
-        Back
-      </span>
-    </button>
-
-    <ng-template #genericInfoVCR>
-    </ng-template>
-  </ng-template>
-
-  <div [ngClass]="{
-    'invisible overflow-hidden h-0': overlaySidenav$ | async,
-    'h-100': !(overlaySidenav$ | async)
-  }" class="pe-all position-relative d-flex flex-column">
-    
-
-  <!-- if pli voi is visible, show pli template
-  otherwise show region tmpl -->
+  <!-- selectedFeature || selectedRegion -->
   <ng-template
     [ngTemplateOutlet]="(selectedFeature$ | async)
       ? selectedFeatureTmpl
@@ -226,8 +201,6 @@
       feature: selectedFeature$ | async
     }">
   </ng-template>
-
-  </div>
 </ng-template>
 
 

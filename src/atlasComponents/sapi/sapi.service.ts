@@ -11,6 +11,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
 import { Observable } from "rxjs";
+import { SAPIFeature } from "./features";
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.2.0'
@@ -68,6 +69,10 @@ export class SAPI{
   getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryParam): Observable<SapiRegionModel[]> {
     const parc = this.getParcellation(atlasId, parcId)
     return parc.getRegions(spaceId, queryParam)
+  }
+
+  getFeature(featureId: string, opts: Record<string, string> = {}) {
+    return new SAPIFeature(this, featureId, opts)
   }
 
   getRegionFeatures(atlasId: string, parcId: string, spaceId: string, regionId: string, priority = 0): Observable<(SapiRegionalFeatureModel | SxplrCleanedFeatureModel)[]>{

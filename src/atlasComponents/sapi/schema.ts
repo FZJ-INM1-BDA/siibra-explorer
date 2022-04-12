@@ -89,9 +89,24 @@ export interface paths {
     /** Return all genes (name, acronym) in siibra */
     get: operations["get_gene_names_genes_get"]
   }
-  "/features": {
+  "/modalities": {
     /** Return all possible modalities */
-    get: operations["get_all_available_modalities_features_get"]
+    get: operations["get_all_available_modalities_modalities_get"]
+  }
+  "/features/{feature_id}": {
+    /**
+     * Get all details for one feature by id.
+     * Since the feature id is unique, no atlas concept is required.
+     *
+     * Further optional params can extend the result.
+     * :param feature_id:
+     * :param atlas_id:
+     * :param space_id:
+     * :param parcellation_id:
+     * :param region_id:
+     * :return: UnionRegionalFeatureModels
+     */
+    get: operations["get_feature_details_features__feature_id__get"]
   }
 }
 
@@ -156,7 +171,7 @@ export interface components {
        * @Type
        * @constant
        */
-      "@type"?: "siibra/core/dataset"
+      "@type"?: "https://openminds.ebrains.eu/core/DatasetVersion"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -190,8 +205,8 @@ export interface components {
       maxpoint: components["schemas"]["siibra__openminds__SANDS__v3__miscellaneous__coordinatePoint__Model"]
       /** Shape */
       shape: number[]
-      /** Is Planar */
-      is_planar: boolean
+      /** Isplanar */
+      isPlanar: boolean
     }
     /** ConnectivityMatrixDataModel */
     ConnectivityMatrixDataModel: {
@@ -207,6 +222,25 @@ export interface components {
       /** Columns */
       columns?: string[]
     }
+    /** CorticalCellDistributionModel */
+    CorticalCellDistributionModel: {
+      /** @Id */
+      "@id": string
+      /**
+       * @Type
+       * @constant
+       */
+      "@type"?: "siibra/features/cells"
+      metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
+      /** Urls */
+      urls: components["schemas"]["Url"][]
+      /** Cells */
+      cells: string
+      /** Section */
+      section: string
+      /** Patch */
+      patch: string
+    }
     /** DatasetJsonModel */
     DatasetJsonModel: {
       /** @Id */
@@ -215,7 +249,7 @@ export interface components {
        * @Type
        * @constant
        */
-      "@type"?: "siibra/core/dataset"
+      "@type"?: "https://openminds.ebrains.eu/core/DatasetVersion"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -792,7 +826,7 @@ export interface components {
        * @Type
        * @constant
        */
-      "@type"?: "siibra/core/dataset"
+      "@type"?: "https://openminds.ebrains.eu/core/DatasetVersion"
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -1347,6 +1381,7 @@ export interface operations {
       }
       query: {
         space_id?: string
+        type?: string
       }
     }
     responses: {
@@ -1356,7 +1391,8 @@ export interface operations {
           "application/json": (Partial<
             components["schemas"]["ReceptorDatasetModel"]
           > &
-            Partial<components["schemas"]["BaseDatasetJsonModel"]>)[]
+            Partial<components["schemas"]["BaseDatasetJsonModel"]> &
+            Partial<components["schemas"]["CorticalCellDistributionModel"]>)[]
         }
       }
       /** Validation Error */
@@ -1388,7 +1424,8 @@ export interface operations {
           "application/json": Partial<
             components["schemas"]["ReceptorDatasetModel"]
           > &
-            Partial<components["schemas"]["BaseDatasetJsonModel"]>
+            Partial<components["schemas"]["BaseDatasetJsonModel"]> &
+            Partial<components["schemas"]["CorticalCellDistributionModel"]>
         }
       }
       /** Validation Error */
@@ -1537,6 +1574,7 @@ export interface operations {
         parcellation_id: string
       }
       query: {
+        type?: string
         per_page?: number
         page?: number
       }
@@ -1831,12 +1869,55 @@ export interface operations {
     }
   }
   /** Return all possible modalities */
-  get_all_available_modalities_features_get: {
+  get_all_available_modalities_modalities_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
           "application/json": unknown
+        }
+      }
+    }
+  }
+  /**
+   * Get all details for one feature by id.
+   * Since the feature id is unique, no atlas concept is required.
+   *
+   * Further optional params can extend the result.
+   * :param feature_id:
+   * :param atlas_id:
+   * :param space_id:
+   * :param parcellation_id:
+   * :param region_id:
+   * :return: UnionRegionalFeatureModels
+   */
+  get_feature_details_features__feature_id__get: {
+    parameters: {
+      path: {
+        feature_id: string
+      }
+      query: {
+        atlas_id?: string
+        space_id?: string
+        parcellation_id?: string
+        region_id?: string
+      }
+    }
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": Partial<
+            components["schemas"]["ReceptorDatasetModel"]
+          > &
+            Partial<components["schemas"]["BaseDatasetJsonModel"]> &
+            Partial<components["schemas"]["CorticalCellDistributionModel"]>
+        }
+      }
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
         }
       }
     }
