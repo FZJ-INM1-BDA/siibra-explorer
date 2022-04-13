@@ -94,7 +94,7 @@ current-layout
   background-color: rgba(0,0,0,0);
   -webkit-transition: .2s;
   transition: opacity .2s;
-
+  left: 0;
   z-index: 200;
   width:200px;
   pointer-events:none;

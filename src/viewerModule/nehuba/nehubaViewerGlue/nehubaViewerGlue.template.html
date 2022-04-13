@@ -239,7 +239,7 @@
 
 <ng-template #miniPerspectiveTmp>
 
-  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer">
+  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer overflow-hidden">
 
     <div   *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
     >
@@ -257,16 +257,14 @@
            style="z-index: 100 !important;">
 
     <input type="range"
+           class="custom-slider-3d-highlight position-absolute"
            [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
            [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
                     * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
-           class="custom-slider-3d-highlight position-absolute"
-           [style.height]="(maximiseService.maximisedPanelIndex === 2 ? 200 : maximiseService.height) + 'px'"
-           [style.width]="(maximiseService.maximisedPanelIndex === 2 ? maximiseService.height : 200) + 'px'"
-           [style.top]="(maximiseService.maximisedPanelIndex === 2? 0 : maximiseService.top) + 'px'"
-           [style.left]="(maximiseService.maximisedPanelIndex === 2? maximiseService.top : 0) + 'px'">
+           [style.height]="maximiseService.height + 'px'"
+           [style.top]="maximiseService.top + 'px'">
 
     </div>
 
