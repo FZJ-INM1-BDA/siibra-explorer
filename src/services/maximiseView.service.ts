@@ -2,7 +2,10 @@ import {Inject, Injectable, OnDestroy, Optional} from "@angular/core";
 import {NehubaViewerUnit} from "src/viewerModule/nehuba";
 import {getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN} from "src/viewerModule/nehuba/util";
 import {combineLatest, Observable, of, Subscription} from "rxjs";
-import {viewerStateSelectedTemplatePureSelector} from "src/services/state/viewerState/selectors";
+import {
+  viewerStateNavigationStateSelector,
+  viewerStateSelectedTemplatePureSelector
+} from "src/services/state/viewerState/selectors";
 import {IavRootStoreInterface} from "src/services/stateStore.service";
 import {select, Store} from "@ngrx/store";
 import {debounceTime, distinctUntilChanged, filter, map, mergeMap} from "rxjs/operators";
@@ -23,7 +26,7 @@ export class MaximiseViewService implements OnDestroy {
     private subscriptions: Subscription[] = []
 
     public maximisedPanelIndex: number | null = null
-    
+
     public defaultZoomLevels
 
     public navPosVoxel: any
@@ -37,6 +40,11 @@ export class MaximiseViewService implements OnDestroy {
     public isMaximised: boolean = false
 
     private perspectivePanel: any
+    
+    public max: any
+    public min: any
+    public height: any
+    public top: any
 
     private get viewer(){
       return this.injectedViewer || (window as any).viewer
@@ -55,7 +63,7 @@ export class MaximiseViewService implements OnDestroy {
               this.nehubaViewer = viewer
               if (viewer){
                 return combineLatest([
-                  viewer.viewerPosInReal$.pipe(filter(v => !!v)), 
+                  viewer.viewerPosInReal$.pipe(filter(v => !!v)),
                   viewer.viewerPosInVoxel$.pipe(filter(v => !!v))
                 ])
               } else {
@@ -87,6 +95,40 @@ export class MaximiseViewService implements OnDestroy {
             const navigationState = getNavigationStateFromConfig(t.nehubaConfig)
             this.defaultOrientation = navigationState.orientation
           }),
+
+          this.store$.pipe(
+            select(viewerStateNavigationStateSelector),
+            filter(n => !!n && n.position && n.zoom)
+          ).subscribe(nav => {
+            if (this.isMaximised && this.panelOrder && +this.panelOrder[0] !== 3) {
+              const panel = document.getElementsByClassName('neuroglancer-panel')
+
+              if ( panel && panel.length) {
+                const fP: any = panel[0]
+                const height = fP.offsetHeight
+                const width = fP.offsetWidth
+
+                const divisor = 1e6
+                const calcOri : 'height' | 'width' = +this.panelOrder[0] === 2? 'width' : 'height'
+                const position = calcOri === 'height'? nav.position[2] : nav.position[0]
+                const hiSize = calcOri === 'height'? height : width
+
+                const min = (position - (hiSize * nav.zoom)) / divisor
+                const max = (position + (hiSize * nav.zoom)) / divisor
+
+                const perstMin = -(200 * nav.perspectiveZoom) / divisor
+                const perstMax = 200 * nav.perspectiveZoom / divisor
+
+                this.min=min
+                this.max=max
+                this.height=(max - min) * 200 / hiSize
+                this.top = (perstMax-max)*200/(perstMax-perstMin)
+
+              }
+            }
+              
+          })
+            
         )
       } else {
         console.warn(`NEHUBA_INSTANCE_INJTKN not injected!`)
@@ -140,6 +182,7 @@ export class MaximiseViewService implements OnDestroy {
     }
 
     maximise(panelIndex, panelOrder = '') {
+      this.isMaximised = true
       this.maximisedPanelIndex = panelIndex
       this.formatMiniPerspectiveView()
       this.setPerspectivePanelState(panelOrder)
@@ -184,22 +227,18 @@ export class MaximiseViewService implements OnDestroy {
     }
 
     //  ToDo find better solution
+    // Order of redrawing is an issue
     fakeRedraw() {
-
       if (this.perspectivePanel) {
-        setTimeout(() => {
-          this.perspectivePanel.draw()
-        })
+        this.perspectivePanel.setGLViewport();
+        this.perspectivePanel.draw()
       }
-
       if (this.panelOrder && +this.panelOrder[0] !== 3) {
-        setTimeout(() => {
-          const fakeRedrawIndex = +this.panelOrder[1] !== 3 ? +this.panelOrder[1] : +this.panelOrder[2]
-          const a: any = Array.from(this.viewer.display.panels)[fakeRedrawIndex]
-          a.draw()
-        })
+        const fakeRedrawIndex = +this.panelOrder[1] !== 3 ? +this.panelOrder[1] : +this.panelOrder[2]
+        const a: any = Array.from(this.viewer.display.panels)[fakeRedrawIndex]
+        a.setGLViewport()
+        a.draw()
       }
-
     }
     
     cleanOnMinimise() {

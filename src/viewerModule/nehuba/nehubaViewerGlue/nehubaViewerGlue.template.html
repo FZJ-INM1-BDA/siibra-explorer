@@ -241,19 +241,40 @@
 
   <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer">
 
+    <div   *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
+    >
+
     <input type="range"
            #custom3DRangeInput
            [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
-           *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
            [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
            [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
                     * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
            (input)="maximiseService.navigate(custom3DRangeInput.value)"
            class="custom-slider-3d mini-perspective-viewer"
-           id="customSliderFor3d">
+           id="customSliderFor3d"
+           style="z-index: 100 !important;">
+
+    <input type="range"
+           [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
+           [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
+           [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
+           [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
+                    * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
+           class="custom-slider-3d-highlight position-absolute"
+           [style.height]="(maximiseService.maximisedPanelIndex === 2 ? 200 : maximiseService.height) + 'px'"
+           [style.width]="(maximiseService.maximisedPanelIndex === 2 ? maximiseService.height : 200) + 'px'"
+           [style.top]="(maximiseService.maximisedPanelIndex === 2? 0 : maximiseService.top) + 'px'"
+           [style.left]="(maximiseService.maximisedPanelIndex === 2? maximiseService.top : 0) + 'px'">
+
+    </div>
+
     <div class="position-absolute iv-custom-comp text range-value">
       {{(maximiseService.navPosReal[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2] / 1e6).toFixed(3)}}mm
     </div>
   </div>
+
+
+
 </ng-template>
