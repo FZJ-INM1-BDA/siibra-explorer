@@ -115,18 +115,18 @@ export class MaximiseViewService implements OnDestroy {
 
                 const max = (position + (hiSize/2 * nav.zoom)) / divisor
                 const min = (position - (hiSize/2 * nav.zoom)) / divisor
-                const perMax = 100 * nav.perspectiveZoom / divisor
-                const perMin = -100 * nav.perspectiveZoom / divisor
-
+                const perMax = 100 * (nav.perspectiveZoom/2) / divisor
+                const perMin = -100 * (nav.perspectiveZoom/2) / divisor
 
                 const radiusOnPer = (max*divisor - position)/nav.perspectiveZoom
-                const lineHeight = 2*radiusOnPer
+                const lineHeight = 4*radiusOnPer
                 // const lineHeight = hiSize * nav.zoom / nav.perspectiveZoom
                 // ////ToDo 2 ways of calculate the width of the line
                 //      (same result) Seems correct calculations and incorrect result...
                 //      Issue in perspective zoom? it has some other scale?
                 //      1 - Inverse proportion for zoom and page size
                 //      2 - Calculate radius from formula
+                //  Current approach works closest to reality
                 // This also does not seem accurate. maybe connected to perspective zoom
                 const top = (perMax-max)*200/(perMax-perMin)
 
