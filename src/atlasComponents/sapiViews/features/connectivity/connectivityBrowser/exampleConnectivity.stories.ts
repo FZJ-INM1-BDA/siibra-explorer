@@ -10,6 +10,7 @@ import {SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "
 import { AngularMaterialModule } from "src/sharedModules"
 import {ConnectivityBrowserComponent} from "src/atlasComponents/sapiViews/features/connectivity";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
+import { take } from "rxjs/operators"
 
 @Component({
   selector: 'autoradiograph-wrapper-cmp',
@@ -65,7 +66,8 @@ class ExampleConnectivityBrowserWrapper {
 
   fetchConnectivity() {
     this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.featureId)
-      .then(ds=> {
+      .pipe(take(1))
+      .subscribe(ds=> {
         const matrixData = ds as SapiParcellationFeatureMatrixModel
         this.regionIndexInMatrix =  (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
         this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY)
