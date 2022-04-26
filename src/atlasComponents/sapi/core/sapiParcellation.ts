@@ -36,12 +36,13 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatures(param?: PaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
+  getFeatures(param?: PaginationQuery, type?: string, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
     return this.sapi.httpGet<SapiParcellationFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
-        per_page: '5',
-        page: '0',
+        type: type,
+        per_page: param && param.perPage? param.perPage.toString() : '5',
+        page: param && param.page? param.page.toString() : '0',
       },
       queryParam
     )

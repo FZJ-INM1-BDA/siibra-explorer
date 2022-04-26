@@ -29,6 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 
 import { ClipboardModule } from '@angular/cdk/clipboard'
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -63,6 +64,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
+    MatProgressBarModule
   ],
   exports: [
     MatButtonModule,
@@ -92,6 +94,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
+    MatProgressBarModule
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

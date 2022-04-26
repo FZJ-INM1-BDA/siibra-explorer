@@ -70,7 +70,7 @@
     "acorn": "^8.4.1",
     "export-nehuba": "0.0.12",
     "file-loader": "^6.2.0",
-    "hbp-connectivity-component": "^0.5.2",
+    "hbp-connectivity-component": "^0.6.1",
     "jszip": "^3.6.0",
     "postcss": "^8.3.6",
     "raw-loader": "^4.0.2",

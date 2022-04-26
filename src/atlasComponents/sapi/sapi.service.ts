@@ -76,6 +76,10 @@ export class SAPI{
     return reg.getFeatures(spaceId)
   }
 
+  getModalities() {
+    return this.http.get('https://siibra-api-dev.apps-dev.hbp.eu/v1_0/modalities')
+  }
+
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){
     const headers: Record<string, string> = {}
     if (sapiParam?.priority) {
