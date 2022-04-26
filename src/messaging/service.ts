@@ -188,20 +188,21 @@ export class MessagingService {
       })
       isLoadingSnack?.dismiss()
       const meshId = 'bobby'
-      if (false) {
-        /**
-         * TODO re-enable plotly VTK mesh
-         */
-        const { objectUrl, customFragmentColor } = resp.result || {}
-        // this.loadMesh({
-        //   type: 'VTK',
-        //   id: meshId,
-        //   url: objectUrl,
-        //   customFragmentColor
-        // })
-      } else {
-        this.snackbar.open(`Error: loadMesh method not injected.`)
-      }
+      /**
+       * TODO re-enable plotly VTK mesh
+       */
+      
+      // if (false) {
+      //   const { objectUrl, customFragmentColor } = resp.result || {}
+      //   this.loadMesh({
+      //     type: 'VTK',
+      //     id: meshId,
+      //     url: objectUrl,
+      //     customFragmentColor
+      //   })
+      // } else {
+      //   this.snackbar.open(`Error: loadMesh method not injected.`)
+      // }
       return 'OK'
     }
 

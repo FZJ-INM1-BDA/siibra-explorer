@@ -236,196 +236,201 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
 
     const method = event.method.replace(nameSpaceRegex, '').replace(/^\./, '')
     switch (method) {
-      case 'getAllAtlases': {
-        if (!event.id) return
-        const atlases = await this.sapi.atlases$.pipe(
-          take(1)
-        ).toPromise()
-        return {
-          id: event.id,
-          result: atlases,
-          jsonrpc: '2.0'
-        }
+    case 'getAllAtlases': {
+      if (!event.id) return
+      const atlases = await this.sapi.atlases$.pipe(
+        take(1)
+      ).toPromise()
+      return {
+        id: event.id,
+        result: atlases,
+        jsonrpc: '2.0'
       }
-      case 'getSupportedParcellations': {
-        if (!event.id) return
-        const parcs = await this.store.pipe(
-          atlasSelection.fromRootStore.allAvailParcs(this.sapi),
-          take(1)
-        ).toPromise()
-        return {
-          id: event.id,
-          jsonrpc: '2.0',
-          result: parcs
-        }
+    }
+    case 'getSupportedParcellations': {
+      if (!event.id) return
+      const parcs = await this.store.pipe(
+        atlasSelection.fromRootStore.allAvailParcs(this.sapi),
+        take(1)
+      ).toPromise()
+      return {
+        id: event.id,
+        jsonrpc: '2.0',
+        result: parcs
       }
-      case 'getSupportedTemplates': {
-        if (!event.id) return
-        const spaces = await this.store.pipe(
-          atlasSelection.fromRootStore.allAvailSpaces(this.sapi),
-          take(1)
-        ).toPromise()
-        return {
-          id: event.id,
-          jsonrpc: '2.0',
-          result: spaces
-        }
+    }
+    case 'getSupportedTemplates': {
+      if (!event.id) return
+      const spaces = await this.store.pipe(
+        atlasSelection.fromRootStore.allAvailSpaces(this.sapi),
+        take(1)
+      ).toPromise()
+      return {
+        id: event.id,
+        jsonrpc: '2.0',
+        result: spaces
       }
-      case 'selectAtlas': {
-        const atlases = await this.sapi.atlases$.pipe(
-          take(1)
-        ).toPromise()
-        const id = event.params as ApiBoothEvents['selectAtlas']['request']
-        const atlas = atlases.find(atlas => atlas["@id"] === id?.["@id"])
-        if (!atlas) {
-          if (!!event.id) {
-            return {
-              id: event.id,
-              jsonrpc: '2.0',
-              error: {
-                code: -32602,
-                message:`atlas id ${id?.["@id"]} not found`
-              }
-            }
-          }
-          return
-        }
-        this.store.dispatch(
-          atlasSelection.actions.selectAtlas({ atlas })
-        )
+    }
+    case 'selectAtlas': {
+      const atlases = await this.sapi.atlases$.pipe(
+        take(1)
+      ).toPromise()
+      const id = event.params as ApiBoothEvents['selectAtlas']['request']
+      const atlas = atlases.find(atlas => atlas["@id"] === id?.["@id"])
+      if (!atlas) {
         if (!!event.id) {
-          return {
-            jsonrpc: '2.0',
-            id: event.id,
-            result: null
-          }
-        }
-      }
-      case 'selectParcellation': {
-        if (!!event.id) {
-          return {
-            jsonrpc: '2.0',
-            id: event.id,
-            error: {
-              code: -32601,
-              message: `NYI`
-            }
-          }
-        }
-      }
-      case 'selectTemplate': {
-        if (!!event.id) {
-          return {
-            jsonrpc: '2.0',
-            id: event.id,
-            error: {
-              code: -32601,
-              message: `NYI`
-            }
-          }
-        }
-      }
-      case 'navigateTo': {
-        const { animate, ...navigation } = event.params as ApiBoothEvents['navigateTo']['request']
-        this.store.dispatch(
-          atlasSelection.actions.navigateTo({
-            navigation,
-            animation: !!animate
-          })
-        )
-        if (!!event.id) {
-          const timeoutDuration = !!animate
-            ? 500
-            : 0
-          await new Promise(rs => setTimeout(rs, timeoutDuration))
-          return {
-            id: event.id,
-            jsonrpc: '2.0',
-            result: null
-          }
-        }
-      }
-      case 'getUserToSelectARoi': {
-        const { params, id } = event as JRPCRequest<'getUserToSelectARoi', ApiBoothEvents['getUserToSelectARoi']['request']>
-        const { type, message } = params
-        if (!params || (type !== "region" && type !== "point")) {
           return {
             id: event.id,
             jsonrpc: '2.0',
             error: {
               code: -32602,
-              message: `type must be either region or point!`
+              message:`atlas id ${id?.["@id"]} not found`
             }
           }
         }
-        let rs, rj, promise = new Promise<RequestUserTypes['region'] | RequestUserTypes['point']>((_rs, _rj) => {
-          rs = _rs
-          rj = _rj
+        return
+      }
+      this.store.dispatch(
+        atlasSelection.actions.selectAtlas({ atlas })
+      )
+      if (!!event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          result: null
+        }
+      }
+      break
+    }
+    case 'selectParcellation': {
+      if (!!event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          error: {
+            code: -32601,
+            message: `NYI`
+          }
+        }
+      }
+      break
+    }
+    case 'selectTemplate': {
+      if (!!event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          error: {
+            code: -32601,
+            message: `NYI`
+          }
+        }
+      }
+      break
+    }
+    case 'navigateTo': {
+      const { animate, ...navigation } = event.params as ApiBoothEvents['navigateTo']['request']
+      this.store.dispatch(
+        atlasSelection.actions.navigateTo({
+          navigation,
+          animation: !!animate
         })
-        this.requestUserQueue.push({
-          message,
-          promise,
+      )
+      if (!!event.id) {
+        const timeoutDuration = !!animate
+          ? 500
+          : 0
+        await new Promise(rs => setTimeout(rs, timeoutDuration))
+        return {
+          id: event.id,
+          jsonrpc: '2.0',
+          result: null
+        }
+      }
+      break
+    }
+    case 'getUserToSelectARoi': {
+      const { params, id } = event as JRPCRequest<'getUserToSelectARoi', ApiBoothEvents['getUserToSelectARoi']['request']>
+      const { type, message } = params
+      if (!params || (type !== "region" && type !== "point")) {
+        return {
+          id: event.id,
+          jsonrpc: '2.0',
+          error: {
+            code: -32602,
+            message: `type must be either region or point!`
+          }
+        }
+      }
+      let rs, rj
+      const promise = new Promise<RequestUserTypes['region'] | RequestUserTypes['point']>((_rs, _rj) => {
+        rs = _rs
+        rj = _rj
+      })
+      this.requestUserQueue.push({
+        message,
+        promise,
+        id,
+        type: type as 'region' | 'point',
+        rj,
+        rs
+      })
+      this.requestUser$.next(
+        this.requestUserQueue[0]
+      )
+      return promise.then(val => {
+        return {
           id,
-          type: type as 'region' | 'point',
-          rj,
-          rs
-        })
-        this.requestUser$.next(
-          this.requestUserQueue[0]
-        )
-        return promise.then(val => {
-          return {
-            id,
-            jsonrpc: '2.0',
-            result: val
-          }
-        })
-      }
-      case 'cancelRequest': {
-        const { id } = event.params as ApiBoothEvents['cancelRequest']['request']
-        const idx = this.requestUserQueue.findIndex(q => q.id === id)
-        if (idx < 0) {
-          if (!!event.id) {
-            return {
-              jsonrpc: '2.0',
-              id: event.id,
-              error: {
-                code: -1,
-                message: `cancelRequest failed, request with id ${id} does not exist, or has already been resolved.`
-              }
-            }
-          }
-          return
+          jsonrpc: '2.0',
+          result: val
         }
-        const req = this.requestUserQueue.splice(idx, 1)
-        req[0].rj(`client cancelled`)
-
-        this.requestUser$.next(
-          this.requestUserQueue[0]
-        )
-
-        if (!!event.id) {
-          return {
-            jsonrpc: '2.0',
-            id: event.id,
-            result: null
-          }
-        }
-        break
-      }
-      default: {
-        const message = `Method ${event.method} not found.`
+      })
+    }
+    case 'cancelRequest': {
+      const { id } = event.params as ApiBoothEvents['cancelRequest']['request']
+      const idx = this.requestUserQueue.findIndex(q => q.id === id)
+      if (idx < 0) {
         if (!!event.id) {
           return {
             jsonrpc: '2.0',
             id: event.id,
             error: {
-              code: -32601,
-              message
+              code: -1,
+              message: `cancelRequest failed, request with id ${id} does not exist, or has already been resolved.`
             }
           }
         }
+        return
       }
+      const req = this.requestUserQueue.splice(idx, 1)
+      req[0].rj(`client cancelled`)
+
+      this.requestUser$.next(
+        this.requestUserQueue[0]
+      )
+
+      if (!!event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          result: null
+        }
+      }
+      break
+    }
+    default: {
+      const message = `Method ${event.method} not found.`
+      if (!!event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          error: {
+            code: -32601,
+            message
+          }
+        }
+      }
+    }
     }
   }
 }
