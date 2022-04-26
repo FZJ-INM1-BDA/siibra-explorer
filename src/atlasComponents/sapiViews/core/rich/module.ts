@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { SxplrFlatHierarchyModule } from "src/components/flatHierarchy";
 import { AngularMaterialModule } from "src/sharedModules";
+import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
 import { SapiViewsCoreRegionModule } from "../region";
 import { HighlightPipe } from "./regionsHierarchy/highlight.pipe";
@@ -17,6 +18,7 @@ import { SapiViewsCoreRichRegionListSearch } from "./regionsListSearch/regionLis
     SapiViewsCoreRegionModule,
     SxplrFlatHierarchyModule,
     SapiViewsUtilModule,
+    UtilModule,
   ],
   declarations: [
     SapiViewsCoreRichRegionListSearch,
