@@ -1,8 +1,9 @@
 import { Component, ViewChild, TemplateRef } from "@angular/core";
-import { IPluginManifest, PluginServices } from "../atlasViewer.pluginService.service";
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { PluginService } from "../service";
+import { PluginManifest } from "../types";
 
 @Component({
   selector : 'plugin-banner',
@@ -16,28 +17,17 @@ export class PluginBannerUI {
 
   EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
 
-  @ViewChild('pluginInfoTmpl', { read: TemplateRef })
-  private pluginInfoTmpl: TemplateRef<any>
+  pluginManifests: PluginManifest[] = []
 
   constructor(
-    public pluginServices: PluginServices,
+    private svc: PluginService,
     private matDialog: MatDialog,
     private matSnackbar: MatSnackBar,
   ) {
   }
 
-  public clickPlugin(plugin: IPluginManifest) {
-    this.pluginServices.launchPlugin(plugin)
-  }
-
-  public showPluginInfo(manifest: IPluginManifest){
-    this.matDialog.open(
-      this.pluginInfoTmpl,
-      {
-        data: manifest,
-        ariaLabel: `Additional information about a plugin`
-      }
-    )
+  public launchPlugin(plugin: PluginManifest) {
+    this.svc.launchPlugin(plugin.url)
   }
 
   public showTmpl(tmpl: TemplateRef<any>){
@@ -47,20 +37,11 @@ export class PluginBannerUI {
   }
 
   public loadingThirdpartyPlugin = false
-
   public async addThirdPartyPlugin(manifestUrl: string) {
-    this.loadingThirdpartyPlugin = true
-    try {
-      await this.pluginServices.addPluginViaManifestUrl(manifestUrl)
-      this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Adding plugin successful`, 'Dismiss', {
-        duration: 5000
-      })
-    } catch (e) {
-      this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Error adding plugin: ${e.toString()}`, 'Dismiss', {
-        duration: 5000
-      })
-    }
+    this.matSnackbar.open(`Adding third party plugin is current unavailable.`)
+  }
+
+  test(){
+    this.svc.launchPlugin('http://localhost:8000')
   }
 }

@@ -1,3 +1,4 @@
+import { InjectionToken } from "@angular/core";
 import { MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 
 export enum EnumActionToWidget{
@@ -19,3 +20,4 @@ interface TypeActionWidgetReturnVal<T>{
 
 export type TypeActionToWidget<T> = (type: EnumActionToWidget, obj: T, option: IActionWidgetOption) => TypeActionWidgetReturnVal<T>
 
+export const WIDGET_PORTAL_TOKEN = new InjectionToken<Record<string, unknown>>("WIDGET_PORTAL_TOKEN")

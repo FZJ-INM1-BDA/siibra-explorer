@@ -665,7 +665,7 @@
     </ng-container>
   </div>
 
-  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
+  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column sxplr-h-100"
     [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
     <!-- region detail -->
     <ng-container *ngIf="selectedRegions$ | async as selectedRegions; else selectRegionErrorTmpl">

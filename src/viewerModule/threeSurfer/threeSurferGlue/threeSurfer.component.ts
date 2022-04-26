@@ -7,7 +7,6 @@ import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CONST } from 'common/constants'
-import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { getUuid } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
@@ -201,7 +200,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
-    @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
   ){
     if (intViewerStateSvc) {
       const {
@@ -230,74 +228,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       this.internalStateNext = next
       this.onDestroyCb.push(() => done())
     }
-
-    // set viewer handle
-    // the API won't be 100% compatible with ngviewer
-    if (setViewerHandle) {
-      const nyi = () => {
-        throw new Error(`Not yet implemented`)
-      }
-      setViewerHandle({
-        add3DLandmarks: nyi,
-        loadLayer: nyi,
-        applyLayersColourMap: function(map: Map<string, Map<number, { red: number, green: number, blue: number }>>){
-          throw new Error(`NYI`)
-          // if (this.loanedColorMap.has(map)) {
-          //   this.externalHemisphLblColorMap = null
-          // } else {
-
-          //   const applyCm = new Map()
-          //   for (const [hem, m] of map.entries()) {
-          //     const nMap = new Map()
-          //     applyCm.set(hem, nMap)
-          //     for (const [lbl, vals] of m.entries()) {
-          //       const { red, green, blue } = vals
-          //       nMap.set(lbl, [red/255, green/255, blue/255])
-          //     }
-          //   }
-          //   this.externalHemisphLblColorMap = applyCm
-          // }
-          // this.applyColorMap()
-        },
-        getLayersSegmentColourMap: () => {
-          throw new Error(`NYI`)
-          // const map = this.getColormapCopy()
-          // const outmap = new Map<string, Map<number, { red: number, green: number, blue: number }>>()
-          // for (const [ hem, m ] of map.entries()) {
-          //   const nMap = new Map<number, {red: number, green: number, blue: number}>()
-          //   outmap.set(hem, nMap)
-          //   for (const [ lbl, vals ] of m.entries()) {
-          //     nMap.set(lbl, {
-          //       red: vals[0] * 255,
-          //       green: vals[1] * 255,
-          //       blue: vals[2] * 255,
-          //     })
-          //   }
-          // }
-          // this.loanedColorMap.add(outmap)
-          // return outmap
-        },
-        getNgHash: nyi,
-        hideAllSegments: nyi,
-        hideSegment: nyi,
-        mouseEvent: null, 
-        mouseOverNehuba: null,
-        mouseOverNehubaUI: null,
-        moveToNavigationLoc: null,
-        moveToNavigationOri: null,
-        remove3DLandmarks: null,
-        removeLayer: null,
-        setLayerVisibility: null,
-        setNavigationLoc: null,
-        setNavigationOri: null,
-        showAllSegments: nyi,
-        showSegment: nyi,
-      })
-    }
-
-    this.onDestroyCb.push(
-      () => setViewerHandle(null)
-    )
 
     /**
      * intercept click and act

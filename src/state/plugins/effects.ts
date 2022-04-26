@@ -2,9 +2,6 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { catchError, filter, map, mapTo, switchMap } from "rxjs/operators";
-import { PluginServices } from "src/plugin";
-import { WidgetServices } from "src/widget";
-import { atlasSelection } from ".."
 import * as constants from "./const"
 import * as selectors from "./selectors"
 import * as actions from "./actions"
@@ -15,12 +12,6 @@ import { getHttpHeader } from "src/util/constants"
 
 @Injectable()
 export class Effects{
-  onATPUpdateClearWidgets = createEffect(() => this.store.pipe(
-    atlasSelection.fromRootStore.distinctATP(),
-    map(() => {
-      this.widgetSvc.clearAllWidgets()
-    })
-  ), { dispatch: false })
 
   initMan = this.store.pipe(
     select(selectors.initManfests),
@@ -40,9 +31,12 @@ export class Effects{
             responseType: 'json'
           }).toPromise()
         )
-        .then(json => 
-          this.pluginSvc.launchNewWidget(json)
-        )
+        .then(json => {
+          /**
+           * TODO fix init plugin launch
+           * at that time, also restore effects.spec.ts test
+           */
+        })
     ),
     catchError(() => of(null))
   ), { dispatch: false })
@@ -57,8 +51,6 @@ export class Effects{
 
   constructor(
     private store: Store,
-    private widgetSvc: WidgetServices,
-    private pluginSvc: PluginServices,
     private dialogSvc: DialogService,
     private http: HttpClient,
   ){

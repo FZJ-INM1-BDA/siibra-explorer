@@ -20,6 +20,11 @@ export type TRegionOfInterest = { ['fullId']: string }
 
 export const CANCELLABLE_DIALOG = new InjectionToken('CANCELLABLE_DIALOG')
 
+export type CANCELLABLE_DIALOG_OPTS = Partial<{
+  userCancelCallback: () => void
+  ariaLabel: string
+}>
+
 export type TTemplateImage = {
   name: string
   '@id': string

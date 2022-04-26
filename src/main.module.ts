@@ -38,7 +38,7 @@ import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
-import { CANCELLABLE_DIALOG } from './util/interfaces';
+import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 import {
@@ -107,7 +107,7 @@ import { CONST } from "common/constants"
     {
       provide: CANCELLABLE_DIALOG,
       useFactory: (uiService: UIService) => {
-        return (message, option) => {
+        return (message: string, option: CANCELLABLE_DIALOG_OPTS) => {
           const actionBtn = {
             type: 'mat-stroked-button',
             color: 'default',

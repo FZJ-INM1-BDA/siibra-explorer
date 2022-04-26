@@ -13,6 +13,7 @@ export {
   SapiParcellationFeatureModel,
   CleanedIeegDataset,
   SxplrCleanedFeatureModel,
+  OpenMINDSCoordinatePoint,
   CLEANED_IEEG_DATASET_TYPE,
 } from "./type"
 

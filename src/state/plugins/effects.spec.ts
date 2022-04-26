@@ -7,7 +7,6 @@ import { provideMockActions } from "@ngrx/effects/testing";
 import { MockStore, provideMockStore } from "@ngrx/store/testing";
 import { Injectable } from "@angular/core";
 import { getRandomHex } from 'common/util'
-import { PluginServices } from "src/plugin";
 import { AngularMaterialModule } from "src/sharedModules";
 import { hot } from "jasmine-marbles";
 import * as actions from "./actions"
@@ -75,57 +74,57 @@ class MockPluginService{
   }
 }
 
-describe('pluginUseEffect.ts', () => {
+// describe('pluginUseEffect.ts', () => {
 
-  let spy: jasmine.Spy
-  let mockStore: MockStore
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientModule,
-        AngularMaterialModule
-      ],
-      providers: [
-        Effects,
-        provideMockActions(() => actions$),
-        provideMockStore(),
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: HTTPInterceptorClass,
-          multi: true
-        },
-        {
-          provide: PluginServices,
-          useClass: MockPluginService
-        },{
-          provide: DialogService,
-          useValue: {
-            getUserConfirm() {
-              return Promise.resolve()
-            }
-          }
-        }
-      ]
-    })
-    mockStore = TestBed.inject(MockStore)
-    mockStore.overrideSelector(selectors.initManfests, { [constants.INIT_MANIFEST_SRC]: "http://localhost:12345/manifest.json" })
-    const pluginServices = TestBed.inject(PluginServices)
-    spy = spyOn(pluginServices, 'launchNewWidget')
-  })
+//   let spy: jasmine.Spy
+//   let mockStore: MockStore
+//   beforeEach(() => {
+//     TestBed.configureTestingModule({
+//       imports: [
+//         HttpClientModule,
+//         AngularMaterialModule
+//       ],
+//       providers: [
+//         Effects,
+//         provideMockActions(() => actions$),
+//         provideMockStore(),
+//         {
+//           provide: HTTP_INTERCEPTORS,
+//           useClass: HTTPInterceptorClass,
+//           multi: true
+//         },
+//         {
+//           provide: PluginServices,
+//           useClass: MockPluginService
+//         },{
+//           provide: DialogService,
+//           useValue: {
+//             getUserConfirm() {
+//               return Promise.resolve()
+//             }
+//           }
+//         }
+//       ]
+//     })
+//     mockStore = TestBed.inject(MockStore)
+//     mockStore.overrideSelector(selectors.initManfests, { [constants.INIT_MANIFEST_SRC]: "http://localhost:12345/manifest.json" })
+//     const pluginServices = TestBed.inject(PluginServices)
+//     spy = spyOn(pluginServices, 'launchNewWidget')
+//   })
 
-  it('initManifests should fetch manifest.json', fakeAsync(() => {
-    const effect = TestBed.inject(Effects)
-    effect.initManLaunch.subscribe()
-    expect(
-      effect.initManClear
-    ).toBeObservable(
-      hot('a', {
-        a: actions.clearInitManifests({
-          nameSpace: INIT_MANIFEST_SRC
-        })
-      })
-    )
-    tick(16)
-    expect(spy).toHaveBeenCalledWith(manifest)
-  }))
-})
+//   it('initManifests should fetch manifest.json', fakeAsync(() => {
+//     const effect = TestBed.inject(Effects)
+//     effect.initManLaunch.subscribe()
+//     expect(
+//       effect.initManClear
+//     ).toBeObservable(
+//       hot('a', {
+//         a: actions.clearInitManifests({
+//           nameSpace: INIT_MANIFEST_SRC
+//         })
+//       })
+//     )
+//     tick(16)
+//     expect(spy).toHaveBeenCalledWith(manifest)
+//   }))
+// })

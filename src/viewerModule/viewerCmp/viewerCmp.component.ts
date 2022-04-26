@@ -10,7 +10,8 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { atlasSelection, userInteraction, } from "src/state";
-import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
+import { getUuid } from "src/util/fn";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -184,7 +185,7 @@ export class ViewerCmp implements OnDestroy {
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
   public context: TContextArg<TSupportedViewers>
-  private templateSelected: any
+  private templateSelected: SapiSpaceModel
 
   constructor(
     private store$: Store<any>,
@@ -324,12 +325,30 @@ export class ViewerCmp implements OnDestroy {
     case EnumViewerEvt.VIEWER_CTX:
       this.ctxMenuSvc.context$.next(event.data)
       if (event.data.viewerType === "nehuba") {
-        const { nehuba } = (event.data as TContextArg<"nehuba">).payload
+        const { nehuba, nav } = (event.data as TContextArg<"nehuba">).payload
         if (nehuba) {
           const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
           this.store$.dispatch(
             userInteraction.actions.mouseoverRegions({
               regions: mousingOverRegions
+            })
+          )
+        }
+        if (nav) {
+          this.store$.dispatch(
+            userInteraction.actions.mouseoverPosition({
+              position: {
+                "@id": getUuid(),
+                "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+                coordinates: nav.position.map(p => {
+                  return {
+                    value: p,
+                  }
+                }),
+                coordinateSpace: {
+                  '@id': this.templateSelected["@id"]
+                }
+              }
             })
           )
         }

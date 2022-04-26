@@ -45,14 +45,6 @@ export interface IMessagingActions<TAction extends keyof IMessagingActionTmpl> {
   payload: IMessagingActionTmpl[TAction]
 }
 
-export interface ILoadMesh {
-  type: 'VTK'
-  id: string
-  url: string
-  customFragmentColor?: string
-}
-export const LOAD_MESH_TOKEN = new InjectionToken<(loadMeshParam: ILoadMesh) => void>('LOAD_MESH_TOKEN')
-
 export interface IWindowMessaging {
   loadTempladById(payload: IMessagingActionTmpl['loadTemplate']): void
   loadResource(payload: IMessagingActionTmpl['loadResource']): void

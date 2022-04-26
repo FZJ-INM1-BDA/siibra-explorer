@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { SapiFeatureModel, SapiRegionalFeatureModel, SapiSpatialFeatureModel, SapiParcellationFeatureModel } from "src/atlasComponents/sapi";
+import { SapiFeatureModel } from "src/atlasComponents/sapi";
 import { CleanedIeegDataset, CLEANED_IEEG_DATASET_TYPE, SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatureReceptorModel, SapiSerializationErrorModel, SapiVOIDataResponse, SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
 
 @Component({
@@ -21,7 +21,8 @@ export class SapiViewsFeaturesEntryListItem{
     if (!this.feature) return null
     const { '@type': type } = this.feature
     if (
-      type === "siibra/core/dataset" ||
+      type === "https://openminds.ebrains.eu/core/DatasetVersion" ||
+      type === "siibra/features/cells" ||
       type === "siibra/features/receptor" ||
       type === "siibra/features/voi" ||
       type === CLEANED_IEEG_DATASET_TYPE

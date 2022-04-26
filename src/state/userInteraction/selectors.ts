@@ -13,3 +13,8 @@ export const selectedFeature = createSelector(
   selectStore,
   state => state.selectedFeature
 )
+
+export const mousingOverPosition = createSelector(
+  selectStore,
+  state => state.mouseoverPosition
+)

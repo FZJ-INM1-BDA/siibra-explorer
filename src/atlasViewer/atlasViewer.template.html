@@ -1,8 +1,3 @@
-
-<!-- required for manufacturing plugin templates -->
-<div pluginFactoryDirective>
-</div>
-
 <ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
   <ng-container *ngTemplateOutlet="viewerBody">
@@ -44,6 +39,9 @@
       (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
     </iav-cmp-viewer-container>
 
+    <div class="widget-canvas-container">
+      <div widget-canvas class="widget-canvas"></div>
+    </div>
   </div>
 </ng-template>
 

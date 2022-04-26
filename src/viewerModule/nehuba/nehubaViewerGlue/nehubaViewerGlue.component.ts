@@ -6,7 +6,6 @@ import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { ARIA_LABELS } from 'common/constants'
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
-import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, TSetViewerHandle } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { getExportNehuba, getUuid } from "src/util/fn";
@@ -187,7 +186,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     private worker: AtlasWorkerService,
     private layerCtrlService: NehubaLayerControlService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
-    @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) setViewerHandle: TSetViewerHandle,
   ){
     /**
      * This **massively** improve the performance of the viewer
@@ -236,10 +234,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       this.onhoverSegments = arr
     })
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
-
-    if (setViewerHandle) {
-      console.warn(`NYI viewer handle is deprecated`)
-    }
   }
 
 

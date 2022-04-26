@@ -4,7 +4,7 @@ import { SAPI } from "src/atlasComponents/sapi"
 import { RouteStateTransformSvc } from "./routeStateTransform.service"
 import { DefaultUrlSerializer } from "@angular/router"
 import * as nehubaConfigService from "src/viewerModule/nehuba/config.service"
-import { atlasSelection } from "src/state"
+import { atlasSelection, userInteraction } from "src/state"
 import { encodeNumber } from "./cipher"
 
 const serializer = new DefaultUrlSerializer()
@@ -116,6 +116,10 @@ describe("> routeStateTransform.service.ts", () => {
           navigation: jasmine.createSpy('navigation'),
         }
 
+        let userInteractionSpy: Record<string, jasmine.Spy> = {
+          selectedFeature: jasmine.createSpy('selectedFeature')
+        }
+
         const altasObj = {"@id": 'foo-bar-a'}
         const templObj = {"@id": 'foo-bar-t'}
         const parcObj = {"@id": 'foo-bar-p'}
@@ -127,6 +131,7 @@ describe("> routeStateTransform.service.ts", () => {
           spyOnProperty(nehubaConfigService, 'getRegionLabelIndex').and.returnValue(getRegionLabelIndexSpy)
           spyOnProperty(nehubaConfigService, 'getParcNgId').and.returnValue(getParcNgId)
           spyOnProperty(atlasSelection, 'selectors').and.returnValue(atlasSelectionSpy)
+          spyOnProperty(userInteraction, 'selectors').and.returnValue(userInteractionSpy)
 
           atlasSelectionSpy.selectedAtlas.and.returnValue(altasObj)
           atlasSelectionSpy.selectedParcellation.and.returnValue(templObj)
@@ -135,13 +140,16 @@ describe("> routeStateTransform.service.ts", () => {
           atlasSelectionSpy.standaloneVolumes.and.returnValue(standAloneVolumes)
           atlasSelectionSpy.navigation.and.returnValue(navigation)
 
+          userInteractionSpy.selectedFeature.and.returnValue(null)
         })
 
         afterEach(() => {
           getRegionLabelIndexSpy.calls.reset()
           getParcNgId.calls.reset()
-          for (const key in atlasSelectionSpy) {
-            atlasSelectionSpy[key].calls.reset()
+          for (const spyRecord of [atlasSelectionSpy, userInteractionSpy]) {
+            for (const key in spyRecord) {
+              spyRecord[key].calls.reset()
+            }
           }
         })
 
