@@ -35,7 +35,6 @@ const Template: Story<SapiViewsCoreRegionRegionListItem> = (args: SapiViewsCoreR
   const { contentProjection } = parameters
   return ({
     props: {
-      ...args,
       atlas: human, 
       template: mni152, 
       parcellation: jba29, 

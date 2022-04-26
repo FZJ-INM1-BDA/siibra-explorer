@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Component } from "@angular/core"
+import { provideMockStore } from "@ngrx/store/testing"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
 import { getHoc1RightFeatureDetail, getHoc1RightFeatures, getHoc1Right, getHumanAtlas, getJba29, getMni152, provideDarkTheme, getMni152SpatialFeatureHoc1Right } from "src/atlasComponents/sapi/stories.base"
@@ -56,6 +57,7 @@ export default {
       ],
       providers: [
         SAPI,
+        provideMockStore(),
         ...provideDarkTheme,
       ],
       declarations: []
