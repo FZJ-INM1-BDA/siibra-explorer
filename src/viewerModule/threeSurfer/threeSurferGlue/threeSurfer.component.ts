@@ -431,6 +431,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
      * 3/ select region, hide hemisphere, deselect region
      */
     if (!this.colormapInUse) return
+    if (!this.tsRef) return
+    
     const isBaseCM = this.colormapInUse?.clType === "baselayer/colormap"
 
     for (const laterality in this.lateralityMeshRecord) {

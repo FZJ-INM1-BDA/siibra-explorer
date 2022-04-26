@@ -122,7 +122,10 @@ export class LayerCtrlEffects {
       this.store.pipe(
         select(atlasAppearance.selectors.customLayers),
         map(
-          cl => cl.filter(layer => layer.clType === "baselayer/nglayer" || "customlayer/nglayer")
+          cl => cl.filter(layer =>
+            layer.clType === "baselayer/nglayer"
+            || layer.clType === "customlayer/nglayer"
+          )
         )
       )
     ),
