@@ -48,11 +48,13 @@ RUN apt upgrade -y && apt update && apt install brotli
 RUN mkdir /iv
 COPY --from=builder /iv/dist/aot /iv
 COPY --from=builder /iv/storybook-static /iv/storybook-static
-WORKDIR /iv
 
 # Remove duplicated assets. Use symlink instead.
-RUN rm -rf ./storybook-static/assets
-RUN ln -s ./assets ./storybook-static/assets
+WORKDIR /iv/storybook-static
+RUN rm -rf ./assets
+RUN ln -s ../assets ./assets
+
+WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
