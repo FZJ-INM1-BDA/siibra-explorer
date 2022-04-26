@@ -6,8 +6,8 @@ import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
-import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState.store.helper";
 import {BS_ENDPOINT} from "src/util/constants";
+import {SAPI} from "src/atlasComponents/sapi";
 
 /**
  * injecting databrowser module is bad idea
@@ -40,17 +40,21 @@ describe('ConnectivityComponent', () => {
 
     let datasetList = [
         {
-            ['@id']: 'id1',
-            src_name: 'id1',
-            src_info: 'd1',
-            kgId: 'kgId1',
-            kgschema: 'kgschema1'
+            '@id': 'id1',
+            data: {
+                name: 'id1',
+                description: 'd1',
+                kgId: 'kgId1',
+                kgschema: 'kgschema1'
+            }
         }, {
-            ['@id']: 'id2',
-            src_name: 'id2',
-            src_info: 'd2',
-            kgId: 'kgId2',
-            kgschema: 'kgschema2'
+            '@id': 'id2',
+            data: {
+                name: 'id2',
+                description: 'd2',
+                kgId: 'kgId2',
+                kgschema: 'kgschema2'
+            }
         }
     ]
 
@@ -65,6 +69,15 @@ describe('ConnectivityComponent', () => {
                 {
                     provide: BS_ENDPOINT,
                     useValue: MOCK_BS_ENDPOINT
+                },
+                {
+                    provide: SAPI,
+                    useValue: {
+                        atlases$: of([]),
+                        getSpaceDetail: jasmine.createSpy('getSpaceDetail'),
+                        getParcDetail: jasmine.createSpy('getParcDetail'),
+                        getParcRegions: jasmine.createSpy('getParcRegions'),
+                    }
                 }
             ],
             declarations: [
@@ -81,7 +94,7 @@ describe('ConnectivityComponent', () => {
     beforeEach(() => {
         const mockStore = TestBed.inject(MockStore)
         // mockStore.overrideSelector(viewerStateOverwrittenColorMapSelector, null)
-        mockStore.overrideSelector(ngViewerSelectorClearViewEntries, [])
+        // mockStore.overrideSelector(ngViewerSelectorClearViewEntries, [])
     })
 
     it('> component can be created', async () => {
@@ -96,13 +109,12 @@ describe('ConnectivityComponent', () => {
         component = fixture.componentInstance
 
         component.datasetList = datasetList
-
-        component.changeDataset({value: 'id1'})
+        component.selectDataset('id1', false)
 
         expect(component.selectedDataset).toEqual('id1')
         expect(component.selectedDatasetDescription).toEqual('d1')
 
-        component.changeDataset({value: 'id2'})
+        component.selectDataset('id2', false)
 
         expect(component.selectedDataset).toEqual('id2')
         expect(component.selectedDatasetDescription).toEqual('d2')
