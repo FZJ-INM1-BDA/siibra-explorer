@@ -50,10 +50,14 @@ COPY --from=builder /iv/dist/aot /iv
 COPY --from=builder /iv/storybook-static /iv/storybook-static
 WORKDIR /iv
 
+# Remove duplicated assets. Use symlink instead.
+RUN rm -rf ./storybook-static/assets
+RUN ln -s ./assets ./storybook-static/assets
+
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:12-alpine
+FROM node:14-alpine
 
 ENV NODE_ENV=production
 
