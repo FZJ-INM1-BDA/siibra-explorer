@@ -20,7 +20,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 
 @NgModule({
-  imports : [
+  imports: [
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
@@ -33,16 +33,12 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     ShareModule,
     AuthModule,
   ],
-  declarations : [
+  declarations: [
     MobileOverlay,
-
     ActionDialog,
-
     /* pipes */
-
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
-
     /* directive */
     DownloadDirective,
     FixedMouseContextualContainerDirective,
@@ -51,7 +47,7 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     {
       provide: APPEND_SCRIPT_TOKEN,
       useFactory: appendScriptFactory,
-      deps: [ DOCUMENT ]
+      deps: [DOCUMENT]
     },
     {
       provide: HANDLE_SCREENSHOT_PROMISE,
@@ -78,7 +74,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
           const context = subCanvas.getContext('2d')
           context.drawImage(
             canvas,
-
             /**
              * from
              */
@@ -86,7 +81,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
             y,
             width,
             height,
-
             /**
              * to
              */
@@ -95,7 +89,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
             width,
             height
           )
-
           subCanvas.toBlob(blob => {
             const url = URL.createObjectURL(blob)
             rs({
@@ -107,16 +100,9 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
       }) as TypeHandleScrnShotPromise
     }
   ],
-  entryComponents : [
-
-    /* dynamically created components needs to be declared here */
-    
-    ActionDialog,
-  ],
-  exports : [
+  exports: [
     // NehubaContainer,
     MobileOverlay,
-    
     // StatusCardComponent,
     FixedMouseContextualContainerDirective,
   ]

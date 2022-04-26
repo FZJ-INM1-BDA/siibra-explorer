@@ -13,8 +13,6 @@ import { HttpClientModule } from "@angular/common/http";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
-import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
-import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
 import { UIService } from "./services/uiService.service";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
@@ -56,14 +54,14 @@ import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.servic
 import { CONST } from "common/constants"
 
 @NgModule({
-  imports : [
+  imports: [
     FormsModule,
     CommonModule,
     LayoutModule,
     ComponentsModule,
     DragDropModule,
     UIModule,
-    
+
     AngularMaterialModule,
     UtilModule,
     WidgetModule,
@@ -85,19 +83,13 @@ import { CONST } from "common/constants"
     RootStoreModule,
     HttpClientModule,
   ],
-  declarations : [
+  declarations: [
     AtlasViewer,
     NotSupportedCmp,
     TryMeComponent,
-
     /* directives */
-
   ],
-  entryComponents : [
-    DialogComponent,
-    ConfirmDialogComponent,
-  ],
-  providers : [
+  providers: [
     AtlasWorkerService,
     AuthService,
     DialogService,
@@ -193,9 +185,9 @@ import { CONST } from "common/constants"
       deps: [ AuthService ]
     }
   ],
-  bootstrap : [
+  bootstrap: [
     AtlasViewer,
-  ],
+  ]
 })
 
 export class MainModule {}
