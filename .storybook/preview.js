@@ -1,6 +1,7 @@
 import { setCompodocJson } from "@storybook/addon-docs/angular";
 import docJson from "../documentation.json";
 setCompodocJson(docJson);
+import * as ConnectivityComponent from 'hbp-connectivity-component/dist/loader'
 
 import 'src/theme.scss'
 
@@ -18,3 +19,5 @@ export const parameters = {
     current: 'light'
   }
 }
+
+ConnectivityComponent.defineCustomElements(window)
