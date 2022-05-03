@@ -13,12 +13,13 @@ import {catchError, distinctUntilChanged, map, switchMap, take} from "rxjs/opera
 import {HttpClient} from "@angular/common/http";
 import {BS_ENDPOINT} from "src/util/constants";
 import {OVERWRITE_SHOW_DATASET_DIALOG_TOKEN} from "src/util/interfaces";
-import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
-import { actions } from "src/state/atlasSelection";
+import {SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionModel} from "src/atlasComponents/sapi";
+import {actions, selectors} from "src/state/atlasSelection";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
+import {CustomLayer} from "src/state/atlasAppearance";
 
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
@@ -78,7 +79,38 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       //   this.addNewColorMap()
       // } else {
       //   this.restoreDefaultColormap()
+      // } 
+        
+      // if (flag) {
+      //   this.setCustomLayer()
+      // } else {
+      //   this.removeCustomLayer()
       // }
+                
+    }
+
+    public connectivityLayerId = 'connectivity-colormap-id'
+    
+    setCustomLayer() {
+      const map = new Map<SapiRegionModel, number[]>()
+      for (const region of this.allRegions) {
+        map.set(region, SAPIRegion.GetDisplayColor(region))
+      }
+        
+      const customLayer: CustomLayer = {
+        clType: 'customlayer/colormap',
+        id: this.connectivityLayerId,
+        colormap: map
+      }
+      const layer = atlasAppearance.actions.addCustomLayer({customLayer})
+        
+      console.log(layer)
+    }
+    
+    removeCustomLayer() {
+      atlasAppearance.actions.removeCustomLayer({
+        id: this.connectivityLayerId
+      })
     }
 
     @Input() types: any[]
@@ -128,7 +160,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       //   this.fetchConnectivity()
       // }
       // TODO may not be necessary
-      this.changeDetectionRef.detectChanges()
+      // this.changeDetectionRef.detectChanges()
     }
 
     public atlasId: any
@@ -202,12 +234,22 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       //   this.setColorMap$.next(true)
       // }
       //
-      // this.subscriptions.push(
-      //   this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
-      //     this.defaultColorMap = null
-      //     this.allRegions = flattenedRegions
-      //   }),
-      // )
+      this.subscriptions.push(
+        // this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
+        //   this.defaultColorMap = null
+        //   this.allRegions = flattenedRegions
+        //   console.log(this.allRegions)
+        // }),
+
+        this.store$.pipe(
+          select(atlasSelection.selectors.selectedParcAllRegions)
+        ).subscribe(flattenedRegions => {
+          this.defaultColorMap = null
+          this.allRegions = flattenedRegions
+          this.setCustomLayer()
+        }),
+          
+      )
       //
       // /**
       //    * setting/restoring colormap
@@ -306,6 +348,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     selectDataset(datasetId, fetchConnectivity=true) {
       const dataset = this.datasetList.find(d => d['@id'] === datasetId)
       this.selectedDataset = dataset['@id']
+        console.log(dataset)
       this.selectedDatasetName = dataset.data.name
       this.selectedDatasetDescription = dataset.data.description
       this.selectedDatasetKgId = dataset.data['dataset_id']
