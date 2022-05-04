@@ -1,14 +1,10 @@
 <mat-action-list>
   <button mat-menu-item
-    *ngFor="let plugin of pluginManifests"
+    *ngFor="let plugin of availablePlugins$ | async"
     (click)="launchPlugin(plugin)">
     <span>
       {{ plugin.name }}
     </span>
-  </button>
-
-  <button *ngIf="EXPERIMENTAL_FEATURE_FLAG" mat-menu-item (click)="test()">
-    test
   </button>
 
   <button mat-menu-item *ngIf="EXPERIMENTAL_FEATURE_FLAG"
@@ -28,9 +24,9 @@
     <form>
       <mat-form-field class="d-block">
         <mat-label>
-          manifest.json URL
+          iframe index.html URL
         </mat-label>
-        <input type="text" matInput placeholder="https://example.com/manifest.json" #urlInput>
+        <input type="text" matInput placeholder="https://example.com/index.html" #urlInput>
       </mat-form-field>
     </form>
   </mat-dialog-content>
@@ -38,7 +34,6 @@
   <mat-dialog-actions align="end">
     <button (click)="addThirdPartyPlugin(urlInput.value)"
       mat-raised-button
-      [disabled]="loadingThirdpartyPlugin"
       color="primary">
       Load
     </button>

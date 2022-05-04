@@ -12,6 +12,7 @@ import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
 import { ColorMapCustomLayer } from "src/state/atlasAppearance";
 import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { AnnotationLayer } from "src/atlasComponents/annotations";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -359,6 +360,6 @@ export class NehubaLayerControlService implements OnDestroy{
       )
     )
   ]).pipe(
-    map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName])
+    map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName, ...AnnotationLayer.Map.keys()])
   )
 }

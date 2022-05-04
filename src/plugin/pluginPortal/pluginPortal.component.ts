@@ -109,25 +109,28 @@ export class PluginPortal implements AfterViewInit, OnDestroy, ListenerChannel{
        * listening to plugin requests
        * only start after boothVisitor is defined
        */
-      this.sub.push(
-        fromEvent<MessageEvent>(window, 'message').pipe(
-          startWith(null as MessageEvent),
-          filter(msg => !!this.boothVisitor && msg.data.jsonrpc === "2.0" && !!msg.data.method)
-        ).subscribe(async msg => {
-          try {
-            const result = await this.boothVisitor.request(msg.data)
-            this.childWindow.postMessage(result, this.origin)
-          } catch (e) {
-            this.childWindow.postMessage({
-              id: msg.data.id,
-              error: {
-                code: -32603,
-                message: e.toString()
-              }
-            }, this.origin)
+      const sub = fromEvent<MessageEvent>(window, 'message').pipe(
+        startWith(null as MessageEvent),
+        filter(msg => !!this.boothVisitor && msg.data.jsonrpc === "2.0" && !!msg.data.method && msg.origin === this.origin)
+      ).subscribe(async msg => {
+        try {
+          if (msg.data.method === `${namespace}.exit`) {
+            sub.unsubscribe()
           }
-        })
-      )
+          const result = await this.boothVisitor.request(msg.data)
+          if (!!result) {
+            this.childWindow.postMessage(result, this.origin)
+          }
+        } catch (e) {
+          this.childWindow.postMessage({
+            id: msg.data.id,
+            error: {
+              code: -32603,
+              message: e.toString()
+            }
+          }, this.origin)
+        }
+      })
     }
   }
   notify(payload: JRPCRequest<keyof BroadCastingApiEvents, BroadCastingApiEvents[keyof BroadCastingApiEvents]>) {

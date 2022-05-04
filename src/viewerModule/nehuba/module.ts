@@ -26,6 +26,8 @@ import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
 import { NehubaLayoutOverlayModule } from "./layoutOverlay";
+import { NgAnnotationService } from "./annotation/service";
+import { NgAnnotationEffects } from "./annotation/effects";
 
 @NgModule({
   imports: [
@@ -51,7 +53,8 @@ import { NehubaLayoutOverlayModule } from "./layoutOverlay";
       reducer
     ),
     EffectsModule.forFeature([
-      MeshEffects
+      MeshEffects,
+      NgAnnotationEffects,
     ]),
     QuickTourModule,
     NehubaLayoutOverlayModule,
@@ -81,11 +84,17 @@ import { NehubaLayoutOverlayModule } from "./layoutOverlay";
     {
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)
-    }
+    },
+    NgAnnotationService
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 
-export class NehubaModule{}
+export class NehubaModule{
+
+  constructor(_svc: NgAnnotationService){
+
+  }
+}

@@ -3,7 +3,7 @@ import { nameSpace, AtlasSelectionState } from "./const"
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
 
-const selectStore = (state: any) => state[nameSpace] as AtlasSelectionState
+export const selectStore = (state: any) => state[nameSpace] as AtlasSelectionState
 
 export const selectedAtlas = createSelector(
   selectStore,

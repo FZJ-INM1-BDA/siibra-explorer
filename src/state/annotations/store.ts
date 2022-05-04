@@ -1,12 +1,40 @@
 import { createReducer, on } from "@ngrx/store"
+import { OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi"
 import * as actions from "./actions"
 
-export type Annotation = {
-  "@id": string
+type Line = {
+  pointA: OpenMINDSCoordinatePoint
+  pointB: OpenMINDSCoordinatePoint
 }
 
+type BBox = {
+  pointA: OpenMINDSCoordinatePoint
+  pointB: OpenMINDSCoordinatePoint
+}
+
+export type TypesOfDetailedAnnotations = {
+  openminds: OpenMINDSCoordinatePoint
+  line: Line
+  box: BBox
+}
+
+export enum AnnotationColor {
+  WHITE="WHITE",
+  RED="RED",
+  BLUE="BLUE",
+}
+
+export type Annotation<T extends keyof TypesOfDetailedAnnotations> = {
+  "@id": string
+  name: string
+  description?: string
+  color?: AnnotationColor
+} & { [key in T] : TypesOfDetailedAnnotations[T]}
+
+export type UnionAnnotation = Annotation<'openminds'> | Annotation<'line'> | Annotation<'box'>
+
 export type AnnotationState = {
-  annotations: Annotation[]
+  annotations: UnionAnnotation[]
 }
 
 export const defaultState: AnnotationState = {

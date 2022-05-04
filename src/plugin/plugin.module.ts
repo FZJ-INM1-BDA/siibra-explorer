@@ -1,4 +1,5 @@
 import { CommonModule, DOCUMENT } from "@angular/common";
+import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { LoggingModule } from "src/logging";
 import { AngularMaterialModule } from "src/sharedModules";
@@ -15,6 +16,7 @@ import { PluginPortal } from "./pluginPortal/pluginPortal.component";
     LoggingModule,
     UtilModule,
     AngularMaterialModule,
+    HttpClientModule,
   ],
   declarations: [
     PluginBannerUI,

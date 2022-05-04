@@ -1,9 +1,9 @@
 import { Component, Input, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { AnnotationLayer, TNgAnnotationPoint } from "src/atlasComponents/annotations";
+import { TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { SapiFeatureModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel, CLEANED_IEEG_DATASET_TYPE } from "src/atlasComponents/sapi";
 import { IeegOnFocusEvent, ContactPoint, Electrode, Session, IeegOnDefocusEvent } from "../ieeg";
-import { atlasSelection, annotation, atlasAppearance } from "src/state"
+import { atlasSelection, annotation } from "src/state"
 
 @Component({
   selector: 'sxplr-sapiviews-features-entry',
@@ -39,11 +39,8 @@ export class FeatureEntryCmp implements OnDestroy{
     ieeg: CLEANED_IEEG_DATASET_TYPE
   }
 
-  static readonly IEEG_ANNOTATION_LAYER_RED = `ieeg-annotation-layer-red`
-  static readonly IEEG_ANNOTATION_LAYER_WHITE = `ieeg-annotation-layer-white`
-  private ieegRedAnnLayer: AnnotationLayer
-  private ieegWhiteAnnLayer: AnnotationLayer
-  
+  private addedAnnotations: annotation.UnionAnnotation[] = []
+
   ieegOnFocus(ev: IeegOnFocusEvent){
     if (ev.contactPoint) {
       /**
@@ -63,30 +60,51 @@ export class FeatureEntryCmp implements OnDestroy{
       /**
        * 
        */
-      if (!this.ieegRedAnnLayer) {
-        this.ieegRedAnnLayer = new AnnotationLayer(FeatureEntryCmp.IEEG_ANNOTATION_LAYER_RED, "#ff0000")
-      }
-      if (!this.ieegWhiteAnnLayer) {
-        this.ieegWhiteAnnLayer = new AnnotationLayer(FeatureEntryCmp.IEEG_ANNOTATION_LAYER_WHITE, "#ffffff")
-      }
       const allInRoiPoints: TNgAnnotationPoint[] = this.getPointsFromSession(ev.session, true)
       const allNonInRoiPoints: TNgAnnotationPoint[] = this.getPointsFromSession(ev.session, false)
+      const annotationsToBeAdded: annotation.UnionAnnotation[] = []
       for (const pt of allInRoiPoints) {
-        this.ieegRedAnnLayer.addAnnotation(pt)
+        annotationsToBeAdded.push({
+          "@id": pt.id,
+          color: annotation.AnnotationColor.RED,
+          openminds: {
+            "@id": pt.id,
+            "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+            coordinateSpace: {
+              "@id": this.space["@id"]
+            },
+            coordinates: pt.point.map(v => {
+              return {
+                value: v / 1e6
+              }
+            })
+          },
+          name: pt.description || "Untitled"
+        })
       }
       for (const pt of allNonInRoiPoints) {
-        this.ieegWhiteAnnLayer.addAnnotation(pt)
+        annotationsToBeAdded.push({
+          "@id": pt.id,
+          color: annotation.AnnotationColor.WHITE,
+          openminds: {
+            "@id": pt.id,
+            "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+            coordinateSpace: {
+              "@id": this.space["@id"]
+            },
+            coordinates: pt.point.map(v => {
+              return {
+                value: v / 1e6
+              }
+            })
+          },
+          name: pt.description || "Untitled"
+        })
       }
+      this.addedAnnotations = annotationsToBeAdded
       this.store.dispatch(
         annotation.actions.addAnnotations({
-          annotations: [...allInRoiPoints, ...allNonInRoiPoints].map(p => {
-            return { "@id": p.id }
-          })
-        })
-      )
-      this.store.dispatch(
-        atlasAppearance.actions.setOctantRemoval({
-          flag: false
+          annotations: annotationsToBeAdded
         })
       )
     }
@@ -103,31 +121,15 @@ export class FeatureEntryCmp implements OnDestroy{
           })
         })
       )
-
-      this.store.dispatch(
-        atlasAppearance.actions.setOctantRemoval({
-          flag: true
-        })
-      )
-
-      if (this.ieegRedAnnLayer) {
-        for (const pt of allInRoiPoints) {
-          this.ieegRedAnnLayer.removeAnnotation(pt)
-        }
-      }
-      
-      if (this.ieegWhiteAnnLayer) {
-        for (const pt of allNonInRoiPoints) {
-          this.ieegWhiteAnnLayer.removeAnnotation(pt)
-        }
-      }
-      
-
     }
   }
+
   ngOnDestroy(): void {
-    if (this.ieegRedAnnLayer) this.ieegRedAnnLayer.dispose()
-    if (this.ieegWhiteAnnLayer) this.ieegWhiteAnnLayer.dispose()
+    this.store.dispatch(
+      annotation.actions.rmAnnotations({
+        annotations: this.addedAnnotations
+      })
+    )
   }
 
   constructor(

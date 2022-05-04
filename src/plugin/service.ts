@@ -1,9 +1,11 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable, Injector, NgZone } from "@angular/core";
 import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
 import { WidgetService } from "src/widget/service";
 import { WidgetPortal } from "src/widget/widgetPortal/widgetPortal.component";
 import { setPluginSrc } from "./const";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
+import { environment } from "src/environments/environment"
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +18,14 @@ export class PluginService {
     private wSvc: WidgetService,
     private injector: Injector,
     private zone: NgZone,
+    private http: HttpClient
   ){}
 
+  pluginManifests$ = this.http.get<{
+    'siibra-explorer': true
+    name: string
+    iframeUrl: string
+  }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`)
 
   async launchPlugin(htmlSrc: string){
     if (this.loadedPlugins.includes(htmlSrc)) return

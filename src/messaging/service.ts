@@ -71,11 +71,13 @@ export class MessagingService {
           result
         }, origin)
       } catch (error) {
-        src.postMessage({
-          id,
-          jsonrpc: '2.0',
-          error
-        }, origin)
+        if (src) {
+          src.postMessage({
+            id,
+            jsonrpc: '2.0',
+            error
+          }, origin)
+        }
       }
     })
 

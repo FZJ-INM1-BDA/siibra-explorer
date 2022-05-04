@@ -1,4 +1,4 @@
 export type PluginManifest = {
   name: string
-  url: string
+  iframeUrl: string
 }

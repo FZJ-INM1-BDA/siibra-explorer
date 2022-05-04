@@ -3,7 +3,8 @@ import { select, Store } from "@ngrx/store";
 import { Subject } from "rxjs";
 import { distinctUntilChanged, filter, map, take } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi";
-import { MainState, atlasSelection, userInteraction } from "src/state"
+import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/type";
+import { MainState, atlasSelection, userInteraction, annotation } from "src/state"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from "src/util/interfaces";
 import { Booth, BoothResponder, createBroadcastingJsonRpcChannel, JRPCRequest, JRPCResp } from "./jsonrpc"
@@ -70,6 +71,27 @@ export type ApiBoothEvents = {
       message: string
     }
     response: SapiRegionModel | OpenMINDSCoordinatePoint
+  }
+  
+  addAnnotations: {
+    request: {
+      annotations: SxplrCoordinatePointExtension[]
+    }
+    response: 'OK'
+  }
+
+  rmAnnotations: {
+    request: {
+      annotations: AtId[]
+    }
+    response: 'OK'
+  }
+
+  exit: {
+    request: {
+      requests: JRPCRequest<keyof ApiBoothEvents, ApiBoothEvents[keyof ApiBoothEvents]['request']>[]
+    }
+    response: 'OK'
   }
 
   cancelRequest: {
@@ -225,7 +247,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       this.broadcastCh.emit('allRegions', regions)
     })
   }
-  async onRequest(event: JRPCRequest<keyof ApiBoothEvents, null>): Promise<void | JRPCResp<ApiBoothEvents[keyof ApiBoothEvents]['response'], string>> {
+  async onRequest(event: JRPCRequest<keyof ApiBoothEvents, unknown>): Promise<void | JRPCResp<ApiBoothEvents[keyof ApiBoothEvents]['response'], string>> {
     /**
      * if id is not present, then it's a no-op
      */
@@ -385,6 +407,46 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
           result: val
         }
       })
+    }
+    case 'addAnnotations': {
+      const { annotations } = event.params as ApiBoothEvents['addAnnotations']['request']
+      const ann = annotations as (annotation.Annotation<'openminds'>)[]
+      this.store.dispatch(
+        annotation.actions.addAnnotations({
+          annotations: ann
+        })
+      )
+      if (event.id) {
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          result: 'OK'
+        }
+      }
+      break
+    }
+    case 'rmAnnotations': {
+      const { annotations } = event.params as ApiBoothEvents['rmAnnotations']['request']
+      this.store.dispatch(
+        annotation.actions.rmAnnotations({
+          annotations
+        })
+      )
+      if (event.id){
+        return {
+          jsonrpc: '2.0',
+          id: event.id,
+          result: 'OK'
+        }
+      }
+      break
+    }
+    case 'exit': {
+      const { requests } = event.params as ApiBoothEvents['exit']['request']
+      for (const req of requests) {
+        await this.onRequest(req)
+      }
+      break
     }
     case 'cancelRequest': {
       const { id } = event.params as ApiBoothEvents['cancelRequest']['request']
