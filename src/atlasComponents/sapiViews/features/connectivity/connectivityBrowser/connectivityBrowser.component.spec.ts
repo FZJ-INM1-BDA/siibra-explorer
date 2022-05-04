@@ -41,20 +41,18 @@ describe('ConnectivityComponent', () => {
     let datasetList = [
         {
             '@id': 'id1',
-            data: {
-                name: 'id1',
-                description: 'd1',
-                kgId: 'kgId1',
-                kgschema: 'kgschema1'
-            }
+            name: 'id1',
+            description: 'd1',
+            kgId: 'kgId1',
+            kgschema: 'kgschema1',
+            items: []
         }, {
             '@id': 'id2',
-            data: {
-                name: 'id2',
-                description: 'd2',
-                kgId: 'kgId2',
-                kgschema: 'kgschema2'
-            }
+            name: 'id2',
+            description: 'd2',
+            kgId: 'kgId2',
+            kgschema: 'kgschema2',
+            items: []
         }
     ]
 
@@ -108,16 +106,15 @@ describe('ConnectivityComponent', () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)
         component = fixture.componentInstance
 
-        component.datasetList = datasetList
-        component.selectDataset('id1', false)
+        component.defaultProfile = {selectedDataset: datasetList[0]}
 
-        expect(component.selectedDataset).toEqual('id1')
-        expect(component.selectedDatasetDescription).toEqual('d1')
+        expect(component.selectedDataset['@id']).toEqual('id1')
+        expect(component.selectedDataset.description).toEqual('d1')
 
-        component.selectDataset('id2', false)
+        component.defaultProfile = {selectedDataset: datasetList[1]}
 
-        expect(component.selectedDataset).toEqual('id2')
-        expect(component.selectedDatasetDescription).toEqual('d2')
+        expect(component.selectedDataset['@id']).toEqual('id2')
+        expect(component.selectedDataset.description).toEqual('d2')
     })
 
 });

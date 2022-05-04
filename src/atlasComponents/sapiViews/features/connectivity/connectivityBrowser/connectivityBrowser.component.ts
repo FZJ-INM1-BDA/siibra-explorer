@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, Chang
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Subscription, BehaviorSubject} from "rxjs";
 import {catchError, take} from "rxjs/operators";
-import {SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionModel} from "src/atlasComponents/sapi";
+import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
@@ -53,22 +53,21 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     }
 
-    @Input() types: any[]
+    @Input() types: any[] = []
 
     private _defaultProfile
     @Input() set defaultProfile(val: any) {
       this._defaultProfile = val
-      this.selectedType = this.types.find(t => t.types.includes(val.type)).name
+      this.selectedType = this.types.find(t => t.types.includes(val.type))?.name
       this.pageNumber = 1
       this.selectedDataset = this.fixDatasetFormat(val.selectedDataset)
-      this.setMatrixData(val.matrix)
+      if (val.matrix) this.setMatrixData(val.matrix)
       this.numberOfDatasets = val.numberOfDatasets
     }
 
     get defaultProfile() {
       return this._defaultProfile
     }
-
 
     public selectedType: any
 
@@ -213,10 +212,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     // ToDo this is caused by the bug existing on siibra python
-    private fixDatasetFormat = (ds) => ({
+    private fixDatasetFormat = (ds) => ds.name.includes('{')? ({
       ...ds,
       ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
-    })
+    }) : ds
 
     fetchConnectivity() {
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
