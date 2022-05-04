@@ -103,7 +103,6 @@ export class NehubaLayerControlService implements OnDestroy{
           }
           returnVal[ngId][labelIndex] = { red, green, blue }
         }
-        this.activeColorMap = returnVal
         return returnVal
       })
     ),

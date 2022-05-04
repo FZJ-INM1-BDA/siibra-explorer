@@ -4,7 +4,7 @@ import { SAPI } from "../sapi.service"
 import { SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryParam, SapiRegionModel } from "../type"
 
 type PaginationQuery = {
-  perPage: number
+  size: number
   page: number
 }
 
@@ -41,7 +41,7 @@ export class SAPIParcellation{
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
         type: type,
-        per_page: param && param.perPage? param.perPage.toString() : '5',
+        size: param && param.size? param.size.toString() : '5',
         page: param && param.page? param.page.toString() : '0',
       },
       queryParam

@@ -43,7 +43,7 @@ export class HasConnectivity implements OnDestroy {
     private regionIndex: number
     public hasConnectivity = false
     public connectivityNumber = 0
-    
+
     private connectivityModalities: any[] = []
     private waitForModalities = false
     public defaultProfile: any
@@ -69,35 +69,31 @@ export class HasConnectivity implements OnDestroy {
           const type = m.types[0]
           
           this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-            .getFeatures({page: 0, perPage: 20}, type)
+            .getFeatures({page: 1, size: 1}, type)
             .pipe(
-              take(1),  
-              switchMap((datasets: any[]) => {
-                if (datasets && datasets.length) {
+              take(1),
+              switchMap((res: any) => {
+                if (res && res.items) {
 
                   this.availableModalities.push(m)
+                  const firstDataset = res.items[0]
 
-                  if (datasets[0]) {
-
+                  if (firstDataset) {
                     this.hasConnectivity = true
                     if (!(this.defaultProfile && this.defaultProfile.length)) {
                       return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-                        .getFeatureInstance(datasets[0]['@id'])
+                        .getFeatureInstance(firstDataset['@id'])
                         .pipe(switchMap(inst => {
                           if (inst) {
-                            // if () {
                             this.defaultProfile = {
                               type,
-                              datasets,
-                              selectedDataset: datasets[0]['@id'],
-                              matrix: inst
+                              selectedDataset: firstDataset,
+                              matrix: inst,
+                              numberOfDatasets: res.total
                             }
-
-
                             const matrixData = inst as SapiParcellationFeatureMatrixModel
                             this.regionIndex = (matrixData.columns as Array<string>).findIndex(md => md === this.region.name)
                             return from(this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY))
-                            // }
                           }
                           return of(null)
                         }))
@@ -109,19 +105,6 @@ export class HasConnectivity implements OnDestroy {
                 }
                 return of(null)
               }), 
-              // switchMap(res => {
-              //   if (res) {
-              //     if (!(this.defaultProfile && this.defaultProfile.length)) {
-              //       this.defaultProfile = {type, matrix: res}
-              //     }
-              //
-              //     const matrixData = res as SapiParcellationFeatureMatrixModel
-              //     this.regionIndex = (matrixData.columns as Array<string>).findIndex(md => md === this.region.name)
-              //     // this.connectedAreas = matrixData.columns as Array<string>
-              //     return from(this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY))
-              //   }
-              //   return of(null)
-              // })
             ).subscribe(res => {
               if (res && res.rawArray && res.rawArray[this.regionIndex]) {
                 const connections = res.rawArray[this.regionIndex]
