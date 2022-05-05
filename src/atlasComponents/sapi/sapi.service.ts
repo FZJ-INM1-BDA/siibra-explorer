@@ -21,9 +21,10 @@ type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 @Injectable()
 export class SAPI{
   static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v1_0`
+  static modalitiesEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v1_0/modalities`
 
   public bsEndpoint = SAPI.bsEndpoint
-  
+
   registry = {
     _map: {} as Record<string, {
       func: (...arg: any[]) => RegistryType
@@ -82,7 +83,7 @@ export class SAPI{
   }
 
   getModalities() {
-    return this.http.get('https://siibra-api-dev.apps-dev.hbp.eu/v1_0/modalities')
+    return this.http.get(SAPI.modalitiesEndpoint)
   }
 
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){

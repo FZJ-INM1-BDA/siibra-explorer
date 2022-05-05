@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
-import {Component, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core"
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core"
 import { FormsModule } from "@angular/forms"
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
@@ -10,25 +10,28 @@ import {SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "
 import { AngularMaterialModule } from "src/sharedModules"
 import {ConnectivityBrowserComponent} from "src/atlasComponents/sapiViews/features/connectivity";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import { take } from "rxjs/operators"
+import {catchError, take} from "rxjs/operators"
+import {of} from "rxjs";
 
 @Component({
   selector: 'autoradiograph-wrapper-cmp',
   template: `
-  <mat-form-field appearance="fill">
-    <mat-select [(ngModel)]="featureId" (selectionChange)="fetchConnectivity()">
-      <mat-option value="null" disabled>
-        --select--
-      </mat-option>
+    
+  <button mat-button (click)="datasetSliderChanged(1)" class="mb-3">Load Connectivity</button>
 
-      <mat-option [value]="feat['@id']"
-        *ngFor="let feat of features">
-        {{ feat.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  
   <div class="d-flex">Source: {{regionName}}</div>
+
+    <mat-label>
+        Dataset
+    </mat-label>
+    <mat-slider [min]="1"
+            [max]="numberOfDatasets"
+            (change)="datasetSliderChanged($event.value)"
+            [value]="pageNumber"
+            thumbLabel
+            step="1"
+            class="w-100">
+    </mat-slider>
 
   <hbp-connectivity-matrix-row
       #connectivityComponent
@@ -57,11 +60,36 @@ class ExampleConnectivityBrowserWrapper {
   featureId: string
 
   regionName: string = 'Area TE 3 (STG) right'
+  type: string = 'siibra/features/connectivity/streamlineCounts'
+  pageNumber = 1
+  numberOfDatasets = 1
   private regionIndexInMatrix = -1
   public connectionsString: string
 
 
-  constructor(private sapi: SAPI) {
+  constructor(private sapi: SAPI, private cdf: ChangeDetectorRef) {
+  }
+
+  datasetSliderChanged(pageNumber) {
+    this.pageNumber = pageNumber
+    this.loadDataset()
+  }
+
+  loadDataset() {
+    return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
+        .getFeatures({page: this.pageNumber, size: 1}, {type: this.type})
+        .pipe(
+            take(1),
+            catchError(() => {
+              return of(null)
+            })
+        ).subscribe((res: any) => {
+          if (res && res.items) {
+            this.numberOfDatasets = res.total
+            this.featureId = res.items[0]['@id']
+            this.fetchConnectivity()
+          }
+        })
   }
 
   fetchConnectivity() {
@@ -93,7 +121,6 @@ export default {
         AngularMaterialModule,
         HttpClientModule,
         BrowserAnimationsModule,
-        FormsModule,
       ],
       providers: [
         SAPI

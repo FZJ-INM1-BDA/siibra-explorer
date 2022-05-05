@@ -8,6 +8,10 @@ type PaginationQuery = {
   page: number
 }
 
+type ParcellationPaginationQuery = {
+  type?: string
+}
+
 export class SAPIParcellation{
   constructor(private sapi: SAPI, public atlasId: string, public id: string){
 
@@ -36,13 +40,13 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatures(param?: PaginationQuery, type?: string, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
+  getFeatures(param?: PaginationQuery, parcPagination?: ParcellationPaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
     return this.sapi.httpGet<SapiParcellationFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
-        type: type,
-        size: param && param.size? param.size.toString() : '5',
-        page: param && param.page? param.page.toString() : '0',
+        type: parcPagination?.type,
+        size: param?.size?.toString() || '5',
+        page: param?.page?.toString() || '0',
       },
       queryParam
     )

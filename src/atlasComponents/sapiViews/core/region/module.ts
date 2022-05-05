@@ -17,7 +17,6 @@ import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.compone
     SapiViewsUtilModule,
     SapiViewsFeaturesModule,
     SpinnerModule,
-    SapiViewsFeaturesModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

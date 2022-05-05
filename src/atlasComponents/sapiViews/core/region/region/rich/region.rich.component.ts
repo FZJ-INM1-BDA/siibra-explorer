@@ -38,7 +38,7 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
 
   // eslint-disable-next-line  @typescript-eslint/no-empty-function
   handleExpansionPanelClosedEv(title: string){
-    this.expandedPanel = ''
+    this.expandedPanel = null
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-empty-function

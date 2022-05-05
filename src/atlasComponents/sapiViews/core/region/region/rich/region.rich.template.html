@@ -96,8 +96,7 @@
 <mat-accordion class="d-block mt-2">
 
   <!-- connectivity -->
-  <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser
-               let-contentAttribute="contentAttribute">
+  <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
     <sxplr-sapiviews-features-connectivity-browser class="pe-all flex-shrink-1"
                                                    [region]="region"
                                                    [types]="hasConnectivityDirective.availableModalities"
@@ -113,7 +112,6 @@
     title: CONST.CONNECTIVITY,
     iconClass: 'fab fa-connectdevelop',
     content: sxplrSapiviewsFeaturesConnectivityBrowser,
-    contentAttribute: {types: hasConnectivityDirective.availableModalities, defaultProfile: hasConnectivityDirective.defaultProfile},
     desc: hasConnectivityDirective.connectivityNumber,
     iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
     iavNgIf: hasConnectivityDirective.hasConnectivity
@@ -176,10 +174,4 @@
       </ng-container>
     </ng-template>
   </mat-expansion-panel>
-</ng-template>
-
-<!-- fall back if region is not provided -->
-
-<ng-template [ngIf]="!region">
-  Region must be provided!
 </ng-template>
