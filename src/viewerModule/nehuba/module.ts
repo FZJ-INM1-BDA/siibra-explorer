@@ -94,7 +94,6 @@ import { NgAnnotationEffects } from "./annotation/effects";
 
 export class NehubaModule{
 
-  constructor(_svc: NgAnnotationService){
-
-  }
+  // eslint-disable-next-line  @typescript-eslint/no-empty-function
+  constructor(_svc: NgAnnotationService){}
 }
