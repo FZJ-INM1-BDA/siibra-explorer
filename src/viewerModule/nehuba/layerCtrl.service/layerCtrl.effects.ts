@@ -3,8 +3,8 @@ import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, of } from "rxjs";
 import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { SapiVOIDataResponse } from "src/atlasComponents/sapi/type";
+import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel, SapiRegionModel } from "src/atlasComponents/sapi";
+import { SapiVOIDataResponse, SapiVolumeModel } from "src/atlasComponents/sapi/type";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -146,51 +146,115 @@ export class LayerCtrlEffects {
       throw new Error(`parcellation defined, but template not defined!`)
     }
     
+    /**
+     * some labelled maps (such as julich brain in big brain) do not have the volumes defined on the parcellation level.
+     * While we have the URLs of these volumes (the method we use is also kind of hacky), and in theory, we could construct a volume object directly
+     * It is probably better to fetch the correct volume object to begin with
+     */
     const parcVolumes$ = !parcellation
-      ? of([])
+      ? of([] as {volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[])
       : forkJoin([
         this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getRegions(template["@id"]).pipe(
           map(regions => {
 
-            const returnArr: ParcVolumeSpec[] = []
+            const volumeIdToRegionMap = new Map<string, {
+              labelIndex: number
+              region: SapiRegionModel
+            }[]>()
+
             for (const r of regions) {
-              const source = r?.hasAnnotation?.visualizedIn?.["@id"]
-              if (!source) continue
-              if (source.indexOf("precomputed://") < 0) continue
+              const volumeId = r?.hasAnnotation?.visualizedIn?.["@id"]
+              if (!volumeId) continue
+
               const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
               if (!labelIndex) continue
-              
-              const found = returnArr.find(v => v.volumeSrc === source)
-              if (found) {
-                found.labelIndicies.push(labelIndex)
-                continue
-              }
 
-              let laterality: "left hemisphere" | "right hemisphere" | "whole brain" = "whole brain"
-              if (r.name.indexOf("left") >= 0) laterality = "left hemisphere"
-              if (r.name.indexOf("right") >= 0) laterality = "right hemisphere"
-              returnArr.push({
-                volumeSrc: source,
-                labelIndicies: [labelIndex],
-                parcellation,
-                laterality,
+              if (!volumeIdToRegionMap.has(volumeId)) {
+                volumeIdToRegionMap.set(volumeId, [])
+              }
+              volumeIdToRegionMap.get(volumeId).push({
+                labelIndex,
+                region: r
               })
             }
-            return returnArr
+            return volumeIdToRegionMap
           })
         ),
         this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getVolumes()
       ]).pipe(
-        map(([ volumeSrcs, volumes ]) => {
-          return volumes.map(
-            v => {
-              const found = volumeSrcs.find(volSrc => volSrc.volumeSrc.indexOf(v.data.url) >= 0)
-              return {
-                volume: v,
-                volumeMetadata: found,
+        switchMap(([ volumeIdToRegionMap, volumes ]) => {
+          const missingVolumeIds = Array.from(volumeIdToRegionMap.keys()).filter(id => volumes.map(v => v["@id"]).indexOf(id) < 0)
+
+          const volumesFromParc: {volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[] = volumes.map(
+            volume => {
+              const found = volumeIdToRegionMap.get(volume["@id"])
+              if (!found) return null
+
+              try {
+
+                const volumeMetadata: ParcVolumeSpec = {
+                  regions: found,
+                  parcellation,
+                  volumeSrc: volume.data.url
+                }
+                return {
+                  volume,
+                  volumeMetadata,
+                }
+              } catch (e) {
+                console.error(e)
+                return null
               }
-            }).filter(
-            v => !!v.volumeMetadata?.labelIndicies
+            }
+          ).filter(v => v?.volumeMetadata?.regions)
+
+          if (missingVolumeIds.length === 0) return of([...volumesFromParc])
+          return forkJoin(
+            missingVolumeIds.map(missingId => {
+              if (!volumeIdToRegionMap.has(missingId)) {
+                console.warn(`volumeIdToRegionMap does not have volume with id ${missingId}`)
+                return of(null as SapiVolumeModel)
+              }
+              const { region } = volumeIdToRegionMap.get(missingId)[0]
+              return this.sapi.getRegion(atlas["@id"], parcellation["@id"], region.name).getVolumeInstance(missingId).pipe(
+                catchError((err, obs) => of(null as SapiVolumeModel))
+              )
+            })
+          ).pipe(
+            map((missingVolumes: SapiVolumeModel[]) => {
+
+              const volumesFromRegion: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[] = missingVolumes.map(
+                volume => {
+                  if (!volume || !volumeIdToRegionMap.has(volume['@id'])) {
+                    return null
+                  }
+
+                  try {
+
+                    const found = volumeIdToRegionMap.get(volume['@id'])
+                    const volumeMetadata: ParcVolumeSpec = {
+                      regions: found,
+                      parcellation,
+                      volumeSrc: volume.data.url
+                    }
+                    return {
+                      volume,
+                      volumeMetadata
+                    }
+                  } catch (e) {
+                    console.error(`volume from region error`, e)
+                    return null
+                  }
+                }
+              ).filter(
+                v => !!v
+              )
+
+              return [
+                ...volumesFromParc,
+                ...volumesFromRegion
+              ]
+            })
           )
         })
       )
@@ -199,7 +263,7 @@ export class LayerCtrlEffects {
       ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
         shareReplay(1),
       )
-      : of([])
+      : of([] as SapiVolumeModel[])
     
     return forkJoin({
       tmplVolumes: spaceVols$.pipe(

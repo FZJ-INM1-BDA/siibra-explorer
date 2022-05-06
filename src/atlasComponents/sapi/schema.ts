@@ -24,6 +24,9 @@ export interface paths {
     /** Returns a regional map for given region name. */
     get: operations["get_regional_map_file_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__regional_map_map_get"]
   }
+  "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/volumes": {
+    get: operations["get_regional_volumes_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__volumes_get"]
+  }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}": {
     get: operations["get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get"]
   }
@@ -104,7 +107,7 @@ export interface paths {
      * :param space_id:
      * :param parcellation_id:
      * :param region_id:
-     * :return: UnionRegionalFeatureModels
+     * :return: FeatureModels
      */
     get: operations["get_feature_details_features__feature_id__get"]
   }
@@ -235,11 +238,24 @@ export interface components {
       /** Urls */
       urls: components["schemas"]["Url"][]
       /** Cells */
-      cells: string
+      cells?: components["schemas"]["CorticalCellModel"][]
       /** Section */
-      section: string
+      section?: string
       /** Patch */
-      patch: string
+      patch?: string
+    }
+    /** CorticalCellModel */
+    CorticalCellModel: {
+      /** X */
+      x: number
+      /** Y */
+      y: number
+      /** Area */
+      area: number
+      /** Layer */
+      layer: number
+      /** Instance Label */
+      "instance label": number
     }
     /** DatasetJsonModel */
     DatasetJsonModel: {
@@ -419,6 +435,29 @@ export interface components {
       dtype: string
       /** Content */
       content: string
+    }
+    /** Page[Union[siibra.features.connectivity.ConnectivityMatrixDataModel, app.models.SerializationErrorModel]] */
+    "Page_Union_siibra.features.connectivity.ConnectivityMatrixDataModel__app.models.SerializationErrorModel__": {
+      /** Items */
+      items: (Partial<components["schemas"]["ConnectivityMatrixDataModel"]> &
+        Partial<components["schemas"]["SerializationErrorModel"]>)[]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Size */
+      size: number
+    }
+    /** Page[VolumeModel] */
+    Page_VolumeModel_: {
+      /** Items */
+      items: components["schemas"]["VolumeModel"][]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Size */
+      size: number
     }
     /** ProfileDataModel */
     ProfileDataModel: {
@@ -787,7 +826,7 @@ export interface components {
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: string[]
+      loc: (Partial<string> & Partial<number>)[]
       /** Message */
       msg: string
       /** Error Type */
@@ -822,11 +861,8 @@ export interface components {
     VolumeModel: {
       /** @Id */
       "@id": string
-      /**
-       * @Type
-       * @constant
-       */
-      "@type"?: "https://openminds.ebrains.eu/core/DatasetVersion"
+      /** @Type */
+      "@type": string
       metadata: components["schemas"]["siibra__openminds__core__v4__products__datasetVersion__Model"]
       /** Urls */
       urls: components["schemas"]["Url"][]
@@ -1491,6 +1527,35 @@ export interface operations {
       }
     }
   }
+  get_regional_volumes_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__volumes_get: {
+    parameters: {
+      path: {
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+      }
+      query: {
+        space_id?: string
+        type?: string
+        page?: number
+        size?: number
+      }
+    }
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_VolumeModel_"]
+        }
+      }
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get: {
     parameters: {
       path: {
@@ -1575,18 +1640,15 @@ export interface operations {
       }
       query: {
         type?: string
-        per_page?: number
         page?: number
+        size?: number
       }
     }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": (Partial<
-            components["schemas"]["ConnectivityMatrixDataModel"]
-          > &
-            Partial<components["schemas"]["SerializationErrorModel"]>)[]
+          "application/json": components["schemas"]["Page_Union_siibra.features.connectivity.ConnectivityMatrixDataModel__app.models.SerializationErrorModel__"]
         }
       }
       /** Validation Error */
@@ -1889,7 +1951,7 @@ export interface operations {
    * :param space_id:
    * :param parcellation_id:
    * :param region_id:
-   * :return: UnionRegionalFeatureModels
+   * :return: FeatureModels
    */
   get_feature_details_features__feature_id__get: {
     parameters: {
@@ -1911,7 +1973,11 @@ export interface operations {
             components["schemas"]["ReceptorDatasetModel"]
           > &
             Partial<components["schemas"]["BaseDatasetJsonModel"]> &
-            Partial<components["schemas"]["CorticalCellDistributionModel"]>
+            Partial<components["schemas"]["CorticalCellDistributionModel"]> &
+            Partial<components["schemas"]["IEEGSessionModel"]> &
+            Partial<components["schemas"]["VOIDataModel"]> &
+            Partial<components["schemas"]["ConnectivityMatrixDataModel"]> &
+            Partial<components["schemas"]["SerializationErrorModel"]>
         }
       }
       /** Validation Error */

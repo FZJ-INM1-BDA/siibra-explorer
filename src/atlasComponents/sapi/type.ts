@@ -34,6 +34,12 @@ export type SapiIeegSessionModel = components["schemas"]["IEEGSessionModel"]
  * utility types
  */
 type PathReturn<T extends keyof paths> = Required<paths[T]["get"]["responses"][200]["content"]["application/json"]>
+export type PaginatedResponse<T> = {
+  items: T[]
+  total: number
+  page: number
+  size: number
+}
 
 /**
  * serialization error type

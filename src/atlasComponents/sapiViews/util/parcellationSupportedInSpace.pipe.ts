@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SAPIParcellation } from "src/atlasComponents/sapi/core";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
@@ -35,6 +35,11 @@ export class ParcellationSupportedInSpacePipe implements PipeTransform{
     const tmplId = typeof tmpl === "string"
       ? tmpl
       : tmpl["@id"]
+    for (const key in knownExceptions.supported) {
+      if (key === parcId && knownExceptions.supported[key].indexOf(tmplId) >= 0) {
+        return of(true)
+      }
+    }
     return this.sapi.registry.get<SAPIParcellation>(parcId).getVolumes().pipe(
       map(volumes => volumes.some(v => v.data.space["@id"] === tmplId))
     )

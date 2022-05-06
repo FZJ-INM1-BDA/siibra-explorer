@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
 import { getParcNgId, getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
@@ -43,16 +43,21 @@ export class RouteStateTransformSvc {
       this.sapi.getParcRegions(selectedAtlasId, selectedParcellationId, selectedTemplateId, { priority: 10 }).toPromise(),
     ])
 
-    const latNgIdMap = ["left hemisphere", "right hemisphere", "whole brain"].map(lat => {
-      let regex: RegExp = /./
-      if (lat === "left hemisphere") regex = /left/i
-      if (lat === "right hemisphere") regex = /right/i
-      return {
-        lat,
-        regex,
-        ngId: getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, lat)
+    const ngIdToRegionMap: Map<string, Map<number, SapiRegionModel[]>> = new Map()
+
+    for (const region of allParcellationRegions) {
+      const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
+      if (!ngIdToRegionMap.has(ngId)) {
+        ngIdToRegionMap.set(ngId, new Map())
       }
-    })
+      const map = ngIdToRegionMap.get(ngId)
+
+      const idx = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
+      if (!map.has(idx)) {
+        map.set(idx, [])
+      }
+      map.get(idx).push(region)
+    }
     
     const selectedRegions = (() => {
       if (!selectedRegionIds) return []
@@ -63,12 +68,12 @@ export class RouteStateTransformSvc {
       const json = { [selectedRegionIds[0]]: selectedRegionIds[1] }
 
       for (const ngId in json) {
-        const matchingMap = latNgIdMap.find(ngIdMap => ngIdMap.ngId === ngId)
-        if (!matchingMap) {
+        if (!ngIdToRegionMap.has(ngId)) {
           console.error(`could not find matching map for ${ngId}`)
           continue
         }
-        const filteredRegions = allParcellationRegions.filter(r => matchingMap.regex.test(r.name))
+
+        const map = ngIdToRegionMap.get(ngId)
         
         const val = json[ngId]
         const labelIndicies = val.split(separator).map(n => {
@@ -81,20 +86,8 @@ export class RouteStateTransformSvc {
             return null
           }
         }).filter(v => !!v)
-  
-        for (const labelIndex of labelIndicies) {
-          /**
-           * currently, only 1 region is expected to be selected at max
-           * this method probably out performs creating a map
-           * but with 2+ regions, creating a map would consistently be faster
-           */
-          for (const r of filteredRegions) {
-            const idx = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, r)
-            if (idx === labelIndex) {
-              return [ r ]
-            }
-          }
-        }
+
+        return labelIndicies.map(idx => map.get(idx) || []).flatMap(v => v)
       }
       return []
     })()

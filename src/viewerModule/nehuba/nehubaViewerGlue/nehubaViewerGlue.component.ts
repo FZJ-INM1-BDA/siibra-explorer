@@ -187,11 +187,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     private layerCtrlService: NehubaLayerControlService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
   ){
-    /**
-     * This **massively** improve the performance of the viewer
-     * TODO investigate why, and perhaps eventually remove the cdr.detach()
-     */
-    // this.cdr.detach()
 
     /**
      * define onclick behaviour
@@ -215,10 +210,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       this.multiNgIdsRegionsLabelIndexMap.clear()
       for (const r of regions) {
         const ngId = getParcNgId(atlas, template, parcellation, r)
-        const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
+        if (!ngId) continue
         if (!this.multiNgIdsRegionsLabelIndexMap.has(ngId)) {
           this.multiNgIdsRegionsLabelIndexMap.set(ngId, new Map())
         }
+        const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
+        if (!labelIndex) continue
         this.multiNgIdsRegionsLabelIndexMap.get(ngId).set(labelIndex, r)
       }
     })

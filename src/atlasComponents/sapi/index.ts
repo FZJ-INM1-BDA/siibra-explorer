@@ -24,3 +24,7 @@ export {
   SAPIParcellation,
   SAPIRegion
 } from "./core"
+
+export {
+  IDS
+} from "./constants"

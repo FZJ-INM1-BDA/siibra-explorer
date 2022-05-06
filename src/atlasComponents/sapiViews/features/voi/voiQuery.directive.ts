@@ -1,10 +1,11 @@
 import { Directive, EventEmitter, Inject, Input, OnChanges, OnDestroy, Optional, Output, SimpleChanges } from "@angular/core";
 import { interval, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { debounce, debounceTime, filter, pairwise, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
+import { debounce, debounceTime, distinctUntilChanged, filter, pairwise, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint, TNgAnnotationAABBox } from "src/atlasComponents/annotations";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { BoundingBoxConcept, SapiAtlasModel, SapiSpaceModel, SapiVOIDataResponse, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi/type";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
+import { arrayEqual } from "src/util/array";
 
 @Directive({
   selector: '[sxplr-sapiviews-features-voi-query]',
@@ -130,14 +131,15 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
     clickInterceptor.register(handle)
     this.subscription.push(
       this.features$.pipe(
+        startWith([] as SapiVOIDataResponse[]),
+        distinctUntilChanged(arrayEqual((o, n) => o["@id"] === n["@id"])),
+        pairwise(),
         debounce(() => 
           interval(16).pipe(
             filter(() => !!this.voiBBoxSvc),
             take(1),
           )
         ),
-        startWith([] as SapiVOIDataResponse[]),
-        pairwise()
       ).subscribe(([ prev, curr ]) => {
         for (const v of prev) {
           const box = this.pointsToAABB(v.location.maxpoint, v.location.minpoint)

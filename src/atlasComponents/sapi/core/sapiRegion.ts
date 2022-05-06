@@ -1,5 +1,5 @@
 import { SAPI } from "..";
-import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel, cleanIeegSessionDatasets, SapiIeegSessionModel, CleanedIeegDataset } from "../type";
+import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel, cleanIeegSessionDatasets, SapiIeegSessionModel, CleanedIeegDataset, SapiVolumeModel, PaginatedResponse } from "../type";
 import { strToRgb, hexToRgb } from 'common/util'
 import { forkJoin, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
@@ -78,6 +78,20 @@ export class SAPIRegion{
 
   getMapUrl(spaceId: string): string {
     return `${this.prefix}/regional_map/map?space_id=${encodeURI(spaceId)}`
+  }
+
+  getVolumes(): Observable<PaginatedResponse<SapiVolumeModel>>{
+    const url = `${this.prefix}/volumes`
+    return this.sapi.httpGet<PaginatedResponse<SapiVolumeModel>>(
+      url
+    )
+  }
+
+  getVolumeInstance(volumeId: string): Observable<SapiVolumeModel> {
+    const url = `${this.prefix}/volumes/${encodeURIComponent(volumeId)}`
+    return this.sapi.httpGet<SapiVolumeModel>(
+      url
+    )
   }
 
   getDetail(spaceId: string): Observable<SapiRegionModel> {

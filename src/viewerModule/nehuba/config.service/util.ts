@@ -1,5 +1,5 @@
 import { SapiParcellationModel, SapiSpaceModel, SapiAtlasModel, SapiRegionModel } from 'src/atlasComponents/sapi'
-import { SapiVolumeModel } from 'src/atlasComponents/sapi/type'
+import { SapiVolumeModel, IDS } from 'src/atlasComponents/sapi'
 import { atlasSelection } from 'src/state'
 import { MultiDimMap } from 'src/util/fn'
 import { ParcVolumeSpec } from "../store/util"
@@ -14,7 +14,7 @@ import {
 
 // fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
 const fsAverageKeyVal = {
-  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290": {
+  [IDS.PARCELLATION.JBA29]: {
     "left hemisphere": "left",
     "right hemisphere": "right"
   }
@@ -29,7 +29,7 @@ const BACKCOMAP_KEY_DICT = {
   // human multi level
   'juelich/iav/atlas/v1.0.0/1': {
     // icbm152
-    'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': {
+    [IDS.TEMPLATES.MNI152]: {
       // julich brain v2.6
       'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-26': {
         'left hemisphere': 'MNI152_V25_LEFT_NG_SPLIT_HEMISPHERE',
@@ -186,15 +186,23 @@ export function getTmplAuxNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, s
   }
 }
 
-export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, _laterality: string | SapiRegionModel): string {
-  let laterality: string
-  if (typeof _laterality === "string") {
-    laterality = _laterality
-  } else {
-    laterality = "whole brain"
-    if (_laterality.name.indexOf("left") >= 0) laterality = "left hemisphere"
-    if (_laterality.name.indexOf("right") >= 0) laterality = "right hemisphere"
+export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel): string {
+
+  let laterality: string = "whole brain"
+  if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
+  if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
+
+  /**
+   * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
+   */
+  if (tmpl['@id'] === IDS.TEMPLATES.BIG_BRAIN && parc['@id'] === IDS.PARCELLATION.JBA29) {
+    laterality = region.hasAnnotation.visualizedIn?.['@id']
   }
+
+  if (!laterality) {
+    return null
+  }
+
   let ngId = BACKCOMAP_KEY_DICT[atlas["@id"]]?.[tmpl["@id"]]?.[parc["@id"]]?.[laterality]
   if (!ngId) {
     ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], parc["@id"], laterality)}`
@@ -202,18 +210,37 @@ export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: S
   return ngId
 }
 
+const labelIdxRegex = /siibra_python_ng_precomputed_labelindex:\/\/(.*?)#([0-9]+)$/
+
+export function getRegionLabelIndex(_atlas: SapiAtlasModel, _tmpl: SapiSpaceModel, _parc: SapiParcellationModel, region: SapiRegionModel): number {
+  const overwriteLabelIndex = region.hasAnnotation.inspiredBy.map(({ "@id": id }) => labelIdxRegex.exec(id)).filter(v => !!v)
+  if (overwriteLabelIndex.length > 0) {
+    const match = overwriteLabelIndex[0]
+    const volumeId = match[1]
+    const labelIndex = match[2]
+    const _labelIndex = Number(labelIndex)
+    if (!isNaN(_labelIndex)) return _labelIndex
+  }
+  const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
+  if (isNaN(lblIdx)) return null
+  return lblIdx
+}
+
 export function getParcNgLayers(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[]): Record<string, NgSegLayerSpec>{
   const returnVal: Record<string, NgSegLayerSpec> = {}
   for (const parcVol of parcVolumes) {
     const { volume, volumeMetadata } = parcVol
-    const { laterality, labelIndicies } = volumeMetadata
-    const ngId = getParcNgId(atlas, tmpl, parc, laterality)
+    const { regions } = volumeMetadata
+    if (regions.length === 0) {
+      console.warn(`parc volume with no associated region`)
+      continue
+    }
+    const ngId = getParcNgId(atlas, tmpl, parc, regions[0].region)
 
     returnVal[ngId] = {
       source: `precomputed://${volume.data.url.replace(/^precomputed:\/\//, '')}`,
-      labelIndicies,
-      laterality,
-      transform: (volume.data.detail["neuroglancer/precomputed"] as any).transform
+      transform: (volume.data.detail["neuroglancer/precomputed"] as any).transform,
+      labelIndicies: regions.map(v => v.labelIndex)
     }
   }
   return returnVal
@@ -238,12 +265,6 @@ export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atl
     tmplAuxNgLayers: getTmplAuxNgLayer(atlas, template, tmplAuxMeshVolumes),
     parcNgLayers: getParcNgLayers(atlas, template, parcellation, parcVolumes)
   }
-}
-
-export function getRegionLabelIndex(_atlas: SapiAtlasModel, _tmpl: SapiSpaceModel, _parc: SapiParcellationModel, region: SapiRegionModel): number {
-  const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
-  if (isNaN(lblIdx)) return null
-  return lblIdx
 }
 
 export const defaultNehubaConfig: NehubaConfig = {
@@ -318,11 +339,11 @@ export const defaultNehubaConfig: NehubaConfig = {
 }
 
 export const spaceMiscInfoMap = new Map([
-  ['minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588', {
+  [IDS.TEMPLATES.BIG_BRAIN, {
     name: 'bigbrain',
     scale: 1,
   }],
-  ['minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2', {
+  [IDS.TEMPLATES.MNI152, {
     name: 'icbm2009c',
     scale: 1,
   }],

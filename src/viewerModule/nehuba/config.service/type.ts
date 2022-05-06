@@ -112,5 +112,4 @@ export type NgPrecompMeshSpec = {
 
 export type NgSegLayerSpec = {
   labelIndicies: number[]
-  laterality: 'left hemisphere' | 'right hemisphere' | 'whole brain'
 } & NgLayerSpec
