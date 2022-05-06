@@ -129,11 +129,6 @@ export class NehubaViewerUnit implements OnDestroy {
 
   public ondestroySubscriptions: Subscription[] = []
 
-  private createNehubaPromiseRs: () => void
-  private createNehubaPromise = new Promise<void>(rs => {
-    this.createNehubaPromiseRs = rs
-  })
-
   public nehubaLoaded: boolean = false
 
   public landmarksLoaded: boolean = false
@@ -181,10 +176,6 @@ export class NehubaViewerUnit implements OnDestroy {
           this.nehubaReady.emit(null)
         })
         viewer.registerDisposer(this.layersChangedHandler)
-      })
-      .then(() => {
-        // all mutation to this.nehubaViewer should await createNehubaPromise
-        this.createNehubaPromiseRs()
       })
       .catch(e => this.errorEmitter.emit(e))
 

@@ -47,23 +47,6 @@ export class ViewerCtrlCmp implements OnInit{
   )
 
   ngOnInit(): void {
-    
-    // TODO move this to... nehubadirective?
-    if (this.nehubaInst$) {
-      this.sub.push(
-        // combineLatest([
-        //   this.customLandmarks$,
-        //   this.nehubaInst$,
-        // ]).pipe(
-        //   filter(([_, nehubaInst]) => !!nehubaInst),
-        // ).subscribe(([landmarks, nehubainst]) => {
-        //   this.setOctantRemoval(landmarks.length === 0)
-        //   nehubainst.updateUserLandmarks(landmarks)
-        // }),
-      )
-    } else {
-      console.warn(`NEHUBA_INSTANCE_INJTKN not provided`)
-    }
 
     this.sub.push(
 

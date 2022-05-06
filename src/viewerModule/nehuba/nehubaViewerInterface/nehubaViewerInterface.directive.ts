@@ -1,4 +1,4 @@
-import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef } from "@angular/core";
+import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef } from "@angular/core";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, asyncScheduler, combineLatest } from "rxjs";
@@ -151,12 +151,10 @@ export class NehubaViewerContainerDirective implements OnDestroy{
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
-  private nehubaViewerFactory: ComponentFactory<NehubaViewerUnit>
   private cr: ComponentRef<NehubaViewerUnit>
   private navigation: atlasSelection.AtlasSelectionState['navigation']
   constructor(
     private el: ViewContainerRef,
-    private cfr: ComponentFactoryResolver,
     private store$: Store<any>,
     private navService: NehubaNavigationService,
     private effect: LayerCtrlEffects,
@@ -164,7 +162,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     @Optional() private log: LoggingService,
   ){
     this.cdr.detach()
-    this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
 
     this.subscriptions.push(
       this.nehubaViewerPerspectiveOctantRemoval$.pipe(
@@ -296,7 +293,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     await new Promise(rs => setTimeout(rs, 0))
 
     this.iavNehubaViewerContainerViewerLoading.emit(true)
-    this.cr = this.el.createComponent(this.nehubaViewerFactory)
+    this.cr = this.el.createComponent(NehubaViewerUnit)
 
     if (this.navService.storeNav) {
       this.nehubaViewerInstance.initNav = {
