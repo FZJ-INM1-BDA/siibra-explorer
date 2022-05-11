@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay } from "rxjs/operators";
+import { map, shareReplay, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel, SxplrCleanedFeatureModel } from "./type";
 import { getExportNehuba } from "src/util/fn";
@@ -79,6 +79,10 @@ export class SAPI{
 
     const reg = this.getRegion(atlasId, parcId, regionId)
     return reg.getFeatures(spaceId)
+  }
+
+  getModalities() {
+    return this.http.get(`${SAPI.bsEndpoint}/modalities`)
   }
 
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { Observable, Subject } from "rxjs";
+import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
@@ -23,6 +23,8 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
   featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
 
+  public expandedPanel: string
+
   constructor(
     sapi: SAPI,
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>,
@@ -36,12 +38,12 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
 
   // eslint-disable-next-line  @typescript-eslint/no-empty-function
   handleExpansionPanelClosedEv(title: string){
-    
+    this.expandedPanel = null
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-empty-function
   handleExpansionPanelAfterExpandEv(title: string) {
-    
+    this.expandedPanel = title
   }
 
   activePanelTitles$: Observable<string[]> = new Subject()

@@ -1,0 +1,86 @@
+<div class="w-100 h-100 d-block d-flex flex-column sxplr-pb-2">
+    <div>
+        <div *ngIf="types && types.length && selectedType" class="flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+            <mat-form-field class="flex-grow-1 flex-shrink-1 w-0">
+                <mat-label>
+                    Modality
+                </mat-label>
+
+                <mat-select
+                        [value]="selectedType"
+                        (selectionChange)="selectType($event.value)">
+                    <mat-option
+                            *ngFor="let type of types"
+                            [matTooltip]="type.name"
+                            [value]="type.name">
+                        {{ type.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div *ngIf="selectedDataset"  class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
+            <div class="flex-grow-1 flex-shrink-1 w-0">
+                <mat-label>
+                    Dataset
+                </mat-label>
+                <mat-slider [min]="1"
+                            [max]="numberOfDatasets"
+                            (change)="datasetSliderChanged($event.value)"
+                            [value]="pageNumber"
+                            thumbLabel
+                            step="1"
+                            class="w-100">
+                </mat-slider>
+            </div>
+
+            <ng-container *ngIf="selectedDataset.description || (selectedDataset.data && selectedDataset.data.description)" >
+                <!--                    TODO please reimplmenent button to explore KG dataset-->
+                <button class="flex-grow-0 flex-shrink-0"
+                        mat-icon-button
+                        (click)="exportFullConnectivity()"
+                        matTooltip="Export full connectivity profile">
+                    <i class="fas fa-download"></i>
+                </button>
+            </ng-container>
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <mat-spinner *ngIf="fetching"></mat-spinner>
+    </div>
+
+    <hbp-connectivity-matrix-row
+            #connectivityComponent
+            *ngIf="regionName && !fetching"
+            [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
+            [connections]="connectionsString"
+            theme="dark"
+            show-export="true"
+            show-source="false"
+            show-title="false"
+            show-toolbar="false"
+            show-description="false"
+            show-dataset-name="false"
+            custom-dataset-selector="true"
+            tools_showlog="true"
+            [tools_custom]='[{"name": "exportslot", "type": "slot"}]'
+            hide-export-view="true">
+
+        <div slot="exportslot">
+            <button mat-icon-button
+                    [disabled]="noDataReceived"
+                    (click)="exportConnectivityProfile()"
+                    matTooltip="Export connectivity profile">
+                <i class="fas fa-download mb-2"></i>
+            </button>
+        </div>
+    </hbp-connectivity-matrix-row>
+    <full-connectivity-grid #fullConnectivityGrid
+                            [matrix]="matrixString"
+                            [datasetName]="selectedDataset?.name"
+                            [datasetDescription]="selectedDataset?.description || selectedDataset?.data?.description"
+                            only-export="true">
+    </full-connectivity-grid>
+</div>

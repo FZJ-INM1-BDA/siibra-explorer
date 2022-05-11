@@ -6,6 +6,9 @@ import { getHoc1Right, getHumanAtlas, getJba29, getJba29Regions, getMni152, prov
 import { SapiViewsCoreRegionModule } from "../../module"
 import { SapiViewsCoreRegionRegionRich } from "./region.rich.component"
 import { action } from '@storybook/addon-actions';
+import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {AngularMaterialModule} from "src/sharedModules";
+import {provideMockStore} from "@ngrx/store/testing";
 
 const actionsData = {
   onNavigateTo: action('onNavigateTo'),
@@ -20,10 +23,15 @@ export default {
         CommonModule,
         HttpClientModule,
         SapiViewsCoreRegionModule,
+        AngularMaterialModule,
       ],
       providers: [
         SAPI,
+        provideMockStore(),
         ...provideDarkTheme,
+      ],
+      schemas: [
+        CUSTOM_ELEMENTS_SCHEMA,
       ],
       declarations: []
     })

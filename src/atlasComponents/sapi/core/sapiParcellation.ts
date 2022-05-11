@@ -4,8 +4,12 @@ import { SAPI } from "../sapi.service"
 import { SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryParam, SapiRegionModel } from "../type"
 
 type PaginationQuery = {
-  perPage: number
+  size: number
   page: number
+}
+
+type ParcellationPaginationQuery = {
+  type?: string
 }
 
 export class SAPIParcellation{
@@ -36,12 +40,13 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatures(param?: PaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
+  getFeatures(param?: PaginationQuery, parcPagination?: ParcellationPaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
     return this.sapi.httpGet<SapiParcellationFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
-        per_page: '5',
-        page: '0',
+        type: parcPagination?.type,
+        size: param?.size?.toString() || '5',
+        page: param?.page?.toString() || '0',
       },
       queryParam
     )
