@@ -92,7 +92,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public logConnectionsString: string
     public pureConnections: any
     public connectedAreas: BehaviorSubject<any[]> = new BehaviorSubject([])
-
+    public noConnectivityForRegion: boolean
     private subscriptions: Subscription[] = []
     public allRegions = []
     private regionIndexInMatrix = -1
@@ -217,14 +217,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     // ToDo this is caused by the bug existing on siibra python
     private fixDatasetFormat = (ds) => ds.name.includes('{')? ({
+      ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"')),
       ...ds,
-      ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
     }) : ds
 
     fetchConnectivity() {
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
+        .pipe(catchError(() => {
+          this.fetching = false
+          return of(null)
+        }))
         .subscribe(ds=> {
-          this.setMatrixData(ds)  
+          this.setMatrixData(ds)
           this.fetching = false
         })
     }
@@ -232,6 +236,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     setMatrixData(data) {
       const matrixData = data as SapiParcellationFeatureMatrixModel
       this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
+      if (this.regionIndexInMatrix < 0) {
+        this.fetching = false
+        this.noConnectivityForRegion = true
+        this.changeDetectionRef.detectChanges()
+        return
+      } else if (this.noConnectivityForRegion) {
+        this.noConnectivityForRegion = false
+      }
       this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY)
         .then(matrix => {
           const regionProfile = matrix.rawArray[this.regionIndexInMatrix]

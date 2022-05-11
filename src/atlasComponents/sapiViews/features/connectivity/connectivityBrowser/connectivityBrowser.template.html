@@ -55,7 +55,7 @@
         <mat-checkbox class="mr-2"
                       [checked]="logChecked"
                       (change)="changeLog($event.checked)"
-                      [disabled]="logDisabled">Log 10</mat-checkbox>
+                      [disabled]="logDisabled || noConnectivityForRegion">Log 10</mat-checkbox>
         <button mat-button [matMenuTriggerFor]="exportMenu"
                 [disabled]="!connectedAreas.value">
             <i class="fas fa-download mb-2 mr-2"></i>
@@ -65,12 +65,13 @@
 
     <hbp-connectivity-matrix-row
         #connectivityComponent
-        *ngIf="regionName && !fetching"
+        *ngIf="regionName && !fetching && !noConnectivityForRegion"
         [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
         [connections]="connectionsString"
         show-export="true" hide-export-view="true"
         theme="dark">
     </hbp-connectivity-matrix-row>
+    <div *ngIf="noConnectivityForRegion">No connectivity for the region.</div>
     <full-connectivity-grid #fullConnectivityGrid
                             [matrix]="matrixString"
                             [datasetName]="selectedDataset?.name"
@@ -79,7 +80,7 @@
     </full-connectivity-grid>
 
     <mat-menu #exportMenu="matMenu">
-        <button mat-menu-item (click)="exportConnectivityProfile()">Regional</button>
+        <button mat-menu-item [disabled]="noConnectivityForRegion" (click)="exportConnectivityProfile()">Regional</button>
         <button mat-menu-item (click)="exportFullConnectivity()">Dataset</button>
     </mat-menu>
 </div>
