@@ -89,6 +89,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public regionHemisphere: string = null
     public selectedDataset: any
     public connectionsString: string
+    public logConnectionsString: string
+    public pureConnections: any
     public connectedAreas: BehaviorSubject<any[]> = new BehaviorSubject([])
 
     private subscriptions: Subscription[] = []
@@ -96,13 +98,15 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
     public matrixString: string
-    public noDataReceived = false
     public fetching: boolean
     public numberOfDatasets: number
     public connectivityLayerId = 'connectivity-colormap-id'
     private setCustomLayerOnLoad = false
     public pageNumber: number
     private customLayerEnabled: boolean
+
+    public logDisabled: boolean = true
+    public logChecked: boolean = true
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
@@ -230,18 +234,34 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
       this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY)
         .then(matrix => {
-          const areas = {}
-          matrix.rawArray[this.regionIndexInMatrix].forEach((value, i) => {
-            areas[matrixData.columns[i]] = value
-          })
+          const regionProfile = matrix.rawArray[this.regionIndexInMatrix]
+
+          const maxStrength = Math.max(...regionProfile)  
+          this.logChecked = maxStrength > 1
+          this.logDisabled = maxStrength <= 1
+
+          const areas = regionProfile.reduce((p, c, i) => ({...p, [matrixData.columns[i]]: c}), {})
+          // const areas = {}
+          // regionProfile.forEach((value, i) => {
+          //   areas[matrixData.columns[i]] = value
+          // })
+          this.pureConnections = areas
           this.connectionsString = JSON.stringify(areas)
           this.connectedAreas.next(this.formatConnections(areas))
-
           this.setCustomLayer()
+
           this.matrixString = JSON.stringify(matrixData.columns.map((mc, i) => ([mc, ...matrix.rawArray[i]])))
           this.changeDetectionRef.detectChanges()
 
         })
+    }
+
+    
+    changeLog(checked) {
+      this.logChecked = checked
+      this.connectedAreas.next(this.formatConnections(this.pureConnections))
+      this.connectivityComponentElement.nativeElement.toggleShowLog()
+      this.setCustomLayer()
     }
 
     //ToDo navigateRegion action does not work any more
@@ -271,38 +291,23 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
-    private floatConnectionNumbers
     private formatConnections = (areas) => {
       const cleanedObj = Object.keys(areas)
         .map(key => ({name: key, numberOfConnections: areas[key]}))
         .filter(f => f.numberOfConnections > 0)
         .sort((a, b) => +b.numberOfConnections - +a.numberOfConnections)
 
-      this.floatConnectionNumbers = cleanedObj[0].numberOfConnections <= 1
-      const logMax = this.floatConnectionNumbers ? cleanedObj[0].numberOfConnections : Math.log(cleanedObj[0].numberOfConnections)
+      const logMax = this.logChecked ? Math.log(cleanedObj[0].numberOfConnections) : cleanedObj[0].numberOfConnections
       const colorAreas = []
 
-      cleanedObj.forEach((a, i) => {
-        if (a.name.includes(' - both hemispheres')) {
-
-          const rightTitle = a.name.replace(' - both hemispheres', ' - right hemisphere')
-          const rightHemisphereItemToAdd = {...a, name: rightTitle}
-          cleanedObj.splice(i + 1, 0, rightHemisphereItemToAdd)
-
-          cleanedObj[i] = {
-            ...cleanedObj[i],
-            name: cleanedObj[i].name.replace(' - both hemispheres', ' - left hemisphere')
-          }
-        }
-      })
       cleanedObj.forEach((a) => {
         colorAreas.push({
           ...a,
           color: {
-            r: this.colormap_red(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax),
-            g: this.colormap_green(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax),
-            b: this.colormap_blue(this.floatConnectionNumbers ? a.numberOfConnections : Math.log(a.numberOfConnections) / logMax)
-          }
+            r: this.colormap_red((this.logChecked ? Math.log(a.numberOfConnections) : a.numberOfConnections) / logMax ),
+            g: this.colormap_green((this.logChecked ? Math.log(a.numberOfConnections) : a.numberOfConnections) / logMax ),
+            b: this.colormap_blue((this.logChecked ? Math.log(a.numberOfConnections) : a.numberOfConnections) / logMax )
+          },
         })
       })
       return colorAreas

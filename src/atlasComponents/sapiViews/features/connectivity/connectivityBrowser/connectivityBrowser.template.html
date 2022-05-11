@@ -48,34 +48,28 @@
     </div>
 
     <div class="d-flex justify-content-center">
-      <mat-spinner *ngIf="fetching"></mat-spinner>
+        <mat-spinner *ngIf="fetching"></mat-spinner>
+    </div>
+
+    <div class="d-flex align-items-center" *ngIf="regionName && !fetching">
+        <mat-checkbox class="mr-2"
+                      [checked]="logChecked"
+                      (change)="changeLog($event.checked)"
+                      [disabled]="logDisabled">Log 10</mat-checkbox>
+        <button mat-button [matMenuTriggerFor]="exportMenu"
+                [disabled]="!connectedAreas.value">
+            <i class="fas fa-download mb-2 mr-2"></i>
+            <label>Export</label>
+        </button>
     </div>
 
     <hbp-connectivity-matrix-row
-            #connectivityComponent
-            *ngIf="regionName && !fetching"
-            [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
-            [connections]="connectionsString"
-            theme="dark"
-            show-export="true"
-            show-source="false"
-            show-title="false"
-            show-toolbar="false"
-            show-description="false"
-            show-dataset-name="false"
-            custom-dataset-selector="true"
-            tools_showlog="true"
-            [tools_custom]='[{"name": "exportslot", "type": "slot"}]'
-            hide-export-view="true">
-
-        <div slot="exportslot">
-            <button mat-icon-button
-                    [disabled]="noDataReceived"
-                    (click)="exportConnectivityProfile()"
-                    matTooltip="Export connectivity profile">
-                <i class="fas fa-download mb-2"></i>
-            </button>
-        </div>
+        #connectivityComponent
+        *ngIf="regionName && !fetching"
+        [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
+        [connections]="connectionsString"
+        show-export="true" hide-export-view="true"
+        theme="dark">
     </hbp-connectivity-matrix-row>
     <full-connectivity-grid #fullConnectivityGrid
                             [matrix]="matrixString"
@@ -83,4 +77,9 @@
                             [datasetDescription]="selectedDataset?.description || selectedDataset?.data?.description"
                             only-export="true">
     </full-connectivity-grid>
+
+    <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportConnectivityProfile()">Regional</button>
+        <button mat-menu-item (click)="exportFullConnectivity()">Dataset</button>
+    </mat-menu>
 </div>

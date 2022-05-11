@@ -105,6 +105,7 @@ class ExampleConnectivityBrowserWrapper {
               areas[matrixData.columns[i]] = value
             })
             this.connectionsString = JSON.stringify(areas)
+            this.cdf.detectChanges()
           })
       })
   }
