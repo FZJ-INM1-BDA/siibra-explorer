@@ -241,10 +241,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.logDisabled = maxStrength <= 1
 
           const areas = regionProfile.reduce((p, c, i) => ({...p, [matrixData.columns[i]]: c}), {})
-          // const areas = {}
-          // regionProfile.forEach((value, i) => {
-          //   areas[matrixData.columns[i]] = value
-          // })
           this.pureConnections = areas
           this.connectionsString = JSON.stringify(areas)
           this.connectedAreas.next(this.formatConnections(areas))

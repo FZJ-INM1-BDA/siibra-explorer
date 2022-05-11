@@ -8,6 +8,7 @@ import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import {BS_ENDPOINT} from "src/util/constants";
 import {SAPI} from "src/atlasComponents/sapi";
+import {AngularMaterialModule} from "src/sharedModules";
 
 /**
  * injecting databrowser module is bad idea
@@ -60,6 +61,7 @@ describe('ConnectivityComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 HttpClientModule,
+                AngularMaterialModule
             ],
             providers: [
                 provideMockActions(() => actions$),
