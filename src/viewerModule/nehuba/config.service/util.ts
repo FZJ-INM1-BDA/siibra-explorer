@@ -229,6 +229,7 @@ export function getRegionLabelIndex(_atlas: SapiAtlasModel, _tmpl: SapiSpaceMode
 export function getParcNgLayers(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[]): Record<string, NgSegLayerSpec>{
   const returnVal: Record<string, NgSegLayerSpec> = {}
   for (const parcVol of parcVolumes) {
+    if ("spy/volume/neuroglancer/precomputed" !== parcVol.volume['@type']) continue
     const { volume, volumeMetadata } = parcVol
     const { regions } = volumeMetadata
     if (regions.length === 0) {

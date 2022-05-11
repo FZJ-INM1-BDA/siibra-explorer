@@ -107,15 +107,9 @@ module.exports = {
         scriptSrc:[
           "'self'",
           ...userScriptSrc,
-          'code.jquery.com', // plugin load external library -> jquery v2 and v3
-          'cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/', // plugin load external library -> web components
-          'cdnjs.cloudflare.com/ajax/libs/d3/', // plugin load external lib -> d3
-          'cdn.jsdelivr.net/npm/vue@2.5.16/', // plugin load external lib -> vue 2
-          'cdn.jsdelivr.net/npm/preact@8.4.2/', // plugin load external lib -> preact
-          'unpkg.com/react@16/umd/', // plugin load external lib -> react
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
-          'https://unpkg.com/three-surfer@0.0.10/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
+          'https://unpkg.com/three-surfer@0.0.11/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           'https://unpkg.com/ng-layer-tune@0.0.5/dist/ng-layer-tune/', // needed for ng layer control
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,

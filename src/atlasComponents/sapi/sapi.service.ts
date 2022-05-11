@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay, tap } from "rxjs/operators";
+import { map, shareReplay } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel, SxplrCleanedFeatureModel } from "./type";
 import { getExportNehuba } from "src/util/fn";
@@ -20,7 +20,7 @@ type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 @Injectable()
 export class SAPI{
-  static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v1_0`
+  static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v2_0`
 
   public bsEndpoint = SAPI.bsEndpoint
   
@@ -101,8 +101,7 @@ export class SAPI{
       observe: "response"
     }
   ).pipe(
-    tap(resp => {
-
+    map(resp => {
       const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
       if (respVersion !== SIIBRA_API_VERSION) {
         this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
@@ -110,8 +109,8 @@ export class SAPI{
         })
       }
       console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
+      return resp.body
     }),
-    map(resp => resp.body),
     shareReplay(1)
   )
 
