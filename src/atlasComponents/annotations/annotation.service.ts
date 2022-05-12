@@ -166,14 +166,39 @@ export class AnnotationLayer {
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{
-    let overwritingType = null
-    if (spec.type === 'point') overwritingType = 0
-    if (spec.type === 'line') overwritingType = 1
-    if (spec.type === "aabbox") overwritingType = 2
-    if (overwritingType === null) throw new Error(`overwrite type lookup failed for ${spec.type}`)
+    const voxelSize = this.viewer.navigationState.voxelSize.toJSON()
+    const sanitizePoint = (p: [number, number, number]) => p.map((v, idx) => v / voxelSize[idx]) as [number, number, number]
+    const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
+    let overwrite: Partial<_AnnotationSpec> = {}
+    if (spec.type === 'point') {
+      overwrite = {
+        type: 0,
+      }
+    }
+    if (spec.type === 'line') {
+      overwrite = {
+        type: 1
+      }
+    }
+    if (spec.type === "aabbox") {
+      overwrite = {
+        type: 2
+      }
+    }
+    if (!overwrite.type) throw new Error(`overwrite type lookup failed for ${spec.type}`)
+
+    /**
+     * The unit of annotation(s) depends on voxel size. If it is 1,1,1 then it would be in um, but often it is not.
+     * If not sanitized, the annotation can be miles off.
+     */
+    if (needSanitizePosition) {
+      for (const key of ['point', 'pointA', 'pointB'] ) {
+        if (!!spec[key]) overwrite[key] = sanitizePoint(spec[key])
+      }
+    }
     return {
       ...spec,
-      type: overwritingType
-    }
+      ...overwrite,
+    } as _AnnotationSpec
   }
 }
