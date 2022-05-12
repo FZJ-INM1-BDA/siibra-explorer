@@ -23,7 +23,8 @@ export class NgAnnotationService implements OnDestroy {
 
   static GET_ANN_LAYER(ann: annotation.UnionAnnotation): AnnotationLayer {
     const color = ann.color || annotation.AnnotationColor.WHITE
-    const layerName = `${NgAnnotationService.ANNOTATION_LAYER_NAME}-${annotation.AnnotationColor[color]}`
+    const layerEnum = annotation.AnnotationColor[color] || annotation.AnnotationColor.WHITE
+    const layerName = `${NgAnnotationService.ANNOTATION_LAYER_NAME}-${layerEnum}`
 
     const annLayer = AnnotationLayer.Get(layerName, NgAnnotationService.COLOR_MAP.get(color) || "#ffffff")
     NgAnnotationService.INIT_LAYERS.add(layerName)
@@ -35,6 +36,7 @@ export class NgAnnotationService implements OnDestroy {
       const layer = AnnotationLayer.Get(layername, '#ffffff')
       layer.dispose()
     })
+    NgAnnotationService.INIT_LAYERS.clear()
     while(this.subs.length) this.subs.pop().unsubscribe()
   }
 

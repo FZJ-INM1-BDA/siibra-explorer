@@ -108,6 +108,7 @@ module.exports = {
           "'self'",
           ...userScriptSrc,
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
+          'cdnjs.cloudflare.com/ajax/libs/d3/', // required for preview component
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
           'https://unpkg.com/three-surfer@0.0.11/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           'https://unpkg.com/ng-layer-tune@0.0.5/dist/ng-layer-tune/', // needed for ng layer control
