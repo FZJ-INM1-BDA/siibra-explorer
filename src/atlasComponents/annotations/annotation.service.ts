@@ -169,23 +169,22 @@ export class AnnotationLayer {
     const voxelSize = this.viewer.navigationState.voxelSize.toJSON()
     const sanitizePoint = (p: [number, number, number]) => p.map((v, idx) => v / voxelSize[idx]) as [number, number, number]
     const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
-    let overwrite: Partial<_AnnotationSpec> = {}
-    if (spec.type === 'point') {
-      overwrite = {
-        type: 0,
+    const overwrite: Partial<_AnnotationSpec> = {}
+    switch (spec.type) {
+      case "point": {
+        overwrite['type'] = 0
+        break
       }
-    }
-    if (spec.type === 'line') {
-      overwrite = {
-        type: 1
+      case "line": {
+        overwrite['type'] = 1
+        break
       }
-    }
-    if (spec.type === "aabbox") {
-      overwrite = {
-        type: 2
+      case "aabbox": {
+        overwrite['type'] = 2
+        break
       }
+      default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
     }
-    if (!overwrite.type) throw new Error(`overwrite type lookup failed for ${spec.type}`)
 
     /**
      * The unit of annotation(s) depends on voxel size. If it is 1,1,1 then it would be in um, but often it is not.
