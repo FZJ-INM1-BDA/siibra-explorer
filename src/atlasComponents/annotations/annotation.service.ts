@@ -171,19 +171,19 @@ export class AnnotationLayer {
     const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
     const overwrite: Partial<_AnnotationSpec> = {}
     switch (spec.type) {
-      case "point": {
-        overwrite['type'] = 0
-        break
-      }
-      case "line": {
-        overwrite['type'] = 1
-        break
-      }
-      case "aabbox": {
-        overwrite['type'] = 2
-        break
-      }
-      default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
+    case "point": {
+      overwrite['type'] = 0
+      break
+    }
+    case "line": {
+      overwrite['type'] = 1
+      break
+    }
+    case "aabbox": {
+      overwrite['type'] = 2
+      break
+    }
+    default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
     }
 
     /**
