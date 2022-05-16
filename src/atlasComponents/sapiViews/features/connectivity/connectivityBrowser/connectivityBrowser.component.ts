@@ -197,7 +197,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.fetching = true
       const type = this.types.find(t => t.name === this.selectedType).types[0]
       return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-        .getFeatures({page: this.pageNumber, size: 1}, {type})
+        .getFeatures({type, page: this.pageNumber, size: 1},)
         .pipe(
           take(1),
           catchError(() => {

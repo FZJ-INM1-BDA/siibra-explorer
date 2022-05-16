@@ -2,7 +2,16 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { map, shareReplay, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
-import { SapiAtlasModel, SapiParcellationModel, SapiQueryParam, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel, SpyNpArrayDataModel, SxplrCleanedFeatureModel } from "./type";
+import {
+  SapiAtlasModel,
+  SapiParcellationModel,
+  SapiQueryPriorityArg,
+  SapiRegionalFeatureModel,
+  SapiRegionModel,
+  SapiSpaceModel,
+  SpyNpArrayDataModel,
+  SxplrCleanedFeatureModel
+} from "./type";
 import { getExportNehuba } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
@@ -58,15 +67,15 @@ export class SAPI{
     return new SAPIRegion(this, atlasId, parcId, regionId)
   }
 
-  getSpaceDetail(atlasId: string, spaceId: string, param?: SapiQueryParam): Observable<SapiSpaceModel> {
+  getSpaceDetail(atlasId: string, spaceId: string, param?: SapiQueryPriorityArg): Observable<SapiSpaceModel> {
     return this.getSpace(atlasId, spaceId).getDetail(param)
   }
 
-  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryParam): Observable<SapiParcellationModel> {
+  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryPriorityArg): Observable<SapiParcellationModel> {
     return this.getParcellation(atlasId, parcId).getDetail(param)
   }
 
-  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryParam): Observable<SapiRegionModel[]> {
+  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryPriorityArg): Observable<SapiRegionModel[]> {
     const parc = this.getParcellation(atlasId, parcId)
     return parc.getRegions(spaceId, queryParam)
   }
@@ -85,7 +94,7 @@ export class SAPI{
     return this.http.get(`${SAPI.bsEndpoint}/modalities`)
   }
 
-  httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryParam){
+  httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){
     const headers: Record<string, string> = {}
     if (sapiParam?.priority) {
       headers[PRIORITY_HEADER] = sapiParam.priority.toString()

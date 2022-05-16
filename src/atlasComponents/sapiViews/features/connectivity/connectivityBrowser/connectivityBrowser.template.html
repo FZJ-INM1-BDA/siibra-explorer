@@ -33,16 +33,6 @@
                             class="w-100">
                 </mat-slider>
             </div>
-
-            <ng-container *ngIf="selectedDataset.description || (selectedDataset.data && selectedDataset.data.description)" >
-                <!--                    TODO please reimplmenent button to explore KG dataset-->
-                <button class="flex-grow-0 flex-shrink-0"
-                        mat-icon-button
-                        (click)="exportFullConnectivity()"
-                        matTooltip="Export full connectivity profile">
-                    <i class="fas fa-download"></i>
-                </button>
-            </ng-container>
         </div>
 
     </div>

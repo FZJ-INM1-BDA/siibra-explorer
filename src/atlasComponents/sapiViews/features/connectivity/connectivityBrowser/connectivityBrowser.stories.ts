@@ -77,7 +77,7 @@ class ExampleConnectivityBrowserWrapper {
 
   loadDataset() {
     return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-        .getFeatures({page: this.pageNumber, size: 1}, {type: this.type})
+        .getFeatures({type: this.type, page: this.pageNumber, size: 1})
         .pipe(
             take(1),
             catchError(() => {
