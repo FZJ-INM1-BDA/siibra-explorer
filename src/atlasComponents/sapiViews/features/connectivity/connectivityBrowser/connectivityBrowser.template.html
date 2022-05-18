@@ -64,8 +64,8 @@
     <div *ngIf="noConnectivityForRegion">No connectivity for the region.</div>
     <full-connectivity-grid #fullConnectivityGrid
                             [matrix]="matrixString"
-                            [datasetName]="selectedDataset?.name"
-                            [datasetDescription]="selectedDataset?.description || selectedDataset?.data?.description"
+                            [datasetName]="selectedDataset?.dataset?.name"
+                            [datasetDescription]="selectedDataset?.dataset?.description"
                             only-export="true">
     </full-connectivity-grid>
 

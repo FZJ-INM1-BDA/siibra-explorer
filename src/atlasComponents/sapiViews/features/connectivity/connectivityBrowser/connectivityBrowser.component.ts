@@ -213,11 +213,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         })
     }
 
-    // ToDo this is caused by the bug existing on siibra python
-    private fixDatasetFormat = (ds) => ds.name.includes('{')? ({
-      ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"')),
+    // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
+    private fixDatasetFormat = (ds) =>  ds.name.includes('{')? ({
       ...ds,
+      name: ds.name.substr(0, ds.name.indexOf('{')),
+      dataset: JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
     }) : ds
+    
 
     fetchConnectivity() {
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
