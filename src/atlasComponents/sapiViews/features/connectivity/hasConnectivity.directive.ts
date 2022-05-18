@@ -4,10 +4,10 @@ import {map, switchMap, take} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
 import {PARSE_TYPEDARRAY, SAPI} from "src/atlasComponents/sapi/sapi.service";
 import {
-    SapiAtlasModel, SapiModalityModel,
-    SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel,
-    SapiParcellationModel,
-    SapiRegionModel
+  SapiAtlasModel, SapiModalityModel,
+  SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel,
+  SapiParcellationModel,
+  SapiRegionModel
 } from "src/atlasComponents/sapi/type";
 
 @Directive({
