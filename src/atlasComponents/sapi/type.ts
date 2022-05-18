@@ -110,7 +110,6 @@ export function guardPipe<
   )
 }
 
-export type SapiQueryParam = {
-  priority?: number
-  type?: string
+export type SapiQueryPriorityArg = {
+  priority: number
 }

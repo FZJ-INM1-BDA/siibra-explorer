@@ -1,7 +1,7 @@
 import { Observable } from "rxjs"
 import { SAPI } from '../sapi.service'
 import { camelToSnake } from 'common/util'
-import { SapiQueryParam, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel } from "../type"
+import {SapiQueryPriorityArg, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel} from "../type"
 
 type FeatureResponse = {
   features: {
@@ -24,7 +24,7 @@ export class SAPISpace{
 
   constructor(private sapi: SAPI, public atlasId: string, public id: string){}
 
-  getModalities(param?: SapiQueryParam): Observable<FeatureResponse> {
+  getModalities(param?: SapiQueryPriorityArg): Observable<FeatureResponse> {
     return this.sapi.httpGet<FeatureResponse>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`,
       null,
@@ -54,7 +54,7 @@ export class SAPISpace{
     )
   }
 
-  getDetail(param?: SapiQueryParam): Observable<SapiSpaceModel>{
+  getDetail(param?: SapiQueryPriorityArg): Observable<SapiSpaceModel>{
     return this.sapi.httpGet<SapiSpaceModel>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}`,
       null,
