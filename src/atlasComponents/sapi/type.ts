@@ -7,6 +7,11 @@ export type IdName = {
   name: string
 }
 
+export type SapiModalityModel = {
+  name: string
+  types: string[]
+}
+
 type Point = [number, number, number]
 
 export type BoundingBoxConcept = [Point, Point]
@@ -30,6 +35,7 @@ export type SapiVolumeModel = components["schemas"]["VolumeModel"]
 export type SapiDatasetModel = components["schemas"]["DatasetJsonModel"]
 export type SpyNpArrayDataModel = components["schemas"]["NpArrayDataModel"]
 export type SapiIeegSessionModel = components["schemas"]["IEEGSessionModel"]
+
 /**
  * utility types
  */

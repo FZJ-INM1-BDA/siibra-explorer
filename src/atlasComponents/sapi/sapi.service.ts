@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay, tap } from "rxjs/operators";
+import { map, shareReplay } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
-  SapiAtlasModel,
+  SapiAtlasModel, SapiModalityModel,
   SapiParcellationModel,
   SapiQueryPriorityArg,
   SapiRegionalFeatureModel,
@@ -90,8 +90,8 @@ export class SAPI{
     return reg.getFeatures(spaceId)
   }
 
-  getModalities() {
-    return this.http.get(`${SAPI.bsEndpoint}/modalities`)
+  getModalities(): Observable<SapiModalityModel[]> {
+    return this.http.get<SapiModalityModel[]>(`${SAPI.bsEndpoint}/modalities`)
   }
 
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){

@@ -5,7 +5,7 @@ import {catchError, take} from "rxjs/operators";
 import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import {SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
+import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
 
@@ -53,7 +53,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     }
 
-    @Input() types: any[] = []
+    @Input() types: SapiModalityModel[] = []
 
     private _defaultProfile
     @Input() set defaultProfile(val: any) {
@@ -84,14 +84,12 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.regionName = newRegionName
     }
 
-    public atlasId: any
     public regionName: string
     public regionHemisphere: string = null
     public selectedDataset: any
     public connectionsString: string
-    public logConnectionsString: string
-    public pureConnections: any
-    public connectedAreas: BehaviorSubject<any[]> = new BehaviorSubject([])
+    public pureConnections: { [key: string]: number }
+    public connectedAreas: BehaviorSubject<ConnectedArea[]> = new BehaviorSubject([])
     public noConnectivityForRegion: boolean
     private subscriptions: Subscription[] = []
     public allRegions = []
@@ -112,7 +110,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
 
     constructor(
-        private store$: Store<any>,
+        private store$: Store,
         private sapi: SAPI,
         private changeDetectionRef: ChangeDetectorRef,
     ) {}
@@ -265,7 +263,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     
-    changeLog(checked) {
+    changeLog(checked: boolean) {
       this.logChecked = checked
       this.connectedAreas.next(this.formatConnections(this.pureConnections))
       this.connectivityComponentElement.nativeElement.toggleShowLog()
@@ -281,7 +279,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
     }
 
-    getRegionWithName(region) {
+    getRegionWithName(region: string) {
       return this.allRegions.find(r => r.name === region)
     }
 
@@ -299,7 +297,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
-    private formatConnections = (areas) => {
+    private formatConnections(areas: { [key: string]: number }) {
       const cleanedObj = Object.keys(areas)
         .map(key => ({name: key, numberOfConnections: areas[key]}))
         .filter(f => f.numberOfConnections > 0)
@@ -326,3 +324,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     private colormap_blue = x => x < 0.3? this.clamp(4.0 * x + 0.5) : this.clamp(-4.0 * x + 2.5)
 
 }
+
+export type ConnectedArea = {
+    color: {r: number, g: number, b: number}
+    name: string
+    numberOfConnections: number
+}
+
