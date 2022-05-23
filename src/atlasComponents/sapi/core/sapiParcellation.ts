@@ -1,10 +1,16 @@
 import { Observable } from "rxjs"
 import { SapiVolumeModel } from ".."
 import { SAPI } from "../sapi.service"
-import { SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryParam, SapiRegionModel } from "../type"
+import {SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryPriorityArg, SapiRegionModel} from "../type"
 
 type PaginationQuery = {
-  perPage: number
+  size: number
+  page: number
+}
+
+type ParcellationPaginationQuery = {
+  type?: string
+  size?: number
   page: number
 }
 
@@ -13,7 +19,7 @@ export class SAPIParcellation{
 
   }
 
-  getDetail(queryParam?: SapiQueryParam): Observable<SapiParcellationModel>{
+  getDetail(queryParam?: SapiQueryPriorityArg): Observable<SapiParcellationModel>{
     return this.sapi.httpGet<SapiParcellationModel>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}`,
       null,
@@ -21,7 +27,7 @@ export class SAPIParcellation{
     )
   }
 
-  getRegions(spaceId: string, queryParam?: SapiQueryParam): Observable<SapiRegionModel[]> {
+  getRegions(spaceId: string, queryParam?: SapiQueryPriorityArg): Observable<SapiRegionModel[]> {
     return this.sapi.httpGet<SapiRegionModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/regions`,
       {
@@ -36,12 +42,13 @@ export class SAPIParcellation{
     )
   }
 
-  getFeatures(param?: PaginationQuery, queryParam?: SapiQueryParam): Observable<SapiParcellationFeatureModel[]> {
+  getFeatures(parcPagination?: ParcellationPaginationQuery, queryParam?: SapiQueryPriorityArg): Observable<SapiParcellationFeatureModel[]> {
     return this.sapi.httpGet<SapiParcellationFeatureModel[]>(
       `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
       {
-        per_page: '5',
-        page: '0',
+        type: parcPagination?.type,
+        size: parcPagination?.size?.toString() || '5',
+        page: parcPagination?.page.toString() || '0',
       },
       queryParam
     )

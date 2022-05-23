@@ -89,7 +89,7 @@ export class NehubaLayerControlService implements OnDestroy{
         })()
         
         for (const r of regions) {
-          
+
           if (!r.hasAnnotation) continue
           if (!r.hasAnnotation.visualizedIn) continue
 

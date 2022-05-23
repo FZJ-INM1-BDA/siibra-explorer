@@ -1,0 +1,76 @@
+<div class="w-100 h-100 d-block d-flex flex-column sxplr-pb-2">
+    <div>
+        <div *ngIf="types && types.length && selectedType" class="flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+            <mat-form-field class="flex-grow-1 flex-shrink-1 w-0">
+                <mat-label>
+                    Modality
+                </mat-label>
+
+                <mat-select
+                        [value]="selectedType"
+                        (selectionChange)="selectType($event.value)">
+                    <mat-option
+                            *ngFor="let type of types"
+                            [matTooltip]="type.name"
+                            [value]="type.name">
+                        {{ type.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div *ngIf="selectedDataset"  class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
+            <div class="flex-grow-1 flex-shrink-1 w-0">
+                <mat-label>
+                    Dataset
+                </mat-label>
+                <mat-slider [min]="1"
+                            [max]="numberOfDatasets"
+                            (change)="datasetSliderChanged($event.value)"
+                            [value]="pageNumber"
+                            thumbLabel
+                            step="1"
+                            class="w-100">
+                </mat-slider>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <mat-spinner *ngIf="fetching"></mat-spinner>
+    </div>
+
+    <div class="d-flex align-items-center" *ngIf="regionName && !fetching">
+        <mat-checkbox class="mr-2"
+                      [checked]="logChecked"
+                      (change)="changeLog($event.checked)"
+                      [disabled]="logDisabled || noConnectivityForRegion">Log 10</mat-checkbox>
+        <button mat-button [matMenuTriggerFor]="exportMenu"
+                [disabled]="!connectedAreas.value">
+            <i class="fas fa-download mb-2 mr-2"></i>
+            <label>Export</label>
+        </button>
+    </div>
+
+    <hbp-connectivity-matrix-row
+        #connectivityComponent
+        *ngIf="regionName && !fetching && !noConnectivityForRegion"
+        [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
+        [connections]="connectionsString"
+        show-export="true" hide-export-view="true"
+        theme="dark">
+    </hbp-connectivity-matrix-row>
+    <div *ngIf="noConnectivityForRegion">No connectivity for the region.</div>
+    <full-connectivity-grid #fullConnectivityGrid
+                            [matrix]="matrixString"
+                            [datasetName]="selectedDataset?.dataset?.name"
+                            [datasetDescription]="selectedDataset?.dataset?.description"
+                            only-export="true">
+    </full-connectivity-grid>
+
+    <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item [disabled]="noConnectivityForRegion" (click)="exportConnectivityProfile()">Regional</button>
+        <button mat-menu-item (click)="exportFullConnectivity()">Dataset</button>
+    </mat-menu>
+</div>
