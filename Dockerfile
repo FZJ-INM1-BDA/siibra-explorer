@@ -38,7 +38,7 @@ RUN rm -rf ./node_modules
 
 
 RUN npm i
-RUN npm run build-aot
+RUN npm run build
 RUN npm run build-storybook
 
 # gzipping container
