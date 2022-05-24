@@ -675,6 +675,10 @@
         <!-- a series of bugs result in requiring this hacky -->
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
 
+
+        <ng-template [ngIf]="regionDirective.fetchInProgress">
+          <spinner-cmp class="sxplr-mt-10 fs-200"></spinner-cmp>
+        </ng-template>
         <sxplr-sapiviews-core-region-region-rich
           [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
           [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
@@ -682,6 +686,7 @@
           [sxplr-sapiviews-core-region-region]="selectedRegions[0]"
           (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
           (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+          #regionDirective="sapiViewsCoreRegionRich"
         >
           <div class="sapi-container" header></div>
         </sxplr-sapiviews-core-region-region-rich>

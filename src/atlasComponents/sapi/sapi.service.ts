@@ -21,6 +21,7 @@ import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
 import { Observable } from "rxjs";
 import { SAPIFeature } from "./features";
+import { environment } from "src/environments/environment"
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const SIIBRA_API_VERSION = '0.2.0'
@@ -29,7 +30,7 @@ type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 @Injectable()
 export class SAPI{
-  static bsEndpoint = `https://siibra-api-dev.apps-dev.hbp.eu/v2_0`
+  static bsEndpoint = `https://siibra-api-latest.apps-dev.hbp.eu/v2_0` || environment.BS_REST_URL
 
   public bsEndpoint = SAPI.bsEndpoint
   

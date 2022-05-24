@@ -1,14 +1,21 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { interval, merge, Observable, of, Subject, timer } from "rxjs"
-import { filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
+import { catchError, filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
 
 export const PRIORITY_HEADER = 'x-sxplr-http-priority'
 
-type Result<T> = {
+type ResultBase = {
   urlWithParams: string
-  result: HttpResponse<T>
 }
+
+type Result<T> = {
+  result: HttpResponse<T>
+} & ResultBase
+
+type ErrorResult = {
+  error: Error
+} & ResultBase
 
 type Queue = {
   urlWithParams: string
@@ -22,6 +29,7 @@ type Queue = {
 })
 export class PriorityHttpInterceptor implements HttpInterceptor{
 
+  private retry = 5
   private disablePriority = false
 
   private priorityQueue: Queue[] = []
@@ -30,6 +38,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
   private archive: Map<string, HttpResponse<unknown>> = new Map()
   private queue$: Subject<Queue> = new Subject()
   private result$: Subject<Result<unknown>> = new Subject()
+  private error$: Subject<ErrorResult> = new Subject()
 
   private forceCheck$ = new Subject()
 
@@ -56,11 +65,25 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
 
     this.queue$.subscribe(({ next, req, urlWithParams }) => {
       this.counter ++
+      let retry = this.retry
       next.handle(req).pipe(
         finalize(() => {
           this.counter --
-        })
+        }),
+        catchError((err, obs) => {
+          if (retry >= 0) {
+            retry --
+            return obs
+          }
+          return of(new Error(err))
+        }),
       ).subscribe(val => {
+        if (val instanceof Error) {
+          this.error$.next({
+            urlWithParams,
+            error: val
+          })
+        }
         if (val instanceof HttpResponse) {
           this.archive.set(urlWithParams, val)
           this.result$.next({
@@ -132,10 +155,18 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
     this.insert(objToInsert)
     this.forceCheck$.next(true)
 
-    return this.result$.pipe(
+    return merge(
+      this.result$,
+      this.error$,
+    ).pipe(
       filter(v => v.urlWithParams === urlWithParams),
       take(1),
-      map(v => v.result)
+      map(v => {
+        if (v instanceof Error) {
+          throw v
+        }
+        return (v as Result<unknown>).result
+      })
     )
   }
 }

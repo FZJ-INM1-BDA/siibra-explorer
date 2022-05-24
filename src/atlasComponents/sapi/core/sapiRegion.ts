@@ -1,8 +1,8 @@
 import { SAPI } from "..";
 import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel, cleanIeegSessionDatasets, SapiIeegSessionModel, CleanedIeegDataset, SapiVolumeModel, PaginatedResponse } from "../type";
 import { strToRgb, hexToRgb } from 'common/util'
-import { forkJoin, Observable, of } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { merge, Observable, of } from "rxjs";
+import { catchError, map, scan } from "rxjs/operators";
 
 export class SAPIRegion{
 
@@ -28,19 +28,20 @@ export class SAPIRegion{
   }
 
   getFeatures(spaceId: string): Observable<(SapiRegionalFeatureModel | CleanedIeegDataset)[]> {
-    return forkJoin({
-      regionalFeatures: this.sapi.httpGet<SapiRegionalFeatureModel[]>(
+    return merge(
+      this.sapi.httpGet<SapiRegionalFeatureModel[]>(
         `${this.prefix}/features`,
         {
           space_id: spaceId
         }
       ).pipe(
-        catchError((err, obs) => of([]))
+        catchError((err, obs) => {
+          return of([])
+        })
       ),
-      spatialFeatures: spaceId
+      spaceId
         ? this.sapi.getSpace(this.atlasId, spaceId).getFeatures({ parcellationId: this.parcId, region: this.id }).pipe(
           catchError((err, obs) => {
-            console.log('error caught')
             return of([])
           }),
           map(feats => {
@@ -49,10 +50,8 @@ export class SAPIRegion{
           }),
         )
         : of([] as CleanedIeegDataset[])
-    }).pipe(
-      map(({ regionalFeatures, spatialFeatures }) => {
-        return [...spatialFeatures, ...regionalFeatures]
-      })
+    ).pipe(
+      scan((acc, curr) => [...acc, ...curr], [])
     )
   }
 

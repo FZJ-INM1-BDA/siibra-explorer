@@ -11,7 +11,8 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service";
   templateUrl: './region.rich.template.html',
   styleUrls: [
     `./region.rich.style.css`
-  ]
+  ],
+  exportAs: "sapiViewsCoreRegionRich"
 })
 
 export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase {
