@@ -1,11 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { BehaviorSubject, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { viewerStateSetViewerMode } from "src/services/state/viewerState.store.helper";
-import { KEYFRAME_VIEWMODE } from "./constants";
-import { KeyFrameCtrlCmp } from "./keyframeCtrl/keyframeCtrl.component";
+import { actions } from "src/state/atlasSelection";
 
 @Injectable()
 export class KeyFrameService implements OnDestroy {
@@ -42,8 +39,10 @@ export class KeyFrameService implements OnDestroy {
 
       // TODO enable side bar when ready
       this.store.dispatch(
-        viewerStateSetViewerMode({
-          payload: flag && KEYFRAME_VIEWMODE
+        actions.setViewerMode({
+          viewerMode: flag
+            ? "key frame"
+            : null
         })
       )
     })

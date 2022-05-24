@@ -28,7 +28,7 @@ const getQuickStartMdPr = (async () => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Atlas Viewer Quickstart</title>
 </head>
-<body class="p-4">
+<body class="sxplr-p-4">
   
 </body>
 <script>

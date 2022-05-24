@@ -55,7 +55,7 @@
     </div>
 
     <!-- content -->
-    <mat-card-content class="mt-4 ml-15px-n mr-15px-n pb-4">
+    <mat-card-content class="mt-4 ml-15px-n mr-15px-n sxplr-pb-4">
         <!-- list of annotations -->
         <ng-template [ngIf]="managedAnnotations$ | async" [ngIfElse]="placeholderTmpl" let-managedAnnotations>
 
@@ -98,14 +98,14 @@
         </ng-template>
 
         <ng-template [ngIf]="annotationInOtherSpaces$ | async" let-annsInOtherSpace>
-            <div *ngIf="annsInOtherSpace.length > 0" class="p-4 text-muted">
+            <div *ngIf="annsInOtherSpace.length > 0" class="sxplr-p-4 text-muted">
                 {{ annsInOtherSpace.length }} annotations found in other reference spaces, and not shown here.
             </div>
         </ng-template>
 
         <!-- place holder when no annotations exist -->
         <ng-template #placeholderTmpl>
-            <div class="p-4 text-muted">
+            <div class="sxplr-p-4 text-muted">
                 <p>Start by adding an annotation, or import existing annotations.</p>
             </div>
         </ng-template>

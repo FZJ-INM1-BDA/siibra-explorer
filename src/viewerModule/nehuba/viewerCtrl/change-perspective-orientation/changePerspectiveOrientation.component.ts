@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {viewerStateChangeNavigation} from "src/services/state/viewerState/actions";
 import {Store} from "@ngrx/store";
+import { actions } from 'src/state/atlasSelection';
 
 @Component({
   selector: 'app-change-perspective-orientation',
@@ -22,10 +22,11 @@ export class ChangePerspectiveOrientationComponent {
     const orientation = this.viewOrientations[plane][view === 'first'? 0 : 1]
 
     this.store$.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
           perspectiveOrientation: orientation,
-        }
+        },
+        animation: true
       })
     )
   }

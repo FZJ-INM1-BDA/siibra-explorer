@@ -3,9 +3,6 @@ FROM node:14 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
-ARG DATASET_PREVIEW_URL
-ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
-
 ARG BS_REST_URL
 ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-stable.apps.hbp.eu/v1_0}
 
@@ -42,6 +39,7 @@ RUN rm -rf ./node_modules
 
 RUN npm i
 RUN npm run build-aot
+RUN npm run build-storybook
 
 # gzipping container
 FROM ubuntu:22.04 as compressor
@@ -49,12 +47,19 @@ RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv
 COPY --from=builder /iv/dist/aot /iv
+COPY --from=builder /iv/storybook-static /iv/storybook-static
+
+# Remove duplicated assets. Use symlink instead.
+WORKDIR /iv/storybook-static
+RUN rm -rf ./assets
+RUN ln -s ../assets ./assets
+
 WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:12-alpine
+FROM node:14-alpine
 
 ENV NODE_ENV=production
 

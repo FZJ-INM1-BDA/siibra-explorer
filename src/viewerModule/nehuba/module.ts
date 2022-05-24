@@ -10,12 +10,8 @@ import { NEHUBA_VIEWER_FEATURE_KEY } from "./constants";
 import { reducer } from "./store";
 import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
-import { LayoutModule } from "src/layouts/layout.module";
-import { TouchSideClass } from "./touchSideClass.directive";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { MaximisePanelButton } from "./maximisePanelButton/maximisePanelButton.component";
-import { Landmark2DModule } from "src/ui/nehubaContainer/2dLandmarks/module";
 import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
@@ -25,8 +21,13 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
-import { ViewerCtrlModule } from "./viewerCtrl";
 import { DragDropFileModule } from "src/dragDropFile/module";
+import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
+import { EffectsModule } from "@ngrx/effects";
+import { MeshEffects } from "./mesh.effects/mesh.effects";
+import { NehubaLayoutOverlayModule } from "./layoutOverlay";
+import { NgAnnotationService } from "./annotation/service";
+import { NgAnnotationEffects } from "./annotation/effects";
 
 @NgModule({
   imports: [
@@ -34,14 +35,11 @@ import { DragDropFileModule } from "src/dragDropFile/module";
     FormsModule,
     ReactiveFormsModule,
     UtilModule,
-    LayoutModule,
     AngularMaterialModule,
-    Landmark2DModule,
     ComponentsModule,
     MouseoverModule,
     ShareModule,
     WindowResizeModule,
-    ViewerCtrlModule,
     DragDropFileModule,
 
     /**
@@ -54,24 +52,30 @@ import { DragDropFileModule } from "src/dragDropFile/module";
       NEHUBA_VIEWER_FEATURE_KEY,
       reducer
     ),
-    QuickTourModule
+    EffectsModule.forFeature([
+      MeshEffects,
+      NgAnnotationEffects,
+    ]),
+    QuickTourModule,
+    NehubaLayoutOverlayModule,
   ],
   declarations: [
     NehubaViewerContainerDirective,
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
-    TouchSideClass,
-    MaximisePanelButton,
     StatusCardComponent,
+    NgLayerCtrlCmp,
   ],
   exports: [
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
     StatusCardComponent,
+    NgLayerCtrlCmp,
   ],
   providers: [
+    
     {
       provide: IMPORT_NEHUBA_INJECT_TOKEN,
       useFactory: importNehubaFactory,
@@ -80,11 +84,16 @@ import { DragDropFileModule } from "src/dragDropFile/module";
     {
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)
-    }
+    },
+    NgAnnotationService
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 
-export class NehubaModule{}
+export class NehubaModule{
+
+  // eslint-disable-next-line  @typescript-eslint/no-empty-function
+  constructor(_svc: NgAnnotationService){}
+}

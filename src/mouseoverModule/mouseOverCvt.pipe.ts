@@ -4,16 +4,14 @@ import { TOnHoverObj } from "./util";
 function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
   if (!value) return []
   switch (key) {
-  case 'segments': {
-    return (value as TOnHoverObj['segments']).map(seg => {
+  case 'regions': {
+    return (value as TOnHoverObj['regions']).map(seg => {
       return {
         icon: {
           fontSet: 'fas',
           fontIcon: 'fa-brain'
         },
-        text: typeof seg.segment === 'string'
-          ? seg.segment
-          : seg.segment.name
+        text: seg.name
       }
     })
   }

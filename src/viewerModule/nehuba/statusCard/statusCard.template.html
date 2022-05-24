@@ -3,7 +3,7 @@
   [quick-tour-order]="quickTourData.order"
   #statusCardQT="quickTour">
   <mat-card *ngIf="showFull; else showMin"
-    class="expandedContainer p-2 pt-1">
+    class="expandedContainer sxplr-p-2 sxplr-pt-1">
     
     <mat-card-content>
 
@@ -53,7 +53,7 @@
 
         <mat-slide-toggle
           [formControl]="statusPanelFormCtrl"
-          class="pl-2 pr-2">
+          class="sxplr-pl-2 sxplr-pr-2">
         </mat-slide-toggle>
 
         <span class="d-flex align-items center">
@@ -106,12 +106,12 @@
 
 <!-- minimised status bar -->
 <ng-template #showMin>
-  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center m-1 mt-3"
+  <div class="sxplr-custom-cmp text of-visible text-nowrap d-inline-flex align-items-center m-1 mt-3"
     iav-media-query
     #media="iavMediaQuery">
 
     <i aria-label="viewer navigation" class="fas fa-compass"></i>
-    <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="pl-2">
+    <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="sxplr-pl-2">
       {{ navVal$ | async }}
     </span>
 

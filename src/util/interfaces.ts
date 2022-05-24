@@ -16,12 +16,14 @@ export interface IHasFullId{
 
 export type TOverwriteShowDatasetDialog = (arg: any) => void
 
-export const OVERWRITE_SHOW_DATASET_DIALOG_TOKEN = new InjectionToken<TOverwriteShowDatasetDialog>('OVERWRITE_SHOW_DATASET_DIALOG_TOKEN')
-
 export type TRegionOfInterest = { ['fullId']: string }
 
-export const REGION_OF_INTEREST = new InjectionToken<Observable<TRegionOfInterest>>('RegionOfInterest')
 export const CANCELLABLE_DIALOG = new InjectionToken('CANCELLABLE_DIALOG')
+
+export type CANCELLABLE_DIALOG_OPTS = Partial<{
+  userCancelCallback: () => void
+  ariaLabel: string
+}>
 
 export type TTemplateImage = {
   name: string

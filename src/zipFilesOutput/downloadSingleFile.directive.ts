@@ -13,7 +13,7 @@ export class SingleFileOutput {
   singleFile: TZipFileConfig
 
   @HostListener('click')
-  onClick(){
+  onClick(): void{
     const anchor = this.doc.createElement('a')
     const blob = new Blob([this.singleFile.filecontent], { type: 'text/plain' })
     anchor.href = URL.createObjectURL(blob)

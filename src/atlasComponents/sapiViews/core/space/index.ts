@@ -1,0 +1,1 @@
+export { SapiViewsCoreSpaceModule } from "./module"

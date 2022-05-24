@@ -46,7 +46,7 @@ jobs:
           if [[ "$GITHUB_REF" == *hotfix* ]]
           then
             echo "Hotfix branch, using prod env..."
-            echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
+            echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
           else
             echo "Using dev env..."
             echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV

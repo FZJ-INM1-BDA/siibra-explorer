@@ -17,7 +17,6 @@ if (typeof self.importScripts === 'function')  self.importScripts('./worker-type
  */
 
 const validTypes = [
-  'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
   'PROPAGATE_PARC_REGION_ATTR'
 ]
@@ -26,16 +25,21 @@ const VALID_METHOD = {
   PROCESS_PLOTLY: `PROCESS_PLOTLY`,
   PROCESS_NIFTI: 'PROCESS_NIFTI',
   PROCESS_TYPED_ARRAY: `PROCESS_TYPED_ARRAY`,
+  PROCESS_TYPED_ARRAY_F2RGBA: `PROCESS_TYPED_ARRAY_F2RGBA`,
+  PROCESS_TYPED_ARRAY_CM2RGBA: "PROCESS_TYPED_ARRAY_CM2RGBA",
+  PROCESS_TYPED_ARRAY_RAW: "PROCESS_TYPED_ARRAY_RAW",
 }
 
 const VALID_METHODS = [
   VALID_METHOD.PROCESS_PLOTLY,
   VALID_METHOD.PROCESS_NIFTI,
   VALID_METHOD.PROCESS_TYPED_ARRAY,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA,
+  VALID_METHOD.PROCESS_TYPED_ARRAY_RAW,
 ]
 
 const validOutType = [
-  'ASSEMBLED_LANDMARKS_VTK',
   'ASSEMBLED_USERLANDMARKS_VTK',
 ]
 
@@ -170,32 +174,6 @@ const parseLmToVtk = (landmarks, scale) => {
     .concat(reduce.labelString.join('\n'))
 }
 
-let landmarkVtkUrl
-
-const getLandmarksVtk = (action) => {
-
-  // landmarks are array of triples in nm (array of array of numbers)
-  const landmarks = action.landmarks
-  const template = action.template
-  const scale = action.scale
-    ? action.scale
-    : 2.8
-
-  const vtk = parseLmToVtk(landmarks, scale)
-
-  if(!vtk) return
-
-  // when new set of landmarks are to be displayed, the old landmarks will be discarded
-  if(landmarkVtkUrl) URL.revokeObjectURL(landmarkVtkUrl)
-
-  landmarkVtkUrl = URL.createObjectURL(new Blob( [encoder.encode(vtk)], {type : 'application/octet-stream'} ))
-  postMessage({
-    type : 'ASSEMBLED_LANDMARKS_VTK',
-    template,
-    url : landmarkVtkUrl
-  })
-}
-
 let userLandmarkVtkUrl
 
 const getuserLandmarksVtk = (action) => {
@@ -296,6 +274,27 @@ onmessage = (message) => {
     }
     if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY) {
       try {
+        const { inputArray, dtype, width, height, channel } = message.data.param
+        const array = self.typedArray.packNpArray(inputArray, dtype, width, height, channel)
+
+        postMessage({
+          id,
+          result: {
+            array
+          }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA) {
+      try {
         const { inputArray, width, height, channel } = message.data.param
         const buffer = self.typedArray.fortranToRGBA(inputArray, width, height, channel)
 
@@ -315,11 +314,57 @@ onmessage = (message) => {
         })
       }
     }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA) {
+      try {
+        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { buffer, min, max } = self.typedArray.cm2rgba(inputArray, width, height, channel, dtype, processParams)
+
+        postMessage({
+          id,
+          result: {
+            buffer,
+            min,
+            max,
+          }
+        }, [ buffer.buffer ])
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
+    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_RAW) {
+      try {
+        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { outputArray, min, max } = self.typedArray.rawArray(inputArray, width, height, channel, dtype, processParams)
+
+        postMessage({
+          id,
+          result: {
+            outputArray,
+            min,
+            max,
+          }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `process typed array error: ${e.toString()}`
+          }
+        })
+      }
+    }
     postMessage({
       id,
       error: {
         code: 404,
-        message: `worker method not found`
+        message: `worker method not found. ${message.data.method}`
       }
     })
     return
@@ -327,9 +372,6 @@ onmessage = (message) => {
 
   if(validTypes.findIndex(type => type === message.data.type) >= 0){
     switch(message.data.type){
-      case 'GET_LANDMARKS_VTK':
-        getLandmarksVtk(message.data)
-        return
       case 'GET_USERLANDMARKS_VTK':
         getuserLandmarksVtk(message.data)
         return

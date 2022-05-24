@@ -1,0 +1,35 @@
+<ng-template #prefixTmpl>
+  <ng-content select="[prefix]"></ng-content>
+</ng-template>
+
+<ng-template #suffixTmpl>
+  <ng-content select="[suffix]"></ng-content>
+</ng-template>
+
+<div *ngIf="!region">
+  <div class="sxplr-d-inline-block">
+    <ng-template [ngTemplateOutlet]="prefixTmpl"></ng-template>
+  </div>
+  <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
+  <div class="sxplr-d-inline-block">
+    <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
+  </div>
+</div>
+
+<mat-chip-list *ngIf="region"
+  [ngClass]="{
+    'darktheme': regionDarkmode,
+    'lighttheme': !regionDarkmode
+  }">
+  <mat-chip
+    (click)="onClick($event)"
+    class="sxplr-custom-cmp text"
+    [style.backgroundColor]="regionRgbString"
+    >
+    <ng-template [ngTemplateOutlet]="prefixTmpl"></ng-template>
+    <span class="mat-body">
+      {{ region.name }}
+    </span>
+    <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
+  </mat-chip>
+</mat-chip-list>

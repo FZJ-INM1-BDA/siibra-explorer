@@ -1,0 +1,16 @@
+.region-tmpl
+{
+  text-overflow: clip;
+  white-space: nowrap; 
+}
+
+:host
+{
+  display: flex;
+  flex-direction: column;
+}
+
+sxplr-flat-hierarchy-tree-view
+{
+  flex: 0px 1 1;
+}

@@ -15,11 +15,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
     BrowserAnimationsModule,
     CommonModule
   ],
-  exports:[
+  exports: [
     SlSpotlightDirective
-  ],
-  entryComponents: [
-    SpotlightBackdropComponent
   ]
 })
 export class SpotLightModule { }

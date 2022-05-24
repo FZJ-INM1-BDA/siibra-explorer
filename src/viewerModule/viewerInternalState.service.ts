@@ -33,7 +33,7 @@ export class ViewerInternalStateSvc{
 
   private registeredEmitter: TViewerInternalStateEmitter
 
-  applyInternalState<T>(arg: TInteralStatePayload<T>){
+  applyInternalState<T>(arg: TInteralStatePayload<T>): void{
     if (!this.registeredEmitter) {
       throw new Error(`No emitter registered. Aborting.`)
     }
@@ -49,7 +49,7 @@ export class ViewerInternalStateSvc{
       done: () => this.deregisterEmitter(emitter)
     }
   }
-  deregisterEmitter(emitter: TViewerInternalStateEmitter){
+  deregisterEmitter(emitter: TViewerInternalStateEmitter): void{
     if (emitter === this.registeredEmitter) {
       this.viewerInternalState$.next(null)
       this.registeredEmitter = null

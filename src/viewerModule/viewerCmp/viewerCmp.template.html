@@ -1,6 +1,59 @@
-<div class="position-absolute w-100 h-100">
+<div iav-media-query class="position-absolute w-100 h-100" #media="iavMediaQuery">
   <ng-container *ngTemplateOutlet="viewerTmpl">
   </ng-container>
+
+  <div class="floating-ui">
+
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 3"
+      class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
+      <logo-container></logo-container>
+    </div>
+
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 3" floatingMouseContextualContainerDirective>
+
+      <div class="h-0"
+        iav-mouse-hover
+        #iavMouseHoverContextualBlock="iavMouseHover">
+      </div>
+      <mat-list dense class="contextual-block">
+        <mat-list-item *ngFor="let cvtOutput of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseoverCvt"
+          class="h-auto">
+
+          <mat-icon
+            [fontSet]="cvtOutput.icon.fontSet"
+            [fontIcon]="cvtOutput.icon.fontIcon"
+            mat-list-icon>
+          </mat-icon>
+
+          <div matLine>{{ cvtOutput.text }}</div>
+
+        </mat-list-item>
+
+        <ng-template [ngIf]="voiFeatures.onhover | async" let-feat>
+          <mat-list-item>
+            <mat-icon
+              fontSet="fas"
+              fontIcon="fa-database"
+              mat-list-icon>
+            </mat-icon>
+            <div matLine>{{ feat?.metadata?.fullName || 'Feature' }}</div>
+          </mat-list-item>
+        </ng-template>
+      </mat-list>
+      <!-- TODO Potentially implementing plugin contextual info -->
+    </div>
+
+    <!-- mouse on click context menu, currently not used -->
+    <!-- <div class="floating-container"
+      [attr.aria-label]="CONTEXT_MENU_ARIA_LABEL"
+      fixedMouseContextualContainerDirective
+      #fixedContainer="iavFixedMouseCtxContainer">
+
+      
+
+    </div> -->
+
+  </div>
 </div>
 
 
@@ -23,7 +76,7 @@
     (@openClose.done)="$event.toState === 'closed' && drawer.close()"
     [autoFocus]="false"
     [disableClose]="true"
-    class="iv-custom-comp darker-bg p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
+    class="sxplr-custom-cmp darker-bg sxplr-p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
 
     <!-- entry template -->
     <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="regularTmpl">
@@ -137,58 +190,17 @@
   let-drawer="drawer"
   let-showFullSidenavSwitch="showFullSidenavSwitch">
 
-  <!-- check if preview volume -->
-  <ng-template [ngIf]="overlaySidenav$ | async" let-overlaySideNav>
-    
-    <!-- back btn -->
-    <button mat-button
-      (click)="clearPreviewingDataset()"
-      [attr.aria-label]="ARIA_LABELS.CLOSE"
-      class="position-absolute z-index-10 m-2">
-      <i class="fas fa-chevron-left"></i>
-      <span class="ml-1">
-        Back
-      </span>
-    </button>
-
-    <ng-template #genericInfoVCR>
-    </ng-template>
-  </ng-template>
-
-  <div [ngClass]="{
-    'invisible overflow-hidden h-0': overlaySidenav$ | async,
-    'h-100': !(overlaySidenav$ | async)
-  }" class="pe-all position-relative d-flex flex-column">
-    
-
-  <!-- if pli voi is visible, show pli template
-  otherwise show region tmpl -->
+  <!-- selectedFeature || selectedRegion -->
   <ng-template
-    [ngTemplateOutlet]="(pliVol$ | async)?.[0]
-      ? voiTmpl
+    [ngTemplateOutlet]="(selectedFeature$ | async)
+      ? selectedFeatureTmpl
       : sidenavRegionTmpl"
     [ngTemplateOutletContext]="{
       drawer: drawer,
-      showFullSidenavSwitch: showFullSidenavSwitch
+      showFullSidenavSwitch: showFullSidenavSwitch,
+      feature: selectedFeature$ | async
     }">
   </ng-template>
-
-    <!-- <ng-template let-pliVol [ngIf]="pliVol$ | async" [ngIfElse]="sidenavRegionTmpl">
-      <ng-template [ngIf]="pliVol.length > 0" [ngIfElse]="sidenavRegionTmpl">
-        <ng-template [ngTemplateOutlet]="voiTmpl">
-
-        </ng-template>
-      </ng-template>
-    </ng-template> -->
-
-    <!-- TODO dataset preview will become deprecated in the future.
-    Regional feature/data feature will replace it -->
-    <!-- <div class="hidden"
-      iav-shown-dataset
-      #iavShownDataset="iavShownDataset">
-    </div> -->
-
-  </div>
 </ng-template>
 
 
@@ -206,33 +218,41 @@
       'transition-margin-left': !drawer.opened
     }">
 
+    <!-- collapsed side bar view -->
     <div class="h-0 w-100 region-text-search-autocomplete-position">
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
+      
+      <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
+        <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
+      </div>
     </div>
 
     <!-- such a gross implementation -->
     <!-- TODO fix this -->
-    <div class="mt-1-n w-100 pl-2 pr-2 m-1px">
+    <div class="min-tray-explr-btn"
+      sxplr-sapiviews-core-region
+      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-region-region]="(selectedRegions$ | async)[0]"
+      [sxplr-sapiviews-core-region-detail-flag]="true"
+      #sapiRegion="sapiViewsCoreRegion">
+
+      <!-- TODO use sapiViews/core/region/base and fix the rest -->
       <button mat-raised-button
         *ngIf="!(onlyShowMiniTray$ | async)"
         [attr.aria-label]="ARIA_LABELS.EXPAND"
         (click)="showFullSidenav()"
-        class="explore-btn pe-all w-100"
+        class="sxplr-mt-9 sxplr-pe-all w-100"
         [ngClass]="{
-          'darktheme': iavRegion.rgbDarkmode === true,
-          'lighttheme': iavRegion.rgbDarkmode === false
+          'darktheme': sapiRegion.regionDarkmode,
+          'lighttheme': !sapiRegion.regionDarkmode
         }"
-        [style.backgroundColor]="iavRegion?.rgbString || 'accent'">
-        <span class="text iv-custom-comp">
+        [style.backgroundColor]="sapiRegion.regionRgbString">
+        <span class="text sxplr-custom-cmp">
           Explore
         </span>
-
-        <div class="hidden"
-          iav-region
-          [region]="(selectedRegions$ | async) && (selectedRegions$ | async)[0]"
-          #iavRegion="iavRegion">
-        </div>
       </button>
     </div>
   
@@ -243,7 +263,8 @@
     <ng-container *ngTemplateOutlet="tabTmpl; context: {
       isOpen: minTrayVisSwitch.switchState$ | async,
       regionSelected: selectedRegions$ | async,
-      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
+      badge: (voiFeatures.features$ | async).length || null
     }">
     </ng-container>
   </div>
@@ -335,16 +356,16 @@
 
   <!-- signin banner at top right corner -->
   <top-menu-cmp class="mt-3 mr-2 d-inline-block"
-    [ismobile]="ismobile"
+    [ismobile]="(media.mediaBreakPoint$ | async) > 3"
     [viewerLoaded]="viewerLoaded">
   </top-menu-cmp>
 
-  <atlas-dropdown-selector
-    class="v-align-top pt-2 pe-all mt-2 iv-custom-comp bg card m-2 mat-elevation-z2 d-inline-block"
+  <sxplr-sapiviews-core-atlas-dropdown-selector
+    class="v-align-top sxplr-pt-2 pe-all mt-2 sxplr-custom-cmp bg card m-2 mat-elevation-z2 d-inline-block"
     quick-tour
     [quick-tour-description]="quickTourAtlasSelector.description"
     [quick-tour-order]="quickTourAtlasSelector.order">
-  </atlas-dropdown-selector>
+  </sxplr-sapiviews-core-atlas-dropdown-selector>
 
 </ng-template>
 
@@ -367,18 +388,54 @@
 <ng-template #bottomLeftTmpl let-showFullSideNav="showFullSideNav">
 
   <!-- atlas selector -->
-  <atlas-layer-selector *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
-    #alSelector="atlasLayerSelector"
-    class="d-inline-block flex-grow-0 flex-shrink-0 pe-all"
-    (iav-outsideClick)="alSelector.selectorExpanded = false">
-  </atlas-layer-selector>
+  <sxplr-sapiviews-core-atlas-tmplparcselector
+    *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
+    [iav-key-listener]="[{'type': 'keydown', 'key': 'Escape'}]"
+    (iav-key-event)="tmplParcSelector.closeSelector()"
+    (iav-outsideClick)="tmplParcSelector.closeSelector()"
+    #tmplParcSelector="sxplrSapiViewsCoreAtlasTmplparcselector">
+  </sxplr-sapiviews-core-atlas-tmplparcselector>
 
-  <!-- chips -->
-  <div *ngIf="parcellationSelected$ | async"
-    class="d-inline-block flex-grow-1 flex-shrink-1 pe-none overflow-x-auto overflow-y-hidden">
+  <!-- scroll container -->
+  <div class="sxplr-d-inline-flex
+    sxplr-flex-wrap-nowrap
+    sxplr-mxw-80vw
+    sxplr-pe-all
+    sxplr-of-x-auto
+    sxplr-of-y-hidden">
 
-    <viewer-state-breadcrumb class="d-inline-block pe-all" (on-item-click)="showFullSideNav()">
-    </viewer-state-breadcrumb>
+    <!-- selected parcellation chip -->
+    <sxplr-sapiviews-core-parcellation-smartchip
+      class="sxplr-z-2 sxplr-mr-1"
+      [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
+      (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
+      (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
+      >
+    </sxplr-sapiviews-core-parcellation-smartchip>
+
+    <!-- selected region chip -->
+    <sxplr-sapiviews-core-region-region-chip
+      *ngFor="let region of selectedRegions$ | async"
+      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1"
+      (sxplr-sapiviews-core-region-region-chip-clicked)="showFullSideNav()"
+      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+      [sxplr-sapiviews-core-region-region]="region">
+
+      <div prefix>
+      </div>
+
+      <div suffix class="sxplr-scale-70">
+        <button mat-mini-fab
+          color="primary"
+          iav-stop="mousedown click"
+          (click)="clearRoi()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </sxplr-sapiviews-core-region-region-chip>
   </div>
 
 </ng-template>
@@ -391,20 +448,16 @@
     <ng-container [ngSwitch]="useViewer$ | async">
 
       <!-- nehuba viewer -->
-      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 top-0"
+      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'nehuba'"
         (viewerEvent)="handleViewerEvent($event)"
-        [selectedTemplate]="templateSelected$ | async"
-        [selectedParcellation]="parcellationSelected$ | async"
         #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
       </iav-cmp-viewer-nehuba-glue>
 
       <!-- three surfer (free surfer viewer) -->
-      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 top-0"
+      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'threeSurfer'"
-        (viewerEvent)="handleViewerEvent($event)"
-        [selectedTemplate]="templateSelected$ | async"
-        [selectedParcellation]="parcellationSelected$ | async">
+        (viewerEvent)="handleViewerEvent($event)">
       </three-surfer-glue-cmp>
 
       <!-- if not supported, show not supported message -->
@@ -412,7 +465,7 @@
 
       <!-- by default, show splash screen -->
       <div *ngSwitchDefault>
-        <ui-splashscreen class="position-absolute left-0 top-0">
+        <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
         </ui-splashscreen>
       </div>
     </ng-container>
@@ -424,15 +477,68 @@
   </div>
 </ng-template>
 
+<!-- region-hierarchy-tmpl -->
+
+<ng-template #regionHierarchyTmpl>
+  <div class="sxplr-d-flex sxplr-flex-column sxplr-h-100">
+    <sxplr-sapiviews-core-rich-regionshierarchy
+      class="sxplr-w-100 sxplr-flex-var"
+      [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
+      [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="selectedRegions$ | async"
+      (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
+      >
+    </sxplr-sapiviews-core-rich-regionshierarchy>
+  
+    <mat-dialog-actions align="center" class="sxplr-flex-static">
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
 
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
-  <div class="iv-custom-comp bg card ml-2 mr-2 mat-elevation-z8 pe-all">
-    <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
-    </region-text-search-autocomplete>
+  <div class="sxplr-custom-cmp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
+    
+    <ng-template #selectedRegionCheckTmpl let-region>
+      <ng-template #fallbackTmpl>
+        <button mat-icon-button
+          class="sxplr-mt-a sxplr-mb-a">
+          <i class="far fa-square"></i>
+        </button>
+      </ng-template>
+
+      <button *ngIf="selectedRegions$ | async | includes : region; else fallbackTmpl"
+        mat-icon-button
+        color="primary"
+        class="sxplr-mt-a sxplr-mb-a">
+        <i class="far fa-check-square"></i>
+      </button>
+    </ng-template>
+
+    <sxplr-sapiviews-core-rich-regionlistsearch
+      [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
+      [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="selectedRegions$ | async | getProperty : 0 | getProperty : 'name'"
+      [sxplr-sapiviews-core-rich-regionlistsearch-region-template-ref]="selectedRegionCheckTmpl"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)">
+
+      <button mat-icon-button
+        search-input-suffix
+        *ngIf="selectedRegions$ | async | getProperty : 'length'"
+        (click)="clearRoi()">
+        <i class="fas fa-times"></i>
+      </button>
+    </sxplr-sapiviews-core-rich-regionlistsearch>
+
+    <button mat-icon-button
+      color="primary"
+      [sxplr-dialog]="regionHierarchyTmpl"
+      sxplr-dialog-size="xl">
+      <i class="fas fa-sitemap"></i>
+    </button>
 
     <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
     </div>
+
   </div>
 </ng-template>
 
@@ -441,7 +547,8 @@
   let-isOpen="isOpen"
   let-regionSelected="regionSelected"
   let-iavAdditionallayers="iavAdditionallayers"
-  let-click="click">
+  let-click="click"
+  let-badge="badge">
 
   <!-- if mat drawer is open -->
   <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
@@ -449,7 +556,8 @@
       [ngTemplateOutletContext]="{
         matColor: 'basic',
         fontIcon: 'fa-chevron-left',
-        click: click
+        click: click,
+        badge: badge
       }">
     </ng-template>
   </ng-template>
@@ -473,18 +581,24 @@
 
       <!-- if region selected > 0 -->
       <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
-        <div class="hidden"
-          iav-region
-          [region]="regionSelected[0]"
-          #tabTmpl_iavRegion="iavRegion">
+
+        <div sxplr-sapiviews-core-region
+          [sxplr-sapiviews-core-region-detail-flag]="true"
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+          [sxplr-sapiviews-core-region-region]="regionSelected[0]"
+          #tabTmpl_iavRegion="sapiViewsCoreRegion">
+
         </div>
 
+        <!-- TODO fix with sapiView/core/region directive -->
         <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
           matColor: 'accent',
-          customColor: tabTmpl_iavRegion.rgbString,
-          customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
+          customColor: tabTmpl_iavRegion.regionRgbString,
+          customColorDarkmode: tabTmpl_iavRegion.regionDarkmode,
           fontIcon: 'fa-brain',
-          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name,
+          tooltip: 'Explore ' + regionSelected[0].name,
           click: click
         }">
 
@@ -497,7 +611,8 @@
           matColor: 'primary',
           fontIcon: 'fa-sitemap',
           tooltip: 'Explore regions',
-          click: click
+          click: click,
+          badge: badge
         }">
         </ng-container>
       </ng-template>
@@ -531,62 +646,12 @@
     [matBadge]="badge"
     [matBadgeColor]="badgeColor || 'warn'">
 
-    <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+    <span [ngClass]="{'sxplr-custom-cmp  text': !!customColor}">
       <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
     </span>
   </button>
 </ng-template>
 
-<!-- VOI sidenav tmpl -->
-<ng-template #voiTmpl>
-
-  <!-- back btn -->
-  <button mat-button
-    (click)="clearVoi()"
-    [attr.aria-label]="ARIA_LABELS.CLOSE"
-    class="position-absolute z-index-10 m-2">
-    <i class="fas fa-chevron-left"></i>
-    <span class="ml-1">
-      Back
-    </span>
-  </button>
-
-  <mat-card class="_pli-container">
-    <mat-card-title>
-      {{ _pliTitle }}
-    </mat-card-title>
-
-    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
-      <span>
-        Dataset preview
-      </span>
-
-      <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
-
-      <a [href]="_pliLink"
-        mat-icon-button
-        matTooltip="Explore in EBRAINS Knowledge Graph"
-        target="_blank">
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-
-    </mat-card-subtitle>
-
-    <small class="d-block text-muted iv-custom-comp darker-bg">
-      {{ _pliDesc }}
-    </small>
-
-    <mat-expansion-panel class="sidenav-cover-header-container">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Registered Volumes
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <layer-browser></layer-browser>
-    </mat-expansion-panel>
-  </mat-card>
-</ng-template>
 
 <!-- region sidenav tmpl -->
 <ng-template #sidenavRegionTmpl
@@ -600,7 +665,7 @@
     </ng-container>
   </div>
 
-  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
+  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column sxplr-h-100"
     [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
     <!-- region detail -->
     <ng-container *ngIf="selectedRegions$ | async as selectedRegions; else selectRegionErrorTmpl">
@@ -609,8 +674,17 @@
       <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
         <!-- a series of bugs result in requiring this hacky -->
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
-        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: (regionOfInterest$ | async) }">
-        </ng-container>
+
+        <sxplr-sapiviews-core-region-region-rich
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+          [sxplr-sapiviews-core-region-region]="selectedRegions[0]"
+          (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
+          (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+        >
+          <div class="sapi-container" header></div>
+        </sxplr-sapiviews-core-region-region-rich>
       </ng-template>
 
       <!-- multi region wrapper -->
@@ -624,8 +698,7 @@
 
       <!-- place holder if length === 0 -->
       <ng-container *ngIf="selectedRegions.length === 0">
-        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: false }">
-        </ng-container>
+        no region selected
       </ng-container>
     </ng-container>
 
@@ -642,16 +715,6 @@
 </ng-template>
 
 
-<!-- single region tmpl -->
-<ng-template #singleRegionTmpl let-region="region">
-  <!-- region detail -->
-  <region-menu
-    [region]="region"
-    class="flex-grow-1 bs-border-box mat-elevation-z4">
-  </region-menu>
-</ng-template>
-
-
 <!-- expansion tmpl -->
 <ng-template #ngMatAccordionTmpl
   let-title="title"
@@ -660,49 +723,7 @@
   let-iconTooltip="iconTooltip"
   let-iavNgIf="iavNgIf"
   let-content="content">
-  <mat-expansion-panel
-    [attr.data-opened]="expansionPanel.expanded"
-    [attr.data-mat-expansion-title]="title"
-    hideToggle
-    *ngIf="iavNgIf"
-    #expansionPanel="matExpansionPanel">
-
-    <mat-expansion-panel-header>
-
-      <!-- title -->
-      <mat-panel-title>
-        {{ title }}
-      </mat-panel-title>
-
-      <!-- desc + icon -->
-      <mat-panel-description class="d-flex align-items-center justify-content-end"
-        [matTooltip]="iconTooltip">
-        <span class="mr-3">{{ desc }}</span>
-        <span class="accordion-icon d-inline-flex justify-content-center">
-          <i [class]="iconClass"></i>
-        </span>
-      </mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <!-- content -->
-    <ng-template matExpansionPanelContent>
-      <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
-      </ng-container>
-    </ng-template>
-  </mat-expansion-panel>
 </ng-template>
-
-<!-- misc dataset (e.g. PLI) -->
-<!-- <ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
-  <div class="w-100 flex-grow-1 d-flex flex-column">
-
-    Previewing misc dataset
-
-    <ng-container *ngTemplateOutlet="collapseBtn">
-    </ng-container>
-  </div>
-</ng-template> -->
 
 <!-- select region error... for whatever reason -->
 <ng-template #selectRegionErrorTmpl>
@@ -713,41 +734,42 @@
 <!-- multi region tmpl -->
 <ng-template #multiRegionTmpl let-regions="regions">
   <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
-    <region-menu
-      [region]="{ name: CONST.MULTI_REGION_SELECTION }"
-      class="bs-border-box ml-15px-n mr-15px-n mat-elevation-z4">
-    </region-menu>
 
     <!-- other regions detail accordion -->
     <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
 
       <!-- Multi regions include -->
-      <ng-template #multiRegionInclTmpl>
 
-        <mat-chip *ngFor="let r of regions"
-          iav-region
-          [region]="r"
-          class="m-1"
-          [ngClass]="{
-            'darktheme':regionDirective.rgbDarkmode === true,
-            'lighttheme': regionDirective.rgbDarkmode === false
-          }"
-          [style.backgroundColor]="regionDirective.rgbString"
-          #regionDirective="iavRegion">
-          <span class="iv-custom-comp text text-truncate d-inline">
-            {{ r.name }}
-          </span>
-        </mat-chip>
-      </ng-template>
+      <mat-expansion-panel
+        [attr.data-opened]="expansionPanel.expanded"
+        [attr.data-mat-expansion-title]="'Brain regions'"
+        hideToggle
+        #expansionPanel="matExpansionPanel">
 
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: 'Brain regions',
-        desc: regions.length,
-        iconClass: 'fas fa-brain',
-        iavNgIf: true,
-        content: multiRegionInclTmpl
-      }">
-      </ng-container>
+        <mat-expansion-panel-header>
+
+          <!-- title -->
+          <mat-panel-title>
+            Brain regions
+          </mat-panel-title>
+
+          <!-- desc + icon -->
+          <mat-panel-description class="d-flex align-items-center justify-content-end">
+            <span class="mr-3">{{ regions.length }}</span>
+            <span class="accordion-icon d-inline-flex justify-content-center">
+              <i class="fas fa-brain"></i>
+            </span>
+          </mat-panel-description>
+
+        </mat-expansion-panel-header>
+
+        <!-- content -->
+        <ng-template matExpansionPanelContent>
+          
+          <!-- TODO use actual region chip in sapiViews/core/region/chip -->
+          SOMETHING
+        </ng-template>
+      </mat-expansion-panel>
 
     </mat-accordion>
   </ng-template>
@@ -781,7 +803,7 @@
 
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
-  <mat-card class="p-0 d-flex flex-column"
+  <mat-card class="sxplr-p-0 d-flex flex-column"
     [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">
@@ -807,6 +829,7 @@
   </mat-card>
 </ng-template>
 
+
 <!-- viewer status ctx menu -->
 <ng-template #viewerStatusCtxMenu let-data>
   <mat-list>
@@ -818,7 +841,7 @@
       <ng-container *ngSwitchCase="'nehuba'">
         <mat-list-item>
           <span mat-line>
-            {{ data.context.payload.mouse.real | nmToMm | addUnitAndJoin : '' }} (mm)
+            {{ data.context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
           </span>
           <span mat-line class="text-muted">
             <i class="fas fa-map"></i>
@@ -853,27 +876,144 @@
   </mat-list>
 </ng-template>
 
+
+<!-- viewer state hover ctx menu -->
 <ng-template #viewerStatusRegionCtxMenu let-data>
   <!-- hovered ROIs -->
   <mat-list>
-    <mat-list-item *ngFor="let hoveredR of data.metadata.hoveredRegions; let first = first">
+    <mat-list-item *ngFor="let region of data.metadata.hoveredRegions; let first = first">
       <mat-divider class="top-0" *ngIf="!first"></mat-divider>
-      <span mat-line>
-        {{ hoveredR.displayName || hoveredR.name }}
-      </span>
-      <span mat-line class="text-muted">
-        <i class="fas fa-brain"></i>
-        <span>
-          Brain region
-        </span>
-      </span>
 
-      <!-- lookup region -->
-      <button mat-icon-button
-        (click)="selectRoi(hoveredR)"
-        ctx-menu-dismiss>
-        <i class="fas fa-search"></i>
-      </button>
+      <ng-container *ngTemplateOutlet="viewerStateSapiRegionTmpl; context: { $implicit: region }">
+      </ng-container>
+
     </mat-list-item>
   </mat-list>
 </ng-template>
+
+
+<!-- sapi region tmpl -->
+<ng-template #viewerStateSapiRegionTmpl let-region>
+  <span mat-line>
+    {{ region.name }}
+  </span>
+  <span mat-line class="text-muted">
+    <i class="fas fa-brain"></i>
+    <span>
+      Brain region
+    </span>
+  </span>
+
+  <!-- lookup region -->
+  <button mat-icon-button
+    (click)="selectRoi(region)"
+    ctx-menu-dismiss>
+    <i class="fas fa-search"></i>
+  </button>
+</ng-template>
+
+
+<!-- feature tmpls -->
+<ng-template #sapiBaseFeatureTmpl
+  let-backCb="backCb"
+  let-feature="feature">
+
+  <sxplr-sapiviews-core-datasets-dataset class="sxplr-z-2 mat-elevation-z2"
+    [sxplr-sapiviews-core-datasets-dataset-input]="feature">
+
+    <div header>
+      <!-- back btn -->
+      <button mat-button
+        *ngIf="backCb"
+        (click)="backCb()"
+        [attr.aria-label]="ARIA_LABELS.CLOSE"
+        class="sxplr-mb-2"
+        >
+        <i class="fas fa-chevron-left"></i>
+        <span class="ml-1">
+          Back
+        </span>
+      </button>
+    </div>
+
+  </sxplr-sapiviews-core-datasets-dataset>
+  
+  <sxplr-sapiviews-features-entry
+    [sxplr-sapiviews-features-entry-atlas]="selectedAtlas$ | async"
+    [sxplr-sapiviews-features-entry-space]="templateSelected$ | async"
+    [sxplr-sapiviews-features-entry-parcellation]="parcellationSelected$ | async"
+    [sxplr-sapiviews-features-entry-region]="(selectedRegions$ | async)[0]"
+    [sxplr-sapiviews-features-entry-feature]="feature">
+  </sxplr-sapiviews-features-entry>
+</ng-template>
+
+<!-- general feature tmpl -->
+
+<ng-template let-feature="feature" #selectedFeatureTmpl>
+  <!-- TODO differentiate between features (spatial, regional etc) -->
+  
+  <!-- spatial feature tmpl -->
+  <ng-container *ngTemplateOutlet="sapiBaseFeatureTmpl; context: {
+    backCb: clearSelectedFeature.bind(this),
+    feature: feature
+  }">
+  </ng-container>
+
+  <ng-layer-ctl *ngFor="let vol of feature.volumes"
+    class="d-block"
+    [ng-layer-ctl-name]="vol.metadata.fullName"
+    [ng-layer-ctl-src]="vol.data.url"
+    [ng-layer-ctl-transform]="vol.data | getProperty : 'detail' | getProperty: 'neuroglancer/precomputed' | getProperty : 'transform'">
+  </ng-layer-ctl>
+  <ng-template #sapiVOITmpl>
+  </ng-template>
+
+</ng-template>
+
+<ng-template #spatialFeatureListViewTmpl>
+  <div *ngIf="voiFeatures.busy$ | async; else notBusyTmpl" class="fs-200">
+    <spinner-cmp></spinner-cmp>
+  </div>
+
+  <ng-template #notBusyTmpl>
+    <mat-card *ngIf="(voiFeatures.features$ | async).length > 0" class="pe-all mat-elevation-z4">
+      <mat-card-title>
+        Volumes of interest
+      </mat-card-title>
+      <mat-card-subtitle class="overflow-hidden">
+        <!-- TODO in future, perhaps encapsulate this as a component? seems like a nature fit in sapiView/space/boundingbox -->
+        <ng-template let-bbox [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" [ngIfElse]="bboxFallbackTmpl">
+          Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
+        </ng-template>
+        <ng-template #bboxFallbackTmpl>
+          Found nearby
+        </ng-template>
+        
+      </mat-card-subtitle>
+
+      <mat-divider></mat-divider>
+
+      <div *ngFor="let feature of voiFeatures.features$ | async"
+        mat-ripple
+        (click)="showDataset(feature)"
+        class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
+        {{ feature.metadata.fullName }}
+      </div>
+    </mat-card>
+  </ng-template>
+</ng-template>
+
+<div class="d-none"
+  sxplr-sapiviews-core-space-boundingbox
+  [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
+  [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"
+  [sxplr-sapiviews-core-space-boundingbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
+  #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+  sxplr-sapiviews-features-voi-query
+  [sxplr-sapiviews-features-voi-query-atlas]="selectedAtlas$ | async"
+  [sxplr-sapiviews-features-voi-query-space]="templateSelected$ | async"
+  [sxplr-sapiviews-features-voi-query-bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+  (sxplr-sapiviews-features-voi-query-onclick)="showDataset($event)"
+  #voiFeatures="sxplrSapiViewsFeaturesVoiQuery">
+
+</div>

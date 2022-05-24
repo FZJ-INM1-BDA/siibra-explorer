@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
+import { Directive, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from "@angular/core";
 import { Subscription } from "rxjs";
 import { ResizeObserverService } from "./windowResize.service";
 
@@ -7,7 +7,7 @@ import { ResizeObserverService } from "./windowResize.service";
   exportAs: 'iavWindowResize'
 })
 
-export class ResizeObserverDirective implements OnChanges, OnInit {
+export class ResizeObserverDirective implements OnChanges, OnInit, OnDestroy {
   @Input('iav-window-resize-type')
   type: 'debounce' | 'throttle' = 'throttle'
 
@@ -27,14 +27,18 @@ export class ResizeObserverDirective implements OnChanges, OnInit {
 
   constructor(private svc: ResizeObserverService){}
 
-  ngOnInit(){
+  ngOnInit(): void {
     this.configure()
   }
-  ngOnChanges(){
+  ngOnChanges(): void {
     this.configure()
   }
 
-  configure(){
+  ngOnDestroy(): void {
+    while(this.sub.length > 0) this.sub.pop().unsubscribe()
+  }
+
+  configure(): void {
     while(this.sub.length > 0) this.sub.pop().unsubscribe()
 
     let sub: Subscription

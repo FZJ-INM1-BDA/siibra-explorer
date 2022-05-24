@@ -1,8 +1,10 @@
-import { Component, ViewChild, TemplateRef } from "@angular/core";
-import { IPluginManifest, PluginServices } from "../atlasViewer.pluginService.service";
+import { Component, TemplateRef } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { environment } from 'src/environments/environment';
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { PluginService } from "../service";
+import { PluginManifest } from "../types";
+import { combineLatest, Observable, Subject } from "rxjs";
+import { map, scan, startWith } from "rxjs/operators";
 
 @Component({
   selector : 'plugin-banner',
@@ -16,28 +18,14 @@ export class PluginBannerUI {
 
   EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
 
-  @ViewChild('pluginInfoTmpl', { read: TemplateRef })
-  private pluginInfoTmpl: TemplateRef<any>
-
   constructor(
-    public pluginServices: PluginServices,
+    private svc: PluginService,
     private matDialog: MatDialog,
-    private matSnackbar: MatSnackBar,
   ) {
   }
 
-  public clickPlugin(plugin: IPluginManifest) {
-    this.pluginServices.launchPlugin(plugin)
-  }
-
-  public showPluginInfo(manifest: IPluginManifest){
-    this.matDialog.open(
-      this.pluginInfoTmpl,
-      {
-        data: manifest,
-        ariaLabel: `Additional information about a plugin`
-      }
-    )
+  public launchPlugin(plugin: PluginManifest) {
+    this.svc.launchPlugin(plugin.iframeUrl)
   }
 
   public showTmpl(tmpl: TemplateRef<any>){
@@ -46,21 +34,25 @@ export class PluginBannerUI {
     })
   }
 
-  public loadingThirdpartyPlugin = false
+  private thirdpartyPlugin$: Subject<{name: 'Added Plugin', iframeUrl: string}> = new Subject()
 
-  public async addThirdPartyPlugin(manifestUrl: string) {
-    this.loadingThirdpartyPlugin = true
-    try {
-      await this.pluginServices.addPluginViaManifestUrl(manifestUrl)
-      this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Adding plugin successful`, 'Dismiss', {
-        duration: 5000
-      })
-    } catch (e) {
-      this.loadingThirdpartyPlugin = false
-      this.matSnackbar.open(`Error adding plugin: ${e.toString()}`, 'Dismiss', {
-        duration: 5000
-      })
-    }
+  availablePlugins$: Observable<{
+    name: string
+    iframeUrl: string
+  }[]> = combineLatest([
+    this.svc.pluginManifests$,
+    this.thirdpartyPlugin$.pipe(
+      scan((acc, curr) => acc.concat(curr), []),
+      startWith([])
+    ),
+  ]).pipe(
+    map(([builtIn, thirdParty]) => [...builtIn, ...thirdParty])
+  )
+
+  public addThirdPartyPlugin(iframeUrl: string) {
+    this.thirdpartyPlugin$.next({
+      name: 'Added Plugin',
+      iframeUrl
+    })
   }
 }

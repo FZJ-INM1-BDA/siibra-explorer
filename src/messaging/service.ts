@@ -7,7 +7,7 @@ import { getUuid } from "src/util/fn";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 
-import { IMessagingActions, IMessagingActionTmpl, ILoadMesh, LOAD_MESH_TOKEN, WINDOW_MESSAGING_HANDLER_TOKEN, IWindowMessaging } from './types'
+import { IMessagingActions, IMessagingActionTmpl, WINDOW_MESSAGING_HANDLER_TOKEN, IWindowMessaging } from './types'
 import { TYPE as NMV_TYPE, processJsonLd as nmvProcess } from './nmvSwc/index'
 import { TYPE as NATIVE_TYPE, processJsonLd as nativeProcess } from './native'
 
@@ -35,7 +35,6 @@ export class MessagingService {
     private snackbar: MatSnackBar,
     private worker: AtlasWorkerService,
     @Optional() @Inject(WINDOW_MESSAGING_HANDLER_TOKEN) private messagingHandler: IWindowMessaging,
-    @Optional() @Inject(LOAD_MESH_TOKEN) private loadMesh: (loadMeshParam: ILoadMesh) => void,
   ){
     
     if (window.opener){
@@ -72,11 +71,13 @@ export class MessagingService {
           result
         }, origin)
       } catch (error) {
-        src.postMessage({
-          id,
-          jsonrpc: '2.0',
-          error
-        }, origin)
+        if (src) {
+          src.postMessage({
+            id,
+            jsonrpc: '2.0',
+            error
+          }, origin)
+        }
       }
     })
 
@@ -189,17 +190,21 @@ export class MessagingService {
       })
       isLoadingSnack?.dismiss()
       const meshId = 'bobby'
-      if (this.loadMesh) {
-        const { objectUrl, customFragmentColor } = resp.result || {}
-        this.loadMesh({
-          type: 'VTK',
-          id: meshId,
-          url: objectUrl,
-          customFragmentColor
-        })
-      } else {
-        this.snackbar.open(`Error: loadMesh method not injected.`)
-      }
+      /**
+       * TODO re-enable plotly VTK mesh
+       */
+      
+      // if (false) {
+      //   const { objectUrl, customFragmentColor } = resp.result || {}
+      //   this.loadMesh({
+      //     type: 'VTK',
+      //     id: meshId,
+      //     url: objectUrl,
+      //     customFragmentColor
+      //   })
+      // } else {
+      //   this.snackbar.open(`Error: loadMesh method not injected.`)
+      // }
       return 'OK'
     }
 

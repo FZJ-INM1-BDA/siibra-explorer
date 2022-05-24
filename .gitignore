@@ -1,3 +1,4 @@
+/.angular/cache
 node_modules
 dist
 src/res/raw
@@ -12,3 +13,5 @@ site
 *.log
 cachedKgDataset.json
 tmp
+storybook-static
+documentation.json

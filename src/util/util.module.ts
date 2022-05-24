@@ -1,13 +1,10 @@
 import { NgModule } from "@angular/core";
-import { FilterRowsByVisbilityPipe } from "src/components/flatTree/filterRowsByVisibility.pipe";
 import { KeyListner } from "./directives/keyDownListener.directive";
 
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
-import { IncludesPipe } from "./pipes/includes.pipe";
 import { SafeResourcePipe } from "./pipes/safeResource.pipe";
 import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
-import { AddUnitAndJoin } from "./pipes/addUnitAndJoin.pipe";
-import { NmToMm } from "./pipes/numbers.pipe";
+import { NmToMm } from "./pipes/nmToMm.pipe";
 import { SwitchDirective } from "./directives/switch.directive";
 import { MediaQueryDirective } from './directives/mediaQuery.directive'
 import { LayoutModule } from "@angular/cdk/layout";
@@ -28,13 +25,10 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     LayoutModule
   ],
   declarations: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
-    IncludesPipe,
     SafeResourcePipe,
     CaptureClickListenerDirective,
-    AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
     MediaQueryDirective,
@@ -51,13 +45,10 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     MergeObjPipe,
   ],
   exports: [
-    FilterRowsByVisbilityPipe,
     StopPropagationDirective,
     KeyListner,
-    IncludesPipe,
     SafeResourcePipe,
     CaptureClickListenerDirective,
-    AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
     MediaQueryDirective,

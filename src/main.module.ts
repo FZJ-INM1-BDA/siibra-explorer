@@ -1,82 +1,67 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, ActionReducer } from "@ngrx/store";
+import { Store, select } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
-import { ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
 import { UIModule } from "./ui/ui.module";
 
 import { HttpClientModule } from "@angular/common/http";
-import { EffectsModule } from "@ngrx/effects";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
-import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
-import { DialogComponent } from "./components/dialog/dialog.component";
 import { DialogService } from "./services/dialogService.service";
-import { UseEffects } from "./services/effect/effect";
-import { LocalFileService } from "./services/localFile.service";
-import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
-import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { ViewerStateControllerUseEffect } from "src/state";
-import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
-import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, PureContantService, UtilModule } from "src/util";
+import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
-import { UiStateUseEffect } from "src/services/state/uiState.store";
-import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
-import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
 import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, ClickInterceptorService, _PLI_VOLUME_INJ_TOKEN } from './glue';
-import { viewerStateHelperReducer, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
+import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
-import { UiEffects } from './services/state/uiState/ui.effects';
 import { MesssagingModule } from './messaging/module';
-import { ParcellationRegionModule } from './atlasComponents/parcellationRegion';
-import { ViewerModule, VIEWERMODULE_DARKTHEME } from './viewerModule';
+import { ViewerModule } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
-import { MouseoverModule } from './mouseoverModule/mouseover.module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, kgTos, IAV_DATASET_PREVIEW_ACTIVE } from './databrowser.fallback'
-import { CANCELLABLE_DIALOG } from './util/interfaces';
+import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
 import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
+import {
+  atlasSelection,
+  RootStoreModule,
+  getStoreEffects,
+} from "./state"
+import { DARKTHEME } from './util/injectionTokens';
+import { map } from 'rxjs/operators';
+import { EffectsModule } from '@ngrx/effects';
 
-export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
-  return function(state, action) {
-    console.log('state', state);
-    console.log('action', action);
- 
-    return reducer(state, action);
-  };
-}
+// TODO check if there is a more logical place import put layerctrl effects ts
+import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerCtrl.effects';
+import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
+import { CONST } from "common/constants"
 
 @NgModule({
-  imports : [
+  imports: [
     FormsModule,
     CommonModule,
     LayoutModule,
     ComponentsModule,
     DragDropModule,
     UIModule,
-    
+
     AngularMaterialModule,
     UtilModule,
     WidgetModule,
@@ -85,74 +70,36 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     MesssagingModule,
     ViewerModule,
     SpotLightModule,
-    ParcellationRegionModule,
     CookieModule,
     KgTosModule,
-    MouseoverModule,
     AtlasViewerRouterModule,
     QuickTourModule,
     
     EffectsModule.forRoot([
-      UseEffects,
-      UserConfigStateUseEffect,
-      ViewerStateControllerUseEffect,
-      ViewerStateUseEffect,
-      NgViewerUseEffect,
-      PluginServiceUseEffect,
-      UiStateUseEffect,
-      NewTemplateUseEffect,
-      ViewerStateHelperEffect,
-      GlueEffects,
-      UiEffects,
+      ...getStoreEffects(),
+      LayerCtrlEffects,
+      NehubaNavigationEffects,
     ]),
-    StoreModule.forRoot({
-      pluginState,
-      viewerConfigState,
-      ngViewerState,
-      viewerState,
-      viewerStateHelper: viewerStateHelperReducer,
-      uiState,
-      userConfigState,
-    },{
-      metaReducers: [ 
-        // debug,
-        ...viewerStateMetaReducers,
-        datasetPreviewMetaReducer,
-      ]
-    }),
+    RootStoreModule,
     HttpClientModule,
   ],
-  declarations : [
+  declarations: [
     AtlasViewer,
     NotSupportedCmp,
     TryMeComponent,
-
     /* directives */
-    FloatingContainerDirective,
-    FloatingMouseContextualContainerDirective,
-
   ],
-  entryComponents : [
-    DialogComponent,
-    ConfirmDialogComponent,
-  ],
-  providers : [
+  providers: [
     AtlasWorkerService,
     AuthService,
-    LocalFileService,
     DialogService,
     UIService,
     TemplateCoordinatesTransformation,
     ClickInterceptorService,
     {
-      provide: OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
-      useFactory: (glue: IDatasetPreviewGlue) => glue.displayDatasetPreview.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
-    {
       provide: CANCELLABLE_DIALOG,
       useFactory: (uiService: UIService) => {
-        return (message, option) => {
+        return (message: string, option: CANCELLABLE_DIALOG_OPTS) => {
           const actionBtn = {
             type: 'mat-stroked-button',
             color: 'default',
@@ -188,25 +135,8 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       deps: [ UIService ]
     },
     {
-      provide: _PLI_VOLUME_INJ_TOKEN,
-      useFactory: (glue: DatasetPreviewGlue) => glue._volumePreview$,
-      deps: [ DatasetPreviewGlue ]
-    },
-    {
-      provide: IAV_DATASET_PREVIEW_ACTIVE,
-      useFactory: (glue: DatasetPreviewGlue) => glue.datasetPreviewDisplayed.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
-    {
-      provide: GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
-      useFactory: (glue: DatasetPreviewGlue) => glue.getDatasetPreviewFromId.bind(glue),
-      deps: [ DatasetPreviewGlue ]
-    },
-    DatasetPreviewGlue,
-    
-    {
       provide: TOS_OBS_INJECTION_TOKEN,
-      useValue: of(kgTos)
+      useValue: of(CONST.KG_TOS)
     },
 
     {
@@ -230,11 +160,6 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       ]
     },
     {
-      provide: VIEWERMODULE_DARKTHEME,
-      useFactory: (pureConstantService: PureContantService) => pureConstantService.darktheme$,
-      deps: [ PureContantService ]
-    },
-    {
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,
       useClass: MessagingGlue
     },
@@ -242,20 +167,27 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       provide: BS_ENDPOINT,
       useValue: (environment.BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
+    {
+      provide: DARKTHEME,
+      useFactory: (store: Store) => store.pipe(
+        select(atlasSelection.selectors.selectedTemplate),
+        map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
+      ),
+      deps: [ Store ]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authSvc: AuthService) => {
+        authSvc.authReloadState()
+        return () => Promise.resolve()
+      },
+      multi: true,
+      deps: [ AuthService ]
+    }
   ],
-  bootstrap : [
+  bootstrap: [
     AtlasViewer,
-  ],
+  ]
 })
 
-export class MainModule {
-
-  constructor(
-    authServce: AuthService,
-    // bandaid fix: required to init glueService on startup
-    // TODO figure out why, then init service without this hack
-    glueService: DatasetPreviewGlue
-  ) {
-    authServce.authReloadState()
-  }
-}
+export class MainModule {}

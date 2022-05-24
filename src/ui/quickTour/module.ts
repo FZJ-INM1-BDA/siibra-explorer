@@ -21,7 +21,7 @@ import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourD
     WindowResizeModule,
     ComponentsModule,
   ],
-  declarations:[
+  declarations: [
     QuickTourThis,
     QuickTourComponent,
     QuickTourDirective,
@@ -32,7 +32,7 @@ import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourD
     QuickTourDirective,
     QuickTourThis,
   ],
-  providers:[
+  providers: [
     {
       provide: OverlayContainer,
       useClass: FullscreenOverlayContainer
@@ -42,7 +42,6 @@ import {StartTourDialogDialog} from "src/ui/quickTour/startTourDialog/startTourD
       provide: QUICK_TOUR_CMP_INJTKN,
       useValue: QuickTourComponent
     }
-  ],
-  entryComponents: [ StartTourDialogDialog ]
+  ]
 })
 export class QuickTourModule{}

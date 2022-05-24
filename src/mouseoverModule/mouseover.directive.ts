@@ -1,11 +1,11 @@
 import { Directive } from "@angular/core"
 import { select, Store } from "@ngrx/store"
-import { merge, Observable } from "rxjs"
+import { merge, NEVER, Observable, of } from "rxjs"
 import { distinctUntilChanged, map, scan, shareReplay } from "rxjs/operators"
 import { LoggingService } from "src/logging"
-import { uiStateMouseOverLandmarkSelector, uiStateMouseOverSegmentsSelector, uiStateMouseoverUserLandmark } from "src/services/state/uiState/selectors"
 import { TOnHoverObj, temporalPositveScanFn } from "./util"
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
+import { userInteraction } from "src/state"
 
 @Directive({
   selector: '[iav-mouse-hover]',
@@ -25,27 +25,29 @@ export class MouseHoverDirective {
     // TODO consider moving these into a single obs serviced by a DI service
     // can potentially net better performance
 
-    const onHoverUserLandmark$ = this.store$.pipe(
-      select(uiStateMouseoverUserLandmark)
-    )
+    const onHoverUserLandmark$ = NEVER
+    // this.store$.pipe(
+    //   select(uiStateMouseoverUserLandmark)
+    // )
 
-    const onHoverLandmark$ = this.store$.pipe(
-      select(uiStateMouseOverLandmarkSelector)
-    ).pipe(
-      map(landmark => {
-        if (landmark === null) { return null }
-        const idx = Number(landmark.replace('label=', ''))
-        if (isNaN(idx)) {
-          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
-          return {
-            landmarkName: idx,
-          }
-        } 
-      }),
-    )
+    const onHoverLandmark$ = NEVER
+    // this.store$.pipe(
+    //   select(uiStateMouseOverLandmarkSelector)
+    // ).pipe(
+    //   map(landmark => {
+    //     if (landmark === null) { return null }
+    //     const idx = Number(landmark.replace('label=', ''))
+    //     if (isNaN(idx)) {
+    //       this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+    //       return {
+    //         landmarkName: idx,
+    //       }
+    //     } 
+    //   }),
+    // )
 
     const onHoverSegments$ = this.store$.pipe(
-      select(uiStateMouseOverSegmentsSelector),
+      select(userInteraction.selectors.mousingOverRegions),
 
       // TODO fix aux mesh filtering
 
@@ -59,7 +61,7 @@ export class MouseHoverDirective {
       //   ? arr.filter(({ segment }) => {
       //     // if segment is not a string (i.e., not labelIndexId) return true
       //     if (typeof segment !== 'string') { return true }
-      //     const { labelIndex } = deserialiseParcRegionId(segment)
+      //     const { label: labelIndex } = deserializeSegment(segment)
       //     return parcellationSelected.auxillaryMeshIndices.indexOf(labelIndex) < 0
       //   })
       //   : arr),
@@ -70,8 +72,8 @@ export class MouseHoverDirective {
     const mergeObs = merge(
       onHoverSegments$.pipe(
         distinctUntilChanged(),
-        map(segments => {
-          return { segments }
+        map(regions => {
+          return { regions }
         }),
       ),
       onHoverAnnotation$.pipe(
@@ -101,7 +103,7 @@ export class MouseHoverDirective {
       map(arr => {
 
         let returnObj = {
-          segments: null,
+          regions: null,
           annotation: null,
           landmark: null,
           userLandmark: null,

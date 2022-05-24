@@ -56,7 +56,13 @@ router.get('/:name', async (req, res) => {
 
     if (redirectFlag) {
       if (queryString) return res.redirect(`${REAL_HOSTNAME}?${queryString}`)
-      if (hashPath) return res.redirect(`${REAL_HOSTNAME}#${hashPath}/${xtraRoutes.join('/')}`)
+      if (hashPath) {
+        let redirectUrl = `${REAL_HOSTNAME}#${hashPath}`
+        if (xtraRoutes.length > 0) {
+          redirectUrl += `/${xtraRoutes.join('/')}`
+        }
+        return res.redirect(redirectUrl)
+      }
     } else {
       return res.status(200).send(json)
     }
