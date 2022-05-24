@@ -17,10 +17,11 @@ import { NehubaViewerTouchDirective } from "../nehubaViewerInterface/nehubaViewe
 import { selectorAuxMeshes } from "../store"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
-import { userInterface, atlasSelection, userPreference, atlasAppearance, annotation, userInteraction } from "src/state"
+import { userInterface, atlasSelection, atlasAppearance, annotation, userInteraction } from "src/state"
 import { SapiAtlasModel, SAPIModule, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEHUBA_INSTANCE_INJTKN } from "../util"
+import { RouterService } from "src/routerModule/router.service"
 
 @Component({
   selector: 'viewer-ctrl-component',
@@ -103,6 +104,11 @@ describe('> nehubaViewerGlue.component.ts', () => {
             segmentVis$: new Subject(),
             ngLayersController$: new Subject(),
             selectedATPR$
+          }
+        },{
+          provide: RouterService,
+          useValue: {
+            customRoute$: NEVER
           }
         }, {
           provide: NehubaMeshService,

@@ -9,6 +9,7 @@ import {
 } from "src/state"
 import { LayerCtrlEffects } from "./layerCtrl.effects"
 import { NEVER } from "rxjs"
+import { RouterService } from "src/routerModule/router.service"
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
@@ -18,6 +19,12 @@ describe('> layerctrl.service.ts', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
+          {
+            provide: RouterService,
+            useValue: {
+              customRoute$: NEVER
+            }
+          },
           NehubaLayerControlService,
           provideMockStore(),
           {

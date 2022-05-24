@@ -5,6 +5,7 @@
 
 const express = require('express')
 const lruStore = require('../lruStore')
+const { race } = require("../../common/util")
 const got = require('got')
 const { URL } = require('url')
 const path = require("path")
@@ -29,7 +30,7 @@ router.get('', (_req, res) => {
   ])
 })
 
-const getKey = url => `plugin:manifest-cache:${url}}`
+const getKey = url => `plugin:manifest-cache:${url}`
 
 router.get('/manifests', async (_req, res) => {
 

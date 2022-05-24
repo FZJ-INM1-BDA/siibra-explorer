@@ -1,12 +1,7 @@
 {
   "name": "interactive-viewer",
-  "version": "2.7.0",
   "description": "siibra-explorer - explore brain atlases. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
-    "build-aot": "ng build && node ./third_party/matomo/processMatomo.js",
-    "dev-server-aot": "ng serve",
-    "e2e": "echo NYI && exit 1",
-    "wd": "webdriver-manager",
     "lint": "eslint src --ext .ts",
     "eslint": "eslint",
     "ng": "ng",
@@ -75,7 +70,7 @@
     "postcss": "^8.3.6",
     "raw-loader": "^4.0.2",
     "rxjs": "~6.6.0",
-    "showdown": "^1.9.1",
+    "showdown": "^2.0.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   }

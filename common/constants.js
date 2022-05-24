@@ -149,4 +149,7 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     LAYER_SELECTOR: `This is the atlas layer browser. If an atlas supports multiple template spaces or parcellation maps, you will find them here.`,
     STATUS_CARD: `This is the coordinate navigator. Expand it to manipulate voxel and physical coordinates, to reset the view, or to create persistent links to the current view for sharing.`,
   }
+
+  exports.QUICKTOUR_DESC_MD = {
+  }
 })(typeof exports === 'undefined' ? module.exports : exports)

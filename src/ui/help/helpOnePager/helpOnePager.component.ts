@@ -1,5 +1,7 @@
+import { MatDialog } from '@angular/material/dialog';
 import { Component } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
+import { HowToCite } from '../howToCite/howToCite.component';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { default: QUICK_STARTER } = require('!!raw-loader!common/helpOnePager.md')
@@ -16,8 +18,14 @@ export class HelpOnePager{
   public ARIA_LABELS = ARIA_LABELS
   public QUICK_STARTER_MD = QUICK_STARTER
   public extQuickStarter: string
-  public userDoc: string = `https://siibra-explorer.readthedocs.io/en/latest/`
-  constructor(){
+  public userDoc: string
+  constructor(
+    private dialog: MatDialog,
+  ){
     this.extQuickStarter = `quickstart.html`
+  }
+
+  howToCite(){
+    this.dialog.open(HowToCite)
   }
 }

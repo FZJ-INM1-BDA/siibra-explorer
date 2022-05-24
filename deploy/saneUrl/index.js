@@ -4,7 +4,7 @@ const { GitlabSnippetStore: Store, NotFoundError } = require('./store')
 const { Store: DepcStore } = require('./depcObjStore')
 const RateLimit = require('express-rate-limit')
 const RedisStore = require('rate-limit-redis')
-const { redisURL } = require('../lruStore')
+const lruStore = require('../lruStore')
 const { ProxyStore, NotExactlyPromiseAny } = require('./util')
 
 let store
@@ -23,12 +23,22 @@ const {
   DISABLE_LIMITER,
 } = process.env
 
-const limiter = new RateLimit({
-  windowMs: 1e3 * 5,
-  max: 5,
-  ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
-})
-const passthrough = (_, __, next) => next()
+function limiterMiddleware(){
+  let limiter
+  return async (req, res, next) => {
+    if (DISABLE_LIMITER) return next()
+    if (limiter) return limiter(req, res, next)
+    await lruStore._initPr
+    const { redisURL } = lruStore
+    limiter = new RateLimit({
+      windowMs: 1e3 * 5,
+      max: 5,
+      store: redisURL ? new RedisStore({ redisURL }) : null
+    })
+    return limiter(req, res, next)
+  }
+}
+
 
 const acceptHtmlProg = /text\/html/i
 
@@ -91,7 +101,7 @@ router.get('/:name', async (req, res) => {
 })
 
 router.post('/:name',
-  DISABLE_LIMITER ? passthrough : limiter,
+  limiterMiddleware(),
   express.json(),
   async (req, res) => {
     if (req.headers['x-noop']) return res.status(200).end()
@@ -114,7 +124,10 @@ const ready = async () => {
   return await store.healthCheck()
 }
 
+const vipRoutes = ["human", "monkey", "rat", "mouse"]
+
 module.exports = {
   router,
   ready,
+  vipRoutes,
 }

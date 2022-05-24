@@ -6,6 +6,7 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { AboutCmp } from './about/about.component'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
+import { HowToCite } from "./howToCite/howToCite.component";
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import {QuickTourModule} from "src/ui/quickTour/module";
   declarations: [
     AboutCmp,
     HelpOnePager,
+    HowToCite,
   ],
   exports: [
     AboutCmp,
