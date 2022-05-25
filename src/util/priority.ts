@@ -132,8 +132,12 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    
-    if (this.disablePriority) {
+    /**
+     * Do not use priority for requests other than get.
+     * Since the way in which serialization occurs is via path and query param...
+     * body is not used.
+     */
+    if (this.disablePriority || req.method !== 'GET') {
       return next.handle(req)
     }
 

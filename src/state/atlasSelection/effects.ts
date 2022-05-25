@@ -10,8 +10,9 @@ import { fromRootStore } from "./util";
 import { AtlasSelectionState } from "./const"
 import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
 import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
-import { atlasAppearance } from "..";
+import { atlasAppearance, atlasSelection } from "..";
 import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 
 type OnTmplParcHookArg = {
   previous: {
@@ -46,6 +47,37 @@ export class Effect {
             selectedParcellationAllRegions: regions
           }
         })
+      )
+    },
+    ({ current, previous }) => {
+      const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous.template["@id"])
+      const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current.template["@id"])
+      /**
+       * if either space name is undefined, return default state for navigation
+       */
+      if (!prevSpcName || !currSpcName) {
+        return of({
+          navigation: atlasSelection.defaultState.navigation
+        })
+      }
+      return this.store.pipe(
+        select(atlasSelection.selectors.navigation),
+        take(1),
+        switchMap(({ position, ...rest }) => 
+          this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, position as [number, number, number]).pipe(
+            map(value => {
+              if (value.status === "error") {
+                return {}
+              }
+              return {
+                navigation: {
+                  ...rest,
+                  position: value.result,
+                }
+              } as Partial<AtlasSelectionState>
+            })
+          )
+        )
       )
     }
   ]
@@ -352,6 +384,7 @@ export class Effect {
     private action: Actions,
     private sapiSvc: SAPI,
     private store: Store,
+    private interSpaceCoordXformSvc: InterSpaceCoordXformSvc,
   ){
 
   }

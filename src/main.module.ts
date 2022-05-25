@@ -18,7 +18,7 @@ import { UIService } from "./services/uiService.service";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
-import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
@@ -94,7 +94,7 @@ import { CONST } from "common/constants"
     AuthService,
     DialogService,
     UIService,
-    TemplateCoordinatesTransformation,
+    InterSpaceCoordXformSvc,
     ClickInterceptorService,
     {
       provide: CANCELLABLE_DIALOG,

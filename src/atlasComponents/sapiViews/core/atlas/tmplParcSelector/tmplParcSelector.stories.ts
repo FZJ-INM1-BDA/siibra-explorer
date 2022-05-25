@@ -4,6 +4,7 @@ import { provideMockStore } from "@ngrx/store/testing"
 import { action } from "@storybook/addon-actions"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { SAPI } from "src/atlasComponents/sapi"
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 import { spaceId, provideDarkTheme, getHumanAtlas, getMni152, getJba29, getSpace, atlasId, getParc, parcId } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { atlasSelection } from "src/state"
@@ -27,6 +28,7 @@ export default {
       ],
       providers: [
         SAPI,
+        InterSpaceCoordXformSvc,
         ...provideDarkTheme,
       ],
       declarations: [
