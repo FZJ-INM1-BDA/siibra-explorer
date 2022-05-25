@@ -53,6 +53,7 @@ export class Autoradiography extends BaseReceptor implements OnChanges, AfterVie
   }
 
   rerender(){
+    this.dataBlobAvailable = false
     if (!this.el || !this.renderBuffer) {
       this.pleaseRender = true
       return
@@ -71,6 +72,11 @@ export class Autoradiography extends BaseReceptor implements OnChanges, AfterVie
     const imgData = ctx.createImageData(this.width, this.height)
     imgData.data.set(this.renderBuffer)
     ctx.putImageData(imgData, 0, 0)
+
+    canvas.toBlob(blob => {
+      this.dataBlobAvailable = true
+      this.dataBlob$.next(blob)
+    })
     this.pleaseRender = false
   }
 }

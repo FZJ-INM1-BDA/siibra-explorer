@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SpinnerModule } from "src/components/spinner";
 import { AngularMaterialModule } from "src/sharedModules";
 import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
+import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 import { Autoradiography } from "./autoradiography/autoradiography.component";
 import { Entry } from "./entry/entry.component";
 import { Fingerprint } from "./fingerprint/fingerprint.component"
@@ -17,6 +18,7 @@ import { Profile } from "./profile/profile.component"
     FormsModule,
     BrowserAnimationsModule,
     SpinnerModule,
+    ZipFilesOutputModule,
   ],
   declarations: [
     Autoradiography,

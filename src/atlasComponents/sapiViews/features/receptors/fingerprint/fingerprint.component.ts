@@ -45,7 +45,8 @@ function transformRadar(input: SapiRegionalFeatureReceptorModel['data']['fingerp
   templateUrl: './fingerprint.template.html',
   styleUrls: [
     './fingerprint.style.css'
-  ]
+  ],
+  exportAs: "sxplrSapiViewsFeaturesReceptorFP"
 })
 
 export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewInit, OnDestroy{
@@ -105,6 +106,23 @@ export class Fingerprint extends BaseReceptor implements OnChanges, AfterViewIni
     this.dumbRadarCmp.metaBs = this.receptorData.data.receptor_symbols
     this.dumbRadarCmp.radar= transformRadar(this.receptorData.data.fingerprints)
 
-    this.setDumbRadarPlease = false   
+    this.dataBlob$.next(this.getDataBlob())
+    this.dataBlobAvailable = true
+    this.setDumbRadarPlease = false
+  }
+
+  private getDataBlob(): Blob {
+    if (!this.receptorData?.data?.fingerprints) throw new Error(`raw data unavailable. Try again later.`)
+    const fingerprints = this.receptorData.data.fingerprints
+    const output: string[] = []
+    output.push(
+      ["name", "mean", "std"].join("\t")
+    )
+    for (const key in fingerprints) {
+      output.push(
+        [key, fingerprints[key].mean, fingerprints[key].std].join("\t")
+      )
+    }
+    return new Blob([output.join("\n")], { type: 'text/tab-separated-values' })
   }
 }
