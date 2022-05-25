@@ -1,6 +1,6 @@
 import { Directive, OnChanges, SimpleChanges } from "@angular/core";
-import { BehaviorSubject, merge, Observable } from "rxjs";
-import { switchMap,  filter, startWith, shareReplay, mapTo, delay, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable } from "rxjs";
+import { switchMap,  filter, startWith, shareReplay, finalize } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
 import { SapiViewsCoreRegionRegionBase } from "./region.base.directive";
@@ -34,7 +34,12 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
       const { atlas, parcellation, region, template } = arg
       return !!atlas && !!parcellation && !!region && !!template 
     }),
-    switchMap(({ atlas, parcellation, region, template }) => this.sapi.getRegionFeatures(atlas["@id"], parcellation["@id"], template["@id"], region.name)),
+    switchMap(({ atlas, parcellation, region, template }) => {
+      this.busy$.next(true)
+      return this.sapi.getRegionFeatures(atlas["@id"], parcellation["@id"], template["@id"], region.name).pipe(
+        finalize(() => this.busy$.next(false))
+      )
+    }),
   )
 
   public listOfFeatures$: Observable<(SapiRegionalFeatureModel|SxplrCleanedFeatureModel)[]> = this.features$.pipe(
@@ -42,12 +47,5 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
     shareReplay(1),
   )
 
-  public busy$: Observable<boolean> = merge(
-    this.ATPR$.pipe(
-      mapTo(true)    
-    ),
-    this.features$.pipe(
-      mapTo(false)
-    )
-  )
+  public busy$ = new BehaviorSubject<boolean>(false)
 }

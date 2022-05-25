@@ -10,7 +10,8 @@ import { BaseReceptor } from "../base";
   templateUrl: './profile.template.html',
   styleUrls: [
     './profile.style.css'
-  ]
+  ],
+  exportAs: "sxplrSapiViewsFeaturesReceptorProfile"
 })
 
 export class Profile extends BaseReceptor implements AfterViewInit, OnChanges{
@@ -46,6 +47,7 @@ export class Profile extends BaseReceptor implements AfterViewInit, OnChanges{
   }
 
   async rerender() {
+    this.dataBlobAvailable = false
     if (!this.dumbLineCmp) {
       this.pleaseRender = true
       return
@@ -67,7 +69,23 @@ export class Profile extends BaseReceptor implements AfterViewInit, OnChanges{
       for (const idx in prof) {
         this.dumbLineData[idx] = prof[idx]
       }
+      this.dataBlob$.next(this.getDataBlob())
+      this.dataBlobAvailable = true
       this.dumbLineCmp.profileBs = this.dumbLineData
     }
+  }
+
+  private getDataBlob(): Blob {
+    if (!this.dumbLineData) throw new Error(`data has not been populated. Perhaps wait until render finishes?`)
+    const output: string[] = []
+    output.push(
+      ["cortical depth (%)", "receptor density (fmol/mg)"].join("\t")
+    )
+    for (const key in this.dumbLineData) {
+      output.push(
+        [key, this.dumbLineData[key]].join("\t")
+      )
+    }
+    return new Blob([output.join("\n")], { type: 'text/tab-separated-values' })
   }
 }

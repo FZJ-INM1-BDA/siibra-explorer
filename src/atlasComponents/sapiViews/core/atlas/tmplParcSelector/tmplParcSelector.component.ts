@@ -1,8 +1,8 @@
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, QueryList, ViewChild, ViewChildren } from "@angular/core";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { combineLatest, forkJoin, merge, Observable, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, map, mapTo, shareReplay, switchMap, tap } from "rxjs/operators";
+import { distinctUntilChanged, map, mapTo, shareReplay, switchMap, take } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
@@ -10,6 +10,7 @@ import { IQuickTourData } from "src/ui/quickTour";
 import { ARIA_LABELS, CONST, QUICKTOUR_DESC } from 'common/constants'
 import { MatMenuTrigger } from "@angular/material/menu";
 import { SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 
 @Component({
   selector: `sxplr-sapiviews-core-atlas-tmplparcselector`,
@@ -126,7 +127,11 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   }
 
 
-  constructor(private store$: Store, private sapi: SAPI) {
+  constructor(
+    private store$: Store,
+    private sapi: SAPI,
+    private interSpaceCoordXformSvc: InterSpaceCoordXformSvc,
+  ) {
 
   }
   ngOnDestroy() {
@@ -136,6 +141,34 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
 
   toggleSelector() {
     this.selectorExpanded = !this.selectorExpanded
+    /**
+     * on selector open, call transform end point
+     * this caches the result, and will not bottleneck when the user selects a new space
+     */
+    if (this.selectorExpanded) {
+      forkJoin({
+        availableTemplates: this.availableTemplates$.pipe(
+          take(1)
+        ),
+        selectedTemplate: this.selectedTemplate$.pipe(
+          take(1)
+        ),
+        navigation: this.store$.pipe(
+          select(atlasSelection.selectors.navigation),
+          take(1)
+        )
+      }).pipe(
+
+      ).subscribe(({ availableTemplates, selectedTemplate, navigation }) => {
+        for (const avail of availableTemplates) {
+          this.interSpaceCoordXformSvc.transform(
+            InterSpaceCoordXformSvc.TmplIdToValidSpaceName(selectedTemplate["@id"]),
+            InterSpaceCoordXformSvc.TmplIdToValidSpaceName(avail["@id"]),
+            navigation.position as [number, number, number]
+          ).subscribe()
+        }
+      })
+    }
   }
 
   closeSelector() {

@@ -1,6 +1,5 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { ChangeDetectorRef, Component, OnChanges, SimpleChanges } from "@angular/core";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
 import { BaseReceptor } from "../base";
 
 @Component({
@@ -36,5 +35,9 @@ export class Entry extends BaseReceptor implements OnChanges {
 
   setSelectedSymbol(select: string){
     this.selectedSymbol = select
+  }
+
+  getDataBlob(): Promise<Blob> {
+    throw new Error(`cannot get blob of entry component`)
   }
 }

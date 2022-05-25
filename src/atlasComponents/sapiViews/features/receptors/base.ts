@@ -1,4 +1,5 @@
 import { Directive, Input, SimpleChanges } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
 
@@ -82,6 +83,15 @@ export abstract class BaseReceptor{
   }
 
   abstract rerender(): void
+
+  /**
+   * flag to indicate that getDataBlob() can be called.
+   */
+  dataBlobAvailable = false
+  /**
+   * blob object observable, representing the data of the component. This allows the data to be downloaded.
+   */
+  dataBlob$ = new BehaviorSubject<Blob>(null)
 
   constructor(
     protected sapi: SAPI
