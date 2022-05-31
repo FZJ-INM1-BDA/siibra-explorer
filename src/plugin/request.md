@@ -188,6 +188,51 @@ window.addEventListener('pagehide', () => {
   ```
 
 
+### `sxplr.loadLayers`
+
+- request
+
+  ```ts
+  {"layers": AddableLayer[]}
+  ```
+
+- response
+
+  ```ts
+  'OK'
+  ```
+
+
+### `sxplr.updateLayers`
+
+- request
+
+  ```ts
+  {"layers": AddableLayer[]}
+  ```
+
+- response
+
+  ```ts
+  'OK'
+  ```
+
+
+### `sxplr.removeLayers`
+
+- request
+
+  ```ts
+  {"layers": {"id": string}}
+  ```
+
+- response
+
+  ```ts
+  'OK'
+  ```
+
+
 ### `sxplr.exit`
 
 - request

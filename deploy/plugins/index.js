@@ -34,38 +34,42 @@ const getKey = url => `plugin:manifest-cache:${url}`
 
 router.get('/manifests', async (_req, res) => {
 
-  const allManifests = await Promise.all([
-    ...V2_7_PLUGIN_URLS,
-    ...V2_7_STAGING_PLUGIN_URLS
-  ].map(async url => {
-    const key = getKey(url)
+  const allManifests = await Promise.all(
+    [...V2_7_PLUGIN_URLS, ...V2_7_STAGING_PLUGIN_URLS].map(async url =>
+      race(
+        async () => {
+          const key = getKey(url)
+          
+          await lruStore._initPr
+          const { store } = lruStore
+          
+          try {
+            const storedManifest = await store.get(key)
+            if (storedManifest) return JSON.parse(storedManifest)
+            else throw `not found`
+          } catch (e) {
+            const resp = await got(url)
+            const json = JSON.parse(resp.body)
     
-    await lruStore._initPr
-    const { store } = lruStore
-    
-    try {
-      const storedManifest = await store.get(key)
-      if (storedManifest) return JSON.parse(storedManifest)
-      else throw `not found`
-    } catch (e) {
-      const resp = await got(url)
-      const json = JSON.parse(resp.body)
-
-      const { iframeUrl, 'siibra-explorer': flag } = json
-      if (!flag) return null
-      if (!iframeUrl) return null
-      const u = new URL(url)
-      
-      let replaceObj = {}
-      if (!/^https?:\/\//.test(iframeUrl)) {
-        u.pathname = path.resolve(path.dirname(u.pathname), iframeUrl)
-        replaceObj['iframeUrl'] = u.toString()
-      }
-      const returnObj = {...json, ...replaceObj}
-      await store.set(key, JSON.stringify(returnObj), { maxAge: 1000 * 60 * 60 })
-      return returnObj
-    }
-  }))
+            const { iframeUrl, 'siibra-explorer': flag } = json
+            if (!flag) return null
+            if (!iframeUrl) return null
+            const u = new URL(url)
+            
+            let replaceObj = {}
+            if (!/^https?:\/\//.test(iframeUrl)) {
+              u.pathname = path.resolve(path.dirname(u.pathname), iframeUrl)
+              replaceObj['iframeUrl'] = u.toString()
+            }
+            const returnObj = {...json, ...replaceObj}
+            await store.set(key, JSON.stringify(returnObj), { maxAge: 1000 * 60 * 60 })
+            return returnObj
+          }
+        },
+        { timeout: 1000 }
+      )
+    )
+  )
 
   res.status(200).json(
     [...V2_7_DEV_PLUGINS, ...allManifests.filter(v => !!v)]

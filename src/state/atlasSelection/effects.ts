@@ -50,8 +50,8 @@ export class Effect {
       )
     },
     ({ current, previous }) => {
-      const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous.template["@id"])
-      const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current.template["@id"])
+      const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous?.template?.["@id"])
+      const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current?.template?.["@id"])
       /**
        * if either space name is undefined, return default state for navigation
        */
