@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { SAPIRegion } from "src/atlasComponents/sapi/core";
 import { getParcNgId } from "../config.service"
@@ -276,6 +276,16 @@ export class NehubaLayerControlService implements OnDestroy{
 
   private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
 
+  private updateCustomLayerTransparency$ = this.store$.pipe(
+    select(atlasAppearance.selectors.customLayers),
+    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    pairwise(),
+    map(([ oldCustomLayers, newCustomLayers ]) => {
+      return newCustomLayers.filter(({ id, opacity }) => oldCustomLayers.some(({ id: oldId, opacity: oldOpacity }) => oldId === id && oldOpacity !== opacity))
+    }),
+    filter(arr => arr.length > 0)
+  )
+
   private ngLayers$ = this.customLayers$.pipe(
     map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
     distinctUntilChanged(
@@ -322,6 +332,19 @@ export class NehubaLayerControlService implements OnDestroy{
           type: 'remove',
           payload: { names: removeLayerNames }
         } as TNgLayerCtrl<'remove'>
+      })
+    ),
+    this.updateCustomLayerTransparency$.pipe(
+      map(layers => {
+        const payload: Record<string, number> = {}
+        for (const layer of layers) {
+          const opacity = layer.opacity ?? 0.8
+          payload[layer.id] = opacity
+        }
+        return {
+          type: 'setLayerTransparency',
+          payload
+        } as TNgLayerCtrl<'setLayerTransparency'>
       })
     ),
     this.manualNgLayersControl$,

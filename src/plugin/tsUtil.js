@@ -14,6 +14,7 @@ function getTypeText(node){
       return node.typeName.text
     }
     case "ArrayType": {
+      if (!node.elementType.typeName) return getTypeText(node.elementType)
       return `${node.elementType.typeName.text}[]`
     }
     case "TypeLiteral": {

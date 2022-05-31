@@ -4,7 +4,7 @@ import { Subject } from "rxjs";
 import { distinctUntilChanged, filter, map, take } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi";
 import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/type";
-import { MainState, atlasSelection, userInteraction, annotation } from "src/state"
+import { MainState, atlasSelection, userInteraction, annotation, atlasAppearance } from "src/state"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from "src/util/interfaces";
 import { Booth, BoothResponder, createBroadcastingJsonRpcChannel, JRPCRequest, JRPCResp } from "./jsonrpc"
@@ -12,6 +12,8 @@ import { Booth, BoothResponder, createBroadcastingJsonRpcChannel, JRPCRequest, J
 export type NAMESPACE_TYPE = "sxplr"
 export const namespace: NAMESPACE_TYPE = "sxplr"
 const nameSpaceRegex = new RegExp(`^${namespace}`)
+
+type AddableLayer = atlasAppearance.NgLayerCustomLayer
 
 type AtId = {
   "@id": string
@@ -83,6 +85,27 @@ export type ApiBoothEvents = {
   rmAnnotations: {
     request: {
       annotations: AtId[]
+    }
+    response: 'OK'
+  }
+
+  loadLayers: {
+    request: {
+      layers: AddableLayer[]
+    }
+    response: 'OK'
+  }
+
+  updateLayers: {
+    request: {
+      layers: AddableLayer[]
+    }
+    response: 'OK'
+  }
+
+  removeLayers: {
+    request: {
+      layers: {id: string}[]
     }
     response: 'OK'
   }
@@ -438,6 +461,27 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
           id: event.id,
           result: 'OK'
         }
+      }
+      break
+    }
+    case 'loadLayers':
+    case 'updateLayers': {
+      const { layers } = event.params as ApiBoothEvents['loadLayers']['request'] | ApiBoothEvents['updateLayers']['request']
+      for (const layer of layers) {
+        this.store.dispatch(
+          atlasAppearance.actions.addCustomLayer({
+            customLayer: layer
+          })
+        )
+      }
+      break
+    }
+    case 'removeLayers': {
+      const { layers } = event.params as ApiBoothEvents['removeLayers']['request']
+      for (const layer of layers) {
+        this.store.dispatch(
+          atlasAppearance.actions.removeCustomLayer(layer)
+        )
       }
       break
     }

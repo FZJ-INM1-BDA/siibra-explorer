@@ -785,7 +785,15 @@ export class NehubaViewerUnit implements OnDestroy {
   private setLayerTransparency(layerName: string, alpha: number) {
     const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
     if (!layer) return
-    layer.layer.displayState.objectAlpha.restoreState(alpha)
+
+    /**
+     * for segmentation layer
+     */
+    if (layer.layer.displayState) layer.layer.displayState.objectAlpha.restoreState(alpha)
+    /**
+     * for image layer
+     */
+    if (layer.layer.opacity) layer.layer.opacity.restoreState(alpha)
   }
 
   public setMeshTransparency(flag: boolean){

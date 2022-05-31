@@ -6,6 +6,26 @@ siibra-explorer provides a plugin system, which allow a third party application 
 
 ## Quickstart
 
+### manifest
+
+The plugin need to expose a manifest json file. The manifest file needs to have the following properties:
+
+```json
+{
+  "iframeUrl": "<iframeUrl>",
+  "name": "<name>",
+  "siibra-explorer": "<siibra-explorer>"
+}
+```
+
+| property | required | desc | 
+| --- | --- | --- |
+| `iframeUrl` | true | points to the html where the iframe is located. If does not start with `https?://`, siibra-explorer will try to resolve it relative to the absolute path of manifest. |
+| `name` | true | name of the plugin | 
+| `siibra-explorer` | true | the version siibra-explorer this plugin is targetting. Should be >= 2.7.0. n.b. currently this entry is partially implemented, and any truthy value is sufficient.
+ |
+
+
 <!-- TBD -->
 
 ## Architecture
