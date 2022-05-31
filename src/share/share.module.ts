@@ -6,6 +6,8 @@ import { SaneUrl } from "./saneUrl/saneUrl.component";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { AuthModule } from "src/auth";
+import { ShareSheetComponent } from "./shareSheet/shareSheet.component";
+import { ShareDirective } from "./share.directive";
 
 @NgModule({
   imports: [
@@ -19,10 +21,14 @@ import { AuthModule } from "src/auth";
   declarations: [
     ClipboardCopy,
     SaneUrl,
+    ShareSheetComponent,
+    ShareDirective,
   ],
   exports: [
     ClipboardCopy,
     SaneUrl,
+    ShareSheetComponent,
+    ShareDirective,
   ]
 })
 

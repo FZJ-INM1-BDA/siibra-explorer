@@ -308,6 +308,13 @@
   <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
     class="pe-all mt-2 muted-7 d-inline-block v-align-top">
   </iav-cmp-viewer-nehuba-status>
+  <button
+    mat-icon-button
+    sxplr-share-view
+    *ngIf="(useViewer$ | async) === 'threeSurfer'"
+    class="pe-all mt-2 muted-7 d-inline-block v-align-top">
+    <i class="fas fa-share-square"></i>
+  </button>
 </ng-template>
 
 
