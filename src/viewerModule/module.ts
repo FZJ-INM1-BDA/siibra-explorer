@@ -25,6 +25,7 @@ import { DialogModule } from "src/ui/dialogInfo/module";
 import { MouseoverModule } from "src/mouseoverModule";
 import { LogoContainer } from "src/ui/logoContainer/logoContainer.component";
 import { FloatingMouseContextualContainerDirective } from "src/util/directives/floatingMouseContextualContainer.directive";
+import { ShareModule } from "src/share";
 
 @NgModule({
   imports: [
@@ -45,6 +46,7 @@ import { FloatingMouseContextualContainerDirective } from "src/util/directives/f
     SapiViewsUtilModule,
     DialogModule,
     MouseoverModule,
+    ShareModule,
   ],
   declarations: [
     ViewerCmp,

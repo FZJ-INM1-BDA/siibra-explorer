@@ -79,7 +79,7 @@
 
         <div class="w-0 position-relative">
           <button
-            (click)="showBottomSheet(shareTmpl)"
+            sxplr-share-view
             [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
             mat-icon-button
             class="position-absolute share-btn">
@@ -121,65 +121,6 @@
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
       (click)="statusCardQT.ngOnChanges(); showFull = true">
       <i class="fas fa-angle-down"></i>
-    </button>
-  </div>
-</ng-template>
-
-<!-- share template -->
-<ng-template #shareTmpl>
-  <h4 class="mat-h4">
-    Share via
-  </h4>
-  <mat-nav-list>
-    <mat-list-item iav-clipboard-copy
-      [attr.aria-label]="COPY_URL_TO_CLIPBOARD_ARIA_LABEL"
-      [attr.tab-index]="10">
-      <mat-icon
-        class="mr-4"
-        fontSet="fas"
-        fontIcon="fa-copy">
-      </mat-icon>
-      <span>
-        Copy link to this view
-      </span>
-    </mat-list-item>
-    <mat-list-item
-      [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
-      [attr.tab-index]="10"
-      (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_ARIA_LABEL })"
-      [matTooltip]="SHARE_CUSTOM_URL_ARIA_LABEL"
-      >
-      <mat-icon
-        class="mr-4"
-        fontSet="fas"
-        fontIcon="fa-link">
-      </mat-icon>
-
-      <span>
-        Create custom URL
-      </span>
-
-    </mat-list-item>
-  </mat-nav-list>
-</ng-template>
-
-<ng-template #shareSaneUrl>
-  <h2 mat-dialog-title>
-    Create custom URL
-  </h2>
-
-  <div mat-dialog-content>
-    <iav-sane-url iav-state-aggregator
-      [stateTobeSaved]="stateAggregator.jsonifiedState$ | async"
-      #stateAggregator="iavStateAggregator">
-    </iav-sane-url>
-  </div>
-
-  <div mat-dialog-actions
-    class="d-flex justify-content-center">
-    <button mat-button
-      mat-dialog-close>
-      close
     </button>
   </div>
 </ng-template>
