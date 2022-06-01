@@ -1,4 +1,7 @@
 export const IDS = {
+  ATLAES: {
+    HUMAN: "juelich/iav/atlas/v1.0.0/1"
+  },
   TEMPLATES: {
     BIG_BRAIN: "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
     MNI152: "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
