@@ -368,7 +368,6 @@ export class Effect {
         )
       }
       
-      console.log('bla2?')
       return this.sapiSvc.getRegion(selectedAtlas['@id'], selectedParcellation['@id'], region["@id"]).getDetail(selectedTemplate["@id"]).pipe(
         map(detailedRegion => {
           if (!detailedRegion?.hasAnnotation?.bestViewPoint?.coordinates) {
