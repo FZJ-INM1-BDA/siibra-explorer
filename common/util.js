@@ -1,5 +1,7 @@
 (function(exports) {
 
+  exports.camelToSnake = s => s.replace(/[A-Z]/g, s => `_${s.toLowerCase()}`)
+
   const flattenReducer = (acc, curr) => acc.concat(curr)
   exports.flattenReducer = flattenReducer
 
@@ -157,6 +159,8 @@
 
   exports.flattenRegions = flattenRegions
 
+  exports.hexToRgb = hex => hex && hex.match(/[a-fA-F0-9]{2}/g).map(v => parseInt(v, 16))
+  exports.rgbToHex = rgb => rgb && `#${rgb.map(color => color.toString(16).padStart(2, '0')).join("")}`
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 
   /**
@@ -199,37 +203,6 @@
     )
   }
 
-  exports.serialiseParcellationRegion = ({ ngId, labelIndex }) => {
-    if (!ngId) {
-      throw new Error(`#serialiseParcellationRegion error: ngId must be defined`)
-    }
-
-    if (!labelIndex) {
-      throw new Error(`#serialiseParcellationRegion error labelIndex must be defined`)
-    }
-
-    return `${ngId}#${labelIndex}`
-  }
-
-  const deserialiseParcRegionId = labelIndexId => {
-    const _ = labelIndexId && labelIndexId.split && labelIndexId.split('#') || []
-    const ngId = _.length > 1
-      ? _[0]
-      : null
-    const labelIndex = _.length > 1
-      ? Number(_[1])
-      : _.length === 0
-        ? null
-        : Number(_[0])
-    return { labelIndex, ngId }
-  }
-
-  exports.deserialiseParcRegionId = deserialiseParcRegionId
-
-  exports.deserialiseParcellationRegion = ({ region, labelIndexId, inheritedNgId = 'root' }) => {
-    const { labelIndex, ngId } = deserialiseParcRegionId(labelIndexId)
-  }
-
   const getPad = ({ length, pad }) => {
     if (pad.length !== 1) throw new Error(`pad needs to be precisely 1 character`)
     return input => {
@@ -251,5 +224,20 @@
     const min = d.getMinutes()
     return `${year}${pad2(month)}${pad2(date)}_${pad2(hr)}${pad2(min)}`
   }
+
+  function isVec4(input) {
+    if (!Array.isArray(input)) return false
+    if (input.length !== 4) return false
+    return input.every(v => typeof v === "number")
+  }
+  function isMat4(input) {
+    if (!Array.isArray(input)) return false
+    if (input.length !== 4) return false
+    return input.every(isVec4)
+  }
+
+  exports.isVec4 = isVec4
+  exports.isMat4 = isMat4
+
 
 })(typeof exports === 'undefined' ? module.exports : exports)

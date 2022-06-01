@@ -28,7 +28,6 @@ import '!!file-loader?name=version.css!src/version.css'
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
 
-import * as ConnectivityComponent from 'hbp-connectivity-component/dist/loader'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 
@@ -39,5 +38,3 @@ if (PRODUCTION) { console.log(`Siibra Explorer: ${VERSION}::${GIT_HASH}`) }
 
 
 platformBrowserDynamic().bootstrapModule(MainModule)
-
-ConnectivityComponent.defineCustomElements(window)

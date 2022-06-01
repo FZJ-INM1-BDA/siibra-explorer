@@ -5,10 +5,11 @@ import { Polygon } from '../tools/poly'
 import { FormControl, FormGroup } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { select, Store } from "@ngrx/store";
-import { viewerStateFetchedAtlasesSelector } from "src/services/state/viewerState/selectors";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Line } from "../tools/line";
+import { atlasSelection } from "src/state";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: 'single-annotation-unit',
@@ -31,7 +32,6 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
   private subs: Subscription[] = []
   public templateSpaces: {
     ['@id']: string
-    name: string
   }[] = []
   ngOnChanges(){
     while(this.chSubs.length > 0) this.chSubs.pop().unsubscribe()
@@ -52,30 +52,22 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
         this.managedAnnotation.desc = desc
       })
     )
-
   }
 
+  public tmpls$ = this.store.pipe(
+    select(atlasSelection.selectors.selectedTemplate),
+    map(val => {
+      return [val]
+    })
+  )
+
   constructor(
-    store: Store<any>,
+    private store: Store<any>,
     private snackbar: MatSnackBar,
     private svc: ModularUserAnnotationToolService,
     private cfr: ComponentFactoryResolver,
     private injector: Injector,
   ){
-    this.subs.push(
-      store.pipe(
-        select(viewerStateFetchedAtlasesSelector),
-      ).subscribe(atlases => {
-        for (const atlas of atlases) {
-          for (const tmpl of atlas.templateSpaces) {
-            this.templateSpaces.push({
-              '@id': tmpl['@id'],
-              name: tmpl.name
-            })
-          }
-        }
-      })
-    )
   }
 
   ngAfterViewInit(){

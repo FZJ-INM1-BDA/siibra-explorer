@@ -1,0 +1,1 @@
+export { SxplrFlatHierarchyModule } from "./module"

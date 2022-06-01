@@ -1,12 +1,11 @@
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { BehaviorSubject, of, Subject } from 'rxjs'
-import { selectViewerConfigAnimationFlag } from 'src/services/state/viewerConfig/selectors'
-import { viewerStateSelectorNavigation } from 'src/services/state/viewerState/selectors'
 import * as NavUtil from './navigation.util'
 import { NehubaViewerUnit } from '../nehubaViewer/nehubaViewer.component'
 import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { NehubaNavigationService } from './navigation.service'
+import { userPreference, atlasSelection } from "src/state"
 
 const nav1 = {
   position: [1,2,3],
@@ -63,11 +62,11 @@ describe('> navigation.service.ts', () => {
 
       const mockStore = TestBed.inject(MockStore)
       mockStore.overrideSelector(
-        viewerStateSelectorNavigation,
+        atlasSelection.selectors.navigation,
         nav1
       )
       mockStore.overrideSelector(
-        selectViewerConfigAnimationFlag,
+        userPreference.selectors.useAnimation,
         true
       )
     })
@@ -108,7 +107,7 @@ describe('> navigation.service.ts', () => {
         service['nehubaViewerInstance'] = nehubaInst as NehubaViewerUnit
 
         const mockStore = TestBed.inject(MockStore)
-        mockStore.overrideSelector(viewerStateSelectorNavigation, nav1)
+        mockStore.overrideSelector(atlasSelection.selectors.navigation, nav1)
         dispatchSpy = spyOn(mockStore, 'dispatch').and.callFake(() => {})
       })
 

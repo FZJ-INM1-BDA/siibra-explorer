@@ -9,7 +9,7 @@ import { ConfigComponent } from "./configCmp/config.component";
   imports: [
     CommonModule,
     AngularMaterialModule,
-    PluginModule,
+    // PluginModule,
     LayoutModule,
   ],
   declarations: [

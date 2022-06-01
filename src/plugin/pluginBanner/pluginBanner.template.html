@@ -1,18 +1,9 @@
 <mat-action-list>
   <button mat-menu-item
-    *ngFor="let plugin of pluginServices.fetchedPluginManifests"
-    [matTooltip]="plugin.displayName ? plugin.displayName : plugin.name"
-    (click)="clickPlugin(plugin)">
-    <span mat-icon-button
-      aria-label="About this plugin"
-      class="mat-icon d-inline-flex align-items-center justify-content-center fa-stack"
-      (click)="showPluginInfo(plugin)"
-      iav-stop="click mousedown mouseup">
-      <i class="fas fa-cube fa-stack-1x"></i>
-      <i class="fas fa-info-circle fa-stack-1x sub"></i>
-    </span>
+    *ngFor="let plugin of availablePlugins$ | async"
+    (click)="launchPlugin(plugin)">
     <span>
-      {{ plugin.displayName ? plugin.displayName : plugin.name }}
+      {{ plugin.name }}
     </span>
   </button>
 
@@ -33,9 +24,9 @@
     <form>
       <mat-form-field class="d-block">
         <mat-label>
-          manifest.json URL
+          iframe index.html URL
         </mat-label>
-        <input type="text" matInput placeholder="https://example.com/manifest.json" #urlInput>
+        <input type="text" matInput placeholder="https://example.com/index.html" #urlInput>
       </mat-form-field>
     </form>
   </mat-dialog-content>
@@ -43,7 +34,6 @@
   <mat-dialog-actions align="end">
     <button (click)="addThirdPartyPlugin(urlInput.value)"
       mat-raised-button
-      [disabled]="loadingThirdpartyPlugin"
       color="primary">
       Load
     </button>
@@ -53,58 +43,4 @@
     </button>
   </mat-dialog-actions>
 
-</ng-template>
-
-<ng-template #pluginInfoTmpl let-manifest>
-  <h1 mat-dialog-title>
-    About {{ manifest.displayName || manifest.name }}
-  </h1>
-
-  <div mat-dialog-content>
-    <mat-list>
-      <mat-list-item>
-        <span mat-list-icon class="d-inline-flex justify-content-center align-items-center">
-          <i class="fas fa-info"></i>
-        </span>
-        <div mat-line>
-          Description
-        </div>
-        <div mat-line>
-          {{ manifest.description || manifest.desc || 'Not provided.' }}
-        </div>
-      </mat-list-item>
-
-      <mat-list-item>
-        <span mat-list-icon class="d-inline-flex justify-content-center align-items-center">
-          <i class="fas fa-users"></i>
-        </span>
-        <div mat-line>
-          Authors
-        </div>
-        <div mat-line>
-          {{ manifest.authors || 'Not provided' }}
-        </div>
-      </mat-list-item>
-
-      <mat-list-item>
-        <span mat-list-icon class="d-inline-flex justify-content-center align-items-center">
-          <i class="fas fa-globe-europe"></i>
-        </span>
-        <div mat-line>
-          Homepage
-        </div>
-        <div mat-line>
-          {{ manifest.homepage || 'Not provided' }}
-        </div>
-      </mat-list-item>
-    </mat-list>
-
-  </div>
-
-  <div mat-dialog-actions class="d-flex justify-content-center">
-    <button mat-button mat-dialog-close>
-      close
-    </button>
-  </div>
-  
 </ng-template>

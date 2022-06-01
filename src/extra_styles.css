@@ -293,6 +293,11 @@ markdown-dom p
   transform: rotate(270deg)!important;
 }
 
+.ws-normal
+{
+  white-space: normal!important;
+}
+
 .ws-no-wrap
 {
   white-space: nowrap!important;
@@ -579,70 +584,15 @@ markdown-dom p
   flex-grow:1;
 }
 
-.transform-origin-left-center
-{
-  transform-origin: 0% 50%;
-}
-
-.transform-origin-center
-{
-  transform-origin: 50% 50%;
-}
-
 .box-shadow-none
 {
   box-shadow: none!important;
-}
-
-.translate-x-2
-{
-  transform: translateX(1em);
-}
-
-.translate-x-3
-{
-  transform: translateX(1.5em);
-}
-
-.translate-x-4
-{
-  transform: translateX(2em);
-}
-
-.translate-x-6
-{
-  transform: translateX(3em);
-}
-
-.translate-x-4-n
-{
-  transform: translateX(-2em);
-}
-
-.translate-x-6-n
-{
-  transform: translateX(-3em);
-}
-
-.translate-x-7-n
-{
-  transform: translateX(-3.5em);
-}
-
-.translate-x-8-n
-{
-  transform: translateX(-4em);
 }
 
 /* this is required to physically link label with side bar */
 .mat-drawer-content-overflow-visible > mat-drawer-content,
 /* this is required to show the popout info of template and parcellation */
 .mat-drawer-content-overflow-visible > mat-drawer > .mat-drawer-inner-container
-{
-  overflow: visible!important;
-}
-
-.overflow-visible
 {
   overflow: visible!important;
 }
@@ -751,27 +701,11 @@ kg-dataset-previewer > img
   width: 100%;
 }
 
-.hover-grab
-{
-  opacity: 0.5;
-  transition: opacity 200ms ease-in-out;
-  cursor: move;
-}
-
-.hover-grab:hover
-{
-  opacity: 1.0;
-}
-
 .m-15
 {
   margin: 15px;
 }
 
-.m-1px
-{
-  margin:1px;
-}
 
 .ml-15px-n
 {
@@ -873,10 +807,6 @@ mat-list.sm mat-list-item
 {
   height:50px;
 }
-.scale-80
-{
-  transform: scale(0.8);
-}
 
 .grid
 {
@@ -904,4 +834,45 @@ mat-list.sm mat-list-item
 .v-align-top
 {
   vertical-align: top;
+}
+
+.text-overflow-ellipses
+{
+  text-overflow: ellipsis;
+}
+
+iav-cmp-viewer-container .mat-chip-list-wrapper
+{
+  flex-wrap: nowrap;
+}
+
+sxplr-sapiviews-features-ieeg-ieegdataset .mat-chip-list-wrapper
+{
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+iav-cmp-viewer-container poly-update-cmp .mat-chip-list-wrapper
+{
+  flex-wrap: wrap;
+}
+
+quick-tour-unit svg
+{
+  pointer-events: none;
+  stroke-width: 3px;
+  stroke: rgb(255, 255, 255);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+sxplr-sapiviews-features-receptor-autoradiograph canvas
+{
+  max-width: 100%;
+  max-height: 100%;
+}
+
+how-to-cite img
+{
+  width: 100%;
 }

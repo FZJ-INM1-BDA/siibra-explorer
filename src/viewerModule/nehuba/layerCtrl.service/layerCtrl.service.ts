@@ -1,41 +1,23 @@
-import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, merge, NEVER, Observable, of, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
-import { viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
-import { getRgb, IColorMap, INgLayerCtrl, INgLayerInterface, TNgLayerCtrl } from "./layerCtrl.util";
-import { getMultiNgIdsRegionsLabelIndexMap } from "../constants";
-import { IAuxMesh } from '../store'
-import { REGION_OF_INTEREST } from "src/util/interfaces";
-import { TRegionDetail } from "src/util/siibraApiConstants/types";
-import { EnumColorMapName } from "src/util/colorMaps";
-import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerSelectorClearView, ngViewerSelectorLayers } from "src/services/state/ngViewerState.store.helper";
-import { serialiseParcellationRegion } from 'common/util'
-import { _PLI_VOLUME_INJ_TOKEN, _TPLIVal } from "src/glue";
-import { RouterService } from "src/routerModule/router.service";
+import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
+import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
+import { SAPIRegion } from "src/atlasComponents/sapi/core";
+import { getParcNgId } from "../config.service"
+import { getRegionLabelIndex } from "../config.service/util";
+import { annotation, atlasAppearance, atlasSelection } from "src/state";
+import { serializeSegment } from "../util";
+import { LayerCtrlEffects } from "./layerCtrl.effects";
+import { arrayEqual } from "src/util/array";
+import { ColorMapCustomLayer } from "src/state/atlasAppearance";
+import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { AnnotationLayer } from "src/atlasComponents/annotations";
 
 export const BACKUP_COLOR = {
   red: 255,
   green: 255,
   blue: 255
-}
-
-export function getAuxMeshesAndReturnIColor(auxMeshes: IAuxMesh[]): IColorMap{
-  const returnVal: IColorMap = {}
-  for (const auxMesh of auxMeshes as IAuxMesh[]) {
-    const { ngId, labelIndicies, rgb = [255, 255, 255] } = auxMesh
-    const auxMeshColorMap = returnVal[ngId] || {}
-    for (const lblIdx of labelIndicies) {
-      auxMeshColorMap[lblIdx as number] = {
-        red: rgb[0] as number,
-        green: rgb[1] as number,
-        blue: rgb[2] as number,
-      }
-    }
-    returnVal[ngId] = auxMeshColorMap
-  }
-  return returnVal
 }
 
 @Injectable({
@@ -46,216 +28,146 @@ export class NehubaLayerControlService implements OnDestroy{
   static PMAP_LAYER_NAME = 'regional-pmap'
 
   private selectedRegion$ = this.store$.pipe(
-    select(viewerStateSelectedRegionsSelector),
+    select(atlasSelection.selectors.selectedRegions),
     shareReplay(1),
   )
 
-  private selectedParcellation$ = this.store$.pipe(
-    select(viewerStateSelectedParcellationSelector)
-  )
 
-  private selectedTemplateSelector$ = this.store$.pipe(
-    select(viewerStateSelectedTemplateSelector)
-  )
+  private defaultNgLayers$ = this.layerEffects.onATPDebounceNgLayers$
 
-  private selParcNgIdMap$ = this.selectedParcellation$.pipe(
-    map(parc => getMultiNgIdsRegionsLabelIndexMap(parc)),
+  private selectedATP$ = this.store$.pipe(
+    atlasSelection.fromRootStore.distinctATP(),
     shareReplay(1),
   )
-  
-  private activeColorMap$: Observable<IColorMap> = combineLatest([
-    this.selParcNgIdMap$.pipe(
-      map(map => {
+
+  public selectedATPR$ = this.selectedATP$.pipe(
+    switchMap(({ atlas, template, parcellation }) => 
+      this.store$.pipe(
+        select(atlasSelection.selectors.selectedParcAllRegions),
+        map(regions => ({
+          atlas, template, parcellation, regions
+        })),
+        shareReplay(1)
+      )
+    )
+  )
+
+  private customLayers$ = this.store$.pipe(
+    select(atlasAppearance.selectors.customLayers),
+    distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
+    shareReplay(1)
+  )
+  private activeColorMap$ = combineLatest([
+    combineLatest([
+      this.selectedATPR$,
+      this.customLayers$,
+    ]).pipe(
+      map(([{ atlas, parcellation, regions, template }, layers]) => {
         const returnVal: IColorMap = {}
-        for (const [ key, val ] of map.entries()) {
-          returnVal[key] = {}
-          for (const [ lblIdx, region ] of val.entries()) {
-            const rgb = getRgb(lblIdx, region)
-            returnVal[key][lblIdx] = rgb
+
+        const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as ColorMapCustomLayer[]
+        const cmBaseLayers = layers.filter(l => l.clType === "baselayer/colormap") as ColorMapCustomLayer[]
+        
+        const useCm = (() => {
+          /**
+           * if custom layer exist, use the last custom layer
+           */
+          if (cmCustomLayers.length > 0) return cmCustomLayers[cmCustomLayers.length - 1].colormap
+          /**
+           * otherwise, use last baselayer
+           */
+          if (cmBaseLayers.length > 0) return cmBaseLayers[cmBaseLayers.length - 1].colormap
+          /**
+           * fallback color map
+           */
+          return {
+            set: () => {
+              throw new Error(`cannot set`)
+            },
+            get: (r: SapiRegionModel) => SAPIRegion.GetDisplayColor(r)
           }
+        })()
+        
+        for (const r of regions) {
+
+          if (!r.hasAnnotation) continue
+          if (!r.hasAnnotation.visualizedIn) continue
+
+          const ngId = getParcNgId(atlas, template, parcellation, r)
+          const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
+          if (!labelIndex) continue
+
+          const [ red, green, blue ] = useCm.get(r)
+
+          if (!returnVal[ngId]) {
+            returnVal[ngId] = {}
+          }
+          returnVal[ngId][labelIndex] = { red, green, blue }
         }
         return returnVal
       })
     ),
-    this.selectedRegion$,
-    this.selectedTemplateSelector$.pipe(
-      map(template => {
-        const { auxMeshes = [] } = template || {}
-        return getAuxMeshesAndReturnIColor(auxMeshes)
-      })
-    ),
-    this.selectedParcellation$.pipe(
-      map(parc => {
-        const { auxMeshes = [] } = parc || {}
-        return getAuxMeshesAndReturnIColor(auxMeshes)
-      })
-    ),
-  ]).pipe(
-    map(([ regions, selReg, ...auxMeshesArr ]) => {
-      
-      const returnVal: IColorMap = {}
-      if (selReg.length === 0) {
-        for (const key in regions) {
-          returnVal[key] = regions[key]
-        }
-      } else {
-        /**
-         * if selected regions are non empty
-         * set the selected regions to show color,
-         * but the rest to show white 
-         */
-        for (const key in regions) {
-          const colorMap = {}
-          returnVal[key] = colorMap
-          for (const lblIdx in regions[key]) {
-            if (selReg.some(r => r.ngId === key && r.labelIndex === Number(lblIdx))) {
-              colorMap[lblIdx] = regions[key][lblIdx]
-            } else {
-              colorMap[lblIdx] = BACKUP_COLOR
+    this.defaultNgLayers$.pipe(
+      map(({ tmplAuxNgLayers }) => {
+        const returnVal: IColorMap = {}
+        for (const ngId in tmplAuxNgLayers) {
+          returnVal[ngId] = {}
+          const { auxMeshes } = tmplAuxNgLayers[ngId]
+          for (const auxMesh of auxMeshes) {
+            const { labelIndicies } = auxMesh
+            for (const lblIdx of labelIndicies) {
+              returnVal[ngId][lblIdx] = BACKUP_COLOR
             }
           }
         }
-      }
-
-      for (const auxMeshes of auxMeshesArr) {
-        for (const key in auxMeshes) {
-          const existingObj = returnVal[key] || {}
-          returnVal[key] = {
-            ...existingObj,
-            ...auxMeshes[key],
-          }
-        }
-      }
-      this.activeColorMap = returnVal
-      return returnVal
-    })
-  )
-
-  private auxMeshes$: Observable<IAuxMesh[]> = combineLatest([
-    this.selectedTemplateSelector$,
-    this.selectedParcellation$,
+        return returnVal
+      })
+    )
   ]).pipe(
-    map(([ tmpl, parc ]) => {
-      const { auxMeshes: tmplAuxMeshes = [] as IAuxMesh[] } = tmpl || {}
-      const { auxMeshes: parclAuxMeshes = [] as IAuxMesh[] } = parc || {}
-      return [...tmplAuxMeshes, ...parclAuxMeshes]
-    })
+    map(([cmParc, cmAux]) => ({
+      ...cmParc,
+      ...cmAux
+    }))
   )
 
   private sub: Subscription[] = []
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     while (this.sub.length > 0) this.sub.pop().unsubscribe()
   }
 
-  private pliVol$: Observable<string[]> = this._pliVol$
-    ? this._pliVol$.pipe(
-      map(arr => {
-        const output = []
-        for (const item of arr) {
-          for (const volume of item.data["iav-registered-volumes"].volumes) {
-            output.push(volume.name)
-          }
-        }
-        return output
-      })
-    )
-    : NEVER
   constructor(
     private store$: Store<any>,
-    private routerSvc: RouterService,
-    @Optional() @Inject(_PLI_VOLUME_INJ_TOKEN) private _pliVol$: Observable<_TPLIVal[]>,
-    @Optional() @Inject(REGION_OF_INTEREST) roi$: Observable<TRegionDetail>
+    private layerEffects: LayerCtrlEffects,
   ){
 
-    if (roi$) {
-
-      this.sub.push(
-        roi$.pipe(
-          switchMap(roi => {
-            if (!roi || !roi.hasRegionalMap) {
-              // clear pmap
-              return of(null)
-            }
-            
-            const { links } = roi
-            const { regional_map: regionalMapUrl, regional_map_info: regionalMapInfoUrl } = links
-            return from(fetch(regionalMapInfoUrl).then(res => res.json())).pipe(
-              map(regionalMapInfo => {
-                return {
-                  roi,
-                  regionalMapUrl,
-                  regionalMapInfo
-                }
-              })
-            )
-          })
-        ).subscribe(processedRoi => {
-          if (!processedRoi) {
-            this.store$.dispatch(
-              ngViewerActionRemoveNgLayer({
-                layer: {
-                  name: NehubaLayerControlService.PMAP_LAYER_NAME
-                }
-              })
-            )
-            return
-          }
-          const { 
-            roi,
-            regionalMapUrl,
-            regionalMapInfo
-          } = processedRoi
-          const { min, max, colormap = EnumColorMapName.VIRIDIS } = regionalMapInfo || {} as any
-
-          const shaderObj = {
-            ...PMAP_DEFAULT_CONFIG,
-            ...{ colormap },
-            ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
-            ...( max ? { highThreshold: max } : { highThreshold: 1 } )
-          }
-
-          const layer = {
-            name: NehubaLayerControlService.PMAP_LAYER_NAME,
-            source : `nifti://${regionalMapUrl}`,
-            mixability : 'nonmixable',
-            shader : getShader(shaderObj),
-          }
-
-          this.store$.dispatch(
-            ngViewerActionAddNgLayer({ layer })
-          )
-
-          // this.layersService.highThresholdMap.set(layerName, highThreshold)
-          // this.layersService.lowThresholdMap.set(layerName, lowThreshold)
-          // this.layersService.colorMapMap.set(layerName, cmap)
-          // this.layersService.removeBgMap.set(layerName, removeBg)
-        })
-      )
-    }
-
     this.sub.push(
-      this.ngLayers$.subscribe(({ ngLayers }) => {
-        this.ngLayersRegister.layers = ngLayers
-      })
+
+      /**
+       * on store showdelin
+       * toggle parcnglayers visibility
+       */
+      this.store$.pipe(
+        select(atlasAppearance.selectors.showDelineation),
+        withLatestFrom(this.defaultNgLayers$)
+      ).subscribe(([flag, { parcNgLayers }]) => {
+        const layerObj = {}
+        for (const key in parcNgLayers) {
+          layerObj[key] = {
+            visible: flag
+          }
+        }
+
+        this.manualNgLayersControl$.next({
+          type: 'update',
+          payload: layerObj
+        })
+      }),
     )
 
     this.sub.push(
-      this.store$.pipe(
-        select(ngViewerSelectorClearView),
-        distinctUntilChanged()
-      ).subscribe(flag => {
-        const pmapLayer = this.ngLayersRegister.layers.find(l => l.name === NehubaLayerControlService.PMAP_LAYER_NAME)
-        if (!pmapLayer) return
-        const payload = {
-          type: 'update',
-          payload: {
-            [NehubaLayerControlService.PMAP_LAYER_NAME]: {
-              visible: !flag
-            }
-          }
-        } as TNgLayerCtrl<'update'>
-        this.manualNgLayersControl$.next(payload)
+      this.ngLayers$.subscribe(({ customLayers }) => {
+        this.ngLayersRegister = customLayers
       })
     )
 
@@ -264,18 +176,17 @@ export class NehubaLayerControlService implements OnDestroy{
      */
     this.sub.push(
       this.store$.pipe(
-        select(viewerStateCustomLandmarkSelector),
-        withLatestFrom(this.auxMeshes$)
-      ).subscribe(([landmarks, auxMeshes]) => {
-        
+        select(annotation.selectors.annotations),
+        withLatestFrom(this.defaultNgLayers$)
+      ).subscribe(([landmarks, { tmplAuxNgLayers }]) => {
         const payload: {
           [key: string]: number
         } = {}
         const alpha = landmarks.length > 0
           ? 0.2
           : 1.0
-        for (const auxMesh of auxMeshes) {
-          payload[auxMesh.ngId] = alpha
+        for (const ngId in tmplAuxNgLayers) {
+          payload[ngId] = alpha
         }
         
         this.manualNgLayersControl$.next({
@@ -286,98 +197,73 @@ export class NehubaLayerControlService implements OnDestroy{
     )
   }
 
-  public activeColorMap: IColorMap
-
-  public overwriteColorMap$ = new BehaviorSubject<IColorMap>(null)
-
-  public setColorMap$: Observable<IColorMap> = merge(
-    this.activeColorMap$.pipe(
-      // TODO this is a dirty fix
-      // it seems, sometimes, overwritecolormap and activecolormap can emit at the same time
-      // (e.g. when reg selection changes)
-      // this ensures that the activecolormap emits later, and thus take effect over overwrite colormap
-      debounceTime(16),
-    ),
-    this.overwriteColorMap$.pipe(
-      filter(v => !!v),
-    )
+  public setColorMap$: Observable<IColorMap> = this.activeColorMap$.pipe(
+    debounceTime(16),
   ).pipe(
     shareReplay(1)
   )
 
-  public expectedLayerNames$ = combineLatest([
-    this.selectedTemplateSelector$,
-    this.auxMeshes$,
-    this.selParcNgIdMap$,
-  ]).pipe(
-    map(([ tmpl, auxMeshes, parcNgIdMap ]) => {
-      const ngIdSet = new Set<string>()
-      const { ngId } = tmpl
-      ngIdSet.add(ngId)
-      for (const auxMesh of auxMeshes) {
-        const { ngId } = auxMesh
-        ngIdSet.add(ngId as string)
-      }
-      for (const ngId of parcNgIdMap.keys()) {
-        ngIdSet.add(ngId)
-      }
-      return Array.from(ngIdSet)
-    })
-  )
-
-  public visibleLayer$: Observable<string[]> = combineLatest([
-    this.expectedLayerNames$,
-    this.pliVol$.pipe(
-      startWith([])
-    ),
-    this.routerSvc.customRoute$.pipe(
-      startWith({}),
-      map(val => val['x-voi'] === "d71d369a-c401-4d7e-b97a-3fb78eed06c5"
-        ? ["VOI_1 (area V1)", "VOI_2 (area V2)"]
-        : []),
-    )
-  ]).pipe(
-    map(([ expectedLayerNames, layerNames, voiLayers ]) => {
-      const ngIdSet = new Set<string>([...layerNames, ...expectedLayerNames, ...voiLayers])
-      return Array.from(ngIdSet)
+  public expectedLayerNames$ = this.defaultNgLayers$.pipe(
+    map(({ parcNgLayers, tmplAuxNgLayers, tmplNgLayers }) => {
+      return [
+        ...Object.keys(parcNgLayers),
+        ...Object.keys(tmplAuxNgLayers),
+        ...Object.keys(tmplNgLayers),
+      ]
     })
   )
 
   /**
    * define when shown segments should be updated
    */
+  public _segmentVis$: Observable<string[]> = combineLatest([
+    this.selectedATP$,
+    this.selectedRegion$
+  ]).pipe(
+    map(() => [''])
+  )
+
   public segmentVis$: Observable<string[]> = combineLatest([
     /**
      * selectedRegions
      */
     this.selectedRegion$,
+    this.customLayers$.pipe(
+      map(layers => layers.filter(l => l.clType === "customlayer/colormap").length > 0),
+    ),
     /**
      * if layer contains non mixable layer
      */
-    this.store$.pipe(
-      select(ngViewerSelectorLayers),
-      map(layers => layers.findIndex(l => l.mixability === 'nonmixable') >= 0),
+    this.customLayers$.pipe(
+      map(layers => layers.filter(l => l.clType === "customlayer/nglayer").length > 0),
     ),
-    /**
-     * clearviewqueue, indicating something is controlling colour map
-     * show all seg
-     */
-    this.store$.pipe(
-      select(ngViewerSelectorClearView),
-      distinctUntilChanged()
-    )
   ]).pipe(
-    withLatestFrom(this.selectedParcellation$),
-    map(([[ regions, nonmixableLayerExists, clearViewFlag ], selParc]) => {
-      if (nonmixableLayerExists && !clearViewFlag) {
+    withLatestFrom(this.selectedATPR$),
+    map(([[ selectedRegions, customMapExists, nonmixableLayerExists ], { atlas, parcellation, template, regions }]) => {
+      /**
+       * if non mixable layer exist (e.g. pmap)
+       * and no custom color map exist
+       * hide all segmentations
+       */
+      if (!customMapExists && nonmixableLayerExists) {
         return null
       }
-      const { ngId: defaultNgId } = selParc || {}
   
-      /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-      const selectedRegionIndexSet = new Set<string>(regions.map(({ngId = defaultNgId, labelIndex}) => serialiseParcellationRegion({ ngId, labelIndex })))
-      if (selectedRegionIndexSet.size > 0 && !clearViewFlag) {
-        return [...selectedRegionIndexSet]
+      /**
+       * if custom map exists, roi is all regions
+       * otherwise, roi is only selectedRegions
+       */
+      const roi = customMapExists ? regions : selectedRegions
+
+      const roiIndexSet = new Set<string>(
+        roi.map(r => {
+          const ngId = getParcNgId(atlas, template, parcellation, r)
+          const label = getRegionLabelIndex(atlas, template, parcellation, r)
+          return ngId && label && serializeSegment(ngId, label)
+        }).filter(v => !!v)
+      )
+      if (roiIndexSet.size > 0) {
+        return [...roiIndexSet]
       } else {
         return []
       }
@@ -388,38 +274,33 @@ export class NehubaLayerControlService implements OnDestroy{
    * ngLayers controller
    */
 
-  private ngLayersRegister: {layers: INgLayerInterface[]} = {
-    layers: []
-  }
-  public removeNgLayers(layerNames: string[]) {
-    this.ngLayersRegister.layers
-      .filter(layer => layerNames?.findIndex(l => l === layer.name) >= 0)
-      .map(l => l.name)
-      .forEach(layerName => {
-        this.store$.dispatch(ngViewerActionRemoveNgLayer({
-          layer: {
-            name: layerName
-          }
-        }))
+  private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
+
+  private updateCustomLayerTransparency$ = this.store$.pipe(
+    select(atlasAppearance.selectors.customLayers),
+    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    pairwise(),
+    map(([ oldCustomLayers, newCustomLayers ]) => {
+      return newCustomLayers.filter(({ id, opacity }) => oldCustomLayers.some(({ id: oldId, opacity: oldOpacity }) => oldId === id && oldOpacity !== opacity))
+    }),
+    filter(arr => arr.length > 0)
+  )
+
+  private ngLayers$ = this.customLayers$.pipe(
+    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    distinctUntilChanged(
+      arrayEqual((o, n) => o.id === n.id)
+    ),
+    map(customLayers => {
+      const newLayers = customLayers.filter(l => {
+        const registeredLayerNames = this.ngLayersRegister.map(l => l.id)
+        return !registeredLayerNames.includes(l.id)
       })
-  }
-  public addNgLayer(layers: INgLayerInterface[]){
-    this.store$.dispatch(ngViewerActionAddNgLayer({
-      layer: layers
-    }))
-  }
-  private ngLayers$ = this.store$.pipe(
-    select(ngViewerSelectorLayers),
-    map((ngLayers: INgLayerInterface[]) => {
-      const newLayers = ngLayers.filter(l => {
-        const registeredLayerNames = this.ngLayersRegister.layers.map(l => l.name)
-        return !registeredLayerNames.includes(l.name)
+      const removeLayers = this.ngLayersRegister.filter(l => {
+        const stateLayerNames = customLayers.map(l => l.id)
+        return !stateLayerNames.includes(l.id)
       })
-      const removeLayers = this.ngLayersRegister.layers.filter(l => {
-        const stateLayerNames = ngLayers.map(l => l.name)
-        return !stateLayerNames.includes(l.name)
-      })
-      return { newLayers, removeLayers, ngLayers }
+      return { newLayers, removeLayers, customLayers }
     }),
     shareReplay(1)
   )
@@ -431,11 +312,9 @@ export class NehubaLayerControlService implements OnDestroy{
       map(newLayers => {
 
         const newLayersObj: any = {}
-        newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
+        newLayers.forEach(({ id, source, ...rest }) => newLayersObj[id] = {
           ...rest,
           source,
-          // source: getProxyUrl(source),
-          // ...getProxyOther({source})
         })
   
         return {
@@ -448,14 +327,62 @@ export class NehubaLayerControlService implements OnDestroy{
       map(({ removeLayers }) => removeLayers),
       filter(layers => layers.length > 0),
       map(removeLayers => {
-        const removeLayerNames = removeLayers.map(v => v.name)
+        const removeLayerNames = removeLayers.map(v => v.id)
         return {
           type: 'remove',
           payload: { names: removeLayerNames }
         } as TNgLayerCtrl<'remove'>
       })
     ),
+    this.updateCustomLayerTransparency$.pipe(
+      map(layers => {
+        const payload: Record<string, number> = {}
+        for (const layer of layers) {
+          const opacity = layer.opacity ?? 0.8
+          payload[layer.id] = opacity
+        }
+        return {
+          type: 'setLayerTransparency',
+          payload
+        } as TNgLayerCtrl<'setLayerTransparency'>
+      })
+    ),
     this.manualNgLayersControl$,
   ).pipe(
+  )
+
+  public visibleLayer$: Observable<string[]> = combineLatest([
+    this.expectedLayerNames$.pipe(
+      map(expectedLayerNames => {
+        const ngIdSet = new Set<string>([...expectedLayerNames])
+        return Array.from(ngIdSet)
+      })
+    ),
+    this.ngLayers$.pipe(
+      map(({ customLayers }) => customLayers),
+      startWith([] as atlasAppearance.NgLayerCustomLayer[]),
+      map(customLayers => {
+        /**
+         * pmap control has its own visibility controller
+         */
+        return customLayers
+          .map(l => l.id)
+          .filter(name => name !== NehubaLayerControlService.PMAP_LAYER_NAME)
+      })
+    ),
+    this.customLayers$.pipe(
+      map(cl => {
+        const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
+        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
+        return pmapExist && !otherColormapExist
+      }),
+      distinctUntilChanged(),
+      map(flag => flag
+        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
+        : []
+      )
+    )
+  ]).pipe(
+    map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName, ...AnnotationLayer.Map.keys()])
   )
 }

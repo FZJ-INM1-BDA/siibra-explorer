@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-import { PureContantService } from 'src/util';
 
 @Component({
   selector: 'iav-about',
@@ -10,14 +9,9 @@ import { PureContantService } from 'src/util';
 })
 
 export class AboutCmp {
-  public contactEmailHref: string = `mailto:${this.constantService.supportEmailAddress}?Subject=[InteractiveAtlasViewer]%20Queries`
-  public supportEmailAddress: string = this.constantService.supportEmailAddress
+  public supportEmailAddress: string = `support@ebrains.eu`
+  public contactEmailHref: string = `mailto:${this.supportEmailAddress}?Subject=[siibra-explorer]%20Queries`
 
-  public userDoc: string = this.constantService.docUrl
-  public repoUrl = this.constantService.repoUrl
-
-  constructor(
-    private constantService: PureContantService,
-  ) {
-  }
+  public userDoc = `https://siibra-explorer.readthedocs.io/en/latest/`
+  public repoUrl = `https://github.com/FZJ-INM1-BDA/siibra-explorer`
 }

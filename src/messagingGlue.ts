@@ -1,10 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { select, Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { IMessagingActionTmpl, IWindowMessaging } from "./messaging/types";
-import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "./services/state/ngViewerState/actions";
-import { viewerStateSelectAtlas } from "./services/state/viewerState/actions";
-import { viewerStateFetchedAtlasesSelector } from "./services/state/viewerState/selectors";
-import { generalActionError } from "./services/stateStore.helper";
+import { atlasAppearance, atlasSelection, generalActions } from "src/state"
+import { SAPI } from "./atlasComponents/sapi";
 
 @Injectable()
 export class MessagingGlue implements IWindowMessaging, OnDestroy {
@@ -17,14 +15,15 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
   }
 
-  constructor(private store: Store<any>){
+  constructor(
+    private store: Store<any>,
+    sapi: SAPI,
+  ){
 
-    const sub = this.store.pipe(
-      select(viewerStateFetchedAtlasesSelector)
-    ).subscribe((atlases: any[]) => {
+    const sub = sapi.atlases$.subscribe(atlases => {
       for (const atlas of atlases) {
-        const { ['@id']: atlasId, templateSpaces } = atlas
-        for (const tmpl of templateSpaces) {
+        const { ['@id']: atlasId, spaces } = atlas
+        for (const tmpl of spaces) {
           const { ['@id']: tmplId } = tmpl
           this.tmplSpIdToAtlasId.set(tmplId, atlasId)
         }
@@ -42,19 +41,15 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     const atlasId = this.tmplSpIdToAtlasId.get(payload['@id'])
     if (!atlasId) {
       return this.store.dispatch(
-        generalActionError({
+        generalActions.generalActionError({
           message: `atlas id with the corresponding templateId ${payload['@id']} not found.`
         })
       )
     }
     this.store.dispatch(
-      viewerStateSelectAtlas({
-        atlas: {
-          ['@id']: atlasId,
-          template: {
-            ['@id']: payload['@id']
-          }
-        }
+      atlasSelection.actions.selectATPById({
+        atlasId,
+        templateId: payload["@id"]
       })
     )
   }
@@ -71,29 +66,25 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     if (type === 'swc') {
       const { transform } = resourceParam
       const layer = {
-        name: swcLayerUuid,
         id: swcLayerUuid,
         source: `swc://${url}`,
-        mixability: 'mixable',
-        type: "segmentation",
-        "segments": [
+        segments: [
           "1"
         ],
-        transform,
+        transform: transform,
+        clType: 'customlayer/nglayer' as const
       }
 
       this.store.dispatch(
-        ngViewerActionAddNgLayer({
-          layer
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: layer
         })
       )
 
       this.mapIdUnload.set(swcLayerUuid, () => {
         this.store.dispatch(
-          ngViewerActionRemoveNgLayer({
-            layer: {
-              name: swcLayerUuid
-            }
+          atlasAppearance.actions.removeCustomLayer({
+            id: swcLayerUuid
           })
         )
         unload()

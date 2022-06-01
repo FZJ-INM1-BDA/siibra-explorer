@@ -3,11 +3,11 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Polygon, POLY_ICON_CLASS } from "../poly";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { Store } from "@ngrx/store";
 import { Point } from "../point";
 import { ARIA_LABELS } from 'common/constants'
 import { ComponentStore } from "src/viewerModule/componentStore";
+import { actions } from "src/state/atlasSelection";
 
 @Component({
   selector: 'poly-update-cmp',
@@ -68,12 +68,12 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
       const { x, y, z } = roi
 
       this.store.dispatch(
-        viewerStateChangeNavigation({
+        actions.navigateTo({
           navigation: {
-            position: [x, y, z],
-            positionReal: true,
-            animation: {}
-          }
+            position: [x, y, z]
+          },
+          physical: true,
+          animation: true
         })
       )
       return
@@ -88,12 +88,12 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
     const { x, y, z } = this.updateAnnotation.points[0]
     
     this.store.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
-          position: [x, y, z],
-          positionReal: true,
-          animation: {}
-        }
+          position: [x, y, z]
+        },
+        physical: true,
+        animation: true
       })
     )
   }

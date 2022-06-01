@@ -1,0 +1,34 @@
+<h4 class="mat-h4">
+  Share via
+</h4>
+<mat-nav-list>
+  <mat-list-item iav-clipboard-copy
+    [attr.aria-label]="ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD"
+    [attr.tab-index]="10">
+    <mat-icon
+      class="mr-4"
+      fontSet="fas"
+      fontIcon="fa-copy">
+    </mat-icon>
+    <span>
+      Copy link to this view
+    </span>
+  </mat-list-item>
+  <mat-list-item
+    [attr.aria-label]="ARIA_LABELS.SHARE_CUSTOM_URL"
+    [attr.tab-index]="10"
+    (click)="openShareSaneUrl()"
+    [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
+    >
+    <mat-icon
+      class="mr-4"
+      fontSet="fas"
+      fontIcon="fa-link">
+    </mat-icon>
+
+    <span>
+      Create custom URL
+    </span>
+
+  </mat-list-item>
+</mat-nav-list>

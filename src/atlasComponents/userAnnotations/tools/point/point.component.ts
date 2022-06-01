@@ -3,9 +3,9 @@ import { Point, POINT_ICON_CLASS } from "../point";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { ToolCmpBase } from "../toolCmp.base";
 import { Store } from "@ngrx/store";
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { ARIA_LABELS } from 'common/constants'
+import { actions } from "src/state/atlasSelection";
 
 @Component({
   selector: 'point-update-cmp',
@@ -55,12 +55,12 @@ export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
     }
     const { x, y, z } = this.updateAnnotation
     this.store.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
-          position: [x, y, z],
-          positionReal: true,
-          animation: {}
-        }
+          position: [x, y, z]
+        },
+        physical: true,
+        animation: true
       })
     )
   }

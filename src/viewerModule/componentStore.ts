@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { select } from "@ngrx/store";
-import { ReplaySubject, Subject } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
 import { shareReplay } from "rxjs/operators";
 
 export class LockError extends Error{}
@@ -15,14 +15,14 @@ export class LockError extends Error{}
 export class ComponentStore<T>{
   private _state$: Subject<T> = new ReplaySubject<T>(1)
   private _lock: boolean = false
-  get isLocked() {
+  get isLocked(): boolean {
     return this._lock
   }
-  setState(state: T){
+  setState(state: T): void {
     if (this.isLocked) throw new LockError('State is locked')
     this._state$.next(state)
   }
-  select<V>(selectorFn: (state: T) => V) {
+  select<V>(selectorFn: (state: T) => V): Observable<V> {
     return this._state$.pipe(
       select(selectorFn),
       shareReplay(1),

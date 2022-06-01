@@ -3,7 +3,8 @@
   "exclude": [
     "**/*.spec.ts",
     "./spec/*",
-    "src/atlasViewerExports/*"
+    "src/atlasViewerExports/*",
+    "**/*.stories.*"
   ],
   "files": [
     "src/main-aot.ts"

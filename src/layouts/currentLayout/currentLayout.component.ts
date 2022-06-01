@@ -1,9 +1,5 @@
-import { Component } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { startWith } from "rxjs/operators";
-import { SUPPORTED_PANEL_MODES } from "src/services/state/ngViewerState.store";
-import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/selectors";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { userInterface } from "src/state"
 
 @Component({
   selector: 'current-layout',
@@ -11,19 +7,20 @@ import { ngViewerSelectorPanelMode } from "src/services/state/ngViewerState/sele
   styleUrls: [
     './currentLayout.style.css',
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class CurrentLayout {
 
-  public supportedPanelModes = SUPPORTED_PANEL_MODES
-  public panelMode$: Observable<string>
-
-  constructor(
-    private store$: Store<any>,
-  ) {
-    this.panelMode$ = this.store$.pipe(
-      select(ngViewerSelectorPanelMode),
-      startWith(SUPPORTED_PANEL_MODES[0]),
-    )
+  @Input('current-layout-use-layout')
+  public useLayout: userInterface.PanelMode = "FOUR_PANEL"
+  
+  public panelModes: Record<string, userInterface.PanelMode> = {
+    FOUR_PANEL: "FOUR_PANEL",
+    H_ONE_THREE: "H_ONE_THREE",
+    SINGLE_PANEL: "SINGLE_PANEL",
+    V_ONE_THREE: "V_ONE_THREE"
   }
+
+  public panelMode: userInterface.PanelMode = null
 }

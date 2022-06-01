@@ -3,7 +3,6 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ComponentsModule } from "../components/components.module";
 import { CurrentLayout } from "./currentLayout/currentLayout.component";
-import { FloatingLayoutContainer } from "./floating/floating.component";
 import { FourCornersCmp } from "./fourCorners/fourCorners.component";
 import { FourPanelLayout } from "./layouts/fourPanel/fourPanel.component";
 import { HorizontalOneThree } from "./layouts/h13/h13.component";
@@ -17,7 +16,6 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     ComponentsModule,
   ],
   declarations : [
-    FloatingLayoutContainer,
     FourCornersCmp,
     CurrentLayout,
 
@@ -28,7 +26,6 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
   ],
   exports : [
     BrowserAnimationsModule,
-    FloatingLayoutContainer,
     FourCornersCmp,
     CurrentLayout,
     FourPanelLayout,

@@ -1,8 +1,6 @@
 export {
-  actionAddNgLayer,
   actionRemoveAuxMesh,
   actionSetAuxMesh,
-  actionClearAuxMeshes,
   actionSetAuxMeshes,
 } from './actions'
 export {
@@ -14,5 +12,4 @@ export {
 export {
   IAuxMesh,
   INehubaFeature,
-  INgLayerInterface
 } from './type'

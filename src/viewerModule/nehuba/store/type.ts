@@ -1,3 +1,5 @@
+import { atlasAppearance } from "src/state"
+
 export interface IAuxMesh {
   ['@id']: string
   name: string
@@ -8,19 +10,9 @@ export interface IAuxMesh {
   visible: boolean
 }
 
-export interface INgLayerInterface {
-  name: string // displayName
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  id?: string // unique identifier
-  visible?: boolean
-  shader?: string
-  transform?: any
-}
 
 export interface INehubaFeature {
-  layers: INgLayerInterface[]
+  layers: atlasAppearance.NgLayerCustomLayer[]
   panelMode: string
   panelOrder: string
   octantRemoval: boolean
