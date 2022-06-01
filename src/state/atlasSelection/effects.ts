@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { concat, forkJoin, merge, Observable, of } from "rxjs";
-import { filter, map, mapTo, switchMap, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
+import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
@@ -337,9 +337,59 @@ export class Effect {
 
   onNavigateToRegion = createEffect(() => this.action.pipe(
     ofType(actions.navigateToRegion),
-    mapTo(mainActions.generalActionError({
-      message: `NYI onNavigateToRegion`
-    }))
+    withLatestFrom(
+      this.store.pipe(
+        select(selectors.selectedTemplate)
+      ),
+      this.store.pipe(
+        select(selectors.selectedAtlas)
+      ),
+      this.store.pipe(
+        select(selectors.selectedParcellation)
+      )
+    ),
+    switchMap(([{ region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
+      if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !region)  {
+        return of(
+          mainActions.generalActionError({
+            message: `atlas, template, parcellation or region not set`
+          })
+        )
+      }
+
+      if (region.hasAnnotation?.bestViewPoint && region.hasAnnotation.bestViewPoint.coordinateSpace['@id'] === selectedTemplate["@id"]) {
+        return of(
+          actions.navigateTo({
+            animation: true,
+            navigation: {
+              position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
+            }
+          })
+        )
+      }
+      
+      console.log('bla2?')
+      return this.sapiSvc.getRegion(selectedAtlas['@id'], selectedParcellation['@id'], region["@id"]).getDetail(selectedTemplate["@id"]).pipe(
+        map(detailedRegion => {
+          if (!detailedRegion?.hasAnnotation?.bestViewPoint?.coordinates) {
+            return mainActions.generalActionError({
+              message: `getting region detail error! cannot get coordinates`
+            })
+          }
+          return actions.navigateTo({
+            animation: true,
+            navigation: {
+              position: detailedRegion.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
+            }
+          })
+        }),
+        catchError((_err, _obs) => of(
+          mainActions.generalActionError({
+            message: `Error getting region centroid`
+          })
+        ))
+      )
+    })
   ))
 
   onSelAtlasTmplParcClearRegion = createEffect(() => merge(
