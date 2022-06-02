@@ -1,20 +1,28 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 
-export function getTraverseFunctions(parcellations: SapiParcellationModel[]) {
+export function getTraverseFunctions(parcellations: SapiParcellationModel[], skipDeprecated: boolean = true) {
 
-  const getTraverse = (key: 'prev' | 'next') => (parc: SapiParcellationModel) => {
-    if (!parc.version) {
-      throw new Error(`parcellation ${parc.name} does not have version defined!`)
+  const getTraverse = (key: 'prev' | 'next') => {
+
+    const returnFunction = (parc: SapiParcellationModel) => {
+      if (!parc.version) {
+        throw new Error(`parcellation ${parc.name} does not have version defined!`)
+      }
+      if (!parc.version[key]) {
+        return null
+      }
+      const found = parcellations.find(p => p["@id"] === parc.version[key]["@id"])
+      if (!found) {
+        throw new Error(`parcellation ${parc.name} references ${parc.version[key]['@id']} as ${key} version, but it cannot be found.`)
+      }
+      if (skipDeprecated && found.version.deprecated) {
+        return returnFunction(found)
+      }
+      return found
     }
-    if (!parc.version[key]) {
-      return null
-    }
-    const found = parcellations.find(p => p["@id"] === parc.version[key]["@id"])
-    if (!found) {
-      throw new Error(`parcellation ${parc.name} references ${parc.version[key]['@id']} as ${key} version, but it cannot be found.`)
-    }
-    return found
+
+    return returnFunction
   }
   
   const findNewer = getTraverse('next')
