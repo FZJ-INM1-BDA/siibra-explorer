@@ -2,7 +2,6 @@ import { createSelector } from "@ngrx/store"
 import { nameSpace } from "./const"
 import { Annotation, AnnotationState } from "./store"
 import { selectors as atlasSelectionSelectors } from "../atlasSelection"
-import { annotation } from ".."
 
 const selectStore = state => state[nameSpace] as AnnotationState
 

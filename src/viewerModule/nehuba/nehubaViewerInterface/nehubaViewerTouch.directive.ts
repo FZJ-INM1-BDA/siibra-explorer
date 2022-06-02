@@ -27,9 +27,20 @@ export class NehubaViewerTouchDirective implements OnDestroy{
   public translate$: Observable<any>
 
   private nehubaUnit: NehubaViewerUnit
+  private htmlElementIndexMap = new WeakMap<HTMLElement, number>()
   private findPanelIndex(panel: HTMLElement){
     if (!this.nehubaUnit) return null
-    return Array.from(this.nehubaUnit?.nehubaViewer?.ngviewer?.display?.panels || []).indexOf(panel)
+    if (!this.htmlElementIndexMap.has(panel)) {
+      Array.from(this.nehubaUnit?.nehubaViewer?.ngviewer?.display?.panels || []).forEach((el, idx) => {
+        if (el['element']) {
+          this.htmlElementIndexMap.set(
+            el['element'] as HTMLElement,
+            idx
+          )
+        }
+      })
+    }
+    return this.htmlElementIndexMap.get(panel)
   }
 
   private _exportNehuba: any

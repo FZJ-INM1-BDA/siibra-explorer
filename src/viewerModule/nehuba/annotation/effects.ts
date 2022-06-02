@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { map } from "rxjs/operators";
+import { distinctUntilChanged, map } from "rxjs/operators";
 import { annotation, atlasAppearance } from "src/state"
 
 @Injectable()
@@ -10,8 +10,9 @@ export class NgAnnotationEffects{
 
   onAnnotationHideQuadrant = createEffect(() => this.store.pipe(
     select(annotation.selectors.spaceFilteredAnnotations),
-    map(arr => {
-      const spaceFilteredAnnotationExists = arr.length > 0
+    map(arr => arr.length > 0),
+    distinctUntilChanged(),
+    map(spaceFilteredAnnotationExists => {
       return atlasAppearance.actions.setOctantRemoval({
         flag: !spaceFilteredAnnotationExists
       })
