@@ -112,7 +112,7 @@ module.exports = {
           'cdnjs.cloudflare.com/ajax/libs/mathjax/', // math jax
           'https://unpkg.com/three-surfer@0.0.11/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           'https://unpkg.com/ng-layer-tune@0.0.6/dist/ng-layer-tune/', // needed for ng layer control
-          'https://unpkg.com/hbp-connectivity-component@0.6.3/', // needed for connectivity component
+          'https://unpkg.com/hbp-connectivity-component@0.6.4/', // needed for connectivity component
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,
