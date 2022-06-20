@@ -321,6 +321,7 @@ export class ViewerCmp implements OnDestroy {
     switch(event.type) {
     case EnumViewerEvt.VIEWERLOADED:
       this.viewerLoaded = event.data
+      this.cdr.detectChanges()
       break
     case EnumViewerEvt.VIEWER_CTX:
       this.ctxMenuSvc.context$.next(event.data)
