@@ -6,7 +6,7 @@ import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "../../util";
 import { QUICKTOUR_DESC, ARIA_LABELS, IDS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { debounce, debounceTime, filter, mapTo, switchMap, take } from "rxjs/operators";
+import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take } from "rxjs/operators";
 
 @Component({
   selector: `nehuba-layout-overlay`,
@@ -154,11 +154,17 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
       fromEvent<CustomEvent>(
         nehubaUnit.elementRef.nativeElement,
         'sliceRenderEvent'
-      ).subscribe(ev => {
-        const { missingImageChunks, missingChunks } = ev.detail
+      ).pipe(
+        map(ev => {
+          const { missingImageChunks, missingChunks } = ev.detail
+          return { missingImageChunks, missingChunks }
+        }),
+        distinctUntilChanged((o, n) => o.missingChunks === n.missingChunks && o.missingImageChunks === n.missingImageChunks)
+      ).subscribe(({ missingImageChunks, missingChunks }) => {
         this.volumeChunkLoading$.next(
-          missingImageChunks.length === 0 && missingChunks.length === 0
+          missingImageChunks > 0 || missingChunks > 0
         )
+        this.detectChanges()
       }),
 
       /**
