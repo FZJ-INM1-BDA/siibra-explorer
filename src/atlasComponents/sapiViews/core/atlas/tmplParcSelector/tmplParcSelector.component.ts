@@ -104,12 +104,19 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
     )
   )
 
-  private showOverlayIntent$ = new Subject()
+  private showOverlayIntentByTemplate$ = new Subject()
+  private showOverlayIntentByParcellation$ = new Subject()
   public showLoadingOverlay$ = merge(
-    this.showOverlayIntent$.pipe(
+    this.showOverlayIntentByTemplate$.pipe(
       mapTo(true)
     ),
     this.selectedTemplate$.pipe(
+      mapTo(false)
+    ),
+    this.showOverlayIntentByParcellation$.pipe(
+      mapTo(true)
+    ),
+    this.selectedParcellation$.pipe(
       mapTo(false)
     )
   ).pipe(
@@ -180,7 +187,7 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   }
 
   selectTemplate(tmpl: SapiSpaceModel) {
-    this.showOverlayIntent$.next(true)
+    this.showOverlayIntentByTemplate$.next(true)
 
     this.store$.dispatch(
       atlasSelection.actions.selectTemplate({
@@ -190,6 +197,7 @@ export class SapiViewsCoreAtlasAtlasTmplParcSelector {
   }
 
   selectParcellation(parc: SapiParcellationModel) {
+    this.showOverlayIntentByParcellation$.next(true)
 
     this.store$.dispatch(
       atlasSelection.actions.selectParcellation({

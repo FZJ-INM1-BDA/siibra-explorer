@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { Observable } from "rxjs";
+import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
+import { concat, Observable, of, timer } from "rxjs";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
 import { ARIA_LABELS } from "common/constants"
 import { getTraverseFunctions } from "../parcellationVersion.pipe";
+import { mapTo, shareReplay, switchMap } from "rxjs/operators";
 
 @Component({
   selector: `sxplr-sapiviews-core-parcellation-smartchip`,
@@ -64,6 +65,16 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     }
   }
 
+  loadingParc$: Observable<SapiParcellationModel> = this.onSelectParcellation.pipe(
+    switchMap(parc => concat(
+      of(parc),
+      timer(5000).pipe(
+        mapTo(null)
+      ),
+    )),
+    shareReplay(1),
+  )
+
   parcellationVisibility$: Observable<boolean> = this.svc.visibility$
 
   toggleParcellationVisibility(){
@@ -75,7 +86,7 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
   }
 
   selectParcellation(parc: SapiParcellationModel){
-    if (parc === this.parcellation) return
+    if (this.trackByFn(parc) === this.trackByFn(this.parcellation)) return
     this.onSelectParcellation.emit(parc)
   }
 
