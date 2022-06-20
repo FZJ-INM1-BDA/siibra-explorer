@@ -1,11 +1,11 @@
 <mat-menu #otherParcMenu="matMenu"
   [hasBackdrop]="false"
-  class="sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+  class="parc-smart-chip-menu-panel sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
   <div (iav-outsideClick)="menuTrigger.closeMenu()">
 
     <sxplr-sapiviews-core-parcellation-chip *ngFor="let parc of otherVersions"
       [sxplr-sapiviews-core-parcellation-chip-parcellation]="parc"
-      [sxplr-sapiviews-core-parcellation-chip-color]="parcellation === parc ? 'primary' : 'default'"
+      [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | equality : parc : trackByFn) ? 'primary' : 'default'"
       (sxplr-sapiviews-core-parcellation-chip-onclick)="selectParcellation(parc)">
 
     </sxplr-sapiviews-core-parcellation-chip>

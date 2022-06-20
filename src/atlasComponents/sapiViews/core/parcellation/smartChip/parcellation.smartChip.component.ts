@@ -78,4 +78,8 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     if (parc === this.parcellation) return
     this.onSelectParcellation.emit(parc)
   }
+
+  trackByFn(parc: SapiParcellationModel){
+    return parc["@id"]
+  }
 }
