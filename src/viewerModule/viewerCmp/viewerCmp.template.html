@@ -683,7 +683,7 @@
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
 
 
-        <ng-template [ngIf]="regionDirective.fetchInProgress">
+        <ng-template [ngIf]="regionDirective.fetchInProgress$ | async">
           <spinner-cmp class="sxplr-mt-10 fs-200"></spinner-cmp>
         </ng-template>
         <sxplr-sapiviews-core-region-region-rich
