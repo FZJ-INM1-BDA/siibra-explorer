@@ -5,6 +5,7 @@ import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { atlasAppearance } from "src/state";
 import { UtilModule } from "src/util";
+import { SapiViewsUtilModule } from "../../util";
 import { SapiViewsCoreParcellationParcellationChip } from "./chip/parcellation.chip.component";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
@@ -20,6 +21,7 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     ComponentsModule,
     AngularMaterialModule,
     UtilModule,
+    SapiViewsUtilModule,
   ],
   declarations: [
     SapiViewsCoreParcellationParcellationTile,

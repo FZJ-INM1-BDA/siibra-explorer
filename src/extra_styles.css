@@ -876,3 +876,8 @@ how-to-cite img
 {
   width: 100%;
 }
+
+.mat-menu-panel.parc-smart-chip-menu-panel
+{
+  max-width: 100vw;
+}

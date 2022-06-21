@@ -4,12 +4,12 @@
 
   <div class="floating-ui">
 
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 3"
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
       class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
       <logo-container></logo-container>
     </div>
 
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 3" floatingMouseContextualContainerDirective>
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 2" floatingMouseContextualContainerDirective>
 
       <div class="h-0"
         iav-mouse-hover
@@ -683,7 +683,7 @@
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
 
 
-        <ng-template [ngIf]="regionDirective.fetchInProgress">
+        <ng-template [ngIf]="regionDirective.fetchInProgress$ | async">
           <spinner-cmp class="sxplr-mt-10 fs-200"></spinner-cmp>
         </ng-template>
         <sxplr-sapiviews-core-region-region-rich

@@ -52,6 +52,16 @@ export class Effect {
     ({ current, previous }) => {
       const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous?.template?.["@id"])
       const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current?.template?.["@id"])
+
+      /**
+       * if trans-species, return default state for navigation
+       */
+      if (previous?.atlas?.["@id"] !== current?.atlas?.["@id"]) {
+        return of({
+          navigation: null
+        })
+      }
+
       /**
        * if either space name is undefined, return default state for navigation
        */
@@ -435,6 +445,5 @@ export class Effect {
     private store: Store,
     private interSpaceCoordXformSvc: InterSpaceCoordXformSvc,
   ){
-
   }
 }

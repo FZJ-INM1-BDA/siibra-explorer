@@ -1,16 +1,15 @@
-import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { TestBed } from "@angular/core/testing"
 import { provideMockActions } from "@ngrx/effects/testing"
 import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
 import { Observable, of, throwError } from "rxjs"
-import { SAPI, SAPIModule, SapiRegionModel, SAPIParcellation, SapiAtlasModel, SapiSpaceModel, SapiParcellationModel } from "src/atlasComponents/sapi"
+import { SAPI, SAPIModule, SapiRegionModel, SapiAtlasModel, SapiSpaceModel, SapiParcellationModel } from "src/atlasComponents/sapi"
 import { IDS } from "src/atlasComponents/sapi/constants"
 import { actions, selectors } from "."
 import { Effect } from "./effects"
 import * as mainActions from "../actions"
-import { take } from "rxjs/operators"
+import { atlasSelection } from ".."
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
@@ -40,7 +39,6 @@ describe("> effects.ts", () => {
 
         const sapisvc = TestBed.inject(SAPI)
         const regions = await sapisvc.getParcRegions(IDS.ATLAES.HUMAN, IDS.PARCELLATION.JBA29, IDS.TEMPLATES.MNI152).toPromise()
-  
         hoc1left = regions.find(r => /hoc1/i.test(r.name) && /left/i.test(r.name))
         if (!hoc1left) throw new Error(`cannot find hoc1 left`)
         hoc1leftCentroid = JSON.parse(JSON.stringify(hoc1left)) 
@@ -93,6 +91,98 @@ describe("> effects.ts", () => {
 
       })
 
+    })
+
+    describe("> onTemplateParcSelectionPostHook", () => {
+      describe("> 0", () => {
+      })
+      describe("> 1", () => {
+        const currNavigation = {
+          orientation: [0, 0, 0, 1],
+          perspectiveOrientation: [0, 0, 0, 1],
+          perspectiveZoom: 1,
+          position: [1, 2, 3], 
+          zoom: 1
+        }
+        beforeEach(() => {
+          const store = TestBed.inject(MockStore)
+          store.overrideSelector(atlasSelection.selectors.navigation, currNavigation)
+        })
+        describe("> when atlas is different", () => {
+          describe("> if no atlas prior", () => {
+
+            it("> navigation should be reset", () => {
+              const effects = TestBed.inject(Effect)
+              const hook = effects.onTemplateParcSelectionPostHook[1]
+              const obs = hook({
+                current: {
+                  atlas: null,
+                  parcellation: null,
+                  template: null
+                },
+                previous: {
+                  atlas: {
+                    "@id": IDS.ATLAES.RAT
+                  } as any,
+                  parcellation: {
+                    "@id": IDS.PARCELLATION.WAXHOLMV4
+                  } as any,
+                  template: {
+                    "@id": IDS.TEMPLATES.WAXHOLM
+                  } as any,
+                }
+              })
+
+              expect(obs).toBeObservable(
+                hot('(a|)', {
+                  a: {
+                    navigation: null
+                  }
+                })
+              )
+            })
+          })
+          describe("> if different atlas prior", () => {
+
+            it("> navigation should be reset", () => {
+              const effects = TestBed.inject(Effect)
+              const hook = effects.onTemplateParcSelectionPostHook[1]
+              const obs = hook({
+                current: {
+                  atlas: {
+                    "@id": IDS.ATLAES.HUMAN
+                  } as any,
+                  parcellation: {
+                    "@id": IDS.PARCELLATION.JBA29
+                  } as any,
+                  template: {
+                    "@id": IDS.TEMPLATES.MNI152
+                  } as any,
+                },
+                previous: {
+                  atlas: {
+                    "@id": IDS.ATLAES.RAT
+                  } as any,
+                  parcellation: {
+                    "@id": IDS.PARCELLATION.WAXHOLMV4
+                  } as any,
+                  template: {
+                    "@id": IDS.TEMPLATES.WAXHOLM
+                  } as any,
+                }
+              })
+
+              expect(obs).toBeObservable(
+                hot('(a|)', {
+                  a: {
+                    navigation: null
+                  }
+                })
+              )
+            })
+          })
+        })
+      })
     })
   
     describe('> if selected atlas has no matching tmpl space', () => {

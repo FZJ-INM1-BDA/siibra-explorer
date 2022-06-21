@@ -118,3 +118,8 @@ mat-list[dense].contextual-block
 {
   background-color : rgba(30,30,30,0.8);
 }
+
+.region-populated
+{
+  overflow: hidden auto;
+}

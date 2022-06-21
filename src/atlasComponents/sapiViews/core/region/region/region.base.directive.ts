@@ -2,7 +2,7 @@ import { Directive, EventEmitter, Input, OnDestroy, Output } from "@angular/core
 import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { SAPIRegion } from "src/atlasComponents/sapi/core";
 
 @Directive({
@@ -13,7 +13,8 @@ export class SapiViewsCoreRegionRegionBase {
 
   @Input('sxplr-sapiviews-core-region-detail-flag')
   shouldFetchDetail = false
-  public fetchInProgress = false
+
+  public fetchInProgress$ = new BehaviorSubject<boolean>(false)
 
   @Input('sxplr-sapiviews-core-region-atlas')
   atlas: SapiAtlasModel
@@ -37,7 +38,7 @@ export class SapiViewsCoreRegionRegionBase {
       this.setupRegionDarkmode()
       return
     }
-    this.fetchInProgress = true
+    this.fetchInProgress$.next(true)
     this._region = null
     
     this.fetchDetail(val)
@@ -49,7 +50,7 @@ export class SapiViewsCoreRegionRegionBase {
         this._region = val
       })
       .finally(() => {
-        this.fetchInProgress = false
+        this.fetchInProgress$.next(false)
         this.setupRegionDarkmode()
       })
   }
