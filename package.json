@@ -1,6 +1,6 @@
 {
   "name": "interactive-viewer",
-  "version": "2.6.9",
+  "version": "2.6.10",
   "description": "Siibra Explorer. Integrating KG query, dataset previews & more. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
     "build-aot": "ng build && node ./third_party/matomo/processMatomo.js",
