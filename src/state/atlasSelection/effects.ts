@@ -56,7 +56,7 @@ export class Effect {
       /**
        * if trans-species, return default state for navigation
        */
-       if (previous?.atlas?.["@id"] !== current?.atlas?.["@id"]) {
+      if (previous?.atlas?.["@id"] !== current?.atlas?.["@id"]) {
         return of({
           navigation: null
         })
