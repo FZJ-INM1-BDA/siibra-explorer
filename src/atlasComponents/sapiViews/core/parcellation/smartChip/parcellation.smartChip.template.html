@@ -10,7 +10,10 @@
       }">
 
 
-      <sxplr-sapiviews-core-parcellation-chip 
+      <sxplr-sapiviews-core-parcellation-chip
+        [ngClass]="{
+          'sxplr-blink': (loadingParc$ | async) === parc
+        }"
         [sxplr-sapiviews-core-parcellation-chip-parcellation]="parc"
         [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | equality : parc : trackByFn) ? 'primary' : 'default'"
         (sxplr-sapiviews-core-parcellation-chip-onclick)="selectParcellation(parc)">
@@ -28,7 +31,8 @@
 
 <sxplr-sapiviews-core-parcellation-chip
   [ngClass]="{
-    'sxplr-muted': !(parcellationVisibility$ | async)
+    'sxplr-muted': !(parcellationVisibility$ | async),
+    'sxplr-blink': onDismissClicked$ | async
   }"
   class="sxplr-d-inline-block"
   [sxplr-sapiviews-core-parcellation-chip-parcellation]="parcellation"
@@ -63,7 +67,12 @@
       color="primary"
       iav-stop="mousedown click"
       (click)="dismiss()">
-      <i class="fas fa-times"></i>
+
+      <spinner-cmp class="sxplr-w-100 sxplr-h-100" *ngIf="onDismissClicked$ | async; else defaultDismissIcon"></spinner-cmp>
+      <ng-template #defaultDismissIcon>
+        <i class="fas fa-times"></i>
+      </ng-template>
+
     </button>
   </div>
 </sxplr-sapiviews-core-parcellation-chip>
