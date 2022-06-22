@@ -328,7 +328,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
      * subscribe to main store and negotiate with relay to set camera
      */
     const navSub = this.store$.pipe(
-      select(atlasSelection.selectors.navigation)
+      select(atlasSelection.selectors.navigation),
+      filter(v => !!v),
     ).subscribe(nav => {
       const { perspectiveOrientation, perspectiveZoom } = nav
       this.mainStoreCameraNav = {
