@@ -12,6 +12,9 @@ import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
 import { atlasSelection, userInteraction, } from "src/state";
 import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
 import { getUuid } from "src/util/fn";
+import { environment } from "src/environments/environment"
+import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
+import { SapiViewsCoreSpaceBoundingBox } from "src/atlasComponents/sapiViews/core";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -62,9 +65,16 @@ export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
+  public VOI_QUERY_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
 
   @ViewChild('genericInfoVCR', { read: ViewContainerRef })
   genericInfoVCR: ViewContainerRef
+
+  @ViewChild('voiFeatures', { read: SapiViewsFeaturesVoiQuery })
+  voiQueryDirective: SapiViewsFeaturesVoiQuery
+
+  @ViewChild('bbox', { read: SapiViewsCoreSpaceBoundingBox })
+  boundingBoxDirective: SapiViewsCoreSpaceBoundingBox
 
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
