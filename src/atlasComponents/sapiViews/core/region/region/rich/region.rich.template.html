@@ -68,7 +68,7 @@
       <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
 
       <sxplr-sapiviews-features-entry-list-item
-        *ngFor="let feat of rfDir.listOfFeatures$ | async"
+        *ngFor="let feat of rfDir.listOfFeatures$ | async | orderFilterFeatures"
         [sxplr-sapiviews-features-entry-list-item-feature]="feat"
         (click)="handleRegionalFeatureClicked(feat)">
       </sxplr-sapiviews-features-entry-list-item>

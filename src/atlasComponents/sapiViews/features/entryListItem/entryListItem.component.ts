@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { SapiFeatureModel } from "src/atlasComponents/sapi";
 import { CleanedIeegDataset, CLEANED_IEEG_DATASET_TYPE, SapiDatasetModel, SapiParcellationFeatureMatrixModel, SapiRegionalFeatureReceptorModel, SapiSerializationErrorModel, SapiVOIDataResponse, SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
 
@@ -7,7 +7,8 @@ import { CleanedIeegDataset, CLEANED_IEEG_DATASET_TYPE, SapiDatasetModel, SapiPa
   templateUrl: `./entryListItem.template.html`,
   styleUrls: [
     `./entryListItem.style.css`
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class SapiViewsFeaturesEntryListItem{
