@@ -116,6 +116,10 @@ const WARNING_STRINGS = {
 }
 const pliPreviewUrl = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1qI1a.D31U~.i-Os~..HRE/f:siibra:features:voi:19c437087299dd62e7c507200f69aea6`
 module.exports = (query, _warningCb) => {
+
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  let redirectUrl = `${HOST_PATHNAME}/#`
+
   const {
     standaloneVolumes,
     niftiLayers, // deprecating - check if anyone calls this url
@@ -167,7 +171,7 @@ module.exports = (query, _warningCb) => {
             /**
              * if preview pli link, return hardcoded link
              */
-            return pliPreviewUrl
+            return `${HOST_PATHNAME}/#${pliPreviewUrl}`
           } else {
             /**
              * TODO deprecate dsp
@@ -216,8 +220,6 @@ module.exports = (query, _warningCb) => {
       // ignore region selected and move on
     }
   }
-  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
-  let redirectUrl = `${HOST_PATHNAME}/#`
   if (standaloneVolumes) {
     searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav
