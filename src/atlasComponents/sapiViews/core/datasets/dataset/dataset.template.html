@@ -24,6 +24,13 @@
     <span class="sxplr-m-a">
       EBRAINS dataset
     </span>
+
+    <button *ngIf="isRestricted"
+      [matTooltip]="CONST.GDPR_TEXT"
+      mat-icon-button color="warn">
+      <i class="fas fa-exclamation-triangle"></i>
+    </button>
+
     <mat-divider class="sxplr-pl-1" [vertical]="true"></mat-divider>
 
     <a mat-icon-button *ngFor="let url of dataset.urls" [href]="url.doi | parseDoi" target="_blank">
