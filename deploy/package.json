@@ -19,7 +19,7 @@
     "express": "^4.16.4",
     "express-rate-limit": "^5.5.1",
     "express-session": "^1.15.6",
-    "got": "^10.5.5",
+    "got": "^11.8.5",
     "hbp-seafile": "^0.2.0",
     "helmet-csp": "^3.4.0",
     "lru-cache": "^5.1.1",
