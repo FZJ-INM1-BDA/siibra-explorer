@@ -11,7 +11,7 @@ import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
 import { getNgLayersFromVolumesATP, getRegionLabelIndex } from "../config.service";
 import { ParcVolumeSpec } from "../store/util";
-import { NehubaLayerControlService } from "./layerCtrl.service";
+import { PMAP_LAYER_NAME } from "../constants";
 
 @Injectable()
 export class LayerCtrlEffects {
@@ -22,7 +22,7 @@ export class LayerCtrlEffects {
     ),
     mapTo(
       atlasAppearance.actions.removeCustomLayer({
-        id: NehubaLayerControlService.PMAP_LAYER_NAME
+        id: PMAP_LAYER_NAME
       })
     )
   ))
@@ -42,7 +42,7 @@ export class LayerCtrlEffects {
           atlasAppearance.actions.addCustomLayer({
             customLayer: {
               clType: "customlayer/nglayer",
-              id: NehubaLayerControlService.PMAP_LAYER_NAME,
+              id: PMAP_LAYER_NAME,
               source: `nifti://${sapiRegion.getMapUrl(template["@id"])}`,
               shader: getShader({
                 colormap: EnumColorMapName.VIRIDIS,
@@ -55,7 +55,7 @@ export class LayerCtrlEffects {
         ),
         catchError(() => of(
           atlasAppearance.actions.removeCustomLayer({
-            id: NehubaLayerControlService.PMAP_LAYER_NAME
+            id: PMAP_LAYER_NAME
           })
         ))
       )
