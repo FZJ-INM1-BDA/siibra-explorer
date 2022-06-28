@@ -68,7 +68,7 @@
       <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
 
       <sxplr-sapiviews-features-entry-list-item
-        *ngFor="let feat of rfDir.listOfFeatures$ | async"
+        *ngFor="let feat of rfDir.listOfFeatures$ | async | orderFilterFeatures"
         [sxplr-sapiviews-features-entry-list-item-feature]="feat"
         (click)="handleRegionalFeatureClicked(feat)">
       </sxplr-sapiviews-features-entry-list-item>
@@ -76,10 +76,23 @@
     
   </ng-template>
 
-
-
+  <ng-template #regionDesc>
+    <markdown-dom class="sxplr-muted" [markdown]="region?.versionInnovation || 'No description provided.'">
+    </markdown-dom>
+  </ng-template>
 
   <mat-accordion class="d-block mt-2">
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: CONST.DESCRIPTION,
+      iconClass: 'fas fa-info',
+      content: regionDesc,
+      desc: '',
+      iconTooltip: 'Description',
+      iavNgIf: !!region?.versionInnovation
+    }">
+
+    </ng-container>
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: CONST.REGIONAL_FEATURES,
@@ -90,10 +103,6 @@
       iavNgIf: true
     }">
     </ng-container>
-
-  </mat-accordion>
-
-  <mat-accordion class="d-block mt-2">
 
     <!-- connectivity -->
     <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>

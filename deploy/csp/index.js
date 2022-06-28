@@ -54,7 +54,9 @@ const connectSrc = [
   'object.cscs.ch',
 
   // required for dataset previews
-  'hbp-kg-dataset-previewer.apps.hbp.eu/v2/',
+
+  // spatial transform
+  "hbp-spatial-backend.apps.hbp.eu",
 
   // injected by env var
   ...CSP_CONNECT_SRC
@@ -102,7 +104,6 @@ module.exports = {
         ],
         imgSrc: [
           "'self'",
-          "hbp-kg-dataset-previewer.apps.hbp.eu/v2/"
         ],
         scriptSrc:[
           "'self'",
@@ -117,6 +118,9 @@ module.exports = {
           ...SCRIPT_SRC,
           ...WHITE_LIST_SRC,
           ...defaultAllowedSites
+        ],
+        frameSrc: [
+          "*"
         ],
         reportUri: CSP_REPORT_URI || '/report-violation'
       },

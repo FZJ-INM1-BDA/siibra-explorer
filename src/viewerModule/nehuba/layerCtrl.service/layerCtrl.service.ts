@@ -13,6 +13,7 @@ import { arrayEqual } from "src/util/array";
 import { ColorMapCustomLayer } from "src/state/atlasAppearance";
 import { SapiRegionModel } from "src/atlasComponents/sapi";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { PMAP_LAYER_NAME } from "../constants"
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -24,8 +25,6 @@ export const BACKUP_COLOR = {
   providedIn: 'root'
 })
 export class NehubaLayerControlService implements OnDestroy{
-
-  static PMAP_LAYER_NAME = 'regional-pmap'
 
   private selectedRegion$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions),
@@ -367,7 +366,7 @@ export class NehubaLayerControlService implements OnDestroy{
          */
         return customLayers
           .map(l => l.id)
-          .filter(name => name !== NehubaLayerControlService.PMAP_LAYER_NAME)
+          .filter(name => name !== PMAP_LAYER_NAME)
       })
     ),
     this.customLayers$.pipe(
@@ -378,7 +377,7 @@ export class NehubaLayerControlService implements OnDestroy{
       }),
       distinctUntilChanged(),
       map(flag => flag
-        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
+        ? [ PMAP_LAYER_NAME ]
         : []
       )
     )

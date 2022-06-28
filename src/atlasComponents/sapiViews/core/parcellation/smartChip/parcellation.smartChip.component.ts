@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { concat, Observable, of, timer } from "rxjs";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange, SimpleChanges } from "@angular/core";
+import { BehaviorSubject, concat, Observable, of, timer } from "rxjs";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
 import { ARIA_LABELS } from "common/constants"
@@ -38,7 +38,11 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   otherVersions: SapiParcellationModel[]
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    const { parcellation } = changes
+    if (parcellation) {
+      this.onDismissClicked$.next(false)
+    }
     this.otherVersions = []
     if (!this.parcellation) {
       return
@@ -82,6 +86,8 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
   }
 
   dismiss(){
+    if (this.onDismissClicked$.value) return
+    this.onDismissClicked$.next(true)
     this.onDismiss.emit(this.parcellation)
   }
 
@@ -93,4 +99,6 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
   trackByFn(parc: SapiParcellationModel){
     return parc["@id"]
   }
+
+  onDismissClicked$ = new BehaviorSubject<boolean>(false)
 }

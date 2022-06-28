@@ -114,8 +114,12 @@ const WARNING_STRINGS = {
   REGION_SELECT_ERROR: 'Region selected cannot be processed properly.',
   TEMPLATE_ERROR: 'Template not found.',
 }
-
+const pliPreviewUrl = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1qI1a.D31U~.i-Os~..HRE/f:siibra:features:voi:19c437087299dd62e7c507200f69aea6`
 module.exports = (query, _warningCb) => {
+
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  let redirectUrl = `${HOST_PATHNAME}/#`
+
   const {
     standaloneVolumes,
     niftiLayers, // deprecating - check if anyone calls this url
@@ -163,7 +167,17 @@ module.exports = (query, _warningCb) => {
       if (Array.isArray(parsedDsp)) {
         if (parsedDsp.length === 1) {
           const { datasetId, filename } = parsedDsp[0]
-          dsp = `/dsp:${encodeId(datasetId)}::${encodeURI(filename)}`
+          if (datasetId === "minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957") {
+            /**
+             * if preview pli link, return hardcoded link
+             */
+            return `${HOST_PATHNAME}/#${pliPreviewUrl}`
+          } else {
+            /**
+             * TODO deprecate dsp
+             */
+            dsp = `/dsp:${encodeId(datasetId)}::${encodeURI(filename)}`
+          }
         } else {
           searchParam.set(`previewingDatasetFiles`, previewingDatasetFiles)
         }
@@ -206,8 +220,6 @@ module.exports = (query, _warningCb) => {
       // ignore region selected and move on
     }
   }
-  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
-  let redirectUrl = `${HOST_PATHNAME}/#`
   if (standaloneVolumes) {
     searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav

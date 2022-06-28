@@ -64,3 +64,5 @@ export interface IMeshesToLoad {
 }
 
 export const SET_MESHES_TO_LOAD = new InjectionToken<Observable<IMeshesToLoad>>('SET_MESHES_TO_LOAD')
+
+export const PMAP_LAYER_NAME = 'regional-pmap'
