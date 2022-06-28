@@ -349,6 +349,12 @@ export class NehubaViewerUnit implements OnDestroy {
                 this.setLayerTransparency(key, p.payload[key])
               }
             }
+            if (message.type === "updateShader") {
+              const p = message as TNgLayerCtrl<'updateShader'>
+              for (const key in p.payload) {
+                this.setLayerShader(key, p.payload[key])
+              }
+            }
           }
         })
       )
@@ -794,6 +800,11 @@ export class NehubaViewerUnit implements OnDestroy {
      * for image layer
      */
     if (layer.layer.opacity) layer.layer.opacity.restoreState(alpha)
+  }
+
+  private setLayerShader(layerName: string, shader: string) {
+    const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+    if (layer?.layer?.fragmentMain) layer.layer.fragmentMain.restoreState(shader)
   }
 
   public setMeshTransparency(flag: boolean){

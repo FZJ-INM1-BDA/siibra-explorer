@@ -51,6 +51,9 @@ export interface INgLayerCtrl {
   setLayerTransparency: {
     [key: string]: number
   }
+  updateShader: {
+    [key: string]: string
+  }
 }
 
 export type TNgLayerCtrl<T extends keyof INgLayerCtrl> = {

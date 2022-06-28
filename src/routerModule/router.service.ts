@@ -10,9 +10,8 @@ import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { generalActions } from "src/state";
-/**
- * http://localhost:8080/#/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2/p:minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-290/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..0.14gY0~.14gY0..1LSm
- */
+
+
 @Injectable({
   providedIn: 'root'
 })

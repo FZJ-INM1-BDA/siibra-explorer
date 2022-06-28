@@ -146,8 +146,11 @@ export class RouteStateTransformSvc {
     const pluginStates = fullPath.queryParams['pl']
     if (pluginStates) {
       try {
-        const arrPluginStates = JSON.parse(pluginStates)
-        returnState["[state.plugins]"].initManifests = arrPluginStates.map(url => [plugins.INIT_MANIFEST_SRC, url] as [string, string])
+        const arrPluginStates: string[] = JSON.parse(pluginStates)
+        if (arrPluginStates.length > 1) throw new Error(`can only initialise one plugin at a time`)
+        returnState["[state.plugins]"].initManifests = {
+          [plugins.INIT_MANIFEST_SRC]: arrPluginStates
+        }
       } catch (e) {
         /**
          * parsing plugin error

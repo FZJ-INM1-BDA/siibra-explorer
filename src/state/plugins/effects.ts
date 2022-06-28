@@ -6,9 +6,8 @@ import * as constants from "./const"
 import * as selectors from "./selectors"
 import * as actions from "./actions"
 import { DialogService } from "src/services/dialogService.service";
-import { of } from "rxjs";
-import { HttpClient } from "@angular/common/http";
-import { getHttpHeader } from "src/util/constants"
+import { NEVER, of } from "rxjs";
+import { PluginService } from "src/plugin/service";
 
 @Injectable()
 export class Effects{
@@ -16,27 +15,33 @@ export class Effects{
   initMan = this.store.pipe(
     select(selectors.initManfests),
     map(initMan => initMan[constants.INIT_MANIFEST_SRC]),
-    filter(val => !!val),
+    filter(val => val && val.length > 0),
   )
 
+  private pendingList = new Set<string>()
+  private launchedList = new Set<string>()
+  private banList = new Set<string>()
+
   initManLaunch = createEffect(() => this.initMan.pipe(
-    switchMap(val => 
-      this.dialogSvc
-        .getUserConfirm({
-          message: `This URL is trying to open a plugin from ${val}. Proceed?`
-        })
-        .then(() => 
-          this.http.get(val, {
-            headers: getHttpHeader(),
-            responseType: 'json'
-          }).toPromise()
-        )
-        .then(json => {
-          /**
-           * TODO fix init plugin launch
-           * at that time, also restore effects.spec.ts test
-           */
-        })
+    switchMap(val => of(...val)),
+    switchMap(
+      url => {
+        if (this.pendingList.has(url)) return NEVER
+        if (this.launchedList.has(url)) return NEVER
+        if (this.banList.has(url)) return NEVER
+        this.pendingList.add(url)
+        return this.dialogSvc
+          .getUserConfirm({
+            message: `This URL is trying to open a plugin from ${url}. Proceed?`
+          })
+          .then(() => {
+            this.launchedList.add(url)
+            return this.svc.launchPlugin(url)
+          })
+          .finally(() => {
+            this.pendingList.delete(url)
+          })
+      }
     ),
     catchError(() => of(null))
   ), { dispatch: false })
@@ -52,7 +57,7 @@ export class Effects{
   constructor(
     private store: Store,
     private dialogSvc: DialogService,
-    private http: HttpClient,
+    private svc: PluginService,
   ){
     
   }
