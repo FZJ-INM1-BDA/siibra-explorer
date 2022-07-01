@@ -1,11 +1,5 @@
-import { deserialiseParcRegionId } from 'common/util'
 import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
-
-export function isSame(o, n) {
-  if (!o) { return !n }
-  return o === n || (o && n && o.name === n.name)
-}
 
 export function getViewer() {
   return (window as any).viewer
@@ -45,24 +39,8 @@ const recursiveFlatten = (region, {ngId}) => {
   )
 }
 
-export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId: string}) {
-  const { ngId, labelIndex } = deserialiseParcRegionId( labelIndexId )
-  const fr1 = regions.map(r => recursiveFlatten(r, { ngId: inheritedNgId }))
-  const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
-  const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
-  if (found) { return found }
-  return null
-}
-
 export function getUuid(){
   return crypto.getRandomValues(new Uint32Array(1))[0].toString(16)
-}
-
-export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
-  const { ngId: defaultNgId, regions } = parcellation
-  // if (!updated) throw new Error(`parcellation not yet updated`)
-  return ({ labelIndexId }) =>
-    recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
 }
 
 type TPrimitive = string | number
@@ -131,8 +109,7 @@ export class QuickHash {
     if (opts?.length) this.length = opts.length
   }
 
-  @CachedFunction()
-  getHash(str: string){
+  static GetHash(str: string) {
     let hash = 0
     for (const char of str) {
       const charCode = char.charCodeAt(0)
@@ -140,6 +117,11 @@ export class QuickHash {
       hash = hash & hash
     }
     return hash.toString(16).slice(1)
+  }
+
+  @CachedFunction()
+  getHash(str: string){
+    return QuickHash.GetHash(str)
   }
 }
 

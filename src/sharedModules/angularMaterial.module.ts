@@ -28,11 +28,16 @@ import {MatMenuModule} from "@angular/material/menu";
 import { MatToolbarModule } from '@angular/material/toolbar'
 
 import { ClipboardModule } from '@angular/cdk/clipboard'
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
 @NgModule({
   imports: [
+    BrowserAnimationsModule,
+    
     MatButtonModule,
     MatSnackBarModule,
     MatCheckboxModule,
@@ -60,6 +65,8 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
   ],
   exports: [
     MatButtonModule,
@@ -89,12 +96,13 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,
     useValue: {
       ...defaultDialogOption,
-      panelClass: 'iav-dialog-class',
     },
   }],
 })

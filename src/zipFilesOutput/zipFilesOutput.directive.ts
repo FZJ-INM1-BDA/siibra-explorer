@@ -36,7 +36,7 @@ export class ZipFilesOutput {
   }
 
   @HostListener('click')
-  async onClick(){
+  async onClick(): Promise<void>{
     if (Array.isArray(this.zipFiles)) {
       await this.zipArray(this.zipFiles)
       return

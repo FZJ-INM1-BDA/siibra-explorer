@@ -1,0 +1,1 @@
+export { SapiViewsUtilModule } from "./module"

@@ -1,28 +1,11 @@
-<h3 class="iv-custom-comp text mat-h3">
-  Volumes
-</h3>
-
-<mat-slide-toggle [(ngModel)]="flagDelin"
-  #delinToggle="matSlideToggle"
-  [iav-key-listener]="[{ type: 'keydown', key: 'q', target: 'document', capture: true }]"
-  (iav-key-event)="delinToggle.toggle()"
-  name="toggle-delineation">
-
-  <markdown-dom class="d-inline-block iv-custom-comp text"
-    markdown="Show delineations `[q]`">
-  </markdown-dom>
-</mat-slide-toggle>
-
-<mat-divider class="mt-2 mb-2"></mat-divider>
-
-<h3 class="iv-custom-comp text mat-h3">
+<h3 class="sxplr-custom-cmp text mat-h3">
   Perspective View
 </h3>
 
 <mat-slide-toggle [(ngModel)]="removeOctantFlag"
   [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
   name="remove-frontal-octant">
-  <span class="iv-custom-comp text">
+  <span class="sxplr-custom-cmp text">
     Remove frontal octant
   </span>
 </mat-slide-toggle>
@@ -34,11 +17,12 @@
       [formControlName]="auxMesh['@id']"
       class="d-block"
       [name]="'toggle-aux-mesh-' + auxMesh['@id']">
-      <span class="iv-custom-comp text">
+      <span class="sxplr-custom-cmp text">
         {{ auxMesh.displayName || auxMesh.name }}
       </span>
     </mat-slide-toggle>
   </form>
 </ng-container>
 
-<app-change-perspective-orientation></app-change-perspective-orientation>
+<!-- TODO menu no longer showing, likely something to do with detaching cdr on nehubaGlue.component -->
+<app-change-perspective-orientation *ngIf="false"></app-change-perspective-orientation>

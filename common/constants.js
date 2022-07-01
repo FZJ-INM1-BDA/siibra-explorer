@@ -27,6 +27,7 @@
     NO_BULK_DOWNLOAD: `No datasets pinned`,
 
     // overlay/layout specific
+    TOGGLE_DELINEATION: `Toggle delineation [q]`,
     SELECT_ATLAS: 'Atlas',
     CONTEXT_MENU: `Viewer context menu`,
     TOGGLE_FRONTAL_OCTANT: `Toggle perspective view frontal octant`,
@@ -84,12 +85,32 @@
   }
 
   exports.CONST = {
+    KG_TOS: `The interactive viewer queries HBP Knowledge Graph Data Platform ("KG") for published datasets.
+
+
+Access to the data and metadata provided through KG requires that you cite and acknowledge said data and metadata according to the Terms and Conditions of the Platform.
+
+
+Citation requirements are outlined <https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use#citations> .
+
+
+Acknowledgement requirements are outlined <https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use#acknowledgements>
+
+
+These outlines are based on the authoritative Terms and Conditions are found <https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use>
+
+
+If you do not accept the Terms & Conditions you are not permitted to access or use the KG to search for, to submit, to post, or to download any materials found there-in.
+`,
+
     LOADING_TXT: `Loading ...`,
 
     CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
     DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
+    DESCRIPTION: 'Description',
     REGIONAL_FEATURES: 'Regional features',
+    CONNECTIVITY: 'Connectivity',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
 
     ATLAS_NOT_FOUND: `Atlas not found. Maybe it is still loading. Try again in a few seconds?`,

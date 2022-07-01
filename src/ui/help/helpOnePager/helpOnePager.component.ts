@@ -1,6 +1,5 @@
 import { MatDialog } from '@angular/material/dialog';
-import { Component, Optional } from "@angular/core";
-import { PureContantService } from "src/util";
+import { Component } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { HowToCite } from '../howToCite/howToCite.component';
 
@@ -21,13 +20,9 @@ export class HelpOnePager{
   public extQuickStarter: string
   public userDoc: string
   constructor(
-    @Optional() pConstService: PureContantService,
     private dialog: MatDialog,
   ){
     this.extQuickStarter = `quickstart.html`
-    if (pConstService) {
-      this.userDoc = pConstService.docUrl
-    }
   }
 
   howToCite(){

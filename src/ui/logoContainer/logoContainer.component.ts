@@ -1,7 +1,7 @@
-import { Component } from "@angular/core";
-import { PureContantService } from "src/util";
-import { Subscription } from "rxjs";
+import { Component, Inject } from "@angular/core";
+import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
+import { DARKTHEME } from "src/util/injectionTokens";
 
 const imageDark = 'assets/logo/ebrains-logo-dark.svg'
 const imageLight = 'assets/logo/ebrains-logo-light.svg'
@@ -24,10 +24,10 @@ export class LogoContainer {
 
   private subscriptions: Subscription[] = []
   constructor(
-    private pureConstantService: PureContantService
+    @Inject(DARKTHEME) darktheme$: Observable<boolean>
   ){
     this.subscriptions.push(
-      pureConstantService.darktheme$.pipe(
+      darktheme$.pipe(
         distinctUntilChanged()
       ).subscribe(flag => {
         this.containerStyle = {

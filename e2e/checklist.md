@@ -72,3 +72,4 @@
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/mouse) redirects allen mouse 2017
 ## plugins
 - [ ] jugex plugin works
+- [ ] 1um section works

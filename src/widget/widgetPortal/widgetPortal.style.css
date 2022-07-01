@@ -1,0 +1,56 @@
+:host
+{
+  pointer-events: none;
+  display: block;
+  max-width: 24rem;
+}
+
+mat-card
+{
+  pointer-events: all;
+  max-width: 36vw;
+  height: 36rem;
+  max-height: 90vh;
+}
+
+mat-card-content
+{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-portal-header
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.widget-portal-content
+{
+  flex-grow: 1;
+}
+
+.hover-grab
+{
+  opacity: 0.5;
+  transition: opacity 200ms ease-in-out;
+  cursor: move;
+}
+
+.hover-grab:hover
+{
+  opacity: 1.0;
+}
+
+.widget-grab-handle
+{
+  margin-right:1rem;
+}
+
+.widget-name
+{
+  flex-grow: 1;
+}

@@ -16,11 +16,13 @@ import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl } from "@angular/forms";
-import { viewerStateNavigationStateSelector, viewerStateSelectedTemplatePureSelector } from "src/services/state/viewerState/selectors";
 
-import { viewerStateChangeNavigation } from "src/services/state/viewerState/actions";
-import { getNavigationStateFromConfig, NEHUBA_INSTANCE_INJTKN } from '../util'
+import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
+import { actions } from "src/state/atlasSelection";
+import { atlasSelection } from "src/state";
+import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { getNehubaConfig } from "../config.service";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -31,7 +33,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
   private _nehubaViewer: NehubaViewerUnit;
 
-  get nehubaViewer(){
+  get nehubaViewer(): NehubaViewerUnit{
     return this._nehubaViewer
   }
   set nehubaViewer(v: NehubaViewerUnit) {
@@ -43,7 +45,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public arialabel = ARIA_LABELS.STATUS_PANEL
   public showFull = false
 
-  private selectedTemplatePure: any
+  private selectedTemplate: SapiSpaceModel
   private currentNavigation: any
   private subscriptions: Subscription[] = []
 
@@ -57,9 +59,6 @@ export class StatusCardComponent implements OnInit, OnChanges{
   }
 
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
-  public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
-  public SHARE_CUSTOM_URL_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL
-  public SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL_DIALOG
   public SHOW_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.SHOW_FULL_STATUS_PANEL
   public HIDE_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.HIDE_FULL_STATUS_PANEL
   constructor(
@@ -90,18 +89,18 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
     this.subscriptions.push(
       this.store$.pipe(
-        select(viewerStateSelectedTemplatePureSelector)
-      ).subscribe(n => this.selectedTemplatePure = n)
+        select(atlasSelection.selectors.selectedTemplate)
+      ).subscribe(n => this.selectedTemplate = n)
     )
 
     this.subscriptions.push(
       this.store$.pipe(
-        select(viewerStateNavigationStateSelector)
+        select(atlasSelection.selectors.navigation)
       ).subscribe(nav => this.currentNavigation = nav)
     )
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (this.nehubaViewer?.viewerPosInReal$ && this.nehubaViewer?.viewerPosInVoxel$) {
       this.navVal$ = combineLatest([
         this.statusPanelRealSpace$,
@@ -151,7 +150,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     startWith(true)
   )
 
-  public textNavigateTo(string: string) {
+  public textNavigateTo(string: string): void {
     if (string.split(/[\s|,]+/).length >= 3 && string.split(/[\s|,]+/).slice(0, 3).every(entry => !isNaN(Number(entry.replace(/mm/, ''))))) {
       const pos = (string.split(/[\s|,]+/).slice(0, 3).map((entry) => Number(entry.replace(/mm/, '')) * (this.statusPanelRealSpace ? 1000000 : 1)))
       this.nehubaViewer.setNavigationState({
@@ -163,7 +162,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     }
   }
 
-  showBottomSheet(tmpl: TemplateRef<any>){
+  showBottomSheet(tmpl: TemplateRef<any>): void{
     this.bottomSheet.open(tmpl)
   }
 
@@ -176,28 +175,31 @@ export class StatusCardComponent implements OnInit, OnChanges{
    *
    * the info re: nehubaViewer can stay there, too
    */
-  public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
+  public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}): void {
+    const config = getNehubaConfig(this.selectedTemplate)
     const {
       orientation,
-      position,
-      zoom
-    } = getNavigationStateFromConfig(this.selectedTemplatePure.nehubaConfig)
+      position
+    } = config.dataset.initialNgState.navigation.pose
+    const {
+      zoomFactor: zoom
+    } = config.dataset.initialNgState.navigation
 
     this.store$.dispatch(
-      viewerStateChangeNavigation({
+      actions.navigateTo({
         navigation: {
           ...this.currentNavigation,
           ...(rotationFlag ? { orientation: orientation } : {}),
           ...(positionFlag ? { position: position } : {}),
           ...(zoomFlag ? { zoom: zoom } : {}),
-          positionReal : false,
-          animation : {},
-        }
+        },
+        physical: true,
+        animation: true
       })
     )
   }
 
-  openDialog(tmpl: TemplateRef<any>, options) {
+  openDialog(tmpl: TemplateRef<any>, options: { ariaLabel: string }): void {
     const { ariaLabel } = options
     this.dialog.open(tmpl, {
       ariaLabel

@@ -1,0 +1,80 @@
+<mat-card>
+  <spinner-cmp *ngIf="loading"></spinner-cmp>
+
+  <ng-template [ngTemplateOutlet]="downloadBtn"
+    [ngTemplateOutletContext]="{
+      label: 'fingerprint.tsv',
+      filename: 'fingerprint.tsv',
+      receptorCmp: fp
+    }">
+  </ng-template>
+  <sxplr-sapiviews-features-receptor-fingerprint
+    [sxplr-sapiviews-features-receptor-data]="receptorData"
+    (sxplr-sapiviews-features-receptor-fingerprint-receptor-selected)="setSelectedSymbol($event)"
+    #fp="sxplrSapiViewsFeaturesReceptorFP"
+  >
+  </sxplr-sapiviews-features-receptor-fingerprint>
+
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-select [(ngModel)]="selectedSymbol">
+      <mat-option value="null" disabled>
+        --select--
+      </mat-option>
+
+      <mat-option [value]="option"
+        *ngFor="let option of symbolsOptions">
+        {{ option }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <ng-template [ngIf]="selectedSymbol">
+    
+    <ng-template [ngTemplateOutlet]="downloadBtn"
+      [ngTemplateOutletContext]="{
+        label: 'profile.tsv',
+        filename: 'profile.tsv',
+        receptorCmp: profile
+      }">
+    </ng-template>
+    <sxplr-sapiviews-features-receptor-profile
+      [sxplr-sapiviews-features-receptor-data]="receptorData"
+      [sxplr-sapiviews-features-receptor-profile-selected-symbol]="selectedSymbol"
+      #profile="sxplrSapiViewsFeaturesReceptorProfile">
+    </sxplr-sapiviews-features-receptor-profile>
+
+
+    <ng-template [ngTemplateOutlet]="downloadBtn"
+      [ngTemplateOutletContext]="{
+        label: 'autoradiograph.png',
+        filename: 'autoradiograph.png',
+        receptorCmp: ar
+      }">
+    </ng-template>
+    <sxplr-sapiviews-features-receptor-autoradiograph
+      [sxplr-sapiviews-features-receptor-data]="receptorData"
+      [sxplr-sapiviews-features-receptor-autoradiograph-selected-symbol]="selectedSymbol"
+      #ar="sxplrSapiViewsFeaturesReceptorAR"
+    >
+    </sxplr-sapiviews-features-receptor-autoradiograph>
+  </ng-template>
+
+</mat-card>
+
+
+<!-- download data button template -->
+<ng-template #downloadBtn
+  let-label="label"
+  let-filename="filename"
+  let-receptorCmp="receptorCmp">
+  <button mat-button
+    *ngIf="receptorCmp.dataBlobAvailable"
+    single-file-output
+    [single-file-output-blob]="receptorCmp.dataBlob$ | async"
+    [single-file-output-filename]="filename">
+    <i class="fas fa-download"></i>
+    <span>
+      {{ label }}
+    </span>
+  </button>
+</ng-template>

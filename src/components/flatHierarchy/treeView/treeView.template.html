@@ -1,0 +1,70 @@
+<ng-template [ngIf]="showControl">
+  <button
+    mat-button
+    (click)="treeControl.collapseAll()">
+    Collapse All
+  </button>
+
+  <button
+    mat-button
+    (click)="treeControl.expandAll()">
+    Expand All
+  </button>
+</ng-template>
+
+
+<cdk-virtual-scroll-viewport [itemSize]="lineHeight">
+
+  <div class="virtual-scroll-container"
+    *cdkVirtualFor="let node of dataSource"
+    [style.height.px]="lineHeight">
+
+    <!-- directory ruling template -->
+    <ng-template
+      [ngTemplateOutlet]="phTmpl"
+      [ngTemplateOutletContext]="{
+        $implicit: node
+      }">
+    </ng-template>
+
+    <!-- expandable button -->
+    <ng-template [ngIf]="node.expandable" [ngIfElse]="btnFallBackTmpl">
+      <button mat-icon-button
+        [ngClass]="{
+          'r-270': !treeControl.isExpanded(node)
+        }"
+        (click)="treeControl.toggle(node)">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    </ng-template>
+
+    <!-- non expandable button -->
+    <ng-template #btnFallBackTmpl>
+      <button mat-icon-button disabled></button>
+    </ng-template>
+
+
+    <!-- template to render the node -->
+    <div class="node-render-tmpl"
+      [ngClass]="nodeLabelToggles ? 'label-toggles' : ''"
+      (click)="handleClickNode(node)">
+      <ng-template
+        [ngTemplateOutlet]="renderNodeTmplRef"
+        [ngTemplateOutletContext]="{
+          $implicit: node.node
+        }">
+      </ng-template>
+    </div>
+
+  </div>
+
+</cdk-virtual-scroll-viewport>
+
+<ng-template #phTmpl let-node>
+  <div class="ph-container sxplr-pe-none">
+    <div class="ph lvl"
+      [ngClass]="getSpacerClass(node, index)"
+      *ngFor="let spacer of (node | flatHierarchySpacer); index as index">
+    </div>
+  </div>
+</ng-template>

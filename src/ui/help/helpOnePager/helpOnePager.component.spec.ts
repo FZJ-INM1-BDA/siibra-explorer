@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing'
 import { ComponentsModule } from 'src/components'
 import { AngularMaterialModule } from 'src/sharedModules'
 import { QuickTourModule } from 'src/ui/quickTour'
-import { PureContantService } from 'src/util'
 import { UtilModule } from 'src/util/util.module'
 import { HelpOnePager } from './helpOnePager.component'
 
@@ -24,12 +23,6 @@ describe('> helpOnePager.component.ts', () => {
         declarations: [
           HelpOnePager,
         ],
-        providers: [
-          {
-            provide: PureContantService,
-            useValue: {}
-          }
-        ]
       }).compileComponents()
     })
     it('> should render a table', () => {

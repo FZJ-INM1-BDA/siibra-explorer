@@ -8,7 +8,6 @@ As interactive atlas viewer uses [webpack define plugin](https://webpack.js.org/
 | `PRODUCTION` | if the build is for production, toggles optimisations such as minification | `undefined` | true |
 | `BACKEND_URL` | backend that the viewer calls to fetch available template spaces, parcellations, plugins, datasets | `null` | https://interactive-viewer.apps.hbp.eu/ |
 | `BS_REST_URL` | [siibra-api](https://github.com/FZJ-INM1-BDA/siibra-api) used to fetch different resources | https://siibra-api-stable.apps.hbp.eu/v1_0 |
-| `DATASET_PREVIEW_URL` | dataset preview url used by component <https://github.com/fzj-inm1-bda/kg-dataset-previewer>. Useful for diagnosing issues with dataset previews.| https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview | http://localhost:1234/datasetPreview |
 | `MATOMO_URL` | base url for matomo analytics | `null` | https://example.com/matomo/ |
 | `MATOMO_ID` | application id for matomo analytics | `null` | 6 |
 | `STRICT_LOCAL` | hides **Explore** and **Download** buttons. Useful for offline demo's | `false` | `true` |

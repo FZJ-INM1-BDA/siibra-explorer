@@ -1,5 +1,5 @@
 @use 'sass:map';
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 @include mat.core();
 
@@ -13,9 +13,20 @@
   $accent: map-get($color-config, accent);
   $warn: map-get($color-config, warn);
 
-  [iv-custom-comp],
-  .iv-custom-comp
+  [sxplr-custom-cmp],
+  .sxplr-custom-cmp
   {
+    color: mat.get-color-from-palette($foreground, text);
+    
+    &.hoverable
+    {
+      padding: 1rem 1.3rem;
+      &:hover
+      {
+        cursor: pointer;
+        background-color: mat.get-color-from-palette($background, 100);
+      }
+    }
 
     &[target="_blank"]
     {

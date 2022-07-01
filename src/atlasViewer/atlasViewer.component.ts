@@ -12,18 +12,8 @@ import {
 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, switchMapTo, take, startWith } from "rxjs/operators";
+import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
-import {
-  IavRootStoreInterface,
-  isDefined,
-  safeFilter,
-} from "../services/stateStore.service";
-import { WidgetServices } from "src/widget";
-
-import { LocalFileService } from "src/services/localFile.service";
-import { AGREE_COOKIE } from "src/services/state/uiState.store";
-import { isSame } from "src/util/fn";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
@@ -31,10 +21,11 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS, CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
-import { PureContantService } from "src/util";
 import { ClickInterceptorService } from "src/glue";
 import { environment } from 'src/environments/environment'
 import { DOCUMENT } from "@angular/common";
+import { userPreference } from "src/state"
+import { DARKTHEME } from "src/util/injectionTokens";
 
 /**
  * TODO
@@ -57,7 +48,6 @@ const compareFn = (it, item) => it.name === item.name
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
-  public CONTEXT_MENU_ARIA_LABEL = ARIA_LABELS.CONTEXT_MENU
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
@@ -70,65 +60,27 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
 
-  public sidePanelView$: Observable<string|null>
-  private newViewer$: Observable<any>
-
   private snackbarRef: MatSnackBarRef<any>
-  public snackbarMessage$: Observable<symbol>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
   private subscriptions: Subscription[] = []
 
-  private selectedParcellation$: Observable<any>
   public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
-    private widgetServices: WidgetServices,
-    private pureConstantService: PureContantService,
+    private store: Store<any>,
     private matDialog: MatDialog,
     private rd: Renderer2,
-    public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
     private slService: SlServiceService,
     private clickIntService: ClickInterceptorService,
-    @Inject(DOCUMENT) private document,
+    @Inject(DOCUMENT) private document: Document,
+    @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
-
-    this.snackbarMessage$ = this.store.pipe(
-      select('uiState'),
-      select("snackbarMessage"),
-    )
-
-    this.sidePanelView$ = this.store.pipe(
-      select('uiState'),
-      filter(state => isDefined(state)),
-      map(state => state.focusedSidePanel),
-    )
-
-    this.newViewer$ = this.store.pipe(
-      select('viewerState'),
-      select('templateSelected'),
-      distinctUntilChanged(isSame),
-    )
-
-    this.selectedParcellation$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
-      distinctUntilChanged(),
-    )
-
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => {
-        this.selectedParcellation = parcellation
-      }),
-
-    )
 
     const error = this.el.nativeElement.getAttribute('data-error')
 
@@ -165,35 +117,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
+      this.store.pipe(
+        select(userPreference.selectors.useMobileUi),
+      ).subscribe(bool => this.ismobile = bool),
     )
 
     this.subscriptions.push(
-      this.snackbarMessage$.pipe(
-        // angular material issue
-        // see https://github.com/angular/angular/issues/15634
-        // and https://github.com/angular/components/issues/11357
-        delay(0),
-      ).subscribe(messageSymbol => {
-        if (this.snackbarRef) { this.snackbarRef.dismiss() }
-
-        if (!messageSymbol) { return }
-
-        const message = messageSymbol.description
-        this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
-          duration: 5000,
-        })
-      }),
-    )
-
-    this.subscriptions.push(
-      this.newViewer$.subscribe(() => {
-        this.widgetServices.clearAllWidgets()
-      }),
-    )
-
-    this.subscriptions.push(
-      this.pureConstantService.darktheme$.subscribe(flag => {
+      this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
     )
@@ -220,9 +150,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
      * TODO avoid creating new views in lifecycle hooks in general
      */
     this.store.pipe(
-      select('uiState'),
-      select('agreedCookies'),
-      filter(agreed => !agreed),
+      select(userPreference.selectors.agreedToCookie),
+      filter(val => !val),
       delay(0),
     ).subscribe(() => {
       this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
@@ -264,31 +193,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public cookieClickedOk() {
     if (this.cookieDialogRef) { this.cookieDialogRef.close() }
-    this.store.dispatch({
-      type: AGREE_COOKIE,
-    })
+    this.store.dispatch(
+      userPreference.actions.agreeCookie()
+    )
   }
 
+  private supportEmailAddress = `support@ebrains.eu`
   public quickTourFinale = {
     order: 1e6,
     descriptionMd: `That's it! We hope you enjoy your stay.
 
 ---
 
-If you have any comments or need further support, please contact us at [${this.pureConstantService.supportEmailAddress}](mailto:${this.pureConstantService.supportEmailAddress})`,
-    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.pureConstantService.supportEmailAddress}`,
+If you have any comments or need further support, please contact us at [${this.supportEmailAddress}](mailto:${this.supportEmailAddress})`,
+    description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.supportEmailAddress}`,
     position: 'center'
   }
 
   @HostBinding('attr.version')
   public _version: string = environment.VERSION
-}
-
-export interface INgLayerInterface {
-  name: string
-  visible: boolean
-  source: string
-  type: string // image | segmentation | etc ...
-  transform?: [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]] | null
-  // colormap : string
 }

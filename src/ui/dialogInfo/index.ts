@@ -1,0 +1,1 @@
+export { DialogDirective } from "./dialog.directive"

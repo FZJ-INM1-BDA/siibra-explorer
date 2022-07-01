@@ -1,0 +1,78 @@
+<mat-menu #otherParcMenu="matMenu"
+  [hasBackdrop]="false"
+  class="parc-smart-chip-menu-panel sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+  <div (iav-outsideClick)="menuTrigger.closeMenu()">
+
+    <div *ngFor="let parc of otherVersions"
+      class="otherversion-wrapper"
+      [ngClass]="{
+        'loading': (loadingParc$ | async) === parc
+      }">
+
+
+      <sxplr-sapiviews-core-parcellation-chip
+        [ngClass]="{
+          'sxplr-blink': (loadingParc$ | async) === parc
+        }"
+        [sxplr-sapiviews-core-parcellation-chip-parcellation]="parc"
+        [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | equality : parc : trackByFn) ? 'primary' : 'default'"
+        (sxplr-sapiviews-core-parcellation-chip-onclick)="selectParcellation(parc)">
+
+      </sxplr-sapiviews-core-parcellation-chip>
+
+      <div class="spinner-container" *ngIf="(loadingParc$ | async) === parc">
+        <spinner-cmp>
+        </spinner-cmp>
+      </div>
+    </div>
+  </div>
+  
+</mat-menu>
+
+<sxplr-sapiviews-core-parcellation-chip
+  [ngClass]="{
+    'sxplr-muted': !(parcellationVisibility$ | async),
+    'sxplr-blink': onDismissClicked$ | async
+  }"
+  class="sxplr-d-inline-block"
+  [sxplr-sapiviews-core-parcellation-chip-parcellation]="parcellation"
+  [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | parcellationIsBaseLayer) ? 'default' : 'primary'"
+  (sxplr-sapiviews-core-parcellation-chip-onclick)="menuTrigger.toggleMenu()"
+  [matMenuTriggerFor]="otherParcMenu"
+  #menuTrigger="matMenuTrigger"
+  >
+
+  <div prefix class="sxplr-scale-70">
+    <button mat-mini-fab
+      [color]="(parcellationVisibility$ | async) ? 'primary' : 'default'"
+      [matTooltip]="ARIA_LABELS.TOGGLE_DELINEATION"
+      iav-stop="mousedown click"
+      [iav-key-listener]="[{'type': 'keydown', 'key': 'q', 'capture': true, 'target': 'document' }]"
+      (iav-key-event)="toggleParcellationVisibility()"
+      (click)="toggleParcellationVisibility()">
+      <i class="fas"
+        [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye': 'fa-eye-slash'"
+        aria-hidden="true">
+      </i>
+      <span class="sr-only">
+        {{ ARIA_LABELS.TOGGLE_DELINEATION }}
+      </span>
+    </button>
+  </div>
+
+  <div *ngIf="!(parcellation | parcellationIsBaseLayer)"
+    class="sxplr-scale-70"
+    suffix>
+    <button mat-mini-fab
+      color="primary"
+      iav-stop="mousedown click"
+      (click)="dismiss()">
+
+      <spinner-cmp class="sxplr-w-100 sxplr-h-100" *ngIf="onDismissClicked$ | async; else defaultDismissIcon"></spinner-cmp>
+      <ng-template #defaultDismissIcon>
+        <i class="fas fa-times"></i>
+      </ng-template>
+
+    </button>
+  </div>
+</sxplr-sapiviews-core-parcellation-chip>

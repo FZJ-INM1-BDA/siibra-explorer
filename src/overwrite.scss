@@ -1,41 +1,7 @@
 @use 'sass:math';
 
-iav-cmp-viewer-container
-{
+$nsp: "sxplr";
 
-  .mat-chip-list-wrapper
-  {
-    flex-wrap: nowrap;
-  }
-
-  poly-update-cmp
-  {
-    .mat-chip-list-wrapper
-    {
-      flex-wrap: wrap;
-    }
-  }
-}
-
-quick-tour-unit
-{
-  svg
-  {
-    pointer-events: none;
-    stroke-width: 3px;
-    stroke: rgb(255, 255, 255);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-}
-
-kg-ds-prv-regional-feature-view
-{
-  div
-  {
-    min-height: 20em;
-  }
-}
 
 // no prefix
 @for $i from 1 through 12 {
@@ -69,5 +35,247 @@ $media-map: (
         margin-left: -1 * $vw;
       }
     }
+  }
+}
+
+@for $i from 5 through 20 {
+  $fontsize: $i * 10;
+  .fs-#{$fontsize} {
+    font-size: $fontsize * 1%;
+  }
+}
+
+
+@for $i from 4 through 10 {
+  $tensvar: $i * 10;
+  .#{$nsp}-mxh-#{$tensvar}vh {
+    max-height: $tensvar * 1vh;
+  }
+  .#{$nsp}-mxw-#{$tensvar}vw {
+    max-width: $tensvar * 1vw;
+  }
+}
+
+$overflow-directive: hidden, scroll, auto, visible;
+@each $directive in $overflow-directive {
+  .#{$nsp}-of-x-#{$directive} {
+    overflow-x: $directive!important;
+  }
+  .#{$nsp}-of-y-#{$directive} {
+    overflow-y: $directive!important;
+  }
+  .#{$nsp}-of-#{$directive} {
+    overflow: $directive!important;
+  }
+}
+
+@for $scale from 5 through 10 {
+
+  $scale-var: $scale * 10;
+  .#{$nsp}-scale-#{$scale-var}
+  {
+    transform: scale($scale * 0.1);
+  }
+}
+
+$transform-origin-vars: "left-center", "center";
+$transform-origin-maps: (
+  "left-center": 0% 50%,
+  "center": 50% 50%
+);
+
+@each $var in $transform-origin-vars {
+  .transform-origin-#{$var} {
+    transform-origin: map-get($transform-origin-maps, $var);
+  }
+}
+
+@for $unit from 5 through 10 {
+  $width: $unit * 10;
+  .w-#{$width} {
+    width: $width * 1%;
+  }
+  .#{$nsp}-w-#{$width} {
+    width: $width * 1%;
+  }
+  .h-#{$width} {
+    width: $width * 1%;
+  }
+  .#{$nsp}-h-#{$width} {
+    height: $width * 1%;
+  }
+}
+
+@for $zlvl from 0 through 10 {
+  .#{$nsp}-z-#{$zlvl} {
+    z-index: $zlvl;
+  }
+}
+
+@for $unit from 0 through 10 {
+  .#{$nsp}-pt-#{$unit}{
+    padding-top: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-pb-#{$unit}{
+    padding-bottom: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-pl-#{$unit}{
+    padding-left: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-pr-#{$unit}{
+    padding-right: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-p-#{$unit}{
+    padding: $unit * 0.5rem!important;
+  }
+
+  .#{$nsp}-mt-#{$unit}{
+    margin-top: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-mb-#{$unit}{
+    margin-bottom: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-ml-#{$unit}{
+    margin-left: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-mr-#{$unit}{
+    margin-right: $unit * 0.5rem!important;
+  }
+  .#{$nsp}-m-#{$unit}{
+    margin: $unit * 0.5rem!important;
+  }
+}
+
+.#{$nsp}-mt-a {
+  margin-top: auto!important;
+}
+.#{$nsp}-mb-a {
+  margin-bottom: auto!important;
+}
+
+$display-vars: none, block, inline-block, flex, inline-flex;
+@each $display-var in $display-vars {
+  .d-#{$display-var}
+  {
+    display: $display-var!important;
+  }
+  .#{$nsp}-d-#{$display-var}
+  {
+    display: $display-var!important;
+  }
+}
+
+$align-items-vars: center, stretch, start;
+@each $align-items-var in $align-items-vars {
+  .align-items-#{$align-items-var} {
+    align-items: $align-items-var;
+  }
+  
+  .#{$nsp}-align-items-#{$align-items-var} {
+    align-items: $align-items-var;
+  }
+}
+
+$justify-content-vars: end, center, space-between;
+@each $justify-content-var in $justify-content-vars {
+  .#{$nsp}-justify-content-#{$justify-content-var} {
+    justify-content: $justify-content-var;
+  }
+}
+
+.#{$nsp}-m-a {
+  margin: auto;
+}
+
+.#{$nsp}-muted {
+  opacity: 0.75;
+}
+
+.#{$nsp}-very-muted {
+  opacity: 0.5;
+}
+
+.#{$nsp}-extra-muted {
+  opacity: 0.25;
+}
+
+$position-vars: relative, absolute;
+@each $position-var in $position-vars {
+  .#{$nsp}-position-#{$position-var} {
+    position: $position-var;
+  }
+}
+
+.#{$nsp}-bg-none
+{
+  background: none!important;
+}
+
+.#{$nsp}-box-shadow-none
+{
+  box-shadow: none!important;
+}
+
+
+$white-space-vars: nowrap;
+@each $white-space-var in $white-space-vars {
+  .#{$nsp}-white-space-#{$white-space-var}
+  {
+    white-space: $white-space-var!important;
+  }
+}
+
+$pointer-events-vars: all, none;
+@each $pointer-events-var in $pointer-events-vars {
+  .#{$nsp}-pe-#{$pointer-events-var}
+  {
+    pointer-events: $pointer-events-var!important;
+  }
+}
+
+$width-pc-vars: 100;
+@each $width-pc-var in $width-pc-vars {
+  .#{$nsp}-w-#{$width-pc-var} {
+    width: $width-pc-var * 1%;
+  }
+}
+
+.#{$nsp}-border
+{
+  border-width: 1px;
+}
+
+// flex
+$flex-wrap-vars: nowrap, wrap, wrap-reverse;
+@each $flex-wrap-var in $flex-wrap-vars {
+  .#{$nsp}-flex-wrap-#{$flex-wrap-var} {
+    flex-wrap: $flex-wrap-var;
+  }
+}
+$flex-directions: row,column;
+@each $flex-direction in $flex-directions {
+  .#{$nsp}-flex-#{$flex-direction} {
+    flex-direction: $flex-direction;
+  }
+}
+.#{$nsp}-flex-var {
+  flex: 1 1 0px;
+}
+
+.#{$nsp}-flex-static {
+  flex: 0 0 auto;
+}
+
+.#{$nsp}-blink
+{
+  animation: blink 500ms ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
   }
 }

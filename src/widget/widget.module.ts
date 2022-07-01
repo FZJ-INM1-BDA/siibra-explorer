@@ -1,27 +1,29 @@
 import { NgModule } from "@angular/core";
-import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
-import { WidgetServices } from "./widgetService.service";
-import { AngularMaterialModule } from "src/sharedModules";
 import { CommonModule } from "@angular/common";
 import { ComponentsModule } from "src/components";
+import { WidgetCanvas } from "./widgetCanvas.directive";
+import { WidgetPortal } from "./widgetPortal/widgetPortal.component";
+import { MatCardModule } from "@angular/material/card";
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { MatButtonModule } from "@angular/material/button";
+import { PortalModule } from "@angular/cdk/portal";
 
 @NgModule({
   imports:[
-    AngularMaterialModule,
+    MatCardModule,
+    DragDropModule,
+    MatButtonModule,
+    PortalModule,
     CommonModule,
     ComponentsModule,
   ],
   declarations: [
-    WidgetUnit
+    WidgetCanvas,
+    WidgetPortal,
   ],
-  entryComponents: [
-    WidgetUnit
-  ],
-  providers: [
-    WidgetServices,
-  ],
+  providers: [],
   exports: [
-    WidgetUnit
+    WidgetCanvas,
   ]
 })
 

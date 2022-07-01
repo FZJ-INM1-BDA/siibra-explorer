@@ -1,0 +1,22 @@
+<mat-card cdkDrag [cdkDragFreeDragPosition]="defaultPosition">
+  <mat-card-content>
+    <div class="widget-portal-header" cdkDragHandle>
+      <span class="hover-grab widget-grab-handle">
+        <i class="fas fa-grip-vertical"></i>
+      </span>
+
+      <span *ngIf="name" class="widget-name">
+        {{ name }}
+      </span>
+
+      <button mat-icon-button (click)="exit()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="widget-portal-content">
+      <ng-template [cdkPortalOutlet]="portal">
+      </ng-template>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -4,17 +4,6 @@ import { Observable } from 'rxjs'
 export { getNgIds } from 'src/util/fn'
 export const NEHUBA_VIEWER_FEATURE_KEY = 'ngViewerFeature'
 
-export interface INgLayerInterface {
-  name: string // displayName
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  id?: string // unique identifier
-  visible?: boolean
-  shader?: string
-  transform?: any
-}
-
 export interface IRegion {
   [key: string]: any
   ngId: string
@@ -75,3 +64,5 @@ export interface IMeshesToLoad {
 }
 
 export const SET_MESHES_TO_LOAD = new InjectionToken<Observable<IMeshesToLoad>>('SET_MESHES_TO_LOAD')
+
+export const PMAP_LAYER_NAME = 'regional-pmap'

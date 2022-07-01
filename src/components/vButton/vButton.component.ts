@@ -19,7 +19,7 @@ export class IAVVerticalButton{
   private color$ = new Subject<TIVBColor>()
   public class$ = this.color$.pipe(
     startWith('default'),
-    map(colorCls => `d-flex flex-column align-items-center iv-custom-comp ${colorCls} h-100`)
+    map(colorCls => `d-flex flex-column align-items-center sxplr-custom-cmp ${colorCls} h-100`)
   )
 
   @Input()

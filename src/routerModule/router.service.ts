@@ -3,12 +3,14 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMapTo, take, tap, withLatestFrom } from "rxjs/operators";
-import { generalApplyState } from "src/services/stateStore.helper";
-import { PureContantService } from "src/util";
-import { cvtStateToHashedRoutes, cvtFullRouteToState, encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, merge, Observable, of } from 'rxjs'
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
+import { BehaviorSubject, combineLatest, concat, merge, Observable, timer } from 'rxjs'
 import { scan } from 'rxjs/operators'
+import { RouteStateTransformSvc } from "./routeStateTransform.service";
+import { SAPI } from "src/atlasComponents/sapi";
+import { generalActions } from "src/state";
+
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +22,9 @@ export class RouterService {
     console.log(...e)
   }
 
-  private _customRoute$ = new BehaviorSubject<{
-    [key: string]: string
-  }>({})
+  private _customRoute$ = new BehaviorSubject<Record<string, string>>({})
 
-  public customRoute$: Observable<Record<string, any>>
+  public customRoute$: Observable<Record<string, string>>
 
   setCustomRoute(key: string, state: string){
     if (!verifyCustomState(key)) {
@@ -37,7 +37,8 @@ export class RouterService {
 
   constructor(
     router: Router,
-    pureConstantService: PureContantService,
+    routeToStateTransformSvc: RouteStateTransformSvc,
+    sapi: SAPI,
     store$: Store<any>,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
@@ -51,7 +52,31 @@ export class RouterService {
 
     navEnd$.subscribe()
 
-    const ready$ = pureConstantService.allFetchingReady$.pipe(
+    /**
+     * onload
+     */
+    const onload$ = navEnd$.pipe(
+      take(1),
+      filter(ev => ev.urlAfterRedirects !== '/'),
+      switchMap(ev => 
+        routeToStateTransformSvc.cvtRouteToState(
+          router.parseUrl(
+            ev.urlAfterRedirects
+          )
+        )
+      )
+    )
+    onload$.subscribe(
+      state => {
+        store$.dispatch(
+          generalActions.generalApplyState({
+            state
+          })
+        )
+      }
+    )
+
+    const ready$ = sapi.atlases$.pipe(
       filter(flag => !!flag),
       take(1),
       shareReplay(1),
@@ -91,25 +116,47 @@ export class RouterService {
       ),
     )
 
-    ready$.pipe(
-      switchMapTo(
-        navEnd$.pipe(
-          withLatestFrom(
-            store$,
-            this.customRoute$.pipe(
-              startWith({})
-            )
+    /**
+     * does work too well =( 
+     */
+    concat(
+      onload$.pipe(
+        mapTo(false)
+      ),
+      timer(160).pipe(
+        mapTo(false)
+      ),
+      ready$.pipe(
+        map(val => !!val)
+      )
+    ).pipe(
+      switchMap(() => navEnd$),
+      map(navEv => navEv.urlAfterRedirects),
+      switchMap(url =>
+        routeToStateTransformSvc.cvtRouteToState(
+          router.parseUrl(
+            url
           )
+        ).then(stateFromRoute => {
+          return {
+            url,
+            stateFromRoute
+          }
+        })
+      ),
+      withLatestFrom(
+        store$,
+        this.customRoute$.pipe(
+          startWith({})
         )
       )
     ).subscribe(arg => {
-      const [ev, state, customRoutes] = arg
+      const [{ stateFromRoute, url }, currentState, customRoutes] = arg
+      const fullPath = url
       
-      const fullPath = ev.urlAfterRedirects
-      const stateFromRoute = cvtFullRouteToState(router.parseUrl(fullPath), state, this.logError)
       let routeFromState: string
       try {
-        routeFromState = cvtStateToHashedRoutes(state)
+        routeFromState = routeToStateTransformSvc.cvtStateToRoute(currentState)
       } catch (_e) {
         routeFromState = ``
       }
@@ -119,27 +166,41 @@ export class RouterService {
         if (!customStatePath) continue
         routeFromState += `/${customStatePath}`
       }
-
       if ( fullPath !== `/${routeFromState}`) {
         store$.dispatch(
-          generalApplyState({
+          generalActions.generalApplyState({
             state: stateFromRoute
           })
         )
       }
     })
     
-    // TODO this may still be a bit finiky. 
-    // we rely on that update of store happens within 160ms
-    // which may or many not be 
-    ready$.pipe(
+    /**
+     * wait until onload completes
+     * wait for 160ms
+     * then start listening to store changes, and update route accordingly
+     * 
+     * this is so that initial state can be loaded
+     */
+    concat(
+      onload$.pipe(
+        mapTo(false)
+      ),
+      timer(160).pipe(
+        mapTo(false)
+      ),
+      ready$.pipe(
+        map(val => !!val)
+      )
+    ).pipe(
+      filter(flag => flag),
       switchMapTo(
         combineLatest([
           store$.pipe(
             debounceTime(160),
             map(state => {
               try {
-                return cvtStateToHashedRoutes(state)
+                return routeToStateTransformSvc.cvtStateToRoute(state)
               } catch (e) {
                 this.logError(e)
                 return ``
@@ -160,7 +221,12 @@ export class RouterService {
         )
       )
     ).subscribe(routePath => {
-      if (routePath === '') {
+      /**
+       * routePath may be falsy
+       * or empty string
+       * both can be caught by !routePath
+       */
+      if (!routePath) {
         router.navigate([ baseHref ])
       } else {
 
