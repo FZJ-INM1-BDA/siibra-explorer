@@ -24,7 +24,7 @@ import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.2.0'
+export const SIIBRA_API_VERSION = '0.2.1'
 
 type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 

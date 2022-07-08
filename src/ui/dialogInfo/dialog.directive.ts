@@ -52,7 +52,7 @@ export class DialogDirective{
     }
     this.matDialog.open(this.templateRef, {
       data: this.data,
-      ...sizeDict[this.size]
+      ...(sizeDict[this.size] || {})
     })
   }
 }

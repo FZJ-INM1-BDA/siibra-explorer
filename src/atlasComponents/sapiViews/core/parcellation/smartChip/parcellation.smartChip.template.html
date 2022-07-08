@@ -18,6 +18,22 @@
         [sxplr-sapiviews-core-parcellation-chip-color]="(parcellation | equality : parc : trackByFn) ? 'primary' : 'default'"
         (sxplr-sapiviews-core-parcellation-chip-onclick)="selectParcellation(parc)">
 
+        <div class="sxplr-scale-70"
+          suffix 
+          iav-stop="mousedown click">
+
+          <ng-template #otherParcDesc>
+            <ng-template [ngTemplateOutlet]="parcDescTmpl"
+              [ngTemplateOutletContext]="{ parcellation: parc }">
+            </ng-template>
+          </ng-template>
+
+          <button mat-mini-fab color="default"
+            [sxplr-dialog]="otherParcDesc"
+            [sxplr-dialog-size]="null">
+            <i class="fas fa-info"></i>
+          </button>
+        </div>
       </sxplr-sapiviews-core-parcellation-chip>
 
       <div class="spinner-container" *ngIf="(loadingParc$ | async) === parc">
@@ -60,12 +76,24 @@
     </button>
   </div>
 
-  <div *ngIf="!(parcellation | parcellationIsBaseLayer)"
-    class="sxplr-scale-70"
-    suffix>
+  <div class="sxplr-scale-70"
+    suffix 
+    iav-stop="mousedown click">
+
+    <ng-template #mainParcDesc>
+      <ng-template [ngTemplateOutlet]="parcDescTmpl"
+        [ngTemplateOutletContext]="{ parcellation: parcellation }">
+      </ng-template>
+    </ng-template>
+
+    <button mat-mini-fab color="default"
+      [sxplr-dialog]="mainParcDesc"
+      [sxplr-dialog-size]="null">
+      <i class="fas fa-info"></i>
+    </button>
     <button mat-mini-fab
+      *ngIf="!(parcellation | parcellationIsBaseLayer)"
       color="primary"
-      iav-stop="mousedown click"
       (click)="dismiss()">
 
       <spinner-cmp class="sxplr-w-100 sxplr-h-100" *ngIf="onDismissClicked$ | async; else defaultDismissIcon"></spinner-cmp>
@@ -76,3 +104,32 @@
     </button>
   </div>
 </sxplr-sapiviews-core-parcellation-chip>
+
+<!-- parcellation description template -->
+
+<ng-template #parcDescTmpl let-parc="parcellation">
+  <h1 mat-dialog-title>
+    {{ parc.name }}
+  </h1>
+  <div mat-dialog-content>
+    <markdown-dom
+      *ngIf="parc.brainAtlasVersions.length > 0 && parc.brainAtlasVersions[0].versionInnovation"
+      [markdown]="parc.brainAtlasVersions[0].versionInnovation">
+    </markdown-dom>
+  </div>
+
+  <mat-dialog-actions align="start">
+    <a *ngFor="let url of parc | parcellationDoiPipe"
+      [href]="url"
+      target="_blank"
+      mat-raised-button
+      color="primary">
+      <div class="fas fa-external-link-alt"></div>
+      <span>
+        Explore
+      </span>
+    </a>
+
+    <button mat-button mat-dialog-close>Close</button>
+  </mat-dialog-actions>
+</ng-template>
