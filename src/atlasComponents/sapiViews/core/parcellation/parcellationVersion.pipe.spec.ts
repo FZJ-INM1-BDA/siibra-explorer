@@ -3,7 +3,7 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service"
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type"
 import { getTraverseFunctions } from "./parcellationVersion.pipe"
 
-describe("parcellationVersion.pipe.ts", () => {
+describe(`parcellationVersion.pipe.ts (endpoint at ${SAPI.bsEndpoint})`, () => {
   describe("getTraverseFunctions", () => {
     let julichBrainParcellations: SapiParcellationModel[] = []
     beforeAll(async () => {

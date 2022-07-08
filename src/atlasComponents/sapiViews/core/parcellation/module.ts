@@ -4,11 +4,13 @@ import { Store } from "@ngrx/store";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { atlasAppearance } from "src/state";
+import { DialogModule } from "src/ui/dialogInfo/module";
 import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
 import { SapiViewsCoreParcellationParcellationChip } from "./chip/parcellation.chip.component";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
+import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
 import { ParcellationIsBaseLayer } from "./parcellationIsBaseLayer.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { PreviewParcellationUrlPipe } from "./previewParcellationUrl.pipe";
@@ -22,6 +24,7 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     AngularMaterialModule,
     UtilModule,
     SapiViewsUtilModule,
+    DialogModule,
   ],
   declarations: [
     SapiViewsCoreParcellationParcellationTile,
@@ -31,6 +34,7 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
     ParcellationIsBaseLayer,
+    ParcellationDoiPipe,
   ],
   exports: [
     SapiViewsCoreParcellationParcellationTile,

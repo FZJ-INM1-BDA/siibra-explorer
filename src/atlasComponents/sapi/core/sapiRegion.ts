@@ -94,7 +94,7 @@ export class SAPIRegion{
   }
 
   getDetail(spaceId: string): Observable<SapiRegionModel> {
-    const url = `${this.prefix}/${encodeURIComponent(this.id)}`
+    const url = `${this.prefix}`
     return this.sapi.httpGet<SapiRegionModel>(
       url,
       {
