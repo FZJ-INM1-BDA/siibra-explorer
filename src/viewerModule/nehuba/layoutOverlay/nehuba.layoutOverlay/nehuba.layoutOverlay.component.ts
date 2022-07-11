@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
+import { ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { userInterface } from "src/state";
@@ -16,7 +16,7 @@ import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switc
   ]
 })
 
-export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
+export class NehubaLayoutOverlay implements OnDestroy{
 
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
@@ -42,10 +42,6 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
   ngOnDestroy(): void {
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
     while(this.nehubaUnitSubs.length > 0) this.nehubaUnitSubs.pop().unsubscribe()
-  }
-
-  ngAfterViewInit(): void {
-    this.setQuickTourPos()
   }
 
   handleCycleViewEvent(): void {
@@ -124,6 +120,7 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
       nehuba$.subscribe(nehuba => {
         this.nehubaUnit = nehuba
         this.onNewNehubaUnit(nehuba)
+        this.setQuickTourPos()
       })
     )
   }

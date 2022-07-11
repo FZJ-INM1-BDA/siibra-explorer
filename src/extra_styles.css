@@ -390,11 +390,6 @@ markdown-dom p
   height: 0px;
 }
 
-.pe-none
-{
-  pointer-events: none!important;
-}
-
 .h-2rem
 {
   height: 2rem!important;

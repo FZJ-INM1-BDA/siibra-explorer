@@ -117,9 +117,14 @@ const reducer = createReducer(
   on(
     actions.selectAtlas,
     (state, { atlas }) => {
+      if (atlas?.["@id"] === state?.selectedAtlas?.["@id"]) {
+        return state
+      }
       return {
         ...state,
-        selectedAtlas: atlas
+        selectedAtlas: atlas,
+        selectedTemplate: null,
+        selectedParcellation: null,
       }
     }
   ),

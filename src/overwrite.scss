@@ -279,3 +279,13 @@ $flex-directions: row,column;
     opacity: 0.5;
   }
 }
+
+a[mat-raised-button]
+{
+  text-decoration: none;
+}
+
+.#{$nsp}-pe-none
+{
+  pointer-events: none!important;
+}

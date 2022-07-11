@@ -14,6 +14,11 @@
 - [ ] Human multilevel atlas
   - [ ] on click from home page, MNI152, Julich v2.9 loads without issue
   - [ ] on hover, show correct region name(s)
+  - [ ] Parcellation smart chip
+    - [ ] show/hide parcellation toggle exists and works
+    - [ ] `q` is a shortcut to show/hide parcellation toggle
+    - [ ] info button exists and works
+    - [ ] info button shows desc, and link to KG
   - [ ] regional is fine :: select hOC1 right
     - [ ] probabilistic map loads fine
     - [ ] segmentation layer hides

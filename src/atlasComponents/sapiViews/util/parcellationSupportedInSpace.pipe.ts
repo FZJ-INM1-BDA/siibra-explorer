@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { NEVER, Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SAPIParcellation } from "src/atlasComponents/sapi/core";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
@@ -29,6 +29,7 @@ export class ParcellationSupportedInSpacePipe implements PipeTransform{
   constructor(private sapi: SAPI){}
 
   public transform(parc: SapiParcellationModel|string, tmpl: SapiSpaceModel|string): Observable<boolean> {
+    if (!parc) return NEVER
     const parcId = typeof parc === "string"
       ? parc
       : parc["@id"]
