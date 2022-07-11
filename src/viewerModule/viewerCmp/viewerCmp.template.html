@@ -5,7 +5,7 @@
   <div class="floating-ui">
 
     <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
-      class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
+      class="fixed-bottom sxplr-pe-none mb-2 d-flex justify-content-center">
       <logo-container></logo-container>
     </div>
 
@@ -99,7 +99,7 @@
   </mat-drawer>
 
   <!-- master content -->
-  <mat-drawer-content class="visible pe-none position-relative">
+  <mat-drawer-content class="visible sxplr-pe-none position-relative">
     <iav-layout-fourcorners>
 
       <!-- top left -->
@@ -148,7 +148,7 @@
 
 
       <!-- bottom left -->
-      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw pe-none align-items-center mb-4">
+      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw sxplr-pe-none align-items-center mb-4">
 
         <!-- special bottom left -->
         <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="localBottomLeftTmpl"></ng-template>
@@ -436,7 +436,7 @@
       <div prefix>
       </div>
 
-      <div suffix class="sxplr-scale-70">
+      <div suffix class="region-chip-suffix">
         <button mat-mini-fab
           color="primary"
           iav-stop="mousedown click"
@@ -545,7 +545,7 @@
       <i class="fas fa-sitemap"></i>
     </button>
 
-    <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
+    <div class="w-100 h-100 position-absolute sxplr-pe-none" *ngIf="showTour">
     </div>
 
   </div>

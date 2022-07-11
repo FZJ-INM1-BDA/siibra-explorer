@@ -58,9 +58,25 @@
   #menuTrigger="matMenuTrigger"
   >
 
-  <div prefix class="sxplr-scale-70">
-    <button mat-mini-fab
-      [color]="(parcellationVisibility$ | async) ? 'primary' : 'default'"
+  <div class="icons-container"
+    suffix 
+    iav-stop="mousedown click">
+
+    <ng-template #mainParcDesc>
+      <ng-template [ngTemplateOutlet]="parcDescTmpl"
+        [ngTemplateOutletContext]="{ parcellation: parcellation }">
+      </ng-template>
+    </ng-template>
+
+    <button mat-icon-button
+      color="default"
+      [sxplr-dialog]="mainParcDesc"
+      [sxplr-dialog-size]="null">
+      <i class="fas fa-info"></i>
+    </button>
+
+    <button mat-icon-button
+      color="default"
       [matTooltip]="ARIA_LABELS.TOGGLE_DELINEATION"
       iav-stop="mousedown click"
       [iav-key-listener]="[{'type': 'keydown', 'key': 'q', 'capture': true, 'target': 'document' }]"
@@ -74,26 +90,10 @@
         {{ ARIA_LABELS.TOGGLE_DELINEATION }}
       </span>
     </button>
-  </div>
 
-  <div class="sxplr-scale-70"
-    suffix 
-    iav-stop="mousedown click">
-
-    <ng-template #mainParcDesc>
-      <ng-template [ngTemplateOutlet]="parcDescTmpl"
-        [ngTemplateOutletContext]="{ parcellation: parcellation }">
-      </ng-template>
-    </ng-template>
-
-    <button mat-mini-fab color="default"
-      [sxplr-dialog]="mainParcDesc"
-      [sxplr-dialog-size]="null">
-      <i class="fas fa-info"></i>
-    </button>
     <button mat-mini-fab
       *ngIf="!(parcellation | parcellationIsBaseLayer)"
-      color="primary"
+      color="default"
       (click)="dismiss()">
 
       <spinner-cmp class="sxplr-w-100 sxplr-h-100" *ngIf="onDismissClicked$ | async; else defaultDismissIcon"></spinner-cmp>

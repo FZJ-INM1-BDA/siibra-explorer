@@ -284,3 +284,8 @@ a[mat-raised-button]
 {
   text-decoration: none;
 }
+
+.#{$nsp}-pe-none
+{
+  pointer-events: none!important;
+}

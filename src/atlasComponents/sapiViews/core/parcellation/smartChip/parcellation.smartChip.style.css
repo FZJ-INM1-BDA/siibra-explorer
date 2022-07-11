@@ -21,3 +21,14 @@
 {
   margin: 0.5rem;
 }
+
+.icons-container
+{
+  transform: scale(0.7);
+  margin-right: -1.5rem;
+}
+
+.icons-container > *
+{
+  margin: auto 0.2rem;
+}

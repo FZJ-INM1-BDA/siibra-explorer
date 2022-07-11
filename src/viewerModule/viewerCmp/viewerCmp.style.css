@@ -123,3 +123,9 @@ mat-list[dense].contextual-block
 {
   overflow: hidden auto;
 }
+
+.region-chip-suffix
+{
+  transform: scale(0.7);
+  margin-right: -0.25rem;
+}
