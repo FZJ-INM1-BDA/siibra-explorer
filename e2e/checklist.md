@@ -65,6 +65,9 @@
   - [ ] on hover, show correct region name(s)
   - [ ] whole mesh loads
 ## saneURL
+- [ ] saneurl generation functions properly
+  - [ ] try existing key (human), and get unavailable error
+  - [ ] try non existing key, and get available
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/bigbrainGreyWhite) redirects to big brain
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/julichbrain) redirects to julich brain (colin 27)
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4
