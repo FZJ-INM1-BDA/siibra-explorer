@@ -1,7 +1,6 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optional } from "@angular/core";
-import { fromEvent, Subscription, BehaviorSubject, Observable, Subject, of, interval } from 'rxjs'
-import { debounceTime, filter, map, scan, switchMap, take, distinctUntilChanged, debounce } from "rxjs/operators";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { Subscription, BehaviorSubject, Observable, Subject, of, interval } from 'rxjs'
+import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { bufferUntil, getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
@@ -135,7 +134,6 @@ export class NehubaViewerUnit implements OnDestroy {
 
   constructor(
     public elementRef: ElementRef,
-    private workerService: AtlasWorkerService,
     private log: LoggingService,
     @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
@@ -179,67 +177,6 @@ export class NehubaViewerUnit implements OnDestroy {
       })
       .catch(e => this.errorEmitter.emit(e))
 
-
-    /**
-     * TODO move to layerCtrl.service
-     */
-    this.ondestroySubscriptions.push(
-      fromEvent(this.workerService.worker, 'message').pipe(
-        filter((message: any) => {
-
-          if (!message) {
-            // this.log.error('worker response message is undefined', message)
-            return false
-          }
-          if (!message.data) {
-            // this.log.error('worker response message.data is undefined', message.data)
-            return false
-          }
-          if (message.data.type !== 'ASSEMBLED_USERLANDMARKS_VTK') {
-            /* worker responded with not assembled landmark, no need to act */
-            return false
-          }
-          /**
-           * nb url may be undefined
-           * if undefined, user have removed all user landmarks, and all that needs to be done
-           * is remove the user landmark layer
-           *
-           * message.data.url
-           */
-
-          return true
-        }),
-        debounceTime(100),
-        map(e => e.data.url),
-      ).subscribe(url => {
-        this.landmarksLoaded = !!url
-        this.removeuserLandmarks()
-
-        /**
-         * url may be null if user removes all landmarks
-         */
-        if (!url) {
-          /**
-           * remove transparency from meshes in current layer(s)
-           */
-          this.setMeshTransparency(false)
-          return
-        }
-        const _ = {}
-        _[NG_USER_LANDMARK_LAYER_NAME] = {
-          type: 'mesh',
-          source: `vtk://${url}`,
-          shader: this.userLandmarkShader,
-        }
-        this.loadLayer(_)
-
-        /**
-         * adding transparency to meshes in current layer(s)
-         */
-        this.setMeshTransparency(true)
-      }),
-    )
-  
     if (this.setColormap$) {
       this.ondestroySubscriptions.push(
         this.setColormap$.pipe(
@@ -546,37 +483,6 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 
   private userLandmarkShader: string = FRAGMENT_MAIN_WHITE
-  
-  // TODO single landmark for user landmark
-  public updateUserLandmarks(landmarks: any[]) {
-    if (!this.nehubaViewer) {
-      return
-    }
-    
-    this.workerService.worker.postMessage({
-      type : 'GET_USERLANDMARKS_VTK',
-      scale: Math.min(...this.dim.map(v => v * NG_LANDMARK_CONSTANT)),
-      landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6)),
-    })
-
-    const parseLmColor = lm => {
-      if (!lm) return null
-      const { color } = lm
-      if (!color) return null
-      if (!Array.isArray(color)) return null
-      if (color.length !== 3) return null
-      const parseNum = num => (num >= 0 && num <= 255 ? num / 255 : 1).toFixed(3)
-      return `emitRGB(vec3(${color.map(parseNum).join(',')}));`
-    }
-  
-    const appendConditional = (frag, idx) => frag && `if (label > ${idx - 0.01} && label < ${idx + 0.01}) { ${frag} }`
-
-    if (landmarks.some(parseLmColor)) {
-      this.userLandmarkShader = `void main(){ ${landmarks.map(parseLmColor).map(appendConditional).filter(v => !!v).join('else ')} else {${FRAGMENT_EMIT_WHITE}} }`
-    } else {
-      this.userLandmarkShader = FRAGMENT_MAIN_WHITE  
-    }
-  }
 
   public removeSpatialSearch3DLandmarks() {
     this.removeLayer({
