@@ -177,10 +177,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}): void {
     const config = getNehubaConfig(this.selectedTemplate)
-    const {
-      orientation,
-      position
-    } = config.dataset.initialNgState.navigation.pose
+
     const {
       zoomFactor: zoom
     } = config.dataset.initialNgState.navigation
@@ -189,8 +186,8 @@ export class StatusCardComponent implements OnInit, OnChanges{
       actions.navigateTo({
         navigation: {
           ...this.currentNavigation,
-          ...(rotationFlag ? { orientation: orientation } : {}),
-          ...(positionFlag ? { position: position } : {}),
+          ...(rotationFlag ? { orientation: [0, 0, 0, 1] } : {}),
+          ...(positionFlag ? { position: [0, 0, 0] } : {}),
           ...(zoomFlag ? { zoom: zoom } : {}),
         },
         physical: true,
