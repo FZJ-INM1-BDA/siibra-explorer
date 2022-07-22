@@ -4,7 +4,7 @@ export const environment = {
   VERSION: 'unknown version',
   PRODUCTION: true,
   BACKEND_URL: null,
-  BS_REST_URL: 'https://siibra-api-latest.apps-dev.hbp.eu/v2_0',
+  SIIBRA_API_ENDPOINTS: 'https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0',
   SPATIAL_TRANSFORM_BACKEND: 'https://hbp-spatial-backend.apps.hbp.eu',
   MATOMO_URL: null,
   MATOMO_ID: null,
