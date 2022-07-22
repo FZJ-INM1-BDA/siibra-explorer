@@ -18,7 +18,7 @@ jobs:
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
 
-      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v2_0'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v2_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v2_0'
 
@@ -37,19 +37,19 @@ jobs:
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
         then
           echo "Either master, using prod env..."
-          echo "BS_REST_URL=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
+          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
         elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
           echo "Either staging, using staging env..."
-          echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
+          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
           if [[ "$GITHUB_REF" == *hotfix* ]]
           then
             echo "Hotfix branch, using prod env..."
-            echo "BS_REST_URL=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
+            echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
           else
             echo "Using dev env..."
-            echo "BS_REST_URL=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+            echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
           fi
         fi
 
@@ -78,7 +78,7 @@ jobs:
           --build-arg VERSION=$VERSION \
           --build-arg MATOMO_URL=$MATOMO_URL \
           --build-arg MATOMO_ID=$MATOMO_ID \
-          --build-arg BS_REST_URL=$BS_REST_URL \
+          --build-arg SIIBRA_API_ENDPOINTS=$SIIBRA_API_ENDPOINTS \
           --build-arg EXPERIMENTAL_FEATURE_FLAG=$EXPERIMENTAL_FEATURE_FLAG \
           -t $DOCKER_BUILT_TAG \
           .

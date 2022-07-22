@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { map, shareReplay } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
-  SapiAtlasModel, SapiModalityModel,
+  SapiAtlasModel,
+  SapiModalityModel,
   SapiParcellationModel,
   SapiQueryPriorityArg,
   SapiRegionalFeatureModel,
@@ -24,14 +25,34 @@ import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.2.1'
+export const SIIBRA_API_VERSION = '0.2.2'
 
 type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 @Injectable()
 export class SAPI{
-  static bsEndpoint = environment.BS_REST_URL || `https://siibra-api-latest.apps-dev.hbp.eu/v2_0`
 
+  static async SetBsEndPoint() {
+    let idx = 0
+    const siibraApiEndpts = environment.SIIBRA_API_ENDPOINTS.split(',')
+    while (idx < siibraApiEndpts.length) {
+      const url = siibraApiEndpts[idx]
+      try {
+        const resp = await fetch(`${url}/atlases`)
+        const atlases = await resp.json()
+        if (atlases.length > 0) {
+          SAPI.bsEndpoint = url
+          return
+        }
+      } catch (e) {
+        idx ++
+      }
+    }
+    SAPI.ErrorMessage = `It appears all of our mirrors are not working. The viewer may not be working properly...`
+  }
+
+  static ErrorMessage = null
+  static bsEndpoint = `https://siibra-api-stable.apps.hbp.eu/v2_0`
   public bsEndpoint = SAPI.bsEndpoint
   
   registry = {
@@ -133,6 +154,9 @@ export class SAPI{
     private snackbar: MatSnackBar,
     private workerSvc: AtlasWorkerService,
   ){
+    if (SAPI.ErrorMessage) {
+      this.snackbar.open(SAPI.ErrorMessage, 'Dismiss', { duration: 5000 })
+    }
     this.atlases$.subscribe(atlases => {
       for (const atlas of atlases) {
         for (const space of atlas.spaces) {
