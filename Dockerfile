@@ -39,6 +39,7 @@ RUN rm -rf ./node_modules
 
 RUN npm i
 RUN npm run build
+RUN node third_party/matomo/processMatomo.js
 RUN npm run build-storybook
 
 # gzipping container
