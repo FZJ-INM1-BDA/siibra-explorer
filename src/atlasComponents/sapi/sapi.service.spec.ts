@@ -1,3 +1,4 @@
+import { NEVER } from "rxjs"
 import * as env from "src/environments/environment"
 import { SAPI } from "./sapi.service"
 
@@ -7,16 +8,24 @@ describe("> sapi.service.ts", () => {
       let fetchSpy: jasmine.Spy
       let environmentSpy: jasmine.Spy
 
-      const endpt1 = 'foo-bar'
-      const endpt2 = 'buzz-bizz'
+      const endpt1 = 'http://foo-bar'
+      const endpt2 = 'http://buzz-bizz'
 
       const atlas1 = 'foo'
       const atlas2 = 'bar'
-      
 
+      let originalBsEndpoint: string
+      beforeAll(() => {
+        originalBsEndpoint = SAPI.BsEndpoint
+      })
+
+      afterAll(() => {
+        SAPI.BsEndpoint = originalBsEndpoint
+      })
+      
       beforeEach(() => {
         fetchSpy = spyOn(window, 'fetch')
-        fetchSpy.and.rejectWith("foo-bar")
+        fetchSpy.and.callThrough()
 
         environmentSpy = spyOnProperty(env, 'environment')
         environmentSpy.and.returnValue({
@@ -42,7 +51,7 @@ describe("> sapi.service.ts", () => {
 
         it("> endpoint should be set", async () => {
           await SAPI.SetBsEndPoint()
-          expect(SAPI.bsEndpoint).toBe(endpt1)
+          expect(SAPI.BsEndpoint).toBe(endpt1)
         })
       })
 
@@ -70,7 +79,17 @@ describe("> sapi.service.ts", () => {
 
         it('> should set endpt2', async () => {
           await SAPI.SetBsEndPoint()
-          expect(SAPI.bsEndpoint).toBe(endpt2)
+          expect(SAPI.BsEndpoint).toBe(endpt2)
+        })
+
+        it("> instances bsendpoint should be the updated version", async () => {
+          await SAPI.SetBsEndPoint()
+          const mockHttpClient = {
+            get: jasmine.createSpy()
+          }
+          mockHttpClient.get.and.returnValue(NEVER)
+          const sapi = new SAPI(mockHttpClient as any, null, null)
+          expect(sapi.bsEndpoint).toBe(endpt2)
         })
       })
     })

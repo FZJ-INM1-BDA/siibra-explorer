@@ -41,7 +41,7 @@ export class SAPI{
         const resp = await fetch(`${url}/atlases`)
         const atlases = await resp.json()
         if (atlases.length > 0) {
-          SAPI.bsEndpoint = url
+          SAPI.BsEndpoint = url
           return
         }
       } catch (e) {
@@ -52,8 +52,11 @@ export class SAPI{
   }
 
   static ErrorMessage = null
-  static bsEndpoint = `https://siibra-api-stable.apps.hbp.eu/v2_0`
-  public bsEndpoint = SAPI.bsEndpoint
+  static BsEndpoint = `https://siibra-api-rc.apps.hbp.eu/v2_0`
+
+  get bsEndpoint() {
+    return SAPI.BsEndpoint
+  }
   
   registry = {
     _map: {} as Record<string, {
@@ -113,7 +116,7 @@ export class SAPI{
   }
 
   getModalities(): Observable<SapiModalityModel[]> {
-    return this.http.get<SapiModalityModel[]>(`${SAPI.bsEndpoint}/modalities`)
+    return this.http.get<SapiModalityModel[]>(`${SAPI.BsEndpoint}/modalities`)
   }
 
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){

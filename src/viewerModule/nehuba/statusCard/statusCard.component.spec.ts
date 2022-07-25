@@ -146,8 +146,8 @@ describe('> statusCard.component.ts', () => {
           initialNgState: {
             navigation: {
               pose: {
-                orientation: [0,0,0,1],
-                position: [10, 20, 30]
+                orientation: [0, 0, 0, 1],
+                position: [0, 0, 0]
               },
               zoomFactor: 1e6
             }

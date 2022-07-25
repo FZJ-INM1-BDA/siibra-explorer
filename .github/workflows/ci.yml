@@ -37,6 +37,11 @@ jobs:
         node-version: 16.x
     - run: npm i
     - run: |
+        if [[ "$GITHUB_REF" = *hotfix* ]] || [[ "$GITHUB_REF" = refs/heads/staging ]]
+        then
+          export SIIBRA_API_ENDPOINTS=https://siibra-api-rc.apps.hbp.eu/v2_0
+          node src/environments/parseEnv.js ./environment.common.ts
+        fi
         npm run test-ci
 
   backend:

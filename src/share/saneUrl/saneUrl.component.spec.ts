@@ -1,14 +1,13 @@
-import { TestBed, fakeAsync, tick, flush } from '@angular/core/testing'
-import { ShareModule } from '../share.module'
+import { TestBed, fakeAsync, tick, flush, ComponentFixture } from '@angular/core/testing'
 import { SaneUrl } from './saneUrl.component'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { BACKENDURL } from 'src/util/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { SaneUrlSvc } from './saneUrl.service'
 import { AngularMaterialModule } from 'src/sharedModules'
 import { CUSTOM_ELEMENTS_SCHEMA, Directive } from '@angular/core'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
+import { NotFoundError } from '../type'
 
 const inputCss = `input[aria-label="Custom link"]`
 const submitCss = `button[aria-label="Create custom link"]`
@@ -25,15 +24,22 @@ class AuthStateDummy {
 
 describe('> saneUrl.component.ts', () => {
   describe('> SaneUrl', () => {
+    const mockSaneUrlSvc = {
+      saneUrlroot: 'saneUrlroot',
+      getKeyVal: jasmine.createSpy('getKeyVal'),
+      setKeyVal: jasmine.createSpy('setKeyVal'),
+    }
     beforeEach(async () => {
       await TestBed.configureTestingModule({
         imports: [
-          HttpClientTestingModule,
           NoopAnimationsModule,
           AngularMaterialModule,
         ],
         providers: [
-          SaneUrlSvc,
+          {
+            provide: SaneUrlSvc,
+            useValue: mockSaneUrlSvc
+          }
         ],
         declarations: [
           SaneUrl,
@@ -43,11 +49,18 @@ describe('> saneUrl.component.ts', () => {
           CUSTOM_ELEMENTS_SCHEMA
         ]
       }).compileComponents()
+
+      mockSaneUrlSvc.getKeyVal.and.returnValue(
+        of('foo-bar')
+      )
+      mockSaneUrlSvc.setKeyVal.and.returnValue(
+        of('OK')
+      )
     })
 
     afterEach(() => {
-      const ctrl = TestBed.inject(HttpTestingController)
-      ctrl.verify()
+      mockSaneUrlSvc.getKeyVal.calls.reset()
+      mockSaneUrlSvc.setKeyVal.calls.reset()
     })
 
     it('> can be created', () => {
@@ -112,215 +125,188 @@ describe('> saneUrl.component.ts', () => {
       const input = fixture.debugElement.query( By.css( inputCss ) )
     })
 
-    it('> on entering string in input, makes debounced GET request', fakeAsync(() => {
-
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush(200)
-    }))
-
-    it('> on 200 response, show error', fakeAsync(() => {
-      
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush('OK')
-
-      // Expect validator to fail catch it
-      expect(fixture.componentInstance.customUrl.invalid).toEqual(true)
-
-      // on change detection, UI should catch it
-      fixture.detectChanges()
-
-      const input = fixture.debugElement.query( By.css( inputCss ) )
-
-      const submit = fixture.debugElement.query( By.css( submitCss ) )
-      const disabled = !!submit.attributes['disabled']
-      expect(disabled.toString()).toEqual('true')
-    }))
-
-    it('> on 404 response, show available', fakeAsync(() => {
-
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush('some reason', { status: 404, statusText: 'Not Found.' })
-
-      // Expect validator to fail catch it
-      expect(fixture.componentInstance.customUrl.invalid).toEqual(false)
-
-      // on change detection, UI should catch it
-      fixture.detectChanges()
-
-      const input = fixture.debugElement.query( By.css( inputCss ) )
-
-      const submit = fixture.debugElement.query( By.css( submitCss ) )
-      const disabled = !!submit.attributes['disabled']
-      expect(disabled.toString()).toEqual('false')
-    }))
-
-    it('> on other error codes, show invalid', fakeAsync(() => {
-
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush('some reason', { status: 401, statusText: 'Unauthorised.' })
-
-      // Expect validator to fail catch it
-      expect(fixture.componentInstance.customUrl.invalid).toEqual(true)
-
-      // on change detection, UI should catch it
-      fixture.detectChanges()
-
-      const input = fixture.debugElement.query( By.css( inputCss ) )
-
-      const submit = fixture.debugElement.query( By.css( submitCss ) )
-      const disabled = !!submit.attributes['disabled']
-      expect(disabled.toString()).toEqual('true')
-    }))
-
-    it('> on click create link btn calls correct API', fakeAsync(() => {
-
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush('some reason', { status: 404, statusText: 'Not Found.' })
-
-      fixture.detectChanges()
-      flush()
-
-      const submit = fixture.debugElement.query( By.css( submitCss ) )
-      const disabled = !!submit.attributes['disabled']
-      expect(disabled.toString()).toEqual('false')
-
-      submit.triggerEventHandler('click', {})
-
-      fixture.detectChanges()
-
-      const disabledInProgress = !!submit.attributes['disabled']
-      expect(disabledInProgress.toString()).toEqual('true')
-
-      const req2 = httpTestingController.expectOne({
-        method: 'POST',
-        url: `${BACKENDURL}saneUrl/${value}`
+    describe("> on valid input", () => {
+      let saneUrlCmp: SaneUrl
+      let fixture: ComponentFixture<SaneUrl>
+      const stateTobeSaved = 'foo-bar'
+      beforeEach(() => {
+        // Necessary to detectChanges, or formControl will not initialise properly
+        // See https://stackoverflow.com/a/56600762/6059235
+        fixture = TestBed.createComponent(SaneUrl)
+        saneUrlCmp = fixture.componentInstance
+        saneUrlCmp.stateTobeSaved = stateTobeSaved
+        fixture.detectChanges()
       })
-      
-      req2.flush({})
+      it('> on entering string in input, makes debounced GET request', fakeAsync(() => {
 
-      fixture.detectChanges()
-
-      const disabledAfterComplete = !!submit.attributes['disabled']
-      expect(disabledAfterComplete.toString()).toEqual('true')
-
-      const cpyBtn = fixture.debugElement.query( By.css( copyBtnCss ) )
-      expect(cpyBtn).toBeTruthy()
-    }))
-
-    it('> on click create link btn fails show result', fakeAsync(() => {
-
-      const value = 'test_1'
-
-      const httpTestingController = TestBed.inject(HttpTestingController)
-
-      // Necessary to detectChanges, or formControl will not initialise properly
-      // See https://stackoverflow.com/a/56600762/6059235
-      const fixture = TestBed.createComponent(SaneUrl)
-      fixture.detectChanges()
-
-      // Set value
-      fixture.componentInstance.customUrl.setValue(value)
-
-      tick(500)
-
-      const req = httpTestingController.expectOne(`${BACKENDURL}saneUrl/${value}`)
-      req.flush('some reason', { status: 404, statusText: 'Not Found.' })
-
-      fixture.detectChanges()
-      flush()
-
-      const submit = fixture.debugElement.query( By.css( submitCss ) )
-      const disabled = !!submit.attributes['disabled']
-      expect(disabled.toString()).toEqual('false')
-
-      submit.triggerEventHandler('click', {})
-
-      fixture.detectChanges()
-
-      const disabledInProgress = !!submit.attributes['disabled']
-      expect(disabledInProgress.toString()).toEqual('true')
-
-      const req2 = httpTestingController.expectOne({
-        method: 'POST',
-        url: `${BACKENDURL}saneUrl/${value}`
+        const value = 'test_1'
+  
+        // Set value
+        fixture.componentInstance.customUrl.setValue(value)
+  
+        tick(500)
+  
+        expect(mockSaneUrlSvc.getKeyVal).toHaveBeenCalledOnceWith(value)
+      }))
+  
+      describe("> on 200", () => {
+        it("> show error", fakeAsync(() => {
+  
+          const value = 'test_1'
+    
+          // Set value
+          fixture.componentInstance.customUrl.setValue(value)
+    
+          tick(500)
+    
+          // Expect validator to fail catch it
+          expect(fixture.componentInstance.customUrl.invalid).toEqual(true)
+    
+          // on change detection, UI should catch it
+          fixture.detectChanges()
+    
+          const input = fixture.debugElement.query( By.css( inputCss ) )
+    
+          const submit = fixture.debugElement.query( By.css( submitCss ) )
+          const disabled = !!submit.attributes['disabled']
+          expect(disabled.toString()).toEqual('true')
+        }))
       })
+  
+      describe('> on 404', () => {
+        beforeEach(() => {
+          mockSaneUrlSvc.getKeyVal.and.returnValue(
+            throwError(new NotFoundError('not found'))
+          )
+        })
+        it("> should available", fakeAsync(() => {
+  
+          const value = 'test_1'
+    
+          // Set value
+          fixture.componentInstance.customUrl.setValue(value)
+    
+          tick(500)
+    
+          // Expect validator to fail catch it
+          expect(fixture.componentInstance.customUrl.invalid).toEqual(false)
+    
+          // on change detection, UI should catch it
+          fixture.detectChanges()
+    
+          const input = fixture.debugElement.query( By.css( inputCss ) )
+    
+          const submit = fixture.debugElement.query( By.css( submitCss ) )
+          const disabled = !!submit.attributes['disabled']
+          expect(disabled.toString()).toEqual('false')
+        }))
+      })
+  
+      describe("> on other error", () => {
+        beforeEach(() => {
+  
+          mockSaneUrlSvc.getKeyVal.and.returnValue(
+            throwError(new Error('other errors'))
+          )
+        })
+        it("> show invalid", fakeAsync(() => {
+          const value = 'test_1'
+    
+          // Set value
+          fixture.componentInstance.customUrl.setValue(value)
+    
+          tick(500)
+    
+          // Expect validator to fail catch it
+          expect(fixture.componentInstance.customUrl.invalid).toEqual(true)
+    
+          // on change detection, UI should catch it
+          fixture.detectChanges()
+    
+          const input = fixture.debugElement.query( By.css( inputCss ) )
+    
+          const submit = fixture.debugElement.query( By.css( submitCss ) )
+          const disabled = !!submit.attributes['disabled']
+          expect(disabled.toString()).toEqual('true')
+        }))
+      })
+  
+      describe("> on click create link", () => {
+        beforeEach(() => {
+          mockSaneUrlSvc.getKeyVal.and.returnValue(
+            throwError(new NotFoundError('not found'))
+          )
+        })
+        it("> calls correct service function", fakeAsync(() => {
+  
+          const value = 'test_1'
+    
+          // Set value
+          fixture.componentInstance.customUrl.setValue(value)
+    
+          tick(500)
+    
+          fixture.detectChanges()
+          flush()
+    
+          const submit = fixture.debugElement.query( By.css( submitCss ) )
+          const disabled = !!submit.attributes['disabled']
+          expect(disabled.toString()).toEqual('false')
+    
+          submit.triggerEventHandler('click', {})
+    
+          fixture.detectChanges()
+    
+          const disabledInProgress = !!submit.attributes['disabled']
+          expect(disabledInProgress.toString()).toEqual('true')
+    
+          fixture.detectChanges()
+    
+          const disabledAfterComplete = !!submit.attributes['disabled']
+          expect(disabledAfterComplete.toString()).toEqual('true')
+    
+          const cpyBtn = fixture.debugElement.query( By.css( copyBtnCss ) )
+          expect(cpyBtn).toBeTruthy()
+        }))
+  
+        describe("> on fail", () => {
+          beforeEach(() => {
+            mockSaneUrlSvc.setKeyVal.and.returnValue(
+              throwError(new Error(`some error`))
+            )
+          })
+          it("> show result", fakeAsync(() => {
+  
+            const value = 'test_1'
       
-      req2.flush('Something went wrong', { statusText: 'Wrong status text', status: 500 })
-
-      fixture.detectChanges()
-
-      const input = fixture.debugElement.query( By.css( inputCss ) )
-
-    }))
+            // Set value
+            fixture.componentInstance.customUrl.setValue(value)
+      
+            tick(500)
+      
+            fixture.detectChanges()
+      
+            const submit = fixture.debugElement.query( By.css( submitCss ) )
+            const disabled = !!submit.attributes['disabled']
+            expect(disabled.toString()).toEqual('false')
+      
+            submit.triggerEventHandler('click', {})
+      
+            fixture.detectChanges()
+      
+            const disabledInProgress = !!submit.attributes['disabled']
+            expect(disabledInProgress.toString()).toEqual('true')
+      
+            expect(mockSaneUrlSvc.setKeyVal).toHaveBeenCalledOnceWith(value, stateTobeSaved)
+            
+            fixture.detectChanges()
+      
+            const input = fixture.debugElement.query( By.css( inputCss ) )
+      
+          }))
+        })
+      })
+  
+    })
   })
 })

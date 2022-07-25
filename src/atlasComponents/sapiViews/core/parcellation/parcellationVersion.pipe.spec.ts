@@ -3,11 +3,11 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service"
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type"
 import { getTraverseFunctions } from "./parcellationVersion.pipe"
 
-describe(`parcellationVersion.pipe.ts (endpoint at ${SAPI.bsEndpoint})`, () => {
+describe(`parcellationVersion.pipe.ts (endpoint at ${SAPI.BsEndpoint})`, () => {
   describe("getTraverseFunctions", () => {
     let julichBrainParcellations: SapiParcellationModel[] = []
     beforeAll(async () => {
-      const res = await fetch(`${SAPI.bsEndpoint}/atlases/${encodeURIComponent(IDS.ATLAES.HUMAN)}/parcellations`)
+      const res = await fetch(`${SAPI.BsEndpoint}/atlases/${encodeURIComponent(IDS.ATLAES.HUMAN)}/parcellations`)
       const arr: SapiParcellationModel[] = await res.json()
       julichBrainParcellations = arr.filter(it => /Julich-Brain Cytoarchitectonic Maps/.test(it.name))
     })

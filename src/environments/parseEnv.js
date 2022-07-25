@@ -2,9 +2,11 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 const asyncWrite = promisify(fs.writeFile)
+const process = require("process")
 
 const main = async () => {
-  const pathToEnvFile = path.join(__dirname, './environment.prod.ts')
+  const target = process.argv[2] || './environment.prod.ts'
+  const pathToEnvFile = path.join(__dirname, target)
   const {
     BACKEND_URL,
     STRICT_LOCAL,

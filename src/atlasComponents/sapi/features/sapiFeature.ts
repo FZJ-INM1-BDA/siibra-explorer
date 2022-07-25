@@ -7,7 +7,7 @@ export class SAPIFeature {
   }
 
   public detail$ = this.sapi.httpGet<SapiFeatureModel>(
-    `${SAPI.bsEndpoint}/features/${this.id}`,
+    `${SAPI.BsEndpoint}/features/${this.id}`,
     this.opts
   )
 }
