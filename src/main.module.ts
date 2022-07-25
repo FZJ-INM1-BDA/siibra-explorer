@@ -33,7 +33,6 @@ import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
-import { BS_ENDPOINT } from './util/constants';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
@@ -162,10 +161,6 @@ import { CONST } from "common/constants"
     {
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,
       useClass: MessagingGlue
-    },
-    {
-      provide: BS_ENDPOINT,
-      useValue: (environment.BS_REST_URL || `https://siibra-api-stable.apps.hbp.eu/v1_0`).replace(/\/$/, '')
     },
     {
       provide: DARKTHEME,

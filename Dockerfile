@@ -3,8 +3,8 @@ FROM node:14 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
-ARG BS_REST_URL
-ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-stable.apps.hbp.eu/v1_0}
+ARG SIIBRA_API_ENDPOINTS
+ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}
@@ -39,6 +39,7 @@ RUN rm -rf ./node_modules
 
 RUN npm i
 RUN npm run build
+RUN node third_party/matomo/processMatomo.js
 RUN npm run build-storybook
 
 # gzipping container

@@ -6,7 +6,6 @@ import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
-import {BS_ENDPOINT} from "src/util/constants";
 import {SAPI} from "src/atlasComponents/sapi";
 import {AngularMaterialModule} from "src/sharedModules";
 
@@ -66,10 +65,6 @@ describe('ConnectivityComponent', () => {
             providers: [
                 provideMockActions(() => actions$),
                 provideMockStore(),
-                {
-                    provide: BS_ENDPOINT,
-                    useValue: MOCK_BS_ENDPOINT
-                },
                 {
                     provide: SAPI,
                     useValue: {
