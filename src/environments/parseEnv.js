@@ -2,15 +2,17 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 const asyncWrite = promisify(fs.writeFile)
+const process = require("process")
 
 const main = async () => {
-  const pathToEnvFile = path.join(__dirname, './environment.prod.ts')
+  const target = process.argv[2] || './environment.prod.ts'
+  const pathToEnvFile = path.join(__dirname, target)
   const {
     BACKEND_URL,
     STRICT_LOCAL,
     MATOMO_URL,
     MATOMO_ID,
-    BS_REST_URL,
+    SIIBRA_API_ENDPOINTS,
     VERSION,
     GIT_HASH = 'unknown hash',
     EXPERIMENTAL_FEATURE_FLAG
@@ -21,7 +23,7 @@ const main = async () => {
     STRICT_LOCAL,
     MATOMO_URL,
     MATOMO_ID,
-    BS_REST_URL,
+    SIIBRA_API_ENDPOINTS,
     VERSION,
     GIT_HASH,
     EXPERIMENTAL_FEATURE_FLAG,
@@ -39,7 +41,7 @@ export const environment = {
   ...commonEnv,
   GIT_HASH: ${gitHash},
   VERSION: ${version},
-  BS_REST_URL: ${JSON.stringify(BS_REST_URL)},
+  SIIBRA_API_ENDPOINTS: ${JSON.stringify(SIIBRA_API_ENDPOINTS)},
   BACKEND_URL: ${JSON.stringify(BACKEND_URL)},
   STRICT_LOCAL: ${JSON.stringify(STRICT_LOCAL)},
   MATOMO_URL: ${JSON.stringify(MATOMO_URL)},

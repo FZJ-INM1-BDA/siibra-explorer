@@ -1,7 +1,6 @@
 import { TestBed, fakeAsync, tick, ComponentFixture } from "@angular/core/testing"
 import { CommonModule } from "@angular/common"
 import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN, scanFn } from "./nehubaViewer.component"
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { LoggingModule, LoggingService } from "src/logging"
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants"
 import { Subject } from "rxjs"
@@ -106,7 +105,6 @@ describe('> nehubaViewer.component.ts', () => {
             provide: SET_COLORMAP_OBS,
             useValue: setcolorMap$
           },
-          AtlasWorkerService,
           LoggingService,
         ]
       }).compileComponents()
