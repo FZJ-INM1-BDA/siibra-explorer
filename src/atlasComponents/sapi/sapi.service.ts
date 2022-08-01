@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay } from "rxjs/operators";
+import { filter, map, shareReplay, switchMap, take } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
   SapiAtlasModel,
@@ -20,7 +20,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
-import { Observable } from "rxjs";
+import { interval, Observable } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 
@@ -52,7 +52,7 @@ export class SAPI{
   }
 
   static ErrorMessage = null
-  static BsEndpoint = `https://siibra-api-rc.apps.hbp.eu/v2_0`
+  static BsEndpoint = null
 
   get bsEndpoint() {
     return SAPI.BsEndpoint
@@ -133,12 +133,16 @@ export class SAPI{
     )
   }
 
-  public atlases$ = this.http.get<SapiAtlasModel[]>(
-    `${this.bsEndpoint}/atlases`,
-    {
-      observe: "response"
-    }
-  ).pipe(
+  public atlases$ = interval(160).pipe(
+    map(() => this.bsEndpoint),
+    filter(v => !!v),
+    take(1),
+    switchMap(endpt => this.http.get<SapiAtlasModel[]>(
+      `${endpt}/atlases`,
+      {
+        observe: "response"
+      }
+    )),
     map(resp => {
       const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
       if (respVersion !== SIIBRA_API_VERSION) {
