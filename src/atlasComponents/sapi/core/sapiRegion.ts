@@ -2,7 +2,7 @@ import { SAPI } from "..";
 import { SapiRegionalFeatureModel, SapiRegionMapInfoModel, SapiRegionModel, cleanIeegSessionDatasets, SapiIeegSessionModel, CleanedIeegDataset, SapiVolumeModel, PaginatedResponse } from "../type";
 import { strToRgb, hexToRgb } from 'common/util'
 import { merge, Observable, of } from "rxjs";
-import { catchError, map, scan } from "rxjs/operators";
+import { catchError, map, scan, switchMap } from "rxjs/operators";
 
 export class SAPIRegion{
 
@@ -16,7 +16,7 @@ export class SAPIRegion{
     return strToRgb(JSON.stringify(region))
   }
 
-  private prefix: string
+  private prefix$: Observable<string>
 
   constructor(
     private sapi: SAPI,
@@ -24,20 +24,26 @@ export class SAPIRegion{
     public parcId: string,
     public id: string,
   ){
-    this.prefix = `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcId)}/regions/${encodeURIComponent(this.id)}`
+    this.prefix$ = SAPI.BsEndpoint$.pipe(
+      map(endpt => `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.parcId)}/regions/${encodeURIComponent(this.id)}`)
+    )
   }
 
   getFeatures(spaceId: string): Observable<(SapiRegionalFeatureModel | CleanedIeegDataset)[]> {
     return merge(
-      this.sapi.httpGet<SapiRegionalFeatureModel[]>(
-        `${this.prefix}/features`,
-        {
-          space_id: spaceId
-        }
-      ).pipe(
-        catchError((err, obs) => {
-          return of([])
-        })
+      this.prefix$.pipe(
+        switchMap(prefix => 
+          this.sapi.httpGet<SapiRegionalFeatureModel[]>(
+            `${prefix}/features`,
+            {
+              space_id: spaceId
+            }
+          ).pipe(
+            catchError((err, obs) => {
+              return of([])
+            })
+          )
+        )
       ),
       spaceId
         ? this.sapi.getSpace(this.atlasId, spaceId).getFeatures({ parcellationId: this.parcId, region: this.id }).pipe(
@@ -56,50 +62,59 @@ export class SAPIRegion{
   }
 
   getFeatureInstance(instanceId: string, spaceId: string = null): Observable<SapiRegionalFeatureModel> {
-    return this.sapi.httpGet<SapiRegionalFeatureModel>(
-      `${this.prefix}/features/${encodeURIComponent(instanceId)}`,
-      {
-        space_id: spaceId
-      }
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiRegionalFeatureModel>(
+        `${prefix}/features/${encodeURIComponent(instanceId)}`,
+        {
+          space_id: spaceId
+        }
+      ))
     )
   }
 
   getMapInfo(spaceId: string): Observable<SapiRegionMapInfoModel> {
-    return this.sapi.http.get<SapiRegionMapInfoModel>(
-      `${this.prefix}/regional_map/info`,
-      {
-        params: {
-          space_id: spaceId
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.http.get<SapiRegionMapInfoModel>(
+        `${prefix}/regional_map/info`,
+        {
+          params: {
+            space_id: spaceId
+          }
         }
-      }
+      ))
     )
   }
 
-  getMapUrl(spaceId: string): string {
-    return `${this.prefix}/regional_map/map?space_id=${encodeURI(spaceId)}`
+  getMapUrl(spaceId: string): Observable<string> {
+    return this.prefix$.pipe(
+      map(prefix => `${prefix}/regional_map/map?space_id=${encodeURI(spaceId)}`)
+    )
   }
 
   getVolumes(): Observable<PaginatedResponse<SapiVolumeModel>>{
-    const url = `${this.prefix}/volumes`
-    return this.sapi.httpGet<PaginatedResponse<SapiVolumeModel>>(
-      url
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<PaginatedResponse<SapiVolumeModel>>(
+        `${prefix}/volumes`
+      ))
     )
   }
 
   getVolumeInstance(volumeId: string): Observable<SapiVolumeModel> {
-    const url = `${this.prefix}/volumes/${encodeURIComponent(volumeId)}`
-    return this.sapi.httpGet<SapiVolumeModel>(
-      url
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiVolumeModel>(
+        `${prefix}/volumes/${encodeURIComponent(volumeId)}`
+      ))
     )
   }
 
   getDetail(spaceId: string): Observable<SapiRegionModel> {
-    const url = `${this.prefix}`
-    return this.sapi.httpGet<SapiRegionModel>(
-      url,
-      {
-        space_id: spaceId
-      }
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiRegionModel>(
+        prefix,
+        {
+          space_id: spaceId
+        }
+      ))
     )
   }
 }
