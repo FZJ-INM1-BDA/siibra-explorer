@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { filter, map, shareReplay, switchMap, take } from "rxjs/operators";
+import { catchError, filter, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
   SapiAtlasModel,
@@ -20,7 +20,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
-import { interval, Observable } from "rxjs";
+import { concat, EMPTY, from, merge, Observable, of } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 
@@ -29,34 +29,56 @@ export const SIIBRA_API_VERSION = '0.2.2'
 
 type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
-@Injectable()
+let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
+
+@Injectable({
+  providedIn: 'root'
+})
 export class SAPI{
 
-  static async SetBsEndPoint() {
-    let idx = 0
-    const siibraApiEndpts = environment.SIIBRA_API_ENDPOINTS.split(',')
-    while (idx < siibraApiEndpts.length) {
-      const url = siibraApiEndpts[idx]
-      try {
-        const resp = await fetch(`${url}/atlases`)
-        const atlases = await resp.json()
-        if (atlases.length > 0) {
-          SAPI.BsEndpoint = url
-          return
-        }
-      } catch (e) {
-        idx ++
-      }
-    }
-    SAPI.ErrorMessage = `It appears all of our mirrors are not working. The viewer may not be working properly...`
+  /**
+   * Used to clear BsEndPoint, so the next static get BsEndpoints$ will
+   * fetch again. Only used for unit test of BsEndpoint$
+   */
+  static ClearBsEndPoint(){
+    BS_ENDPOINT_CACHED_VALUE = null
+  }
+
+  /**
+   * BsEndpoint$ is designed as a static getter mainly for unit testing purposes.
+   * see usage of BsEndpoint$ and ClearBsEndPoint in sapi.service.spec.ts
+   */
+  static get BsEndpoint$(): Observable<string> {
+    if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
+    BS_ENDPOINT_CACHED_VALUE = concat(
+      merge(
+        ...environment.SIIBRA_API_ENDPOINTS.split(',').map(url => {
+          return from((async () => {
+            const resp = await fetch(`${url}/atlases`)
+            const atlases = await resp.json()
+            if (atlases.length == 0) {
+              throw new Error(`atlas length == 0`)
+            }
+            return url
+          })()).pipe(
+            catchError(() => EMPTY)
+          )
+        })
+      ),
+      of(null).pipe(
+        tap(() => {
+          SAPI.ErrorMessage = `It appears all of our mirrors are not working. The viewer may not be working properly...`
+        }),
+        filter(() => false)
+      )
+    ).pipe(
+      take(1),
+      shareReplay(1),
+    )
+    return BS_ENDPOINT_CACHED_VALUE
   }
 
   static ErrorMessage = null
-  static BsEndpoint = null
-
-  get bsEndpoint() {
-    return SAPI.BsEndpoint
-  }
   
   registry = {
     _map: {} as Record<string, {
@@ -116,7 +138,9 @@ export class SAPI{
   }
 
   getModalities(): Observable<SapiModalityModel[]> {
-    return this.http.get<SapiModalityModel[]>(`${SAPI.BsEndpoint}/modalities`)
+    return SAPI.BsEndpoint$.pipe(
+      switchMap(endpt => this.http.get<SapiModalityModel[]>(`${endpt}/modalities`))
+    )
   }
 
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){
@@ -133,10 +157,7 @@ export class SAPI{
     )
   }
 
-  public atlases$ = interval(160).pipe(
-    map(() => this.bsEndpoint),
-    filter(v => !!v),
-    take(1),
+  public atlases$ = SAPI.BsEndpoint$.pipe(
     switchMap(endpt => this.http.get<SapiAtlasModel[]>(
       `${endpt}/atlases`,
       {

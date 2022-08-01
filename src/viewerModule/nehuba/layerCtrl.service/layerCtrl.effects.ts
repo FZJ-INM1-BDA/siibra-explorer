@@ -37,17 +37,20 @@ export class LayerCtrlEffects {
     ),
     switchMap(([ regions, { atlas, parcellation, template } ]) => {
       const sapiRegion = this.sapi.getRegion(atlas["@id"], parcellation["@id"], regions[0].name)
-      return sapiRegion.getMapInfo(template["@id"]).pipe(
-        map(val => 
+      return forkJoin([
+        sapiRegion.getMapInfo(template["@id"]),
+        sapiRegion.getMapUrl(template["@id"])
+      ]).pipe(
+        map(([mapInfo, mapUrl]) => 
           atlasAppearance.actions.addCustomLayer({
             customLayer: {
               clType: "customlayer/nglayer",
               id: PMAP_LAYER_NAME,
-              source: `nifti://${sapiRegion.getMapUrl(template["@id"])}`,
+              source: `nifti://${mapUrl}`,
               shader: getShader({
                 colormap: EnumColorMapName.VIRIDIS,
-                highThreshold: val.max,
-                lowThreshold: val.min,
+                highThreshold: mapInfo.max,
+                lowThreshold: mapInfo.min,
                 removeBg: true,
               })
             }

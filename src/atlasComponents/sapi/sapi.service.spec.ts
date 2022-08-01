@@ -1,10 +1,10 @@
-import { NEVER } from "rxjs"
+import { finalize } from "rxjs/operators"
 import * as env from "src/environments/environment"
 import { SAPI } from "./sapi.service"
 
 describe("> sapi.service.ts", () => {
   describe("> SAPI", () => {
-    describe("#SetBsEndPoint", () => {
+    describe("#BsEndpoint$", () => {
       let fetchSpy: jasmine.Spy
       let environmentSpy: jasmine.Spy
 
@@ -14,16 +14,10 @@ describe("> sapi.service.ts", () => {
       const atlas1 = 'foo'
       const atlas2 = 'bar'
 
-      let originalBsEndpoint: string
-      beforeAll(() => {
-        originalBsEndpoint = SAPI.BsEndpoint
-      })
+      let subscribedVal: string
 
-      afterAll(() => {
-        SAPI.BsEndpoint = originalBsEndpoint
-      })
-      
       beforeEach(() => {
+        SAPI.ClearBsEndPoint()
         fetchSpy = spyOn(window, 'fetch')
         fetchSpy.and.callThrough()
 
@@ -33,43 +27,70 @@ describe("> sapi.service.ts", () => {
         })
       })
 
+
       afterEach(() => {
+        SAPI.ClearBsEndPoint()
         fetchSpy.calls.reset()
         environmentSpy.calls.reset()
+        subscribedVal = null
       })
 
       describe("> first passes", () => {
-        beforeEach(() => {
+        beforeEach(done => {
           const resp = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 200 })
-          fetchSpy.and.resolveTo(resp)
+          fetchSpy.and.callFake(async url => {
+            if (url === `${endpt1}/atlases`) {
+              return resp
+            }
+            throw new Error("controlled throw")
+          })
+          SAPI.BsEndpoint$.pipe(
+            finalize(() => done())
+          ).subscribe(val => {
+            subscribedVal = val
+          })
         })
-        it("> should call fetch once", async () => {
-          await SAPI.SetBsEndPoint()
-          expect(fetchSpy).toHaveBeenCalledTimes(1)
-          expect(fetchSpy).toHaveBeenCalledOnceWith(`${endpt1}/atlases`)
+        it("> should call fetch twice", async () => {
+          expect(fetchSpy).toHaveBeenCalledTimes(2)
+          
+          const allArgs = fetchSpy.calls.allArgs()
+          expect(allArgs.length).toEqual(2)
+          expect(allArgs[0]).toEqual([`${endpt1}/atlases`])
+          expect(allArgs[1]).toEqual([`${endpt2}/atlases`])
         })
 
         it("> endpoint should be set", async () => {
-          await SAPI.SetBsEndPoint()
-          expect(SAPI.BsEndpoint).toBe(endpt1)
+          expect(subscribedVal).toBe(endpt1)
+        })
+
+        it("> additional calls should return cached observable", () => {
+
+          expect(fetchSpy).toHaveBeenCalledTimes(2)
+          SAPI.BsEndpoint$.subscribe()
+          SAPI.BsEndpoint$.subscribe()
+
+          expect(fetchSpy).toHaveBeenCalledTimes(2)
         })
       })
 
       describe("> first fails", () => {
-        beforeEach(() => {
-          let counter = 0
-          fetchSpy.and.callFake(async () => {
-            if (counter === 0) {
-              counter ++
+        beforeEach(done => {
+          fetchSpy.and.callFake(async url => {
+            if (url === `${endpt1}/atlases`) {
               throw new Error(`bla`)
             }
             const resp = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 200 })
             return resp
           })
+
+          SAPI.BsEndpoint$.pipe(
+            finalize(() => done())
+          ).subscribe(val => {
+            subscribedVal = val
+          })
         })
 
         it("> should call twice", async () => {
-          await SAPI.SetBsEndPoint()
           expect(fetchSpy).toHaveBeenCalledTimes(2)
           expect(fetchSpy.calls.allArgs()).toEqual([
             [`${endpt1}/atlases`],
@@ -78,18 +99,7 @@ describe("> sapi.service.ts", () => {
         })
 
         it('> should set endpt2', async () => {
-          await SAPI.SetBsEndPoint()
-          expect(SAPI.BsEndpoint).toBe(endpt2)
-        })
-
-        it("> instances bsendpoint should be the updated version", async () => {
-          await SAPI.SetBsEndPoint()
-          const mockHttpClient = {
-            get: jasmine.createSpy()
-          }
-          mockHttpClient.get.and.returnValue(NEVER)
-          const sapi = new SAPI(mockHttpClient as any, null, null)
-          expect(sapi.bsEndpoint).toBe(endpt2)
+          expect(subscribedVal).toBe(endpt2)
         })
       })
     })
