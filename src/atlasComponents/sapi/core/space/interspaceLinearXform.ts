@@ -17,15 +17,15 @@ const _linearXformDict: Record<
     keyof typeof VALID_LINEAR_XFORM_DST,
     TLinearXform
   >> = {
-  CCF: {
-    NEHUBA: [
-      [-1e3, 0, 0, 11400000 - 5737500], //
-      [0, 0, -1e3, 13200000 - 6637500], //
-      [0, -1e3, 0, 8000000 - 4037500], //
-      [0, 0, 0, 1],
-    ]
+    CCF: {
+      NEHUBA: [
+        [-1e3, 0, 0, 11400000 - 5737500], //
+        [0, 0, -1e3, 13200000 - 6637500], //
+        [0, -1e3, 0, 8000000 - 4037500], //
+        [0, 0, 0, 1],
+      ]
+    }
   }
-}
 
 const defaultXform = [
   [1e3, 0, 0, 0],
@@ -34,12 +34,6 @@ const defaultXform = [
   [0, 0, 0, 1],
 ]
 
-const s = `
-  LIP
-  [ 11400000, 13200000, 8000000 ]
-  RSP
-  RAS
-`
 
 const getProxyXform = <T>(obj: Record<string, T>, cb: (value: T) => T) => new Proxy({}, {
   get: (_target, prop: string, _receiver) => {

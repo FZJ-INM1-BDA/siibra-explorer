@@ -291,7 +291,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
       let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
       const swcText = await file.text()
       let src: TVALID_LINEAR_XFORM_SRC
-      let dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
+      const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
       if (/ccf/i.test(swcText)) {
         src = "CCF"
         message += `CCF detected, applying known transformation.`
