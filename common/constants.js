@@ -108,6 +108,7 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
     DOES_NOT_SUPPORT_MULTI_REGION_SELECTION: `Please only select a single region.`,
     MULTI_REGION_SELECTION: `Multi region selection`,
+    DESCRIPTION: 'Description',
     REGIONAL_FEATURES: 'Regional features',
     CONNECTIVITY: 'Connectivity',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,

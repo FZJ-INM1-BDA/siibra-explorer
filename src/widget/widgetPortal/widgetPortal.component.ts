@@ -1,6 +1,6 @@
 import { ComponentPortal } from "@angular/cdk/portal";
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from "@angular/core";
-import { WidgetService } from "../service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional } from "@angular/core";
+import { RM_WIDGET } from "../constants";
 
 @Component({
   selector: 'sxplr-widget-portal',
@@ -30,12 +30,12 @@ export class WidgetPortal<T>{
   }
 
   constructor(
-    private wSvc: WidgetService,
     private cdr: ChangeDetectorRef,
+    @Optional() @Inject(RM_WIDGET) private rmWidget: (inst: unknown) => void
   ){
     
   }
   exit(){
-    this.wSvc.rmWidget(this)
+    if (this.rmWidget) this.rmWidget(this)
   }
 }

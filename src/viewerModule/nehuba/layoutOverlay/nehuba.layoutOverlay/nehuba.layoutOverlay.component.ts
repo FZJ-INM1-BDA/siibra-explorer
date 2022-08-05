@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
+import { ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { userInterface } from "src/state";
@@ -6,7 +6,7 @@ import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "../../util";
 import { QUICKTOUR_DESC, ARIA_LABELS, IDS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { debounce, debounceTime, filter, mapTo, switchMap, take } from "rxjs/operators";
+import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take } from "rxjs/operators";
 
 @Component({
   selector: `nehuba-layout-overlay`,
@@ -16,7 +16,7 @@ import { debounce, debounceTime, filter, mapTo, switchMap, take } from "rxjs/ope
   ]
 })
 
-export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
+export class NehubaLayoutOverlay implements OnDestroy{
 
   public ARIA_LABELS = ARIA_LABELS
   public IDS = IDS
@@ -42,10 +42,6 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
   ngOnDestroy(): void {
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
     while(this.nehubaUnitSubs.length > 0) this.nehubaUnitSubs.pop().unsubscribe()
-  }
-
-  ngAfterViewInit(): void {
-    this.setQuickTourPos()
   }
 
   handleCycleViewEvent(): void {
@@ -124,6 +120,7 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
       nehuba$.subscribe(nehuba => {
         this.nehubaUnit = nehuba
         this.onNewNehubaUnit(nehuba)
+        this.setQuickTourPos()
       })
     )
   }
@@ -154,11 +151,17 @@ export class NehubaLayoutOverlay implements OnDestroy, AfterViewInit{
       fromEvent<CustomEvent>(
         nehubaUnit.elementRef.nativeElement,
         'sliceRenderEvent'
-      ).subscribe(ev => {
-        const { missingImageChunks, missingChunks } = ev.detail
+      ).pipe(
+        map(ev => {
+          const { missingImageChunks, missingChunks } = ev.detail
+          return { missingImageChunks, missingChunks }
+        }),
+        distinctUntilChanged((o, n) => o.missingChunks === n.missingChunks && o.missingImageChunks === n.missingImageChunks)
+      ).subscribe(({ missingImageChunks, missingChunks }) => {
         this.volumeChunkLoading$.next(
-          missingImageChunks.length === 0 && missingChunks.length === 0
+          missingImageChunks > 0 || missingChunks > 0
         )
+        this.detectChanges()
       }),
 
       /**

@@ -4,128 +4,139 @@
 
 <ng-template [ngIf]="region">
 
-<mat-card class="mat-elevation-z4">
-  <div 
-    [style.backgroundColor]="regionRgbString"
-    class="vanishing-border"
-    [ngClass]="{
-      'darktheme': regionDarkmode === true,
-      'lighttheme': regionDarkmode === false
-    }">
+  <mat-card class="mat-elevation-z4">
+    <div
+      [style.backgroundColor]="regionRgbString"
+      class="vanishing-border"
+      [ngClass]="{
+        'darktheme': regionDarkmode === true,
+        'lighttheme': regionDarkmode === false
+      }">
 
-    <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
 
-    <mat-card-title class="sxplr-custom-cmp text">
-      {{ region.name }}
-    </mat-card-title>
-
-
-    <!-- subtitle on what it is -->
-    <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-      <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
-      <span>
-        Brain region
-      </span>
-
-      <!-- origin datas format -->
-      
-      <mat-divider vertical="true" class="sxplr-pl-2 h-2rem"></mat-divider>
-
-      <!-- position -->
-      <button mat-icon-button *ngIf="regionPosition"
-        (click)="navigateTo(regionPosition)"
-        [matTooltip]="ARIA_LABELS.GO_TO_REGION_CENTROID + ': ' + (regionPosition | numbers | addUnitAndJoin : 'mm')">
-        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
-        </mat-icon>
-      </button>
-
-      <!-- explore doi -->
-      <a *ngFor="let doi of dois"
-        [href]="doi | parseDoi"
-        [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-        target="_blank"
-        mat-icon-button>
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-
-    </mat-card-subtitle>
-
-  </div>
-</mat-card>
+      <mat-card-title class="sxplr-custom-cmp text">
+        {{ region.name }}
+      </mat-card-title>
 
 
-<!-- kg regional features list -->
-<ng-template #kgRegionalFeatureList>
-  <div sxplr-sapiviews-core-region-regional-feature
-    [sxplr-sapiviews-core-region-atlas]="atlas"
-    [sxplr-sapiviews-core-region-template]="template"
-    [sxplr-sapiviews-core-region-parcellation]="parcellation"
-    [sxplr-sapiviews-core-region-region]="region"
-    #rfDir="sapiViewsRegionalFeature"
-    class="feature-list-container"
-    >
+      <!-- subtitle on what it is -->
+      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
+        <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+        <span>
+          Brain region
+        </span>
 
-    <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
+        <!-- origin datas format -->
 
-    <sxplr-sapiviews-features-entry-list-item
-      *ngFor="let feat of rfDir.listOfFeatures$ | async"
-      [sxplr-sapiviews-features-entry-list-item-feature]="feat"
-      (click)="handleRegionalFeatureClicked(feat)">
-    </sxplr-sapiviews-features-entry-list-item>
-  </div>
-  
-</ng-template>
+        <mat-divider vertical="true" class="sxplr-pl-2 h-2rem"></mat-divider>
+
+        <!-- position -->
+        <button mat-icon-button *ngIf="regionPosition"
+          (click)="navigateTo(regionPosition)"
+          [matTooltip]="ARIA_LABELS.GO_TO_REGION_CENTROID + ': ' + (regionPosition | numbers | addUnitAndJoin : 'mm')">
+          <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
+          </mat-icon>
+        </button>
+
+        <!-- explore doi -->
+        <a *ngFor="let doi of dois"
+          [href]="doi | parseDoi"
+          sxplr-hide-when-local
+          [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
+          target="_blank"
+          mat-icon-button>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+
+      </mat-card-subtitle>
+
+    </div>
+  </mat-card>
 
 
+  <!-- kg regional features list -->
+  <ng-template #kgRegionalFeatureList>
+    <div sxplr-sapiviews-core-region-regional-feature
+      [sxplr-sapiviews-core-region-atlas]="atlas"
+      [sxplr-sapiviews-core-region-template]="template"
+      [sxplr-sapiviews-core-region-parcellation]="parcellation"
+      [sxplr-sapiviews-core-region-region]="region"
+      #rfDir="sapiViewsRegionalFeature"
+      class="feature-list-container"
+      >
 
+      <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
 
-<mat-accordion class="d-block mt-2">
-
-  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-    title: CONST.REGIONAL_FEATURES,
-    iconClass: 'fas fa-database',
-    content: kgRegionalFeatureList,
-    desc: '',
-    iconTooltip: 'Regional Features',
-    iavNgIf: true
-  }">
-  </ng-container>
-
-</mat-accordion>
-
-<mat-accordion class="d-block mt-2">
-
-  <!-- connectivity -->
-  <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
-    <sxplr-sapiviews-features-connectivity-browser class="pe-all flex-shrink-1"
-                                                   [region]="region"
-                                                   [types]="hasConnectivityDirective.availableModalities"
-                                                   [defaultProfile]="hasConnectivityDirective.defaultProfile"
-                                                   [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
-                                                   [sxplr-sapiviews-features-connectivity-browser-parcellation]="parcellation"
-                                                   [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
-    >
-    </sxplr-sapiviews-features-connectivity-browser>
+      <sxplr-sapiviews-features-entry-list-item
+        *ngFor="let feat of rfDir.listOfFeatures$ | async | orderFilterFeatures"
+        [sxplr-sapiviews-features-entry-list-item-feature]="feat"
+        (click)="handleRegionalFeatureClicked(feat)">
+      </sxplr-sapiviews-features-entry-list-item>
+    </div>
+    
   </ng-template>
 
-  <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-    title: CONST.CONNECTIVITY,
-    iconClass: 'fab fa-connectdevelop',
-    content: sxplrSapiviewsFeaturesConnectivityBrowser,
-    desc: hasConnectivityDirective.connectivityNumber,
-    iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
-    iavNgIf: hasConnectivityDirective.hasConnectivity
-  }">
-  </ng-container>
+  <ng-template #regionDesc>
+    <markdown-dom class="sxplr-muted" [markdown]="region?.versionInnovation || 'No description provided.'">
+    </markdown-dom>
+  </ng-template>
 
-  <div sxplr-sapiviews-features-connectivity-check
-       [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
-       [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
-       [region]="region"
-       #hasConnectivityDirective="hasConnectivityDirective">
-  </div>
+  <mat-accordion class="d-block mt-2">
 
-</mat-accordion>
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: CONST.DESCRIPTION,
+      iconClass: 'fas fa-info',
+      content: regionDesc,
+      desc: '',
+      iconTooltip: 'Description',
+      iavNgIf: !!region?.versionInnovation
+    }">
+
+    </ng-container>
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: CONST.REGIONAL_FEATURES,
+      iconClass: 'fas fa-database',
+      content: kgRegionalFeatureList,
+      desc: '',
+      iconTooltip: 'Regional Features',
+      iavNgIf: true
+    }">
+    </ng-container>
+
+    <!-- connectivity -->
+    <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
+      <sxplr-sapiviews-features-connectivity-browser
+        class="pe-all flex-shrink-1"
+        [region]="region"
+        [types]="hasConnectivityDirective.availableModalities"
+        [defaultProfile]="hasConnectivityDirective.defaultProfile"
+        [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
+        [sxplr-sapiviews-features-connectivity-browser-parcellation]="parcellation"
+        [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
+      >
+      </sxplr-sapiviews-features-connectivity-browser>
+    </ng-template>
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: CONST.CONNECTIVITY,
+      iconClass: 'fab fa-connectdevelop',
+      content: sxplrSapiviewsFeaturesConnectivityBrowser,
+      desc: hasConnectivityDirective.connectivityNumber,
+      iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
+      iavNgIf: hasConnectivityDirective.hasConnectivity
+    }">
+    </ng-container>
+
+    <div sxplr-sapiviews-features-connectivity-check
+        [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
+        [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
+        [region]="region"
+        #hasConnectivityDirective="hasConnectivityDirective">
+    </div>
+
+  </mat-accordion>
 
 </ng-template>
 

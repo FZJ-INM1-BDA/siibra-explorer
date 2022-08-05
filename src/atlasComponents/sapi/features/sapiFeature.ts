@@ -1,3 +1,4 @@
+import { switchMap } from "rxjs/operators";
 import { SAPI } from "../sapi.service";
 import { SapiFeatureModel } from "../type";
 
@@ -6,8 +7,10 @@ export class SAPIFeature {
 
   }
 
-  public detail$ = this.sapi.httpGet<SapiFeatureModel>(
-    `${SAPI.bsEndpoint}/features/${this.id}`,
-    this.opts
+  public detail$ = SAPI.BsEndpoint$.pipe(
+    switchMap(endpt => this.sapi.httpGet<SapiFeatureModel>(
+      `${endpt}/features/${this.id}`,
+      this.opts
+    ))
   )
 }

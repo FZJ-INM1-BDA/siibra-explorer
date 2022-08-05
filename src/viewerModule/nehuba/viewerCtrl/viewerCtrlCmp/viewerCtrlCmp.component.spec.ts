@@ -22,7 +22,6 @@ describe('> viewerCtrlCmp.component.ts', () => {
     let mockStore: MockStore
 
     let mockNehubaViewer = {
-      updateUserLandmarks: jasmine.createSpy(),
       nehubaViewer: {
         ngviewer: {
           layerManager: {
@@ -42,7 +41,6 @@ describe('> viewerCtrlCmp.component.ts', () => {
     }
 
     afterEach(() => {
-      mockNehubaViewer.updateUserLandmarks.calls.reset()
       mockNehubaViewer.nehubaViewer.ngviewer.layerManager.getLayerByName.calls.reset()
       mockNehubaViewer.nehubaViewer.ngviewer.display.scheduleRedraw.calls.reset()
     })

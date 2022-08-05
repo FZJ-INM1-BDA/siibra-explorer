@@ -265,3 +265,27 @@ $flex-directions: row,column;
 .#{$nsp}-flex-static {
   flex: 0 0 auto;
 }
+
+.#{$nsp}-blink
+{
+  animation: blink 500ms ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+a[mat-raised-button]
+{
+  text-decoration: none;
+}
+
+.#{$nsp}-pe-none
+{
+  pointer-events: none!important;
+}

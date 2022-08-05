@@ -3,7 +3,7 @@ import { Injectable, Injector, NgZone } from "@angular/core";
 import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
 import { WidgetService } from "src/widget/service";
 import { WidgetPortal } from "src/widget/widgetPortal/widgetPortal.component";
-import { setPluginSrc } from "./const";
+import { setPluginSrc, SET_PLUGIN_NAME } from "./const";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
 import { environment } from "src/environments/environment"
 
@@ -33,6 +33,9 @@ export class PluginService {
       providers: [{
         provide: WIDGET_PORTAL_TOKEN,
         useValue: setPluginSrc(htmlSrc, {})
+      }, {
+        provide: SET_PLUGIN_NAME,
+        useValue: (inst: PluginPortal, pluginName: string) => this.setPluginName(inst, pluginName)
       }],
       parent: this.injector
     })

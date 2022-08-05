@@ -146,7 +146,8 @@ export class AnnotationLayer {
     }
   }
   updateAnnotation(spec: AnnotationSpec) {
-    const localAnnotations = this.nglayer.layer.localAnnotations
+    const localAnnotations = this.nglayer?.layer?.localAnnotations
+    if (!localAnnotations) return
     const ref = localAnnotations.references.get(spec.id)
     const _spec = this.parseNgSpecType(spec)
     if (ref) {

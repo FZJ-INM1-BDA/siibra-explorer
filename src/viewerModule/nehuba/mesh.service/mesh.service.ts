@@ -47,7 +47,40 @@ export class NehubaMeshService implements OnDestroy {
     ]).pipe(
       switchMap(([{ atlas, template, parcellation }, regions, selectedRegions]) => {
         const ngIdRecord: Record<string, number[]> = {}
+        
+        const tree = new Tree(
+          regions,
+          (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
+        )
+
+        for (const r of regions) {
+          const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
+          if (!regionLabelIndex) {
+            continue
+          }
+          if (
+            tree.someAncestor(r, anc => !!getRegionLabelIndex(atlas, template, parcellation, anc))
+          ) {
+            continue
+          }
+          const ngId = getParcNgId(atlas, template, parcellation, r)
+          if (!ngIdRecord[ngId]) {
+            ngIdRecord[ngId] = []
+          }
+          ngIdRecord[ngId].push(regionLabelIndex)
+        }
+
         if (selectedRegions.length > 0) {
+          /**
+           * If regions are selected, reset the meshes
+           */
+          for (const key in ngIdRecord) {
+            ngIdRecord[key] = []
+          }
+
+          /**
+           * only show selected region
+           */
           for (const r of selectedRegions) {
             const ngId = getParcNgId(atlas, template, parcellation, r)
             const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
@@ -56,28 +89,6 @@ export class NehubaMeshService implements OnDestroy {
             }
             ngIdRecord[ngId].push(regionLabelIndex)
           }
-        } else {
-          const tree = new Tree(
-            regions,
-            (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
-          )
-  
-          for (const r of regions) {
-            const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
-            if (!regionLabelIndex) {
-              continue
-            }
-            if (
-              tree.someAncestor(r, (anc) => !!getRegionLabelIndex(atlas, template, parcellation, anc))
-            ) {
-              continue
-            }
-            const ngId = getParcNgId(atlas, template, parcellation, r)
-            if (!ngIdRecord[ngId]) {
-              ngIdRecord[ngId] = []
-            }
-            ngIdRecord[ngId].push(regionLabelIndex)
-          }  
         }
         const arr: IMeshesToLoad[] = []
 

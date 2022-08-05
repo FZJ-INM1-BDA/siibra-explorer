@@ -4,12 +4,12 @@
 
   <div class="floating-ui">
 
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 3"
-      class="fixed-bottom pe-none mb-2 d-flex justify-content-center">
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
+      class="fixed-bottom sxplr-pe-none mb-2 d-flex justify-content-center">
       <logo-container></logo-container>
     </div>
 
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 3" floatingMouseContextualContainerDirective>
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 2" floatingMouseContextualContainerDirective>
 
       <div class="h-0"
         iav-mouse-hover
@@ -29,7 +29,7 @@
 
         </mat-list-item>
 
-        <ng-template [ngIf]="voiFeatures.onhover | async" let-feat>
+        <ng-template [ngIf]="voiQueryDirective && (voiQueryDirective.onhover | async)" let-feat>
           <mat-list-item>
             <mat-icon
               fontSet="fas"
@@ -99,7 +99,7 @@
   </mat-drawer>
 
   <!-- master content -->
-  <mat-drawer-content class="visible pe-none position-relative">
+  <mat-drawer-content class="visible sxplr-pe-none position-relative">
     <iav-layout-fourcorners>
 
       <!-- top left -->
@@ -148,7 +148,7 @@
 
 
       <!-- bottom left -->
-      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw pe-none align-items-center mb-4">
+      <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw sxplr-pe-none align-items-center mb-4">
 
         <!-- special bottom left -->
         <ng-template [ngIf]="viewerMode$ | async" let-mode [ngIfElse]="localBottomLeftTmpl"></ng-template>
@@ -223,9 +223,11 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
-        <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
-      </div>
+      <ng-template [ngIf]="VOI_QUERY_FLAG">
+        <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
+          <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
+        </div>
+      </ng-template>
     </div>
 
     <!-- such a gross implementation -->
@@ -264,7 +266,7 @@
       isOpen: minTrayVisSwitch.switchState$ | async,
       regionSelected: selectedRegions$ | async,
       click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
-      badge: (voiFeatures.features$ | async).length || null
+      badge: voiQueryDirective && (voiQueryDirective.features$ | async).length || null
     }">
     </ng-container>
   </div>
@@ -434,7 +436,7 @@
       <div prefix>
       </div>
 
-      <div suffix class="sxplr-scale-70">
+      <div suffix class="region-chip-suffix">
         <button mat-mini-fab
           color="primary"
           iav-stop="mousedown click"
@@ -543,7 +545,7 @@
       <i class="fas fa-sitemap"></i>
     </button>
 
-    <div class="w-100 h-100 position-absolute pe-none" *ngIf="showTour">
+    <div class="w-100 h-100 position-absolute sxplr-pe-none" *ngIf="showTour">
     </div>
 
   </div>
@@ -683,7 +685,7 @@
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
 
 
-        <ng-template [ngIf]="regionDirective.fetchInProgress">
+        <ng-template [ngIf]="regionDirective.fetchInProgress$ | async">
           <spinner-cmp class="sxplr-mt-10 fs-200"></spinner-cmp>
         </ng-template>
         <sxplr-sapiviews-core-region-region-rich
@@ -983,18 +985,18 @@
 </ng-template>
 
 <ng-template #spatialFeatureListViewTmpl>
-  <div *ngIf="voiFeatures.busy$ | async; else notBusyTmpl" class="fs-200">
+  <div *ngIf="voiQueryDirective && (voiQueryDirective.busy$ | async); else notBusyTmpl" class="fs-200">
     <spinner-cmp></spinner-cmp>
   </div>
 
   <ng-template #notBusyTmpl>
-    <mat-card *ngIf="(voiFeatures.features$ | async).length > 0" class="pe-all mat-elevation-z4">
+    <mat-card *ngIf="voiQueryDirective && (voiQueryDirective.features$ | async).length > 0" class="pe-all mat-elevation-z4">
       <mat-card-title>
         Volumes of interest
       </mat-card-title>
       <mat-card-subtitle class="overflow-hidden">
         <!-- TODO in future, perhaps encapsulate this as a component? seems like a nature fit in sapiView/space/boundingbox -->
-        <ng-template let-bbox [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" [ngIfElse]="bboxFallbackTmpl">
+        <ng-template let-bbox [ngIf]="boundingBoxDirective && (boundingBoxDirective.bbox$ | async | getProperty : 'bbox')" [ngIfElse]="bboxFallbackTmpl">
           Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
         </ng-template>
         <ng-template #bboxFallbackTmpl>
@@ -1005,17 +1007,21 @@
 
       <mat-divider></mat-divider>
 
-      <div *ngFor="let feature of voiFeatures.features$ | async"
-        mat-ripple
-        (click)="showDataset(feature)"
-        class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
-        {{ feature.metadata.fullName }}
-      </div>
+      <ng-template [ngIf]="voiQueryDirective">
+
+        <div *ngFor="let feature of voiQueryDirective.features$ | async"
+          mat-ripple
+          (click)="showDataset(feature)"
+          class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
+          {{ feature.metadata.fullName }}
+        </div>
+      </ng-template>
     </mat-card>
   </ng-template>
 </ng-template>
 
 <div class="d-none"
+  *ngIf="VOI_QUERY_FLAG"
   sxplr-sapiviews-core-space-boundingbox
   [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
   [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"

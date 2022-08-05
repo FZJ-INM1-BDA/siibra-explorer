@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row mt-4 mb-4">
 
-    <a [href]="userDoc" target="_blank">
+    <a sxplr-hide-when-local [href]="userDoc" target="_blank">
       <button mat-raised-button color="primary">
         <i class="fas fa-book-open"></i>
         <span>
@@ -10,7 +10,7 @@
       </button>
     </a>
 
-    <a [href]="repoUrl" target="_blank">
+    <a sxplr-hide-when-local [href]="repoUrl" target="_blank">
       <button mat-flat-button>
         <i class="fab fa-github"></i>
         <span>

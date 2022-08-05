@@ -118,3 +118,14 @@ mat-list[dense].contextual-block
 {
   background-color : rgba(30,30,30,0.8);
 }
+
+.region-populated
+{
+  overflow: hidden auto;
+}
+
+.region-chip-suffix
+{
+  transform: scale(0.7);
+  margin-right: -0.25rem;
+}

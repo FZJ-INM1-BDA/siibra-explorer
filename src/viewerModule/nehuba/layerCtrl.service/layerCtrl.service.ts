@@ -13,6 +13,9 @@ import { arrayEqual } from "src/util/array";
 import { ColorMapCustomLayer } from "src/state/atlasAppearance";
 import { SapiRegionModel } from "src/atlasComponents/sapi";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { PMAP_LAYER_NAME } from "../constants"
+import { EnumColorMapName, mapKeyColorMap } from "src/util/colorMaps";
+import { getShader } from "src/util/constants";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -24,8 +27,6 @@ export const BACKUP_COLOR = {
   providedIn: 'root'
 })
 export class NehubaLayerControlService implements OnDestroy{
-
-  static PMAP_LAYER_NAME = 'regional-pmap'
 
   private selectedRegion$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions),
@@ -276,15 +277,20 @@ export class NehubaLayerControlService implements OnDestroy{
 
   private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
 
-  private updateCustomLayerTransparency$ = this.store$.pipe(
-    select(atlasAppearance.selectors.customLayers),
-    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
-    pairwise(),
-    map(([ oldCustomLayers, newCustomLayers ]) => {
-      return newCustomLayers.filter(({ id, opacity }) => oldCustomLayers.some(({ id: oldId, opacity: oldOpacity }) => oldId === id && oldOpacity !== opacity))
-    }),
-    filter(arr => arr.length > 0)
-  )
+  private getUpdatedCustomLayer(isSameLayer: (o: atlasAppearance.NgLayerCustomLayer, n: atlasAppearance.NgLayerCustomLayer) => boolean){
+    return this.store$.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+      pairwise(),
+      map(([ oldCustomLayers, newCustomLayers ]) => {
+        return newCustomLayers.filter(n => oldCustomLayers.some(o => o.id === n.id && !isSameLayer(o, n)))
+      }),
+      filter(arr => arr.length > 0),
+    )
+  }
+
+  private updateCustomLayerTransparency$ = this.getUpdatedCustomLayer((o, n) => o.opacity === n.opacity)
+  private updateCustomLayerColorMap$ = this.getUpdatedCustomLayer((o, n) => o.shader === n.shader)
 
   private ngLayers$ = this.customLayers$.pipe(
     map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
@@ -347,6 +353,19 @@ export class NehubaLayerControlService implements OnDestroy{
         } as TNgLayerCtrl<'setLayerTransparency'>
       })
     ),
+    this.updateCustomLayerColorMap$.pipe(
+      map(layers => {
+        const payload: Record<string, string> = {}
+        for (const layer of layers) {
+          const shader = layer.shader ?? getShader()
+          payload[layer.id] = shader
+        }
+        return {
+          type: 'updateShader',
+          payload
+        } as TNgLayerCtrl<'updateShader'>
+      })
+    ),
     this.manualNgLayersControl$,
   ).pipe(
   )
@@ -367,7 +386,7 @@ export class NehubaLayerControlService implements OnDestroy{
          */
         return customLayers
           .map(l => l.id)
-          .filter(name => name !== NehubaLayerControlService.PMAP_LAYER_NAME)
+          .filter(name => name !== PMAP_LAYER_NAME)
       })
     ),
     this.customLayers$.pipe(
@@ -378,7 +397,7 @@ export class NehubaLayerControlService implements OnDestroy{
       }),
       distinctUntilChanged(),
       map(flag => flag
-        ? [ NehubaLayerControlService.PMAP_LAYER_NAME ]
+        ? [ PMAP_LAYER_NAME ]
         : []
       )
     )

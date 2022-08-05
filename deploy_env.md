@@ -8,7 +8,7 @@
 | `HOST_PATHNAME` | pathname to listen on, restrictions: leading slash, no trailing slash | `''` | `/viewer` |
 | `SESSIONSECRET` | session secret for cookie session |
 | `NODE_ENV` | determines where the built viewer will be served from | | `production` |
-| `PRECOMPUTED_SERVER` | redirect data uri to another server. Useful for offline demos | | `http://localhost:8080/precomputed/` |
+| ~~`PRECOMPUTED_SERVER`~~ _deprecated_, use `LOCAL_CDN` instead. | redirect data uri to another server. Useful for offline demos | | `http://localhost:8080/precomputed/` |
 | `LOCAL_CDN` | rewrite cdns to local server. useful for offlnie demo | | `http://localhost:7080/` |
 | `PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`

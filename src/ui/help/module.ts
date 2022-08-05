@@ -7,6 +7,7 @@ import { AboutCmp } from './about/about.component'
 import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { HowToCite } from "./howToCite/howToCite.component";
+import { StrictLocalModule } from "src/strictLocal";
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { HowToCite } from "./howToCite/howToCite.component";
     AngularMaterialModule,
     ComponentsModule,
     UtilModule,
-    QuickTourModule
+    QuickTourModule,
+    StrictLocalModule,
   ],
   declarations: [
     AboutCmp,

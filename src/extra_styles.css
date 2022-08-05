@@ -390,11 +390,6 @@ markdown-dom p
   height: 0px;
 }
 
-.pe-none
-{
-  pointer-events: none!important;
-}
-
 .h-2rem
 {
   height: 2rem!important;
@@ -875,4 +870,9 @@ sxplr-sapiviews-features-receptor-autoradiograph canvas
 how-to-cite img
 {
   width: 100%;
+}
+
+.mat-menu-panel.parc-smart-chip-menu-panel
+{
+  max-width: 100vw;
 }

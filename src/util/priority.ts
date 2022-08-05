@@ -24,6 +24,8 @@ type Queue = {
   next: HttpHandler
 }
 
+export const DISABLE_PRIORITY_HEADER = 'x-sxplr-disable-priority'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -137,8 +139,11 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
      * Since the way in which serialization occurs is via path and query param...
      * body is not used.
      */
-    if (this.disablePriority || req.method !== 'GET') {
-      return next.handle(req)
+    if (this.disablePriority || req.method !== 'GET' || !!req.headers.get(DISABLE_PRIORITY_HEADER)) {
+      const newReq = req.clone({
+        headers: req.headers.delete(DISABLE_PRIORITY_HEADER)
+      })
+      return next.handle(newReq)
     }
 
     const { urlWithParams } = req

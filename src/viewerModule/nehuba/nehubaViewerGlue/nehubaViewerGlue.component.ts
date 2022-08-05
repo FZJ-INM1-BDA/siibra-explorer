@@ -284,8 +284,33 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     /**
      * TODO check extension?
      */
-     
     this.dismissAllAddedLayers()
+
+    if (/\.swc$/i.test(file.name)) {
+      const url = URL.createObjectURL(file)
+      this.droppedLayerNames.push({
+        layerName: randomUuid,
+        resourceUrl: url
+      })
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            id: randomUuid,
+            source: `swc://${url}`,
+            segments: ["1"],
+            transform: [
+              [1e3, 0, 0, 0],
+              [0, 1e3, 0, 0],
+              [0, 0, 1e3, 0],
+              [0, 0, 0, 1],
+            ],
+            clType: 'customlayer/nglayer' as const
+          }
+        })
+      )
+      return
+    }
+     
     
     // Get file, try to inflate, if files, use original array buffer
     const buf = await file.arrayBuffer()

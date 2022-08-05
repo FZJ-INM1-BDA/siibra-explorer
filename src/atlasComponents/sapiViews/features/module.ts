@@ -11,6 +11,7 @@ import * as ieeg from "./ieeg"
 import * as receptor from "./receptors"
 import {SapiViewsFeatureConnectivityModule} from "src/atlasComponents/sapiViews/features/connectivity";
 import * as voi from "./voi"
+import { OrderFilterFeaturesPipe } from "./orderFilterFeatureList.pipe"
 
 const {
   SxplrSapiViewsFeaturesIeegModule
@@ -35,6 +36,7 @@ const { SapiViewsFeaturesVoiModule } = voi
     FeatureBadgeColourPipe,
     FeatureBadgeFlagPipe,
     SapiViewsFeaturesEntryListItem,
+    OrderFilterFeaturesPipe,
   ],
   providers: [
     {
@@ -48,6 +50,7 @@ const { SapiViewsFeaturesVoiModule } = voi
     SapiViewsFeaturesEntryListItem,
     SapiViewsFeaturesVoiModule,
     SapiViewsFeatureConnectivityModule,
+    OrderFilterFeaturesPipe,
   ]
 })
 export class SapiViewsFeaturesModule{}

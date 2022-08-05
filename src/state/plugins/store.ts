@@ -1,9 +1,8 @@
 import { createReducer, on } from "@ngrx/store";
 import * as actions from "./actions"
-import { INIT_MANIFEST_SRC } from "./const"
 
 export type PluginStore = {
-  initManifests: Record<string, string>
+  initManifests: Record<string, string[]>
 }
 
 export const defaultState: PluginStore = {
@@ -15,8 +14,8 @@ export const reducer = createReducer(
   on(
     actions.clearInitManifests,
     (state, { nameSpace }) => {
-      if (!state[nameSpace]) return state
-      const newMan: Record<string, string> = {}
+      if (!state.initManifests[nameSpace]) return state
+      const newMan: Record<string, string[]> = {}
       const { initManifests } = state
       for (const key in initManifests) {
         if (key === nameSpace) continue
@@ -28,20 +27,4 @@ export const reducer = createReducer(
       }
     }
   ),
-  on(
-    actions.setInitMan,
-    (state, { nameSpace, url, internal }) => {
-      if (!internal) {
-        if (nameSpace === INIT_MANIFEST_SRC) return state
-      }
-      const { initManifests } = state
-      return {
-        ...state,
-        initManifests: {
-          ...initManifests,
-          [nameSpace]: url
-        }
-      }
-    }
-  )
 )
