@@ -409,6 +409,11 @@ export function getNehubaConfig(space: SapiSpaceModel): NehubaConfig {
         "layers": {},
         "navigation": {
           "zoomFactor": 350000 * scale,
+          pose: {
+            position: {
+              voxelSize: [1, 1, 1]
+            }
+          }
         },
         "perspectiveOrientation": [
           0.3140767216682434,
