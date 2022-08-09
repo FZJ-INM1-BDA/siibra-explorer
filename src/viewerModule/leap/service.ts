@@ -179,7 +179,7 @@ export class LeapService{
         const vel = velocity
         vel[1] = -vel[1]
         vel[2] = -vel[2]
-        let cur = nehuba.nehubaViewer.ngviewer.perspectiveNavigationState.pose.orientation.orientation
+        const cur = nehuba.nehubaViewer.ngviewer.perspectiveNavigationState.pose.orientation.orientation
         this.vec3.transformQuat(vel, vel, cur)
         const { position } = nehuba.nehubaViewer.ngviewer.navigationState.pose
         this.vec3.scaleAndAdd(
