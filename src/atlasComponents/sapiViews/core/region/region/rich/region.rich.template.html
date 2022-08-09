@@ -84,6 +84,7 @@
 
   <mat-accordion class="d-block mt-2">
 
+    <!-- desc -->
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: CONST.DESCRIPTION,
       iconClass: 'fas fa-info',
@@ -95,46 +96,51 @@
 
     </ng-container>
 
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: CONST.REGIONAL_FEATURES,
-      iconClass: 'fas fa-database',
-      content: kgRegionalFeatureList,
-      desc: '',
-      iconTooltip: 'Regional Features',
-      iavNgIf: true
-    }">
-    </ng-container>
+    <!-- only show dynamic data when strict-local is set to false -->
+    <ng-template [ngIf]="!environment.STRICT_LOCAL">
 
-    <!-- connectivity -->
-    <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
-      <sxplr-sapiviews-features-connectivity-browser
-        class="pe-all flex-shrink-1"
-        [region]="region"
-        [types]="hasConnectivityDirective.availableModalities"
-        [defaultProfile]="hasConnectivityDirective.defaultProfile"
-        [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
-        [sxplr-sapiviews-features-connectivity-browser-parcellation]="parcellation"
-        [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
-      >
-      </sxplr-sapiviews-features-connectivity-browser>
+      <!-- feature list -->
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: CONST.REGIONAL_FEATURES,
+        iconClass: 'fas fa-database',
+        content: kgRegionalFeatureList,
+        desc: '',
+        iconTooltip: 'Regional Features',
+        iavNgIf: true
+      }">
+      </ng-container>
+
+      <!-- connectivity -->
+      <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
+        <sxplr-sapiviews-features-connectivity-browser
+          class="pe-all flex-shrink-1"
+          [region]="region"
+          [types]="hasConnectivityDirective.availableModalities"
+          [defaultProfile]="hasConnectivityDirective.defaultProfile"
+          [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
+          [sxplr-sapiviews-features-connectivity-browser-parcellation]="parcellation"
+          [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
+        >
+        </sxplr-sapiviews-features-connectivity-browser>
+      </ng-template>
+
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: CONST.CONNECTIVITY,
+        iconClass: 'fab fa-connectdevelop',
+        content: sxplrSapiviewsFeaturesConnectivityBrowser,
+        desc: hasConnectivityDirective.connectivityNumber,
+        iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
+        iavNgIf: hasConnectivityDirective.hasConnectivity
+      }">
+      </ng-container>
+
+      <div sxplr-sapiviews-features-connectivity-check
+          [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
+          [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
+          [region]="region"
+          #hasConnectivityDirective="hasConnectivityDirective">
+      </div>
     </ng-template>
-
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: CONST.CONNECTIVITY,
-      iconClass: 'fab fa-connectdevelop',
-      content: sxplrSapiviewsFeaturesConnectivityBrowser,
-      desc: hasConnectivityDirective.connectivityNumber,
-      iconTooltip: hasConnectivityDirective.connectivityNumber + 'Connections',
-      iavNgIf: hasConnectivityDirective.hasConnectivity
-    }">
-    </ng-container>
-
-    <div sxplr-sapiviews-features-connectivity-check
-        [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
-        [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
-        [region]="region"
-        #hasConnectivityDirective="hasConnectivityDirective">
-    </div>
 
   </mat-accordion>
 

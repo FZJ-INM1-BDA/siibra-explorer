@@ -13,4 +13,5 @@ As interactive atlas viewer uses [webpack define plugin](https://webpack.js.org/
 | `MATOMO_ID` | application id for matomo analytics | `null` | 6 |
 | `STRICT_LOCAL` | hides **Explore** and **Download** buttons. Useful for offline demo's | `false` | `true` |
 | `KIOSK_MODE` | after 5 minutes of inactivity, shows overlay inviting users to interact | `false` | `true` |
-| `BUILD_TEXT` | overlay text at bottom right of the viewer. set to `''` to hide. | |
+| `EXPERIMENTAL_FEATURE_FLAG` | enabling experimental features | `false` | `true` |
+| `ENABLE_LEAP_MOTION` | enable leap motion controller | `false` | `true` |

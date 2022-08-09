@@ -26,6 +26,9 @@ import { MouseoverModule } from "src/mouseoverModule";
 import { LogoContainer } from "src/ui/logoContainer/logoContainer.component";
 import { FloatingMouseContextualContainerDirective } from "src/util/directives/floatingMouseContextualContainer.directive";
 import { ShareModule } from "src/share";
+import { LeapModule } from "./leap/module";
+
+import { environment } from "src/environments/environment"
 
 @NgModule({
   imports: [
@@ -47,6 +50,7 @@ import { ShareModule } from "src/share";
     DialogModule,
     MouseoverModule,
     ShareModule,
+    ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [
     ViewerCmp,

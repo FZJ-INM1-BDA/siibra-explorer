@@ -15,7 +15,8 @@ const main = async () => {
     SIIBRA_API_ENDPOINTS,
     VERSION,
     GIT_HASH = 'unknown hash',
-    EXPERIMENTAL_FEATURE_FLAG
+    EXPERIMENTAL_FEATURE_FLAG,
+    ENABLE_LEAP_MOTION,
   } = process.env
   
   console.log(`[parseEnv.js] parse envvar:`, {
@@ -27,6 +28,7 @@ const main = async () => {
     VERSION,
     GIT_HASH,
     EXPERIMENTAL_FEATURE_FLAG,
+    ENABLE_LEAP_MOTION,
   })
   const version = JSON.stringify(
     VERSION || 'unknown version'
@@ -43,10 +45,11 @@ export const environment = {
   VERSION: ${version},
   SIIBRA_API_ENDPOINTS: ${JSON.stringify(SIIBRA_API_ENDPOINTS)},
   BACKEND_URL: ${JSON.stringify(BACKEND_URL)},
-  STRICT_LOCAL: ${JSON.stringify(STRICT_LOCAL)},
+  STRICT_LOCAL: ${STRICT_LOCAL},
   MATOMO_URL: ${JSON.stringify(MATOMO_URL)},
   MATOMO_ID: ${JSON.stringify(MATOMO_ID)},
-  EXPERIMENTAL_FEATURE_FLAG: ${EXPERIMENTAL_FEATURE_FLAG}
+  EXPERIMENTAL_FEATURE_FLAG: ${EXPERIMENTAL_FEATURE_FLAG},
+  ENABLE_LEAP_MOTION: ${ENABLE_LEAP_MOTION}
 }
 `
   await asyncWrite(pathToEnvFile, outputTxt, 'utf-8')
