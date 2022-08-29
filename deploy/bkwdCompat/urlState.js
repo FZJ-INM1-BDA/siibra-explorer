@@ -1,6 +1,12 @@
 // this module is suppose to rewrite state stored in query param
 // and convert it to path based url
-const separator = '.'
+const { sxplrNumB64Enc } = require("../../common/util")
+
+const {
+  encodeNumber,
+  separator
+} = sxplrNumB64Enc
+
 const waxolmObj = {
   aId: 'minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a',
   id: 'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8',
@@ -131,7 +137,7 @@ module.exports = (query, _warningCb) => {
     regionsSelected, // deprecating - check if any one calls this url
     cRegionsSelected,
 
-    navigation, // deprecating - check if any one calls this endpoint
+    navigation,
     cNavigation,
   } = query || {}
 
@@ -146,7 +152,6 @@ module.exports = (query, _warningCb) => {
     if (Object.values(WARNING_STRINGS).includes(arg)) _warningCb(arg)
   }
 
-  if (navigation) console.warn(`navigation has been deprecated`)
   if (regionsSelected) console.warn(`regionSelected has been deprecated`)
   if (niftiLayers) console.warn(`nifitlayers has been deprecated`)
 
@@ -160,6 +165,30 @@ module.exports = (query, _warningCb) => {
 
   // common search param & path
   let nav, dsp, r
+  if (navigation) {
+    try {
+
+      const [
+        _o, _po, _pz, _p, _z
+      ] = navigation.split("__")
+      const o = _o.split("_").map(v => Number(v))
+      const po = _po.split("_").map(v => Number(v))
+      const pz = Number(_pz)
+      const p = _p.split("_").map(v => Number(v))
+      const z = Number(_z)
+      const v = [
+        o.map(n => encodeNumber(n, {float: true})).join(separator),
+        po.map(n => encodeNumber(n, {float: true})).join(separator),
+        encodeNumber(Math.floor(pz)),
+        Array.from(p).map(v => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+        encodeNumber(Math.floor(z)),
+      ].join(`${separator}${separator}`)
+
+      nav = `/@:${encodeURI(v)}`
+    } catch (e) {
+      console.warn(`Parsing navigation param error`, e)
+    }
+  }
   if (cNavigation) nav = `/@:${encodeURI(cNavigation)}`
   if (previewingDatasetFiles) {
     try {
