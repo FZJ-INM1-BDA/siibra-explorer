@@ -5,6 +5,7 @@ import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: 'sxplr-sapiviews-core-region-region-rich',
@@ -17,7 +18,8 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 
 export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase {
   
-  shouldFetchDetail = true
+  public environment = environment
+  public shouldFetchDetail = true
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
 

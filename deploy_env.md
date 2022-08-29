@@ -14,6 +14,8 @@
 | `STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `USE_LOGO` | possible values are `hbp`, `ebrains`, `fzj` | `hbp` | `ebrains` |
 | `__DEBUG__` | debug flag | 
+| `BUILD_TEXT` | overlay text at bottom right of the viewer. set to `''` to hide. | |
+
 
 ##### ebrains user authentication
 
