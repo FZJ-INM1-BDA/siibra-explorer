@@ -117,10 +117,16 @@ const asyncLoader = async () => {
     const atlasDetail = await getAtlas(atlasId[species])
     regionsDict[species] = {}
     
-    for (const parc of atlasDetail.parcellations) {
-      const parcDetail = await getParc(atlasDetail['@id'], parc['@id'])
-      regionsDict[species][parcDetail.name] = await getParcRegions(atlasDetail['@id'], parc['@id'], atlasDetail.spaces[0]["@id"] )
-    }
+    await Promise.all(
+      atlasDetail.parcellations.map(async parc => {
+        try {
+          const parcDetail = await getParc(atlasDetail['@id'], parc['@id'])
+          regionsDict[species][parcDetail.name] = await getParcRegions(atlasDetail['@id'], parc['@id'], atlasDetail.spaces[0]["@id"] )
+        } catch (e) {
+          console.warn(`fetching region detail for ${parc["@id"]} failed... Skipping...`)
+        }
+      })
+    )
   }
 
   return {

@@ -9,7 +9,7 @@ Be it request the user to select a region, a point, navigate to a specific locat
 ```javascript
 
 let parentWindow
-window.addEventListener('message', ev => {
+window.addEventListener('message', msg => {
   const { source, data, origin } = msg
   const { id, method, params, result, error } = data
 
