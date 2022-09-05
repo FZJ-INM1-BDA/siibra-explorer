@@ -1,0 +1,28 @@
+<sxplr-sapiviews-core-atlas-chip
+  class="sxplr-d-inline-block"
+  [sxplr-sapiviews-core-atlas-chip-atlas]="atlas"
+  [sxplr-sapiviews-core-atlas-chip-color]="'default'"
+  (sxplr-sapiviews-core-atlas-chip-onclick)="menuTrigger.toggleMenu()"
+  [matMenuTriggerFor]="atlasesMenu"
+  #menuTrigger="matMenuTrigger">
+  <div class="sxplr-scale-70"
+       suffix
+       iav-stop="mousedown click"></div>
+</sxplr-sapiviews-core-atlas-chip>
+
+<mat-menu #atlasesMenu="matMenu"
+  [hasBackdrop]="false"
+  class="parc-smart-chip-menu-panel sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+  <div (iav-outsideClick)="menuTrigger.closeMenu()">
+
+    <div *ngFor="let atl of atlases"
+      class="otherversion-wrapper"> 
+      <sxplr-sapiviews-core-atlas-chip
+        [sxplr-sapiviews-core-atlas-chip-atlas]="atl"
+        [sxplr-sapiviews-core-atlas-chip-color]="(atl | equality : atlas : trackByFn) ? 'primary' : 'default'"
+        (sxplr-sapiviews-core-atlas-chip-onclick)="selectAtlas(atl)">
+      </sxplr-sapiviews-core-atlas-chip>
+    </div> 
+  </div>
+  
+</mat-menu>
