@@ -1,0 +1,44 @@
+<sxplr-sapiviews-core-space-chip
+  class="sxplr-d-inline-block"
+  [sxplr-sapiviews-core-space-chip-space]="space"
+  [sxplr-sapiviews-core-space-chip-color]="'default'"
+  (sxplr-sapiviews-core-space-chip-onclick)="menuTrigger.toggleMenu()"
+  [matMenuTriggerFor]="spacesMenu"
+  #menuTrigger="matMenuTrigger"
+  >
+
+  <div class="sxplr-scale-70"
+       suffix
+       iav-stop="mousedown click"></div>
+
+
+</sxplr-sapiviews-core-space-chip>
+
+<mat-menu #spacesMenu="matMenu"
+  [hasBackdrop]="false"
+  class="parc-smart-chip-menu-panel sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+  <div (iav-outsideClick)="menuTrigger.closeMenu()">
+
+    <div *ngFor="let spc of spaces"
+      class="otherversion-wrapper"> 
+
+      <sxplr-sapiviews-core-space-chip
+
+        [sxplr-sapiviews-core-space-chip-space]="spc"
+        [sxplr-sapiviews-core-space-chip-color]="(spc | equality : space : trackByFn) ? 'primary' : 'default'"
+        (sxplr-sapiviews-core-space-chip-onclick)="selectSpace(spc)">
+
+      </sxplr-sapiviews-core-space-chip>
+
+    </div> 
+  </div>
+  
+</mat-menu>
+
+<!-- space description template -->
+<ng-template #spaceDescTmpl let-space="space">
+    <h1 mat-dialog-title>
+      {{ space.fullName }}
+    </h1>
+
+</ng-template>

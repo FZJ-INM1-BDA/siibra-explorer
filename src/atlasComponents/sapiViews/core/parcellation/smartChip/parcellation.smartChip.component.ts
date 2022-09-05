@@ -1,10 +1,22 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange, SimpleChanges } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output, QueryList,
+  SimpleChange,
+  SimpleChanges,
+  ViewChild,
+  ViewChildren
+} from "@angular/core";
 import { BehaviorSubject, concat, Observable, of, timer } from "rxjs";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
 import { ARIA_LABELS } from "common/constants"
 import { getTraverseFunctions } from "../parcellationVersion.pipe";
 import { mapTo, shareReplay, switchMap } from "rxjs/operators";
+import {GroupedParcellation} from "src/atlasComponents/sapiViews/core/parcellation/groupedParcellation";
+import {MatMenu, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: `sxplr-sapiviews-core-parcellation-smartchip`,
@@ -29,6 +41,8 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   @Output('sxplr-sapiviews-core-parcellation-smartchip-select-parcellation')
   onSelectParcellation = new EventEmitter<SapiParcellationModel>()
+
+  @ViewChildren('subParcMenuTrigger') subParcMenuTrigger: QueryList<MatMenuTrigger>;
 
   constructor(
     private svc: ParcellationVisibilityService
@@ -98,6 +112,16 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   trackByFn(parc: SapiParcellationModel){
     return parc["@id"]
+  }
+
+  openParcellationGroup(index) {
+    const children = this.subParcMenuTrigger.toArray()
+    children[index].openMenu()
+  }
+
+  closeParcellationGroup(index) {
+    const children = this.subParcMenuTrigger.toArray()
+    children[index].closeMenu()
   }
 
   onDismissClicked$ = new BehaviorSubject<boolean>(false)
