@@ -17,8 +17,10 @@
   <mat-list-item
     [attr.aria-label]="ARIA_LABELS.SHARE_CUSTOM_URL"
     [attr.tab-index]="10"
-    (click)="openShareSaneUrl()"
+    (click)="openDialog(saneUrlTmpl)"
     [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
+    iav-state-aggregator
+    #stateAggregator="iavStateAggregator"
     >
     <mat-icon
       class="mr-4"
@@ -32,3 +34,9 @@
 
   </mat-list-item>
 </mat-nav-list>
+
+
+<ng-template #saneUrlTmpl>
+  <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async">
+  </iav-sane-url>
+</ng-template>
