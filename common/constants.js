@@ -136,7 +136,11 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`,
 
     ATLAS_SELECTOR_LABEL_SPACES: `Spaces`,
-    ATLAS_SELECTOR_LABEL_PARC_MAPS: `Parcellation maps`
+    ATLAS_SELECTOR_LABEL_PARC_MAPS: `Parcellation maps`,
+
+    TOGGLE_LAYER_VISILITY: 'Toggle layer visility',
+    ORIENT_TO_LAYER: 'Orient to layer native orientation',
+    CONFIGURE_LAYER: 'Configure layer'
   }
 
   exports.QUICKTOUR_DESC ={

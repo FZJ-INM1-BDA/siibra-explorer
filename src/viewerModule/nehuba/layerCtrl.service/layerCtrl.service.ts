@@ -176,14 +176,23 @@ export class NehubaLayerControlService implements OnDestroy{
      * on custom landmarks loaded, set mesh transparency
      */
     this.sub.push(
-      this.store$.pipe(
-        select(annotation.selectors.annotations),
+      merge(
+        this.store$.pipe(
+          select(annotation.selectors.annotations),
+          map(landmarks => landmarks.length > 0),
+        ),
+        this.store$.pipe(
+          select(atlasAppearance.selectors.customLayers),
+          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && /^swc:\/\//.test(l.source)).length > 0),
+        )
+      ).pipe(
+        startWith(false),
         withLatestFrom(this.defaultNgLayers$)
-      ).subscribe(([landmarks, { tmplAuxNgLayers }]) => {
+      ).subscribe(([flag, { tmplAuxNgLayers }]) => {
         const payload: {
           [key: string]: number
         } = {}
-        const alpha = landmarks.length > 0
+        const alpha = flag
           ? 0.2
           : 1.0
         for (const ngId in tmplAuxNgLayers) {

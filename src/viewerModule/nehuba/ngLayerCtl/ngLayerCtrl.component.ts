@@ -1,44 +1,22 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { isMat4 } from "common/util"
+import { CONST } from "common/constants"
 import { Observable } from "rxjs";
-import { atlasAppearance } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit } from "..";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
+import { getExportNehuba } from "src/util/fn";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
 
-const _VOL_DETAIL_MAP: Record<string, { shader: string, opacity: number }> = {
-  "PLI Fiber Orientation Red Channel": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x < 0.1) { emitTransparent(); } else { emitRGB(vec3(1.0 * x, x * 0., 0. * x )); } }",
-    opacity: 1
-  },
-  "PLI Fiber Orientation Green Channel": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x < 0.1) { emitTransparent(); } else { emitRGB(vec3(0. * x, x * 1., 0. * x )); } }",
-    opacity: 0.5
-  },
-  "PLI Fiber Orientation Blue Channel": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x < 0.1) { emitTransparent(); } else { emitRGB(vec3(0. * x, x * 0., 1.0 * x )); } }",
-    opacity: 0.25
-  },
-  "Blockface Image": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x < 0.1) { emitTransparent(); } else { emitRGB(vec3(0.8 * x, x * 1., 0.8 * x )); } }",
-    opacity: 1.0
-  },
-  "PLI Transmittance": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x > 0.9) { emitTransparent(); } else { emitRGB(vec3(x * 1., x * 0.8, x * 0.8 )); } }",
-    opacity: 1.0
-  },
-  "T2w MRI": {
-    shader: "void main(){ float x = toNormalized(getDataValue()); if (x < 0.1) { emitTransparent(); } else { emitRGB(vec3(0.8 * x, 0.8 * x, x * 1. )); } }",
-    opacity: 1
-  },
-  "MRI Labels": {
-    shader: null,
-    opacity: 1
-  }
-}
+export const idMat4: Mat4 = [
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1],
+]
 
 @Component({
   selector: 'ng-layer-ctl',
@@ -50,6 +28,8 @@ const _VOL_DETAIL_MAP: Record<string, { shader: string, opacity: number }> = {
 })
 
 export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
+
+  public CONST = CONST
 
   private onDestroyCb: (() => void)[] = []
   private removeLayer: () => void
@@ -77,7 +57,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     this.opacity = Number(val)
   }
   
-  transform: Mat4
+  transform: Mat4 = idMat4
+
   @Input('ng-layer-ctl-transform')
   set _transform(xform: string | Mat4) {
     const parsedResult = typeof xform === "string"
@@ -111,12 +92,6 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   }
 
   ngOnChanges(): void {
-    if (this.name in _VOL_DETAIL_MAP) {
-      const { shader, opacity } = _VOL_DETAIL_MAP[this.name]
-      this.shader = shader
-      this.opacity = opacity
-    }
-
     if (this.name && this.source) {
       const { name } = this
       if (this.removeLayer) {
@@ -143,6 +118,28 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         )
       }
     }
+  }
+
+  setOrientation(): void {
+    const { mat4, quat, vec3 } = getExportNehuba()
+
+    /**
+     * glMatrix seems to store the matrix in transposed format
+     */
+    
+    const incM = mat4.transpose(mat4.create(), mat4.fromValues(...this.transform.reduce((acc, curr) => [...acc, ...curr], [])))
+    const scale = mat4.getScaling(vec3.create(), incM)
+    const scaledM = mat4.scale(mat4.create(), incM, vec3.inverse(vec3.create(), scale))
+    const q = mat4.getRotation(quat.create(0), scaledM)
+
+    this.store.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          orientation: Array.from(q)
+        },
+        animation: true
+      })
+    )
   }
 
   toggleVisibility(): void{

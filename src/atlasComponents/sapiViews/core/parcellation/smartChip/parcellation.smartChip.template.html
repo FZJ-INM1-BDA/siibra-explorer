@@ -121,12 +121,13 @@
   <mat-dialog-actions align="start">
     <a *ngFor="let url of parc | parcellationDoiPipe"
       [href]="url"
+      sxplr-hide-when-local
       target="_blank"
       mat-raised-button
       color="primary">
       <div class="fas fa-external-link-alt"></div>
       <span>
-        Explore
+        Dataset Detail
       </span>
     </a>
 

@@ -2,15 +2,18 @@
 {
   pointer-events: none;
   display: block;
-  max-width: 24rem;
+  
+  width: 24rem;
+  height: 90vh;
+
+  transition: all 160ms cubic-bezier(0.35, 0, 0.25, 1);
 }
 
 mat-card
 {
   pointer-events: all;
-  max-width: 36vw;
-  height: 36rem;
-  max-height: 90vh;
+  width: 100%;
+  height: 100%;
 }
 
 mat-card-content
@@ -24,7 +27,7 @@ mat-card-content
 .widget-portal-header
 {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -33,24 +36,13 @@ mat-card-content
   flex-grow: 1;
 }
 
-.hover-grab
-{
-  opacity: 0.5;
-  transition: opacity 200ms ease-in-out;
-  cursor: move;
-}
-
-.hover-grab:hover
-{
-  opacity: 1.0;
-}
-
-.widget-grab-handle
-{
-  margin-right:1rem;
-}
-
 .widget-name
 {
   flex-grow: 1;
+}
+
+.when-minimized-nub
+{
+  position: absolute;
+  transform: translate(-5rem, 5rem);
 }

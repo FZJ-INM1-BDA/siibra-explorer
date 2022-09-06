@@ -67,22 +67,27 @@ export const parcId = {
 }
 
 export async function getAtlases(): Promise<SapiAtlasModel[]> {
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases`)).json() as SapiAtlasModel[]
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases`)).json() as SapiAtlasModel[]
 }
 
 export async function getAtlas(id: string): Promise<SapiAtlasModel>{
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${id}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${id}`)).json()
 }
 
 export async function getParc(atlasId: string, id: string): Promise<SapiParcellationModel>{
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId}/parcellations/${id}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId}/parcellations/${id}`)).json()
 }
 export async function getParcRegions(atlasId: string, id: string, spaceId: string): Promise<SapiRegionModel[]>{
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId}/parcellations/${id}/regions?space_id=${encodeURIComponent(spaceId)}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId}/parcellations/${id}/regions?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function getSpace(atlasId: string, id: string): Promise<SapiSpaceModel> {
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId}/spaces/${id}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId}/spaces/${id}`)).json()
 }
 
 export async function getHumanAtlas(): Promise<SapiAtlasModel> {
@@ -90,7 +95,8 @@ export async function getHumanAtlas(): Promise<SapiAtlasModel> {
 }
 
 export async function getMni152(): Promise<SapiSpaceModel> {
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}`)).json()
 }
 
 export async function getJba29(): Promise<SapiParcellationModel> {
@@ -103,33 +109,41 @@ export async function getJba29Regions(): Promise<SapiRegionModel[]> {
 
 export async function getHoc1Right(spaceId=null): Promise<SapiRegionModel> {
   if (!spaceId) {
-    return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right`)).json()
+    const endPt = await SAPI.BsEndpoint$.toPromise()
+    return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right`)).json()
   }
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right?space_id=${encodeURIComponent(spaceId)}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function get44Left(spaceId=null): Promise<SapiRegionModel> {
   if (!spaceId) {
-    return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left`)).json()
+    const endPt = await SAPI.BsEndpoint$.toPromise()
+    return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left`)).json()
   }
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/area%2044%20left?space_id=${encodeURIComponent(spaceId)}`)).json()
 }
 
 export async function getHoc1RightSpatialFeatures(): Promise<SxplrCleanedFeatureModel[]> {
-  const json: SapiSpatialFeatureModel[] = await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features?parcellation_id=2.9&region=hoc1%20right`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  const json: SapiSpatialFeatureModel[] = await (await fetch(`${endPt}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features?parcellation_id=2.9&region=hoc1%20right`)).json()
   return cleanIeegSessionDatasets(json.filter(it => it['@type'] === "siibra/features/ieegSession"))
 }
 
 export async function getHoc1RightFeatures(): Promise<SapiRegionalFeatureModel[]> {
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features`)).json()
 }
 
 export async function getHoc1RightFeatureDetail(featId: string): Promise<SapiRegionalFeatureModel>{
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features/${encodeURIComponent(featId)}`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/regions/hoc1%20right/features/${encodeURIComponent(featId)}`)).json()
 }
 
 export async function getJba29Features(): Promise<SapiParcellationFeatureModel[]> {
-  return await (await fetch(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/features`)).json()
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId.human}/parcellations/${parcId.human.jba29}/features`)).json()
 }
 
 export async function getBigbrainSpatialFeatures(): Promise<SapiSpatialFeatureModel[]>{
@@ -137,14 +151,16 @@ export async function getBigbrainSpatialFeatures(): Promise<SapiSpatialFeatureMo
     [-1000, -1000, -1000],
     [1000, 1000, 1000]
   ]
-  const url = new URL(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.bigbrain}/features`)
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  const url = new URL(`${endPt}/atlases/${atlasId.human}/spaces/${spaceId.human.bigbrain}/features`)
   url.searchParams.set(`bbox`, JSON.stringify(bbox))
   return await (await fetch(url.toString())).json()
 }
 
 export async function getMni152SpatialFeatureHoc1Right(): Promise<SapiSpatialFeatureModel[]>{
   
-  const url = new URL(`${SAPI.BsEndpoint}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features`)
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  const url = new URL(`${endPt}/atlases/${atlasId.human}/spaces/${spaceId.human.mni152}/features`)
   url.searchParams.set(`parcellation_id`, parcId.human.jba29)
   url.searchParams.set("region", 'hoc1 right')
   return await (await fetch(url.toString())).json()

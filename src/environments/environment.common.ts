@@ -17,4 +17,6 @@ export const environment = {
 
   // experimental feature flag
   EXPERIMENTAL_FEATURE_FLAG: false,
+
+  ENABLE_LEAP_MOTION: false,
 }
