@@ -121,6 +121,7 @@
   <mat-dialog-actions align="start">
     <a *ngFor="let url of parc | parcellationDoiPipe"
       [href]="url"
+      sxplr-hide-when-local
       target="_blank"
       mat-raised-button
       color="primary">

@@ -4,6 +4,7 @@ import { Store } from "@ngrx/store";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { atlasAppearance } from "src/state";
+import { StrictLocalModule } from "src/strictLocal";
 import { DialogModule } from "src/ui/dialogInfo/module";
 import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
@@ -25,6 +26,7 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     UtilModule,
     SapiViewsUtilModule,
     DialogModule,
+    StrictLocalModule
   ],
   declarations: [
     SapiViewsCoreParcellationParcellationTile,

@@ -7,7 +7,7 @@ const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
 
-const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
+const LOCAL_CDN_FLAG = !!process.env.LOCAL_CDN
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
@@ -126,7 +126,8 @@ if (LOCAL_CDN_FLAG) {
   const LOCAL_CDN = process.env.LOCAL_CDN
   const CDN_ARRAY = [
     'https://stackpath.bootstrapcdn.com',
-    'https://use.fontawesome.com'
+    'https://use.fontawesome.com',
+    'https://unpkg.com'
   ]
 
   let indexFile
@@ -214,8 +215,7 @@ app.get('/ready', async (req, res) => {
  * only use compression for production
  * this allows locally built aot to be served without errors
  */
-const { compressionMiddleware, setAlwaysOff } = require('nomiseco')
-if (LOCAL_CDN_FLAG) setAlwaysOff(true)
+const { compressionMiddleware } = require('nomiseco')
 
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 

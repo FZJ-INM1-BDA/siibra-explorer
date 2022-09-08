@@ -6,13 +6,16 @@ import { getTraverseFunctions } from "./parcellationVersion.pipe"
 describe(`parcellationVersion.pipe.ts`, () => {
   describe("getTraverseFunctions", () => {
     let julichBrainParcellations: SapiParcellationModel[] = []
+    let endpoint: string
     beforeAll(async () => {
       const bsEndPoint = await SAPI.BsEndpoint$.toPromise()
+      endpoint = bsEndPoint
       const res = await fetch(`${bsEndPoint}/atlases/${encodeURIComponent(IDS.ATLAES.HUMAN)}/parcellations`)
       const arr: SapiParcellationModel[] = await res.json()
       julichBrainParcellations = arr.filter(it => /Julich-Brain Cytoarchitectonic Maps/.test(it.name))
     })
     it("> should be at least 3 parcellations", () => {
+      console.log(`testing against endpoint: ${endpoint}`)
       expect(julichBrainParcellations.length).toBeGreaterThanOrEqual(3)
     })
 

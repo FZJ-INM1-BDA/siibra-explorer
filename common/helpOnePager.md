@@ -10,6 +10,7 @@
 | Next slice | `<ctrl>` + `[mousewheel]` | - |
 | Next 10 slice | `<ctrl>` + `<shift>` + `[mousewheel]` | - |
 | Toggle delineation | `[q]` | - |
+| Toggle cross hair | `[a]` | - |
 
 ---
 

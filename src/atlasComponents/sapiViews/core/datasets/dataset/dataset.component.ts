@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { SapiDatasetModel } from "src/atlasComponents/sapi";
 import { CONST } from "common/constants"
 
@@ -9,7 +9,8 @@ const RESTRICTED_ACCESS_ID = "https://nexus.humanbrainproject.org/v0/data/minds/
   templateUrl: './dataset.template.html',
   styleUrls: [
     `./dataset.style.css`
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class DatasetView implements OnChanges{
