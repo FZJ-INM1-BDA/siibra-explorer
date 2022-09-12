@@ -376,13 +376,6 @@
     [viewerLoaded]="viewerLoaded">
   </top-menu-cmp>
 
-<!--  <sxplr-sapiviews-core-atlas-dropdown-selector-->
-<!--    class="v-align-top sxplr-pt-2 pe-all mt-2 sxplr-custom-cmp bg card m-2 mat-elevation-z2 d-inline-block"-->
-<!--    quick-tour-->
-<!--    [quick-tour-description]="quickTourAtlasSelector.description"-->
-<!--    [quick-tour-order]="quickTourAtlasSelector.order">-->
-<!--  </sxplr-sapiviews-core-atlas-dropdown-selector>-->
-
 </ng-template>
 
 
@@ -403,15 +396,6 @@
 <!-- bottom left -->
 <ng-template #bottomLeftTmpl let-showFullSideNav="showFullSideNav">
 
-<!--  &lt;!&ndash; atlas selector &ndash;&gt;-->
-<!--  <sxplr-sapiviews-core-atlas-tmplparcselector-->
-<!--    *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"-->
-<!--    [iav-key-listener]="[{'type': 'keydown', 'key': 'Escape'}]"-->
-<!--    (iav-key-event)="tmplParcSelector.closeSelector()"-->
-<!--    (iav-outsideClick)="tmplParcSelector.closeSelector()"-->
-<!--    #tmplParcSelector="sxplrSapiViewsCoreAtlasTmplparcselector">-->
-<!--  </sxplr-sapiviews-core-atlas-tmplparcselector>-->
-
   <!-- scroll container -->
   <div class="sxplr-d-inline-flex
     sxplr-flex-wrap-nowrap
@@ -422,36 +406,38 @@
 
     <!-- selected atlas chip -->
     <sxplr-sapiviews-core-atlas-smartchip
-      class="sxplr-z-2 sxplr-ml-2"
+      class="sxplr-z-4 sxplr-ml-2"
+      [sxplr-sapiviews-core-atlas-smartchip-custom-color]="'dimgrey'"
       [sxplr-sapiviews-core-atlas-smartchip-atlas]="selectedAtlas$ | async"
       [sxplr-sapiviews-core-atlas-smartchip-all-atlases]="fetchedAtlases$ | async"
       (sxplr-sapiviews-core-atlas-smartchip-select-atlas)="onSelectAtlas($event)"
       >
     </sxplr-sapiviews-core-atlas-smartchip>
 
-    <mat-chip class="pe-all sxplr-z-1 arrow-between-chips">></mat-chip>
-
 
     <!-- selected space chip -->
-    <sxplr-sapiviews-core-space-smartchip
-      class="sxplr-z-2"
-      [sxplr-sapiviews-core-space-smartchip-space]="templateSelected$ | async"
-      [sxplr-sapiviews-core-space-smartchip-all-spaces]="allAvailableSpaces$ | async"
-      (sxplr-sapiviews-core-space-smartchip-select-space)="onSelectSpace($event)"
-      >
-    </sxplr-sapiviews-core-space-smartchip>
-
-    <mat-chip class="pe-all sxplr-z-1 arrow-between-chips">></mat-chip>
-
+    <ng-container *ngIf="(allAvailableSpaces$ | async) as spaces">
+      <sxplr-sapiviews-core-space-smartchip
+              *ngIf="spaces.length > 1"
+              class="sxplr-z-3"
+              [sxplr-sapiviews-core-space-smartchip-custom-color]="'grey'"
+              [sxplr-sapiviews-core-space-smartchip-space]="templateSelected$ | async"
+              [sxplr-sapiviews-core-space-smartchip-all-spaces]="allAvailableSpaces$ | async"
+              (sxplr-sapiviews-core-space-smartchip-select-space)="onSelectSpace($event)">
+      </sxplr-sapiviews-core-space-smartchip>
+    </ng-container>
 
     <!-- selected parcellation chip -->
     <sxplr-sapiviews-core-parcellation-smartchip
       class="sxplr-z-2 sxplr-mr-1"
+      [sxplr-sapiviews-core-parcellation-smartchip-selected-space]="templateSelected$ | async"
       [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
       [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
       (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
       (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
-      >
+      (sxplr-sapiviews-core-parcellation-smartchip-select-space-parcellation)="onSelectSpaceAndParcellation($event)"
+      [sxplr-sapiviews-core-parcellation-smartchip-custom-color]="'darkgrey'"
+    >
     </sxplr-sapiviews-core-parcellation-smartchip>
 
     <!-- selected region chip -->

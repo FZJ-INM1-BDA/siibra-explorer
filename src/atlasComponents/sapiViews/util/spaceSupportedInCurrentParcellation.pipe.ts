@@ -28,7 +28,7 @@ export class SpaceSupportedInCurrentParcellationPipe implements PipeTransform{
   ){
 
   }
-  public transform(space: SapiSpaceModel): Observable<boolean> {
+  public transform(space: SapiSpaceModel): Observable<{ supported: boolean, spaces?: string[] }> {
     return this.selectedParcellation$.pipe(
       switchMap(parc => 
         this.supportedPipe.transform(parc, space)

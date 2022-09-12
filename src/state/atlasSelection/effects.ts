@@ -140,7 +140,7 @@ export class Effect {
             return concat(
               ...currAtlas.parcellations.map(
                 p => this.parcSupportedInSpacePipe.transform(p["@id"], template).pipe(
-                  filter(flag => flag),
+                  filter(flag => flag.supported),
                   switchMap(() => this.sapiSvc.getParcDetail(currAtlas["@id"], p['@id'])),
                 )
               )
@@ -159,7 +159,7 @@ export class Effect {
             return concat(
               ...currAtlas.spaces.map(
                 sp => this.parcSupportedInSpacePipe.transform(parcellation["@id"], sp["@id"]).pipe(
-                  filter(flag => flag),
+                  filter(flag => flag.supported),
                   switchMap(() => this.sapiSvc.getSpaceDetail(currAtlas["@id"], sp['@id'])),
                 )
               )

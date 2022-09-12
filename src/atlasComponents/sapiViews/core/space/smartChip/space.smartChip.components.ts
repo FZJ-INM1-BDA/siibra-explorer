@@ -1,5 +1,6 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, HostListener, Input, Output, Renderer2} from "@angular/core";
 import { SapiSpaceModel } from "src/atlasComponents/sapi/type";
+import {Renderer} from "@angular/compiler-cli/ngcc/src/rendering/renderer";
 
 @Component({
   selector: 'sxplr-sapiviews-core-space-smartchip',
@@ -15,10 +16,12 @@ export class SapiViewCoreSpaceSmartChip {
   @Input('sxplr-sapiviews-core-space-smartchip-all-spaces')
   spaces: SapiSpaceModel[]
 
+  @Input('sxplr-sapiviews-core-space-smartchip-custom-color')
+  customColor: string
+
   @Output('sxplr-sapiviews-core-space-smartchip-select-space')
   onSelectSpace = new EventEmitter<SapiSpaceModel>()
 
-  // constructor() {}
 
 
   selectSpace(space: SapiSpaceModel){

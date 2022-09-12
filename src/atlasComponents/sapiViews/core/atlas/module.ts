@@ -13,7 +13,7 @@ import {DialogModule} from "src/ui/dialogInfo/module";
 import {
   SapiViewCoreAtlasSmartChip
 } from "src/atlasComponents/sapiViews/core/atlas/smartChip/atlas.smartChip.components";
-import {SapiViewCoreAtlasChip} from "src/atlasComponents/sapiViews/core/atlas/chip/atlas.chip.component";
+import {UtilModule} from "src/util";
 
 @NgModule({
   imports: [
@@ -25,20 +25,19 @@ import {SapiViewCoreAtlasChip} from "src/atlasComponents/sapiViews/core/atlas/ch
     SpinnerModule,
     SapiViewsUtilModule,
     DialogModule,
+    UtilModule
   ],
   declarations: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
     SapiViewsCoreAtlasSplashScreen,
     SapiViewCoreAtlasSmartChip,
-    SapiViewCoreAtlasChip,
   ],
   exports: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
     SapiViewsCoreAtlasSplashScreen,
     SapiViewCoreAtlasSmartChip,
-    SapiViewCoreAtlasChip,
   ]
 })
 
