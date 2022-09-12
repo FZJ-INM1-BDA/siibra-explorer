@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import {switchMap, tap} from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { atlasSelection } from "src/state";
@@ -29,7 +29,8 @@ export class ParcellationSupportedInCurrentSpace implements PipeTransform{
     private sapi: SAPI,
   ){}
 
-  public transform(parcellation: SapiParcellationModel): Observable<boolean> {
+  public transform(parcellation: SapiParcellationModel)
+    : Observable<{supported: boolean, spaces?: Array<string>}> {
     return this.selectedTemplate$.pipe(
       switchMap(tmpl => this.transformPipe.transform(parcellation, tmpl))
     )

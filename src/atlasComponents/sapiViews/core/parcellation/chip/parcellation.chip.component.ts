@@ -17,6 +17,12 @@ export class SapiViewsCoreParcellationParcellationChip {
   @Input('sxplr-sapiviews-core-parcellation-chip-color')
   color: 'default' | 'primary' | 'accent' | 'warn' = "default"
 
+  @Input('sxplr-sapiviews-core-parcellation-chip-custom-class')
+  customClass: string = ''
+
+  @Input('sxplr-sapiviews-core-parcellation-chip-custom-color')
+  customColor: string
+
   @Output('sxplr-sapiviews-core-parcellation-chip-onclick')
   onClick = new EventEmitter<MouseEvent>()
 

@@ -106,9 +106,6 @@ export class ViewerCmp implements OnDestroy {
     map(({ parcellation }) => parcellation)
   )
 
-  public allAvailableAtlas$ = this.store$.pipe(
-    atlasSelection.fromRootStore.allAvailSpaces(this.sapi)
-  )
   public allAvailableSpaces$ = this.store$.pipe(
     atlasSelection.fromRootStore.allAvailSpaces(this.sapi)
   )
@@ -435,6 +432,16 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
+  onSelectSpaceAndParcellation(e): void{
+    const {space, parcellation} = e
+    this.store$.dispatch(
+      atlasSelection.actions.setAtlasSelectionState({
+        selectedTemplate: space,
+        selectedParcellation: parcellation
+      })
+    )
+  }
+
   navigateTo(position: number[]): void {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({

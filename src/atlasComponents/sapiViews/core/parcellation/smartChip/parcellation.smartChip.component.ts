@@ -1,22 +1,10 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output, QueryList,
-  SimpleChange,
-  SimpleChanges,
-  ViewChild,
-  ViewChildren
-} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import { BehaviorSubject, concat, Observable, of, timer } from "rxjs";
-import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import {SapiParcellationModel, SapiSpaceModel} from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
 import { ARIA_LABELS } from "common/constants"
 import { getTraverseFunctions } from "../parcellationVersion.pipe";
 import { mapTo, shareReplay, switchMap } from "rxjs/operators";
-import {GroupedParcellation} from "src/atlasComponents/sapiViews/core/parcellation/groupedParcellation";
-import {MatMenu, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: `sxplr-sapiviews-core-parcellation-smartchip`,
@@ -30,11 +18,17 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   public ARIA_LABELS = ARIA_LABELS
 
+  @Input('sxplr-sapiviews-core-parcellation-smartchip-selected-space')
+  selectedSpace: SapiSpaceModel
+
   @Input('sxplr-sapiviews-core-parcellation-smartchip-parcellation')
   parcellation: SapiParcellationModel
 
   @Input('sxplr-sapiviews-core-parcellation-smartchip-all-parcellations')
   parcellations: SapiParcellationModel[]
+
+  @Input('sxplr-sapiviews-core-parcellation-smartchip-custom-color')
+  customColor: string
 
   @Output('sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer')
   onDismiss = new EventEmitter<SapiParcellationModel>()
@@ -42,7 +36,8 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
   @Output('sxplr-sapiviews-core-parcellation-smartchip-select-parcellation')
   onSelectParcellation = new EventEmitter<SapiParcellationModel>()
 
-  @ViewChildren('subParcMenuTrigger') subParcMenuTrigger: QueryList<MatMenuTrigger>;
+  @Output('sxplr-sapiviews-core-parcellation-smartchip-select-space-parcellation')
+  onSelectSpaceParcellation = new EventEmitter<{space: SapiSpaceModel, parcellation: SapiParcellationModel}>()
 
   constructor(
     private svc: ParcellationVisibilityService
@@ -63,10 +58,10 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     }
     this.otherVersions = [ this.parcellation ]
     if (!this.parcellations || this.parcellations.length === 0) {
-      return 
+      return
     }
     if (!this.parcellation.version) {
-      return 
+      return
     }
 
     this.otherVersions = []
@@ -114,14 +109,11 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     return parc["@id"]
   }
 
-  openParcellationGroup(index) {
-    const children = this.subParcMenuTrigger.toArray()
-    children[index].openMenu()
-  }
+  selectSpaceAndParcellation(space, parcellation) {
+    if (this.trackByFn(parcellation) === this.trackByFn(this.parcellation)
+        && space['@id'] === this.selectedSpace['@id']) return
 
-  closeParcellationGroup(index) {
-    const children = this.subParcMenuTrigger.toArray()
-    children[index].closeMenu()
+    this.onSelectSpaceParcellation.emit({space, parcellation})
   }
 
   onDismissClicked$ = new BehaviorSubject<boolean>(false)

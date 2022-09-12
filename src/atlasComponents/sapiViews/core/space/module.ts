@@ -7,10 +7,10 @@ import { SapiViewsCoreSpaceSpaceTile } from "./tile/space.tile.component";
 import {
   SapiViewCoreSpaceSmartChip
 } from "src/atlasComponents/sapiViews/core/space/smartChip/space.smartChip.components";
-import {SapiViewCoreSpaceChip} from "src/atlasComponents/sapiViews/core/space/chip/space.chip.component";
 import { AngularMaterialModule } from "src/sharedModules";
 import { DialogModule } from "src/ui/dialogInfo/module";
 import { SapiViewsUtilModule } from "../../util";
+import {UtilModule} from "src/util";
 
 @NgModule({
   imports: [
@@ -19,19 +19,18 @@ import { SapiViewsUtilModule } from "../../util";
     AngularMaterialModule,
     DialogModule,
     SapiViewsUtilModule,
+    UtilModule
   ],
   declarations: [
     SapiViewsCoreSpaceSpaceTile,
     PreviewSpaceUrlPipe,
     SapiViewsCoreSpaceBoundingBox,
     SapiViewCoreSpaceSmartChip,
-    SapiViewCoreSpaceChip
   ],
   exports: [
     SapiViewsCoreSpaceSpaceTile,
     SapiViewsCoreSpaceBoundingBox,
     SapiViewCoreSpaceSmartChip,
-    SapiViewCoreSpaceChip
   ]
 })
 
