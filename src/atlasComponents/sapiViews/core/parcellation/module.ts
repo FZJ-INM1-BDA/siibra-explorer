@@ -8,7 +8,6 @@ import { StrictLocalModule } from "src/strictLocal";
 import { DialogModule } from "src/ui/dialogInfo/module";
 import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
-import { SapiViewsCoreParcellationParcellationChip } from "./chip/parcellation.chip.component";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
 import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
@@ -31,7 +30,6 @@ import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/
   ],
   declarations: [
     SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationChip,
     SapiViewsCoreParcellationParcellationSmartChip,
     PreviewParcellationUrlPipe,
     FilterGroupedParcellationPipe,
@@ -42,7 +40,6 @@ import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/
   ],
   exports: [
     SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationChip,
     SapiViewsCoreParcellationParcellationSmartChip,
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
