@@ -17,6 +17,7 @@ import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { PreviewParcellationUrlPipe } from "./previewParcellationUrl.pipe";
 import { SapiViewsCoreParcellationParcellationSmartChip } from "./smartChip/parcellation.smartChip.component";
 import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.tile.component";
+import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/getSpaceById.pipe";
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     FilterUnsupportedParcPipe,
     ParcellationIsBaseLayer,
     ParcellationDoiPipe,
+    GetSpaceByIdPipe,
   ],
   exports: [
     SapiViewsCoreParcellationParcellationTile,

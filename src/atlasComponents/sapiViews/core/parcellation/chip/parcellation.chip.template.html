@@ -1,7 +1,9 @@
 <mat-chip-list *ngIf="parcellation">
   <mat-chip [selected]="color !== 'default'"
     (click)="click($event)"
-    [color]="color">
+    [color]="color"
+    [style.background-color]="customColor && customColor"
+    [ngClass]="customClass">
 
     <ng-content select="[prefix]">
     </ng-content>

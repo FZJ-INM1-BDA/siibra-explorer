@@ -145,3 +145,8 @@ mat-list[dense].contextual-block
   margin: 0 -30px;
   padding: 0 30px;
 }
+
+.hide-chip-corner {
+  margin-left: -2.5rem;
+  padding-left: 3rem;
+}

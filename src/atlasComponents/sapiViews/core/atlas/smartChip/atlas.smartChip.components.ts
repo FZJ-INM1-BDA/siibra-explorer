@@ -15,6 +15,9 @@ export class SapiViewCoreAtlasSmartChip {
   @Input('sxplr-sapiviews-core-atlas-smartchip-all-atlases')
   atlases: SapiAtlasModel[]
 
+  @Input('sxplr-sapiviews-core-atlas-smartchip-custom-color')
+  customColor: string
+
   @Output('sxplr-sapiviews-core-atlas-smartchip-select-atlas')
   onSelectAtlas = new EventEmitter<SapiAtlasModel>()
 
