@@ -18,19 +18,12 @@
              [ngClass]="{'loading': (loadingParc$ | async) === parc}"
              class="d-flex align-items-center justify-content-space-between">
             <ng-container *ngIf="(parc | parcellationSupportedInCurrentSpace | async) as sup;">
-                <button [disabled]="!sup.supported"
-                        mat-menu-item (click)="selectParcellation(parc)"
+                <button mat-menu-item
+                        (click)="sup.supported? selectParcellation(parc) : openChangeTemplateModal(sup.spaces, parc)"
                         [style.background-color]="(parcellation | equality : parc : trackByFn) ? 'grey' : ''">
                     {{parc.name}}
                 </button>
-                <button *ngIf="sup.spaces"
-                        [matMenuTriggerFor]="otherSpacesMenu"
-                        [matMenuTriggerData]="{parc: parc, spaces: sup.spaces}"
-                        mat-menu-item class="w-0 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-sync"></i>
-                </button>
             </ng-container>
-<!--            <ng-container [ngTemplateOutlet]="selectParcButton" [ngTemplateOutletContext]="{parc:parc}"></ng-container>-->
             <ng-container [ngTemplateOutlet]="menuItemSuffix" [ngTemplateOutletContext]="{parc: parc}"></ng-container>
         </div>
 
@@ -42,33 +35,13 @@
                  [ngClass]="{'loading': (loadingParc$ | async) === parc}"
                  class="d-flex align-items-center justify-content-space-between">
                 <ng-container *ngIf="(parc | parcellationSupportedInCurrentSpace | async) as sup;">
-                    <button [disabled]="!sup.supported"
-                            mat-menu-item (click)="selectParcellation(parc)"
+                    <button mat-menu-item
+                            (click)="sup.supported? selectParcellation(parc) : openChangeTemplateModal(sup.spaces, parc)"
                             [style.background-color]="(parcellation | equality : parc : trackByFn) ? 'grey' : ''">
                         {{parc.name}}
                     </button>
-                    <button *ngIf="sup.spaces && !(sup.spaces.length === 1 && sup.supported)"
-                            [matMenuTriggerFor]="otherSpacesMenu"
-                            [matMenuTriggerData]="{parc: parc, templates: sup.spaces}"
-                            mat-menu-item class="w-0 d-flex align-items-center justify-content-center">
-                        <i class="fas fa-sync"></i>
-                    </button>
                 </ng-container>
-<!--                <ng-container [ngTemplateOutlet]="selectParcButton" [ngTemplateOutletContext]="{parc:parc}"></ng-container>-->
                 <ng-container [ngTemplateOutlet]="menuItemSuffix" [ngTemplateOutletContext]="{parc: parc}"></ng-container>
-            </div>
-        </ng-template>
-    </mat-menu>
-
-    <mat-menu #otherSpacesMenu="matMenu">
-        <ng-template matMenuContent let-parc="parc" >
-            <div *ngFor="let spaceId of (parc | parcellationSupportedInCurrentSpace | async).spaces">
-                <button *ngIf="spaceId | getSpaceById | async as space"
-                        mat-menu-item
-                        (click)="selectSpaceAndParcellation(space, parc)"
-                        [disabled]="(selectedSpace | equality : space : trackByFn) && (parcellation | equality : parc : trackByFn)">
-                    {{space.fullName}}
-                </button>
             </div>
         </ng-template>
     </mat-menu>
@@ -85,22 +58,6 @@
     </div>
 
 </div>
-
-<!--<ng-template #selectParcButton let-parc="parc">-->
-<!--    <ng-container *ngIf="(parc | parcellationSupportedInCurrentSpace | async) as sup;">-->
-<!--        <button [disabled]="!sup.supported"-->
-<!--                mat-menu-item (click)="selectParcellation(parc)"-->
-<!--                [style.background-color]="(parcellation | equality : parc : trackByFn) ? 'grey' : ''">-->
-<!--            {{parc.name}}-->
-<!--        </button>-->
-<!--        <button *ngIf="sup.spaces"-->
-<!--                [matMenuTriggerFor]="otherSpacesMenu"-->
-<!--                [matMenuTriggerData]="{templates: sup.spaces}"-->
-<!--                mat-menu-item class="w-0 d-flex align-items-center justify-content-center">-->
-<!--            <i class="fas fa-sync"></i>-->
-<!--        </button>-->
-<!--    </ng-container>-->
-<!--</ng-template>-->
 
 <!-- parcellation description template -->
 <ng-template #parcDescTmpl let-parc="parcellation">

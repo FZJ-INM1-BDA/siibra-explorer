@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
+import {Component, EventEmitter, Inject, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import { BehaviorSubject, concat, Observable, of, timer } from "rxjs";
 import {SapiParcellationModel, SapiSpaceModel} from "src/atlasComponents/sapi/type";
 import { ParcellationVisibilityService } from "../parcellationVis.service";
 import { ARIA_LABELS } from "common/constants"
 import { getTraverseFunctions } from "../parcellationVersion.pipe";
-import { mapTo, shareReplay, switchMap } from "rxjs/operators";
+import {filter, mapTo, shareReplay, switchMap, take} from "rxjs/operators";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 @Component({
   selector: `sxplr-sapiviews-core-parcellation-smartchip`,
@@ -20,6 +21,9 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
 
   @Input('sxplr-sapiviews-core-parcellation-smartchip-selected-space')
   selectedSpace: SapiSpaceModel
+
+  @Input('sxplr-sapiviews-core-parcellation-smartchip-selected-all-spaces')
+  allAvailableSpaces: SapiSpaceModel[]
 
   @Input('sxplr-sapiviews-core-parcellation-smartchip-parcellation')
   parcellation: SapiParcellationModel
@@ -40,10 +44,13 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
   onSelectSpaceParcellation = new EventEmitter<{space: SapiSpaceModel, parcellation: SapiParcellationModel}>()
 
   constructor(
-    private svc: ParcellationVisibilityService
+    private svc: ParcellationVisibilityService,
+    public dialog: MatDialog
   ){
 
   }
+
+  private templateNotAvailableDialog: MatDialogRef<TemplateNotAvailableDialog>
 
   otherVersions: SapiParcellationModel[]
 
@@ -116,5 +123,48 @@ export class SapiViewsCoreParcellationParcellationSmartChip implements OnChanges
     this.onSelectSpaceParcellation.emit({space, parcellation})
   }
 
+  openChangeTemplateModal(supportedSpaces, parc) {
+    const spaces = this.allAvailableSpaces.filter(s => supportedSpaces.includes(s['@id']))
+    this.templateNotAvailableDialog = this.dialog.open(TemplateNotAvailableDialog, {
+      data: spaces
+    })
+
+    this.templateNotAvailableDialog.afterClosed().pipe(
+      take(1),
+      filter(r => !!r)
+    ).subscribe(res => {
+      this.selectSpaceAndParcellation(res, parc)
+    })
+  }
+
   onDismissClicked$ = new BehaviorSubject<boolean>(false)
+}
+
+
+@Component({
+  selector: 'template-not-available-dialog',
+  template: `
+      <div class="d-flex align-items-start">
+
+          <div class="flex-grow-1">
+              <p>Parcellation is not available for the current template space. Please select template space to explore
+                  the parcellation:</p>
+              <div class="d-flex align-items-center">
+                  <button mat-button *ngFor="let space of availableSpaces"
+                  (click)="selectTemplate(space)">{{space.fullName}}</button>
+              </div>
+          </div>
+          <button class="flex-grow-0" mat-icon-button (click)="dialogRef.close()"><i class="fas fa-times"></i></button>
+      </div>
+  `,
+})
+export class TemplateNotAvailableDialog {
+  constructor(
+    public dialogRef: MatDialogRef<TemplateNotAvailableDialog>,
+    @Inject(MAT_DIALOG_DATA) public availableSpaces: SapiSpaceModel[],
+  ) {}
+
+  selectTemplate(space) {
+    this.dialogRef.close(space)
+  }
 }

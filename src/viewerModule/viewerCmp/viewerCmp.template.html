@@ -416,21 +416,19 @@
 
 
     <!-- selected space chip -->
-    <ng-container *ngIf="(allAvailableSpaces$ | async) as spaces">
-      <sxplr-sapiviews-core-space-smartchip
-              *ngIf="spaces.length > 1"
-              class="sxplr-z-3"
-              [sxplr-sapiviews-core-space-smartchip-custom-color]="'grey'"
-              [sxplr-sapiviews-core-space-smartchip-space]="templateSelected$ | async"
-              [sxplr-sapiviews-core-space-smartchip-all-spaces]="allAvailableSpaces$ | async"
-              (sxplr-sapiviews-core-space-smartchip-select-space)="onSelectSpace($event)">
-      </sxplr-sapiviews-core-space-smartchip>
-    </ng-container>
+    <sxplr-sapiviews-core-space-smartchip
+            class="sxplr-z-3"
+            [sxplr-sapiviews-core-space-smartchip-custom-color]="'grey'"
+            [sxplr-sapiviews-core-space-smartchip-space]="templateSelected$ | async"
+            [sxplr-sapiviews-core-space-smartchip-all-spaces]="allAvailableSpaces$ | async"
+            (sxplr-sapiviews-core-space-smartchip-select-space)="onSelectSpace($event)">
+    </sxplr-sapiviews-core-space-smartchip>
 
     <!-- selected parcellation chip -->
     <sxplr-sapiviews-core-parcellation-smartchip
       class="sxplr-z-2 sxplr-mr-1"
       [sxplr-sapiviews-core-parcellation-smartchip-selected-space]="templateSelected$ | async"
+      [sxplr-sapiviews-core-parcellation-smartchip-selected-all-spaces]="allAvailableSpaces$ | async"
       [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
       [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
       (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
