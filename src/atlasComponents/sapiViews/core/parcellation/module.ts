@@ -14,7 +14,10 @@ import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
 import { ParcellationIsBaseLayer } from "./parcellationIsBaseLayer.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { PreviewParcellationUrlPipe } from "./previewParcellationUrl.pipe";
-import { SapiViewsCoreParcellationParcellationSmartChip } from "./smartChip/parcellation.smartChip.component";
+import {
+  SapiViewsCoreParcellationParcellationSmartChip,
+  TemplateNotAvailableDialog
+} from "./smartChip/parcellation.smartChip.component";
 import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.tile.component";
 import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/getSpaceById.pipe";
 
@@ -37,6 +40,7 @@ import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/
     ParcellationIsBaseLayer,
     ParcellationDoiPipe,
     GetSpaceByIdPipe,
+    TemplateNotAvailableDialog
   ],
   exports: [
     SapiViewsCoreParcellationParcellationTile,
