@@ -1,5 +1,6 @@
 import { ComponentPortal } from "@angular/cdk/portal";
 import { ComponentFactory, ComponentFactoryResolver, ComponentRef, Injectable, Injector, ViewContainerRef } from "@angular/core";
+import { RM_WIDGET } from "./constants";
 import { WidgetPortal } from "./widgetPortal/widgetPortal.component";
 
 @Injectable({
@@ -18,8 +19,15 @@ export class WidgetService {
   }
 
   public addNewWidget<T>(Component: new (...arg: any) => T, injector: Injector): WidgetPortal<T> {
-    const widgetPortal = this.vcr.createComponent(this.cf, 0, injector) as ComponentRef<WidgetPortal<T>>
-    const cmpPortal = new ComponentPortal<T>(Component, this.vcr, injector)
+    const inj = Injector.create({
+      providers: [{
+        provide: RM_WIDGET,
+        useValue: (cmp: WidgetPortal<T>) => this.rmWidget(cmp)
+      }],
+      parent: injector
+    })
+    const widgetPortal = this.vcr.createComponent(this.cf, 0, inj) as ComponentRef<WidgetPortal<T>>
+    const cmpPortal = new ComponentPortal<T>(Component, this.vcr, inj)
     
     this.viewRefMap.set(widgetPortal.instance, widgetPortal)
 

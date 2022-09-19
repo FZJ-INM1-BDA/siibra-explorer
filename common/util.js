@@ -239,5 +239,78 @@
   exports.isVec4 = isVec4
   exports.isMat4 = isMat4
 
+  const cipher = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-'
+  const negString = '~'
+
+  const encodeInt = (number) => {
+    if (number % 1 !== 0) { throw new Error('cannot encodeInt on a float. Ensure float flag is set') }
+    if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) { throw new Error('The input is not valid') }
+  
+    let residual
+    let result = ''
+  
+    if (number < 0) {
+      result += negString
+      residual = Math.floor(number * -1)
+    } else {
+      residual = Math.floor(number)
+    }
+  
+    /* eslint-disable-next-line no-constant-condition */
+    while (true) {
+      result = cipher.charAt(residual % 64) + result
+      residual = Math.floor(residual / 64)
+  
+      if (residual === 0) {
+        break
+      }
+    }
+    return result
+  }
+  const decodeToInt = (encodedString) => {
+    let _encodedString
+    let negFlag = false
+    if (encodedString.slice(-1) === negString) {
+      negFlag = true
+      _encodedString = encodedString.slice(0, -1)
+    } else {
+      _encodedString = encodedString
+    }
+    return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc, curr) => {
+      const index = cipher.indexOf(curr)
+      if (index < 0) { throw new Error(`Poisoned b64 encoding ${encodedString}`) }
+      return acc * 64 + index
+    }, 0)
+  }
+
+  exports.sxplrNumB64Enc = {
+    separator: ".",
+    cipher,
+    encodeNumber: (number, opts = { float: false }) => {
+      const { float } = opts
+      if (!float) {
+        return encodeInt(number)
+      } else {
+        const floatArray = new Float32Array(1)
+        floatArray[0] = number
+        const intArray = new Uint32Array(floatArray.buffer)
+        const castedInt = intArray[0]
+        return encodeInt(castedInt)
+      }
+    },
+    decodeToNumber: (encodedString, opts = { float: false }) => {
+      const { float } = opts
+      if (!float) {
+        return decodeToInt(encodedString)
+      } else {
+        const _int = decodeToInt(encodedString)
+        const intArray = new Uint32Array(1)
+        intArray[0] = _int
+        const castedFloat = new Float32Array(intArray.buffer)
+        return castedFloat[0]
+      }
+    }
+  }
+
 
 })(typeof exports === 'undefined' ? module.exports : exports)

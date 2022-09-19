@@ -80,6 +80,10 @@
               "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
               "inject": false,
               "bundleName": "chunk_worker.bundle"
+            },{
+              "inject": false,
+              "input": "third_party/leap-0.6.4.js",
+              "bundleName": "leap-0.6.4"
             }]
           },
           "configurations": {

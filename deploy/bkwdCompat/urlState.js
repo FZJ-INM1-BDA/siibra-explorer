@@ -1,6 +1,12 @@
 // this module is suppose to rewrite state stored in query param
 // and convert it to path based url
-const separator = '.'
+const { sxplrNumB64Enc } = require("../../common/util")
+
+const {
+  encodeNumber,
+  separator
+} = sxplrNumB64Enc
+
 const waxolmObj = {
   aId: 'minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a',
   id: 'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8',
@@ -114,8 +120,12 @@ const WARNING_STRINGS = {
   REGION_SELECT_ERROR: 'Region selected cannot be processed properly.',
   TEMPLATE_ERROR: 'Template not found.',
 }
-
+const pliPreviewUrl = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1qI1a.D31U~.i-Os~..HRE/f:siibra:features:voi:19c437087299dd62e7c507200f69aea6`
 module.exports = (query, _warningCb) => {
+
+  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
+  let redirectUrl = `${HOST_PATHNAME}/#`
+
   const {
     standaloneVolumes,
     niftiLayers, // deprecating - check if anyone calls this url
@@ -127,7 +137,7 @@ module.exports = (query, _warningCb) => {
     regionsSelected, // deprecating - check if any one calls this url
     cRegionsSelected,
 
-    navigation, // deprecating - check if any one calls this endpoint
+    navigation,
     cNavigation,
   } = query || {}
 
@@ -142,7 +152,6 @@ module.exports = (query, _warningCb) => {
     if (Object.values(WARNING_STRINGS).includes(arg)) _warningCb(arg)
   }
 
-  if (navigation) console.warn(`navigation has been deprecated`)
   if (regionsSelected) console.warn(`regionSelected has been deprecated`)
   if (niftiLayers) console.warn(`nifitlayers has been deprecated`)
 
@@ -156,6 +165,30 @@ module.exports = (query, _warningCb) => {
 
   // common search param & path
   let nav, dsp, r
+  if (navigation) {
+    try {
+
+      const [
+        _o, _po, _pz, _p, _z
+      ] = navigation.split("__")
+      const o = _o.split("_").map(v => Number(v))
+      const po = _po.split("_").map(v => Number(v))
+      const pz = Number(_pz)
+      const p = _p.split("_").map(v => Number(v))
+      const z = Number(_z)
+      const v = [
+        o.map(n => encodeNumber(n, {float: true})).join(separator),
+        po.map(n => encodeNumber(n, {float: true})).join(separator),
+        encodeNumber(Math.floor(pz)),
+        Array.from(p).map(v => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+        encodeNumber(Math.floor(z)),
+      ].join(`${separator}${separator}`)
+
+      nav = `/@:${encodeURI(v)}`
+    } catch (e) {
+      console.warn(`Parsing navigation param error`, e)
+    }
+  }
   if (cNavigation) nav = `/@:${encodeURI(cNavigation)}`
   if (previewingDatasetFiles) {
     try {
@@ -163,7 +196,17 @@ module.exports = (query, _warningCb) => {
       if (Array.isArray(parsedDsp)) {
         if (parsedDsp.length === 1) {
           const { datasetId, filename } = parsedDsp[0]
-          dsp = `/dsp:${encodeId(datasetId)}::${encodeURI(filename)}`
+          if (datasetId === "minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957") {
+            /**
+             * if preview pli link, return hardcoded link
+             */
+            return `${HOST_PATHNAME}/#${pliPreviewUrl}`
+          } else {
+            /**
+             * TODO deprecate dsp
+             */
+            dsp = `/dsp:${encodeId(datasetId)}::${encodeURI(filename)}`
+          }
         } else {
           searchParam.set(`previewingDatasetFiles`, previewingDatasetFiles)
         }
@@ -206,8 +249,6 @@ module.exports = (query, _warningCb) => {
       // ignore region selected and move on
     }
   }
-  const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
-  let redirectUrl = `${HOST_PATHNAME}/#`
   if (standaloneVolumes) {
     searchParam.set('standaloneVolumes', standaloneVolumes)
     if (nav) redirectUrl += nav

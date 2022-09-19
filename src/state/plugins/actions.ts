@@ -7,12 +7,3 @@ export const clearInitManifests = createAction(
     nameSpace: string
   }>()
 )
-
-export const setInitMan = createAction(
-  `${nameSpace} setInitMan`,
-  props<{
-    nameSpace: string
-    url: string
-    internal?: boolean
-  }>()
-)

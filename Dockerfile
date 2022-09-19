@@ -3,8 +3,8 @@ FROM node:14 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
-ARG BS_REST_URL
-ENV BS_REST_URL=${BS_REST_URL:-https://siibra-api-stable.apps.hbp.eu/v1_0}
+ARG SIIBRA_API_ENDPOINTS
+ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}
@@ -21,11 +21,9 @@ ENV MATOMO_ID=${MATOMO_ID}
 ARG EXPERIMENTAL_FEATURE_FLAG
 ENV EXPERIMENTAL_FEATURE_FLAG=${EXPERIMENTAL_FEATURE_FLAG:-false}
 
-ARG GIT_HASH
-ENV GIT_HASH=${GIT_HASH:-unknownhash}
+ARG ENABLE_LEAP_MOTION
+ENV ENABLE_LEAP_MOTION=${ENABLE_LEAP_MOTION:-false}
 
-ARG VERSION
-ENV VERSION=${VERSION:-unknownversion}
 
 COPY . /iv
 WORKDIR /iv
@@ -39,6 +37,7 @@ RUN rm -rf ./node_modules
 
 RUN npm i
 RUN npm run build
+RUN node third_party/matomo/processMatomo.js
 RUN npm run build-storybook
 
 # gzipping container

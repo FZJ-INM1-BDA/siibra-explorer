@@ -2,6 +2,7 @@ import { Observable } from "rxjs"
 import { SAPI } from '../sapi.service'
 import { camelToSnake } from 'common/util'
 import {SapiQueryPriorityArg, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel} from "../type"
+import { map, switchMap } from "rxjs/operators"
 
 type FeatureResponse = {
   features: {
@@ -22,13 +23,21 @@ type SpatialFeatureOpts = RegionalSpatialFeatureOpts | BBoxSpatialFEatureOpts
 
 export class SAPISpace{
 
-  constructor(private sapi: SAPI, public atlasId: string, public id: string){}
+  constructor(private sapi: SAPI, public atlasId: string, public id: string){
+    this.prefix$ = SAPI.BsEndpoint$.pipe(
+      map(endpt => `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}`)
+    )
+  }
+
+  private prefix$: Observable<string>
 
   getModalities(param?: SapiQueryPriorityArg): Observable<FeatureResponse> {
-    return this.sapi.httpGet<FeatureResponse>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`,
-      null,
-      param
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<FeatureResponse>(
+        `${prefix}/features`,
+        null,
+        param
+      ))
     )
   }
 
@@ -37,9 +46,11 @@ export class SAPISpace{
     for (const [key, value] of Object.entries(opts)) {
       query[camelToSnake(key)] = value
     }
-    return this.sapi.httpGet<SapiSpatialFeatureModel[]>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features`,
-      query
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiSpatialFeatureModel[]>(
+        `${prefix}/features`,
+        query
+      ))
     )
   }
 
@@ -48,23 +59,29 @@ export class SAPISpace{
     for (const [key, value] of Object.entries(opts)) {
       query[camelToSnake(key)] = value
     }
-    return this.sapi.httpGet<SapiSpatialFeatureModel>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
-      query
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiSpatialFeatureModel>(
+        `${prefix}/features/${encodeURIComponent(instanceId)}`,
+        query
+      ))
     )
   }
 
   getDetail(param?: SapiQueryPriorityArg): Observable<SapiSpaceModel>{
-    return this.sapi.httpGet<SapiSpaceModel>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}`,
-      null,
-      param
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiSpaceModel>(
+        `${prefix}`,
+        null,
+        param
+      ))
     )
   }
 
   getVolumes(): Observable<SapiVolumeModel[]>{
-    return this.sapi.httpGet<SapiVolumeModel[]>(
-      `${this.sapi.bsEndpoint}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}/volumes`,
+    return this.prefix$.pipe(
+      switchMap(prefix => this.sapi.httpGet<SapiVolumeModel[]>(
+        `${prefix}/volumes`,
+      ))
     )
   }
 }

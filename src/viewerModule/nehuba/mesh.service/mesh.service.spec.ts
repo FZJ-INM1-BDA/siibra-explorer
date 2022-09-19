@@ -7,7 +7,7 @@ import { SapiRegionModel } from "src/atlasComponents/sapi"
 import * as configSvc from "../config.service"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
-import { mapTo } from "rxjs/operators"
+import { mapTo, take } from "rxjs/operators"
 import { selectorAuxMeshes } from "../store"
 
 
@@ -51,6 +51,12 @@ describe('> mesh.service.ts', () => {
       )
     )
   })
+
+  afterEach(() => {
+    getParcNgIdSpy.calls.reset()
+    getRegionLabelIndexSpy.calls.reset()
+    getATPSpy.calls.reset()
+  })
   describe('> NehubaMeshService', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -72,37 +78,106 @@ describe('> mesh.service.ts', () => {
       expect(service).toBeTruthy()
     })
 
-    it('> mixes in auxillaryMeshIndices', () => {
-      const mockStore = TestBed.inject(MockStore)
-      mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [ fits1 ])
-      mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [])
-      mockStore.overrideSelector(selectorAuxMeshes, [auxMesh])
+    describe("> loadMeshes$", () => {
 
-      const ngId = 'blabla'
-      const labelIndex = 12
-      getParcNgIdSpy.and.returnValue(ngId)
-      getRegionLabelIndexSpy.and.returnValue(labelIndex)
+      describe("> auxMesh defined", () => {
 
-      const service = TestBed.inject(NehubaMeshService)
-      
-      expect(
-        service.loadMeshes$
-      ).toBeObservable(
-        hot('(ab)', {
-          a: {
-            layer: {
-              name: ngId
-            },
-            labelIndicies: [ labelIndex ]
-          },
-          b: {
-            layer: {
-              name: auxMesh.ngId,
-            },
-            labelIndicies: auxMesh.labelIndicies
-          }
+        const ngId = 'blabla'
+        const labelIndex = 12
+
+        beforeEach(() => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [ fits1 ])
+          mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [])
+          mockStore.overrideSelector(selectorAuxMeshes, [auxMesh])
+    
+          getParcNgIdSpy.and.returnValue(ngId)
+          getRegionLabelIndexSpy.and.returnValue(labelIndex)
+
         })
-      )
+
+        it("> auxMesh ngId labelIndex emitted", () => {
+
+          const service = TestBed.inject(NehubaMeshService)
+          expect(
+            service.loadMeshes$
+          ).toBeObservable(
+            hot('(ab)', {
+              a: {
+                layer: {
+                  name: ngId
+                },
+                labelIndicies: [ labelIndex ]
+              },
+              b: {
+                layer: {
+                  name: auxMesh.ngId,
+                },
+                labelIndicies: auxMesh.labelIndicies
+              }
+            })
+          )
+        })
+      })
+
+      describe("> if multiple ngid and labelindicies are present", () => {
+
+        const ngId1 = 'blabla'
+        const labelIndex1 = 12
+
+        const ngId2 = 'foobar'
+        const labelIndex2 = 13
+
+        beforeEach(() => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [ fits1 ])
+          mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [fits1, fits1])
+          mockStore.overrideSelector(selectorAuxMeshes, [])
+    
+          getParcNgIdSpy.and.returnValues(ngId1, ngId2, ngId2)
+          getRegionLabelIndexSpy.and.returnValues(labelIndex1, labelIndex2, labelIndex2)
+        })
+
+        it('> should call getParcNgIdSpy and getRegionLabelIndexSpy thrice', () => {
+          const service = TestBed.inject(NehubaMeshService)
+          service.loadMeshes$.pipe(
+            take(1)
+          ).subscribe(() => {
+
+            expect(getParcNgIdSpy).toHaveBeenCalledTimes(3)
+            expect(getRegionLabelIndexSpy).toHaveBeenCalledTimes(3)
+          })
+        })
+
+        /**
+         * in the case of julich brain 2.9 in colin 27, we expect selecting a region will hide meshes from all relevant ngIds (both left and right)
+         */
+        it('> expect the emitted value to be incl all ngIds', () => {
+          const service = TestBed.inject(NehubaMeshService)
+          expect(
+            service.loadMeshes$
+          ).toBeObservable(
+            hot('(ab)', {
+              a: {
+                layer: {
+                  name: ngId1
+                },
+                labelIndicies: []
+              },
+              b: {
+                layer: {
+                  name: ngId2
+                },
+                labelIndicies: [ labelIndex2 ]
+              }
+            })
+          )
+
+        })
+      })
+
     })
   })
 })

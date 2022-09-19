@@ -1,4 +1,4 @@
-site_name: Interactive Atlas Viewer User Documentation
+site_name: Siibra Explorer User Documentation
 
 theme:
   name: 'material'
@@ -33,7 +33,13 @@ nav:
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.7.5: 'releases/v2.7.5.md'
+    - v2.7.4: 'releases/v2.7.4.md'
+    - v2.7.3: 'releases/v2.7.3.md'
+    - v2.7.2: 'releases/v2.7.2.md'
+    - v2.7.1: 'releases/v2.7.1.md'
     - v2.7.0: 'releases/v2.7.0.md'
+    - v2.6.10: 'releases/v2.6.10.md'
     - v2.6.9: 'releases/v2.6.9.md'
     - v2.6.8: 'releases/v2.6.8.md'
     - v2.6.7: 'releases/v2.6.7.md'

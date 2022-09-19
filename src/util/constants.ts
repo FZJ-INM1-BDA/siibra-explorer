@@ -32,9 +32,12 @@ export const MIN_REQ_EXPLAINER = `
 
 export const APPEND_SCRIPT_TOKEN: InjectionToken<(url: string) => Promise<HTMLScriptElement>> = new InjectionToken(`APPEND_SCRIPT_TOKEN`)
 
-export const appendScriptFactory = (document: Document) => {
+export const appendScriptFactory = (document: Document, defer: boolean = false) => {
   return src => new Promise((rs, rj) => {
     const scriptEl = document.createElement('script')
+    if (defer) {
+      scriptEl.defer = true
+    }
     scriptEl.src = src
     scriptEl.onload = () => rs(scriptEl)
     scriptEl.onerror = (e) => rj(e)
@@ -115,7 +118,6 @@ export const compareLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]
 }
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
-export const BS_ENDPOINT = new InjectionToken<string>('BS_ENDPOINT')
 
 export const UNSUPPORTED_PREVIEW = [{
   text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',

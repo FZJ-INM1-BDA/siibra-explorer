@@ -57,6 +57,12 @@ export class InterSpaceCoordXformSvc {
   // see https://github.com/ngrx/platform/issues/498#issuecomment-337465179
   // in order to properly test with marble, use obs instead of promise
   transform(srcTmplName: ValidTemplateSpaceName, targetTmplName: ValidTemplateSpaceName, coordinatesInNm: [number, number, number]): Observable<ITemplateCoordXformResp> {
+    if (environment.STRICT_LOCAL) {
+      return of({
+        status: 'error',
+        statusText: 'STRICT_LOCAL mode on, will not transform'
+      } as ITemplateCoordXformResp)
+    }
     if (!srcTmplName || !targetTmplName) {
       return of({
         status: 'error',

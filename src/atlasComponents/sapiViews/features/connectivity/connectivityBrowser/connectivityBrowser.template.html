@@ -62,10 +62,11 @@
         theme="dark">
     </hbp-connectivity-matrix-row>
     <div *ngIf="noConnectivityForRegion">No connectivity for the region.</div>
+
     <full-connectivity-grid #fullConnectivityGrid
                             [matrix]="matrixString"
-                            [datasetName]="selectedDataset?.dataset?.name"
-                            [datasetDescription]="selectedDataset?.dataset?.description"
+                            [datasetName]="selectedDataset?.name"
+                            [datasetDescription]="selectedDataset?.description"
                             only-export="true">
     </full-connectivity-grid>
 

@@ -1,10 +1,34 @@
 <div [ngClass]="{ 'text-muted': !visible }">
 
-  <button mat-icon-button (click)="toggleVisibility()">
+  <button mat-icon-button
+    [matTooltip]="CONST.TOGGLE_LAYER_VISILITY"
+    (click)="toggleVisibility()">
     <i [ngClass]="visible ? 'fa-eye' : 'fa-eye-slash'" class="far"></i>
   </button>
   
   <span>
     {{ name }}
   </span>
+
+  <button
+    mat-icon-button
+    [matTooltip]="CONST.ORIENT_TO_LAYER"
+    (click)="setOrientation()">
+    <i class="iavic iavic-rotation"></i>
+  </button>
+
+  <button
+    mat-icon-button
+    [matTooltip]="CONST.CONFIGURE_LAYER"
+    (click)="showOpacityCtrl = !showOpacityCtrl">
+    <i class="fas fa-cog"></i>
+  </button>
+
+  <ng-template [ngIf]="showOpacityCtrl">
+    <ng-layer-tune
+      [ngLayerName]="name"
+      [hideCtrl]="hideNgTuneCtrl"
+      [opacity]="defaultOpacity">
+    </ng-layer-tune>
+  </ng-template>
 </div>

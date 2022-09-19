@@ -1,8 +1,7 @@
 {
   "name": "interactive-viewer",
-  "version": "2.7.0",
+  "version": "2.7.5",
   "description": "siibra-explorer - explore brain atlases. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
-  "version": "2.7.0",
   "scripts": {
     "lint": "eslint src --ext .ts",
     "eslint": "eslint",

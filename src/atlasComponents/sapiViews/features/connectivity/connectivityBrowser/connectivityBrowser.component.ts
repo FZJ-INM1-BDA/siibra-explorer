@@ -216,10 +216,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
     private fixDatasetFormat = (ds) =>  ds.name.includes('{')? ({
       ...ds,
-      name: ds.name.substr(0, ds.name.indexOf('{')),
-      dataset: JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
+      ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
     }) : ds
-    
 
     fetchConnectivity() {
       this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
@@ -232,7 +230,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.fetching = false
         })
     }
-    
+
     setMatrixData(data) {
       const matrixData = data as SapiParcellationFeatureMatrixModel
       this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
@@ -248,7 +246,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         .then(matrix => {
           const regionProfile = matrix.rawArray[this.regionIndexInMatrix]
 
-          const maxStrength = Math.max(...regionProfile)  
+          const maxStrength = Math.max(...regionProfile)
           this.logChecked = maxStrength > 1
           this.logDisabled = maxStrength <= 1
 
@@ -264,7 +262,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         })
     }
 
-    
+
     changeLog(checked: boolean) {
       this.logChecked = checked
       this.connectedAreas.next(this.formatConnections(this.pureConnections))
@@ -272,13 +270,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.setCustomLayer()
     }
 
-    //ToDo navigateRegion action does not work any more
+    //ToDo bestViewPoint is null for the most cases
     navigateToRegion(region: SapiRegionModel) {
-      this.store$.dispatch(
-        atlasSelection.actions.navigateToRegion({
-          region
-        })
-      )
+      const regionCentroid = this.region.hasAnnotation?.bestViewPoint?.coordinates
+      if (regionCentroid)
+        this.store$.dispatch(
+          atlasSelection.actions.navigateTo({
+            navigation: {
+              position: regionCentroid.map(v => v.value*1e6),
+            },
+            animation: true
+          })
+        )
     }
 
     getRegionWithName(region: string) {

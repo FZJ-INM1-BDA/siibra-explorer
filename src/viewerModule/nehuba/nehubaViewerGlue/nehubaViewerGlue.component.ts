@@ -20,6 +20,7 @@ import { SapiRegionModel } from "src/atlasComponents/sapi";
 import { NehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
@@ -284,8 +285,45 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     /**
      * TODO check extension?
      */
-     
     this.dismissAllAddedLayers()
+
+    if (/\.swc$/i.test(file.name)) {
+      let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
+      const swcText = await file.text()
+      let src: TVALID_LINEAR_XFORM_SRC
+      const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
+      if (/ccf/i.test(swcText)) {
+        src = "CCF"
+        message += `CCF detected, applying known transformation.`
+      }
+      if (!src) {
+        message += `no known space detected. Applying default transformation.`
+      }
+
+      const xform = await linearTransform(src, dst)
+      
+      const url = URL.createObjectURL(file)
+      this.droppedLayerNames.push({
+        layerName: randomUuid,
+        resourceUrl: url
+      })
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            id: randomUuid,
+            source: `swc://${url}`,
+            segments: ["1"],
+            transform: xform,
+            clType: 'customlayer/nglayer' as const
+          }
+        })
+      )
+      this.snackbar.open(message, "Dismiss", {
+        duration: 10000
+      })
+      return
+    }
+     
     
     // Get file, try to inflate, if files, use original array buffer
     const buf = await file.arrayBuffer()

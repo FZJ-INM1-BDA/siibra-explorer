@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { AddUnitAndJoin } from "./addUnitAndJoin.pipe";
+import { EqualityPipe } from "./equality.pipe";
 import { IncludesPipe } from "./includes.pipe";
 import { NumbersPipe } from "./numbers.pipe";
 import { ParcellationSupportedInCurrentSpace } from "./parcellationSupportedInCurrentSpace.pipe";
@@ -9,6 +10,7 @@ import { SpaceSupportedInCurrentParcellationPipe } from "./spaceSupportedInCurre
 
 @NgModule({
   declarations: [
+    EqualityPipe,
     ParseDoiPipe,
     NumbersPipe,
     AddUnitAndJoin,
@@ -18,6 +20,7 @@ import { SpaceSupportedInCurrentParcellationPipe } from "./spaceSupportedInCurre
     SpaceSupportedInCurrentParcellationPipe,
   ],
   exports: [
+    EqualityPipe,
     ParseDoiPipe,
     NumbersPipe,
     AddUnitAndJoin,

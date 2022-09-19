@@ -5,8 +5,7 @@ import { BoothVisitor, JRPCRequest, JRPCSuccessResp, ListenerChannel } from "src
 import { ApiBoothEvents, ApiService, BroadCastingApiEvents, HeartbeatEvents, namespace } from "src/api/service";
 import { getUuid } from "src/util/fn";
 import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
-import { getPluginSrc } from "../const";
-import { PluginService } from "../service";
+import { getPluginSrc, SET_PLUGIN_NAME } from "../const";
 
 @Component({
   selector: 'sxplr-plugin-portal',
@@ -44,8 +43,8 @@ export class PluginPortal implements AfterViewInit, OnDestroy, ListenerChannel{
 
   constructor(
     private apiService: ApiService,
-    private pluginSvc: PluginService,
     public vcr: ViewContainerRef,
+    @Optional() @Inject(SET_PLUGIN_NAME) private setPluginName: (inst: unknown, pluginName: string) => void,
     @Optional() @Inject(WIDGET_PORTAL_TOKEN) portalData: Record<string, string>
   ){
     if (portalData){
@@ -91,7 +90,7 @@ export class PluginPortal implements AfterViewInit, OnDestroy, ListenerChannel{
             const data = event.data as JRPCSuccessResp<HeartbeatEvents['init']['response']>
 
             this.srcName = data.result.name || 'Untitled Pluging'
-            this.pluginSvc.setPluginName(this, this.srcName)
+            this.setPluginName(this, this.srcName)
             
             while (this.handshakeSub.length > 0) this.handshakeSub.pop().unsubscribe()
 

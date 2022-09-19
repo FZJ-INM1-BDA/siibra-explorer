@@ -3,15 +3,19 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service"
 import { SapiParcellationModel } from "src/atlasComponents/sapi/type"
 import { getTraverseFunctions } from "./parcellationVersion.pipe"
 
-describe("parcellationVersion.pipe.ts", () => {
+describe(`parcellationVersion.pipe.ts`, () => {
   describe("getTraverseFunctions", () => {
     let julichBrainParcellations: SapiParcellationModel[] = []
+    let endpoint: string
     beforeAll(async () => {
-      const res = await fetch(`${SAPI.bsEndpoint}/atlases/${encodeURIComponent(IDS.ATLAES.HUMAN)}/parcellations`)
+      const bsEndPoint = await SAPI.BsEndpoint$.toPromise()
+      endpoint = bsEndPoint
+      const res = await fetch(`${bsEndPoint}/atlases/${encodeURIComponent(IDS.ATLAES.HUMAN)}/parcellations`)
       const arr: SapiParcellationModel[] = await res.json()
       julichBrainParcellations = arr.filter(it => /Julich-Brain Cytoarchitectonic Maps/.test(it.name))
     })
     it("> should be at least 3 parcellations", () => {
+      console.log(`testing against endpoint: ${endpoint}`)
       expect(julichBrainParcellations.length).toBeGreaterThanOrEqual(3)
     })
 

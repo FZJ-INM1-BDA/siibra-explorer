@@ -3,9 +3,10 @@ import { Injectable, Injector, NgZone } from "@angular/core";
 import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
 import { WidgetService } from "src/widget/service";
 import { WidgetPortal } from "src/widget/widgetPortal/widgetPortal.component";
-import { setPluginSrc } from "./const";
+import { setPluginSrc, SET_PLUGIN_NAME } from "./const";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
 import { environment } from "src/environments/environment"
+import { startWith } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,9 @@ export class PluginService {
     'siibra-explorer': true
     name: string
     iframeUrl: string
-  }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`)
+  }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
+    startWith([])
+  )
 
   async launchPlugin(htmlSrc: string){
     if (this.loadedPlugins.includes(htmlSrc)) return
@@ -33,6 +36,9 @@ export class PluginService {
       providers: [{
         provide: WIDGET_PORTAL_TOKEN,
         useValue: setPluginSrc(htmlSrc, {})
+      }, {
+        provide: SET_PLUGIN_NAME,
+        useValue: (inst: PluginPortal, pluginName: string) => this.setPluginName(inst, pluginName)
       }],
       parent: this.injector
     })

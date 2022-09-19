@@ -90,7 +90,7 @@ export class QuickTourService {
         height: '0px',
         width: '0px',
         hasBackdrop: true,
-        backdropClass: ['pe-none', 'cdk-overlay-dark-backdrop'],
+        backdropClass: ['sxplr-pe-none', 'cdk-overlay-dark-backdrop'],
         positionStrategy: this.overlay.position().global(),
       })
     }

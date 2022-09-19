@@ -8,6 +8,7 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { AuthModule } from "src/auth";
 import { ShareSheetComponent } from "./shareSheet/shareSheet.component";
 import { ShareDirective } from "./share.directive";
+import { StateModule } from "src/state";
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { ShareDirective } from "./share.directive";
     FormsModule,
     ReactiveFormsModule,
     AuthModule,
+    StateModule,
   ],
   declarations: [
     ClipboardCopy,

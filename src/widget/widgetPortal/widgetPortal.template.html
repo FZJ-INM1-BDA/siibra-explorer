@@ -1,13 +1,41 @@
-<mat-card cdkDrag [cdkDragFreeDragPosition]="defaultPosition">
+<div *ngIf="state === EnumWidgetState.MINIMIZED"
+  class="when-minimized-nub">
+
+  <button mat-mini-fab
+    [matTooltip]="name"
+    color="primary"
+    class="sxplr-pe-all"
+    (click)="state = minimizeReturnState">
+    <i [class]="minimizeReturnState | widgetStateIcon"></i>
+  </button>
+</div>
+
+<mat-card>
   <mat-card-content>
-    <div class="widget-portal-header" cdkDragHandle>
-      <span class="hover-grab widget-grab-handle">
-        <i class="fas fa-grip-vertical"></i>
-      </span>
+    <div class="widget-portal-header">
 
       <span *ngIf="name" class="widget-name">
         {{ name }}
       </span>
+      
+      <!-- state changer -->
+      <ng-template [ngTemplateOutlet]="stateBtnTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: EnumWidgetState.MINIMIZED
+        }">
+      </ng-template>
+
+      <ng-template [ngTemplateOutlet]="stateBtnTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: EnumWidgetState.NORMAL
+        }">
+      </ng-template>
+
+      <ng-template [ngTemplateOutlet]="stateBtnTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: EnumWidgetState.MAXIMIZED
+        }">
+      </ng-template>
 
       <button mat-icon-button (click)="exit()">
         <i class="fas fa-times"></i>
@@ -20,3 +48,13 @@
     </div>
   </mat-card-content>
 </mat-card>
+
+<!-- template for plugin state -->
+<ng-template #stateBtnTmpl let-btnstate>
+  <button
+    *ngIf="state !== btnstate"
+    (click)="state = btnstate"
+    mat-icon-button>
+    <i [class]="btnstate | widgetStateIcon"></i>
+  </button>
+</ng-template>
