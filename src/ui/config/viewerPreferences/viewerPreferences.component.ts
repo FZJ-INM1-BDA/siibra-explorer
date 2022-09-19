@@ -3,30 +3,22 @@ import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { MatSliderChange } from "@angular/material/slider";
 import { atlasSelection, userPreference, userInterface } from 'src/state';
 import { environment } from "src/environments/environment"
 
-const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
-const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
-const MOBILE_UI_TOOLTIP = `Mobile UI enables touch controls`
 const ROOT_TEXT_ORDER: [string, string, string, string] = ['Coronal', 'Sagittal', 'Axial', '3D']
 const OBLIQUE_ROOT_TEXT_ORDER: [string, string, string, string] = ['Slice View 1', 'Slice View 2', 'Slice View 3', '3D']
 
 @Component({
-  selector: 'config-component',
-  templateUrl: './config.template.html',
+  selector: 'viewer-preferences-component',
+  templateUrl: './viewerPreferences.template.html',
   styleUrls: [
-    './config.style.css',
+    './viewerPreferences.style.css',
   ],
 })
 
-export class ConfigComponent implements OnInit, OnDestroy {
+export class ViewerPreferencesComponent implements OnInit, OnDestroy {
 
-  public GPU_TOOLTIP = GPU_TOOLTIP
-  public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
-  public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
 
   public experimentalFlag = environment.EXPERIMENTAL_FEATURE_FLAG
 
@@ -38,19 +30,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * in MB
-   */
-  public gpuLimit$: Observable<number>
-
-  public useMobileUI$: Observable<boolean> = this.store.pipe(
-    select(userPreference.selectors.useMobileUi)
-  )
-  public animationFlag$: Observable<boolean>
   private subscriptions: Subscription[] = []
-
-  public gpuMin: number = 100
-  public gpuMax: number = 1000
 
   public panelMode$: Observable<string>
 
@@ -63,15 +43,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<any>,
   ) {
-
-    this.gpuLimit$ = this.store.pipe(
-      select(userPreference.selectors.gpuLimit),
-      map(v => v / 1e6),
-    )
-
-    this.animationFlag$ = this.store.pipe(
-      select(userPreference.selectors.useAnimation)
-    )
 
     this.panelMode$ = this.store.pipe(
       select(userInterface.selectors.panelMode)
@@ -111,31 +82,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public toggleMobileUI(ev: MatSlideToggleChange) {
-    const { checked } = ev
-    this.store.dispatch(
-      userPreference.actions.useMobileUi({
-        flag: checked
-      })
-    )
-  }
-
-  public toggleAnimationFlag(ev: MatSlideToggleChange ) {
-    const { checked } = ev
-    this.store.dispatch(
-      userPreference.actions.setAnimationFlag({
-        flag: checked
-      })
-    )
-  }
-
-  public handleMatSliderChange(ev: MatSliderChange) {
-    this.store.dispatch(
-      userPreference.actions.setGpuLimit({
-        limit: ev.value * 1e6
-      })
-    )
-  }
   public usePanelMode(panelMode: userInterface.PanelMode) {
 
     this.store.dispatch(
@@ -180,5 +126,5 @@ export class ConfigComponent implements OnInit, OnDestroy {
     target.classList.remove('onDragOver')
   }
 
-  public stepSize: number = 10
+  // public stepSize: number = 10
 }

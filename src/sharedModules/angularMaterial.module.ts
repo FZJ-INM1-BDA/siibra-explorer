@@ -31,6 +31,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard'
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {OverlayModule} from "@angular/cdk/overlay";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -67,6 +68,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ClipboardModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    OverlayModule,
   ],
   exports: [
     MatButtonModule,
@@ -98,6 +100,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     ClipboardModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    OverlayModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

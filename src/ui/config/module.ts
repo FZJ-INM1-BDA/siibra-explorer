@@ -3,7 +3,8 @@ import { NgModule } from "@angular/core";
 import { LayoutModule } from "src/layouts/layout.module";
 import { PluginModule } from "src/plugin";
 import { AngularMaterialModule } from "src/sharedModules";
-import { ConfigComponent } from "./configCmp/config.component";
+import {HardwareConfigComponent} from "src/ui/config/hardwareConfig/hardwareConfig.component";
+import {ViewerPreferencesComponent} from "src/ui/config/viewerPreferences/viewerPreferences.component";
 
 @NgModule({
   imports: [
@@ -13,10 +14,12 @@ import { ConfigComponent } from "./configCmp/config.component";
     LayoutModule,
   ],
   declarations: [
-    ConfigComponent,
+    HardwareConfigComponent,
+    ViewerPreferencesComponent
   ],
   exports: [
-    ConfigComponent,
+    HardwareConfigComponent,
+    ViewerPreferencesComponent
   ]
 })
 export class ConfigModule{}
