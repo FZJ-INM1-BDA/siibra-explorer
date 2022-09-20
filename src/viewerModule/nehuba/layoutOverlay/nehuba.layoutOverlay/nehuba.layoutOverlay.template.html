@@ -157,7 +157,9 @@
 <ng-template #miniPerspectiveTmp>
   <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer overflow-hidden">
 
-    <div   *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform">
+    <div *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
+         [style.background-image]="'url(' + maximiseService.previewImage + ')'"
+         style="background-size: cover;">
 
       <input type="range"
              class="custom-slider-3d mini-perspective-viewer"
