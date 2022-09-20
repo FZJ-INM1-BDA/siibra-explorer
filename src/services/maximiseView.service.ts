@@ -46,6 +46,8 @@ export class MaximiseViewService implements OnDestroy {
 
   public heightChanged: EventEmitter<null> = new EventEmitter();
 
+  public previewImage: string
+
   private get viewer(){
     return (window as any).viewer
   }
@@ -197,6 +199,9 @@ export class MaximiseViewService implements OnDestroy {
   }
 
   maximise(panelIndex, panelOrder) {
+
+    this.previewImage = `assets/images/persp-view/${perspectiveScreenshots[this.selectedTemplateId][+panelOrder[0]]}`
+
     this.isMaximised = true
     this.maximisedPanelIndex = panelIndex
     this.formatMiniPerspectiveView()
@@ -284,4 +289,13 @@ const defaultZoom = {
   "minds/core/referencespace/v1.0.0/MEBRAINS": [3450000,2700000,1300000],
   "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": [165000,140000,100000],
   "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": [600000,240000,240000],
+}
+
+export const perspectiveScreenshots = {
+  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": ['mni1.png', 'mni2.png', 'mni3.png'],
+  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": ['colin1.png', 'colin2.png', 'colin3.png'],
+  "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": ['bb1.png', 'bb2.png', 'bb3.png'],
+  "minds/core/referencespace/v1.0.0/MEBRAINS": ['monkey1.png', 'monkey2.png', 'monkey3.png'],
+  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": ['mouse1.png', 'mouse2.png', 'mouse3.png'],
+  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": ['rat1.png', 'rat2.png', 'rat3.png'],
 }

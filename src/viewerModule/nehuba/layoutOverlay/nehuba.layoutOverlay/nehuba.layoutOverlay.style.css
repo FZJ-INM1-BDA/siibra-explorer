@@ -94,6 +94,7 @@ current-layout
   outline: none;
   opacity: 1;
   left: 0;
+  min-height: 5px;
   background-color: rgba(0,0,0,0);
   -webkit-transition: .2s;
   transition: opacity .2s;

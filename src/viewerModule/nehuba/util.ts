@@ -151,39 +151,21 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
 export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement], panelOrderString: string): HTMLDivElement => {
   washPanels(panels)
 
-  const panelOrder = panelOrderString.split('').map(p => +p)
-
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "SINGLE_PANEL"))
 
   const majorContainer = makeRow(panels[0])
 
   majorContainer.style.flexBasis = '100%'
 
-  const perspectivePanelIndex = panelOrder.findIndex(po => po === 3)
-
   let minorContainer
-  const perspectiveContainer = (panels[perspectivePanelIndex])
 
-  if (panelOrder[0] !== 3) {
-    perspectiveContainer.style.width = '200px'
-    perspectiveContainer.style.height = '200px'
-    perspectiveContainer.style.bottom = '50px'
-    perspectiveContainer.style.right = '50px'
-    perspectiveContainer.style.border='1px solid lightgrey'
-    perspectiveContainer.classList.add('position-absolute')
+  washPanels(panels)
+  majorContainer.style.flexBasis = '100%'
+  minorContainer = makeRow(panels[1], panels[2], panels[3])
+  minorContainer.style.flexBasis = '0%'
+  minorContainer.className = ''
 
-  } else {
-    washPanels(panels)
-    majorContainer.style.flexBasis = '100%'
-    minorContainer = makeRow(panels[1], panels[2], panels[3])
-    minorContainer.style.flexBasis = '0%'
-    minorContainer.className = ''
-    minorContainer.style.height = '0px'
-
-  }
-
-  return panelOrder[0] !== 3 ? makeRow(majorContainer, perspectiveContainer)
-    : makeRow(majorContainer, minorContainer)
+  return makeRow(majorContainer, minorContainer)
 }
 
 export const getNavigationStateFromConfig = nehubaConfig => {
