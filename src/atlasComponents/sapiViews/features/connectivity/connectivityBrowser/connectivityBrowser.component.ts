@@ -1,13 +1,20 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, ChangeDetectorRef} from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Subscription, BehaviorSubject} from "rxjs";
-import {catchError, take} from "rxjs/operators";
-import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
+import {catchError} from "rxjs/operators";
+import {
+  SAPI,
+  SapiAtlasModel,
+  SapiParcellationModel,
+  SapiRegionModel
+} from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
+import {HttpClient} from "@angular/common/http";
+import {environment} from "src/environments/environment";
 
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
@@ -58,11 +65,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     private _defaultProfile
     @Input() set defaultProfile(val: any) {
       this._defaultProfile = val
-      this.selectedType = this.types.find(t => t.types.includes(val.type))?.name
-      this.pageNumber = 1
-      this.selectedDataset = this.fixDatasetFormat(val.selectedDataset)
-      if (val.matrix) this.setMatrixData(val.matrix)
-      this.numberOfDatasets = val.numberOfDatasets
     }
 
     get defaultProfile() {
@@ -70,6 +72,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     public selectedType: any
+    public selectedTypeId: string
+    public selectedCohort: Cohort
+    public selectedSubjectIndex: number
+    public selectedSubjectDatasetIndex: number
+    public cohorts: Cohort[]
+    public selectedView: 'subject' | 'average' | null
+    public averageDisabled: boolean = true
+    public subjectsDisabled: boolean = true
 
     @Input()
     set region(val) {
@@ -97,10 +107,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
     public matrixString: string
     public fetching: boolean
-    public numberOfDatasets: number
     public connectivityLayerId = 'connectivity-colormap-id'
     private setCustomLayerOnLoad = false
-    public pageNumber: number
     private customLayerEnabled: boolean
 
     public logDisabled: boolean = true
@@ -113,6 +121,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         private store$: Store,
         private sapi: SAPI,
         private changeDetectionRef: ChangeDetectorRef,
+        private httpClient: HttpClient
     ) {}
 
     public ngAfterViewInit(): void {
@@ -182,35 +191,56 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     selectType(typeName) {
       this.selectedType = typeName
-      this.pageNumber = 1
-      this.loadDataset()
+      this.selectedTypeId = this.types.find(t => t.name === typeName).types[0]
+      this.selectedCohort = null
+      this.cohorts = null
+      this.fetchCohorts()
     }
 
-    datasetSliderChanged(pageNumber) {
-      this.pageNumber = pageNumber
-      this.loadDataset()
+    getCohortsReq() {
+      const { SIIBRA_API_ENDPOINTS } = environment
+      const endp = SIIBRA_API_ENDPOINTS.split(',')[0]
+      return this.sapi.http.get(
+        `${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&group=cohort_subject`,
+      )
     }
-
-    loadDataset() {
-      this.fetching = true
-      const type = this.types.find(t => t.name === this.selectedType).types[0]
-      return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-        .getFeatures({type, page: this.pageNumber, size: 1},)
-        .pipe(
-          take(1),
-          catchError(() => {
-            this.fetching = false
-            return of(null)
-          })
-        ).subscribe((res: any) => {
-          if (res && res.items) {
-            if (res.total !== this.numberOfDatasets) {
-              this.numberOfDatasets = res.total
-            }
-            this.selectedDataset = this.fixDatasetFormat(res.items[0])
-            this.fetchConnectivity()
-          }
+  
+    fetchCohorts() {
+      this.subscriptions.push(
+        this.getCohortsReq().subscribe((c: Cohort[]) => {
+          this.cohorts = c
         })
+      )
+    }
+
+    selectCohort(cohort: Cohort) {
+      this.selectedCohort = cohort
+
+      this.averageDisabled = !this.selectedCohort.subjects.find(s => s.subject === 'average')
+      this.subjectsDisabled = !this.selectedCohort.subjects.find(s => s.subject !== 'average')
+
+      this.selectedView = !this.averageDisabled? 'average' : 'subject'
+
+      this.selectedSubjectIndex = 0
+      this.selectedSubjectDatasetIndex = 0
+
+      this.loadSubjectConnectivity()
+    }
+
+    subjectSliderChanged(index) {
+      this.selectedSubjectIndex = this.selectedCohort.subjects.findIndex((s, i) => i === index)
+      this.selectedSubjectDatasetIndex = 0
+      this.loadSubjectConnectivity()
+    }
+
+    subjectDatasetSliderChanged(index) {
+      this.selectedSubjectDatasetIndex = index
+      this.loadSubjectConnectivity()
+    }
+
+    loadSubjectConnectivity() {
+      this.fetching = true
+      this.fetchConnectivity(this.selectedCohort.subjects[this.selectedSubjectIndex].datasets[this.selectedSubjectDatasetIndex])
     }
 
     // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
@@ -219,13 +249,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
     }) : ds
 
-    fetchConnectivity() {
-      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
+    fetchConnectivity(datasetId=null) {
+      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(datasetId || this.selectedDataset['@id'])
         .pipe(catchError(() => {
           this.fetching = false
           return of(null)
         }))
         .subscribe(ds=> {
+          this.selectedDataset = this.fixDatasetFormat(ds)
           this.setMatrixData(ds)
           this.fetching = false
         })
@@ -336,3 +367,10 @@ export type ConnectedArea = {
     numberOfConnections: number
 }
 
+export type Cohort = {
+  cohort: string
+  subjects: {
+    subject: string
+    datasets: string[]
+  }[]
+}
