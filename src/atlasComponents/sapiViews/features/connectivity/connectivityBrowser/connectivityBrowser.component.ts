@@ -262,9 +262,24 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         })
     }
 
+    // ToDo need to be fixed on configuration side
+    fixHemisphereNaming(area) {
+      if (area.includes(' - left hemisphere')) {
+        return area.replace('- left hemisphere', 'left')
+      } else if (area.includes(' - right hemisphere')) {
+        return area.replace('- right hemisphere', 'right')
+      } else {
+        return area
+      }
+    }
+
     setMatrixData(data) {
       const matrixData = data as SapiParcellationFeatureMatrixModel
-      this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
+
+      this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => {
+        return this.fixHemisphereNaming(md) === this.regionName
+      })
+
       if (this.regionIndexInMatrix < 0) {
         this.fetching = false
         this.noConnectivityForRegion = true
@@ -281,8 +296,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.logChecked = maxStrength > 1
           this.logDisabled = maxStrength <= 1
 
-          const areas = regionProfile.reduce((p, c, i) => ({...p, [matrixData.columns[i]]: c}), {})
+          const areas = regionProfile.reduce((p, c, i) => {
+            return {
+              ...p,
+              [this.fixHemisphereNaming(matrixData.columns[i])]: c
+            }
+          }, {})
           this.pureConnections = areas
+
           this.connectionsString = JSON.stringify(areas)
           this.connectedAreas.next(this.formatConnections(areas))
           this.setCustomLayer()
