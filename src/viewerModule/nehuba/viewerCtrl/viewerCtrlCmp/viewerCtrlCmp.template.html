@@ -10,19 +10,5 @@
   </span>
 </mat-slide-toggle>
 
-<ng-container *ngIf="auxMeshes$ | async as auxMeshes">
-  <mat-divider class="mt-1 mb-1"></mat-divider>
-  <form [formGroup]="auxMeshFormGroup">
-    <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
-      [formControlName]="auxMesh['@id']"
-      class="d-block"
-      [name]="'toggle-aux-mesh-' + auxMesh['@id']">
-      <span class="sxplr-custom-cmp text">
-        {{ auxMesh.displayName || auxMesh.name }}
-      </span>
-    </mat-slide-toggle>
-  </form>
-</ng-container>
-
 <!-- TODO menu no longer showing, likely something to do with detaching cdr on nehubaGlue.component -->
 <app-change-perspective-orientation *ngIf="false"></app-change-perspective-orientation>

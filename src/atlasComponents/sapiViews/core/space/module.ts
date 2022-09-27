@@ -11,12 +11,14 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { DialogModule } from "src/ui/dialogInfo/module";
 import { SapiViewsUtilModule } from "../../util";
 import {UtilModule} from "src/util";
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   imports: [
     CommonModule,
     ComponentsModule,
     AngularMaterialModule,
+    ReactiveFormsModule,
     DialogModule,
     SapiViewsUtilModule,
     UtilModule
