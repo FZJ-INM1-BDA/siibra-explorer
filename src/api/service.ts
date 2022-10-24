@@ -140,6 +140,7 @@ export type BroadCastingApiEvents = {
   parcellationSelected: SapiParcellationModel
   allRegions: SapiRegionModel[]
   regionsSelected: SapiRegionModel[]
+  navigation: MainState['[state.atlasSelection]']['navigation']
 }
 
 const broadCastDefault: BroadCastingApiEvents = {
@@ -148,6 +149,7 @@ const broadCastDefault: BroadCastingApiEvents = {
   parcellationSelected: null,
   allRegions: [],
   regionsSelected: [],
+  navigation: null,
 }
 
 @Injectable({
@@ -268,6 +270,11 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       select(atlasSelection.selectors.selectedParcAllRegions)
     ).subscribe(regions => {
       this.broadcastCh.emit('allRegions', regions)
+    })
+    this.store.pipe(
+      select(atlasSelection.selectors.navigation)
+    ).subscribe(navigation => {
+      this.broadcastCh.emit('navigation', navigation)
     })
   }
   async onRequest(event: JRPCRequest<keyof ApiBoothEvents, unknown>): Promise<void | JRPCResp<ApiBoothEvents[keyof ApiBoothEvents]['response'], string>> {
