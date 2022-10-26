@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, CONST } from 'common/constants'
 import { EnumViewerEvt, IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaViewerContainerDirective, TMouseoverEvent } from "../nehubaViewerInterface/nehubaViewerInterface.directive";
 import { NehubaMeshService } from "../mesh.service";
@@ -21,8 +21,9 @@ import { NehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.servic
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
+import { DragDropFileDirective } from 'src/dragDropFile/dragDrop.directive'
 
-export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
+export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
 
 @Component({
   selector: 'iav-cmp-viewer-nehuba-glue',
@@ -66,7 +67,11 @@ export const INVALID_FILE_INPUT = `Exactly one (1) nifti file is required!`
 
 export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewInit {
 
-  @ViewChild('layerCtrlTmpl', { read: TemplateRef }) layerCtrlTmpl: TemplateRef<any>
+  @ViewChild('layerCtrlTmpl', { static: true })
+  layerCtrlTmpl: TemplateRef<any>
+
+  @ViewChild(DragDropFileDirective, { static: true })
+  dragDropDirective: DragDropFileDirective
 
   public ARIA_LABELS = ARIA_LABELS
 
@@ -163,6 +168,12 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
   ngAfterViewInit(): void {
     this.setupNehubaEvRelay()
+    /**
+     * TODO directly dynamic input binding does not seem to work ...
+     * even though static input binding works (i.e. [comp-input]="var" does not work, comp-input="value" works)
+     * 
+     */
+    this.dragDropDirective.snackText = CONST.NEHUBA_DRAG_DROP_TEXT
   }
 
   ngOnDestroy(): void {

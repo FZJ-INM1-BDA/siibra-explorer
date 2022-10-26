@@ -876,3 +876,9 @@ how-to-cite img
 {
   max-width: 100vw;
 }
+
+/* this is required to set snackbar to be none-interactive */
+.cdk-overlay-pane:has(.sxplr-pe-none)
+{
+  pointer-events: none;
+}

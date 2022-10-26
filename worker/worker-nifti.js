@@ -244,7 +244,7 @@
             if (val < min) min = val
             if (val > max) max = val
           } catch (e) {
-            console.error(`error in while true block`)
+            // erroring here is expected. Since we will overread the buffer.
             break
           }
           pointer.offset += increment
