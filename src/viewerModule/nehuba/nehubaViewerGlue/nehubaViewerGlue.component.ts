@@ -173,7 +173,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
      * even though static input binding works (i.e. [comp-input]="var" does not work, comp-input="value" works)
      * 
      */
-    this.dragDropDirective.snackText = CONST.NEHUBA_DRAG_DROP_TEXT
+    if (this.dragDropDirective) this.dragDropDirective.snackText = CONST.NEHUBA_DRAG_DROP_TEXT
   }
 
   ngOnDestroy(): void {
