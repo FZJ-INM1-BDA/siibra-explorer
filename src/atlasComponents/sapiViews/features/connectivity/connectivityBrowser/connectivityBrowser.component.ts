@@ -13,7 +13,6 @@ import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
-import {HttpClient} from "@angular/common/http";
 import {environment} from "src/environments/environment";
 
 @Component({
@@ -49,7 +48,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.accordionIsExpanded = flag
 
       if (flag) {
-        if (this.allRegions.length) {
+        if (this.selectedSubjectDatasetIndex >= 0 && this.allRegions.length) {
           this.setCustomLayer()
         } else {
           this.setCustomLayerOnLoad = true
@@ -121,7 +120,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         private store$: Store,
         private sapi: SAPI,
         private changeDetectionRef: ChangeDetectorRef,
-        private httpClient: HttpClient
     ) {}
 
     public ngAfterViewInit(): void {
@@ -194,12 +192,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.selectedTypeId = this.types.find(t => t.name === typeName).types[0]
       this.selectedCohort = null
       this.cohorts = null
+      this.removeCustomLayer()
       this.fetchCohorts()
     }
 
     getCohortsReq() {
       const { SIIBRA_API_ENDPOINTS } = environment
-      const endp = SIIBRA_API_ENDPOINTS.split(',')[0]
+      // const end = this.sapi.BsEndpoint$.subscribe()
+      const endp = 'https://siibra-api-tmp-1kb-fix.apps.jsc.hbp.eu/v2_0'
       return this.sapi.http.get(
         `${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&group=cohort_subject`,
       )
