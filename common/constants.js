@@ -84,6 +84,11 @@
     MESH_LOADING_STATUS: 'mesh-loading-status'
   }
 
+  exports.VALUES = {
+    ROOT_2: 0.7071067690849304,
+    THRESHOLD: 1e-3
+  }
+
   exports.CONST = {
     KG_TOS: `The interactive viewer queries HBP Knowledge Graph Data Platform ("KG") for published datasets.
 

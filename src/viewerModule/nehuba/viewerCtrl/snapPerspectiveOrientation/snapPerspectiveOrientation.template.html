@@ -1,0 +1,18 @@
+<h3 class="text mat-h3">
+    Set perspective orientation
+</h3>
+
+<ng-container *ngTemplateOutlet="btnTmpl; context: { $implicit: EnumClassicalView.CORONAL }">
+</ng-container>
+<ng-container *ngTemplateOutlet="btnTmpl; context: { $implicit: EnumClassicalView.SAGITTAL }">
+</ng-container>
+<ng-container *ngTemplateOutlet="btnTmpl; context: { $implicit: EnumClassicalView.AXIAL }">
+</ng-container>
+
+<ng-template #btnTmpl let-orientation>
+    <button mat-button
+        [color]="currentView === orientation ? 'primary': 'default'"
+        (click)="set3DViewPoint(orientation)">
+        {{ orientation }}
+    </button>
+</ng-template>

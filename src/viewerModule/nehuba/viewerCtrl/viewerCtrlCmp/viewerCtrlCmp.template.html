@@ -1,28 +1,40 @@
-<h3 class="sxplr-custom-cmp text mat-h3">
+<h3 class="text mat-h3">
   Perspective View
 </h3>
 
 <mat-slide-toggle [(ngModel)]="removeOctantFlag"
   [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
   name="remove-frontal-octant">
-  <span class="sxplr-custom-cmp text">
+  <span class="text">
     Remove frontal octant
   </span>
 </mat-slide-toggle>
 
+<!-- aux mesh controller -->
 <ng-container *ngIf="auxMeshes$ | async as auxMeshes">
-  <mat-divider class="mt-1 mb-1"></mat-divider>
-  <form [formGroup]="auxMeshFormGroup">
-    <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
-      [formControlName]="auxMesh['@id']"
-      class="d-block"
-      [name]="'toggle-aux-mesh-' + auxMesh['@id']">
-      <span class="sxplr-custom-cmp text">
-        {{ auxMesh.displayName || auxMesh.name }}
-      </span>
-    </mat-slide-toggle>
-  </form>
+  <ng-template [ngIf]="auxMeshes.length > 0">
+    <mat-divider class="mt-1 mb-1"></mat-divider>
+
+    <h3 class="text mat-h3">
+      Toggle auxiliary meshes
+    </h3>
+    
+    <form [formGroup]="auxMeshFormGroup">
+      <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
+        [formControlName]="auxMesh['@id']"
+        class="d-block"
+        [name]="'toggle-aux-mesh-' + auxMesh['@id']">
+        <span class="text">
+          {{ auxMesh.displayName || auxMesh.name }}
+        </span>
+      </mat-slide-toggle>
+    </form>
+  </ng-template>
 </ng-container>
 
 <!-- TODO menu no longer showing, likely something to do with detaching cdr on nehubaGlue.component -->
-<app-change-perspective-orientation *ngIf="false"></app-change-perspective-orientation>
+
+<mat-divider class="mt-1 mb-1"></mat-divider>
+<snap-perspective-orientation-cmp></snap-perspective-orientation-cmp>
+
+

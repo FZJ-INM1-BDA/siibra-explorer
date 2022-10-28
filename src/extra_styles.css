@@ -427,6 +427,11 @@ markdown-dom p
   height:20em!important;
 }
 
+.overflow-hidden
+{
+  overflow: hidden!important;
+}
+
 .overflow-x-auto
 {
   overflow-x: auto;
