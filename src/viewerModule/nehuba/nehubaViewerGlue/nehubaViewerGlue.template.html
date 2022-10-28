@@ -6,7 +6,7 @@
 
   <sxplr-nehuba-viewer-container
     class="sxplr-w-100 sxplr-h-100 sxplr-d-block"
-    (viewerLoaded)="handleViewerLoadedEvent($event)">
+    (viewerEvent)="viewerEvent.emit($event)">
   </sxplr-nehuba-viewer-container>
 
 </div>
