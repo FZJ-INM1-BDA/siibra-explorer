@@ -120,10 +120,6 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CONNECTIVITY: 'Connectivity',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
 
-    ATLAS_NOT_FOUND: `Atlas not found. Maybe it is still loading. Try again in a few seconds?`,
-    TEMPLATE_NOT_FOUND: `Template not found. Maybe it is still loading. Try again in a few seconds?`,
-    PARC_NOT_FOUND: ``,
-
     PINNED_DATASETS_BADGE_DESC: `Number of pinned datasets`,
 
     GDPR_TEXT: `This dataset is currently reviewed by the EBRAINS Data Protection Office regarding GDPR compliance. Therefore the atlas does not provide access to the underlying data files yet. The data will be available after this review.`,
@@ -147,14 +143,16 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
 
     TOGGLE_LAYER_VISILITY: 'Toggle layer visility',
     ORIENT_TO_LAYER: 'Orient to layer native orientation',
-    CONFIGURE_LAYER: 'Configure layer'
+    CONFIGURE_LAYER: 'Configure layer',
+
+    REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
   }
 
   exports.QUICKTOUR_DESC ={
     REGION_SEARCH: `Use the region quick search for finding, selecting and navigating brain regions in the selected parcellation map.`,
     ATLAS_SELECTOR: `This is the atlas selector. Click here to choose between EBRAINS reference atlases of different species.`,
     CHIPS: `These "chips" indicate the currently selected parcellation map as well as selected region. Click the chip to see different versions, if any. Click (i) to read more about a selected item. Click (x) to clear a selection.`,
-    SLICE_VIEW: `The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can double-click brain regions to select them.`,
+    SLICE_VIEW: `The planar views allow you to zoom in to full resolution (mouse wheel), pan the view (click+drag), and select oblique sections (shift+click+drag). You can click any brain regions to select them.`,
     PERSPECTIVE_VIEW: `The 3D view gives an overview of the brain with limited resolution. It can be independently rotated. On the 3d view you can find additional settings.`,
     VIEW_ICONS: `Use these icons in any of the views to maximize it and zoom in/out.`,
     TOP_MENU: `These icons provide access to plugins, pinned datasets, and user documentation. Use the profile icon to login with your EBRAINS account.`,

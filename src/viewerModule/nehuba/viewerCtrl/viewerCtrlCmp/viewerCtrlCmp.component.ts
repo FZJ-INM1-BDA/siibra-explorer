@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, of, Subscription } from "rxjs";
 import { pairwise, withLatestFrom} from "rxjs/operators";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, CONST } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { atlasAppearance } from "src/state";
@@ -20,6 +20,7 @@ import { atlasAppearance } from "src/state";
 export class ViewerCtrlCmp implements OnInit{
 
   public ARIA_LABELS = ARIA_LABELS
+  public CONST = CONST
 
   private sub: Subscription[] = []
 
