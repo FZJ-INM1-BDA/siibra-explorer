@@ -11,7 +11,7 @@
 
 <ng-template #btnTmpl let-orientation>
     <button mat-button
-        [color]="currentView === orientation ? 'primary': 'default'"
+        [color]="(currentPersView$ | async) === orientation ? 'primary': 'default'"
         (click)="set3DViewPoint(orientation)">
         {{ orientation }}
     </button>

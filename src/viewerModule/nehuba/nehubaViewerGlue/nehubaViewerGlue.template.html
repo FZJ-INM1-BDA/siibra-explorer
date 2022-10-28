@@ -1,14 +1,14 @@
 <div class="nehuba-viewer-container-parent"
   iav-viewer-touch-interface
   (touchmove)="$event.preventDefault()"
+  [snackText]="CONST.NEHUBA_DRAG_DROP_TEXT"
   (drag-drop-file)="handleFileDrop($event)">
 
-  <div class="sxplr-d-block"
-    iav-nehuba-viewer-container
-    #iavContainer="iavNehubaViewerContainer"
-    (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+  <sxplr-nehuba-viewer-container
+    class="sxplr-w-100 sxplr-h-100 sxplr-d-block"
+    (viewerLoaded)="handleViewerLoadedEvent($event)">
+  </sxplr-nehuba-viewer-container>
 
-  </div>
 </div>
 
 <nehuba-layout-overlay></nehuba-layout-overlay>

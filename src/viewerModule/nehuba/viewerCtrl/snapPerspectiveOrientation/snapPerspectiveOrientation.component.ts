@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { select, Store } from "@ngrx/store";
-import { concat, Observable, of, Subscription } from 'rxjs';
+import { concat, Observable, of } from 'rxjs';
 import { atlasSelection } from 'src/state';
 import { actions } from 'src/state/atlasSelection';
 import { VALUES } from "common/constants"
@@ -8,9 +8,9 @@ import { floatEquality } from "common/util"
 import { filter, map } from 'rxjs/operators';
 
 enum EnumClassicalView {
-  CORONAL="Coronal",
-  SAGITTAL="Sagittal",
-  AXIAL="Axial",
+  CORONAL = "Coronal",
+  SAGITTAL = "Sagittal",
+  AXIAL = "Axial",
 }
 
 const viewOrientations : Record<EnumClassicalView, number[][]> = {
@@ -22,9 +22,10 @@ const viewOrientations : Record<EnumClassicalView, number[][]> = {
 @Component({
   selector: 'snap-perspective-orientation-cmp',
   templateUrl: './snapPerspectiveOrientation.template.html',
-  styleUrls: ['./snapPerspectiveOrientation.style.sass']
+  styleUrls: ['./snapPerspectiveOrientation.style.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SnapPerspectiveOrientationCmp implements OnDestroy, OnInit {
+export class SnapPerspectiveOrientationCmp {
 
   public currentView: EnumClassicalView = null
   public EnumClassicalView = EnumClassicalView
@@ -56,7 +57,7 @@ export class SnapPerspectiveOrientationCmp implements OnDestroy, OnInit {
     )
   )
 
-  constructor(private store$: Store, private cdr: ChangeDetectorRef) {}
+  constructor(private store$: Store) {}
 
   public set3DViewPoint(plane: EnumClassicalView) {
 
@@ -72,19 +73,5 @@ export class SnapPerspectiveOrientationCmp implements OnDestroy, OnInit {
       })
     )
   }
-
-  ngOnInit(): void {
-    this.subscriptions.push(
-      this.currentPersView$.subscribe(val => {
-        this.currentView = val
-        this.cdr.detectChanges()
-      })
-    )
-  }
-
-  ngOnDestroy(): void {
-    while(this.subscriptions.length) this.subscriptions.pop().unsubscribe()
-  }
-  private subscriptions: Subscription[] = []
   private counter = 0
 }

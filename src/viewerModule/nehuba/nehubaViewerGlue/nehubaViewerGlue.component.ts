@@ -21,7 +21,6 @@ import { NehubaConfig, getParcNgId, getRegionLabelIndex } from "../config.servic
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { annotation, atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
-import { DragDropFileDirective } from 'src/dragDropFile/dragDrop.directive'
 
 export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
 
@@ -70,10 +69,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   @ViewChild('layerCtrlTmpl', { static: true })
   layerCtrlTmpl: TemplateRef<any>
 
-  @ViewChild(DragDropFileDirective, { static: true })
-  dragDropDirective: DragDropFileDirective
-
   public ARIA_LABELS = ARIA_LABELS
+  public CONST  = CONST
 
   @ViewChild(NehubaViewerContainerDirective, { static: true })
   public nehubaContainerDirective: NehubaViewerContainerDirective
@@ -168,12 +165,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
 
   ngAfterViewInit(): void {
     this.setupNehubaEvRelay()
-    /**
-     * TODO directly dynamic input binding does not seem to work ...
-     * even though static input binding works (i.e. [comp-input]="var" does not work, comp-input="value" works)
-     * 
-     */
-    if (this.dragDropDirective) this.dragDropDirective.snackText = CONST.NEHUBA_DRAG_DROP_TEXT
   }
 
   ngOnDestroy(): void {

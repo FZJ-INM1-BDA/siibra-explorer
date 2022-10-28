@@ -1,7 +1,7 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { ChangeDetectorRef, Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, Output } from "@angular/core";
 import { fromEvent, merge, Observable, of, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, scan, switchMap } from "rxjs/operators";
-import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from "@angular/material/snack-bar";
 
 @Directive({
   selector: '[drag-drop-file]',
@@ -20,7 +20,15 @@ export class DragDropFileDirective implements OnDestroy {
   public transition = `opacity 300ms ease-in`
 
   @HostBinding('style.opacity')
-  public opacity = null
+  public hostOpacity = null
+
+  get opacity() {
+    return this.hostOpacity
+  }
+  set opacity(val: number) {
+    this.hostOpacity = val
+    this.cdr.markForCheck()
+  }
 
   public snackbarRef: MatSnackBarRef<SimpleSnackBar>
 
@@ -55,7 +63,7 @@ export class DragDropFileDirective implements OnDestroy {
     }
   }
 
-  constructor(private snackBar: MatSnackBar, private el: ElementRef) {
+  constructor(private snackBar: MatSnackBar, private el: ElementRef, private cdr: ChangeDetectorRef) {
     this.dragover$ = merge(
       of(null),
       fromEvent(this.el.nativeElement, 'drop'),
