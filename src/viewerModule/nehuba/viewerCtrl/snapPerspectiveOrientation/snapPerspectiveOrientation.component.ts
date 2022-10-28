@@ -5,7 +5,7 @@ import { atlasSelection } from 'src/state';
 import { actions } from 'src/state/atlasSelection';
 import { VALUES } from "common/constants"
 import { floatEquality } from "common/util"
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 enum EnumClassicalView {
   CORONAL="Coronal",
@@ -32,6 +32,7 @@ export class SnapPerspectiveOrientationCmp implements OnDestroy, OnInit {
     of(null),
     this.store$.pipe(
       select(atlasSelection.selectors.navigation),
+      filter(v => !!v),
       map(({ perspectiveOrientation }) => {
         if (
           perspectiveOrientation.some(v => floatEquality( Math.abs (v), 1, VALUES.THRESHOLD))
