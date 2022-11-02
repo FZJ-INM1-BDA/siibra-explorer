@@ -19,34 +19,31 @@
                     (click)="selectSpace(spc)"
                     [style.background-color]="(spc | equality : space : trackByFn) ? 'grey' : ''">
                 {{spc.fullName}}</button>
-            <button *ngIf="(auxMeshes$ | async).length"
-                    [disabled]="space['@id'] !== spc['@id']"
-                    cdkOverlayOrigin
-                    #settingsTrigger="cdkOverlayOrigin"
-                    (mouseenter)="spaceSettingEnabled=true"
-                    mat-menu-item class="w-0 d-flex align-items-center justify-content-center">
-                <i class="fas fa-cog"></i>
-                <ng-template
-                        cdkConnectedOverlay
-                        [cdkConnectedOverlayOrigin]="settingsTrigger"
-                        [cdkConnectedOverlayOpen]="spaceSettingEnabled"
-                        [cdkConnectedOverlayPositions]="[{originX: 'end', originY: 'top', overlayX: 'start', overlayY:'top'}]">
-                    <mat-card (iav-outsideClick)="spaceSettingEnabled = false" >
+
+            <div *ngIf="space['@id'] === spc['@id'] && (auxMeshes$ | async).length">
+                <button [disabled]="space['@id'] !== spc['@id']"
+                    cdkOverlayOrigin #settingsTrigger="cdkOverlayOrigin" (mouseenter)="spaceSettingEnabled=true" mat-menu-item
+                    class="w-0 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="settingsTrigger"
+                    [cdkConnectedOverlayOpen]="spaceSettingEnabled"
+                    [cdkConnectedOverlayPositions]="[{originX: 'end', originY: 'top', overlayX: 'start', overlayY:'top'}]">
+                    <mat-card (iav-outsideClick)="spaceSettingEnabled = false">
                         <ng-container *ngIf="auxMeshes$ | async as auxMeshes">
                             <form [formGroup]="auxMeshFormGroup" class="mt-1 mb-1">
                                 <mat-slide-toggle *ngFor="let auxMesh of auxMeshes; trackBy: trackByAtId"
-                                                  [formControlName]="auxMesh['@id']"
-                                                  class="d-block"
-                                                  [name]="'toggle-aux-mesh-' + auxMesh['@id']">
-      <span class="sxplr-custom-cmp text">
-        {{ auxMesh.displayName || auxMesh.name }}
-      </span>
+                                    [formControlName]="auxMesh['@id']" class="d-block" [name]="'toggle-aux-mesh-' + auxMesh['@id']">
+                                    <span class="sxplr-custom-cmp text">
+                                        {{ auxMesh.displayName || auxMesh.name }}
+                                    </span>
                                 </mat-slide-toggle>
                             </form>
                         </ng-container>
                     </mat-card>
                 </ng-template>
-            </button>
+            </div>
         </div>
     </mat-menu>
 </div>
+
