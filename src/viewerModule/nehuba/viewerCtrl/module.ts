@@ -5,7 +5,7 @@ import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
-import {ChangePerspectiveOrientationComponent} from "src/viewerModule/nehuba/viewerCtrl/change-perspective-orientation/changePerspectiveOrientation.component";
+import { SnapPerspectiveOrientationCmp } from "src/viewerModule/nehuba/viewerCtrl/snapPerspectiveOrientation/snapPerspectiveOrientation.component";
 
 @NgModule({
   imports: [
@@ -18,7 +18,7 @@ import {ChangePerspectiveOrientationComponent} from "src/viewerModule/nehuba/vie
   ],
   declarations: [
     ViewerCtrlCmp,
-    ChangePerspectiveOrientationComponent
+    SnapPerspectiveOrientationCmp
   ],
   exports: [
     ViewerCtrlCmp
