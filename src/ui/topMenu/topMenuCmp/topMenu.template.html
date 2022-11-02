@@ -22,6 +22,12 @@
 
     <!-- pinned dataset -->
     <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="settingsTmpl">
+      </ng-container>
+    </div>
+
+    <!-- pinned dataset -->
+    <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
       </ng-container>
     </div>
@@ -51,6 +57,10 @@
 
     <!-- signin -->
     <ng-container *ngTemplateOutlet="signinBtnTmpl">
+    </ng-container>
+
+    <!-- settings -->
+    <ng-container *ngTemplateOutlet="settingsTmpl">
     </ng-container>
 
     <!-- plugin and tools -->
@@ -84,6 +94,22 @@
       <ng-template #notLoggedInTmpl>
         <i class="fas fa-user"></i>
       </ng-template>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
+<!-- settings tmpl -->
+<ng-template #settingsTmpl>
+  <div class="btnWrapper"
+    [matMenuTriggerFor]="settingsDropdownMenu"
+    matTooltipPosition="below"
+    [matTooltip]="pluginTooltipText">
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show settings">
+
+      <i class="fas fa-cog"></i>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
@@ -193,12 +219,6 @@
   <mat-divider></mat-divider>
 
   <button mat-menu-item
-    (click)="openTmplWithDialog(settingTemplate)">
-    <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
-    Settings
-  </button>
-
-  <button mat-menu-item
     (click)="openTmplWithDialog(aboutComponent)">
     <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
     About
@@ -235,15 +255,6 @@
   </mat-dialog-actions>
 </ng-template>
 
-<ng-template #settingTemplate>
-  <h2 mat-dialog-title>Settings</h2>
-  <mat-dialog-content>
-    <!-- required to avoid showing an ugly vertical scroll bar -->
-    <!-- TODO investigate why, then remove the friller class -->
-    <config-component class="mb-4 d-block">
-    </config-component>
-  </mat-dialog-content>
-</ng-template>
 
 <!-- saved dataset tmpl -->
 
@@ -277,4 +288,44 @@
 
     </mat-list-item>
   </mat-list>
+</ng-template>
+
+
+<!-- Settings tmpl -->
+<mat-menu #settingsDropdownMenu="matMenu"
+          (closed)="openedSettingsMenu = undefined">
+  <button mat-menu-item
+          cdkOverlayOrigin
+          #viewerSettingsTrigger="cdkOverlayOrigin"
+          (mouseenter)="openedSettingsMenu='viewer'"><i class="fas fa-chevron-left mr-1 small-icon-button"></i> Viewer</button>
+
+  <button [hidden]="EXPERIMENTAL_FEATURE_FLAG"
+          mat-menu-item
+          cdkOverlayOrigin
+          #hardwareSettingsTrigger="cdkOverlayOrigin"
+          (mouseenter)="openedSettingsMenu='hardware'"><i class="fas fa-chevron-left mr-1 small-icon-button"></i> Hardware</button>
+</mat-menu>
+
+<mat-menu #viewerSettingsMenu="matMenu">
+  <button mat-menu-item>item here</button>
+</mat-menu>
+
+<ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="hardwareSettingsTrigger"
+        [cdkConnectedOverlayOpen]="openedSettingsMenu === 'hardware'"
+        [cdkConnectedOverlayPositions]="[{originX: 'start', originY: 'top', overlayX: 'end', overlayY:'top'}]">
+  <mat-card>
+    <hardware-config-component class="d-block"></hardware-config-component>
+  </mat-card>
+</ng-template>
+
+<ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="viewerSettingsTrigger"
+        [cdkConnectedOverlayOpen]="openedSettingsMenu === 'viewer'"
+        [cdkConnectedOverlayPositions]="[{originX: 'start', originY: 'top', overlayX: 'end', overlayY:'top'}]">
+  <mat-card>
+    <viewer-preferences-component class="d-block"></viewer-preferences-component>
+  </mat-card>
 </ng-template>

@@ -33,6 +33,8 @@ export class TopMenuCmp {
   public matBtnStyle = 'mat-icon-button'
   public matBtnColor = 'primary'
 
+  public openedSettingsMenu: undefined | 'hardware' | 'viewer'
+
   private _ismobile = false
   @Input()
   set ismobile(val) {

@@ -140,3 +140,13 @@ mat-list[dense].contextual-block
   align-items: flex-end;
   justify-content: flex-end;
 }
+
+.arrow-between-chips {
+  margin: 0 -30px;
+  padding: 0 30px;
+}
+
+.hide-chip-corner {
+  margin-left: -2.5rem;
+  padding-left: 3rem;
+}

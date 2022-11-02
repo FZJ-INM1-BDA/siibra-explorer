@@ -9,6 +9,11 @@ import { SapiViewsCoreSpaceModule } from "../space";
 import { SapiViewsCoreAtlasAtlasDropdownSelector } from "./dropdownAtlasSelector/dropdownAtlasSelector.component";
 import { SapiViewsCoreAtlasSplashScreen } from "./splashScreen/splashScreen.component";
 import { SapiViewsCoreAtlasAtlasTmplParcSelector } from "./tmplParcSelector/tmplParcSelector.component";
+import {DialogModule} from "src/ui/dialogInfo/module";
+import {
+  SapiViewCoreAtlasSmartChip
+} from "src/atlasComponents/sapiViews/core/atlas/smartChip/atlas.smartChip.components";
+import {UtilModule} from "src/util";
 
 @NgModule({
   imports: [
@@ -19,16 +24,20 @@ import { SapiViewsCoreAtlasAtlasTmplParcSelector } from "./tmplParcSelector/tmpl
     QuickTourModule,
     SpinnerModule,
     SapiViewsUtilModule,
+    DialogModule,
+    UtilModule
   ],
   declarations: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
     SapiViewsCoreAtlasSplashScreen,
+    SapiViewCoreAtlasSmartChip,
   ],
   exports: [
     SapiViewsCoreAtlasAtlasDropdownSelector,
     SapiViewsCoreAtlasAtlasTmplParcSelector,
     SapiViewsCoreAtlasSplashScreen,
+    SapiViewCoreAtlasSmartChip,
   ]
 })
 

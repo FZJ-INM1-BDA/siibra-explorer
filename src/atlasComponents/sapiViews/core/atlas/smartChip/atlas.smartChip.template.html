@@ -1,0 +1,23 @@
+<div (iav-outsideClick)="atlasMenuTrigger.closeMenu()">
+  <div [style.background-color]="customColor && customColor"
+       [matMenuTriggerFor]="atlasMenu"
+       #atlasMenuTrigger="matMenuTrigger"
+       matRipple
+       class="custom-chip">
+    <span class="mat-body sxplr-white-space-nowrap">
+      {{ atlas.name }}
+    </span>
+  </div>
+
+  <mat-menu #atlasMenu="matMenu"
+            [hasBackdrop]="false"
+            class="parc-smart-chip-menu-panel sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+
+    <div *ngFor="let atl of atlases">
+      <button mat-menu-item
+              (click)="selectAtlas(atl)"
+              [style.background-color]="(atl | equality : atlas : trackByFn) ? 'grey' : ''">
+        {{atl.name}}</button>
+    </div>
+  </mat-menu>
+</div>

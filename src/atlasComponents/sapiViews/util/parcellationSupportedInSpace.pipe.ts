@@ -28,7 +28,8 @@ export class ParcellationSupportedInSpacePipe implements PipeTransform{
 
   constructor(private sapi: SAPI){}
 
-  public transform(parc: SapiParcellationModel|string, tmpl: SapiSpaceModel|string): Observable<boolean> {
+  public transform(parc: SapiParcellationModel|string, tmpl: SapiSpaceModel|string)
+    : Observable<{supported: boolean, spaces?: (Array<string>)}> {
     if (!parc) return NEVER
     const parcId = typeof parc === "string"
       ? parc
@@ -38,11 +39,17 @@ export class ParcellationSupportedInSpacePipe implements PipeTransform{
       : tmpl["@id"]
     for (const key in knownExceptions.supported) {
       if (key === parcId && knownExceptions.supported[key].indexOf(tmplId) >= 0) {
-        return of(true)
+        return of({supported: true})
       }
     }
     return this.sapi.registry.get<SAPIParcellation>(parcId).getVolumes().pipe(
-      map(volumes => volumes.some(v => v.data.space["@id"] === tmplId))
+      map(volumes => {
+        const supported = volumes.some(v => v.data.space["@id"] === tmplId)
+        return {
+          supported,
+          spaces: [...new Set(volumes.map(v => v.data.space["@id"]))]
+        }
+      })
     )
   }
 }

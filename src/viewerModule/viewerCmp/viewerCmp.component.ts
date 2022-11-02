@@ -8,7 +8,7 @@ import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
-import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
+import {SAPI, SapiAtlasModel, SapiRegionModel} from "src/atlasComponents/sapi";
 import { atlasSelection, userInteraction, } from "src/state";
 import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
 import { getUuid } from "src/util/fn";
@@ -94,6 +94,8 @@ export class ViewerCmp implements OnDestroy {
     shareReplay(1)
   )
 
+  public fetchedAtlases$: Observable<SapiAtlasModel[]> = this.sapi.atlases$
+
   public selectedAtlas$ = this.selectedATP.pipe(
     map(({ atlas }) => atlas)
   )
@@ -102,6 +104,10 @@ export class ViewerCmp implements OnDestroy {
   )
   public parcellationSelected$ = this.selectedATP.pipe(
     map(({ parcellation }) => parcellation)
+  )
+
+  public allAvailableSpaces$ = this.store$.pipe(
+    atlasSelection.fromRootStore.allAvailSpaces(this.sapi)
   )
 
   public allAvailableParcellations$ = this.store$.pipe(
@@ -405,6 +411,20 @@ export class ViewerCmp implements OnDestroy {
       atlasSelection.actions.clearNonBaseParcLayer()
     )
   }
+  onSelectAtlas(atlas: SapiAtlasModel): void{
+    this.store$.dispatch(
+      atlasSelection.actions.selectAtlas({
+        atlas
+      })
+    )
+  }
+  onSelectSpace(template: SapiSpaceModel): void{
+    this.store$.dispatch(
+      atlasSelection.actions.selectTemplate({
+        template
+      })
+    )
+  }
   onSelectParcellation(parcellation: SapiParcellationModel): void{
     this.store$.dispatch(
       atlasSelection.actions.selectParcellation({
@@ -412,6 +432,16 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
+  onSelectSpaceAndParcellation(e): void{
+    const {space, parcellation} = e
+    this.store$.dispatch(
+      atlasSelection.actions.setAtlasSelectionState({
+        selectedTemplate: space,
+        selectedParcellation: parcellation
+      })
+    )
+  }
+
   navigateTo(position: number[]): void {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({
