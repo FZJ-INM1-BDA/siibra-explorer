@@ -99,7 +99,7 @@ describe('ConnectivityComponent', () => {
     })
 
     // ToDo create test for kgId and kgSchema after it will work while viewing dataset
-    it('> change dataset changes name and description', () => {
+    xit('> change dataset changes name and description', () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)
         component = fixture.componentInstance
 

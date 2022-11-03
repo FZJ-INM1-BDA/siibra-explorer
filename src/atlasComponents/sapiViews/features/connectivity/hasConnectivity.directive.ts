@@ -1,11 +1,10 @@
 import {Directive, Input, OnDestroy} from "@angular/core";
-import {from, of, Subscription} from "rxjs";
-import {map, switchMap, take} from "rxjs/operators";
-import {HttpClient} from "@angular/common/http";
-import {PARSE_TYPEDARRAY, SAPI} from "src/atlasComponents/sapi/sapi.service";
+import {Subscription} from "rxjs";
+import {map, take} from "rxjs/operators";
+import {SAPI} from "src/atlasComponents/sapi/sapi.service";
 import {
   SapiAtlasModel, SapiModalityModel,
-  SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel,
+  SapiParcellationFeatureModel,
   SapiParcellationModel,
   SapiRegionModel
 } from "src/atlasComponents/sapi/type";
@@ -45,7 +44,6 @@ export class HasConnectivity implements OnDestroy {
       return this._region
     }
 
-    private regionIndex: number
     public hasConnectivity = false
     public connectivityNumber = 0
 
@@ -53,9 +51,13 @@ export class HasConnectivity implements OnDestroy {
     private waitForModalities = false
     public defaultProfile: DefaultProfile
     public availableModalities: SapiModalityModel[] = []
+    public numberOfDatasets: number = 0
 
-    constructor(private httpClient: HttpClient,
-                private sapi: SAPI) {
+    constructor(private sapi: SAPI) {
+      this.getModalities()            
+    }
+
+    getModalities() {        
       this.sapi.getModalities()
         .pipe(map((mod: SapiModalityModel[]) => mod.filter((m: SapiModalityModel) => m.types && m.types.find(t => t.includes('siibra/features/connectivity')))))
         .subscribe(modalities => {
@@ -63,7 +65,8 @@ export class HasConnectivity implements OnDestroy {
           if (this.waitForModalities) {
             this.waitForModalities = false
             this.checkConnectivity()
-          }  
+          } 
+
         })
     }
 
@@ -73,50 +76,20 @@ export class HasConnectivity implements OnDestroy {
           const type = m.types[0]
           
           this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-            .getFeatures({type, page: 1, size: 1})
-            .pipe(
-              take(1),
-              // ToDo remove any type when `SapiParcellationFeatureModel` will be fixed
-              switchMap((res: SapiParcellationFeatureModel[] | any) => {
-                if (res && res.items) {
-
+            .getFeatures({type, page: 1, size: 1}).pipe(take(1), map((res: SapiParcellationFeatureModel[] | any) => {
+              if (res && res.items) {
                   this.availableModalities.push(m)
                   const firstDataset = res.items[0]
 
                   if (firstDataset) {
                     this.hasConnectivity = true
-                    if (!(this.defaultProfile)) {
-                      return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-                        .getFeatureInstance(firstDataset['@id'])
-                        .pipe(switchMap(inst => {
-                          if (inst) {
-                            this.defaultProfile = {
-                              type,
-                              selectedDataset: firstDataset,
-                              matrix: inst,
-                              numberOfDatasets: res.total
-                            }
-
-                            const matrixData = inst as SapiParcellationFeatureMatrixModel
-                            this.regionIndex = (matrixData.columns as Array<string>).findIndex(md => md === this.region.name)
-                            return from(this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY))
-                          }
-                          return of(null)
-                        }))
-                    }
                   } else {
                     this.hasConnectivity = false
                     this.connectivityNumber = 0
                   }
                 }
-                return of(null)
               }), 
-            ).subscribe(res => {
-              if (res && res.rawArray && res.rawArray[this.regionIndex]) {
-                const connections = res.rawArray[this.regionIndex]
-                this.connectivityNumber = connections.filter(p => p > 0).length
-              }
-            })
+            ).subscribe()
         })
       }
     }

@@ -12,14 +12,13 @@
                         (selectionChange)="selectType($event.value)">
                     <mat-option
                             *ngFor="let type of types"
-                            [matTooltip]="type.name"
                             [value]="type.name">
                         {{ type.name }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="selectedType" class="flex-grow-1 flex-shrink-1 w-100">
+            <mat-form-field *ngIf="!fetching && selectedType" class="flex-grow-1 flex-shrink-1 w-100">
                 <mat-label>
                     Cohort
                 </mat-label>
@@ -30,13 +29,13 @@
                     <mat-option
                             *ngFor="let cohort of cohorts"
                             [value]="cohort">
-                        {{ cohort.cohort }}
+                        {{ cohort }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
 
-        <mat-radio-group *ngIf="selectedCohort && selectedCohort.subjects" [(ngModel)]="selectedView">
+        <mat-radio-group *ngIf="selectedCohort" [(ngModel)]="selectedView">
             <mat-radio-button value="average" class="m-2" [disabled]="averageDisabled" color="primary">
                 Average
             </mat-radio-button>
@@ -45,14 +44,14 @@
             </mat-radio-button>
         </mat-radio-group>
 
-        <div *ngIf="selectedView !== 'average' && selectedCohort && selectedCohort.subjects"
+        <div *ngIf="selectedView !== 'average' && selectedCohort && cohortSubjects"
              class="flex-grow-0 flex-shrink-0 d-flex flex-column">
             <div class="flex-grow-1 flex-shrink-1 w-100">
                 <mat-label>
                     Subject
                 </mat-label>
                 <mat-slider [min]="0"
-                            [max]="selectedCohort.subjects.length-1"
+                            [max]="cohortSubjects.length - 1"
                             (change)="subjectSliderChanged($event.value)"
                             [value]="selectedSubjectIndex"
                             thumbLabel
@@ -61,14 +60,14 @@
                 </mat-slider>
             </div>
 
-            <div *ngIf="selectedSubjectIndex >= 0 && selectedCohort.subjects[selectedSubjectIndex].datasets.length > 1"
+            <div *ngIf="selectedSubjectsDatasets && selectedSubjectsDatasets.length > 1"
                  class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
                 <div class="flex-grow-1 flex-shrink-1 w-100">
                     <mat-label>
-                        Datasets
+                        Dataset
                     </mat-label>
                     <mat-slider [min]="0"
-                                [max]="selectedCohort.subjects[selectedSubjectIndex].datasets.length-1"
+                                [max]="selectedSubjectsDatasets.length - 1"
                                 (change)="subjectDatasetSliderChanged($event.value)"
                                 [value]="selectedSubjectDatasetIndex"
                                 thumbLabel

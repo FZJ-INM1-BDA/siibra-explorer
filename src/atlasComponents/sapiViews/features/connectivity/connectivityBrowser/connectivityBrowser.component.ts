@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, ChangeDetectorRef} from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Subscription, BehaviorSubject} from "rxjs";
-import {catchError} from "rxjs/operators";
+import {catchError, take} from "rxjs/operators";
 import {
   SAPI,
   SapiAtlasModel,
@@ -13,7 +13,6 @@ import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
-import {environment} from "src/environments/environment";
 
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
@@ -34,7 +33,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
      */
     private _isFirstUpdate = true
     
-    private accordionIsExpanded = false
 
     @Input()
     set accordionExpanded(flag: boolean) {
@@ -45,7 +43,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         this._isFirstUpdate = false
         return
       }
-      this.accordionIsExpanded = flag
 
       if (flag) {
         if (this.selectedSubjectDatasetIndex >= 0 && this.allRegions.length) {
@@ -72,10 +69,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public selectedType: any
     public selectedTypeId: string
-    public selectedCohort: Cohort
+    public selectedCohort: string
+    public cohortSubjects: string[]
     public selectedSubjectIndex: number
+    public selectedSubjectsDatasets: string[]
     public selectedSubjectDatasetIndex: number
-    public cohorts: Cohort[]
+    private fetchedItems = []
+    public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
     public averageDisabled: boolean = true
     public subjectsDisabled: boolean = true
@@ -187,48 +187,67 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
     }
 
+    clearCohortSelection() {
+      this.fetchedItems = []
+      this.selectedCohort = null
+      this.cohorts = []
+      this.selectedCohort = null
+      this.cohortSubjects = []
+      this.selectedSubjectIndex = null
+      this.selectedSubjectsDatasets = null
+      this.selectedSubjectDatasetIndex = null
+    }
+
     selectType(typeName) {
+      this.clearCohortSelection()
       this.selectedType = typeName
       this.selectedTypeId = this.types.find(t => t.name === typeName).types[0]
-      this.selectedCohort = null
-      this.cohorts = null
+
       this.removeCustomLayer()
-      this.fetchCohorts()
+
+      // this.fetchCohorts()
+      this.fetchModality()
     }
 
-    getCohortsReq() {
-      const { SIIBRA_API_ENDPOINTS } = environment
-      // const end = this.sapi.BsEndpoint$.subscribe()
-      const endp = 'https://siibra-api-tmp-1kb-fix.apps.jsc.hbp.eu/v2_0'
-      return this.sapi.http.get(
-        `${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&group=cohort_subject`,
-      )
-    }
-  
-    fetchCohorts() {
-      this.subscriptions.push(
-        this.getCohortsReq().subscribe((c: Cohort[]) => {
-          this.cohorts = c
-        })
-      )
+    fetchModality(size: number = 100, page: number = 1) {
+      this.fetching = true
+      let endp
+      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => endp = en)
+      this.sapi.http.get(`${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&size=${size}&page=${page}`,)
+        .pipe(take(1)).subscribe((res: any) => {
+
+          this.fetchedItems.push(...res.items)
+          
+          if (res.total > size*page) {
+            this.fetchModality(100, page+1)
+          } else {
+            this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
+            this.fetching = false
+            this.changeDetectionRef.detectChanges()
+          }
+      })
     }
 
-    selectCohort(cohort: Cohort) {
+    selectCohort(cohort) {
       this.selectedCohort = cohort
-
-      this.averageDisabled = !this.selectedCohort.subjects.find(s => s.subject === 'average')
-      this.subjectsDisabled = !this.selectedCohort.subjects.find(s => s.subject !== 'average')
-
+      this.averageDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject === 'average')
+      this.subjectsDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject !== 'average')
       this.selectedView = !this.averageDisabled? 'average' : 'subject'
-
-      this.selectedSubjectIndex = 0
-      this.selectedSubjectDatasetIndex = 0
-
-      this.loadSubjectConnectivity()
+      this.cohortSubjects = [...new Set(
+        this.fetchedItems
+          .filter(i => this.selectedView === 'average'? i.subject === 'average' : i.subject !== 'average')
+          .map(item => item.subject)
+      )]
+      this.subjectSliderChanged(0)
     }
 
     subjectSliderChanged(index) {
-      this.selectedSubjectIndex = this.selectedCohort.subjects.findIndex((s, i) => i === index)
+      // this.selectedSubjectIndex = this.cohortSubjects.findIndex((s, i) => i === index - 1)
+      this.selectedSubjectIndex = index
+      this.selectedSubjectsDatasets = this.fetchedItems
+        .filter(fi => fi.cohort === this.selectedCohort && fi.subject === this.cohortSubjects[this.selectedSubjectIndex])
+        .map(i => i['@id'])
+
       this.selectedSubjectDatasetIndex = 0
       this.loadSubjectConnectivity()
     }
@@ -240,7 +259,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     loadSubjectConnectivity() {
       this.fetching = true
-      this.fetchConnectivity(this.selectedCohort.subjects[this.selectedSubjectIndex].datasets[this.selectedSubjectDatasetIndex])
+      this.fetchConnectivity(this.selectedSubjectsDatasets[this.selectedSubjectDatasetIndex])
     }
 
     // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
