@@ -225,7 +225,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
             this.fetching = false
             this.changeDetectionRef.detectChanges()
           }
-      })
+        })
     }
 
     selectCohort(cohort) {

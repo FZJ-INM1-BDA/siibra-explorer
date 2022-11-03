@@ -78,17 +78,17 @@ export class HasConnectivity implements OnDestroy {
           this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
             .getFeatures({type, page: 1, size: 1}).pipe(take(1), map((res: SapiParcellationFeatureModel[] | any) => {
               if (res && res.items) {
-                  this.availableModalities.push(m)
-                  const firstDataset = res.items[0]
+                this.availableModalities.push(m)
+                const firstDataset = res.items[0]
 
-                  if (firstDataset) {
-                    this.hasConnectivity = true
-                  } else {
-                    this.hasConnectivity = false
-                    this.connectivityNumber = 0
-                  }
+                if (firstDataset) {
+                  this.hasConnectivity = true
+                } else {
+                  this.hasConnectivity = false
+                  this.connectivityNumber = 0
                 }
-              }), 
+              }
+            }), 
             ).subscribe()
         })
       }
