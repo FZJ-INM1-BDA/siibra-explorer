@@ -52,6 +52,7 @@ export const selectRegion = createAction(
   `${nameSpace} selectRegion`,
   props<{
     region: SapiRegionModel
+    multi?: boolean
   }>()
 )
 

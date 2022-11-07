@@ -65,16 +65,23 @@ export class RouteStateTransformSvc {
        * assuming only 1 selected region
        * if this assumption changes, iterate over array of selectedRegionIds
        */
-      const json = { [selectedRegionIds[0]]: selectedRegionIds[1] }
+      // const json = { [selectedRegionIds[0]]: selectedRegionIds[1] }
+      // console.log(json)
 
-      for (const ngId in json) {
+      const jsonArray = []
+      for (let i = 0; i < selectedRegionIds.length - 1; i = i+2) {
+        jsonArray.push({[selectedRegionIds[i]]: selectedRegionIds[i + 1]})
+      }
+
+      const regions = []
+      for (const json of jsonArray) {
+        const ngId = Object.keys(json)[0]
         if (!ngIdToRegionMap.has(ngId)) {
-          console.error(`could not find matching map for ${ngId}`)
+          console.error(`could not find matching map for ${json.key()}`)
           continue
         }
 
         const map = ngIdToRegionMap.get(ngId)
-        
         const val = json[ngId]
         const labelIndicies = val.split(separator).map(n => {
           try {
@@ -87,9 +94,11 @@ export class RouteStateTransformSvc {
           }
         }).filter(v => !!v)
 
-        return labelIndicies.map(idx => map.get(idx) || []).flatMap(v => v)
+        const region = labelIndicies.map(idx => map.get(idx) || []).flatMap(v => v)
+        regions.push(region[0])
       }
-      return []
+      
+      return regions
     })()
 
     return {
@@ -235,13 +244,15 @@ export class RouteStateTransformSvc {
     }
   
     // encoding selected regions
-    let selectedRegionsString: string
-    if (selectedRegions.length === 1) {
-      const region = selectedRegions[0]
-      const labelIndex = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
-      
-      const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
-      selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`
+    let selectedRegionsString: string = ''
+    
+    if (selectedRegions.length) {
+      for (let i = 0; i< selectedRegions.length; i++) {
+        const labelIndex = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, selectedRegions[i])
+        const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, selectedRegions[i])
+        selectedRegionsString += `${ngId}::${encodeNumber(labelIndex, { float: false })}`
+        selectedRegionsString += i === selectedRegions.length - 1? '' : '::'  
+      }
     }
     let routes: TUrlPathObj<string, TUrlAtlas<string>> | TUrlPathObj<string, TUrlStandaloneVolume<string>>
     

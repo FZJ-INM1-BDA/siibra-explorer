@@ -43,7 +43,7 @@ const reducer = createReducer(
   ),
   on(
     actions.selectRegion,
-    (state, { region }) => {
+    (state, { region, multi }) => {
       /**
        * if roi does not have visualizedIn defined
        * or internal identifier
@@ -58,11 +58,20 @@ const reducer = createReducer(
         return { ...state }
       }
       const selected = state.selectedRegions.includes(region)
-      return {
-        ...state,
-        selectedRegions: selected
+
+      let regions = [...state.selectedRegions]
+      if (!multi) {
+        regions = selected && regions.length === 1
           ? [ ]
           : [ region ]
+      } else {
+        regions = selected? regions.filter(r => r.name !== region.name) 
+          : [...regions, region]
+      }
+
+      return {
+        ...state,
+        selectedRegions: regions 
       }
     }
   ),

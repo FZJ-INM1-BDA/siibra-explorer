@@ -243,6 +243,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
   }
 
   private selectHoveredRegion(_ev: any): boolean{
+  
     /**
      * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
      */
@@ -250,7 +251,8 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy, AfterViewIni
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
-        region: trueOnhoverSegments[0]
+        region: trueOnhoverSegments[0],
+        multi: _ev.shiftKey
       })
     )
     return true

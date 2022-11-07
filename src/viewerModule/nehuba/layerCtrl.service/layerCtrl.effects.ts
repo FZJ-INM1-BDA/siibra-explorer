@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise } from "rxjs/operators";
+import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, mapTo } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel, SapiRegionModel } from "src/atlasComponents/sapi";
 import { SapiVOIDataResponse, SapiVolumeModel } from "src/atlasComponents/sapi/type";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
@@ -29,7 +29,7 @@ export class LayerCtrlEffects {
 
   onRegionSelectShowNewPmapLayer = createEffect(() => this.store.pipe(
     select(atlasSelection.selectors.selectedRegions),
-    filter(regions => regions.length > 0),
+    filter(regions => regions.length === 1),
     withLatestFrom(
       this.store.pipe(
         atlasSelection.fromRootStore.distinctATP()
