@@ -206,16 +206,16 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.fetching = true
       this.fetchModality(size, page).subscribe((res: any) => {
 
-          this.fetchedItems.push(...res.items)
+        this.fetchedItems.push(...res.items)
           
-          if (res.total > size*page) {
-            this.getModality(100, page+1)
-          } else {
-            this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
-            this.fetching = false
-            this.changeDetectionRef.detectChanges()
-          }
-        })
+        if (res.total > size*page) {
+          this.getModality(100, page+1)
+        } else {
+          this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
+          this.fetching = false
+          this.changeDetectionRef.detectChanges()
+        }
+      })
     }
 
     public fetchModality = (size: number, page: number): Observable<any> => {
