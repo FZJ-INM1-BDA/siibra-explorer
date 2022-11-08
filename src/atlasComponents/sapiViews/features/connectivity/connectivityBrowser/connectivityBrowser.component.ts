@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, ChangeDetectorRef} from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Subscription, BehaviorSubject} from "rxjs";
+import {fromEvent, Subscription, BehaviorSubject, Observable} from "rxjs";
 import {catchError, take} from "rxjs/operators";
 import {
   SAPI,
@@ -10,9 +10,10 @@ import {
 } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
+import {SapiModalityModel, SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
@@ -58,23 +59,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     @Input() types: SapiModalityModel[] = []
 
-    private _defaultProfile
-    @Input() set defaultProfile(val: any) {
-      this._defaultProfile = val
-    }
-
-    get defaultProfile() {
-      return this._defaultProfile
-    }
-
-    public selectedType: any
+    public selectedType: string
     public selectedTypeId: string
     public selectedCohort: string
     public cohortSubjects: string[]
     public selectedSubjectIndex: number
     public selectedSubjectsDatasets: string[]
     public selectedSubjectDatasetIndex: number
-    private fetchedItems = []
+    public fetchedItems: ConnectivityFeature[] = []
     public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
     public averageDisabled: boolean = true
@@ -95,13 +87,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public regionName: string
     public regionHemisphere: string = null
-    public selectedDataset: any
+    public selectedDataset: ConnectivityFeature
     public connectionsString: string
     public pureConnections: { [key: string]: number }
     public connectedAreas: BehaviorSubject<ConnectedArea[]> = new BehaviorSubject([])
     public noConnectivityForRegion: boolean
     private subscriptions: Subscription[] = []
-    public allRegions = []
+    public allRegions: SapiRegionModel[] = []
     private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
     public matrixString: string
@@ -119,6 +111,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     constructor(
         private store$: Store,
         private sapi: SAPI,
+        private http: HttpClient,
         private changeDetectionRef: ChangeDetectorRef,
     ) {}
 
@@ -205,21 +198,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
       this.removeCustomLayer()
 
-      // this.fetchCohorts()
-      this.fetchModality()
+      this.getModality()
     }
 
-    fetchModality(size: number = 100, page: number = 1) {
+
+    getModality(size: number = 100, page: number = 1) {
       this.fetching = true
-      let endp
-      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => endp = en)
-      this.sapi.http.get(`${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&size=${size}&page=${page}`,)
-        .pipe(take(1)).subscribe((res: any) => {
+      this.fetchModality(size, page).subscribe((res: any) => {
 
           this.fetchedItems.push(...res.items)
           
           if (res.total > size*page) {
-            this.fetchModality(100, page+1)
+            this.getModality(100, page+1)
           } else {
             this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
             this.fetching = false
@@ -228,7 +218,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         })
     }
 
-    selectCohort(cohort) {
+    public fetchModality = (size: number, page: number): Observable<any> => {
+      let endp
+      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => endp = en)
+      return this.http.get(`${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&size=${size}&page=${page}`,)
+        .pipe(take(1))
+    }
+
+    selectCohort(cohort: string) {
       this.selectedCohort = cohort
       this.averageDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject === 'average')
       this.subjectsDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject !== 'average')
@@ -241,8 +238,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.subjectSliderChanged(0)
     }
 
-    subjectSliderChanged(index) {
-      // this.selectedSubjectIndex = this.cohortSubjects.findIndex((s, i) => i === index - 1)
+    subjectSliderChanged(index: number) {
       this.selectedSubjectIndex = index
       this.selectedSubjectsDatasets = this.fetchedItems
         .filter(fi => fi.cohort === this.selectedCohort && fi.subject === this.cohortSubjects[this.selectedSubjectIndex])
@@ -407,10 +403,8 @@ export type ConnectedArea = {
     numberOfConnections: number
 }
 
-export type Cohort = {
+export type ConnectivityFeature = {
   cohort: string
-  subjects: {
-    subject: string
-    datasets: string[]
-  }[]
-}
+  subject?: string
+  description?: string
+} & SapiParcellationFeatureModel

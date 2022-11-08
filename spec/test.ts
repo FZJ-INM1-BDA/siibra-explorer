@@ -14,7 +14,7 @@ import {
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting(),
-  { teardown: { destroyAfterEach: true }},
+  { teardown: { destroyAfterEach: false }},
 )
 
 declare const require: any
