@@ -1,5 +1,5 @@
-import {ConnectivityBrowserComponent, ConnectivityFeature} from "./connectivityBrowser.component";
-import {async, ComponentFixture, TestBed} from "@angular/core/testing";
+import {ConnectivityBrowserComponent} from "./connectivityBrowser.component";
+import {ComponentFixture, TestBed} from "@angular/core/testing";
 import {Action} from "@ngrx/store";
 import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
@@ -7,7 +7,7 @@ import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import {SAPI} from "src/atlasComponents/sapi";
 import {AngularMaterialModule} from "src/sharedModules";
-import { SapiAtlasModel, SapiModalityModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { SapiAtlasModel, SapiModalityModel, SapiParcellationFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 
 /**
@@ -52,23 +52,23 @@ describe('ConnectivityComponent', () => {
         types: ['siibra/features/connectivity/functional']
     }]
 
-    let datasetList: ConnectivityFeature[] = [
+    let datasetList: SapiParcellationFeatureModel[] = [
         {
             '@id': 'id1',
             name: 'id1',
             cohort: 'HCP',
             subject: '100',
             '@type': 'siibra/features/connectivity/streamlineCounts',
-        } as ConnectivityFeature, {
+        } as SapiParcellationFeatureModel, {
             '@id': 'id2',
             name: 'id2',
             cohort: '1000BRAINS',
             subject: 'average',
-        } as ConnectivityFeature
+        } as SapiParcellationFeatureModel
     ]
 
-    beforeEach(async (() => {
-        TestBed.configureTestingModule({
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
             imports: [
                 HttpClientTestingModule,
                 AngularMaterialModule
@@ -96,7 +96,7 @@ describe('ConnectivityComponent', () => {
             ],
         }).compileComponents()
         httpTestingController = TestBed.inject(HttpTestingController);
-    }));
+    });
 
     it('> component can be created', async () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)
