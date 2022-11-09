@@ -66,7 +66,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public selectedSubjectIndex: number
     public selectedSubjectsDatasets: string[]
     public selectedSubjectDatasetIndex: number
-    public fetchedItems: ConnectivityFeature[] = []
+    public fetchedItems: SapiParcellationFeatureModel[] = []
     public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
     public averageDisabled: boolean = true
@@ -87,7 +87,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public regionName: string
     public regionHemisphere: string = null
-    public selectedDataset: ConnectivityFeature
+    public selectedDataset: SapiParcellationFeatureModel
     public connectionsString: string
     public pureConnections: { [key: string]: number }
     public connectedAreas: BehaviorSubject<ConnectedArea[]> = new BehaviorSubject([])
@@ -397,14 +397,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
 }
 
-export type ConnectedArea = {
+type ConnectedArea = {
     color: {r: number, g: number, b: number}
     name: string
     numberOfConnections: number
 }
-
-export type ConnectivityFeature = {
-  cohort: string
-  subject?: string
-  description?: string
-} & SapiParcellationFeatureModel
