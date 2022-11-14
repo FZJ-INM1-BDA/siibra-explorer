@@ -6,6 +6,7 @@ import { CurrentLayout } from "./currentLayout/currentLayout.component";
 import { FourCornersCmp } from "./fourCorners/fourCorners.component";
 import { FourPanelLayout } from "./layouts/fourPanel/fourPanel.component";
 import { HorizontalOneThree } from "./layouts/h13/h13.component";
+import { PictureInPicturePanel } from "./layouts/pip/pip.component";
 import { SinglePanel } from "./layouts/single/single.component";
 import { VerticalOneThree } from "./layouts/v13/v13.component";
 
@@ -22,6 +23,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     FourPanelLayout,
     HorizontalOneThree,
     SinglePanel,
+    PictureInPicturePanel,
     VerticalOneThree,
   ],
   exports : [
@@ -31,6 +33,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     FourPanelLayout,
     HorizontalOneThree,
     SinglePanel,
+    PictureInPicturePanel,
     VerticalOneThree,
   ],
 })

@@ -5,7 +5,9 @@ import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
-import {ChangePerspectiveOrientationComponent} from "src/viewerModule/nehuba/viewerCtrl/change-perspective-orientation/changePerspectiveOrientation.component";
+import { PerspectiveViewSlider } from "./perspectiveViewSlider/perspectiveViewSlider.component";
+import { PerspectiveViewSliderDirective } from "./perspectiveViewSlider/perspectiveViewSlider.directive";
+import { PerspectiveViewRangeValue } from "./perspectiveViewSlider/perspectiveViewRangeValue.pipe";
 
 @NgModule({
   imports: [
@@ -18,10 +20,13 @@ import {ChangePerspectiveOrientationComponent} from "src/viewerModule/nehuba/vie
   ],
   declarations: [
     ViewerCtrlCmp,
-    ChangePerspectiveOrientationComponent
+    PerspectiveViewSlider,
+    PerspectiveViewSliderDirective,
+    PerspectiveViewRangeValue
   ],
   exports: [
-    ViewerCtrlCmp
+    ViewerCtrlCmp,
+    PerspectiveViewSlider
   ]
 })
 

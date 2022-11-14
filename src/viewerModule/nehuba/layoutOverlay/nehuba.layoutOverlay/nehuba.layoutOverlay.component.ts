@@ -3,11 +3,10 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
-import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "../../util";
+import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
 import { QUICKTOUR_DESC, ARIA_LABELS, IDS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take } from "rxjs/operators";
-import {MaximiseViewService} from "src/services/maximiseView.service";
 import {panelOrder} from "src/state/userInterface/selectors";
 
 @Component({
@@ -47,7 +46,7 @@ export class NehubaLayoutOverlay implements OnDestroy{
   }
 
   handleCycleViewEvent(): void {
-    if (this.currentPanelMode !== "SINGLE_PANEL") return
+    if (!["SINGLE_PANEL", 'PIP_PANEL'].includes(this.currentPanelMode)) return
     this.store$.dispatch(
       userInterface.actions.cyclePanelMode()
     )
@@ -118,7 +117,6 @@ export class NehubaLayoutOverlay implements OnDestroy{
   constructor(
     private store$: Store,
     private cdr: ChangeDetectorRef,
-    public maximiseService: MaximiseViewService,
     @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<NehubaViewerUnit>
   ){
     this.subscription.push(
@@ -133,7 +131,6 @@ export class NehubaLayoutOverlay implements OnDestroy{
       ).subscribe(po => {
         this.panelOrder = po
       }),
-      this.maximiseService.heightChanged.subscribe(() => this.cdr.detectChanges())
     )
   }
 
@@ -278,7 +275,13 @@ export class NehubaLayoutOverlay implements OnDestroy{
         }
         case "SINGLE_PANEL": {
           const element = removeExistingPanels()
-          const newEl = getSinglePanel(viewPanels, this.currentOrder)
+          const newEl = getSinglePanel(viewPanels)
+          element.appendChild(newEl)
+          break;
+        }
+        case "PIP_PANEL": {
+          const element = removeExistingPanels()
+          const newEl = getPipPanel(viewPanels)
           element.appendChild(newEl)
           break;
         }

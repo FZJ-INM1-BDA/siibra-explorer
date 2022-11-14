@@ -12,6 +12,7 @@ export enum EnumPanelMode {
   V_ONE_THREE = 'V_ONE_THREE',
   H_ONE_THREE = 'H_ONE_THREE',
   SINGLE_PANEL = 'SINGLE_PANEL',
+  PIP_PANEL = 'PIP_PANEL',
 }
 
 const defaultState: INehubaFeature = {

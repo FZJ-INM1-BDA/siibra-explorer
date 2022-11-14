@@ -62,10 +62,26 @@
     <ng-container cell-iv>
       <ng-content *ngTemplateOutlet="celliv"></ng-content>
     </ng-container>
-    <div mini-perspective-view>
-      <ng-content *ngTemplateOutlet="miniPerspectiveTmp"></ng-content>
-    </div>
   </layout-single-panel>
+  <picture-in-picture-panel
+    *ngSwitchCase="panelModes.PIP_PANEL"
+    class="d-block sxplr-w-100 sxplr-h-100">
+    <ng-container cell-i>
+      <ng-content *ngTemplateOutlet="celli"></ng-content>
+    </ng-container>
+    <ng-container cell-ii>
+      <ng-content *ngTemplateOutlet="cellii"></ng-content>
+    </ng-container>
+    <ng-container cell-iii>
+      <ng-content *ngTemplateOutlet="celliii"></ng-content>
+    </ng-container>
+    <ng-container cell-iv>
+      <ng-content *ngTemplateOutlet="celliv"></ng-content>
+    </ng-container>
+    <div picture-in-picture>
+      <ng-content *ngTemplateOutlet="pictureInPictureTmp"></ng-content>
+    </div>
+  </picture-in-picture-panel>
   <div *ngSwitchDefault>
     A panel mode which I have never seen before ... {{ useLayout }}
   </div>
@@ -83,6 +99,6 @@
 <ng-template #celliv>
   <ng-content select="[cell-iv]"></ng-content>
 </ng-template>
-<ng-template #miniPerspectiveTmp>
-  <ng-content select="[mini-perspective-view]"></ng-content>
+<ng-template #pictureInPictureTmp>
+  <ng-content select="[picture-in-picture]"></ng-content>
 </ng-template>

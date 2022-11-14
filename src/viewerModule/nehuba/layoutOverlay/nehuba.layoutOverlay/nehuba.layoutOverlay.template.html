@@ -25,8 +25,8 @@
     [quick-tour-order]="quickTour3dViewSlide.order">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
-  <div class="w-100 h-100 position-relative" style="z-index: 100" mini-perspective-view>
-    <ng-container *ngTemplateOutlet="miniPerspectiveTmp"></ng-container>
+  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="w-100 h-100 position-relative" style="z-index: 100" picture-in-picture >
+    <nehuba-perspective-view-slider></nehuba-perspective-view-slider>
   </div>
 </current-layout>
 
@@ -116,7 +116,7 @@
     color="primary"
     (click)="toggleMaximiseMinimise(panelIndex)">
     <ng-template
-      [ngIf]="currentPanelMode === 'SINGLE_PANEL'"
+      [ngIf]="currentPanelMode === 'SINGLE_PANEL' || currentPanelMode === 'PIP_PANEL'"
       [ngIfElse]="expandTmpl">
       <i class="fas fa-compress"></i>
     </ng-template>
@@ -152,45 +152,4 @@
       <path id="arrow_head_3" d="M68.4342 11.1429C69.9189 10.1032 72.0665 8.29351 73.3667 7.02421C74.5891 5.83091 74.7305 5.5689 75.8779 4.30076C76.5581 3.54892 75.8779 4.30076 77.5771 2C79.2914 6.00002 78.7059 5.12172 79.2915 6.00002C80.4343 7.71431 80.4331 7.99326 82.1486 10C83.7287 11.8485 84.5072 12.3587 85.0058 12.8572"  stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </svg>
-</ng-template>
-
-<ng-template #miniPerspectiveTmp>
-  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="pe-all position-relative mini-perspective-viewer overflow-hidden">
-
-    <div *ngIf="maximiseService.maximisedPanelIndex !== null && maximiseService.templateTransform"
-         [style.background-image]="'url(' + maximiseService.previewImage + ')'"
-         style="background-size: cover;">
-
-      <input type="range"
-             class="custom-slider-3d mini-perspective-viewer"
-             #custom3DRangeInput
-             [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
-             [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
-             [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
-             [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
-                    * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
-             (input)="maximiseService.navigate(custom3DRangeInput.value); detectChanges()"
-             id="customSliderFor3d"
-             style="z-index: 100 !important;">
-
-
-      <input type="range"
-             #custom3DRangeInput
-             [min]="maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
-             [max]="-maximiseService.templateTransform[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]"
-             [value]="maximiseService.navPosVoxel[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2]
-                    * (maximiseService.maximisedPanelIndex === 1? -1 : 1)"
-             [style.height]="maximiseService.height + 'px'"
-             [style.top]="maximiseService[maximiseService.maximisedPanelIndex !== 2? 'top' : 'topForSagittal'] + 'px'"
-             [style.transform]="maximiseService.maximisedPanelIndex === 2? 'rotate(270deg)' : ''"
-             class="custom-slider-3d-highlight mini-perspective-viewer position-absolute"
-             [style.left]="maximiseService.maximisedPanelIndex === 2? (maximiseService.topForSagittal - maximiseService.top) + 'px' : 0"
-      >
-
-    </div>
-
-    <div class="position-absolute  range-value" *ngIf="maximiseService.navPosReal">
-      {{(maximiseService.navPosReal[maximiseService.maximisedPanelIndex === 0? 1 : maximiseService.maximisedPanelIndex === 1? 0 : 2] / 1e6).toFixed(3)}}mm
-    </div>
-  </div>
 </ng-template>

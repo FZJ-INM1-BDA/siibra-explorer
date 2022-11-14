@@ -72,7 +72,7 @@ export class Effects{
     ),
     switchMap(([ { targetIndex }, panelMode ]) => {
       const newMode: userInterface.PanelMode = panelMode === "FOUR_PANEL"
-        ? "SINGLE_PANEL"
+        ? "PIP_PANEL"
         : "FOUR_PANEL"
       const newOrder = newMode === "FOUR_PANEL"
         ? "0123"
@@ -98,7 +98,7 @@ export class Effects{
         select(userInterface.selectors.panelOrder)
       ),
     ),
-    filter(([_, panelMode, _1]) => panelMode === "SINGLE_PANEL"),
+    filter(([_, panelMode, _1]) => ['SINGLE_PANEL', 'PIP_PANEL'].includes(panelMode)),
     map(([_, _1, panelOrder]) => userInterface.actions.setPanelOrder({
       order: [
         ...panelOrder.split('').slice(1),

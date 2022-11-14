@@ -67,6 +67,13 @@ mapModeIdxClass.set("SINGLE_PANEL", new Map([
   [3, {}],
 ]))
 
+mapModeIdxClass.set("PIP_PANEL", new Map([
+  [0, { top, left, right, bottom }],
+  [1, {}],
+  [2, {}],
+  [3, {}],
+]))
+
 mapModeIdxClass.set("H_ONE_THREE", new Map([
   [0, { top, left, bottom }],
   [1, { top, right }],
@@ -148,7 +155,15 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
   return makeCol(majorContainer, minorContainer)
 }
 
-export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement], panelOrderString: string): HTMLDivElement => {
+export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  return getFullViewPanel(panels)
+}
+
+export const getPipPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  return getFullViewPanel(panels)
+}
+
+const getFullViewPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
   washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "SINGLE_PANEL"))
@@ -157,45 +172,13 @@ export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, H
 
   majorContainer.style.flexBasis = '100%'
 
-  let minorContainer
-
   washPanels(panels)
   majorContainer.style.flexBasis = '100%'
-  minorContainer = makeRow(panels[1], panels[2], panels[3])
+  const minorContainer = makeRow(panels[1], panels[2], panels[3])
   minorContainer.style.flexBasis = '0%'
   minorContainer.className = ''
 
   return makeRow(majorContainer, minorContainer)
-}
-
-export const getNavigationStateFromConfig = nehubaConfig => {
-  const {
-    navigation = {},
-    perspectiveOrientation = [0, 0, 0, 1],
-    perspectiveZoom = 1e7
-  } = (nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState) || {}
-
-  const {
-    zoomFactor = 3e5,
-    pose = {}
-  } = navigation || {}
-
-  const {
-    voxelSize = [1e6, 1e6, 1e6],
-    voxelCoordinates = [0, 0, 0]
-  } = (pose && pose.position) || {}
-
-  const {
-    orientation = [0, 0, 0, 1]
-  } = pose || {}
-
-  return {
-    orientation,
-    perspectiveOrientation,
-    perspectiveZoom,
-    position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
-    zoom: zoomFactor
-  }
 }
 
 export const isIdentityQuat = (ori: number[]): boolean => Math.abs(ori[0]) < 1e-6
