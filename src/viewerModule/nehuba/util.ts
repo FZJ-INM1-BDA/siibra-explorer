@@ -25,19 +25,6 @@ const makeCol = (...els: HTMLElement[]) => {
   return container
 }
 
-const washPanels = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
-  for (const panel of panels) {
-    if (panel) {
-      panel.className = `position-relative`
-      panel.style.width = null
-      panel.style.height = null
-      panel.style.bottom = null
-      panel.style.right = null
-      panel.style.border=null
-    }
-  }
-  return panels
-}
 
 const top = true
 const left = true
@@ -114,7 +101,6 @@ export const addTouchSideClasses = (panel: HTMLElement, actualOrderIndex: number
 }
 
 export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLElement => {
-  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "H_ONE_THREE"))
 
@@ -128,7 +114,6 @@ export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEle
 }
 
 export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
-  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "V_ONE_THREE"))
 
@@ -142,7 +127,6 @@ export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEleme
 }
 
 export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
-  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "FOUR_PANEL"))
 
@@ -164,16 +148,12 @@ export const getPipPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTML
 }
 
 const getFullViewPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
-  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "SINGLE_PANEL"))
 
   const majorContainer = makeRow(panels[0])
-
   majorContainer.style.flexBasis = '100%'
 
-  washPanels(panels)
-  majorContainer.style.flexBasis = '100%'
   const minorContainer = makeRow(panels[1], panels[2], panels[3])
   minorContainer.style.flexBasis = '0%'
   minorContainer.className = ''

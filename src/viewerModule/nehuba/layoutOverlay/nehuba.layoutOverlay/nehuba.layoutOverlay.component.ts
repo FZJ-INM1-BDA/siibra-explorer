@@ -112,7 +112,11 @@ export class NehubaLayoutOverlay implements OnDestroy{
 
   public volumeChunkLoading$: Subject<boolean> = new Subject()
 
-  public panelOrder: string
+  public showPipPerspectiveView$ = this.store$.pipe(
+    select(panelOrder),
+    distinctUntilChanged(),
+    map(po => po[0] !== '3')
+  )
 
   constructor(
     private store$: Store,
@@ -124,13 +128,7 @@ export class NehubaLayoutOverlay implements OnDestroy{
         this.nehubaUnit = nehuba
         this.onNewNehubaUnit(nehuba)
         this.setQuickTourPos()
-      }),
-      this.store$.pipe(
-        select(panelOrder),
-        distinctUntilChanged(),
-      ).subscribe(po => {
-        this.panelOrder = po
-      }),
+      })
     )
   }
 

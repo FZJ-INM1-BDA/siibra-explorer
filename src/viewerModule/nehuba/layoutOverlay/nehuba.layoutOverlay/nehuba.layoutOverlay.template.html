@@ -25,7 +25,7 @@
     [quick-tour-order]="quickTour3dViewSlide.order">
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
-  <div *ngIf="panelOrder && panelOrder[0] !== '3'" class="w-100 h-100 position-relative" style="z-index: 100" picture-in-picture >
+  <div *ngIf="showPipPerspectiveView$ | async" class="w-100 h-100 position-relative" style="z-index: 100" picture-in-picture >
     <nehuba-perspective-view-slider></nehuba-perspective-view-slider>
   </div>
 </current-layout>

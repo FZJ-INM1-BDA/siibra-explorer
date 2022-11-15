@@ -151,12 +151,7 @@ export class PerspectiveViewSlider implements OnDestroy {
           )
         ]).subscribe(([singlePanel, orderStr]) => {
           if (singlePanel && this.panelOrder !== orderStr) {
-
-            console.log('panelChanged')
-          
-            const firstExpand = !this.panelOrder
             this.panelOrder = orderStr
-          
             const order = orderStr.split('').map(o => Number(o))
           
             if (order[0] === 3) {

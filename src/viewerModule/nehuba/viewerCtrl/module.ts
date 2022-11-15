@@ -5,9 +5,10 @@ import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
+import { ChangePerspectiveOrientationComponent } from "./change-perspective-orientation/changePerspectiveOrientation.component";
 import { PerspectiveViewSlider } from "./perspectiveViewSlider/perspectiveViewSlider.component";
 import { PerspectiveViewSliderDirective } from "./perspectiveViewSlider/perspectiveViewSlider.directive";
-import { PerspectiveViewRangeValue } from "./perspectiveViewSlider/perspectiveViewRangeValue.pipe";
+import { NavigationPosToTextPipe } from "./perspectiveViewSlider/navigationPosToTextPipe.pipe";
 
 @NgModule({
   imports: [
@@ -20,9 +21,10 @@ import { PerspectiveViewRangeValue } from "./perspectiveViewSlider/perspectiveVi
   ],
   declarations: [
     ViewerCtrlCmp,
+    ChangePerspectiveOrientationComponent,
     PerspectiveViewSlider,
     PerspectiveViewSliderDirective,
-    PerspectiveViewRangeValue
+    NavigationPosToTextPipe,
   ],
   exports: [
     ViewerCtrlCmp,
