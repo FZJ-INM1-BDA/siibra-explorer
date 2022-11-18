@@ -36,7 +36,6 @@ import { MessagingGlue } from './messagingGlue';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
-import { environment } from 'src/environments/environment' 
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 import {
   atlasSelection,
