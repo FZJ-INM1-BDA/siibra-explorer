@@ -93,7 +93,3 @@ img
     bottom: 5px;
 }
 
-:host-context([darktheme="true"]) .range-value {
-    color: white;
-}
-

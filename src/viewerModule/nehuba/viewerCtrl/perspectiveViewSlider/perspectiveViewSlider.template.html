@@ -1,4 +1,5 @@
 <div class="range-container"
+  *ngIf="sliceviewIsNormal$ | async else resetOrientationTmpl"
   [ngClass]="{
     'r-270': rangeControlIsVertical$ | async
   }">
@@ -28,6 +29,18 @@
   </div>
 </div>
 
-<div class="position-absolute range-value" *ngIf="textToDisplay$ | async as textToDisplay">
+<ng-template #resetOrientationTmpl>
+  <div class="sxplr-custom-cmp text sxplr-p-2 bg">
+    Minimap disabled until orientation is reset.
+
+    <button mat-button
+      (click)="resetSliceview()">
+      Reset Orientation
+    </button>
+  </div>
+</ng-template>
+
+<div *ngIf="textToDisplay$ | async as textToDisplay"
+  class="position-absolute range-value sxplr-custom-cmp text">
   {{ textToDisplay }}
 </div>

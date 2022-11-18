@@ -13,6 +13,7 @@ import { EnumPanelMode } from "../../store/store";
 import { NEHUBA_INSTANCE_INJTKN } from "../../util";
 import { EnumClassicalView } from "src/atlasComponents/constants"
 import { atlasSelection } from "src/state";
+import { floatEquality } from "common/util"
 
 const MINIMAP_SIZE = {
   width: 200,
@@ -190,11 +191,18 @@ export class PerspectiveViewSlider implements OnDestroy {
       })
     )
 
+    public sliceviewIsNormal$ = this.store$.pipe(
+      select(atlasSelection.selectors.navigation),
+      map(navigation => [0, 0, 0, 1].every((v, idx) => floatEquality(navigation.orientation[idx], v,  1e-3)))
+    )
+
     public textToDisplay$ = combineLatest([
+      this.sliceviewIsNormal$,
       this.navPosition$,
       this.maximisedPanelIndex$,
     ]).pipe(
-      map(([ nav, maximisedIdx ]) => {
+      map(([ sliceviewIsNormal, nav, maximisedIdx ]) => {
+        if (!sliceviewIsNormal) return null
         if (!(nav?.real) || (maximisedIdx === null)) return null
         return `${(nav.real[maximisedIdx === 0? 1 : maximisedIdx === 1? 0 : 2] / 1e6).toFixed(3)}mm`
       })
@@ -329,6 +337,17 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe());
+    }
+
+    resetSliceview() {
+      this.store$.dispatch(
+        atlasSelection.actions.navigateTo({
+          animation: true,
+          navigation: {
+            orientation: [0, 0, 0, 1]
+          }
+        })
+      )
     }
   
 }
