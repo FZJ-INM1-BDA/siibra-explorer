@@ -883,7 +883,8 @@ how-to-cite img
 }
 
 /* this is required to set snackbar to be none-interactive */
-.cdk-overlay-pane:has(.sxplr-pe-none)
+/* ignore css lint error, they don't know what they are talking about */
+.cdk-overlay-pane:has(> .sxplr-pe-none)
 {
   pointer-events: none;
 }
