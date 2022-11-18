@@ -138,9 +138,9 @@ export class PerspectiveViewSlider implements OnDestroy {
     private currentTemplateSize$ = this.store$.pipe(
       fromRootStore.distinctATP(),
       switchMap(({ atlas, template }) => 
-      atlas && template
-      ? this.sapi.getSpace(atlas['@id'], template['@id']).getTemplateSize()
-      : NEVER),
+        atlas && template
+          ? this.sapi.getSpace(atlas['@id'], template['@id']).getTemplateSize()
+          : NEVER),
     )
     
     public rangeControlMinMaxValue$ = this.currentTemplateSize$.pipe(
@@ -235,8 +235,8 @@ export class PerspectiveViewSlider implements OnDestroy {
             take(1)
           ),
           viewer
-          ? viewer.viewerPositionChange
-          : NEVER,
+            ? viewer.viewerPositionChange
+            : NEVER,
         ),
         this.viewportSize$,
         this.rangeControlSetting$,
