@@ -13,7 +13,7 @@ export interface paths {
     get: operations["get_all_regional_features_for_region_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features_get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/features/{feature_id}": {
-    /** Returns a feature for a region, as defined by by the modality and feature ID */
+    /** Returns a feature for a region, as defined by the modality and feature ID */
     get: operations["get_single_detailed_regional_feature_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/regional_map/info": {
@@ -26,6 +26,9 @@ export interface paths {
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/volumes": {
     get: operations["get_regional_volumes_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__volumes_get"]
+  }
+  "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}/volumes/{volume_id}": {
+    get: operations["get_regional_volumes_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__volumes__volume_id__get"]
   }
   "/atlases/{atlas_id}/parcellations/{parcellation_id}/regions/{region_id}": {
     get: operations["get_single_region_detail_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__get"]
@@ -218,7 +221,21 @@ export interface components {
       /** @Type */
       "@type": string
       /** Name */
-      name: string
+      name?: string
+      /** Description */
+      description?: string
+      /** Citation */
+      citation?: string
+      /** Authors */
+      authors?: string[]
+      /** Cohort */
+      cohort?: string
+      /** Subject */
+      subject?: string
+      /** Filename */
+      filename?: string
+      /** Dataset Id */
+      dataset_id?: string
       /** Parcellations */
       parcellations: { [key: string]: string }[]
       matrix?: components["schemas"]["NpArrayDataModel"]
@@ -1439,7 +1456,7 @@ export interface operations {
       }
     }
   }
-  /** Returns a feature for a region, as defined by by the modality and feature ID */
+  /** Returns a feature for a region, as defined by the modality and feature ID */
   get_single_detailed_regional_feature_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__features__feature_id__get: {
     parameters: {
       path: {
@@ -1546,6 +1563,30 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["Page_VolumeModel_"]
+        }
+      }
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_regional_volumes_atlases__atlas_id__parcellations__parcellation_id__regions__region_id__volumes__volume_id__get: {
+    parameters: {
+      path: {
+        atlas_id: string
+        parcellation_id: string
+        region_id: string
+        volume_id: string
+      }
+    }
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["VolumeModel"]
         }
       }
       /** Validation Error */
@@ -1819,6 +1860,7 @@ export interface operations {
       }
       query: {
         parcellation_id?: string
+        type?: string
         region?: string
         bbox?: string
       }

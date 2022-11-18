@@ -1,13 +1,19 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, ChangeDetectorRef} from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Subscription, BehaviorSubject} from "rxjs";
+import {fromEvent, Subscription, BehaviorSubject, Observable} from "rxjs";
 import {catchError, take} from "rxjs/operators";
-import {SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel} from "src/atlasComponents/sapi";
+import {
+  SAPI,
+  SapiAtlasModel,
+  SapiParcellationModel,
+  SapiRegionModel
+} from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import {SapiModalityModel, SapiParcellationFeatureMatrixModel} from "src/atlasComponents/sapi/type";
+import {SapiModalityModel, SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
@@ -28,7 +34,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
      */
     private _isFirstUpdate = true
     
-    private accordionIsExpanded = false
 
     @Input()
     set accordionExpanded(flag: boolean) {
@@ -39,10 +44,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         this._isFirstUpdate = false
         return
       }
-      this.accordionIsExpanded = flag
 
       if (flag) {
-        if (this.allRegions.length) {
+        if (this.selectedSubjectDatasetIndex >= 0 && this.allRegions.length) {
           this.setCustomLayer()
         } else {
           this.setCustomLayerOnLoad = true
@@ -55,21 +59,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     @Input() types: SapiModalityModel[] = []
 
-    private _defaultProfile
-    @Input() set defaultProfile(val: any) {
-      this._defaultProfile = val
-      this.selectedType = this.types.find(t => t.types.includes(val.type))?.name
-      this.pageNumber = 1
-      this.selectedDataset = this.fixDatasetFormat(val.selectedDataset)
-      if (val.matrix) this.setMatrixData(val.matrix)
-      this.numberOfDatasets = val.numberOfDatasets
-    }
-
-    get defaultProfile() {
-      return this._defaultProfile
-    }
-
-    public selectedType: any
+    public selectedType: string
+    public selectedTypeId: string
+    public selectedCohort: string
+    public cohortSubjects: string[]
+    public selectedSubjectIndex: number
+    public selectedSubjectsDatasets: string[]
+    public selectedSubjectDatasetIndex: number
+    public fetchedItems: SapiParcellationFeatureModel[] = []
+    public cohorts: string[]
+    public selectedView: 'subject' | 'average' | null
+    public averageDisabled: boolean = true
+    public subjectsDisabled: boolean = true
 
     @Input()
     set region(val) {
@@ -86,21 +87,19 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public regionName: string
     public regionHemisphere: string = null
-    public selectedDataset: any
+    public selectedDataset: SapiParcellationFeatureModel
     public connectionsString: string
     public pureConnections: { [key: string]: number }
     public connectedAreas: BehaviorSubject<ConnectedArea[]> = new BehaviorSubject([])
     public noConnectivityForRegion: boolean
     private subscriptions: Subscription[] = []
-    public allRegions = []
+    public allRegions: SapiRegionModel[] = []
     private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
     public matrixString: string
     public fetching: boolean
-    public numberOfDatasets: number
     public connectivityLayerId = 'connectivity-colormap-id'
     private setCustomLayerOnLoad = false
-    public pageNumber: number
     private customLayerEnabled: boolean
 
     public logDisabled: boolean = true
@@ -112,6 +111,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     constructor(
         private store$: Store,
         private sapi: SAPI,
+        private http: HttpClient,
         private changeDetectionRef: ChangeDetectorRef,
     ) {}
 
@@ -180,37 +180,82 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
     }
 
+    clearCohortSelection() {
+      this.fetchedItems = []
+      this.selectedCohort = null
+      this.cohorts = []
+      this.selectedCohort = null
+      this.cohortSubjects = []
+      this.selectedSubjectIndex = null
+      this.selectedSubjectsDatasets = null
+      this.selectedSubjectDatasetIndex = null
+    }
+
     selectType(typeName) {
+      this.clearCohortSelection()
       this.selectedType = typeName
-      this.pageNumber = 1
-      this.loadDataset()
+      this.selectedTypeId = this.types.find(t => t.name === typeName).types[0]
+
+      this.removeCustomLayer()
+
+      this.getModality()
     }
 
-    datasetSliderChanged(pageNumber) {
-      this.pageNumber = pageNumber
-      this.loadDataset()
-    }
 
-    loadDataset() {
+    getModality(size: number = 100, page: number = 1) {
       this.fetching = true
-      const type = this.types.find(t => t.name === this.selectedType).types[0]
-      return this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-        .getFeatures({type, page: this.pageNumber, size: 1},)
-        .pipe(
-          take(1),
-          catchError(() => {
-            this.fetching = false
-            return of(null)
-          })
-        ).subscribe((res: any) => {
-          if (res && res.items) {
-            if (res.total !== this.numberOfDatasets) {
-              this.numberOfDatasets = res.total
-            }
-            this.selectedDataset = this.fixDatasetFormat(res.items[0])
-            this.fetchConnectivity()
-          }
-        })
+      this.fetchModality(size, page).subscribe((res: any) => {
+
+        this.fetchedItems.push(...res.items)
+          
+        if (res.total > size*page) {
+          this.getModality(100, page+1)
+        } else {
+          this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
+          this.fetching = false
+          this.changeDetectionRef.detectChanges()
+        }
+      })
+    }
+
+    public fetchModality = (size: number, page: number): Observable<any> => {
+      let endp
+      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => endp = en)
+      return this.http.get(`${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&size=${size}&page=${page}`,)
+        .pipe(take(1))
+    }
+
+    selectCohort(cohort: string) {
+      this.selectedCohort = cohort
+      this.averageDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject === 'average')
+      this.subjectsDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject !== 'average')
+      this.selectedView = !this.averageDisabled? 'average' : 'subject'
+      this.cohortSubjects = [...new Set(
+        this.fetchedItems
+          .filter(i => this.selectedView === 'average'? i.subject === 'average' : i.subject !== 'average')
+          .map(item => item.subject)
+      )]
+      this.subjectSliderChanged(0)
+    }
+
+    subjectSliderChanged(index: number) {
+      this.selectedSubjectIndex = index
+      this.selectedSubjectsDatasets = this.fetchedItems
+        .filter(fi => fi.cohort === this.selectedCohort && fi.subject === this.cohortSubjects[this.selectedSubjectIndex])
+        .map(i => i['@id'])
+
+      this.selectedSubjectDatasetIndex = 0
+      this.loadSubjectConnectivity()
+    }
+
+    subjectDatasetSliderChanged(index) {
+      this.selectedSubjectDatasetIndex = index
+      this.loadSubjectConnectivity()
+    }
+
+    loadSubjectConnectivity() {
+      this.fetching = true
+      this.fetchConnectivity(this.selectedSubjectsDatasets[this.selectedSubjectDatasetIndex])
     }
 
     // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
@@ -219,21 +264,37 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
     }) : ds
 
-    fetchConnectivity() {
-      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(this.selectedDataset['@id'])
+    fetchConnectivity(datasetId=null) {
+      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(datasetId || this.selectedDataset['@id'])
         .pipe(catchError(() => {
           this.fetching = false
           return of(null)
         }))
         .subscribe(ds=> {
+          this.selectedDataset = this.fixDatasetFormat(ds)
           this.setMatrixData(ds)
           this.fetching = false
         })
     }
 
+    // ToDo need to be fixed on configuration side
+    fixHemisphereNaming(area) {
+      if (area.includes(' - left hemisphere')) {
+        return area.replace('- left hemisphere', 'left')
+      } else if (area.includes(' - right hemisphere')) {
+        return area.replace('- right hemisphere', 'right')
+      } else {
+        return area
+      }
+    }
+
     setMatrixData(data) {
       const matrixData = data as SapiParcellationFeatureMatrixModel
-      this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => md === this.regionName)
+
+      this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => {
+        return this.fixHemisphereNaming(md) === this.regionName
+      })
+
       if (this.regionIndexInMatrix < 0) {
         this.fetching = false
         this.noConnectivityForRegion = true
@@ -250,8 +311,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.logChecked = maxStrength > 1
           this.logDisabled = maxStrength <= 1
 
-          const areas = regionProfile.reduce((p, c, i) => ({...p, [matrixData.columns[i]]: c}), {})
+          const areas = regionProfile.reduce((p, c, i) => {
+            return {
+              ...p,
+              [this.fixHemisphereNaming(matrixData.columns[i])]: c
+            }
+          }, {})
           this.pureConnections = areas
+
           this.connectionsString = JSON.stringify(areas)
           this.connectedAreas.next(this.formatConnections(areas))
           this.setCustomLayer()
@@ -330,9 +397,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
 }
 
-export type ConnectedArea = {
+type ConnectedArea = {
     color: {r: number, g: number, b: number}
     name: string
     numberOfConnections: number
 }
-

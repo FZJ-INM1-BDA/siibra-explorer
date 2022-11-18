@@ -28,6 +28,7 @@ import { MeshEffects } from "./mesh.effects/mesh.effects";
 import { NehubaLayoutOverlayModule } from "./layoutOverlay";
 import { NgAnnotationService } from "./annotation/service";
 import { NgAnnotationEffects } from "./annotation/effects";
+import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import { NgAnnotationEffects } from "./annotation/effects";
     NehubaGlueCmp,
     StatusCardComponent,
     NgLayerCtrlCmp,
+    NehubaViewerContainer,
   ],
   exports: [
     NehubaViewerUnit,

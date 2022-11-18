@@ -33,6 +33,9 @@ nav:
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.8.0: 'releases/v2.8.0.md'
+    - v2.7.7: 'releases/v2.7.7.md'
+    - v2.7.6: 'releases/v2.7.6.md'
     - v2.7.5: 'releases/v2.7.5.md'
     - v2.7.4: 'releases/v2.7.4.md'
     - v2.7.3: 'releases/v2.7.3.md'

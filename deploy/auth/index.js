@@ -23,8 +23,12 @@ const configureAuth = async (app) => {
 
   app.get('/logout', (req, res) => {
     if (req.user && req.user.id) objStoreDb.delete(req.user.id)
-    req.logout()
-    res.redirect(`${HOST_PATHNAME}/`)
+    req.logout(err => {
+      if (!!err) {
+        console.log(`err during logout: ${err.toString()}`)
+      }
+      res.redirect(`${HOST_PATHNAME}/`)
+    })
   })
 }
 
