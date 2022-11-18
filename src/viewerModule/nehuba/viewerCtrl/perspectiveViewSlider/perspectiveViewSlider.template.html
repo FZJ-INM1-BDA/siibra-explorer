@@ -1,31 +1,33 @@
-<div  class="pe-all">
+<div class="range-container"
+  [ngClass]="{
+    'r-270': rangeControlIsVertical$ | async
+  }">
+  <img *ngIf="previewImageUrl$ | async as url"
+    [ngClass]="{
+      'r-90': rangeControlIsVertical$ | async
+    }"
+    [src]="url">
 
-    <div *ngIf="maximisedPanelIndex !== null && templateTransform"
-         [style.background-image]="'url(' + previewImage + ')'"
-         style="background-size: cover;"
-         class="mini-perspective-viewer position-relative overflow-hidden">
+  <input type="range"
+    *ngIf="rangeControlMinMaxValue$ | async as minMaxValue"
+    iav-window-resize
+    (iav-window-resize-event)="recalcViewportSize$.next($event)"
+    [min]="minMaxValue.min"
+    [max]="minMaxValue.max"
+    [value]="minMaxValue.value"
+    [formControl]="minimapControl"
+    class="anchored perspective-slider-range-input custom-slider-3d1"
+    >
 
-      <input type="range"
-             class="custom-slider-3d mini-perspective-viewer"
-             #custom3DRangeInput id="customSliderFor3d"
-             sxplr-ui-config-perspective-view-slider
-             [sxplr-ui-config-perspective-view-slider-maximised-panel-index]="maximisedPanelIndex"
-             [sxplr-ui-config-perspective-view-slider-templatetransform]="templateTransform"
-             [sxplr-ui-config-perspective-view-slider-nav-pos-voxel]="navPosVoxel"
-             (input)="navigate(custom3DRangeInput.value); detectChanges()">
-      <input type="range"
-              sxplr-ui-config-perspective-view-slider
-              [sxplr-ui-config-perspective-view-slider-is-highlight] = "true"
-              [sxplr-ui-config-perspective-view-slider-maximised-panel-index]="maximisedPanelIndex"
-              [sxplr-ui-config-perspective-view-slider-templatetransform]="templateTransform"
-              [sxplr-ui-config-perspective-view-slider-nav-pos-voxel]="navPosVoxel"
-              [sxplr-ui-config-perspective-view-slider-height]="sliderHeight"
-              [sxplr-ui-config-perspective-view-slider-top-for-sagittal]="sliderTopForSagittal"
-              [sxplr-ui-config-perspective-view-slider-top]="sliderTop"
-             class="custom-slider-3d-highlight mini-perspective-viewer position-absolute">
+  <div *ngIf="scrubberPosition$ | async as transform"
+    [style.transform]="transform"
+    class="anchored scrubber">
+    <div *ngIf="scrubberHighlighter$ | async as highlighter"
+      [style.transform]="highlighter" class="scrubber-highlight">
     </div>
+  </div>
+</div>
 
-    <div class="position-absolute range-value" *ngIf="navPosReal">
-      {{navPosReal | perspectiveViewRangeValue : maximisedPanelIndex}}mm
-    </div>
+<div class="position-absolute range-value" *ngIf="textToDisplay$ | async as textToDisplay">
+  {{ textToDisplay }}
 </div>

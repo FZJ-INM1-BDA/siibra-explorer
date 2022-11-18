@@ -26,7 +26,7 @@
     <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: currentOrder | getProperty : 3 | parseAsNumber }"></ng-content>
   </div>
   <div *ngIf="showPipPerspectiveView$ | async" class="w-100 h-100 position-relative" style="z-index: 100" picture-in-picture >
-    <nehuba-perspective-view-slider></nehuba-perspective-view-slider>
+    <nehuba-perspective-view-slider class="pe-all"></nehuba-perspective-view-slider>
   </div>
 </current-layout>
 

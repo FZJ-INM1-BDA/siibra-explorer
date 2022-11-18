@@ -6,9 +6,8 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
 import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
 import { PerspectiveViewSlider } from "./perspectiveViewSlider/perspectiveViewSlider.component";
-import { PerspectiveViewSliderDirective } from "./perspectiveViewSlider/perspectiveViewSlider.directive";
-import { NavigationPosToTextPipe } from "./perspectiveViewSlider/navigationPosToTextPipe.pipe";
 import { SnapPerspectiveOrientationCmp } from "src/viewerModule/nehuba/viewerCtrl/snapPerspectiveOrientation/snapPerspectiveOrientation.component";
+import { WindowResizeModule } from "src/util/windowResize";
 
 @NgModule({
   imports: [
@@ -18,12 +17,11 @@ import { SnapPerspectiveOrientationCmp } from "src/viewerModule/nehuba/viewerCtr
     FormsModule,
     ReactiveFormsModule,
     ComponentsModule,
+    WindowResizeModule,
   ],
   declarations: [
     ViewerCtrlCmp,
     PerspectiveViewSlider,
-    PerspectiveViewSliderDirective,
-    NavigationPosToTextPipe,
     SnapPerspectiveOrientationCmp,
   ],
   exports: [
