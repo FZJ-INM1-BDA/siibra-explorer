@@ -8,6 +8,8 @@ import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
 import { PerspectiveViewSlider } from "./perspectiveViewSlider/perspectiveViewSlider.component";
 import { SnapPerspectiveOrientationCmp } from "src/viewerModule/nehuba/viewerCtrl/snapPerspectiveOrientation/snapPerspectiveOrientation.component";
 import { WindowResizeModule } from "src/util/windowResize";
+import { EffectsModule } from "@ngrx/effects";
+import { ViewerCtrlEffects } from "./effects"
 
 @NgModule({
   imports: [
@@ -18,6 +20,9 @@ import { WindowResizeModule } from "src/util/windowResize";
     ReactiveFormsModule,
     ComponentsModule,
     WindowResizeModule,
+    EffectsModule.forFeature([
+      ViewerCtrlEffects
+    ])
   ],
   declarations: [
     ViewerCtrlCmp,

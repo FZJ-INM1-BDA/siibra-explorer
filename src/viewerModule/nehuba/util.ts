@@ -25,6 +25,12 @@ const makeCol = (...els: HTMLElement[]) => {
   return container
 }
 
+const washPanels = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
+  for (const panel of panels) {
+    if (panel) { panel.className = `position-relative` }
+  }
+  return panels
+}
 
 const top = true
 const left = true
@@ -101,6 +107,7 @@ export const addTouchSideClasses = (panel: HTMLElement, actualOrderIndex: number
 }
 
 export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLElement => {
+  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "H_ONE_THREE"))
 
@@ -114,6 +121,7 @@ export const getHorizontalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEle
 }
 
 export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "V_ONE_THREE"))
 
@@ -127,6 +135,7 @@ export const getVerticalOneThree = (panels: [HTMLElement, HTMLElement, HTMLEleme
 }
 
 export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "FOUR_PANEL"))
 
@@ -140,10 +149,14 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
 }
 
 export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
+
   return getFullViewPanel(panels)
 }
 
 export const getPipPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
+  
   return getFullViewPanel(panels)
 }
 

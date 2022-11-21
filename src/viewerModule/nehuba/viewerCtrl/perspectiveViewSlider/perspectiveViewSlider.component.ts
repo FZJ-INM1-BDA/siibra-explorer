@@ -193,7 +193,10 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     public sliceviewIsNormal$ = this.store$.pipe(
       select(atlasSelection.selectors.navigation),
-      map(navigation => [0, 0, 0, 1].every((v, idx) => floatEquality(navigation.orientation[idx], v,  1e-3)))
+      map(navigation => {
+        // if navigation in store is nullish, assume starting position, ie slice view is normal
+        if (!navigation) return true
+        return [0, 0, 0, 1].every((v, idx) => floatEquality(navigation.orientation[idx], v,  1e-3))})
     )
 
     public textToDisplay$ = combineLatest([
