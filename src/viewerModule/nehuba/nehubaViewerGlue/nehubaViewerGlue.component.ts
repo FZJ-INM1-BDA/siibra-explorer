@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { distinctUntilChanged } from "rxjs/operators";
+import { distinctUntilChanged, map } from "rxjs/operators";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
@@ -18,6 +18,8 @@ import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { arrayEqual } from "src/util/array";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
 
@@ -61,7 +63,7 @@ export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
+export class NehubaGlueCmp implements IViewer<'nehuba'>, AfterViewInit, OnDestroy {
 
   @ViewChild('layerCtrlTmpl', { static: true })
   layerCtrlTmpl: TemplateRef<any>
@@ -123,6 +125,23 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
       })
     )
     return true
+  }
+
+  ngAfterViewInit(): void {
+    const customLayer = this.store$.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
+      map(cl => {
+        const customLayers = cl.filter(l => l.clType === "customlayer/nglayer" && l.controllable)
+        return customLayers
+      }),
+      distinctUntilChanged(),
+    ).subscribe((l: NgLayerCustomLayer[]) => {
+      if (l && l.length === 1) {
+        this.openLayerController({layerName: l[0].id, fileName: l[0].source.split(',').pop()})
+      }
+    })
+    this.onDestroyCb.push(() => customLayer.unsubscribe())
   }
 
   private droppedLayerNames: {
@@ -235,36 +254,46 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
           }
         })
       )
-      this.dialog.open(
-        this.layerCtrlTmpl,
-        {
-          data: {
-            layerName: randomUuid,
-            filename: file.name,
-            moreInfoFlag: false,
-            min: meta.min || 0,
-            max: meta.max || 1,
-            warning: meta.warning || []
-          },
-          hasBackdrop: false,
-          disableClose: true,
-          position: {
-            top: '0em'
-          },
-          autoFocus: false,
-          panelClass: [
-            'no-padding-dialog',
-            'w-100'
-          ]
-        }
-      ).afterClosed().subscribe(
-        () => this.dismissAllAddedLayers()
-      )
+
+      this.openLayerController({layerName: randomUuid,
+        fileName: file.name,
+        min: meta.min || 0,
+        max: meta.max || 1,
+        warning: meta.warning || []})
+      
     } catch (e) {
       console.error(e)
       this.snackbar.open(`Error loading nifti: ${e.toString()}`, 'Dismiss', {
         duration: 5000
       })
     }
+  }
+
+  openLayerController(meta: {layerName: string, fileName: string, min?: number, max?: number, warning?: any[]}) {
+    this.dialog.open(
+      this.layerCtrlTmpl,
+      {
+        data: {
+          layerName: meta.layerName,
+          filename: meta.fileName,
+          moreInfoFlag: false,
+          min: meta.min || 0,
+          max: meta.max || 1,
+          warning: meta.warning || []
+        },
+        hasBackdrop: false,
+        disableClose: true,
+        position: {
+          top: '0em'
+        },
+        autoFocus: false,
+        panelClass: [
+          'no-padding-dialog',
+          'w-100'
+        ]
+      }
+    ).afterClosed().subscribe(
+      () => this.dismissAllAddedLayers()
+    )
   }
 }

@@ -30,7 +30,9 @@ export type NgLayerCustomLayer = {
   shader?: string
   transform?: number[][]
   opacity?: number
-  segments?: (number|string)[]
+  segments?: (number|string)[],
+  controllable?: boolean
+  isLocal?: boolean
   // type?: string
 
   // annotation?: string // TODO what is this used for?

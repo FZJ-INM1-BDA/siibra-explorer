@@ -2,7 +2,11 @@ import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
 import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
-import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
+import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
+import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { EnumColorMapName } from "src/util/colorMaps";
+import { getShader } from "src/util/constants";
+import { getUuid } from "src/util/fn";
 import { getParcNgId, getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
@@ -159,6 +163,41 @@ export class RouteStateTransformSvc {
       }
     }
 
+    const addLayerStates = fullPath.queryParams['customlayers']
+    if (addLayerStates) {
+      try {
+        const layers: string[] = JSON.parse(addLayerStates)
+        // Remove unused non-local controllable layers
+        const controllableWebLayers: NgLayerCustomLayer[] = returnState["[state.atlasAppearance]"].customLayers.filter((l: NgLayerCustomLayer) => l.controllable && !l.isLocal) as NgLayerCustomLayer[]
+        for (const layer of controllableWebLayers) {
+          if (!layers.includes(layer.source)) {
+            returnState["[state.atlasAppearance]"].customLayers = returnState["[state.atlasAppearance]"].customLayers
+              .filter((l: NgLayerCustomLayer) => l.source !== layer.source)
+          }
+        }
+        for (const layer of layers) {
+          if (!returnState["[state.atlasAppearance]"].customLayers.map((l: NgLayerCustomLayer) => l.source).includes(layer)) {
+            returnState["[state.atlasAppearance]"].customLayers.push({
+              id: getUuid(),
+              source: layer,
+              shader: getShader({
+                colormap: EnumColorMapName.MAGMA,
+                lowThreshold: 0,
+                highThreshold: 1
+              }),
+              clType: 'customlayer/nglayer',
+              controllable: true
+            })
+          }
+        }
+      } catch (e) {
+        /**
+         * parsing plugin error
+         */
+        console.error(`parse plugin states error`, e, pluginStates)
+      }
+    }
+
     // If sv (standaloneVolume is defined)
     // only load sv in state
     // ignore all other params
@@ -217,6 +256,10 @@ export class RouteStateTransformSvc {
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
     const navigation = atlasSelection.selectors.navigation(state)
     const selectedFeature = userInteraction.selectors.selectedFeature(state)
+
+    const controlledLayers = atlasAppearance.selectors.customLayers(state)
+    .filter(cl => cl.clType === "customlayer/nglayer" && cl.controllable && !cl.isLocal)
+    .map((l: NgLayerCustomLayer) => l.source)
   
     const searchParam = new URLSearchParams()
   
@@ -270,7 +313,12 @@ export class RouteStateTransformSvc {
         ['@']: cNavString,
       } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
     }
-  
+
+    if (controlledLayers && Array.isArray(controlledLayers) && controlledLayers.length) {
+      searchParam.delete('customlayers')
+      searchParam.set('customlayers', JSON.stringify(controlledLayers))
+    }
+    
     const routesArr: string[] = []
     for (const key in routes) {
       if (!!routes[key]) {
