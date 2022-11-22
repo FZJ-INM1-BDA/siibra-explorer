@@ -1,7 +1,7 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
+import { AfterContentChecked, AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { distinctUntilChanged, map } from "rxjs/operators";
+import { distinctUntilChanged, filter, map } from "rxjs/operators";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
@@ -18,7 +18,7 @@ import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
-import { NgLayerCustomLayer } from "src/state/atlasAppearance";
+import { CustomLayer, NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
 
 export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
@@ -130,13 +130,15 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, AfterViewInit, OnDestro
   ngAfterViewInit(): void {
     const customLayer = this.store$.pipe(
       select(atlasAppearance.selectors.customLayers),
-      distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
+      distinctUntilChanged(arrayEqual((o: NgLayerCustomLayer, n) => o.id === n.id)),
       map(cl => {
-        const customLayers = cl.filter(l => l.clType === "customlayer/nglayer" && l.controllable)
+        const customLayers = cl.filter(l => l.clType === "customlayer/nglayer/controller" && l.controllable)
         return customLayers
       }),
-      distinctUntilChanged(),
+      filter(r => !!r),
+      distinctUntilChanged(arrayEqual((o: NgLayerCustomLayer, n) => o.source === n.source)),
     ).subscribe((l: NgLayerCustomLayer[]) => {
+      console.log(l)
       if (l && l.length === 1) {
         this.openLayerController({layerName: l[0].id, fileName: l[0].source.split(',').pop()})
       }

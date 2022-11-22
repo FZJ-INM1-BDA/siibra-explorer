@@ -24,7 +24,7 @@ export type ThreeSurferCustomLabelLayer = {
 } & CustomLayerBase
 
 export type NgLayerCustomLayer = {
-  clType: 'customlayer/nglayer' | 'baselayer/nglayer'
+  clType: 'customlayer/nglayer' | 'baselayer/nglayer' | 'customlayer/nglayer/controller'
   source: string
   visible?: boolean
   shader?: string

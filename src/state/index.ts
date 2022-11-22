@@ -22,10 +22,13 @@ export {
 
 export * as generalActions from "./actions"
 
-function debug(reducer: ActionReducer<any>): ActionReducer<any> {
+function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
-    console.log('state', state);
-    console.log('action', action);
+    if (action.type === generalApplyState.type) {
+      console.log(state["[state.atlasAppearance]"].customLayers.map((l: any) => l.source))
+    }
+    // console.log('state', state);
+    // console.log('action', action);
  
     return reducer(state, action);
   };
@@ -56,7 +59,7 @@ export const RootStoreModule = StoreModule.forRoot({
 },{
   metaReducers: [ 
     generalApplyStateReducer,
-    // debug,
+    debug,
   ]
 })
 

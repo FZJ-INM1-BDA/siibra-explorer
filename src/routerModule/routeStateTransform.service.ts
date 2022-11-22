@@ -166,35 +166,34 @@ export class RouteStateTransformSvc {
     const addLayerStates = fullPath.queryParams['customlayers']
     if (addLayerStates) {
       try {
-        const layers: string[] = JSON.parse(addLayerStates)
+        const layerUrls: string[] = JSON.parse(addLayerStates)
         // Remove unused non-local controllable layers
-        const controllableWebLayers: NgLayerCustomLayer[] = returnState["[state.atlasAppearance]"].customLayers.filter((l: NgLayerCustomLayer) => l.controllable && !l.isLocal) as NgLayerCustomLayer[]
-        for (const layer of controllableWebLayers) {
-          if (!layers.includes(layer.source)) {
-            returnState["[state.atlasAppearance]"].customLayers = returnState["[state.atlasAppearance]"].customLayers
-              .filter((l: NgLayerCustomLayer) => l.source !== layer.source)
-          }
-        }
-        for (const layer of layers) {
-          if (!returnState["[state.atlasAppearance]"].customLayers.map((l: NgLayerCustomLayer) => l.source).includes(layer)) {
-            returnState["[state.atlasAppearance]"].customLayers.push({
-              id: getUuid(),
-              source: layer,
-              shader: getShader({
-                colormap: EnumColorMapName.MAGMA,
-                lowThreshold: 0,
-                highThreshold: 1
-              }),
-              clType: 'customlayer/nglayer',
-              controllable: true
-            })
-          }
-        }
+        const currentControlledUrls = returnState["[state.atlasAppearance]"].customLayers.filter((layer: NgLayerCustomLayer) => layer.clType === "customlayer/nglayer/controller").map((layer: NgLayerCustomLayer) => layer.source)
+        const urlsToRemove = currentControlledUrls.filter(url => !layerUrls.includes(url))
+        const urlsToAdd = layerUrls.filter(url => !currentControlledUrls.includes(url))
+
+        const customLayers = [...returnState["[state.atlasAppearance]"].customLayers]
+        returnState["[state.atlasAppearance]"].customLayers = [
+          ...customLayers.filter((layer: NgLayerCustomLayer) => !urlsToRemove.includes(layer?.source)),
+          ...urlsToAdd.map(url => ({
+            id: getUuid(),
+            source: url,
+            shader: getShader({
+              colormap: EnumColorMapName.MAGMA,
+              lowThreshold: 0,
+              highThreshold: 1
+            }),
+            clType: 'customlayer/nglayer/controller',
+            isControllable: true,
+            isLocal: true
+          } as NgLayerCustomLayer)),
+        ]
+        
       } catch (e) {
         /**
          * parsing plugin error
          */
-        console.error(`parse plugin states error`, e, pluginStates)
+        console.error(`parse custom layer state error`, e, pluginStates)
       }
     }
 
@@ -257,10 +256,6 @@ export class RouteStateTransformSvc {
     const navigation = atlasSelection.selectors.navigation(state)
     const selectedFeature = userInteraction.selectors.selectedFeature(state)
 
-    const controlledLayers = atlasAppearance.selectors.customLayers(state)
-    .filter(cl => cl.clType === "customlayer/nglayer" && cl.controllable && !cl.isLocal)
-    .map((l: NgLayerCustomLayer) => l.source)
-  
     const searchParam = new URLSearchParams()
   
     let cNavString: string
@@ -314,6 +309,10 @@ export class RouteStateTransformSvc {
       } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
     }
 
+    const controlledLayers = atlasAppearance.selectors.customLayers(state)
+      .filter(cl => cl.clType === "customlayer/nglayer/controller")
+      .map((l: NgLayerCustomLayer) => l.source)
+  
     if (controlledLayers && Array.isArray(controlledLayers) && controlledLayers.length) {
       searchParam.delete('customlayers')
       searchParam.set('customlayers', JSON.stringify(controlledLayers))
