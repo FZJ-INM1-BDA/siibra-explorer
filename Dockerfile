@@ -1,4 +1,4 @@
-FROM node:14 as builder
+FROM node:16 as builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
@@ -60,7 +60,7 @@ WORKDIR /iv
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:14-alpine
+FROM node:16-alpine
 
 ENV NODE_ENV=production
 
