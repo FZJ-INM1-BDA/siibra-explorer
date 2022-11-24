@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { catchError, filter, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { map, shareReplay, switchMap, take } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
   SapiAtlasModel,
@@ -20,7 +20,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
-import { concat, EMPTY, from, merge, Observable, of } from "rxjs";
+import { NEVER, Observable } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 
@@ -44,34 +44,60 @@ export class SAPI{
     BS_ENDPOINT_CACHED_VALUE = null
   }
 
+  static async VerifyEndpoint(url: string): Promise<string> {
+    const resp = await fetch(`${url}/atlases`)
+    const atlases = await resp.json()
+    if (atlases.length > 0) return url
+  }
+
   /**
    * BsEndpoint$ is designed as a static getter mainly for unit testing purposes.
    * see usage of BsEndpoint$ and ClearBsEndPoint in sapi.service.spec.ts
    */
   static get BsEndpoint$(): Observable<string> {
     if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
-    BS_ENDPOINT_CACHED_VALUE = concat(
-      merge(
-        ...environment.SIIBRA_API_ENDPOINTS.split(',').map(url => {
-          return from((async () => {
-            const resp = await fetch(`${url}/atlases`)
-            const atlases = await resp.json()
-            if (atlases.length == 0) {
-              throw new Error(`atlas length == 0`)
-            }
-            return url
-          })()).pipe(
-            catchError(() => EMPTY)
-          )
+    const endpoints = environment.SIIBRA_API_ENDPOINTS.split(',')
+    if (endpoints.length === 0) {
+      SAPI.ErrorMessage = `No siibra-api endpoint defined!`
+      return NEVER
+    }
+    const mainEndpoint = endpoints[0]
+    const backupEndpoints = endpoints.slice(1)
+    
+    BS_ENDPOINT_CACHED_VALUE = new Observable<string>(obs => {
+      (async () => {
+        const backupPr = new Promise<string>(rs => {
+          for (const endpt of backupEndpoints) {
+            SAPI.VerifyEndpoint(endpt)
+              .then(flag => {
+                if (flag) rs(endpt)
+              })
+              // eslint-disable-next-line  @typescript-eslint/no-empty-function
+              .catch(e => {})
+          }
         })
-      ),
-      of(null).pipe(
-        tap(() => {
-          SAPI.ErrorMessage = `It appears all of our mirrors are not working. The viewer may not be working properly...`
-        }),
-        filter(() => false)
-      )
-    ).pipe(
+        try {
+          const url = await Promise.race([
+            SAPI.VerifyEndpoint(mainEndpoint),
+            new Promise<string>((_, rj) => setTimeout(() => rj(`10s timeout`), 10000))
+          ])
+          obs.next(url)
+        } catch (e) {
+
+          try {
+            const url = await Promise.race([
+              backupPr,
+              new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
+            ])
+            obs.next(url)
+          } catch (e) {
+            SAPI.ErrorMessage = `No usabe mirror found`
+          }
+        } finally {
+          obs.complete()
+        }
+      })()
+    }).pipe(
       take(1),
       shareReplay(1),
     )
