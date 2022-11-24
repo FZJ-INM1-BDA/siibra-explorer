@@ -30,6 +30,9 @@ describe('> util.ts', () => {
       it('> encodes correctly', () => {
         expect(encodeCustomState('x-test', 'foo-bar')).toEqual('x-test:foo-bar')
       })
+      it("> encodes /", () => {
+        expect(encodeCustomState("x-test", "http://local.dev/foo")).toEqual(`x-test:http:%2F%2Flocal.dev%2Ffoo`)
+      })
     })
   })
 })

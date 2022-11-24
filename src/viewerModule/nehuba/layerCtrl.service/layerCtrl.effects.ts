@@ -68,7 +68,6 @@ export class LayerCtrlEffects {
   onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
     map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }),
-    tap(console.log)
   )
 
   onShownFeature = createEffect(() => this.store.pipe(
@@ -288,7 +287,6 @@ export class LayerCtrlEffects {
   onATPDebounceNgLayers$ = this.onATP$.pipe(
     debounceTime(16),
     switchMap(({ atlas, parcellation, template }) => {
-      console.log('debounce', { atlas, parcellation, template })
       return this.getNgLayers(atlas, parcellation, template).pipe(
         map(volumes => getNgLayersFromVolumesATP(volumes, { atlas, parcellation, template }))
       )
@@ -324,10 +322,5 @@ export class LayerCtrlEffects {
     })
   ))
 
-  constructor(
-    private store: Store<any>,
-    private sapi: SAPI,  
-  ){
-    console.log("init effect")
-  }
+  constructor(private store: Store<any>,private sapi: SAPI){}
 }

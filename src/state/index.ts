@@ -24,9 +24,6 @@ export * as generalActions from "./actions"
 
 function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
-    if (action.type === generalApplyState.type) {
-      console.log(state["[state.atlasAppearance]"].customLayers.map((l: any) => l.source))
-    }
     // console.log('state', state);
     // console.log('action', action);
  

@@ -1,0 +1,37 @@
+<div class="grid grid-col-3">
+
+  <span class="ml-2 text-truncate v-center-text-span">
+    <i class="fas fa-file"></i>
+    {{ data.filename }}
+  </span>
+  
+  <button
+    [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
+    mat-icon-button
+    [color]="showMoreInfo ? 'primary' : 'basic'"
+    (click)="showMoreInfo = !showMoreInfo">
+    <i class="fas fa-sliders-h"></i>
+  </button>
+
+  <button
+    [matTooltip]="ARIA_LABELS.CLOSE"
+    color="warn"
+    mat-icon-button
+    mat-dialog-close>
+    <i class="fas fa-trash"></i>
+  </button>
+
+  <div *ngIf="showMoreInfo"
+    class="sxplr-custom-cmp darker-bg overflow-hidden grid-wide-3">
+    <ng-layer-tune
+      advanced-control="true"
+      [ngLayerName]="data.layerName"
+      [thresholdMin]="data.min"
+      [thresholdMax]="data.max">
+    </ng-layer-tune>
+    <ul>
+      <li *ngFor="let warn of data.warning">{{ warn }}</li>
+    </ul>
+  </div>
+
+</div>

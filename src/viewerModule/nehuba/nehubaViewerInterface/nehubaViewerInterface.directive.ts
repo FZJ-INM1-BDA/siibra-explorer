@@ -295,8 +295,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
 
     await new Promise(rs => setTimeout(rs, 0))
 
-    console.log('')
-
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.componentFactory)
 
