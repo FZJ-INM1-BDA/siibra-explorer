@@ -196,10 +196,6 @@ export class UserLayerService implements OnDestroy {
     private worker: AtlasWorkerService,
     private routerSvc: RouterService
   ) {
-    this.routerSvc.setCustomRoute(
-      OVERLAY_LAYER_KEY,
-      "nifti://http://localhost:3000/hoc1-right.nii.gz"
-    )
     this.#subscription.push(
       concat(
         of(null),
