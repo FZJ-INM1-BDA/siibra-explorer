@@ -9,12 +9,7 @@ module.exports = {
     "@typescript-eslint/interface-name-prefix": [0],
     // "no-unused-vars": "off",
     "semi": "off",
-    "indent": ["error", 2, {
-      "FunctionDeclaration": {
-        "body": 1,
-        "parameters": 2
-      }
-    }],
+    "indent": "off",
     "@typescript-eslint/member-delimiter-style": [2, {
       "multiline": {
         "delimiter": "none",

@@ -28,7 +28,8 @@
       <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
     </h1>
   </atlas-viewer>
+  <!-- catch safari 11 syntax error -->
   <script src="catchSyntaxError.js"></script>
-  <script src="syntaxError.js"></script>
+  <script>(()=>{let e = e => {console.log(e);for(let e of [1,2,3]){console.log(e);}}})()</script>
 </body>
 </html>
