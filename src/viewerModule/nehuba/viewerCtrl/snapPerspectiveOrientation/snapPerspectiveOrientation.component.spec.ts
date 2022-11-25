@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangePerspectiveOrientationComponent } from './changePerspectiveOrientation.component';
+import { SnapPerspectiveOrientationCmp } from './snapPerspectiveOrientation.component';
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { AngularMaterialModule } from 'src/sharedModules';
 import { CommonModule } from '@angular/common';
 
-describe('ChangePerspectiveOrientationComponent', () => {
-  let component: ChangePerspectiveOrientationComponent;
-  let fixture: ComponentFixture<ChangePerspectiveOrientationComponent>;
+describe('SnapPerspectiveOrientationCmp', () => {
+  let component: SnapPerspectiveOrientationCmp;
+  let fixture: ComponentFixture<SnapPerspectiveOrientationCmp>;
   let mockStore: MockStore;
 
   beforeEach(async () => {
@@ -15,7 +15,7 @@ describe('ChangePerspectiveOrientationComponent', () => {
         AngularMaterialModule,
         CommonModule
       ],
-      declarations: [ ChangePerspectiveOrientationComponent ],
+      declarations: [ SnapPerspectiveOrientationCmp ],
       providers: [provideMockStore()],
 
     })
@@ -23,7 +23,7 @@ describe('ChangePerspectiveOrientationComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChangePerspectiveOrientationComponent);
+    fixture = TestBed.createComponent(SnapPerspectiveOrientationCmp);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

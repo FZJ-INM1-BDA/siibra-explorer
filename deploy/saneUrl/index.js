@@ -104,7 +104,8 @@ router.post('/:name',
   limiterMiddleware(),
   express.json(),
   async (req, res) => {
-    if (req.headers['x-noop']) return res.status(200).end()
+    if (/bot/i.test(req.headers['user-agent'])) return res.status(201).end()
+    if (req.headers['x-noop']) return res.status(201).end()
     const { name } = req.params
     try {
       await proxyStore.set(req, name, req.body)

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith } from "rxjs/operators";
 import { SapiRegionModel } from "src/atlasComponents/sapi/type";
@@ -65,7 +65,7 @@ export class SapiViewsCoreRichRegionsHierarchy {
 
   isParent = SapiViewsCoreRichRegionsHierarchy.IsParent
 
-  searchFormControl = new FormControl()
+  searchFormControl = new UntypedFormControl()
   
   searchTerm: string
 

@@ -41,9 +41,7 @@ import { SapiViewsCoreRichModule } from "../module"
     </mat-expansion-panel>
   </mat-accordion>
   `,
-  styles: [
-    ``
-  ]
+  styles: []
 })
 
 class RegionTreeHierarchyWrapper {

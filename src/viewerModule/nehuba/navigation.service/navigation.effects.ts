@@ -73,7 +73,7 @@ export class NehubaNavigationEffects implements OnDestroy{
         const n = navAdd(src, navMul(delta, d))
         this.nehubaInst.setNavigationState({
           ...n,
-          positionReal: true
+          positionReal: physical
         })
 
         if ( !next.done ) {

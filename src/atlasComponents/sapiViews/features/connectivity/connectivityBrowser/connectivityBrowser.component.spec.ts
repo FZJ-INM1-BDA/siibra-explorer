@@ -1,13 +1,14 @@
 import {ConnectivityBrowserComponent} from "./connectivityBrowser.component";
-import {async, ComponentFixture, TestBed} from "@angular/core/testing";
+import {ComponentFixture, TestBed} from "@angular/core/testing";
 import {Action} from "@ngrx/store";
-import {HttpClientModule} from "@angular/common/http";
 import {CUSTOM_ELEMENTS_SCHEMA, Directive, Input} from "@angular/core";
 import {provideMockActions} from "@ngrx/effects/testing";
 import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import {SAPI} from "src/atlasComponents/sapi";
 import {AngularMaterialModule} from "src/sharedModules";
+import { SapiAtlasModel, SapiModalityModel, SapiParcellationFeatureModel, SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 
 /**
  * injecting databrowser module is bad idea
@@ -37,29 +38,39 @@ describe('ConnectivityComponent', () => {
     let component: ConnectivityBrowserComponent;
     let fixture: ComponentFixture<ConnectivityBrowserComponent>;
     const actions$: Observable<Action> = of({type: 'TEST'})
+    let httpTestingController: HttpTestingController;
+    let req
 
-    let datasetList = [
+    const types: SapiModalityModel[] = [{
+        name: 'StreamlineCounts',
+        types: ['siibra/features/connectivity/streamlineCounts']
+    },{
+        name: 'StreamlineLengths',
+        types: ['siibra/features/connectivity/streamlineLengths']
+    },{
+        name: 'FunctionalConnectivity',
+        types: ['siibra/features/connectivity/functional']
+    }]
+
+    let datasetList: SapiParcellationFeatureModel[] = [
         {
             '@id': 'id1',
             name: 'id1',
-            description: 'd1',
-            kgId: 'kgId1',
-            kgschema: 'kgschema1',
-            items: []
-        }, {
+            cohort: 'HCP',
+            subject: '100',
+            '@type': 'siibra/features/connectivity/streamlineCounts',
+        } as SapiParcellationFeatureModel, {
             '@id': 'id2',
             name: 'id2',
-            description: 'd2',
-            kgId: 'kgId2',
-            kgschema: 'kgschema2',
-            items: []
-        }
+            cohort: '1000BRAINS',
+            subject: 'average',
+        } as SapiParcellationFeatureModel
     ]
 
-    beforeEach(async (() => {
-        TestBed.configureTestingModule({
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
             imports: [
-                HttpClientModule,
+                HttpClientTestingModule,
                 AngularMaterialModule
             ],
             providers: [
@@ -69,6 +80,7 @@ describe('ConnectivityComponent', () => {
                     provide: SAPI,
                     useValue: {
                         atlases$: of([]),
+                        getParcellation: jasmine.createSpy('getParcellation'), // getFeatureInstance(instanceId: string): Observable<SapiParcellationFeatureModel>
                         getSpaceDetail: jasmine.createSpy('getSpaceDetail'),
                         getParcDetail: jasmine.createSpy('getParcDetail'),
                         getParcRegions: jasmine.createSpy('getParcRegions'),
@@ -83,14 +95,8 @@ describe('ConnectivityComponent', () => {
                 CUSTOM_ELEMENTS_SCHEMA,
             ],
         }).compileComponents()
-
-    }));
-
-    beforeEach(() => {
-        const mockStore = TestBed.inject(MockStore)
-        // mockStore.overrideSelector(viewerStateOverwrittenColorMapSelector, null)
-        // mockStore.overrideSelector(ngViewerSelectorClearViewEntries, [])
-    })
+        httpTestingController = TestBed.inject(HttpTestingController);
+    });
 
     it('> component can be created', async () => {
         fixture = TestBed.createComponent(ConnectivityBrowserComponent)
@@ -98,20 +104,44 @@ describe('ConnectivityComponent', () => {
         expect(component).toBeTruthy()
     })
 
-    // ToDo create test for kgId and kgSchema after it will work while viewing dataset
-    it('> change dataset changes name and description', () => {
-        fixture = TestBed.createComponent(ConnectivityBrowserComponent)
-        component = fixture.componentInstance
+    describe('> Select modality', async () => {
+        beforeEach(async () => {
+            fixture = TestBed.createComponent(ConnectivityBrowserComponent)
+            component = fixture.componentInstance
+            component.types = types
 
-        component.defaultProfile = {selectedDataset: datasetList[0]}
+            const atlas = 'atlases/juelich/iav/atlas/v1.0.0/1'
+            const parcellation = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
+            const endp = await SAPI.BsEndpoint$.toPromise()
 
-        expect(component.selectedDataset['@id']).toEqual('id1')
-        expect(component.selectedDataset.description).toEqual('d1')
+            component.atlas = { '@id': atlas } as SapiAtlasModel
+            component.parcellation = { '@id': parcellation } as SapiParcellationModel
 
-        component.defaultProfile = {selectedDataset: datasetList[1]}
+            component.selectType('StreamlineCounts')
 
-        expect(component.selectedDataset['@id']).toEqual('id2')
-        expect(component.selectedDataset.description).toEqual('d2')
+            const url = `${endp}/atlases/${encodeURIComponent(atlas)}/parcellations/${encodeURIComponent(parcellation)}/features?type=${component.selectedTypeId}&size=${100}&page=${1}`
+
+            req = httpTestingController.expectOne(`${url}`);
+
+            await req.flush({
+                page: 1,
+                size: 2,
+                total: 2,
+                items: datasetList
+            });
+        })
+
+        it('> Get request should be called', () => {
+            expect(req.request.method).toEqual('GET')
+        })
+
+        it('> Datasets are set correctly', () => {
+            expect(datasetList).toEqual(component.fetchedItems)
+        })
+        
+        it('> Cohorts are set correctly', () => {
+            expect(datasetList.map(d => d.cohort)).toEqual(component.cohorts)
+        })
     })
 
 });

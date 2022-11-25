@@ -1,4 +1,4 @@
-FROM node:14 as builder
+FROM node:16 as builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
@@ -24,18 +24,20 @@ ENV EXPERIMENTAL_FEATURE_FLAG=${EXPERIMENTAL_FEATURE_FLAG:-false}
 ARG ENABLE_LEAP_MOTION
 ENV ENABLE_LEAP_MOTION=${ENABLE_LEAP_MOTION:-false}
 
+# mkdir, and copy package.json and package-lock.json and npm i
+# to effectively use the caching layer
 
-COPY . /iv
+RUN mkdir /iv
 WORKDIR /iv
+COPY ./package.json /iv/
+COPY ./package-lock.json /iv/
+RUN npm i
+
+COPY . /iv/
 
 # angular 12 echo the env var into src/environments/environment.prod.ts
 RUN node ./src/environments/parseEnv.js
 
-# When building in local, where node_module already exist, prebuilt binary may throw an error
-RUN rm -rf ./node_modules
-
-
-RUN npm i
 RUN npm run build
 RUN node third_party/matomo/processMatomo.js
 RUN npm run build-storybook
@@ -58,7 +60,7 @@ WORKDIR /iv
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:14-alpine
+FROM node:16-alpine
 
 ENV NODE_ENV=production
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Input } from "@angular/core";
 import { Observable, merge, of, Subscription, BehaviorSubject, combineLatest } from "rxjs";
 import { startWith, mapTo, map, debounceTime, switchMap, catchError, shareReplay, filter, tap, takeUntil, distinctUntilChanged } from "rxjs/operators";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { ErrorStateMatcher } from "@angular/material/core";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { MatSnackBar } from "@angular/material/snack-bar";
@@ -9,7 +9,7 @@ import { SaneUrlSvc } from "./saneUrl.service";
 import { NotFoundError } from "../type";
 
 export class SaneUrlErrorStateMatcher implements ErrorStateMatcher{
-  isErrorState(ctrl: FormControl | null){
+  isErrorState(ctrl: UntypedFormControl | null){
     return !!(ctrl && ctrl.invalid)
   }
 }
@@ -50,7 +50,7 @@ export class SaneUrl implements OnDestroy{
   private subscriptions: Subscription[] = []
 
   private validator = (val: string) => /^[a-zA-Z0-9_]+$/.test(val)
-  public customUrl = new FormControl('')
+  public customUrl = new UntypedFormControl('')
 
   public matcher = new SaneUrlErrorStateMatcher()
 

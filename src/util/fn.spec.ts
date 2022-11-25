@@ -1,9 +1,8 @@
 import { fakeAsync, tick } from '@angular/core/testing'
-import {} from 'jasmine'
 import { hot } from 'jasmine-marbles'
 import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { switchMapWaitFor, bufferUntil } from './fn'
+import { switchMapWaitFor, bufferUntil, arrayOfPrimitiveEqual } from './fn'
 
 describe(`> util/fn.ts`, () => {
 
@@ -80,5 +79,52 @@ describe(`> util/fn.ts`, () => {
         })
       )
     })
+  })
+
+  describe("> #arrayOfPrimitiveEqual", () => {
+
+    const primitives: {text: string, examples: (string|number)[][]}[] = [{
+      text: 'string',
+      examples: [
+        ['foo', 'bar'], 
+        ['foo', 'bar'], 
+        ['buzz', 'boo'], 
+        ['hello'], 
+      ]
+    }, {
+      text: 'number',
+      examples: [
+        [0, 1],
+        [0, 1],
+        [-1, -2],
+        [1, 3, 4],
+      ]
+    }]
+
+    for (const { text, examples } of primitives) {
+      describe(`> for ${text}`, () => {
+
+        describe("> when elements length unequal", () => {
+          it("> returns false", () => {
+            expect(arrayOfPrimitiveEqual(examples[0], examples[3])).toBeFalse()
+            expect(arrayOfPrimitiveEqual(examples[3], examples[0])).toBeFalse()
+          })
+        })
+
+        describe("> when element element unequal", () => {
+          it("> returns false", () => {
+            expect(arrayOfPrimitiveEqual(examples[0], examples[2])).toBeFalse()
+            expect(arrayOfPrimitiveEqual(examples[2], examples[0])).toBeFalse()
+          })
+        })
+
+        describe("> when elementwise equal", () => {
+          it("> returns true", () => {
+            expect(arrayOfPrimitiveEqual(examples[0], examples[1])).toBeTrue()
+            expect(arrayOfPrimitiveEqual(examples[1], examples[0])).toBeTrue()
+          })
+        })
+      })
+    }
   })
 })

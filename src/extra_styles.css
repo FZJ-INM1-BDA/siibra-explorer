@@ -427,6 +427,11 @@ markdown-dom p
   height:20em!important;
 }
 
+.overflow-hidden
+{
+  overflow: hidden!important;
+}
+
 .overflow-x-auto
 {
   overflow-x: auto;
@@ -899,4 +904,10 @@ how-to-cite img
   height: 20px;
   padding: 0 5px;
   border-radius: 50%;
+}
+/* this is required to set snackbar to be none-interactive */
+/* ignore css lint error, they don't know what they are talking about */
+.cdk-overlay-pane:has(> .sxplr-pe-none)
+{
+  pointer-events: none;
 }

@@ -1,12 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, Optional } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, Observable, of, Subscription } from "rxjs";
+import { merge, of, Subscription } from "rxjs";
 import { pairwise, withLatestFrom} from "rxjs/operators";
-import { NehubaViewerUnit } from "src/viewerModule/nehuba";
-import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, CONST } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { atlasAppearance } from "src/state";
 
 @Component({
@@ -22,6 +20,7 @@ import { atlasAppearance } from "src/state";
 export class ViewerCtrlCmp implements OnInit{
 
   public ARIA_LABELS = ARIA_LABELS
+  public CONST = CONST
 
   private sub: Subscription[] = []
 
@@ -33,21 +32,19 @@ export class ViewerCtrlCmp implements OnInit{
     if (val === this._removeOctantFlag) return
     this._removeOctantFlag = val
     this.setOctantRemoval(this._removeOctantFlag)
-    this.cdr.detectChanges()
   }
 
   public nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
     select(atlasAppearance.selectors.octantRemoval),
   )
 
-  public auxMeshFormGroup: FormGroup = this.formBuilder.group({})
+  public auxMeshFormGroup: UntypedFormGroup = new UntypedFormGroup({})
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
     select(selectorAuxMeshes),
   )
 
   ngOnInit(): void {
-
     this.sub.push(
 
       this.nehubaViewerPerspectiveOctantRemoval$.subscribe(
@@ -71,9 +68,8 @@ export class ViewerCtrlCmp implements OnInit{
         this.auxMeshesNamesSet.clear()
         for (const mesh of meshes) {
           this.auxMeshesNamesSet.add(mesh.ngId)
-          this.auxMeshFormGroup.addControl(mesh['@id'], new FormControl(mesh.visible))
+          this.auxMeshFormGroup.addControl(mesh['@id'], new UntypedFormControl(mesh.visible))
         }
-        this.cdr.detectChanges()
       }),
 
       this.auxMeshFormGroup.valueChanges.pipe(
@@ -98,16 +94,12 @@ export class ViewerCtrlCmp implements OnInit{
             })
           )
         }
-        this.cdr.detectChanges()
       })
     )
   }
 
   constructor(
     private store$: Store<any>,
-    private formBuilder: FormBuilder,
-    private cdr: ChangeDetectorRef,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<NehubaViewerUnit>,
   ){
 
   }
