@@ -15,7 +15,7 @@ import { map, filter, startWith, throttleTime } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 
 import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
@@ -144,7 +144,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
 
   }
 
-  public statusPanelFormCtrl = new FormControl(true, [])
+  public statusPanelFormCtrl = new UntypedFormControl(true, [])
   public statusPanelRealSpace = true
   public statusPanelRealSpace$ = this.statusPanelFormCtrl.valueChanges.pipe(
     startWith(true)

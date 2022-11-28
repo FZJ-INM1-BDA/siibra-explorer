@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
 import { SapiRegionModel } from "src/atlasComponents/sapi/type";
 import { ARIA_LABELS } from "common/constants"
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 
@@ -52,7 +52,7 @@ export class SapiViewsCoreRichRegionListSearch {
   @Output('sxplr-sapiviews-core-rich-regionlistsearch-region-select')
   onOptionSelected = new EventEmitter<SapiRegionModel>()
 
-  public searchFormControl = new FormControl()
+  public searchFormControl = new UntypedFormControl()
 
   public autocompleteList$ = this.searchFormControl.valueChanges.pipe(
     startWith(''),

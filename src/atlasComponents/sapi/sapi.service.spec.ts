@@ -11,6 +11,8 @@ describe("> sapi.service.ts", () => {
       const endpt1 = 'http://foo-bar'
       const endpt2 = 'http://buzz-bizz'
 
+      const atlasEndpts = [endpt1, endpt2].map(url => `${url}/atlases`)
+
       const atlas1 = 'foo'
       const atlas2 = 'bar'
 
@@ -55,8 +57,8 @@ describe("> sapi.service.ts", () => {
           
           const allArgs = fetchSpy.calls.allArgs()
           expect(allArgs.length).toEqual(2)
-          expect(allArgs[0]).toEqual([`${endpt1}/atlases`])
-          expect(allArgs[1]).toEqual([`${endpt2}/atlases`])
+          expect(atlasEndpts).toContain(allArgs[0][0])
+          expect(atlasEndpts).toContain(allArgs[1][0])
         })
 
         it("> endpoint should be set", async () => {
@@ -92,10 +94,12 @@ describe("> sapi.service.ts", () => {
 
         it("> should call twice", async () => {
           expect(fetchSpy).toHaveBeenCalledTimes(2)
-          expect(fetchSpy.calls.allArgs()).toEqual([
-            [`${endpt1}/atlases`],
-            [`${endpt2}/atlases`],
-          ])
+
+          const allArgs = fetchSpy.calls.allArgs()
+
+          expect(allArgs.length).toEqual(2)
+          expect(atlasEndpts).toContain(allArgs[0][0])
+          expect(atlasEndpts).toContain(allArgs[1][0])
         })
 
         it('> should set endpt2', async () => {
