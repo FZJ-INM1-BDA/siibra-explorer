@@ -24,15 +24,13 @@ export type ThreeSurferCustomLabelLayer = {
 } & CustomLayerBase
 
 export type NgLayerCustomLayer = {
-  clType: 'customlayer/nglayer' | 'baselayer/nglayer' | 'customlayer/nglayer/controller'
+  clType: 'customlayer/nglayer' | 'baselayer/nglayer'
   source: string
   visible?: boolean
   shader?: string
   transform?: number[][]
   opacity?: number
-  segments?: (number|string)[],
-  controllable?: boolean
-  isLocal?: boolean
+  segments?: (number|string)[]
   // type?: string
 
   // annotation?: string // TODO what is this used for?
