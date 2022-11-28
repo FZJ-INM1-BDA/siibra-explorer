@@ -46,17 +46,17 @@ export const decodeCustomState = (fullPath: UrlTree) => {
     if (!verifyCustomState(f.path)) continue
     const { key, val } = decodePath(f.path) || {}
     if (!key || !val) continue
-    returnObj[key] = val[0]
+    returnObj[key] = val[0].replace("%2F", '/')
   }
   return returnObj
 }
 
-export const encodeCustomState = (key: string, value: string) => {
+export const encodeCustomState = (key: string, value: string|string[]) => {
   if (!verifyCustomState(key)) {
     throw new Error(`custom state must start with x-`)
   }
   if (!value) return null
-  return endcodePath(key, value)
+  return endcodePath(key, value).replace(/\//g, '%2F')
 }
 
 @Component({
