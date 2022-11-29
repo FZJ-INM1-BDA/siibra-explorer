@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise } from "rxjs/operators";
+import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel, SapiRegionModel } from "src/atlasComponents/sapi";
 import { SapiVOIDataResponse, SapiVolumeModel } from "src/atlasComponents/sapi/type";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
@@ -67,7 +67,7 @@ export class LayerCtrlEffects {
 
   onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
-    map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel })
+    map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }),
   )
 
   onShownFeature = createEffect(() => this.store.pipe(
@@ -286,11 +286,11 @@ export class LayerCtrlEffects {
 
   onATPDebounceNgLayers$ = this.onATP$.pipe(
     debounceTime(16),
-    switchMap(({ atlas, parcellation, template }) => 
-      this.getNgLayers(atlas, parcellation, template).pipe(
+    switchMap(({ atlas, parcellation, template }) => {
+      return this.getNgLayers(atlas, parcellation, template).pipe(
         map(volumes => getNgLayersFromVolumesATP(volumes, { atlas, parcellation, template }))
       )
-    ),
+    }),
     shareReplay(1)
   )
 
@@ -322,10 +322,5 @@ export class LayerCtrlEffects {
     })
   ))
 
-  constructor(
-    private store: Store<any>,
-    private sapi: SAPI,  
-  ){
-
-  }
+  constructor(private store: Store<any>,private sapi: SAPI){}
 }

@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
 import { IMPORT_NEHUBA_INJECT_TOKEN, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
@@ -21,7 +21,6 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
-import { DragDropFileModule } from "src/dragDropFile/module";
 import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
@@ -29,6 +28,7 @@ import { NehubaLayoutOverlayModule } from "./layoutOverlay";
 import { NgAnnotationService } from "./annotation/service";
 import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
+import { NehubaUserLayerModule } from "./userLayers";
 
 @NgModule({
   imports: [
@@ -41,7 +41,7 @@ import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerConta
     MouseoverModule,
     ShareModule,
     WindowResizeModule,
-    DragDropFileModule,
+    NehubaUserLayerModule,
 
     /**
      * should probably break this into its own...
@@ -87,6 +87,12 @@ import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerConta
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)
     },
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: (_svc: NgAnnotationService) => () => Promise.resolve(),
+      deps: [ NgAnnotationService ]
+    },
     NgAnnotationService
   ],
   schemas: [
@@ -94,8 +100,4 @@ import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerConta
   ]
 })
 
-export class NehubaModule{
-
-  // eslint-disable-next-line  @typescript-eslint/no-empty-function
-  constructor(_svc: NgAnnotationService){}
-}
+export class NehubaModule{}

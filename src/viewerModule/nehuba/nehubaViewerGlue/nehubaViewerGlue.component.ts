@@ -2,24 +2,15 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Op
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { distinctUntilChanged } from "rxjs/operators";
-import { ARIA_LABELS, CONST } from 'common/constants'
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
-import { getExportNehuba, getUuid } from "src/util/fn";
 import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { getShader } from "src/util/constants";
-import { EnumColorMapName } from "src/util/colorMaps";
-import { MatDialog } from "@angular/material/dialog";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { SapiRegionModel } from "src/atlasComponents/sapi";
 import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
-import { linearTransform, TVALID_LINEAR_XFORM_DST, TVALID_LINEAR_XFORM_SRC } from "src/atlasComponents/sapi/core/space/interspaceLinearXform";
+import { atlasSelection, userInteraction } from "src/state";
 
-export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
 
 @Component({
   selector: 'iav-cmp-viewer-nehuba-glue',
@@ -63,12 +54,6 @@ export const INVALID_FILE_INPUT = `Exactly one (1) file is required!`
 
 export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
 
-  @ViewChild('layerCtrlTmpl', { static: true })
-  layerCtrlTmpl: TemplateRef<any>
-
-  public ARIA_LABELS = ARIA_LABELS
-  public CONST = CONST
-
   private onhoverSegments: SapiRegionModel[] = []
   private onDestroyCb: (() => void)[] = []
 
@@ -83,9 +68,6 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
 
   constructor(
     private store$: Store<any>,
-    private snackbar: MatSnackBar,
-    private dialog: MatDialog,
-    private worker: AtlasWorkerService,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
   ){
 
@@ -123,148 +105,5 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
       })
     )
     return true
-  }
-
-  private droppedLayerNames: {
-    layerName: string
-    resourceUrl: string
-  }[] = []
-  private dismissAllAddedLayers(){
-    while (this.droppedLayerNames.length) {
-      const { resourceUrl, layerName } = this.droppedLayerNames.pop()
-      this.store$.dispatch(
-        atlasAppearance.actions.removeCustomLayer({
-          id: layerName
-        })
-      )
-      
-      URL.revokeObjectURL(resourceUrl)
-    }
-  }
-  public async handleFileDrop(files: File[]): Promise<void> {
-    if (files.length !== 1) {
-      this.snackbar.open(INVALID_FILE_INPUT, 'Dismiss', {
-        duration: 5000
-      })
-      return
-    }
-    const randomUuid = getUuid()
-    const file = files[0]
-
-    /**
-     * TODO check extension?
-     */
-    this.dismissAllAddedLayers()
-
-    if (/\.swc$/i.test(file.name)) {
-      let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
-      const swcText = await file.text()
-      let src: TVALID_LINEAR_XFORM_SRC
-      const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
-      if (/ccf/i.test(swcText)) {
-        src = "CCF"
-        message += `CCF detected, applying known transformation.`
-      }
-      if (!src) {
-        message += `no known space detected. Applying default transformation.`
-      }
-
-      const xform = await linearTransform(src, dst)
-      
-      const url = URL.createObjectURL(file)
-      this.droppedLayerNames.push({
-        layerName: randomUuid,
-        resourceUrl: url
-      })
-      this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
-            id: randomUuid,
-            source: `swc://${url}`,
-            segments: ["1"],
-            transform: xform,
-            clType: 'customlayer/nglayer' as const
-          }
-        })
-      )
-      this.snackbar.open(message, "Dismiss", {
-        duration: 10000
-      })
-      return
-    }
-     
-    
-    // Get file, try to inflate, if files, use original array buffer
-    const buf = await file.arrayBuffer()
-    let outbuf
-    try {
-      outbuf = getExportNehuba().pako.inflate(buf).buffer
-    } catch (e) {
-      console.log('unpack error', e)
-      outbuf = buf
-    }
-
-    try {
-      const { result } = await this.worker.sendMessage({
-        method: 'PROCESS_NIFTI',
-        param: {
-          nifti: outbuf
-        },
-        transfers: [ outbuf ]
-      })
-      
-      const { meta, buffer } = result
-
-      const url = URL.createObjectURL(new Blob([ buffer ]))
-      this.droppedLayerNames.push({
-        layerName: randomUuid,
-        resourceUrl: url
-      })
-
-      this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
-            id: randomUuid,
-            source: `nifti://${url}`,
-            shader: getShader({
-              colormap: EnumColorMapName.MAGMA,
-              lowThreshold: meta.min || 0,
-              highThreshold: meta.max || 1
-            }),
-            clType: 'customlayer/nglayer'
-          }
-        })
-      )
-      this.dialog.open(
-        this.layerCtrlTmpl,
-        {
-          data: {
-            layerName: randomUuid,
-            filename: file.name,
-            moreInfoFlag: false,
-            min: meta.min || 0,
-            max: meta.max || 1,
-            warning: meta.warning || []
-          },
-          hasBackdrop: false,
-          disableClose: true,
-          position: {
-            top: '0em'
-          },
-          autoFocus: false,
-          panelClass: [
-            'no-padding-dialog',
-            'w-100'
-          ]
-        }
-      ).afterClosed().subscribe(
-        () => this.dismissAllAddedLayers()
-      )
-    } catch (e) {
-      console.error(e)
-      this.snackbar.open(`Error loading nifti: ${e.toString()}`, 'Dismiss', {
-        duration: 5000
-      })
-    }
   }
 }

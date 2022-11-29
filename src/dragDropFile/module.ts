@@ -3,15 +3,8 @@ import { NgModule } from "@angular/core";
 import { DragDropFileDirective } from "./dragDrop.directive";
 
 @NgModule({
-  imports: [
-    CommonModule
-  ],
-  declarations: [
-    DragDropFileDirective
-  ],
-  exports: [
-    DragDropFileDirective
-  ]
+  imports: [CommonModule],
+  declarations: [DragDropFileDirective],
+  exports: [DragDropFileDirective],
 })
-
-export class DragDropFileModule{}
+export class DragDropFileModule {}
