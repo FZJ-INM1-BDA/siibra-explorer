@@ -257,13 +257,15 @@ export class PerspectiveViewSlider implements OnDestroy {
 
           const getTranslatePc = (idx: number) => position[idx] / templateSize.real[idx]
 
+          let viewportDimOfInterest: number
           if (sliceView === EnumClassicalView.CORONAL) {
             sliceviewDim = [
               templateSize.real[0],
               templateSize.real[2]
             ]
-            // minimap is saggital view, so interested in superior-inferior axis
+            // minimap is sagittal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
+            viewportDimOfInterest = viewportSize.height
           }
 
           if (sliceView === EnumClassicalView.SAGITTAL) {
@@ -273,6 +275,7 @@ export class PerspectiveViewSlider implements OnDestroy {
             ]
             // minimap is coronal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
+            viewportDimOfInterest = viewportSize.height
           }
 
           if (sliceView === EnumClassicalView.AXIAL) {
@@ -282,6 +285,7 @@ export class PerspectiveViewSlider implements OnDestroy {
             ]
             // minimap  is in coronal view, so interested in left-right axis
             translate = getTranslatePc(0) * -1
+            viewportDimOfInterest = viewportSize.width
           }
 
           if (!sliceviewDim) return null
@@ -291,8 +295,8 @@ export class PerspectiveViewSlider implements OnDestroy {
            * calculate scale
            */
           const scale = [2, 2]
-          scale[0] = Math.min(scale[0], viewportSize.width * zoom / sliceviewDim[0])
-          scale[1] = Math.min(scale[1], viewportSize.width * zoom / sliceviewDim[1])
+          scale[0] = Math.min(scale[0], viewportDimOfInterest * zoom / sliceviewDim[0])
+          scale[1] = Math.min(scale[1], viewportDimOfInterest * zoom / sliceviewDim[1])
           const scaleArr = scale.map(v => `scaleY(${v})`)
           const scaleString = isVertical ? scaleArr[1] : scaleArr[0]
 
