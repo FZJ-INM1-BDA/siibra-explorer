@@ -1,0 +1,61 @@
+<div [style.background-color]="color"
+  [matMenuTriggerFor]="mainMenu"
+  matRipple
+  [ngClass]="smartChipClass"
+  class="mat-body smart-chip sxplr-custom-cmp text">
+  <ng-template [ngTemplateOutlet]="contentTmpl?.templateRef || fallbackContentTmpl">
+  </ng-template>
+</div>
+
+<!-- main menu is fired from chip -->
+<mat-menu #mainMenu="matMenu">
+  <ng-template ngFor [ngForOf]="items" let-item>
+
+    <!-- if item is has submenu -->
+    <ng-template [ngIf]="item | hasSubMenu : getChildren" [ngIfElse]="noSubMenuTmpl">
+      <button
+        mat-menu-item
+        [matMenuTriggerFor]="subMenu"
+        [matMenuTriggerData]="{ $implicit: getChildren(item) }">
+        <ng-container *ngTemplateOutlet="menuTmpl?.templateRef || fallbackMenu; context: {
+          $implicit: item
+        }">
+        </ng-container>
+      </button>
+
+    </ng-template>
+
+    <!-- if item has no submenu -->
+    <ng-template #noSubMenuTmpl>
+      <ng-container *ngTemplateOutlet="leafTmpl; context: { $implicit: item }"></ng-container>
+    </ng-template>
+
+  </ng-template>
+</mat-menu>
+
+<!-- submenu (fired from menu item) -->
+<mat-menu #subMenu="matMenu">
+  <ng-template matMenuContent let-items>
+    <ng-template ngFor [ngForOf]="items" let-item>
+      <ng-container *ngTemplateOutlet="leafTmpl; context: { $implicit: item }"></ng-container>
+    </ng-template>
+  </ng-template>
+</mat-menu>
+
+<!-- template to render the leaf nodes -->
+<ng-template #leafTmpl let-item>
+  <button mat-menu-item (click)="itemClicked.emit(item)">
+    <ng-container *ngTemplateOutlet="menuTmpl?.templateRef || fallbackMenu; context: {
+      $implicit: item
+    }">
+    </ng-container>
+  </button>
+</ng-template>
+
+<ng-template #fallbackContentTmpl>
+  Fallback Content
+</ng-template>
+
+<ng-template #fallbackMenu let-item>
+  {{ item.name || 'Item Name' }}
+</ng-template>
