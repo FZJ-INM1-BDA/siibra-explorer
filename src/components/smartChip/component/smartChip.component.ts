@@ -19,8 +19,8 @@ const cssColorIsDark = (input: string) => {
     const match = /\((.*)\)/.exec(input)
     const [h, s, l] = match[1].split(",")
     const trimmedL = l.trim()
-    if (/\%$/.test(trimmedL)) {
-      const match = /^([0-9]+)\%/.exec(trimmedL)
+    if (/%$/.test(trimmedL)) {
+      const match = /^([0-9]+)%/.exec(trimmedL)
       return (parseInt(match[1]) / 100) < 0.4
     }
   }
