@@ -9,6 +9,7 @@ import { SapiViewsCoreRegionModule } from "../region";
 import { HighlightPipe } from "./regionsHierarchy/highlight.pipe";
 import { SapiViewsCoreRichRegionsHierarchy } from "./regionsHierarchy/regionsHierarchy.component";
 import { SapiViewsCoreRichRegionListSearch } from "./regionsListSearch/regionListSearch.component";
+import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionsListSearch/regionListSearchTmpl.directive";
 
 @NgModule({
   imports: [
@@ -24,9 +25,11 @@ import { SapiViewsCoreRichRegionListSearch } from "./regionsListSearch/regionLis
     SapiViewsCoreRichRegionListSearch,
     SapiViewsCoreRichRegionsHierarchy,
     HighlightPipe,
+    SapiViewsCoreRichRegionListTemplateDirective,
   ],
   exports: [
     SapiViewsCoreRichRegionListSearch,
+    SapiViewsCoreRichRegionListTemplateDirective,
     SapiViewsCoreRichRegionsHierarchy,
   ]
 })
