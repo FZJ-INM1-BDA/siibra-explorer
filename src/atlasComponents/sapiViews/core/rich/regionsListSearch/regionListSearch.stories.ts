@@ -5,9 +5,10 @@ import { SAPI } from "src/atlasComponents/sapi"
 import { atlasId, provideDarkTheme, getParcRegions, parcId, spaceId } from "src/atlasComponents/sapi/stories.base"
 import { SapiViewsCoreRichModule } from "../module"
 import { SapiViewsCoreRichRegionListSearch } from "./regionListSearch.component"
-import { Pipe, PipeTransform, SecurityContext } from "@angular/core"
+import { Pipe, PipeTransform } from "@angular/core"
 import { SapiRegionModel } from "src/atlasComponents/sapi/type"
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser"
+import { DomSanitizer } from "@angular/platform-browser"
+import { SapiViewsCoreRegionModule } from "../../region"
 
 @Pipe({
   name: 'regionTmplPipe',
@@ -38,6 +39,7 @@ export default {
       imports: [
         HttpClientModule,
         SapiViewsCoreRichModule,
+        SapiViewsCoreRegionModule,
       ],
       providers: [
         SAPI,
@@ -63,10 +65,8 @@ const Template: Story<SapiViewsCoreRichRegionListSearch> = (args: SapiViewsCoreR
     tmplRef
   } = parameters
   const template = `
-  ${tmplRef ? ('<ng-template #tmplref let-region>' + tmplRef + '</ng-template>') : ''}
-  <sxplr-sapiviews-core-rich-regionlistsearch
-    ${tmplRef ? '[sxplr-sapiviews-core-rich-regionlistsearch-region-template-ref]="tmplref"' : ''}
-    >
+  <sxplr-sapiviews-core-rich-regionlistsearch>
+    ${tmplRef ? ('<ng-template regionTemplate let-region>' + tmplRef + '</ng-template>') : ''}
     ${contentProjection || ''}
   </sxplr-sapiviews-core-rich-regionlistsearch>
   `
@@ -80,6 +80,9 @@ const Template: Story<SapiViewsCoreRichRegionListSearch> = (args: SapiViewsCoreR
   })
 }
 Template.loaders = []
+Template.parameters = {
+  tmplRef: `<span>{{ region.name }}</span>`
+}
 
 const asyncLoader = async (atlasId: string, parcId: string, spaceId: string) => {
   const regions = await getParcRegions(atlasId, parcId, spaceId)
@@ -97,6 +100,14 @@ const getContentProjection = ({ searchInputSuffix }) => {
 }
 
 export const Default = Template.bind({})
+Default.parameters = {
+  ...Template.parameters,
+  tmplRef: `
+<sxplr-sapiviews-core-region-region-list-item
+  [sxplr-sapiviews-core-region-region]="region">
+</sxplr-sapiviews-core-region-region-list-item>
+`
+}
 Default.loaders = [
   async () => {
     const { regions } = await asyncLoader(atlasId.human, parcId.human.jba29, spaceId.human.mni152)
@@ -112,6 +123,7 @@ InputSuffix.loaders = [
   }
 ]
 InputSuffix.parameters = {
+  ...Template.parameters,
   contentProjection: getContentProjection({
     searchInputSuffix: `SUFFIX`
   })
@@ -125,7 +137,8 @@ TemplatedRegionSuffix.loaders = [
   }
 ]
 TemplatedRegionSuffix.parameters = {
-  tmplRef: `<span [innerHTML]="region | regionTmplPipe"></span>`
+  ...Template.parameters,
+  tmplRef: `<span [innerHTML]="region | regionTmplPipe"></span><span>{{ region.name }}</span>`
 }
 
 
