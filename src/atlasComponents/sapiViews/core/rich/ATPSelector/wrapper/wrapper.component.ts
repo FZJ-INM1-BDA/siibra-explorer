@@ -77,7 +77,7 @@ export class WrapperATPSelector implements OnDestroy{
           }
           if (template) {
             return this.#parcSupportedInSpacePipe.transform(selectedATP.parcellation, template).pipe(
-              switchMap(({ supported }) => supported
+              switchMap(supported => supported
                 ? of({ template })
                 : this.#askUser(`Incompatible parcellation`, `Attempting to load template **${template.fullName}**, which does not support parcellation **${selectedATP.parcellation.name}**. Proceed anyway and load the default parcellation?`).pipe(
                   switchMap(flag => of(flag ? { template } : null))
@@ -86,7 +86,7 @@ export class WrapperATPSelector implements OnDestroy{
           }
           if (parcellation) {
             return this.#parcSupportedInSpacePipe.transform(parcellation, selectedATP.template).pipe(
-              switchMap(({ supported }) => supported
+              switchMap(supported=> supported
                 ? of({ parcellation })
                 : this.#askUser(`Incompatible template`, `Attempting to load parcellation **${parcellation.name}**, which is not supported in template **${selectedATP.template.fullName}**. Proceed anyway and load the default template?`).pipe(
                   switchMap(flag => of(flag ? { parcellation } : null))

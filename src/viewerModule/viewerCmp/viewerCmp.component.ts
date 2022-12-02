@@ -106,14 +106,6 @@ export class ViewerCmp implements OnDestroy {
     map(({ parcellation }) => parcellation)
   )
 
-  public allAvailableSpaces$ = this.store$.pipe(
-    atlasSelection.fromRootStore.allAvailSpaces(this.sapi)
-  )
-
-  public allAvailableParcellations$ = this.store$.pipe(
-    atlasSelection.fromRootStore.allAvailParcs(this.sapi)
-  )
-
   public selectedRegions$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions),
   )
@@ -403,42 +395,6 @@ export class ViewerCmp implements OnDestroy {
   clearSelectedFeature(): void{
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
-    )
-  }
-
-  onDismissNonbaseLayer(): void{
-    this.store$.dispatch(
-      atlasSelection.actions.clearNonBaseParcLayer()
-    )
-  }
-  onSelectAtlas(atlas: SapiAtlasModel): void{
-    this.store$.dispatch(
-      atlasSelection.actions.selectAtlas({
-        atlas
-      })
-    )
-  }
-  onSelectSpace(template: SapiSpaceModel): void{
-    this.store$.dispatch(
-      atlasSelection.actions.selectTemplate({
-        template
-      })
-    )
-  }
-  onSelectParcellation(parcellation: SapiParcellationModel): void{
-    this.store$.dispatch(
-      atlasSelection.actions.selectParcellation({
-        parcellation
-      })
-    )
-  }
-  onSelectSpaceAndParcellation(e): void{
-    const {space, parcellation} = e
-    this.store$.dispatch(
-      atlasSelection.actions.setAtlasSelectionState({
-        selectedTemplate: space,
-        selectedParcellation: parcellation
-      })
     )
   }
 

@@ -126,7 +126,7 @@ mat-list[dense].contextual-block
 
 .region-chip-suffix
 {
-  transform: scale(0.7);
+  transform: scale(0.9);
   margin-right: -0.25rem;
 }
 
@@ -139,14 +139,4 @@ mat-list[dense].contextual-block
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-}
-
-.arrow-between-chips {
-  margin: 0 -30px;
-  padding: 0 30px;
-}
-
-.hide-chip-corner {
-  margin-left: -2.5rem;
-  padding-left: 3rem;
 }

@@ -402,41 +402,11 @@
     sxplr-mxw-80vw
     sxplr-pe-all
     sxplr-of-x-auto
-    sxplr-of-y-hidden">
-
-    <!-- selected atlas chip -->
-    <sxplr-sapiviews-core-atlas-smartchip
-      class="sxplr-z-4 sxplr-ml-2"
-      [sxplr-sapiviews-core-atlas-smartchip-custom-color]="'dimgrey'"
-      [sxplr-sapiviews-core-atlas-smartchip-atlas]="selectedAtlas$ | async"
-      [sxplr-sapiviews-core-atlas-smartchip-all-atlases]="fetchedAtlases$ | async"
-      (sxplr-sapiviews-core-atlas-smartchip-select-atlas)="onSelectAtlas($event)"
-      >
-    </sxplr-sapiviews-core-atlas-smartchip>
-
-
-    <!-- selected space chip -->
-    <sxplr-sapiviews-core-space-smartchip
-            class="sxplr-z-3"
-            [sxplr-sapiviews-core-space-smartchip-custom-color]="'grey'"
-            [sxplr-sapiviews-core-space-smartchip-space]="templateSelected$ | async"
-            [sxplr-sapiviews-core-space-smartchip-all-spaces]="allAvailableSpaces$ | async"
-            (sxplr-sapiviews-core-space-smartchip-select-space)="onSelectSpace($event)">
-    </sxplr-sapiviews-core-space-smartchip>
-
-    <!-- selected parcellation chip -->
-    <sxplr-sapiviews-core-parcellation-smartchip
-      class="sxplr-z-2 sxplr-mr-1"
-      [sxplr-sapiviews-core-parcellation-smartchip-selected-space]="templateSelected$ | async"
-      [sxplr-sapiviews-core-parcellation-smartchip-selected-all-spaces]="allAvailableSpaces$ | async"
-      [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
-      [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
-      (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
-      (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
-      (sxplr-sapiviews-core-parcellation-smartchip-select-space-parcellation)="onSelectSpaceAndParcellation($event)"
-      [sxplr-sapiviews-core-parcellation-smartchip-custom-color]="'darkgrey'"
-    >
-    </sxplr-sapiviews-core-parcellation-smartchip>
+    sxplr-of-y-hidden
+    sxplr-align-items-center">
+    
+    <sxplr-wrapper-atp-selector class="sxplr-z-2">
+    </sxplr-wrapper-atp-selector>
 
     <!-- selected region chip -->
     <sxplr-sapiviews-core-region-region-chip
@@ -452,9 +422,7 @@
       </div>
 
       <div suffix class="region-chip-suffix">
-        <button mat-mini-fab
-          color="primary"
-          iav-stop="mousedown click"
+        <button mat-icon-button iav-stop="mousedown click"
           (click)="clearRoi()">
           <i class="fas fa-times"></i>
         </button>

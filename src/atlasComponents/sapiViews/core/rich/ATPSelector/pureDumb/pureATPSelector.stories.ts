@@ -9,6 +9,7 @@ import { UtilModule } from "src/util";
 import { ATPSelectorModule } from "../module";
 import { defaultColorPalette } from "./pureATPSelector.components"
 import { loadAtlasEtcData, wrapperDecoratorFn } from "../story.base"
+import { provideMockStore } from "@ngrx/store/testing";
 
 @Component({
   selector: 'atlas-selector-wrapper-story',
@@ -77,6 +78,7 @@ export default {
       ],
       providers: [
         ...provideDarkTheme,
+        provideMockStore(),
       ]
     }),
     componentWrapperDecorator(wrapperDecoratorFn)

@@ -29,6 +29,7 @@ import { ShareModule } from "src/share";
 import { LeapModule } from "./leap/module";
 
 import { environment } from "src/environments/environment"
+import { ATPSelectorModule } from "src/atlasComponents/sapiViews/core/rich/ATPSelector";
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { environment } from "src/environments/environment"
     DialogModule,
     MouseoverModule,
     ShareModule,
+    ATPSelectorModule,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

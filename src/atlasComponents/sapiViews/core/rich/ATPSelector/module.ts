@@ -7,7 +7,7 @@ import { MarkdownModule } from "src/components/markdown";
 import { SmartChipModule } from "src/components/smartChip";
 import { DialogModule } from "src/ui/dialogInfo";
 import { UtilModule } from "src/util";
-import { FilterGroupedParcellationPipe, ParcellationDoiPipe, ParcellationGroupSelectedPipe } from "src/atlasComponents/sapiViews/core/parcellation";
+import { SapiViewsCoreParcellationModule } from "src/atlasComponents/sapiViews/core/parcellation";
 import { PureATPSelector } from "./pureDumb/pureATPSelector.components";
 import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
@@ -23,14 +23,11 @@ import { SAPIModule } from "src/atlasComponents/sapi/module";
     MatButtonModule,
     DialogModule,
     SAPIModule,
+    SapiViewsCoreParcellationModule,
   ],
   declarations: [
     PureATPSelector,
     WrapperATPSelector,
-
-    FilterGroupedParcellationPipe,
-    ParcellationDoiPipe,
-    ParcellationGroupSelectedPipe,
   ],
   exports: [
     PureATPSelector,

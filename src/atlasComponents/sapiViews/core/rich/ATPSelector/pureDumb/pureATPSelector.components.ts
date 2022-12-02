@@ -13,6 +13,15 @@ export type ATP = {
   template: SapiSpaceModel
   parcellation: SapiParcellationModel
 }
+
+function isATPGuard(atp: Record<string, unknown>): atp is Partial<ATP> {
+  const { atlas, template, parcellation } = atp
+  if (atlas && atlas["@type"] === "juelich/iav/atlas/v1.0.0") return true
+  if (template && template["@type"] === "https://openminds.ebrains.eu/sands/CoordinateSpace") return true
+  if (parcellation && parcellation["@type"] === "minds/core/parcellationatlas/v1.0.0") return true
+  return false
+}
+
 const pipe = new FilterGroupedParcellationPipe()
 
 
@@ -50,14 +59,15 @@ export class PureATPSelector implements OnChanges{
   public isBusy: boolean = false
 
   @Output('sxplr-pure-atp-selector-on-select')
-  selectLeafEmitter = new EventEmitter<ATP>()
+  selectLeafEmitter = new EventEmitter<Partial<ATP>>()
 
   getChildren(parc: GroupedParcellation|SapiParcellationModel){
     return (parc as GroupedParcellation).parcellations || []
   }
 
-  selectLeaf(atp: ATP) {
+  selectLeaf(atp: Record<string, unknown>) {
     if (this.isBusy) return
+    if (!isATPGuard(atp)) return
     this.selectLeafEmitter.emit(atp)
   }
 

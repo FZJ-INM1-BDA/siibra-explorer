@@ -1,7 +1,7 @@
 <ng-template [ngIf]="selectedATP" let-ATP>
 
   <!-- parcellation smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.parcellation"
+  <sxplr-smart-chip *ngIf="ATP.parcellation && parcAndGroup.length > 1"
     [items]="parcAndGroup"
     [color]="colorPalette[2]"
     [getChildren]="getChildren"
@@ -44,7 +44,7 @@
   </sxplr-smart-chip>
 
   <!-- space smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.template"
+  <sxplr-smart-chip *ngIf="ATP.template && availableTemplates.length > 1"
     [items]="availableTemplates"
     [color]="colorPalette[1]"
     (itemClicked)="selectLeaf({ template: $event })"
@@ -106,8 +106,8 @@
   </ng-template>
 
   <!-- button body -->
-  <span *ngIf="item; else noItemTmpl" class="full-sized-button">
-    {{ item.name || item.fullName }}
+  <span *ngIf="item" class="full-sized-button">
+    {{ item.version?.name || item.name || item.fullName }}
   </span>
 
   <!-- suffix -->

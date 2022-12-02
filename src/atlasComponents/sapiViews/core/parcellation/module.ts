@@ -11,15 +11,8 @@ import { SapiViewsUtilModule } from "../../util";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
 import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
-import { ParcellationIsBaseLayer } from "./parcellationIsBaseLayer.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
-import { PreviewParcellationUrlPipe } from "./previewParcellationUrl.pipe";
-import {
-  SapiViewsCoreParcellationParcellationSmartChip,
-  TemplateNotAvailableDialog
-} from "./smartChip/parcellation.smartChip.component";
-import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.tile.component";
-import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/getSpaceById.pipe";
+import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe";
 
 @NgModule({
   imports: [
@@ -32,21 +25,16 @@ import {GetSpaceByIdPipe} from "src/atlasComponents/sapiViews/core/parcellation/
     StrictLocalModule
   ],
   declarations: [
-    SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationSmartChip,
-    PreviewParcellationUrlPipe,
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
-    ParcellationIsBaseLayer,
     ParcellationDoiPipe,
-    GetSpaceByIdPipe,
-    TemplateNotAvailableDialog
+    ParcellationGroupSelectedPipe,
   ],
   exports: [
-    SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationSmartChip,
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
+    ParcellationGroupSelectedPipe,
+    ParcellationDoiPipe,
   ],
   providers: [
     ParcellationVisibilityService,
