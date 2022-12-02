@@ -312,5 +312,8 @@
     }
   }
 
+  exports.floatEquality = (v1, v2, threshold) => {
+    return Math.abs(v1 - v2) < threshold
+  }
 
 })(typeof exports === 'undefined' ? module.exports : exports)

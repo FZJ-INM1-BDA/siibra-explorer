@@ -25,12 +25,11 @@
     "memorystore": "^1.6.1",
     "nomiseco": "0.0.2",
     "openid-client": "^4.4.0",
-    "passport": "^0.4.0",
+    "passport": "^0.6.0",
     "rate-limit-redis": "^2.1.0",
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "showdown": "^2.0.0",
-    "soswrap": "^0.0.2",
     "through2": "^3.0.1"
   },
   "devDependencies": {
@@ -39,7 +38,7 @@
     "cookie": "^0.4.0",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
-    "mocha": "^9.2.1",
+    "mocha": "^10.1.0",
     "nock": "^12.0.3",
     "sinon": "^8.0.2"
   }

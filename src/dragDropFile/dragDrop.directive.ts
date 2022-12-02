@@ -1,14 +1,14 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { ChangeDetectorRef, Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, Output } from "@angular/core";
 import { fromEvent, merge, Observable, of, Subscription } from "rxjs";
-import { debounceTime, map, scan, switchMap } from "rxjs/operators";
-import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
+import { debounceTime, distinctUntilChanged, map, scan, switchMap } from "rxjs/operators";
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from "@angular/material/snack-bar";
 
 @Directive({
   selector: '[drag-drop-file]',
   exportAs: 'dragDropFile'
 })
 
-export class DragDropFileDirective implements OnInit, OnDestroy {
+export class DragDropFileDirective implements OnDestroy {
 
   @Input()
   public snackText: string
@@ -20,7 +20,15 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
   public transition = `opacity 300ms ease-in`
 
   @HostBinding('style.opacity')
-  public opacity = null
+  public hostOpacity = null
+
+  get opacity() {
+    return this.hostOpacity
+  }
+  set opacity(val: number) {
+    this.hostOpacity = val
+    this.cdr.markForCheck()
+  }
 
   public snackbarRef: MatSnackBarRef<SimpleSnackBar>
 
@@ -49,37 +57,13 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = []
 
-  public ngOnInit() {
-    this.subscriptions.push(
-      this.dragover$.pipe(
-        debounceTime(16),
-      ).subscribe(flag => {
-        if (flag) {
-          this.snackbarRef = this.snackBar.open(this.snackText || `Drop file(s) here.`, 'Dismiss')
-
-          /**
-           * In buggy scenarios, user could at least dismiss by action
-           */
-          this.snackbarRef.afterDismissed().subscribe(reason => {
-            if (reason.dismissedByAction) {
-              this.reset()
-            }
-          })
-          this.opacity = 0.2
-        } else {
-          this.reset()
-        }
-      }),
-    )
-  }
-
   public ngOnDestroy() {
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
 
-  constructor(private snackBar: MatSnackBar, private el: ElementRef) {
+  constructor(private snackBar: MatSnackBar, private el: ElementRef, private cdr: ChangeDetectorRef) {
     this.dragover$ = merge(
       of(null),
       fromEvent(this.el.nativeElement, 'drop'),
@@ -95,6 +79,34 @@ export class DragDropFileDirective implements OnInit, OnDestroy {
         scan((acc, curr) => acc + curr, 0),
         map(val => val > 0),
       )),
+    )
+
+    this.subscriptions.push(
+      this.dragover$.pipe(
+        debounceTime(16),
+        distinctUntilChanged(),
+      ).subscribe(flag => {
+        if (flag) {
+          this.snackbarRef = this.snackBar.open(
+            this.snackText || `Drop file(s) here.`, 'Dismiss',
+            {
+              panelClass: 'sxplr-pe-none'
+            }
+          )
+
+          /**
+           * In buggy scenarios, user could at least dismiss by action
+           */
+          this.snackbarRef.afterDismissed().subscribe(reason => {
+            if (reason.dismissedByAction) {
+              this.reset()
+            }
+          })
+          this.opacity = 0.2
+        } else {
+          this.reset()
+        }
+      }),
     )
   }
 }

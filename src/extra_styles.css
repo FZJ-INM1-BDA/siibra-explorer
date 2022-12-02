@@ -427,6 +427,11 @@ markdown-dom p
   height:20em!important;
 }
 
+.overflow-hidden
+{
+  overflow: hidden!important;
+}
+
 .overflow-x-auto
 {
   overflow-x: auto;
@@ -872,31 +877,9 @@ how-to-cite img
   width: 100%;
 }
 
-.mat-menu-panel.parc-smart-chip-menu-panel
+/* this is required to set snackbar to be none-interactive */
+/* ignore css lint error, they don't know what they are talking about */
+.cdk-overlay-pane:has(> .sxplr-pe-none)
 {
-  max-width: 100vw;
-}
-
-.custom-chip {
-  padding: 5px 10px;
-  border-radius: 15px;
-  cursor: pointer;
-}
-
-.custom-chip:hover {
-  filter: brightness(1.1);
-}
-
-.layer-chip-overflowed {
-  margin-left: -2.5rem !important;
-  padding-left: 3rem !important;
-}
-
-.small-icon-button {
-  font-size: 12px;
-  min-width: 20px;
-  text-align: center;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 50%;
+  pointer-events: none;
 }

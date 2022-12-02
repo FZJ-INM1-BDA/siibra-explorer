@@ -1,7 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, TemplateRef } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
-import { SaneUrl } from "../saneUrl/saneUrl.component"
 
 @Component({
   selector: 'sxplr-share-sheet',
@@ -18,7 +17,7 @@ export class ShareSheetComponent{
 
   }
 
-  openShareSaneUrl(){
-    this.dialog.open(SaneUrl, { ariaLabel: ARIA_LABELS.SHARE_CUSTOM_URL })
+  openDialog(templateRef: TemplateRef<unknown>){
+    this.dialog.open(templateRef, { ariaLabel: ARIA_LABELS.SHARE_CUSTOM_URL })
   }
 }

@@ -4,16 +4,12 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended", "plugin:storybook/recommended"],
   rules: {
+    "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/interface-name-prefix": [0],
     // "no-unused-vars": "off",
     "semi": "off",
-    "indent": ["error", 2, {
-      "FunctionDeclaration": {
-        "body": 1,
-        "parameters": 2
-      }
-    }],
+    "indent": "off",
     "@typescript-eslint/member-delimiter-style": [2, {
       "multiline": {
         "delimiter": "none",

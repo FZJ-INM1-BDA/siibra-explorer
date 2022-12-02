@@ -6,10 +6,7 @@ import { SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionMode
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
-import { fromRootStore } from "./util";
 import { AtlasSelectionState } from "./const"
-import { ParcellationIsBaseLayer } from "src/atlasComponents/sapiViews/core/parcellation/parcellationIsBaseLayer.pipe";
-import { OrderParcellationByVersionPipe } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVersion.pipe";
 import { atlasAppearance, atlasSelection } from "..";
 import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
@@ -140,7 +137,7 @@ export class Effect {
             return concat(
               ...currAtlas.parcellations.map(
                 p => this.parcSupportedInSpacePipe.transform(p["@id"], template).pipe(
-                  filter(flag => flag.supported),
+                  filter(flag => flag),
                   switchMap(() => this.sapiSvc.getParcDetail(currAtlas["@id"], p['@id'])),
                 )
               )
@@ -159,7 +156,7 @@ export class Effect {
             return concat(
               ...currAtlas.spaces.map(
                 sp => this.parcSupportedInSpacePipe.transform(parcellation["@id"], sp["@id"]).pipe(
-                  filter(flag => flag.supported),
+                  filter(flag => flag),
                   switchMap(() => this.sapiSvc.getSpaceDetail(currAtlas["@id"], sp['@id'])),
                 )
               )
@@ -294,25 +291,6 @@ export class Effect {
       regions: []
     }))
   ))
-
-  onNonBaseLayerRemoval = createEffect(() => this.action.pipe(
-    ofType(actions.clearNonBaseParcLayer),
-    switchMapTo(
-      this.store.pipe(
-        fromRootStore.allAvailParcs(this.sapiSvc),
-        map(parcs => {
-          const baseLayers = parcs.filter(this.parcellationIsBaseLayerPipe.transform)
-          const newestLayer = this.orderParcellationByVersionPipe.transform(baseLayers)
-          return actions.selectParcellation({
-            parcellation: newestLayer
-          })
-        })  
-      )
-    )
-  ))
-
-  private parcellationIsBaseLayerPipe = new ParcellationIsBaseLayer()
-  private orderParcellationByVersionPipe = new OrderParcellationByVersionPipe()
 
   onClearStandAloneVolumes = createEffect(() => this.action.pipe(
     ofType(actions.clearStandAloneVolumes),
