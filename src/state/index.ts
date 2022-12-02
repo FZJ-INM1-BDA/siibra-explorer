@@ -22,7 +22,7 @@ export {
 
 export * as generalActions from "./actions"
 
-function debug(reducer: ActionReducer<any>): ActionReducer<any> {
+function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
     console.log('state', state);
     console.log('action', action);
