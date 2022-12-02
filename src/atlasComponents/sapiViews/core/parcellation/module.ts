@@ -8,15 +8,11 @@ import { StrictLocalModule } from "src/strictLocal";
 import { DialogModule } from "src/ui/dialogInfo/module";
 import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
-import { SapiViewsCoreParcellationParcellationChip } from "./chip/parcellation.chip.component";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
 import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
-import { ParcellationIsBaseLayer } from "./parcellationIsBaseLayer.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
-import { PreviewParcellationUrlPipe } from "./previewParcellationUrl.pipe";
-import { SapiViewsCoreParcellationParcellationSmartChip } from "./smartChip/parcellation.smartChip.component";
-import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.tile.component";
+import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe";
 
 @NgModule({
   imports: [
@@ -29,21 +25,16 @@ import { SapiViewsCoreParcellationParcellationTile } from "./tile/parcellation.t
     StrictLocalModule
   ],
   declarations: [
-    SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationChip,
-    SapiViewsCoreParcellationParcellationSmartChip,
-    PreviewParcellationUrlPipe,
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
-    ParcellationIsBaseLayer,
     ParcellationDoiPipe,
+    ParcellationGroupSelectedPipe,
   ],
   exports: [
-    SapiViewsCoreParcellationParcellationTile,
-    SapiViewsCoreParcellationParcellationChip,
-    SapiViewsCoreParcellationParcellationSmartChip,
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
+    ParcellationGroupSelectedPipe,
+    ParcellationDoiPipe,
   ],
   providers: [
     ParcellationVisibilityService,

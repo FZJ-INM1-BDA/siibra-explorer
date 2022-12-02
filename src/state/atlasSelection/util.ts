@@ -1,31 +1,41 @@
 import { createSelector, select } from "@ngrx/store";
-import { forkJoin, pipe } from "rxjs";
+import { forkJoin, of, pipe } from "rxjs";
 import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import { jsonEqual } from "src/util/json";
 import * as selectors from "./selectors"
 
-const allAvailSpaces = (sapi: SAPI) => pipe(
-  select(selectors.selectedAtlas),
-  switchMap(atlas => forkJoin(
-    atlas.spaces.map(spcWId => sapi.getSpaceDetail(atlas["@id"], spcWId["@id"])))
+const allAvailSpaces = (sapi: SAPI) => {
+  return pipe(
+    select(selectors.selectedAtlas),
+    switchMap(atlas => atlas
+      ? forkJoin(
+        atlas.spaces.map(spcWId => sapi.getSpaceDetail(atlas["@id"], spcWId["@id"]))
+      )
+      : of([])
+    )
   )
-)
+}
 
 const allAvailParcs = (sapi: SAPI) => pipe(
   select(selectors.selectedAtlas),
-  switchMap(atlas =>
-    forkJoin(
+  switchMap(atlas => atlas
+    ? forkJoin(
       atlas.parcellations.map(parcWId => sapi.getParcDetail(atlas["@id"], parcWId["@id"]))
     )
+    : of([])
   )
 )
 const allAvailSpacesParcs = (sapi: SAPI) => pipe(
   select(selectors.selectedAtlas),
-  switchMap(atlas =>
-    forkJoin({
+  switchMap(atlas => atlas
+    ? forkJoin({
       spaces: atlas.spaces.map(spcWId => sapi.getSpaceDetail(atlas["@id"], spcWId["@id"])),
       parcellation: atlas.parcellations.map(parcWId => sapi.getParcDetail(atlas["@id"], parcWId["@id"])),
+    })
+    : of({
+      spaces: [],
+      parcellation: []
     })
   )
 )

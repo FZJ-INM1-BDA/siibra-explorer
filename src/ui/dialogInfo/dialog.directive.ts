@@ -1,6 +1,6 @@
 import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 
 type DialogSize = 's' | 'm' | 'l' | 'xl'
 
@@ -39,18 +39,11 @@ export class DialogDirective{
   @Input('sxplr-dialog-data')
   data: unknown
 
-  constructor(
-    private matDialog: MatDialog,
-    private snackbar: MatSnackBar,
-  ){
-  }
+  constructor(private matDialog: MatDialog){}
 
   @HostListener('click')
   onClick(){
-    if (!this.templateRef) {
-      return this.snackbar.open(`Cannot show dialog. sxplr-dialog template not provided`)
-    }
-    this.matDialog.open(this.templateRef, {
+    this.matDialog.open(this.templateRef || DialogFallbackCmp, {
       data: this.data,
       ...(sizeDict[this.size] || {})
     })

@@ -1,0 +1,30 @@
+:host
+{
+  display: inline-flex;
+  flex-direction: row-reverse;
+}
+
+.full-sized-button
+{
+  width: 100%;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.icons
+{
+  margin-right: -1rem;
+  margin-left: 0.2rem;
+}
+
+sxplr-smart-chip:not(:last-child)
+{
+  margin-left: -2.5rem;
+
+  .chip-text 
+  {
+    padding-left: 1rem;
+  }
+}

@@ -1,0 +1,40 @@
+<h1 *ngIf="data.title" mat-dialog-title>
+  {{ data.title }}
+</h1>
+
+<div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
+  <ng-template [ngIf]="data.desc">
+    {{ data.desc }}
+  </ng-template>
+  
+  <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
+  </markdown-dom>
+</div>
+
+
+<mat-dialog-actions align="start">
+
+  <ng-template ngFor [ngForOf]="data.actions || []" let-action>
+    <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
+      [href]="action"
+      sxplr-hide-when-local
+      target="_blank"
+      mat-raised-button
+      color="primary">
+      <i class="fas fa-external-link-alt"></i>
+      <span>Detail</span>
+    </a>
+
+    <ng-template #defaultActionTmpl>
+      <button mat-raised-button
+        color="primary"
+        [mat-dialog-close]="action">
+        {{ action }}
+      </button>
+    </ng-template>
+  </ng-template>
+
+  <button mat-dialog-close mat-button>
+    Close
+  </button>
+</mat-dialog-actions>

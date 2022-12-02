@@ -126,7 +126,7 @@ mat-list[dense].contextual-block
 
 .region-chip-suffix
 {
-  transform: scale(0.7);
+  transform: scale(0.9);
   margin-right: -0.25rem;
 }
 
