@@ -15,16 +15,26 @@ import { EnumClassicalView } from "src/atlasComponents/constants"
 import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
 
-const MINIMAP_SIZE = {
-  width: 200,
-  height: 200,
-}
+const MAX_DIM = 200
+
 type AnatomicalOrientation = 'ap' | 'si' | 'lr' // anterior-posterior, superior-inferior, left-right
 type RangeOrientation = 'horizontal' | 'vertical'
 const anatOriToIdx: Record<AnatomicalOrientation, number> = {
   'lr': 0,
   'ap': 1,
   'si': 2
+}
+
+function getDim(triplet: number[], view: EnumClassicalView) {
+  if (view === EnumClassicalView.AXIAL) {
+    return [triplet[0], triplet[1]]
+  }
+  if (view === EnumClassicalView.CORONAL) {
+    return [triplet[0], triplet[2]]
+  }
+  if (view === EnumClassicalView.SAGITTAL) {
+    return [triplet[1], triplet[2]]
+  }
 }
 
 @Component({
@@ -142,7 +152,40 @@ export class PerspectiveViewSlider implements OnDestroy {
           ? this.sapi.getSpace(atlas['@id'], template['@id']).getTemplateSize()
           : NEVER),
     )
-    
+
+    private useMinimap$: Observable<EnumClassicalView> = this.maximisedPanelIndex$.pipe(
+      map(maximisedPanelIndex => {
+        if (maximisedPanelIndex === 0) return EnumClassicalView.SAGITTAL
+        if (maximisedPanelIndex === 1) return EnumClassicalView.CORONAL
+        if (maximisedPanelIndex === 2) return EnumClassicalView.CORONAL
+        return null
+      })
+    )
+
+
+    // this crazy hack is required since firefox support vertical-orient
+    // do not and -webkit-slider-thumb#apperance cannot be used to hide the thumb
+    public rangeInputStyle$ = this.rangeControlIsVertical$.pipe(
+      withLatestFrom(this.currentTemplateSize$, this.useMinimap$),
+      map(([ isVertical, templateSizes, useMinimap ]) => {
+        if (!isVertical) return {}
+        const { real } = templateSizes
+        const [ width, height ] = getDim(real, useMinimap)
+        const max = Math.max(width, height)
+        const useHeight = width/max*MAX_DIM
+        const useWidth = height/max*MAX_DIM
+
+        const xformOriginVal = Math.min(useHeight, useWidth)/2
+        const transformOrigin = `${xformOriginVal}px ${xformOriginVal}px`
+
+        return {
+          height: `${useHeight}px`,
+          width: `${useWidth}px`,
+          transformOrigin,
+        }
+      })
+    )
+
     public rangeControlMinMaxValue$ = this.currentTemplateSize$.pipe(
       switchMap(templateSize => {
         return this.rangeControlSetting$.pipe(
@@ -175,14 +218,7 @@ export class PerspectiveViewSlider implements OnDestroy {
   
     public previewImageUrl$ = combineLatest([
       this.selectedTemplate$,
-      this.maximisedPanelIndex$.pipe(
-        map(maximisedPanelIndex => {
-          if (maximisedPanelIndex === 0) return EnumClassicalView.SAGITTAL
-          if (maximisedPanelIndex === 1) return EnumClassicalView.CORONAL
-          if (maximisedPanelIndex === 2) return EnumClassicalView.CORONAL
-          return null
-        })
-      ),
+      this.useMinimap$,
     ]).pipe(
       map(([template, view]) => {
         const url = getScreenshotUrl(template, view)
@@ -251,38 +287,30 @@ export class PerspectiveViewSlider implements OnDestroy {
 
           const { zoom, position } = navigation
 
-          let sliceviewDim: [number, number] = null
           let translate: number = null
           const { sliceView } = ctrl
 
-          const getTranslatePc = (idx: number) => position[idx] / templateSize.real[idx]
+          const getTranslatePc = (idx: number) => {
+            const trueCenter = templateSize.real[idx] / 2
+            const compensate = trueCenter + templateSize.transform[idx][3]
+            return (position[idx] - compensate) / templateSize.real[idx]
+          }
 
           let viewportDimOfInterest: number
+          const sliceviewDim = getDim(templateSize.real, sliceView)
           if (sliceView === EnumClassicalView.CORONAL) {
-            sliceviewDim = [
-              templateSize.real[0],
-              templateSize.real[2]
-            ]
             // minimap is sagittal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
             viewportDimOfInterest = viewportSize.height
           }
 
           if (sliceView === EnumClassicalView.SAGITTAL) {
-            sliceviewDim = [
-              templateSize.real[1],
-              templateSize.real[2]
-            ]
             // minimap is coronal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
             viewportDimOfInterest = viewportSize.height
           }
 
           if (sliceView === EnumClassicalView.AXIAL) {
-            sliceviewDim = [
-              templateSize.real[0],
-              templateSize.real[1]
-            ]
             // minimap  is in coronal view, so interested in left-right axis
             translate = getTranslatePc(0) * -1
             viewportDimOfInterest = viewportSize.width
