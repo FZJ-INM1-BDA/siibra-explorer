@@ -23,8 +23,14 @@ export class SapiViewsCoreRegionRegionBase {
   @Input('sxplr-sapiviews-core-region-parcellation')
   parcellation: SapiParcellationModel
 
+  @Input('sxplr-sapiviews-core-region-selected-regions')
+  selectedRegions: SapiRegionModel[]
+
   @Output('sxplr-sapiviews-core-region-navigate-to')
   onNavigateTo = new EventEmitter<number[]>()
+
+  @Output('sxplr-sapiviews-core-region-toggle')
+  toggleRegionSelection = new EventEmitter<SapiRegionModel>()
 
   protected region$ = new Subject<SapiRegionModel>()
   private _region: SapiRegionModel
@@ -101,6 +107,10 @@ export class SapiViewsCoreRegionRegionBase {
 
   protected async fetchDetail(region: SapiRegionModel) {
     return this.sapi.getRegion(this.atlas["@id"],this.parcellation["@id"], region.name).getDetail(this.template["@id"]).toPromise()
+  }
+
+  deselectRoi(region: SapiRegionModel) {
+    this.toggleRegionSelection.emit(region)
   }
 
   constructor(protected sapi: SAPI){

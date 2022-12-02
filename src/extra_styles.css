@@ -876,3 +876,9 @@ how-to-cite img
 {
   max-width: 100vw;
 }
+
+.region-chip-suffix
+{
+  transform: scale(0.7);
+  margin-right: -0.25rem;
+}

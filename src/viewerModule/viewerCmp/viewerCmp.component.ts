@@ -313,6 +313,10 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
+  public toggleRoi(region: SapiRegionModel): void {
+    this.store$.dispatch(atlasSelection.actions.toggleRegionSelect({region}))
+  }
+
   public selectRoi(roi: SapiRegionModel): void {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({

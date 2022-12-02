@@ -416,6 +416,7 @@
   <div class="sxplr-d-inline-flex
     sxplr-flex-wrap-nowrap
     sxplr-mxw-80vw
+    sxplr-pr-1
     sxplr-pe-all
     sxplr-of-x-auto
     sxplr-of-y-hidden">
@@ -433,7 +434,7 @@
     <!-- selected region chip -->
     <sxplr-sapiviews-core-region-region-chip
       *ngIf="(selectedRegions$ | async).length === 1"
-      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1"
+      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1 ml-n5"
       (sxplr-sapiviews-core-region-region-chip-clicked)="showFullSideNav()"
       [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
       [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
@@ -452,6 +453,47 @@
         </button>
       </div>
     </sxplr-sapiviews-core-region-region-chip>
+
+
+    <!-- multi region selection -->
+    <div *ngIf="(selectedRegions$ | async).length > 1">
+      <mat-chip-list class="sxplr-pe-all sxplr-z-1">
+        <!-- <mat-chip *ngFor="let region of selectedRegions$ | async"></mat-chip> -->
+        <mat-chip class="multi-region-chip" #regionMenuTrigger="matMenuTrigger" [matMenuTriggerFor]="selectedRegionsMenu">{{(selectedRegions$ | async).length}}
+          Regions selected.</mat-chip>
+        <div class="region-chip-suffix multi-region-close-button">
+          <button mat-mini-fab color="primary" iav-stop="mousedown click" (click)="clearRoi()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div></mat-chip-list>
+        <mat-menu #selectedRegionsMenu="matMenu" [hasBackdrop]="false"
+          class="parc-smart-chip-menu-panel sxplr-bg-none sxplr-of-x-hidden sxplr-box-shadow-none sxplr-mxw-80vw">
+          <div>
+        
+            <div *ngFor="let region of (selectedRegions$ | async)" class="otherversion-wrapper">
+        
+              <!-- selected region chip -->
+              <sxplr-sapiviews-core-region-region-chip class="sxplr-pe-all sxplr-z-1"
+                [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+                [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+                [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+                [sxplr-sapiviews-core-region-region]="region">
+        
+                <div suffix class="region-chip-suffix">
+                  <button mat-mini-fab color="primary" iav-stop="mousedown click" (click)="toggleRoi(region)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </sxplr-sapiviews-core-region-region-chip>
+        
+            </div>
+          </div>
+        </mat-menu>
+    
+    </div>
+
+
+
   </div>
 
 </ng-template>
@@ -687,7 +729,7 @@
     <ng-container *ngIf="selectedRegions$ | async as selectedRegions; else selectRegionErrorTmpl">
 
       <!-- single-region-wrapper -->
-      <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
+      <!-- <ng-template [ngIf]="selectedRegions.length"> -->
         <!-- a series of bugs result in requiring this hacky -->
         <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
 
@@ -699,23 +741,16 @@
           [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
           [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
           [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
-          [sxplr-sapiviews-core-region-region]="selectedRegions[0]"
+          [sxplr-sapiviews-core-region-region]="selectedRegions.length === 1 && selectedRegions[0]"
+          [sxplr-sapiviews-core-region-selected-regions]="selectedRegions"
           (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
           (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+          (sxplr-sapiviews-core-region-toggle)="toggleRoi($event)"
           #regionDirective="sapiViewsCoreRegionRich"
         >
           <div class="sapi-container" header></div>
         </sxplr-sapiviews-core-region-region-rich>
-      </ng-template>
-
-      <!-- multi region wrapper -->
-      <ng-template #multiRegionWrapperTmpl>
-        <ng-container *ngTemplateOutlet="multiRegionTmpl; context: {
-          regions: selectedRegions
-        }">
-        </ng-container>
-        <!-- This is a wrapper for multiregion consisting of {{ selectedRegions.length }} regions -->
-      </ng-template>
+      <!-- </ng-template> -->
 
       <!-- place holder if length === 0 -->
       <ng-container *ngIf="selectedRegions.length === 0">
@@ -749,61 +784,6 @@
 <!-- select region error... for whatever reason -->
 <ng-template #selectRegionErrorTmpl>
   SELECT REGION ERROR
-</ng-template>
-
-
-<!-- multi region tmpl -->
-<ng-template #multiRegionTmpl let-regions="regions">
-  <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
-
-    <!-- other regions detail accordion -->
-    <mat-accordion class="bs-border-box sapi-container ml-15px-n mr-15px-n mt-2">
-
-      <!-- Multi regions include -->
-
-      <mat-expansion-panel
-        [attr.data-opened]="expansionPanel.expanded"
-        [attr.data-mat-expansion-title]="'Brain regions'"
-        hideToggle
-        #expansionPanel="matExpansionPanel">
-
-        <mat-expansion-panel-header>
-
-          <!-- title -->
-          <mat-panel-title>
-            Selected regions
-          </mat-panel-title>
-
-          <!-- desc + icon -->
-          <mat-panel-description class="d-flex align-items-center justify-content-end">
-            <span class="mr-3">{{ regions.length }}</span>
-            <span class="accordion-icon d-inline-flex justify-content-center">
-              
-            </span>
-          </mat-panel-description>
-
-        </mat-expansion-panel-header>
-
-        <!-- content -->
-        <ng-template matExpansionPanelContent>
-          
-          <!-- TODO use actual region chip in sapiViews/core/region/chip -->
-          <div *ngFor="let region of regions">
-            <div class="d-flex align-items-center justify-content-space-between mt-1 mb-1">
-              <div class="flex-grow-1">{{region.name}}</div>
-              <div class="d-flex flex-grow-0">
-                <button mat-icon-button (click)="selectRoi(region)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-            <mat-divider></mat-divider>
-          </div>
-        </ng-template>
-      </mat-expansion-panel>
-
-    </mat-accordion>
-  </ng-template>
 </ng-template>
 
 <!-- collapse btn -->

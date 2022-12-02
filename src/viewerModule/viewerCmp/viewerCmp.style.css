@@ -55,14 +55,9 @@ mat-drawer
   padding-top: 5rem;
 }
 
-sxplr-sapiviews-core-region-region-chip
-{
-  margin-left:-5rem;
-}
-
 sxplr-sapiviews-core-region-region-chip [prefix]
 {
-  padding-left:5rem;
+  padding-left:2rem;
 }
 
 .auto-complete-container
@@ -124,12 +119,6 @@ mat-list[dense].contextual-block
   overflow: hidden auto;
 }
 
-.region-chip-suffix
-{
-  transform: scale(0.7);
-  margin-right: -0.25rem;
-}
-
 .leap-control-wrapper
 {
   width: 0;
@@ -139,4 +128,13 @@ mat-list[dense].contextual-block
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+}
+
+.multi-region-chip {
+  padding-left: 5rem !important;
+  margin-left: -4rem !important;
+  padding-right: 3rem !important;
+}
+.multi-region-close-button {
+  margin-left: -3rem;
 }
