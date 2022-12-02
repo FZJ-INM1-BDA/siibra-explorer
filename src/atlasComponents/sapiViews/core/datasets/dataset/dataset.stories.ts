@@ -36,7 +36,7 @@ const Template: Story<DatasetView> = (args: DatasetView, { loaded }) => {
 
 const loadFeat = async () => {
   const features = await getHoc1RightFeatures()
-  const receptorfeat = features.find(f => f['@type'] === "siibra/core/dataset")
+  const receptorfeat = features.find(f => f['@type'] === "siibra/features/receptor")
   const feature = await getHoc1RightFeatureDetail(receptorfeat["@id"])
   return {
     feature

@@ -17,13 +17,11 @@ const { default: QUICK_STARTER } = require('!!raw-loader!common/helpOnePager.md'
 export class HelpOnePager{
   public ARIA_LABELS = ARIA_LABELS
   public QUICK_STARTER_MD = QUICK_STARTER
-  public extQuickStarter: string
+  public extQuickStarter: string = `quickstart`
   public userDoc: string
   constructor(
     private dialog: MatDialog,
-  ){
-    this.extQuickStarter = `quickstart.html`
-  }
+  ){}
 
   howToCite(){
     this.dialog.open(HowToCite)

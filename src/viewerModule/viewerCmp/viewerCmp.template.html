@@ -376,13 +376,6 @@
     [viewerLoaded]="viewerLoaded">
   </top-menu-cmp>
 
-  <sxplr-sapiviews-core-atlas-dropdown-selector
-    class="v-align-top sxplr-pt-2 pe-all mt-2 sxplr-custom-cmp bg card m-2 mat-elevation-z2 d-inline-block"
-    quick-tour
-    [quick-tour-description]="quickTourAtlasSelector.description"
-    [quick-tour-order]="quickTourAtlasSelector.order">
-  </sxplr-sapiviews-core-atlas-dropdown-selector>
-
 </ng-template>
 
 
@@ -403,32 +396,17 @@
 <!-- bottom left -->
 <ng-template #bottomLeftTmpl let-showFullSideNav="showFullSideNav">
 
-  <!-- atlas selector -->
-  <sxplr-sapiviews-core-atlas-tmplparcselector
-    *ngIf="viewerLoaded && !(isStandaloneVolumes$ | async)"
-    [iav-key-listener]="[{'type': 'keydown', 'key': 'Escape'}]"
-    (iav-key-event)="tmplParcSelector.closeSelector()"
-    (iav-outsideClick)="tmplParcSelector.closeSelector()"
-    #tmplParcSelector="sxplrSapiViewsCoreAtlasTmplparcselector">
-  </sxplr-sapiviews-core-atlas-tmplparcselector>
-
   <!-- scroll container -->
   <div class="sxplr-d-inline-flex
     sxplr-flex-wrap-nowrap
     sxplr-mxw-80vw
     sxplr-pe-all
     sxplr-of-x-auto
-    sxplr-of-y-hidden">
-
-    <!-- selected parcellation chip -->
-    <sxplr-sapiviews-core-parcellation-smartchip
-      class="sxplr-z-2 sxplr-mr-1"
-      [sxplr-sapiviews-core-parcellation-smartchip-parcellation]="parcellationSelected$ | async"
-      [sxplr-sapiviews-core-parcellation-smartchip-all-parcellations]="allAvailableParcellations$ | async"
-      (sxplr-sapiviews-core-parcellation-smartchip-dismiss-nonbase-layer)="onDismissNonbaseLayer()"
-      (sxplr-sapiviews-core-parcellation-smartchip-select-parcellation)="onSelectParcellation($event)"
-      >
-    </sxplr-sapiviews-core-parcellation-smartchip>
+    sxplr-of-y-hidden
+    sxplr-align-items-center">
+    
+    <sxplr-wrapper-atp-selector class="sxplr-z-2">
+    </sxplr-wrapper-atp-selector>
 
     <!-- selected region chip -->
     <sxplr-sapiviews-core-region-region-chip
@@ -444,9 +422,7 @@
       </div>
 
       <div suffix class="region-chip-suffix">
-        <button mat-mini-fab
-          color="primary"
-          iav-stop="mousedown click"
+        <button mat-icon-button iav-stop="mousedown click"
           (click)="clearRoi()">
           <i class="fas fa-times"></i>
         </button>
@@ -515,28 +491,23 @@
 <ng-template #autocompleteTmpl let-showTour="showTour">
   <div class="sxplr-custom-cmp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
     
-    <ng-template #selectedRegionCheckTmpl let-region>
-      <ng-template #fallbackTmpl>
-        <button mat-icon-button
-          class="sxplr-mt-a sxplr-mb-a">
-          <i class="far fa-square"></i>
-        </button>
-      </ng-template>
-
-      <button *ngIf="selectedRegions$ | async | includes : region; else fallbackTmpl"
-        mat-icon-button
-        color="primary"
-        class="sxplr-mt-a sxplr-mb-a">
-        <i class="far fa-check-square"></i>
-      </button>
-    </ng-template>
-
     <sxplr-sapiviews-core-rich-regionlistsearch
       [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
       [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="selectedRegions$ | async | getProperty : 0 | getProperty : 'name'"
-      [sxplr-sapiviews-core-rich-regionlistsearch-region-template-ref]="selectedRegionCheckTmpl"
       (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)">
+      <ng-template regionTemplate let-region>
+        <div class="sxplr-d-flex">
+          <button
+            mat-icon-button
+            class="sxplr-mt-a sxplr-mb-a">
+            <i [ngClass]="(selectedRegions$ | async | includes : region) ? 'fa-circle' : 'fa-none'" class="fas"></i>
+          </button>
 
+          <sxplr-sapiviews-core-region-region-list-item
+            [sxplr-sapiviews-core-region-region]="region">
+          </sxplr-sapiviews-core-region-region-list-item>
+        </div>
+      </ng-template>
       <button mat-icon-button
         search-input-suffix
         *ngIf="selectedRegions$ | async | getProperty : 'length'"

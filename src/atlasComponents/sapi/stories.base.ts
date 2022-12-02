@@ -76,6 +76,11 @@ export async function getAtlas(id: string): Promise<SapiAtlasModel>{
   return await (await fetch(`${endPt}/atlases/${id}`)).json()
 }
 
+export async function getParcellations(atlasId: string): Promise<SapiParcellationModel[]> {
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId}/parcellations`)).json()
+}
+
 export async function getParc(atlasId: string, id: string): Promise<SapiParcellationModel>{
   const endPt = await SAPI.BsEndpoint$.toPromise()
   return await (await fetch(`${endPt}/atlases/${atlasId}/parcellations/${id}`)).json()
@@ -83,6 +88,11 @@ export async function getParc(atlasId: string, id: string): Promise<SapiParcella
 export async function getParcRegions(atlasId: string, id: string, spaceId: string): Promise<SapiRegionModel[]>{
   const endPt = await SAPI.BsEndpoint$.toPromise()
   return await (await fetch(`${endPt}/atlases/${atlasId}/parcellations/${id}/regions?space_id=${encodeURIComponent(spaceId)}`)).json()
+}
+
+export async function getSpaces(atlasId: string): Promise<SapiSpaceModel[]> {
+  const endPt = await SAPI.BsEndpoint$.toPromise()
+  return await (await fetch(`${endPt}/atlases/${atlasId}/spaces`)).json()
 }
 
 export async function getSpace(atlasId: string, id: string): Promise<SapiSpaceModel> {
