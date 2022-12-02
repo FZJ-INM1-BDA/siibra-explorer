@@ -1,5 +1,5 @@
 <sxplr-pure-atp-selector
-  [sxplr-pure-atp-selector-color-palette]="defaultColorPalette"
+  [sxplr-pure-atp-selector-color-palette]="(darktheme$ | async) ? darkThemePalette : lightThemePalette"
   [sxplr-pure-atp-selector-selected-atp]="selectedATP$ | async"
   [sxplr-pure-atp-selector-atlases]="allAtlases$ | async"
   [sxplr-pure-atp-selector-templates]="availableTemplates$ | async"

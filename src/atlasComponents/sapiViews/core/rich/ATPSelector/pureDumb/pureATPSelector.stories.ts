@@ -7,7 +7,7 @@ import { atlasId, provideDarkTheme } from "src/atlasComponents/sapi/stories.base
 import { SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
 import { UtilModule } from "src/util";
 import { ATPSelectorModule } from "../module";
-import { defaultColorPalette } from "./pureATPSelector.components"
+import { darkThemePalette } from "./pureATPSelector.components"
 import { loadAtlasEtcData, wrapperDecoratorFn } from "../story.base"
 import { provideMockStore } from "@ngrx/store/testing";
 
@@ -39,9 +39,9 @@ import { provideMockStore } from "@ngrx/store/testing";
   ]
 })
 class AtlasLayerSelectorWrapper {
-  atlasColor: string = defaultColorPalette[0]
-  spaceColor: string = defaultColorPalette[1]
-  parcellationColor: string = defaultColorPalette[2]
+  atlasColor: string = darkThemePalette[0]
+  spaceColor: string = darkThemePalette[1]
+  parcellationColor: string = darkThemePalette[2]
   allAtlases: SapiAtlasModel[]
   availableTemplates: SapiSpaceModel[]
   selectedATP: {
@@ -122,9 +122,9 @@ const Template: Story<AtlasLayerSelectorWrapper> = (args: AtlasLayerSelectorWrap
 
 export const Default = Template.bind({})
 Default.args = {
-  atlasColor: defaultColorPalette[0],
-  spaceColor: defaultColorPalette[1],
-  parcellationColor: defaultColorPalette[2],
+  atlasColor: darkThemePalette[0],
+  spaceColor: darkThemePalette[1],
+  parcellationColor: darkThemePalette[2],
 }
 Default.loaders = [
   async () => {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, Inject, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable, of, Subject, Subscription } from "rxjs";
@@ -8,8 +8,9 @@ import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/
 import { atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
+import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
-import { defaultColorPalette, ATP } from "../pureDumb/pureATPSelector.components"
+import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
 
 function isATPGuard(obj: any): obj is ATP {
   if (!obj) return false
@@ -25,7 +26,8 @@ function isATPGuard(obj: any): obj is ATP {
 })
 
 export class WrapperATPSelector implements OnDestroy{
-  defaultColorPalette = defaultColorPalette
+  darkThemePalette = darkThemePalette
+  lightThemePalette = lightThemePalette
 
   #subscription: Subscription[] = []
   #parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapi)
@@ -63,6 +65,7 @@ export class WrapperATPSelector implements OnDestroy{
     private store$: Store,
     private sapi: SAPI,
     private svc: ParcellationVisibilityService,
+    @Inject(DARKTHEME) public darktheme$: Observable<boolean>
   ){
     this.#subscription.push(
       this.selectLeaf$.pipe(

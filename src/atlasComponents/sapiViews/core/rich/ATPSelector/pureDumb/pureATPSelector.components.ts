@@ -2,10 +2,16 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import { SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 
-export const defaultColorPalette = [
-  "#480202",
-  "#6b1205",
-  "#921d1d",
+export const darkThemePalette = [
+  "#141414",
+  "#242424",
+  "#333333",
+]
+
+export const lightThemePalette = [
+  "#ffffff",
+  "#fafafa",
+  "#f5f5f5",
 ]
 
 export type ATP = {
@@ -37,7 +43,7 @@ const pipe = new FilterGroupedParcellationPipe()
 export class PureATPSelector implements OnChanges{
 
   @Input('sxplr-pure-atp-selector-color-palette')
-  colorPalette: string[] = defaultColorPalette
+  colorPalette: string[] = darkThemePalette
 
   @Input(`sxplr-pure-atp-selector-selected-atp`)
   public selectedATP: ATP

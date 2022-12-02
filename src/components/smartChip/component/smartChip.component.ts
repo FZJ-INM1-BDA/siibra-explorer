@@ -3,7 +3,7 @@ import { SmartChipContent } from "../smartChip.content.directive"
 import { SmartChipMenu } from "../smartChip.menu.directive";
 import { rgbToHsl, hexToRgb } from 'common/util'
 
-const cssColorIsDark = (input: string) => {
+const cssColorToHsl = (input: string) => {
   if (/rgb/i.test(input)) {
     const match = /\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(input)
     if (!match) throw new Error(`rgb cannot be extracted ${input}`)
@@ -13,7 +13,7 @@ const cssColorIsDark = (input: string) => {
       parseInt(match[3]),
     ]
     const [_h, _s, l] = rgbToHsl(...rgb)
-    return l < 0.4
+    return l
   }
   if (/hsl/i.test(input)) {
     const match = /\((.*)\)/.exec(input)
@@ -21,13 +21,13 @@ const cssColorIsDark = (input: string) => {
     const trimmedL = l.trim()
     if (/%$/.test(trimmedL)) {
       const match = /^([0-9]+)%/.exec(trimmedL)
-      return (parseInt(match[1]) / 100) < 0.4
+      return parseInt(match[1]) / 100
     }
   }
   if (/^#/i.test(input) && input.length === 7) {
     const [r, g, b] = hexToRgb(input)
     const [_h, _s, l] = rgbToHsl(r, g, b)
-    return l < 0.6
+    return l
   }
   throw new Error(`Cannot parse css color: ${input}`)
 }
@@ -73,7 +73,8 @@ export class SmartChip<T extends object> implements OnChanges{
 
   ngOnChanges(simpleChanges: SimpleChanges) {
     if (simpleChanges.color) {
-      this.darkTheme = cssColorIsDark(this.color)
+      const brightness = cssColorToHsl(this.color)
+      this.darkTheme = brightness < 0.4
         ? 'darktheme'
         : 'lighttheme'
     }
