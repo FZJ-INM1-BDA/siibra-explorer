@@ -10,13 +10,15 @@ import { getPluginSrc, SET_PLUGIN_NAME } from "../const";
 /**
  * sandbox attribute must be set statically
  * see https://angular.io/errors/NG0910
+ * 
+ * allow-same-origin is needed in order for postmessage to work
  */
 
 @Component({
   selector: 'sxplr-plugin-portal',
   template: `
   <iframe [src]="src | iframeSrc"
-    sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox allow-scripts"
+    sandbox="allow-same-origin allow-downloads allow-popups allow-popups-to-escape-sandbox allow-scripts"
     #iframe>
   </iframe>
   `,
