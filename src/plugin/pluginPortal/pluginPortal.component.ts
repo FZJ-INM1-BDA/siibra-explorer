@@ -7,10 +7,17 @@ import { getUuid } from "src/util/fn";
 import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
 import { getPluginSrc, SET_PLUGIN_NAME } from "../const";
 
+/**
+ * sandbox attribute must be set statically
+ * see https://angular.io/errors/NG0910
+ */
+
 @Component({
   selector: 'sxplr-plugin-portal',
   template: `
-  <iframe [src]="src | iframeSrc" [sandbox]="sandbox" #iframe>
+  <iframe [src]="src | iframeSrc"
+    sandbox="allow-downloads allow-popups allow-popups-to-escape-sandbox allow-scripts"
+    #iframe>
   </iframe>
   `,
   styles: [
@@ -20,13 +27,6 @@ import { getPluginSrc, SET_PLUGIN_NAME } from "../const";
 })
 
 export class PluginPortal implements AfterViewInit, OnDestroy, ListenerChannel{
-
-  sandbox = [
-    "allow-downloads",
-    "allow-popups",
-    "allow-popups-to-escape-sandbox",
-    "allow-scripts",
-  ].join(" ")
 
   @ViewChild('iframe', { read: ElementRef })
   iframeElRef: ElementRef
