@@ -42,6 +42,12 @@ Please note that the `handshake.init` needs to be responded to, *before* any oth
 
 ## API References
 
+The API is generated automatically with the following script:
+
+```sh
+npm run api-schema
+```
+
 [handshake API](./handshake.md)
 
 [broadcast API](./broadcast.md)

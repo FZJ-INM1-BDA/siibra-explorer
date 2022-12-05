@@ -32,21 +32,33 @@
     *ngFor="let region of autocompleteList$ | async"
     [value]="region">
 
-    <div class="sxplr-d-flex sxplr-justify-content-space-between">
+    <ng-template [ngIf]="regionTmplDirective">
 
-      <sxplr-sapiviews-core-region-region-list-item
-        [sxplr-sapiviews-core-region-region]="region">
-      </sxplr-sapiviews-core-region-region-list-item>
-      
       <ng-template
-        [ngIf]="regionTemplateRef"
-        [ngTemplateOutlet]="regionTemplateRef"
+        [ngTemplateOutlet]="regionTmplDirective.tmplRef"
         [ngTemplateOutletContext]="{
           $implicit: region
         }">
-        
       </ng-template>
-    </div>
+    </ng-template>
 
   </mat-option>
+  <ng-template [ngIf]="searchedList$ | async" let-searchedList>
+
+    <mat-option *ngIf="searchedList.length > showNOptions"
+      [disabled]="true">
+
+      <ng-template [ngIf]="regionTmplDirective">
+
+        <ng-template
+          [ngTemplateOutlet]="regionTmplDirective.tmplRef"
+          [ngTemplateOutletContext]="{
+            $implicit: {
+              name: '... and ' + (searchedList.length - showNOptions) + ' more'
+            }
+          }">
+        </ng-template>
+      </ng-template>
+    </mat-option>
+  </ng-template>
 </mat-autocomplete>

@@ -11,7 +11,7 @@ module.exports = {
   ],
   "framework": "@storybook/angular",
   "core": {
-    "builder": "webpack5"
+    "builder": "@storybook/builder-webpack5"
   },
   features: {
     interactionsDebugger: true,

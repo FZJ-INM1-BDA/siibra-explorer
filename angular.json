@@ -52,18 +52,11 @@
               "input": "worker/worker-typedarray.js",
               "inject": false,
               "bundleName": "worker-typedarray"
-            },
-            
-            {
+            },{
               "input": "third_party/catchSyntaxError.js",
               "inject": false,
               "bundleName": "catchSyntaxError"
             },{
-              "input": "third_party/syntaxError.js",
-              "inject": false,
-              "bundleName": "syntaxError"
-            },
-            {
               "input": "third_party/extra_js.js",
               "inject": false,
               "bundleName": "extra_js"
@@ -160,6 +153,5 @@
         }
       }
     }
-  },
-  "defaultProject": "siibra-explorer"
+  }
 }

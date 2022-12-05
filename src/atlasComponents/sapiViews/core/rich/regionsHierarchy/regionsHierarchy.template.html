@@ -1,20 +1,18 @@
-<form class="sxplr-custom-cmp text sxplr-w-100">
-  <mat-form-field class="sxplr-w-100">
-    <input
-      [placeholder]="placeholderText"
-      type="text"
-      matInput
-      name="searchTerm"
-      [formControl]="searchFormControl"
-      autocomplete="off">
+<mat-form-field class="sxplr-custom-cmp text sxplr-w-100">
+  <input
+    [placeholder]="placeholderText"
+    type="text"
+    matInput
+    name="searchTerm"
+    [formControl]="searchFormControl"
+    autocomplete="off">
 
-    <!-- search input suffix -->
-    <div matSuffix>
-      <ng-content select="[search-input-suffix]"></ng-content>
-    </div>
+  <!-- search input suffix -->
+  <div matSuffix>
+    <ng-content select="[search-input-suffix]"></ng-content>
+  </div>
 
-  </mat-form-field>
-</form>
+</mat-form-field>
 
 <ng-template #tmplRef let-region>
   <div class="mat-body sxplr-d-flex sxplr-align-items-center sxplr-h-100 region-tmpl"
