@@ -116,10 +116,6 @@ export const selectATPById = createAction(
   }>()
 )
 
-export const clearNonBaseParcLayer = createAction(
-  `${nameSpace} clearNonBaseParcLayer`
-)
-
 export const clearStandAloneVolumes = createAction(
   `${nameSpace} clearStandAloneVolumes`
 )

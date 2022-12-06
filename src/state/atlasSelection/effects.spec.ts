@@ -10,6 +10,7 @@ import { actions, selectors } from "."
 import { Effect } from "./effects"
 import * as mainActions from "../actions"
 import { atlasSelection } from ".."
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
@@ -23,7 +24,8 @@ describe("> effects.ts", () => {
       TestBed.configureTestingModule({
         imports: [
           // HttpClientTestingModule,
-          SAPIModule
+          SAPIModule,
+          BrowserAnimationsModule
         ],
         providers: [
           Effect,

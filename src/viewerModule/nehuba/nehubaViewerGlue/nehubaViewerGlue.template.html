@@ -1,8 +1,7 @@
 <div class="nehuba-viewer-container-parent"
   iav-viewer-touch-interface
   (touchmove)="$event.preventDefault()"
-  [snackText]="CONST.NEHUBA_DRAG_DROP_TEXT"
-  (drag-drop-file)="handleFileDrop($event)">
+  sxplr-nehuba-drag-drop>
 
   <sxplr-nehuba-viewer-container
     class="sxplr-w-100 sxplr-h-100 sxplr-d-block"
@@ -13,43 +12,3 @@
 
 <nehuba-layout-overlay></nehuba-layout-overlay>
 
-<!-- user dropped NIFTI overlay -->
-<ng-template #layerCtrlTmpl let-data>
-  <div class="grid grid-col-3">
-
-    <span class="ml-2 text-truncate v-center-text-span">
-      <i class="fas fa-file"></i>
-      {{ data.filename }}
-    </span>
-    
-    <button
-      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
-      mat-icon-button
-      [color]="data.moreInfoFlag ? 'primary' : 'basic'"
-      (click)="data.moreInfoFlag = !data.moreInfoFlag">
-      <i class="fas fa-sliders-h"></i>
-    </button>
-
-    <button
-      [matTooltip]="ARIA_LABELS.CLOSE"
-      color="warn"
-      mat-icon-button
-      mat-dialog-close>
-      <i class="fas fa-trash"></i>
-    </button>
-
-    <div *ngIf="data.moreInfoFlag"
-      class="sxplr-custom-cmp darker-bg overflow-hidden grid-wide-3">
-      <ng-layer-tune
-        advanced-control="true"
-        [ngLayerName]="data.layerName"
-        [thresholdMin]="data.min"
-        [thresholdMax]="data.max">
-      </ng-layer-tune>
-      <ul>
-        <li *ngFor="let warn of data.warning">{{ warn }}</li>
-      </ul>
-    </div>
-
-  </div>
-</ng-template>

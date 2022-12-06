@@ -217,7 +217,7 @@ export class RouteStateTransformSvc {
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
     const navigation = atlasSelection.selectors.navigation(state)
     const selectedFeature = userInteraction.selectors.selectedFeature(state)
-  
+
     const searchParam = new URLSearchParams()
   
     let cNavString: string
@@ -270,7 +270,7 @@ export class RouteStateTransformSvc {
         ['@']: cNavString,
       } as TUrlPathObj<string, TUrlStandaloneVolume<string>>
     }
-  
+
     const routesArr: string[] = []
     for (const key in routes) {
       if (!!routes[key]) {

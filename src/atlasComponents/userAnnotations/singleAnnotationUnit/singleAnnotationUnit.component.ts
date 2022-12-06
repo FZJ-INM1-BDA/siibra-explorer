@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ComponentFactoryResolver, Inject, Injector, I
 import { IAnnotationGeometry, UDPATE_ANNOTATION_TOKEN } from "../tools/type";
 import { Point } from '../tools/point'
 import { Polygon } from '../tools/poly'
-import { FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { select, Store } from "@ngrx/store";
 import { ModularUserAnnotationToolService } from "../tools/service";
@@ -23,7 +23,7 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
   @Input('single-annotation-unit-annotation')
   public managedAnnotation: IAnnotationGeometry
 
-  public formGrp: FormGroup
+  public formGrp: UntypedFormGroup
 
   @ViewChild('editAnnotationVCRef', { read: ViewContainerRef })
   editAnnotationVCR: ViewContainerRef
@@ -36,13 +36,13 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
   ngOnChanges(){
     while(this.chSubs.length > 0) this.chSubs.pop().unsubscribe()
     
-    this.formGrp = new FormGroup({
-      name: new FormControl(this.managedAnnotation.name),
-      spaceId: new FormControl({
+    this.formGrp = new UntypedFormGroup({
+      name: new UntypedFormControl(this.managedAnnotation.name),
+      spaceId: new UntypedFormControl({
         value: this.managedAnnotation.space["@id"],
         disabled: true
       }),
-      desc: new FormControl(this.managedAnnotation.desc),
+      desc: new UntypedFormControl(this.managedAnnotation.desc),
     })
 
     this.chSubs.push(

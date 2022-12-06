@@ -4,7 +4,7 @@ import { merge, of, Subscription } from "rxjs";
 import { pairwise, withLatestFrom} from "rxjs/operators";
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { atlasAppearance } from "src/state";
 
 @Component({
@@ -38,7 +38,7 @@ export class ViewerCtrlCmp implements OnInit{
     select(atlasAppearance.selectors.octantRemoval),
   )
 
-  public auxMeshFormGroup: FormGroup = this.formBuilder.group({})
+  public auxMeshFormGroup: UntypedFormGroup = new UntypedFormGroup({})
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
     select(selectorAuxMeshes),
@@ -68,7 +68,7 @@ export class ViewerCtrlCmp implements OnInit{
         this.auxMeshesNamesSet.clear()
         for (const mesh of meshes) {
           this.auxMeshesNamesSet.add(mesh.ngId)
-          this.auxMeshFormGroup.addControl(mesh['@id'], new FormControl(mesh.visible))
+          this.auxMeshFormGroup.addControl(mesh['@id'], new UntypedFormControl(mesh.visible))
         }
       }),
 
@@ -100,7 +100,6 @@ export class ViewerCtrlCmp implements OnInit{
 
   constructor(
     private store$: Store<any>,
-    private formBuilder: FormBuilder,
   ){
 
   }

@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
 import { SapiRegionModel } from "src/atlasComponents/sapi/type";
 import { ARIA_LABELS } from "common/constants"
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionListSearchTmpl.directive";
 
 /**
  * Filter function, which determines whether the region will be included in the list of autocompleted search.
@@ -34,6 +35,8 @@ export class SapiViewsCoreRichRegionListSearch {
 
   ARIA_LABELS = ARIA_LABELS
 
+  showNOptions = 4
+
   private _regions: SapiRegionModel[] = []
   get regions(){
     return this._regions
@@ -42,6 +45,9 @@ export class SapiViewsCoreRichRegionListSearch {
   set regions(val: SapiRegionModel[]) {
     this._regions = val.filter(filterRegionForListSearch)
   }
+
+  @ContentChild(SapiViewsCoreRichRegionListTemplateDirective)
+  regionTmplDirective: SapiViewsCoreRichRegionListTemplateDirective
 
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-region-template-ref')
   regionTemplateRef: TemplateRef<any>
@@ -52,18 +58,22 @@ export class SapiViewsCoreRichRegionListSearch {
   @Output('sxplr-sapiviews-core-rich-regionlistsearch-region-select')
   onOptionSelected = new EventEmitter<SapiRegionModel>()
 
-  public searchFormControl = new FormControl()
+  public searchFormControl = new UntypedFormControl()
 
-  public autocompleteList$ = this.searchFormControl.valueChanges.pipe(
+  public searchedList$ = this.searchFormControl.valueChanges.pipe(
     startWith(''),
     distinctUntilChanged(),
     debounceTime(160),
     map((searchTerm: string | SapiRegionModel) => {
       if (typeof searchTerm === "string") {
-        return this.regions.filter(filterRegionViaSearch(searchTerm)).slice(0,5)
+        return this.regions.filter(filterRegionViaSearch(searchTerm))
       }
       return []
     })
+  )
+
+  public autocompleteList$ = this.searchedList$.pipe(
+    map(list => list.slice(0, this.showNOptions))
   )
 
   displayFn(region: SapiRegionModel){

@@ -27,8 +27,11 @@ const getQuickStartMdPr = (async () => {
   <script src="https://unpkg.com/dompurify@latest/dist/purify.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Atlas Viewer Quickstart</title>
+  <style>
+    .padded { padding: 1.5rem; }
+  </style>
 </head>
-<body class="sxplr-p-4">
+<body class="padded">
   
 </body>
 <script>

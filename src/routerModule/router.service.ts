@@ -167,6 +167,11 @@ export class RouterService {
         routeFromState += `/${customStatePath}`
       }
       if ( fullPath !== `/${routeFromState}`) {
+        /**
+         * TODO buggy edge case:
+         * if the route changes on viewer load, the already added baselayer/nglayer will be cleared
+         * This will result in a white screen (nehuba viewer not showing)
+         */
         store$.dispatch(
           generalActions.generalApplyState({
             state: stateFromRoute

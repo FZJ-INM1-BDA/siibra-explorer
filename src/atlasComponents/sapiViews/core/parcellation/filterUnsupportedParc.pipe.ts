@@ -10,7 +10,6 @@ const unsupportedIds = [
 ]
 
 const hideGroup = [
-  "cytoarchitecture"
 ]
 
 @Pipe({
