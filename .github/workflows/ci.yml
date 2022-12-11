@@ -54,7 +54,15 @@ jobs:
           node src/environments/parseEnv.js ./environment.ts
         fi
         npm run test-ci
-
+        - name: Build
+    - name: Build
+      run:  npm run build
+    - name: Upload atrifact
+      uses: actions/upload-artifact@v3
+      with: 
+        name: build-files
+        path: dist
+        
   backend:
     if: always()
     runs-on: ubuntu-latest
