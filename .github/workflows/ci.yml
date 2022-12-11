@@ -54,7 +54,6 @@ jobs:
           node src/environments/parseEnv.js ./environment.ts
         fi
         npm run test-ci
-        - name: Build
     - name: Build
       run:  npm run build
     - name: Upload atrifact
