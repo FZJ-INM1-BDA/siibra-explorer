@@ -57,8 +57,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     }
 
-    @Input() types: SapiModalityModel[] = []
-
     public selectedType: string
     public selectedTypeId: string
     public selectedCohort: string
@@ -66,6 +64,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public selectedSubjectIndex: number
     public selectedSubjectsDatasets: string[]
     public selectedSubjectDatasetIndex: number
+    public infoExpanded: boolean
     public fetchedItems: SapiParcellationFeatureModel[] = []
     public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
@@ -104,6 +103,16 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public logDisabled: boolean = true
     public logChecked: boolean = true
+
+    private _types: SapiModalityModel[] = []
+    @Input()
+    set types(val) {
+      this._types = val
+      if (val && val.length) this.selectType(val[0].name)
+    }
+    get types() {
+      return this._types
+    }
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
@@ -214,6 +223,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
           this.fetching = false
           this.changeDetectionRef.detectChanges()
+          this.selectCohort(this.cohorts[0])
         }
       })
     }
