@@ -18,6 +18,7 @@ import { HttpClient } from "@angular/common/http";
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
+  styleUrls: ['./connectivityBrowser.style.scss']
 })
 export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
@@ -64,7 +65,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public selectedSubjectIndex: number
     public selectedSubjectsDatasets: string[]
     public selectedSubjectDatasetIndex: number
-    public infoExpanded: boolean
     public fetchedItems: SapiParcellationFeatureModel[] = []
     public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
@@ -275,20 +275,23 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }) : ds
 
     fetchConnectivity(datasetId=null) {
-      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(datasetId || this.selectedDataset['@id'])
-        .pipe(catchError(() => {
-          this.fetching = false
-          return of(null)
-        }))
-        .subscribe(ds=> {
-          this.selectedDataset = this.fixDatasetFormat(ds)
-          this.setMatrixData(ds)
-          this.fetching = false
-        })
+      const parcellation = this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
+      if (parcellation) {
+        parcellation.getFeatureInstance(datasetId || this.selectedDataset['@id'])
+          .pipe(catchError(() => {
+            this.fetching = false
+            return of(null)
+          }))
+          .subscribe(ds => {
+            this.selectedDataset = this.fixDatasetFormat(ds)
+            this.setMatrixData(ds)
+            this.fetching = false
+          })
+      }
     }
 
     // ToDo need to be fixed on configuration side
-    fixHemisphereNaming(area) {
+    fixHemisphereNaming(area: string) {
       if (area.includes(' - left hemisphere')) {
         return area.replace('- left hemisphere', 'left')
       } else if (area.includes(' - right hemisphere')) {

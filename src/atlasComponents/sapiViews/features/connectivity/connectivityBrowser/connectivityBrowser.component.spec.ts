@@ -108,7 +108,6 @@ describe('ConnectivityComponent', () => {
         beforeEach(async () => {
             fixture = TestBed.createComponent(ConnectivityBrowserComponent)
             component = fixture.componentInstance
-            component.types = types
 
             const atlas = 'atlases/juelich/iav/atlas/v1.0.0/1'
             const parcellation = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
@@ -116,8 +115,7 @@ describe('ConnectivityComponent', () => {
 
             component.atlas = { '@id': atlas } as SapiAtlasModel
             component.parcellation = { '@id': parcellation } as SapiParcellationModel
-
-            component.selectType('StreamlineCounts')
+            component.types = types
 
             const url = `${endp}/atlases/${encodeURIComponent(atlas)}/parcellations/${encodeURIComponent(parcellation)}/features?type=${component.selectedTypeId}&size=${100}&page=${1}`
 

@@ -93,21 +93,17 @@
                       [disabled]="logDisabled || noConnectivityForRegion">Log 10</mat-checkbox>
         <button mat-button [matMenuTriggerFor]="exportMenu"
                 [disabled]="!connectedAreas.value">
-            <i class="fas fa-download mb-2 mr-2"></i>
-            <label>Export</label>
+            <i class="fas fa-download mr-2"></i>
+            <span>Export</span>
         </button>
-        <button mat-button (click)="infoExpanded = !infoExpanded">
-            <i class="fas fa-info mb-2 mr-2"></i>
-            <i class="fas mb-2 ml-2" [ngClass]="infoExpanded? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        <button *ngIf="selectedDataset" iav-stop="mousedown click" class="icons" mat-icon-button sxplr-dialog [sxplr-dialog-size]="null"
+            [sxplr-dialog-data]="{
+                  title: selectedDataset?.name,
+                  descMd: selectedDataset?.description + '' + selectedDataset?.authors.join(),
+                  actions: selectedDataset | connectivityDoiPipe
+                }">
+            <i class="fas fa-info"></i>
         </button>
-        <a *ngIf="selectedDataset" [href]="'https://search.kg.ebrains.eu/instances/' + selectedDataset['dataset_id']" target="_blank">
-            <button mat-icon-button><i class="fas fa-external-link-alt mb-2"></i></button>
-        </a>    
-    </div>
-
-    <div *ngIf="infoExpanded">
-        <p>{{selectedDataset.description}}</p>
-        <p>{{selectedDataset.authors.join()}}</p>
     </div>
 
     <hbp-connectivity-matrix-row
