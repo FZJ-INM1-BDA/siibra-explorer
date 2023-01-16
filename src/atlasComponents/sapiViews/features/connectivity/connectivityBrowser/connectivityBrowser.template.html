@@ -93,8 +93,16 @@
                       [disabled]="logDisabled || noConnectivityForRegion">Log 10</mat-checkbox>
         <button mat-button [matMenuTriggerFor]="exportMenu"
                 [disabled]="!connectedAreas.value">
-            <i class="fas fa-download mb-2 mr-2"></i>
-            <label>Export</label>
+            <i class="fas fa-download mr-2"></i>
+            <span>Export</span>
+        </button>
+        <button *ngIf="selectedDataset" iav-stop="mousedown click" class="icons" mat-icon-button sxplr-dialog [sxplr-dialog-size]="null"
+            [sxplr-dialog-data]="{
+                  title: selectedDataset?.name,
+                  descMd: selectedDataset?.description + '' + selectedDataset?.authors.join(),
+                  actions: selectedDataset | connectivityDoiPipe
+                }">
+            <i class="fas fa-info"></i>
         </button>
     </div>
 
