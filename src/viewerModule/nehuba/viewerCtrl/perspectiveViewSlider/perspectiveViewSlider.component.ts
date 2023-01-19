@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy, HostBinding } from "@angular/core";
+import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
@@ -17,10 +17,10 @@ import { floatEquality } from "common/util"
 
 const MAX_DIM = 200
 
-type AnatomicalOrientation = 'ap' | 'si' | 'lr' // anterior-posterior, superior-inferior, left-right
+type AnatomicalOrientation = 'ap' | 'si' | 'rl' // anterior-posterior, superior-inferior, right-left
 type RangeOrientation = 'horizontal' | 'vertical'
 const anatOriToIdx: Record<AnatomicalOrientation, number> = {
-  'lr': 0,
+  'rl': 0,
   'ap': 1,
   'si': 2
 }
@@ -121,7 +121,7 @@ export class PerspectiveViewSlider implements OnDestroy {
           sliceView = EnumClassicalView.CORONAL
         }
         if (maximisedPanelIndex === 1) {
-          anatomicalOrientation = 'lr'
+          anatomicalOrientation = 'rl'
           rangeOrientation = 'horizontal'
           minimapView = EnumClassicalView.CORONAL
           sliceView = EnumClassicalView.SAGITTAL
@@ -197,13 +197,10 @@ export class PerspectiveViewSlider implements OnDestroy {
               const { real: realPos } = nav
 
               const { anatomicalOrientation: anatOri } = orientation
-              let idx = null
-              if (anatOri === "ap") idx = 1
-              if (anatOri === "lr") idx = 0
-              if (anatOri === "si") idx = 2
-              if (idx === null) return null
+              const idx = anatOriToIdx[anatOri]
               
               const { real, transform } = templateSize
+              if (!transform || !transform[idx]) return null
               const min = Math.round(transform[idx][3])
               const max = Math.round(real[idx] + transform[idx][3])
 
@@ -296,37 +293,32 @@ export class PerspectiveViewSlider implements OnDestroy {
             return (position[idx] - compensate) / templateSize.real[idx]
           }
 
-          let viewportDimOfInterest: number
+          let scale: number = 2
           const sliceviewDim = getDim(templateSize.real, sliceView)
+          if (!sliceviewDim) return null
+
           if (sliceView === EnumClassicalView.CORONAL) {
             // minimap is sagittal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
-            viewportDimOfInterest = viewportSize.height
+            scale = Math.min(scale, viewportSize.height * zoom / sliceviewDim[1])
           }
 
           if (sliceView === EnumClassicalView.SAGITTAL) {
             // minimap is coronal view, so interested in superior-inferior axis
             translate = getTranslatePc(2)
-            viewportDimOfInterest = viewportSize.height
+            scale = Math.min(scale, viewportSize.height * zoom / sliceviewDim[1])
           }
 
           if (sliceView === EnumClassicalView.AXIAL) {
             // minimap  is in coronal view, so interested in left-right axis
             translate = getTranslatePc(0) * -1
-            viewportDimOfInterest = viewportSize.width
+            scale = Math.min(scale, viewportSize.width * zoom / sliceviewDim[0])
           }
-
-          if (!sliceviewDim) return null
-          
 
           /**
            * calculate scale
            */
-          const scale = [2, 2]
-          scale[0] = Math.min(scale[0], viewportDimOfInterest * zoom / sliceviewDim[0])
-          scale[1] = Math.min(scale[1], viewportDimOfInterest * zoom / sliceviewDim[1])
-          const scaleArr = scale.map(v => `scaleY(${v})`)
-          const scaleString = isVertical ? scaleArr[1] : scaleArr[0]
+          const scaleString = `scaleY(${scale})`
 
           /**
            * calculate translation
