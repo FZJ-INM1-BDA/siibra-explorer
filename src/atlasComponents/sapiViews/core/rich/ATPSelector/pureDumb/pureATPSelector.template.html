@@ -1,8 +1,8 @@
 <ng-template [ngIf]="selectedATP" let-ATP>
 
   <!-- parcellation smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.parcellation && parcAndGroup.length > 1"
-    [items]="parcAndGroup"
+  <sxplr-smart-chip *ngIf="ATP.parcellation && parcAndGroup && parcAndGroup.length > 1"
+    [items]="parcAndGroup || []"
     [color]="colorPalette[2]"
     [getChildren]="getChildren"
     (itemClicked)="selectLeaf({ parcellation: $event })"
@@ -44,8 +44,8 @@
   </sxplr-smart-chip>
 
   <!-- space smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.template && availableTemplates.length > 1"
-    [items]="availableTemplates"
+  <sxplr-smart-chip *ngIf="ATP.template && availableTemplates && availableTemplates.length > 1"
+    [items]="availableTemplates || []"
     [color]="colorPalette[1]"
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"

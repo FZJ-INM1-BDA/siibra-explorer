@@ -1,26 +1,23 @@
-<form class="sxplr-custom-cmp text sxplr-w-100">
-  <mat-form-field
-    class="sxplr-w-100"
-    floatLabel="never">
-    <input
-      placeholder="Search for regions"
-      [value]="currentSearch"
-      #trigger="matAutocompleteTrigger"
-      type="text"
-      matInput
-      name="searchTerm"
-      [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
-      [formControl]="searchFormControl"
-      [matAutocomplete]="auto">
+<mat-form-field
+  class="sxplr-w-100"
+  floatLabel="never">
+  <input
+    placeholder="Search for regions"
+    [value]="currentSearch"
+    #trigger="matAutocompleteTrigger"
+    type="text"
+    matInput
+    name="searchTerm"
+    [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
+    [formControl]="searchFormControl"
+    [matAutocomplete]="auto">
 
-    <!-- search input suffix -->
-    <div matSuffix iav-stop="click">
-      <ng-content select="[search-input-suffix]"></ng-content>
-    </div>
+  <!-- search input suffix -->
+  <div matSuffix iav-stop="click">
+    <ng-content select="[search-input-suffix]"></ng-content>
+  </div>
 
-  </mat-form-field>
-</form>
-
+</mat-form-field>
 
 <mat-autocomplete
   panelWidth="auto"
