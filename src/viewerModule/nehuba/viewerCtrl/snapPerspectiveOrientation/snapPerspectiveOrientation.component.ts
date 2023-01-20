@@ -6,12 +6,7 @@ import { actions } from 'src/state/atlasSelection';
 import { VALUES } from "common/constants"
 import { floatEquality } from "common/util"
 import { filter, map } from 'rxjs/operators';
-
-enum EnumClassicalView {
-  CORONAL = "Coronal",
-  SAGITTAL = "Sagittal",
-  AXIAL = "Axial",
-}
+import { EnumClassicalView } from "src/atlasComponents/constants"
 
 const viewOrientations : Record<EnumClassicalView, number[][]> = {
   [EnumClassicalView.CORONAL]: [[0,-1 * VALUES.ROOT_2,VALUES.ROOT_2,0], [-1 * VALUES.ROOT_2,0,0,VALUES.ROOT_2]],

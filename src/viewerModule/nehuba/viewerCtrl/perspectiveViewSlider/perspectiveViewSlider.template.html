@@ -1,0 +1,46 @@
+<div class="range-container"
+  *ngIf="sliceviewIsNormal$ | async else resetOrientationTmpl">
+  <img *ngIf="previewImageUrl$ | async as url" [src]="url">
+
+  <div class="range-input-wrapper anchored"
+    [style]="rangeInputStyle$ | async"
+    [ngClass]="{
+      'r-270': rangeControlIsVertical$ | async
+    }">
+
+    <input type="range"
+      *ngIf="rangeControlMinMaxValue$ | async as minMaxValue"
+      iav-window-resize
+      (iav-window-resize-event)="recalcViewportSize$.next($event)"
+      [min]="minMaxValue.min"
+      [max]="minMaxValue.max"
+      [value]="minMaxValue.value"
+      [formControl]="minimapControl"
+      class="anchored perspective-slider-range-input"
+      >
+
+    <div *ngIf="scrubberPosition$ | async as transform"
+      [style.transform]="transform"
+      class="anchored scrubber">
+      <div *ngIf="scrubberHighlighter$ | async as highlighter"
+        [style.transform]="highlighter" class="scrubber-highlight">
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #resetOrientationTmpl>
+  <div class="sxplr-custom-cmp text sxplr-p-2 bg">
+    Minimap disabled until orientation is reset.
+
+    <button mat-button
+      (click)="resetSliceview()">
+      Reset Orientation
+    </button>
+  </div>
+</ng-template>
+
+<div *ngIf="textToDisplay$ | async as textToDisplay"
+  class="position-absolute range-value sxplr-custom-cmp text">
+  {{ textToDisplay }}
+</div>

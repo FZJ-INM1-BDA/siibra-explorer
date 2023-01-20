@@ -1,0 +1,12 @@
+.major-column
+{
+  flex: 0 0 100%;
+}
+.minor-column
+{
+  flex: 0 0 0%;
+}
+.picture-in-picture-margin {
+  bottom: 50px;
+  right: 50px;
+}
