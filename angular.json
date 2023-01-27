@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -29,55 +32,68 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "assets": [
-              "src/assets"
+              "src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "src/theme.scss",
               "src/overwrite.scss",
               "src/extra_styles.css"
             ],
-            "scripts": [{
-              "input": "worker/worker.js",
-              "inject": false,
-              "bundleName": "worker"
-            },{
-              "input": "worker/worker-plotly.js",
-              "inject": false,
-              "bundleName": "worker-plotly"
-            },{
-              "input": "worker/worker-nifti.js",
-              "inject": false,
-              "bundleName": "worker-nifti"
-            },{
-              "input": "worker/worker-typedarray.js",
-              "inject": false,
-              "bundleName": "worker-typedarray"
-            },{
-              "input": "third_party/catchSyntaxError.js",
-              "inject": false,
-              "bundleName": "catchSyntaxError"
-            },{
-              "input": "third_party/extra_js.js",
-              "inject": false,
-              "bundleName": "extra_js"
-            },
-            {
-              "input": "third_party/vanilla_nehuba.js",
-              "inject": false,
-              "bundleName": "vanilla_nehuba"
-            },{
-              "input": "export-nehuba/dist/min/main.bundle.js",
-              "inject": false,
-              "bundleName": "main.bundle"
-            },{
-              "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
-              "inject": false,
-              "bundleName": "chunk_worker.bundle"
-            },{
-              "inject": false,
-              "input": "third_party/leap-0.6.4.js",
-              "bundleName": "leap-0.6.4"
-            }]
+            "scripts": [
+              {
+                "input": "worker/worker.js",
+                "inject": false,
+                "bundleName": "worker"
+              },
+              {
+                "input": "worker/worker-plotly.js",
+                "inject": false,
+                "bundleName": "worker-plotly"
+              },
+              {
+                "input": "worker/worker-nifti.js",
+                "inject": false,
+                "bundleName": "worker-nifti"
+              },
+              {
+                "input": "worker/worker-typedarray.js",
+                "inject": false,
+                "bundleName": "worker-typedarray"
+              },
+              {
+                "input": "third_party/catchSyntaxError.js",
+                "inject": false,
+                "bundleName": "catchSyntaxError"
+              },
+              {
+                "input": "third_party/extra_js.js",
+                "inject": false,
+                "bundleName": "extra_js"
+              },
+              {
+                "input": "third_party/vanilla_nehuba.js",
+                "inject": false,
+                "bundleName": "vanilla_nehuba"
+              },
+              {
+                "input": "export-nehuba/dist/min/main.bundle.js",
+                "inject": false,
+                "bundleName": "main.bundle"
+              },
+              {
+                "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
+                "inject": false,
+                "bundleName": "chunk_worker.bundle"
+              },
+              {
+                "inject": false,
+                "input": "third_party/leap-0.6.4.js",
+                "bundleName": "leap-0.6.4"
+              }
+            ],
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -142,13 +158,23 @@
             "inlineStyleLanguage": "css",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "src/theme.scss",
               "src/extra_styles.css"
             ],
             "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }

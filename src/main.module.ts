@@ -49,7 +49,9 @@ import { EffectsModule } from '@ngrx/effects';
 // TODO check if there is a more logical place import put layerctrl effects ts
 import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerCtrl.effects';
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
-import { CONST } from "common/constants"
+import { CONST } from "common/constants";
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from 'src/environments/environment'
 
 @NgModule({
   imports: [
@@ -59,6 +61,12 @@ import { CONST } from "common/constants"
     ComponentsModule,
     DragDropModule,
     UIModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.PRODUCTION,
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
 
     AngularMaterialModule,
     UtilModule,
