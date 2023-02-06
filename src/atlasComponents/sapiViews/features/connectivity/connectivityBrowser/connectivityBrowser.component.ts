@@ -18,6 +18,7 @@ import { HttpClient } from "@angular/common/http";
 @Component({
   selector: 'sxplr-sapiviews-features-connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
+  styleUrls: ['./connectivityBrowser.style.scss']
 })
 export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
@@ -56,8 +57,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       }
 
     }
-
-    @Input() types: SapiModalityModel[] = []
 
     public selectedType: string
     public selectedTypeId: string
@@ -104,6 +103,16 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     public logDisabled: boolean = true
     public logChecked: boolean = true
+
+    private _types: SapiModalityModel[] = []
+    @Input()
+    set types(val) {
+      this._types = val
+      if (val && val.length) this.selectType(val[0].name)
+    }
+    get types() {
+      return this._types
+    }
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
@@ -214,6 +223,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
           this.fetching = false
           this.changeDetectionRef.detectChanges()
+          this.selectCohort(this.cohorts[0])
         }
       })
     }
@@ -265,20 +275,23 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }) : ds
 
     fetchConnectivity(datasetId=null) {
-      this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"]).getFeatureInstance(datasetId || this.selectedDataset['@id'])
-        .pipe(catchError(() => {
-          this.fetching = false
-          return of(null)
-        }))
-        .subscribe(ds=> {
-          this.selectedDataset = this.fixDatasetFormat(ds)
-          this.setMatrixData(ds)
-          this.fetching = false
-        })
+      const parcellation = this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
+      if (parcellation) {
+        parcellation.getFeatureInstance(datasetId || this.selectedDataset['@id'])
+          .pipe(catchError(() => {
+            this.fetching = false
+            return of(null)
+          }))
+          .subscribe(ds => {
+            this.selectedDataset = this.fixDatasetFormat(ds)
+            this.setMatrixData(ds)
+            this.fetching = false
+          })
+      }
     }
 
     // ToDo need to be fixed on configuration side
-    fixHemisphereNaming(area) {
+    fixHemisphereNaming(area: string) {
       if (area.includes(' - left hemisphere')) {
         return area.replace('- left hemisphere', 'left')
       } else if (area.includes(' - right hemisphere')) {

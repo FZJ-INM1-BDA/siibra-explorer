@@ -60,6 +60,13 @@ mapModeIdxClass.set("SINGLE_PANEL", new Map([
   [3, {}],
 ]))
 
+mapModeIdxClass.set("PIP_PANEL", new Map([
+  [0, { top, left, right, bottom }],
+  [1, {}],
+  [2, {}],
+  [3, {}],
+]))
+
 mapModeIdxClass.set("H_ONE_THREE", new Map([
   [0, { top, left, bottom }],
   [1, { top, right }],
@@ -144,16 +151,26 @@ export const getFourPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTM
 export const getSinglePanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
   washPanels(panels)
 
+  return getFullViewPanel(panels)
+}
+
+export const getPipPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
+  
+  return getFullViewPanel(panels)
+}
+
+const getFullViewPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "SINGLE_PANEL"))
 
   const majorContainer = makeRow(panels[0])
-  const minorContainer = makeRow(panels[1], panels[2], panels[3])
-
   majorContainer.style.flexBasis = '100%'
-  minorContainer.style.flexBasis = '0%'
 
+  const minorContainer = makeRow(panels[1], panels[2], panels[3])
+  minorContainer.style.flexBasis = '0%'
   minorContainer.className = ''
-  minorContainer.style.height = '0px'
+
   return makeRow(majorContainer, minorContainer)
 }
 

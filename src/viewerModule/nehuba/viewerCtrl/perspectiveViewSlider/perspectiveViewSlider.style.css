@@ -1,0 +1,100 @@
+:host
+{
+    display: inline-block;
+    background-size: cover;
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid rgba(200, 200, 200, 0.5);
+    border-radius: 0.25rem;
+
+    opacity: 0.7;
+    transition: all 160ms ease-in-out;
+}
+
+:host:hover
+{
+    opacity: 1.0;
+}
+
+img
+{
+    max-width: 200px;
+    max-height: 200px;
+    aspect-ratio: auto;
+}
+
+.range-container,
+.range-input-wrapper
+{
+    width: 100%;
+    height: 100%;
+}
+
+
+.anchored
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.perspective-slider-range-input
+{
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    
+    background: transparent;
+}
+
+.scrubber
+{
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+
+    border-style: solid;
+    border-width: 0 0 0 0.5rem;
+    margin-left: -0.25rem;
+
+    border-color: rgba(10, 10, 10, 0.5);
+}
+
+:host-context([darktheme="true"]) .scrubber
+{
+    border-color: rgba(200, 200, 200, 0.5);
+}
+
+.scrubber > .scrubber-highlight
+{
+    background-color: red;
+    display: inline-block;
+    height: 100%;
+    width: 0.5rem;
+    margin-left: -0.5rem;
+}
+
+
+.perspective-slider-range-input::-webkit-slider-thumb {
+    appearance: none;
+    height: 100%;
+    width: 1px;
+}
+
+.perspective-slider-range-input::-moz-range-thumb {
+    appearance: none;
+    height: 100%;
+    width: 1px;
+}
+.perspective-slider-range-input:focus {
+    outline: none; 
+}
+
+
+.range-value {
+    right: 10px;
+    bottom: 5px;
+}
+

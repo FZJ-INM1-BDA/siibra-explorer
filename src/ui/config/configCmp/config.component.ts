@@ -34,6 +34,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     FOUR_PANEL: "FOUR_PANEL",
     H_ONE_THREE: "H_ONE_THREE",
     SINGLE_PANEL: "SINGLE_PANEL",
+    PIP_PANEL: "PIP_PANEL",
     V_ONE_THREE: "V_ONE_THREE",
   }
 

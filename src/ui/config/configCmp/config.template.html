@@ -222,6 +222,23 @@
           previewTmpl: singlePanelTmpl
         }">
       </ng-template>
+
+      <!-- picture-in-picture -->
+      <ng-template #pipPanelTmpl>
+        <picture-in-picture-panel class="d-block w-10em h-7em">
+          <div class="border chunky" cell-i></div>
+          <div class="border chunky" cell-ii></div>
+          <div class="border chunky" cell-iii></div>
+          <div class="border chunky" cell-iv></div>
+        </picture-in-picture-panel>
+      </ng-template>
+      <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
+        [ngTemplateOutletContext]="{
+          panelMode: panelModes.PIP_PANEL,
+          previewTmpl: pipPanelTmpl
+        }">
+      </ng-template>
+      
     </div>
   </mat-tab>
 </mat-tab-group>

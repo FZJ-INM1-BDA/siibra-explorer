@@ -7,11 +7,12 @@ import { INehubaFeature } from "./type";
  * TODO port from global store to feature store
  */
 
-enum EnumPanelMode {
+export enum EnumPanelMode {
   FOUR_PANEL = 'FOUR_PANEL',
   V_ONE_THREE = 'V_ONE_THREE',
   H_ONE_THREE = 'H_ONE_THREE',
   SINGLE_PANEL = 'SINGLE_PANEL',
+  PIP_PANEL = 'PIP_PANEL',
 }
 
 const defaultState: INehubaFeature = {
