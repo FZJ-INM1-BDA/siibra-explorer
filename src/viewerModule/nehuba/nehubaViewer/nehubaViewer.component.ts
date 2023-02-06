@@ -64,8 +64,8 @@ export class NehubaViewerUnit implements OnDestroy {
   public ngIdSegmentsMap: Record<string, number[]> = {}
 
   public viewerPosInVoxel$ = new BehaviorSubject(null)
-  public viewerPosInReal$ = new BehaviorSubject(null)
-  public mousePosInVoxel$ = new BehaviorSubject(null)
+  public viewerPosInReal$ = new BehaviorSubject<[number, number, number]>(null)
+  public mousePosInVoxel$ = new BehaviorSubject<[number, number, number]>(null)
   public mousePosInReal$ = new BehaviorSubject(null)
 
   private exportNehuba: any
@@ -76,7 +76,7 @@ export class NehubaViewerUnit implements OnDestroy {
   @Output() public nehubaReady: EventEmitter<null> = new EventEmitter()
   @Output() public layersChanged: EventEmitter<null> = new EventEmitter()
   private layersChangedHandler: any
-  @Output() public viewerPositionChange: EventEmitter<any> = new EventEmitter()
+  @Output() public viewerPositionChange: EventEmitter<{ orientation: number[], perspectiveOrientation: number[], perspectiveZoom: number, zoom: number, position: number[], positionReal?: boolean }> = new EventEmitter()
   @Output() public mouseoverSegmentEmitter:
     EventEmitter<{
       segmentId: number | null
@@ -814,7 +814,7 @@ export class NehubaViewerUnit implements OnDestroy {
       .filter(v => typeof v !== 'undefined' && v !== null)
       .subscribe(v => {
         this.navPosReal = Array.from(v) as [number, number, number]
-        this.viewerPosInReal$.next(Array.from(v))
+        this.viewerPosInReal$.next(Array.from(v) as [number, number, number])
       })
     this._s5$ = this.nehubaViewer.navigationState.position.inVoxels
       .filter(v => typeof v !== 'undefined' && v !== null)
@@ -832,7 +832,7 @@ export class NehubaViewerUnit implements OnDestroy {
       .filter(v => typeof v !== 'undefined' && v !== null)
       .subscribe(v => {
         this.mousePosVoxel = Array.from(v) as [number, number, number]
-        this.mousePosInVoxel$.next(Array.from(v))
+        this.mousePosInVoxel$.next(Array.from(v) as [number, number, number] )
       })
   }
 

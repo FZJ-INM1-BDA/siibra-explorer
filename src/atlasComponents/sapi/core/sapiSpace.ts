@@ -1,4 +1,4 @@
-import { Observable } from "rxjs"
+import { Observable, throwError } from "rxjs"
 import { SAPI } from '../sapi.service'
 import { camelToSnake } from 'common/util'
 import {SapiQueryPriorityArg, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel} from "../type"
@@ -82,6 +82,25 @@ export class SAPISpace{
       switchMap(prefix => this.sapi.httpGet<SapiVolumeModel[]>(
         `${prefix}/volumes`,
       ))
+    )
+  }
+
+  getTemplateSize() {
+    return this.getVolumes().pipe(
+      switchMap(volumes => {
+        const ngVolumes = volumes.filter(vol => vol["@type"] === "spy/volume/neuroglancer/precomputed")
+        if (ngVolumes.length === 0) return throwError(`template ${this.id} has no ng volume.`)
+        return this.sapi.httpGet<any>(`${ngVolumes[0].data.url}/info`).pipe(
+          map(infoJson => {
+            const { resolution, size } = infoJson.scales[0]
+            return {
+              voxel: size as [number, number, number],
+              real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
+              transform: ngVolumes[0].data?.detail?.['neuroglancer/precomputed']?.['transform'] as number[][]
+            }
+          })
+        )
+      })
     )
   }
 }

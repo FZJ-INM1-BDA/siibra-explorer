@@ -9,7 +9,6 @@ import { UtilModule } from "src/util";
 import { WindowResizeModule } from "src/util/windowResize";
 import { LayoutModule } from "src/layouts/layout.module";
 import { MatButtonModule } from "@angular/material/button";
-import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   imports: [
@@ -22,7 +21,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     UtilModule,
     WindowResizeModule,
     MatButtonModule,
-    MatTooltipModule,
+    MatMenuModule
   ],
   declarations: [
     NehubaLayoutOverlay,

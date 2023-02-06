@@ -5,16 +5,20 @@ import {ConnectivityBrowserComponent} from "src/atlasComponents/sapiViews/featur
 import {HasConnectivity} from "src/atlasComponents/sapiViews/features/connectivity/hasConnectivity.directive";
 import {AngularMaterialModule} from "src/sharedModules";
 import {FormsModule} from "@angular/forms";
+import { DialogModule } from "src/ui/dialogInfo";
+import { ConnectivityDoiPipe } from "./connectivityDoi.pipe";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    DialogModule
   ],
   declarations: [
     ConnectivityBrowserComponent,
-    HasConnectivity
+    HasConnectivity,
+    ConnectivityDoiPipe
   ],
   exports: [
     ConnectivityBrowserComponent,
