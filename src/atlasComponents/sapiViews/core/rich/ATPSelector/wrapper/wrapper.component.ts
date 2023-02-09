@@ -17,6 +17,11 @@ function isATPGuard(obj: any): obj is ATP {
   return obj.atlas || obj.template || obj.parcellation
 }
 
+const banListParcName = new Set([
+  "VEP Atlas",
+  "Desikan-Killiany 2006"
+])
+
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
   templateUrl: './wrapper.template.html',
@@ -55,6 +60,7 @@ export class WrapperATPSelector implements OnDestroy{
   )
   parcs$ = this.store$.pipe(
     fromRootStore.allAvailParcs(this.sapi),
+    map(parcs => parcs.filter(p => !banListParcName.has(p.name)))
   )
   isBusy$ = new Subject<boolean>()
   

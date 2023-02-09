@@ -47,6 +47,8 @@ const connectSrc = [
   'siibra-api-latest.apps-dev.hbp.eu',
   'siibra-api-rc.apps.hbp.eu',
   'siibra-api-stable.apps.hbp.eu',
+  'siibra-api-ns.apps.hbp.eu',
+  'siibra-api-stable.apps.jsc.hbp.eu',
   
   // chunk servers
   'neuroglancer.humanbrainproject.org',
