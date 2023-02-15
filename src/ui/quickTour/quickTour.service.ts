@@ -4,10 +4,17 @@ import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
-import { EnumQuickTourSeverity, PERMISSION_DIALOG_ACTIONS, QUICK_TOUR_CMP_INJTKN } from "./constrants";
+import { EnumQuickTourSeverity, PERMISSION_DIALOG_ACTIONS, QuickTourSeverity, QUICK_TOUR_CMP_INJTKN } from "./constrants";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { StartTourDialogDialog } from "src/ui/quickTour/startTourDialog/startTourDialog.component";
+
+const autoPlayPriority: Set<EnumQuickTourSeverity | keyof typeof QuickTourSeverity> = new Set([
+  EnumQuickTourSeverity.HIGH,
+  EnumQuickTourSeverity.MEDIUM,
+  "medium",
+  "high"
+])
 
 @Injectable()
 export class QuickTourService {
@@ -51,7 +58,7 @@ export class QuickTourService {
     )
 
     
-    if (dir.quickTourSeverity === EnumQuickTourSeverity.MEDIUM || dir.quickTourSeverity === EnumQuickTourSeverity.HIGH) {
+    if (autoPlayPriority.has(dir.quickTourSeverity)) {
       this.autoStart()
     }
   }

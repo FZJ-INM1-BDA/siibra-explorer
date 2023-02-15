@@ -1,13 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
 import * as actions from "./actions"
 import { AtlasSelectionState } from "./const"
-
-function getRegionLabelIndex(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel) {
-  const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
-  if (isNaN(lblIdx)) return null
-  return lblIdx
-}
 
 export const defaultState: AtlasSelectionState = {
   selectedAtlas: null,
@@ -50,13 +43,6 @@ const reducer = createReducer(
        * 
        * ignore
        */
-      const { selectedAtlas, selectedParcellation, selectedTemplate } = state
-      if (
-        !region.hasAnnotation?.visualizedIn
-        && !getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
-      ) {
-        return { ...state }
-      }
       const selected = state.selectedRegions.includes(region)
       return {
         ...state,
@@ -117,14 +103,12 @@ const reducer = createReducer(
   on(
     actions.selectAtlas,
     (state, { atlas }) => {
-      if (atlas?.["@id"] === state?.selectedAtlas?.["@id"]) {
-        return state
+      if (atlas?.id === state?.selectedAtlas?.id) {
+        return { ...state }
       }
       return {
         ...state,
         selectedAtlas: atlas,
-        selectedTemplate: null,
-        selectedParcellation: null,
       }
     }
   ),

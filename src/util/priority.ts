@@ -31,7 +31,7 @@ export const DISABLE_PRIORITY_HEADER = 'x-sxplr-disable-priority'
 })
 export class PriorityHttpInterceptor implements HttpInterceptor{
 
-  private retry = 5
+  private retry = 0
   private disablePriority = false
 
   private priorityQueue: Queue[] = []
@@ -73,8 +73,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           this.counter --
         }),
         catchError((err, obs) => {
-          if (retry >= 0) {
-            retry --
+          if (--retry >= 0) {
             return obs
           }
           return of(new Error(err))

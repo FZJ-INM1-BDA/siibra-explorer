@@ -166,6 +166,7 @@ export class Polygon extends IAnnotationGeometry{
       coordinateSpace,
       coordinates
     } = sands
+    const { ["@id"]: spaceId } = coordinateSpace
     if (type === 'tmp/poly') {
       const points: Point[] = []
       const edges: [number, number][] = []
@@ -175,7 +176,9 @@ export class Polygon extends IAnnotationGeometry{
           return c.value * 1e6
         })
         const p = new Point({
-          space: coordinateSpace,
+          space: {
+            id: spaceId
+          },
           x: parsedValue[0],
           y: parsedValue[1],
           z:  parsedValue[2],
@@ -190,7 +193,7 @@ export class Polygon extends IAnnotationGeometry{
       const poly = new Polygon({
         id,
         "@type": 'siibra-ex/annotation/polyline',
-        space: coordinateSpace,
+        space: { id: spaceId },
         points,
         edges
       })

@@ -18,13 +18,7 @@ export class AnnotationMode implements OnDestroy{
 
   public ARIA_LABELS = ARIA_LABELS
 
-  public moduleAnnotationTypes: {
-    instance: {
-      name: string
-      iconClass: string
-    }
-    onClick: () => void
-  }[] = []
+  public moduleAnnotationTypes = this.modularToolSvc.moduleAnnotationTypes
 
   private onDestroyCb: (() => void)[] = []
 
@@ -34,7 +28,6 @@ export class AnnotationMode implements OnDestroy{
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(CONTEXT_MENU_ITEM_INJECTOR) ctxMenuInterceptor: TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
   ) {
-    this.moduleAnnotationTypes = this.modularToolSvc.moduleAnnotationTypes
     const stopClickProp = () => false
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor

@@ -29,16 +29,16 @@
   </div>
   <mat-divider></mat-divider>
 
-  <button *ngFor="let surfaceLayer of threeSurferSurfaceLayers$ | async"
+  <button *ngFor="let surfaceLayer of (threeSurferSurfaceVariants$ | async)"
     mat-menu-item
     (click)="switchSurfaceLayer(surfaceLayer)"
     color="primary">
     <mat-icon
       fontSet="fas"
-      [fontIcon]="surfaceLayer['@id'] === (selectedSurfaceLayerId$ | async) ? 'fa-circle' : 'fa-none'">
+      [fontIcon]="surfaceLayer === (selectedSurfaceLayerId$ | async) ? 'fa-circle' : 'fa-none'">
     </mat-icon>
     <span>
-      {{ surfaceLayer.metadata.shortName }}
+      {{ surfaceLayer }}
     </span>
   </button>
 </mat-menu>

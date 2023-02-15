@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { SxplrParcellation } from "src/atlasComponents/sapi/type_sxplr";
+import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
 
 @Pipe({
   name: 'parcellationDoiPipe',
@@ -7,7 +8,8 @@ import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
 })
 
 export class ParcellationDoiPipe implements PipeTransform {
-  public transform(parc: SapiParcellationModel): string[] {
+  public transform(_parc: SxplrParcellation): string[] {
+    const parc = translateV3Entities.retrieveParcellation(_parc)
     const urls = (parc?.brainAtlasVersions || []).filter(
       v => v.digitalIdentifier && v.digitalIdentifier['@type'] === 'https://openminds.ebrains.eu/core/DOI'
     ).map(

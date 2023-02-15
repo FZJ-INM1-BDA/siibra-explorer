@@ -1,13 +1,12 @@
 import { AfterViewInit, Component, EventEmitter, OnDestroy, Output, ViewChild } from "@angular/core";
-import { concat, Observable, of, Subscription } from "rxjs";
-import { map, withLatestFrom } from "rxjs/operators";
-import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { concat, of, Subscription } from "rxjs";
+import { withLatestFrom } from "rxjs/operators";
 import { EnumViewerEvt, TViewerEvent } from "../../viewer.interface";
 import { NehubaLayerControlService } from "../layerCtrl.service";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directive";
-import { getParcNgId, getRegionLabelIndex } from "../config.service";
 import { Store } from "@ngrx/store";
 import { atlasSelection } from "src/state";
+import { SAPI } from "src/atlasComponents/sapi";
 
 @Component({
   selector: `sxplr-nehuba-viewer-container`,
@@ -47,26 +46,29 @@ export class NehubaViewerContainer implements AfterViewInit, OnDestroy {
       }),
 
       concat(
-        of(null),
+        of('start' as const),
         mouseOverSegments
       ).pipe(
         withLatestFrom(
-          this.multiNgIdsRegionsLabelMap$
+          this.layerCtrlService.completeNgIdLabelRegionMap$
         )
       ).subscribe(([seg, multiNgIdsRegionsLabelIndexMap]) => {
+        const isStart = seg === "start"
         this.viewerEvent.emit({
           type: EnumViewerEvt.VIEWER_CTX,
           data: {
             viewerType: 'nehuba',
             payload: {
-              nehuba: seg && seg.map(v => {
+              nehuba: isStart
+              ? []
+              : seg.map(v => {
                 return {
                   layerName: v.layer.name,
                   labelIndices: [ Number(v.segmentId) ],
                   regions: (() => {
-                    const map = multiNgIdsRegionsLabelIndexMap.get(v.layer.name)
-                    if (!map) return []
-                    return [map.get(Number(v.segmentId))]
+                    const record = multiNgIdsRegionsLabelIndexMap[v.layer.name] || {}
+                    if (!record) return []
+                    return [record[Number(v.segmentId)]]
                   })()
                 }
               })
@@ -117,23 +119,6 @@ export class NehubaViewerContainer implements AfterViewInit, OnDestroy {
   @ViewChild(NehubaViewerContainerDirective, { static: true })
   private nehubaContainerDirective: NehubaViewerContainerDirective
 
-  private multiNgIdsRegionsLabelMap$: Observable<Map<string, Map<number, SapiRegionModel>>> = this.layerCtrlService.selectedATPR$.pipe(
-    map(( { atlas, parcellation, template, regions } ) => {
-      
-      const retMap = new Map<string, Map<number, SapiRegionModel>>()
-      for (const r of regions) {
-        const ngId = getParcNgId(atlas, template, parcellation, r)
-        if (!ngId) continue
-        if (!retMap.has(ngId)) {
-          retMap.set(ngId, new Map())
-        }
-        const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
-        if (!labelIndex) continue
-        retMap.get(ngId).set(labelIndex, r)
-      }
-      return retMap
-    })
-  )
 
   private subscriptions: Subscription[] = []
 }

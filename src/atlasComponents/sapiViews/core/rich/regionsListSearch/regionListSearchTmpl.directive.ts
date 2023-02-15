@@ -1,10 +1,10 @@
 import { Directive, TemplateRef } from "@angular/core";
-import { SapiRegionModel } from "src/atlasComponents/sapi/type";
+import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
 
 @Directive({
   selector: 'ng-template[region-template],ng-template[regionTemplate]'
 })
 
 export class SapiViewsCoreRichRegionListTemplateDirective{
-  constructor(public tmplRef: TemplateRef<SapiRegionModel>){}
+  constructor(public tmplRef: TemplateRef<SxplrRegion>){}
 }

@@ -21,7 +21,7 @@ import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 import { getNehubaConfig } from "../config.service";
 
 @Component({
@@ -45,7 +45,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public arialabel = ARIA_LABELS.STATUS_PANEL
   public showFull = false
 
-  private selectedTemplate: SapiSpaceModel
+  private selectedTemplate: SxplrTemplate
   private currentNavigation: any
   private subscriptions: Subscription[] = []
 

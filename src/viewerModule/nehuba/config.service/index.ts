@@ -7,10 +7,7 @@ export {
   NgSegLayerSpec,
 } from "./type"
 export {
-  getParcNgLayers,
-  getTmplAuxNgLayer,
-  getTmplNgLayer,
-  getNgLayersFromVolumesATP,
+  
   getParcNgId,
   getRegionLabelIndex,
   getNehubaConfig,

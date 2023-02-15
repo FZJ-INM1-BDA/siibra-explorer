@@ -26,6 +26,7 @@ import { environment } from 'src/environments/environment'
 import { DOCUMENT } from "@angular/common";
 import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
+import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
 
 /**
  * TODO
@@ -207,7 +208,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
 If you have any comments or need further support, please contact us at [${this.supportEmailAddress}](mailto:${this.supportEmailAddress})`,
     description: `That's it! We hope you enjoy your stay. If you have any comments or need further support, please contact us at ${this.supportEmailAddress}`,
-    position: 'center'
+    position: 'center' as const,
+    priority: EnumQuickTourSeverity.LOW
   }
 
   @HostBinding('attr.version')

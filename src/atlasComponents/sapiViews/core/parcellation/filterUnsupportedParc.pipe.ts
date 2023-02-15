@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { SxplrParcellation } from "src/atlasComponents/sapi/type_sxplr";
 import { GroupedParcellation } from "./groupedParcellation";
+import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
 
-type Filterables = SapiParcellationModel | GroupedParcellation
+type Filterables = SxplrParcellation | GroupedParcellation
 
 const unsupportedIds = [
   "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152",
@@ -23,11 +24,12 @@ export class FilterUnsupportedParcPipe implements PipeTransform{
       if (p instanceof GroupedParcellation) {
         return hideGroup.indexOf(p.name) < 0
       }
-      if (unsupportedIds.includes(p["@id"])) {
+      if (unsupportedIds.includes(p.id)) {
         return false
       }
-      if (p.version) {
-        return !p.version.deprecated
+      const apiP = translateV3Entities.retrieveParcellation(p)
+      if (apiP.version) {
+        return !apiP.version.deprecated
       }
       return true
     })

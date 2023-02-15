@@ -2,14 +2,14 @@ import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmit
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, asyncScheduler, combineLatest } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMap, take } from "rxjs/operators";
+import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMap, take, tap } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj, NehubaNavigationService } from "../navigation.service";
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
-import { SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
@@ -175,7 +175,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       this.store$.pipe(
         atlasSelection.fromRootStore.distinctATP(),
         debounceTime(16),
-        switchMap((ATP: { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }) => this.store$.pipe(
+        switchMap((ATP: { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }) => this.store$.pipe(
           select(atlasAppearance.selectors.customLayers),
           debounceTime(16),
           map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),

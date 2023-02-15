@@ -147,7 +147,6 @@ export class NehubaViewerUnit implements OnDestroy {
     if (this.nehubaViewer$) {
       this.nehubaViewer$.next(this)
     }
-
     getImportNehubaPr()
       .then(() => {
         this.nehubaLoaded = true

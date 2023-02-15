@@ -1,18 +1,13 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay, switchMap, take } from "rxjs/operators";
+import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
 import { SAPIAtlas, SAPISpace } from './core'
 import {
-  SapiAtlasModel,
-  SapiModalityModel,
-  SapiParcellationModel,
   SapiQueryPriorityArg,
-  SapiRegionalFeatureModel,
-  SapiRegionModel,
-  SapiSpaceModel,
-  SpyNpArrayDataModel,
-  SxplrCleanedFeatureModel
-} from "./type";
+} from "./type_v3";
+import {
+  translateV3Entities
+} from "./translate_v3"
 import { getExportNehuba } from "src/util/fn";
 import { SAPIParcellation } from "./core/sapiParcellation";
 import { SAPIRegion } from "./core/sapiRegion"
@@ -20,21 +15,34 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { PRIORITY_HEADER } from "src/util/priority";
-import { NEVER, Observable } from "rxjs";
+import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
+import { PathReturn, RouteParam, SapiRoute } from "./type_v3";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./type_sxplr";
+
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const SIIBRA_API_VERSION = '0.2.3'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.0'
 
 type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
+type PaginatedResponse<T> = {
+  items: T[]
+  total: number
+  page: number
+  size: number
+  pages?: number
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class SAPI{
+
+  static API_VERSION = null
 
   /**
    * Used to clear BsEndPoint, so the next static get BsEndpoints$ will
@@ -44,10 +52,43 @@ export class SAPI{
     BS_ENDPOINT_CACHED_VALUE = null
   }
 
+  iteratePages<T>(resp: PaginatedResponse<T>, cb: (page: number) => Observable<PaginatedResponse<T>>) {
+    /**
+     * technically, it's easier to use a concat + merge + reduce map rather than forkJoin + flatmap
+     * but merge does not guarantee same order, forkjoin does
+     * I don't know if page order matters, but it's good to be safe
+     */
+    const pages = Math.ceil(resp.total / resp.size)
+    return forkJoin([
+      of(resp.items),
+      
+      /**
+       * similar to python's range function, this function generates a uniformly increasing array, to pages
+       * discarding first, since we already got it
+       */
+      ...Array(pages).fill(null).map((_, idx) => idx + 1).slice(1)
+        .map(page => 
+          cb(page).pipe(
+            map(v => v.items)
+          )
+        )
+    ]).pipe(
+      map(arrOfArr => arrOfArr.flatMap(v => v))
+    )
+  }
+
   static async VerifyEndpoint(url: string): Promise<string> {
     const resp = await fetch(`${url}/atlases`)
-    const atlases = await resp.json()
-    if (atlases.length > 0) return url
+    await resp.json()
+    if (resp.status >= 400) {
+      return Promise.reject(resp.statusText)
+    }
+    
+    if (!SAPI.API_VERSION) {
+      SAPI.API_VERSION = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
+      console.log(`siibra-api::version::${SAPI.API_VERSION}, expecting::${EXPECTED_SIIBRA_API_VERSION}`)
+    }
+    return url
   }
 
   /**
@@ -123,11 +164,6 @@ export class SAPI{
       this._map[id] = { func, args }
     }
   }
-
-  getAtlas(atlasId: string): SAPIAtlas {
-    return new SAPIAtlas(this, atlasId)
-  }
-
   getSpace(atlasId: string, spaceId: string): SAPISpace {
     return new SAPISpace(this, atlasId, spaceId)
   }
@@ -140,35 +176,116 @@ export class SAPI{
     return new SAPIRegion(this, atlasId, parcId, regionId)
   }
 
-  getSpaceDetail(atlasId: string, spaceId: string, param?: SapiQueryPriorityArg): Observable<SapiSpaceModel> {
-    return this.getSpace(atlasId, spaceId).getDetail(param)
+  getSpaceDetail(_atlasId: string, spaceId: string, param?: SapiQueryPriorityArg): Observable<SxplrTemplate> {
+    return this.v3Get("/spaces/{space_id}", {
+      path: {
+        space_id: spaceId
+      },
+      priority: param?.priority
+    }).pipe(
+      switchMap(v => translateV3Entities.translateTemplate(v))
+    )
   }
 
-  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryPriorityArg): Observable<SapiParcellationModel> {
-    return this.getParcellation(atlasId, parcId).getDetail(param)
+  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryPriorityArg): Observable<SxplrParcellation> {
+    return this.v3Get("/parcellations/{parcellation_id}", {
+      path: {
+        parcellation_id: parcId
+      },
+      priority: param?.priority
+    }).pipe(
+      switchMap(v => translateV3Entities.translateParcellation(v))
+    )
   }
 
-  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryPriorityArg): Observable<SapiRegionModel[]> {
-    const parc = this.getParcellation(atlasId, parcId)
-    return parc.getRegions(spaceId, queryParam)
+  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryPriorityArg) {
+    const param = {
+      query: {
+        parcellation_id: parcId,
+      },
+      priority: queryParam?.priority
+    }
+    return this.v3Get("/regions", param).pipe(
+      switchMap(resp =>
+        this.iteratePages(
+          resp,
+          (page) => this.v3Get("/regions", {
+            ...param,
+            query: {
+              ...param.query,
+              page
+            },
+          })
+        ).pipe(
+          switchMap(regions => forkJoin(regions.map(r => translateV3Entities.translateRegion(r)))),
+        )
+      ),
+    )
+  }
+
+  getMap(parcId: string, spaceId: string, mapType: "LABELLED" | "STATISTICAL",  queryParam?: SapiQueryPriorityArg) {
+    return this.v3Get("/map", {
+      query: {
+        map_type: mapType,
+        parcellation_id: parcId,
+        space_id: spaceId
+      }
+    })
   }
 
   getFeature(featureId: string, opts: Record<string, string> = {}) {
     return new SAPIFeature(this, featureId, opts)
   }
 
-  getRegionFeatures(atlasId: string, parcId: string, spaceId: string, regionId: string, priority = 0): Observable<(SapiRegionalFeatureModel | SxplrCleanedFeatureModel)[]>{
-
-    const reg = this.getRegion(atlasId, parcId, regionId)
-    return reg.getFeatures(spaceId)
-  }
-
-  getModalities(): Observable<SapiModalityModel[]> {
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.http.get<SapiModalityModel[]>(`${endpt}/modalities`))
+  getModalities() {
+    return this.v3Get("/feature/_types", { query: {} }).pipe(
+      map(v => v.items)
     )
   }
 
+  v3GetRoute<T extends SapiRoute>(route: T, sapiParam: RouteParam<T>) {
+    const params: Record<string, string|number> = "query" in sapiParam ? sapiParam["query"] : {}
+    const _path: Record<string, string|number> = "path" in sapiParam ? sapiParam["path"] : {}
+    let path: string = route
+    for (const key in _path) {
+      path = path.replace(`{${key}}`, _path[key].toString())
+    }
+    return { path, params }
+  }
+
+  /**
+   * Should be privated. All components use this method forms a tight coupling to API
+   * Use this method sparingly!
+   * @param route 
+   * @param sapiParam 
+   * @returns 
+   */
+  v3Get<T extends SapiRoute>(route: T, sapiParam: RouteParam<T> & Partial<{ priority: number }>){
+    return SAPI.BsEndpoint$.pipe(
+      switchMap(endpoint => {
+        const headers: Record<string, string> = {}
+        if (sapiParam?.priority) {
+          headers[PRIORITY_HEADER] = sapiParam.priority.toString()
+        }
+        const { path, params } = this.v3GetRoute(route, sapiParam)
+        return this.http.get<PathReturn<T>>(
+          `${endpoint}${path}`,
+          {
+            headers,
+            params
+          }
+        )
+      })
+    )
+  }
+
+  /**
+   * @deprecated
+   * @param url 
+   * @param params 
+   * @param sapiParam 
+   * @returns 
+   */
   httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){
     const headers: Record<string, string> = {}
     if (sapiParam?.priority) {
@@ -183,25 +300,183 @@ export class SAPI{
     )
   }
 
-  public atlases$ = SAPI.BsEndpoint$.pipe(
-    switchMap(endpt => this.http.get<SapiAtlasModel[]>(
-      `${endpt}/atlases`,
-      {
-        observe: "response"
-      }
+  public atlases$ = this.v3Get("/atlases", {
+    query: {}
+  }).pipe(
+    switchMap(atlases => forkJoin(
+      atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
     )),
-    map(resp => {
-      const respVersion = resp.headers.get(SIIBRA_API_VERSION_HEADER_KEY)
-      if (respVersion !== SIIBRA_API_VERSION) {
-        this.snackbar.open(`Expecting ${SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
+    tap(() => {
+      const respVersion = SAPI.API_VERSION
+      if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {
+        this.snackbar.open(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
           duration: 5000
         })
       }
-      console.log(`siibra-api::version::${respVersion}, expecting::${SIIBRA_API_VERSION}`)
-      return resp.body
     }),
-    shareReplay(1)
+    shareReplay(1),
   )
+    
+
+  public getAllSpaces(atlas: SxplrAtlas): Observable<SxplrTemplate[]> {
+    return forkJoin(
+      translateV3Entities.retrieveAtlas(atlas).spaces.map(
+        spc => this.v3Get("/spaces/{space_id}", { path: { space_id: spc["@id"] } }).pipe(
+          switchMap(v => translateV3Entities.translateTemplate(v))
+        )
+      )
+    )
+  }
+
+  public getAllParcellations(atlas: SxplrAtlas): Observable<SxplrParcellation[]> {
+    return forkJoin(
+      translateV3Entities.retrieveAtlas(atlas).parcellations.map(
+        parc => this.v3Get("/parcellations/{parcellation_id}", { path: { parcellation_id: parc["@id"] } }).pipe(
+          switchMap(v => translateV3Entities.translateParcellation(v))
+        )
+      )
+    )
+  }
+
+  #tmplToParcMap = new Map<string, SxplrParcellation[]>()
+  public getSupportedParcellations(atlas: SxplrAtlas, template: SxplrTemplate): Observable<any|SxplrParcellation[]> {
+    if (!template) {
+      return throwError(`template cannot be empty!`)
+    }
+    if (this.#tmplToParcMap.has(template.id)) {
+      return of(this.#tmplToParcMap.get(template.id))
+    }
+    return this.getAllParcellations(atlas).pipe(
+      switchMap(parcs => forkJoin(
+        parcs.map(
+          parc => this.getMap(
+            parc.id,
+            template.id,
+            "LABELLED"
+          ).pipe(
+            catchError((err, obs) => of(null as SxplrParcellation)),
+            map(_map => _map && parc)
+          )
+        )
+      ).pipe(
+        map(arr => {
+          const val = arr.filter(v => !!v)
+          this.#tmplToParcMap.set(template.id, val)
+          return val
+        })
+      ))
+    )
+  }
+
+  #parcIdToTmplMap = new Map<string, SxplrTemplate[]>()
+  public getSupportedTemplates(atlas: SxplrAtlas, parc: SxplrParcellation): Observable<SxplrTemplate[]> {
+    if (!parc) {
+      return throwError(`parc cannot be empty!`)
+    }
+    if (this.#parcIdToTmplMap.has(parc.id)) {
+      return of(this.#parcIdToTmplMap.get(parc.id))
+    }
+    return this.getAllSpaces(atlas).pipe(
+      switchMap(spaces => forkJoin(
+        spaces.map(
+          space => this.getMap(
+            parc.id,
+            space.id,
+            "LABELLED"
+          ).pipe(
+            catchError((err, obs) => of(null)),
+            map(_map => _map && space)
+          )
+        )
+      ).pipe(
+        map(arr => {
+          const val = arr.filter(v => !!v)
+          this.#parcIdToTmplMap.set(parc.id, val)
+          return val
+        })
+      ))
+    )
+  }
+
+  public getVoiFeatures(bbox: BoundingBox): Observable<VoiFeature[]> {
+    /**
+     * FIXME iterate over all pages
+     */
+    return this.v3Get("/feature/VolumeOfInterest", {
+      query: {
+        space_id: bbox.space.id,
+        bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),
+      }
+    }).pipe(
+      switchMap(v => Promise.all(v.items.map(item => translateV3Entities.translateVoi(item))))
+    )
+  }
+
+  private async getLabelledMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
+    // No need to retrieve sapi object, since we know @id maps to id
+    return await this.v3Get("/map", {
+      query: {
+        map_type: "LABELLED",
+        parcellation_id: parcellation.id,
+        space_id: template.id
+      }
+    }).toPromise()
+  }
+
+  public getVoxelTemplateImage(template: SxplrTemplate) {
+    return from(translateV3Entities.translateSpaceToVolumeImage(template))
+  }
+
+  public getVoxelAuxMesh(template: SxplrTemplate) {
+    return from(translateV3Entities.translateSpaceToAuxMesh(template))
+  }
+
+  public getSurfaceTemplateImage(template: SxplrTemplate) {
+    return from(translateV3Entities.translateSpaceToSurfaceImage(template))
+  }
+  /**
+   * Even though this creates a rather tight coupling between sapi.server and nehuba viewer module
+   * This is better than the alternative, which is creating a tight coupling between nehuba viewer module and siibra-api
+   */
+
+  public async getTranslatedLabelledNgMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
+    if (!parcellation || !template) return {}
+    const map = await this.getLabelledMap(parcellation, template)
+    return await translateV3Entities.translateLabelledMapToNgSegLayers(map)
+  }
+
+  public async getTranslatedLabelledThreeMap(parcellation: SxplrParcellation, template: SxplrTemplate){
+    if (!parcellation || !template) return {}
+    const map = await this.getLabelledMap(parcellation, template)
+    return await translateV3Entities.translateLabelledMapToThreeLabel(map)
+  }
+  
+  #tmplParcMap = new Map<string, PathReturn<"/map">>()
+  public async getRegionLabelIndices(tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion) {
+    const key = `${tmpl.id}::${parc.id}`
+
+    if (!this.#tmplParcMap.has(key)) {
+      const _map = await this.v3Get("/map", {
+        query: {
+          map_type: "LABELLED",
+          parcellation_id: parc.id,
+          space_id: tmpl.id
+        }
+      }).toPromise()
+      this.#tmplParcMap.set(key, _map)
+    }
+
+    const { indices } = this.#tmplParcMap.get(key)
+    const index = indices[region.name] || []
+    if (index.length === 0) {
+      throw new Error(`No map index found for ${region.name}`)
+    }
+    if (index.length !== 1) {
+      console.warn(`Multiple map indicies found... Using the first one`)
+    }
+    const _index = index[0]
+    return _index.label
+  }
 
   constructor(
     public http: HttpClient,
@@ -213,11 +488,12 @@ export class SAPI{
     }
     this.atlases$.subscribe(atlases => {
       for (const atlas of atlases) {
-        for (const space of atlas.spaces) {
+        const sapiAtlas = translateV3Entities.retrieveAtlas(atlas)
+        for (const space of sapiAtlas.spaces) {
           this.registry.set(space["@id"], this.getSpace.bind(this), [atlas["@id"], space["@id"]])
           this.getSpaceDetail(atlas["@id"], space["@id"])
         }
-        for (const parc of atlas.parcellations) {
+        for (const parc of sapiAtlas.parcellations) {
           this.registry.set(parc["@id"], this.getParcellation.bind(this), [atlas["@id"], parc["@id"]])
           this.getParcDetail(atlas["@id"], parc["@id"])
         }
@@ -225,8 +501,16 @@ export class SAPI{
     })
   }
   
-  async processNpArrayData<T extends keyof ProcessTypedArrayResult>(input: SpyNpArrayDataModel, method: PARSE_TYPEDARRAY = PARSE_TYPEDARRAY.RAW_ARRAY, params: ProcessTypedArrayResult[T]['input'] = null): Promise<ProcessTypedArrayResult[T]['output']> {
-
+  /**
+   * 
+   * @deprecated
+   * @param input 
+   * @param method 
+   * @param params 
+   * @returns 
+   */
+  async processNpArrayData<T extends keyof ProcessTypedArrayResult>(input: any /*SpyNpArrayDataModel*/, method: PARSE_TYPEDARRAY = PARSE_TYPEDARRAY.RAW_ARRAY, params: ProcessTypedArrayResult[T]['input'] = null): Promise<ProcessTypedArrayResult[T]['output']> {
+    return null
     const supportedDtype = [
       "uint8",
       "int32",
@@ -300,6 +584,9 @@ export class SAPI{
   }
 }
 
+/**
+ * @deprecated
+ */
 export enum PARSE_TYPEDARRAY {
   CANVAS_FORTRAN_RGBA="CANVAS_FORTRAN_RGBA",
   CANVAS_COLORMAP_RGBA="CANVAS_COLORMAP_RGBA",

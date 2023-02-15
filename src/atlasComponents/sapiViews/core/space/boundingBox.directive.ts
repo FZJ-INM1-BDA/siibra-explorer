@@ -1,7 +1,7 @@
 import { Directive, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { BoundingBoxConcept, SapiAtlasModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
+import { BoundingBox, SxplrTemplate, SxplrAtlas } from "src/atlasComponents/sapi/type_sxplr"
 
 function validateBbox(input: any): boolean {
   if (!Array.isArray(input)) return false
@@ -16,19 +16,27 @@ function validateBbox(input: any): boolean {
 
 export class SapiViewsCoreSpaceBoundingBox implements OnChanges{
   @Input('sxplr-sapiviews-core-space-boundingbox-atlas')
-  atlas: SapiAtlasModel
+  atlas: SxplrAtlas
 
   @Input('sxplr-sapiviews-core-space-boundingbox-space')
-  space: SapiSpaceModel
+  space: SxplrTemplate
 
-  private _bbox: BoundingBoxConcept
+  private _bbox: BoundingBox
   @Input('sxplr-sapiviews-core-space-boundingbox-spec')
-  set bbox(val: string | BoundingBoxConcept ) {
+  set bbox(val: string | BoundingBox ) {
 
     if (typeof val === "string") {
       try {
-        const [min, max] = JSON.parse(val)
-        this._bbox = [min, max]
+        const [min, max]: [
+          [number, number, number],
+          [number, number, number],
+        ] = JSON.parse(val)
+        this._bbox = {
+          minpoint: min,
+          maxpoint: max,
+          center: min.map((v, idx) => (v + max[idx]) / 2) as [number, number, number],
+          space: this.space
+        }
       } catch (e) {
         console.warn(`Parse bbox input error`)
       }
@@ -40,14 +48,14 @@ export class SapiViewsCoreSpaceBoundingBox implements OnChanges{
     }
     this._bbox = val
   }
-  get bbox(): BoundingBoxConcept {
+  get bbox(): BoundingBox {
     return this._bbox
   }
 
   private _bbox$: BehaviorSubject<{
-    atlas: SapiAtlasModel
-    space: SapiSpaceModel
-    bbox: BoundingBoxConcept
+    atlas: SxplrAtlas
+    space: SxplrTemplate
+    bbox: BoundingBox
   }> = new BehaviorSubject({
     atlas: null,
     space: null,
@@ -55,9 +63,9 @@ export class SapiViewsCoreSpaceBoundingBox implements OnChanges{
   })
 
   public bbox$: Observable<{
-    atlas: SapiAtlasModel
-    space: SapiSpaceModel
-    bbox: BoundingBoxConcept
+    atlas: SxplrAtlas
+    space: SxplrTemplate
+    bbox: BoundingBox
   }> = this._bbox$.asObservable().pipe(
     distinctUntilChanged(
       (prev, curr) => prev.atlas?.["@id"] === curr.atlas?.['@id']

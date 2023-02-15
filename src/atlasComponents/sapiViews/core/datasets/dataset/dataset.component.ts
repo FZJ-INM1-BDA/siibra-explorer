@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
-import { SapiDatasetModel } from "src/atlasComponents/sapi";
+import { Feature } from "src/atlasComponents/sapi/type_sxplr";
 import { CONST } from "common/constants"
+import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
 
 const RESTRICTED_ACCESS_ID = "https://nexus.humanbrainproject.org/v0/data/minds/core/embargostatus/v1.0.0/3054f80d-96a8-4dce-9b92-55c68a8b5efd"
 
@@ -15,7 +16,7 @@ const RESTRICTED_ACCESS_ID = "https://nexus.humanbrainproject.org/v0/data/minds/
 
 export class DatasetView implements OnChanges{
   @Input('sxplr-sapiviews-core-datasets-dataset-input')
-  dataset: SapiDatasetModel
+  dataset: Feature
 
   public isRestricted = false
   public CONST = CONST
@@ -23,7 +24,8 @@ export class DatasetView implements OnChanges{
   ngOnChanges(changes: SimpleChanges): void {
     const { dataset } = changes
     if (dataset) {
-      this.isRestricted = (dataset.currentValue as SapiDatasetModel)?.metadata?.accessibility?.["@id"] === RESTRICTED_ACCESS_ID
+      throw new Error(`Fix this`)
+      // this.isRestricted = (dataset.currentValue as Feature)?.metadata?.accessibility?.["@id"] === RESTRICTED_ACCESS_ID
     }
   }
 }

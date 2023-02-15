@@ -68,7 +68,7 @@ export class FileInputModal implements IFileInputConfig{
   get fileInput(){
     return this._fileInput
   }
-  handleFileInputChange(ev: InputEvent){
+  handleFileInputChange(ev: Event){
     const target = ev.target as HTMLInputElement
     this.fileInput = target.files[0]
   }

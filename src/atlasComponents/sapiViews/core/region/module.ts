@@ -4,7 +4,7 @@ import { MarkdownModule } from "src/components/markdown";
 import { SpinnerModule } from "src/components/spinner";
 import { AngularMaterialModule } from "src/sharedModules";
 import { StrictLocalModule } from "src/strictLocal";
-import { SapiViewsFeaturesModule } from "../../features";
+// import { SapiViewsFeaturesModule } from "../../features";
 import { SapiViewsUtilModule } from "../../util/module";
 import { SapiViewsCoreRegionRegionChip } from "./region/chip/region.chip.component";
 import { SapiViewsCoreRegionRegionListItem } from "./region/listItem/region.listItem.component";
@@ -17,7 +17,7 @@ import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.compone
     CommonModule,
     AngularMaterialModule,
     SapiViewsUtilModule,
-    SapiViewsFeaturesModule,
+    // SapiViewsFeaturesModule,
     SpinnerModule,
     MarkdownModule,
     StrictLocalModule,

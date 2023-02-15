@@ -1,8 +1,8 @@
 import { Directive, OnChanges, SimpleChanges } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { switchMap,  filter, startWith, shareReplay, finalize } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionalFeatureModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { SxplrCleanedFeatureModel } from "src/atlasComponents/sapi/type";
+import { BehaviorSubject, merge } from "rxjs";
+import { switchMap,  filter, startWith, shareReplay, scan } from "rxjs/operators";
+import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
 import { SapiViewsCoreRegionRegionBase } from "./region.base.directive";
 
 @Directive({
@@ -13,10 +13,10 @@ import { SapiViewsCoreRegionRegionBase } from "./region.base.directive";
 export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRegionRegionBase implements OnChanges{
 
   private ATPR$ = new BehaviorSubject<{
-    atlas: SapiAtlasModel
-    template: SapiSpaceModel
-    parcellation: SapiParcellationModel
-    region: SapiRegionModel
+    atlas: SxplrAtlas
+    template: SxplrTemplate
+    parcellation: SxplrParcellation
+    region: SxplrRegion
   }>(null)
 
   ngOnChanges(sc: SimpleChanges): void {
@@ -28,7 +28,7 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
     super(sapi)
   }
 
-  private features$: Observable<(SapiRegionalFeatureModel|SxplrCleanedFeatureModel)[]> = this.ATPR$.pipe(
+  private features$ = this.ATPR$.pipe(
     filter(arg => {
       if (!arg) return false
       const { atlas, parcellation, region, template } = arg
@@ -36,13 +36,31 @@ export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRe
     }),
     switchMap(({ atlas, parcellation, region, template }) => {
       this.busy$.next(true)
-      return this.sapi.getRegionFeatures(atlas["@id"], parcellation["@id"], template["@id"], region.name).pipe(
-        finalize(() => this.busy$.next(false))
+      const parcId = parcellation["@id"]
+      const regionId = region.name
+      const atlasId = atlas["@id"]
+      const reg = this.sapi.getRegion(atlasId, parcId, regionId)
+      return SAPIRegion.Features$.pipe(
+        switchMap(features => merge(
+          ...features.map(
+            feature => reg.getFeatures(
+              feature,
+              {
+                query: {
+                  parcellation_id: parcId,
+                  region_id: regionId,
+                },
+                priority: 1
+              }
+            )
+          )
+        )),
+        scan((acc, curr) => [...acc, ...curr.items], [])
       )
     }),
   )
 
-  public listOfFeatures$: Observable<(SapiRegionalFeatureModel|SxplrCleanedFeatureModel)[]> = this.features$.pipe(
+  public listOfFeatures$ = this.features$.pipe(
     startWith([]),
     shareReplay(1),
   )
