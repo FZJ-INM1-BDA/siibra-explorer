@@ -68,17 +68,17 @@
 
       <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
 
-      <sxplr-sapiviews-features-entry-list-item
+      <!-- <sxplr-sapiviews-features-entry-list-item
         *ngFor="let feat of rfDir.listOfFeatures$ | async | orderFilterFeatures"
         [sxplr-sapiviews-features-entry-list-item-feature]="feat"
         (click)="handleRegionalFeatureClicked(feat)">
-      </sxplr-sapiviews-features-entry-list-item>
+      </sxplr-sapiviews-features-entry-list-item> -->
     </div>
     
   </ng-template>
 
   <ng-template #regionDesc>
-    <markdown-dom class="sxplr-muted" [markdown]="region?.versionInnovation || 'No description provided.'">
+    <markdown-dom class="sxplr-muted" [markdown]="region?.desc || 'No description provided.'">
     </markdown-dom>
   </ng-template>
 
@@ -91,7 +91,7 @@
       content: regionDesc,
       desc: '',
       iconTooltip: 'Description',
-      iavNgIf: !!region?.versionInnovation
+      iavNgIf: !!region?.desc
     }">
 
     </ng-container>
@@ -112,7 +112,7 @@
 
       <!-- connectivity -->
       <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
-        <sxplr-sapiviews-features-connectivity-browser
+        <!-- <sxplr-sapiviews-features-connectivity-browser
           class="pe-all flex-shrink-1"
           [region]="region"
           [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
@@ -120,23 +120,23 @@
           [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
           [types]="hasConnectivityDirective.availableModalities"
         >
-        </sxplr-sapiviews-features-connectivity-browser>
+        </sxplr-sapiviews-features-connectivity-browser> -->
       </ng-template>
 
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      <!-- <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: CONST.CONNECTIVITY,
         iconClass: 'fab fa-connectdevelop',
         content: sxplrSapiviewsFeaturesConnectivityBrowser,
         iavNgIf: hasConnectivityDirective.hasConnectivity
       }">
-      </ng-container>
+      </ng-container> -->
 
-      <div sxplr-sapiviews-features-connectivity-check
+      <!-- <div sxplr-sapiviews-features-connectivity-check
           [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
           [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
           [region]="region"
           #hasConnectivityDirective="hasConnectivityDirective">
-      </div>
+      </div> -->
     </ng-template>
 
   </mat-accordion>

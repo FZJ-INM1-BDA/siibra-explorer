@@ -3,6 +3,7 @@ import { Store } from "@ngrx/store";
 import { IMessagingActionTmpl, IWindowMessaging } from "./messaging/types";
 import { atlasAppearance, atlasSelection, generalActions } from "src/state"
 import { SAPI } from "./atlasComponents/sapi";
+import { translateV3Entities } from "./atlasComponents/sapi/translate_v3"
 
 @Injectable()
 export class MessagingGlue implements IWindowMessaging, OnDestroy {
@@ -22,7 +23,8 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
 
     const sub = sapi.atlases$.subscribe(atlases => {
       for (const atlas of atlases) {
-        const { ['@id']: atlasId, spaces } = atlas
+        const sapiAtlas = translateV3Entities.retrieveAtlas(atlas)
+        const { ['@id']: atlasId, spaces } = sapiAtlas
         for (const tmpl of spaces) {
           const { ['@id']: tmplId } = tmpl
           this.tmplSpIdToAtlasId.set(tmplId, atlasId)

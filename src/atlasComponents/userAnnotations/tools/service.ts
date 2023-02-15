@@ -16,7 +16,7 @@ import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
@@ -91,7 +91,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
 
-  private selectedTmpl: SapiSpaceModel
+  private selectedTmpl: SxplrTemplate
   private selectedTmpl$ = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
   )
@@ -501,7 +501,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         this.annotnEvSubj.next({
           type: 'metadataEv',
           detail: {
-            space: tmpl && { ['@id']: tmpl['@id'] }
+            space: tmpl
           }
         })
         this.forcedAnnotationRefresh$.next(null)

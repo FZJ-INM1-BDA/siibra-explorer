@@ -1,9 +1,10 @@
 import { Inject, Injectable, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Subject } from "rxjs";
-import { distinctUntilChanged, filter, map, take } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi";
-import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/type";
+import { distinctUntilChanged, filter, map, switchMap, take } from "rxjs/operators";
+import { SAPI } from "src/atlasComponents/sapi";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, Point } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/type_v3";
 import { MainState, atlasSelection, userInteraction, annotation, atlasAppearance } from "src/state"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from "src/util/interfaces";
@@ -20,8 +21,8 @@ type AtId = {
 }
 
 type RequestUserTypes = {
-  region: SapiRegionModel
-  point: OpenMINDSCoordinatePoint
+  region: SxplrRegion
+  point: Point
   confirm: void
   input: string
 }
@@ -38,15 +39,15 @@ type RequestUser<T extends keyof RequestUserTypes> = {
 export type ApiBoothEvents = {
   getAllAtlases: {
     request: null
-    response: SapiAtlasModel[]
+    response: SxplrAtlas[]
   }
   getSupportedTemplates: {
     request: null
-    response: SapiSpaceModel[]
+    response: SxplrTemplate[]
   }
   getSupportedParcellations: {
     request: null
-    response: SapiParcellationModel[]
+    response: SxplrParcellation[]
   }
 
   selectAtlas: {
@@ -72,7 +73,7 @@ export type ApiBoothEvents = {
       type: 'region' | 'point'
       message: string
     }
-    response: SapiRegionModel | OpenMINDSCoordinatePoint
+    response: SxplrRegion | Point
   }
   
   addAnnotations: {
@@ -135,11 +136,11 @@ export type HeartbeatEvents = {
 }
 
 export type BroadCastingApiEvents = {
-  atlasSelected: SapiAtlasModel
-  templateSelected: SapiSpaceModel
-  parcellationSelected: SapiParcellationModel
-  allRegions: SapiRegionModel[]
-  regionsSelected: SapiRegionModel[]
+  atlasSelected: SxplrAtlas
+  templateSelected: SxplrTemplate
+  parcellationSelected: SxplrParcellation
+  allRegions: SxplrRegion[]
+  regionsSelected: SxplrRegion[]
   navigation: MainState['[state.atlasSelection]']['navigation']
 }
 
@@ -187,7 +188,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     const { type } = this.requestUserQueue[0]
 
     if (type === "region") {
-      let moRegion: SapiRegionModel
+      let moRegion: SxplrRegion
       this.store.pipe(
         select(userInteraction.selectors.mousingOverRegions),
         filter(val => val.length > 0),
@@ -201,7 +202,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     }
 
     if (type === "point") {
-      let point: OpenMINDSCoordinatePoint
+      let point: Point
       this.store.pipe(
         select(userInteraction.selectors.mousingOverPosition),
         take(1)
@@ -302,8 +303,9 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     case 'getSupportedParcellations': {
       if (!event.id) return
       const parcs = await this.store.pipe(
-        atlasSelection.fromRootStore.allAvailParcs(this.sapi),
-        take(1)
+        select(atlasSelection.selectors.selectedAtlas),
+        switchMap(atlas => this.sapi.getAllParcellations(atlas)),
+        take(1),
       ).toPromise()
       return {
         id: event.id,
@@ -314,7 +316,8 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     case 'getSupportedTemplates': {
       if (!event.id) return
       const spaces = await this.store.pipe(
-        atlasSelection.fromRootStore.allAvailSpaces(this.sapi),
+        select(atlasSelection.selectors.selectedAtlas),
+        switchMap(atlas => this.sapi.getAllSpaces(atlas)),
         take(1)
       ).toPromise()
       return {

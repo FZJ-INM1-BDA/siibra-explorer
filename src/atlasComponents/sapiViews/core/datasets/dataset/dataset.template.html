@@ -15,7 +15,7 @@
   <mat-card-title>
     <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
     <span>
-      {{ dataset.metadata.fullName }}
+      {{ dataset.name }}
     </span>
   </mat-card-title>
 
@@ -33,15 +33,15 @@
 
     <mat-divider class="sxplr-pl-1" [vertical]="true"></mat-divider>
 
-    <a mat-icon-button sxplr-hide-when-local *ngFor="let url of dataset.urls" [href]="url.doi | parseDoi" target="_blank">
+    <!-- <a mat-icon-button sxplr-hide-when-local *ngFor="let url of dataset.link" [href]="url.doi | parseDoi" target="_blank">
       <i class="fas fa-external-link-alt"></i>
-    </a>
+    </a> -->
   </mat-card-subtitle>
 </mat-card>
 
 <mat-card *ngIf="dataset" class="sxplr-z-0">
   <mat-card-content>
-    <markdown-dom class="sxplr-muted" [markdown]="dataset?.metadata?.description">
+    <markdown-dom class="sxplr-muted" [markdown]="dataset?.desc">
     </markdown-dom>
   </mat-card-content>
 </mat-card>

@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, of } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map, switchMap, tap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { atlasSelection } from "src/state";
 import { Tree } from "src/components/flatHierarchy/treeView/treeControl"
-import { getParcNgId, getRegionLabelIndex } from "../config.service";
+import { BaseService } from "../base.service/base.service";
 
 /**
  * control mesh loading etc
@@ -21,6 +21,7 @@ export class NehubaMeshService implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private effect: LayerCtrlEffects,
+    private baseService: BaseService,
   ){
   }
 
@@ -30,66 +31,44 @@ export class NehubaMeshService implements OnDestroy {
 
 
   public auxMeshes$ = this.effect.onATPDebounceNgLayers$.pipe(
-    map(({ tmplAuxNgLayers }) => tmplAuxNgLayers)
+    map(({ tmplAuxNgLayers }) => tmplAuxNgLayers),
+    tap(v => console.log('mesh.service', v))
   )
 
   public loadMeshes$: Observable<IMeshesToLoad> = merge(
     combineLatest([
-      this.store$.pipe(
-        atlasSelection.fromRootStore.distinctATP(),
-      ),
+      this.baseService.completeNgIdLabelRegionMap$,
       this.store$.pipe(
         select(atlasSelection.selectors.selectedParcAllRegions),
       ),
       this.store$.pipe(
         select(atlasSelection.selectors.selectedRegions),
-      )
+      ),
+      
     ]).pipe(
-      switchMap(([{ atlas, template, parcellation }, regions, selectedRegions]) => {
+      switchMap(([record, regions, selectedRegions]) => {
         const ngIdRecord: Record<string, number[]> = {}
         
         const tree = new Tree(
           regions,
-          (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
+          (c, p) => (c.parentIds.some( id => p.id === id))
         )
+        
+        const selectedRegionFlag = selectedRegions.length > 0
+        const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
 
-        for (const r of regions) {
-          const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
-          if (!regionLabelIndex) {
-            continue
-          }
-          if (
-            tree.someAncestor(r, anc => !!getRegionLabelIndex(atlas, template, parcellation, anc))
-          ) {
-            continue
-          }
-          const ngId = getParcNgId(atlas, template, parcellation, r)
-          if (!ngIdRecord[ngId]) {
-            ngIdRecord[ngId] = []
-          }
-          ngIdRecord[ngId].push(regionLabelIndex)
-        }
-
-        if (selectedRegions.length > 0) {
-          /**
-           * If regions are selected, reset the meshes
-           */
-          for (const key in ngIdRecord) {
-            ngIdRecord[key] = []
-          }
-
-          /**
-           * only show selected region
-           */
-          for (const r of selectedRegions) {
-            const ngId = getParcNgId(atlas, template, parcellation, r)
-            const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
+        for (const [ngId, labelToRegion] of Object.entries(record)) {
+          for (const [label, region] of Object.entries(labelToRegion)) {
+            if (selectedRegionFlag && !selectedRegionNameSet.has(region.name)) {
+              continue
+            }
             if (!ngIdRecord[ngId]) {
               ngIdRecord[ngId] = []
             }
-            ngIdRecord[ngId].push(regionLabelIndex)
+            ngIdRecord[ngId].push(Number(label))
           }
         }
+
         const arr: IMeshesToLoad[] = []
 
         for (const ngId in ngIdRecord) {

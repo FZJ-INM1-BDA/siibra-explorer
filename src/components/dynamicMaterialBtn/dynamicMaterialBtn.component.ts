@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 
-type TypeMatBtnStyle = 'mat-button' | 'mat-raised-button' | 'mat-stroked-button' | 'mat-flat-button' | 'mat-icon-button' | 'mat-fab' | 'mat-mini-fab'
-type TypeMatBtnColor = 'basic' | 'primary' | 'accent' | 'warn'
+export type TypeMatBtnStyle = 'mat-button' | 'mat-raised-button' | 'mat-stroked-button' | 'mat-flat-button' | 'mat-icon-button' | 'mat-fab' | 'mat-mini-fab'
+export type TypeMatBtnColor = 'basic' | 'primary' | 'accent' | 'warn'
 
 @Component({
   selector: 'iav-dynamic-mat-button',

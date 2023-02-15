@@ -24,8 +24,8 @@
         sxplr-dialog
         [sxplr-dialog-size]="null"
         [sxplr-dialog-data]="{
-          title: ATP.parcellation.name || ATP.parcellation.fullName,
-          descMd: (ATP.parcellation.brainAtlasVersions || [])[0]?.versionInnovation,
+          title: ATP.parcellation.name,
+          descMd: ATP.parcellation.desc,
           actions: ATP.parcellation | parcellationDoiPipe
         }">
         <i class="fas fa-info"></i>
@@ -52,7 +52,7 @@
     [disabled]="isBusy">
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.template.fullName }}
+        {{ ATP.template.name }}
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>

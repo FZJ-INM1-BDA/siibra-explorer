@@ -1,17 +1,12 @@
-import { SapiParcellationModel, SapiSpaceModel, SapiAtlasModel, SapiRegionModel } from 'src/atlasComponents/sapi'
-import { SapiVolumeModel, IDS } from 'src/atlasComponents/sapi'
+import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
+import { IDS } from 'src/atlasComponents/sapi/constants'
 import { atlasSelection } from 'src/state'
 import { MultiDimMap } from 'src/util/fn'
-import { ParcVolumeSpec } from "../store/util"
 import {
   NehubaConfig,
   NgConfig,
   RecursivePartial,
-  NgLayerSpec,
-  NgPrecompMeshSpec,
-  NgSegLayerSpec,
 } from "./type"
-
 // fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
 const fsAverageKeyVal = {
   [IDS.PARCELLATION.JBA29]: {
@@ -160,33 +155,7 @@ const BACKCOMAP_KEY_DICT = {
 }
 
 
-export function getTmplNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spaceVolumes: SapiVolumeModel[]): Record<string, NgLayerSpec>{
-  if (!atlas || !tmpl) return {}
-  const ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], "tmplImage")}`
-  const tmplImage = spaceVolumes.find(v => "neuroglancer/precomputed" in v.data.detail)
-  if (!tmplImage) return {}
-  return {
-    [ngId]: {
-      source: `precomputed://${tmplImage.data.url.replace(/^precomputed:\/\//, '')}`,
-      ...tmplImage.data.detail["neuroglancer/precomputed"] as NgLayerSpec
-    }
-  }
-}
-
-export function getTmplAuxNgLayer(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, spaceVolumes: SapiVolumeModel[]): Record<string, NgPrecompMeshSpec>{
-  if (!atlas || !tmpl) return {}
-  const ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], "auxLayer")}`
-  const tmplImage = spaceVolumes.find(v => "neuroglancer/precompmesh" in v.data.detail)
-  if (!tmplImage) return {}
-  return {
-    [ngId]: {
-      source: `precompmesh://${tmplImage.data.url.replace(/^precompmesh:\/\//, '')}`,
-      ...tmplImage.data.detail["neuroglancer/precompmesh"] as NgPrecompMeshSpec
-    }
-  }
-}
-
-export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, region: SapiRegionModel): string {
+export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): string {
 
   let laterality: string = "whole brain"
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
@@ -195,77 +164,44 @@ export function getParcNgId(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: S
   /**
    * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
    */
-  if (tmpl['@id'] === IDS.TEMPLATES.BIG_BRAIN && parc['@id'] === IDS.PARCELLATION.JBA29) {
-    laterality = region.hasAnnotation.visualizedIn?.['@id']
+  if (tmpl.id === IDS.TEMPLATES.BIG_BRAIN && parc.id === IDS.PARCELLATION.JBA29) {
+    // laterality = region.hasAnnotation.visualizedIn?.['@id']
+    throw new Error(`FIXME figure out what region.hasAnnotation id is`)
   }
 
   if (!laterality) {
     return null
   }
 
-  let ngId = BACKCOMAP_KEY_DICT[atlas["@id"]]?.[tmpl["@id"]]?.[parc["@id"]]?.[laterality]
+  let ngId = BACKCOMAP_KEY_DICT[atlas.id]?.[tmpl.id]?.[parc.id]?.[laterality]
   if (!ngId) {
-    ngId = `_${MultiDimMap.GetKey(atlas["@id"], tmpl["@id"], parc["@id"], laterality)}`
+    ngId = `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, laterality)}`
   }
   return ngId
 }
 
 const labelIdxRegex = /siibra_python_ng_precomputed_labelindex:\/\/(.*?)#([0-9]+)$/
 
-export function getRegionLabelIndex(_atlas: SapiAtlasModel, _tmpl: SapiSpaceModel, _parc: SapiParcellationModel, region: SapiRegionModel): number {
-  const overwriteLabelIndex = region.hasAnnotation.inspiredBy.map(({ "@id": id }) => labelIdxRegex.exec(id)).filter(v => !!v)
-  if (overwriteLabelIndex.length > 0) {
-    const match = overwriteLabelIndex[0]
-    const volumeId = match[1]
-    const labelIndex = match[2]
-    const _labelIndex = Number(labelIndex)
-    if (!isNaN(_labelIndex)) return _labelIndex
-  }
-  const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
-  if (isNaN(lblIdx)) return null
-  return lblIdx
-}
-
-export function getParcNgLayers(atlas: SapiAtlasModel, tmpl: SapiSpaceModel, parc: SapiParcellationModel, parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[]): Record<string, NgSegLayerSpec>{
-  const returnVal: Record<string, NgSegLayerSpec> = {}
-  for (const parcVol of parcVolumes) {
-    if ("spy/volume/neuroglancer/precomputed" !== parcVol.volume['@type']) continue
-    const { volume, volumeMetadata } = parcVol
-    const { regions } = volumeMetadata
-    if (regions.length === 0) {
-      console.warn(`parc volume with no associated region`)
-      continue
-    }
-    const ngId = getParcNgId(atlas, tmpl, parc, regions[0].region)
-
-    returnVal[ngId] = {
-      source: `precomputed://${volume.data.url.replace(/^precomputed:\/\//, '')}`,
-      transform: (volume.data.detail["neuroglancer/precomputed"] as any).transform,
-      labelIndicies: regions.map(v => v.labelIndex)
-    }
-  }
-  return returnVal
-}
-
-type CongregatedVolume = {
-  tmplVolumes: SapiVolumeModel[]
-  tmplAuxMeshVolumes: SapiVolumeModel[]
-  parcVolumes: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[]
-}
-
-export const getNgLayersFromVolumesATP = (volumes: CongregatedVolume, ATP: { atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel }): {
-  tmplNgLayers: Record<string, NgLayerSpec>
-  tmplAuxNgLayers: Record<string, NgPrecompMeshSpec>
-  parcNgLayers: Record<string, NgSegLayerSpec>
-} => {
-  
-  const { tmplVolumes, tmplAuxMeshVolumes, parcVolumes } = volumes
-  const { atlas, template, parcellation } = ATP
-  return {
-    tmplNgLayers: getTmplNgLayer(atlas, template, tmplVolumes),
-    tmplAuxNgLayers: getTmplAuxNgLayer(atlas, template, tmplAuxMeshVolumes),
-    parcNgLayers: getParcNgLayers(atlas, template, parcellation, parcVolumes)
-  }
+/**
+ * @deprecated
+ * @param _atlas 
+ * @param tmpl 
+ * @param parc 
+ * @param region 
+ */
+export function getRegionLabelIndex(_atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): number {
+  throw new Error(`TODO fix me`)
+  // const overwriteLabelIndex = region.hasAnnotation.inspiredBy.map(({ "@id": id }) => labelIdxRegex.exec(id)).filter(v => !!v)
+  // if (overwriteLabelIndex.length > 0) {
+  //   const match = overwriteLabelIndex[0]
+  //   const volumeId = match[1]
+  //   const labelIndex = match[2]
+  //   const _labelIndex = Number(labelIndex)
+  //   if (!isNaN(_labelIndex)) return _labelIndex
+  // }
+  // const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
+  // if (isNaN(lblIdx)) return null
+  // return lblIdx
 }
 
 export const defaultNehubaConfig: NehubaConfig = {
@@ -362,7 +298,7 @@ export const spaceMiscInfoMap = new Map([
   }],
 ])
 
-export function getNehubaConfig(space: SapiSpaceModel): NehubaConfig {
+export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
   const darkTheme = space["@id"] !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
   const { scale } = spaceMiscInfoMap.get(space["@id"]) || { scale: 1 }

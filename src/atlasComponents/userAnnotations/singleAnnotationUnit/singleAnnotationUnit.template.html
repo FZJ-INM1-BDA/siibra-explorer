@@ -5,7 +5,7 @@
     </mat-label>
     <mat-select formControlName="spaceId">
       <mat-option *ngFor="let tmpl of tmpls$ | async" [value]="tmpl['@id']">
-        {{ tmpl.fullName }}
+        {{ tmpl.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>

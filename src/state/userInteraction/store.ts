@@ -1,11 +1,11 @@
 import { createReducer, on } from "@ngrx/store";
-import { SapiRegionModel, SapiFeatureModel, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi";
+import { SxplrRegion, Feature, Point } from "src/atlasComponents/sapi/type_sxplr";
 import * as actions from "./actions"
 
 export type UserInteraction = {
-  mouseoverRegions: SapiRegionModel[]
-  selectedFeature: SapiFeatureModel
-  mouseoverPosition: OpenMINDSCoordinatePoint
+  mouseoverRegions: SxplrRegion[]
+  selectedFeature: Feature
+  mouseoverPosition: Point
 }
 
 export const defaultState: UserInteraction = {

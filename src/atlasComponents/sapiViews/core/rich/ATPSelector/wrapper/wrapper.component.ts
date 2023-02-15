@@ -1,10 +1,9 @@
 import { Component, Inject, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { Observable, of, Subject, Subscription } from "rxjs";
 import { filter, map, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
 import { atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
@@ -30,7 +29,6 @@ export class WrapperATPSelector implements OnDestroy{
   lightThemePalette = lightThemePalette
 
   #subscription: Subscription[] = []
-  #parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapi)
 
   #askUser(title: string, descMd: string): Observable<boolean> {
     const agree = "OK"
@@ -51,10 +49,12 @@ export class WrapperATPSelector implements OnDestroy{
 
   allAtlases$ = this.sapi.atlases$
   availableTemplates$ = this.store$.pipe(
-    fromRootStore.allAvailSpaces(this.sapi),
+    select(atlasSelection.selectors.selectedAtlas),
+    switchMap(atlas => this.sapi.getAllSpaces(atlas))
   )
   parcs$ = this.store$.pipe(
-    fromRootStore.allAvailParcs(this.sapi),
+    select(atlasSelection.selectors.selectedAtlas),
+    switchMap(atlas => this.sapi.getAllParcellations(atlas))
   )
   isBusy$ = new Subject<boolean>()
   
@@ -79,21 +79,28 @@ export class WrapperATPSelector implements OnDestroy{
             return of({ atlas })
           }
           if (template) {
-            return this.#parcSupportedInSpacePipe.transform(selectedATP.parcellation, template).pipe(
-              switchMap(supported => supported
-                ? of({ template })
-                : this.#askUser(`Incompatible parcellation`, `Attempting to load template **${template.fullName}**, which does not support parcellation **${selectedATP.parcellation.name}**. Proceed anyway and load the default parcellation?`).pipe(
+            return this.sapi.getSupportedTemplates(selectedATP.atlas, selectedATP.parcellation).pipe(
+              switchMap(tmpls => {
+                const supported = tmpls.some(tmpl => tmpl.id === template.id)
+                if (supported) return of({ template })
+                return this.#askUser(
+                  `Incompatible parcellation`, `Attempting to load template **${template.name}**, which does not support parcellation **${selectedATP.parcellation.name}**. Proceed anyway and load the default parcellation?`
+                ).pipe(
                   switchMap(flag => of(flag ? { template } : null))
-                ))
+                )
+              })
             )
           }
           if (parcellation) {
-            return this.#parcSupportedInSpacePipe.transform(parcellation, selectedATP.template).pipe(
-              switchMap(supported=> supported
-                ? of({ parcellation })
-                : this.#askUser(`Incompatible template`, `Attempting to load parcellation **${parcellation.name}**, which is not supported in template **${selectedATP.template.fullName}**. Proceed anyway and load the default template?`).pipe(
-                  switchMap(flag => of(flag ? { parcellation } : null))
-                ))
+            return this.sapi.getSupportedParcellations(selectedATP.atlas, selectedATP.template).pipe(
+              switchMap(parcs => {
+                const supported = parcs.some(parc => parc.id === parcellation.id)
+                return supported
+                  ? of ({ parcellation })
+                  : this.#askUser(`Incompatible template`, `Attempting to load parcellation **${parcellation.name}**, which is not supported in template **${selectedATP.template.name}**. Proceed anyway and load the default template?`).pipe(
+                    switchMap(flag => of(flag ? { parcellation } : null))
+                  )
+              })
             )
           }
           return of(null)
@@ -125,8 +132,8 @@ export class WrapperATPSelector implements OnDestroy{
     )
   }
 
-  private selectLeaf$ = new Subject<ATP>()
-  selectLeaf(atp: ATP) {
+  private selectLeaf$ = new Subject<Partial<ATP>>()
+  selectLeaf(atp: Partial<ATP>) {
     this.selectLeaf$.next(atp)
   }
 

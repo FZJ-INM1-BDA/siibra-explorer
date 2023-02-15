@@ -1,4 +1,4 @@
-import { SapiRegionModel } from 'src/atlasComponents/sapi'
+import { SxplrRegion } from 'src/atlasComponents/sapi/type_sxplr'
 
 export type TThreeSurferMesh = {
   colormap: string
@@ -6,11 +6,25 @@ export type TThreeSurferMesh = {
   hemisphere: 'left' | 'right'
 }
 
+export type TThreeMesh = {
+  id: string
+  variant: string
+  space: string
+  url: string
+  laterality: 'left' | 'right'
+}
+
+export type TThreeMeshLabel = {
+  url: string
+  space: string
+  laterality: 'left' | 'right'
+}
+
 export type TThreeSurferContextInfo = {
   position: number[]
   faceIndex: number
   vertexIndices: number[]
   fsversion: string
-  regions: SapiRegionModel[]
+  regions: SxplrRegion[]
   error?: string
 }

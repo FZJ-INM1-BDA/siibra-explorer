@@ -3,7 +3,7 @@ import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { SapiRegionalFeatureModel } from "src/atlasComponents/sapi";
+import { Feature } from "src/atlasComponents/sapi/type_sxplr";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
 
@@ -24,7 +24,7 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   public CONST = CONST
 
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
-  featureClicked = new EventEmitter<SapiRegionalFeatureModel>()
+  featureClicked = new EventEmitter<Feature>()
 
   public expandedPanel: string
 
@@ -35,7 +35,7 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
     super(sapi)
   }
 
-  handleRegionalFeatureClicked(feat: SapiRegionalFeatureModel) {
+  handleRegionalFeatureClicked(feat: Feature) {
     this.featureClicked.emit(feat)
   }
 

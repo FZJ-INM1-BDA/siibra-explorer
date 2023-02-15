@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, of, Subscription } from "rxjs";
+import { combineLatest, forkJoin, Observable, of, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
@@ -8,13 +8,14 @@ import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
-import {SAPI, SapiAtlasModel, SapiRegionModel} from "src/atlasComponents/sapi";
-import { atlasSelection, userInteraction, } from "src/state";
-import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
-import { getUuid } from "src/util/fn";
+import { SAPI } from "src/atlasComponents/sapi";
+import { Feature, NgLayerSpec, SxplrAtlas, SxplrRegion, TThreeMesh } from "src/atlasComponents/sapi/type_sxplr"
+import { atlasSelection, userInteraction } from "src/state";
+
 import { environment } from "src/environments/environment"
-import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
+// import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
 import { SapiViewsCoreSpaceBoundingBox } from "src/atlasComponents/sapiViews/core";
+import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -70,8 +71,8 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('genericInfoVCR', { read: ViewContainerRef })
   genericInfoVCR: ViewContainerRef
 
-  @ViewChild('voiFeatures', { read: SapiViewsFeaturesVoiQuery })
-  voiQueryDirective: SapiViewsFeaturesVoiQuery
+  // @ViewChild('voiFeatures', { read: SapiViewsFeaturesVoiQuery })
+  // voiQueryDirective: SapiViewsFeaturesVoiQuery
 
   @ViewChild('bbox', { read: SapiViewsCoreSpaceBoundingBox })
   boundingBoxDirective: SapiViewsCoreSpaceBoundingBox
@@ -94,7 +95,7 @@ export class ViewerCmp implements OnDestroy {
     shareReplay(1)
   )
 
-  public fetchedAtlases$: Observable<SapiAtlasModel[]> = this.sapi.atlases$
+  public fetchedAtlases$: Observable<SxplrAtlas[]> = this.sapi.atlases$
 
   public selectedAtlas$ = this.selectedATP.pipe(
     map(({ atlas }) => atlas)
@@ -127,20 +128,24 @@ export class ViewerCmp implements OnDestroy {
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
     this.store$.pipe(
       atlasSelection.fromRootStore.distinctATP(),
-      switchMap(({ atlas, template }) => atlas && template
-        ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes()
-        : of(null)),
+      switchMap(({ template }) => template
+        ? forkJoin({
+          voxel: this.sapi.getVoxelTemplateImage(template),
+          surface: this.sapi.getSurfaceTemplateImage(template),
+        })
+        : of(null as { voxel: NgLayerSpec[], surface: TThreeMesh[] })
+      ),
       map(vols => {
         if (!vols) return null
         const flags = {
           isNehuba: false,
           isThreeSurfer: false
         }
-        if (vols.find(vol => vol.data.volume_type === "neuroglancer/precomputed")) {
+        if (vols.voxel.length > 0) {
           flags.isNehuba = true
         }
 
-        if (vols.find(vol => vol.data.volume_type === "gii")) {
+        if (vols.surface.length > 0) {
           flags.isThreeSurfer = true
         }
         return flags
@@ -166,7 +171,7 @@ export class ViewerCmp implements OnDestroy {
 
   public viewerCtx$ = this.ctxMenuSvc.context$
 
-  public selectedFeature$: Observable<SapiFeatureModel> = this.store$.pipe(
+  public selectedFeature$: Observable<Feature> = this.store$.pipe(
     select(userInteraction.selectors.selectedFeature)
   )
 
@@ -193,7 +198,7 @@ export class ViewerCmp implements OnDestroy {
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
   public context: TContextArg<TSupportedViewers>
-  private templateSelected: SapiSpaceModel
+  private templateSelected: SxplrTemplate
 
   constructor(
     private store$: Store<any>,
@@ -227,7 +232,7 @@ export class ViewerCmp implements OnDestroy {
           message.push(`- _${atlas.name}_`)
         }
         if (checkPrerelease(tmpl)) {
-          message.push(`- _${tmpl.fullName}_`)
+          message.push(`- _${tmpl.name}_`)
         }
         if (checkPrerelease(parc)) {
           message.push(`- _${parc.name}_`)
@@ -311,7 +316,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public selectRoi(roi: SapiRegionModel): void {
+  public selectRoi(roi: SxplrRegion): void {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -347,16 +352,8 @@ export class ViewerCmp implements OnDestroy {
           this.store$.dispatch(
             userInteraction.actions.mouseoverPosition({
               position: {
-                "@id": getUuid(),
-                "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
-                coordinates: nav.position.map(p => {
-                  return {
-                    value: p,
-                  }
-                }),
-                coordinateSpace: {
-                  '@id': this.templateSelected["@id"]
-                }
+                loc: nav.position as [number, number, number],
+                space: this.templateSelected
               }
             })
           )
@@ -371,19 +368,22 @@ export class ViewerCmp implements OnDestroy {
     this.ctxMenuSvc.dismissCtxMenu()
   }
 
-  showDataset(feat: SapiFeatureModel): void {
-    if ((feat as SapiSpatialFeatureModel).location) {
-      const feature = feat as SapiSpatialFeatureModel
-      this.store$.dispatch(
-        atlasSelection.actions.navigateTo({
-          navigation: {
-            orientation: [0, 0, 0, 1],
-            position: feature.location.center.coordinates.map(v => v.value * 1e6)
-          },
-          animation: true
-        })
-      )
-    }
+  showDataset(feat: Feature): void {
+    /**
+     * TODO if feat is spatial feature, navigate to region
+     */
+    // if ((feat as SapiSpatialFeatureModel).location) {
+    //   const feature = feat as SapiSpatialFeatureModel
+    //   this.store$.dispatch(
+    //     atlasSelection.actions.navigateTo({
+    //       navigation: {
+    //         orientation: [0, 0, 0, 1],
+    //         position: feature.location.center.coordinates.map(v => v.value * 1e6)
+    //       },
+    //       animation: true
+    //     })
+    //   )
+    // }
     
     this.store$.dispatch(
       userInteraction.actions.showFeature({

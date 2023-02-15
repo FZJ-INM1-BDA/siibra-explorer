@@ -1,26 +1,28 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { concat, forkJoin, merge, Observable, of } from "rxjs";
+import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
 import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SAPIRegion, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
 import { AtlasSelectionState } from "./const"
 import { atlasAppearance, atlasSelection } from "..";
-import { ParcellationSupportedInSpacePipe } from "src/atlasComponents/sapiViews/util/parcellationSupportedInSpace.pipe";
+
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
+import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 
 type OnTmplParcHookArg = {
   previous: {
-    atlas: SapiAtlasModel
-    template: SapiSpaceModel
-    parcellation: SapiParcellationModel
+    atlas: SxplrAtlas
+    template: SxplrTemplate
+    parcellation: SxplrParcellation
   }
   current: {
-    atlas: SapiAtlasModel
-    template: SapiSpaceModel
-    parcellation: SapiParcellationModel
+    atlas: SxplrAtlas
+    template: SxplrTemplate
+    parcellation: SxplrParcellation
   }
 }
 
@@ -36,7 +38,7 @@ export class Effect {
       const { atlas, parcellation, template } = current
       return (
         !!atlas && !!parcellation && !!template
-          ? this.sapiSvc.getParcRegions(atlas["@id"], parcellation["@id"], template["@id"])
+          ? this.sapiSvc.getParcRegions(atlas.id, parcellation.id, template.id)
           : of([])
       ).pipe(
         map(regions => {
@@ -47,13 +49,13 @@ export class Effect {
       )
     },
     ({ current, previous }) => {
-      const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous?.template?.["@id"])
-      const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current?.template?.["@id"])
+      const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous?.template?.id)
+      const currSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(current?.template?.id)
 
       /**
        * if trans-species, return default state for navigation
        */
-      if (previous?.atlas?.["@id"] !== current?.atlas?.["@id"]) {
+      if (previous?.atlas?.id !== current?.atlas?.id) {
         return of({
           navigation: null
         })
@@ -89,14 +91,13 @@ export class Effect {
     }
   ]
 
-  parcSupportedInSpacePipe = new ParcellationSupportedInSpacePipe(this.sapiSvc)
-  onTemplateParcSelection = createEffect(() => merge<{ template: SapiSpaceModel, parcellation: SapiParcellationModel }>(
+  onTemplateParcSelection = createEffect(() => merge(
     this.action.pipe(
       ofType(actions.selectTemplate),
       map(({ template }) => {
         return {
           template,
-          parcellation: null
+          parcellation: null as SxplrParcellation
         }
       })
     ),
@@ -104,7 +105,7 @@ export class Effect {
       ofType(actions.selectParcellation),
       map(({ parcellation }) => {
         return {
-          template: null,
+          template: null as SxplrTemplate,
           parcellation
         }
       })
@@ -115,14 +116,9 @@ export class Effect {
       const currTmpl = selectors.selectedTemplate(store)
       const currParc = selectors.selectedParcellation(store)
       const currAtlas = selectors.selectedAtlas(store)
-      return this.parcSupportedInSpacePipe.transform(
-        parcellation || currParc,
-        template || currTmpl
-      ).pipe(
-        switchMap(flag => {
-          /**
-           * if desired parc is supported in tmpl, emit them
-           */
+      return this.sapiSvc.getSupportedTemplates(currAtlas, parcellation || currParc).pipe(
+        switchMap(tmpls => {
+          const flag = tmpls.some(tmpl => tmpl.id === (template || currTmpl).id)
           if (flag) {
             return of({
               atlas: currAtlas,
@@ -134,38 +130,28 @@ export class Effect {
            * if template is defined, find the first parcellation that is supported
            */
           if (!!template) {
-            return concat(
-              ...currAtlas.parcellations.map(
-                p => this.parcSupportedInSpacePipe.transform(p["@id"], template).pipe(
-                  filter(flag => flag),
-                  switchMap(() => this.sapiSvc.getParcDetail(currAtlas["@id"], p['@id'])),
-                )
-              )
-            ).pipe(
-              take(1),
-              map(parcellation => {
+            return this.sapiSvc.getSupportedParcellations(currAtlas, template).pipe(
+              map(parcs => {
+                if (parcs.length === 0) {
+                  throw new Error(`Cannot find any supported parcellations for template ${template.name}`)
+                }
                 return {
                   atlas: currAtlas,
                   template,
-                  parcellation
+                  parcellation: parcs[0]
                 }
               })
             )
           }
           if (!!parcellation) {
-            return concat(
-              ...currAtlas.spaces.map(
-                sp => this.parcSupportedInSpacePipe.transform(parcellation["@id"], sp["@id"]).pipe(
-                  filter(flag => flag),
-                  switchMap(() => this.sapiSvc.getSpaceDetail(currAtlas["@id"], sp['@id'])),
-                )
-              )
-            ).pipe(
-              take(1),
-              map(template => {
+            return this.sapiSvc.getSupportedTemplates(currAtlas, parcellation).pipe(
+              map(templates => {
+                if (templates.length === 0) {
+                  throw new Error(`Cannot find any supported templates for parcellation ${parcellation.name}`)
+                }
                 return {
                   atlas: currAtlas,
-                  template,
+                  template: templates[0],
                   parcellation
                 }
               })
@@ -178,6 +164,7 @@ export class Effect {
             this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: { atlas: currAtlas, template: currTmpl, parcellation: currParc }, current: { atlas, template, parcellation } }))
           ).pipe(
             map(partialStates => {
+              console.log('selected teplate', template, parcellation)
               let returnState: Partial<AtlasSelectionState> = {
                 selectedAtlas: atlas,
                 selectedTemplate: template,
@@ -200,28 +187,21 @@ export class Effect {
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     filter(action => !!action.atlas),
-    switchMap(({ atlas }) => {
-      const selectedParc = atlas.parcellations.find(p => /290/.test(p["@id"])) || atlas.parcellations[0]
-      return this.sapiSvc.getParcDetail(atlas["@id"], selectedParc["@id"], { priority: 10 }).pipe(
-        map(parcellation => {
+    switchMap(({ atlas }) => 
+      this.sapiSvc.getAllParcellations(atlas).pipe(
+        map(parcellations => {
+          const selectedParc = parcellations.find(p => p.id.includes("290")) || parcellations[0]
           return {
-            parcellation,
+            parcellation: selectedParc,
             atlas
           }
         })
       )
-    }),
+    ),
     switchMap(({ atlas, parcellation }) => {
-      const spacdIds = parcellation.brainAtlasVersions.map(bas => bas.coordinateSpace) as { "@id": string }[]
-      return forkJoin(
-        spacdIds.filter(
-          spaceId => atlas.spaces.map(spc => spc["@id"]).indexOf(spaceId["@id"]) >= 0
-        ).map(spaceId =>
-          this.sapiSvc.getSpaceDetail(atlas["@id"], spaceId["@id"])
-        )
-      ).pipe(
+      return this.sapiSvc.getSupportedTemplates(atlas, parcellation).pipe(
         switchMap(spaces => {
-          const selectedSpace = spaces.find(s => /152/.test(s.fullName)) || spaces[0]
+          const selectedSpace = spaces.find(s => s.name.includes("152")) || spaces[0]
           return forkJoin(
             this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: null, current: { atlas, parcellation, template: selectedSpace } }))
           ).pipe(
@@ -255,7 +235,7 @@ export class Effect {
       )
     ),
     switchMap(([regions, layers]) => {
-      const map = new Map<SapiRegionModel, number[]>()
+      const map = new Map<SxplrRegion, number[]>()
       for (const region of regions) {
         map.set(region, SAPIRegion.GetDisplayColor(region))
       }
@@ -336,46 +316,27 @@ export class Effect {
         select(selectors.selectedParcellation)
       )
     ),
-    switchMap(([{ region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
-      if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !region)  {
-        return of(
-          mainActions.generalActionError({
-            message: `atlas, template, parcellation or region not set`
-          })
-        )
+    map(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
+      if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !_region)  {
+        return mainActions.generalActionError({
+          message: `atlas, template, parcellation or region not set`
+        })
       }
 
+      const region = translateV3Entities.retrieveRegion(_region)
+
       if (region.hasAnnotation?.bestViewPoint && region.hasAnnotation.bestViewPoint.coordinateSpace['@id'] === selectedTemplate["@id"]) {
-        return of(
-          actions.navigateTo({
-            animation: true,
-            navigation: {
-              position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
-            }
-          })
-        )
+        return actions.navigateTo({
+          animation: true,
+          navigation: {
+            position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
+          }
+        })
       }
       
-      return this.sapiSvc.getRegion(selectedAtlas['@id'], selectedParcellation['@id'], region["@id"]).getDetail(selectedTemplate["@id"]).pipe(
-        map(detailedRegion => {
-          if (!detailedRegion?.hasAnnotation?.bestViewPoint?.coordinates) {
-            return mainActions.generalActionError({
-              message: `getting region detail error! cannot get coordinates`
-            })
-          }
-          return actions.navigateTo({
-            animation: true,
-            navigation: {
-              position: detailedRegion.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
-            }
-          })
-        }),
-        catchError((_err, _obs) => of(
-          mainActions.generalActionError({
-            message: `Error getting region centroid`
-          })
-        ))
-      )
+      return mainActions.generalActionError({
+        message: `getting region detail error! cannot get coordinates`
+      })
     })
   ))
 

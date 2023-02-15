@@ -3,9 +3,9 @@ import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { Store } from "@ngrx/store";
-import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { encodeCustomState, decodeCustomState, verifyCustomState } from "./util";
-import { BehaviorSubject, combineLatest, concat, merge, Observable, timer } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, from, merge, Observable, of, timer } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";
@@ -145,22 +145,21 @@ export class RouterService {
         })
       ),
       withLatestFrom(
-        store$,
+        store$.pipe(
+          switchMap(state => 
+            from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
+              catchError(() => of(``))
+            )
+          )
+        ),
         this.customRoute$.pipe(
           startWith({})
         )
       )
     ).subscribe(arg => {
-      const [{ stateFromRoute, url }, currentState, customRoutes] = arg
+      const [{ stateFromRoute, url }, _routeFromState, customRoutes] = arg
       const fullPath = url
-      
-      let routeFromState: string
-      try {
-        routeFromState = routeToStateTransformSvc.cvtStateToRoute(currentState)
-      } catch (_e) {
-        routeFromState = ``
-      }
-
+      let routeFromState = _routeFromState
       for (const key in customRoutes) {
         const customStatePath = encodeCustomState(key, customRoutes[key])
         if (!customStatePath) continue
@@ -203,14 +202,14 @@ export class RouterService {
         combineLatest([
           store$.pipe(
             debounceTime(160),
-            map(state => {
-              try {
-                return routeToStateTransformSvc.cvtStateToRoute(state)
-              } catch (e) {
-                this.logError(e)
-                return ``
-              }
-            })
+            switchMap(state =>
+              from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
+                catchError(err => {
+                  this.logError(err)
+                  return of(``)
+                })
+              )
+            ),
           ),
           this.customRoute$,
         ]).pipe(

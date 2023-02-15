@@ -1,3 +1,8 @@
+/**
+ * This node script generates API doc for plugins.
+ * Check npm run api-schema for usage.
+ */
+
 const ts = require('typescript')
 const fs = require('fs')
 const path = require('path')

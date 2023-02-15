@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
-import { SapiRegionModel } from "src/atlasComponents/sapi/type";
+import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
 import { ARIA_LABELS } from "common/constants"
 import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";
@@ -13,12 +13,11 @@ import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionListSearch
  * @param region input region
  * @returns {boolean} whether or not to include the region in the list search
  */
-const filterRegionForListSearch = (region: SapiRegionModel): boolean => {
-  const visualizedIn = region.hasAnnotation?.visualizedIn
-  return !!visualizedIn
+const filterRegionForListSearch = (region: SxplrRegion): boolean => {
+  return !!region.color
 }
 
-const filterRegionViaSearch = (searchTerm: string) => (region:SapiRegionModel) => {
+const filterRegionViaSearch = (searchTerm: string) => (region:SxplrRegion) => {
   return region.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
 }
 
@@ -37,12 +36,12 @@ export class SapiViewsCoreRichRegionListSearch {
 
   showNOptions = 4
 
-  private _regions: SapiRegionModel[] = []
+  private _regions: SxplrRegion[] = []
   get regions(){
     return this._regions
   }
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-regions')
-  set regions(val: SapiRegionModel[]) {
+  set regions(val: SxplrRegion[]) {
     this._regions = val.filter(filterRegionForListSearch)
   }
 
@@ -56,7 +55,7 @@ export class SapiViewsCoreRichRegionListSearch {
   currentSearch: string = ''
 
   @Output('sxplr-sapiviews-core-rich-regionlistsearch-region-select')
-  onOptionSelected = new EventEmitter<SapiRegionModel>()
+  onOptionSelected = new EventEmitter<SxplrRegion>()
 
   public searchFormControl = new UntypedFormControl()
 
@@ -64,7 +63,7 @@ export class SapiViewsCoreRichRegionListSearch {
     startWith(''),
     distinctUntilChanged(),
     debounceTime(160),
-    map((searchTerm: string | SapiRegionModel) => {
+    map((searchTerm: string | SxplrRegion) => {
       if (typeof searchTerm === "string") {
         return this.regions.filter(filterRegionViaSearch(searchTerm))
       }
@@ -76,12 +75,12 @@ export class SapiViewsCoreRichRegionListSearch {
     map(list => list.slice(0, this.showNOptions))
   )
 
-  displayFn(region: SapiRegionModel){
+  displayFn(region: SxplrRegion){
     return region?.name || ''
   }
 
   optionSelected(opt: MatAutocompleteSelectedEvent) {
-    const selectedRegion = opt.option.value as SapiRegionModel
+    const selectedRegion = opt.option.value as SxplrRegion
     this.onOptionSelected.emit(selectedRegion)
   }
 }

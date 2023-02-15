@@ -3,7 +3,8 @@ import { interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { debounce, debounceTime, distinctUntilChanged, filter, pairwise, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint, TNgAnnotationAABBox } from "src/atlasComponents/annotations";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BoundingBoxConcept, SapiAtlasModel, SapiSpaceModel, SapiVOIDataResponse, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi/type";
+import { BoundingBox, SxplrAtlas, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/type_sxplr";
+
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { arrayEqual } from "src/util/array";
 
@@ -17,9 +18,9 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
   static VOI_LAYER_NAME = 'voi-annotation-layer'
   static VOI_ANNOTATION_COLOR = "#ffff00"
   private voiQuerySpec = new Subject<{
-    atlas: SapiAtlasModel
-    space: SapiSpaceModel
-    bbox: BoundingBoxConcept
+    atlas: SxplrAtlas
+    space: SxplrTemplate
+    bbox: BoundingBox
   }>()
 
   private canFetchVoi(){
@@ -27,22 +28,22 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
   }
   
   @Input('sxplr-sapiviews-features-voi-query-atlas')
-  atlas: SapiAtlasModel
+  atlas: SxplrAtlas
 
   @Input('sxplr-sapiviews-features-voi-query-space')
-  space: SapiSpaceModel
+  space: SxplrTemplate
 
   @Input('sxplr-sapiviews-features-voi-query-bbox')
-  bbox: BoundingBoxConcept
+  bbox: BoundingBox
 
   @Output('sxplr-sapiviews-features-voi-query-onhover')
-  onhover = new EventEmitter<SapiVOIDataResponse>()
+  onhover = new EventEmitter<VoiFeature>()
 
   @Output('sxplr-sapiviews-features-voi-query-onclick')
-  onclick = new EventEmitter<SapiVOIDataResponse>()
+  onclick = new EventEmitter<VoiFeature>()
 
   public busy$ = new EventEmitter<boolean>()
-  public features$: Observable<SapiVOIDataResponse[]> = this.voiQuerySpec.pipe(
+  public features$: Observable<VoiFeature[]> = this.voiQuerySpec.pipe(
     debounceTime(160),
     tap(() => this.busy$.emit(true)),
     switchMap(({ atlas, bbox, space }) => {
@@ -51,18 +52,14 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
       }
       return merge(
         of([]),
-        this.sapi.getSpace(atlas["@id"], space["@id"]).getFeatures({ bbox: JSON.stringify(bbox) }).pipe(
-          tap(val => {
-            this.busy$.emit(false)
-          })
-        )
+        this.sapi.getVoiFeatures(bbox)
       )
     }),
     startWith([]),
     shareReplay(1)
   )
 
-  private hoveredFeat: SapiVOIDataResponse
+  private hoveredFeat: VoiFeature
   private onDestroyCb: (() => void)[] = []
   private subscription: Subscription[] = []
   ngOnChanges(simpleChanges: SimpleChanges): void {
@@ -131,7 +128,7 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
     clickInterceptor.register(handle)
     this.subscription.push(
       this.features$.pipe(
-        startWith([] as SapiVOIDataResponse[]),
+        startWith([] as VoiFeature[]),
         distinctUntilChanged(arrayEqual((o, n) => o["@id"] === n["@id"])),
         pairwise(),
         debounce(() => 
@@ -142,8 +139,8 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
         ),
       ).subscribe(([ prev, curr ]) => {
         for (const v of prev) {
-          const box = this.pointsToAABB(v.location.maxpoint, v.location.minpoint)
-          const point = this.pointToPoint(v.location.center)
+          const box = this.pointsToAABB(v.bbox.maxpoint, v.bbox.minpoint)
+          const point = this.pointToPoint(v.bbox.center)
           this.annotationIdToFeature.delete(box.id)
           this.annotationIdToFeature.delete(point.id)
           if (!this.voiBBoxSvc) continue
@@ -154,8 +151,8 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
           }
         }
         for (const v of curr) {
-          const box = this.pointsToAABB(v.location.maxpoint, v.location.minpoint)
-          const point = this.pointToPoint(v.location.center)
+          const box = this.pointsToAABB(v.bbox.maxpoint, v.bbox.minpoint)
+          const point = this.pointToPoint(v.bbox.center)
           this.annotationIdToFeature.set(box.id, v)
           this.annotationIdToFeature.set(point.id, v)
           if (!this.voiBBoxSvc) {
@@ -170,20 +167,20 @@ export class SapiViewsFeaturesVoiQuery implements OnChanges, OnDestroy{
     )
   }
 
-  private annotationIdToFeature = new Map<string, SapiVOIDataResponse>()
+  private annotationIdToFeature = new Map<string, VoiFeature>()
 
-  private pointsToAABB(pointA: OpenMINDSCoordinatePoint, pointB: OpenMINDSCoordinatePoint): TNgAnnotationAABBox{
+  private pointsToAABB(pointA: [number, number, number], pointB: [number, number, number]): TNgAnnotationAABBox{
     return {
       id: `${SapiViewsFeaturesVoiQuery.VOI_LAYER_NAME}:${pointA["@id"]}:${pointB["@id"]}`,
-      pointA: pointA.coordinates.map(v => v.value * 1e6) as [number, number, number],
-      pointB: pointB.coordinates.map(v => v.value * 1e6) as [number, number, number],
+      pointA: pointA.map(v => v * 1e6) as [number, number, number],
+      pointB: pointB.map(v => v * 1e6) as [number, number, number],
       type: "aabbox"
     }
   }
-  private pointToPoint(point: OpenMINDSCoordinatePoint): TNgAnnotationPoint {
+  private pointToPoint(point: [number, number, number]): TNgAnnotationPoint {
     return {
-      id: `${SapiViewsFeaturesVoiQuery.VOI_LAYER_NAME}:${point["@id"]}`,
-      point: point.coordinates.map(v => v.value * 1e6) as [number, number, number],
+      id: `${SapiViewsFeaturesVoiQuery.VOI_LAYER_NAME}:${JSON.stringify(point)}}`,
+      point: point.map(v => v * 1e6) as [number, number, number],
       type: "point"
     }
   }

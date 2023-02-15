@@ -7,7 +7,7 @@
 <mat-chip-list>
   <mat-chip *ngFor="let point of (updateAnnotation?.points || []) ; let i = index"
     (click)="gotoRoi(point)"
-    [matTooltip]="point">
+    [matTooltip]="point.toString()">
     {{ i }}
   </mat-chip>
 </mat-chip-list>

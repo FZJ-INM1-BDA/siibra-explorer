@@ -1,6 +1,6 @@
 {
-  "name": "interactive-viewer",
-  "version": "2.9.0",
+  "name": "siibra-explorer",
+  "version": "2.10.0",
   "description": "siibra-explorer - explore brain atlases. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
     "lint": "eslint src --ext .ts",
@@ -11,7 +11,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test-ci": "ng test --progress false --watch false --browsers=ChromeHeadless",
-    "sapi-schema": "npx openapi-typescript@5.1.1 https://siibra-api-stable.apps.hbp.eu/v2_0/openapi.json --output ./src/atlasComponents/sapi/schema.ts && eslint ./src/atlasComponents/sapi/schema.ts --no-ignore --fix",
+    "sapi-schema": "npx openapi-typescript@6.1.0 https://siibra-api-latest.apps-dev.hbp.eu/v3_0/openapi.json --output ./src/atlasComponents/sapi/schema_v3.ts && eslint ./src/atlasComponents/sapi/schema_v3.ts --no-ignore --fix",
     "api-schema": "node src/plugin/generateTypes.js",
     "docs:json": "compodoc -p ./tsconfig.json -e json -d .",
     "storybook": "npm run docs:json && start-storybook -p 6006",

@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Injec
 import { fromEvent, Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
+import { TabularFeature } from "src/atlasComponents/sapi/type_sxplr";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { BaseReceptor } from "../base";
 
@@ -21,22 +21,27 @@ type RequiredType = {
   }
 }
 
-function transformRadar(input: SapiRegionalFeatureReceptorModel['data']['fingerprints']): RequiredType[]{
+function transformRadar(input: TabularFeature<number>): RequiredType[]{
   const listRequired: RequiredType[] = []
-  for (const key in input) {
-    const item = input[key]
+  if (input.index.length !== input.data.length) {
+    throw new Error(`Expecting index length: '${input.index.length}' to be the same as data length : '${input.data.length}'.`)
+  }
+  const rowLength = new Set([input.data.map(row => row.length)])
+  if (rowLength.size !== 1) {
+    throw new Error(`Expecting all row length to equal, but exists: ${JSON.stringify(Array.from(rowLength))}`)
+  }
+  input.index.forEach((label, idx) => {
     listRequired.push({
       receptor: {
-        label: key
+        label
       },
       density: {
-        mean: item.mean,
-        sd: item.std,
-        unit: item.unit
+        mean: input.data[idx][0],
+        sd: input.data[idx][1],
+        unit: ''
       }
     })
-    
-  }
+  })
   return listRequired
 }
 

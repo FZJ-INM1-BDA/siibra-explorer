@@ -29,7 +29,7 @@
 
         </mat-list-item>
 
-        <ng-template [ngIf]="voiQueryDirective && (voiQueryDirective.onhover | async)" let-feat>
+        <!-- <ng-template [ngIf]="voiQueryDirective && (voiQueryDirective.onhover | async)" let-feat>
           <mat-list-item>
             <mat-icon
               fontSet="fas"
@@ -38,7 +38,8 @@
             </mat-icon>
             <div matLine>{{ feat?.metadata?.fullName || 'Feature' }}</div>
           </mat-list-item>
-        </ng-template>
+        </ng-template> -->
+
       </mat-list>
       <!-- TODO Potentially implementing plugin contextual info -->
     </div>
@@ -230,11 +231,11 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <ng-template [ngIf]="VOI_QUERY_FLAG">
+      <!-- <ng-template [ngIf]="VOI_QUERY_FLAG">
         <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
           <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
         </div>
-      </ng-template>
+      </ng-template> -->
     </div>
 
     <!-- such a gross implementation -->
@@ -268,7 +269,7 @@
   </div>
 
   <!-- tab toggling hide/show of min search tray -->
-  <div class="tab-toggle-container d-inline-block v-align-top">
+  <!-- <div class="tab-toggle-container d-inline-block v-align-top">
     <ng-container *ngTemplateOutlet="tabTmpl; context: {
       isOpen: minTrayVisSwitch.switchState$ | async,
       regionSelected: selectedRegions$ | async,
@@ -276,7 +277,7 @@
       badge: voiQueryDirective && (voiQueryDirective.features$ | async).length || null
     }">
     </ng-container>
-  </div>
+  </div> -->
 
 </ng-template>
 
@@ -796,7 +797,7 @@
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
   <mat-card class="sxplr-p-0 d-flex flex-column"
-    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
+    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true, key: 'Esc'}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">
     <mat-card-content *ngFor="let tmplRef of tmplRefs"
@@ -930,13 +931,14 @@
 
   </sxplr-sapiviews-core-datasets-dataset>
   
-  <sxplr-sapiviews-features-entry
+  <!-- TODO FIXME -->
+  <!-- <sxplr-sapiviews-features-entry
     [sxplr-sapiviews-features-entry-atlas]="selectedAtlas$ | async"
     [sxplr-sapiviews-features-entry-space]="templateSelected$ | async"
     [sxplr-sapiviews-features-entry-parcellation]="parcellationSelected$ | async"
     [sxplr-sapiviews-features-entry-region]="(selectedRegions$ | async)[0]"
     [sxplr-sapiviews-features-entry-feature]="feature">
-  </sxplr-sapiviews-features-entry>
+  </sxplr-sapiviews-features-entry> -->
 </ng-template>
 
 <!-- general feature tmpl -->
@@ -962,7 +964,7 @@
 
 </ng-template>
 
-<ng-template #spatialFeatureListViewTmpl>
+<!-- <ng-template #spatialFeatureListViewTmpl>
   <div *ngIf="voiQueryDirective && (voiQueryDirective.busy$ | async); else notBusyTmpl" class="fs-200">
     <spinner-cmp></spinner-cmp>
   </div>
@@ -973,7 +975,6 @@
         Volumes of interest
       </mat-card-title>
       <mat-card-subtitle class="overflow-hidden">
-        <!-- TODO in future, perhaps encapsulate this as a component? seems like a nature fit in sapiView/space/boundingbox -->
         <ng-template let-bbox [ngIf]="boundingBoxDirective && (boundingBoxDirective.bbox$ | async | getProperty : 'bbox')" [ngIfElse]="bboxFallbackTmpl">
           Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
         </ng-template>
@@ -996,9 +997,10 @@
       </ng-template>
     </mat-card>
   </ng-template>
-</ng-template>
+</ng-template> -->
 
-<div class="d-none"
+<!-- TODO FIXME -->
+<!-- <div class="d-none"
   *ngIf="VOI_QUERY_FLAG"
   sxplr-sapiviews-core-space-boundingbox
   [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
@@ -1012,4 +1014,4 @@
   (sxplr-sapiviews-features-voi-query-onclick)="showDataset($event)"
   #voiFeatures="sxplrSapiViewsFeaturesVoiQuery">
 
-</div>
+</div> -->

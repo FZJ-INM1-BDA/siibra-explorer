@@ -1,8 +1,18 @@
-import { Observable, throwError } from "rxjs"
+import { Observable, of, throwError } from "rxjs"
 import { SAPI } from '../sapi.service'
-import { camelToSnake } from 'common/util'
-import {SapiQueryPriorityArg, SapiSpaceModel, SapiSpatialFeatureModel, SapiVolumeModel} from "../type"
+import { SxplrTemplate } from "../type_sxplr"
 import { map, switchMap } from "rxjs/operators"
+import { SAPIBase } from "./base"
+import { SapiQueryPriorityArg } from "../type_v3"
+
+/**
+ * All valid parcellation features
+ */
+const SpaceFeatures = {
+  VolumeOfInterest: "VolumeOfInterest",
+} as const
+
+export type SF = keyof typeof SpaceFeatures
 
 type FeatureResponse = {
   features: {
@@ -21,9 +31,13 @@ type BBoxSpatialFEatureOpts = {
 
 type SpatialFeatureOpts = RegionalSpatialFeatureOpts | BBoxSpatialFEatureOpts
 
-export class SAPISpace{
+export class SAPISpace extends SAPIBase<SF>{
+
+  static Features$ = of(Object.keys(SpaceFeatures) as SF[])
+  public features$ = SAPISpace.Features$
 
   constructor(private sapi: SAPI, public atlasId: string, public id: string){
+    super(sapi)
     this.prefix$ = SAPI.BsEndpoint$.pipe(
       map(endpt => `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/spaces/${encodeURIComponent(this.id)}`)
     )
@@ -41,35 +55,9 @@ export class SAPISpace{
     )
   }
 
-  getFeatures(opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel[]> {
-    const query: Record<string, string> = {}
-    for (const [key, value] of Object.entries(opts)) {
-      query[camelToSnake(key)] = value
-    }
+  getDetail(param?: SapiQueryPriorityArg): Observable<SxplrTemplate>{
     return this.prefix$.pipe(
-      switchMap(prefix => this.sapi.httpGet<SapiSpatialFeatureModel[]>(
-        `${prefix}/features`,
-        query
-      ))
-    )
-  }
-
-  getFeatureInstance(instanceId: string, opts: SpatialFeatureOpts): Observable<SapiSpatialFeatureModel> {
-    const query: Record<string, string> = {}
-    for (const [key, value] of Object.entries(opts)) {
-      query[camelToSnake(key)] = value
-    }
-    return this.prefix$.pipe(
-      switchMap(prefix => this.sapi.httpGet<SapiSpatialFeatureModel>(
-        `${prefix}/features/${encodeURIComponent(instanceId)}`,
-        query
-      ))
-    )
-  }
-
-  getDetail(param?: SapiQueryPriorityArg): Observable<SapiSpaceModel>{
-    return this.prefix$.pipe(
-      switchMap(prefix => this.sapi.httpGet<SapiSpaceModel>(
+      switchMap(prefix => this.sapi.httpGet<SxplrTemplate>(
         `${prefix}`,
         null,
         param
@@ -77,30 +65,4 @@ export class SAPISpace{
     )
   }
 
-  getVolumes(): Observable<SapiVolumeModel[]>{
-    return this.prefix$.pipe(
-      switchMap(prefix => this.sapi.httpGet<SapiVolumeModel[]>(
-        `${prefix}/volumes`,
-      ))
-    )
-  }
-
-  getTemplateSize() {
-    return this.getVolumes().pipe(
-      switchMap(volumes => {
-        const ngVolumes = volumes.filter(vol => vol["@type"] === "spy/volume/neuroglancer/precomputed")
-        if (ngVolumes.length === 0) return throwError(`template ${this.id} has no ng volume.`)
-        return this.sapi.httpGet<any>(`${ngVolumes[0].data.url}/info`).pipe(
-          map(infoJson => {
-            const { resolution, size } = infoJson.scales[0]
-            return {
-              voxel: size as [number, number, number],
-              real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
-              transform: ngVolumes[0].data?.detail?.['neuroglancer/precomputed']?.['transform'] as number[][]
-            }
-          })
-        )
-      })
-    )
-  }
 }

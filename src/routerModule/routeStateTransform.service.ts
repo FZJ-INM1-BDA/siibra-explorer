@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
-import { SAPI, SapiRegionModel } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi";
+import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
 import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
-import { getParcNgId, getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
+import { getParcNgId, } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, endcodePath } from "./util";
@@ -43,7 +44,7 @@ export class RouteStateTransformSvc {
       this.sapi.getParcRegions(selectedAtlasId, selectedParcellationId, selectedTemplateId, { priority: 10 }).toPromise(),
     ])
 
-    const ngIdToRegionMap: Map<string, Map<number, SapiRegionModel[]>> = new Map()
+    const ngIdToRegionMap: Map<string, Map<number, SxplrRegion[]>> = new Map()
 
     for (const region of allParcellationRegions) {
       const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
@@ -52,7 +53,7 @@ export class RouteStateTransformSvc {
       }
       const map = ngIdToRegionMap.get(ngId)
 
-      const idx = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
+      const idx = await this.sapi.getRegionLabelIndices(selectedTemplate, selectedParcellation, region)
       if (!map.has(idx)) {
         map.set(idx, [])
       }
@@ -201,7 +202,7 @@ export class RouteStateTransformSvc {
     return returnState
   }
 
-  cvtStateToRoute(_state: MainState) {
+  async cvtStateToRoute(_state: MainState) {
     
     /**
      * need to create new references here
@@ -238,7 +239,7 @@ export class RouteStateTransformSvc {
     let selectedRegionsString: string
     if (selectedRegions.length === 1) {
       const region = selectedRegions[0]
-      const labelIndex = getRegionLabelIndex(selectedAtlas, selectedTemplate, selectedParcellation, region)
+      const labelIndex = await this.sapi.getRegionLabelIndices(selectedTemplate, selectedParcellation, region)
       
       const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
       selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`

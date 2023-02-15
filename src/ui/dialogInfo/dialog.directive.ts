@@ -31,7 +31,7 @@ const sizeDict: Record<DialogSize, Partial<MatDialogConfig>> = {
 export class DialogDirective{
 
   @Input('sxplr-dialog')
-  templateRef: TemplateRef<unknown>
+  templateRef: TemplateRef<unknown>|string
 
   @Input('sxplr-dialog-size')
   size: DialogSize = 'm'
@@ -43,7 +43,11 @@ export class DialogDirective{
 
   @HostListener('click')
   onClick(){
-    this.matDialog.open(this.templateRef || DialogFallbackCmp, {
+    const tmpl = this.templateRef instanceof TemplateRef
+      ? this.templateRef
+      : DialogFallbackCmp
+
+    this.matDialog.open(tmpl, {
       data: this.data,
       ...(sizeDict[this.size] || {})
     })

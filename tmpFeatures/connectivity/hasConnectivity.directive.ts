@@ -74,7 +74,6 @@ export class HasConnectivity implements OnDestroy {
       if (this.region.name) {
         this.connectivityModalities.forEach(m => {
           const type = m.types[0]
-          
           this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
             .getFeatures({type, page: 1, size: 1}).pipe(take(1))
             .subscribe((res: SapiParcellationFeatureModel[] | any) => {

@@ -4,7 +4,7 @@ import { Store } from "./store"
 
 const selectStore = state => state[nameSpace] as Store
 
-export const getSelectedVolumeId = createSelector(
+export const getSelectedSurfaceVariant = createSelector(
   selectStore,
-  ({ selectedVolumeId }) => selectedVolumeId
+  ({ selectedSurfaceVariant }) => selectedSurfaceVariant
 )

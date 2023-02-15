@@ -1,7 +1,7 @@
 import { Directive, Input, SimpleChanges } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { SapiRegionalFeatureReceptorModel } from "src/atlasComponents/sapi/type";
+import { TabularFeature } from "src/atlasComponents/sapi/type_sxplr"
 
 @Directive()
 export abstract class BaseReceptor{
@@ -22,7 +22,7 @@ export abstract class BaseReceptor{
   featureId: string
 
   @Input('sxplr-sapiviews-features-receptor-data')
-  receptorData: SapiRegionalFeatureReceptorModel
+  receptorData: TabularFeature<number>
 
   error: string
 

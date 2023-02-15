@@ -153,21 +153,21 @@ describe("> routeStateTransform.service.ts", () => {
           }
         })
 
-        it('> calls correct functions', () => {
+        it('> calls correct functions', async () => {
 
           getRegionLabelIndexSpy.and.returnValue(11)
           getParcNgId.and.returnValue('foo-bar')
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
+          const s = await svc.cvtStateToRoute(state as any)
 
           for (const key in atlasSelectionSpy) {
             expect(atlasSelectionSpy[key]).toHaveBeenCalledTimes(1)
           }
         })
 
-        it('> regular ngId', () => {
+        it('> regular ngId', async () => {
           const ngId = 'foobar'
           const labelIndex = 124
           
@@ -176,12 +176,12 @@ describe("> routeStateTransform.service.ts", () => {
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
+          const s = await svc.cvtStateToRoute(state as any)
 
           expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
         })
   
-        it('> ngId containing ()', () => {
+        it('> ngId containing ()', async () => {
           const ngId = 'foobar(1)'
           const labelIndex = 124
 
@@ -190,7 +190,7 @@ describe("> routeStateTransform.service.ts", () => {
           
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
+          const s = await svc.cvtStateToRoute(state as any)
           expect(s).toContain(`r:foobar%25281%2529::${encodeNumber(labelIndex, { float: false })}`)
         })
       })
