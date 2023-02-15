@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, merge, Observable, of } from "rxjs";
+import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
 import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
@@ -316,48 +316,27 @@ export class Effect {
         select(selectors.selectedParcellation)
       )
     ),
-    switchMap(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
+    map(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
       if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !_region)  {
-        return of(
-          mainActions.generalActionError({
-            message: `atlas, template, parcellation or region not set`
-          })
-        )
+        return mainActions.generalActionError({
+          message: `atlas, template, parcellation or region not set`
+        })
       }
 
       const region = translateV3Entities.retrieveRegion(_region)
 
       if (region.hasAnnotation?.bestViewPoint && region.hasAnnotation.bestViewPoint.coordinateSpace['@id'] === selectedTemplate["@id"]) {
-        return of(
-          actions.navigateTo({
-            animation: true,
-            navigation: {
-              position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
-            }
-          })
-        )
+        return actions.navigateTo({
+          animation: true,
+          navigation: {
+            position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
+          }
+        })
       }
       
-      return this.sapiSvc.getRegion(selectedAtlas['@id'], selectedParcellation['@id'], region["@id"]).getDetail(selectedTemplate["@id"]).pipe(
-        map(detailedRegion => {
-          if (!detailedRegion?.hasAnnotation?.bestViewPoint?.coordinates) {
-            return mainActions.generalActionError({
-              message: `getting region detail error! cannot get coordinates`
-            })
-          }
-          return actions.navigateTo({
-            animation: true,
-            navigation: {
-              position: detailedRegion.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
-            }
-          })
-        }),
-        catchError((_err, _obs) => of(
-          mainActions.generalActionError({
-            message: `Error getting region centroid`
-          })
-        ))
-      )
+      return mainActions.generalActionError({
+        message: `getting region detail error! cannot get coordinates`
+      })
     })
   ))
 

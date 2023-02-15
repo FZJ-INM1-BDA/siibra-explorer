@@ -25,8 +25,6 @@ import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate,
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const EXPECTED_SIIBRA_API_VERSION = '0.3.0'
 
-type RegistryType = SAPIAtlas | SAPISpace | SAPIParcellation
-
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
 type PaginatedResponse<T> = {
@@ -146,35 +144,6 @@ export class SAPI{
   }
 
   static ErrorMessage = null
-  
-  registry = {
-    _map: {} as Record<string, {
-      func: (...arg: any[]) => RegistryType
-      args: string[]
-    }>,
-    get<T>(id: string): T {
-      if (!this._map[id]) return null
-      const { func, args } = this._map[id]
-      return func(...args)
-    },
-    set(id: string, func: (...args: any[]) => RegistryType, args: string[]) {
-      if (this._map[id]) {
-        console.warn(`id ${id} already mapped as ${this._map[id]}`)
-      }
-      this._map[id] = { func, args }
-    }
-  }
-  getSpace(atlasId: string, spaceId: string): SAPISpace {
-    return new SAPISpace(this, atlasId, spaceId)
-  }
-
-  getParcellation(atlasId: string, parcId: string): SAPIParcellation {
-    return new SAPIParcellation(this, atlasId, parcId)
-  }
-
-  getRegion(atlasId: string, parcId: string, regionId: string): SAPIRegion{
-    return new SAPIRegion(this, atlasId, parcId, regionId)
-  }
 
   getSpaceDetail(_atlasId: string, spaceId: string, param?: SapiQueryPriorityArg): Observable<SxplrTemplate> {
     return this.v3Get("/spaces/{space_id}", {
@@ -486,19 +455,6 @@ export class SAPI{
     if (SAPI.ErrorMessage) {
       this.snackbar.open(SAPI.ErrorMessage, 'Dismiss', { duration: 5000 })
     }
-    this.atlases$.subscribe(atlases => {
-      for (const atlas of atlases) {
-        const sapiAtlas = translateV3Entities.retrieveAtlas(atlas)
-        for (const space of sapiAtlas.spaces) {
-          this.registry.set(space["@id"], this.getSpace.bind(this), [atlas["@id"], space["@id"]])
-          this.getSpaceDetail(atlas["@id"], space["@id"])
-        }
-        for (const parc of sapiAtlas.parcellations) {
-          this.registry.set(parc["@id"], this.getParcellation.bind(this), [atlas["@id"], parc["@id"]])
-          this.getParcDetail(atlas["@id"], parc["@id"])
-        }
-      }
-    })
   }
   
   /**

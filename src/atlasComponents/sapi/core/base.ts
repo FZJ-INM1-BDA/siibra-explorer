@@ -28,7 +28,7 @@ export abstract class SAPIBase<T extends AF> {
   }
   
   getFeatureInstance(featureType: T, param: RouteParam<`/feature/${T}/{feature_id}`> & Partial<SapiQueryPriorityArg>) {
-    let route = `/feature/${featureType}/{feature_id}` as `/feature/${T}/{feature_id}`
+    const route = `/feature/${featureType}/{feature_id}` as `/feature/${T}/{feature_id}`
     return this._sapi.v3Get(route, param)
   }
 }

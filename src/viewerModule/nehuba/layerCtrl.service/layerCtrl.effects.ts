@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, from, of } from "rxjs";
+import { forkJoin, from, of, throwError } from "rxjs";
 import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
 import { NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
 import { SAPI } from "src/atlasComponents/sapi"
@@ -54,34 +54,31 @@ export class LayerCtrlEffects {
       )
     ),
     switchMap(([ regions, { atlas, parcellation, template } ]) => {
-      const sapiRegion = this.sapi.getRegion(atlas["@id"], parcellation["@id"], regions[0].name)
-      return forkJoin([
-        sapiRegion.getMapInfo(template["@id"]),
-        sapiRegion.getMapUrl(template["@id"])
-      ]).pipe(
-        map(([mapInfo, mapUrl]) => 
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: {
-              clType: "customlayer/nglayer",
-              id: PMAP_LAYER_NAME,
-              source: `nifti://${mapUrl}`,
-              shader: getShader({
-                colormap: EnumColorMapName.VIRIDIS,
-                highThreshold: mapInfo.max,
-                lowThreshold: mapInfo.min,
-                removeBg: true,
-              })
-            }
-          })
-        ),
-        catchError(() => of(
-          atlasAppearance.actions.removeCustomLayer({
-            id: PMAP_LAYER_NAME
-          })
-        ))
-      )
+      return throwError(`IMPLEMENT PMAP LAYER YO`)
+      const actions = [
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            clType: "customlayer/nglayer",
+            id: PMAP_LAYER_NAME,
+            source: `nifti://${regions['url']}`,
+            shader: getShader({
+              colormap: EnumColorMapName.VIRIDIS,
+              // highThreshold: [regions['']].max,
+              // lowThreshold: [regions['']].min,
+              removeBg: true,
+            })
+          }
+        }),
+        
+        /**
+         * on error, remove layer
+         */
+        atlasAppearance.actions.removeCustomLayer({
+          id: PMAP_LAYER_NAME
+        })
+      ]
     }),
-  ))
+  ), { dispatch: false })
 
   onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),

@@ -34,7 +34,6 @@ class TranslateV3 {
 
   #templateMap: Map<string, PathReturn<"/spaces/{space_id}">> = new Map()
   retrieveTemplate(template:SxplrTemplate): PathReturn<"/spaces/{space_id}"> {
-    if (!template) debugger
     return this.#templateMap.get(template.id)
   }
   async translateTemplate(template:PathReturn<"/spaces/{space_id}">): Promise<SxplrTemplate> {
@@ -234,7 +233,7 @@ class TranslateV3 {
         if (!label) {
           console.error(`Attempmting to add labelledmap with label '${label}'`)
         }
-        let error = `Attempting to access map volume with idx '${volumeIdx}'`
+        const error = `Attempting to access map volume with idx '${volumeIdx}'`
         if (!map.volumes[volumeIdx]) {
           console.error(`${error}, IndexError, Skipping`)
           continue
