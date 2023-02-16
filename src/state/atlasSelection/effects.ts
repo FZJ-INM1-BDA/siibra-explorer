@@ -10,8 +10,8 @@ import { AtlasSelectionState } from "./const"
 import { atlasAppearance, atlasSelection } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 type OnTmplParcHookArg = {
   previous: {
@@ -35,18 +35,14 @@ export class Effect {
      * and then set selectedParcellationAllRegions to it
      */
     ({ current }) => {
-      const { atlas, parcellation, template } = current
-      return (
-        !!atlas && !!parcellation && !!template
-          ? this.sapiSvc.getParcRegions(atlas.id, parcellation.id, template.id)
-          : of([])
-      ).pipe(
+      const { parcellation } = current
+      if (!parcellation) return NEVER
+      return this.sapiSvc.getParcRegions(parcellation.id).pipe(
         map(regions => {
           return {
             selectedParcellationAllRegions: regions
           }
-        })
-      )
+        }))
     },
     ({ current, previous }) => {
       const prevSpcName = InterSpaceCoordXformSvc.TmplIdToValidSpaceName(previous?.template?.id)

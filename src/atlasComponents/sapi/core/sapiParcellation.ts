@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs"
-import { switchMap } from "rxjs/operators"
 import { SAPI } from "../sapi.service"
-import { SapiParcellationModel, SapiQueryPriorityArg, SapiRegionModel, RouteParam } from "../type_v3"
+import { SapiParcellationModel } from "../typeV3"
+import { SapiQueryPriorityArg } from "../sxplrTypes"
 import { SAPIBase } from "./base"
 
 /**

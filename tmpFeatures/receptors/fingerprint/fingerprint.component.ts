@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Injec
 import { fromEvent, Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { TabularFeature } from "src/atlasComponents/sapi/type_sxplr";
+import { TabularFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { BaseReceptor } from "../base";
 

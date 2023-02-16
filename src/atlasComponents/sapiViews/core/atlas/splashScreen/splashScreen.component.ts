@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { tap } from 'rxjs/operators'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { SxplrAtlas } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrAtlas } from "src/atlasComponents/sapi/sxplrTypes";
 import { atlasSelection } from "src/state"
 
 @Component({

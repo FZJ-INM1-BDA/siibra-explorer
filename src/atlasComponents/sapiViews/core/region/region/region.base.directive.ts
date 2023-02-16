@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, OnDestroy, Output } from "@angular/core";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { BehaviorSubject, Subject } from "rxjs";

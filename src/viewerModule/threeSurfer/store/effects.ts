@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { EMPTY, forkJoin, merge, Observable, of, pipe, throwError } from "rxjs";
 import { debounceTime, map, switchMap, withLatestFrom, filter, shareReplay, distinctUntilChanged } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer } from "src/state/atlasAppearance/const";
 import * as selectors from "./selectors"
@@ -118,7 +118,7 @@ export class ThreeSurferEffects {
     switchMap(({ labels, surfaces }) => {
       const labelMaps: ThreeSurferCustomLabelLayer[] = []
       for (const key in labels) {
-        const { laterality, regions, url } = labels[key]
+        const { laterality, url } = labels[key]
         labelMaps.push({
           clType: 'baselayer/threesurfer-label',
           id: `${url}-${laterality}`,

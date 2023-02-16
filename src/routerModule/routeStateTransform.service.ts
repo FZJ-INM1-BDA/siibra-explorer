@@ -1,8 +1,10 @@
 import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
-import { map } from "rxjs/operators";
+import { forkJoin } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
 import { getParcNgId, } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
@@ -39,45 +41,78 @@ export class RouteStateTransformSvc {
       this.sapi.atlases$.pipe(
         map(atlases => atlases.find(atlas => atlas["@id"] === selectedAtlasId))
       ).toPromise(),
-      this.sapi.getSpaceDetail(selectedAtlasId, selectedTemplateId, { priority: 10 }).toPromise(),
-      this.sapi.getParcDetail(selectedAtlasId, selectedParcellationId, { priority: 10 }).toPromise(),
-      this.sapi.getParcRegions(selectedAtlasId, selectedParcellationId, selectedTemplateId, { priority: 10 }).toPromise(),
+      this.sapi.v3Get("/spaces/{space_id}", {
+        path: {
+          space_id: selectedTemplateId
+        }
+      }).pipe(
+        map(val => translateV3Entities.translateTemplate(val))
+      ).toPromise(),
+      this.sapi.v3Get("/parcellations/{parcellation_id}", {
+        path: {
+          parcellation_id: selectedParcellationId
+        }
+      }).pipe(
+        map(val => translateV3Entities.translateParcellation(val))
+      ).toPromise(),
+      this.sapi.v3Get("/regions", {
+        query: {
+          parcellation_id: selectedParcellationId,
+        }
+      }).pipe(
+        switchMap(v =>
+          this.sapi.iteratePages(v, (page) => this.sapi.v3Get("/regions", {
+            query: {
+              parcellation_id: selectedParcellationId,
+              page
+            }
+          }))
+        ),
+        switchMap(regions => 
+          forkJoin(
+            regions.map(region => translateV3Entities.translateRegion(region))
+          )
+        )
+      ).toPromise(),
     ])
 
-    const ngIdToRegionMap: Map<string, Map<number, SxplrRegion[]>> = new Map()
-
-    for (const region of allParcellationRegions) {
-      const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
-      if (!ngIdToRegionMap.has(ngId)) {
-        ngIdToRegionMap.set(ngId, new Map())
-      }
-      const map = ngIdToRegionMap.get(ngId)
-
-      const idx = await this.sapi.getRegionLabelIndices(selectedTemplate, selectedParcellation, region)
-      if (!map.has(idx)) {
-        map.set(idx, [])
-      }
-      map.get(idx).push(region)
-    }
     
-    const selectedRegions = (() => {
+    const selectedRegions = await (async () => {
       if (!selectedRegionIds) return []
-      /**
-       * assuming only 1 selected region
-       * if this assumption changes, iterate over array of selectedRegionIds
-       */
-      const json = { [selectedRegionIds[0]]: selectedRegionIds[1] }
 
-      for (const ngId in json) {
-        if (!ngIdToRegionMap.has(ngId)) {
-          console.error(`could not find matching map for ${ngId}`)
+      /**
+       * should account for 
+       */
+      const json = {}
+
+      for (let idx = 0; idx < selectedAtlasId.length; idx += 2) {
+        const stateNgId = selectedRegionIds[idx]
+        if (json[stateNgId]) {
+          console.warn(`ngId '${stateNgId}' appeared multiple times. Skipping. Are the label indicies been stored inefficiently?`)
           continue
         }
+        json[selectedRegionIds[idx]] = selectedRegionIds[idx + 1]
+      }
+      
+      const regionMap = new Map<string, SxplrRegion>(allParcellationRegions.map(region => [region.name, region]))
+      const ngIdToRegionMap: Map<string, Map<number, SxplrRegion[]>> = new Map()
 
-        const map = ngIdToRegionMap.get(ngId)
+      const [ ngMap, threeMap ] = await Promise.all([
+        this.sapi.getTranslatedLabelledNgMap(selectedParcellation, selectedTemplate),
+        this.sapi.getTranslatedLabelledThreeMap(selectedParcellation, selectedTemplate)
+      ])
+
+      const _selectedRegions: SxplrRegion[] = []
+
+      for (const { region } of [...Object.values(ngMap), ...Object.values(threeMap)]) {
+        const actualRegion = regionMap.get(region[0].name)
+        const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, actualRegion)
+
+        if (!json[ngId]) {
+          continue
+        }
         
-        const val = json[ngId]
-        const labelIndicies = val.split(separator).map(n => {
+        const labelIndicies: number[] = json[ngId].split(separator).map((n: string) => {
           try {
             return decodeToNumber(n)
           } catch (e) {
@@ -88,9 +123,22 @@ export class RouteStateTransformSvc {
           }
         }).filter(v => !!v)
 
-        return labelIndicies.map(idx => map.get(idx) || []).flatMap(v => v)
+        _selectedRegions.push(
+          ...region.
+            filter(({ label }) => labelIndicies.includes(label))
+            .map(({ name }) => {
+              
+              const actualRegion = regionMap.get(name)
+              if (!actualRegion) {
+                console.warn(`region name '${name}' cannot be deciphered. Skipping`)
+              }
+              return actualRegion
+            })
+            .filter(v => !!v)
+        )
       }
-      return []
+      return _selectedRegions
+
     })()
 
     return {

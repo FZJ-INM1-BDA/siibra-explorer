@@ -3,7 +3,7 @@ import { Store } from "@ngrx/store";
 import { IMessagingActionTmpl, IWindowMessaging } from "./messaging/types";
 import { atlasAppearance, atlasSelection, generalActions } from "src/state"
 import { SAPI } from "./atlasComponents/sapi";
-import { translateV3Entities } from "./atlasComponents/sapi/translate_v3"
+import { translateV3Entities } from "./atlasComponents/sapi/translateV3"
 
 @Injectable()
 export class MessagingGlue implements IWindowMessaging, OnDestroy {

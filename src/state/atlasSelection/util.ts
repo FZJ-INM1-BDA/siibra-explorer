@@ -2,8 +2,8 @@ import { createSelector, select } from "@ngrx/store";
 import { forkJoin, of, pipe } from "rxjs";
 import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
-import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { jsonEqual } from "src/util/json";
 import * as selectors from "./selectors"
 

@@ -6,11 +6,12 @@
 
 
 /**
- * TODO do a global search on type_v3
- * anything outside src/atlasComponent should directly import from type_sxplr, and not from type_v3, or worse type, schema_v3
+ * TODO do a global search on typeV3
+ * anything outside src/atlasComponent should directly import from sxplrTypes, and not from typeV3, or worse type, schemaV3
  */
 
 export type SxplrRegion = {
+  type: 'SxplrRegion'
   id: string
   name: string
   centroid?: Point
@@ -19,17 +20,20 @@ export type SxplrRegion = {
 } & Partial<AdditionalInfo>
 
 export type SxplrParcellation = {
+  type: 'SxplrParcellation'
   id: string
   name: string
   modality?: string
 } & Partial<AdditionalInfo>
 
 export type SxplrTemplate = {
+  type: 'SxplrTemplate'
   id: string
   name: string
 } & Partial<AdditionalInfo>
 
 export type SxplrAtlas = {
+  type: 'SxplrAtlas'
   id: string
   name: string
 } & Partial<AdditionalInfo>
@@ -101,4 +105,18 @@ export type TabularFeature<T extends TabularDataType> = {
 export type LabelledMap = {
   name: string
   label: number
+}
+
+export type StatisticalMap = {
+  url: string
+  min: number
+  max: number
+}
+
+
+/**
+ * Support types
+ */
+export type SapiQueryPriorityArg = {
+  priority: number
 }

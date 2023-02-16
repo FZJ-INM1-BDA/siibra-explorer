@@ -1,10 +1,10 @@
 import { SAPI } from "..";
-import { SapiRegionModel, RouteParam } from "../type_v3";
+import { SapiRegionModel, RouteParam } from "../typeV3";
 import { strToRgb, hexToRgb } from 'common/util'
 import { NEVER, Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SAPIBase } from "./base";
-import { SxplrRegion } from "../type_sxplr";
+import { SxplrRegion } from "../sxplrTypes";
 
 /**
  * All valid region features

@@ -3,7 +3,7 @@ import { interval, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { debounce, debounceTime, distinctUntilChanged, filter, pairwise, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint, TNgAnnotationAABBox } from "src/atlasComponents/annotations";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BoundingBox, SxplrAtlas, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/type_sxplr";
+import { BoundingBox, SxplrAtlas, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { arrayEqual } from "src/util/array";

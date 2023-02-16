@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, from, of, throwError } from "rxjs";
+import { forkJoin, from, NEVER, of, throwError } from "rxjs";
 import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { 
   SapiFeatureModel,
   SapiSpatialFeatureModel,
-} from "src/atlasComponents/sapi/type_v3";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+} from "src/atlasComponents/sapi/typeV3";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -36,7 +36,7 @@ export class LayerCtrlEffects {
   onRegionSelectClearPmapLayer = createEffect(() => this.store.pipe(
     select(atlasSelection.selectors.selectedRegions),
     distinctUntilChanged(
-      arrayEqual((o, n) => o["@id"] === n["@id"])
+      arrayEqual((o, n) => o.name === n.name)
     ),
     mapTo(
       atlasAppearance.actions.removeCustomLayer({
@@ -45,40 +45,42 @@ export class LayerCtrlEffects {
     )
   ))
 
+  #pmapUrl: string
   onRegionSelectShowNewPmapLayer = createEffect(() => this.store.pipe(
     select(atlasSelection.selectors.selectedRegions),
-    filter(regions => regions.length > 0),
+    filter(regions => regions.length === 1),
+    map(regions => regions[0]),
+    distinctUntilChanged((ro, rn) => ro.name === rn.name),
     withLatestFrom(
       this.store.pipe(
         atlasSelection.fromRootStore.distinctATP()
       )
     ),
-    switchMap(([ regions, { atlas, parcellation, template } ]) => {
-      return throwError(`IMPLEMENT PMAP LAYER YO`)
-      const actions = [
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
-            clType: "customlayer/nglayer",
-            id: PMAP_LAYER_NAME,
-            source: `nifti://${regions['url']}`,
-            shader: getShader({
-              colormap: EnumColorMapName.VIRIDIS,
-              // highThreshold: [regions['']].max,
-              // lowThreshold: [regions['']].min,
-              removeBg: true,
-            })
+    switchMap(([ region, { parcellation, template } ]) => {
+      return this.sapi.getStatisticalMap(parcellation, template, region).pipe(
+        catchError(() => NEVER),
+        map(({ buffer, meta }) => {
+          if (!!this.#pmapUrl) {
+            URL.revokeObjectURL(this.#pmapUrl)
           }
-        }),
-        
-        /**
-         * on error, remove layer
-         */
-        atlasAppearance.actions.removeCustomLayer({
-          id: PMAP_LAYER_NAME
+          this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
+          return atlasAppearance.actions.addCustomLayer({
+            customLayer: {
+              clType: "customlayer/nglayer",
+              id: PMAP_LAYER_NAME,
+              source: `nifti://${this.#pmapUrl}`,
+              shader: getShader({
+                colormap: EnumColorMapName.VIRIDIS,
+                highThreshold: meta.max,
+                lowThreshold: meta.min,
+                removeBg: true,
+              })
+            }
+          })
         })
-      ]
+      )
     }),
-  ), { dispatch: false })
+  ))
 
   onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
@@ -170,7 +172,8 @@ export class LayerCtrlEffects {
               const ngId = getParcNgId(atlas, template, parcellation, {
                 id: '',
                 name,
-                parentIds: []
+                parentIds: [],
+                type: "SxplrRegion"
               })
               returnVal[ngId] = layer
               continue

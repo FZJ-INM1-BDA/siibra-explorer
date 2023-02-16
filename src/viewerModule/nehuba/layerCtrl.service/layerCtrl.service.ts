@@ -9,7 +9,7 @@ import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
 import { ColorMapCustomLayer } from "src/state/atlasAppearance";
-import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
 import { getShader } from "src/util/constants";

@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { UntypedFormControl } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith } from "rxjs/operators";
-import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { SxplrFlatHierarchyTreeView } from "src/components/flatHierarchy/treeView/treeView.component";
 import { FilterByRegexPipe } from "./filterByRegex.pipe";
 import { RegionTreeFilterPipe } from "./regionTreeFilter.pipe";

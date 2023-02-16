@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SxplrParcellation } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
 import { GroupedParcellation } from "./groupedParcellation";
 
 @Pipe({

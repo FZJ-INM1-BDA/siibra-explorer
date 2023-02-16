@@ -1,6 +1,7 @@
 import { Observable } from "rxjs"
 import { SAPI } from "../sapi.service"
-import { RouteParam, SapiQueryPriorityArg } from "../type_v3"
+import { RouteParam } from "../typeV3"
+import { SapiQueryPriorityArg } from "../sxplrTypes"
 
 const AllFeatures = {
   // Feature: "Feature",

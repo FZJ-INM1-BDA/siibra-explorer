@@ -1,4 +1,4 @@
-import { components, paths, operations } from "./schema_v3"
+import { components, paths, operations } from "./schemaV3"
 
 export type SapiAtlasModel = PathReturn<"/atlases/{atlas_id}">
 export type SapiSpaceModel = PathReturn<"/spaces/{space_id}">
@@ -36,12 +36,4 @@ export type PaginatedModel<T> = {
   total: number
   page: number
   size: number
-}
-
-/**
- * siibra-explorer types
- * TODO: to be exported
- */
-export type SapiQueryPriorityArg = {
-  priority: number
 }

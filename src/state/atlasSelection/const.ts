@@ -1,4 +1,4 @@
-import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 
 export const nameSpace = `[state.atlasSelection]`
 export type ViewerMode = 'annotating' | 'key frame'

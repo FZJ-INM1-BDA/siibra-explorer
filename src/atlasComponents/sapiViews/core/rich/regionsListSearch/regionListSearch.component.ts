@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
-import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { ARIA_LABELS } from "common/constants"
 import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";

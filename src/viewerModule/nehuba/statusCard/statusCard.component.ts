@@ -21,7 +21,7 @@ import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { getNehubaConfig } from "../config.service";
 
 @Component({

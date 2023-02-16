@@ -16,7 +16,7 @@ import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
