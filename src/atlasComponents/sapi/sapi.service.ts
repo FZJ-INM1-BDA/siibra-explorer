@@ -1,16 +1,10 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import { SAPIAtlas, SAPISpace } from './core'
-import {
-  SapiQueryPriorityArg,
-} from "./type_v3";
 import {
   translateV3Entities
-} from "./translate_v3"
+} from "./translateV3"
 import { getExportNehuba } from "src/util/fn";
-import { SAPIParcellation } from "./core/sapiParcellation";
-import { SAPIRegion } from "./core/sapiRegion"
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -18,8 +12,8 @@ import { PRIORITY_HEADER } from "src/util/priority";
 import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
-import { PathReturn, RouteParam, SapiRoute } from "./type_v3";
-import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./type_sxplr";
+import { PathReturn, RouteParam, SapiRoute } from "./typeV3";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, SapiQueryPriorityArg } from "./sxplrTypes";
 
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
@@ -145,29 +139,7 @@ export class SAPI{
 
   static ErrorMessage = null
 
-  getSpaceDetail(_atlasId: string, spaceId: string, param?: SapiQueryPriorityArg): Observable<SxplrTemplate> {
-    return this.v3Get("/spaces/{space_id}", {
-      path: {
-        space_id: spaceId
-      },
-      priority: param?.priority
-    }).pipe(
-      switchMap(v => translateV3Entities.translateTemplate(v))
-    )
-  }
-
-  getParcDetail(atlasId: string, parcId: string, param?: SapiQueryPriorityArg): Observable<SxplrParcellation> {
-    return this.v3Get("/parcellations/{parcellation_id}", {
-      path: {
-        parcellation_id: parcId
-      },
-      priority: param?.priority
-    }).pipe(
-      switchMap(v => translateV3Entities.translateParcellation(v))
-    )
-  }
-
-  getParcRegions(atlasId: string, parcId: string, spaceId: string, queryParam?: SapiQueryPriorityArg) {
+  getParcRegions(parcId: string, queryParam?: SapiQueryPriorityArg) {
     const param = {
       query: {
         parcellation_id: parcId,
@@ -201,7 +173,7 @@ export class SAPI{
       }
     })
   }
-
+  
   getFeature(featureId: string, opts: Record<string, string> = {}) {
     return new SAPIFeature(this, featureId, opts)
   }
@@ -334,6 +306,54 @@ export class SAPI{
           return val
         })
       ))
+    )
+  }
+
+  public getStatisticalMap(parcellation: SxplrParcellation, template: SxplrTemplate, region: SxplrRegion) {
+    const query = {
+      parcellation_id: parcellation.id,
+      region_id: region.name,
+      space_id: template.id
+    }
+    return SAPI.BsEndpoint$.pipe(
+      switchMap(endpoint => {
+        const _url = this.v3GetRoute("/map/statistical_map.nii.gz", {
+          query
+        })
+        const url = new URL(`${endpoint}${_url.path}`)
+        for (const key in _url.params) {
+          url.searchParams.set(key, _url.params[key].toString())
+        }
+        
+        return from((async () => {
+          const resp = await fetch(url)
+          const arraybuffer = await resp.arrayBuffer()
+          let outbuf: ArrayBuffer
+          try {
+            outbuf = getExportNehuba().pako.inflate(arraybuffer).buffer
+          } catch (e) {
+            console.log("unpack error", e)
+            outbuf = arraybuffer
+          }
+      
+          const { result } = await this.workerSvc.sendMessage({
+            method: "PROCESS_NIFTI",
+            param: {
+              nifti: outbuf,
+            },
+            transfers: [outbuf],
+          })
+
+          const { meta, buffer } = result
+          return { meta, buffer } as {
+            meta: {
+              min: number
+              max: number
+            }
+            buffer: ArrayBuffer
+          }
+        })())
+      })
     )
   }
 

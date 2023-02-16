@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { SxplrRegion, Feature, Point } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrRegion, Feature, Point } from "src/atlasComponents/sapi/sxplrTypes";
 import * as actions from "./actions"
 
 export type UserInteraction = {

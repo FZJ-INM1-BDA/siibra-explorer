@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { from, Observable, pipe, UnaryFunction } from "rxjs";
-import { map, shareReplay, switchMap } from "rxjs/operators";
+import { from, Observable } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { NgSegLayerSpec, SxplrRegion } from "src/atlasComponents/sapi/type_sxplr";
+import { NgSegLayerSpec, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { atlasSelection } from "src/state";
 import { getParcNgId } from "../config.service";
 
@@ -67,19 +67,6 @@ export class BaseService {
         })
       )
     )
-  )
-
-
-  public completeNgIdNgSegLayerSpec$: Observable<Record<string, NgSegLayerSpec>> = this.#translatedNgMap.pipe(
-    map(val => {
-      const returnObj: Record<string, NgSegLayerSpec> = {}
-      for (const [ ngId, obj ] of Object.entries(val)) {
-        for (const [_label, layer] of Object.entries(obj)) {
-          returnObj[ngId] = layer.layer
-        }
-      }
-      return returnObj
-    })
   )
 
   public completeNgIdLabelRegionMap$: Observable<Record<string, Record<number, SxplrRegion>>> = this.#translatedNgMap.pipe(

@@ -3,7 +3,7 @@ import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { Feature } from "src/atlasComponents/sapi/type_sxplr";
+import { Feature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
 

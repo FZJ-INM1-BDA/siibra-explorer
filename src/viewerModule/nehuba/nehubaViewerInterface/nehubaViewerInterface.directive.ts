@@ -9,7 +9,7 @@ import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj, NehubaNavigationService } from "../navigation.service";
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
-import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";

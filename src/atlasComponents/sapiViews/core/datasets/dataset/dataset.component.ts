@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
-import { Feature } from "src/atlasComponents/sapi/type_sxplr";
+import { Feature } from "src/atlasComponents/sapi/sxplrTypes";
 import { CONST } from "common/constants"
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 
 const RESTRICTED_ACCESS_ID = "https://nexus.humanbrainproject.org/v0/data/minds/core/embargostatus/v1.0.0/3054f80d-96a8-4dce-9b92-55c68a8b5efd"
 

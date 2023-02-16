@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { IAnnotationGeometry } from "./tools/type";
-import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 
 type TOpts = {
   reverse?: boolean

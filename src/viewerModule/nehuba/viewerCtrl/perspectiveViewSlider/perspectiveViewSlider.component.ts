@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, concat, forkJoin, NEVER, Observable, of, Subject, Subscription, throwError } from "rxjs";
 import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { fromRootStore } from "src/state/atlasSelection";
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";

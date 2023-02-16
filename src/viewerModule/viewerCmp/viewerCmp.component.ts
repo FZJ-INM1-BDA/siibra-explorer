@@ -9,13 +9,13 @@ import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { Feature, NgLayerSpec, SxplrAtlas, SxplrRegion, TThreeMesh } from "src/atlasComponents/sapi/type_sxplr"
+import { Feature, NgLayerSpec, SxplrAtlas, SxplrRegion, TThreeMesh } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasSelection, userInteraction } from "src/state";
 
 import { environment } from "src/environments/environment"
 // import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
 import { SapiViewsCoreSpaceBoundingBox } from "src/atlasComponents/sapiViews/core";
-import { SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 @Component({
   selector: 'iav-cmp-viewer-container',

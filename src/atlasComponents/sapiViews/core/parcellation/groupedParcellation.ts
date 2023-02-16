@@ -1,4 +1,4 @@
-import { SxplrParcellation } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes"
 
 export class GroupedParcellation{
   name: string

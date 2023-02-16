@@ -1,7 +1,7 @@
 import { Directive, Input, SimpleChanges } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
-import { TabularFeature } from "src/atlasComponents/sapi/type_sxplr"
+import { TabularFeature } from "src/atlasComponents/sapi/sxplrTypes"
 
 @Directive()
 export abstract class BaseReceptor{

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 
 export const darkThemePalette = [
@@ -22,9 +22,9 @@ export type ATP = {
 
 function isATPGuard(atp: Record<string, unknown>): atp is Partial<ATP> {
   const { atlas, template, parcellation } = atp
-  if (atlas && atlas["@type"] === "juelich/iav/atlas/v1.0.0") return true
-  if (template && template["@type"] === "https://openminds.ebrains.eu/sands/CoordinateSpace") return true
-  if (parcellation && parcellation["@type"] === "minds/core/parcellationatlas/v1.0.0") return true
+  if (atlas && atlas["type"] === "SxplrAtlas") return true
+  if (template && template["type"] === "SxplrTemplate") return true
+  if (parcellation && parcellation["type"] === "SxplrParcellation") return true
   return false
 }
 

@@ -11,7 +11,7 @@ import { getUuid } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer, ColorMapCustomLayer } from "src/state/atlasAppearance/const";
-import { SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { arrayEqual } from "src/util/array";
 import { ThreeSurferEffects } from "../store/effects";
 import { selectors, actions  } from "../store"

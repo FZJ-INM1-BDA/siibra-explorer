@@ -1,9 +1,8 @@
 import { Observable, of, throwError } from "rxjs"
 import { SAPI } from '../sapi.service'
-import { SxplrTemplate } from "../type_sxplr"
+import { SxplrTemplate, SapiQueryPriorityArg } from "../sxplrTypes"
 import { map, switchMap } from "rxjs/operators"
 import { SAPIBase } from "./base"
-import { SapiQueryPriorityArg } from "../type_v3"
 
 /**
  * All valid parcellation features

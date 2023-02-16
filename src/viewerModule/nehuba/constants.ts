@@ -1,7 +1,6 @@
 import { InjectionToken } from '@angular/core'
 import { Observable } from 'rxjs'
 
-export { getNgIds } from 'src/util/fn'
 export const NEHUBA_VIEWER_FEATURE_KEY = 'ngViewerFeature'
 
 export interface IRegion {

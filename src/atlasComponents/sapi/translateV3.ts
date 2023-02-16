@@ -1,9 +1,9 @@
 import {
   SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap
-} from "./type_sxplr"
-import { PathReturn } from "./type_v3"
+} from "./sxplrTypes"
+import { PathReturn } from "./typeV3"
 import { hexToRgb } from 'common/util'
-import { components } from "./schema_v3"
+import { components } from "./schemaV3"
 
 
 class TranslateV3 {
@@ -16,6 +16,7 @@ class TranslateV3 {
     this.#atlasMap.set(atlas["@id"], atlas)
     return {
       id: atlas["@id"],
+      type: "SxplrAtlas",
       name: atlas.name
     }
   }
@@ -29,6 +30,7 @@ class TranslateV3 {
       id: parcellation["@id"],
       name: parcellation.name,
       modality: parcellation.modality,
+      type: "SxplrParcellation"
     }
   }
 
@@ -40,7 +42,8 @@ class TranslateV3 {
     this.#templateMap.set(template["@id"], template)
     return {
       id: template["@id"],
-      name: template.fullName
+      name: template.fullName,
+      type: "SxplrTemplate"
     }
   }
 
@@ -59,7 +62,8 @@ class TranslateV3 {
       id: region["@id"],
       name: region.name,
       color: hexToRgb(region.hasAnnotation?.displayColor) as [number, number, number],
-      parentIds: region.hasParent.map( v => v["@id"] )
+      parentIds: region.hasParent.map( v => v["@id"] ),
+      type: "SxplrRegion"
     }
   }
 
@@ -161,17 +165,20 @@ class TranslateV3 {
   }
 
   async translateLabelledMapToThreeLabel(map:PathReturn<"/map">) {
-    const threeLabelMap: Record<string, { laterality: 'left' | 'right', url: string, regions: Record<string, number> }> = {}
+    const threeLabelMap: Record<string, { laterality: 'left' | 'right', url: string, region: LabelledMap[] }> = {}
     const registerLayer = (url: string, laterality: 'left' | 'right', region: string, label: number) => {
       if (!threeLabelMap[url]) {
         threeLabelMap[url] = {
           laterality,
-          regions: {},
+          region: [],
           url,
         }
       }
 
-      threeLabelMap[url].regions[region] = label
+      threeLabelMap[url].region.push({
+        name: region,
+        label,
+      })
     }
     for (const regionname in map.indices) {
       for (const { volume: volIdx, fragment, label } of map.indices[regionname]) {

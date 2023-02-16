@@ -3,8 +3,8 @@ import { select, Store } from "@ngrx/store";
 import { Subject } from "rxjs";
 import { distinctUntilChanged, filter, map, switchMap, take } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, Point } from "src/atlasComponents/sapi/type_sxplr";
-import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/type_v3";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, Point } from "src/atlasComponents/sapi/sxplrTypes";
+import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/typeV3";
 import { MainState, atlasSelection, userInteraction, annotation, atlasAppearance } from "src/state"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from "src/util/interfaces";

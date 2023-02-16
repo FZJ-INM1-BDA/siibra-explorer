@@ -1,7 +1,7 @@
 import { Directive, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { BoundingBox, SxplrTemplate, SxplrAtlas } from "src/atlasComponents/sapi/type_sxplr"
+import { BoundingBox, SxplrTemplate, SxplrAtlas } from "src/atlasComponents/sapi/sxplrTypes"
 
 function validateBbox(input: any): boolean {
   if (!Array.isArray(input)) return false

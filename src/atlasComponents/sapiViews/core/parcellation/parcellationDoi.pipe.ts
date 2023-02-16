@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SxplrParcellation } from "src/atlasComponents/sapi/type_sxplr";
-import { translateV3Entities } from "src/atlasComponents/sapi/translate_v3"
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 
 @Pipe({
   name: 'parcellationDoiPipe',

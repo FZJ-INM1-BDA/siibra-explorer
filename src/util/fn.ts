@@ -21,15 +21,6 @@ export function getExportNehuba() {
   return (window as any).export_nehuba
 }
 
-export function getNgIds(regions: any[]): string[] {
-  return regions && regions.map
-    ? regions
-      .map(r => [r.ngId, ...getNgIds(r.children)])
-      .reduce((acc, item) => acc.concat(item), [])
-      .filter(ngId => !!ngId)
-    : []
-}
-
 const recursiveFlatten = (region, {ngId}) => {
   return [{
     ngId,

@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/type_sxplr";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 
 export const selectAtlas = createAction(

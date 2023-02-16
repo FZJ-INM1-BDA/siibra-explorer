@@ -1,4 +1,4 @@
-import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/type_sxplr"
+import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { IDS } from 'src/atlasComponents/sapi/constants'
 import { atlasSelection } from 'src/state'
 import { MultiDimMap } from 'src/util/fn'
