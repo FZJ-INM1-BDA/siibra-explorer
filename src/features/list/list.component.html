@@ -1,0 +1,11 @@
+<mat-list>
+    <mat-list-item mat-ripple
+        *ngFor="let feature of features$ | async"
+        [matTooltip]="feature.name"
+        matTooltipPosition="right"
+        (click)="onClickItem(feature)">
+        <span class="feature-name">
+            {{ feature.name }}
+        </span>
+    </mat-list-item>
+</mat-list>

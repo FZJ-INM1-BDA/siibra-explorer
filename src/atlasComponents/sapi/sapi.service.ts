@@ -12,7 +12,7 @@ import { PRIORITY_HEADER } from "src/util/priority";
 import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
-import { PathReturn, RouteParam, SapiRoute } from "./typeV3";
+import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, SapiQueryPriorityArg } from "./sxplrTypes";
 
 
@@ -173,6 +173,43 @@ export class SAPI{
       }
     })
   }
+
+  #isPaged<T>(resp: any): resp is PaginatedResponse<T>{
+    if (!!resp.total) return true
+    return false
+  }
+  getV3Features<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>[]> {
+    const query = structuredClone(sapiParam)
+    return this.v3Get<`/feature/${T}`>(`/feature/${featureType}`, {
+      ...query
+    }).pipe(
+      switchMap(resp => {
+        if (!this.#isPaged(resp)) return throwError(`endpoint not returning paginated response`)
+        return this.iteratePages(
+          resp,
+          page => {
+            const query = structuredClone(sapiParam)
+            query.query.page = page
+            return this.v3Get(`/feature/${featureType}`, {
+              ...query,
+            }).pipe(
+              map(val => {
+                if (this.#isPaged(val)) return val
+                return { items: [], total: 0, page: 0, size: 0 }
+              })
+            )
+          }
+        )
+      }),
+      catchError(() => of([]))
+    )
+  }
+
+  getV3FeatureDetail<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}/{feature_id}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>> {
+    return this.v3Get<`/feature/${T}/{feature_id}`>(`/feature/${featureType}/{feature_id}`, {
+      ...sapiParam
+    })
+  }
   
   getFeature(featureId: string, opts: Record<string, string> = {}) {
     return new SAPIFeature(this, featureId, opts)
@@ -257,7 +294,6 @@ export class SAPI{
     }),
     shareReplay(1),
   )
-    
 
   public getAllSpaces(atlas: SxplrAtlas): Observable<SxplrTemplate[]> {
     return forkJoin(
@@ -391,7 +427,7 @@ export class SAPI{
     /**
      * FIXME iterate over all pages
      */
-    return this.v3Get("/feature/VolumeOfInterest", {
+    return this.v3Get("/feature/Image", {
       query: {
         space_id: bbox.space.id,
         bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),

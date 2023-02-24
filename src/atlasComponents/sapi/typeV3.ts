@@ -12,10 +12,22 @@ export type SxplrCoordinatePointExtension = {
   color: string
   '@id': string // should match the id of opendminds specs
 }
-export type SapiSpatialFeatureModel = PathReturn<"/feature/VolumeOfInterest/{feature_id}">
+export type SapiSpatialFeatureModel = PathReturn<"/feature/Image/{feature_id}">
 export type SapiFeatureModel = SapiSpatialFeatureModel | PathReturn<"/feature/Tabular/{feature_id}"> | PathReturn<"/feature/RegionalConnectivity/{feature_id}"> | PathReturn<"/feature/CorticalProfile/{feature_id}">
 
 export type SapiRoute = keyof paths
+
+type _FeatureType<FeatureRoute extends SapiRoute> = FeatureRoute extends `/feature/${infer FT}`
+  ? FT extends "_types"
+    ? never
+    : FT extends "{feature_id}"
+      ? never
+      : FT extends `${infer _FT}/{${infer _FID}}`
+        ? never
+        : FT
+  : never
+
+export type FeatureType = _FeatureType<SapiRoute>
 
 /**
  * Support types

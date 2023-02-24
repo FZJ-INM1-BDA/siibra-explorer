@@ -1,5 +1,5 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap, CorticalFeature
 } from "./sxplrTypes"
 import { PathReturn } from "./typeV3"
 import { hexToRgb } from 'common/util'
@@ -63,7 +63,18 @@ class TranslateV3 {
       name: region.name,
       color: hexToRgb(region.hasAnnotation?.displayColor) as [number, number, number],
       parentIds: region.hasParent.map( v => v["@id"] ),
-      type: "SxplrRegion"
+      type: "SxplrRegion",
+      centroid: region.hasAnnotation?.bestViewPoint
+        ? await (async () => {
+          const bestViewPoint = region.hasAnnotation?.bestViewPoint
+          const fullSpace = this.#templateMap.get(bestViewPoint.coordinateSpace['@id'])
+          const space = await this.translateTemplate(fullSpace)
+          return {
+            loc: bestViewPoint.coordinates.map(v => v.value) as [number, number, number],
+            space
+          }
+        })()
+        : null
     }
   }
 
@@ -322,7 +333,7 @@ class TranslateV3 {
     }
   }
 
-  async translateVoi(voi: PathReturn<"/feature/VolumeOfInterest/{feature_id}">): Promise<VoiFeature> {
+  async translateVoi(voi: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
     const { boundingbox } = voi
     const { loc: center, space } = await this.translatePoint(boundingbox.center)
     const { loc: maxpoint } = await this.translatePoint(boundingbox.maxpoint)
@@ -337,6 +348,29 @@ class TranslateV3 {
       name: voi.name,
       desc: voi.description,
       id: voi.id
+    }
+  }
+
+  
+  async translateCorticalProfile(feat: PathReturn<"/feature/CorticalProfile/{feature_id}">): Promise<CorticalFeature<number>> {
+    return {
+      id: feat.id,
+      name: feat.name,
+      desc: feat.description,
+      link: [
+        ...feat.datasets
+          .map(ds => ds.urls)
+          .flatMap(v => v)
+          .map(url => ({
+            href: url.url,
+            text: url.url
+          })),
+        ...feat.datasets
+          .map(ds => ({
+            href: ds.ebrains_page,
+            text: "ebrains resource"
+          }))
+      ]
     }
   }
 }

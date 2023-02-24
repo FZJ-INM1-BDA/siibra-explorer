@@ -39,7 +39,7 @@ export class RouteStateTransformSvc {
       allParcellationRegions = []
     ] = await Promise.all([
       this.sapi.atlases$.pipe(
-        map(atlases => atlases.find(atlas => atlas["@id"] === selectedAtlasId))
+        map(atlases => atlases.find(atlas => atlas.id === selectedAtlasId))
       ).toPromise(),
       this.sapi.v3Get("/spaces/{space_id}", {
         path: {
@@ -296,17 +296,17 @@ export class RouteStateTransformSvc {
     
     routes = {
       // for atlas
-      a: selectedAtlas && encodeId(selectedAtlas['@id']),
+      a: selectedAtlas && encodeId(selectedAtlas.id),
       // for template
-      t: selectedTemplate && encodeId(selectedTemplate['@id']),
+      t: selectedTemplate && encodeId(selectedTemplate.id),
       // for parcellation
-      p: selectedParcellation && encodeId(selectedParcellation['@id']),
+      p: selectedParcellation && encodeId(selectedParcellation.id),
       // for regions
       r: selectedRegionsString && encodeURIFull(selectedRegionsString),
       // nav
       ['@']: cNavString,
       // showing dataset
-      f: selectedFeature && encodeId(selectedFeature["@id"])
+      f: selectedFeature && encodeId(selectedFeature.id)
     }
   
     /**

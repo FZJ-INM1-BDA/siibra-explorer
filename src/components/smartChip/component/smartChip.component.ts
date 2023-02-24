@@ -36,7 +36,7 @@ const cssColorToHsl = (input: string) => {
   selector: `sxplr-smart-chip`,
   templateUrl: `./smartChip.template.html`,
   styleUrls: [
-    `/smartChip.style.css`
+    `./smartChip.style.scss`
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

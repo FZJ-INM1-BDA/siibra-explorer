@@ -4,13 +4,12 @@ import { RouteParam } from "../typeV3"
 import { SapiQueryPriorityArg } from "../sxplrTypes"
 
 const AllFeatures = {
-  // Feature: "Feature",
   CorticalProfile: "CorticalProfile",
   // EbrainsDataFeature: "EbrainsDataFeature",
   RegionalConnectivity: "RegionalConnectivity",
   Tabular: "Tabular",
-  GeneExpressions: "GeneExpressions",
-  VolumeOfInterest: "VolumeOfInterest",
+  // GeneExpressions: "GeneExpressions",
+  Image: "Image",
 } as const
 
 type AF = keyof typeof AllFeatures

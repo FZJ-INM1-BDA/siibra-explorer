@@ -14,6 +14,6 @@ function isGroupedParc(parc: GroupedParcellation|unknown): parc is GroupedParcel
 export class ParcellationGroupSelectedPipe implements PipeTransform {
   public transform(parc: GroupedParcellation|unknown, selectedParcellation: SxplrParcellation): boolean {
     if (!isGroupedParc(parc)) return false
-    return parc.parcellations.some(p => p["@id"] === selectedParcellation["@id"])
+    return parc.parcellations.some(p => p.id === selectedParcellation.id)
   }
 }

@@ -77,31 +77,6 @@ export { TThreeSurferMesh, TThreeMesh, TThreeMeshLabel }
  */
 export type TemplateDefaultImage = NgLayerSpec | TThreeMesh
 
-/**
- * Features
- */
-
-export type Feature = {
-  id: string
-  name: string
-} & Partial<AdditionalInfo>
-
-type DataFrame = {
-  index: Record<string, string>
-}
-
-export type VoiFeature = {
-  bbox: BoundingBox
-} & Feature
-
-type TabularDataType = number | string | number[]
-
-export type TabularFeature<T extends TabularDataType> = {
-  index: string[]
-  columns: string[]
-  data: T[][]
-} & Feature
-
 export type LabelledMap = {
   name: string
   label: number
@@ -112,6 +87,39 @@ export type StatisticalMap = {
   min: number
   max: number
 }
+
+/**
+ * Features
+ */
+
+export type Feature = {
+  id: string
+  name: string
+  category?: string
+} & Partial<AdditionalInfo>
+
+type DataFrame = {
+  index: Record<string, string>
+}
+
+export type VoiFeature = {
+  bbox: BoundingBox
+} & Feature
+
+type CorticalDataType = number
+
+export type CorticalFeature<T extends CorticalDataType, IndexType extends string|number=string> = {
+  indices?: IndexType[]
+  corticalProfile?: T[]
+} & Feature
+
+type TabularDataType = number | string | number[]
+
+export type TabularFeature<T extends TabularDataType> = {
+  index: string[]
+  columns: string[]
+  data?: T[][]
+} & Feature
 
 
 /**

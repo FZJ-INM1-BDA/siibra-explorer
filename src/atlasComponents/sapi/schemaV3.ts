@@ -42,11 +42,23 @@ export interface paths {
     get: operations["route_get_map_map_get"]
   }
   "/map/labelled_map.nii.gz": {
-    /** Route Get Parcellation Labelled Map */
+    /**
+     * Route Get Parcellation Labelled Map 
+     * @description Returns a labelled map if region_id is not provided.
+     * 
+     * Returns a mask if a region_id is provided.
+     * 
+     * region_id MAY refer to ANY region on the region hierarchy, and a combined mask will be returned.
+     */
     get: operations["route_get_parcellation_labelled_map_map_labelled_map_nii_gz_get"]
   }
   "/map/statistical_map.nii.gz": {
-    /** Route Get Region Statistical Map */
+    /**
+     * Route Get Region Statistical Map 
+     * @description Returns a statistic map.
+     * 
+     * region_id MUST refer to leaf region on the region hierarchy.
+     */
     get: operations["route_get_region_statistical_map_map_statistical_map_nii_gz_get"]
   }
   "/map/statistical_map.info.json": {
@@ -81,13 +93,13 @@ export interface paths {
     /** Get Single Tabular */
     get: operations["get_single_tabular_feature_Tabular__feature_id__get"]
   }
-  "/feature/VolumeOfInterest": {
+  "/feature/Image": {
     /** Get All Voi */
-    get: operations["get_all_voi_feature_VolumeOfInterest_get"]
+    get: operations["get_all_voi_feature_Image_get"]
   }
-  "/feature/VolumeOfInterest/{feature_id}": {
+  "/feature/Image/{feature_id}": {
     /** Get Single Voi */
-    get: operations["get_single_voi_feature_VolumeOfInterest__feature_id__get"]
+    get: operations["get_single_voi_feature_Image__feature_id__get"]
   }
   "/feature/GeneExpressions": {
     /** Get All Gene */
@@ -96,6 +108,16 @@ export interface paths {
   "/feature/GeneExpressions/{feature_id}": {
     /** Get All Gene */
     get: operations["get_all_gene_feature_GeneExpressions__feature_id__get"]
+  }
+  "/feature/{feature_id}": {
+    /**
+     * Get Single Feature 
+     * @description This endpoint allows detail of a single feature to be fetched, without the necessary context. However, the tradeoff for this endpoint is:
+     * 
+     * - the endpoint typing is the union of all possible return types
+     * - the client needs to supply any necessary query param (e.g. subject for regional connectivity, gene for gene expression etc)
+     */
+    get: operations["get_single_feature_feature__feature_id__get"]
   }
 }
 
@@ -341,9 +363,9 @@ export interface components {
       axesOrigin: (components["schemas"]["AxesOrigin"])[]
       /**
        * defaultImage 
-       * @description Two or three dimensional image that particluarly represents a specific coordinate space.
+       * @description Two or three dimensional image that particluarly represents a specific coordinate space. Overriden by Siibra API to use as VolumeModel
        */
-      defaultImage?: components["schemas"]["VolumeModel"][]
+      defaultImage?: (components["schemas"]["VolumeModel"])[]
       /**
        * digitalIdentifier 
        * @description Digital handle to identify objects or legal persons.
@@ -505,6 +527,19 @@ export interface components {
       /** Url */
       url: string
     }
+    /** FeatureMetaModel */
+    FeatureMetaModel: {
+      /** Name */
+      name: string
+      /** Path */
+      path?: string
+      /** Query Params */
+      query_params?: (string)[]
+      /** Path Params */
+      path_params?: (string)[]
+      /** Category */
+      category?: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -662,8 +697,17 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
+    }
+    /** Page[FeatureMetaModel] */
+    Page_FeatureMetaModel_: {
+      /** Items */
+      items: (components["schemas"]["FeatureMetaModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Size */
+      size: number
     }
     /** Page[ParcellationEntityVersionModel] */
     Page_ParcellationEntityVersionModel_: {
@@ -675,8 +719,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraAtlasModel] */
     Page_SiibraAtlasModel_: {
@@ -688,8 +730,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraCorticalProfileModel] */
     Page_SiibraCorticalProfileModel_: {
@@ -701,8 +741,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraParcellationModel] */
     Page_SiibraParcellationModel_: {
@@ -714,8 +752,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraRegionalConnectivityModel] */
     Page_SiibraRegionalConnectivityModel_: {
@@ -727,8 +763,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraTabularModel] */
     Page_SiibraTabularModel_: {
@@ -740,8 +774,6 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
     /** Page[SiibraVoiModel] */
     Page_SiibraVoiModel_: {
@@ -753,34 +785,17 @@ export interface components {
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
     }
-    /** Page[Union[SiibraCorticalProfileModel, SiibraTabularModel, SiibraReceptorDensityFp]] */
-    Page_Union_SiibraCorticalProfileModel__SiibraTabularModel__SiibraReceptorDensityFp__: {
+    /** Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
+    Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
       /** Items */
-      items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraReceptorDensityFp"])[]
+      items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"])[]
       /** Total */
       total: number
       /** Page */
       page: number
       /** Size */
       size: number
-      /** Pages */
-      pages?: number
-    }
-    /** Page[str] */
-    Page_str_: {
-      /** Items */
-      items: (string)[]
-      /** Total */
-      total: number
-      /** Page */
-      page: number
-      /** Size */
-      size: number
-      /** Pages */
-      pages?: number
     }
     /** ParcellationEntityVersionModel */
     ParcellationEntityVersionModel: {
@@ -979,6 +994,8 @@ export interface components {
       id: string
       /** Modality */
       modality: string
+      /** Category */
+      category: string
       /** Description */
       description: string
       /** Name */
@@ -1038,6 +1055,8 @@ export interface components {
       id: string
       /** Modality */
       modality: string
+      /** Category */
+      category: string
       /** Description */
       description: string
       /** Name */
@@ -1067,6 +1086,8 @@ export interface components {
       id: string
       /** Modality */
       modality: string
+      /** Category */
+      category: string
       /** Description */
       description: string
       /** Name */
@@ -1091,6 +1112,8 @@ export interface components {
       id: string
       /** Modality */
       modality: string
+      /** Category */
+      category: string
       /** Description */
       description: string
       /** Name */
@@ -1108,6 +1131,8 @@ export interface components {
       id: string
       /** Modality */
       modality: string
+      /** Category */
+      category: string
       /** Description */
       description: string
       /** Name */
@@ -1453,11 +1478,19 @@ export interface operations {
     }
   }
   route_get_parcellation_labelled_map_map_labelled_map_nii_gz_get: {
-    /** Route Get Parcellation Labelled Map */
+    /**
+     * Route Get Parcellation Labelled Map 
+     * @description Returns a labelled map if region_id is not provided.
+     * 
+     * Returns a mask if a region_id is provided.
+     * 
+     * region_id MAY refer to ANY region on the region hierarchy, and a combined mask will be returned.
+     */
     parameters: {
       query: {
         parcellation_id: string
         space_id: string
+        region_id?: string
       }
     }
     responses: {
@@ -1472,7 +1505,12 @@ export interface operations {
     }
   }
   route_get_region_statistical_map_map_statistical_map_nii_gz_get: {
-    /** Route Get Region Statistical Map */
+    /**
+     * Route Get Region Statistical Map 
+     * @description Returns a statistic map.
+     * 
+     * region_id MUST refer to leaf region on the region hierarchy.
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1527,7 +1565,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_str_"]
+          "application/json": components["schemas"]["Page_FeatureMetaModel_"]
         }
       }
       /** @description Validation Error */
@@ -1658,7 +1696,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_Union_SiibraCorticalProfileModel__SiibraTabularModel__SiibraReceptorDensityFp__"]
+          "application/json": components["schemas"]["Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"]
         }
       }
       /** @description Validation Error */
@@ -1685,7 +1723,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraReceptorDensityFp"]
+          "application/json": components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"]
         }
       }
       /** @description Validation Error */
@@ -1696,7 +1734,7 @@ export interface operations {
       }
     }
   }
-  get_all_voi_feature_VolumeOfInterest_get: {
+  get_all_voi_feature_Image_get: {
     /** Get All Voi */
     parameters: {
       query: {
@@ -1721,7 +1759,7 @@ export interface operations {
       }
     }
   }
-  get_single_voi_feature_VolumeOfInterest__feature_id__get: {
+  get_single_voi_feature_Image__feature_id__get: {
     /** Get Single Voi */
     parameters: {
       query: {
@@ -1790,6 +1828,34 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["SiibraTabularModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_single_feature_feature__feature_id__get: {
+    /**
+     * Get Single Feature 
+     * @description This endpoint allows detail of a single feature to be fetched, without the necessary context. However, the tradeoff for this endpoint is:
+     * 
+     * - the endpoint typing is the union of all possible return types
+     * - the client needs to supply any necessary query param (e.g. subject for regional connectivity, gene for gene expression etc)
+     */
+    parameters: {
+      path: {
+        feature_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"]
         }
       }
       /** @description Validation Error */

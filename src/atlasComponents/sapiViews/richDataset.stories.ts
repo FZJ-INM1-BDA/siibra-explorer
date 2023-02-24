@@ -7,7 +7,6 @@ import { SAPI } from "src/atlasComponents/sapi"
 import { getHoc1RightFeatureDetail, getHoc1RightFeatures, getHoc1Right, getHumanAtlas, getJba29, getMni152, provideDarkTheme, getMni152SpatialFeatureHoc1Right } from "src/atlasComponents/sapi/stories.base"
 import { AngularMaterialModule } from "src/sharedModules"
 import { cleanIeegSessionDatasets, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "../sapi/type"
-import { SapiViewsCoreDatasetModule } from "./core/datasets"
 import { SapiViewsFeaturesModule } from "./features"
 
 @Component({
@@ -52,7 +51,6 @@ export default {
         AngularMaterialModule,
         CommonModule,
         HttpClientModule,
-        SapiViewsCoreDatasetModule,
         SapiViewsFeaturesModule,
       ],
       providers: [

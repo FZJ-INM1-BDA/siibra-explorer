@@ -160,7 +160,6 @@ export class Effect {
             this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: { atlas: currAtlas, template: currTmpl, parcellation: currParc }, current: { atlas, template, parcellation } }))
           ).pipe(
             map(partialStates => {
-              console.log('selected teplate', template, parcellation)
               let returnState: Partial<AtlasSelectionState> = {
                 selectedAtlas: atlas,
                 selectedTemplate: template,

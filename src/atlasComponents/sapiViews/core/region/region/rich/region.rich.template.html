@@ -82,6 +82,11 @@
     </markdown-dom>
   </ng-template>
 
+  <sxplr-feature-entry
+    [parcellation]="parcellation"
+    [region]="region">
+  </sxplr-feature-entry>
+
   <mat-accordion class="d-block mt-2">
 
     <!-- desc -->
@@ -100,7 +105,7 @@
     <ng-template [ngIf]="!environment.STRICT_LOCAL">
 
       <!-- feature list -->
-      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      <!-- <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
         title: CONST.REGIONAL_FEATURES,
         iconClass: 'fas fa-database',
         content: kgRegionalFeatureList,
@@ -108,7 +113,7 @@
         iconTooltip: 'Regional Features',
         iavNgIf: true
       }">
-      </ng-container>
+      </ng-container> -->
 
       <!-- connectivity -->
       <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>

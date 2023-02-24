@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { MarkdownModule } from "src/components/markdown";
 import { SpinnerModule } from "src/components/spinner";
+import { FeatureModule } from "src/features";
 import { AngularMaterialModule } from "src/sharedModules";
 import { StrictLocalModule } from "src/strictLocal";
 // import { SapiViewsFeaturesModule } from "../../features";
@@ -21,6 +22,7 @@ import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.compone
     SpinnerModule,
     MarkdownModule,
     StrictLocalModule,
+    FeatureModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

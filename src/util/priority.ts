@@ -170,7 +170,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
       filter(v => v.urlWithParams === urlWithParams),
       take(1),
       map(v => {
-        if (v instanceof Error) {
+        if (v['error'] instanceof Error) {
           throw v
         }
         return (v as Result<unknown>).result

@@ -1,13 +1,14 @@
 import { NgModule } from "@angular/core";
 import { SapiViewsCoreModule } from "./core";
+import { FeaturesModule } from "./features/features.module";
 
 @NgModule({
   imports: [
-    // SapiViewsFeaturesModule,
+    FeaturesModule,
     SapiViewsCoreModule,
   ],
   exports: [
-    // SapiViewsFeaturesModule,
+    FeaturesModule,
     SapiViewsCoreModule,
   ]
 })

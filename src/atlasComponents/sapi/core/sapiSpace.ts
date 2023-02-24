@@ -8,7 +8,7 @@ import { SAPIBase } from "./base"
  * All valid parcellation features
  */
 const SpaceFeatures = {
-  VolumeOfInterest: "VolumeOfInterest",
+  Image: "Image",
 } as const
 
 export type SF = keyof typeof SpaceFeatures

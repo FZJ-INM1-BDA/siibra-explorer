@@ -99,7 +99,7 @@
     <ng-template [ngIf]="selectedIds" let-selectedIds>
       <mat-icon
         fontSet="fas"
-        [fontIcon]="selectedIds.includes(item['@id']) ? 'fa-circle' : 'fa-none'"
+        [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
         >
       </mat-icon>
     </ng-template>
