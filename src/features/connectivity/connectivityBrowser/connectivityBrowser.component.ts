@@ -2,31 +2,28 @@ import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, Chang
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Subscription, BehaviorSubject, Observable} from "rxjs";
 import {catchError, take} from "rxjs/operators";
-import {
-  SAPI,
-  SapiAtlasModel,
-  SapiParcellationModel,
-  SapiRegionModel
-} from "src/atlasComponents/sapi";
-import { atlasAppearance, atlasSelection } from "src/state";
-import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import {SapiModalityModel, SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "src/atlasComponents/sapi/type";
+
+import { atlasAppearance } from "src/state";
+import {SAPI} from "src/atlasComponents/sapi/sapi.service";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
 import { HttpClient } from "@angular/common/http";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
+import { actions, selectors } from "src/state/atlasSelection";
 
 @Component({
-  selector: 'sxplr-sapiviews-features-connectivity-browser',
+  selector: 'sxplr-features-connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
   styleUrls: ['./connectivityBrowser.style.scss']
 })
 export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
-    @Input('sxplr-sapiviews-features-connectivity-browser-atlas')
-    atlas: SapiAtlasModel
 
-    @Input('sxplr-sapiviews-features-connectivity-browser-parcellation')
-    parcellation: SapiParcellationModel
+    @Input('sxplr-features-connectivity-browser-atlas')
+    atlas: SxplrAtlas
+
+    @Input('sxplr-features-connectivity-browser-parcellation')
+    parcellation: SxplrParcellation
 
     /**
      * accordion expansion should only toggle the clearviewqueue state
@@ -34,8 +31,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
      * setcolormaps$ is set by the presence/absence of clearviewqueue[CONNECTIVITY_NAME_PLATE]
      */
     private _isFirstUpdate = true
-    
-
     @Input()
     set accordionExpanded(flag: boolean) {
       /**
@@ -46,8 +41,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         return
       }
 
+      if (this.types.length && !this.selectedType) this.selectType(this._types[0])
+
       if (flag) {
-        if (this.selectedSubjectDatasetIndex >= 0 && this.allRegions.length) {
+        if (this.selectedSubjectIndex >= 0 && this.allRegions.length) {
           this.setCustomLayer()
         } else {
           this.setCustomLayerOnLoad = true
@@ -57,45 +54,56 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       }
 
     }
+    
+    private _region: SxplrRegion
+    @Input()
+    set region(region) {
+      this._region = region
+      this.regionName = region.name
+    }
 
-    public selectedType: string
-    public selectedTypeId: string
+    get region() {
+      return this._region
+    }
+
+    
+    private _types: any[] = []
+    @Input()
+    set types(val) {
+      this._types = val.map(t => ({...t, shortName: t.name.split('.').pop()}))
+    }
+    get types() {
+      return this._types
+    }
+
+
+    public selectedType: any
     public selectedCohort: string
-    public cohortSubjects: string[]
-    public selectedSubjectIndex: number
-    public selectedSubjectsDatasets: string[]
-    public selectedSubjectDatasetIndex: number
-    public fetchedItems: SapiParcellationFeatureModel[] = []
+
+    public cohortDatasets: any[]
+
+    public selectedSubjectIndex = null
+    public selectedCohortDatasetIndex: any
+    public selectedCohortSubjects: any
+    public fetchedItems: any[] = []
     public cohorts: string[]
     public selectedView: 'subject' | 'average' | null
     public averageDisabled: boolean = true
     public subjectsDisabled: boolean = true
 
-    @Input()
-    set region(val) {
-      const newRegionName = val && val.name
-
-      if (val.status
-          && !val.name.includes('left hemisphere')
-          && !val.name.includes('right hemisphere')) {
-        this.regionHemisphere = val.status
-      }
-
-      this.regionName = newRegionName
-    }
-
     public regionName: string
-    public regionHemisphere: string = null
-    public selectedDataset: SapiParcellationFeatureModel
+
+    public selectedDataset: any
     public connectionsString: string
     public pureConnections: { [key: string]: number }
     public connectedAreas: BehaviorSubject<ConnectedArea[]> = new BehaviorSubject([])
     public noConnectivityForRegion: boolean
     private subscriptions: Subscription[] = []
-    public allRegions: SapiRegionModel[] = []
+    public allRegions: SxplrRegion[] = []
     private regionIndexInMatrix = -1
     public defaultColorMap: Map<string, Map<number, { red: number, green: number, blue: number }>>
     public matrixString: string
+    public fetchingPreData: boolean
     public fetching: boolean
     public connectivityLayerId = 'connectivity-colormap-id'
     private setCustomLayerOnLoad = false
@@ -104,31 +112,25 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public logDisabled: boolean = true
     public logChecked: boolean = true
 
-    private _types: SapiModalityModel[] = []
-    @Input()
-    set types(val) {
-      this._types = val
-      if (val && val.length) this.selectType(val[0].name)
-    }
-    get types() {
-      return this._types
-    }
+    private endpoint: string
 
-    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<any>
+
+    @ViewChild('connectivityComponent') public connectivityComponentElement: ElementRef<any>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<any>
 
     constructor(
         private store$: Store,
-        private sapi: SAPI,
         private http: HttpClient,
         private changeDetectionRef: ChangeDetectorRef,
-    ) {}
+    ) {
+      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => this.endpoint = `${en}/feature/RegionalConnectivity`)
+    }
 
     public ngAfterViewInit(): void {
       this.subscriptions.push(
 
         this.store$.pipe(
-          select(atlasSelection.selectors.selectedParcAllRegions)
+          select(selectors.selectedParcAllRegions)
         ).subscribe(flattenedRegions => {
           this.defaultColorMap = null
           this.allRegions = flattenedRegions
@@ -140,7 +142,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
 
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', {capture: true})
+        fromEvent(this.connectivityComponentElement.nativeElement, 'customToolEvent', {capture: true})
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
               // ToDo Fix in future to use component
@@ -148,7 +150,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
               (a as any).downloadCSV()
             }
           }),
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
+        fromEvent(this.connectivityComponentElement.nativeElement, 'connectedRegionClicked', {capture: true})
           .subscribe((e: CustomEvent) => {
             this.navigateToRegion(this.getRegionWithName(e.detail.name))
           }),
@@ -159,7 +161,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       if (this.customLayerEnabled) {
         this.removeCustomLayer()
       }
-      const map = new Map<SapiRegionModel, number[]>()
+      const map = new Map<SxplrRegion, number[]>()
       const areas = this.connectedAreas.value
       for (const region of this.allRegions) {
         const area = areas.find(a => a.name === region.name)
@@ -194,152 +196,118 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.selectedCohort = null
       this.cohorts = []
       this.selectedCohort = null
-      this.cohortSubjects = []
+      this.selectedCohortDatasetIndex = null
+      this.selectedCohortSubjects = null
+
       this.selectedSubjectIndex = null
-      this.selectedSubjectsDatasets = null
-      this.selectedSubjectDatasetIndex = null
     }
 
-    selectType(typeName) {
+    selectType(type) {
       this.clearCohortSelection()
-      this.selectedType = typeName
-      this.selectedTypeId = this.types.find(t => t.name === typeName).types[0]
-
+      this.selectedType = type
       this.removeCustomLayer()
-
       this.getModality()
     }
 
 
-    getModality(size: number = 100, page: number = 1) {
-      this.fetching = true
-      this.fetchModality(size, page).subscribe((res: any) => {
+    getModality() {
+      this.fetchingPreData = true
+      this.fetchModality().subscribe((res: any) => {
 
         this.fetchedItems.push(...res.items)
-          
-        if (res.total > size*page) {
-          this.getModality(100, page+1)
-        } else {
-          this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
-          this.fetching = false
-          this.changeDetectionRef.detectChanges()
-          this.selectCohort(this.cohorts[0])
-        }
+        
+        this.cohorts = [...new Set(this.fetchedItems.map(item => item.cohort))]
+        this.fetchingPreData = false
+        this.changeDetectionRef.detectChanges()
+        this.selectCohort(this.cohorts[0])
+      
       })
     }
 
-    public fetchModality = (size: number, page: number): Observable<any> => {
-      let endp
-      SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => endp = en)
-      return this.http.get(`${endp}/atlases/${encodeURIComponent(this.atlas['@id'])}/parcellations/${encodeURIComponent(this.parcellation['@id'])}/features?type=${this.selectedTypeId}&size=${size}&page=${page}`,)
-        .pipe(take(1))
+    public fetchModality = (): Observable<any> => {
+      const url = `${this.endpoint}?parcellation_id=${encodeURIComponent(this.parcellation.id)}&type=${encodeURIComponent(this.selectedType.shortName)}`
+      return this.http.get(url)
     }
 
     selectCohort(cohort: string) {
       this.selectedCohort = cohort
-      this.averageDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject === 'average')
-      this.subjectsDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subject !== 'average')
+      this.averageDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && !s.subjects.length)
+      this.subjectsDisabled = !this.fetchedItems.find(s => s.cohort === this.selectedCohort && s.subjects.length > 0)
       this.selectedView = !this.averageDisabled? 'average' : 'subject'
-      this.cohortSubjects = [...new Set(
-        this.fetchedItems
-          .filter(i => this.selectedView === 'average'? i.subject === 'average' : i.subject !== 'average')
-          .map(item => item.subject)
-      )]
-      this.subjectSliderChanged(0)
+
+      this.cohortDatasets = this.fetchedItems.filter(i => this.selectedCohort === i.cohort)
+      
+      this.selectedCohortDatasetChanged(0)
+    }
+
+    selectedCohortDatasetChanged(index) {
+      this.selectedCohortDatasetIndex = index
+      this.selectedCohortSubjects = this.cohortDatasets[index].subjects
+
+      this.selectedDataset = this.cohortDatasets[index].datasets[0]
+
+      
+      const keepSubject = this.selectedSubjectIndex >= 0 && this.cohortDatasets[this.selectedCohortDatasetIndex].subjects
+        .includes(this.selectedCohortSubjects[this.selectedSubjectIndex])
+
+      this.subjectSliderChanged(keepSubject? this.selectedSubjectIndex : 0)
     }
 
     subjectSliderChanged(index: number) {
       this.selectedSubjectIndex = index
-      this.selectedSubjectsDatasets = this.fetchedItems
-        .filter(fi => fi.cohort === this.selectedCohort && fi.subject === this.cohortSubjects[this.selectedSubjectIndex])
-        .map(i => i['@id'])
-
-      this.selectedSubjectDatasetIndex = 0
-      this.loadSubjectConnectivity()
+      this.fetchConnectivity()
     }
 
-    subjectDatasetSliderChanged(index) {
-      this.selectedSubjectDatasetIndex = index
-      this.loadSubjectConnectivity()
-    }
+    fetchConnectivity() {
+      const subject = this.selectedCohortSubjects[this.selectedSubjectIndex]
+      const dataset = this.cohortDatasets[this.selectedCohortDatasetIndex]
 
-    loadSubjectConnectivity() {
       this.fetching = true
-      this.fetchConnectivity(this.selectedSubjectsDatasets[this.selectedSubjectDatasetIndex])
-    }
+      const url = `${this.endpoint}/${dataset.id}?parcellation_id=${this.parcellation.id}&subject=${subject}&type=${this.selectedType.shortName}`
 
-    // ToDo this temporary fix is for the bug existing on siibra api https://github.com/FZJ-INM1-BDA/siibra-api/issues/100
-    private fixDatasetFormat = (ds) =>  ds.name.includes('{')? ({
-      ...ds,
-      ...JSON.parse(ds.name.substring(ds.name.indexOf('{')).replace(/'/g, '"'))
-    }) : ds
-
-    fetchConnectivity(datasetId=null) {
-      const parcellation = this.sapi.getParcellation(this.atlas["@id"], this.parcellation["@id"])
-      if (parcellation) {
-        parcellation.getFeatureInstance(datasetId || this.selectedDataset['@id'])
-          .pipe(catchError(() => {
-            this.fetching = false
-            return of(null)
-          }))
-          .subscribe(ds => {
-            this.selectedDataset = this.fixDatasetFormat(ds)
-            this.setMatrixData(ds)
-            this.fetching = false
-          })
-      }
-    }
-
-    // ToDo need to be fixed on configuration side
-    fixHemisphereNaming(area: string) {
-      if (area.includes(' - left hemisphere')) {
-        return area.replace('- left hemisphere', 'left')
-      } else if (area.includes(' - right hemisphere')) {
-        return area.replace('- right hemisphere', 'right')
-      } else {
-        return area
-      }
+      this.http.get(url).pipe(catchError(() => {
+        this.fetching = false
+        return of(null)
+      })).subscribe(ds => {
+        this.fetching = false
+        this.setMatrixData(ds.matrices[subject])
+      })
     }
 
     setMatrixData(data) {
-      const matrixData = data as SapiParcellationFeatureMatrixModel
-
-      this.regionIndexInMatrix = (matrixData.columns as Array<string>).findIndex(md => {
-        return this.fixHemisphereNaming(md) === this.regionName
-      })
+      this.regionIndexInMatrix = data.columns.findIndex(re => this.region.id === re['@id'])
 
       if (this.regionIndexInMatrix < 0) {
-        this.fetching = false
         this.noConnectivityForRegion = true
         this.changeDetectionRef.detectChanges()
         return
       } else if (this.noConnectivityForRegion) {
         this.noConnectivityForRegion = false
       }
-      this.sapi.processNpArrayData<PARSE_TYPEDARRAY.RAW_ARRAY>(matrixData.matrix, PARSE_TYPEDARRAY.RAW_ARRAY)
-        .then(matrix => {
-          const regionProfile = matrix.rawArray[this.regionIndexInMatrix]
 
-          const maxStrength = Math.max(...regionProfile)
-          this.logChecked = maxStrength > 1
-          this.logDisabled = maxStrength <= 1
+      const regionProfile = data.data[this.regionIndexInMatrix]
 
-          const areas = regionProfile.reduce((p, c, i) => {
-            return {
-              ...p,
-              [this.fixHemisphereNaming(matrixData.columns[i])]: c
-            }
-          }, {})
-          this.pureConnections = areas
+      const maxStrength = Math.max(...regionProfile)
 
-          this.connectionsString = JSON.stringify(areas)
-          this.connectedAreas.next(this.formatConnections(areas))
-          this.setCustomLayer()
+      this.logChecked = maxStrength > 1
+      this.logDisabled = maxStrength <= 1
+      const areas = regionProfile.reduce((p, c, i) => {
+        return {
+          ...p,
+          [data.columns[i].name]: c
+        }
+      }, {})
 
-          this.matrixString = JSON.stringify(matrixData.columns.map((mc, i) => ([mc, ...matrix.rawArray[i]])))
-          this.changeDetectionRef.detectChanges()
+      this.pureConnections = areas
+      this.connectionsString = JSON.stringify(areas)
+      this.connectedAreas.next(this.formatConnections(areas))
 
-        })
+      this.setCustomLayer()
+      this.matrixString = JSON.stringify(data.columns.map((mc, i) => ([mc.name, ...data.data[i]])))
+      this.changeDetectionRef.detectChanges()
+
+        
+      return data
     }
 
 
@@ -351,13 +319,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     //ToDo bestViewPoint is null for the most cases
-    navigateToRegion(region: SapiRegionModel) {
-      const regionCentroid = this.region.hasAnnotation?.bestViewPoint?.coordinates
+    navigateToRegion(region: SxplrRegion) {
+      const regionCentroid = region.centroid
       if (regionCentroid)
         this.store$.dispatch(
-          atlasSelection.actions.navigateTo({
+          actions.navigateTo({
             navigation: {
-              position: regionCentroid.map(v => v.value*1e6),
+              position: regionCentroid.loc.map(v => v*1e6),
             },
             animation: true
           })

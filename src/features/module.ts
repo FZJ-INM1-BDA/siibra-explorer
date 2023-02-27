@@ -12,6 +12,7 @@ import { FeatureNamePipe } from "./featureName.pipe";
 import { FetchDirective } from "./fetch.directive";
 import { ListComponent } from './list/list.component';
 import { CategoryAccDirective } from './category-acc.directive';
+import { SapiViewsFeatureConnectivityModule } from "./connectivity";
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import { CategoryAccDirective } from './category-acc.directive';
     MatTooltipModule,
     UtilModule,
     MatRippleModule,
+    SapiViewsFeatureConnectivityModule
   ],
   declarations: [
     EntryComponent,
