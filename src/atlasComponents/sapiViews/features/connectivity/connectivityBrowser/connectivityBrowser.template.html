@@ -18,12 +18,13 @@
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="!fetching && selectedType" class="flex-grow-1 flex-shrink-1 w-100">
+            <mat-form-field *ngIf="selectedType" class="flex-grow-1 flex-shrink-1 w-100">
                 <mat-label>
                     Cohort
                 </mat-label>
 
                 <mat-select
+                        [disabled]="fetching"
                         [value]="selectedCohort"
                         (selectionChange)="selectCohort($event.value)">
                     <mat-option
@@ -96,10 +97,10 @@
             <i class="fas fa-download mr-2"></i>
             <span>Export</span>
         </button>
-        <button *ngIf="selectedDataset" iav-stop="mousedown click" class="icons" mat-icon-button sxplr-dialog [sxplr-dialog-size]="null"
+        <button *ngIf="selectedDataset && selectedDataset['@id']" iav-stop="mousedown click" class="icons" mat-icon-button sxplr-dialog [sxplr-dialog-size]="null"
             [sxplr-dialog-data]="{
                   title: selectedDataset?.name,
-                  descMd: selectedDataset?.description + '' + selectedDataset?.authors.join(),
+                  descMd: selectedDataset?.description + ' ' + (selectedDataset?.authors? selectedDataset?.authors.join() : ''),
                   actions: selectedDataset | connectivityDoiPipe
                 }">
             <i class="fas fa-info"></i>
@@ -108,8 +109,8 @@
 
     <hbp-connectivity-matrix-row
         #connectivityComponent
-        [style.visibility]="selectedCohort && (selectedSubjectDatasetIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
-        *ngIf="regionName && !fetching && !noConnectivityForRegion"
+        [style.visibility]="regionName && !fetching && !noConnectivityForRegion && selectedCohort
+                             && (selectedSubjectDatasetIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
         [region]="regionName + (regionHemisphere? ' - ' + regionHemisphere : '')"
         [connections]="connectionsString"
         show-export="true" hide-export-view="true"
