@@ -95,4 +95,14 @@ export class SapiViewsCoreRichRegionsHierarchy {
 
   private subs: Subscription[] = []
   
+  onNodeClick(roi: SxplrRegion){
+    /**
+     * only allow leave nodes to be selectable for now
+     */
+    const children = this._regions.filter(r => this.isParent(r, roi))
+    if (children.length > 0) {
+      return
+    }
+    this.nodeClicked.emit(roi)
+  }
 }

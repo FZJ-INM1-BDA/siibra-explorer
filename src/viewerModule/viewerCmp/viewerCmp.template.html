@@ -457,9 +457,22 @@
       <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
 
       <!-- by default, show splash screen -->
-      <div *ngSwitchDefault>
-        <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
-        </ui-splashscreen>
+      <div class="sxplr-h-100" *ngSwitchDefault>
+        <ng-template [ngIf]="(selectedAtlas$ | async)" [ngIfElse]="splashScreenTmpl">
+          <div class="center-a-div">
+            <div class="loading-atlas-text-container">
+              <spinner-cmp class="fs-200"></spinner-cmp>
+              <span>
+                Loading 
+                {{ (selectedAtlas$ | async).name }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #splashScreenTmpl>
+          <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
+          </ui-splashscreen>
+        </ng-template>
       </div>
     </ng-container>
 

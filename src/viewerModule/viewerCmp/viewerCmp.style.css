@@ -140,3 +140,11 @@ mat-list[dense].contextual-block
   align-items: flex-end;
   justify-content: flex-end;
 }
+
+.loading-atlas-text-container
+{
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

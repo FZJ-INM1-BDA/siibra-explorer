@@ -179,6 +179,14 @@ export class Effect {
     })
   ))
 
+  onAtlasSelClearTmplParc = createEffect(() => this.action.pipe(
+    ofType(actions.selectAtlas),
+    map(() => actions.setAtlasSelectionState({
+      selectedTemplate: null,
+      selectedParcellation: null,
+    })),
+  ))
+
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     filter(action => !!action.atlas),
