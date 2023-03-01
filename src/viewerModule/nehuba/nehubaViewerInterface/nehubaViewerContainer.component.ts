@@ -6,7 +6,6 @@ import { NehubaLayerControlService } from "../layerCtrl.service";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directive";
 import { Store } from "@ngrx/store";
 import { atlasSelection } from "src/state";
-import { SAPI } from "src/atlasComponents/sapi";
 
 @Component({
   selector: `sxplr-nehuba-viewer-container`,

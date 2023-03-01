@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, forkJoin, Observable, of, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -9,8 +9,8 @@ import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { Feature, NgLayerSpec, SxplrAtlas, SxplrRegion, TThreeMesh } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasSelection, userInteraction } from "src/state";
+import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 
 import { environment } from "src/environments/environment"
 // import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
@@ -115,58 +115,19 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.selectedParcAllRegions)
   )
 
-  public isStandaloneVolumes$ = this.store$.pipe(
-    select(atlasSelection.selectors.standaloneVolumes),
-    map(v => v.length > 0)
-  )
-
   public viewerMode$: Observable<string> = this.store$.pipe(
     select(atlasSelection.selectors.viewerMode),
     shareReplay(1),
   )
 
-  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
-    this.store$.pipe(
-      atlasSelection.fromRootStore.distinctATP(),
-      switchMap(({ template }) => template
-        ? forkJoin({
-          voxel: this.sapi.getVoxelTemplateImage(template),
-          surface: this.sapi.getSurfaceTemplateImage(template),
-        })
-        : of(null as { voxel: NgLayerSpec[], surface: TThreeMesh[] })
-      ),
-      map(vols => {
-        if (!vols) return null
-        const flags = {
-          isNehuba: false,
-          isThreeSurfer: false
-        }
-        if (vols.voxel.length > 0) {
-          flags.isNehuba = true
-        }
-
-        if (vols.surface.length > 0) {
-          flags.isThreeSurfer = true
-        }
-        return flags
-      })
-    ),
-    this.isStandaloneVolumes$,
-  ]).pipe(
-    distinctUntilChanged(([ prevFlags, prevIsSv ], [  currFlags, currIsSv ]) => {
-      const same = prevIsSv === currIsSv
-      && prevFlags?.isNehuba === currFlags?.isNehuba
-      && prevFlags?.isThreeSurfer === currFlags?.isThreeSurfer
-      return same
-    }),
-    map<unknown, TSupportedViewers | 'notsupported'>(([flags, isSv]) => {
-      if (isSv) return 'nehuba'
-      if (!flags) return null
-      if (flags.isNehuba) return 'nehuba'
-      if (flags.isThreeSurfer) return 'threeSurfer'
-      return 'notsupported'
-    }),
-    shareReplay(1),
+  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = this.store$.pipe(
+    select(atlasAppearance.selectors.useViewer),
+    map(useviewer => {
+      if (useviewer === "NEHUBA") return "nehuba"
+      if (useviewer === "THREESURFER") return "threeSurfer"
+      if (useviewer === "NOT_SUPPORTED") return "notsupported"
+      return null
+    })
   )
 
   public viewerCtx$ = this.ctxMenuSvc.context$

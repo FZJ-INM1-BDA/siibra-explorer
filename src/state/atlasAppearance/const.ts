@@ -50,3 +50,11 @@ export type NgLayerCustomLayer = {
  * - id allows custom layer to be removed, if necessary
  */
 export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer | ThreeSurferCustomLayer | ThreeSurferCustomLabelLayer
+
+export const useViewer = {
+  THREESURFER: "THREESURFER",
+  NEHUBA: "NEHUBA",
+  NOT_SUPPORTED: "NOT_SUPPORTED" 
+} as const
+
+export type UseViewer = keyof typeof useViewer

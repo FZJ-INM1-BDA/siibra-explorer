@@ -43,13 +43,7 @@ export class NehubaViewerTouchDirective implements OnDestroy{
     return this.htmlElementIndexMap.get(panel)
   }
 
-  private _exportNehuba: any
-  private get exportNehuba(){
-    if (!this._exportNehuba) {
-      this._exportNehuba = getExportNehuba()
-    }
-    return this._exportNehuba
-  }
+  private exportNehuba: any
 
   private s: Subscription[] = []
   private nehubaSub: Subscription[] = []
@@ -67,6 +61,7 @@ export class NehubaViewerTouchDirective implements OnDestroy{
         })
       )
     }
+    getExportNehuba().then(exportNehuba => this.exportNehuba = exportNehuba)
     /**
      * Touchend also needs to be listened to, as user could start
      * with multitouch, and end up as single touch
@@ -262,8 +257,9 @@ export class NehubaViewerTouchDirective implements OnDestroy{
         if (isNaN(deltaX) || isNaN(deltaX)) return
         const { position } = this.ngViewer.navigationState
         const pos = position.spatialCoordinates
-        this.exportNehuba.vec3.set(pos, deltaX, deltaY, 0)
-        this.exportNehuba.vec3.transformMat4(pos, pos, this.viewportToData[panelIndex])
+        const { vec3 } = this.exportNehuba
+        vec3.set(pos, deltaX, deltaY, 0)
+        vec3.transformMat4(pos, pos, this.viewportToData[panelIndex])
 
         position.changed.dispatch()
       })

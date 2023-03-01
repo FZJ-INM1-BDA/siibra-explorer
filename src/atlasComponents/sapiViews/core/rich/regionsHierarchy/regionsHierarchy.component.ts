@@ -3,7 +3,6 @@ import { UntypedFormControl } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith } from "rxjs/operators";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
-import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { SxplrFlatHierarchyTreeView } from "src/components/flatHierarchy/treeView/treeView.component";
 import { FilterByRegexPipe } from "./filterByRegex.pipe";
 import { RegionTreeFilterPipe } from "./regionTreeFilter.pipe";
@@ -23,13 +22,7 @@ const filterByRegexPipe = new FilterByRegexPipe()
 export class SapiViewsCoreRichRegionsHierarchy {
 
   static IsParent(region: SxplrRegion, parentRegion: SxplrRegion): boolean {
-    const _region = translateV3Entities.retrieveRegion(region)
-    const _parentRegion = translateV3Entities.retrieveRegion(parentRegion)
-    const { ["@id"]: parentRegionId } = _parentRegion
-    return _region.hasParent?.some(parent => {
-      const { ["@id"]: pId } = parent
-      return pId === parentRegionId
-    })
+    return region.parentIds.some(id => parentRegion.id === id)
   }
 
   static FilterRegions(regions: SxplrRegion[], searchTerm: string): SxplrRegion[]{

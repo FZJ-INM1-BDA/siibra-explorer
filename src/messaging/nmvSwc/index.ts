@@ -5,15 +5,6 @@ import { INmvTransform } from "./type"
 
 export const TYPE = 'bas:datasource'
 
-const waitFor = (condition: (...arg: any[]) => boolean) => new Promise<void>((rs, rj) => {
-  const intervalRef = setInterval(() => {
-    if (condition()) {
-      clearInterval(intervalRef)
-      rs()
-    }
-  }, 1000)
-})
-
 const NM_IDS = {
   AMBA_V3: 'hbp:Allen_Mouse_CCF_v3(um)',
   WAXHOLM_V1_01: 'hbp:WHS_SD_Rat_v1.01(um)',
@@ -110,16 +101,15 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
       }
     })
 
-    await waitFor(() => !!getExportNehuba())
-
     const b64Encoded = encoding.indexOf('base64') >= 0
     const isGzipped = encoding.indexOf('gzip') >= 0
     let data = rawData
     if (b64Encoded) {
       data = atob(data)
     }
+    const { pako, mat3, vec3 } = await getExportNehuba()
     if (isGzipped) {
-      data = getExportNehuba().pako.inflate(data)
+      data = pako.inflate(data)
     }
     let output = ``
     for (let i = 0; i < data.length; i++) {
@@ -146,7 +136,6 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     ]
     // NG translation works on nm scale
     const scaleUmToNm = 1e3
-    const { mat3, vec3 } = getExportNehuba()
     const modA = mat3.fromValues(
       scaleUmToVoxelFixed[0], 0, 0,
       0, scaleUmToVoxelFixed[1], 0,

@@ -13,6 +13,8 @@ import { FetchDirective } from "./fetch.directive";
 import { ListComponent } from './list/list.component';
 import { CategoryAccDirective } from './category-acc.directive';
 import { SapiViewsFeatureConnectivityModule } from "./connectivity";
+import { ScrollingModule } from "@angular/cdk/scrolling";
+import { MatButtonModule } from "@angular/material/button"
 
 @NgModule({
   imports: [
@@ -24,7 +26,9 @@ import { SapiViewsFeatureConnectivityModule } from "./connectivity";
     MatTooltipModule,
     UtilModule,
     MatRippleModule,
-    SapiViewsFeatureConnectivityModule
+    SapiViewsFeatureConnectivityModule,
+    ScrollingModule,
+    MatButtonModule,
   ],
   declarations: [
     EntryComponent,

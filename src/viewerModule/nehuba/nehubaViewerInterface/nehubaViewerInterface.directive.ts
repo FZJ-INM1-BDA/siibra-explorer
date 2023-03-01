@@ -10,7 +10,6 @@ import { INavObj, NehubaNavigationService } from "../navigation.service";
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { NgLayerCustomLayer } from "src/state/atlasAppearance";
 import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
@@ -178,7 +177,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
         switchMap((ATP: { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }) => this.store$.pipe(
           select(atlasAppearance.selectors.customLayers),
           debounceTime(16),
-          map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as NgLayerCustomLayer[]),
+          map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
           distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
           filter(layers => layers.length > 0),
           map(ngBaseLayers => {

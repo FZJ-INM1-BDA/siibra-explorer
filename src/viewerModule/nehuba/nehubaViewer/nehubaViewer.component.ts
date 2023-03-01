@@ -147,10 +147,12 @@ export class NehubaViewerUnit implements OnDestroy {
     if (this.nehubaViewer$) {
       this.nehubaViewer$.next(this)
     }
+
     getImportNehubaPr()
-      .then(() => {
+      .then(() => getExportNehuba())
+      .then(exportNehuba => {
         this.nehubaLoaded = true
-        this.exportNehuba = getExportNehuba()
+        this.exportNehuba = exportNehuba
         const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
         if (fixedZoomPerspectiveSlices) {
           const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = fixedZoomPerspectiveSlices

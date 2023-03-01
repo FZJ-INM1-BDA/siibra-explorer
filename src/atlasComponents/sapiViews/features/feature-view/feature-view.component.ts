@@ -30,7 +30,6 @@ export class FeatureViewComponent implements OnChanges {
   constructor(private sapi: SAPI) { }
 
   ngOnChanges(): void {
-    console.log(this.feature)
     this.tabular$.next(null)
     this.busy$.next(true)
     this.sapi.v3Get("/feature/{feature_id}", {

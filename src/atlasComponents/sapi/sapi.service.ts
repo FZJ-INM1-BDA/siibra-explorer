@@ -210,6 +210,14 @@ export class SAPI{
       ...sapiParam
     })
   }
+
+  getV3FeatureDetailWithId(id: string) {
+    return this.v3Get("/feature/{feature_id}", {
+      path: {
+        feature_id: id
+      }
+    })
+  }
   
   getFeature(featureId: string, opts: Record<string, string> = {}) {
     return new SAPIFeature(this, featureId, opts)
@@ -366,7 +374,7 @@ export class SAPI{
           const arraybuffer = await resp.arrayBuffer()
           let outbuf: ArrayBuffer
           try {
-            outbuf = getExportNehuba().pako.inflate(arraybuffer).buffer
+            outbuf = (await getExportNehuba()).pako.inflate(arraybuffer).buffer
           } catch (e) {
             console.log("unpack error", e)
             outbuf = arraybuffer
@@ -550,7 +558,7 @@ export class SAPI{
 
     try {
       const bin = atob(content)
-      const { pako } = getExportNehuba()
+      const { pako } = await getExportNehuba()
       const array = pako.inflate(bin)
       let workerMsg: string
       switch (method) {

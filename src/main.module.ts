@@ -50,6 +50,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerCtrl.effects';
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
+import { ViewerCommonEffects } from './viewerModule';
 
 @NgModule({
   imports: [
@@ -77,6 +78,7 @@ import { CONST } from "common/constants"
       ...getStoreEffects(),
       LayerCtrlEffects,
       NehubaNavigationEffects,
+      ViewerCommonEffects,
     ]),
     RootStoreModule,
     HttpClientModule,

@@ -100,7 +100,6 @@ class TranslateV3 {
       }
       const [transform, info] = await Promise.all([
         (async () => {
-          
           const resp = await fetch(`${precomputedVol}/transform.json`)
           if (resp.status >= 400) {
             console.error(`cannot retrieve transform: ${resp.status}`)
@@ -195,7 +194,7 @@ class TranslateV3 {
       for (const { volume: volIdx, fragment, label } of map.indices[regionname]) {
         const volume = map.volumes[volIdx || 0]
         if (!volume.formats.includes("gii-label")) {
-          console.warn(`getting three label error! volume does not provide gii-label! skipping!`)
+          // Does not support gii-label... skipping!
           continue
         }
         const { ["gii-label"]: giiLabel } = volume.providedVolumes
@@ -206,7 +205,7 @@ class TranslateV3 {
           continue
         }
         if (!giiLabel[fragment]) {
-          console.warn(`fragment '${fragment}' not provided by volume.gii-label! skipping!`)
+          // Does not support gii-label... skipping!
           continue
         }
         let laterality: 'left' | 'right'
@@ -222,7 +221,11 @@ class TranslateV3 {
     return threeLabelMap
   }
   
+  #wkmpLblMapToNgSegLayers = new WeakMap()
   async translateLabelledMapToNgSegLayers(map:PathReturn<"/map">): Promise<Record<string,{layer:NgSegLayerSpec, region: LabelledMap[]}>> {
+    if (this.#wkmpLblMapToNgSegLayers.has(map)) {
+      return this.#wkmpLblMapToNgSegLayers.get(map)
+    }
     const nglayerSpecMap: Record<string,{layer:NgSegLayerSpec, region: LabelledMap[]}> = {}
 
     const registerLayer = async (url: string, label: number, region: LabelledMap) => {
@@ -259,7 +262,8 @@ class TranslateV3 {
         const volume = map.volumes[volumeIdx]
         
         if (!volume.providedVolumes["neuroglancer/precomputed"]) {
-          console.error(`${error}, volume does not provide neuroglancer/precomputed. Skipping.`)
+          // volume does not provide neuroglancer/precomputed
+          // probably when fsaverage has been selected
           continue
         }
 
@@ -276,7 +280,7 @@ class TranslateV3 {
         await registerLayer(precomputedVol[fragment], label, { name: regionname, label })
       }
     }
-    
+    this.#wkmpLblMapToNgSegLayers.set(map, nglayerSpecMap)
     return nglayerSpecMap
   }
 

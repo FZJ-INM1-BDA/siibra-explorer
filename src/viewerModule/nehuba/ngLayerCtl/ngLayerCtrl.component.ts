@@ -73,6 +73,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   visible: boolean = true
   private viewer: NehubaViewerUnit
 
+  private exportNehuba: any
+
   constructor(
     private store: Store<any>,
     @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
@@ -81,6 +83,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     this.onDestroyCb.push(
       () => sub.unsubscribe()
     )
+
+    getExportNehuba().then(exportNehuba => this.exportNehuba = exportNehuba)
   }
 
   ngOnDestroy(): void {
@@ -121,7 +125,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   }
 
   setOrientation(): void {
-    const { mat4, quat, vec3 } = getExportNehuba()
+    const { mat4, quat, vec3 } = this.exportNehuba
 
     /**
      * glMatrix seems to store the matrix in transposed format

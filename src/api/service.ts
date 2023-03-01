@@ -14,7 +14,7 @@ export type NAMESPACE_TYPE = "sxplr"
 export const namespace: NAMESPACE_TYPE = "sxplr"
 const nameSpaceRegex = new RegExp(`^${namespace}`)
 
-type AddableLayer = atlasAppearance.NgLayerCustomLayer
+type AddableLayer = atlasAppearance.const.NgLayerCustomLayer
 
 type AtId = {
   "@id": string

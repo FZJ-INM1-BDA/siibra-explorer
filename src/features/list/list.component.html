@@ -1,11 +1,11 @@
-<mat-list>
-    <mat-list-item mat-ripple
-        *ngFor="let feature of features$ | async"
+<cdk-virtual-scroll-viewport itemSize="36"
+    class="virtual-scroll-viewport">
+    <button *cdkVirtualFor="let feature of features$ | async"
+        mat-button
+        class="virtual-scroll-item sxplr-w-100"
         [matTooltip]="feature.name"
         matTooltipPosition="right"
         (click)="onClickItem(feature)">
-        <span class="feature-name">
-            {{ feature.name }}
-        </span>
-    </mat-list-item>
-</mat-list>
+        {{ feature.name }}
+    </button>
+</cdk-virtual-scroll-viewport>

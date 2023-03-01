@@ -15,9 +15,11 @@
                 
                 <mat-panel-description>
                     <spinner-cmp *ngIf="categoryAcc.isBusy$ | async"></spinner-cmp>
-                    <span>
-                        {{ categoryAcc.total$ | async }}
-                    </span>
+                    <ng-template [ngIf]="categoryAcc.total$ | async" let-total>
+                        <span>
+                            {{ total }}
+                        </span>
+                    </ng-template>
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
@@ -36,6 +38,7 @@
                             </mat-card-title>
                         </mat-card-header>
                         <mat-card-content>
+                            <spinner-cmp *ngIf="(list.state$ | async) === 'busy'"></spinner-cmp>
                             <sxplr-feature-list
                                 [template]="template"
                                 [parcellation]="parcellation"
@@ -45,8 +48,7 @@
                                 (onClickFeature)="onClickFeature($event)"
                                 #list="featureList"
                                 >
-                            </sxplr-feature-list>
-                            <spinner-cmp *ngIf="(list.state$ | async) === 'busy'"></spinner-cmp>
+                            </sxplr-feature-list>                            
                         </mat-card-content>
                     </mat-card>
                 </div>

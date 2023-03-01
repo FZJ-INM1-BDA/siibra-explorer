@@ -1,27 +1,25 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, from, NEVER, of, throwError } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { forkJoin, from, of } from "rxjs";
+import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
+import { Feature, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { 
   SapiFeatureModel,
   SapiSpatialFeatureModel,
 } from "src/atlasComponents/sapi/typeV3";
-import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
-import { BaseService } from "../base.service/base.service";
 import { getParcNgId } from "../config.service";
 
 @Injectable()
 export class LayerCtrlEffects {
-  static TransformVolumeModel(volumeModel: SapiSpatialFeatureModel['volume']): atlasAppearance.NgLayerCustomLayer[] {
+  static TransformVolumeModel(volumeModel: SapiSpatialFeatureModel['volume']): atlasAppearance.const.NgLayerCustomLayer[] {
     /**
      * TODO implement
      */
@@ -33,67 +31,76 @@ export class LayerCtrlEffects {
     return []
   }
 
-  onRegionSelectClearPmapLayer = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedRegions),
-    distinctUntilChanged(
-      arrayEqual((o, n) => o.name === n.name)
-    ),
-    mapTo(
-      atlasAppearance.actions.removeCustomLayer({
-        id: PMAP_LAYER_NAME
-      })
-    )
-  ))
-
-  #pmapUrl: string
-  onRegionSelectShowNewPmapLayer = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedRegions),
-    filter(regions => regions.length === 1),
-    map(regions => regions[0]),
-    distinctUntilChanged((ro, rn) => ro.name === rn.name),
-    withLatestFrom(
-      this.store.pipe(
-        atlasSelection.fromRootStore.distinctATP()
-      )
-    ),
-    switchMap(([ region, { parcellation, template } ]) => {
-      return this.sapi.getStatisticalMap(parcellation, template, region).pipe(
-        catchError(() => NEVER),
-        map(({ buffer, meta }) => {
-          if (!!this.#pmapUrl) {
-            URL.revokeObjectURL(this.#pmapUrl)
-          }
-          this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
-          return atlasAppearance.actions.addCustomLayer({
-            customLayer: {
-              clType: "customlayer/nglayer",
-              id: PMAP_LAYER_NAME,
-              source: `nifti://${this.#pmapUrl}`,
-              shader: getShader({
-                colormap: EnumColorMapName.VIRIDIS,
-                highThreshold: meta.max,
-                lowThreshold: meta.min,
-                removeBg: true,
-              })
-            }
-          })
-        })
-      )
-    }),
-  ))
-
-  onATP$ = this.store.pipe(
+  #onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
     map(val => val as { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }),
   )
 
+
+  #pmapUrl: string
+  #cleanupUrl(){
+    if (!!this.#pmapUrl) {
+      URL.revokeObjectURL(this.#pmapUrl)
+      this.#pmapUrl = null
+    }
+  }
+
+  onRegionSelect = createEffect(() => this.store.pipe(
+    select(atlasAppearance.selectors.useViewer),
+    switchMap(viewer => {
+      const rmPmapAction = atlasAppearance.actions.removeCustomLayer({
+        id: PMAP_LAYER_NAME
+      })
+      if (viewer !== "NEHUBA") {
+        this.#cleanupUrl()
+        return of(rmPmapAction)
+      }
+      return this.store.pipe(
+        select(atlasSelection.selectors.selectedRegions),
+        distinctUntilChanged(
+          arrayEqual((o, n) => o.name === n.name)
+        ),
+        withLatestFrom(this.#onATP$),
+        // since region selection changed, pmap will definitely be removed. revoke the url resource.
+        tap(() => this.#cleanupUrl()),
+        switchMap(([ regions, { parcellation, template } ]) => {
+          if (regions.length !== 1) {
+            return of(rmPmapAction)
+          }
+          return this.sapi.getStatisticalMap(parcellation, template, regions[0]).pipe(
+            switchMap(({ buffer, meta }) => {
+              this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
+              return of(
+                rmPmapAction,
+                atlasAppearance.actions.addCustomLayer({
+                  customLayer: {
+                    clType: "customlayer/nglayer",
+                    id: PMAP_LAYER_NAME,
+                    source: `nifti://${this.#pmapUrl}`,
+                    shader: getShader({
+                      colormap: EnumColorMapName.VIRIDIS,
+                      highThreshold: meta.max,
+                      lowThreshold: meta.min,
+                      removeBg: true,
+                    })
+                  }
+                })
+              )
+            }),
+            catchError(() => of(rmPmapAction)),
+          )
+        })
+      )
+    })
+  ))
+
   onShownFeature = createEffect(() => this.store.pipe(
     select(userInteraction.selectors.selectedFeature),
-    startWith(null as SapiFeatureModel),
-    pairwise<SapiFeatureModel>(),
+    startWith(null as Feature),
+    pairwise(),
     map(([ prev, curr ]) => {
-      const removeLayers: atlasAppearance.NgLayerCustomLayer[] = []
-      const addLayers: atlasAppearance.NgLayerCustomLayer[] = []
+      const removeLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
+      const addLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       if (prev?.["@type"].includes("feature/volume_of_interest")) {
         const prevVoi = prev as SapiSpatialFeatureModel
         removeLayers.push(
@@ -119,7 +126,7 @@ export class LayerCtrlEffects {
     ]))
   ))
 
-  onATPClearBaseLayers = createEffect(() => this.onATP$.pipe(
+  onATPClearBaseLayers = createEffect(() => this.#onATP$.pipe(
     withLatestFrom(
       this.store.pipe(
         select(atlasAppearance.selectors.customLayers),
@@ -142,7 +149,7 @@ export class LayerCtrlEffects {
     )
   ))
 
-  onATPDebounceNgLayers$ = this.onATP$.pipe(
+  onATPDebounceNgLayers$ = this.#onATP$.pipe(
     debounceTime(16),
     switchMap(({ atlas, template, parcellation }) => 
       forkJoin({
@@ -190,7 +197,7 @@ export class LayerCtrlEffects {
     switchMap(ngLayers => {
       const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers } = ngLayers
       
-      const customBaseLayers: atlasAppearance.NgLayerCustomLayer[] = []
+      const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
         for (const key in layers) {
           const { source, transform, opacity, visible } = layers[key]
@@ -217,6 +224,5 @@ export class LayerCtrlEffects {
   constructor(
     private store: Store<any>,
     private sapi: SAPI,
-    private baseService: BaseService,
   ){}
 }

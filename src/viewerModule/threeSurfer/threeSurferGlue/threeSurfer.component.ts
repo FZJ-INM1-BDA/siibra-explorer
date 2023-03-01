@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { combineLatest, forkJoin, from, merge, Observable, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap } from "rxjs/operators";
+import { combineLatest, from, merge, NEVER, Observable, Subject } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
@@ -145,15 +145,12 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       select(atlasSelection.selectors.selectedParcAllRegions),
     )
   ]).pipe(
-    switchMap(([ { atlas, parcellation, template },  regions]) => {
-      const returnObj = {
-        'left': {} as Record<number, SxplrRegion>,
-        'right': {} as Record<number, SxplrRegion>
-      }
+    switchMap(([ { parcellation, template },  regions]) => {
       return merge(
         ...regions.map(region => 
           from(this.sapi.getRegionLabelIndices(template, parcellation, region)).pipe(
-            map(label => ({ region, label }))
+            map(label => ({ region, label })),
+            catchError(() => NEVER)
           )
         )
       ).pipe(

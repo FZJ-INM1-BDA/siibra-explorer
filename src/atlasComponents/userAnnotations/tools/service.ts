@@ -12,7 +12,6 @@ import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
-import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
@@ -535,15 +534,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (!encoded) return []
     const bin = atob(encoded)
     
-    await retry(() => {
-      if (!!getExportNehuba()) return true
-      else throw new Error(`export nehuba not yet ready`)
-    }, {
-      timeout: 1000,
-      retries: 10
-    })
-    
-    const { pako } = getExportNehuba()
+    const { pako } = await getExportNehuba()
     const decoded = pako.inflate(bin, { to: 'string' })
     const arr = JSON.parse(decoded)
     const anns: IAnnotationGeometry[] = []
@@ -572,14 +563,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    */
   private metadataMap = new Map<string, TAnnotationMetadata>()
 
-  private storeAnnotation(anns: IAnnotationGeometry[]){
+  private async storeAnnotation(anns: IAnnotationGeometry[]){
     const arr = []
     for (const ann of anns) {
       const json = ann.toJSON()
       arr.push(json)
     }
     const stringifiedJSON = JSON.stringify(arr)
-    const exportNehuba = getExportNehuba()
+    const exportNehuba = await getExportNehuba()
     if (!exportNehuba) return
     const { pako } = exportNehuba
     const compressed = pako.deflate(stringifiedJSON)

@@ -289,3 +289,8 @@ a[mat-raised-button]
 {
   pointer-events: none!important;
 }
+
+.virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
+{
+  width: 100%;
+}

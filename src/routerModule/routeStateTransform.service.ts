@@ -228,7 +228,7 @@ export class RouteStateTransformSvc {
     try {
       if (returnObj.f && returnObj.f.length === 1) {
         const decodedFeatId = decodeId(returnObj.f[0])
-        const feature = await this.sapi.getFeature(decodedFeatId).detail$.toPromise()
+        const feature = await this.sapi.getV3FeatureDetailWithId(decodedFeatId).toPromise()
         returnState["[state.userInteraction]"].selectedFeature = feature
       }
     } catch (e) {
