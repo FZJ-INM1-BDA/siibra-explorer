@@ -6,7 +6,7 @@ import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponen
 import { FeatureType, SapiRoute } from 'src/atlasComponents/sapi/typeV3';
 import { Feature, CorticalFeature, VoiFeature, TabularFeature } from "src/atlasComponents/sapi/sxplrTypes"
 
-type ObservableOf<Obs extends Observable<unknown>> = Parameters<Obs['subscribe']>[0] extends Function
+type ObservableOf<Obs extends Observable<unknown>> = Parameters<Obs['subscribe']>[0] extends () => void
 ? Parameters<Parameters<Obs['subscribe']>[0]>[0]
 : never
 

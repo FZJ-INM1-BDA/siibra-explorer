@@ -1,15 +1,16 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, Input, ChangeDetectorRef} from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Subscription, BehaviorSubject, Observable} from "rxjs";
-import {catchError, take} from "rxjs/operators";
+import {catchError, take, switchMap} from "rxjs/operators";
 
 import { atlasAppearance } from "src/state";
 import {SAPI} from "src/atlasComponents/sapi/sapi.service";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
 import { HttpClient } from "@angular/common/http";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { actions, selectors } from "src/state/atlasSelection";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 
 @Component({
   selector: 'sxplr-features-connectivity-browser',
@@ -21,6 +22,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     @Input('sxplr-features-connectivity-browser-atlas')
     atlas: SxplrAtlas
+
+    @Input('sxplr-features-connectivity-browser-template')
+    template: SxplrTemplate
 
     @Input('sxplr-features-connectivity-browser-parcellation')
     parcellation: SxplrParcellation
@@ -122,6 +126,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         private store$: Store,
         private http: HttpClient,
         private changeDetectionRef: ChangeDetectorRef,
+        protected sapi: SAPI
     ) {
       SAPI.BsEndpoint$.pipe(take(1)).subscribe(en => this.endpoint = `${en}/feature/RegionalConnectivity`)
     }
@@ -142,17 +147,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
 
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement.nativeElement, 'customToolEvent', {capture: true})
-          .subscribe((e: CustomEvent) => {
-            if (e.detail.name === 'export csv') {
-              // ToDo Fix in future to use component
-              const a = document.querySelector('hbp-connectivity-matrix-row');
-              (a as any).downloadCSV()
-            }
-          }),
         fromEvent(this.connectivityComponentElement.nativeElement, 'connectedRegionClicked', {capture: true})
           .subscribe((e: CustomEvent) => {
-            this.navigateToRegion(this.getRegionWithName(e.detail.name))
+            this.navigateToRegion(e.detail.name)
           }),
       )
     }
@@ -318,18 +315,28 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.setCustomLayer()
     }
 
-    //ToDo bestViewPoint is null for the most cases
-    navigateToRegion(region: SxplrRegion) {
-      const regionCentroid = region.centroid
-      if (regionCentroid)
-        this.store$.dispatch(
-          actions.navigateTo({
-            navigation: {
-              position: regionCentroid.loc.map(v => v*1e6),
-            },
-            animation: true
-          })
-        )
+    navigateToRegion(regionName: string) {
+        this.sapi.v3Get("/regions/{region_id}", {
+          path: {region_id: regionName},
+          query: {
+            parcellation_id: this.parcellation.id,
+            space_id: this.template.id
+          }
+        }).pipe(
+          switchMap(r => translateV3Entities.translateRegion(r))
+        ).subscribe(region => {
+          const centroid = region.centroid?.loc
+          if (centroid) {
+            this.store$.dispatch(
+              actions.navigateTo({
+                navigation: {
+                  position: centroid.map(v => v*1e6),
+                },
+                animation: true
+              })
+            )
+          }
+        })
     }
 
     getRegionWithName(region: string) {

@@ -84,8 +84,8 @@
     </div>
 
     <hbp-connectivity-matrix-row #connectivityComponent
-        [style.visibility]="selectedCohort && (selectedSubjectIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
-        *ngIf="regionName && !fetching && !noConnectivityForRegion"
+        [style.visibility]="regionName && !fetching && !noConnectivityForRegion && selectedCohort
+                             && (selectedSubjectIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
         [region]="regionName"
         [connections]="connectionsString"
         show-export="true" hide-export-view="true" theme="dark">

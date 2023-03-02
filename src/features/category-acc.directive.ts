@@ -9,8 +9,6 @@ import { ListComponent } from './list/list.component';
 })
 export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
-  constructor() { }
-
   public isBusy$ = new BehaviorSubject<boolean>(false)
   public total$ = new BehaviorSubject<number>(0)
 
