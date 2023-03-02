@@ -8,10 +8,10 @@ import { SAPI, SapiAtlasModel, SapiParcellationModel } from "src/atlasComponents
 import { getJba29Features, getHumanAtlas, getJba29 } from "src/atlasComponents/sapi/stories.base"
 import {SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "src/atlasComponents/sapi/type"
 import { AngularMaterialModule } from "src/sharedModules"
-import {ConnectivityBrowserComponent} from "src/atlasComponents/sapiViews/features/connectivity";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
 import {catchError, take} from "rxjs/operators"
 import {of} from "rxjs";
+import { ConnectivityBrowserComponent } from "./connectivityBrowser.component"
 
 @Component({
   selector: 'autoradiograph-wrapper-cmp',

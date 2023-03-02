@@ -9,7 +9,6 @@ import { FeatureBadgeFlagPipe } from "./featureBadgeFlag.pipe"
 import { FeatureBadgeNamePipe } from "./featureBadgeName.pipe"
 import * as ieeg from "./ieeg"
 import * as receptor from "./receptors"
-import {SapiViewsFeatureConnectivityModule} from "src/atlasComponents/sapiViews/features/connectivity";
 import * as voi from "./voi"
 import { OrderFilterFeaturesPipe } from "./orderFilterFeatureList.pipe"
 
@@ -28,7 +27,6 @@ const { SapiViewsFeaturesVoiModule } = voi
     SxplrSapiViewsFeaturesIeegModule,
     AngularMaterialModule,
     SapiViewsFeaturesVoiModule,
-    SapiViewsFeatureConnectivityModule,
   ],
   declarations: [
     FeatureEntryCmp,
@@ -49,7 +47,6 @@ const { SapiViewsFeaturesVoiModule } = voi
     FeatureEntryCmp,
     SapiViewsFeaturesEntryListItem,
     SapiViewsFeaturesVoiModule,
-    SapiViewsFeatureConnectivityModule,
     OrderFilterFeaturesPipe,
   ]
 })

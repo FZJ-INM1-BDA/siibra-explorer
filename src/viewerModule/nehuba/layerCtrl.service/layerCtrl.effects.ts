@@ -26,9 +26,9 @@ export class LayerCtrlEffects {
      * TODO implement
      */
     throw new Error(`IMPLEMENT ME`)
-    for (const volumeFormat in volumeModel.providedVolumes) {
+    // for (const volumeFormat in volumeModel.providedVolumes) {
 
-    }
+    // }
     
     return []
   }

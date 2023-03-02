@@ -1,6 +1,6 @@
 <mat-card>
     <mat-accordion>
-        <mat-expansion-panel *ngFor="let keyvalue of (cateogryCollections$ | async | keyvalue)"
+        <mat-expansion-panel *ngFor="let keyvalue of (cateogryCollections$ | async | keyvalue | isConnectivity : false)"
             sxplrCategoryAcc
             #categoryAcc="categoryAcc"
             [ngClass]="{
@@ -23,23 +23,18 @@
 
             <div class="c3-outer">
                 <div class="c3-inner">
-                    
                     <mat-card class="c3 mat-elevation-z4"
                         *ngFor="let feature of keyvalue.value"
                         [ngClass]="{
                             'sxplr-d-none': (list.state$ | async) === 'noresult'
                         }">
                         <mat-card-header>
-
                             <mat-card-title>
                                 <span class="category-title sxplr-white-space-nowrap">
                                     {{ feature.name | featureNamePipe }}
                                 </span>
                             </mat-card-title>
-                            
                         </mat-card-header>
-
-
                         <mat-card-content>
                             <sxplr-feature-list
                                 [template]="template"
@@ -51,15 +46,35 @@
                                 #list="featureList"
                                 >
                             </sxplr-feature-list>
-
                             <spinner-cmp *ngIf="(list.state$ | async) === 'busy'"></spinner-cmp>
-                            
                         </mat-card-content>
                     </mat-card>
                 </div>
             </div>
         </mat-expansion-panel>
-    </mat-accordion>
+        
+        <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
+            #connectivityAccordion
+            *ngIf="(cateogryCollections$ | async | keyvalue | isConnectivity : true) as connectivity">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ connectivity[0].key }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+        
+            <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
+                [region]="region"
+                [sxplr-features-connectivity-browser-atlas]="atlas | async"
+                [sxplr-features-connectivity-browser-template]="template"
+                [sxplr-features-connectivity-browser-parcellation]="parcellation"
+                [accordionExpanded]="connectivityAccordion.expanded"
+                [types]="connectivity[0].value">
+            </sxplr-features-connectivity-browser>
+        
+        </mat-expansion-panel>
+        
+        
+        </mat-accordion>
 
 </mat-card>
 

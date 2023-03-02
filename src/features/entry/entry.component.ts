@@ -5,6 +5,7 @@ import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
+import { atlasSelection } from 'src/state';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -30,6 +31,8 @@ export class EntryComponent extends FeatureBase {
   constructor(private sapi: SAPI, private store: Store) {
     super()
   }
+
+  public atlas = this.store.select(atlasSelection.selectors.selectedAtlas)
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
     switchMap(resp => 
