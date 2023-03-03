@@ -6,7 +6,6 @@ import {catchError, take, switchMap} from "rxjs/operators";
 import { atlasAppearance } from "src/state";
 import {SAPI} from "src/atlasComponents/sapi/sapi.service";
 import { of } from "rxjs";
-import {CustomLayer} from "src/state/atlasAppearance";
 import { HttpClient } from "@angular/common/http";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { actions, selectors } from "src/state/atlasSelection";
@@ -169,7 +168,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         }
       }
       this.customLayerEnabled = true
-      const customLayer: CustomLayer = {
+      const customLayer: atlasAppearance.const.CustomLayer = {
         clType: 'customlayer/colormap',
         id: this.connectivityLayerId,
         colormap: map

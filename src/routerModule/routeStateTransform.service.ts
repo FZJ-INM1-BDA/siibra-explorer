@@ -133,7 +133,7 @@ export class RouteStateTransformSvc {
 
   async cvtRouteToState(fullPath: UrlTree) {
 
-    const returnState: MainState = defaultState
+    const returnState: MainState = structuredClone(defaultState)
     const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
       ? fullPath.root.children['primary'].segments
       : []
