@@ -18,8 +18,8 @@ export function getDebug() {
 }
 
 export async function getExportNehuba() {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
-
     const nehuba = (window as any).export_nehuba
     if (!!nehuba) return nehuba
     await new Promise((rs) => setTimeout(rs, 160))

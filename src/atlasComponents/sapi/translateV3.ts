@@ -110,8 +110,8 @@ class TranslateV3 {
     }
     
     const returnObj: Record<string, {
-      url: string,
-      transform: number[][],
+      url: string
+      transform: number[][]
       info: Record<string, any>
     }> = {}
     for (const key in input) {
