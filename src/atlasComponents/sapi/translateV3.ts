@@ -1,5 +1,5 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap, CorticalFeature, Feature, TabularFeature, GenericInfo
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, TabularFeature, GenericInfo, BoundingBox
 } from "./sxplrTypes"
 import { PathReturn } from "./typeV3"
 import { hexToRgb } from 'common/util'
@@ -50,16 +50,20 @@ class TranslateV3 {
   }
 
   #templateMap: Map<string, PathReturn<"/spaces/{space_id}">> = new Map()
+  #sxplrTmplMap: Map<string, SxplrTemplate> = new Map()
   retrieveTemplate(template:SxplrTemplate): PathReturn<"/spaces/{space_id}"> {
     return this.#templateMap.get(template.id)
   }
   async translateTemplate(template:PathReturn<"/spaces/{space_id}">): Promise<SxplrTemplate> {
+
     this.#templateMap.set(template["@id"], template)
-    return {
+    const tmpl = {
       id: template["@id"],
       name: template.fullName,
-      type: "SxplrTemplate"
+      type: "SxplrTemplate" as const
     }
+    this.#sxplrTmplMap.set(tmpl.id, tmpl)
+    return tmpl
   }
 
   /**
@@ -93,6 +97,41 @@ class TranslateV3 {
     }
   }
 
+
+  #hasNoFragment(input: Record<string, unknown>): input is Record<string, string> {
+    for (const key in input) {
+      if (typeof input[key] !== 'string') return false
+    }
+    return true
+  }
+  async #extractNgPrecompUnfrag(input: Record<string, unknown>) {
+    if (!this.#hasNoFragment(input)) {
+      throw new Error(`#extractNgPrecompUnfrag can only handle unfragmented volume`)
+    }
+    
+    const returnObj: Record<string, {
+      url: string,
+      transform: number[][],
+      info: Record<string, any>
+    }> = {}
+    for (const key in input) {
+      if (key !== 'neuroglancer/precomputed') {
+        continue
+      }
+      const url = input[key]
+      const [ transform, info ] = await Promise.all([
+        fetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
+        fetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
+      ])
+      returnObj[key] = {
+        url: input[key],
+        transform: transform,
+        info: info,
+      }
+    }
+    return returnObj
+  }
+
   async translateSpaceToVolumeImage(template: SxplrTemplate): Promise<NgLayerSpec[]> {
     if (!template) return []
     const space = this.retrieveTemplate(template)
@@ -103,42 +142,20 @@ class TranslateV3 {
     for (const defaultImage of validImages) {
       
       const { providedVolumes } = defaultImage
-  
-      const { ['neuroglancer/precomputed']: precomputedVol } = providedVolumes
+      const { "neuroglancer/precomputed": precomputedVol, ...rest } = await this.#extractNgPrecompUnfrag(providedVolumes)
+      
       if (!precomputedVol) {
         console.error(`neuroglancer/precomputed data source has not been found!`)
         continue
       }
-      if (typeof precomputedVol === "object") {
-        console.error(`template default image cannot have fragment`)
-        continue
+      const { transform, info: _info, url } = precomputedVol
+      const { resolution, size } = _info.scales[0]
+      const info = {
+        voxel: size as [number, number, number],
+        real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number]
       }
-      const [transform, info] = await Promise.all([
-        (async () => {
-          const resp = await fetch(`${precomputedVol}/transform.json`)
-          if (resp.status >= 400) {
-            console.error(`cannot retrieve transform: ${resp.status}`)
-            return null
-          }
-          const transform: number[][] = await resp.json()
-          return transform
-        })(),
-        (async () => {
-          const resp = await fetch(`${precomputedVol}/info`)
-          if (resp.status >= 400) {
-            console.error(`cannot retrieve transform: ${resp.status}`)
-            return null
-          }
-          const info = await resp.json()
-          const { resolution, size } = info.scales[0]
-          return {
-            voxel: info.scales[0].size as [number, number, number],
-            real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
-          }
-        })()
-      ])
       returnObj.push({
-        source: `precomputed://${precomputedVol}`,
+        source: `precomputed://${url}`,
         transform,
         info,
       })
@@ -250,7 +267,7 @@ class TranslateV3 {
       if (url in nglayerSpecMap){
         segLayerSpec = nglayerSpecMap[url]
       } else {
-        const resp = await fetch(`${url}/transform.json`)
+        const resp = await this.cFetch(`${url}/transform.json`)
         const transform = await resp.json()
         segLayerSpec = {
           layer: {
@@ -301,6 +318,36 @@ class TranslateV3 {
     return nglayerSpecMap
   }
 
+  #cFetchCache = new Map<string, string>()
+  /**
+   * Cached fetch
+   * 
+   * Since translate v3 has no dependency on any angular components.
+   * We couldn't cache the response. This is a monkey patch to allow for caching of queries.
+   * @param url: string
+   * @returns { status: number, json: () => Promise<unknown> }
+   */
+  async cFetch(url: string): Promise<{ status: number, json?: () => Promise<any> }> {
+    
+    if (!this.#cFetchCache.has(url)) {
+      const resp = await fetch(url)
+      if (resp.status >= 400) {
+        return {
+          status: resp.status,
+        }
+      }
+      const text = await resp.text()
+      this.#cFetchCache.set(url, text)
+    }
+    const cachedText = this.#cFetchCache.get(url)
+    return {
+      status: 200,
+      json() {
+        return Promise.resolve(JSON.parse(cachedText))
+      }
+    }
+  }
+
   async translateSpaceToAuxMesh(template: SxplrTemplate): Promise<NgPrecompMeshSpec[]>{
     if (!template) return []
     const space = this.retrieveTemplate(template)
@@ -327,7 +374,7 @@ class TranslateV3 {
         console.error(`Expecting exactly two fragments by splitting precompmeshvol, but got ${splitPrecompMeshVol.length}`)
         continue
       }
-      const resp = await fetch(`${splitPrecompMeshVol[0]}/transform.json`)
+      const resp = await this.cFetch(`${splitPrecompMeshVol[0]}/transform.json`)
       if (resp.status >= 400) {
         console.error(`cannot retrieve transform: ${resp.status}`)
         continue
@@ -345,30 +392,15 @@ class TranslateV3 {
     return returnObj
   }
 
-  async translatePoint(point: components["schemas"]["CoordinatePointModel"]): Promise<Point> {
-    const sapiSpace = this.#templateMap.get(point.coordinateSpace['@id'])
-    const space = await this.translateTemplate(sapiSpace)
-    return {
-      space,
-      loc: point.coordinates.map(v => v.value) as [number, number, number]
+  async #translatePoint(point: components["schemas"]["CoordinatePointModel"]): Promise<Point> {
+    const getTmpl = (id: string) => {
+      return this.#sxplrTmplMap.get(id)
     }
-  }
-
-  async translateVoi(voi: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
-    const { boundingbox } = voi
-    const { loc: center, space } = await this.translatePoint(boundingbox.center)
-    const { loc: maxpoint } = await this.translatePoint(boundingbox.maxpoint)
-    const { loc: minpoint } = await this.translatePoint(boundingbox.minpoint)
     return {
-      bbox: {
-        center,
-        maxpoint,
-        minpoint,
-        space
-      },
-      name: voi.name,
-      desc: voi.description,
-      id: voi.id
+      loc: point.coordinates.map(v => v.value) as [number, number, number],
+      get space() {
+        return getTmpl(point.coordinateSpace['@id'])
+      }
     }
   }
 
@@ -376,6 +408,10 @@ class TranslateV3 {
     if (this.#isTabular(feat)) {
       return await this.translateTabularFeature(feat)
     }
+    if (this.#isVoi(feat)) {
+      return await this.translateVoiFeature(feat)
+    }
+    
     return await this.translateBaseFeature(feat)
   }
 
@@ -392,6 +428,35 @@ class TranslateV3 {
       category,
       desc: dsDescs[0] || description,
       link: urls,
+    }
+  }
+
+  #isVoi(feat: unknown): feat is PathReturn<"/feature/Image/{feature_id}"> {
+    return feat['@type'].includes("feature/volume_of_interest")
+  }
+
+  async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
+    const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol }] = await Promise.all([
+      this.translateBaseFeature(feat),
+      this.#translatePoint(feat.boundingbox.center),
+      this.#translatePoint(feat.boundingbox.maxpoint),
+      this.#translatePoint(feat.boundingbox.minpoint),
+      await this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
+    ])
+    const { ['@id']: spaceId } = feat.boundingbox.space
+    const getSpace = (id: string) => this.#sxplrTmplMap.get(id)
+    const bbox: BoundingBox = {
+      center,
+      maxpoint,
+      minpoint,
+      get space() {
+        return getSpace(spaceId)
+      }
+    }
+    return {
+      ...superObj,
+      bbox,
+      ngVolume: precomputedVol
     }
   }
 

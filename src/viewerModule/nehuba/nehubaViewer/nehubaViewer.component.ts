@@ -697,7 +697,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
   private setLayerTransparency(layerName: string, alpha: number) {
     const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-    if (!layer) return
+    if (!(layer?.layer)) return
 
     /**
      * for segmentation layer

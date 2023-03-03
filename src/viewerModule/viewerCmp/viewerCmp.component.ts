@@ -66,7 +66,6 @@ export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
-  public VOI_QUERY_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
 
   @ViewChild('genericInfoVCR', { read: ViewContainerRef })
   genericInfoVCR: ViewContainerRef

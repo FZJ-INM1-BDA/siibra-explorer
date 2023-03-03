@@ -31,6 +31,7 @@ import { LeapModule } from "./leap/module";
 import { environment } from "src/environments/environment"
 import { ATPSelectorModule } from "src/atlasComponents/sapiViews/core/rich/ATPSelector";
 import { FeatureModule } from "src/features";
+import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import { FeatureModule } from "src/features";
     ShareModule,
     ATPSelectorModule,
     FeatureModule,
+    NgLayerCtlModule,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

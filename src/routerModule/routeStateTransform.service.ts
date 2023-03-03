@@ -57,6 +57,7 @@ export class RouteStateTransformSvc {
       this.sapi.getParcRegions(selectedParcellationId).toPromise(),
     ])
 
+    const userViewer = await this.sapi.useViewer(selectedTemplate).toPromise()
     
     const selectedRegions = await (async () => {
       if (!selectedRegionIds) return []
@@ -127,12 +128,12 @@ export class RouteStateTransformSvc {
       selectedTemplate,
       selectedParcellation,
       selectedRegions,
-      allParcellationRegions
+      allParcellationRegions, 
+      userViewer
     }
   }
 
   async cvtRouteToState(fullPath: UrlTree) {
-
     const returnState: MainState = structuredClone(defaultState)
     const pathFragments: UrlSegment[] = fullPath.root.hasChildren()
       ? fullPath.root.children['primary'].segments
@@ -217,13 +218,15 @@ export class RouteStateTransformSvc {
     }
 
     try {
-      const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate, allParcellationRegions } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
+      const { selectedAtlas, selectedParcellation, selectedRegions = [], selectedTemplate, allParcellationRegions, userViewer } = await this.getATPR(returnObj as TUrlPathObj<string[], TUrlAtlas<string[]>>)
       returnState["[state.atlasSelection]"].selectedAtlas = selectedAtlas
       returnState["[state.atlasSelection]"].selectedParcellation = selectedParcellation
       returnState["[state.atlasSelection]"].selectedTemplate = selectedTemplate
+
       returnState["[state.atlasSelection]"].selectedRegions = selectedRegions || []
       returnState["[state.atlasSelection]"].selectedParcellationAllRegions = allParcellationRegions || []
       returnState["[state.atlasSelection]"].navigation = parsedNavObj
+      returnState["[state.atlasAppearance]"].useViewer = userViewer
     } catch (e) {
       // if error, show error on UI?
       console.error(`parse template, parc, region error`, e)

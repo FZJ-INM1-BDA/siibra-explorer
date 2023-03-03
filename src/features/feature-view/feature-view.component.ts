@@ -2,10 +2,14 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit } from '@a
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
-import { Feature, TabularFeature } from 'src/atlasComponents/sapi/sxplrTypes';
+import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 
 function isTabularData(feature: unknown): feature is TabularFeature<number|string|number[]> {
   return !!feature['index'] && !!feature['columns']
+}
+
+function isVoiData(feature: unknown): feature is VoiFeature {
+  return !!feature['bbox']
 }
 
 @Component({
@@ -20,8 +24,9 @@ export class FeatureViewComponent implements OnChanges {
   feature: Feature
 
   busy$ = new BehaviorSubject<boolean>(false)
-
-  tabular$: BehaviorSubject<TabularFeature<number|string|number[]>> = new BehaviorSubject(null)
+  
+  tabular$ = new BehaviorSubject<TabularFeature<number|string|number[]>>(null)
+  voi$ = new BehaviorSubject<VoiFeature>(null)
   columns$: Observable<string[]> = this.tabular$.pipe(
     map(data => data
       ? ['index', ...data.columns]
@@ -30,14 +35,20 @@ export class FeatureViewComponent implements OnChanges {
   constructor(private sapi: SAPI) { }
 
   ngOnChanges(): void {
+    
+    this.voi$.next(null)
     this.tabular$.next(null)
     this.busy$.next(true)
+
     this.sapi.getV3FeatureDetailWithId(this.feature.id).subscribe(
       val => {
         this.busy$.next(false)
         
         if (isTabularData(val)) {
           this.tabular$.next(val)
+        }
+        if (isVoiData(val)) {
+          this.voi$.next(val)
         }
       },
       () => this.busy$.next(false)

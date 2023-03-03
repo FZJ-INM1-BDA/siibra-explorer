@@ -378,14 +378,11 @@ export class NehubaLayerControlService implements OnDestroy{
     this.customLayers$.pipe(
       map(cl => {
         const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
-        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
-        return pmapExist && !otherColormapExist
+        const otherLayerNames = cl.filter(l => l.clType === "customlayer/nglayer").map(l => l.id)
+        return otherColormapExist
+          ? []
+          : otherLayerNames
       }),
-      distinctUntilChanged(),
-      map(flag => flag
-        ? [ PMAP_LAYER_NAME ]
-        : []
-      )
     )
   ]).pipe(
     map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName, ...AnnotationLayer.Map.keys()])

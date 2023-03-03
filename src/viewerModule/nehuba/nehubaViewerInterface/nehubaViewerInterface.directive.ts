@@ -6,13 +6,14 @@ import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, sw
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
-import { INavObj, NehubaNavigationService } from "../navigation.service";
+import { INavObj } from "../constants"
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
+import { NavigationBaseSvc } from "../navigation.service/navigation.base.service";
 
 
 const determineProtocol = (url: string) => {
@@ -134,7 +135,6 @@ const accumulatorFn: (
 @Directive({
   selector: '[iav-nehuba-viewer-container]',
   exportAs: 'iavNehubaViewerContainer',
-  providers: [ NehubaNavigationService ]
 })
 export class NehubaViewerContainerDirective implements OnDestroy{
 
@@ -150,19 +150,16 @@ export class NehubaViewerContainerDirective implements OnDestroy{
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
-  private componentFactory: ComponentFactory<NehubaViewerUnit>
   private cr: ComponentRef<NehubaViewerUnit>
   private navigation: atlasSelection.AtlasSelectionState['navigation']
   constructor(
     private el: ViewContainerRef,
     private store$: Store<any>,
-    private navService: NehubaNavigationService,
+    private navBaseSvc: NavigationBaseSvc,
     private effect: LayerCtrlEffects,
     private cdr: ChangeDetectorRef,
-    cfr: ComponentFactoryResolver,
     @Optional() private log: LoggingService,
   ){
-    this.componentFactory = cfr.resolveComponentFactory(NehubaViewerUnit)
     this.cdr.detach()
 
     this.subscriptions.push(
@@ -247,9 +244,9 @@ export class NehubaViewerContainerDirective implements OnDestroy{
           this.nehubaViewerInstance.applyGpuLimit(limit)
         }
       }),
-      this.navService.viewerNav$.subscribe(v => {
-        this.navigationEmitter.emit(v)
-      }),
+      this.navBaseSvc.nehubaViewerUnit$.pipe(
+        switchMap(nvUnit => nvUnit.viewerPositionChange)
+      ).subscribe(v => this.navigationEmitter.emit(v)),
       this.store$.pipe(
         select(atlasSelection.selectors.navigation)
       ).subscribe(nav => this.navigation = nav)
@@ -295,14 +292,8 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     await new Promise(rs => setTimeout(rs, 0))
 
     this.iavNehubaViewerContainerViewerLoading.emit(true)
-    this.cr = this.el.createComponent(this.componentFactory)
+    this.cr = this.el.createComponent(NehubaViewerUnit)
 
-    if (this.navService.storeNav) {
-      this.nehubaViewerInstance.initNav = {
-        ...this.navService.storeNav,
-        positionReal: true
-      }
-    }
 
     if (this.gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState

@@ -47,7 +47,7 @@ export type AdditionalInfo = {
 }
 
 type Location = {
-  space: SxplrTemplate
+  readonly space: SxplrTemplate
 }
 type LocTuple = [number, number, number]
 
@@ -104,6 +104,11 @@ type DataFrame = {
 
 export type VoiFeature = {
   bbox: BoundingBox
+  ngVolume: {
+    url: string
+    transform: number[][]
+    info: Record<string, any>
+  }
 } & Feature
 
 type CorticalDataType = number

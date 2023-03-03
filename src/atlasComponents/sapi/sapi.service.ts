@@ -13,6 +13,7 @@ import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
+import { atlasAppearance } from "src/state";
 
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
@@ -444,7 +445,7 @@ export class SAPI{
         bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),
       }
     }).pipe(
-      switchMap(v => Promise.all(v.items.map(item => translateV3Entities.translateVoi(item))))
+      switchMap(v => Promise.all(v.items.map(item => translateV3Entities.translateVoiFeature(item))))
     )
   }
 
@@ -457,6 +458,29 @@ export class SAPI{
         space_id: template.id
       }
     }).toPromise()
+  }
+
+  public useViewer(template: SxplrTemplate) {
+    return forkJoin({
+      voxel: this.getVoxelTemplateImage(template),
+      surface: this.getSurfaceTemplateImage(template)
+    }).pipe(
+      map(vols => {
+        if (!vols) return null
+        const { voxel, surface } = vols
+        if (voxel.length > 0 && surface.length > 0) {
+          console.error(`both voxel and surface length are > 0, this should not happen.`)
+          return atlasAppearance.const.useViewer.NOT_SUPPORTED
+        }
+        if (voxel.length > 0) {
+          return atlasAppearance.const.useViewer.NEHUBA
+        }
+        if (surface.length > 0) {
+          return atlasAppearance.const.useViewer.THREESURFER
+        }
+        return atlasAppearance.const.useViewer.NOT_SUPPORTED
+      })
+    )
   }
 
   public getVoxelTemplateImage(template: SxplrTemplate) {

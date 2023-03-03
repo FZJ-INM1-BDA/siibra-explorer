@@ -21,6 +21,7 @@ import { MarkdownModule } from "src/components/markdown";
 import { MatTableModule } from "@angular/material/table";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
 import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
+import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
     MatDividerModule,
     MarkdownModule,
     MatTableModule,
+    NgLayerCtlModule,
   ],
   declarations: [
     EntryComponent,

@@ -231,11 +231,9 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <ng-template [ngIf]="VOI_QUERY_FLAG">
-        <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-1 w-100">
-          <ng-container *ngTemplateOutlet="spatialFeatureListTmpl"></ng-container>
-        </div>
-      </ng-template>
+      <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-1 w-100">
+        <ng-container *ngTemplateOutlet="spatialFeatureListTmpl"></ng-container>
+      </div>
     </div>
 
     <!-- such a gross implementation -->

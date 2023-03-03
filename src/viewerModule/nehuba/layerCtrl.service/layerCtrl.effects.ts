@@ -3,12 +3,8 @@ import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, from, of } from "rxjs";
 import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { Feature, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { Feature, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
-import { 
-  SapiFeatureModel,
-  SapiSpatialFeatureModel,
-} from "src/atlasComponents/sapi/typeV3";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -19,16 +15,13 @@ import { getParcNgId } from "../config.service";
 
 @Injectable()
 export class LayerCtrlEffects {
-  static TransformVolumeModel(volumeModel: SapiSpatialFeatureModel['volume']): atlasAppearance.const.NgLayerCustomLayer[] {
-    /**
-     * TODO implement
-     */
-    throw new Error(`IMPLEMENT ME`)
-    // for (const volumeFormat in volumeModel.providedVolumes) {
-
-    // }
-    
-    return []
+  static TransformVolumeModel(volumeModel: VoiFeature['ngVolume']): atlasAppearance.const.NgLayerCustomLayer[] {    
+    return [{
+      clType: "customlayer/nglayer",
+      id: volumeModel.url,
+      source: `precomputed://${volumeModel.url}`,
+      transform: volumeModel.transform,
+    }]
   }
 
   #onATP$ = this.store.pipe(
@@ -101,16 +94,21 @@ export class LayerCtrlEffects {
     map(([ prev, curr ]) => {
       const removeLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       const addLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-      if (prev?.["@type"]?.includes("feature/volume_of_interest")) {
-        const prevVoi = prev as SapiSpatialFeatureModel
+      
+      /**
+       * TODO: use proper guard functions
+       */
+      if (!!prev?.['bbox']) {
+        const prevVoi = prev as VoiFeature
+        prevVoi.bbox
         removeLayers.push(
-          ...LayerCtrlEffects.TransformVolumeModel(prevVoi.volume)
+          ...LayerCtrlEffects.TransformVolumeModel(prevVoi.ngVolume)
         )
       }
-      if (curr?.["@type"]?.includes("feature/volume_of_interest")) {
-        const currVoi = curr as SapiSpatialFeatureModel
+      if (!!curr?.['bbox']) {
+        const currVoi = curr as VoiFeature
         addLayers.push(
-          ...LayerCtrlEffects.TransformVolumeModel(currVoi.volume)
+          ...LayerCtrlEffects.TransformVolumeModel(currVoi.ngVolume)
         )
       }
       return { removeLayers, addLayers }

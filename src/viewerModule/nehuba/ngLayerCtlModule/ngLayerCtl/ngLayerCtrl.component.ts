@@ -4,8 +4,7 @@ import { isMat4 } from "common/util"
 import { CONST } from "common/constants"
 import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
-import { NehubaViewerUnit } from "..";
-import { NEHUBA_INSTANCE_INJTKN } from "../util";
+import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba } from "src/util/fn";
 
 type Vec4 = [number, number, number, number]
@@ -60,7 +59,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   transform: Mat4 = idMat4
 
   @Input('ng-layer-ctl-transform')
-  set _transform(xform: string | Mat4) {
+  set _transform(xform: string | Mat4 | number[][]) {
     const parsedResult = typeof xform === "string"
       ? JSON.parse(xform)
       : xform
@@ -69,6 +68,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     }
     this.transform = parsedResult as Mat4
   }
+
+  @Input('ng-layer-ctl-info')
+  info: Record<string, any>
 
   visible: boolean = true
   private viewer: NehubaViewerUnit
@@ -84,7 +86,10 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       () => sub.unsubscribe()
     )
 
-    getExportNehuba().then(exportNehuba => this.exportNehuba = exportNehuba)
+    getExportNehuba().then(exportNehuba => {
+      this.exportNehuba = exportNehuba
+      this.setOrientation()
+    })
   }
 
   ngOnDestroy(): void {
@@ -136,10 +141,23 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     const scaledM = mat4.scale(mat4.create(), incM, vec3.inverse(vec3.create(), scale))
     const q = mat4.getRotation(quat.create(0), scaledM)
 
+    let position: number[]
+    if (this.info) {
+      const { scales } = this.info
+      const sizeInNm = [0, 1, 2].map(idx => scales[0].size[idx] * scales[0].resolution[idx])
+      const start = vec3.transformMat4(vec3.create(), vec3.fromValues(0, 0, 0), incM)
+      const end = vec3.transformMat4(vec3.create(), vec3.fromValues(...sizeInNm), incM)
+      const final = vec3.add(vec3.create(), start, end)
+      vec3.scale(final, final, 0.5)
+      position = Array.from(final)
+    }
+    
+    
     this.store.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          orientation: Array.from(q)
+          orientation: Array.from(q),
+          position,
         },
         animation: true
       })

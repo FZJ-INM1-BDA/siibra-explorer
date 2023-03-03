@@ -66,3 +66,15 @@
     <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
   </table>
 </ng-template>
+
+
+<!-- voi special view -->
+<ng-template [ngIf]="voi$ | async" let-voi>
+  <ng-layer-ctl
+    [ng-layer-ctl-name]="voi.ngVolume.url"
+    [ng-layer-ctl-src]="voi.ngVolume.url"
+    [ng-layer-ctl-transform]="voi.ngVolume.transform"
+    [ng-layer-ctl-info]="voi.ngVolume.info"
+    [ng-layer-ctl-opacity]="1.0">
+  </ng-layer-ctl>
+</ng-template>

@@ -21,7 +21,6 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
-import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
 import { NehubaLayoutOverlayModule } from "./layoutOverlay";
@@ -66,7 +65,6 @@ import { NehubaUserLayerModule } from "./userLayers";
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
     StatusCardComponent,
-    NgLayerCtrlCmp,
     NehubaViewerContainer,
   ],
   exports: [
@@ -74,7 +72,6 @@ import { NehubaUserLayerModule } from "./userLayers";
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
     StatusCardComponent,
-    NgLayerCtrlCmp,
   ],
   providers: [
     
@@ -94,9 +91,6 @@ import { NehubaUserLayerModule } from "./userLayers";
       deps: [ NgAnnotationService ]
     },
     NgAnnotationService
-  ],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

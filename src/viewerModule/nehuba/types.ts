@@ -1,5 +1,5 @@
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
-import { INavObj } from "./navigation.service";
+import { INavObj } from "./constants";
 
 export type TNehubaContextInfo = {
   nav: INavObj
