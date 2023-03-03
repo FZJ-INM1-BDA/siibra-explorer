@@ -7,6 +7,7 @@ import {
   NgConfig,
   RecursivePartial,
 } from "./type"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 // fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
 const fsAverageKeyVal = {
   [IDS.PARCELLATION.JBA29]: {
@@ -165,8 +166,10 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
    * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
    */
   if (tmpl.id === IDS.TEMPLATES.BIG_BRAIN && parc.id === IDS.PARCELLATION.JBA29) {
-    // laterality = region.hasAnnotation.visualizedIn?.['@id']
-    throw new Error(`FIXME figure out what region.hasAnnotation id is`)
+    const frag = translateV3Entities.mapTPRToFrag[tmpl.id][parc.id][region.name]
+    return frag
+      ? `_${MultiDimMap.GetKey(frag)}`
+      : null
   }
 
   if (!laterality) {
@@ -178,30 +181,6 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
     ngId = `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, laterality)}`
   }
   return ngId
-}
-
-const labelIdxRegex = /siibra_python_ng_precomputed_labelindex:\/\/(.*?)#([0-9]+)$/
-
-/**
- * @deprecated
- * @param _atlas 
- * @param tmpl 
- * @param parc 
- * @param region 
- */
-export function getRegionLabelIndex(_atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): number {
-  throw new Error(`TODO fix me`)
-  // const overwriteLabelIndex = region.hasAnnotation.inspiredBy.map(({ "@id": id }) => labelIdxRegex.exec(id)).filter(v => !!v)
-  // if (overwriteLabelIndex.length > 0) {
-  //   const match = overwriteLabelIndex[0]
-  //   const volumeId = match[1]
-  //   const labelIndex = match[2]
-  //   const _labelIndex = Number(labelIndex)
-  //   if (!isNaN(_labelIndex)) return _labelIndex
-  // }
-  // const lblIdx = Number(region?.hasAnnotation?.internalIdentifier)
-  // if (isNaN(lblIdx)) return null
-  // return lblIdx
 }
 
 export const defaultNehubaConfig: NehubaConfig = {
@@ -300,8 +279,8 @@ export const spaceMiscInfoMap = new Map([
 
 export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
-  const darkTheme = space["@id"] !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
-  const { scale } = spaceMiscInfoMap.get(space["@id"]) || { scale: 1 }
+  const darkTheme = space.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
+  const { scale } = spaceMiscInfoMap.get(space.id) || { scale: 1 }
   const backgrd = darkTheme
     ? [0,0,0,1]
     : [1,1,1,1]

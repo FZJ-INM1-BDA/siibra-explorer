@@ -1,12 +1,11 @@
 import { Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
-import { forkJoin } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
-import { getParcNgId, } from "src/viewerModule/nehuba/config.service";
+import { getParcNgId } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, endcodePath } from "./util";
@@ -55,25 +54,7 @@ export class RouteStateTransformSvc {
       }).pipe(
         map(val => translateV3Entities.translateParcellation(val))
       ).toPromise(),
-      this.sapi.v3Get("/regions", {
-        query: {
-          parcellation_id: selectedParcellationId,
-        }
-      }).pipe(
-        switchMap(v =>
-          this.sapi.iteratePages(v, (page) => this.sapi.v3Get("/regions", {
-            query: {
-              parcellation_id: selectedParcellationId,
-              page
-            }
-          }))
-        ),
-        switchMap(regions => 
-          forkJoin(
-            regions.map(region => translateV3Entities.translateRegion(region))
-          )
-        )
-      ).toPromise(),
+      this.sapi.getParcRegions(selectedParcellationId).toPromise(),
     ])
 
     

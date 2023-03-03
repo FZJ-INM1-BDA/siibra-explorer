@@ -74,7 +74,12 @@ export interface paths {
     get: operations["get_all_connectivity_features_feature_RegionalConnectivity_get"]
   }
   "/feature/RegionalConnectivity/{feature_id}": {
-    /** Get Single Connectivity Feature */
+    /**
+     * Get Single Connectivity Feature 
+     * @description subject is an optional param.
+     * If provided, the specific matrix will be return.
+     * If not provided, the matrix averaged between subjects will be returned under the key _average.
+     */
     get: operations["get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get"]
   }
   "/feature/CorticalProfile": {
@@ -476,11 +481,11 @@ export interface components {
       /** @Type */
       "@type": string
       /** Index */
-      index: (Record<string, never>)[]
+      index: (string)[]
       /** Dtype */
       dtype: string
       /** Columns */
-      columns: (Record<string, never>)[]
+      columns: (string)[]
       /** Ndim */
       ndim: number
       /** Data */
@@ -945,19 +950,6 @@ export interface components {
       /** Quantitativeoverlap */
       quantitativeOverlap: components["schemas"]["QuantitativeOverlapItem"] | components["schemas"]["QuantitativeOverlapItem1"]
     }
-    /** SeriesModel */
-    SeriesModel: {
-      /** @Type */
-      "@type": string
-      /** Name */
-      name?: string
-      /** Dtype */
-      dtype: string
-      /** Index */
-      index: (string | number | number)[]
-      /** Data */
-      data: (number)[]
-    }
     /** SiibraAnchorModel */
     SiibraAnchorModel: {
       /** @Type */
@@ -1003,6 +995,7 @@ export interface components {
       /** Datasets */
       datasets: (components["schemas"]["EbrainsDatasetModel"])[]
       anchor?: components["schemas"]["SiibraAnchorModel"]
+      data?: components["schemas"]["DataFrameModel"]
       /** Unit */
       unit?: string
       /** Boundary Positions */
@@ -1011,7 +1004,6 @@ export interface components {
       }
       /** Boundaries Mapped */
       boundaries_mapped: boolean
-      data?: components["schemas"]["SeriesModel"]
     }
     /** SiibraParcellationModel */
     SiibraParcellationModel: {
@@ -1023,6 +1015,8 @@ export interface components {
       name: string
       /** Modality */
       modality?: string
+      /** Datasets */
+      datasets: (components["schemas"]["EbrainsDatasetModel"])[]
       /** Brainatlasversions */
       brainAtlasVersions: (components["schemas"]["BrainAtlasVersionModel"])[]
       version?: components["schemas"]["SiibraParcellationVersionModel"]
@@ -1602,11 +1596,16 @@ export interface operations {
     }
   }
   get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get: {
-    /** Get Single Connectivity Feature */
+    /**
+     * Get Single Connectivity Feature 
+     * @description subject is an optional param.
+     * If provided, the specific matrix will be return.
+     * If not provided, the matrix averaged between subjects will be returned under the key _average.
+     */
     parameters: {
       query: {
         parcellation_id: string
-        subject: string
+        subject?: string
         type?: components["schemas"]["ConnectivityTypes"]
       }
       path: {

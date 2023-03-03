@@ -9,7 +9,6 @@ export {
 export {
   
   getParcNgId,
-  getRegionLabelIndex,
   getNehubaConfig,
   defaultNehubaConfig,
 } from "./util"

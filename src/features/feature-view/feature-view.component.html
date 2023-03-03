@@ -33,16 +33,16 @@
       <spinner-cmp></spinner-cmp>
     </ng-template>
 
-    <!-- <a mat-icon-button sxplr-hide-when-local *ngFor="let url of dataset.link" [href]="url.doi | parseDoi" target="_blank">
+    <a mat-icon-button sxplr-hide-when-local *ngFor="let url of feature.link" [href]="url.href" target="_blank">
       <i class="fas fa-external-link-alt"></i>
-    </a> -->
+    </a>
   </mat-card-subtitle>
 </mat-card>
 
 <mat-card *ngIf="feature" class="sxplr-z-0">
   <mat-card-content>
     <!-- TODO fix feature typing! with proper translate fn -->
-    <markdown-dom class="sxplr-muted" [markdown]="feature['description']">
+    <markdown-dom class="sxplr-muted" [markdown]="feature.desc">
     </markdown-dom>
   </mat-card-content>
 </mat-card>

@@ -48,11 +48,10 @@ export class BaseService {
             
             
             for (const { name, label } of region) {
-              const actualRegion = regionmap.get(name)
-              if (!actualRegion) {
-                console.warn(`region with name ${name} cannot be found, skipping`)
-                continue
-              }
+              const actualRegion = regionmap.get(name) || (() => {
+                console.log(`region with name ${name} cannot be found. Viewer may not behave properly`)
+                return { name, id: '', parentIds: [], type: 'SxplrRegion' }
+              })()
               const ngId = getParcNgId(atlas, template, parcellation, actualRegion)
               if (!returnVal[ngId]) {
                 returnVal[ngId] = {}

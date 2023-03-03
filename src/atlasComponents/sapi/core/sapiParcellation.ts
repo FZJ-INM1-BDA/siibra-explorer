@@ -1,7 +1,6 @@
 import { Observable, of } from "rxjs"
 import { SAPI } from "../sapi.service"
 import { SapiParcellationModel } from "../typeV3"
-import { SapiQueryPriorityArg } from "../sxplrTypes"
 import { SAPIBase } from "./base"
 
 /**
@@ -18,17 +17,16 @@ export class SAPIParcellation extends SAPIBase<PF>{
     super(sapi)
   }
 
-  getDetail(queryParam?: SapiQueryPriorityArg): Observable<SapiParcellationModel>{
+  getDetail(): Observable<SapiParcellationModel>{
     return this.sapi.v3Get(`/parcellations/{parcellation_id}`, {
       path: {
         parcellation_id: this.id
       },
-      priority: queryParam?.priority
     })
   }
 
-  getLabelledMap(spaceId: string, queryParam?: SapiQueryPriorityArg) {
-    return this.sapi.getMap(this.id, spaceId, "LABELLED", queryParam)
+  getLabelledMap(spaceId: string) {
+    return this.sapi.getMap(this.id, spaceId, "LABELLED")
   }
 
   static Features$ = of(Object.keys(ParcellationFeatures) as PF[])

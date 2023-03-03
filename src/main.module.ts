@@ -167,7 +167,7 @@ import { ViewerCommonEffects } from './viewerModule';
       provide: DARKTHEME,
       useFactory: (store: Store) => store.pipe(
         select(atlasSelection.selectors.selectedTemplate),
-        map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
+        map(tmpl => !!(tmpl && tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
       ),
       deps: [ Store ]
     },

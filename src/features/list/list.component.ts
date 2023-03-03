@@ -51,8 +51,7 @@ export class ListComponent extends FeatureBase {
           ...this.queryParams,
           ...query,
         } as any
-      }).pipe(
-      )
+      })
     }),
     catchError(() => {
       this.state$.next("noresult")

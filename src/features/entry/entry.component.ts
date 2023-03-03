@@ -55,9 +55,9 @@ export class EntryComponent extends FeatureBase {
             ...(v.query_params || []),
           ]
           return [
-            params.includes("space_id") === (!!template),
-            params.includes("parcellation_id") === (!!parcellation),
-            params.includes("region_id") === (!!region),
+            params.includes("space_id") === (!!template) && !!template,
+            params.includes("parcellation_id") === (!!parcellation) && !!parcellation,
+            params.includes("region_id") === (!!region) && !!region,
           ].some(val => val)
         })
         return categoryAcc(filteredFeatures)

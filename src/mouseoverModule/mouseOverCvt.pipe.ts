@@ -11,7 +11,7 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
           fontSet: 'fas',
           fontIcon: 'fa-brain'
         },
-        text: seg.name
+        text: seg?.name || "Unknown"
       }
     })
   }

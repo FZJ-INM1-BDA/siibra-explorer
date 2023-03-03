@@ -6,7 +6,8 @@ import { WidgetPortal } from "src/widget/widgetPortal/widgetPortal.component";
 import { setPluginSrc, SET_PLUGIN_NAME } from "./const";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
 import { environment } from "src/environments/environment"
-import { startWith } from "rxjs/operators";
+import { catchError, startWith } from "rxjs/operators";
+import { of } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,8 @@ export class PluginService {
     name: string
     iframeUrl: string
   }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
-    startWith([])
+    startWith([]),
+    catchError(() =>  of([]))
   )
 
   async launchPlugin(htmlSrc: string){

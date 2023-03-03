@@ -4,8 +4,8 @@ import { map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 
-function isTabularData(feature: unknown): feature is { data: TabularFeature<number|string|number[]> } {
-  return feature['@type'].includes("siibra-0.4/feature/tabular")
+function isTabularData(feature: unknown): feature is TabularFeature<number|string|number[]> {
+  return !!feature['index'] && !!feature['columns']
 }
 
 @Component({
@@ -32,16 +32,13 @@ export class FeatureViewComponent implements OnChanges {
   ngOnChanges(): void {
     this.tabular$.next(null)
     this.busy$.next(true)
-    this.sapi.v3Get("/feature/{feature_id}", {
-      path: {
-        feature_id: this.feature.id
-      }
-    }).subscribe(
+    this.sapi.getV3FeatureDetailWithId(this.feature.id).subscribe(
       val => {
         this.busy$.next(false)
-
-        if (!isTabularData(val)) return
-        this.tabular$.next(val.data)
+        
+        if (isTabularData(val)) {
+          this.tabular$.next(val)
+        }
       },
       () => this.busy$.next(false)
     )

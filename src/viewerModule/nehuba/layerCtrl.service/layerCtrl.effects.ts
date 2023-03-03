@@ -101,13 +101,13 @@ export class LayerCtrlEffects {
     map(([ prev, curr ]) => {
       const removeLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       const addLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-      if (prev?.["@type"].includes("feature/volume_of_interest")) {
+      if (prev?.["@type"]?.includes("feature/volume_of_interest")) {
         const prevVoi = prev as SapiSpatialFeatureModel
         removeLayers.push(
           ...LayerCtrlEffects.TransformVolumeModel(prevVoi.volume)
         )
       }
-      if (curr?.["@type"].includes("feature/volume_of_interest")) {
+      if (curr?.["@type"]?.includes("feature/volume_of_interest")) {
         const currVoi = curr as SapiSpatialFeatureModel
         addLayers.push(
           ...LayerCtrlEffects.TransformVolumeModel(currVoi.volume)

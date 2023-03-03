@@ -1,9 +1,10 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap, CorticalFeature
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TemplateDefaultImage, TThreeSurferMesh, TThreeMesh, LabelledMap, CorticalFeature, Feature, TabularFeature, GenericInfo
 } from "./sxplrTypes"
 import { PathReturn } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
+import { defaultdict } from "src/util/fn"
 
 
 class TranslateV3 {
@@ -21,16 +22,30 @@ class TranslateV3 {
     }
   }
 
+  async translateDs(ds: PathReturn<"/parcellations/{parcellation_id}">['datasets'][number]): Promise<GenericInfo> {
+    return {
+      name: ds.name,
+      desc: ds.description,
+      link: ds.urls.map(v => ({
+        href: v.url,
+        text: 'Link'
+      }))
+    }
+  }
+
   #parcellationMap: Map<string, PathReturn<"/parcellations/{parcellation_id}">> = new Map()
   retrieveParcellation(parcellation: SxplrParcellation): PathReturn<"/parcellations/{parcellation_id}"> {
     return this.#parcellationMap.get(parcellation.id)
   }
   async translateParcellation(parcellation:PathReturn<"/parcellations/{parcellation_id}">): Promise<SxplrParcellation> {
+    const ds = await Promise.all((parcellation.datasets || []).map(ds => this.translateDs(ds)))
+    const { name, ...rest } = ds[0] || {}
     return {
       id: parcellation["@id"],
       name: parcellation.name,
       modality: parcellation.modality,
-      type: "SxplrParcellation"
+      type: "SxplrParcellation",
+      ...rest
     }
   }
 
@@ -221,6 +236,8 @@ class TranslateV3 {
     return threeLabelMap
   }
   
+  mapTPRToFrag = defaultdict(() => defaultdict(() => defaultdict(() => null as string)))
+
   #wkmpLblMapToNgSegLayers = new WeakMap()
   async translateLabelledMapToNgSegLayers(map:PathReturn<"/map">): Promise<Record<string,{layer:NgSegLayerSpec, region: LabelledMap[]}>> {
     if (this.#wkmpLblMapToNgSegLayers.has(map)) {
@@ -355,6 +372,44 @@ class TranslateV3 {
     }
   }
 
+  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<TabularFeature<number|string|number[]>|Feature> {
+    if (this.#isTabular(feat)) {
+      return await this.translateTabularFeature(feat)
+    }
+    return await this.translateBaseFeature(feat)
+  }
+
+  async translateBaseFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<Feature>{
+    const { id, name, category, description, datasets } = feat
+    const dsDescs = datasets.map(ds => ds.description)
+    const urls = datasets.flatMap(ds => ds.urls).map(v => ({
+      href: v.url,
+      text: 'link to dataset'
+    }))
+    return {
+      id,
+      name,
+      category,
+      desc: dsDescs[0] || description,
+      link: urls,
+    }
+  }
+
+  #isTabular(feat: unknown): feat is PathReturn<"/feature/Tabular/{feature_id}"> {
+    return feat["@type"].includes("feature/tabular")
+  }
+  async translateTabularFeature(feat: unknown): Promise<TabularFeature<number | string| number[]>> {
+    if (!this.#isTabular(feat)) throw new Error(`Feature is not of tabular type`)
+    const superObj = await this.translateBaseFeature(feat)
+    const { data: _data } = feat
+    const { index, columns, data } = _data || {}
+    return {
+      ...superObj,
+      columns,
+      index,
+      data
+    }
+  }
   
   async translateCorticalProfile(feat: PathReturn<"/feature/CorticalProfile/{feature_id}">): Promise<CorticalFeature<number>> {
     return {

@@ -1,6 +1,6 @@
 import { Observable, of, throwError } from "rxjs"
 import { SAPI } from '../sapi.service'
-import { SxplrTemplate, SapiQueryPriorityArg } from "../sxplrTypes"
+import { SxplrTemplate } from "../sxplrTypes"
 import { map, switchMap } from "rxjs/operators"
 import { SAPIBase } from "./base"
 
@@ -44,22 +44,20 @@ export class SAPISpace extends SAPIBase<SF>{
 
   private prefix$: Observable<string>
 
-  getModalities(param?: SapiQueryPriorityArg): Observable<FeatureResponse> {
+  getModalities(): Observable<FeatureResponse> {
     return this.prefix$.pipe(
       switchMap(prefix => this.sapi.httpGet<FeatureResponse>(
         `${prefix}/features`,
         null,
-        param
       ))
     )
   }
 
-  getDetail(param?: SapiQueryPriorityArg): Observable<SxplrTemplate>{
+  getDetail(): Observable<SxplrTemplate>{
     return this.prefix$.pipe(
       switchMap(prefix => this.sapi.httpGet<SxplrTemplate>(
         `${prefix}`,
         null,
-        param
       ))
     )
   }

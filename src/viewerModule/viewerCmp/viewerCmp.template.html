@@ -231,11 +231,11 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <!-- <ng-template [ngIf]="VOI_QUERY_FLAG">
-        <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
-          <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
+      <ng-template [ngIf]="VOI_QUERY_FLAG">
+        <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-1 w-100">
+          <ng-container *ngTemplateOutlet="spatialFeatureListTmpl"></ng-container>
         </div>
-      </ng-template> -->
+      </ng-template>
     </div>
 
     <!-- such a gross implementation -->
@@ -975,6 +975,13 @@
   <ng-template #sapiVOITmpl>
   </ng-template>
 
+</ng-template>
+
+<ng-template #spatialFeatureListTmpl>
+  <sxplr-feature-entry
+    class="sxplr-pe-all sxplr-d-block mat-elevation-z8"
+    [template]="templateSelected$ | async">
+  </sxplr-feature-entry>
 </ng-template>
 
 <!-- <ng-template #spatialFeatureListViewTmpl>

@@ -6,17 +6,6 @@ import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operato
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionListSearchTmpl.directive";
 
-/**
- * Filter function, which determines whether the region will be included in the list of autocompleted search.
- * Ideally, only the selectable regions are included in the result.
- * 
- * @param region input region
- * @returns {boolean} whether or not to include the region in the list search
- */
-const filterRegionForListSearch = (region: SxplrRegion): boolean => {
-  return !!region.color
-}
-
 const filterRegionViaSearch = (searchTerm: string) => (region:SxplrRegion) => {
   return region.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
 }
@@ -41,8 +30,8 @@ export class SapiViewsCoreRichRegionListSearch {
     return this._regions
   }
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-regions')
-  set regions(val: SxplrRegion[]) {
-    this._regions = val.filter(filterRegionForListSearch)
+  set regions(reg: SxplrRegion[]) {
+    this._regions = reg.filter(r => !reg.some(c => c.parentIds.includes(r.id)))
   }
 
   @ContentChild(SapiViewsCoreRichRegionListTemplateDirective)

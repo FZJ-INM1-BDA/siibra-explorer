@@ -1,7 +1,6 @@
 import { Observable } from "rxjs"
 import { SAPI } from "../sapi.service"
 import { RouteParam } from "../typeV3"
-import { SapiQueryPriorityArg } from "../sxplrTypes"
 
 const AllFeatures = {
   CorticalProfile: "CorticalProfile",
@@ -22,12 +21,12 @@ export abstract class SAPIBase<T extends AF> {
     private _sapi: SAPI,
   ){}
 
-  getFeatures(featureType: T, param: RouteParam<`/feature/${T}`> & Partial<SapiQueryPriorityArg>) {
+  getFeatures(featureType: T, param: RouteParam<`/feature/${T}`>) {
     const route = `/feature/${featureType}` as `/feature/${T}`
     return this._sapi.v3Get(route, param)
   }
   
-  getFeatureInstance(featureType: T, param: RouteParam<`/feature/${T}/{feature_id}`> & Partial<SapiQueryPriorityArg>) {
+  getFeatureInstance(featureType: T, param: RouteParam<`/feature/${T}/{feature_id}`>) {
     const route = `/feature/${featureType}/{feature_id}` as `/feature/${T}/{feature_id}`
     return this._sapi.v3Get(route, param)
   }

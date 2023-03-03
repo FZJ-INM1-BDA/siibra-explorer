@@ -15,6 +15,12 @@ import { CategoryAccDirective } from './category-acc.directive';
 import { SapiViewsFeatureConnectivityModule } from "./connectivity";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MatButtonModule } from "@angular/material/button"
+import { MatIconModule } from "@angular/material/icon";
+import { MatDividerModule } from "@angular/material/divider";
+import { MarkdownModule } from "src/components/markdown";
+import { MatTableModule } from "@angular/material/table";
+import { FeatureViewComponent } from "./feature-view/feature-view.component";
+import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 
 @NgModule({
   imports: [
@@ -29,18 +35,25 @@ import { MatButtonModule } from "@angular/material/button"
     SapiViewsFeatureConnectivityModule,
     ScrollingModule,
     MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+    MarkdownModule,
+    MatTableModule,
   ],
   declarations: [
     EntryComponent,
     ListComponent,
+    FeatureViewComponent,
 
     FetchDirective,
     CategoryAccDirective,
 
     FeatureNamePipe,
+    TransformPdToDsPipe,
   ],
   exports: [
     EntryComponent,
+    FeatureViewComponent,
   ]
 })
 export class FeatureModule{}

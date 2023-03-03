@@ -121,10 +121,6 @@ export type TabularFeature<T extends TabularDataType> = {
   data?: T[][]
 } & Feature
 
-
-/**
- * Support types
- */
-export type SapiQueryPriorityArg = {
-  priority: number
-}
+export type GenericInfo = {
+  name: string
+} & AdditionalInfo

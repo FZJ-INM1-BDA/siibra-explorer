@@ -372,3 +372,15 @@ export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
     )
   })
 }
+
+export function defaultdict<T>(fn: () => T): Record<string, T> {
+  const obj = {}
+  return new Proxy(obj, {
+    get(target, prop, rec) {
+      if (!(prop in target)){
+        target[prop] = fn()
+      }
+      return obj[prop]
+    },
+  })
+}

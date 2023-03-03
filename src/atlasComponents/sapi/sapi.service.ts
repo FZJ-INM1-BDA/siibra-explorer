@@ -8,12 +8,11 @@ import { getExportNehuba } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { PRIORITY_HEADER } from "src/util/priority";
 import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
-import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, SapiQueryPriorityArg } from "./sxplrTypes";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
@@ -139,12 +138,11 @@ export class SAPI{
 
   static ErrorMessage = null
 
-  getParcRegions(parcId: string, queryParam?: SapiQueryPriorityArg) {
+  getParcRegions(parcId: string) {
     const param = {
       query: {
         parcellation_id: parcId,
       },
-      priority: queryParam?.priority
     }
     return this.v3Get("/regions", param).pipe(
       switchMap(resp =>
@@ -164,7 +162,7 @@ export class SAPI{
     )
   }
 
-  getMap(parcId: string, spaceId: string, mapType: "LABELLED" | "STATISTICAL",  queryParam?: SapiQueryPriorityArg) {
+  getMap(parcId: string, spaceId: string, mapType: "LABELLED" | "STATISTICAL") {
     return this.v3Get("/map", {
       query: {
         map_type: mapType,
@@ -175,10 +173,10 @@ export class SAPI{
   }
 
   #isPaged<T>(resp: any): resp is PaginatedResponse<T>{
-    if (!!resp.total) return true
+    if (!!resp.total || resp.total === 0) return true
     return false
   }
-  getV3Features<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>[]> {
+  getV3Features<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}`>): Observable<Feature[]> {
     const query = structuredClone(sapiParam)
     return this.v3Get<`/feature/${T}`>(`/feature/${featureType}`, {
       ...query
@@ -201,7 +199,15 @@ export class SAPI{
           }
         )
       }),
-      catchError(() => of([]))
+      switchMap(features => features.length === 0
+        ? of([])
+        : forkJoin(
+          features.map(feat => translateV3Entities.translateFeature(feat) )
+        )
+      ),
+      catchError((err) => {
+        console.error("Error fetching features", err)
+        return of([])}),
     )
   }
 
@@ -211,12 +217,15 @@ export class SAPI{
     })
   }
 
-  getV3FeatureDetailWithId(id: string) {
+  getV3FeatureDetailWithId(id: string, params: Record<string,  string> = {}) {
     return this.v3Get("/feature/{feature_id}", {
       path: {
         feature_id: id
-      }
-    })
+      },
+      query_param: params
+    } as any).pipe(
+      switchMap(val => translateV3Entities.translateFeature(val))
+    )
   }
   
   getFeature(featureId: string, opts: Record<string, string> = {}) {
@@ -246,13 +255,10 @@ export class SAPI{
    * @param sapiParam 
    * @returns 
    */
-  v3Get<T extends SapiRoute>(route: T, sapiParam: RouteParam<T> & Partial<{ priority: number }>){
+  v3Get<T extends SapiRoute>(route: T, sapiParam: RouteParam<T>){
     return SAPI.BsEndpoint$.pipe(
       switchMap(endpoint => {
         const headers: Record<string, string> = {}
-        if (sapiParam?.priority) {
-          headers[PRIORITY_HEADER] = sapiParam.priority.toString()
-        }
         const { path, params } = this.v3GetRoute(route, sapiParam)
         return this.http.get<PathReturn<T>>(
           `${endpoint}${path}`,
@@ -272,11 +278,8 @@ export class SAPI{
    * @param sapiParam 
    * @returns 
    */
-  httpGet<T>(url: string, params?: Record<string, string>, sapiParam?: SapiQueryPriorityArg){
+  httpGet<T>(url: string, params?: Record<string, string>){
     const headers: Record<string, string> = {}
-    if (sapiParam?.priority) {
-      headers[PRIORITY_HEADER] = sapiParam.priority.toString()
-    }
     return this.http.get<T>(
       url,
       {
@@ -417,7 +420,7 @@ export class SAPI{
             space.id,
             "LABELLED"
           ).pipe(
-            catchError((err, obs) => of(null)),
+            catchError((err, obs) => of(null as SxplrTemplate)),
             map(_map => _map && space)
           )
         )
@@ -475,6 +478,27 @@ export class SAPI{
   public async getTranslatedLabelledNgMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
     if (!parcellation || !template) return {}
     const map = await this.getLabelledMap(parcellation, template)
+
+    for (const regionname in map.indices) {
+      for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
+        const { providedVolumes } = map.volumes[volumeIdx]
+        if (!("neuroglancer/precomputed" in providedVolumes)) {
+          continue
+        }
+        const provider = providedVolumes["neuroglancer/precomputed"]
+          
+        const src = fragment
+          ? provider[fragment]
+          : provider
+
+        const match = /https?:\/\/.*?\/(.*?)$/.exec(src)
+        const regionFragment = match
+          ? match[1]
+          : src
+        translateV3Entities.mapTPRToFrag[template.id][parcellation.id][regionname] = regionFragment
+      }
+    }
+    
     return await translateV3Entities.translateLabelledMapToNgSegLayers(map)
   }
 
