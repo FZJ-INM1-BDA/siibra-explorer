@@ -10,7 +10,7 @@ import {
 } from "src/atlasComponents/sapi";
 import { atlasAppearance, atlasSelection } from "src/state";
 import {PARSE_TYPEDARRAY} from "src/atlasComponents/sapi/sapi.service";
-import {SapiModalityModel, SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel} from "src/atlasComponents/sapi/type";
+import {SapiModalityModel, SapiParcellationFeatureMatrixModel, SapiParcellationFeatureModel, SapiSpaceModel} from "src/atlasComponents/sapi/type";
 import { of } from "rxjs";
 import {CustomLayer} from "src/state/atlasAppearance";
 import { HttpClient } from "@angular/common/http";
@@ -24,6 +24,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     @Input('sxplr-sapiviews-features-connectivity-browser-atlas')
     atlas: SapiAtlasModel
+
+    @Input('sxplr-sapiviews-features-connectivity-browser-space')
+    space: SapiSpaceModel
 
     @Input('sxplr-sapiviews-features-connectivity-browser-parcellation')
     parcellation: SapiParcellationModel
@@ -140,17 +143,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
 
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', {capture: true})
-          .subscribe((e: CustomEvent) => {
-            if (e.detail.name === 'export csv') {
-              // ToDo Fix in future to use component
-              const a = document.querySelector('hbp-connectivity-matrix-row');
-              (a as any).downloadCSV()
-            }
-          }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'connectedRegionClicked', {capture: true})
           .subscribe((e: CustomEvent) => {
-            this.navigateToRegion(this.getRegionWithName(e.detail.name))
+            this.navigateToRegion(e.detail.name)
           }),
       )
     }
@@ -351,17 +346,21 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     //ToDo bestViewPoint is null for the most cases
-    navigateToRegion(region: SapiRegionModel) {
-      const regionCentroid = this.region.hasAnnotation?.bestViewPoint?.coordinates
-      if (regionCentroid)
-        this.store$.dispatch(
-          atlasSelection.actions.navigateTo({
-            navigation: {
-              position: regionCentroid.map(v => v.value*1e6),
-            },
-            animation: true
-          })
-        )
+    navigateToRegion(regionName: string) {
+      this.sapi.getRegion(this.atlas["@id"], this.parcellation["@id"], regionName)
+        .getDetail(this.space["@id"])
+        .subscribe(r => {
+          const regionCentroid = r.hasAnnotation?.bestViewPoint?.coordinates
+          if (regionCentroid)
+            this.store$.dispatch(
+              atlasSelection.actions.navigateTo({
+                navigation: {
+                  position: regionCentroid.map(v => v.value*1e6),
+                },
+                animation: true
+              })
+            )
+        })
     }
 
     getRegionWithName(region: string) {
