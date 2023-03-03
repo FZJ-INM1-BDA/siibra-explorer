@@ -61,24 +61,30 @@
         </div>
     </mat-expansion-panel>
     
-    <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
-        #connectivityAccordion
-        *ngIf="(cateogryCollections$ | async | keyvalue | isConnectivity : true) as connectivity">
-        <mat-expansion-panel-header>
-            <mat-panel-title>
-                {{ connectivity[0].key }}
-            </mat-panel-title>
-        </mat-expansion-panel-header>
 
-        <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
-            [region]="region"
-            [sxplr-features-connectivity-browser-atlas]="atlas | async"
-            [sxplr-features-connectivity-browser-template]="template"
-            [sxplr-features-connectivity-browser-parcellation]="parcellation"
-            [accordionExpanded]="connectivityAccordion.expanded"
-            [types]="connectivity[0].value">
-        </sxplr-features-connectivity-browser>
+    <ng-template [ngIf]="cateogryCollections$ | async | keyvalue | isConnectivity : true" let-connectivity>
+        <ng-template ngFor [ngForOf]="connectivity" let-conn>
+            <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
+                #connectivityAccordion
+                *ngIf="conn">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ conn.key }}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
 
-    </mat-expansion-panel>
+                <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
+                    [region]="region"
+                    [sxplr-features-connectivity-browser-atlas]="atlas | async"
+                    [sxplr-features-connectivity-browser-template]="template"
+                    [sxplr-features-connectivity-browser-parcellation]="parcellation"
+                    [accordionExpanded]="connectivityAccordion.expanded"
+                    [types]="conn.value">
+                </sxplr-features-connectivity-browser>
+
+            </mat-expansion-panel>
+        </ng-template>
+    </ng-template>
+
 
 </mat-accordion>

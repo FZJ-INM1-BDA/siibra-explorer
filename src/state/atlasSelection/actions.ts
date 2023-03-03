@@ -154,13 +154,6 @@ export const clearViewerMode = createAction(
   `${nameSpace} clearViewerMode`,
 )
 
-export const toggleRegionSelect = createAction(
-  `${nameSpace} toggleRegionSelect`,
-  props<{
-    region: SxplrRegion
-  }>()
-)
-
 export const toggleRegionSelectById = createAction(
   `${nameSpace} toggleRegionSelectById`,
   props<{

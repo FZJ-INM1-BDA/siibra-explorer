@@ -363,24 +363,6 @@ export class Effect {
     )
   ))
 
-  onRegionToggleSelect = createEffect(() => this.action.pipe(
-    ofType(actions.toggleRegionSelect),
-    withLatestFrom(
-      this.store.pipe(
-        select(selectors.selectedRegions)
-      )
-    ),
-    map(([ { region }, regions ]) => {
-      const selectedRegionsIndicies = regions.map(r => r["@id"])
-      const roiIndex = selectedRegionsIndicies.indexOf(region["@id"])
-      return actions.setSelectedRegions({
-        regions: roiIndex >= 0
-          ? [...regions.slice(0, roiIndex), ...regions.slice(roiIndex + 1)]
-          : [...regions, region]
-      })
-    })
-  ))
-
   constructor(
     private action: Actions,
     private sapiSvc: SAPI,
