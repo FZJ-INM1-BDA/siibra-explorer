@@ -461,6 +461,9 @@ export class SAPI{
   }
 
   public useViewer(template: SxplrTemplate) {
+    if (!template) {
+      return of(null as keyof typeof atlasAppearance.const.useViewer)
+    }
     return forkJoin({
       voxel: this.getVoxelTemplateImage(template),
       surface: this.getSurfaceTemplateImage(template)
