@@ -12,18 +12,6 @@ import { SapiViewsCoreRegionRegionBase } from "./region.base.directive";
 
 export class SapiViewsCoreRegionRegionalFeatureDirective extends SapiViewsCoreRegionRegionBase implements OnChanges{
 
-  private ATPR$ = new BehaviorSubject<{
-    atlas: SxplrAtlas
-    template: SxplrTemplate
-    parcellation: SxplrParcellation
-    region: SxplrRegion
-  }>(null)
-
-  ngOnChanges(sc: SimpleChanges): void {
-    const { atlas, template, parcellation, region } = this
-    this.ATPR$.next({ atlas, template, parcellation, region })
-  }
-
   constructor(sapi: SAPI){
     super(sapi)
   }

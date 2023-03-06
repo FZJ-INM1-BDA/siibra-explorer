@@ -1,11 +1,11 @@
-import { Directive, EventEmitter, Input, OnDestroy, Output } from "@angular/core";
+import { Directive, EventEmitter, Input, Output, SimpleChanges } from "@angular/core";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest } from "rxjs";
 import { SAPIRegion } from "src/atlasComponents/sapi/core";
-import { switchMap } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 
 @Directive({
   selector: `[sxplr-sapiviews-core-region]`,
@@ -28,11 +28,10 @@ export class SapiViewsCoreRegionRegionBase {
   @Output('sxplr-sapiviews-core-region-navigate-to')
   onNavigateTo = new EventEmitter<number[]>()
 
-  protected region$ = new Subject<SxplrRegion>()
+  protected region$ = new BehaviorSubject<SxplrRegion>(null)
   private _region: SxplrRegion
   @Input('sxplr-sapiviews-core-region-region')
   set region(val: SxplrRegion) {
-    
     this.region$.next(val)
 
     if (!this.shouldFetchDetail || !val) {
@@ -58,6 +57,24 @@ export class SapiViewsCoreRegionRegionBase {
   }
   get region(){
     return this._region
+  }
+
+  private ATP$ = new BehaviorSubject<{
+    atlas: SxplrAtlas
+    template: SxplrTemplate
+    parcellation: SxplrParcellation
+  }>(null)
+
+  protected ATPR$ = combineLatest([
+    this.ATP$,
+    this.region$
+  ]).pipe(
+    map(([ atp, region ]) => ({ ...atp, region }))
+  )
+
+  ngOnChanges(sc: SimpleChanges): void {
+    const { atlas, template, parcellation } = this
+    this.ATP$.next({ atlas, template, parcellation })
   }
 
   regionRgbString: string = `rgb(200, 200, 200)`

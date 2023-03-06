@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { MarkdownModule } from "src/components/markdown";
+import { ReadmoreModule } from "src/components/readmore";
 import { SpinnerModule } from "src/components/spinner";
 import { FeatureModule } from "src/features";
 import { AngularMaterialModule } from "src/sharedModules";
@@ -23,6 +24,7 @@ import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.compone
     MarkdownModule,
     StrictLocalModule,
     FeatureModule,
+    ReadmoreModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

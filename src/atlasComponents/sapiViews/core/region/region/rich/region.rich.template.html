@@ -40,7 +40,7 @@
         </button>
 
         <!-- explore doi -->
-        <a *ngFor="let doi of dois"
+        <a *ngFor="let doi of dois$ | async"
           [href]="doi | parseDoi"
           sxplr-hide-when-local
           [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
@@ -54,32 +54,12 @@
     </div>
   </mat-card>
 
-
-  <!-- kg regional features list -->
-  <ng-template #kgRegionalFeatureList>
-    <div sxplr-sapiviews-core-region-regional-feature
-      [sxplr-sapiviews-core-region-atlas]="atlas"
-      [sxplr-sapiviews-core-region-template]="template"
-      [sxplr-sapiviews-core-region-parcellation]="parcellation"
-      [sxplr-sapiviews-core-region-region]="region"
-      #rfDir="sapiViewsRegionalFeature"
-      class="feature-list-container"
-      >
-
-      <spinner-cmp *ngIf="rfDir.busy$ | async"></spinner-cmp>
-
-      <!-- <sxplr-sapiviews-features-entry-list-item
-        *ngFor="let feat of rfDir.listOfFeatures$ | async | orderFilterFeatures"
-        [sxplr-sapiviews-features-entry-list-item-feature]="feat"
-        (click)="handleRegionalFeatureClicked(feat)">
-      </sxplr-sapiviews-features-entry-list-item> -->
-    </div>
-    
-  </ng-template>
-
-  <ng-template #regionDesc>
-    <markdown-dom class="sxplr-muted" [markdown]="region?.desc || 'No description provided.'">
-    </markdown-dom>
+  <!-- desc -->
+  <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
+    <readmore-component>
+      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
+      </markdown-dom>
+    </readmore-component>
   </ng-template>
 
   <sxplr-feature-entry
@@ -90,31 +70,9 @@
 
   <mat-accordion class="d-block mt-2">
 
-    <!-- desc -->
-    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: CONST.DESCRIPTION,
-      iconClass: 'fas fa-info',
-      content: regionDesc,
-      desc: '',
-      iconTooltip: 'Description',
-      iavNgIf: !!region?.desc
-    }">
-
-    </ng-container>
-
     <!-- only show dynamic data when strict-local is set to false -->
     <ng-template [ngIf]="!environment.STRICT_LOCAL">
 
-      <!-- feature list -->
-      <!-- <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: CONST.REGIONAL_FEATURES,
-        iconClass: 'fas fa-database',
-        content: kgRegionalFeatureList,
-        desc: '',
-        iconTooltip: 'Regional Features',
-        iavNgIf: true
-      }">
-      </ng-container> -->
 
       <!-- connectivity -->
       <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>

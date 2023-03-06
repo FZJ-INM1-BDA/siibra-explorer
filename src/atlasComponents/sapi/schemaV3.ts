@@ -481,11 +481,11 @@ export interface components {
       /** @Type */
       "@type": string
       /** Index */
-      index: (string)[]
+      index: string[]
       /** Dtype */
       dtype: string
       /** Columns */
-      columns: (string)[]
+      columns: string[]
       /** Ndim */
       ndim: number
       /** Data */
@@ -622,6 +622,12 @@ export interface components {
        */
       ontologyIdentifier?: (string)[]
     }
+    /**
+     * ImageTypes 
+     * @description An enumeration. 
+     * @enum {unknown}
+     */
+    ImageTypes: "BlockfaceVolumeOfInterest" | "CellBodyStainedVolumeOfInterest" | "CellbodyStainedSection" | "MRIVolumeOfInterest" | "PLIVolumeOfInterest" | "SegmentedVolumeOfInterest"
     /** LocationModel */
     LocationModel: {
       /** @Type */
@@ -1189,6 +1195,8 @@ export interface components {
         })) | undefined
       }
       space: components["schemas"]["SiibraAtIdModel"]
+      /** Datasets */
+      datasets: (components["schemas"]["EbrainsDatasetModel"])[]
     }
     /** Coordinates */
     api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates: {
@@ -1739,6 +1747,7 @@ export interface operations {
       query: {
         space_id: string
         bbox?: string
+        type?: components["schemas"]["ImageTypes"]
         page?: number
         size?: number
       }
@@ -1764,6 +1773,7 @@ export interface operations {
       query: {
         space_id: string
         bbox?: string
+        type?: components["schemas"]["ImageTypes"]
       }
       path: {
         feature_id: string
