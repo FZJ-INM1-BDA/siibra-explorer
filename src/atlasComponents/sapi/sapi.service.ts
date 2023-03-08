@@ -29,6 +29,11 @@ type PaginatedResponse<T> = {
   pages?: number
 }
 
+const parcBanList: string[] = [
+  "https://identifiers.org/neurovault.image:23262",
+  "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152",
+]
+
 @Injectable({
   providedIn: 'root'
 })
@@ -319,7 +324,12 @@ export class SAPI{
 
   public getAllParcellations(atlas: SxplrAtlas): Observable<SxplrParcellation[]> {
     return forkJoin(
-      translateV3Entities.retrieveAtlas(atlas).parcellations.map(
+      translateV3Entities.retrieveAtlas(atlas).parcellations.filter(
+        p => {
+          const { ['@id']: id } = p
+          return !parcBanList.includes(id)
+        }
+      ).map(
         parc => this.v3Get("/parcellations/{parcellation_id}", { path: { parcellation_id: parc["@id"] } }).pipe(
           switchMap(v => translateV3Entities.translateParcellation(v))
         )
@@ -328,7 +338,7 @@ export class SAPI{
   }
 
   #tmplToParcMap = new Map<string, SxplrParcellation[]>()
-  public getSupportedParcellations(atlas: SxplrAtlas, template: SxplrTemplate): Observable<any|SxplrParcellation[]> {
+  public getSupportedParcellations(atlas: SxplrAtlas, template: SxplrTemplate): Observable<SxplrParcellation[]> {
     if (!template) {
       return throwError(`template cannot be empty!`)
     }

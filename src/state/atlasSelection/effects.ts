@@ -26,6 +26,12 @@ type OnTmplParcHookArg = {
   }
 }
 
+const prefParcId = [
+  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290"
+]
+
+const prefSpcId = []
+
 @Injectable()
 export class Effect {
 
@@ -131,10 +137,11 @@ export class Effect {
                 if (parcs.length === 0) {
                   throw new Error(`Cannot find any supported parcellations for template ${template.name}`)
                 }
+                const selectParc = parcs.find(p => prefParcId.includes(p.id)) || parcs[0]
                 return {
                   atlas: currAtlas,
                   template,
-                  parcellation: parcs[0]
+                  parcellation: selectParc
                 }
               })
             )
@@ -145,9 +152,10 @@ export class Effect {
                 if (templates.length === 0) {
                   throw new Error(`Cannot find any supported templates for parcellation ${parcellation.name}`)
                 }
+                const selectTmpl = templates.find(tmp => prefSpcId.includes(tmp.id)) || templates[0]
                 return {
                   atlas: currAtlas,
-                  template: templates[0],
+                  template: selectTmpl,
                   parcellation
                 }
               })
