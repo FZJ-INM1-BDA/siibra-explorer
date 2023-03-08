@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { MatCardModule } from "@angular/material/card";
 import { MatRippleModule } from "@angular/material/core";
 import { MatExpansionModule } from "@angular/material/expansion";
@@ -56,6 +56,9 @@ import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/modul
   exports: [
     EntryComponent,
     FeatureViewComponent,
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA,
   ]
 })
 export class FeatureModule{}

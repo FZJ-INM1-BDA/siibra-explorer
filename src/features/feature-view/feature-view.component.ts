@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
+import { DARKTHEME } from 'src/util/injectionTokens';
 
 function isTabularData(feature: unknown): feature is TabularFeature<number|string|number[]> {
   return !!feature['index'] && !!feature['columns']
@@ -10,6 +11,18 @@ function isTabularData(feature: unknown): feature is TabularFeature<number|strin
 
 function isVoiData(feature: unknown): feature is VoiFeature {
   return !!feature['bbox']
+}
+
+
+type PolarPlotData = {
+  receptor: {
+    label: string
+  }
+  density: {
+    mean: number
+    sd: number
+    unit: string
+  }
 }
 
 @Component({
@@ -32,7 +45,42 @@ export class FeatureViewComponent implements OnChanges {
       ? ['index', ...data.columns]
       : []),
   )
-  constructor(private sapi: SAPI) { }
+
+  polar$: Observable<PolarPlotData[]> = this.tabular$.pipe(
+    filter(v => v?.name.includes("ReceptorDensityFingerprint")),
+    map(v => {
+      return v.index.map((receptor, idx) => ({
+        receptor: {
+          label: receptor
+        },
+        density: {
+          mean: v.data[idx][0] as number,
+          sd: v.data[idx][1] as number,
+          unit: 'fmol/mg'
+        }
+      }))
+    })
+  )
+
+  linear$: Observable<Record<number, number>> = this.tabular$.pipe(
+    filter(v => v && v.name.includes("ReceptorDensityProfile")),
+    map(v => {
+      const returnLbl: Record<number, number> = {}
+
+      v.index.forEach((label, idx) => {
+        const val = v.data[idx][0]
+        if (typeof val === 'number') {
+          returnLbl[Math.round(Number(label)*100)] = val
+        }
+      })
+      return returnLbl
+    })
+  )
+
+  constructor(
+    private sapi: SAPI,
+    @Inject(DARKTHEME) public darktheme$: Observable<boolean>,  
+  ) { }
 
   ngOnChanges(): void {
     

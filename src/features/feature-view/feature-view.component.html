@@ -47,6 +47,21 @@
   </mat-card-content>
 </mat-card>
 
+<!-- radar special view -->
+<ng-template [ngIf]="polar$ | async" let-polar>
+  <kg-dataset-dumb-radar
+    [radar]="polar"
+    [attr.kg-ds-prv-darkmode]="darktheme$ | async">
+  </kg-dataset-dumb-radar>
+</ng-template>
+
+<!-- line special view -->
+<ng-template [ngIf]="linear$ | async" let-linear>
+  <kg-dataset-dumb-line
+    [profileBs]="linear"
+    [attr.kg-ds-prv-darkmode]="darktheme$ | async">
+  </kg-dataset-dumb-line>
+</ng-template>
 
 <!-- tabular special view -->
 <ng-template [ngIf]="tabular$ | async" let-tabular>
