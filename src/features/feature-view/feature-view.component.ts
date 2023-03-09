@@ -4,15 +4,7 @@ import { filter, map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
-
-function isTabularData(feature: unknown): feature is TabularFeature<number|string|number[]> {
-  return !!feature['index'] && !!feature['columns']
-}
-
-function isVoiData(feature: unknown): feature is VoiFeature {
-  return !!feature['bbox']
-}
-
+import { isTabularData, isVoiData } from "../guards"
 
 type PolarPlotData = {
   receptor: {

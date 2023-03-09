@@ -15,24 +15,15 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
       }
     })
   }
-  case 'landmark': {
+  case 'voi':
+    const { name } = value as TOnHoverObj['voi']
     return [{
       icon: {
         fontSet: 'fas',
-        fontIcon: 'fa-map-marker-alt',
+        fontIcon: 'fa-database'
       },
-      text: (value as TOnHoverObj['landmark']).landmarkName
+      text: name
     }]
-  }
-  case 'userLandmark': {
-    return [{
-      icon: {
-        fontSet: 'fas',
-        fontIcon: 'fa-map-marker-alt',
-      },
-      text: value as TOnHoverObj['userLandmark']
-    }]
-  }
   case 'annotation': {
     const { annotationType, name } = (value as TOnHoverObj['annotation'])
     let fontIcon: string

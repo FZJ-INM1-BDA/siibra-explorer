@@ -22,6 +22,7 @@ import { MatTableModule } from "@angular/material/table";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
 import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
+import { VoiBboxDirective } from "./voi-bbox.directive";
 
 @NgModule({
   imports: [
@@ -49,6 +50,7 @@ import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/modul
 
     FetchDirective,
     CategoryAccDirective,
+    VoiBboxDirective,
 
     FeatureNamePipe,
     TransformPdToDsPipe,
@@ -56,6 +58,7 @@ import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/modul
   exports: [
     EntryComponent,
     FeatureViewComponent,
+    VoiBboxDirective,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

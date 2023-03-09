@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, scan, switchMap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { atlasSelection } from 'src/state';
+import { CategoryAccDirective } from "../category-acc.directive"
+import { BehaviorSubject, combineLatest, merge, of, Subscription } from 'rxjs';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -23,13 +25,59 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
 
 @Component({
   selector: 'sxplr-feature-entry',
-  templateUrl: './entry.component.html',
-  styleUrls: ['./entry.component.scss']
+  templateUrl: './entry.nestedExpPanel.component.html',
+  styleUrls: ['./entry.nestedExpPanel.component.scss'],
+  exportAs: 'featureEntryCmp'
 })
-export class EntryComponent extends FeatureBase {
+export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
+
+  @ViewChildren(CategoryAccDirective)
+  catAccDirs: QueryList<CategoryAccDirective>
+
+  public totals$ = new BehaviorSubject<number>(null)
+  public features$ = new BehaviorSubject<Feature[]>([])
 
   constructor(private sapi: SAPI, private store: Store) {
     super()
+  }
+
+  #subscriptions: Subscription[] = []
+
+  ngOnDestroy(): void {
+    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
+  }
+  ngAfterViewInit(): void {
+    const catAccDirs$ = merge(
+      of(null),
+      this.catAccDirs.changes
+    ).pipe(
+      map(() => Array.from(this.catAccDirs))
+    )
+    this.#subscriptions.push(
+      catAccDirs$.pipe(
+        switchMap(catArrDirs => merge(
+          ...catArrDirs.map((dir, idx) => dir.total$.pipe(
+            map(val => ({ idx, val }))
+          ))
+        )),
+        
+        map(({ idx, val }) => ({ [idx.toString()]: val })),
+        scan((acc, curr) => ({ ...acc, ...curr })),
+        map(record => {
+          let tally = 0
+          for (const idx in record) {
+            tally += record[idx]
+          }
+          return tally
+        })
+      ).subscribe(num => this.totals$.next(num)),
+      catAccDirs$.pipe(
+        switchMap(catArrDirs => combineLatest(
+          catArrDirs.map(dir => dir.features$)
+        )),
+        map(features => features.flatMap(f => f))
+      ).subscribe(features => this.features$.next(features))
+    )
   }
 
   public atlas = this.store.select(atlasSelection.selectors.selectedAtlas)
@@ -46,7 +94,7 @@ export class EntryComponent extends FeatureBase {
     ),
   )
 
-  public cateogryCollections$ = this.TPR$.pipe(
+  public cateogryCollections$ = this.TPRBbox$.pipe(
     switchMap(({ template, parcellation, region }) => this.featureTypes$.pipe(
       map(features => {
         const filteredFeatures = features.filter(v => {

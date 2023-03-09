@@ -1,4 +1,5 @@
 import { createReducer, on } from "@ngrx/store"
+import { environment } from "src/environments/environment"
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from "src/util/constants"
 import * as actions from "./actions"
 import { maxGpuLimit, CSP } from "./const"
@@ -13,6 +14,8 @@ export type UserPreference = {
 
   agreeCookie: boolean
   agreeKgTos: boolean
+
+  showExperimental: boolean
 }
 
 export const defaultState: UserPreference = {
@@ -23,6 +26,7 @@ export const defaultState: UserPreference = {
 
   agreeCookie: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
   agreeKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
+  showExperimental: environment.EXPERIMENTAL_FEATURE_FLAG
 }
 
 export const reducer = createReducer(
@@ -89,5 +93,12 @@ export const reducer = createReducer(
         }
       }
     }
+  ),
+  on(
+    actions.setShowExperimental,
+    (state, { flag }) => ({
+      ...state,
+      showExperimental: flag
+    })
   )
 )

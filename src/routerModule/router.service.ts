@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { APP_BASE_HREF } from "@angular/common";
 import { Inject } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
@@ -40,6 +40,7 @@ export class RouterService {
     routeToStateTransformSvc: RouteStateTransformSvc,
     sapi: SAPI,
     store$: Store<any>,
+    private zone: NgZone,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
 
@@ -245,7 +246,9 @@ export class RouterService {
         const newUrlUrlTree = router.parseUrl(joinedRoutes)
         
         if (currUrlUrlTree.toString() !== newUrlUrlTree.toString()) {
-          router.navigateByUrl(joinedRoutes)
+          this.zone.run(() => {
+            router.navigateByUrl(joinedRoutes)
+          })
         }
       }
     })

@@ -33,3 +33,8 @@ export const userCsp = createSelector(
   storeSelector,
   store => store.pluginCSP
 )
+
+export const showExperimental = createSelector(
+  storeSelector,
+  store => store.showExperimental
+)

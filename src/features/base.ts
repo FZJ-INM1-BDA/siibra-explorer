@@ -1,6 +1,9 @@
-import { Input, OnChanges, Directive } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { Input, OnChanges, Directive, SimpleChanges } from "@angular/core";
+import { BehaviorSubject, combineLatest } from "rxjs";
+import { debounceTime, map } from "rxjs/operators";
 import { SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+
+type BBox = [[number, number, number], [number, number, number]]
 
 @Directive()
 export class FeatureBase implements OnChanges{
@@ -15,13 +18,35 @@ export class FeatureBase implements OnChanges{
   region: SxplrRegion
 
   @Input()
+  bbox: BBox
+
+  @Input()
   queryParams: Record<string, string> = {}
   
-  protected TPR$ = new BehaviorSubject<{ template?: SxplrTemplate, parcellation?: SxplrParcellation, region?: SxplrRegion }>({ template: null, parcellation: null, region: null })
+  #TPR$ = new BehaviorSubject<{ template?: SxplrTemplate, parcellation?: SxplrParcellation, region?: SxplrRegion }>({ template: null, parcellation: null, region: null })
+  #bbox$ = new BehaviorSubject<{ bbox?: BBox }>({ bbox: null })
+  protected TPRBbox$ = combineLatest([
+    this.#TPR$,
+    this.#bbox$.pipe(
+      debounceTime(500)
+    )
+  ]).pipe(
+    map(([ v1, v2 ]) => ({ ...v1, ...v2 }))
+  )
 
-  ngOnChanges(): void {
-    const { template, parcellation, region } = this
-    this.TPR$.next({ template, parcellation, region })
+  ngOnChanges(sc: SimpleChanges): void {
+    const { template, parcellation, region, bbox } = sc
+    if (bbox) {
+      this.#bbox$.next({ bbox: bbox.currentValue })
+    }
+    if (template || parcellation || region) {
+      const { template: t, parcellation: p, region: r } = this
+      this.#TPR$.next({
+        template: template?.currentValue || t,
+        parcellation: parcellation?.currentValue || p,
+        region: region?.currentValue || r
+      })
+    }
   }
 }
 
@@ -29,7 +54,7 @@ export class FeatureBase implements OnChanges{
 
 export const AllFeatures = {
   CorticalProfile: "CorticalProfile",
-  // EbrainsDataFeature: "EbrainsDataFeature",
+  EbrainsDataFeature: "EbrainsDataFeature",
   RegionalConnectivity: "RegionalConnectivity",
   Tabular: "Tabular",
   // GeneExpressions: "GeneExpressions",

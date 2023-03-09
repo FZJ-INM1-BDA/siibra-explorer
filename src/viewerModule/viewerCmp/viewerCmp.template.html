@@ -29,17 +29,6 @@
 
         </mat-list-item>
 
-        <!-- <ng-template [ngIf]="voiQueryDirective && (voiQueryDirective.onhover | async)" let-feat>
-          <mat-list-item>
-            <mat-icon
-              fontSet="fas"
-              fontIcon="fa-database"
-              mat-list-icon>
-            </mat-icon>
-            <div matLine>{{ feat?.metadata?.fullName || 'Feature' }}</div>
-          </mat-list-item>
-        </ng-template> -->
-
       </mat-list>
       <!-- TODO Potentially implementing plugin contextual info -->
     </div>
@@ -265,17 +254,6 @@
     </div>
   
   </div>
-
-  <!-- tab toggling hide/show of min search tray -->
-  <!-- <div class="tab-toggle-container d-inline-block v-align-top">
-    <ng-container *ngTemplateOutlet="tabTmpl; context: {
-      isOpen: minTrayVisSwitch.switchState$ | async,
-      regionSelected: selectedRegions$ | async,
-      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
-      badge: voiQueryDirective && (voiQueryDirective.features$ | async).length || null
-    }">
-    </ng-container>
-  </div> -->
 
 </ng-template>
 
@@ -942,14 +920,6 @@
 
   </sxplr-feature-view>
   
-  <!-- TODO FIXME -->
-  <!-- <sxplr-sapiviews-features-entry
-    [sxplr-sapiviews-features-entry-atlas]="selectedAtlas$ | async"
-    [sxplr-sapiviews-features-entry-space]="templateSelected$ | async"
-    [sxplr-sapiviews-features-entry-parcellation]="parcellationSelected$ | async"
-    [sxplr-sapiviews-features-entry-region]="(selectedRegions$ | async)[0]"
-    [sxplr-sapiviews-features-entry-feature]="feature">
-  </sxplr-sapiviews-features-entry> -->
 </ng-template>
 
 <!-- general feature tmpl -->
@@ -975,61 +945,74 @@
 
 </ng-template>
 
+<!-- spatial search tmpls -->
 <ng-template #spatialFeatureListTmpl>
+  <mat-card class="sxplr-pe-all"
+    [ngClass]="{
+      'sxplr-d-none': !showVoiFlag || (voiFeatureEntryCmp.totals$ | async) === 0
+    }">
+    <mat-card-header>
+      <mat-card-title>
+        Image Features
+      </mat-card-title>
+      <mat-card-subtitle>
+        <div>
+          {{ templateSelected$ | async | getProperty : 'name' }}
+        </div>
+        <ng-template [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" let-bbox>
+          <div>
+            from {{ bbox[0] | numbers | addUnitAndJoin : '' }}
+          </div>
+          <div>
+            to {{ bbox[1] | numbers | addUnitAndJoin : '' }}
+          </div>
+        </ng-template>
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
   <sxplr-feature-entry
-    class="sxplr-pe-all sxplr-d-block mat-elevation-z8"
-    [template]="templateSelected$ | async">
+    [ngClass]="showVoiFlag ? 'sxplr-d-block' : 'sxplr-d-none'"
+    class="sxplr-pe-all mat-elevation-z8"
+    [template]="templateSelected$ | async"
+    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+    #voiFeatureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
+
+  <button mat-raised-button
+    [ngClass]="{
+      'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) === 0
+    }"
+    class="sxplr-pe-all sxplr-w-100"
+    (click)="showVoiFlag = !showVoiFlag">
+
+    <ng-template [ngIf]="showVoiFlag">
+      <i class="fas fa-chevron-up"></i>
+      <span>
+        Collapse
+      </span>
+    </ng-template>
+
+    <ng-template [ngIf]="!showVoiFlag">
+      <i class="fas fa-chevron-down"></i>
+      <span>
+        Explore {{ voiFeatureEntryCmp.totals$ | async }} spatial features
+      </span>
+    </ng-template>
+  </button>
+  <div
+    *ngIf="experimentalFlag$ | async"
+    voiBbox
+    [features]="voiFeatureEntryCmp.features$ | async">
+
+  </div>
 </ng-template>
 
-<!-- <ng-template #spatialFeatureListViewTmpl>
-  <div *ngIf="voiQueryDirective && (voiQueryDirective.busy$ | async); else notBusyTmpl" class="fs-200">
-    <spinner-cmp></spinner-cmp>
-  </div>
-
-  <ng-template #notBusyTmpl>
-    <mat-card *ngIf="voiQueryDirective && (voiQueryDirective.features$ | async).length > 0" class="pe-all mat-elevation-z4">
-      <mat-card-title>
-        Volumes of interest
-      </mat-card-title>
-      <mat-card-subtitle class="overflow-hidden">
-        <ng-template let-bbox [ngIf]="boundingBoxDirective && (boundingBoxDirective.bbox$ | async | getProperty : 'bbox')" [ngIfElse]="bboxFallbackTmpl">
-          Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
-        </ng-template>
-        <ng-template #bboxFallbackTmpl>
-          Found nearby
-        </ng-template>
-        
-      </mat-card-subtitle>
-
-      <mat-divider></mat-divider>
-
-      <ng-template [ngIf]="voiQueryDirective">
-
-        <div *ngFor="let feature of voiQueryDirective.features$ | async"
-          mat-ripple
-          (click)="showDataset(feature)"
-          class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
-          {{ feature.metadata.fullName }}
-        </div>
-      </ng-template>
-    </mat-card>
-  </ng-template>
-</ng-template> -->
-
-<!-- TODO FIXME -->
-<!-- <div class="d-none"
-  *ngIf="VOI_QUERY_FLAG"
+<div
   sxplr-sapiviews-core-space-boundingbox
   [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
   [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"
   [sxplr-sapiviews-core-space-boundingbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
-  #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-  sxplr-sapiviews-features-voi-query
-  [sxplr-sapiviews-features-voi-query-atlas]="selectedAtlas$ | async"
-  [sxplr-sapiviews-features-voi-query-space]="templateSelected$ | async"
-  [sxplr-sapiviews-features-voi-query-bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-  (sxplr-sapiviews-features-voi-query-onclick)="showDataset($event)"
-  #voiFeatures="sxplrSapiViewsFeaturesVoiQuery">
+  #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
+</div>
 
-</div> -->

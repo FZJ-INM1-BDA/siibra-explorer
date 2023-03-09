@@ -120,8 +120,8 @@ class TranslateV3 {
       }
       const url = input[key]
       const [ transform, info ] = await Promise.all([
-        fetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
-        fetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
+        this.cFetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
+        this.cFetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
       ])
       returnObj[key] = {
         url: input[key],

@@ -1,10 +1,11 @@
 import { Component, TemplateRef } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { environment } from 'src/environments/environment';
 import { PluginService } from "../service";
 import { PluginManifest } from "../types";
 import { combineLatest, Observable, Subject } from "rxjs";
 import { map, scan, startWith } from "rxjs/operators";
+import { select, Store } from "@ngrx/store";
+import { userPreference } from "src/state";
 
 @Component({
   selector : 'plugin-banner',
@@ -16,9 +17,13 @@ import { map, scan, startWith } from "rxjs/operators";
 
 export class PluginBannerUI {
 
-  EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
+  experimentalFlag$ = this.store.pipe(
+    select(userPreference.selectors.showExperimental)
+  )
+  
 
   constructor(
+    private store: Store,
     private svc: PluginService,
     private matDialog: MatDialog,
   ) {

@@ -12,8 +12,9 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dial
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { environment } from 'src/environments/environment'
 import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterialBtn/dynamicMaterialBtn.component";
+import { select, Store } from "@ngrx/store";
+import { userPreference } from "src/state";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -26,7 +27,9 @@ import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterial
 
 export class TopMenuCmp {
 
-  public EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
+  public experimentalFlag$ = this.store.pipe(
+    select(userPreference.selectors.showExperimental)
+  )
 
   public ARIA_LABELS = ARIA_LABELS
   public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
@@ -71,6 +74,7 @@ export class TopMenuCmp {
   }
 
   constructor(
+    private store: Store,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,

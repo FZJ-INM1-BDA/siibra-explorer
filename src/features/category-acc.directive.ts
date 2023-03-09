@@ -2,6 +2,7 @@ import { AfterContentInit, ContentChildren, Directive, OnDestroy, QueryList } fr
 import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ListComponent } from './list/list.component';
+import { Feature } from "src/atlasComponents/sapi/sxplrTypes"
 
 @Directive({
   selector: '[sxplrCategoryAcc]',
@@ -11,6 +12,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
   public isBusy$ = new BehaviorSubject<boolean>(false)
   public total$ = new BehaviorSubject<number>(0)
+  public features$ = new BehaviorSubject<Feature[]>([])
 
   @ContentChildren(ListComponent, { read: ListComponent, descendants: true })
   listCmps: QueryList<ListComponent>
@@ -35,15 +37,19 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
     const listCmp = Array.from(this.listCmps)
 
-    this.#subscriptions.push(  
+    this.#subscriptions.push( 
       combineLatest(
-        listCmp.map(listCmp => listCmp.features$)
+        listCmp.map(listC => listC.features$)
+      ).subscribe(features => this.features$.next(features.flatMap(f => f))),
+      
+      combineLatest(
+        listCmp.map(listC => listC.features$)
       ).pipe(
         map(features => features.reduce((acc, curr) => acc + curr.length, 0))
       ).subscribe(total => this.total$.next(total)),
 
       combineLatest(
-        listCmp.map(listCmp => listCmp.state$)
+        listCmp.map(listC => listC.state$)
       ).pipe(
         map(states => states.some(state => state === "busy"))
       ).subscribe(flag => this.isBusy$.next(flag))

@@ -12,7 +12,7 @@ import { SxplrRegion } from "../sxplrTypes";
 const RegionFeatures = {
   // ReceptorDensityFingerprint: "ReceptorDensityFingerprint",
   // GeneExpressions: "GeneExpressions",
-  // EbrainsDataFeature: "EbrainsDataFeature",
+  EbrainsDataFeature: "EbrainsDataFeature",
   
   // ReceptorDensityProfile: "ReceptorDensityProfile",
   // BigBrainIntensityProfile: "BigBrainIntensityProfile",

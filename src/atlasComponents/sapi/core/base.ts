@@ -4,7 +4,7 @@ import { RouteParam } from "../typeV3"
 
 const AllFeatures = {
   CorticalProfile: "CorticalProfile",
-  // EbrainsDataFeature: "EbrainsDataFeature",
+  EbrainsDataFeature: "EbrainsDataFeature",
   RegionalConnectivity: "RegionalConnectivity",
   Tabular: "Tabular",
   // GeneExpressions: "GeneExpressions",

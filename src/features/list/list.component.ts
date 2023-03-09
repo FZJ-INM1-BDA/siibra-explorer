@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { BehaviorSubject, combineLatest, NEVER, Observable, of, throwError } from 'rxjs';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { BehaviorSubject, combineLatest, Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
@@ -27,18 +27,21 @@ export class ListComponent extends FeatureBase {
     super()
   }
 
-  ngOnChanges(): void {
-    super.ngOnChanges()
-    const featureType = (this.featureRoute || '').split("/").slice(-1)[0]
-    this.guardedRoute$.next(AllFeatures[featureType])
+  ngOnChanges(sc: SimpleChanges): void {
+    super.ngOnChanges(sc)
+    const { featureRoute } = sc
+    if (featureRoute) {
+      const featureType = (featureRoute.currentValue || '').split("/").slice(-1)[0]
+      this.guardedRoute$.next(AllFeatures[featureType])
+    }
   }
 
   public features$: Observable<Feature[]> = combineLatest([
     this.guardedRoute$,
-    this.TPR$,
+    this.TPRBbox$,
   ]).pipe(
     tap(() => this.state$.next('busy')),
-    switchMap(([route, { template, parcellation, region }]) => {
+    switchMap(([route, { template, parcellation, region, bbox }]) => {
       if (!route) {
         return throwError("noresult")
       }
@@ -46,6 +49,7 @@ export class ListComponent extends FeatureBase {
       if (template) query['space_id'] = template.id
       if (parcellation) query['parcellation_id'] = parcellation.id
       if (region) query['region_id'] = region.name
+      if (bbox) query['bbox'] = JSON.stringify(bbox)
       return this.sapi.getV3Features(route, {
         query: {
           ...this.queryParams,

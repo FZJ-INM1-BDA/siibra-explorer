@@ -28,7 +28,14 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
 
-  public experimentalFlag = environment.EXPERIMENTAL_FEATURE_FLAG
+  /**
+   * n.b. do not use store to set experimental flag here, since this also shows the control to toggle exp control on and off
+   */
+  public environment = environment
+
+  public experimentalFlag$ = this.store.pipe(
+    select(userPreference.selectors.showExperimental)
+  )
 
   public panelModes: Record<string, userInterface.PanelMode> = {
     FOUR_PANEL: "FOUR_PANEL",
@@ -179,6 +186,14 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public handleDragend(event: DragEvent) {
     const target = (event.target as HTMLElement)
     target.classList.remove('onDragOver')
+  }
+
+  public updateExperimentalFlag(event: MatSlideToggleChange) {
+    this.store.dispatch(
+      userPreference.actions.setShowExperimental({
+        flag: event.checked
+      })
+    )
   }
 
   public stepSize: number = 10

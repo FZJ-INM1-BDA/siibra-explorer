@@ -10,11 +10,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
-
-import { environment } from "src/environments/environment"
-// import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
-import { SapiViewsCoreSpaceBoundingBox } from "src/atlasComponents/sapiViews/core";
+import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 @Component({
@@ -64,18 +60,14 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 export class ViewerCmp implements OnDestroy {
 
+  public experimentalFlag$ = this.store$.pipe(
+    select(userPreference.selectors.showExperimental)
+  )
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
-  @ViewChild('genericInfoVCR', { read: ViewContainerRef })
-  genericInfoVCR: ViewContainerRef
-
-  // @ViewChild('voiFeatures', { read: SapiViewsFeaturesVoiQuery })
-  // voiQueryDirective: SapiViewsFeaturesVoiQuery
-
-  @ViewChild('bbox', { read: SapiViewsCoreSpaceBoundingBox })
-  boundingBoxDirective: SapiViewsCoreSpaceBoundingBox
-
+  public showVoiFlag = true
+  
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,

@@ -1,6 +1,6 @@
 import { createAction, props } from "@ngrx/store"
 import { nameSpace } from "./const"
-import { SxplrRegion, Feature, Point } from "src/atlasComponents/sapi/sxplrTypes"
+import { SxplrRegion, Feature, Point, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes"
 
 export const mouseOverAnnotations = createAction(
   `${nameSpace} mouseOverAnnotations`,
@@ -34,4 +34,11 @@ export const showFeature = createAction(
 
 export const clearShownFeature = createAction(
   `${nameSpace} clearShownFeature`,
+)
+
+export const setMouseoverVoi = createAction(
+  `${nameSpace} setMouseoverVoi`,
+  props<{
+    feature: VoiFeature
+  }>()
 )
