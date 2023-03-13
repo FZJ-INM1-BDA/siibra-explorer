@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { SpinnerModule } from "src/components/spinner";
 import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
 
 @NgModule({
@@ -9,7 +10,7 @@ import { NgLayerCtrlCmp } from "./ngLayerCtl/ngLayerCtrl.component";
     CommonModule,
     MatTooltipModule,
     MatButtonModule,
-    
+    SpinnerModule,
   ],
   declarations: [
     NgLayerCtrlCmp

@@ -27,9 +27,12 @@
 </div>
 
 <ng-template [ngIf]="showOpacityCtrl">
-  <ng-layer-tune
-    [ngLayerName]="name"
-    [hideCtrl]="hideNgTuneCtrl"
-    [opacity]="defaultOpacity">
-  </ng-layer-tune>
+  <div class="sxplr-d-flex sxplr-justify-content-center sxplr-align-items-center">
+    <spinner-cmp></spinner-cmp>
+    <ng-layer-tune
+      [ngLayerName]="name"
+      [hideCtrl]="hideNgTuneCtrl"
+      [opacity]="defaultOpacity">
+    </ng-layer-tune>
+  </div>
 </ng-template>

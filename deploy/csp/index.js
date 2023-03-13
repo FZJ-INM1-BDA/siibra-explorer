@@ -51,6 +51,7 @@ const connectSrc = [
   // chunk servers
   'neuroglancer.humanbrainproject.org',
   'neuroglancer.humanbrainproject.eu',
+  '1um.brainatlas.eu',
   'object.cscs.ch',
 
   // required for dataset previews

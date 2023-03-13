@@ -123,8 +123,9 @@ export class VoiBboxDirective implements OnDestroy {
           feature: this.#hoveredFeat
         })
       )
-      return true
+      return false
     }
+    return true
   }
 
   #hoveredFeat: VoiFeature

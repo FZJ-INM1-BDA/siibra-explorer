@@ -20,3 +20,8 @@ button
     flex: 1 1 0px;
     overflow: hidden;
 }
+
+spinner-cmp:has(+ .hydrated)
+{
+    display: none;
+}
