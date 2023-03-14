@@ -969,6 +969,13 @@
         </ng-template>
       </mat-card-subtitle>
     </mat-card-header>
+
+    <mat-slide-toggle
+      showBboxToggle
+      #showBboxToggle="showBboxToggle"
+      (change)="showBboxToggle.setState($event.checked)">
+      Show image location
+    </mat-slide-toggle>
   </mat-card>
 
   <sxplr-feature-entry
@@ -1001,7 +1008,7 @@
     </ng-template>
   </button>
   <div
-    *ngIf="experimentalFlag$ | async"
+    *ngIf="showBboxToggle.showVoiFlag$ | async"
     voiBbox
     [features]="voiFeatureEntryCmp.features$ | async">
 

@@ -10,7 +10,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 @Component({
@@ -60,9 +60,6 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 export class ViewerCmp implements OnDestroy {
 
-  public experimentalFlag$ = this.store$.pipe(
-    select(userPreference.selectors.showExperimental)
-  )
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
 
@@ -321,21 +318,6 @@ export class ViewerCmp implements OnDestroy {
   }
 
   showDataset(feat: Feature): void {
-    /**
-     * TODO if feat is spatial feature, navigate to region
-     */
-    // if ((feat as SapiSpatialFeatureModel).location) {
-    //   const feature = feat as SapiSpatialFeatureModel
-    //   this.store$.dispatch(
-    //     atlasSelection.actions.navigateTo({
-    //       navigation: {
-    //         orientation: [0, 0, 0, 1],
-    //         position: feature.location.center.coordinates.map(v => v.value * 1e6)
-    //       },
-    //       animation: true
-    //     })
-    //   )
-    // }
     
     this.store$.dispatch(
       userInteraction.actions.showFeature({

@@ -62,6 +62,7 @@
     "@angular/platform-browser": "^14.2.12",
     "@angular/platform-browser-dynamic": "^14.2.12",
     "@angular/router": "^14.2.12",
+    "@ngrx/component-store": "^14.3.3",
     "@ngrx/effects": "^14.3.2",
     "@ngrx/store": "^14.3.2",
     "acorn": "^8.4.1",

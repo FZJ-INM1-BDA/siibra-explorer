@@ -56,7 +56,6 @@ export class VoiBboxDirective implements OnDestroy {
 
   ngOnDestroy(): void {
     while (this.#onDestroyCb.length > 0) this.#onDestroyCb.pop()()
-
   }
 
   constructor(
