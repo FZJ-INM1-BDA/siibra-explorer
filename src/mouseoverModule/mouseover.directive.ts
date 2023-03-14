@@ -18,7 +18,7 @@ export class MouseHoverDirective {
     this.store$.pipe(
       select(userInteraction.selectors.mousingOverRegions),
     ).pipe(
-      distinctUntilChanged(arrayEqual((o, n) => o.id === n.name)),
+      distinctUntilChanged(arrayEqual((o, n) => o?.name === n?.name)),
       map(regions => {
         return { regions }
       }),
