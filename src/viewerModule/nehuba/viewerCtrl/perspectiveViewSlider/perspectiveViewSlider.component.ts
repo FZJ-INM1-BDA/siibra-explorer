@@ -151,16 +151,16 @@ export class PerspectiveViewSlider implements OnDestroy {
       switchMap(({ template }) => 
         template
           ? this.sapi.getVoxelTemplateImage(template).pipe(
-            map(defaultImage => {
+            switchMap(defaultImage => {
               if (defaultImage.length == 0) {
-                const errMsg = `template ${template.name} has no ng volume`
-                throw new Error(errMsg)
+                // template hs no ng volume, which is the case for threesurfer
+                return NEVER
               }
               const img = defaultImage[0]
-              return {
+              return of({
                 ...img.info || {},
                 transform: img.transform
-              }
+              })
             })
           )
           : NEVER),
