@@ -49,7 +49,7 @@ window.addEventListener('pagehide', () => {
 - response
 
   ```ts
-  SapiAtlasModel[]
+  PTAtlas[]
   ```
 
 
@@ -64,7 +64,7 @@ window.addEventListener('pagehide', () => {
 - response
 
   ```ts
-  SapiSpaceModel[]
+  PTSpace[]
   ```
 
 
@@ -79,7 +79,7 @@ window.addEventListener('pagehide', () => {
 - response
 
   ```ts
-  SapiParcellationModel[]
+  PTParcellation[]
   ```
 
 
@@ -154,7 +154,7 @@ window.addEventListener('pagehide', () => {
 - response
 
   ```ts
-  SapiRegionModel | OpenMINDSCoordinatePoint
+  PTRegion | Point
   ```
 
 

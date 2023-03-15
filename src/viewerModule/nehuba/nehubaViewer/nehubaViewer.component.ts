@@ -645,7 +645,7 @@ export class NehubaViewerUnit implements OnDestroy {
       position,
       positionReal,
       zoom,
-    } = newViewerState
+    } = newViewerState || {}
 
     if ( perspectiveZoom ) {
       this.nehubaViewer.ngviewer.perspectiveNavigationState.zoomFactor.restoreState(perspectiveZoom)

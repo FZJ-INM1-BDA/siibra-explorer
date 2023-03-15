@@ -3,16 +3,29 @@ import { select, Store } from "@ngrx/store";
 import { Subject } from "rxjs";
 import { distinctUntilChanged, filter, map, switchMap, take } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, Point } from "src/atlasComponents/sapi/sxplrTypes";
+import { Point } from "src/atlasComponents/sapi/sxplrTypes";
 import { SxplrCoordinatePointExtension } from "src/atlasComponents/sapi/typeV3";
 import { MainState, atlasSelection, userInteraction, annotation, atlasAppearance } from "src/state"
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from "src/util/interfaces";
 import { Booth, BoothResponder, createBroadcastingJsonRpcChannel, JRPCRequest, JRPCResp } from "./jsonrpc"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 
 export type NAMESPACE_TYPE = "sxplr"
 export const namespace: NAMESPACE_TYPE = "sxplr"
 const nameSpaceRegex = new RegExp(`^${namespace}`)
+
+/**
+ * plugin type
+ * previously, full json was used
+ * in future, sxplr jsons will be used
+ * but for backwards compatibility, for now, full json will be retrieved and returned
+ */
+type PTAtlas = PathReturn<"/atlases/{atlas_id}">
+type PTSpace = PathReturn<"/spaces/{space_id}">
+type PTParcellation = PathReturn<"/parcellations/{parcellation_id}">
+type PTRegion = PathReturn<"/regions/{region_id}">
 
 type AddableLayer = atlasAppearance.const.NgLayerCustomLayer
 
@@ -21,7 +34,7 @@ type AtId = {
 }
 
 type RequestUserTypes = {
-  region: SxplrRegion
+  region: PTRegion
   point: Point
   confirm: void
   input: string
@@ -39,15 +52,15 @@ type RequestUser<T extends keyof RequestUserTypes> = {
 export type ApiBoothEvents = {
   getAllAtlases: {
     request: null
-    response: SxplrAtlas[]
+    response: PTAtlas[]
   }
   getSupportedTemplates: {
     request: null
-    response: SxplrTemplate[]
+    response: PTSpace[]
   }
   getSupportedParcellations: {
     request: null
-    response: SxplrParcellation[]
+    response: PTParcellation[]
   }
 
   selectAtlas: {
@@ -73,7 +86,7 @@ export type ApiBoothEvents = {
       type: 'region' | 'point'
       message: string
     }
-    response: SxplrRegion | Point
+    response: PTRegion | Point
   }
   
   addAnnotations: {
@@ -136,11 +149,11 @@ export type HeartbeatEvents = {
 }
 
 export type BroadCastingApiEvents = {
-  atlasSelected: SxplrAtlas
-  templateSelected: SxplrTemplate
-  parcellationSelected: SxplrParcellation
-  allRegions: SxplrRegion[]
-  regionsSelected: SxplrRegion[]
+  atlasSelected: PTAtlas
+  templateSelected: PTSpace
+  parcellationSelected: PTParcellation
+  allRegions: PTRegion[]
+  regionsSelected: PTRegion[]
   navigation: MainState['[state.atlasSelection]']['navigation']
 }
 
@@ -188,13 +201,13 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     const { type } = this.requestUserQueue[0]
 
     if (type === "region") {
-      let moRegion: SxplrRegion
+      let moRegion: PTRegion
       this.store.pipe(
         select(userInteraction.selectors.mousingOverRegions),
         filter(val => val.length > 0),
         map(val => val[0]),
         take(1)
-      ).subscribe(region => moRegion = region)
+      ).subscribe(region => moRegion = translateV3Entities.retrieveRegion(region))
       if (!!moRegion) {
         this.fulfillUserRequest(null, moRegion)
         return false
@@ -250,27 +263,27 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     this.store.pipe(
       select(atlasSelection.selectors.selectedAtlas)
     ).subscribe(atlas => {
-      this.broadcastCh.emit('atlasSelected', atlas)
+      this.broadcastCh.emit('atlasSelected', translateV3Entities.retrieveAtlas(atlas))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedParcellation)
     ).subscribe(parcellation => {
-      this.broadcastCh.emit('parcellationSelected', parcellation)
+      this.broadcastCh.emit('parcellationSelected', translateV3Entities.retrieveParcellation(parcellation))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedTemplate)
     ).subscribe(template => {
-      this.broadcastCh.emit('templateSelected', template)
+      this.broadcastCh.emit('templateSelected', translateV3Entities.retrieveTemplate(template))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedRegions)
     ).subscribe(regions => {
-      this.broadcastCh.emit('regionsSelected', regions)
+      this.broadcastCh.emit('regionsSelected', regions.map(reg => translateV3Entities.retrieveRegion(reg)))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedParcAllRegions)
     ).subscribe(regions => {
-      this.broadcastCh.emit('allRegions', regions)
+      this.broadcastCh.emit('allRegions', regions.map(reg => translateV3Entities.retrieveRegion(reg)))
     })
     this.store.pipe(
       select(atlasSelection.selectors.navigation)
@@ -296,7 +309,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       ).toPromise()
       return {
         id: event.id,
-        result: atlases,
+        result: atlases.map(atlas => translateV3Entities.retrieveAtlas(atlas)),
         jsonrpc: '2.0'
       }
     }
@@ -310,7 +323,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       return {
         id: event.id,
         jsonrpc: '2.0',
-        result: parcs
+        result: parcs.map(parc => translateV3Entities.retrieveParcellation(parc))
       }
     }
     case 'getSupportedTemplates': {
@@ -323,7 +336,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       return {
         id: event.id,
         jsonrpc: '2.0',
-        result: spaces
+        result: spaces.map(spc =>translateV3Entities.retrieveTemplate(spc))
       }
     }
     case 'selectAtlas': {
