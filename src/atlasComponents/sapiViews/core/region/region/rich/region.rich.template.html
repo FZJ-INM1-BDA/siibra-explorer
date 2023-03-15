@@ -62,94 +62,30 @@
     </readmore-component>
   </ng-template>
 
+
+  <!-- header for regional feature -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        Features anchored to region
+      </mat-card-title>
+      <mat-card-subtitle>
+        Parcellation: {{ parcellation.name }}
+      </mat-card-subtitle>
+      <mat-card-subtitle>
+        Region: {{ region.name }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content *ngIf="!(featureEntryCmp.busyTallying$ | async) && (featureEntryCmp.totals$ | async) == 0"
+      class="text-muted">
+      No regional features found.
+    </mat-card-content>
+  </mat-card>
+
   <sxplr-feature-entry
     [template]="template"
     [parcellation]="parcellation"
-    [region]="region">
+    [region]="region"
+    #featureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
-
-  <mat-accordion class="d-block mt-2">
-
-    <!-- only show dynamic data when strict-local is set to false -->
-    <ng-template [ngIf]="!environment.STRICT_LOCAL">
-
-
-      <!-- connectivity -->
-      <ng-template #sxplrSapiviewsFeaturesConnectivityBrowser>
-        <!-- <sxplr-sapiviews-features-connectivity-browser
-          class="pe-all flex-shrink-1"
-          [region]="region"
-          [sxplr-sapiviews-features-connectivity-browser-atlas]="atlas"
-          [sxplr-sapiviews-features-connectivity-browser-parcellation]="parcellation"
-          [accordionExpanded]="expandedPanel === CONST.CONNECTIVITY"
-          [types]="hasConnectivityDirective.availableModalities"
-        >
-        </sxplr-sapiviews-features-connectivity-browser> -->
-      </ng-template>
-
-      <!-- <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-        title: CONST.CONNECTIVITY,
-        iconClass: 'fab fa-connectdevelop',
-        content: sxplrSapiviewsFeaturesConnectivityBrowser,
-        iavNgIf: hasConnectivityDirective.hasConnectivity
-      }">
-      </ng-container> -->
-
-      <!-- <div sxplr-sapiviews-features-connectivity-check
-          [sxplr-sapiviews-features-connectivity-check-atlas]="atlas"
-          [sxplr-sapiviews-features-connectivity-check-parcellation]="parcellation"
-          [region]="region"
-          #hasConnectivityDirective="hasConnectivityDirective">
-      </div> -->
-    </ng-template>
-
-  </mat-accordion>
-
-</ng-template>
-
-<!-- expansion tmpl -->
-<ng-template #ngMatAccordionTmpl
-  let-title="title"
-  let-desc="desc"
-  let-iconClass="iconClass"
-  let-iconTooltip="iconTooltip"
-  let-iavNgIf="iavNgIf"
-  let-content="content">
-  
-  <mat-expansion-panel
-    [expanded]="activePanelTitles$ | async | includes : title"
-    [attr.data-opened]="expansionPanel.expanded"
-    [attr.data-mat-expansion-title]="title"
-    (closed)="handleExpansionPanelClosedEv(title)"
-    (afterExpand)="handleExpansionPanelAfterExpandEv(title)"
-    hideToggle
-    *ngIf="iavNgIf"
-    #expansionPanel="matExpansionPanel">
-
-    <mat-expansion-panel-header>
-
-      <!-- title -->
-      <mat-panel-title>
-        {{ title }}
-      </mat-panel-title>
-
-      <!-- desc + icon -->
-      <mat-panel-description class="sxplr-d-flex sxplr-align-items-center sxplr-justify-content-end"
-        [matTooltip]="iconTooltip">
-        <span class="mr-3">{{ desc }}</span>
-        <span class="accordion-icon d-inline-flex justify-content-center">
-          <i [class]="iconClass"></i>
-        </span>
-      </mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <!-- content -->
-    <ng-template matExpansionPanelContent>
-      <ng-container *ngTemplateOutlet="content; context: {
-        expansionPanel: expansionPanel
-      }">
-      </ng-container>
-    </ng-template>
-  </mat-expansion-panel>
 </ng-template>

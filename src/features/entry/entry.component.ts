@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map, scan, switchMap } from 'rxjs/operators';
+import { map, scan, switchMap, tap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
@@ -34,6 +34,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
 
+  public busyTallying$ = new BehaviorSubject<boolean>(false)
   public totals$ = new BehaviorSubject<number>(null)
   public features$ = new BehaviorSubject<Feature[]>([])
 
@@ -55,6 +56,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     )
     this.#subscriptions.push(
       catAccDirs$.pipe(
+        tap(() => this.busyTallying$.next(true)),
         switchMap(catArrDirs => merge(
           ...catArrDirs.map((dir, idx) => dir.total$.pipe(
             map(val => ({ idx, val }))
@@ -69,8 +71,13 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
             tally += record[idx]
           }
           return tally
-        })
-      ).subscribe(num => this.totals$.next(num)),
+        }),
+        tap(num => {
+          this.busyTallying$.next(false)
+          this.totals$.next(num)
+        }),
+      ).subscribe(),
+
       catAccDirs$.pipe(
         switchMap(catArrDirs => combineLatest(
           catArrDirs.map(dir => dir.features$)
