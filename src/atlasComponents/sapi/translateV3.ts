@@ -385,7 +385,7 @@ class TranslateV3 {
         transform,
         auxMeshes: [{
           labelIndicies: [Number(splitPrecompMeshVol[1])],
-          name: "auxmesh"
+          name: "Auxiliary mesh"
         }]
       })
     }

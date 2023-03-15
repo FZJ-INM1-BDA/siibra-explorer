@@ -146,6 +146,8 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CONFIGURE_LAYER: 'Configure layer',
 
     REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
+
+    AUXMESH_DESC: `Some templates contains auxiliary meshes. They compliment the appearance of the template in perspective view.`,
   }
 
   exports.QUICKTOUR_DESC ={
