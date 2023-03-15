@@ -96,38 +96,52 @@ export class Effect {
   onTemplateParcSelection = createEffect(() => merge(
     this.action.pipe(
       ofType(actions.selectTemplate),
-      map(({ template }) => {
+      map(({ template, requested }) => {
         return {
           template,
-          parcellation: null as SxplrParcellation
+          parcellation: null as SxplrParcellation,
+          requested,
         }
       })
     ),
     this.action.pipe(
       ofType(actions.selectParcellation),
-      map(({ parcellation }) => {
+      map(({ parcellation, requested }) => {
         return {
           template: null as SxplrTemplate,
-          parcellation
+          parcellation,
+          requested,
         }
       })
     )
   ).pipe(
     withLatestFrom(this.store),
-    switchMap(([ { template, parcellation }, store ]) => {
+    switchMap(([ { template, parcellation, requested }, store ]) => {
+
       const currTmpl = selectors.selectedTemplate(store)
       const currParc = selectors.selectedParcellation(store)
       const currAtlas = selectors.selectedAtlas(store)
-      return this.sapiSvc.getSupportedTemplates(currAtlas, parcellation || currParc).pipe(
+
+      const requestedTmpl = requested?.template
+      const requestedParc = requested?.parcellation
+
+      const resolvedTmpl = template || requestedTmpl || currTmpl
+      const resolvedParc = parcellation || requestedParc || currParc
+
+      return this.sapiSvc.getSupportedTemplates(currAtlas, resolvedParc).pipe(
         switchMap(tmpls => {
-          const flag = tmpls.some(tmpl => tmpl.id === (template || currTmpl).id)
+          const flag = tmpls.some(tmpl => tmpl.id === resolvedTmpl.id)
           if (flag) {
             return of({
               atlas: currAtlas,
-              template: template || currTmpl,
-              parcellation: parcellation || currParc,
+              template: resolvedTmpl,
+              parcellation: resolvedParc,
             })
           }
+
+          /**
+           * TODO code below should not be reached
+           */
           /**
            * if template is defined, find the first parcellation that is supported
            */
@@ -137,7 +151,7 @@ export class Effect {
                 if (parcs.length === 0) {
                   throw new Error(`Cannot find any supported parcellations for template ${template.name}`)
                 }
-                const selectParc = parcs.find(p => prefParcId.includes(p.id)) || parcs[0]
+                const selectParc = parcs.find(p => requestedParc?.id === p.id || prefParcId.includes(p.id)) || parcs[0]
                 return {
                   atlas: currAtlas,
                   template,
@@ -152,7 +166,7 @@ export class Effect {
                 if (templates.length === 0) {
                   throw new Error(`Cannot find any supported templates for parcellation ${parcellation.name}`)
                 }
-                const selectTmpl = templates.find(tmp => prefSpcId.includes(tmp.id)) || templates[0]
+                const selectTmpl = templates.find(tmp => requestedTmpl?.id === tmp.id || prefSpcId.includes(tmp.id)) || templates[0]
                 return {
                   atlas: currAtlas,
                   template: selectTmpl,

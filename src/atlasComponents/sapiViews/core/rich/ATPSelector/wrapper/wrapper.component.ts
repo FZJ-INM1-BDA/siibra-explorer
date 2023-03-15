@@ -11,9 +11,9 @@ import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
 import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
 
-function isATPGuard(obj: any): obj is ATP {
+function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
   if (!obj) return false
-  return obj.atlas || obj.template || obj.parcellation
+  return (obj.atlas || obj.template || obj.parcellation) && (!obj.requested || isATPGuard(obj.requested))
 }
 
 @Component({
@@ -30,17 +30,14 @@ export class WrapperATPSelector implements OnDestroy{
 
   #subscription: Subscription[] = []
 
-  #askUser(title: string, descMd: string): Observable<boolean> {
-    const agree = "OK"
+  #askUser(title: string, descMd: string, actions: string[]): Observable<string> {
     return this.dialog.open(DialogFallbackCmp, {
       data: {
         title,
         descMd,
-        actions: [agree]
+        actions: actions
       }
-    }).afterClosed().pipe(
-      map(val => val === agree)
-    )
+    }).afterClosed()
   }
 
   selectedATP$ = this.store$.pipe(
@@ -79,27 +76,46 @@ export class WrapperATPSelector implements OnDestroy{
             return of({ atlas })
           }
           if (template) {
-            return this.sapi.getSupportedTemplates(selectedATP.atlas, selectedATP.parcellation).pipe(
-              switchMap(tmpls => {
-                const supported = tmpls.some(tmpl => tmpl.id === template.id)
-                if (supported) return of({ template })
+            return this.sapi.getSupportedParcellations(selectedATP.atlas, template).pipe(
+              switchMap(parcs => {
+                if (parcs.find(p => p.id === selectedATP.parcellation.id)) {
+                  return of({ template })
+                }
                 return this.#askUser(
-                  `Incompatible parcellation`, `Attempting to load template **${template.name}**, which does not support parcellation **${selectedATP.parcellation.name}**. Proceed anyway and load the default parcellation?`
+                  null,
+                  `Template **${template.name}** does not support the current parcellation **${selectedATP.parcellation.name}**. Please select one of the following parcellations:`,
+                  parcs.map(p => p.name)
                 ).pipe(
-                  switchMap(flag => of(flag ? { template } : null))
+                  map(parcname => {
+                    const foundParc = parcs.find(p => p.name === parcname)
+                    if (foundParc) {
+                      return ({ template, requested: { parcellation: foundParc } })
+                    }
+                    return null
+                  })
                 )
               })
             )
           }
           if (parcellation) {
-            return this.sapi.getSupportedParcellations(selectedATP.atlas, selectedATP.template).pipe(
-              switchMap(parcs => {
-                const supported = parcs.some(parc => parc.id === parcellation.id)
-                return supported
-                  ? of ({ parcellation })
-                  : this.#askUser(`Incompatible template`, `Attempting to load parcellation **${parcellation.name}**, which is not supported in template **${selectedATP.template.name}**. Proceed anyway and load the default template?`).pipe(
-                    switchMap(flag => of(flag ? { parcellation } : null))
-                  )
+            return this.sapi.getSupportedTemplates(selectedATP.atlas, parcellation).pipe(
+              switchMap(tmpls => {
+                if (tmpls.find(t => t.id === selectedATP.template.id)) {
+                  return of({ parcellation })
+                }
+                return this.#askUser(
+                  null,
+                  `Parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
+                  tmpls.map(tmpl => tmpl.name)
+                ).pipe(
+                  map(tmplname => {
+                    const foundTmpl = tmpls.find(tmpl => tmpl.name === tmplname)
+                    if (foundTmpl) {
+                      return ({ requested: { template: foundTmpl }, parcellation })
+                    }
+                    return null
+                  })
+                )
               })
             )
           }
@@ -110,9 +126,8 @@ export class WrapperATPSelector implements OnDestroy{
           return !!val
         })
       ).subscribe((obj) => {
-
         if (!isATPGuard(obj)) return
-        const { atlas, parcellation, template } = obj
+        const { atlas, parcellation, template, requested } = obj
         if (atlas) {
           this.store$.dispatch(
             atlasSelection.actions.selectAtlas({ atlas })
@@ -120,12 +135,12 @@ export class WrapperATPSelector implements OnDestroy{
         }
         if (parcellation) {
           this.store$.dispatch(
-            atlasSelection.actions.selectParcellation({ parcellation })
+            atlasSelection.actions.selectParcellation({ parcellation, requested })
           )
         }
         if (template) {
           this.store$.dispatch(
-            atlasSelection.actions.selectTemplate({ template })
+            atlasSelection.actions.selectTemplate({ template, requested })
           )
         }
       })
