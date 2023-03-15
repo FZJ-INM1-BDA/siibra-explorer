@@ -8,10 +8,13 @@
     (itemClicked)="selectLeaf({ parcellation: $event })"
     [elevation]="2"
     [disabled]="isBusy">
+
+    <ng-template sxplrSmartChipHeader>
+      Parcellation
+    </ng-template>
+
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        <span>
-      </span>
         {{ ATP.parcellation.name }}
       </span>
 
@@ -50,6 +53,10 @@
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"
     [disabled]="isBusy">
+    <ng-template sxplrSmartChipHeader>
+      Template
+    </ng-template>
+
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.template.name }}
@@ -67,6 +74,11 @@
     (itemClicked)="selectLeaf({ atlas: $event})"
     [elevation]="6"
     [disabled]="isBusy">
+    
+    <ng-template sxplrSmartChipHeader>
+      Atlas
+    </ng-template>
+    
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.atlas.name }}
@@ -106,7 +118,9 @@
   </ng-template>
 
   <!-- button body -->
-  <span *ngIf="item" class="full-sized-button">
+  <span *ngIf="item" class="full-sized-button"
+    [matTooltip]="item.version?.name || item.name || item.fullName"
+    [matTooltipPosition]="'above'">
     {{ item.version?.name || item.name || item.fullName }}
   </span>
 

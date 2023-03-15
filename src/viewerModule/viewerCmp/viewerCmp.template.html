@@ -380,31 +380,40 @@
     sxplr-pe-all
     sxplr-of-x-auto
     sxplr-of-y-hidden
-    sxplr-align-items-center">
+    sxplr-align-items-stretch">
     
     <sxplr-wrapper-atp-selector class="sxplr-z-2">
     </sxplr-wrapper-atp-selector>
 
     <!-- selected region chip -->
-    <sxplr-sapiviews-core-region-region-chip
-      *ngFor="let region of selectedRegions$ | async"
-      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1"
-      (sxplr-sapiviews-core-region-region-chip-clicked)="showFullSideNav()"
-      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
-      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
-      [sxplr-sapiviews-core-region-region]="region">
+    <ng-template ngFor [ngForOf]="selectedRegions$ | async" let-region>
+      <sxplr-smart-chip
+        [noMenu]="true"
+        [color]="sapiViewsCoreRegion.regionRgbString"
+        (click)="showFullSideNav()"
+        sxplr-sapiviews-core-region
+        [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+        [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+        [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+        [sxplr-sapiviews-core-region-region]="region"
+        [sxplr-sapiviews-core-region-detail-flag]="true"
+        #sapiViewsCoreRegion="sapiViewsCoreRegion">
+        <ng-template sxplrSmartChipContent>
+          <span class="regionname">
+            {{ region.name }}
+          </span>
+          <button class="sxplr-mr-n3"
+            mat-icon-button
+            (click)="clearRoi()">
+            <i class="fas fa-times"></i>
+          </button>
+        </ng-template>
+        <ng-template sxplrSmartChipHeader>
+          Region
+        </ng-template>
+      </sxplr-smart-chip>
 
-      <div prefix>
-      </div>
-
-      <div suffix class="region-chip-suffix">
-        <button mat-icon-button iav-stop="mousedown click"
-          (click)="clearRoi()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </sxplr-sapiviews-core-region-region-chip>
+    </ng-template>
   </div>
 
 </ng-template>

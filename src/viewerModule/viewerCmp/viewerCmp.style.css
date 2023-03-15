@@ -55,16 +55,6 @@ mat-drawer
   padding-top: 5rem;
 }
 
-sxplr-sapiviews-core-region-region-chip
-{
-  margin-left:-5rem;
-}
-
-sxplr-sapiviews-core-region-region-chip [prefix]
-{
-  padding-left:5rem;
-}
-
 .auto-complete-container
 {
   display: flex;
@@ -147,4 +137,19 @@ mat-list[dense].contextual-block
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+sxplr-smart-chip
+{
+  margin-left: -2.5rem;
+}
+
+sxplr-smart-chip .regionname
+{
+  margin-left: 0.5rem;
+}
+
+sxplr-smart-chip [mat-icon-button]
+{
+  margin-right: -1.5rem;
 }

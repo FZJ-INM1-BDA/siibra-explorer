@@ -64,24 +64,27 @@
 </ng-template>
 
 <!-- tabular special view -->
-<ng-template [ngIf]="tabular$ | async" let-tabular>
-  <table class="feature-detail" mat-table [dataSource]="tabular | transformPdToDs">
+<!-- suppress tabuular view if linear or polar is visible -->
+<ng-template [ngIf]="!(linear$ | async) && !(polar$ | async)">
 
-    <ng-container *ngFor="let column of columns$ | async"
-      [matColumnDef]="column">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ column }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        {{ element[column] }}
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
-    <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
-  </table>
+  <ng-template [ngIf]="tabular$ | async" let-tabular>
+    <table class="feature-detail" mat-table [dataSource]="tabular | transformPdToDs">
+  
+      <ng-container *ngFor="let column of columns$ | async"
+        [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ column }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element[column] }}
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
+    </table>
+  </ng-template>  
 </ng-template>
-
 
 <!-- voi special view -->
 <ng-template [ngIf]="voi$ | async" let-voi>

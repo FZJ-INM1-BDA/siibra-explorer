@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, HostBin
 import { SmartChipContent } from "../smartChip.content.directive"
 import { SmartChipMenu } from "../smartChip.menu.directive";
 import { rgbToHsl, hexToRgb } from 'common/util'
+import { SmartChipHeader } from "../smartChip.header.directive";
 
 const cssColorToHsl = (input: string) => {
   if (/rgb/i.test(input)) {
@@ -45,6 +46,9 @@ export class SmartChip<T extends object> implements OnChanges{
   @Input('color')
   color = `rgba(200, 200, 200, 1)`
 
+  @Input('noMenu')
+  noMenuFlag = false
+
   @Input('disabled')
   disabled: boolean = false
 
@@ -67,6 +71,9 @@ export class SmartChip<T extends object> implements OnChanges{
 
   @ContentChild(SmartChipMenu)
   menuTmpl: SmartChipMenu
+
+  @ContentChild(SmartChipHeader)
+  headerTmpl: SmartChipHeader
 
   @HostBinding('class')
   darkTheme: string = 'lighttheme'

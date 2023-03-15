@@ -32,6 +32,7 @@ import { environment } from "src/environments/environment"
 import { ATPSelectorModule } from "src/atlasComponents/sapiViews/core/rich/ATPSelector";
 import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
+import { SmartChipModule } from "src/components/smartChip";
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
     ATPSelectorModule,
     FeatureModule,
     NgLayerCtlModule,
+    SmartChipModule,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

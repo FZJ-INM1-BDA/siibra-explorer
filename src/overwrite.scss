@@ -165,7 +165,7 @@ $display-vars: none, block, inline-block, flex, inline-flex, grid;
   }
 }
 
-$align-items-vars: center, stretch, start;
+$align-items-vars: center, stretch, start, flex-end;
 @each $align-items-var in $align-items-vars {
   .align-items-#{$align-items-var} {
     align-items: $align-items-var;
