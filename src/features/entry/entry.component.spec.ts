@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SAPIModule } from 'src/atlasComponents/sapi';
 
 import { EntryComponent } from './entry.component';
 
@@ -8,6 +10,10 @@ describe('EntryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [
+        SAPIModule,
+        CommonModule,
+      ],
       declarations: [ EntryComponent ]
     })
     .compileComponents();

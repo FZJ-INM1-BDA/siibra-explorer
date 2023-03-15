@@ -14,8 +14,6 @@ import { RouterService } from "src/routerModule/router.service"
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
     let mockStore: MockStore
-    let getMultiNgIdsRegionsLabelIndexMapSpy: jasmine.Spy
-    let getMultiNgIdsRegionsLabelIndexMapReturnVal: Map<string, Map<number, layerCtrlUtil.IRegion>>
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -37,11 +35,6 @@ describe('> layerctrl.service.ts', () => {
       })
 
       mockStore = TestBed.inject(MockStore)
-      getMultiNgIdsRegionsLabelIndexMapReturnVal = new Map()
-      getMultiNgIdsRegionsLabelIndexMapSpy = spyOnProperty(
-        layerCtrlUtil,
-        'getMultiNgIdsRegionsLabelIndexMap'
-      ).and.returnValue(() => getMultiNgIdsRegionsLabelIndexMapReturnVal)
       mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
       mockStore.overrideSelector(atlasAppearance.selectors.showDelineation, true)
       mockStore.overrideSelector(annotation.selectors.annotations, [])

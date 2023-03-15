@@ -18,7 +18,8 @@ import { selectorAuxMeshes } from "../store"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { userInterface, atlasSelection, atlasAppearance, annotation, userInteraction } from "src/state"
-import { SapiAtlasModel, SAPIModule, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
+import { SAPIModule } from "src/atlasComponents/sapi"
+import { SxplrParcellation, SxplrAtlas, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEHUBA_INSTANCE_INJTKN } from "../util"
 import { RouterService } from "src/routerModule/router.service"
@@ -51,10 +52,10 @@ describe('> nehubaViewerGlue.component.ts', () => {
   let mockStore: MockStore
   let fixture: ComponentFixture<NehubaGlueCmp>
   const selectedATPR$ = new Subject<{
-    atlas: SapiAtlasModel,
-    parcellation: SapiParcellationModel,
-    template: SapiSpaceModel,
-    regions: SapiRegionModel[],
+    atlas: SxplrAtlas,
+    parcellation: SxplrParcellation,
+    template: SxplrTemplate,
+    regions: SxplrRegion[],
   }>()
   beforeEach( async () => {
     await TestBed.configureTestingModule({

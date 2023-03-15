@@ -1,3 +1,0 @@
-export {
-  SAPIFeature
-} from "./sapiFeature"

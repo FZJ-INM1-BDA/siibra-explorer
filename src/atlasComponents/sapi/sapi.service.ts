@@ -1,20 +1,23 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import {
-  translateV3Entities
-} from "./translateV3"
 import { getExportNehuba } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
-import { SAPIFeature } from "./features";
 import { environment } from "src/environments/environment"
+import {
+  translateV3Entities
+} from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
-import { atlasAppearance } from "src/state";
 
+export const useViewer = {
+  THREESURFER: "THREESURFER",
+  NEHUBA: "NEHUBA",
+  NOT_SUPPORTED: "NOT_SUPPORTED" 
+} as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const EXPECTED_SIIBRA_API_VERSION = '0.3.0'
@@ -232,10 +235,6 @@ export class SAPI{
     } as any).pipe(
       switchMap(val => translateV3Entities.translateFeature(val))
     )
-  }
-  
-  getFeature(featureId: string, opts: Record<string, string> = {}) {
-    return new SAPIFeature(this, featureId, opts)
   }
 
   getModalities() {
@@ -472,7 +471,7 @@ export class SAPI{
 
   public useViewer(template: SxplrTemplate) {
     if (!template) {
-      return of(null as keyof typeof atlasAppearance.const.useViewer)
+      return of(null as keyof typeof useViewer)
     }
     return forkJoin({
       voxel: this.getVoxelTemplateImage(template),
@@ -483,15 +482,15 @@ export class SAPI{
         const { voxel, surface } = vols
         if (voxel.length > 0 && surface.length > 0) {
           console.error(`both voxel and surface length are > 0, this should not happen.`)
-          return atlasAppearance.const.useViewer.NOT_SUPPORTED
+          return useViewer.NOT_SUPPORTED
         }
         if (voxel.length > 0) {
-          return atlasAppearance.const.useViewer.NEHUBA
+          return useViewer.NEHUBA
         }
         if (surface.length > 0) {
-          return atlasAppearance.const.useViewer.THREESURFER
+          return useViewer.THREESURFER
         }
-        return atlasAppearance.const.useViewer.NOT_SUPPORTED
+        return useViewer.NOT_SUPPORTED
       })
     )
   }

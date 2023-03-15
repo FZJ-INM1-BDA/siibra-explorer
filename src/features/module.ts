@@ -9,7 +9,6 @@ import { SpinnerModule } from "src/components/spinner";
 import { UtilModule } from "src/util";
 import { EntryComponent } from './entry/entry.component'
 import { FeatureNamePipe } from "./featureName.pipe";
-import { FetchDirective } from "./fetch.directive";
 import { ListComponent } from './list/list.component';
 import { CategoryAccDirective } from './category-acc.directive';
 import { SapiViewsFeatureConnectivityModule } from "./connectivity";
@@ -49,7 +48,6 @@ import { ShowBBoxToggleDirective } from "./showBbox-toggle.directive";
     ListComponent,
     FeatureViewComponent,
 
-    FetchDirective,
     CategoryAccDirective,
     VoiBboxDirective,
     ShowBBoxToggleDirective,
