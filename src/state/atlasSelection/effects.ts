@@ -215,7 +215,9 @@ export class Effect {
     switchMap(({ atlas }) => 
       this.sapiSvc.getAllParcellations(atlas).pipe(
         map(parcellations => {
-          const selectedParc = parcellations.find(p => p.id.includes("290")) || parcellations[0]
+          const parcPrevIds = parcellations.map(p => p.prevId)
+          const latestParcs = parcellations.filter(p => !parcPrevIds.includes(p.id))
+          const selectedParc = parcellations.find(p => p.id.includes("290")) || latestParcs[0] || parcellations[0]
           return {
             parcellation: selectedParc,
             atlas

@@ -40,11 +40,13 @@ class TranslateV3 {
   async translateParcellation(parcellation:PathReturn<"/parcellations/{parcellation_id}">): Promise<SxplrParcellation> {
     const ds = await Promise.all((parcellation.datasets || []).map(ds => this.translateDs(ds)))
     const { name, ...rest } = ds[0] || {}
+    const { ['@id']: prevId } = parcellation.version?.prev || {}
     return {
       id: parcellation["@id"],
       name: parcellation.name,
       modality: parcellation.modality,
       type: "SxplrParcellation",
+      prevId,
       ...rest
     }
   }
