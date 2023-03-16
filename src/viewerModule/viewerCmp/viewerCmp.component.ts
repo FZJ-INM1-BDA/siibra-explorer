@@ -62,8 +62,6 @@ export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
-
-  public showVoiFlag = true
   
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,

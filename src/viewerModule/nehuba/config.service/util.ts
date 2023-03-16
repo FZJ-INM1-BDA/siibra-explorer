@@ -157,7 +157,9 @@ const BACKCOMAP_KEY_DICT = {
 
 
 export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): string {
-
+  if (!region) {
+    return null
+  }
   let laterality: string = "whole brain"
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"

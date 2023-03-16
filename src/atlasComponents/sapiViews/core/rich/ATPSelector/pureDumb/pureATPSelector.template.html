@@ -9,13 +9,9 @@
     [elevation]="2"
     [disabled]="isBusy">
 
-    <ng-template sxplrSmartChipHeader>
-      Parcellation
-    </ng-template>
-
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.parcellation.name }}
+        Parcellation ({{ parcellations.length }})
       </span>
 
       <ng-content select="[parcellation-chip-suffix]">
@@ -38,6 +34,7 @@
 
       <ng-container *ngTemplateOutlet="optionTmpl; context: {
         $implicit: parc,
+        suffixText: (parc | isGroupedParcellation) && '(' + parc.parcellations.length  + ')' ,
         overridePrefixIconTmpl: (parc | parcellationGroupSelected : ATP.parcellation)
           ? halfSelectedTmpl
           : null
@@ -53,13 +50,10 @@
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"
     [disabled]="isBusy">
-    <ng-template sxplrSmartChipHeader>
-      Template
-    </ng-template>
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.template.name }}
+        Template ({{ availableTemplates.length }})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>
@@ -75,13 +69,9 @@
     [elevation]="6"
     [disabled]="isBusy">
     
-    <ng-template sxplrSmartChipHeader>
-      Atlas
-    </ng-template>
-    
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.atlas.name }}
+        Atlas ({{ allAtlases.length}})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-atlas>
@@ -101,7 +91,8 @@
   #optionTmpl
   let-item
   let-overridePrefixIconTmpl="overridePrefixIconTmpl"
-  let-overrideSuffixIcon="overrideSuffixIcon">
+  let-overrideSuffixIcon="overrideSuffixIcon"
+  let-suffixText="suffixText">
 
   <!-- prefix -->
   <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
@@ -122,6 +113,9 @@
     [matTooltip]="item.version?.name || item.name || item.fullName"
     [matTooltipPosition]="'above'">
     {{ item.version?.name || item.name || item.fullName }}
+    <ng-template [ngIf]="suffixText">
+      {{ suffixText }}
+    </ng-template>
   </span>
 
   <!-- suffix -->

@@ -400,16 +400,13 @@
         #sapiViewsCoreRegion="sapiViewsCoreRegion">
         <ng-template sxplrSmartChipContent>
           <span class="regionname">
-            {{ region.name }}
+            Region
           </span>
           <button class="sxplr-mr-n3"
             mat-icon-button
             (click)="clearRoi()">
             <i class="fas fa-times"></i>
           </button>
-        </ng-template>
-        <ng-template sxplrSmartChipHeader>
-          Region
         </ng-template>
       </sxplr-smart-chip>
 
@@ -958,7 +955,7 @@
 <ng-template #spatialFeatureListTmpl>
   <mat-card class="sxplr-pe-all"
     [ngClass]="{
-      'sxplr-d-none': !showVoiFlag || (voiFeatureEntryCmp.totals$ | async) === 0
+      'sxplr-d-none': !(voiSwitch.switchState$ | async) || (voiFeatureEntryCmp.totals$ | async) === 0
     }">
     <mat-card-header>
       <mat-card-title>
@@ -978,17 +975,10 @@
         </ng-template>
       </mat-card-subtitle>
     </mat-card-header>
-
-    <mat-slide-toggle
-      showBboxToggle
-      #showBboxToggle="showBboxToggle"
-      (change)="showBboxToggle.setState($event.checked)">
-      Show image location
-    </mat-slide-toggle>
   </mat-card>
 
   <sxplr-feature-entry
-    [ngClass]="showVoiFlag ? 'sxplr-d-block' : 'sxplr-d-none'"
+    [ngClass]="(voiSwitch.switchState$ | async) ? 'sxplr-d-block' : 'sxplr-d-none'"
     class="sxplr-pe-all mat-elevation-z8"
     [template]="templateSelected$ | async"
     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
@@ -1000,16 +990,19 @@
       'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) === 0
     }"
     class="sxplr-pe-all sxplr-w-100"
-    (click)="showVoiFlag = !showVoiFlag">
+    iav-switch
+    [iav-switch-state]="false"
+    #voiSwitch="iavSwitch"
+    (click)="voiSwitch.toggle()">
 
-    <ng-template [ngIf]="showVoiFlag">
+    <ng-template [ngIf]="voiSwitch.switchState$ | async" [ngIfElse]="chevronCollapseTmpl">
       <i class="fas fa-chevron-up"></i>
       <span>
         Collapse
       </span>
     </ng-template>
 
-    <ng-template [ngIf]="!showVoiFlag">
+    <ng-template #chevronCollapseTmpl>
       <i class="fas fa-chevron-down"></i>
       <span>
         Explore {{ voiFeatureEntryCmp.totals$ | async }} spatial features
@@ -1017,7 +1010,7 @@
     </ng-template>
   </button>
   <div
-    *ngIf="showBboxToggle.showVoiFlag$ | async"
+    *ngIf="voiSwitch.switchState$| async"
     voiBbox
     [features]="voiFeatureEntryCmp.features$ | async">
 

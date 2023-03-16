@@ -22,7 +22,6 @@ import { FeatureViewComponent } from "./feature-view/feature-view.component";
 import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 import { VoiBboxDirective } from "./voi-bbox.directive";
-import { ShowBBoxToggleDirective } from "./showBbox-toggle.directive";
 
 @NgModule({
   imports: [
@@ -50,7 +49,6 @@ import { ShowBBoxToggleDirective } from "./showBbox-toggle.directive";
 
     CategoryAccDirective,
     VoiBboxDirective,
-    ShowBBoxToggleDirective,
 
     FeatureNamePipe,
     TransformPdToDsPipe,
@@ -59,7 +57,6 @@ import { ShowBBoxToggleDirective } from "./showBbox-toggle.directive";
     EntryComponent,
     FeatureViewComponent,
     VoiBboxDirective,
-    ShowBBoxToggleDirective,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

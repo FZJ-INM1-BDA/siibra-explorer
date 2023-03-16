@@ -147,7 +147,7 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
 
     REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
 
-    AUXMESH_DESC: `Some templates contains auxiliary meshes. They compliment the appearance of the template in perspective view.`,
+    AUXMESH_DESC: `Some templates contain auxiliary meshes, which compliment the appearance of the template in the perspective view.`,
   }
 
   exports.QUICKTOUR_DESC ={
