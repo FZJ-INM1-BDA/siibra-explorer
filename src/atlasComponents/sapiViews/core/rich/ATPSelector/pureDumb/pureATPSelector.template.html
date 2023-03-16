@@ -11,7 +11,10 @@
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        Parcellation ({{ parcellations.length }})
+        Parcellation
+      </span>
+      <span class="sxplr-ml-1 text-muted">
+        ({{ parcellations.length }})
       </span>
 
       <ng-content select="[parcellation-chip-suffix]">
@@ -53,7 +56,10 @@
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        Template ({{ availableTemplates.length }})
+        Template
+      </span>
+      <span class="sxplr-ml-1 text-muted">
+        ({{ availableTemplates.length }})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>
@@ -71,7 +77,10 @@
     
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        Atlas ({{ allAtlases.length}})
+        Atlas
+      </span>
+      <span class="sxplr-ml-1 text-muted">
+        ({{ allAtlases.length}})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-atlas>
@@ -114,7 +123,9 @@
     [matTooltipPosition]="'above'">
     {{ item.version?.name || item.name || item.fullName }}
     <ng-template [ngIf]="suffixText">
-      {{ suffixText }}
+      <span class="text-muted">
+        {{ suffixText }}
+      </span>
     </ng-template>
   </span>
 
