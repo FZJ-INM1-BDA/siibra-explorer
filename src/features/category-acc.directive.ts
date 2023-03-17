@@ -1,8 +1,8 @@
 import { AfterContentInit, ContentChildren, Directive, OnDestroy, QueryList } from '@angular/core';
 import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ListComponent } from './list/list.component';
 import { Feature } from "src/atlasComponents/sapi/sxplrTypes"
+import { ListDirective } from './list/list.directive';
 
 @Directive({
   selector: '[sxplrCategoryAcc]',
@@ -14,8 +14,8 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
   public total$ = new BehaviorSubject<number>(0)
   public features$ = new BehaviorSubject<Feature[]>([])
 
-  @ContentChildren(ListComponent, { read: ListComponent, descendants: true })
-  listCmps: QueryList<ListComponent>
+  @ContentChildren(ListDirective, { read: ListDirective, descendants: true })
+  listCmps: QueryList<ListDirective>
 
   #changeSub: Subscription
   ngAfterContentInit(): void {

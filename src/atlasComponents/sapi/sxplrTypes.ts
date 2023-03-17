@@ -23,6 +23,7 @@ export type SxplrParcellation = {
   type: 'SxplrParcellation'
   id: string
   name: string
+  shortName: string
   modality?: string
   prevId?: string
 } & Partial<AdditionalInfo>
@@ -31,12 +32,14 @@ export type SxplrTemplate = {
   type: 'SxplrTemplate'
   id: string
   name: string
+  shortName: string
 } & Partial<AdditionalInfo>
 
 export type SxplrAtlas = {
   type: 'SxplrAtlas'
   id: string
   name: string
+  species: string
 } & Partial<AdditionalInfo>
 
 export type AdditionalInfo = {

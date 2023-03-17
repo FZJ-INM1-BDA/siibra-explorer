@@ -18,7 +18,8 @@ class TranslateV3 {
     return {
       id: atlas["@id"],
       type: "SxplrAtlas",
-      name: atlas.name
+      name: atlas.name,
+      species: atlas.species
     }
   }
 
@@ -47,6 +48,7 @@ class TranslateV3 {
       modality: parcellation.modality,
       type: "SxplrParcellation",
       prevId,
+      shortName: parcellation.name,
       ...rest
     }
   }
@@ -62,6 +64,7 @@ class TranslateV3 {
     const tmpl = {
       id: template["@id"],
       name: template.fullName,
+      shortName: template.shortName,
       type: "SxplrTemplate" as const
     }
     this.#sxplrTmplMap.set(tmpl.id, tmpl)

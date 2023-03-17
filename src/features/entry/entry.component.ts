@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { map, scan, switchMap, tap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
@@ -25,8 +25,8 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
 
 @Component({
   selector: 'sxplr-feature-entry',
-  templateUrl: './entry.nestedExpPanel.component.html',
-  styleUrls: ['./entry.nestedExpPanel.component.scss'],
+  templateUrl: './entry.flattened.component.html',
+  styleUrls: ['./entry.flattened.component.scss'],
   exportAs: 'featureEntryCmp'
 })
 export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
@@ -87,7 +87,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     )
   }
 
-  public atlas = this.store.select(atlasSelection.selectors.selectedAtlas)
+  public selectedAtlas$ = this.store.pipe(
+    select(atlasSelection.selectors.selectedAtlas)
+  )
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
     switchMap(resp => 

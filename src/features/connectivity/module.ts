@@ -7,7 +7,6 @@ import {FormsModule} from "@angular/forms";
 import { DialogModule } from "src/ui/dialogInfo";
 
 import { ConnectivityBrowserComponent } from "./connectivityBrowser/connectivityBrowser.component";
-import { ExcludeConnectivityPipe } from "./excludeConnectivity.pipe";
 
 @NgModule({
   imports: [
@@ -18,11 +17,9 @@ import { ExcludeConnectivityPipe } from "./excludeConnectivity.pipe";
   ],
   declarations: [
     ConnectivityBrowserComponent,
-    ExcludeConnectivityPipe
   ],
   exports: [
     ConnectivityBrowserComponent,
-    ExcludeConnectivityPipe
   ],
   providers: [
     SAPI,

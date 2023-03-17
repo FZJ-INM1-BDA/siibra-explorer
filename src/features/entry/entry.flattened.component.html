@@ -1,0 +1,97 @@
+<mat-accordion>
+
+    <!-- show everything except for connectivity and dataset -->
+    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity', 'dataset', 'other'] : false"  let-keyvalue>
+        <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
+        [ngTemplateOutletContext]="{
+            $implicit: keyvalue
+        }">
+        </ng-template>
+    </ng-template>
+    
+
+    <!-- only show connectivity in human atlas for now -->
+    <ng-template [ngIf]="(selectedAtlas$ | async)?.species === 'Homo sapiens'">
+        <ng-template [ngIf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
+            <ng-template ngFor [ngForOf]="connectivity" let-conn>
+                <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
+                    #connectivityAccordion
+                    *ngIf="conn">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ conn.key }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+    
+                    <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
+                        [region]="region"
+                        [sxplr-features-connectivity-browser-atlas]="selectedAtlas$ | async"
+                        [sxplr-features-connectivity-browser-template]="template"
+                        [sxplr-features-connectivity-browser-parcellation]="parcellation"
+                        [accordionExpanded]="connectivityAccordion.expanded"
+                        [types]="conn.value">
+                    </sxplr-features-connectivity-browser>
+    
+                </mat-expansion-panel>
+            </ng-template>
+        </ng-template>
+    </ng-template>
+
+    <!-- show dataset/other at the very bottom -->
+    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['dataset', 'other']"  let-keyvalue>
+        <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
+        [ngTemplateOutletContext]="{
+            $implicit: keyvalue
+        }">
+        </ng-template>
+    </ng-template>
+</mat-accordion>
+
+<!-- template for collected category -->
+<ng-template #featureCategoryFeatureTmpl let-keyvalue>
+    <mat-expansion-panel
+        sxplrCategoryAcc
+        #categoryAcc="categoryAcc"
+        [ngClass]="{
+            'sxplr-d-none': !(categoryAcc.isBusy$ | async) && (categoryAcc.total$ | async) === 0
+        }">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{ keyvalue.key }}
+            </mat-panel-title>
+            <mat-panel-description>
+                <spinner-cmp *ngIf="categoryAcc.isBusy$ | async"></spinner-cmp>
+                <ng-template [ngIf]="categoryAcc.total$ | async" let-total>
+                    <span>
+                        {{ total }}
+                    </span>
+                </ng-template>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-template ngFor [ngForOf]="keyvalue.value" let-feature>
+
+            <div sxplr-feature-list-directive
+                [template]="template"
+                [parcellation]="parcellation"
+                [region]="region"
+                [bbox]="bbox"
+                [queryParams]="queryParams | mergeObj : { type: (feature.name | featureNamePipe) }"
+                [featureRoute]="feature.path"
+                #featureListDirective="featureListDirective">
+            </div>
+        </ng-template>
+        
+        <cdk-virtual-scroll-viewport itemSize="36"
+            class="virtual-scroll-viewport">
+            <button *cdkVirtualFor="let feature of categoryAcc.features$ | async"
+                mat-button
+                class="virtual-scroll-item sxplr-w-100"
+                [matTooltip]="feature.name"
+                matTooltipPosition="right"
+                (click)="onClickFeature(feature)">
+                {{ feature.name }}
+            </button>
+        </cdk-virtual-scroll-viewport>
+    </mat-expansion-panel>
+</ng-template>
