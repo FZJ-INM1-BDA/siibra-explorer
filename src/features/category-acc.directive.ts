@@ -4,6 +4,13 @@ import { map } from 'rxjs/operators';
 import { Feature } from "src/atlasComponents/sapi/sxplrTypes"
 import { ListDirective } from './list/list.directive';
 
+export type GroupedFeature = {
+  features: Feature[]
+  meta: {
+    displayName: string
+  }
+}
+
 @Directive({
   selector: '[sxplrCategoryAcc]',
   exportAs: 'categoryAcc'
@@ -12,7 +19,10 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
   public isBusy$ = new BehaviorSubject<boolean>(false)
   public total$ = new BehaviorSubject<number>(0)
-  public features$ = new BehaviorSubject<Feature[]>([])
+  public groupedFeatures$ = new BehaviorSubject<GroupedFeature[]>([])
+  public features$ = this.groupedFeatures$.pipe(
+    map(arr => arr.flatMap(val => val.features))
+  )
 
   @ContentChildren(ListDirective, { read: ListDirective, descendants: true })
   listCmps: QueryList<ListDirective>
@@ -37,10 +47,14 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
     const listCmp = Array.from(this.listCmps)
 
-    this.#subscriptions.push( 
+    this.#subscriptions.push(
       combineLatest(
-        listCmp.map(listC => listC.features$)
-      ).subscribe(features => this.features$.next(features.flatMap(f => f))),
+        listCmp.map(
+          listC => listC.features$.pipe(
+            map(features => ({ features, meta: { displayName: listC.displayName } }))
+          )
+        )
+      ).subscribe(val => this.groupedFeatures$.next(val)),
       
       combineLatest(
         listCmp.map(listC => listC.features$)

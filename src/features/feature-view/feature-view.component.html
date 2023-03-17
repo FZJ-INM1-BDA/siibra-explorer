@@ -33,9 +33,39 @@
       <spinner-cmp></spinner-cmp>
     </ng-template>
 
-    <a mat-icon-button sxplr-hide-when-local *ngFor="let url of feature.link" [href]="url.href" target="_blank">
-      <i class="fas fa-external-link-alt"></i>
-    </a>
+    <!-- template for external link -->
+    <ng-template #externalLinkTmpl let-url>
+      <a mat-icon-button sxplr-hide-when-local [href]="url" target="_blank">
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+    </ng-template>
+
+    <!-- if link is prepopulated -->
+    <ng-template
+      ngFor
+      [ngForOf]="feature.link"
+      let-url>
+      <ng-template
+        [ngTemplateOutlet]="externalLinkTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: url.href
+        }">
+      </ng-template>
+    </ng-template>
+
+    <!-- if link is lazy fetched -->
+    <ng-template
+      ngFor
+      [ngForOf]="additionalLinks$ | async"
+      let-url>
+      <ng-template
+        [ngTemplateOutlet]="externalLinkTmpl"
+        [ngTemplateOutletContext]="{
+          $implicit: url
+        }">
+      </ng-template>
+    </ng-template>
+
   </mat-card-subtitle>
 </mat-card>
 

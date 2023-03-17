@@ -544,10 +544,16 @@ export interface components {
     FeatureMetaModel: {
       /** Name */
       name: string
+      /** Display Name */
+      display_name: string
       /** Path */
       path?: string
       /** Query Params */
       query_params?: (string)[]
+      /** Required Query Params */
+      required_query_params?: (string)[]
+      /** Optional Query Params */
+      optional_query_params?: (string)[]
       /** Path Params */
       path_params?: (string)[]
       /** Category */
@@ -716,6 +722,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[FeatureMetaModel] */
     Page_FeatureMetaModel_: {
@@ -727,6 +735,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[ParcellationEntityVersionModel] */
     Page_ParcellationEntityVersionModel_: {
@@ -738,6 +748,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraAtlasModel] */
     Page_SiibraAtlasModel_: {
@@ -749,6 +761,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraCorticalProfileModel] */
     Page_SiibraCorticalProfileModel_: {
@@ -760,6 +774,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraEbrainsDataFeatureModel] */
     Page_SiibraEbrainsDataFeatureModel_: {
@@ -771,6 +787,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraParcellationModel] */
     Page_SiibraParcellationModel_: {
@@ -782,6 +800,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraRegionalConnectivityModel] */
     Page_SiibraRegionalConnectivityModel_: {
@@ -793,6 +813,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraTabularModel] */
     Page_SiibraTabularModel_: {
@@ -804,6 +826,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraVoiModel] */
     Page_SiibraVoiModel_: {
@@ -815,6 +839,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
     Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
@@ -826,6 +852,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** ParcellationEntityVersionModel */
     ParcellationEntityVersionModel: {
@@ -1809,7 +1837,6 @@ export interface operations {
     parameters: {
       query: {
         space_id: string
-        bbox?: string
         type?: components["schemas"]["ImageTypes"]
       }
       path: {

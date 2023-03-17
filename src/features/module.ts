@@ -24,6 +24,10 @@ import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/modul
 import { VoiBboxDirective } from "./voi-bbox.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
+import { MatChipsModule } from "@angular/material/chips";
+import { FeatureFilterDirective } from "./feature.filter.directive";
+import { FilterGroupList } from "./filterGrpFeat.directive"
+import { GroupFeaturesToName } from "./grpFeatToName.pipe";
 
 @NgModule({
   imports: [
@@ -43,6 +47,7 @@ import { ListDirective } from "./list/list.directive";
     MarkdownModule,
     MatTableModule,
     NgLayerCtlModule,
+    MatChipsModule,
   ],
   declarations: [
     EntryComponent,
@@ -50,12 +55,15 @@ import { ListDirective } from "./list/list.directive";
     FeatureViewComponent,
     FilterCategoriesPipe,
     ListDirective,
+    FeatureFilterDirective,
+    FilterGroupList,
 
     CategoryAccDirective,
     VoiBboxDirective,
 
     FeatureNamePipe,
     TransformPdToDsPipe,
+    GroupFeaturesToName,
   ],
   exports: [
     EntryComponent,

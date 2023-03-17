@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
@@ -27,6 +27,15 @@ export class FeatureViewComponent implements OnChanges {
 
   @Input()
   feature: Feature
+
+  #detailLinks = new Subject<string[]>()
+  additionalLinks$ = this.#detailLinks.pipe(
+    distinctUntilChanged((o, n) => o.length == n.length),
+    map(links => {
+      const set = new Set((this.feature.link || []).map(v => v.href))
+      return links.filter(l => !set.has(l))
+    })
+  )
 
   busy$ = new BehaviorSubject<boolean>(false)
   
@@ -90,6 +99,9 @@ export class FeatureViewComponent implements OnChanges {
         if (isVoiData(val)) {
           this.voi$.next(val)
         }
+
+        this.#detailLinks.next((val.link || []).map(l => l.href))
+        
       },
       () => this.busy$.next(false)
     )

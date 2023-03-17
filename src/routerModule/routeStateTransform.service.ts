@@ -8,7 +8,7 @@ import { atlasSelection, defaultState, MainState, plugins, userInteraction } fro
 import { getParcNgId } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
-import { decodePath, encodeId, decodeId, endcodePath } from "./util";
+import { decodePath, encodeId, decodeId, encodePath } from "./util";
 
 @Injectable()
 export class RouteStateTransformSvc {
@@ -210,6 +210,8 @@ export class RouteStateTransformSvc {
     try {
       if (returnObj.f && returnObj.f.length === 1) {
         const decodedFeatId = decodeId(returnObj.f[0])
+          .replace(/~ptc~/g, '://')
+          .replace(/~/g, ':')
         const feature = await this.sapi.getV3FeatureDetailWithId(decodedFeatId).toPromise()
         returnState["[state.userInteraction]"].selectedFeature = feature
       }
@@ -290,7 +292,15 @@ export class RouteStateTransformSvc {
       // nav
       ['@']: cNavString,
       // showing dataset
-      f: selectedFeature && encodeId(selectedFeature.id)
+      f: (() => {
+        return selectedFeature && encodeId(
+          encodeURIFull(
+            selectedFeature.id
+              .replace(/:\/\//, '~ptc~')
+              .replace(/:/g, '~')
+          )
+        )
+      })()
     }
   
     /**
@@ -307,7 +317,7 @@ export class RouteStateTransformSvc {
     const routesArr: string[] = []
     for (const key in routes) {
       if (!!routes[key]) {
-        const segStr = endcodePath(key, routes[key])
+        const segStr = encodePath(key, routes[key])
         routesArr.push(segStr)
       }
     }

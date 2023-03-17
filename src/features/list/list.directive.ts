@@ -13,6 +13,12 @@ import { AllFeatures, FeatureBase } from "../base";
 export class ListDirective extends FeatureBase{
 
   @Input()
+  name: string
+
+  @Input()
+  displayName: string
+
+  @Input()
   featureRoute: string
   private guardedRoute$ = new BehaviorSubject<FeatureType>(null)
 

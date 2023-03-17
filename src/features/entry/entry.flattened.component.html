@@ -69,6 +69,62 @@
             </mat-panel-description>
         </mat-expansion-panel-header>
 
+
+        <!-- <button mat-button>Show all</button> -->
+        <div class="mat-chip-container"
+            feature-filter-directive
+            [initValue]="true"
+            [items]="categoryAcc.groupedFeatures$ | async "
+            #filterFeatureCls="featureFilterDirective">
+
+            <div class="mat-chip-inner-container">
+
+                <button mat-icon-button matTooltip="Reset filter"
+                    (click)="filterFeatureCls.setAll(true)">
+                    <i class="fas fa-filter"></i>
+                </button>
+
+                <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-grpFeat>
+                    <ng-template [ngIf]="grpFeat.features.length > 0">
+
+                        <ng-template [ngIf]="filterFeatureCls.checked$ | async | grpFeatToName | includes : grpFeat.meta.displayName"
+                            [ngIfThen]="selectedTmpl"
+                            [ngIfElse]="notSelectedTmpl">
+                        </ng-template>
+
+                        <ng-template #textTmpl>
+                            <span>
+                                {{ grpFeat.meta.displayName }}
+                            </span>
+                            <span class="text-muted1">
+                                ({{ grpFeat.features.length }})
+                            </span>
+                        </ng-template>
+                        <ng-template #selectedTmpl>
+                            <button mat-flat-button
+                                (click)="filterFeatureCls.toggle(grpFeat)"
+                                color="primary">
+                                <i class="fas fa-eye"></i>
+                                <ng-template [ngTemplateOutlet]="textTmpl">
+                                </ng-template>
+                            </button>
+                        </ng-template>
+
+                        <ng-template #notSelectedTmpl>
+                            <button mat-flat-button
+                                (click)="filterFeatureCls.toggle(grpFeat)"
+                                color="default">
+                                <i class="fas fa-eye-slash"></i>
+                                <ng-template [ngTemplateOutlet]="textTmpl">
+                                </ng-template>
+                            </button>
+                        </ng-template>
+
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
         <ng-template ngFor [ngForOf]="keyvalue.value" let-feature>
 
             <div sxplr-feature-list-directive
@@ -78,13 +134,20 @@
                 [bbox]="bbox"
                 [queryParams]="queryParams | mergeObj : { type: (feature.name | featureNamePipe) }"
                 [featureRoute]="feature.path"
+                [name]="feature.name"
+                [displayName]="feature.display_name"
                 #featureListDirective="featureListDirective">
             </div>
         </ng-template>
         
         <cdk-virtual-scroll-viewport itemSize="36"
+            filter-grp-feat
+            [featureDisplayName]="filterFeatureCls.checked$ | async | mapToProperty : 'meta' | mapToProperty : 'displayName'"
+            [groupFeature]="categoryAcc.groupedFeatures$ | async"
+            #filterGrpFeat="filterGrpFeat"
             class="virtual-scroll-viewport">
-            <button *cdkVirtualFor="let feature of categoryAcc.features$ | async"
+
+            <button *cdkVirtualFor="let feature of filterGrpFeat.filteredFeatures$"
                 mat-button
                 class="virtual-scroll-item sxplr-w-100"
                 [matTooltip]="feature.name"
