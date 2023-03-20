@@ -9,14 +9,20 @@
     [elevation]="2"
     [disabled]="isBusy">
 
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Parcellation
+      </span>
+
+      <span class="sxplr-ml-1 text-muted">
+        ({{ parcellations.length }})
+      </span>
+    </ng-template>
+
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.parcellation.shortName }}
       </span>
-      <span class="sxplr-ml-1 text-muted">
-        ({{ parcellations.length }})
-      </span>
-
       <ng-content select="[parcellation-chip-suffix]">
       </ng-content>
 
@@ -53,13 +59,21 @@
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"
     [disabled]="isBusy">
+    
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Template
+      </span>
+
+      <span class="sxplr-ml-1 text-muted">
+        ({{ availableTemplates.length }})
+      </span>
+    </ng-template>
+
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.template.shortName }}
-      </span>
-      <span class="sxplr-ml-1 text-muted">
-        ({{ availableTemplates.length }})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>
@@ -74,13 +88,21 @@
     (itemClicked)="selectLeaf({ atlas: $event})"
     [elevation]="6"
     [disabled]="isBusy">
+
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Atlas
+      </span>
+
+      <span class="sxplr-ml-1 text-muted">
+        ({{ allAtlases.length }})
+      </span>
+    </ng-template>
+
     
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.atlas.name }}
-      </span>
-      <span class="sxplr-ml-1 text-muted">
-        ({{ allAtlases.length}})
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-atlas>

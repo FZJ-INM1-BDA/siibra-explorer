@@ -174,6 +174,10 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
       : null
   }
 
+  if (parc.id === IDS.PARCELLATION.JBA30) {
+    return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
+  }
+
   if (!laterality) {
     return null
   }
@@ -264,6 +268,14 @@ export const spaceMiscInfoMap = new Map([
   [IDS.TEMPLATES.MNI152, {
     name: 'icbm2009c',
     scale: 1,
+  }],
+  [IDS.TEMPLATES.MNI152, {
+    name: 'icbm2009c',
+    scale: 1,
+  }],
+  [IDS.TEMPLATES.MEBRAINS, {
+    name: 'mebrains',
+    scale: 0.5
   }],
   ['minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992', {
     name: 'colin27',

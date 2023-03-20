@@ -48,7 +48,7 @@ class TranslateV3 {
       modality: parcellation.modality,
       type: "SxplrParcellation",
       prevId,
-      shortName: parcellation.name,
+      shortName: parcellation.shortname,
       ...rest
     }
   }

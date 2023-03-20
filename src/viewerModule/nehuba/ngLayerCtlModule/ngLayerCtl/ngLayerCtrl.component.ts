@@ -33,9 +33,11 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   private onDestroyCb: (() => void)[] = []
   private removeLayer: () => void
 
-  public showOpacityCtrl = false
   public hideNgTuneCtrl = 'lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox'
   public defaultOpacity = 1
+
+  @Input('ng-layer-ctrl-show')
+  public showOpacityCtrl = false
 
   @Input('ng-layer-ctl-name')
   name: string

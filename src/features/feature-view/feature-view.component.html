@@ -23,7 +23,12 @@
     <ng-template [ngIf]="feature.category">
       <mat-icon class="sxplr-m-a" fontSet="fas" fontIcon="fa-database"></mat-icon>
       <span class="sxplr-m-a">
-        {{ feature.category }}
+        <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
+          {{ feature.category }}
+        </ng-template>
+        <ng-template #fallbackTmpl>
+          Generic
+        </ng-template>
       </span>
     </ng-template>
 
@@ -123,6 +128,7 @@
     [ng-layer-ctl-src]="voi.ngVolume.url"
     [ng-layer-ctl-transform]="voi.ngVolume.transform"
     [ng-layer-ctl-info]="voi.ngVolume.info"
-    [ng-layer-ctl-opacity]="1.0">
+    [ng-layer-ctl-opacity]="1.0"
+    [ng-layer-ctrl-show]="true">
   </ng-layer-ctl>
 </ng-template>

@@ -1,6 +1,6 @@
 :host
 {
-  margin: 0.5rem 1rem;
+  margin: 1.5rem 1rem 0.5rem 1rem;
   min-height: 32px;
   height: 1px;
   position: relative;
@@ -55,7 +55,7 @@
 .smart-chip.header::before
 {
   content: "";
-  background-color: rgba(200, 200, 200, 0.8);
+  background-color: rgba(128, 128, 128, 0.8);
   width: 100%;
   height: 100%;
   position: absolute;

@@ -55,7 +55,7 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     private selectedTemplate$ = this.store$.pipe(
       select(selectedTemplate),
-      distinctUntilChanged((o, n) => o?.["@id"] === n?.["@id"]),
+      distinctUntilChanged((o, n) => o?.id === n?.id),
     )
     private subscriptions: Subscription[] = []
     private maximisedPanelIndex$ = combineLatest([

@@ -19,6 +19,10 @@
         {{ region.name }}
       </mat-card-title>
 
+      <mat-card-subtitle>
+        {{ parcellation.name }}
+      </mat-card-subtitle>
+
 
       <!-- subtitle on what it is -->
       <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
@@ -69,12 +73,6 @@
       <mat-card-title>
         Features anchored to region
       </mat-card-title>
-      <mat-card-subtitle>
-        Parcellation: {{ parcellation.name }}
-      </mat-card-subtitle>
-      <mat-card-subtitle>
-        Region: {{ region.name }}
-      </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content *ngIf="!(featureEntryCmp.busyTallying$ | async) && (featureEntryCmp.totals$ | async) == 0"
       class="text-muted">

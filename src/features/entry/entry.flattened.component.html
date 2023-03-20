@@ -11,7 +11,7 @@
     
 
     <!-- only show connectivity in human atlas for now -->
-    <ng-template [ngIf]="(selectedAtlas$ | async)?.species === 'Homo sapiens'">
+    <ng-template [ngIf]="showConnectivity$ | async">
         <ng-template [ngIf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
             <ng-template ngFor [ngForOf]="connectivity" let-conn>
                 <mat-expansion-panel sxplr-sapiviews-features-connectivity-check

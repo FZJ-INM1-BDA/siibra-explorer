@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { map, scan, switchMap, tap } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi';
+import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
@@ -89,6 +89,17 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   public selectedAtlas$ = this.store.pipe(
     select(atlasSelection.selectors.selectedAtlas)
+  )
+
+  public showConnectivity$ = combineLatest([
+    this.selectedAtlas$.pipe(
+      map(atlas => atlas?.species === "Homo sapiens")
+    ),
+    this.TPRBbox$.pipe(
+      map(({ parcellation }) => parcellation?.id === IDS.PARCELLATION.JBA29)
+    )
+  ]).pipe(
+    map(flags => flags.every(f => f))
   )
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(

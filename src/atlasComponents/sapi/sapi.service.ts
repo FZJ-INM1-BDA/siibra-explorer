@@ -12,6 +12,7 @@ import {
 } from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
+import { parcBanList, speciesOrder } from "src/util/constants";
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -32,10 +33,6 @@ type PaginatedResponse<T> = {
   pages?: number
 }
 
-const parcBanList: string[] = [
-  "https://identifiers.org/neurovault.image:23262",
-  "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152",
-]
 
 @Injectable({
   providedIn: 'root'
@@ -300,6 +297,7 @@ export class SAPI{
     switchMap(atlases => forkJoin(
       atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
     )),
+    map(atlases => atlases.sort((a, b) => speciesOrder.indexOf(a.species) - speciesOrder.indexOf(b.species))),
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {

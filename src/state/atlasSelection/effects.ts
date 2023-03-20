@@ -27,7 +27,8 @@ type OnTmplParcHookArg = {
 }
 
 const prefParcId = [
-  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290"
+  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-300",
+  "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
 ]
 
 const prefSpcId = []
@@ -151,7 +152,8 @@ export class Effect {
                 if (parcs.length === 0) {
                   throw new Error(`Cannot find any supported parcellations for template ${template.name}`)
                 }
-                const selectParc = parcs.find(p => requestedParc?.id === p.id || prefParcId.includes(p.id)) || parcs[0]
+                const sortedByPref = parcs.sort((a, b) => prefParcId.indexOf(a.id) - prefParcId.indexOf(b.id))
+                const selectParc = sortedByPref.find(p => requestedParc?.id === p.id) || sortedByPref[0]
                 return {
                   atlas: currAtlas,
                   template,
@@ -217,7 +219,8 @@ export class Effect {
         map(parcellations => {
           const parcPrevIds = parcellations.map(p => p.prevId)
           const latestParcs = parcellations.filter(p => !parcPrevIds.includes(p.id))
-          const selectedParc = parcellations.find(p => p.id.includes("290")) || latestParcs[0] || parcellations[0]
+          const prefParc = parcellations.filter(p => prefParcId.includes(p.id)).sort((a, b) => prefParcId.indexOf(a.id) - prefParcId.indexOf(b.id))
+          const selectedParc = prefParc[0] || latestParcs[0] || parcellations[0]
           return {
             parcellation: selectedParc,
             atlas
