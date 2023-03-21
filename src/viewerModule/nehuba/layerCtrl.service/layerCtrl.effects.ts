@@ -3,7 +3,7 @@ import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, from, of } from "rxjs";
 import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { Feature, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
+import { Feature, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
@@ -153,7 +153,7 @@ export class LayerCtrlEffects {
       forkJoin({
         tmplNgLayers: this.sapi.getVoxelTemplateImage(template).pipe(
           map(templateImages => {
-            const returnObj = {}
+            const returnObj: Record<string, NgLayerSpec> = {}
             for (const img of templateImages) {
               returnObj[QuickHash.GetHash(img.source)] = img
             }
@@ -162,7 +162,7 @@ export class LayerCtrlEffects {
         ),
         tmplAuxNgLayers: this.sapi.getVoxelAuxMesh(template).pipe(
           map(auxMeshes => {
-            const returnObj = {}
+            const returnObj: Record<string, NgPrecompMeshSpec> = {}
             for (const img of auxMeshes) {
               returnObj[QuickHash.GetHash(`${img.source}_auxMesh`)] = img
             }

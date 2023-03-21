@@ -1,12 +1,11 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, merge, Observable, of } from "rxjs";
-import { map, switchMap, tap } from "rxjs/operators";
+import { combineLatest, Observable, of } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { atlasSelection } from "src/state";
-import { Tree } from "src/components/flatHierarchy/treeView/treeControl"
 import { BaseService } from "../base.service/base.service";
 
 /**
@@ -32,79 +31,115 @@ export class NehubaMeshService implements OnDestroy {
 
   public auxMeshes$ = this.effect.onATPDebounceNgLayers$.pipe(
     map(({ tmplAuxNgLayers }) => tmplAuxNgLayers),
-    tap(v => console.log('mesh.service', v))
   )
 
-  public loadMeshes$: Observable<IMeshesToLoad> = merge(
-    combineLatest([
-      this.baseService.completeNgIdLabelRegionMap$,
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedParcAllRegions),
-      ),
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedRegions),
-      ),
-      
-    ]).pipe(
-      switchMap(([record, regions, selectedRegions]) => {
-        const ngIdRecord: Record<string, number[]> = {}
-        
-        const tree = new Tree(
-          regions,
-          (c, p) => (c.parentIds.some( id => p.id === id))
-        )
-        
-        const selectedRegionFlag = selectedRegions.length > 0
-        const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
+  #allSegmentMeshes$ = this.baseService.completeNgIdLabelRegionMap$.pipe(
+    map(record => {
+      const ngIdRecord: Record<string, number[]> = {}
 
-        for (const [ngId, labelToRegion] of Object.entries(record)) {
-          for (const [label, region] of Object.entries(labelToRegion)) {
-            if (selectedRegionFlag && !selectedRegionNameSet.has(region.name)) {
-              continue
-            }
-            if (!ngIdRecord[ngId]) {
-              ngIdRecord[ngId] = []
-            }
-            ngIdRecord[ngId].push(Number(label))
+      for (const [ngId, labelToRegion] of Object.entries(record)) {
+        for (const [label, _region] of Object.entries(labelToRegion)) {
+          if (!ngIdRecord[ngId]) {
+            ngIdRecord[ngId] = []
           }
+          ngIdRecord[ngId].push(Number(label))
         }
+      }
 
-        const arr: IMeshesToLoad[] = []
+      const arr: IMeshesToLoad[] = []
 
-        for (const ngId in ngIdRecord) {
-          const labelIndicies = ngIdRecord[ngId]
-          arr.push({
-            labelIndicies,
-            layer: { name: ngId }
-          })
-        }
-  
-        return of(...arr)
-      })
-    ),
+      for (const ngId in ngIdRecord) {
+        const labelIndicies = ngIdRecord[ngId]
+        arr.push({
+          labelIndicies,
+          layer: { name: ngId }
+        })
+      }
+
+      return arr
+    })
+  )
+
+  #selectedSegmentMeshes$ = combineLatest([
+    this.baseService.completeNgIdLabelRegionMap$,
     this.store$.pipe(
-      select(selectorAuxMeshes),
-      switchMap(auxMeshes => {
-        const obj: Record<string, number[]> = {}
-        const arr: IMeshesToLoad[] = []
-        for (const mesh of auxMeshes) {
-          if (!obj[mesh.ngId]) {
-            obj[mesh.ngId] = []
+      select(atlasSelection.selectors.selectedRegions),
+    ),
+  ]).pipe(
+    switchMap(([record, selectedRegions]) => {
+      const ngIdRecord: Record<string, number[]> = {}
+      
+      const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
+
+      for (const [ngId, labelToRegion] of Object.entries(record)) {
+        for (const [label, region] of Object.entries(labelToRegion)) {
+          if (!ngIdRecord[ngId]) {
+            ngIdRecord[ngId] = []
           }
-          if (mesh.visible) {
-            obj[mesh.ngId].push(...mesh.labelIndicies)
+          if (!selectedRegionNameSet.has(region.name)) {
+            continue
           }
+          ngIdRecord[ngId].push(Number(label))
         }
-        for (const key in obj) {
-          arr.push({
-            layer: {
-              name: key
-            },
-            labelIndicies: obj[key]
-          })
+      }
+
+      const arr: IMeshesToLoad[] = []
+
+      for (const ngId in ngIdRecord) {
+        const labelIndicies = ngIdRecord[ngId]
+        arr.push({
+          labelIndicies,
+          layer: { name: ngId }
+        })
+      }
+
+      return of(arr)
+    })
+  )
+
+  #auxMesh$ = this.store$.pipe(
+    select(selectorAuxMeshes),
+    switchMap(auxMeshes => {
+      const obj: Record<string, number[]> = {}
+      const arr: IMeshesToLoad[] = []
+      for (const mesh of auxMeshes) {
+        if (!obj[mesh.ngId]) {
+          obj[mesh.ngId] = []
         }
-        return of(...arr)
-      })
-    )
+        if (mesh.visible) {
+          obj[mesh.ngId].push(...mesh.labelIndicies)
+        }
+      }
+      for (const key in obj) {
+        arr.push({
+          layer: {
+            name: key
+          },
+          labelIndicies: obj[key]
+        })
+      }
+      return of(arr)
+    })
+  )
+
+  public loadMeshes$: Observable<IMeshesToLoad> = combineLatest([
+    this.#allSegmentMeshes$,
+    this.#selectedSegmentMeshes$,
+    this.#auxMesh$,
+  ]).pipe(
+    switchMap(([ allSegMesh, selectedSegMesh, auxmesh ]) => {
+      const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)
+      const hasAuxMesh = auxmesh.length > 0
+      const meshesToLoad: IMeshesToLoad[] = []
+      if (!hasSegSelected) {
+        meshesToLoad.push(
+          ...(hasAuxMesh ? selectedSegMesh : allSegMesh),
+          ...auxmesh,
+        )
+      } else {
+        meshesToLoad.push(...selectedSegMesh, ...auxmesh)
+      }
+      return of(...meshesToLoad)
+    })
   )
 }

@@ -311,7 +311,7 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
   // enable surface parcellation
   // otherwise, on segmentation selection, the unselected meshes will also be invisible
-  const surfaceParcellation = space["@id"] === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
+  const surfaceParcellation = space.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
   return {
     "configName": "",
     "globals": {

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
-import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
