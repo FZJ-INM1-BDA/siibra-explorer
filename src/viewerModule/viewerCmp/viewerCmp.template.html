@@ -430,10 +430,10 @@
       </iav-cmp-viewer-nehuba-glue>
 
       <!-- three surfer (free surfer viewer) -->
-      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+      <tmp-threesurfer-lifecycle class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'threeSurfer'"
         (viewerEvent)="handleViewerEvent($event)">
-      </three-surfer-glue-cmp>
+      </tmp-threesurfer-lifecycle>
 
       <!-- if not supported, show not supported message -->
       <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
