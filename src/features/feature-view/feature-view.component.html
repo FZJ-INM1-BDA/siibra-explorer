@@ -22,7 +22,7 @@
   <mat-card-subtitle class="sxplr-d-inline-flex sxplr-align-items-stretch">
     <ng-template [ngIf]="feature.category">
       <mat-icon class="sxplr-m-a" fontSet="fas" fontIcon="fa-database"></mat-icon>
-      <span class="sxplr-m-a">
+      <span class="sxplr-m-a sxplr-pr-1">
         <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
           {{ feature.category }}
         </ng-template>
@@ -32,7 +32,17 @@
       </span>
     </ng-template>
 
-    <mat-divider class="sxplr-pl-1" [vertical]="true"></mat-divider>
+    <ng-template [ngIf]="warnings$ | async" let-warnings>
+      <mat-divider [vertical]="true"></mat-divider>  
+      <ng-template ngFor [ngForOf]="warnings" let-warning>
+        <button mat-icon-button
+          [matTooltip]="warning">
+          <i class="fas fa-exclamation-triangle"></i>
+        </button>
+      </ng-template>
+    </ng-template>
+
+    <mat-divider [vertical]="true"></mat-divider>
 
     <ng-template [ngIf]="busy$ | async">
       <spinner-cmp></spinner-cmp>

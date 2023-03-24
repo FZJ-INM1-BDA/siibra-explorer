@@ -4,7 +4,7 @@ import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
-import { isTabularData, isVoiData } from "../guards"
+import { isTabularData, isVoiData, notQuiteRight } from "../guards"
 
 type PolarPlotData = {
   receptor: {
@@ -78,6 +78,8 @@ export class FeatureViewComponent implements OnChanges {
     })
   )
 
+  warnings$ = new Subject<string[]>()
+
   constructor(
     private sapi: SAPI,
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>,  
@@ -99,6 +101,10 @@ export class FeatureViewComponent implements OnChanges {
         if (isVoiData(val)) {
           this.voi$.next(val)
         }
+
+        this.warnings$.next(
+          notQuiteRight(val)
+        )
 
         this.#detailLinks.next((val.link || []).map(l => l.href))
         
