@@ -12,7 +12,9 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dial
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { environment } from 'src/environments/environment'
+import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterialBtn/dynamicMaterialBtn.component";
+import { select, Store } from "@ngrx/store";
+import { userPreference } from "src/state";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -25,13 +27,15 @@ import { environment } from 'src/environments/environment'
 
 export class TopMenuCmp {
 
-  public EXPERIMENTAL_FEATURE_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
+  public experimentalFlag$ = this.store.pipe(
+    select(userPreference.selectors.showExperimental)
+  )
 
   public ARIA_LABELS = ARIA_LABELS
   public PINNED_DATASETS_BADGE_DESC = CONST.PINNED_DATASETS_BADGE_DESC
 
-  public matBtnStyle = 'mat-icon-button'
-  public matBtnColor = 'primary'
+  public matBtnStyle: TypeMatBtnStyle = 'mat-icon-button'
+  public matBtnColor: TypeMatBtnColor = 'primary'
 
   private _ismobile = false
   @Input()
@@ -70,6 +74,7 @@ export class TopMenuCmp {
   }
 
   constructor(
+    private store: Store,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
@@ -103,9 +108,9 @@ export class TopMenuCmp {
   }
 
   private keyListenerConfigBase = {
-    type: 'keydown',
+    type: 'keydown' as const,
     stop: true,
-    target: 'document',
+    target: 'document' as const,
   }
 
   public keyListenerConfig = [{

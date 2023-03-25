@@ -1,15 +1,16 @@
 import { createReducer, on } from "@ngrx/store"
 import * as actions from "./action"
-import { CustomLayer } from "./const"
+import { UseViewer, CustomLayer } from "./const"
 
 export type AtlasAppearanceStore = {
-
+  useViewer: UseViewer
   octantRemoval: boolean
   showDelineation: boolean
   customLayers: CustomLayer[]
 }
 
 export const defaultState: AtlasAppearanceStore = {
+  useViewer: null,
   octantRemoval: true,
   showDelineation: true,
   customLayers: []
@@ -56,6 +57,15 @@ export const reducer = createReducer(
       return {
         ...state,
         customLayers: customLayers.filter(l => l.id !== id)
+      }
+    }
+  ),
+  on(
+    actions.setUseViewer,
+    (state, { viewer }) => {
+      return {
+        ...state,
+        useViewer: viewer
       }
     }
   )

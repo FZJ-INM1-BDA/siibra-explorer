@@ -6,7 +6,6 @@ import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component"
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface.directive"
 import { NEVER, of, pipe, Subject } from "rxjs"
 import { userPreference, atlasSelection, atlasAppearance } from "src/state"
-import { NehubaNavigationService } from "../navigation.service"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { mapTo } from "rxjs/operators"
 
@@ -31,13 +30,6 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         ],
         providers: [
           provideMockStore(),
-          {
-            provide: NehubaNavigationService,
-            useValue: {
-              viewerNav$: NEVER,
-              storeNav: null
-            }
-          },
           {
             provide: LayerCtrlEffects,
             useValue: {

@@ -1,13 +1,6 @@
-import { TVec3, TVec4 } from "src/messaging/types";
+import { TVec3, TVec4, INavObj } from "../constants";
 import { arrayOfPrimitiveEqual } from "src/util/fn";
 
-export interface INavObj {
-  position: TVec3
-  orientation: TVec4
-  perspectiveOrientation: TVec4
-  perspectiveZoom: number
-  zoom: number
-}
 
 export function navMul(nav: INavObj, scalar: number): INavObj {
   return {

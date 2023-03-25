@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Directive, HostBinding, ViewContainerRef } from "@angular/core";
+import { Directive, HostBinding, ViewContainerRef } from "@angular/core";
 import { environment } from "src/environments/environment"
 import { StrictLocalInfo } from "./strictLocalCmp/strictLocalCmp.component";
 
@@ -12,11 +12,9 @@ export class HideWhenLocal {
   hideWhenLocal = environment.STRICT_LOCAL ? 'none!important' : null
   constructor(
     private vc: ViewContainerRef,
-    private cfr: ComponentFactoryResolver,
   ){
     if (environment.STRICT_LOCAL) {
-      const cf = this.cfr.resolveComponentFactory(StrictLocalInfo)
-      this.vc.createComponent(cf)
+      this.vc.createComponent(StrictLocalInfo)
     }
   }
 }

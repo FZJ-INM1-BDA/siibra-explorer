@@ -1,0 +1,160 @@
+<mat-accordion>
+
+    <!-- show everything except for connectivity and dataset -->
+    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity', 'dataset', 'other'] : false"  let-keyvalue>
+        <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
+        [ngTemplateOutletContext]="{
+            $implicit: keyvalue
+        }">
+        </ng-template>
+    </ng-template>
+    
+
+    <!-- only show connectivity in human atlas for now -->
+    <ng-template [ngIf]="showConnectivity$ | async">
+        <ng-template [ngIf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
+            <ng-template ngFor [ngForOf]="connectivity" let-conn>
+                <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
+                    #connectivityAccordion
+                    *ngIf="conn">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ conn.key }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+    
+                    <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
+                        [region]="region"
+                        [sxplr-features-connectivity-browser-atlas]="selectedAtlas$ | async"
+                        [sxplr-features-connectivity-browser-template]="template"
+                        [sxplr-features-connectivity-browser-parcellation]="parcellation"
+                        [accordionExpanded]="connectivityAccordion.expanded"
+                        [types]="conn.value">
+                    </sxplr-features-connectivity-browser>
+    
+                </mat-expansion-panel>
+            </ng-template>
+        </ng-template>
+    </ng-template>
+
+    <!-- show dataset/other at the very bottom -->
+    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['dataset', 'other']"  let-keyvalue>
+        <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
+        [ngTemplateOutletContext]="{
+            $implicit: keyvalue
+        }">
+        </ng-template>
+    </ng-template>
+</mat-accordion>
+
+<!-- template for collected category -->
+<ng-template #featureCategoryFeatureTmpl let-keyvalue>
+    <mat-expansion-panel
+        sxplrCategoryAcc
+        #categoryAcc="categoryAcc"
+        [ngClass]="{
+            'sxplr-d-none': !(categoryAcc.isBusy$ | async) && (categoryAcc.total$ | async) === 0
+        }">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{ keyvalue.key }}
+            </mat-panel-title>
+            <mat-panel-description>
+                <spinner-cmp *ngIf="categoryAcc.isBusy$ | async"></spinner-cmp>
+                <ng-template [ngIf]="categoryAcc.total$ | async" let-total>
+                    <span>
+                        {{ total }}
+                    </span>
+                </ng-template>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+
+        <!-- <button mat-button>Show all</button> -->
+        <div class="mat-chip-container"
+            feature-filter-directive
+            [initValue]="true"
+            [items]="categoryAcc.groupedFeatures$ | async "
+            #filterFeatureCls="featureFilterDirective">
+
+            <div class="mat-chip-inner-container">
+
+                <button mat-icon-button matTooltip="Reset filter"
+                    (click)="filterFeatureCls.setAll(true)">
+                    <i class="fas fa-filter"></i>
+                </button>
+
+                <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-grpFeat>
+                    <ng-template [ngIf]="grpFeat.features.length > 0">
+
+                        <ng-template [ngIf]="filterFeatureCls.checked$ | async | grpFeatToName | includes : grpFeat.meta.displayName"
+                            [ngIfThen]="selectedTmpl"
+                            [ngIfElse]="notSelectedTmpl">
+                        </ng-template>
+
+                        <ng-template #textTmpl>
+                            <span>
+                                {{ grpFeat.meta.displayName }}
+                            </span>
+                            <span class="text-muted1">
+                                ({{ grpFeat.features.length }})
+                            </span>
+                        </ng-template>
+                        <ng-template #selectedTmpl>
+                            <button mat-flat-button
+                                (click)="filterFeatureCls.toggle(grpFeat)"
+                                color="primary">
+                                <i class="fas fa-eye"></i>
+                                <ng-template [ngTemplateOutlet]="textTmpl">
+                                </ng-template>
+                            </button>
+                        </ng-template>
+
+                        <ng-template #notSelectedTmpl>
+                            <button mat-flat-button
+                                (click)="filterFeatureCls.toggle(grpFeat)"
+                                color="default">
+                                <i class="fas fa-eye-slash"></i>
+                                <ng-template [ngTemplateOutlet]="textTmpl">
+                                </ng-template>
+                            </button>
+                        </ng-template>
+
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
+
+        <ng-template ngFor [ngForOf]="keyvalue.value" let-feature>
+
+            <div sxplr-feature-list-directive
+                [template]="template"
+                [parcellation]="parcellation"
+                [region]="region"
+                [bbox]="bbox"
+                [queryParams]="queryParams | mergeObj : { type: (feature.name | featureNamePipe) }"
+                [featureRoute]="feature.path"
+                [name]="feature.name"
+                [displayName]="feature.display_name"
+                #featureListDirective="featureListDirective">
+            </div>
+        </ng-template>
+        
+        <cdk-virtual-scroll-viewport itemSize="36"
+            filter-grp-feat
+            [featureDisplayName]="filterFeatureCls.checked$ | async | mapToProperty : 'meta' | mapToProperty : 'displayName'"
+            [groupFeature]="categoryAcc.groupedFeatures$ | async"
+            #filterGrpFeat="filterGrpFeat"
+            class="virtual-scroll-viewport">
+
+            <button *cdkVirtualFor="let feature of filterGrpFeat.filteredFeatures$"
+                mat-button
+                class="virtual-scroll-item sxplr-w-100"
+                [matTooltip]="feature.name"
+                matTooltipPosition="right"
+                (click)="onClickFeature(feature)">
+                {{ feature.name }}
+            </button>
+        </cdk-virtual-scroll-viewport>
+    </mat-expansion-panel>
+</ng-template>

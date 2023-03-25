@@ -1,0 +1,104 @@
+<div class="w-100 h-100 d-block d-flex flex-column sxplr-pb-2">
+    <div>
+        <div *ngIf="types && types.length"
+            class="flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap d-flex flex-column">
+            <mat-form-field class="flex-grow-1 flex-shrink-1 w-100">
+                <mat-label>
+                    Modality
+                </mat-label>
+                <mat-select [value]="selectedType" (selectionChange)="selectType($event.value)">
+                    <mat-option *ngFor="let type of types" [value]="type">
+                        {{ type.shortName }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="!fetchingPreData && selectedType" class="flex-grow-1 flex-shrink-1 w-100">
+                <mat-label>
+                    Cohort
+                </mat-label>
+                <mat-select [value]="selectedCohort" (selectionChange)="selectCohort($event.value)">
+                    <mat-option *ngFor="let cohort of cohorts" [value]="cohort">
+                        {{ cohort }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <mat-radio-group *ngIf="selectedCohort" [(ngModel)]="selectedView">
+            <mat-radio-button value="average" class="m-2" [disabled]="averageDisabled" color="primary">
+                Average
+            </mat-radio-button>
+            <mat-radio-button value="subject" class="m-2" [disabled]="subjectsDisabled" color="primary">
+                Subject
+            </mat-radio-button>
+        </mat-radio-group>
+
+        <div *ngIf="cohortDatasets && cohortDatasets.length > 1"
+            class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
+            <div class="flex-grow-1 flex-shrink-1 w-100">
+                <mat-label>
+                    Dataset
+                </mat-label>
+                <mat-slider [min]="0" [max]="cohortDatasets.length - 1" (change)="selectedCohortDatasetChanged($event.value)"
+                    [value]="selectedCohortDatasetIndex" thumbLabel step="1" class="w-100">
+                </mat-slider>
+            </div>
+        </div>
+
+        <div *ngIf="selectedCohortDatasetIndex >= 0 && selectedCohortSubjects"
+            class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
+            <div class="flex-grow-1 flex-shrink-1 w-100">
+                <mat-label>
+                    Subject
+                </mat-label>
+                <mat-slider [min]="0" [max]="selectedCohortSubjects.length - 1"
+                    (change)="subjectSliderChanged($event.value)" [value]="selectedSubjectIndex"
+                    thumbLabel step="1" class="w-100">
+                </mat-slider>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <mat-spinner *ngIf="fetching"></mat-spinner>
+    </div>
+
+    <div *ngIf="regionName && !fetching"
+        [style.visibility]="selectedCohort && (selectedSubjectIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
+        class="d-flex align-items-center">
+        <mat-checkbox class="mr-2" [checked]="logChecked" (change)="changeLog($event.checked)"
+            [disabled]="logDisabled || noConnectivityForRegion">Log 10</mat-checkbox>
+        <button mat-button [matMenuTriggerFor]="exportMenu" [disabled]="!connectedAreas.value">
+            <i class="fas fa-download mr-2"></i>
+            <span>Export</span>
+        </button>
+        <button *ngIf="selectedDataset" iav-stop="mousedown click" class="icons" mat-icon-button sxplr-dialog
+            [sxplr-dialog-size]="null" [sxplr-dialog-data]="{
+                  title: selectedDataset?.name,
+                  descMd: selectedDataset?.description + '' + (selectedDataset?.authors && selectedDataset?.authors.join()),
+                  actions: [selectedDataset.ebrains_page]
+                }">
+            <i class="fas fa-info"></i>
+        </button>
+    </div>
+
+    <hbp-connectivity-matrix-row #connectivityComponent
+        [style.visibility]="regionName && !fetching && !noConnectivityForRegion && selectedCohort
+                             && (selectedSubjectIndex >= 0 || !averageDisabled)? 'visible' : 'hidden'"
+        [region]="regionName"
+        [connections]="connectionsString"
+        show-export="true" hide-export-view="true" theme="dark">
+    </hbp-connectivity-matrix-row>
+    <div *ngIf="noConnectivityForRegion">No connectivity for the region.</div>
+
+    <full-connectivity-grid #fullConnectivityGrid [matrix]="matrixString" [datasetName]="selectedDataset?.name"
+        [datasetDescription]="selectedDataset?.description" only-export="true">
+    </full-connectivity-grid>
+
+    <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item [disabled]="noConnectivityForRegion"
+            (click)="exportConnectivityProfile()">Regional</button>
+        <button mat-menu-item (click)="exportFullConnectivity()">Dataset</button>
+    </mat-menu>
+</div>

@@ -181,8 +181,8 @@ export const isIdentityQuat = (ori: number[]): boolean => Math.abs(ori[0]) < 1e-
 
 export const importNehubaFactory = (appendSrc: (src: string) => Promise<void>): () => Promise<void> => {
   let pr: Promise<void>
-  return () => {
-    if (getExportNehuba()) return Promise.resolve()
+  return async () => {
+    if (!!(window as any).export_nehuba) return 
 
     if (pr) return pr
     pr = appendSrc('main.bundle.js')

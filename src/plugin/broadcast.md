@@ -18,7 +18,7 @@ Broadcasting messages never expects a response (and thus will never contain and 
 - payload
 
   ```ts
-  SapiAtlasModel
+  PTAtlas
   ```
 
 
@@ -28,7 +28,7 @@ Broadcasting messages never expects a response (and thus will never contain and 
 - payload
 
   ```ts
-  SapiSpaceModel
+  PTSpace
   ```
 
 
@@ -38,7 +38,7 @@ Broadcasting messages never expects a response (and thus will never contain and 
 - payload
 
   ```ts
-  SapiParcellationModel
+  PTParcellation
   ```
 
 
@@ -48,7 +48,7 @@ Broadcasting messages never expects a response (and thus will never contain and 
 - payload
 
   ```ts
-  SapiRegionModel[]
+  PTRegion[]
   ```
 
 
@@ -58,7 +58,17 @@ Broadcasting messages never expects a response (and thus will never contain and 
 - payload
 
   ```ts
-  SapiRegionModel[]
+  PTRegion[]
+  ```
+
+
+
+### `sxplr.on.navigation`
+
+- payload
+
+  ```ts
+  MainState['[state.atlasSelection]']['navigation']
   ```
 
 

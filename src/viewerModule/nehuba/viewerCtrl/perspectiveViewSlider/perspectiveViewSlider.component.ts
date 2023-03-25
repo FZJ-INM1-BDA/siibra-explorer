@@ -1,9 +1,10 @@
 import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, concat, forkJoin, NEVER, Observable, of, Subject, Subscription, throwError } from "rxjs";
 import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
-import { SAPI, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { fromRootStore } from "src/state/atlasSelection";
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
@@ -54,7 +55,7 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     private selectedTemplate$ = this.store$.pipe(
       select(selectedTemplate),
-      distinctUntilChanged((o, n) => o?.["@id"] === n?.["@id"]),
+      distinctUntilChanged((o, n) => o?.id === n?.id),
     )
     private subscriptions: Subscription[] = []
     private maximisedPanelIndex$ = combineLatest([
@@ -147,9 +148,21 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     private currentTemplateSize$ = this.store$.pipe(
       fromRootStore.distinctATP(),
-      switchMap(({ atlas, template }) => 
-        atlas && template
-          ? this.sapi.getSpace(atlas['@id'], template['@id']).getTemplateSize()
+      switchMap(({ template }) => 
+        template
+          ? this.sapi.getVoxelTemplateImage(template).pipe(
+            switchMap(defaultImage => {
+              if (defaultImage.length == 0) {
+                // template hs no ng volume, which is the case for threesurfer
+                return NEVER
+              }
+              const img = defaultImage[0]
+              return of({
+                ...img.info || {},
+                transform: img.transform
+              })
+            })
+          )
           : NEVER),
     )
 
@@ -394,8 +407,8 @@ const viewToSuffix = {
   [EnumClassicalView.CORONAL]: 'coronal',
 }
 
-function getScreenshotUrl(space: SapiSpaceModel, requestedView: EnumClassicalView): string {
-  const prefix = spaceIdToPrefix[space?.['@id']]
+function getScreenshotUrl(space: SxplrTemplate, requestedView: EnumClassicalView): string {
+  const prefix = spaceIdToPrefix[space?.id]
   if (!prefix) return null
   const suffix = viewToSuffix[requestedView]
   if (!suffix) return null

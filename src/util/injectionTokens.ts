@@ -1,12 +1,19 @@
 import { InjectionToken } from "@angular/core";
 import { Observable } from "rxjs";
 
+/**
+ * Inject click interceptor
+ */
 export const CLICK_INTERCEPTOR_INJECTOR = new InjectionToken<ClickInterceptor>('CLICK_INTERCEPTOR_INJECTOR')
 
 export type TClickInterceptorConfig = {
   last?: boolean
 }
 
+/**
+ * Register callbacks
+ * interceptorFunction may return a truthy value. If so, no futher click interceptors will be called.
+ */
 export interface ClickInterceptor{
   register: (interceptorFunction: (ev: any) => boolean, config?: TClickInterceptorConfig) => void
   deregister: (interceptorFunction: (ev: any) => any) => void

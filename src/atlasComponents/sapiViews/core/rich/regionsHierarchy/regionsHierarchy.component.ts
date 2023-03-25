@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { UntypedFormControl } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith } from "rxjs/operators";
-import { SapiRegionModel } from "src/atlasComponents/sapi/type";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { SxplrFlatHierarchyTreeView } from "src/components/flatHierarchy/treeView/treeView.component";
 import { FilterByRegexPipe } from "./filterByRegex.pipe";
 import { RegionTreeFilterPipe } from "./regionTreeFilter.pipe";
@@ -21,11 +21,11 @@ const filterByRegexPipe = new FilterByRegexPipe()
 
 export class SapiViewsCoreRichRegionsHierarchy {
 
-  static IsParent(region: SapiRegionModel, parentRegion: SapiRegionModel) {
-    return region.hasParent?.some(parent => parent['@id'] === parentRegion["@id"])
+  static IsParent(region: SxplrRegion, parentRegion: SxplrRegion): boolean {
+    return region.parentIds.some(id => parentRegion.id === id)
   }
 
-  static FilterRegions(regions: SapiRegionModel[], searchTerm: string): SapiRegionModel[]{
+  static FilterRegions(regions: SxplrRegion[], searchTerm: string): SxplrRegion[]{
     if (searchTerm === '' || !searchTerm) {
       return regions
     }
@@ -37,19 +37,19 @@ export class SapiViewsCoreRichRegionsHierarchy {
   }
 
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-accent-regions')
-  accentedRegions: SapiRegionModel[] = []
+  accentedRegions: SxplrRegion[] = []
 
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-placeholder')
   placeholderText: string = 'Search all regions'
 
-  passedRegions: SapiRegionModel[] = []
+  passedRegions: SxplrRegion[] = []
 
-  private _regions: SapiRegionModel[] = []
+  private _regions: SxplrRegion[] = []
   get regions(){
     return this._regions
   }
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-regions')
-  set regions(val: SapiRegionModel[]){
+  set regions(val: SxplrRegion[]){
     this._regions = val
     this.passedRegions = SapiViewsCoreRichRegionsHierarchy.FilterRegions(
       this._regions,
@@ -58,10 +58,10 @@ export class SapiViewsCoreRichRegionsHierarchy {
   }
 
   @Output('sxplr-sapiviews-core-rich-regionshierarchy-region-select')
-  nodeClicked = new EventEmitter<SapiRegionModel>()
+  nodeClicked = new EventEmitter<SxplrRegion>()
 
   @ViewChild(SxplrFlatHierarchyTreeView)
-  treeView: SxplrFlatHierarchyTreeView<SapiRegionModel>
+  treeView: SxplrFlatHierarchyTreeView<SxplrRegion>
 
   isParent = SapiViewsCoreRichRegionsHierarchy.IsParent
 
@@ -95,4 +95,14 @@ export class SapiViewsCoreRichRegionsHierarchy {
 
   private subs: Subscription[] = []
   
+  onNodeClick(roi: SxplrRegion){
+    /**
+     * only allow leave nodes to be selectable for now
+     */
+    const children = this._regions.filter(r => this.isParent(r, roi))
+    if (children.length > 0) {
+      return
+    }
+    this.nodeClicked.emit(roi)
+  }
 }

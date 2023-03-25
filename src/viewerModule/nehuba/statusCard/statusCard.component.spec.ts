@@ -15,7 +15,7 @@ import { UtilModule } from "src/util"
 import * as configSvc from '../config.service'
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
-import { SapiSpaceModel } from "src/atlasComponents/sapi"
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 
 @Directive({
   selector: '[iav-auth-auth-state]',
@@ -70,8 +70,9 @@ describe('> statusCard.component.ts', () => {
       const mockStore = TestBed.inject(MockStore)
 
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {
-        '@id': 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588'
-      } as SapiSpaceModel)
+        id: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
+        name: 'foo'
+      } as SxplrTemplate)
 
     })
 

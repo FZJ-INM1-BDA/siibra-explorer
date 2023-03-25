@@ -43,10 +43,10 @@ export interface INgLayerCtrl {
     names: string[]
   }
   add: {
-    [key: string]: atlasAppearance.NgLayerCustomLayer
+    [key: string]: atlasAppearance.const.NgLayerCustomLayer
   }
   update: {
-    [key: string]: Partial<atlasAppearance.NgLayerCustomLayer>
+    [key: string]: Partial<atlasAppearance.const.NgLayerCustomLayer>
   }
   setLayerTransparency: {
     [key: string]: number

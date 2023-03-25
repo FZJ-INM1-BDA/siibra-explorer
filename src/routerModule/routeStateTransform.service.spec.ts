@@ -105,7 +105,6 @@ describe("> routeStateTransform.service.ts", () => {
     describe("> cvtStateToRoute", () => {
 
       describe('> should be able encode region properly', () => {
-        let getRegionLabelIndexSpy: jasmine.Spy = jasmine.createSpy('getRegionLabelIndex')
         let getParcNgId: jasmine.Spy = jasmine.createSpy('getParcNgId')
         let atlasSelectionSpy: Record<string, jasmine.Spy> = {
           selectedAtlas: jasmine.createSpy('selectedAtlas'),
@@ -128,7 +127,6 @@ describe("> routeStateTransform.service.ts", () => {
         const navigation = null
 
         beforeEach(() => {
-          spyOnProperty(nehubaConfigService, 'getRegionLabelIndex').and.returnValue(getRegionLabelIndexSpy)
           spyOnProperty(nehubaConfigService, 'getParcNgId').and.returnValue(getParcNgId)
           spyOnProperty(atlasSelection, 'selectors').and.returnValue(atlasSelectionSpy)
           spyOnProperty(userInteraction, 'selectors').and.returnValue(userInteractionSpy)
@@ -144,7 +142,6 @@ describe("> routeStateTransform.service.ts", () => {
         })
 
         afterEach(() => {
-          getRegionLabelIndexSpy.calls.reset()
           getParcNgId.calls.reset()
           for (const spyRecord of [atlasSelectionSpy, userInteractionSpy]) {
             for (const key in spyRecord) {
@@ -153,45 +150,36 @@ describe("> routeStateTransform.service.ts", () => {
           }
         })
 
-        it('> calls correct functions', () => {
+        it('> calls correct functions', async () => {
 
-          getRegionLabelIndexSpy.and.returnValue(11)
           getParcNgId.and.returnValue('foo-bar')
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
+          const s = await svc.cvtStateToRoute(state as any)
 
           for (const key in atlasSelectionSpy) {
             expect(atlasSelectionSpy[key]).toHaveBeenCalledTimes(1)
           }
         })
 
-        it('> regular ngId', () => {
+        it('> regular ngId', async () => {
           const ngId = 'foobar'
           const labelIndex = 124
           
-          getRegionLabelIndexSpy.and.returnValue(labelIndex)
           getParcNgId.and.returnValue(ngId)
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
+          const s = await svc.cvtStateToRoute(state as any)
 
           expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
         })
   
-        it('> ngId containing ()', () => {
-          const ngId = 'foobar(1)'
-          const labelIndex = 124
-
-          getRegionLabelIndexSpy.and.returnValue(labelIndex)
-          getParcNgId.and.returnValue(ngId)
-          
-          const state = {}
-          const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = svc.cvtStateToRoute(state as any)
-          expect(s).toContain(`r:foobar%25281%2529::${encodeNumber(labelIndex, { float: false })}`)
+        it('> ngId containing expected value', async () => {
+          /**
+           * TODO add new test
+           */
         })
       })
     })

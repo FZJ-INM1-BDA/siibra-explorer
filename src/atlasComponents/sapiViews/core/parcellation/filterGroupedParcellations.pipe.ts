@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SapiParcellationModel } from "src/atlasComponents/sapi";
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
 import { GroupedParcellation } from "./groupedParcellation";
 
 @Pipe({
@@ -8,11 +8,11 @@ import { GroupedParcellation } from "./groupedParcellation";
 })
 
 export class FilterGroupedParcellationPipe implements PipeTransform{
-  public transform(parcs: SapiParcellationModel[], getGroupsFlag: boolean=false): (SapiParcellationModel|GroupedParcellation)[] {
+  public transform(parcs: SxplrParcellation[], getGroupsFlag: boolean=false): (SxplrParcellation|GroupedParcellation)[] {
     if (!getGroupsFlag) {
       return parcs.filter(p => !p.modality)
     }
-    const map: Record<string, SapiParcellationModel[]> = {}
+    const map: Record<string, SxplrParcellation[]> = {}
     for (const parc of parcs.filter(p => !!p.modality)) {
       if (!map[parc.modality]) {
         map[parc.modality] = []

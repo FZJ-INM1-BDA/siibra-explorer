@@ -1,9 +1,9 @@
-import { Injectable, OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy, Type } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import {map, switchMap, filter, shareReplay, pairwise } from "rxjs/operators";
+import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine, TCallback } from "./type";
@@ -12,23 +12,14 @@ import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
-import { retry } from 'common/util'
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
-
-const IAV_VOXEL_SIZES_NM = {
-  'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9': [25000, 25000, 25000],
-  'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8': [39062.5, 39062.5, 39062.5],
-  'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588': [21166.666015625, 20000, 21166.666015625],
-  'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992': [1000000, 1000000, 1000000,],
-  'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2': [1000000, 1000000, 1000000],
-  'minds/core/referencespace/v1.0.0/MEBRAINS_T1.masked': [1000000, 1000000, 1000000]
-}
 
 type TAnnotationMetadata = {
   id: string
@@ -91,7 +82,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
 
-  private selectedTmpl: SapiSpaceModel
+  private selectedTmpl: SxplrTemplate
   private selectedTmpl$ = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
   )
@@ -153,8 +144,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     name: string
     iconClass: string
     toolInstance: AbsToolClass<any>
-    target?: ClassInterface<IAnnotationGeometry>
-    editCmp?: ClassInterface<any>
+    target?: Type<IAnnotationGeometry>
+    editCmp?: Type<unknown>
     onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
@@ -267,6 +258,19 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       tool.onDestoryCallBack()
     }
   }
+
+  #voxelSize = this.store.pipe(
+    select(atlasSelection.selectors.selectedTemplate),
+    switchMap(tmpl => translateV3Entities.translateSpaceToVolumeImage(tmpl)),
+    map(volImages => {
+      if (volImages.length === 0) {
+        return null
+      }
+      const volImage = volImages[0]
+      const { real, voxel } = volImage.info
+      return [0, 1, 2].map(idx => real[idx]/voxel[idx]) as [number, number, number]
+    })
+  )
 
   constructor(
     private store: Store<any>,
@@ -452,15 +456,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      */
     this.subscription.push(
       store.pipe(
-        select(atlasSelection.selectors.viewerMode)
-      ).subscribe(viewerMode => {
+        select(atlasSelection.selectors.viewerMode),
+        withLatestFrom(this.#voxelSize),
+      ).subscribe(([viewerMode, voxelSize]) => {
         this.currMode = viewerMode
         if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
           if (this.annotationLayer) this.annotationLayer.setVisible(true)
           else {
-            const viewer = (window as any).viewer
-            const voxelSize = IAV_VOXEL_SIZES_NM[this.selectedTmpl["@id"]]
-            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl["@id"]} cannot be found!`)
+            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
             if (this.annotationLayer) {
               this.annotationLayer.dispose()
             }
@@ -501,7 +504,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         this.annotnEvSubj.next({
           type: 'metadataEv',
           detail: {
-            space: tmpl && { ['@id']: tmpl['@id'] }
+            space: tmpl
           }
         })
         this.forcedAnnotationRefresh$.next(null)
@@ -535,15 +538,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (!encoded) return []
     const bin = atob(encoded)
     
-    await retry(() => {
-      if (!!getExportNehuba()) return true
-      else throw new Error(`export nehuba not yet ready`)
-    }, {
-      timeout: 1000,
-      retries: 10
-    })
-    
-    const { pako } = getExportNehuba()
+    const { pako } = await getExportNehuba()
     const decoded = pako.inflate(bin, { to: 'string' })
     const arr = JSON.parse(decoded)
     const anns: IAnnotationGeometry[] = []
@@ -572,14 +567,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    */
   private metadataMap = new Map<string, TAnnotationMetadata>()
 
-  private storeAnnotation(anns: IAnnotationGeometry[]){
+  private async storeAnnotation(anns: IAnnotationGeometry[]){
     const arr = []
     for (const ann of anns) {
       const json = ann.toJSON()
       arr.push(json)
     }
     const stringifiedJSON = JSON.stringify(arr)
-    const exportNehuba = getExportNehuba()
+    const exportNehuba = await getExportNehuba()
     if (!exportNehuba) return
     const { pako } = exportNehuba
     const compressed = pako.deflate(stringifiedJSON)
@@ -610,7 +605,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     this.forcedAnnotationRefresh$.next(null)
   }
 
-  public getEditAnnotationCmp(annotation: IAnnotationGeometry): ClassInterface<any>{
+  public getEditAnnotationCmp(annotation: IAnnotationGeometry): Type<unknown>{
     const foundTool = this.registeredTools.find(t => t.target && annotation instanceof t.target)
     return foundTool && foundTool.editCmp
   }

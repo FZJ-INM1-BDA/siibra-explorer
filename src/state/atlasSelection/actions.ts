@@ -1,25 +1,37 @@
 import { createAction, props } from "@ngrx/store";
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
   props<{
-    atlas: SapiAtlasModel
+    atlas: SxplrAtlas
+    requested?: {
+      template?: SxplrTemplate
+      parcellation?: SxplrParcellation
+    }
   }>()
 )
 
 export const selectTemplate = createAction(
   `${nameSpace} selectTemplate`,
   props<{
-    template: SapiSpaceModel
+    template: SxplrTemplate
+    requested?: {
+      template?: SxplrTemplate
+      parcellation?: SxplrParcellation
+    }
   }>()
 )
 
 export const selectParcellation = createAction(
   `${nameSpace} selectParcellation`,
   props<{
-    parcellation: SapiParcellationModel
+    parcellation: SxplrParcellation
+    requested?: {
+      parcellation?: SxplrParcellation
+      template?: SxplrTemplate
+    }
   }>()
 )
 
@@ -44,21 +56,21 @@ export const setAtlasSelectionState = createAction(
 export const setSelectedParcellationAllRegions = createAction(
   `${nameSpace} setSelectedParcellationAllRegions`,
   props<{
-    regions: SapiRegionModel[]
+    regions: SxplrRegion[]
   }>()
 )
 
 export const selectRegion = createAction(
   `${nameSpace} selectRegion`,
   props<{
-    region: SapiRegionModel
+    region: SxplrRegion
   }>()
 )
 
 export const setSelectedRegions = createAction(
   `${nameSpace} setSelectedRegions`,
   props<{
-    regions: SapiRegionModel[]
+    regions: SxplrRegion[]
   }>()
 )
 
@@ -146,19 +158,12 @@ export const navigateTo = createAction(
 export const navigateToRegion = createAction(
   `${nameSpace} navigateToRegion`,
   props<{
-    region: SapiRegionModel
+    region: SxplrRegion
   }>()
 )
 
 export const clearViewerMode = createAction(
   `${nameSpace} clearViewerMode`,
-)
-
-export const toggleRegionSelect = createAction(
-  `${nameSpace} toggleRegionSelect`,
-  props<{
-    region: SapiRegionModel
-  }>()
 )
 
 export const toggleRegionSelectById = createAction(
@@ -171,7 +176,7 @@ export const toggleRegionSelectById = createAction(
 export const viewSelRegionInNewSpace = createAction(
   `${nameSpace} viewSelRegionInNewSpace`,
   props<{
-    region: SapiRegionModel
-    template: SapiSpaceModel
+    region: SxplrRegion
+    template: SxplrTemplate
   }>()
 )

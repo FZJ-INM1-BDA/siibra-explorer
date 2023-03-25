@@ -2,8 +2,8 @@ import {
   navAdd,
   navMul,
   navObjEqual,
-  INavObj
 } from './navigation.util'
+import { INavObj } from "../constants"
 
 const nav1: INavObj = {
   position: [1,2,3],

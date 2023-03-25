@@ -3,19 +3,15 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
-import { SAPIRegion } from "src/atlasComponents/sapi/core";
-import { getParcNgId } from "../config.service"
-import { getRegionLabelIndex } from "../config.service/util";
 import { annotation, atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
-import { ColorMapCustomLayer } from "src/state/atlasAppearance";
-import { SapiRegionModel } from "src/atlasComponents/sapi";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
-import { EnumColorMapName, mapKeyColorMap } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
+import { BaseService } from "../base.service/base.service";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -36,38 +32,28 @@ export class NehubaLayerControlService implements OnDestroy{
 
   private defaultNgLayers$ = this.layerEffects.onATPDebounceNgLayers$
 
-  private selectedATP$ = this.store$.pipe(
-    atlasSelection.fromRootStore.distinctATP(),
-    shareReplay(1),
-  )
+  private selectedATP$ = this.baseService.selectedATP$
 
-  public selectedATPR$ = this.selectedATP$.pipe(
-    switchMap(({ atlas, template, parcellation }) => 
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedParcAllRegions),
-        map(regions => ({
-          atlas, template, parcellation, regions
-        })),
-        shareReplay(1)
-      )
-    )
-  )
+  public selectedATPR$ = this.baseService.selectedATPR$
 
   private customLayers$ = this.store$.pipe(
     select(atlasAppearance.selectors.customLayers),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
     shareReplay(1)
   )
+  
+  public completeNgIdLabelRegionMap$ = this.baseService.completeNgIdLabelRegionMap$
+
   private activeColorMap$ = combineLatest([
     combineLatest([
-      this.selectedATPR$,
+      this.completeNgIdLabelRegionMap$,
       this.customLayers$,
     ]).pipe(
-      map(([{ atlas, parcellation, regions, template }, layers]) => {
+      map(([record, layers]) => {
         const returnVal: IColorMap = {}
 
-        const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as ColorMapCustomLayer[]
-        const cmBaseLayers = layers.filter(l => l.clType === "baselayer/colormap") as ColorMapCustomLayer[]
+        const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
+        const cmBaseLayers = layers.filter(l => l.clType === "baselayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
         
         const useCm = (() => {
           /**
@@ -85,25 +71,19 @@ export class NehubaLayerControlService implements OnDestroy{
             set: () => {
               throw new Error(`cannot set`)
             },
-            get: (r: SapiRegionModel) => SAPIRegion.GetDisplayColor(r)
+            get: (r: SxplrRegion) => r.color
           }
         })()
         
-        for (const r of regions) {
-
-          if (!r.hasAnnotation) continue
-          if (!r.hasAnnotation.visualizedIn) continue
-
-          const ngId = getParcNgId(atlas, template, parcellation, r)
-          const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
-          if (!labelIndex) continue
-
-          const [ red, green, blue ] = useCm.get(r)
-
-          if (!returnVal[ngId]) {
-            returnVal[ngId] = {}
+        for (const [ngId, labelRecord] of Object.entries(record)) {
+          for (const [label, region] of Object.entries(labelRecord)) {
+            if (!region.color) continue
+            const [ red, green, blue ] = useCm.get(region) || [200, 200, 200]
+            if (!returnVal[ngId]) {
+              returnVal[ngId] = {}
+            }
+            returnVal[ngId][label] = { red, green, blue }
           }
-          returnVal[ngId][labelIndex] = { red, green, blue }
         }
         return returnVal
       })
@@ -140,6 +120,7 @@ export class NehubaLayerControlService implements OnDestroy{
   constructor(
     private store$: Store<any>,
     private layerEffects: LayerCtrlEffects,
+    private baseService: BaseService,
   ){
 
     this.sub.push(
@@ -226,13 +207,6 @@ export class NehubaLayerControlService implements OnDestroy{
   /**
    * define when shown segments should be updated
    */
-  public _segmentVis$: Observable<string[]> = combineLatest([
-    this.selectedATP$,
-    this.selectedRegion$
-  ]).pipe(
-    map(() => [''])
-  )
-
   public segmentVis$: Observable<string[]> = combineLatest([
     /**
      * selectedRegions
@@ -248,9 +222,9 @@ export class NehubaLayerControlService implements OnDestroy{
       map(layers => layers.filter(l => l.clType === "customlayer/nglayer").length > 0),
     ),
   ]).pipe(
-    withLatestFrom(this.selectedATPR$),
-    map(([[ selectedRegions, customMapExists, nonmixableLayerExists ], { atlas, parcellation, template, regions }]) => {
-      /**
+    switchMap(( [ selectedRegions, customMapExists, nonmixableLayerExists ] ) => this.completeNgIdLabelRegionMap$.pipe(
+      map(completeNgIdLabelRegion => {
+        /**
        * if non mixable layer exist (e.g. pmap)
        * and no custom color map exist
        * hide all segmentations
@@ -263,33 +237,36 @@ export class NehubaLayerControlService implements OnDestroy{
        * if custom map exists, roi is all regions
        * otherwise, roi is only selectedRegions
        */
-      const roi = customMapExists ? regions : selectedRegions
-
-      const roiIndexSet = new Set<string>(
-        roi.map(r => {
-          const ngId = getParcNgId(atlas, template, parcellation, r)
-          const label = getRegionLabelIndex(atlas, template, parcellation, r)
-          return ngId && label && serializeSegment(ngId, label)
-        }).filter(v => !!v)
-      )
+      const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
+      const roiIndexSet = new Set<string>()
+      for (const ngId in completeNgIdLabelRegion) {
+        for (const label in completeNgIdLabelRegion[ngId]) {
+          const val = completeNgIdLabelRegion[ngId][label]
+          if (!customMapExists && !selectedRegionNameSet.has(val.name)) {
+            continue
+          }
+          roiIndexSet.add(serializeSegment(ngId, label))
+        } 
+      }
       if (roiIndexSet.size > 0) {
         return [...roiIndexSet]
       } else {
         return []
       }
-    })
+      }),
+    )),
   )
 
   /**
    * ngLayers controller
    */
 
-  private ngLayersRegister: atlasAppearance.NgLayerCustomLayer[] = []
+  private ngLayersRegister: atlasAppearance.const.NgLayerCustomLayer[] = []
 
-  private getUpdatedCustomLayer(isSameLayer: (o: atlasAppearance.NgLayerCustomLayer, n: atlasAppearance.NgLayerCustomLayer) => boolean){
+  private getUpdatedCustomLayer(isSameLayer: (o: atlasAppearance.const.NgLayerCustomLayer, n: atlasAppearance.const.NgLayerCustomLayer) => boolean){
     return this.store$.pipe(
       select(atlasAppearance.selectors.customLayers),
-      map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+      map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
       pairwise(),
       map(([ oldCustomLayers, newCustomLayers ]) => {
         return newCustomLayers.filter(n => oldCustomLayers.some(o => o.id === n.id && !isSameLayer(o, n)))
@@ -302,7 +279,7 @@ export class NehubaLayerControlService implements OnDestroy{
   private updateCustomLayerColorMap$ = this.getUpdatedCustomLayer((o, n) => o.shader === n.shader)
 
   private ngLayers$ = this.customLayers$.pipe(
-    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.NgLayerCustomLayer[]),
+    map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
     distinctUntilChanged(
       arrayEqual((o, n) => o.id === n.id)
     ),
@@ -388,7 +365,7 @@ export class NehubaLayerControlService implements OnDestroy{
     ),
     this.ngLayers$.pipe(
       map(({ customLayers }) => customLayers),
-      startWith([] as atlasAppearance.NgLayerCustomLayer[]),
+      startWith([] as atlasAppearance.const.NgLayerCustomLayer[]),
       map(customLayers => {
         /**
          * pmap control has its own visibility controller
@@ -401,14 +378,11 @@ export class NehubaLayerControlService implements OnDestroy{
     this.customLayers$.pipe(
       map(cl => {
         const otherColormapExist = cl.filter(l => l.clType === "customlayer/colormap").length > 0
-        const pmapExist = cl.filter(l => l.clType === "customlayer/nglayer").length > 0
-        return pmapExist && !otherColormapExist
+        const otherLayerNames = cl.filter(l => l.clType === "customlayer/nglayer").map(l => l.id)
+        return otherColormapExist
+          ? []
+          : otherLayerNames
       }),
-      distinctUntilChanged(),
-      map(flag => flag
-        ? [ PMAP_LAYER_NAME ]
-        : []
-      )
     )
   ]).pipe(
     map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName, ...AnnotationLayer.Map.keys()])

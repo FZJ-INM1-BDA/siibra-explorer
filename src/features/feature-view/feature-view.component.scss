@@ -1,0 +1,24 @@
+.feature-title
+{
+    max-height: 8rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.feature-detail
+{
+    width: 100%;
+}
+
+spinner-cmp
+{
+    margin: auto;
+    margin-left: 0.5rem;
+}
+
+kg-dataset-dumb-radar,
+kg-dataset-dumb-line
+{
+    display: block;
+    max-height: 24rem;
+}

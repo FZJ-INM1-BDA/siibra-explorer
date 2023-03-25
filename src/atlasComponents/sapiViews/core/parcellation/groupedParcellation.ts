@@ -1,9 +1,9 @@
-import { SapiParcellationModel } from "src/atlasComponents/sapi"
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes"
 
 export class GroupedParcellation{
   name: string
-  parcellations: SapiParcellationModel[]
-  constructor(name: string, parcellations: SapiParcellationModel[]){
+  parcellations: SxplrParcellation[]
+  constructor(name: string, parcellations: SxplrParcellation[]){
     this.name = name
     this.parcellations = parcellations
   }

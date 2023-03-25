@@ -1,4 +1,4 @@
-import { SapiAtlasModel, SapiParcellationModel, SapiRegionModel, SapiSpaceModel } from "src/atlasComponents/sapi"
+import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 
 export const nameSpace = `[state.atlasSelection]`
 export type ViewerMode = 'annotating' | 'key frame'
@@ -8,12 +8,12 @@ export type BreadCrumb = {
 }
 
 export type AtlasSelectionState = {
-  selectedAtlas: SapiAtlasModel
-  selectedTemplate: SapiSpaceModel
-  selectedParcellation: SapiParcellationModel
-  selectedParcellationAllRegions: SapiRegionModel[]
+  selectedAtlas: SxplrAtlas
+  selectedTemplate: SxplrTemplate
+  selectedParcellation: SxplrParcellation
+  selectedParcellationAllRegions: SxplrRegion[]
 
-  selectedRegions: SapiRegionModel[]
+  selectedRegions: SxplrRegion[]
   standAloneVolumes: string[]
 
   /**

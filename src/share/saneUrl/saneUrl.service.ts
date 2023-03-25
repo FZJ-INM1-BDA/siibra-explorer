@@ -4,7 +4,6 @@ import { throwError } from "rxjs";
 import { catchError, mapTo } from "rxjs/operators";
 import { BACKENDURL } from 'src/util/constants'
 import { IKeyValStore, NotFoundError } from '../type'
-import { DISABLE_PRIORITY_HEADER } from "src/util/priority"
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +23,7 @@ export class SaneUrlSvc implements IKeyValStore{
   getKeyVal(key: string) {
     return this.http.get<Record<string, any>>(
       `${this.saneUrlRoot}${key}`,
-      { responseType: 'json', headers: { [DISABLE_PRIORITY_HEADER]: '1' } }
+      { responseType: 'json' }
     ).pipe(
       catchError((err, obs) => {
         const { status } = err
@@ -40,7 +39,6 @@ export class SaneUrlSvc implements IKeyValStore{
     return this.http.post(
       `${this.saneUrlRoot}${key}`,
       value,
-      { headers: { [DISABLE_PRIORITY_HEADER]: '1' } }
     ).pipe(
       mapTo(`${this.saneUrlRoot}${key}`)
     )

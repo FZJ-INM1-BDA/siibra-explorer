@@ -41,7 +41,9 @@ export abstract class AbsToolClass<T extends IAnnotationGeometry> {
   init(){
     this.subs.push(
       this.metadataEv$.subscribe(ev => {
-        this.space = ev.detail.space
+        this.space = ev.detail.space && ({
+          id: ev.detail.space.id
+        })
       })
     )
   }
@@ -225,7 +227,7 @@ export type TCallbackFunction = <T extends keyof TCallback>(arg: TCallback[T]['c
 export type TBaseAnnotationGeomtrySpec = {
   id?: string
   space?: {
-    ['@id']: string
+    id: string
   }
   name?: string
   desc?: string
@@ -377,7 +379,7 @@ export type TNgMouseEvent = {
 }
 
 export type TMetaEvent = {
-  space: { ['@id']: string }
+  space: { id: string }
 }
 
 export interface IAnnotationEvents {

@@ -37,3 +37,10 @@ export const updateCsp = createAction(
     csp: CSP
   }>()
 )
+
+export const setShowExperimental = createAction(
+  `${nameSpace} setShowExp`,
+  props<{
+    flag: boolean
+  }>()
+)

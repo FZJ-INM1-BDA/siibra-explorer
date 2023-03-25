@@ -26,7 +26,6 @@ function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
     console.log('state', state);
     console.log('action', action);
- 
     return reducer(state, action);
   };
 }

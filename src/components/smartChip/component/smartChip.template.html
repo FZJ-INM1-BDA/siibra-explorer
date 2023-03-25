@@ -1,11 +1,25 @@
+
 <div [style.background-color]="color"
-  [matMenuTriggerFor]="mainMenu"
+  [matMenuTriggerFor]="noMenuFlag ? null : mainMenu"
   matRipple
+  [matRippleDisabled]="noMenuFlag"
   [ngClass]="smartChipClass"
-  class="mat-body smart-chip sxplr-custom-cmp text">
+  class="mat-body smart-chip body sxplr-custom-cmp text">
   <ng-template [ngTemplateOutlet]="contentTmpl?.templateRef || fallbackContentTmpl">
   </ng-template>
 </div>
+
+<!-- header component -->
+<ng-template [ngIf]="headerTmpl?.templateRef" let-tmpl>
+  <div class="mat-body smart-chip sxplr-custom-cmp text header mat-elevation-z2"
+    [style.background-color]="color"
+    matRipple
+    [matRippleDisabled]="noMenuFlag"
+    [matMenuTriggerFor]="noMenuFlag ? null : mainMenu">
+    <ng-template [ngTemplateOutlet]="tmpl">
+    </ng-template>
+  </div>
+</ng-template>
 
 <!-- main menu is fired from chip -->
 <mat-menu #mainMenu="matMenu">

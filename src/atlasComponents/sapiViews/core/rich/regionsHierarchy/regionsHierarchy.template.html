@@ -28,6 +28,6 @@
   [sxplr-flat-hierarchy-is-parent]="isParent"
   [sxplr-flat-hierarchy-render-node-tmpl]="tmplRef"
   [sxplr-flat-hierarchy-tree-view-expand-on-init]="true"
-  sxplr-flat-hierarchy-tree-view-lineheight="24"
-  (sxplr-flat-hierarchy-tree-view-node-clicked)="nodeClicked.emit($event)">
+  [sxplr-flat-hierarchy-tree-view-lineheight]="24"
+  (sxplr-flat-hierarchy-tree-view-node-clicked)="onNodeClick($event)">
 </sxplr-flat-hierarchy-tree-view>

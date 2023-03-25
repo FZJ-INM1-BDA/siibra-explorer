@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store"
-import { OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi"
+import { OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi/typeV3"
 import * as actions from "./actions"
 
 type Line = {

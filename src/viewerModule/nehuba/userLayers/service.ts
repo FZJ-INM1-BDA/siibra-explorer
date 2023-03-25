@@ -10,8 +10,7 @@ import {
 } from "src/atlasComponents/sapi/core/space/interspaceLinearXform"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { RouterService } from "src/routerModule/router.service"
-import { atlasAppearance } from "src/state"
-import { NgLayerCustomLayer } from "src/state/atlasAppearance"
+import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
 import { getShader } from "src/util/constants"
 import { getExportNehuba, getUuid } from "src/util/fn"
@@ -46,7 +45,7 @@ export class UserLayerService implements OnDestroy {
   async getCvtFileToUrl(file: File): Promise<{
     url: string
     meta: Meta
-    options?: Omit<NgLayerCustomLayer, OmitKeys>
+    options?: Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
   }> {
     /**
      * if extension is .swc, process as if swc
@@ -90,7 +89,8 @@ export class UserLayerService implements OnDestroy {
     const buf = await file.arrayBuffer()
     let outbuf
     try {
-      outbuf = getExportNehuba().pako.inflate(buf).buffer
+      const { pako } = await getExportNehuba()
+      outbuf = pako.inflate(buf).buffer
     } catch (e) {
       console.log("unpack error", e)
       outbuf = buf
@@ -128,14 +128,14 @@ export class UserLayerService implements OnDestroy {
   addUserLayer(
     url: string,
     meta: Meta,
-    options: Omit<NgLayerCustomLayer, OmitKeys> = {}
+    options: Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys> = {}
   ) {
     this.verifyUrl(url)
     if (this.userLayerUrlToIdMap.has(url)) {
       throw new Error(`url ${url} already added`)
     }
     const id = getUuid()
-    const layer: NgLayerCustomLayer = {
+    const layer: atlasAppearance.const.NgLayerCustomLayer = {
       id,
       clType: "customlayer/nglayer",
       source: url,

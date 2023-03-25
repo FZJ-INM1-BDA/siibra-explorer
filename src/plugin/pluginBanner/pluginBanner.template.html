@@ -7,7 +7,7 @@
     </span>
   </button>
 
-  <button mat-menu-item *ngIf="EXPERIMENTAL_FEATURE_FLAG"
+  <button mat-menu-item *ngIf="experimentalFlag$ | async"
     (click)="showTmpl(thirdPartyPluginTmpl)">
     <span>
       Add third party plugin

@@ -1,17 +1,19 @@
 import { createReducer, on } from "@ngrx/store";
-import { SapiRegionModel, SapiFeatureModel, OpenMINDSCoordinatePoint } from "src/atlasComponents/sapi";
+import { SxplrRegion, Feature, Point, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import * as actions from "./actions"
 
 export type UserInteraction = {
-  mouseoverRegions: SapiRegionModel[]
-  selectedFeature: SapiFeatureModel
-  mouseoverPosition: OpenMINDSCoordinatePoint
+  mouseoverRegions: SxplrRegion[]
+  selectedFeature: Feature
+  mouseoverPosition: Point
+  mousedOverVoiFeature: VoiFeature
 }
 
 export const defaultState: UserInteraction = {
   selectedFeature: null,
   mouseoverRegions: [],
-  mouseoverPosition: null
+  mouseoverPosition: null,
+  mousedOverVoiFeature: null,
 }
 
 export const reducer = createReducer(
@@ -51,5 +53,12 @@ export const reducer = createReducer(
         mouseoverPosition: position
       }
     }
+  ),
+  on(
+    actions.setMouseoverVoi,
+    (state, { feature }) => ({
+      ...state,
+      mousedOverVoiFeature: feature
+    })
   )
 )

@@ -1,9 +1,9 @@
 import { createAction, props } from "@ngrx/store";
 import { nameSpace } from "./const"
 
-export const selectVolumeById = createAction(
-  `${nameSpace} selectVolumeById`,
+export const selectSurfaceVariant = createAction(
+  `${nameSpace} selectSurfaceVariant`,
   props<{
-    id: string
+    variant: string
   }>()
 )

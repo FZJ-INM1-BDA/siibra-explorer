@@ -8,13 +8,21 @@
     (itemClicked)="selectLeaf({ parcellation: $event })"
     [elevation]="2"
     [disabled]="isBusy">
-    <ng-template sxplrSmartChipContent>
-      <span class="chip-text">
-        <span>
-      </span>
-        {{ ATP.parcellation.name }}
+
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Parcellation
       </span>
 
+      <span class="sxplr-ml-1 text-muted">
+        ({{ parcellations.length }})
+      </span>
+    </ng-template>
+
+    <ng-template sxplrSmartChipContent>
+      <span class="chip-text">
+        {{ ATP.parcellation.shortName }}
+      </span>
       <ng-content select="[parcellation-chip-suffix]">
       </ng-content>
 
@@ -24,8 +32,8 @@
         sxplr-dialog
         [sxplr-dialog-size]="null"
         [sxplr-dialog-data]="{
-          title: ATP.parcellation.name || ATP.parcellation.fullName,
-          descMd: (ATP.parcellation.brainAtlasVersions || [])[0]?.versionInnovation,
+          title: ATP.parcellation.name,
+          descMd: ATP.parcellation.desc,
           actions: ATP.parcellation | parcellationDoiPipe
         }">
         <i class="fas fa-info"></i>
@@ -35,6 +43,7 @@
 
       <ng-container *ngTemplateOutlet="optionTmpl; context: {
         $implicit: parc,
+        suffixText: (parc | isGroupedParcellation) && '(' + parc.parcellations.length  + ')' ,
         overridePrefixIconTmpl: (parc | parcellationGroupSelected : ATP.parcellation)
           ? halfSelectedTmpl
           : null
@@ -50,9 +59,21 @@
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"
     [disabled]="isBusy">
+    
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Template
+      </span>
+
+      <span class="sxplr-ml-1 text-muted">
+        ({{ availableTemplates.length }})
+      </span>
+    </ng-template>
+
+
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.template.fullName }}
+        {{ ATP.template.shortName }}
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>
@@ -67,6 +88,18 @@
     (itemClicked)="selectLeaf({ atlas: $event})"
     [elevation]="6"
     [disabled]="isBusy">
+
+    <ng-template sxplrSmartChipHeader>
+      <span>
+        Atlas
+      </span>
+
+      <span class="sxplr-ml-1 text-muted">
+        ({{ allAtlases.length }})
+      </span>
+    </ng-template>
+
+    
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
         {{ ATP.atlas.name }}
@@ -89,7 +122,8 @@
   #optionTmpl
   let-item
   let-overridePrefixIconTmpl="overridePrefixIconTmpl"
-  let-overrideSuffixIcon="overrideSuffixIcon">
+  let-overrideSuffixIcon="overrideSuffixIcon"
+  let-suffixText="suffixText">
 
   <!-- prefix -->
   <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
@@ -99,15 +133,22 @@
     <ng-template [ngIf]="selectedIds" let-selectedIds>
       <mat-icon
         fontSet="fas"
-        [fontIcon]="selectedIds.includes(item['@id']) ? 'fa-circle' : 'fa-none'"
+        [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
         >
       </mat-icon>
     </ng-template>
   </ng-template>
 
   <!-- button body -->
-  <span *ngIf="item" class="full-sized-button">
-    {{ item.version?.name || item.name || item.fullName }}
+  <span *ngIf="item" class="full-sized-button"
+    [matTooltip]="item.version?.name || item.name || item.fullName"
+    [matTooltipPosition]="'above'">
+    {{ item.version?.name || item.shortName || item.name || item.fullName }}
+    <ng-template [ngIf]="suffixText">
+      <span class="text-muted">
+        {{ suffixText }}
+      </span>
+    </ng-template>
   </span>
 
   <!-- suffix -->

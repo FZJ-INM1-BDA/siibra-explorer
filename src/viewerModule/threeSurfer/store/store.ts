@@ -2,22 +2,22 @@ import { createReducer, on } from "@ngrx/store";
 import * as actions from "./actions"
 
 export type Store = {
-  selectedVolumeId: string
+  selectedSurfaceVariant: string
 }
 
 
 export const defaultStore: Store = {
-  selectedVolumeId: null
+  selectedSurfaceVariant: null
 }
 
 export const reducer = createReducer(
   defaultStore,
   on(
-    actions.selectVolumeById,
-    (state, { id }) => {
+    actions.selectSurfaceVariant,
+    (state, { variant }) => {
       return {
         ...state,
-        selectedVolumeId: id
+        selectedSurfaceVariant: variant
       }
     }
   )

@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SmartChip } from "./component/smartChip.component";
 import { HasSubMenuPipe } from "./hasSubmenu.pipe";
 import { SmartChipContent } from "./smartChip.content.directive";
+import { SmartChipHeader } from "./smartChip.header.directive";
 import { SmartChipMenu } from "./smartChip.menu.directive";
 
 @NgModule({
@@ -18,12 +19,14 @@ import { SmartChipMenu } from "./smartChip.menu.directive";
   declarations: [
     SmartChipMenu,
     SmartChipContent,
+    SmartChipHeader,
     SmartChip,
     HasSubMenuPipe,
   ],
   exports: [
     SmartChipMenu,
     SmartChipContent,
+    SmartChipHeader,
     SmartChip,
   ]
 })

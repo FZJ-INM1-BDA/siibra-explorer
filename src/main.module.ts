@@ -50,6 +50,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerCtrl.effects';
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
+import { ViewerCommonEffects } from './viewerModule';
 
 @NgModule({
   imports: [
@@ -77,6 +78,7 @@ import { CONST } from "common/constants"
       ...getStoreEffects(),
       LayerCtrlEffects,
       NehubaNavigationEffects,
+      ViewerCommonEffects,
     ]),
     RootStoreModule,
     HttpClientModule,
@@ -165,7 +167,7 @@ import { CONST } from "common/constants"
       provide: DARKTHEME,
       useFactory: (store: Store) => store.pipe(
         select(atlasSelection.selectors.selectedTemplate),
-        map(tmpl => !!(tmpl && tmpl["@id"] !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
+        map(tmpl => !!(tmpl && tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
       ),
       deps: [ Store ]
     },

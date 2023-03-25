@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { CustomLayer, nameSpace } from "./const"
+import { CustomLayer, nameSpace, UseViewer } from "./const"
 
 export const setOctantRemoval = createAction(
   `${nameSpace} setOctantRemoval`,
@@ -26,5 +26,12 @@ export const removeCustomLayer = createAction(
   `${nameSpace} removeCustomLayer`,
   props<{
     id: string
+  }>()
+)
+
+export const setUseViewer = createAction(
+  `${nameSpace} useViewer`,
+  props<{
+    viewer: UseViewer
   }>()
 )

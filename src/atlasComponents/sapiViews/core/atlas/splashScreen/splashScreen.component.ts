@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { tap } from 'rxjs/operators'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { SapiAtlasModel } from "src/atlasComponents/sapi/type";
+import { SxplrAtlas } from "src/atlasComponents/sapi/sxplrTypes";
 import { atlasSelection } from "src/state"
 
 @Component({
@@ -28,7 +28,7 @@ export class SapiViewsCoreAtlasSplashScreen {
   ) {
   }
 
-  public selectAtlas(atlas: SapiAtlasModel){
+  public selectAtlas(atlas: SxplrAtlas){
     this.store.dispatch(
       atlasSelection.actions.selectAtlas({
         atlas

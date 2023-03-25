@@ -11,7 +11,7 @@ import { readmoreAnimations } from "./readmore.animations";
 })
 
 export class ReadmoreComponent implements OnChanges, AfterContentChecked {
-  @Input() public collapsedHeight: number = 45
+  @Input() public collapsedHeight: number = 85
   @Input() public show: boolean = false
   @Input() public animationLength: number = 180
   @ViewChild('contentContainer', { read: ElementRef, static: true }) public contentContainer: ElementRef

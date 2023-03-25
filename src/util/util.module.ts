@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { KeyListner } from "./directives/keyDownListener.directive";
-
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
 import { SafeResourcePipe } from "./pipes/safeResource.pipe";
 import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
@@ -19,6 +18,7 @@ import { DoiParserPipe } from "./pipes/doiPipe.pipe";
 import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
 import { MergeObjPipe } from "./mergeObj.pipe";
+import { IncludesPipe } from "./includes.pipe";
 
 @NgModule({
   imports:[
@@ -43,6 +43,7 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     GetFilenamePipe,
     CombineFnPipe,
     MergeObjPipe,
+    IncludesPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -63,6 +64,7 @@ import { MergeObjPipe } from "./mergeObj.pipe";
     GetFilenamePipe,
     CombineFnPipe,
     MergeObjPipe,
+    IncludesPipe,
   ]
 })
 

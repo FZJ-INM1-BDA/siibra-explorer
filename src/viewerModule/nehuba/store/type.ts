@@ -12,7 +12,7 @@ export interface IAuxMesh {
 
 
 export interface INehubaFeature {
-  layers: atlasAppearance.NgLayerCustomLayer[]
+  layers: atlasAppearance.const.NgLayerCustomLayer[]
   panelMode: string
   panelOrder: string
   octantRemoval: boolean
