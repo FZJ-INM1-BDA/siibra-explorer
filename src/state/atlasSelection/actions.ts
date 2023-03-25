@@ -5,9 +5,9 @@ import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
   props<{
-    atlas: SxplrAtlas,
+    atlas: SxplrAtlas
     requested?: {
-      template?: SxplrTemplate,
+      template?: SxplrTemplate
       parcellation?: SxplrParcellation
     }
   }>()
@@ -16,9 +16,9 @@ export const selectAtlas = createAction(
 export const selectTemplate = createAction(
   `${nameSpace} selectTemplate`,
   props<{
-    template: SxplrTemplate,
+    template: SxplrTemplate
     requested?: {
-      template?: SxplrTemplate,
+      template?: SxplrTemplate
       parcellation?: SxplrParcellation
     }
   }>()
@@ -27,9 +27,9 @@ export const selectTemplate = createAction(
 export const selectParcellation = createAction(
   `${nameSpace} selectParcellation`,
   props<{
-    parcellation: SxplrParcellation,
+    parcellation: SxplrParcellation
     requested?: {
-      parcellation?: SxplrParcellation,
+      parcellation?: SxplrParcellation
       template?: SxplrTemplate
     }
   }>()

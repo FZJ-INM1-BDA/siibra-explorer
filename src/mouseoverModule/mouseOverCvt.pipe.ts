@@ -15,7 +15,7 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
       }
     })
   }
-  case 'voi':
+  case 'voi': {
     const { name } = value as TOnHoverObj['voi']
     return [{
       icon: {
@@ -24,6 +24,7 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
       },
       text: name
     }]
+  }
   case 'annotation': {
     const { annotationType, name } = (value as TOnHoverObj['annotation'])
     let fontIcon: string
