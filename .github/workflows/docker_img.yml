@@ -18,8 +18,8 @@ jobs:
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
 
-      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0'
-      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v2_0'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-stable-ns.apps.hbp.eu/v3_0,https://siibra-api-stable.apps.jsc.hbp.eu/v3_0'
+      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
 
