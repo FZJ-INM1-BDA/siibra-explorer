@@ -34,8 +34,14 @@ jobs:
         release_name: Release ${{ needs.check-version.outputs.package-version }}
         draft: false
         prerelease: false
-    - name: Build && zip assets
-      run: npm run build && zip -r siibra-explorer-${{ needs.check-version.outputs.package-version }}.zip ./dist
+        
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build & zip assets
+      run: |
+        STRICT_LOCAL=true node ./src/environments/parseEnv.js
+        npm run build
+        zip -r siibra-explorer-${{ needs.check-version.outputs.package-version }}.zip ./dist
     - name: Attach built as release asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
