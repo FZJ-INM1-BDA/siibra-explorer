@@ -1,10 +1,11 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http"
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { interval, merge, Observable, of, Subject, throwError, timer } from "rxjs"
 import { catchError, filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
 
 type ResultBase = {
   urlWithParams: string
+  status: number
 }
 
 type Result<T> = {
@@ -70,21 +71,36 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           if (--retry >= 0) {
             return obs
           }
+          if (err instanceof HttpErrorResponse) {
+            return of(err)
+          }
           return of(new Error(err))
+          
         }),
       ).subscribe(val => {
         if (val instanceof Error) {
           this.archive.set(urlWithParams, val)
           this.error$.next({
             urlWithParams,
-            error: val
+            error: val,
+            status: 500
           })
         }
         if (val instanceof HttpResponse) {
           this.archive.set(urlWithParams, val)
           this.result$.next({
             urlWithParams,
-            result: val
+            result: val,
+            status: 200
+          })
+        }
+        if (val instanceof HttpErrorResponse) {
+          
+          this.archive.set(urlWithParams, val)
+          this.error$.next({
+            urlWithParams,
+            error: new Error(val.toString()),
+            status: val.status
           })
         }
       })
