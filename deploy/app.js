@@ -94,10 +94,8 @@ const _ = (async () => {
   }))
 
   await configureAuth(app)
-  /**
-   * TODO fix user import
-   */
-  // app.use('/user', require('./user'))
+  
+  app.use('/user', require('./user'))
 
   /**
    * saneUrl end points

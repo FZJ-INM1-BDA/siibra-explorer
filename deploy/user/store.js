@@ -1,4 +1,3 @@
-const { Seafile } = require('hbp-seafile')
 const { Readable } = require('stream')
 
 const IAV_DIR_NAME = `interactive-atlas-viewer`
@@ -6,6 +5,7 @@ const IAV_DIRECTORY = `/${IAV_DIR_NAME}/`
 const IAV_FILENAME = 'data.json'
 
 const getNewSeafilehandle = async ({ accessToken }) => {
+  const { Seafile } = await import("hbp-seafile")
   const seafileHandle = new Seafile({ accessToken })
   await seafileHandle.init()
   return seafileHandle
