@@ -13,6 +13,7 @@ import {
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
+import { IDS } from "./constants";
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -514,6 +515,11 @@ export class SAPI{
     const map = await this.getLabelledMap(parcellation, template)
 
     for (const regionname in map.indices) {
+      if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
+        if (regionname.includes("left") || regionname.includes("right")) {
+          continue
+        }
+      }
       for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
         const { providedVolumes } = map.volumes[volumeIdx]
         if (!("neuroglancer/precomputed" in providedVolumes)) {
