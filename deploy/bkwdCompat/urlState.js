@@ -120,7 +120,7 @@ const WARNING_STRINGS = {
   REGION_SELECT_ERROR: 'Region selected cannot be processed properly.',
   TEMPLATE_ERROR: 'Template not found.',
 }
-const pliPreviewUrl = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1qI1a.D31U~.i-Os~..HRE/f:siibra:features:voi:19c437087299dd62e7c507200f69aea6`
+const pliPreviewUrl = `/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.2-4Fk_.-KlpS.0.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1WNl8.6Tjd~.bTYu~..Zdk/f:b08a7dbc-7c75-4ce7-905b-690b2b1e8957--d3ca8fe622051466a5cde547a11111ca`
 module.exports = (query, _warningCb) => {
 
   const HOST_PATHNAME = process.env.HOST_PATHNAME || ''

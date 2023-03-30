@@ -32,7 +32,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
   private priorityQueue: Queue[] = []
 
   private currentJob: Set<string> = new Set()
-  private archive: Map<string, (HttpResponse<unknown>|Error)> = new Map()
+  private archive: Map<string, (HttpErrorResponse|HttpResponse<unknown>|Error)> = new Map()
   private queue$: Subject<Queue> = new Subject()
   private result$: Subject<Result<unknown>> = new Subject()
   private error$: Subject<ErrorResult> = new Subject()
@@ -136,6 +136,9 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
     const archive = this.archive.get(urlWithParams)
     if (archive) {
       if (archive instanceof Error) {
+        return throwError(archive)
+      }
+      if (archive instanceof HttpErrorResponse) {
         return throwError(archive)
       }
       if (archive instanceof HttpResponse) {
