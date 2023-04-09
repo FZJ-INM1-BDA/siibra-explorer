@@ -1,12 +1,11 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from "@angular/common/http"
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
-import { interval, merge, Observable, of, Subject, timer } from "rxjs"
+import { interval, merge, Observable, of, Subject, throwError, timer } from "rxjs"
 import { catchError, filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
-
-export const PRIORITY_HEADER = 'x-sxplr-http-priority'
 
 type ResultBase = {
   urlWithParams: string
+  status: number
 }
 
 type Result<T> = {
@@ -19,25 +18,21 @@ type ErrorResult = {
 
 type Queue = {
   urlWithParams: string
-  priority: number
   req: HttpRequest<unknown>
   next: HttpHandler
 }
-
-export const DISABLE_PRIORITY_HEADER = 'x-sxplr-disable-priority'
 
 @Injectable({
   providedIn: 'root'
 })
 export class PriorityHttpInterceptor implements HttpInterceptor{
 
-  private retry = 5
-  private disablePriority = false
+  private retry = 0
 
   private priorityQueue: Queue[] = []
 
   private currentJob: Set<string> = new Set()
-  private archive: Map<string, HttpResponse<unknown>> = new Map()
+  private archive: Map<string, (HttpErrorResponse|HttpResponse<unknown>|Error)> = new Map()
   private queue$: Subject<Queue> = new Subject()
   private result$: Subject<Result<unknown>> = new Subject()
   private error$: Subject<ErrorResult> = new Subject()
@@ -73,64 +68,58 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           this.counter --
         }),
         catchError((err, obs) => {
-          if (retry >= 0) {
-            retry --
+          if (--retry >= 0) {
             return obs
           }
+          if (err instanceof HttpErrorResponse) {
+            return of(err)
+          }
           return of(new Error(err))
+          
         }),
       ).subscribe(val => {
         if (val instanceof Error) {
+          this.archive.set(urlWithParams, val)
           this.error$.next({
             urlWithParams,
-            error: val
+            error: val,
+            status: 500
           })
         }
         if (val instanceof HttpResponse) {
           this.archive.set(urlWithParams, val)
           this.result$.next({
             urlWithParams,
-            result: val
+            result: val,
+            status: 200
+          })
+        }
+        if (val instanceof HttpErrorResponse) {
+          
+          this.archive.set(urlWithParams, val)
+          this.error$.next({
+            urlWithParams,
+            error: new Error(val.toString()),
+            status: val.status
           })
         }
       })
     })
   }
 
-  updatePriority(urlWithParams: string, newPriority: number) {
-    
-    if (this.currentJob.has(urlWithParams)) return
-
-    const foundIdx = this.priorityQueue.findIndex(v => v.urlWithParams === urlWithParams)
-    if (foundIdx < 0) return false
-    const [ item ] = this.priorityQueue.splice(foundIdx, 1)
-    item.priority = newPriority
-
-    this.insert(item)
-    this.forceCheck$.next(true)
-    return true
-  }
-
   private insert(obj: Queue) {
-    const { priority, urlWithParams, req } = obj
+    const { urlWithParams, req } = obj
     
     if (this.archive.has(urlWithParams)) return
     if (this.currentJob.has(urlWithParams)) return
 
-    obj.req = req.clone({
-      headers: req.headers.delete(PRIORITY_HEADER)
-    })
+    obj.req = req.clone()
 
     const existing = this.priorityQueue.find(q => q.urlWithParams === urlWithParams)
     if (existing) {
-      if (existing.priority < priority) {
-        this.updatePriority(urlWithParams, priority)
-      }
       return
     }
-    const foundIdx = this.priorityQueue.findIndex(q => q.priority <= priority)
-    const useIndex = foundIdx >= 0 ? foundIdx : this.priorityQueue.length
-    this.priorityQueue.splice(useIndex, 0, obj)
+    this.priorityQueue.push(obj)
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -139,23 +128,25 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
      * Since the way in which serialization occurs is via path and query param...
      * body is not used.
      */
-    if (this.disablePriority || req.method !== 'GET' || !!req.headers.get(DISABLE_PRIORITY_HEADER)) {
-      const newReq = req.clone({
-        headers: req.headers.delete(DISABLE_PRIORITY_HEADER)
-      })
-      return next.handle(newReq)
+    if (req.method !== 'GET') {
+      return next.handle(req)
     }
 
     const { urlWithParams } = req
-    if (this.archive.has(urlWithParams)) {
-      return of(
-        this.archive.get(urlWithParams).clone()
-      )
+    const archive = this.archive.get(urlWithParams)
+    if (archive) {
+      if (archive instanceof Error) {
+        return throwError(archive)
+      }
+      if (archive instanceof HttpErrorResponse) {
+        return throwError(archive)
+      }
+      if (archive instanceof HttpResponse) {
+        return of( archive.clone() )
+      }
     }
     
-    const priority = Number(req.headers.get(PRIORITY_HEADER) || 0)
     const objToInsert: Queue = {
-      priority,
       req,
       next,
       urlWithParams
@@ -171,7 +162,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
       filter(v => v.urlWithParams === urlWithParams),
       take(1),
       map(v => {
-        if (v instanceof Error) {
+        if (v['error'] instanceof Error) {
           throw v
         }
         return (v as Result<unknown>).result

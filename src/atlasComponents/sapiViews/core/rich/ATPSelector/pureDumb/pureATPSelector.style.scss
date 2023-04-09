@@ -19,6 +19,11 @@
   margin-left: 0.2rem;
 }
 
+sxplr-smart-chip
+{
+  min-width: 10rem;
+}
+
 sxplr-smart-chip:not(:last-child)
 {
   margin-left: -2.5rem;

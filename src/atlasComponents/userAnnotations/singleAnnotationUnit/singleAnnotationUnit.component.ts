@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentFactoryResolver, Inject, Injector, Input, OnDestroy, Optional, Pipe, PipeTransform, ViewChild, ViewContainerRef } from "@angular/core";
+import { AfterViewInit, Component, Injector, Input, OnDestroy, Pipe, PipeTransform, Type, ViewChild, ViewContainerRef } from "@angular/core";
 import { IAnnotationGeometry, UDPATE_ANNOTATION_TOKEN } from "../tools/type";
 import { Point } from '../tools/point'
 import { Polygon } from '../tools/poly'
@@ -30,16 +30,13 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
 
   private chSubs: Subscription[] = []
   private subs: Subscription[] = []
-  public templateSpaces: {
-    ['@id']: string
-  }[] = []
   ngOnChanges(){
     while(this.chSubs.length > 0) this.chSubs.pop().unsubscribe()
     
     this.formGrp = new UntypedFormGroup({
       name: new UntypedFormControl(this.managedAnnotation.name),
       spaceId: new UntypedFormControl({
-        value: this.managedAnnotation.space["@id"],
+        value: this.managedAnnotation.space.id,
         disabled: true
       }),
       desc: new UntypedFormControl(this.managedAnnotation.desc),
@@ -65,7 +62,6 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
     private store: Store<any>,
     private snackbar: MatSnackBar,
     private svc: ModularUserAnnotationToolService,
-    private cfr: ComponentFactoryResolver,
     private injector: Injector,
   ){
   }
@@ -79,7 +75,6 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
         })
         throw new Error(`Edit component not found!`)
       }
-      const cf = this.cfr.resolveComponentFactory(editCmp)
       
       const injector = Injector.create({
         providers: [{
@@ -88,7 +83,7 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
         }],
         parent: this.injector
       })
-      this.editAnnotationVCR.createComponent(cf, null, injector)
+      this.editAnnotationVCR.createComponent(editCmp as Type<unknown>, {injector})
     }
   }
 

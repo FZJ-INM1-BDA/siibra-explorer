@@ -26,17 +26,6 @@ import { PluginPortal } from "./pluginPortal/pluginPortal.component";
   exports: [
     PluginBannerUI,
   ],
-  providers: [
-    {
-      provide: APPEND_SCRIPT_TOKEN,
-      useFactory: appendScriptFactory,
-      deps: [ DOCUMENT ]
-    },
-    {
-      provide: REMOVE_SCRIPT_TOKEN,
-      useFactory: removeScriptFactory,
-      deps: [ DOCUMENT ]
-    },
-  ]
+  providers: []
 })
 export class PluginModule{}

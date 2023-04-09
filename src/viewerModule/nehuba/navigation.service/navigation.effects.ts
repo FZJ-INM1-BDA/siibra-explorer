@@ -1,21 +1,18 @@
-import { Inject, Injectable, OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subscription } from "rxjs";
-import { filter, map, mapTo, tap, withLatestFrom } from "rxjs/operators";
+import { combineLatest, NEVER, of, Subscription } from "rxjs";
+import { debounce, distinctUntilChanged, filter, map, mapTo, skipWhile, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { atlasSelection, MainState, userInterface, userPreference } from "src/state"
 import { CYCLE_PANEL_MESSAGE } from "src/util/constants";
 import { timedValues } from "src/util/generator";
-import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { NEHUBA_INSTANCE_INJTKN } from "../util";
-import { navAdd, navMul } from "./navigation.util";
+import { NavigationBaseSvc } from "./navigation.base.service";
+import { navAdd, navMul, navObjEqual } from "./navigation.util";
 
 @Injectable()
 export class NehubaNavigationEffects implements OnDestroy{
 
   private subscription: Subscription[] = []
-  private nehubaInst: NehubaViewerUnit
-  private rafRef: number
 
   /**
    * This is an implementation which reconciles local state with the global navigation state.
@@ -27,64 +24,56 @@ export class NehubaNavigationEffects implements OnDestroy{
    *   and update global state accordingly.
    * - This effect updates the internal navigation state. It should leave reporting any diff to the local viewer's native implementation.
    */
-  onNavigateTo = createEffect(() => this.action.pipe(
-    ofType(atlasSelection.actions.navigateTo),
-    filter(() => !!this.nehubaInst),
-    withLatestFrom(
-      this.store.pipe(
-        select(userPreference.selectors.useAnimation)
+  onNavigateTo = createEffect(() => this.baseSvc.nehubaViewerUnit$.pipe(
+    switchMap(nehubaInst => this.action.pipe(
+      ofType(atlasSelection.actions.navigateTo),
+      withLatestFrom(
+        this.store.pipe(
+          select(userPreference.selectors.useAnimation)
+        ),
+        this.store.pipe(
+          select(atlasSelection.selectors.navigation)
+        )
       ),
-      this.store.pipe(
-        select(atlasSelection.selectors.navigation)
-      )
-    ),
-    tap(([{ navigation, animation, physical }, globalAnimationFlag, currentNavigation]) => {
-      if (!animation || !globalAnimationFlag) {
-        this.nehubaInst.setNavigationState({
-          ...navigation,
-          positionReal: physical
-        })
-        return
-      }
-
-      const gen = timedValues()
-      const src = currentNavigation
-
-      const dest = {
-        ...src,
-        ...navigation
-      }
-
-      const delta = navAdd(dest, navMul(src, -1))
-
-      const animate = () => {
-        
-        /**
-         * if nehubaInst becomes nullish whilst animation is running
-         */  
-        if (!this.nehubaInst) {
-          this.rafRef = null
+      tap(([{ navigation, animation, physical }, globalAnimationFlag, currentNavigation]) => {
+        if (!animation || !globalAnimationFlag) {
+          nehubaInst.setNavigationState({
+            ...navigation,
+            positionReal: physical
+          })
           return
         }
-
-        const next = gen.next()
-        const d =  next.value
-
-        const n = navAdd(src, navMul(delta, d))
-        this.nehubaInst.setNavigationState({
-          ...n,
-          positionReal: physical
-        })
-
-        if ( !next.done ) {
-          this.rafRef = requestAnimationFrame(() => animate())
-        } else {
-          this.rafRef = null
+  
+        const gen = timedValues()
+        const src = currentNavigation
+  
+        const dest = {
+          ...src,
+          ...navigation
         }
-      }
-      this.rafRef = requestAnimationFrame(() => animate())
-
-    })
+  
+        const delta = navAdd(dest, navMul(src, -1))
+  
+        const animate = () => {
+          
+  
+          const next = gen.next()
+          const d =  next.value
+  
+          const n = navAdd(src, navMul(delta, d))
+          nehubaInst.setNavigationState({
+            ...n,
+            positionReal: physical
+          })
+  
+          if ( !next.done ) {
+            requestAnimationFrame(() => animate())
+          }
+        }
+        requestAnimationFrame(() => animate())
+  
+      })
+    )),
   ), { dispatch: false })
 
   onMaximise = createEffect(() => combineLatest([
@@ -104,14 +93,66 @@ export class NehubaNavigationEffects implements OnDestroy{
     )
   ))
 
+  onStoreNavigationUpdate = createEffect(() => this.store.pipe(
+    select(atlasSelection.selectors.navigation),
+    distinctUntilChanged((o, n) => navObjEqual(o, n)),
+    withLatestFrom(
+      this.baseSvc.viewerNavLock$,
+      /**
+       * n.b. if NEHUBA_INSTANCE_INJTKN is not provided, this obs will never emit
+       * which, semantically is the correct behaviour
+       */
+      this.baseSvc.nehubaViewerUnit$,
+      this.baseSvc.nehubaViewerUnit$.pipe(
+        switchMap(nvUnit => nvUnit.viewerPositionChange)
+      )
+    ),
+    skipWhile(([nav, lock, _nvUnit, viewerNav]) => lock || navObjEqual(nav, viewerNav)),
+    tap(([nav, _lock, nvUnit, _viewerNav]) => {
+      nvUnit.setNavigationState(nav)
+    })
+  ), { dispatch: false })
+
+  onViewerNavigationUpdate = createEffect(() => this.baseSvc.nehubaViewerUnit$.pipe(
+    switchMap(nvUnit => 
+      nvUnit.viewerPositionChange.pipe(
+        debounce(() => this.baseSvc.viewerNavLock$.pipe(
+          filter(lock => !lock),
+        )),
+        withLatestFrom(
+          this.store.pipe(
+            select(atlasSelection.selectors.navigation)
+          )
+        ),
+        switchMap(([ val, storedNav ]) => {
+          const { zoom, perspectiveZoom, position } = val
+          const roundedZoom = Math.round(zoom)
+          const roundedPz = Math.round(perspectiveZoom)
+          const roundedPosition = position.map(v => Math.round(v)) as [number, number, number]
+          const roundedNav = {
+            ...val,
+            zoom: roundedZoom,
+            perspectiveZoom: roundedPz,
+            position: roundedPosition,
+          }
+          if (navObjEqual(roundedNav, storedNav)) {
+            return NEVER
+          }
+          return of(
+            atlasSelection.actions.setNavigation({
+              navigation:roundedNav
+            })
+          )
+        })
+      )
+    )
+  ))
+
   constructor(
     private action: Actions,
     private store: Store<MainState>,
-    @Inject(NEHUBA_INSTANCE_INJTKN) nehubaInst$: Observable<NehubaViewerUnit>,
+    private baseSvc: NavigationBaseSvc,
   ){
-    this.subscription.push(
-      nehubaInst$.subscribe(val => this.nehubaInst = val),
-    )
   }
 
   ngOnDestroy(): void {

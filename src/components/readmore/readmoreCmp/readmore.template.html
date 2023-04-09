@@ -7,7 +7,8 @@
       fullHeight: fullHeight,
       animationLength: animationLength
     }}"
-  class="readmore-content">
+  class="readmore-content"
+  [ngClass]="show ? 'full' : 'veil'">
   <div #contentContainer>
     <ng-content>
     </ng-content>

@@ -19,7 +19,7 @@
     "express-rate-limit": "^5.5.1",
     "express-session": "^1.15.6",
     "got": "^11.8.5",
-    "hbp-seafile": "^0.2.0",
+    "hbp-seafile": "^0.3.0",
     "helmet-csp": "^3.4.0",
     "lru-cache": "^5.1.1",
     "memorystore": "^1.6.1",
@@ -28,7 +28,6 @@
     "passport": "^0.6.0",
     "rate-limit-redis": "^2.1.0",
     "redis": "^3.1.2",
-    "request": "^2.88.2",
     "showdown": "^2.0.0",
     "through2": "^3.0.1"
   },

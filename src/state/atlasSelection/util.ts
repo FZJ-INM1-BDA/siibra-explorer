@@ -1,44 +1,11 @@
 import { createSelector, select } from "@ngrx/store";
 import { forkJoin, of, pipe } from "rxjs";
 import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { jsonEqual } from "src/util/json";
 import * as selectors from "./selectors"
-
-const allAvailSpaces = (sapi: SAPI) => {
-  return pipe(
-    select(selectors.selectedAtlas),
-    switchMap(atlas => atlas
-      ? forkJoin(
-        atlas.spaces.map(spcWId => sapi.getSpaceDetail(atlas["@id"], spcWId["@id"]))
-      )
-      : of([])
-    )
-  )
-}
-
-const allAvailParcs = (sapi: SAPI) => pipe(
-  select(selectors.selectedAtlas),
-  switchMap(atlas => atlas
-    ? forkJoin(
-      atlas.parcellations.map(parcWId => sapi.getParcDetail(atlas["@id"], parcWId["@id"]))
-    )
-    : of([])
-  )
-)
-const allAvailSpacesParcs = (sapi: SAPI) => pipe(
-  select(selectors.selectedAtlas),
-  switchMap(atlas => atlas
-    ? forkJoin({
-      spaces: atlas.spaces.map(spcWId => sapi.getSpaceDetail(atlas["@id"], spcWId["@id"])),
-      parcellation: atlas.parcellations.map(parcWId => sapi.getParcDetail(atlas["@id"], parcWId["@id"])),
-    })
-    : of({
-      spaces: [],
-      parcellation: []
-    })
-  )
-)
 
 const nonDistinctATP = createSelector(
   selectors.selectedAtlas,
@@ -50,14 +17,11 @@ const nonDistinctATP = createSelector(
 const distinctATP = () => pipe(
   select(nonDistinctATP),
   distinctUntilChanged(
-    jsonEqual((o, n) => o?.["@id"] === n?.["@id"])
+    jsonEqual((o, n) => o?.id === n?.id)
   ),
-  map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel })
+  map(val => val as { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate })
 )
 
 export const fromRootStore = {
-  allAvailSpaces,
-  allAvailParcs,
-  allAvailSpacesParcs,
   distinctATP,
 }

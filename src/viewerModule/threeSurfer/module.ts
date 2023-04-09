@@ -9,6 +9,7 @@ import { ThreeSurferGlueCmp } from "./threeSurferGlue/threeSurfer.component";
 import { ThreeSurferViewerConfig } from "./tsViewerConfig/tsViewerConfig.component";
 import { nameSpace, reducer, ThreeSurferEffects } from "./store"
 import { EffectsModule } from "@ngrx/effects";
+import { TmpThreeSurferLifeCycle } from "./lifecycle/lifecycle.component";
 
 @NgModule({
   imports: [
@@ -28,9 +29,10 @@ import { EffectsModule } from "@ngrx/effects";
   declarations: [
     ThreeSurferGlueCmp,
     ThreeSurferViewerConfig,
+    TmpThreeSurferLifeCycle,
   ],
   exports: [
-    ThreeSurferGlueCmp,
+    TmpThreeSurferLifeCycle,
   ]
 })
 

@@ -1,11 +1,9 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SapiParcellationModel } from "src/atlasComponents/sapi/type";
+import { SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
 import { GroupedParcellation } from "./groupedParcellation";
+import { IsGroupedParcellation } from "./isGroupedParcellation.pipe"
 
-function isGroupedParc(parc: GroupedParcellation|unknown): parc is GroupedParcellation {
-  if (!parc['parcellations']) return false
-  return (parc['parcellations'] as SapiParcellationModel[]).every(p => p["@type"] === "minds/core/parcellationatlas/v1.0.0")
-}
+const pipe = new IsGroupedParcellation()
 
 @Pipe({
   name: 'parcellationGroupSelected',
@@ -13,8 +11,8 @@ function isGroupedParc(parc: GroupedParcellation|unknown): parc is GroupedParcel
 })
 
 export class ParcellationGroupSelectedPipe implements PipeTransform {
-  public transform(parc: GroupedParcellation|unknown, selectedParcellation: SapiParcellationModel): boolean {
-    if (!isGroupedParc(parc)) return false
-    return parc.parcellations.some(p => p["@id"] === selectedParcellation["@id"])
+  public transform(parc: GroupedParcellation|unknown, selectedParcellation: SxplrParcellation): boolean {
+    if (!pipe.transform(parc)) return false
+    return parc.parcellations.some(p => p.id === selectedParcellation.id)
   }
 }

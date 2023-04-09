@@ -127,6 +127,7 @@ export class Line extends IAnnotationGeometry{
       coordinatesFrom,
       coordinatesTo
     } = json
+    const { ['@id']: spaceId } = coordinateSpace
     if (type !== 'tmp/line') throw new Error(`cannot parse line from sands`)
     const fromPt = coordinatesFrom.map(c => {
       if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Cannot parse unit`)
@@ -145,17 +146,17 @@ export class Line extends IAnnotationGeometry{
           x: fromPt[0],
           y: fromPt[1],
           z: fromPt[2],
-          space: coordinateSpace
+          space: { id: spaceId }
         }),
         new Point({
           '@type': "siibra-ex/annotation/point",
           x: toPoint[0],
           y: toPoint[1],
           z: toPoint[2],
-          space: coordinateSpace
+          space: { id: spaceId }
         })
       ],
-      space: coordinateSpace
+      space: { id: spaceId }
     })
     return line
   }

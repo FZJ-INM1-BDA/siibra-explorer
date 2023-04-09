@@ -1,0 +1,27 @@
+:host
+{
+    padding: 0.5rem 0;
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+button
+{
+    flex: 0 0 auto;
+}
+
+.layer-name
+{
+    flex: 1 1 0px;
+    overflow: hidden;
+}
+
+spinner-cmp:has(+ .hydrated)
+{
+    display: none;
+}

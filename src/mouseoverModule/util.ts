@@ -1,13 +1,10 @@
-import { SapiRegionModel } from "src/atlasComponents/sapi"
+import { SxplrRegion, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes"
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type"
 
 export type TOnHoverObj = {
-  regions: SapiRegionModel[]
+  regions: SxplrRegion[]
   annotation: IAnnotationGeometry
-  landmark: {
-    landmarkName: number
-  }
-  userLandmark: any
+  voi: VoiFeature
 }
 
 /**

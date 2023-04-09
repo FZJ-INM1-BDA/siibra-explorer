@@ -1,4 +1,4 @@
-import { SapiRegionModel } from "src/atlasComponents/sapi"
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 export const nameSpace = `[state.atlasAppearance]`
 
 type CustomLayerBase = {
@@ -7,7 +7,7 @@ type CustomLayerBase = {
 
 export type ColorMapCustomLayer = {
   clType: 'customlayer/colormap' | 'baselayer/colormap'
-  colormap: WeakMap<SapiRegionModel, number[]>
+  colormap: WeakMap<SxplrRegion, number[]>
 } & CustomLayerBase
 
 export type ThreeSurferCustomLayer = {
@@ -50,3 +50,11 @@ export type NgLayerCustomLayer = {
  * - id allows custom layer to be removed, if necessary
  */
 export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer | ThreeSurferCustomLayer | ThreeSurferCustomLabelLayer
+
+export const useViewer = {
+  THREESURFER: "THREESURFER",
+  NEHUBA: "NEHUBA",
+  NOT_SUPPORTED: "NOT_SUPPORTED" 
+} as const
+
+export type UseViewer = keyof typeof useViewer

@@ -17,17 +17,13 @@ export function getDebug() {
   return (window as any).__DEBUG__
 }
 
-export function getExportNehuba() {
-  return (window as any).export_nehuba
-}
-
-export function getNgIds(regions: any[]): string[] {
-  return regions && regions.map
-    ? regions
-      .map(r => [r.ngId, ...getNgIds(r.children)])
-      .reduce((acc, item) => acc.concat(item), [])
-      .filter(ngId => !!ngId)
-    : []
+export async function getExportNehuba() {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nehuba = (window as any).export_nehuba
+    if (!!nehuba) return nehuba
+    await new Promise((rs) => setTimeout(rs, 160))
+  }
 }
 
 const recursiveFlatten = (region, {ngId}) => {
@@ -374,5 +370,17 @@ export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
         sub.unsubscribe()
       }
     )
+  })
+}
+
+export function defaultdict<T>(fn: () => T): Record<string, T> {
+  const obj = {}
+  return new Proxy(obj, {
+    get(target, prop, rec) {
+      if (!(prop in target)){
+        target[prop] = fn()
+      }
+      return obj[prop]
+    },
   })
 }

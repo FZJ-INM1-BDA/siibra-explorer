@@ -5,7 +5,7 @@
   <div class="floating-ui">
 
     <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
-      class="fixed-bottom sxplr-pe-none mb-2 d-flex justify-content-center">
+      class="fixed-bottom sxplr-pe-none sxplr-mb-10 d-flex justify-content-center">
       <logo-container></logo-container>
     </div>
 
@@ -29,16 +29,6 @@
 
         </mat-list-item>
 
-        <ng-template [ngIf]="voiQueryDirective && (voiQueryDirective.onhover | async)" let-feat>
-          <mat-list-item>
-            <mat-icon
-              fontSet="fas"
-              fontIcon="fa-database"
-              mat-list-icon>
-            </mat-icon>
-            <div matLine>{{ feat?.metadata?.fullName || 'Feature' }}</div>
-          </mat-list-item>
-        </ng-template>
       </mat-list>
       <!-- TODO Potentially implementing plugin contextual info -->
     </div>
@@ -230,11 +220,9 @@
       <ng-container *ngTemplateOutlet="autocompleteTmpl; context: { showTour: true }">
       </ng-container>
       
-      <ng-template [ngIf]="VOI_QUERY_FLAG">
-        <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-2 w-100">
-          <ng-container *ngTemplateOutlet="spatialFeatureListViewTmpl"></ng-container>
-        </div>
-      </ng-template>
+      <div *ngIf="!((selectedRegions$ | async)[0])" class="sxplr-p-1 w-100">
+        <ng-container *ngTemplateOutlet="spatialFeatureListTmpl"></ng-container>
+      </div>
     </div>
 
     <!-- such a gross implementation -->
@@ -265,17 +253,6 @@
       </button>
     </div>
   
-  </div>
-
-  <!-- tab toggling hide/show of min search tray -->
-  <div class="tab-toggle-container d-inline-block v-align-top">
-    <ng-container *ngTemplateOutlet="tabTmpl; context: {
-      isOpen: minTrayVisSwitch.switchState$ | async,
-      regionSelected: selectedRegions$ | async,
-      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
-      badge: voiQueryDirective && (voiQueryDirective.features$ | async).length || null
-    }">
-    </ng-container>
   </div>
 
 </ng-template>
@@ -403,31 +380,37 @@
     sxplr-pe-all
     sxplr-of-x-auto
     sxplr-of-y-hidden
-    sxplr-align-items-center">
+    sxplr-align-items-stretch">
     
     <sxplr-wrapper-atp-selector class="sxplr-z-2">
     </sxplr-wrapper-atp-selector>
 
     <!-- selected region chip -->
-    <sxplr-sapiviews-core-region-region-chip
-      *ngFor="let region of selectedRegions$ | async"
-      class="sxplr-pe-all sxplr-z-1 sxplr-mr-1"
-      (sxplr-sapiviews-core-region-region-chip-clicked)="showFullSideNav()"
-      [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-      [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
-      [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
-      [sxplr-sapiviews-core-region-region]="region">
+    <ng-template ngFor [ngForOf]="selectedRegions$ | async" let-region>
+      <sxplr-smart-chip
+        [noMenu]="true"
+        [color]="sapiViewsCoreRegion.regionRgbString"
+        (click)="showFullSideNav()"
+        sxplr-sapiviews-core-region
+        [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+        [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+        [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+        [sxplr-sapiviews-core-region-region]="region"
+        [sxplr-sapiviews-core-region-detail-flag]="true"
+        #sapiViewsCoreRegion="sapiViewsCoreRegion">
+        <ng-template sxplrSmartChipContent>
+          <span class="regionname">
+            {{ region.name }}
+          </span>
+          <button class="sxplr-mr-n3"
+            mat-icon-button
+            (click)="clearRoi()">
+            <i class="fas fa-times"></i>
+          </button>
+        </ng-template>
+      </sxplr-smart-chip>
 
-      <div prefix>
-      </div>
-
-      <div suffix class="region-chip-suffix">
-        <button mat-icon-button iav-stop="mousedown click"
-          (click)="clearRoi()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </sxplr-sapiviews-core-region-region-chip>
+    </ng-template>
   </div>
 
 </ng-template>
@@ -447,18 +430,31 @@
       </iav-cmp-viewer-nehuba-glue>
 
       <!-- three surfer (free surfer viewer) -->
-      <three-surfer-glue-cmp class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+      <tmp-threesurfer-lifecycle class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
         *ngSwitchCase="'threeSurfer'"
         (viewerEvent)="handleViewerEvent($event)">
-      </three-surfer-glue-cmp>
+      </tmp-threesurfer-lifecycle>
 
       <!-- if not supported, show not supported message -->
       <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
 
       <!-- by default, show splash screen -->
-      <div *ngSwitchDefault>
-        <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
-        </ui-splashscreen>
+      <div class="sxplr-h-100" *ngSwitchDefault>
+        <ng-template [ngIf]="(selectedAtlas$ | async)" [ngIfElse]="splashScreenTmpl">
+          <div class="center-a-div">
+            <div class="loading-atlas-text-container">
+              <spinner-cmp class="fs-200"></spinner-cmp>
+              <span>
+                Loading 
+                {{ (selectedAtlas$ | async).name }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #splashScreenTmpl>
+          <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
+          </ui-splashscreen>
+        </ng-template>
       </div>
     </ng-container>
 
@@ -796,7 +792,7 @@
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
   <mat-card class="sxplr-p-0 d-flex flex-column"
-    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true}]"
+    [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true, key: 'Esc'}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">
     <mat-card-content *ngFor="let tmplRef of tmplRefs"
@@ -910,8 +906,8 @@
   let-backCb="backCb"
   let-feature="feature">
 
-  <sxplr-sapiviews-core-datasets-dataset class="sxplr-z-2 mat-elevation-z2"
-    [sxplr-sapiviews-core-datasets-dataset-input]="feature">
+  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2"
+    [feature]="feature">
 
     <div header>
       <!-- back btn -->
@@ -928,15 +924,8 @@
       </button>
     </div>
 
-  </sxplr-sapiviews-core-datasets-dataset>
+  </sxplr-feature-view>
   
-  <sxplr-sapiviews-features-entry
-    [sxplr-sapiviews-features-entry-atlas]="selectedAtlas$ | async"
-    [sxplr-sapiviews-features-entry-space]="templateSelected$ | async"
-    [sxplr-sapiviews-features-entry-parcellation]="parcellationSelected$ | async"
-    [sxplr-sapiviews-features-entry-region]="(selectedRegions$ | async)[0]"
-    [sxplr-sapiviews-features-entry-feature]="feature">
-  </sxplr-sapiviews-features-entry>
 </ng-template>
 
 <!-- general feature tmpl -->
@@ -962,54 +951,77 @@
 
 </ng-template>
 
-<ng-template #spatialFeatureListViewTmpl>
-  <div *ngIf="voiQueryDirective && (voiQueryDirective.busy$ | async); else notBusyTmpl" class="fs-200">
-    <spinner-cmp></spinner-cmp>
-  </div>
-
-  <ng-template #notBusyTmpl>
-    <mat-card *ngIf="voiQueryDirective && (voiQueryDirective.features$ | async).length > 0" class="pe-all mat-elevation-z4">
+<!-- spatial search tmpls -->
+<ng-template #spatialFeatureListTmpl>
+  <mat-card class="sxplr-pe-all"
+    [ngClass]="{
+      'sxplr-d-none': !(voiSwitch.switchState$ | async) || (voiFeatureEntryCmp.totals$ | async) === 0
+    }">
+    <mat-card-header>
       <mat-card-title>
-        Volumes of interest
+        Anchored to current view
       </mat-card-title>
-      <mat-card-subtitle class="overflow-hidden">
-        <!-- TODO in future, perhaps encapsulate this as a component? seems like a nature fit in sapiView/space/boundingbox -->
-        <ng-template let-bbox [ngIf]="boundingBoxDirective && (boundingBoxDirective.bbox$ | async | getProperty : 'bbox')" [ngIfElse]="bboxFallbackTmpl">
-          Bounding box: {{ bbox[0] | numbers | json }} - {{ bbox[1] | numbers | json }} mm
-        </ng-template>
-        <ng-template #bboxFallbackTmpl>
-          Found nearby
-        </ng-template>
-        
-      </mat-card-subtitle>
-
-      <mat-divider></mat-divider>
-
-      <ng-template [ngIf]="voiQueryDirective">
-
-        <div *ngFor="let feature of voiQueryDirective.features$ | async"
-          mat-ripple
-          (click)="showDataset(feature)"
-          class="sxplr-custom-cmp hoverable w-100 overflow-hidden text-overflow-ellipses">
-          {{ feature.metadata.fullName }}
+      <mat-card-subtitle>
+        <div>
+          {{ templateSelected$ | async | getProperty : 'name' }}
         </div>
-      </ng-template>
-    </mat-card>
-  </ng-template>
+        <ng-template [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" let-bbox>
+          <div>
+            from {{ bbox[0] | numbers | addUnitAndJoin : '' }}
+          </div>
+          <div>
+            to {{ bbox[1] | numbers | addUnitAndJoin : '' }}
+          </div>
+        </ng-template>
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <sxplr-feature-entry
+    [ngClass]="(voiSwitch.switchState$ | async) ? 'sxplr-d-block' : 'sxplr-d-none'"
+    class="sxplr-pe-all mat-elevation-z8"
+    [template]="templateSelected$ | async"
+    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+    #voiFeatureEntryCmp="featureEntryCmp">
+  </sxplr-feature-entry>
+
+  <button mat-raised-button
+    [ngClass]="{
+      'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) === 0
+    }"
+    class="sxplr-pe-all sxplr-w-100"
+    iav-switch
+    [iav-switch-state]="false"
+    #voiSwitch="iavSwitch"
+    (click)="voiSwitch.toggle()">
+
+    <ng-template [ngIf]="voiSwitch.switchState$ | async" [ngIfElse]="chevronCollapseTmpl">
+      <i class="fas fa-chevron-up"></i>
+      <span>
+        Collapse
+      </span>
+    </ng-template>
+
+    <ng-template #chevronCollapseTmpl>
+      <i class="fas fa-chevron-down"></i>
+      <span>
+        Explore {{ voiFeatureEntryCmp.totals$ | async }} spatial features
+      </span>
+    </ng-template>
+  </button>
+  <div
+    *ngIf="voiSwitch.switchState$ | async"
+    voiBbox
+    [features]="voiFeatureEntryCmp.features$ | async">
+
+  </div>
 </ng-template>
 
-<div class="d-none"
-  *ngIf="VOI_QUERY_FLAG"
+<div
   sxplr-sapiviews-core-space-boundingbox
   [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
   [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"
   [sxplr-sapiviews-core-space-boundingbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
-  #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-  sxplr-sapiviews-features-voi-query
-  [sxplr-sapiviews-features-voi-query-atlas]="selectedAtlas$ | async"
-  [sxplr-sapiviews-features-voi-query-space]="templateSelected$ | async"
-  [sxplr-sapiviews-features-voi-query-bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-  (sxplr-sapiviews-features-voi-query-onclick)="showDataset($event)"
-  #voiFeatures="sxplrSapiViewsFeaturesVoiQuery">
-
+  #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
 </div>
+

@@ -18,3 +18,8 @@ export const customLayers = createSelector(
   selectStore,
   state => state.customLayers
 )
+
+export const useViewer = createSelector(
+  selectStore,
+  state => state.useViewer
+)

@@ -35,12 +35,16 @@ jobs:
         draft: false
         prerelease: false
         
-    - name: Checkout
-      uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+    - name: Use Node.js 16.x 
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16.x'
+        
     - name: Build & zip assets
       run: |
         STRICT_LOCAL=true node ./src/environments/parseEnv.js
-        npm run build
+        npm i && npm run build
         zip -r siibra-explorer-${{ needs.check-version.outputs.package-version }}.zip ./dist
     - name: Attach built as release asset
       id: upload-release-asset 

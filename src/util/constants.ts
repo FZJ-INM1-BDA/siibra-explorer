@@ -111,12 +111,6 @@ export const PMAP_DEFAULT_CONFIG = {
   removeBg: true
 }
 
-export const compareLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]) => boolean = (prevLandmarks: any[], newLandmarks: any[]) => {
-  return prevLandmarks.every(lm => typeof lm.name !== 'undefined') &&
-    newLandmarks.every(lm => typeof lm.name !== 'undefined') &&
-    prevLandmarks.length === newLandmarks.length
-}
-
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
 
 export const UNSUPPORTED_PREVIEW = [{
@@ -131,3 +125,18 @@ export const UNSUPPORTED_PREVIEW = [{
 }]
 
 export const UNSUPPORTED_INTERVAL = 7000
+
+/**
+ * atlas should follow the following order
+ */
+export const speciesOrder = [
+  "Homo sapiens",
+  "Macaca fascicularis",
+  "Rattus norvegicus",
+  "Mus musculus"
+]
+
+export const parcBanList: string[] = [
+  "https://identifiers.org/neurovault.image:23262",
+  "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152",
+]

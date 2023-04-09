@@ -1,4 +1,4 @@
-const request = require('request')
+const got = require('got')
 
 const apiPath = '/api/v4'
 const saneUrlVer = `0.0.1`
@@ -31,31 +31,18 @@ class GitlabSnippetStore {
   }
 
   _promiseRequest(...arg) {
-    return new Promise((rs, rj) => {
-      request(...arg, (err, resp, body) => {
-        if (err) return rj(err)
-        if (resp.statusCode >= 400) return rj(resp)
-        rs(body)
-      })
-    })
+    return got(...arg).text()
   }
 
   _request({ addPath = '', method = 'GET', headers = {}, opt = {} } = {}) {
-    return new Promise((rs, rj) => {
-      request(`${this.url}${addPath}`, {
-        method,
-        headers: {
-          'PRIVATE-TOKEN': this.token,
-          ...headers
-        },
-        qs: { per_page: 1000 },
-        ...opt
-      }, (err, resp, body) => {
-        if (err) return rj(err)
-        if (resp.statusCode >= 400) return rj(resp)
-        return rs(body)
-      })
-    })
+    return got(`${this.url}${addPath}?per_page=1000`, {
+      method,
+      headers: {
+        'PRIVATE-TOKEN': this.token,
+        ...headers
+      },
+      ...opt
+    }).text()
   }
 
   async get(id) {

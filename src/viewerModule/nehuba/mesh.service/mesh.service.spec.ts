@@ -3,7 +3,7 @@ import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
 import { NehubaMeshService } from "./mesh.service"
 import { atlasSelection } from "src/state"
-import { SapiRegionModel } from "src/atlasComponents/sapi"
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import * as configSvc from "../config.service"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
@@ -11,7 +11,7 @@ import { mapTo, take } from "rxjs/operators"
 import { selectorAuxMeshes } from "../store"
 
 
-const fits1 = {} as SapiRegionModel
+const fits1 = {} as SxplrRegion
 const auxMesh = {
   "@id": 'bla',
   labelIndicies: [1,2,3],
@@ -24,7 +24,7 @@ const auxMesh = {
 
 describe('> mesh.service.ts', () => {
   let getParcNgIdSpy: jasmine.Spy = jasmine.createSpy('getParcNgId')
-  let getRegionLabelIndexSpy: jasmine.Spy = jasmine.createSpy('getRegionLabelIndexSpy')
+  
   let getATPSpy: jasmine.Spy = jasmine.createSpy('distinctATP')
 
   const mockAtlas = {
@@ -39,7 +39,6 @@ describe('> mesh.service.ts', () => {
 
   beforeEach(() => {
     spyOnProperty(configSvc, 'getParcNgId').and.returnValue(getParcNgIdSpy)
-    spyOnProperty(configSvc, 'getRegionLabelIndex').and.returnValue(getRegionLabelIndexSpy)
     getATPSpy = spyOn(atlasSelection.fromRootStore, 'distinctATP')
     getATPSpy.and.returnValue(
       pipe(
@@ -54,7 +53,7 @@ describe('> mesh.service.ts', () => {
 
   afterEach(() => {
     getParcNgIdSpy.calls.reset()
-    getRegionLabelIndexSpy.calls.reset()
+    
     getATPSpy.calls.reset()
   })
   describe('> NehubaMeshService', () => {
@@ -93,7 +92,6 @@ describe('> mesh.service.ts', () => {
           mockStore.overrideSelector(selectorAuxMeshes, [auxMesh])
     
           getParcNgIdSpy.and.returnValue(ngId)
-          getRegionLabelIndexSpy.and.returnValue(labelIndex)
 
         })
 
@@ -137,7 +135,6 @@ describe('> mesh.service.ts', () => {
           mockStore.overrideSelector(selectorAuxMeshes, [])
     
           getParcNgIdSpy.and.returnValues(ngId1, ngId2, ngId2)
-          getRegionLabelIndexSpy.and.returnValues(labelIndex1, labelIndex2, labelIndex2)
         })
 
         it('> should call getParcNgIdSpy and getRegionLabelIndexSpy thrice', () => {
@@ -147,7 +144,6 @@ describe('> mesh.service.ts', () => {
           ).subscribe(() => {
 
             expect(getParcNgIdSpy).toHaveBeenCalledTimes(3)
-            expect(getRegionLabelIndexSpy).toHaveBeenCalledTimes(3)
           })
         })
 

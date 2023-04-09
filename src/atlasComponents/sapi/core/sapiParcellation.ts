@@ -1,73 +1,34 @@
-import { Observable } from "rxjs"
-import { switchMap } from "rxjs/operators"
-import { SapiVolumeModel } from ".."
+import { Observable, of } from "rxjs"
 import { SAPI } from "../sapi.service"
-import {SapiParcellationFeatureModel, SapiParcellationModel, SapiQueryPriorityArg, SapiRegionModel} from "../type"
+import { SapiParcellationModel } from "../typeV3"
+import { SAPIBase } from "./base"
 
-type PaginationQuery = {
-  size: number
-  page: number
-}
+/**
+ * All valid parcellation features
+ */
+const ParcellationFeatures = {
+  RegionalConnectivity: "RegionalConnectivity",
+} as const
 
-type ParcellationPaginationQuery = {
-  type?: string
-  size?: number
-  page: number
-}
+export type PF = keyof typeof ParcellationFeatures
 
-export class SAPIParcellation{
+export class SAPIParcellation extends SAPIBase<PF>{
   constructor(private sapi: SAPI, public atlasId: string, public id: string){
-
+    super(sapi)
   }
 
-  getDetail(queryParam?: SapiQueryPriorityArg): Observable<SapiParcellationModel>{
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.sapi.httpGet<SapiParcellationModel>(
-        `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}`,
-        null,
-        queryParam
-      ))
-    )
+  getDetail(): Observable<SapiParcellationModel>{
+    return this.sapi.v3Get(`/parcellations/{parcellation_id}`, {
+      path: {
+        parcellation_id: this.id
+      },
+    })
   }
 
-  getRegions(spaceId: string, queryParam?: SapiQueryPriorityArg): Observable<SapiRegionModel[]> {
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.sapi.httpGet<SapiRegionModel[]>(
-        `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/regions`,
-        {
-          space_id: spaceId
-        },
-        queryParam
-      ))
-    )
-  }
-  getVolumes(): Observable<SapiVolumeModel[]>{
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.sapi.httpGet<SapiVolumeModel[]>(
-        `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/volumes`
-      ))
-    ) 
+  getLabelledMap(spaceId: string) {
+    return this.sapi.getMap(this.id, spaceId, "LABELLED")
   }
 
-  getFeatures(parcPagination?: ParcellationPaginationQuery, queryParam?: SapiQueryPriorityArg): Observable<SapiParcellationFeatureModel[]> {
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.sapi.httpGet<SapiParcellationFeatureModel[]>(
-        `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features`,
-        {
-          type: parcPagination?.type,
-          size: parcPagination?.size?.toString() || '5',
-          page: parcPagination?.page.toString() || '0',
-        },
-        queryParam
-      ))
-    )
-  }
-
-  getFeatureInstance(instanceId: string): Observable<SapiParcellationFeatureModel> {
-    return SAPI.BsEndpoint$.pipe(
-      switchMap(endpt => this.sapi.http.get<SapiParcellationFeatureModel>(
-        `${endpt}/atlases/${encodeURIComponent(this.atlasId)}/parcellations/${encodeURIComponent(this.id)}/features/${encodeURIComponent(instanceId)}`,
-      ))
-    )
-  }
+  static Features$ = of(Object.keys(ParcellationFeatures) as PF[])
+  public features$ = SAPIParcellation.Features$
 }

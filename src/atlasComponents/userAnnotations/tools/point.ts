@@ -56,6 +56,7 @@ export class Point extends IAnnotationGeometry {
       coordinateSpace,
       coordinates
     } = sands
+    const { ['@id']: spaceId } = coordinateSpace
     if (type === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
       const parsedCoordinate = coordinates.map(coord => {
         const { value, unit } = coord
@@ -64,7 +65,7 @@ export class Point extends IAnnotationGeometry {
       })
       const point = new Point({
         id,
-        space: coordinateSpace,
+        space: { id: spaceId },
         "@type": 'siibra-ex/annotation/point',
         x: parsedCoordinate[0],
         y: parsedCoordinate[1],

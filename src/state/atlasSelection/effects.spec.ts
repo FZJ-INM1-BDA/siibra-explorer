@@ -4,7 +4,8 @@ import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
 import { Observable, of, throwError } from "rxjs"
-import { SAPI, SAPIModule, SapiRegionModel, SapiAtlasModel, SapiSpaceModel, SapiParcellationModel } from "src/atlasComponents/sapi"
+import { SAPI, SAPIModule } from "src/atlasComponents/sapi"
+import { SxplrRegion, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { IDS } from "src/atlasComponents/sapi/constants"
 import { actions, selectors } from "."
 import { Effect } from "./effects"
@@ -16,9 +17,9 @@ describe("> effects.ts", () => {
   describe("> Effect", () => {
 
     let actions$ = new Observable<Action>()
-    let hoc1left: SapiRegionModel
-    let hoc1leftCentroid: SapiRegionModel
-    let hoc1leftCentroidWrongSpc: SapiRegionModel
+    let hoc1left: SxplrRegion
+    let hoc1leftCentroid: SxplrRegion
+    let hoc1leftCentroidWrongSpc: SxplrRegion
 
     beforeEach(async () => {
       TestBed.configureTestingModule({
@@ -40,24 +41,18 @@ describe("> effects.ts", () => {
       if (!hoc1left) {
 
         const sapisvc = TestBed.inject(SAPI)
-        const regions = await sapisvc.getParcRegions(IDS.ATLAES.HUMAN, IDS.PARCELLATION.JBA29, IDS.TEMPLATES.MNI152).toPromise()
+        const regions = await sapisvc.getParcRegions(IDS.PARCELLATION.JBA29).toPromise()
         hoc1left = regions.find(r => /hoc1/i.test(r.name) && /left/i.test(r.name))
         if (!hoc1left) throw new Error(`cannot find hoc1 left`)
         hoc1leftCentroid = JSON.parse(JSON.stringify(hoc1left)) 
-        hoc1leftCentroid.hasAnnotation.bestViewPoint = {
-          coordinateSpace: {
-            '@id': IDS.TEMPLATES.BIG_BRAIN
-          },
-          coordinates: [{
-            value: 1
-          }, {
-            value: 2
-          }, {
-            value: 3
-          }]
+        hoc1leftCentroid.centroid = {
+          space: {
+            id: IDS.TEMPLATES.BIG_BRAIN
+          } as SxplrTemplate,
+          loc: [1, 2, 3]
         }
         hoc1leftCentroidWrongSpc = JSON.parse(JSON.stringify(hoc1leftCentroid))
-        hoc1leftCentroidWrongSpc.hasAnnotation.bestViewPoint.coordinateSpace['@id'] = IDS.TEMPLATES.COLIN27
+        hoc1leftCentroidWrongSpc.centroid.space.id = IDS.TEMPLATES.COLIN27
       }
     })
 
@@ -242,14 +237,14 @@ describe("> effects.ts", () => {
         })
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(selectors.selectedAtlas, {
-          "@id": IDS.ATLAES.HUMAN
-        } as SapiAtlasModel)
+          id: IDS.ATLAES.HUMAN
+        } as SxplrAtlas)
         mockStore.overrideSelector(selectors.selectedTemplate, {
-          "@id": IDS.TEMPLATES.MNI152
-        } as SapiSpaceModel)
+          id: IDS.TEMPLATES.MNI152
+        } as SxplrTemplate)
         mockStore.overrideSelector(selectors.selectedParcellation, {
-          "@id": IDS.PARCELLATION.JBA29
-        } as SapiParcellationModel)
+          id: IDS.PARCELLATION.JBA29
+        } as SxplrParcellation)
       })
 
       describe('> if atlas, template, parc is not set', () => {
@@ -307,20 +302,14 @@ describe("> effects.ts", () => {
       })
 
       describe('> if inputs are fine', () => {
-        let getRegionSpy: jasmine.Spy
         let regionGetDetailSpy: jasmine.Spy = jasmine.createSpy()
         beforeEach(() => {
           const sapi = TestBed.inject(SAPI)
-          getRegionSpy = spyOn(sapi, 'getRegion')
-          getRegionSpy.and.returnValue({
-            getDetail: regionGetDetailSpy
-          })
           regionGetDetailSpy.and.returnValue(
             of(hoc1leftCentroid)
           )
         })
         afterEach(() => {
-          if (getRegionSpy) getRegionSpy.calls.reset()
           if (regionGetDetailSpy) regionGetDetailSpy.calls.reset()
         })
         it('> getRegionDetailSpy is called, and calls navigateTo', () => {
@@ -335,8 +324,6 @@ describe("> effects.ts", () => {
               })
             })
           )
-          expect(getRegionSpy).toHaveBeenCalledTimes(1)
-          expect(getRegionSpy).toHaveBeenCalledWith(IDS.ATLAES.HUMAN, IDS.PARCELLATION.JBA29, hoc1left["@id"])
         })
 
         describe('> mal formed return', () => {

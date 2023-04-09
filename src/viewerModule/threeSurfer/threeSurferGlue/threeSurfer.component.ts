@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { combineLatest, Observable, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
+import { combineLatest, from, merge, NEVER, Observable, Subject } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
@@ -11,11 +11,11 @@ import { getUuid } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer, ColorMapCustomLayer } from "src/state/atlasAppearance/const";
-import { SapiRegionModel, SapiVolumeModel } from "src/atlasComponents/sapi";
-import { getRegionLabelIndex } from "src/viewerModule/nehuba/config.service";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { arrayEqual } from "src/util/array";
 import { ThreeSurferEffects } from "../store/effects";
 import { selectors, actions  } from "../store"
+import { SAPI } from "src/atlasComponents/sapi";
 
 const viewerType = 'ThreeSurfer'
 type TInternalState = {
@@ -30,7 +30,7 @@ type TInternalState = {
 const pZoomFactor = 5e3
 
 type THandlingCustomEv = {
-  regions: SapiRegionModel[]
+  regions: SxplrRegion[]
   error?: string
   evMesh?: {
     faceIndex: number
@@ -112,7 +112,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   }> = {}
   private internalStateNext: (arg: TInteralStatePayload<TInternalState>) => void
 
-  private mouseoverRegions: SapiRegionModel[] = []
+  private mouseoverRegions: SxplrRegion[] = []
   
   private selectedRegions$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions)
@@ -136,8 +136,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   /**
    * maps laterality to label index to sapi region
    */
-  private latLblIdxToRegionRecord: LateralityRecord<Record<number, SapiRegionModel>> = {}
-  private latLblIdxToRegionRecord$: Observable<LateralityRecord<Record<number, SapiRegionModel>>> = combineLatest([
+  private latLblIdxToRegionRecord: LateralityRecord<Record<number, SxplrRegion>> = {}
+  private latLblIdxToRegionRecord$: Observable<LateralityRecord<Record<number, SxplrRegion>>> = combineLatest([
     this.store$.pipe(
       atlasSelection.fromRootStore.distinctATP()
     ),
@@ -145,15 +145,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       select(atlasSelection.selectors.selectedParcAllRegions),
     )
   ]).pipe(
-    map(([ { atlas, parcellation, template },  regions]) => {
-      const returnObj = {
-        'left': {} as Record<number, SapiRegionModel>,
-        'right': {} as Record<number, SapiRegionModel>
-      }
-      
-      for (const region of regions) {
-        const idx = getRegionLabelIndex(atlas, template, parcellation, region)
-        if (idx) {
+    switchMap(([ { parcellation, template },  regions]) => {
+      return merge(
+        ...regions.map(region => 
+          from(this.sapi.getRegionLabelIndices(template, parcellation, region)).pipe(
+            map(label => ({ region, label })),
+            catchError(() => NEVER)
+          )
+        )
+      ).pipe(
+        scan((acc, curr) => {
+          const { label, region } = curr
+          
           let key : 'left' | 'right'
           if ( /left/i.test(region.name) ) key = 'left'
           if ( /right/i.test(region.name) ) key = 'right'
@@ -162,12 +165,17 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
              * TODO
              * there are ... more regions than expected, which has label index without laterality
              */
-            continue
+            return { ...acc }
           }
-          returnObj[key][idx] = region
-        }
-      }
-      return returnObj
+          return {
+            ...acc,
+            [key]: {
+              ...acc[key],
+              [label]: region
+            }
+          }
+        }, {'left': {}, 'right': {}})
+      )
     })
   )
 
@@ -185,11 +193,11 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
    */
   private showDelineation: boolean = true
 
-  public threeSurferSurfaceLayers$ = this.effect.onATPDebounceThreeSurferLayers$.pipe(
-    map(({ surfaces }) => surfaces)
+  public threeSurferSurfaceVariants$ = this.effect.onATPDebounceThreeSurferLayers$.pipe(
+    map(({ surfaces }) => surfaces.reduce((acc, val) => acc.includes(val.variant) ? acc : [...acc, val.variant] ,[] as string[]))
   )
   public selectedSurfaceLayerId$ = this.store$.pipe(
-    select(selectors.getSelectedVolumeId)
+    select(selectors.getSelectedSurfaceVariant)
   )
 
   constructor(
@@ -197,6 +205,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     private el: ElementRef,
     private store$: Store,
     private navStateStoreRelay: ComponentStore<{ perspectiveOrientation: [number, number, number, number], perspectiveZoom: number }>,
+    private sapi: SAPI,
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
@@ -369,7 +378,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   }
 
   private tsRef: TThreeSurfer
-  private selectedRegions: SapiRegionModel[] = []
+  private selectedRegions: SxplrRegion[] = []
 
   private relayStoreLock: () => void = null
   private tsRefInitCb: ((tsRef: any) => void)[] = []
@@ -673,10 +682,10 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     }
   }
 
-  switchSurfaceLayer(layer: SapiVolumeModel): void{
+  switchSurfaceLayer(variant: string): void{
     this.store$.dispatch(
-      actions.selectVolumeById({
-        id: layer["@id"]
+      actions.selectSurfaceVariant({
+        variant
       })
     )
   }

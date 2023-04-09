@@ -11,6 +11,7 @@ import { SapiViewsCoreParcellationModule } from "src/atlasComponents/sapiViews/c
 import { PureATPSelector } from "./pureDumb/pureATPSelector.components";
 import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { SAPIModule } from "src/atlasComponents/sapi/module";
     MarkdownModule,
     MatRippleModule,
     MatIconModule,
+    MatTooltipModule,
     MatButtonModule,
     DialogModule,
     SAPIModule,

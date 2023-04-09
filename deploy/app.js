@@ -94,6 +94,7 @@ const _ = (async () => {
   }))
 
   await configureAuth(app)
+  
   app.use('/user', require('./user'))
 
   /**

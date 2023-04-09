@@ -3,7 +3,8 @@ import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { EMPTY, forkJoin, merge, Observable, of, pipe, throwError } from "rxjs";
 import { debounceTime, map, switchMap, withLatestFrom, filter, shareReplay, distinctUntilChanged } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi";
+import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer } from "src/state/atlasAppearance/const";
 import * as selectors from "./selectors"
@@ -13,25 +14,14 @@ export const fromATP = {
   getThreeSurfaces: (sapi: SAPI) => {
     return pipe(
       filter(
-        ({ atlas, template, parcellation }: {atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel}) => !!atlas && !!template && !!parcellation
+        ({ atlas, template, parcellation }: {atlas: SxplrAtlas, template: SxplrTemplate, parcellation: SxplrParcellation}) => !!atlas && !!template && !!parcellation
       ),
-      switchMap(({ atlas, template, parcellation }: {atlas: SapiAtlasModel, template: SapiSpaceModel, parcellation: SapiParcellationModel}) => 
-        forkJoin({
-          surfaces: sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
-            map(
-              volumes => volumes.filter(vol => vol.data.type === "gii")
-            )
-          ),
-          labels: sapi.getParcellation(atlas["@id"], parcellation["@id"]).getVolumes().pipe(
-            map(
-              volumes => volumes.filter(vol =>
-                vol.data.type === "gii-label" &&
-                vol.data.space["@id"] === template["@id"]
-              )
-            )
-          )
+      switchMap(({ template, parcellation }: {atlas: SxplrAtlas, template: SxplrTemplate, parcellation: SxplrParcellation}) => {
+        return forkJoin({
+          surfaces: sapi.getSurfaceTemplateImage(template),
+          labels: sapi.getTranslatedLabelledThreeMap(parcellation, template),
         })
-      )
+      })
     )
   }
 }
@@ -44,14 +34,17 @@ export class ThreeSurferEffects {
   )
 
   private selectedSurfaceId$ = this.store.pipe(
-    select(selectors.getSelectedVolumeId),
+    select(selectors.getSelectedSurfaceVariant),
     distinctUntilChanged()
   )
 
   private threeSurferBaseCustomLayers$: Observable<ThreeSurferCustomLayer[]> = this.store.pipe(
     select(atlasAppearance.selectors.customLayers),
     map(
-      cl => cl.filter(layer => layer.clType === "baselayer/threesurfer") as ThreeSurferCustomLayer[]
+      cl => cl.filter(layer => 
+        layer.clType === "baselayer/threesurfer" ||
+        layer.clType === "baselayer/threesurfer-label"
+      ) as ThreeSurferCustomLayer[]
     )
   )
 
@@ -81,18 +74,19 @@ export class ThreeSurferEffects {
 
   onATPDebounceHasSurfaceVolumes = createEffect(() => this.onATPDebounceThreeSurferLayers$.pipe(
     switchMap(({ surfaces }) => {
-      const defaultSurface = surfaces.find(s => s.metadata.shortName === "pial") || surfaces[0]
+      
+      const defaultSurface = surfaces.find(s => s.variant === "pial") || surfaces[0]
       if (!defaultSurface) return EMPTY
       return of(
-        actions.selectVolumeById({
-          id: defaultSurface["@id"]
+        actions.selectSurfaceVariant({
+          variant: defaultSurface.variant
         })
       )
     })
   ))
 
   onSurfaceSelected = createEffect(() => this.selectedSurfaceId$.pipe(
-    switchMap(id => this.onATPDebounceThreeSurferLayers$.pipe(
+    switchMap(variant => this.onATPDebounceThreeSurferLayers$.pipe(
       switchMap(({ surfaces }) => {
         if (surfaces.length === 0) return EMPTY
   
@@ -100,19 +94,16 @@ export class ThreeSurferEffects {
         /**
          * select the pial or first one by default
          */
-        const selectedSrc = surfaces.find(s => s["@id"] === id)
+        const selectedSrc = surfaces.filter(surface => surface.variant === variant)
   
-        if (!(selectedSrc.data?.url_map)) {
-          return throwError(`Expecting surfaces[0].data.url_map to be defined, but is not.`)
-        }
-  
-        for (const key in selectedSrc.data.url_map) {
+        for (const src of selectedSrc) {
           layers.push({
+            
             clType: 'baselayer/threesurfer',
-            id: `${selectedSrc["@id"]}-${key}`,
-            name: `${selectedSrc["@id"]}-${key}`,
-            laterality: key as 'left' | 'right',
-            source: selectedSrc.data.url_map[key]
+            id: src.id,
+            name: src.id,
+            laterality: src.laterality,
+            source: src.url
           })
         }
         return of(...[
@@ -127,14 +118,15 @@ export class ThreeSurferEffects {
   ))
 
   onATPDebounceAddBaseLayers$ = createEffect(() => this.onATPDebounceThreeSurferLayers$.pipe(
-    switchMap(({ labels }) => {
+    switchMap(({ labels, surfaces }) => {
       const labelMaps: ThreeSurferCustomLabelLayer[] = []
-      for (const label of labels) {
+      for (const key in labels) {
+        const { laterality, url } = labels[key]
         labelMaps.push({
           clType: 'baselayer/threesurfer-label',
-          id: `${label["@id"]}-${label.metadata.shortName}`,
-          laterality: label.metadata.shortName as 'left' | 'right',
-          source: label.data.url
+          id: `${url}-${laterality}`,
+          laterality,
+          source: url
         })
       }
       return of(

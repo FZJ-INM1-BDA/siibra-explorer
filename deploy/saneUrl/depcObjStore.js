@@ -1,4 +1,4 @@
-const request = require('request')
+const got = require('got')
 const { NotFoundError } = require('./store')
 
 const { OBJ_STORAGE_ROOT_URL } = process.env
@@ -11,14 +11,7 @@ class Store {
         new NotFoundError()
       )
     }
-    return new Promise((rs, rj) => {
-      request.get(`${OBJ_STORAGE_ROOT_URL}/${id}`, (err, resp, body) => {
-        if (err) return rj(err)
-        if (resp.statusCode === 404) return rj(new NotFoundError())
-        if (resp.statusCode >= 400) return rj(resp)
-        return rs(body)
-      })
-    })
+    return got(`${OBJ_STORAGE_ROOT_URL}/${id}`).text()
   }
 
   async del(id){

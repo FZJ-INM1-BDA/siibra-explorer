@@ -1,13 +1,12 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, merge, Observable, of } from "rxjs";
+import { combineLatest, Observable, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { atlasSelection } from "src/state";
-import { Tree } from "src/components/flatHierarchy/treeView/treeControl"
-import { getParcNgId, getRegionLabelIndex } from "../config.service";
+import { BaseService } from "../base.service/base.service";
 
 /**
  * control mesh loading etc
@@ -21,6 +20,7 @@ export class NehubaMeshService implements OnDestroy {
   constructor(
     private store$: Store<any>,
     private effect: LayerCtrlEffects,
+    private baseService: BaseService,
   ){
   }
 
@@ -30,102 +30,116 @@ export class NehubaMeshService implements OnDestroy {
 
 
   public auxMeshes$ = this.effect.onATPDebounceNgLayers$.pipe(
-    map(({ tmplAuxNgLayers }) => tmplAuxNgLayers)
+    map(({ tmplAuxNgLayers }) => tmplAuxNgLayers),
   )
 
-  public loadMeshes$: Observable<IMeshesToLoad> = merge(
-    combineLatest([
-      this.store$.pipe(
-        atlasSelection.fromRootStore.distinctATP(),
-      ),
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedParcAllRegions),
-      ),
-      this.store$.pipe(
-        select(atlasSelection.selectors.selectedRegions),
-      )
-    ]).pipe(
-      switchMap(([{ atlas, template, parcellation }, regions, selectedRegions]) => {
-        const ngIdRecord: Record<string, number[]> = {}
-        
-        const tree = new Tree(
-          regions,
-          (c, p) => (c.hasParent || []).some(_p => _p["@id"] === p["@id"])
-        )
+  #allSegmentMeshes$ = this.baseService.completeNgIdLabelRegionMap$.pipe(
+    map(record => {
+      const ngIdRecord: Record<string, number[]> = {}
 
-        for (const r of regions) {
-          const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
-          if (!regionLabelIndex) {
-            continue
-          }
-          if (
-            tree.someAncestor(r, anc => !!getRegionLabelIndex(atlas, template, parcellation, anc))
-          ) {
-            continue
-          }
-          const ngId = getParcNgId(atlas, template, parcellation, r)
+      for (const [ngId, labelToRegion] of Object.entries(record)) {
+        for (const [label, _region] of Object.entries(labelToRegion)) {
           if (!ngIdRecord[ngId]) {
             ngIdRecord[ngId] = []
           }
-          ngIdRecord[ngId].push(regionLabelIndex)
+          ngIdRecord[ngId].push(Number(label))
         }
+      }
 
-        if (selectedRegions.length > 0) {
-          /**
-           * If regions are selected, reset the meshes
-           */
-          for (const key in ngIdRecord) {
-            ngIdRecord[key] = []
-          }
+      const arr: IMeshesToLoad[] = []
 
-          /**
-           * only show selected region
-           */
-          for (const r of selectedRegions) {
-            const ngId = getParcNgId(atlas, template, parcellation, r)
-            const regionLabelIndex = getRegionLabelIndex( atlas, template, parcellation, r )
-            if (!ngIdRecord[ngId]) {
-              ngIdRecord[ngId] = []
-            }
-            ngIdRecord[ngId].push(regionLabelIndex)
-          }
-        }
-        const arr: IMeshesToLoad[] = []
+      for (const ngId in ngIdRecord) {
+        const labelIndicies = ngIdRecord[ngId]
+        arr.push({
+          labelIndicies,
+          layer: { name: ngId }
+        })
+      }
 
-        for (const ngId in ngIdRecord) {
-          const labelIndicies = ngIdRecord[ngId]
-          arr.push({
-            labelIndicies,
-            layer: { name: ngId }
-          })
-        }
-  
-        return of(...arr)
-      })
-    ),
+      return arr
+    })
+  )
+
+  #selectedSegmentMeshes$ = combineLatest([
+    this.baseService.completeNgIdLabelRegionMap$,
     this.store$.pipe(
-      select(selectorAuxMeshes),
-      switchMap(auxMeshes => {
-        const obj: Record<string, number[]> = {}
-        const arr: IMeshesToLoad[] = []
-        for (const mesh of auxMeshes) {
-          if (!obj[mesh.ngId]) {
-            obj[mesh.ngId] = []
+      select(atlasSelection.selectors.selectedRegions),
+    ),
+  ]).pipe(
+    switchMap(([record, selectedRegions]) => {
+      const ngIdRecord: Record<string, number[]> = {}
+      
+      const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
+
+      for (const [ngId, labelToRegion] of Object.entries(record)) {
+        for (const [label, region] of Object.entries(labelToRegion)) {
+          if (!ngIdRecord[ngId]) {
+            ngIdRecord[ngId] = []
           }
-          if (mesh.visible) {
-            obj[mesh.ngId].push(...mesh.labelIndicies)
+          if (!selectedRegionNameSet.has(region.name)) {
+            continue
           }
+          ngIdRecord[ngId].push(Number(label))
         }
-        for (const key in obj) {
-          arr.push({
-            layer: {
-              name: key
-            },
-            labelIndicies: obj[key]
-          })
+      }
+
+      const arr: IMeshesToLoad[] = []
+
+      for (const ngId in ngIdRecord) {
+        const labelIndicies = ngIdRecord[ngId]
+        arr.push({
+          labelIndicies,
+          layer: { name: ngId }
+        })
+      }
+
+      return of(arr)
+    })
+  )
+
+  #auxMesh$ = this.store$.pipe(
+    select(selectorAuxMeshes),
+    switchMap(auxMeshes => {
+      const obj: Record<string, number[]> = {}
+      const arr: IMeshesToLoad[] = []
+      for (const mesh of auxMeshes) {
+        if (!obj[mesh.ngId]) {
+          obj[mesh.ngId] = []
         }
-        return of(...arr)
-      })
-    )
+        if (mesh.visible) {
+          obj[mesh.ngId].push(...mesh.labelIndicies)
+        }
+      }
+      for (const key in obj) {
+        arr.push({
+          layer: {
+            name: key
+          },
+          labelIndicies: obj[key]
+        })
+      }
+      return of(arr)
+    })
+  )
+
+  public loadMeshes$: Observable<IMeshesToLoad> = combineLatest([
+    this.#allSegmentMeshes$,
+    this.#selectedSegmentMeshes$,
+    this.#auxMesh$,
+  ]).pipe(
+    switchMap(([ allSegMesh, selectedSegMesh, auxmesh ]) => {
+      const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)
+      const hasAuxMesh = auxmesh.length > 0
+      const meshesToLoad: IMeshesToLoad[] = []
+      if (!hasSegSelected) {
+        meshesToLoad.push(
+          ...(hasAuxMesh ? selectedSegMesh : allSegMesh),
+          ...auxmesh,
+        )
+      } else {
+        meshesToLoad.push(...selectedSegMesh, ...auxmesh)
+      }
+      return of(...meshesToLoad)
+    })
   )
 }

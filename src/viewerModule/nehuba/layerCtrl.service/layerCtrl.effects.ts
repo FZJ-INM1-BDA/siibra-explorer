@@ -1,110 +1,114 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, of } from "rxjs";
-import { mapTo, switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { SAPI, SapiAtlasModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel, SapiRegionModel } from "src/atlasComponents/sapi";
-import { SapiVOIDataResponse, SapiVolumeModel } from "src/atlasComponents/sapi/type";
+import { forkJoin, from, of } from "rxjs";
+import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
+import { Feature, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
+import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/constants";
-import { getNgLayersFromVolumesATP, getRegionLabelIndex } from "../config.service";
-import { ParcVolumeSpec } from "../store/util";
 import { PMAP_LAYER_NAME } from "../constants";
+import { QuickHash } from "src/util/fn";
+import { getParcNgId } from "../config.service";
 
 @Injectable()
 export class LayerCtrlEffects {
-  onRegionSelectClearPmapLayer = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedRegions),
-    distinctUntilChanged(
-      arrayEqual((o, n) => o["@id"] === n["@id"])
-    ),
-    mapTo(
-      atlasAppearance.actions.removeCustomLayer({
+  static TransformVolumeModel(volumeModel: VoiFeature['ngVolume']): atlasAppearance.const.NgLayerCustomLayer[] {    
+    return [{
+      clType: "customlayer/nglayer",
+      id: volumeModel.url,
+      source: `precomputed://${volumeModel.url}`,
+      transform: volumeModel.transform,
+    }]
+  }
+
+  #onATP$ = this.store.pipe(
+    atlasSelection.fromRootStore.distinctATP(),
+    map(val => val as { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }),
+  )
+
+
+  #pmapUrl: string
+  #cleanupUrl(){
+    if (!!this.#pmapUrl) {
+      URL.revokeObjectURL(this.#pmapUrl)
+      this.#pmapUrl = null
+    }
+  }
+
+  onRegionSelect = createEffect(() => this.store.pipe(
+    select(atlasAppearance.selectors.useViewer),
+    switchMap(viewer => {
+      const rmPmapAction = atlasAppearance.actions.removeCustomLayer({
         id: PMAP_LAYER_NAME
       })
-    )
-  ))
-
-  onRegionSelectShowNewPmapLayer = createEffect(() => this.store.pipe(
-    select(atlasSelection.selectors.selectedRegions),
-    filter(regions => regions.length > 0),
-    withLatestFrom(
-      this.store.pipe(
-        atlasSelection.fromRootStore.distinctATP()
-      )
-    ),
-    switchMap(([ regions, { atlas, parcellation, template } ]) => {
-      const sapiRegion = this.sapi.getRegion(atlas["@id"], parcellation["@id"], regions[0].name)
-      return forkJoin([
-        sapiRegion.getMapInfo(template["@id"]),
-        sapiRegion.getMapUrl(template["@id"])
-      ]).pipe(
-        map(([mapInfo, mapUrl]) => 
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: {
-              clType: "customlayer/nglayer",
-              id: PMAP_LAYER_NAME,
-              source: `nifti://${mapUrl}`,
-              shader: getShader({
-                colormap: EnumColorMapName.VIRIDIS,
-                highThreshold: mapInfo.max,
-                lowThreshold: mapInfo.min,
-                removeBg: true,
-              })
-            }
-          })
+      if (viewer !== "NEHUBA") {
+        this.#cleanupUrl()
+        return of(rmPmapAction)
+      }
+      return this.store.pipe(
+        select(atlasSelection.selectors.selectedRegions),
+        distinctUntilChanged(
+          arrayEqual((o, n) => o.name === n.name)
         ),
-        catchError(() => of(
-          atlasAppearance.actions.removeCustomLayer({
-            id: PMAP_LAYER_NAME
-          })
-        ))
+        withLatestFrom(this.#onATP$),
+        // since region selection changed, pmap will definitely be removed. revoke the url resource.
+        tap(() => this.#cleanupUrl()),
+        switchMap(([ regions, { parcellation, template } ]) => {
+          if (regions.length !== 1) {
+            return of(rmPmapAction)
+          }
+          return this.sapi.getStatisticalMap(parcellation, template, regions[0]).pipe(
+            switchMap(({ buffer, meta }) => {
+              this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
+              return of(
+                rmPmapAction,
+                atlasAppearance.actions.addCustomLayer({
+                  customLayer: {
+                    clType: "customlayer/nglayer",
+                    id: PMAP_LAYER_NAME,
+                    source: `nifti://${this.#pmapUrl}`,
+                    shader: getShader({
+                      colormap: EnumColorMapName.VIRIDIS,
+                      highThreshold: meta.max,
+                      lowThreshold: meta.min,
+                      removeBg: true,
+                    })
+                  }
+                })
+              )
+            }),
+            catchError(() => of(rmPmapAction)),
+          )
+        })
       )
-    }),
+    })
   ))
-
-  onATP$ = this.store.pipe(
-    atlasSelection.fromRootStore.distinctATP(),
-    map(val => val as { atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel }),
-  )
 
   onShownFeature = createEffect(() => this.store.pipe(
     select(userInteraction.selectors.selectedFeature),
-    startWith(null as SapiFeatureModel),
+    startWith(null as Feature),
     pairwise(),
     map(([ prev, curr ]) => {
-      const removeLayers: atlasAppearance.NgLayerCustomLayer[] = []
-      const addLayers: atlasAppearance.NgLayerCustomLayer[] = []
-      if (prev?.["@type"] === "siibra/features/voi") {
+      const removeLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
+      const addLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
+      
+      /**
+       * TODO: use proper guard functions
+       */
+      if (!!prev?.['bbox']) {
+        const prevVoi = prev as VoiFeature
+        prevVoi.bbox
         removeLayers.push(
-          ...(prev as SapiVOIDataResponse).volumes.map(v => {
-            return {
-              id: v.metadata.fullName,
-              clType: "customlayer/nglayer",
-              source: v.data.url,
-              transform: v.data.detail['neuroglancer/precomputed']['transform'],
-              opacity: 1.0,
-              visible: true,
-              shader: v.data.detail['neuroglancer/precomputed']['shader'] || getShader()
-            } as atlasAppearance.NgLayerCustomLayer
-          })
+          ...LayerCtrlEffects.TransformVolumeModel(prevVoi.ngVolume)
         )
       }
-      if (curr?.["@type"] === "siibra/features/voi") {
+      if (!!curr?.['bbox']) {
+        const currVoi = curr as VoiFeature
         addLayers.push(
-          ...(curr as SapiVOIDataResponse).volumes.map(v => {
-            return {
-              id: v.metadata.fullName,
-              clType: "customlayer/nglayer",
-              source: `precomputed://${v.data.url}`,
-              transform: v.data.detail['neuroglancer/precomputed']['transform'],
-              opacity: v.data.detail['neuroglancer/precomputed']['opacity'] || 1.0,
-              visible: true,
-              shader: v.data.detail['neuroglancer/precomputed']['shader'] || getShader()
-            } as atlasAppearance.NgLayerCustomLayer
-          })
+          ...LayerCtrlEffects.TransformVolumeModel(currVoi.ngVolume)
         )
       }
       return { removeLayers, addLayers }
@@ -120,7 +124,7 @@ export class LayerCtrlEffects {
     ]))
   ))
 
-  onATPClearBaseLayers = createEffect(() => this.onATP$.pipe(
+  onATPClearBaseLayers = createEffect(() => this.#onATP$.pipe(
     withLatestFrom(
       this.store.pipe(
         select(atlasAppearance.selectors.customLayers),
@@ -143,162 +147,55 @@ export class LayerCtrlEffects {
     )
   ))
 
-  private getNgLayers(atlas: SapiAtlasModel, parcellation: SapiParcellationModel, template: SapiSpaceModel){
-
-    if (!!parcellation && !template) {
-      throw new Error(`parcellation defined, but template not defined!`)
-    }
-    
-    /**
-     * some labelled maps (such as julich brain in big brain) do not have the volumes defined on the parcellation level.
-     * While we have the URLs of these volumes (the method we use is also kind of hacky), and in theory, we could construct a volume object directly
-     * It is probably better to fetch the correct volume object to begin with
-     */
-    const parcVolumes$ = !parcellation
-      ? of([] as {volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[])
-      : forkJoin([
-        this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getRegions(template["@id"]).pipe(
-          map(regions => {
-
-            const volumeIdToRegionMap = new Map<string, {
-              labelIndex: number
-              region: SapiRegionModel
-            }[]>()
-
-            for (const r of regions) {
-              const volumeId = r?.hasAnnotation?.visualizedIn?.["@id"]
-              if (!volumeId) continue
-
-              const labelIndex = getRegionLabelIndex(atlas, template, parcellation, r)
-              if (!labelIndex) continue
-
-              if (!volumeIdToRegionMap.has(volumeId)) {
-                volumeIdToRegionMap.set(volumeId, [])
-              }
-              volumeIdToRegionMap.get(volumeId).push({
-                labelIndex,
-                region: r
-              })
+  onATPDebounceNgLayers$ = this.#onATP$.pipe(
+    debounceTime(16),
+    switchMap(({ atlas, template, parcellation }) => 
+      forkJoin({
+        tmplNgLayers: this.sapi.getVoxelTemplateImage(template).pipe(
+          map(templateImages => {
+            const returnObj: Record<string, NgLayerSpec> = {}
+            for (const img of templateImages) {
+              returnObj[QuickHash.GetHash(img.source)] = img
             }
-            return volumeIdToRegionMap
+            return returnObj
           })
         ),
-        this.sapi.getParcellation(atlas["@id"], parcellation["@id"]).getVolumes()
-      ]).pipe(
-        switchMap(([ volumeIdToRegionMap, volumes ]) => {
-          const missingVolumeIds = Array.from(volumeIdToRegionMap.keys()).filter(id => volumes.map(v => v["@id"]).indexOf(id) < 0)
-
-          const volumesFromParc: {volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec}[] = volumes.map(
-            volume => {
-              const found = volumeIdToRegionMap.get(volume["@id"])
-              if (!found) return null
-
-              try {
-
-                const volumeMetadata: ParcVolumeSpec = {
-                  regions: found,
-                  parcellation,
-                  volumeSrc: volume.data.url
-                }
-                return {
-                  volume,
-                  volumeMetadata,
-                }
-              } catch (e) {
-                console.error(e)
-                return null
-              }
+        tmplAuxNgLayers: this.sapi.getVoxelAuxMesh(template).pipe(
+          map(auxMeshes => {
+            const returnObj: Record<string, NgPrecompMeshSpec> = {}
+            for (const img of auxMeshes) {
+              returnObj[QuickHash.GetHash(`${img.source}_auxMesh`)] = img
             }
-          ).filter(v => v?.volumeMetadata?.regions)
-
-          if (missingVolumeIds.length === 0) return of([...volumesFromParc])
-          return forkJoin(
-            missingVolumeIds.map(missingId => {
-              if (!volumeIdToRegionMap.has(missingId)) {
-                console.warn(`volumeIdToRegionMap does not have volume with id ${missingId}`)
-                return of(null as SapiVolumeModel)
-              }
-              const { region } = volumeIdToRegionMap.get(missingId)[0]
-              return this.sapi.getRegion(atlas["@id"], parcellation["@id"], region.name).getVolumeInstance(missingId).pipe(
-                catchError((err, obs) => of(null as SapiVolumeModel))
-              )
-            })
-          ).pipe(
-            map((missingVolumes: SapiVolumeModel[]) => {
-
-              const volumesFromRegion: { volume: SapiVolumeModel, volumeMetadata: ParcVolumeSpec }[] = missingVolumes.map(
-                volume => {
-                  if (!volume || !volumeIdToRegionMap.has(volume['@id'])) {
-                    return null
-                  }
-
-                  try {
-
-                    const found = volumeIdToRegionMap.get(volume['@id'])
-                    const volumeMetadata: ParcVolumeSpec = {
-                      regions: found,
-                      parcellation,
-                      volumeSrc: volume.data.url
-                    }
-                    return {
-                      volume,
-                      volumeMetadata
-                    }
-                  } catch (e) {
-                    console.error(`volume from region error`, e)
-                    return null
-                  }
-                }
-              ).filter(
-                v => !!v
-              )
-
-              return [
-                ...volumesFromParc,
-                ...volumesFromRegion
-              ]
-            })
-          )
-        })
-      )
-    
-    const spaceVols$ = !!template
-      ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes().pipe(
-        shareReplay(1),
-      )
-      : of([] as SapiVolumeModel[])
-    
-    return forkJoin({
-      tmplVolumes: spaceVols$.pipe(
-        map(
-          volumes => volumes.filter(vol => "neuroglancer/precomputed" in vol.data.detail)
+            return returnObj
+          })
         ),
-      ),
-      tmplAuxMeshVolumes: spaceVols$.pipe(
-        map(
-          volumes => volumes.filter(vol => "neuroglancer/precompmesh" in vol.data.detail)
-        ),
-      ),
-      parcVolumes: parcVolumes$.pipe(
-      )
-    })
-  }
-
-  onATPDebounceNgLayers$ = this.onATP$.pipe(
-    debounceTime(16),
-    switchMap(({ atlas, parcellation, template }) => {
-      return this.getNgLayers(atlas, parcellation, template).pipe(
-        map(volumes => getNgLayersFromVolumesATP(volumes, { atlas, parcellation, template }))
-      )
-    }),
-    shareReplay(1)
+        parcNgLayers: from(this.sapi.getTranslatedLabelledNgMap(parcellation, template)).pipe(
+          map(val => {
+            const returnVal: Record<string, NgSegLayerSpec> = {}
+            for (const [ url, { layer, region } ] of Object.entries(val)) {
+              const { name } = region[0]
+              const ngId = getParcNgId(atlas, template, parcellation, {
+                id: '',
+                name,
+                parentIds: [],
+                type: "SxplrRegion"
+              })
+              returnVal[ngId] = layer
+              continue
+            }
+            return returnVal
+          })
+        )
+      })
+    ),
+    shareReplay(1),
   )
 
   onATPDebounceAddBaseLayers$ = createEffect(() => this.onATPDebounceNgLayers$.pipe(
     switchMap(ngLayers => {
       const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers } = ngLayers
       
-      const customBaseLayers: atlasAppearance.NgLayerCustomLayer[] = []
+      const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
         for (const key in layers) {
           const { source, transform, opacity, visible } = layers[key]
@@ -322,5 +219,8 @@ export class LayerCtrlEffects {
     })
   ))
 
-  constructor(private store: Store<any>,private sapi: SAPI){}
+  constructor(
+    private store: Store<any>,
+    private sapi: SAPI,
+  ){}
 }

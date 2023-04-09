@@ -1,0 +1,30 @@
+cdk-virtual-scroll-viewport
+{
+    height: 10rem;
+}
+
+cdk-virtual-scroll-viewport button
+{
+    text-align: left;
+    height: 36px;
+    display: block;
+}
+
+.mat-chip-container
+{
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding: 0.5rem;
+}
+
+.mat-chip-inner-container
+{
+    display: inline-flex;
+}
+
+.mat-chip-inner-container button
+{
+    white-space: nowrap;
+    margin: 0.2rem 0.4rem;
+}

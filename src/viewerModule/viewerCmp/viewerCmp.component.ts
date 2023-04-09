@@ -1,20 +1,17 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, of, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
-import {SAPI, SapiAtlasModel, SapiRegionModel} from "src/atlasComponents/sapi";
-import { atlasSelection, userInteraction, } from "src/state";
-import { SapiSpatialFeatureModel, SapiFeatureModel, SapiParcellationModel, SapiSpaceModel } from "src/atlasComponents/sapi/type";
-import { getUuid } from "src/util/fn";
-import { environment } from "src/environments/environment"
-import { SapiViewsFeaturesVoiQuery } from "src/atlasComponents/sapiViews/features";
-import { SapiViewsCoreSpaceBoundingBox } from "src/atlasComponents/sapiViews/core";
+import { SAPI } from "src/atlasComponents/sapi";
+import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -65,17 +62,7 @@ export class ViewerCmp implements OnDestroy {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
-  public VOI_QUERY_FLAG = environment.EXPERIMENTAL_FEATURE_FLAG
-
-  @ViewChild('genericInfoVCR', { read: ViewContainerRef })
-  genericInfoVCR: ViewContainerRef
-
-  @ViewChild('voiFeatures', { read: SapiViewsFeaturesVoiQuery })
-  voiQueryDirective: SapiViewsFeaturesVoiQuery
-
-  @ViewChild('bbox', { read: SapiViewsCoreSpaceBoundingBox })
-  boundingBoxDirective: SapiViewsCoreSpaceBoundingBox
-
+  
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
     description: QUICKTOUR_DESC.REGION_SEARCH,
@@ -94,7 +81,7 @@ export class ViewerCmp implements OnDestroy {
     shareReplay(1)
   )
 
-  public fetchedAtlases$: Observable<SapiAtlasModel[]> = this.sapi.atlases$
+  public fetchedAtlases$: Observable<SxplrAtlas[]> = this.sapi.atlases$
 
   public selectedAtlas$ = this.selectedATP.pipe(
     map(({ atlas }) => atlas)
@@ -114,59 +101,24 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.selectedParcAllRegions)
   )
 
-  public isStandaloneVolumes$ = this.store$.pipe(
-    select(atlasSelection.selectors.standaloneVolumes),
-    map(v => v.length > 0)
-  )
-
   public viewerMode$: Observable<string> = this.store$.pipe(
     select(atlasSelection.selectors.viewerMode),
     shareReplay(1),
   )
 
-  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = combineLatest([
-    this.store$.pipe(
-      atlasSelection.fromRootStore.distinctATP(),
-      switchMap(({ atlas, template }) => atlas && template
-        ? this.sapi.getSpace(atlas["@id"], template["@id"]).getVolumes()
-        : of(null)),
-      map(vols => {
-        if (!vols) return null
-        const flags = {
-          isNehuba: false,
-          isThreeSurfer: false
-        }
-        if (vols.find(vol => vol.data.volume_type === "neuroglancer/precomputed")) {
-          flags.isNehuba = true
-        }
-
-        if (vols.find(vol => vol.data.volume_type === "gii")) {
-          flags.isThreeSurfer = true
-        }
-        return flags
-      })
-    ),
-    this.isStandaloneVolumes$,
-  ]).pipe(
-    distinctUntilChanged(([ prevFlags, prevIsSv ], [  currFlags, currIsSv ]) => {
-      const same = prevIsSv === currIsSv
-      && prevFlags?.isNehuba === currFlags?.isNehuba
-      && prevFlags?.isThreeSurfer === currFlags?.isThreeSurfer
-      return same
-    }),
-    map<unknown, TSupportedViewers | 'notsupported'>(([flags, isSv]) => {
-      if (isSv) return 'nehuba'
-      if (!flags) return null
-      if (flags.isNehuba) return 'nehuba'
-      if (flags.isThreeSurfer) return 'threeSurfer'
-      return 'notsupported'
-    }),
-    shareReplay(1),
+  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = this.store$.pipe(
+    select(atlasAppearance.selectors.useViewer),
+    map(useviewer => {
+      if (useviewer === "NEHUBA") return "nehuba"
+      if (useviewer === "THREESURFER") return "threeSurfer"
+      if (useviewer === "NOT_SUPPORTED") return "notsupported"
+      return null
+    })
   )
 
   public viewerCtx$ = this.ctxMenuSvc.context$
 
-  public selectedFeature$: Observable<SapiFeatureModel> = this.store$.pipe(
+  public selectedFeature$: Observable<Feature> = this.store$.pipe(
     select(userInteraction.selectors.selectedFeature)
   )
 
@@ -193,7 +145,7 @@ export class ViewerCmp implements OnDestroy {
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
   public context: TContextArg<TSupportedViewers>
-  private templateSelected: SapiSpaceModel
+  private templateSelected: SxplrTemplate
 
   constructor(
     private store$: Store<any>,
@@ -227,7 +179,7 @@ export class ViewerCmp implements OnDestroy {
           message.push(`- _${atlas.name}_`)
         }
         if (checkPrerelease(tmpl)) {
-          message.push(`- _${tmpl.fullName}_`)
+          message.push(`- _${tmpl.name}_`)
         }
         if (checkPrerelease(parc)) {
           message.push(`- _${parc.name}_`)
@@ -311,7 +263,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public selectRoi(roi: SapiRegionModel): void {
+  public selectRoi(roi: SxplrRegion): void {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -347,16 +299,8 @@ export class ViewerCmp implements OnDestroy {
           this.store$.dispatch(
             userInteraction.actions.mouseoverPosition({
               position: {
-                "@id": getUuid(),
-                "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
-                coordinates: nav.position.map(p => {
-                  return {
-                    value: p,
-                  }
-                }),
-                coordinateSpace: {
-                  '@id': this.templateSelected["@id"]
-                }
+                loc: nav.position as [number, number, number],
+                space: this.templateSelected
               }
             })
           )
@@ -371,19 +315,7 @@ export class ViewerCmp implements OnDestroy {
     this.ctxMenuSvc.dismissCtxMenu()
   }
 
-  showDataset(feat: SapiFeatureModel): void {
-    if ((feat as SapiSpatialFeatureModel).location) {
-      const feature = feat as SapiSpatialFeatureModel
-      this.store$.dispatch(
-        atlasSelection.actions.navigateTo({
-          navigation: {
-            orientation: [0, 0, 0, 1],
-            position: feature.location.center.coordinates.map(v => v.value * 1e6)
-          },
-          animation: true
-        })
-      )
-    }
+  showDataset(feat: Feature): void {
     
     this.store$.dispatch(
       userInteraction.actions.showFeature({

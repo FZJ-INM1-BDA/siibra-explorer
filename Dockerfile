@@ -40,7 +40,7 @@ RUN node ./src/environments/parseEnv.js
 
 RUN npm run build
 RUN node third_party/matomo/processMatomo.js
-RUN npm run build-storybook
+# RUN npm run build-storybook
 
 # gzipping container
 FROM ubuntu:22.04 as compressor
@@ -48,10 +48,10 @@ RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv
 COPY --from=builder /iv/dist/aot /iv
-COPY --from=builder /iv/storybook-static /iv/storybook-static
+# COPY --from=builder /iv/storybook-static /iv/storybook-static
 
 # Remove duplicated assets. Use symlink instead.
-WORKDIR /iv/storybook-static
+# WORKDIR /iv/storybook-static
 RUN rm -rf ./assets
 RUN ln -s ../assets ./assets
 

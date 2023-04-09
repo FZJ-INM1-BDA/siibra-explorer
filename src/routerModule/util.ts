@@ -4,7 +4,7 @@ import { Component } from "@angular/core"
 export const encodeId = (id: string) => id && id.replace(/\//g, ':')
 export const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
 
-export const endcodePath = (key: string, val: string|string[]) =>
+export const encodePath = (key: string, val: string|string[]) =>
   key[0] === '?'
     ? `?${key}=${val}`
     : `${key}:${Array.isArray(val)
@@ -56,7 +56,7 @@ export const encodeCustomState = (key: string, value: string|string[]) => {
     throw new Error(`custom state must start with x-`)
   }
   if (!value) return null
-  return endcodePath(key, value).replace(/\//g, '%2F')
+  return encodePath(key, value).replace(/\//g, '%2F')
 }
 
 @Component({

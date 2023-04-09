@@ -13,6 +13,7 @@ import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
 import { ParcellationDoiPipe } from "./parcellationDoi.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe";
+import { IsGroupedParcellation } from "./isGroupedParcellation.pipe";
 
 @NgModule({
   imports: [
@@ -29,12 +30,14 @@ import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe"
     FilterUnsupportedParcPipe,
     ParcellationDoiPipe,
     ParcellationGroupSelectedPipe,
+    IsGroupedParcellation,
   ],
   exports: [
     FilterGroupedParcellationPipe,
     FilterUnsupportedParcPipe,
     ParcellationGroupSelectedPipe,
     ParcellationDoiPipe,
+    IsGroupedParcellation,
   ],
   providers: [
     ParcellationVisibilityService,

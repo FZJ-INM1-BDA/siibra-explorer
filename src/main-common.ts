@@ -34,7 +34,7 @@ import { MainModule } from './main.module';
 import { environment } from 'src/environments/environment'
 const { PRODUCTION, VERSION, GIT_HASH } = environment
 if (PRODUCTION) enableProdMode()
-if (PRODUCTION) { console.log(`Siibra Explorer: ${VERSION}::${GIT_HASH}`) }
+console.log(`Siibra Explorer: ${VERSION}::${GIT_HASH}`)
 
 
 platformBrowserDynamic().bootstrapModule(MainModule)

@@ -1,4 +1,4 @@
-const request = require('request')
+const got = require('got')
 const qs = require('querystring')
 
 class Logger {
@@ -11,7 +11,7 @@ class Logger {
     this.password = password
   }
 
-  emit(logLevel, message, callback){
+  async emit(logLevel, message, callback){
     const {
       name,
       protocol,
@@ -26,17 +26,9 @@ class Logger {
     const formData = {
       json: JSON.stringify(message)
     }
-    if (callback) {
-      request.post({
-        url,
-        formData
-      }, callback)
-    } else {
-      return request.post({
-        url,
-        formData
-      })
-    }
+    await got.post(url, {
+      formData
+    })
   }
 }
 

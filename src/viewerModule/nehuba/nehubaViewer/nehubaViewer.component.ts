@@ -149,9 +149,10 @@ export class NehubaViewerUnit implements OnDestroy {
     }
 
     getImportNehubaPr()
-      .then(() => {
+      .then(() => getExportNehuba())
+      .then(exportNehuba => {
         this.nehubaLoaded = true
-        this.exportNehuba = getExportNehuba()
+        this.exportNehuba = exportNehuba
         const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
         if (fixedZoomPerspectiveSlices) {
           const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = fixedZoomPerspectiveSlices
@@ -644,7 +645,7 @@ export class NehubaViewerUnit implements OnDestroy {
       position,
       positionReal,
       zoom,
-    } = newViewerState
+    } = newViewerState || {}
 
     if ( perspectiveZoom ) {
       this.nehubaViewer.ngviewer.perspectiveNavigationState.zoomFactor.restoreState(perspectiveZoom)
@@ -696,7 +697,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
   private setLayerTransparency(layerName: string, alpha: number) {
     const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-    if (!layer) return
+    if (!(layer?.layer)) return
 
     /**
      * for segmentation layer

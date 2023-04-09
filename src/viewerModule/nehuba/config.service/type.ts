@@ -96,13 +96,23 @@ interface _NehubaConfig {
 
 export type NehubaConfig = RecursivePartial<_NehubaConfig>
 
+/**
+ * source MUST contain format, e.g. precomputed://
+ */
 export type NgLayerSpec = {
   source: string
   transform: number[][]
+  info?: {
+    voxel: [number, number, number]
+    real: [number, number, number]
+  }
   opacity?: number
   visible?: boolean
 }
 
+/**
+ * source MUST contain format, e.g. precomputed://
+ */
 export type NgPrecompMeshSpec = {
   auxMeshes: {
     name: string
@@ -110,6 +120,9 @@ export type NgPrecompMeshSpec = {
   }[]
 } & NgLayerSpec
 
+/**
+ * source MUST contain format, e.g. precomputed://
+ */
 export type NgSegLayerSpec = {
   labelIndicies: number[]
 } & NgLayerSpec

@@ -112,12 +112,12 @@ export class AnnotationLayer {
     this.nglayer && this.nglayer.setVisible(flag)
   }
   dispose() {
-    this.nglayer = null
     AnnotationLayer.Map.delete(this.name)
     this._onHover.complete()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     try {
       this.viewer.layerManager.removeManagedLayer(this.nglayer)
+      this.nglayer = null
     // eslint-disable-next-line no-empty
     } catch (e) {
 

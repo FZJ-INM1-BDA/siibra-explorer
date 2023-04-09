@@ -1,5 +1,5 @@
-import { SapiRegionModel } from "src/atlasComponents/sapi";
-import { INavObj } from "./navigation.service";
+import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
+import { INavObj } from "./constants";
 
 export type TNehubaContextInfo = {
   nav: INavObj
@@ -10,6 +10,6 @@ export type TNehubaContextInfo = {
   nehuba: {
     layerName: string
     labelIndices: number[]
-    regions: SapiRegionModel[]
+    regions: SxplrRegion[]
   }[]
 }

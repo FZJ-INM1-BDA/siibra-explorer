@@ -52,9 +52,16 @@
   </mat-tab>
 
   <!-- viewer preference -->
-  <mat-tab *ngIf="experimentalFlag" label="Viewer Preference">
+  <mat-tab *ngIf="environment.EXPERIMENTAL_FEATURE_FLAG" label="Viewer Preference">
 
     <div class="sxplr-custom-cmp text sxplr-m-2">
+      
+      <mat-slide-toggle
+        [checked]="experimentalFlag$ | async"
+        (change)="updateExperimentalFlag($event)">
+        Experimental Flag
+      </mat-slide-toggle>
+
       <div class="mat-h2">
         Rearrange Viewports
       </div>
@@ -180,7 +187,7 @@
       <!-- temporarily disabling 1-3 layout -->
 
       <!-- horizontal 1 3 card -->
-      <!-- <button
+      <button
         class="sxplr-m-2 sxplr-p-2"
         mat-flat-button
         (click)="usePanelMode(panelModes.H_ONE_THREE)"
@@ -191,10 +198,10 @@
           <div class="border chunky" cell-iii></div>
           <div class="border chunky" cell-iv></div>
         </layout-horizontal-one-three>
-      </button> -->
+      </button>
 
       <!-- vertical 1 3 card -->
-      <!-- <button
+      <button
         class="sxplr-m-2 sxplr-p-2"
         mat-flat-button
         (click)="usePanelMode(panelModes.V_ONE_THREE)"
@@ -205,7 +212,7 @@
           <div class="border chunky" cell-iii></div>
           <div class="border chunky" cell-iv></div>
         </layout-vertical-one-three>
-      </button> -->
+      </button>
 
       <!-- single -->
       <ng-template #singlePanelTmpl>
