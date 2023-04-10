@@ -17,7 +17,7 @@ jobs:
       id: set-version
       run: |
         PACKAGEJSON_VER=v$(cat package.json | jq -r '.version')
-        echo "::set-output name=package-version-from-json::$PACKAGEJSON_VER"
+        echo "package-version-from-json=$PACKAGEJSON_VER" >> $GITHUB_OUTPUT
       
   create-release:
     needs: check-version

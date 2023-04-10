@@ -74,7 +74,7 @@ jobs:
 
     - name: Set output when workflow fails
       if: failure()
-      run: echo '::set-output name=failure-state::true'
+      run: echo "failure-state=true" >> $GITHUB_OUTPUT
       id: failure-state-step
 
     - name: Define screenshot artefact
