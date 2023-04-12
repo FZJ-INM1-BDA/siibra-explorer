@@ -16,8 +16,5 @@ export interface INehubaFeature {
   panelMode: string
   panelOrder: string
   octantRemoval: boolean
-  clearViewQueue: {
-    [key: string]: boolean
-  }
   auxMeshes: IAuxMesh[]
 }

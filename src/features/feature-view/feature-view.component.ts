@@ -43,7 +43,7 @@ export class FeatureViewComponent implements OnChanges {
   voi$ = new BehaviorSubject<VoiFeature>(null)
   columns$: Observable<string[]> = this.tabular$.pipe(
     map(data => data
-      ? ['index', ...data.columns]
+      ? ['index', ...data.columns] as string[]
       : []),
   )
 
@@ -52,7 +52,7 @@ export class FeatureViewComponent implements OnChanges {
     map(v => {
       return v.index.map((receptor, idx) => ({
         receptor: {
-          label: receptor
+          label: receptor as string
         },
         density: {
           mean: v.data[idx][0] as number,
