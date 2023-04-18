@@ -619,7 +619,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       const highlightIdx = new Set<number>()
       if (isBaseCm && selectedRegions.length > 0) {
         for (const [idx, region] of Object.entries(idxReg)) {
-          if (selectedRegions.indexOf(region) >= 0) {
+          if (selectedRegions.findIndex(r => r.name === region.name) >= 0) {
             highlightIdx.add(Number(idx))
           }
         }
