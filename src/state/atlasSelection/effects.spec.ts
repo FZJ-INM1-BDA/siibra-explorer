@@ -12,14 +12,67 @@ import { Effect } from "./effects"
 import * as mainActions from "../actions"
 import { atlasSelection } from ".."
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
 
     let actions$ = new Observable<Action>()
-    let hoc1left: SxplrRegion
-    let hoc1leftCentroid: SxplrRegion
-    let hoc1leftCentroidWrongSpc: SxplrRegion
+
+    let simpleHoc1: SxplrRegion = {
+      name: 'foo',
+      id: '',
+      type: "SxplrRegion",
+      parentIds: [],
+    }
+
+    let hoc1LeftMni152: PathReturn<"/regions/{region_id}"> = {
+      "@id": "",
+      versionIdentifier: '',
+      "@type": '',
+      hasAnnotation: {
+        criteriaQualityType: {},
+        internalIdentifier: "",
+        bestViewPoint: {
+          coordinateSpace: {
+            "@id": IDS.TEMPLATES.MNI152
+          } as any,
+          coordinates: [
+            {
+              value: 1,
+            },{
+              value: 2,
+            },{
+              value: 3,
+            }
+          ]
+        }
+      }
+    }
+    let hoc1LeftColin27: PathReturn<"/regions/{region_id}"> = {
+      "@id": "",
+      versionIdentifier: '',
+      "@type": '',
+      hasAnnotation: {
+        criteriaQualityType: {},
+        internalIdentifier: "",
+        bestViewPoint: {
+          coordinateSpace: {
+            "@id": IDS.TEMPLATES.COLIN27
+          } as any,
+          coordinates: [
+            {
+              value: 1,
+            },{
+              value: 2,
+            },{
+              value: 3,
+            }
+          ]
+        }
+      }
+    }
 
     beforeEach(async () => {
       TestBed.configureTestingModule({
@@ -34,26 +87,6 @@ describe("> effects.ts", () => {
           provideMockActions(() => actions$)
         ]
       })
-
-      /**
-       * only need to populate hoc1 left once
-       */
-      if (!hoc1left) {
-
-        const sapisvc = TestBed.inject(SAPI)
-        const regions = await sapisvc.getParcRegions(IDS.PARCELLATION.JBA29).toPromise()
-        hoc1left = regions.find(r => /hoc1/i.test(r.name) && /left/i.test(r.name))
-        if (!hoc1left) throw new Error(`cannot find hoc1 left`)
-        hoc1leftCentroid = JSON.parse(JSON.stringify(hoc1left)) 
-        hoc1leftCentroid.centroid = {
-          space: {
-            id: IDS.TEMPLATES.BIG_BRAIN
-          } as SxplrTemplate,
-          loc: [1, 2, 3]
-        }
-        hoc1leftCentroidWrongSpc = JSON.parse(JSON.stringify(hoc1leftCentroid))
-        hoc1leftCentroidWrongSpc.centroid.space.id = IDS.TEMPLATES.COLIN27
-      }
     })
 
     it('> can be init', () => {
@@ -229,10 +262,39 @@ describe("> effects.ts", () => {
     })
 
     describe('> onNavigateToRegion', () => {
+
+      const translatedRegion = {
+        "@id": "",
+        versionIdentifier: '',
+        "@type": '',
+        hasAnnotation: {
+          criteriaQualityType: {},
+          internalIdentifier: "",
+          bestViewPoint: {
+            coordinateSpace: {
+              "@id": IDS.TEMPLATES.MNI152
+            } as any,
+            coordinates: [
+              {
+                value: 1,
+              },{
+                value: 2,
+              },{
+                value: 3,
+              }
+            ]
+          }
+        }
+      } as PathReturn<"/regions/{region_id}">
+
+      let retrieveRegionSpy: jasmine.Spy
+
       beforeEach(async () => {
+        retrieveRegionSpy = spyOn(translateV3Entities, 'retrieveRegion')
+        
         actions$ = hot('a', {
           a: actions.navigateToRegion({
-            region: hoc1left
+            region: simpleHoc1
           })
         })
         const mockStore = TestBed.inject(MockStore)
@@ -264,6 +326,7 @@ describe("> effects.ts", () => {
             beforeEach(() => {
               const mockStore = TestBed.inject(MockStore)
               mockStore.overrideSelector(atpSelector, null)
+              retrieveRegionSpy.and.
             })
 
             it('> returns general error', () => {
@@ -302,16 +365,7 @@ describe("> effects.ts", () => {
       })
 
       describe('> if inputs are fine', () => {
-        let regionGetDetailSpy: jasmine.Spy = jasmine.createSpy()
-        beforeEach(() => {
-          const sapi = TestBed.inject(SAPI)
-          regionGetDetailSpy.and.returnValue(
-            of(hoc1leftCentroid)
-          )
-        })
-        afterEach(() => {
-          if (regionGetDetailSpy) regionGetDetailSpy.calls.reset()
-        })
+
         it('> getRegionDetailSpy is called, and calls navigateTo', () => {
           const eff = TestBed.inject(Effect)
           expect(eff.onNavigateToRegion).toBeObservable(
@@ -330,9 +384,6 @@ describe("> effects.ts", () => {
           describe('> returns null', () => {
             beforeEach(() => {
 
-              regionGetDetailSpy.and.returnValue(
-                of(null)
-              )
             })
             it('> generalactionerror', () => {
 
@@ -348,9 +399,7 @@ describe("> effects.ts", () => {
           })
           describe('> general throw', () => {
             beforeEach(() => {
-              regionGetDetailSpy.and.returnValue(
-                throwError(`oh noes`)
-              )
+
             })
             it('> generalactionerror', () => {
 
@@ -358,7 +407,7 @@ describe("> effects.ts", () => {
               expect(eff.onNavigateToRegion).toBeObservable(
                 hot(`a`, {
                   a: mainActions.generalActionError({
-                    message: `Error getting region centroid`
+                    message: `getting region detail error! cannot get coordinates`
                   })
                 })
               )
@@ -368,9 +417,7 @@ describe("> effects.ts", () => {
           describe('> does not contain props attr', () => {
 
             beforeEach(() => {
-              regionGetDetailSpy.and.returnValue(
-                of(hoc1left)
-              )
+              
             })
             it('> generalactionerror', () => {
 

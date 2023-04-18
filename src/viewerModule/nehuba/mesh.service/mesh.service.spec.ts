@@ -9,6 +9,8 @@ import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
 import { mapTo, take } from "rxjs/operators"
 import { selectorAuxMeshes } from "../store"
+import { HttpClientModule } from "@angular/common/http"
+import { BaseService } from "../base.service/base.service"
 
 
 const fits1 = {} as SxplrRegion
@@ -59,6 +61,9 @@ describe('> mesh.service.ts', () => {
   describe('> NehubaMeshService', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
+        imports: [
+          HttpClientModule,
+        ],
         providers: [
           provideMockStore(),
           NehubaMeshService,
@@ -66,6 +71,12 @@ describe('> mesh.service.ts', () => {
             provide: LayerCtrlEffects,
             useValue: {
               onATPDebounceNgLayers$: NEVER
+            }
+          },
+          {
+            provide: BaseService,
+            useValue: {
+              completeNgIdLabelRegionMap$: NEVER
             }
           }
         ]
@@ -151,11 +162,18 @@ describe('> mesh.service.ts', () => {
          * in the case of julich brain 2.9 in colin 27, we expect selecting a region will hide meshes from all relevant ngIds (both left and right)
          */
         it('> expect the emitted value to be incl all ngIds', () => {
+          const bService = TestBed.inject(BaseService)
+          bService.completeNgIdLabelRegionMap$ = of({
+            [ngId1]: {},
+            [ngId2]: {
+              [labelIndex2]: fits1
+            }
+          })
           const service = TestBed.inject(NehubaMeshService)
           expect(
             service.loadMeshes$
           ).toBeObservable(
-            hot('(ab)', {
+            hot('abc', {
               a: {
                 layer: {
                   name: ngId1
@@ -167,6 +185,12 @@ describe('> mesh.service.ts', () => {
                   name: ngId2
                 },
                 labelIndicies: [ labelIndex2 ]
+              },
+              c: {
+                layer: {
+                  name: auxMesh.ngId
+                },
+                labelIndicies: auxMesh.labelIndicies
               }
             })
           )
