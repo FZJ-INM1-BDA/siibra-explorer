@@ -19,12 +19,12 @@
 <mat-menu #fsModeSelMenu="matMenu">
 
   <div class="sxplr-custom-cmp text sxplr-pl-2 m-2">
-    <mat-checkbox *ngFor="let item of lateralityMeshRecord | keyvalue"
+    <mat-checkbox *ngFor="let item of meshVisible$ | async "
       class="d-block"
       iav-stop="click"
-      (change)="updateMeshVisibility()"
-      [(ngModel)]="item.value.visible">
-      {{ item.key }}
+      (change)="toggleMeshVis(item.label)"
+      [checked]="item.visible">
+      {{ item.label }}
     </mat-checkbox>
   </div>
   <mat-divider></mat-divider>

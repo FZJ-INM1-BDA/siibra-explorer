@@ -32,8 +32,6 @@ export class NehubaLayerControlService implements OnDestroy{
 
   private defaultNgLayers$ = this.layerEffects.onATPDebounceNgLayers$
 
-  private selectedATP$ = this.baseService.selectedATP$
-
   public selectedATPR$ = this.baseService.selectedATPR$
 
   private customLayers$ = this.store$.pipe(

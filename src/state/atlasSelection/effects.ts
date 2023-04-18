@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
-import { filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
 import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
@@ -346,27 +346,35 @@ export class Effect {
         select(selectors.selectedParcellation)
       )
     ),
-    map(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
+    switchMap(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
       if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !_region)  {
-        return mainActions.generalActionError({
-          message: `atlas, template, parcellation or region not set`
-        })
+        return of(
+          mainActions.generalActionError({
+            message: `atlas, template, parcellation or region not set`
+          })
+        )
       }
-
-      const region = translateV3Entities.retrieveRegion(_region)
-
-      if (region.hasAnnotation?.bestViewPoint && region.hasAnnotation.bestViewPoint.coordinateSpace['@id'] === selectedTemplate["@id"]) {
-        return actions.navigateTo({
+      return this.sapiSvc.v3Get("/regions/{region_id}", {
+        path: {
+          region_id: _region.name
+        },
+        query: {
+          parcellation_id: selectedParcellation.id,
+          space_id: selectedTemplate.id
+        }
+      }).pipe(
+        map(reg => actions.navigateTo({
           animation: true,
           navigation: {
-            position: region.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
+            position: reg.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
           }
-        })
-      }
-      
-      return mainActions.generalActionError({
-        message: `getting region detail error! cannot get coordinates`
-      })
+        })),
+        catchError(() => of(
+          mainActions.generalActionError({
+            message: `getting region detail error! cannot get coordinates`
+          })
+        )),
+      )
     })
   ))
 
