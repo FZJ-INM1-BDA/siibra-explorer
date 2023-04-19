@@ -14,7 +14,7 @@ export const spaceFilteredAnnotations = createSelector(
   selectStore,
   atlasSelectionSelectors.selectStore,
   (annState, atlasSelState) => annState.annotations.filter(ann => {
-    const spaceId = atlasSelState.selectedTemplate['@id']
+    const spaceId = atlasSelState.selectedTemplate.id
     if (ann['openminds']) {
       return (ann as Annotation<'openminds'>).openminds.coordinateSpace['@id'] === spaceId
     }

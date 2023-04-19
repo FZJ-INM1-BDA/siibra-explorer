@@ -68,7 +68,7 @@ type THandleCustomMouseEv = {
   latLblIdxReg: TLatIdxReg
   meshVisibility: {
     label: string
-    visible: boolean,
+    visible: boolean
     mesh: TThreeGeometry
   }[]
 }
@@ -170,7 +170,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     map(v => {
       const returnVal: {
         label: string
-        visible: boolean,
+        visible: boolean
         mesh: TThreeGeometry
       }[] = []
       for (const lat in v) {
