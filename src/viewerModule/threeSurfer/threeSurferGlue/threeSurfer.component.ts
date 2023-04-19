@@ -1,13 +1,13 @@
 import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { combineLatest, from, merge, NEVER, Observable, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap } from "rxjs/operators";
+import { combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CONST } from 'common/constants'
-import { getUuid } from "src/util/fn";
+import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { ThreeSurferCustomLabelLayer, ThreeSurferCustomLayer, ColorMapCustomLayer } from "src/state/atlasAppearance/const";
@@ -37,6 +37,48 @@ type THandlingCustomEv = {
     verticesIndicies: number[]
   }
 }
+
+type TLatVtxIdxRecord = LateralityRecord<{
+  indexLayer: ThreeSurferCustomLabelLayer
+  vertexIndices: number[]
+}>
+
+type TLatMeshRecord = LateralityRecord<{
+  meshLayer: ThreeSurferCustomLayer
+  mesh: TThreeGeometry
+}>
+
+type MeshVisOp = 'toggle' | 'noop'
+
+type TApplyColorArg = LateralityRecord<{
+  labelIndices: number[]
+  idxReg: Record<number, SxplrRegion>
+  isBaseCm: boolean
+  showDelin: boolean
+  selectedRegions: SxplrRegion[]
+  mesh: TThreeGeometry
+  vertexIndices: number[]
+  map?: Map<number, number[]>
+}>
+
+type THandleCustomMouseEv = {
+  latMeshRecord: TLatMeshRecord
+  latLblIdxRecord: TLatVtxIdxRecord
+  evDetail: any
+  latLblIdxReg: TLatIdxReg
+  meshVisibility: {
+    label: string
+    visible: boolean
+    mesh: TThreeGeometry
+  }[]
+}
+
+type TLatIdxReg = LateralityRecord<Record<number, SxplrRegion>>
+
+type TLatCm = LateralityRecord<{
+  labelIndices: number[]
+  map: Map<number, number[]>
+}>
 
 type TCameraOrientation = {
   perspectiveOrientation: number[]
@@ -92,6 +134,8 @@ function cameraNavsAreSimilar(c1: TCameraOrientation, c2: TCameraOrientation){
 
 export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit, OnDestroy {
 
+  #cameraEv$ = new Subject<{ position: { x: number, y: number, z: number }, zoom: number }>()
+  #mouseEv$ = new Subject()
   
   @Output()
   viewerEvent = new EventEmitter<TViewerEvent<'threeSurfer'>>()
@@ -100,32 +144,58 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   private mainStoreCameraNav: TCameraOrientation = null
   private localCameraNav: TCameraOrientation = null
 
-  public lateralityMeshRecord: LateralityRecord<{
-    visible: boolean
-    meshLayer: ThreeSurferCustomLayer
-    mesh: TThreeGeometry
-  }> = {}
 
-  public latLblIdxRecord: LateralityRecord<{
-    indexLayer: ThreeSurferCustomLabelLayer
-    labelIndices: number[]
-  }> = {}
   private internalStateNext: (arg: TInteralStatePayload<TInternalState>) => void
 
   private mouseoverRegions: SxplrRegion[] = []
-  
-  private selectedRegions$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedRegions)
-  )
 
   private customLayers$ = this.store$.pipe(
     select(atlasAppearance.selectors.customLayers),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
     shareReplay(1)
   )
-  public meshLayers$: Observable<ThreeSurferCustomLayer[]> = this.customLayers$.pipe(
+  #meshLayers$: Observable<ThreeSurferCustomLayer[]> = this.customLayers$.pipe(
     map(layers => layers.filter(l => l.clType === "baselayer/threesurfer") as ThreeSurferCustomLayer[]),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
+  )
+
+  #lateralMeshRecord$ = new Subject<TLatMeshRecord>()
+  lateralMeshRecord$ = concat(
+    of({} as TLatMeshRecord),
+    this.#lateralMeshRecord$.asObservable()
+  )
+
+  #meshVisOp$ = new Subject<{ op: MeshVisOp, label?: string }>()
+  meshVisible$ = this.lateralMeshRecord$.pipe(
+    map(v => {
+      const returnVal: {
+        label: string
+        visible: boolean
+        mesh: TThreeGeometry
+      }[] = []
+      for (const lat in v) {
+        returnVal.push({
+          visible: true,
+          mesh: v[lat].mesh,
+          label: lat
+        })
+      }
+      return returnVal
+    }),
+    switchMap(arr => concat(
+      of({ op: 'noop', label: null }),
+      this.#meshVisOp$
+    ).pipe(
+      map(({ op, label }) => arr.map(v => {
+        if (label !== v.label) {
+          return v
+        }
+        if (op === "toggle") {
+          v.visible = !v.visible
+        }
+        return v
+      }))
+    ))
   )
 
   private vertexIndexLayers$: Observable<ThreeSurferCustomLabelLayer[]> = this.customLayers$.pipe(
@@ -133,11 +203,47 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
   )
 
+  #latVtxIdxRecord$: Observable<TLatVtxIdxRecord> = this.vertexIndexLayers$.pipe(
+    switchMap(
+      switchMapWaitFor({
+        condition: () => !!this.tsRef,
+        leading: true
+      })
+    ),
+    switchMap(layers => 
+      forkJoin(
+        layers.map(layer => 
+          from(
+            this.tsRef.loadColormap(layer.source)
+          ).pipe(
+            map(giiInstance => {
+              let vertexIndices: number[] = giiInstance[0].getData()
+              if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+                vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
+              }
+              return {
+                indexLayer: layer,
+                vertexIndices
+              }
+            })
+          )
+        )
+      )
+    ),
+    map(layers => {
+      const returnObj = {}
+      for (const { indexLayer, vertexIndices } of layers) {
+        returnObj[indexLayer.laterality] = { indexLayer, vertexIndices }
+      }
+      return returnObj
+    })
+  )
+
   /**
    * maps laterality to label index to sapi region
    */
-  private latLblIdxToRegionRecord: LateralityRecord<Record<number, SxplrRegion>> = {}
-  private latLblIdxToRegionRecord$: Observable<LateralityRecord<Record<number, SxplrRegion>>> = combineLatest([
+  
+  #latLblIdxToRegionRecord$: Observable<TLatIdxReg> = combineLatest([
     this.store$.pipe(
       atlasSelection.fromRootStore.distinctATP()
     ),
@@ -183,15 +289,43 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
    * colormap in use (both base & custom)
    */
 
-  private colormapInUse: ColorMapCustomLayer
-  private colormaps$: Observable<ColorMapCustomLayer[]> = this.customLayers$.pipe(
+  #colormaps$: Observable<ColorMapCustomLayer[]> = this.customLayers$.pipe(
     map(layers => layers.filter(l => l.clType === "baselayer/colormap" || l.clType === "customlayer/colormap") as ColorMapCustomLayer[]),
+    distinctUntilChanged(arrayEqual((o, n) => o.id === n.id))
+  )
+
+  #latLblIdxToCm$ = combineLatest([
+    this.#latLblIdxToRegionRecord$,
+    this.#colormaps$
+  ]).pipe(
+    map(([ latIdxReg, cms ]) => {
+      const cm = cms[0]
+      const returnValue: TLatCm = {}
+      for (const lat in latIdxReg) {
+        returnValue[lat] = {
+          labelIndices: [],
+          map: new Map()
+        }
+        for (const lblIdx in latIdxReg[lat]) {
+          returnValue[lat].labelIndices.push(Number(lblIdx))
+          const reg = latIdxReg[lat][lblIdx]
+          returnValue[lat].map.set(
+            Number(lblIdx), (cm.colormap.get(reg) || [255, 255, 255]).map(v => v/255)
+          )
+        }
+      }
+      return returnValue
+    })
   )
 
   /**
-   * show delination map
+   * when do we need to call apply color?
+   * - when mesh loads
+   * - when vertex index layer changes
+   * - selected region changes
+   * - custom color map added (by plugin, etc)
+   * - show delineation updates
    */
-  private showDelineation: boolean = true
 
   public threeSurferSurfaceVariants$ = this.effect.onATPDebounceThreeSurferLayers$.pipe(
     map(({ surfaces }) => surfaces.reduce((acc, val) => acc.includes(val.variant) ? acc : [...acc, val.variant] ,[] as string[]))
@@ -275,7 +409,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     /**
      * subscribe to camera custom event
      */
-    const cameraSub = this.cameraEv$.pipe(
+    const cameraSub = this.#cameraEv$.pipe(
       filter(v => !!v),
       debounceTime(160)
     ).subscribe(() => {
@@ -378,7 +512,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   }
 
   private tsRef: TThreeSurfer
-  private selectedRegions: SxplrRegion[] = []
 
   private relayStoreLock: () => void = null
   private tsRefInitCb: ((tsRef: any) => void)[] = []
@@ -390,47 +523,67 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     this.tsRefInitCb.push(callback)
   }
 
-  private async loadMeshes(layers: ThreeSurferCustomLayer[]) {
+  async #loadMeshes(layers: ThreeSurferCustomLayer[], currMeshRecord: TLatMeshRecord) {
     if (!this.tsRef) throw new Error(`loadMeshes error: this.tsRef is not defined!!`)
-
+    const copiedCurrMeshRecord: TLatMeshRecord = {...currMeshRecord}
     /**
      * remove the layers... 
      */
     for (const layer of layers) {
-      if (!!this.lateralityMeshRecord[layer.laterality]) {
-        this.tsRef.unloadMesh(this.lateralityMeshRecord[layer.laterality].mesh)
+      if (!!copiedCurrMeshRecord[layer.laterality]) {
+        this.tsRef.unloadMesh(copiedCurrMeshRecord[layer.laterality].mesh)
       }
     }
 
     for (const layer of layers) {
       const threeMesh = await this.tsRef.loadMesh(layer.source)
-      this.lateralityMeshRecord[layer.laterality] = {
-        visible: true,
+      copiedCurrMeshRecord[layer.laterality] = {
         meshLayer: layer,
         mesh: threeMesh
       }
     }
-    this.applyColor()
+    this.#lateralMeshRecord$.next(copiedCurrMeshRecord)
   }
 
-  private async loadVertexIndexMap(layers: ThreeSurferCustomLabelLayer[]) {
-    if (!this.tsRef) throw new Error(`loadVertexIndexMap error: this.tsRef is not defined!!`)
-    for (const layer of layers) {
-      const giiInstance = await this.tsRef.loadColormap(layer.source)
-
-      let labelIndices: number[] = giiInstance[0].getData()
-      if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
-        labelIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(labelIndices)
+  #applyColor$ = combineLatest([
+    combineLatest([
+      this.lateralMeshRecord$,
+      this.store$.pipe(
+        select(atlasSelection.selectors.selectedRegions),
+        distinctUntilChanged(arrayEqual((o, n) => o.name === n.name))
+      ),
+      this.#colormaps$.pipe(
+        map(cms => cms[0]),
+        distinctUntilChanged((o, n) => o?.id === n?.id)
+      ),
+      this.store$.pipe(
+        select(atlasAppearance.selectors.showDelineation),
+        distinctUntilChanged()
+      ),
+      this.#latLblIdxToCm$,
+      this.#latLblIdxToRegionRecord$,
+    ]),
+    this.#latVtxIdxRecord$
+  ]).pipe(
+    debounceTime(16),
+    map(([[ latMeshDict, selReg, cm, showDelFlag, latLblIdxToCm, latLblIdxToRegionRecord ], latVtxIdx]) => {
+      const arg: TApplyColorArg = {}
+      for (const lat in latMeshDict) {
+        arg[lat] = {
+          mesh: latMeshDict[lat].mesh,
+          selectedRegions: selReg,
+          showDelin: showDelFlag,
+          isBaseCm: cm.clType === "baselayer/colormap",
+          labelIndices: latLblIdxToCm[lat].labelIndices,
+          idxReg: latLblIdxToRegionRecord[lat],
+          map: latLblIdxToCm[lat].map,
+          vertexIndices: latVtxIdx[lat].vertexIndices
+        }
       }
-      this.latLblIdxRecord[layer.laterality] = {
-        indexLayer: layer,
-        labelIndices
-      }
-    }
-    this.applyColor()
-  }
-
-  private applyColor() {
+      return arg
+    })
+  )
+  private applyColor(applyArg: TApplyColorArg) {
     /**
      * on apply color map, reset mesh visibility
      * this issue is more difficult to solve than first anticiplated.
@@ -440,41 +593,81 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
      * 2/ hide hemisphere, select region, unhide hemisphere
      * 3/ select region, hide hemisphere, deselect region
      */
-    if (!this.colormapInUse) return
+    
     if (!this.tsRef) return
     
-    const isBaseCM = this.colormapInUse?.clType === "baselayer/colormap"
+    for (const laterality in applyArg) {
+      const { labelIndices, map, mesh, showDelin, selectedRegions, isBaseCm, idxReg, vertexIndices } = applyArg[laterality]
 
-    for (const laterality in this.lateralityMeshRecord) {
-      const { mesh } = this.lateralityMeshRecord[laterality]
-      if (!this.latLblIdxRecord[laterality]) continue
-      const { labelIndices } = this.latLblIdxRecord[laterality]
-
-      const lblIdxToRegionRecord = this.latLblIdxToRegionRecord[laterality]
-      if (!lblIdxToRegionRecord) {
-        this.tsRef.applyColorMap(mesh, labelIndices)
+      if (!map) {
+        this.tsRef.applyColorMap(mesh, vertexIndices)
         continue
       }
-      const map = new Map<number, number[]>()
-      for (const lblIdx in lblIdxToRegionRecord) {
-        const region = lblIdxToRegionRecord[lblIdx]
-        let color: number[]
-        if (!this.showDelineation) {
-          color = [1,1,1]
-        } else if (isBaseCM && this.selectedRegions.length > 0 && !this.selectedRegions.includes(region)) {
-          color = [1,1,1]
-        } else {
-          color = (this.colormapInUse.colormap.get(region) || [255, 255, 255]).map(v => v/255)
+
+      const actualApplyMap = new Map<number, number[]>()
+
+      if (!showDelin) {
+        for (const lblIdx of labelIndices){
+          actualApplyMap.set(lblIdx, [1, 1, 1])
         }
-        map.set(Number(lblIdx), color)
+        this.tsRef.applyColorMap(mesh, vertexIndices, {
+          custom: actualApplyMap
+        })
+        return
       }
-      this.tsRef.applyColorMap(mesh, labelIndices, {
-        custom: map
+
+      const highlightIdx = new Set<number>()
+      if (isBaseCm && selectedRegions.length > 0) {
+        for (const [idx, region] of Object.entries(idxReg)) {
+          if (selectedRegions.findIndex(r => r.name === region.name) >= 0) {
+            highlightIdx.add(Number(idx))
+          }
+        }
+      }
+      if (isBaseCm && selectedRegions.length > 0) {
+        for (const lblIdx of labelIndices) {
+          actualApplyMap.set(
+            Number(lblIdx),
+            highlightIdx.has(lblIdx)
+            ? map.get(lblIdx) || [1, 0.8, 0.8]
+            : [1, 1, 1]
+          )
+        }
+      } else {
+        for (const lblIdx of labelIndices) {
+          actualApplyMap.set(
+            Number(lblIdx),
+            map.get(lblIdx) || [1, 0.8, 0.8]
+          )
+        }
+      }
+      this.tsRef.applyColorMap(mesh, vertexIndices, {
+        custom: actualApplyMap
       })
     }
   }
 
-  private handleCustomMouseEv(detail: any){
+  #handleCustomMouseEv$ = this.#mouseEv$.pipe(
+    withLatestFrom(
+      this.lateralMeshRecord$,
+      this.#latLblIdxToRegionRecord$,
+      this.meshVisible$,
+      this.#latVtxIdxRecord$,
+    )
+  ).pipe(
+    map(([ evDetail, latMeshRecord, latLblIdxReg, meshVis, latVtxIdx ]) => {
+      const returnVal: THandleCustomMouseEv = {
+        evDetail,
+        meshVisibility: meshVis,
+        latLblIdxReg: latLblIdxReg,
+        latMeshRecord: latMeshRecord,
+        latLblIdxRecord: latVtxIdx
+      }
+      return returnVal
+    })
+  )
+  #handleCustomMouseEv(arg: THandleCustomMouseEv){
+    const { evDetail: detail, latMeshRecord, latLblIdxRecord, latLblIdxReg, meshVisibility } = arg
     const evMesh = detail.mesh && {
       faceIndex: detail.mesh.faceIndex,
       // typo in three-surfer
@@ -495,25 +688,26 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       verticesIdicies: evVerticesIndicies,
     } = detail.mesh as { geometry: TThreeGeometry, verticesIdicies: number[] }
 
-    for (const laterality in this.lateralityMeshRecord) {
-      const meshRecord = this.lateralityMeshRecord[laterality]
+    for (const laterality in latMeshRecord) {
+      const meshRecord = latMeshRecord[laterality]
       if (meshRecord.mesh !== evGeometry) {
         continue
       }
       /**
        * if either labelindex record or colormap record is undefined for this laterality, emit empty event
        */
-      if (!this.latLblIdxRecord[laterality] || !this.latLblIdxToRegionRecord[laterality]) {
+      if (!latLblIdxRecord[laterality] || !latLblIdxReg[laterality]) {
         return this.handleMouseoverEvent(custEv)
       }
-      const labelIndexRecord = this.latLblIdxRecord[laterality]
-      const regionRecord = this.latLblIdxToRegionRecord[laterality]
+      const labelIndexRecord = latLblIdxRecord[laterality]
+      const regionRecord = latLblIdxReg[laterality]
 
       /**
        * check if the mesh is toggled off
        * if so, do not proceed
        */
-      if (!meshRecord.visible) {
+      const mVis = meshVisibility.filter(({ mesh }) => mesh === meshRecord.mesh)
+      if (!mVis.every(m => m.visible)) {
         return
       }
 
@@ -522,7 +716,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
        */
       const labelIndexSet = new Set<number>()
       for (const idx of evVerticesIndicies){
-        const labelOfInterest = labelIndexRecord.labelIndices[idx]
+        const labelOfInterest = labelIndexRecord.vertexIndices[idx]
         if (!labelOfInterest) {
           continue
         }
@@ -551,31 +745,28 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     }
   }
 
-  private cameraEv$ = new Subject<{ position: { x: number, y: number, z: number }, zoom: number }>()
-  private handleCustomCameraEvent(detail: any){
-    if (this.internalStateNext) {
-      this.internalStateNext({
-        "@id": getUuid(),
-        "@type": 'TViewerInternalStateEmitterEvent',
-        viewerType,
-        payload: {
-          mode: '',
-          camera: detail.position,
-          hemisphere: 'both'
-        }
-      })
-    }
-    this.cameraEv$.next(detail)
-  }
-
   ngAfterViewInit(): void{
     const customEvHandler = (ev: CustomEvent) => {
       const { type, data } = ev.detail
       if (type === 'mouseover') {
-        return this.handleCustomMouseEv(data)
+        this.#mouseEv$.next(data)
+        return
       }
       if (type === 'camera') {
-        return this.handleCustomCameraEvent(data)
+        if (this.internalStateNext) {
+          this.internalStateNext({
+            "@id": getUuid(),
+            "@type": 'TViewerInternalStateEmitterEvent',
+            viewerType,
+            payload: {
+              mode: '',
+              camera: data.position,
+              hemisphere: 'both'
+            }
+          })
+        }
+        this.#cameraEv$.next(data)
+        return
       }
     }
     this.domEl.addEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME_UPDATED, customEvHandler)
@@ -596,40 +787,46 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       tsCb(this.tsRef)
     }
 
-    const meshSub = this.meshLayers$.pipe(
-      distinctUntilChanged(),
+    const meshSub = this.#meshLayers$.pipe(
+      switchMap(
+        switchMapWaitFor({
+          condition: () => !!this.tsRef,
+          leading: true
+        })
+      ),
       debounceTime(16),
-    ).subscribe(layers => {
-      this.loadMeshes(layers)
+      withLatestFrom(
+        this.lateralMeshRecord$
+      )
+    ).subscribe(([layers, currMeshRecord]) => {
+      this.#loadMeshes(layers, currMeshRecord)
     })
-    const vertexIdxSub = this.vertexIndexLayers$.subscribe(layers => this.loadVertexIndexMap(layers))
-    const roiSelectedSub = this.selectedRegions$.subscribe(regions => {
-      this.selectedRegions = regions
-      this.applyColor()
+    
+    const applyColorSub = this.#applyColor$.subscribe(arg => {
+      this.applyColor(arg)
     })
-    const colormapSub = this.colormaps$.subscribe(cm => {
-      this.colormapInUse = cm[0] || null
-      this.applyColor()
+
+    const mouseSub = this.#handleCustomMouseEv$.subscribe(arg => {
+      this.#handleCustomMouseEv(arg)
     })
-    const recordToRegionSub = this.latLblIdxToRegionRecord$.subscribe(val => this.latLblIdxToRegionRecord = val)
-    const hideDelineationSub = this.store$.pipe(
-      select(atlasAppearance.selectors.showDelineation)
-    ).subscribe(flag => {
-      this.showDelineation = flag
-      this.applyColor()
-      /**
-       * apply color resets mesh visibility
-       */
-      this.updateMeshVisibility()
+
+    const visibilitySub = this.meshVisible$.subscribe(arr => {
+      for (const { visible, mesh } of arr) {
+        mesh.visible = visible
+        
+        const meshObj = this.tsRef.customColormap.get(mesh)
+        if (!meshObj) {
+          throw new Error(`mesh obj not found!`)
+        }
+        meshObj.mesh.visible = visible
+      }
     })
 
     this.onDestroyCb.push(() => {
       meshSub.unsubscribe()
-      vertexIdxSub.unsubscribe()
-      roiSelectedSub.unsubscribe()
-      colormapSub.unsubscribe()
-      recordToRegionSub.unsubscribe()
-      hideDelineationSub.unsubscribe()
+      applyColorSub.unsubscribe()
+      mouseSub.unsubscribe()
+      visibilitySub.unsubscribe()
     })
 
     this.viewerEvent.emit({
@@ -666,20 +863,11 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     if (this.mouseoverText === '') this.mouseoverText = null
   }
 
-  public updateMeshVisibility(): void{
-
-    for (const key in this.lateralityMeshRecord) {
-
-      const latMeshRecord = this.lateralityMeshRecord[key]
-      if (!latMeshRecord) {
-        return
-      }
-      const meshObj = this.tsRef.customColormap.get(latMeshRecord.mesh)
-      if (!meshObj) {
-        throw new Error(`mesh obj not found!`)
-      }
-      meshObj.mesh.visible = latMeshRecord.visible
-    }
+  public toggleMeshVis(label: string) {
+    this.#meshVisOp$.next({
+      label,
+      op: 'toggle'
+    })
   }
 
   switchSurfaceLayer(variant: string): void{

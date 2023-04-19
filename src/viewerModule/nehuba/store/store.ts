@@ -20,7 +20,6 @@ const defaultState: INehubaFeature = {
   panelMode: EnumPanelMode.FOUR_PANEL,
   panelOrder: '0123',
   octantRemoval: true,
-  clearViewQueue: {},
   auxMeshes: []
 }
 

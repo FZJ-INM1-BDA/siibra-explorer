@@ -489,11 +489,11 @@ export interface components {
       /** @Type */
       "@type": string
       /** Index */
-      index: string[]
+      index: unknown[]
       /** Dtype */
       dtype: string
       /** Columns */
-      columns: string[]
+      columns: unknown[]
       /** Ndim */
       ndim: number
       /** Data */
@@ -510,7 +510,7 @@ export interface components {
       /** Urls */
       urls: (components["schemas"]["EbrainsDsUrl"])[]
       /** Description */
-      description: string
+      description?: string
       /** Contributors */
       contributors: (components["schemas"]["EbrainsDsPerson"])[]
       /** Ebrains Page */
@@ -722,6 +722,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[FeatureMetaModel] */
     Page_FeatureMetaModel_: {
@@ -733,6 +735,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[ParcellationEntityVersionModel] */
     Page_ParcellationEntityVersionModel_: {
@@ -744,6 +748,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraAtlasModel] */
     Page_SiibraAtlasModel_: {
@@ -755,6 +761,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraCorticalProfileModel] */
     Page_SiibraCorticalProfileModel_: {
@@ -766,6 +774,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraEbrainsDataFeatureModel] */
     Page_SiibraEbrainsDataFeatureModel_: {
@@ -777,6 +787,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraParcellationModel] */
     Page_SiibraParcellationModel_: {
@@ -788,6 +800,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraRegionalConnectivityModel] */
     Page_SiibraRegionalConnectivityModel_: {
@@ -799,6 +813,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraTabularModel] */
     Page_SiibraTabularModel_: {
@@ -810,6 +826,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[SiibraVoiModel] */
     Page_SiibraVoiModel_: {
@@ -821,6 +839,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
     Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
@@ -832,6 +852,8 @@ export interface components {
       page: number
       /** Size */
       size: number
+      /** Pages */
+      pages?: number
     }
     /** ParcellationEntityVersionModel */
     ParcellationEntityVersionModel: {
@@ -985,7 +1007,8 @@ export interface components {
     SiibraAnchorModel: {
       /** @Type */
       "@type": string
-      location?: components["schemas"]["LocationModel"]
+      /** Location */
+      location?: components["schemas"]["LocationModel"] | components["schemas"]["CoordinatePointModel"]
       /** Regions */
       regions: (components["schemas"]["SiibraRegionAssignmentQual"])[]
     }

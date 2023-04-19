@@ -10,12 +10,17 @@ import {
 import { LayerCtrlEffects } from "./layerCtrl.effects"
 import { NEVER } from "rxjs"
 import { RouterService } from "src/routerModule/router.service"
+import { HttpClientModule } from "@angular/common/http"
+import { BaseService } from "../base.service/base.service"
 
 describe('> layerctrl.service.ts', () => {
   describe('> NehubaLayerControlService', () => {
     let mockStore: MockStore
     beforeEach(() => {
       TestBed.configureTestingModule({
+        imports:[
+          HttpClientModule,
+        ],
         providers: [
           {
             provide: RouterService,
@@ -29,6 +34,13 @@ describe('> layerctrl.service.ts', () => {
             provide: LayerCtrlEffects,
             useValue: {
               onATPDebounceNgLayers$: NEVER
+            }
+          },
+          {
+            provide: BaseService,
+            useValue: {
+              selectedATPR$: NEVER,
+              completeNgIdLabelRegionMap$: NEVER,
             }
           }
         ]

@@ -2,7 +2,7 @@ import { KeyValue } from "@angular/common"
 import { Pipe, PipeTransform } from "@angular/core"
 import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 
-type DS = KeyValue<string, PathReturn<"/feature/_types">["items"]>
+export type DS = KeyValue<string, PathReturn<"/feature/_types">["items"]>
 
 @Pipe({
   name: 'filterCategory',

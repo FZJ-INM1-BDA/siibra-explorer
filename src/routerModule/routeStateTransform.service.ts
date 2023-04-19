@@ -77,7 +77,6 @@ export class RouteStateTransformSvc {
       }
       
       const regionMap = new Map<string, SxplrRegion>(allParcellationRegions.map(region => [region.name, region]))
-      const ngIdToRegionMap: Map<string, Map<number, SxplrRegion[]>> = new Map()
 
       const [ ngMap, threeMap ] = await Promise.all([
         this.sapi.getTranslatedLabelledNgMap(selectedParcellation, selectedTemplate),

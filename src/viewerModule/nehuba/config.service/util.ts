@@ -174,7 +174,7 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
       : null
   }
 
-  if (parc.id === IDS.PARCELLATION.JBA30) {
+  if (parc.id === IDS.PARCELLATION.JBA30 && tmpl.id !== IDS.TEMPLATES.FSAVERAGE) {
     return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
   }
 
