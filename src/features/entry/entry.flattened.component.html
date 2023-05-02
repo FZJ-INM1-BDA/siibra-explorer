@@ -51,6 +51,7 @@
 <ng-template #featureCategoryFeatureTmpl let-keyvalue>
     <mat-expansion-panel
         sxplrCategoryAcc
+        [unchecked]="filterFeatureCls.unchecked$ | async"
         #categoryAcc="categoryAcc"
         [ngClass]="{
             'sxplr-d-none': !(categoryAcc.isBusy$ | async) && (categoryAcc.total$ | async) === 0
@@ -60,12 +61,12 @@
                 {{ keyvalue.key }}
             </mat-panel-title>
             <mat-panel-description>
-                <spinner-cmp *ngIf="categoryAcc.isBusy$ | async"></spinner-cmp>
                 <ng-template [ngIf]="categoryAcc.total$ | async" let-total>
                     <span>
                         {{ total }}
                     </span>
                 </ng-template>
+                <spinner-cmp class="sxplr-ml-2 sxplr-d-block" *ngIf="categoryAcc.isBusy$ | async"></spinner-cmp>
             </mat-panel-description>
         </mat-expansion-panel-header>
 
@@ -74,7 +75,7 @@
         <div class="mat-chip-container"
             feature-filter-directive
             [initValue]="true"
-            [items]="categoryAcc.groupedFeatures$ | async "
+            [items]="categoryAcc.featureMetadata$ | async "
             #filterFeatureCls="featureFilterDirective">
 
             <div class="mat-chip-inner-container">
@@ -85,7 +86,7 @@
                 </button>
 
                 <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-grpFeat>
-                    <ng-template [ngIf]="grpFeat.features.length > 0">
+                    <ng-template [ngIf]="grpFeat.meta.total > 0">
 
                         <ng-template [ngIf]="filterFeatureCls.checked$ | async | grpFeatToName | includes : grpFeat.meta.displayName"
                             [ngIfThen]="selectedTmpl"
@@ -97,7 +98,7 @@
                                 {{ grpFeat.meta.displayName }}
                             </span>
                             <span class="text-muted1">
-                                ({{ grpFeat.features.length }})
+                                ({{ grpFeat.meta.total }})
                             </span>
                         </ng-template>
                         <ng-template #selectedTmpl>
@@ -127,6 +128,7 @@
 
         <ng-template ngFor [ngForOf]="keyvalue.value" let-feature>
 
+            <!-- collected by CategoryAccDirective with ContentChildren -->
             <div sxplr-feature-list-directive
                 [template]="template"
                 [parcellation]="parcellation"
@@ -135,26 +137,43 @@
                 [queryParams]="queryParams | mergeObj : { type: (feature.name | featureNamePipe) }"
                 [featureRoute]="feature.path"
                 [name]="feature.name"
-                [displayName]="feature.display_name"
-                #featureListDirective="featureListDirective">
+                [displayName]="feature.display_name">
             </div>
         </ng-template>
-        
-        <cdk-virtual-scroll-viewport itemSize="36"
-            filter-grp-feat
-            [featureDisplayName]="filterFeatureCls.checked$ | async | mapToProperty : 'meta' | mapToProperty : 'displayName'"
-            [groupFeature]="categoryAcc.groupedFeatures$ | async"
-            #filterGrpFeat="filterGrpFeat"
-            class="virtual-scroll-viewport">
 
-            <button *cdkVirtualFor="let feature of filterGrpFeat.filteredFeatures$"
-                mat-button
-                class="virtual-scroll-item sxplr-w-100"
-                [matTooltip]="feature.name"
-                matTooltipPosition="right"
-                (click)="onClickFeature(feature)">
-                {{ feature.name }}
-            </button>
-        </cdk-virtual-scroll-viewport>
+        <ng-template [ngIf]="categoryAcc.datasource$ | async" let-datasource>
+            <cdk-virtual-scroll-viewport itemSize="36"
+                (scrolledIndexChange)="onScroll(datasource, $event)"
+                class="virtual-scroll-viewport">
+
+                <ng-template cdkVirtualFor
+                    [cdkVirtualForOf]="datasource"
+                    let-feature
+                    let-last="last">
+
+                    <button
+                        mat-button
+                        class="virtual-scroll-item sxplr-w-100"
+                        [matTooltip]="feature.name"
+                        matTooltipPosition="right"
+                        (click)="onClickFeature(feature)">
+                        {{ feature.name }}
+                    </button>
+
+                    <div *ngIf="last && datasource.isPulling$ | async">
+                        <ng-template [ngTemplateOutlet]="loadingSpinnerTmpl">
+                        </ng-template>
+                    </div>
+
+
+                </ng-template>
+            </cdk-virtual-scroll-viewport>
+        </ng-template>
+        
     </mat-expansion-panel>
+</ng-template>
+
+
+<ng-template #loadingSpinnerTmpl>
+    <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
 </ng-template>

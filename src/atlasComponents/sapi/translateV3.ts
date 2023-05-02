@@ -419,7 +419,7 @@ class TranslateV3 {
     }
   }
 
-  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<TabularFeature<number|string|number[]>|Feature> {
+  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<TabularFeature<number|string|number[]>|VoiFeature|Feature> {
     if (this.#isTabular(feat)) {
       return await this.translateTabularFeature(feat)
     }

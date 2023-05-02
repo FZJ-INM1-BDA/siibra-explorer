@@ -1009,12 +1009,17 @@
       </span>
     </ng-template>
   </button>
-  <div
+
+  <!-- TODO voiBbox directive is used to draw outlines for VOI
+  this has been temporarily disabled, since datasource is paginated 
+  and how bounding boxes are drawn needs to be reconsidered -->
+  
+  <!-- <div
     *ngIf="voiSwitch.switchState$ | async"
     voiBbox
     [features]="voiFeatureEntryCmp.features$ | async">
 
-  </div>
+  </div> -->
 </ng-template>
 
 <div

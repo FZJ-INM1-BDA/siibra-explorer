@@ -1,11 +1,33 @@
-<cdk-virtual-scroll-viewport itemSize="36"
-    class="virtual-scroll-viewport">
-    <button *cdkVirtualFor="let feature of features$ | async"
-        mat-button
-        class="virtual-scroll-item sxplr-w-100"
-        [matTooltip]="feature.name"
-        matTooltipPosition="right"
-        (click)="onClickItem(feature)">
-        {{ feature.name }}
-    </button>
-</cdk-virtual-scroll-viewport>
+<ng-template [ngIf]="datasource$ | async" let-datasource>
+
+    <cdk-virtual-scroll-viewport itemSize="36"
+        (scrolledIndexChange)="onScroll(datasource, $event)"
+        class="virtual-scroll-viewport">
+        
+        <ng-template cdkVirtualFor
+            [cdkVirtualForOf]="datasource"
+            let-feature
+            let-last="last"
+            let-index="index">
+
+            <button
+                mat-button
+                class="virtual-scroll-item sxplr-w-100"
+                [matTooltip]="feature.name"
+                matTooltipPosition="right"
+                (click)="onClickItem(feature)">
+                {{ feature.name }}
+            </button>
+
+            <div *ngIf="last && datasource.isPulling$ | async">
+                <ng-template [ngTemplateOutlet]="loadingSpinnerTmpl">
+                </ng-template>
+            </div>
+
+        </ng-template>
+    </cdk-virtual-scroll-viewport>
+</ng-template>
+
+<ng-template #loadingSpinnerTmpl>
+    <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
+</ng-template>
