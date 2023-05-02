@@ -99,9 +99,9 @@ export class PulledDataSource<T> extends DataSource<T> {
     this.finalValue = this.currentValue || []
     this._data.complete()
   }
-  disconnect(): void {
-    
-  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  disconnect(): void {}
 }
 
 export class ParentDatasource<T> extends PulledDataSource<T> {
