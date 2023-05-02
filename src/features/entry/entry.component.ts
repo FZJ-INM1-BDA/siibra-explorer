@@ -8,6 +8,7 @@ import * as userInteraction from "src/state/userInteraction"
 import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
 import { BehaviorSubject, combineLatest, merge, of, Subscription } from 'rxjs';
+import { IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -36,7 +37,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   public busyTallying$ = new BehaviorSubject<boolean>(false)
   public totals$ = new BehaviorSubject<number>(null)
-  public features$ = new BehaviorSubject<Feature[]>([])
 
   constructor(private sapi: SAPI, private store: Store) {
     super()
@@ -77,13 +77,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
           this.totals$.next(num)
         }),
       ).subscribe(),
-
-      catAccDirs$.pipe(
-        switchMap(catArrDirs => combineLatest(
-          catArrDirs.map(dir => dir.features$)
-        )),
-        map(features => features.flatMap(f => f))
-      ).subscribe(features => this.features$.next(features))
     )
   }
 
@@ -140,5 +133,17 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
       })
     )
   }
-}
 
+  async onScroll(datasource: PulledDataSource<unknown>, scrollIndex: number){
+    if ((datasource.currentValue.length - scrollIndex) < 30) {
+      try {
+        await datasource.pull()
+      } catch (e) {
+        if (e instanceof IsAlreadyPulling) {
+          return
+        }
+        throw e
+      }
+    }
+  }
+}

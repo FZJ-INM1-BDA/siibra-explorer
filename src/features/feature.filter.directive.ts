@@ -32,7 +32,7 @@ export class FeatureFilterDirective<T> implements OnChanges{
     this.#initValue$
   ]).pipe(
     switchMap(([items, initFlag]) => {
-      const initialCondition = items.map(item => ({ item, flag: initFlag }))
+      const initialCondition = (items || []).map(item => ({ item, flag: initFlag }))
       return merge<{ target: T, flag?: boolean, op: string }>(
         this.#toggle$.pipe(
           map(v => ({ ...v, op: 'toggle' }))

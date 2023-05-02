@@ -1,5 +1,10 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { GroupedFeature } from "./category-acc.directive";
+
+interface MetaDisplayName {
+  meta: {
+    displayName: string
+  }
+}
 
 @Pipe({
   name: 'grpFeatToName',
@@ -7,7 +12,7 @@ import { GroupedFeature } from "./category-acc.directive";
 })
 
 export class GroupFeaturesToName implements PipeTransform{
-  public transform(groupFeats: GroupedFeature[]): string[] {
+  public transform(groupFeats: MetaDisplayName[]): string[] {
     return groupFeats.map(f => f.meta.displayName)
   }
 }
