@@ -26,7 +26,6 @@ import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
 import { MatChipsModule } from "@angular/material/chips";
 import { FeatureFilterDirective } from "./feature.filter.directive";
-import { FilterGroupList } from "./filterGrpFeat.directive"
 import { GroupFeaturesToName } from "./grpFeatToName.pipe";
 
 @NgModule({
@@ -56,7 +55,6 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
     FilterCategoriesPipe,
     ListDirective,
     FeatureFilterDirective,
-    FilterGroupList,
 
     CategoryAccDirective,
     VoiBboxDirective,

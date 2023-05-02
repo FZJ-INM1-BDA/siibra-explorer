@@ -1,6 +1,6 @@
 {
   "name": "siibra-explorer",
-  "version": "2.10.1",
+  "version": "2.10.2",
   "description": "siibra-explorer - explore brain atlases. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
     "lint": "eslint src --ext .ts",
