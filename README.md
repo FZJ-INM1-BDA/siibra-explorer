@@ -1,5 +1,6 @@
 <img align="right" src="https://raw.githubusercontent.com/FZJ-INM1-BDA/siibra-explorer/master/docs/images/siibra-explorer-square.jpeg" width="200">
 
+[![DOI](https://zenodo.org/badge/109723444.svg)](https://zenodo.org/badge/latestdoi/109723444)
 [![Documentation Status](https://readthedocs.org/projects/siibra-explorer/badge/?version=latest)](https://siibra-explorer.readthedocs.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
