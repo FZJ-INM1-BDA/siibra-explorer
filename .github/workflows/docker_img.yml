@@ -64,7 +64,7 @@ jobs:
         if [[ "${{ matrix.build }}" == "local" ]]
         then
           echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
-        else
+        fi
 
     - name: 'Set version variable & expmt feature flag'
       # if matrix.build is local, only run if master or dev
