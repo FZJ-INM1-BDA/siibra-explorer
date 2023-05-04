@@ -15,12 +15,12 @@ Advanced users may wish to run local instances of siibra-explorer against local 
 
 ## Prerequisite
 
-- This document assumes the user validated that the configuration is visible in siibra-python <insert-link>.
+- This document assumes the user validated that the configuration is visible in siibra-python (TODO add link).
 - Docker & docker-compose
 
 ## Steps
 
-- copy the <docker-compose.yml> file to your working directory
+- copy the [docker-compose.yml](docker-compose.yml) file to your working directory
 - replace `</path/to/your/volume/>` with path to siibra-configuration on your machine
 - run `docker-compose up -d`
 - siibra-explorer should be running on http://localhost:10082
