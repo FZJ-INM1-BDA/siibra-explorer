@@ -1,6 +1,6 @@
 # System requirements
 
-Interactive atlas viewer relies on [WebGL2.0](https://en.wikipedia.org/wiki/WebGL). Whilst a large proportion of modern browsers support this technology, some browser vendors do not. Most notably, __none__ of the Apple browsers (Safari on MacOS, [**any** browser on iOS](https://developer.apple.com/app-store/review/guidelines/#software-requirements)) support WebGL2.0.
+Interactive atlas viewer relies on [WebGL2.0](https://en.wikipedia.org/wiki/WebGL). 
 
 !!! info
     To check if your device and browser combination support webgl 2.0, visit <https://get.webgl.org/webgl2/>.
@@ -8,11 +8,9 @@ Interactive atlas viewer relies on [WebGL2.0](https://en.wikipedia.org/wiki/WebG
 ## Desktop
 
 - PC (Windows/Linux/MacOS)
-- Latest Chrome/Firefox
+- Latest Chrome/Firefox/Safari
 - Dedicated graphics card (optional, but will drastically improve the performance)
 
 ## Mobile
 
-- Android Smartphone
-- Latest Chrome/Firefox
-
+- Latest Chrome/Firefox/Safari

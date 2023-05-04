@@ -64,6 +64,8 @@ jobs:
         if [[ "${{ matrix.build }}" == "local" ]]
         then
           echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LOCAL }}" >> $GITHUB_ENV
+          echo "MATOMO_URL=" >> $GITHUB_ENV
+          echo "MATOMO_ID=" >> $GITHUB_ENV
         fi
 
     - name: 'Set version variable & expmt feature flag'

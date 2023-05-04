@@ -6,6 +6,5 @@ The interactive atlas viewer is a browser based viewer of brain atlases. Tight i
 
 ## Links
 
-- production: <https://interactive-viewer.apps.hbp.eu>
 - production: <https://atlases.ebrains.eu/viewer/>
 - support: [support@ebrains.eu](mailto:support@ebrains.eu?subject=[interactive%20atlas%20viewer]%20queries)
