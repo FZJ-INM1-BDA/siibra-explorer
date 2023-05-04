@@ -87,7 +87,10 @@
     [color]="colorPalette[0]"
     (itemClicked)="selectLeaf({ atlas: $event})"
     [elevation]="6"
-    [disabled]="isBusy">
+    [disabled]="isBusy"
+    quick-tour
+    [quick-tour-order]="-10"
+    quick-tour-description="You can change atlas here.">
 
     <ng-template sxplrSmartChipHeader>
       <span>
