@@ -67,16 +67,6 @@ export class RouterService {
         )
       )
     )
-    onload$.subscribe(
-      state => {
-        store$.dispatch(
-          generalActions.generalApplyState({
-            state
-          })
-        )
-      }
-    )
-
     const ready$ = sapi.atlases$.pipe(
       filter(flag => !!flag),
       take(1),
@@ -146,7 +136,11 @@ export class RouterService {
             }
           }),
           store$.pipe(
-            switchMap(state => 
+            /**
+             * forkjoin means requires the observable to complete. So we take 1
+             */
+            take(1),
+            switchMap(state =>
               from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
                 catchError(() => of(``))
               )

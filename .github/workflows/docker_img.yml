@@ -7,7 +7,7 @@ on:
       # changes to .openshift directory... mostly devops config
       - '.openshift/*'
       # docs (docs are built on readthedocs any way)
-      - 'docs/*'
+      - 'docs/**/*'
 
 jobs:
   build-docker-img:
