@@ -63,7 +63,7 @@ jobs:
         
         if [[ "${{ matrix.build }}" == "local" ]]
         then
-          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
+          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LOCAL }}" >> $GITHUB_ENV
         fi
 
     - name: 'Set version variable & expmt feature flag'
