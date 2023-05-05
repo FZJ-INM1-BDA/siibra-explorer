@@ -1,6 +1,7 @@
 import { DataSource } from "@angular/cdk/collections"
-import { BehaviorSubject, Observable, ReplaySubject, Subscription, combineLatest, concat, of, pipe } from "rxjs"
+import { BehaviorSubject, Observable, ReplaySubject, Subscription, combineLatest, concat, of, timer } from "rxjs"
 import { finalize, map, scan, shareReplay, startWith, tap } from "rxjs/operators"
+import { cachedPromise } from "./fn"
 
 export interface IPuller<T> {
   next: (cb: (val: T) => void) => void
@@ -14,6 +15,7 @@ interface PaginatedArg<T> {
 }
 
 export class IsAlreadyPulling extends Error {}
+export class DsExhausted extends Error {}
 
 
 /**
@@ -25,15 +27,20 @@ export class PulledDataSource<T> extends DataSource<T> {
 
   protected annotations: Record<string, string>
 
-  protected onPulled() {
-    return pipe(
-    )
-  }
-
   #pull: () => Promise<T[]>
   
   completed = false
   private _data = new ReplaySubject<T[]>()
+  data$ = this._data.pipe(
+    startWith([] as T[]),
+    scan((acc, curr) => [...acc, ...curr]),
+    tap((v: T[]) => {
+      this.currentValue = v
+    }),
+    shareReplay(1)
+  )
+
+
   currentValue: T[] = []
   finalValue: T[] = []
 
@@ -50,10 +57,10 @@ export class PulledDataSource<T> extends DataSource<T> {
     return this._isPulling
   }
 
-
+  @cachedPromise()
   async pull(): Promise<T[]> {
     if (this.completed) {
-      return []
+      throw new DsExhausted()
     }
     if (this.isPulling) {
       throw new IsAlreadyPulling(`PulledDataSource is already pulling`)
@@ -67,7 +74,6 @@ export class PulledDataSource<T> extends DataSource<T> {
     this.isPulling = false
     if (newResults.length === 0) {
       this.complete()
-      return []
     }
     this._data.next(newResults)
     return newResults
@@ -85,13 +91,7 @@ export class PulledDataSource<T> extends DataSource<T> {
   }
 
   connect(): Observable<readonly T[]> {
-    return this._data.pipe(
-      startWith([] as T[]),
-      scan((acc, curr) => [...acc, ...curr]),
-      tap((v: T[]) => {
-        this.currentValue = v
-      }),
-    )
+    return this.data$
   }
   complete() {
     this.completed = true
@@ -106,6 +106,11 @@ export class PulledDataSource<T> extends DataSource<T> {
 
 export class ParentDatasource<T> extends PulledDataSource<T> {
 
+  private _data$ = new BehaviorSubject<T[]>([])
+  data$ = this._data$.pipe(
+    shareReplay(1),
+  )
+
   #subscriptions: Subscription[] = []
   _children: PulledDataSource<T>[] = []
   constructor(arg: PaginatedArg<T>){
@@ -114,13 +119,14 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
     this._children = children
   }
 
+  @cachedPromise()
   async pull() {
     for (const ds of this._children) {
       if (!ds.completed) {
         return await ds.pull()
       }
     }
-    return []
+    throw new DsExhausted()
   }
 
   connect(): Observable<readonly T[]> {
@@ -131,25 +137,38 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
     this.#subscriptions.push(
       combineLatest(this._children.map(c => c.isPulling$)).subscribe(flags => {
         this.isPulling = flags.some(flag => flag)
-      })
-    )
-
-    return concat(
-      ...this._children.map(ds => ds.connect())
-    ).pipe(
-      map(arr => {
-        const alreadyEmitted = this._children.filter(c => c.completed)
-        const prevValues = alreadyEmitted.flatMap(v => v.finalValue)
-        return [...prevValues, ...arr]
       }),
-      
-      tap((v: T[]) => {
+      concat(
+        ...this._children.map(ds => ds.connect()),
+        /**
+         * final emitted value
+         * in some circumstances, all children would have been completed. 
+         * the first synchronous empty array flushes the current value
+         * the second timed empty array completes the observable
+         * 
+         * Observable must not be completed synchronously, as this leads to the final value not emitted. 
+         */
+        of([] as T[]).pipe(
+          tap(() => this.finalValue = this.currentValue)
+        ),
+        timer(160).pipe(
+          map(() => [] as T[])
+        )
+      ).pipe(
+        map(arr => {
+          const alreadyCompleted = this._children.filter(c => c.completed)
+          const prevValues = alreadyCompleted.flatMap(v => v.finalValue)
+          return [...prevValues, ...arr]
+        }),
+        finalize(() => {
+          this._data$.complete()
+        })
+      ).subscribe(v => {
         this.currentValue = v
-      }),
-      finalize(() => {
-        this.finalValue = this.currentValue || []
+        this._data$.next(v)
       })
     )
+    return this.data$
   }
 
   disconnect(): void {
