@@ -93,6 +93,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
     this.#unchecked$.next(val)
   }
 
+  datasource: ParentDatasource<TranslatedFeature>
   public datasource$ = combineLatest([
     this.unchecked$,
     this.#listCmps$,
@@ -111,11 +112,46 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       return combineLatest(
         filteredListCmps.map(cmp => cmp.datasource$)
       ).pipe(
-        map(dss => new ParentDatasource({ children: dss })),
+        map(dss => {
+          this.datasource = new ParentDatasource({ children: dss })
+          return this.datasource
+        }),
       )
     })
   )
 
+  constructor(){
+
+    /**
+     * On init, if current count is less than 50, and less than total, pull.
+     */
+    this.#subscriptions.push(
+      combineLatest([
+        this.total$,
+        this.datasource$
+      ]).pipe(
+        switchMap(([ total, ds ]) => 
+          ds.data$.pipe(
+            map(items => ({
+              total,
+              ds,
+              current: items.length
+            }))
+          )
+        )
+      ).subscribe(async ({ total, current, ds }) => {
+        if (total > current && current < 50) {
+          try {
+            await ds.pull()
+          } catch (e) {
+            // if already pulling, ignore
+          }
+        }
+      })
+    )
+  }
+
+  #subscriptions: Subscription[] = []
   #changeSub: Subscription
   ngAfterContentInit(): void {
     this.#changeSub = this.listCmps.changes.subscribe(() => {
@@ -130,5 +166,6 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.#changeSub) this.#changeSub.unsubscribe() 
+    if (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
   }
 }

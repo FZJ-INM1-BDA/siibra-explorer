@@ -975,6 +975,13 @@
         </ng-template>
       </mat-card-subtitle>
     </mat-card-header>
+
+    <mat-slide-toggle [formControl]="showVOIWireframeSlideToggle">
+      <span>
+        Show VOI Wireframe
+      </span>
+      <spinner-cmp class="sxplr-d-inline-block" *ngIf="loadingVoiWireFrame$ | async"></spinner-cmp>
+    </mat-slide-toggle>
   </mat-card>
 
   <sxplr-feature-entry
@@ -984,6 +991,12 @@
     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
     #voiFeatureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
+
+  <mat-card [ngClass]="{
+    'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) > 0
+  }">
+    No spatial features found.
+  </mat-card>
 
   <button mat-raised-button
     [ngClass]="{
@@ -1014,12 +1027,12 @@
   this has been temporarily disabled, since datasource is paginated 
   and how bounding boxes are drawn needs to be reconsidered -->
   
-  <!-- <div
-    *ngIf="voiSwitch.switchState$ | async"
+  <div
+    *ngIf="showVOIWireframeSlideToggle.valueChanges | async"
     voiBbox
     [features]="voiFeatureEntryCmp.features$ | async">
 
-  </div> -->
+  </div>
 </ng-template>
 
 <div

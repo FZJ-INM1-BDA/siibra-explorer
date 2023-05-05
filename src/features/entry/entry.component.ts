@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { map, scan, switchMap, tap } from 'rxjs/operators';
+import { map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
@@ -8,7 +8,8 @@ import * as userInteraction from "src/state/userInteraction"
 import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
 import { BehaviorSubject, combineLatest, merge, of, Subscription } from 'rxjs';
-import { IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
+import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
+import { TranslatedFeature } from '../list/list.directive';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -31,6 +32,11 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   exportAs: 'featureEntryCmp'
 })
 export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
+
+  private _features$ = new BehaviorSubject<TranslatedFeature[]>([])
+  features$ = this._features$.pipe(
+    shareReplay(1)
+  )
 
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
@@ -139,11 +145,36 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
       try {
         await datasource.pull()
       } catch (e) {
-        if (e instanceof IsAlreadyPulling) {
+        if (e instanceof IsAlreadyPulling || e instanceof DsExhausted) {
           return
         }
         throw e
       }
     }
+  }
+
+  async pullAll(){
+    const dss = Array.from(this.catAccDirs).map(catAcc => catAcc.datasource)
+
+    this._features$.next([])
+    await Promise.all(
+      dss.map(async ds => {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          try {
+            await ds.pull()
+          } catch (e) {
+            if (e instanceof DsExhausted) {
+              break
+            }
+            if (e instanceof IsAlreadyPulling ) {
+              continue
+            }
+            throw e
+          }
+        }
+      })
+    )
+    this._features$.next(dss.flatMap(ds => ds.finalValue))
   }
 }
