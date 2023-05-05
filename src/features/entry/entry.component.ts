@@ -159,6 +159,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     this._features$.next([])
     await Promise.all(
       dss.map(async ds => {
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
             await ds.pull()
