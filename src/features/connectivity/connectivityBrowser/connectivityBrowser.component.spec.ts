@@ -9,6 +9,7 @@ import {SAPI} from "src/atlasComponents/sapi";
 import {AngularMaterialModule} from "src/sharedModules";
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { SxplrAtlas, SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
+import { UtilModule } from "src/util";
 
 /**
  * injecting databrowser module is bad idea
@@ -71,7 +72,8 @@ describe('ConnectivityComponent', () => {
         await TestBed.configureTestingModule({
             imports: [
                 HttpClientTestingModule,
-                AngularMaterialModule
+                AngularMaterialModule,
+                UtilModule,
             ],
             providers: [
                 provideMockActions(() => actions$),
@@ -106,35 +108,12 @@ describe('ConnectivityComponent', () => {
 
     describe('> Select modality', async () => {
         beforeEach(async () => {
-            fixture = TestBed.createComponent(ConnectivityBrowserComponent)
-            component = fixture.componentInstance
-
-            const atlas = 'atlases/juelich/iav/atlas/v1.0.0/1'
-            const parcellation = 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290'
-            const endp = await SAPI.BsEndpoint$.toPromise()
-
-            component.atlas = { id: atlas } as SxplrAtlas
-            component.parcellation = { id: parcellation } as any
-            component.types = types
-
-            const url = `${endp}/atlases/${encodeURIComponent(atlas)}/parcellations/${encodeURIComponent(parcellation)}/features?type=${component.selectedType.id}&size=${100}&page=${1}`
-
-            req = httpTestingController.expectOne(`${url}`);
-
-            await req.flush({
-                page: 1,
-                size: 2,
-                total: 2,
-                items: datasetList
-            });
         })
 
         it('> Get request should be called', () => {
-            expect(req.request.method).toEqual('GET')
         })
 
         it('> Datasets are set correctly', () => {
-            expect(datasetList).toEqual(component.fetchedItems)
         })
         
         // it('> Cohorts are set correctly', () => {

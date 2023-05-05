@@ -4,16 +4,20 @@ import { hot } from "jasmine-marbles"
 import { NehubaMeshService } from "./mesh.service"
 import { atlasSelection } from "src/state"
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import * as configSvc from "../config.service"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
-import { mapTo, take } from "rxjs/operators"
+import { mapTo } from "rxjs/operators"
 import { selectorAuxMeshes } from "../store"
 import { HttpClientModule } from "@angular/common/http"
 import { BaseService } from "../base.service/base.service"
 
 
-const fits1 = {} as SxplrRegion
+const fits1 = {
+  name: "foo-bar"
+} as SxplrRegion
+const fits2 = {
+  name: "foobar-foobar"
+} as SxplrRegion
 const auxMesh = {
   "@id": 'bla',
   labelIndicies: [1,2,3],
@@ -25,7 +29,7 @@ const auxMesh = {
 }
 
 describe('> mesh.service.ts', () => {
-  let getParcNgIdSpy: jasmine.Spy = jasmine.createSpy('getParcNgId')
+  
   
   let getATPSpy: jasmine.Spy = jasmine.createSpy('distinctATP')
 
@@ -40,7 +44,6 @@ describe('> mesh.service.ts', () => {
   }
 
   beforeEach(() => {
-    spyOnProperty(configSvc, 'getParcNgId').and.returnValue(getParcNgIdSpy)
     getATPSpy = spyOn(atlasSelection.fromRootStore, 'distinctATP')
     getATPSpy.and.returnValue(
       pipe(
@@ -54,7 +57,6 @@ describe('> mesh.service.ts', () => {
   })
 
   afterEach(() => {
-    getParcNgIdSpy.calls.reset()
     
     getATPSpy.calls.reset()
   })
@@ -90,114 +92,165 @@ describe('> mesh.service.ts', () => {
 
     describe("> loadMeshes$", () => {
 
+      const ngId = 'blabla'
+      const labelIndex = 12
+      const ngId2 = 'blabla-foo-foo'
+      const labelIndex2 = 123
+
+      beforeEach(() => {
+        const baseSvc = TestBed.inject(BaseService)
+        baseSvc.completeNgIdLabelRegionMap$ = of({
+          [ngId]: {
+            [labelIndex]: fits1
+          },
+          [ngId2]: {
+            [labelIndex2]: fits2
+          }
+        })
+      })
+
       describe("> auxMesh defined", () => {
 
-        const ngId = 'blabla'
-        const labelIndex = 12
-
         beforeEach(() => {
-
           const mockStore = TestBed.inject(MockStore)
-          mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [ fits1 ])
-          mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [])
           mockStore.overrideSelector(selectorAuxMeshes, [auxMesh])
-    
-          getParcNgIdSpy.and.returnValue(ngId)
-
         })
 
-        it("> auxMesh ngId labelIndex emitted", () => {
+        describe("> no selected region", () => {
+          beforeEach(() => {
+            const mockStore = TestBed.inject(MockStore)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
+          })
+          it('> show auxmesh only', () => {
 
-          const service = TestBed.inject(NehubaMeshService)
-          expect(
-            service.loadMeshes$
-          ).toBeObservable(
-            hot('(ab)', {
-              a: {
-                layer: {
-                  name: ngId
+            const service = TestBed.inject(NehubaMeshService)
+            expect(
+              service.loadMeshes$
+            ).toBeObservable(
+              hot('(abc)', {
+                a: {
+                  layer: {
+                    name: ngId
+                  },
+                  labelIndicies:[]
                 },
-                labelIndicies: [ labelIndex ]
-              },
-              b: {
-                layer: {
-                  name: auxMesh.ngId,
+                b: {
+                  layer: {
+                    name: ngId2
+                  },
+                  labelIndicies:[]
                 },
-                labelIndicies: auxMesh.labelIndicies
-              }
-            })
-          )
+                c: {
+                  layer: {
+                    name: auxMesh.ngId,
+                  },
+                  labelIndicies: auxMesh.labelIndicies
+                }
+              })
+            )
+          })
+        })
+
+        describe("> has selected region", () => {
+          beforeEach(() => {
+            const mockStore = TestBed.inject(MockStore)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [fits1])
+          })
+          it("> shows both shown mesh and aux mesh", () => {
+            
+            const service = TestBed.inject(NehubaMeshService)
+            expect(
+              service.loadMeshes$
+            ).toBeObservable(
+              hot('(abc)', {
+                a: {
+                  layer: {
+                    name: ngId
+                  },
+                  labelIndicies: [ labelIndex ]
+                },
+                b: {
+                  layer: {
+                    name: ngId2,
+                  },
+                  labelIndicies: []
+                },
+                c: {
+                  layer: {
+                    name: auxMesh.ngId,
+                  },
+                  labelIndicies: auxMesh.labelIndicies
+                }
+              })
+            )
+          })
         })
       })
 
-      describe("> if multiple ngid and labelindicies are present", () => {
-
-        const ngId1 = 'blabla'
-        const labelIndex1 = 12
-
-        const ngId2 = 'foobar'
-        const labelIndex2 = 13
-
+      describe('> auxmesh not defined', () => {
         beforeEach(() => {
-
           const mockStore = TestBed.inject(MockStore)
-          mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [ fits1 ])
-          mockStore.overrideSelector(atlasSelection.selectors.selectedParcAllRegions, [fits1, fits1])
           mockStore.overrideSelector(selectorAuxMeshes, [])
-    
-          getParcNgIdSpy.and.returnValues(ngId1, ngId2, ngId2)
         })
+        describe("> has no selected region", () => {
+          beforeEach(() => {
+            const mockStore = TestBed.inject(MockStore)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
+          })
 
-        it('> should call getParcNgIdSpy and getRegionLabelIndexSpy thrice', () => {
-          const service = TestBed.inject(NehubaMeshService)
-          service.loadMeshes$.pipe(
-            take(1)
-          ).subscribe(() => {
-
-            expect(getParcNgIdSpy).toHaveBeenCalledTimes(3)
+          it("> load all meshes", () => {
+            
+            const service = TestBed.inject(NehubaMeshService)
+            expect(
+              service.loadMeshes$
+            ).toBeObservable(
+              hot('(ab)', {
+                a: {
+                  layer: {
+                    name: ngId
+                  },
+                  labelIndicies: [ labelIndex ]
+                },
+                b: {
+                  layer: {
+                    name: ngId2,
+                  },
+                  labelIndicies: [ labelIndex2 ]
+                }
+              })
+            )
           })
         })
 
-        /**
-         * in the case of julich brain 2.9 in colin 27, we expect selecting a region will hide meshes from all relevant ngIds (both left and right)
-         */
-        it('> expect the emitted value to be incl all ngIds', () => {
-          const bService = TestBed.inject(BaseService)
-          bService.completeNgIdLabelRegionMap$ = of({
-            [ngId1]: {},
-            [ngId2]: {
-              [labelIndex2]: fits1
-            }
+        describe("> has selected region", () => {
+          beforeEach(() => {
+            const mockStore = TestBed.inject(MockStore)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [fits1])
           })
-          const service = TestBed.inject(NehubaMeshService)
-          expect(
-            service.loadMeshes$
-          ).toBeObservable(
-            hot('abc', {
-              a: {
-                layer: {
-                  name: ngId1
-                },
-                labelIndicies: []
-              },
-              b: {
-                layer: {
-                  name: ngId2
-                },
-                labelIndicies: [ labelIndex2 ]
-              },
-              c: {
-                layer: {
-                  name: auxMesh.ngId
-                },
-                labelIndicies: auxMesh.labelIndicies
-              }
-            })
-          )
+          it("> load only selected mesh", () => {
 
+            const service = TestBed.inject(NehubaMeshService)
+            expect(
+              service.loadMeshes$
+            ).toBeObservable(
+              hot('(ab)', {
+                a: {
+                  layer: {
+                    name: ngId
+                  },
+                  labelIndicies: [ labelIndex ]
+                },
+                b: {
+                  layer: {
+                    name: ngId2,
+                  },
+                  labelIndicies: [  ]
+                }
+              })
+            )
+          })
         })
       })
-
     })
   })
 })

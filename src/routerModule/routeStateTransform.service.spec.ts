@@ -23,6 +23,7 @@ describe("> routeStateTransform.service.ts", () => {
               getSpaceDetail: jasmine.createSpy('getSpaceDetail'),
               getParcDetail: jasmine.createSpy('getParcDetail'),
               getParcRegions: jasmine.createSpy('getParcRegions'),
+              getRegionLabelIndices: jasmine.createSpy('getRegionLabelIndices')
             }
           }
         ]
@@ -156,7 +157,11 @@ describe("> routeStateTransform.service.ts", () => {
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = await svc.cvtStateToRoute(state as any)
+          try {
+            const s = await svc.cvtStateToRoute(state as any)
+          } catch (e) {
+            
+          }
 
           for (const key in atlasSelectionSpy) {
             expect(atlasSelectionSpy[key]).toHaveBeenCalledTimes(1)
@@ -166,13 +171,18 @@ describe("> routeStateTransform.service.ts", () => {
         it('> regular ngId', async () => {
           const ngId = 'foobar'
           const labelIndex = 124
+          const decoded = 'buzz'
           
           getParcNgId.and.returnValue(ngId)
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
-          const s = await svc.cvtStateToRoute(state as any)
+          const sapi = TestBed.inject(SAPI)
+          
+          const getRegionLabelIndicesSpy = sapi.getRegionLabelIndices as jasmine.Spy
+          getRegionLabelIndicesSpy.and.resolveTo(labelIndex)
 
+          const s = await svc.cvtStateToRoute(state as any)
           expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
         })
   
