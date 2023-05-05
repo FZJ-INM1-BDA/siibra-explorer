@@ -131,6 +131,7 @@ export class RouterService {
         map(val => !!val)
       )
     ).pipe(
+      filter(flag => flag),
       switchMap(() => navEnd$),
       map(navEv => navEv.urlAfterRedirects),
       switchMap(url =>
@@ -149,11 +150,9 @@ export class RouterService {
           ),
           
           store$.pipe(
-            switchMap(state => 
-              from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
-                catchError(() => of(``))
-              )
-            )
+            switchMap(state => from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
+              catchError(() => of(``))
+            ))
           ),
         ]),
       ),
