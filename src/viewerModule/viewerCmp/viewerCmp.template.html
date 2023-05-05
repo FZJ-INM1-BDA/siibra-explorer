@@ -992,6 +992,12 @@
     #voiFeatureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
 
+  <mat-card [ngClass]="{
+    'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) > 0
+  }">
+    No spatial features found.
+  </mat-card>
+
   <button mat-raised-button
     [ngClass]="{
       'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) === 0
