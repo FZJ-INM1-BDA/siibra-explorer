@@ -9,7 +9,7 @@ import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, Observab
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { generalActions } from "src/state";
+import { MainState, generalActions } from "src/state";
 
 
 @Injectable({
@@ -39,7 +39,7 @@ export class RouterService {
     router: Router,
     routeToStateTransformSvc: RouteStateTransformSvc,
     sapi: SAPI,
-    store$: Store<any>,
+    store$: Store<MainState>,
     private zone: NgZone,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
@@ -135,16 +135,19 @@ export class RouterService {
       map(navEv => navEv.urlAfterRedirects),
       switchMap(url =>
         forkJoin([
-          routeToStateTransformSvc.cvtRouteToState(
-            router.parseUrl(
-              url
-            )
-          ).then(stateFromRoute => {
-            return {
-              url,
-              stateFromRoute
-            }
-          }),
+          from(
+            routeToStateTransformSvc.cvtRouteToState(
+              router.parseUrl(
+                url
+              )
+            ).then(stateFromRoute => {
+              return {
+                url,
+                stateFromRoute
+              }
+            })
+          ),
+          
           store$.pipe(
             switchMap(state => 
               from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(

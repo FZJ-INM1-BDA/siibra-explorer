@@ -3,7 +3,7 @@ import { provideMockActions } from "@ngrx/effects/testing"
 import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
-import { Observable, of, throwError } from "rxjs"
+import { ReplaySubject, of, throwError } from "rxjs"
 import { SAPI, SAPIModule } from "src/atlasComponents/sapi"
 import { SxplrRegion, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { IDS } from "src/atlasComponents/sapi/constants"
@@ -18,13 +18,19 @@ import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 describe("> effects.ts", () => {
   describe("> Effect", () => {
 
-    let actions$ = new Observable<Action>()
+    let actions$ :ReplaySubject<Action>
 
     let simpleHoc1: SxplrRegion = {
       name: 'foo',
       id: '',
       type: "SxplrRegion",
       parentIds: [],
+    }
+
+    const regWithNoCentorid: PathReturn<"/regions/{region_id}"> = {
+      "@id": "",
+      versionIdentifier: '',
+      "@type": '',
     }
 
     let hoc1LeftMni152: PathReturn<"/regions/{region_id}"> = {
@@ -288,11 +294,19 @@ describe("> effects.ts", () => {
       } as PathReturn<"/regions/{region_id}">
 
       let retrieveRegionSpy: jasmine.Spy
+      let sapiV3GetSpy: jasmine.Spy
 
       beforeEach(async () => {
         retrieveRegionSpy = spyOn(translateV3Entities, 'retrieveRegion')
-        
-        actions$ = hot('a', {
+        const sapi = TestBed.inject(SAPI)
+        sapiV3GetSpy = spyOn(sapi, 'v3Get')
+        actions$ = new ReplaySubject()
+        actions$.next(
+          actions.navigateToRegion({
+            region: simpleHoc1
+          })
+        )
+         hot('a', {
           a: actions.navigateToRegion({
             region: simpleHoc1
           })
@@ -307,6 +321,11 @@ describe("> effects.ts", () => {
         mockStore.overrideSelector(selectors.selectedParcellation, {
           id: IDS.PARCELLATION.JBA29
         } as SxplrParcellation)
+      })
+
+      afterEach(() => {
+        retrieveRegionSpy.calls.reset()
+        sapiV3GetSpy.calls.reset()
       })
 
       describe('> if atlas, template, parc is not set', () => {
@@ -326,7 +345,7 @@ describe("> effects.ts", () => {
             beforeEach(() => {
               const mockStore = TestBed.inject(MockStore)
               mockStore.overrideSelector(atpSelector, null)
-              retrieveRegionSpy.and.
+              
             })
 
             it('> returns general error', () => {
@@ -346,11 +365,12 @@ describe("> effects.ts", () => {
       describe('> if atlas, template, parc is set, but region unset', () => {
 
         beforeEach(() => {
-          actions$ = hot('a', {
-            a: actions.navigateToRegion({
+          actions$ = new ReplaySubject()
+          actions$.next(
+            actions.navigateToRegion({
               region: null
             })
-          })
+          )
         })
         it('> returns general error', () => {
           const effect = TestBed.inject(Effect)
@@ -365,8 +385,29 @@ describe("> effects.ts", () => {
       })
 
       describe('> if inputs are fine', () => {
+        beforeEach(() => {
+          sapiV3GetSpy.and.returnValue(of(translatedRegion))
+        })
+
+        it("> calls v3get", () => {
+          
+          const eff = TestBed.inject(Effect)
+          eff.onNavigateToRegion.subscribe(res => {
+
+            expect(sapiV3GetSpy).toHaveBeenCalledWith("/regions/{region_id}", {
+              path: {
+                region_id: simpleHoc1.name
+              },
+              query: {
+                parcellation_id: IDS.PARCELLATION.JBA29,
+                space_id: IDS.TEMPLATES.MNI152
+              }
+            })
+          })
+        })
 
         it('> getRegionDetailSpy is called, and calls navigateTo', () => {
+
           const eff = TestBed.inject(Effect)
           expect(eff.onNavigateToRegion).toBeObservable(
             hot(`a`, {
@@ -383,7 +424,7 @@ describe("> effects.ts", () => {
         describe('> mal formed return', () => {
           describe('> returns null', () => {
             beforeEach(() => {
-
+              sapiV3GetSpy.and.returnValue(of(null))
             })
             it('> generalactionerror', () => {
 
@@ -399,7 +440,7 @@ describe("> effects.ts", () => {
           })
           describe('> general throw', () => {
             beforeEach(() => {
-
+              sapiV3GetSpy.and.returnValue(throwError('foobar'))
             })
             it('> generalactionerror', () => {
 
@@ -417,7 +458,7 @@ describe("> effects.ts", () => {
           describe('> does not contain props attr', () => {
 
             beforeEach(() => {
-              
+              sapiV3GetSpy.and.returnValue(of(regWithNoCentorid))
             })
             it('> generalactionerror', () => {
 

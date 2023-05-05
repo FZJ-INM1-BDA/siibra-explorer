@@ -10,7 +10,6 @@ import { AtlasSelectionState } from "./const"
 import { atlasAppearance, atlasSelection } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
-import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 
 type OnTmplParcHookArg = {
