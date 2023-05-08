@@ -131,7 +131,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
         this.datasource$
       ]).pipe(
         switchMap(([ total, ds ]) => 
-          ds.data$.pipe(
+          ds.connect().pipe(
             map(items => ({
               total,
               ds,

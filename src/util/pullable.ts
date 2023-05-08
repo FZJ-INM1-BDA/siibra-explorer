@@ -119,6 +119,13 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
     this._children = children
   }
 
+  set isPulling(val: boolean){
+    throw new Error(`Cannot set isPulling for parent pullable`)
+  }
+  get isPUlling(){
+    return this._children.some(c => c.isPulling)
+  }
+
   @cachedPromise()
   async pull() {
     for (const ds of this._children) {
@@ -129,15 +136,17 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
     throw new DsExhausted()
   }
 
+  /**
+   * 
+   * @TODO ParentPullable connect() must be invoked, before the data$ stream become active
+   * @returns {Observable} of all children features
+   */
   connect(): Observable<readonly T[]> {
     if (this._children.length === 0) {
       return of([] as T[])
     }
 
     this.#subscriptions.push(
-      combineLatest(this._children.map(c => c.isPulling$)).subscribe(flags => {
-        this.isPulling = flags.some(flag => flag)
-      }),
       concat(
         ...this._children.map(ds => ds.connect()),
         /**
@@ -147,6 +156,9 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
          * the second timed empty array completes the observable
          * 
          * Observable must not be completed synchronously, as this leads to the final value not emitted. 
+         * 
+         * @TODO rather than subscribe, turn this into pure observable
+         * 
          */
         of([] as T[]).pipe(
           tap(() => this.finalValue = this.currentValue)
