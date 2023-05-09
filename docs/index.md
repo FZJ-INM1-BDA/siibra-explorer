@@ -1,6 +1,6 @@
 # Interactive Atlas Viewer
 
-The interactive atlas viewer is a browser based viewer of brain atlases. Tight integration with the Human Brain Project Knowledge Graph allows seamless querying of semantically and spatially anchored datasets. 
+The interactive atlas viewer is a browser based viewer of brain atlases. Tight integration with the ebrains Knowledge Graph allows seamless querying of semantically and spatially anchored datasets. 
 
 ![](images/desktop_bigbrain_cortical.png)
 
