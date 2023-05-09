@@ -80,26 +80,26 @@ You can deploy the plugin either via GUI or CLI.
 
 ## How (via GUI)
 
-0. - 5. (follow How (via CLI))
+for 0. - 5. (follow How (via CLI))
 
 6. Deploy a redis instance via GUI:
-- `(top right) Add to project` > `Deploy Image` > `(radio button) Image Name`
-- enter `docker-registry.ebrains.eu/monitoring/redis:alpine3.17` in the text field
-- click `(button) [magnifying glass]`
-- change or remember the `name` attribute. Hereafter this attribute will be referred to as `<redis_instance_name>`
-- click `(primary button) Deploy`
+    - `(top right) Add to project` > `Deploy Image` > `(radio button) Image Name`
+    - enter `docker-registry.ebrains.eu/monitoring/redis:alpine3.17` in the text field
+    - click `(button) [magnifying glass]`
+    - change or remember the `name` attribute. Hereafter this attribute will be referred to as `<redis_instance_name>`
+    - click `(primary button) Deploy`
 
 7. Deploy the server via GUI:
 
-- `(top right) Add to project` > `Deploy Image` > `(radio button) Image Name`
-- enter `docker-registry.ebrains.eu/<project_name>/<app_name>:latest-server` in the text field
-- click `(button) [magnifying glass]`
-- under `Environment Variables`, add the following environment variables[2]:
-    - `SIIBRA_TOOLBOX_CELERY_BROKER`=`redis://<redis_instance_name>:6379`
-    - `SIIBRA_TOOLBOX_CELERY_RESULT`=`redis://<redis_instance_name>:6379`
-- under `Labels`, add the following labels:
-    - `app_role`=`server`
-- click `(primary button) Deploy`
+    - `(top right) Add to project` > `Deploy Image` > `(radio button) Image Name`
+    - enter `docker-registry.ebrains.eu/<project_name>/<app_name>:latest-server` in the text field
+    - click `(button) [magnifying glass]`
+    - under `Environment Variables`, add the following environment variables[2]:
+        - `SIIBRA_TOOLBOX_CELERY_BROKER`=`redis://<redis_instance_name>:6379`
+        - `SIIBRA_TOOLBOX_CELERY_RESULT`=`redis://<redis_instance_name>:6379`
+    - under `Labels`, add the following labels:
+        - `app_role`=`server`
+    - click `(primary button) Deploy`
 
 8. Deploy worker via GUI: repeat 7. but
     - use `docker-registry.ebrains.eu/<project_name>/<app_name>:latest-worker` as the image
