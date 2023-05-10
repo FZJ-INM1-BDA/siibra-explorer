@@ -315,9 +315,59 @@ export class Effect {
    */
   onSelectATPById = createEffect(() => this.action.pipe(
     ofType(actions.selectATPById),
-    mapTo(mainActions.generalActionError({
-      message: `NYI, onSelectATPById`
-    }))
+    switchMap(({ atlasId, parcellationId, templateId }) =>
+      this.sapiSvc.atlases$.pipe(
+        switchMap(atlases => {
+
+          const selectedAtlas = atlasId
+            ? atlases.find(atlas => atlas.id === atlasId)
+            : atlases[0]
+
+          if (!selectedAtlas) {
+            return of(
+              mainActions.generalActionError({
+                message: `Atlas with id ${atlasId} not found!`
+              })
+            )
+          }
+          return this.sapiSvc.getAllParcellations(selectedAtlas).pipe(
+            switchMap(parcs => {
+              const selectedParcellation = parcellationId
+                ? parcs.find(parc => parc.id === parcellationId)
+                : parcs[0]
+              if (!selectedParcellation) {
+                return of(
+                  mainActions.generalActionError({
+                    message: `Parcellation with id ${parcellationId} not found!`
+                  })
+                )
+              }
+              return this.sapiSvc.getSupportedTemplates(selectedAtlas, selectedParcellation).pipe(
+                switchMap(templates => {
+                  const selectedTemplate = templateId
+                    ? templates.find(tmpl => tmpl.id === templateId)
+                    : templates[0]
+                  if (!selectedTemplate) {
+                    return of(
+                      mainActions.generalActionError({
+                        message: `Template with id ${templateId} not found`
+                      })
+                    )
+                  }
+                  return of(
+                    actions.setAtlasSelectionState({
+                      selectedAtlas,
+                      selectedParcellation,
+                      selectedTemplate
+                    })
+                  )
+                })
+              )
+            })
+          )
+        })
+      )
+    )
   ))
   
   onClearViewerMode = createEffect(() => this.action.pipe(
