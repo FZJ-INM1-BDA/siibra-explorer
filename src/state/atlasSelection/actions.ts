@@ -67,6 +67,13 @@ export const selectRegion = createAction(
   }>()
 )
 
+export const toggleRegion = createAction(
+  `${nameSpace} toggleRegion`,
+  props<{
+    region: SxplrRegion
+  }>()
+)
+
 export const setSelectedRegions = createAction(
   `${nameSpace} setSelectedRegions`,
   props<{

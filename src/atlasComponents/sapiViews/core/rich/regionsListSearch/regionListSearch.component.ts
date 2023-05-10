@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, HostListener, Input, Output, TemplateRef } from "@angular/core";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { ARIA_LABELS } from "common/constants"
 import { UntypedFormControl } from "@angular/forms";
@@ -45,6 +45,9 @@ export class SapiViewsCoreRichRegionListSearch {
 
   @Output('sxplr-sapiviews-core-rich-regionlistsearch-region-select')
   onOptionSelected = new EventEmitter<SxplrRegion>()
+  
+  @Output('sxplr-sapiviews-core-rich-regionlistsearch-region-toggle')
+  onRegionToggle = new EventEmitter<SxplrRegion>()
 
   public searchFormControl = new UntypedFormControl()
 
@@ -70,6 +73,22 @@ export class SapiViewsCoreRichRegionListSearch {
 
   optionSelected(opt: MatAutocompleteSelectedEvent) {
     const selectedRegion = opt.option.value as SxplrRegion
-    this.onOptionSelected.emit(selectedRegion)
+    if (this.ctrlFlag) {
+      this.onRegionToggle.emit(selectedRegion)
+    } else {
+      this.onOptionSelected.emit(selectedRegion)
+    }
+  }
+
+  ctrlFlag = false
+
+  @HostListener('document:keydown', ['$event'])
+  keydown(event: KeyboardEvent) {
+    this.ctrlFlag = event.ctrlKey
+  }
+  
+  @HostListener('document:keyup', ['$event'])
+  keyup(event: KeyboardEvent) {
+    this.ctrlFlag = event.ctrlKey
   }
 }

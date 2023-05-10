@@ -58,7 +58,10 @@ export class SapiViewsCoreRichRegionsHierarchy {
   }
 
   @Output('sxplr-sapiviews-core-rich-regionshierarchy-region-select')
-  nodeClicked = new EventEmitter<SxplrRegion>()
+  selectRegion = new EventEmitter<SxplrRegion>()
+
+  @Output('sxplr-sapiviews-core-rich-regionshierarchy-region-toggle')
+  toggleRegion = new EventEmitter<SxplrRegion>()
 
   @ViewChild(SxplrFlatHierarchyTreeView)
   treeView: SxplrFlatHierarchyTreeView<SxplrRegion>
@@ -95,7 +98,7 @@ export class SapiViewsCoreRichRegionsHierarchy {
 
   private subs: Subscription[] = []
   
-  onNodeClick(roi: SxplrRegion){
+  onNodeClick({node: roi, event }: {node: SxplrRegion, event: MouseEvent}){
     /**
      * only allow leave nodes to be selectable for now
      */
@@ -103,6 +106,10 @@ export class SapiViewsCoreRichRegionsHierarchy {
     if (children.length > 0) {
       return
     }
-    this.nodeClicked.emit(roi)
+    if (event.ctrlKey) {
+      this.toggleRegion.emit(roi)
+    } else {
+      this.selectRegion.emit(roi)
+    }
   }
 }

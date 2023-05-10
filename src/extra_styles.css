@@ -849,13 +849,7 @@ iav-cmp-viewer-container .mat-chip-list-wrapper
   flex-wrap: nowrap;
 }
 
-sxplr-sapiviews-features-ieeg-ieegdataset .mat-chip-list-wrapper
-{
-  overflow-y: hidden;
-  overflow-x: auto;
-}
-
-iav-cmp-viewer-container poly-update-cmp .mat-chip-list-wrapper
+.wrapped-chips .mat-chip-list-wrapper
 {
   flex-wrap: wrap;
 }

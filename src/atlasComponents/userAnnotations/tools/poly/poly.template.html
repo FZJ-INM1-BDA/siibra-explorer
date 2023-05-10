@@ -4,7 +4,7 @@
   Vertices
 </span>
 
-<mat-chip-list>
+<mat-chip-list class="wrapped-chips">
   <mat-chip *ngFor="let point of (updateAnnotation?.points || []); let i = index"
     (click)="gotoRoi(point)"
     [matTooltip]="point.toString()">

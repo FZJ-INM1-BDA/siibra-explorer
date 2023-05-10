@@ -37,18 +37,24 @@ const reducer = createReducer(
   on(
     actions.selectRegion,
     (state, { region }) => {
-      /**
-       * if roi does not have visualizedIn defined
-       * or internal identifier
-       * 
-       * ignore
-       */
-      const selected = state.selectedRegions.includes(region)
+      const selected = state.selectedRegions.length === 1 && state.selectedRegions.find(r => r.name === region.name)
       return {
         ...state,
         selectedRegions: selected
           ? [ ]
           : [ region ]
+      }
+    }
+  ),
+  on(
+    actions.toggleRegion,
+    (state, { region }) => {
+      const selected = state.selectedRegions.find(r => r.name === region.name)
+      return {
+        ...state,
+        selectedRegions: selected
+          ? state.selectedRegions.filter(r => r.name !== region.name)
+          : [...state.selectedRegions, region]
       }
     }
   ),

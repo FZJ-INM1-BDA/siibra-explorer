@@ -40,7 +40,7 @@ export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> exten
   expandOnInit: boolean = true
 
   @Output('sxplr-flat-hierarchy-tree-view-node-clicked')
-  nodeClicked = new EventEmitter<T>()
+  nodeClicked = new EventEmitter<{ node: T, event: MouseEvent}>()
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.sxplrNodes || changes.sxplrIsParent) {
@@ -110,11 +110,11 @@ export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> exten
     return ``
   }
 
-  handleClickNode(node: TreeNode<T>){
+  handleClickNode(node: TreeNode<T>, event: MouseEvent){
     if (this.nodeLabelToggles) {
       this.treeControl.toggle(node)
     }
-    this.nodeClicked.emit(node.node)
+    this.nodeClicked.emit({ node: node.node, event })
   }
 
   expandAll(){

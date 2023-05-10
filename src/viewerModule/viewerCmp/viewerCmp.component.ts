@@ -271,6 +271,14 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
+  public toggleRoi(roi: SxplrRegion) {
+    this.store$.dispatch(
+      atlasSelection.actions.toggleRegion({
+        region: roi
+      })
+    )
+  }
+
   public exitSpecialViewMode(): void{
     this.store$.dispatch(
       atlasSelection.actions.clearViewerMode()

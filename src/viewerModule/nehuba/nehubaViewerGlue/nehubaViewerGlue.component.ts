@@ -93,17 +93,26 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
     this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
   }
 
-  private selectHoveredRegion(_ev: any): boolean{
+  private selectHoveredRegion(ev: PointerEvent): boolean{
     /**
      * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
      */
     const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
     if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
-    this.store$.dispatch(
-      atlasSelection.actions.selectRegion({
-        region: trueOnhoverSegments[0]
-      })
-    )
+
+    if (ev.ctrlKey) {
+      this.store$.dispatch(
+        atlasSelection.actions.toggleRegion({
+          region: trueOnhoverSegments[0]
+        })
+      )
+    } else {
+      this.store$.dispatch(
+        atlasSelection.actions.selectRegion({
+          region: trueOnhoverSegments[0]
+        })
+      )
+    }
     return true
   }
 }

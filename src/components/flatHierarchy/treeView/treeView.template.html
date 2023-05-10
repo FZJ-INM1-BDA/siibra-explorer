@@ -47,7 +47,7 @@
     <!-- template to render the node -->
     <div class="node-render-tmpl"
       [ngClass]="nodeLabelToggles ? 'label-toggles' : ''"
-      (click)="handleClickNode(node)">
+      (click)="handleClickNode(node, $event)">
       <ng-template
         [ngTemplateOutlet]="renderNodeTmplRef"
         [ngTemplateOutletContext]="{
