@@ -9,7 +9,7 @@ import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, Observab
 import { scan } from 'rxjs/operators'
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { generalActions } from "src/state";
+import { MainState, generalActions } from "src/state";
 
 
 @Injectable({
@@ -39,7 +39,7 @@ export class RouterService {
     router: Router,
     routeToStateTransformSvc: RouteStateTransformSvc,
     sapi: SAPI,
-    store$: Store<any>,
+    store$: Store<MainState>,
     private zone: NgZone,
     @Inject(APP_BASE_HREF) baseHref: string
   ){
@@ -121,30 +121,28 @@ export class RouterService {
         map(val => !!val)
       )
     ).pipe(
+      filter(flag => flag),
       switchMap(() => navEnd$),
       map(navEv => navEv.urlAfterRedirects),
       switchMap(url =>
         forkJoin([
-          routeToStateTransformSvc.cvtRouteToState(
-            router.parseUrl(
-              url
-            )
-          ).then(stateFromRoute => {
-            return {
-              url,
-              stateFromRoute
-            }
-          }),
-          store$.pipe(
-            /**
-             * forkjoin means requires the observable to complete. So we take 1
-             */
-            take(1),
-            switchMap(state =>
-              from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
-                catchError(() => of(``))
+          from(
+            routeToStateTransformSvc.cvtRouteToState(
+              router.parseUrl(
+                url
               )
-            )
+            ).then(stateFromRoute => {
+              return {
+                url,
+                stateFromRoute
+              }
+            })
+          ),
+          
+          store$.pipe(
+            switchMap(state => from(routeToStateTransformSvc.cvtStateToRoute(state)).pipe(
+              catchError(() => of(``))
+            ))
           ),
         ]),
       ),

@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SAPIModule } from 'src/atlasComponents/sapi';
 
 import { EntryComponent } from './entry.component';
+import { provideMockStore } from '@ngrx/store/testing';
+import { FeatureModule } from '../module';
 
 describe('EntryComponent', () => {
   let component: EntryComponent;
@@ -12,9 +14,12 @@ describe('EntryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         SAPIModule,
-        CommonModule,
+        FeatureModule,
       ],
-      declarations: [ EntryComponent ]
+      declarations: [  ],
+      providers: [
+        provideMockStore()
+      ]
     })
     .compileComponents();
 

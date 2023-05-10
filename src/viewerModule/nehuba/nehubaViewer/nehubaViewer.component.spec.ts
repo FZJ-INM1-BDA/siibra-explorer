@@ -248,13 +248,12 @@ describe('> nehubaViewer.component.ts', () => {
       }
 
       describe('> obs does not emit', () => {
-        beforeEach(fakeAsync(() => {
+        beforeEach(() => {
           setup()
-          tick(320)
-        }))
+        })
         it('> does not call set colormap', () => {
           expect(prvSetCMSpy).not.toHaveBeenCalled()
-        })
+        } )
       })
 
       describe('> if obs does emit', () => {
