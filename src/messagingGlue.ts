@@ -40,7 +40,18 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
    * and enforce single direction flow when possible
    */
   loadTempladById( payload: IMessagingActionTmpl['loadTemplate'] ){
-    const atlasId = this.tmplSpIdToAtlasId.get(payload['@id'])
+    const {
+      parcellation: {
+        id: parcellationId
+      },
+      template: {
+        id: templateId
+      },
+      atlas: {
+        id: atlasId
+      }
+    } = payload
+    
     if (!atlasId) {
       return this.store.dispatch(
         generalActions.generalActionError({
@@ -51,7 +62,8 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
     this.store.dispatch(
       atlasSelection.actions.selectATPById({
         atlasId,
-        templateId: payload["@id"]
+        templateId,
+        parcellationId
       })
     )
   }

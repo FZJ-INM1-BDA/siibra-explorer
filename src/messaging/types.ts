@@ -1,7 +1,15 @@
 import { InjectionToken } from "@angular/core";
 
 interface ILoadTemplateByIdPayload {
-  ['@id']: string
+  atlas: {
+    id: string
+  }
+  template: {
+    id: string
+  }
+  parcellation: {
+    id: string
+  }
 }
 
 interface IResourceType {

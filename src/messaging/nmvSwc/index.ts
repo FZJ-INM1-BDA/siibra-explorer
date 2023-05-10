@@ -13,12 +13,30 @@ const NM_IDS = {
   MNI152_2009C_ASYM: 'hbp:ICBM_Asym_r2009c(um)',
 }
 
-export const IAV_IDS = {
+const IAV_IDS = {
   AMBA_V3: 'minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9',
   WAXHOLM_V1_01: 'minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8',
   BIG_BRAIN: 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588',
   COLIN: 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992',
   MNI152_2009C_ASYM: 'minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2',
+} as const
+
+type SPACE_ID = typeof IAV_IDS[keyof typeof IAV_IDS]
+
+const DEFAULT_PARC: Record<SPACE_ID, string> = {
+  [IAV_IDS.AMBA_V3]: "minds/core/parcellationatlas/v1.0.0/05655b58-3b6f-49db-b285-64b5a0276f83",
+  [IAV_IDS.WAXHOLM_V1_01]: "minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4",
+  [IAV_IDS.BIG_BRAIN]: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
+  [IAV_IDS.COLIN]: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-300",
+  [IAV_IDS.MNI152_2009C_ASYM]: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-300",
+}
+
+const DEFAULT_ATLAS: Record<SPACE_ID, string> = {
+  [IAV_IDS.AMBA_V3]: "juelich/iav/atlas/v1.0.0/2",
+  [IAV_IDS.WAXHOLM_V1_01]: "minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a",
+  [IAV_IDS.BIG_BRAIN]: "juelich/iav/atlas/v1.0.0/1",
+  [IAV_IDS.COLIN]: "juelich/iav/atlas/v1.0.0/1",
+  [IAV_IDS.MNI152_2009C_ASYM]: "juelich/iav/atlas/v1.0.0/1",
 }
 
 /**
@@ -60,6 +78,14 @@ const translateSpace = (spaceId: string) => {
   return null
 }
 
+const getDefaultParcellation = (spaceId: SPACE_ID) => {
+  return DEFAULT_PARC[spaceId]
+}
+
+const getAtlas = (spaceId: SPACE_ID) => {
+  return DEFAULT_ATLAS[spaceId]
+}
+
 const getVoxelFromSpace = (spaceId: string) => {
   for (const key in NM_IDS){
     if (NM_IDS[key] === spaceId) return IAV_VOXEL_SIZES_NM[key]
@@ -97,7 +123,15 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     subject.next({
       type: 'loadTemplate',
       payload: {
-        ['@id']: iavSpace
+        template: {
+          id: iavSpace
+        },
+        parcellation: {
+          id: getDefaultParcellation(iavSpace)
+        },
+        atlas: {
+          id: getAtlas(iavSpace)
+        }
       }
     })
 
@@ -130,9 +164,9 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
      * 1e3 / voxelSize
      */
     const scaleUmToVoxelFixed = [
-      1e3 / voxelSize[0],
-      1e3 / voxelSize[1],
-      1e3 / voxelSize[2],
+      voxelSize[0],
+      voxelSize[1],
+      voxelSize[2],
     ]
     // NG translation works on nm scale
     const scaleUmToNm = 1e3

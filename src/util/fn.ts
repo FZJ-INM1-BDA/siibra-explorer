@@ -67,6 +67,49 @@ type TCacheFunctionArg = {
 }
 
 /**
+ * member function decorator
+ * can only be used to decorate arguementless async function
+ * 
+ */
+
+export const cachedPromise = <T>() => {
+  const key = Symbol('cachedpromise')
+  return (_target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<() => Promise<T>>) => {
+    const originalMethod = descriptor.value
+    descriptor.value = function() {
+      if (key in this) {
+        /**
+         * if cached promise exist, return cached promise
+         */
+        return this[key]
+      }
+      const cleanup = () => {
+        /**
+         * on cleanup, delete the stored instance
+         */
+        delete this[key]
+      }
+      const pr = new Promise<T>((rs, rj) => {
+        originalMethod.apply(this, [])
+          .then((val: T) => {
+            cleanup()
+            rs(val)
+          })
+          .catch((e: Error) => {
+            cleanup()
+            rj(e)
+          })
+      })
+      /**
+       * store the promise as a property of the instance
+       */
+      this[key] = pr
+      return pr
+    }
+  }
+}
+
+/**
  * Member function decorator
  * Multiple function calls with strictly equal arguments will return cached result
  * @returns cached result if exists, else call original function

@@ -1,13 +1,14 @@
 import { APP_BASE_HREF, Location } from "@angular/common"
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { DefaultUrlSerializer, NavigationEnd, Router } from "@angular/router"
-import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { cold } from "jasmine-marbles"
-import { of, Subject } from "rxjs"
+import { BehaviorSubject, of, Subject } from "rxjs"
 import { SAPI } from "src/atlasComponents/sapi"
 import { RouterService } from "./router.service"
 import { RouteStateTransformSvc } from "./routeStateTransform.service"
 import * as util from './util'
+import { Store } from "@ngrx/store"
+import { MockStore, provideMockStore } from "@ngrx/store/testing"
 
 const { DummyCmp } = util
 
@@ -83,6 +84,7 @@ describe('> router.service.ts', () => {
       })
 
       it('> should call cvtStateToHashedRoutes', fakeAsync(() => {
+        cvtStateToRouteSpy.and.rejectWith('boo')
         mockRouter.events.next(
           new NavigationEnd(1, '/', '/')
         )
@@ -90,7 +92,7 @@ describe('> router.service.ts', () => {
         expect(cvtStateToRouteSpy).toHaveBeenCalledWith(fakeState)
       }))
       it('> if cvtStateToRoute throws, should navigate to home', fakeAsync(() => {
-        cvtStateToRouteSpy.and.callFake(() => {
+        cvtStateToRouteSpy.and.callFake(async () => {
           throw new Error(`foo bar`)
         })
         const baseHref = TestBed.inject(APP_BASE_HREF)
@@ -103,7 +105,7 @@ describe('> router.service.ts', () => {
 
       }))
       it('> if cvtStateToHashedRoutes returns, should navigate to expected location', fakeAsync(() => {
-        cvtStateToRouteSpy.and.returnValue(`foo/bar`)
+        cvtStateToRouteSpy.and.resolveTo(`foo/bar`)
         mockRouter.events.next(
           new NavigationEnd(1, '/', '/')
         )
@@ -114,9 +116,7 @@ describe('> router.service.ts', () => {
       describe('> does not excessively call navigateByUrl', () => {
 
         it('> navigate calls navigateByUrl', fakeAsync(() => {
-          cvtStateToRouteSpy.and.callFake(() => {
-            return `foo/bar`
-          })
+          cvtStateToRouteSpy.and.resolveTo(`foo/bar`)
           mockRouter.events.next(
             new NavigationEnd(1, '/', '/')
           )
@@ -126,7 +126,7 @@ describe('> router.service.ts', () => {
         }))
 
         it('> same state should not navigate', fakeAsync(() => {
-          cvtStateToRouteSpy.and.callFake(() => {
+          cvtStateToRouteSpy.and.callFake(async () => {
             return `foo/bar`
           })
           mockRouter.events.next(
@@ -141,7 +141,7 @@ describe('> router.service.ts', () => {
           const searchParam = new URLSearchParams()
           const sv = '["precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64"]'
           searchParam.set('standaloneVolumes', sv)
-          cvtStateToRouteSpy.and.callFake(() => {
+          cvtStateToRouteSpy.and.callFake(async () => {
             return `foo/bar?${searchParam.toString()}`
           })
           mockRouter.events.next(
@@ -159,7 +159,8 @@ describe('> router.service.ts', () => {
       const fakeState = {
         foo: 'bar'
       }
-      beforeEach(fakeAsync(() => {
+      beforeEach(() => {
+        
         cvtRouteToStateSpy.and.resolveTo(fakeState)
         TestBed.inject(RouterService)
         const store = TestBed.inject(MockStore)
@@ -167,24 +168,25 @@ describe('> router.service.ts', () => {
         mockRouter.events.next(
           new NavigationEnd(1, '/', '/')
         )
-        tick(400)
-      }))
+      })
 
       describe('> compares new state and previous state', () => {
+        
         it('> calls cvtRouteToState', fakeAsync(() => {
+          tick(320)   
           const fakeParsedState = {
             bizz: 'buzz'
           }
           cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
-          cvtStateToRouteSpy.and.callFake(() => {
+          cvtStateToRouteSpy.and.callFake(async () => {
             return ['bizz', 'buzz']
           })
           mockRouter.events.next(
             new NavigationEnd(1, '/foo/bar', '/foo/bar')
           )
   
-          tick(160)
   
+          tick(160)
           expect(cvtRouteToStateSpy).toHaveBeenCalledWith(
             new DefaultUrlSerializer().parse('/foo/bar')
           )
@@ -219,7 +221,7 @@ describe('> router.service.ts', () => {
               bizz: 'buzz'
             }
             cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
-            cvtStateToRouteSpy.and.callFake(() => {
+            cvtStateToRouteSpy.and.callFake(async () => {
               throw new Error(`fizz buzz`)
             })
             
@@ -235,26 +237,31 @@ describe('> router.service.ts', () => {
             expect(dispatchSpy).toHaveBeenCalled()
           }))
 
-          it('> ... returns different value, dispatches', fakeAsync(() => {
-            const fakeParsedState = {
-              bizz: 'buzz'
-            }
-            cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
-            cvtStateToRouteSpy.and.callFake(() => {
-              return `fizz/buzz`
-            })
-            mockRouter.events.next(
-              new NavigationEnd(1, '/foo/bar', '/foo/bar')
-            )
-    
-            TestBed.inject(RouterService)
-            const store = TestBed.inject(MockStore)
-            const dispatchSpy = spyOn(store, 'dispatch')
-            
-            tick(160)
+          describe("> returns different value", () => {
+            beforeEach(() => {
 
-            expect(dispatchSpy).toHaveBeenCalled()
-          }))
+              const fakeParsedState = {
+                bizz: 'buzz'
+              }
+              cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
+              cvtStateToRouteSpy.and.resolveTo(`fizz/buzz`)
+            })
+            it("> dispatches", fakeAsync(() => {
+
+              tick(320)
+              mockRouter.events.next(
+                new NavigationEnd(1, '/foo/bar', '/foo/bar')
+              )
+      
+              TestBed.inject(RouterService)
+              const store = TestBed.inject(MockStore)
+              const dispatchSpy = spyOn(store, 'dispatch')
+              
+              tick(160)
+
+              expect(dispatchSpy).toHaveBeenCalled()
+            }))
+          })
 
           describe('> returns the same value', () => {
             it('> ... returns same value, does not dispatches', fakeAsync(() => {
@@ -262,7 +269,7 @@ describe('> router.service.ts', () => {
                 bizz: 'buzz'
               }
               cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
-              cvtStateToRouteSpy.and.callFake(() => {
+              cvtStateToRouteSpy.and.callFake(async () => {
                 return `foo/bar`
               })
               
@@ -285,7 +292,7 @@ describe('> router.service.ts', () => {
                 bizz: 'buzz'
               }
               cvtRouteToStateSpy.and.resolveTo(fakeParsedState)
-              cvtStateToRouteSpy.and.callFake(() => {
+              cvtStateToRouteSpy.and.callFake(async () => {
                 return `foo/bar`
               })
       
