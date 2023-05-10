@@ -19,10 +19,15 @@ import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
 import { MergeObjPipe } from "./mergeObj.pipe";
 import { IncludesPipe } from "./includes.pipe";
+import { SidePanelComponent } from './side-panel/side-panel.component';
+import { MatCardModule } from "@angular/material/card";
+import { CommonModule } from "@angular/common";
 
 @NgModule({
   imports:[
-    LayoutModule
+    LayoutModule,
+    MatCardModule,
+    CommonModule,
   ],
   declarations: [
     StopPropagationDirective,
@@ -44,6 +49,7 @@ import { IncludesPipe } from "./includes.pipe";
     CombineFnPipe,
     MergeObjPipe,
     IncludesPipe,
+    SidePanelComponent,
   ],
   exports: [
     StopPropagationDirective,
@@ -65,6 +71,7 @@ import { IncludesPipe } from "./includes.pipe";
     CombineFnPipe,
     MergeObjPipe,
     IncludesPipe,
+    SidePanelComponent
   ]
 })
 

@@ -386,29 +386,62 @@
     </sxplr-wrapper-atp-selector>
 
     <!-- selected region chip -->
+    <ng-template [ngIf]="selectedRegions$ | async" let-regions>
+
+      <!-- single region -->
+      <ng-template [ngIf]="regions.length === 1">
+        <sxplr-smart-chip
+          *ngFor="let region of regions"
+          [noMenu]="true"
+          [color]="sapiViewsCoreRegion.regionRgbString"
+          (click)="showFullSideNav()"
+          sxplr-sapiviews-core-region
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
+          [sxplr-sapiviews-core-region-region]="region"
+          [sxplr-sapiviews-core-region-detail-flag]="true"
+          #sapiViewsCoreRegion="sapiViewsCoreRegion">
+          <ng-template sxplrSmartChipContent>
+            <span class="regionname">
+              {{ region.name }}
+            </span>
+            <button class="sxplr-mr-n3"
+              mat-icon-button
+              (click)="clearRoi()">
+              <i class="fas fa-times"></i>
+            </button>
+          </ng-template>
+        </sxplr-smart-chip>
+      </ng-template>
+
+      
+      <!-- multiple-regions -->
+      <ng-template [ngIf]="regions.length > 1">
+        <sxplr-smart-chip
+          [noMenu]="true"
+          
+          (click)="showFullSideNav()"
+          sxplr-sapiviews-core-region
+          [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
+          [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
+          [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async">
+          <ng-template sxplrSmartChipContent>
+            <span class="regionname">
+              {{ regions.length }} regions selected
+            </span>
+            <button class="sxplr-mr-n3"
+              mat-icon-button
+              (click)="clearRoi()">
+              <i class="fas fa-times"></i>
+            </button>
+          </ng-template>
+        </sxplr-smart-chip>
+
+      </ng-template>
+
+    </ng-template>
     <ng-template ngFor [ngForOf]="selectedRegions$ | async" let-region>
-      <sxplr-smart-chip
-        [noMenu]="true"
-        [color]="sapiViewsCoreRegion.regionRgbString"
-        (click)="showFullSideNav()"
-        sxplr-sapiviews-core-region
-        [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-        [sxplr-sapiviews-core-region-template]="templateSelected$ | async"
-        [sxplr-sapiviews-core-region-parcellation]="parcellationSelected$ | async"
-        [sxplr-sapiviews-core-region-region]="region"
-        [sxplr-sapiviews-core-region-detail-flag]="true"
-        #sapiViewsCoreRegion="sapiViewsCoreRegion">
-        <ng-template sxplrSmartChipContent>
-          <span class="regionname">
-            {{ region.name }}
-          </span>
-          <button class="sxplr-mr-n3"
-            mat-icon-button
-            (click)="clearRoi()">
-            <i class="fas fa-times"></i>
-          </button>
-        </ng-template>
-      </sxplr-smart-chip>
 
     </ng-template>
   </div>
@@ -474,6 +507,7 @@
       [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
       [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="selectedRegions$ | async"
       (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
+      (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
       >
     </sxplr-sapiviews-core-rich-regionshierarchy>
   
@@ -490,7 +524,8 @@
     <sxplr-sapiviews-core-rich-regionlistsearch
       [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
       [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="selectedRegions$ | async | getProperty : 0 | getProperty : 'name'"
-      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)">
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="toggleRoi($event)">
       <ng-template regionTemplate let-region>
         <div class="sxplr-d-flex">
           <button
@@ -723,43 +758,59 @@
 <ng-template #multiRegionTmpl let-regions="regions">
   <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
 
-    <!-- other regions detail accordion -->
-    <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
 
-      <!-- Multi regions include -->
-
-      <mat-expansion-panel
-        [attr.data-opened]="expansionPanel.expanded"
-        [attr.data-mat-expansion-title]="'Brain regions'"
-        hideToggle
-        #expansionPanel="matExpansionPanel">
-
-        <mat-expansion-panel-header>
-
-          <!-- title -->
-          <mat-panel-title>
-            Brain regions
-          </mat-panel-title>
-
-          <!-- desc + icon -->
-          <mat-panel-description class="d-flex align-items-center justify-content-end">
-            <span class="mr-3">{{ regions.length }}</span>
-            <span class="accordion-icon d-inline-flex justify-content-center">
-              <i class="fas fa-brain"></i>
-            </span>
-          </mat-panel-description>
-
-        </mat-expansion-panel-header>
-
-        <!-- content -->
-        <ng-template matExpansionPanelContent>
-          
-          <!-- TODO use actual region chip in sapiViews/core/region/chip -->
-          SOMETHING
-        </ng-template>
-      </mat-expansion-panel>
-
-    </mat-accordion>
+    <sxplr-side-panel>
+      <div class="sapi-container" header></div>
+      <div title>
+        Multiple regions selected
+      </div>
+      <!-- other regions detail accordion -->
+      <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
+  
+        <!-- Multi regions include -->
+  
+        <mat-expansion-panel
+          [attr.data-opened]="expansionPanel.expanded"
+          [attr.data-mat-expansion-title]="'Brain regions'"
+          hideToggle
+          #expansionPanel="matExpansionPanel">
+  
+          <mat-expansion-panel-header>
+  
+            <!-- title -->
+            <mat-panel-title>
+              Selected regions
+            </mat-panel-title>
+  
+            <!-- desc + icon -->
+            <mat-panel-description class="d-flex align-items-center justify-content-end">
+              <span class="mr-3">{{ regions.length }}</span>
+              <span class="accordion-icon d-inline-flex justify-content-center">
+                <i class="fas fa-brain"></i>
+              </span>
+            </mat-panel-description>
+  
+          </mat-expansion-panel-header>
+  
+          <!-- content -->
+          <ng-template matExpansionPanelContent>
+            <mat-chip-list class="wrapped-chips">
+              <mat-chip *ngFor="let region of regions">
+                <span>
+                  {{ region.name }}
+                </span>
+                <button mat-icon-button
+                  (click)="toggleRoi(region)"
+                  iav-stop="mousedown click">
+                  <i class="fas fa-times"></i>
+                </button>
+              </mat-chip>  
+            </mat-chip-list>
+          </ng-template>
+        </mat-expansion-panel>
+  
+      </mat-accordion>
+    </sxplr-side-panel>
   </ng-template>
 </ng-template>
 
