@@ -12,6 +12,7 @@ import { PureATPSelector } from "./pureDumb/pureATPSelector.components";
 import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { QuickTourModule } from "src/ui/quickTour";
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     DialogModule,
     SAPIModule,
     SapiViewsCoreParcellationModule,
+    QuickTourModule,
   ],
   declarations: [
     PureATPSelector,
