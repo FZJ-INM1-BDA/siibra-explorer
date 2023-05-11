@@ -2,6 +2,7 @@ import { Overlay, OverlayRef } from "@angular/cdk/overlay"
 import { TemplatePortal } from "@angular/cdk/portal"
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core"
 import { ReplaySubject, Subject, Subscription } from "rxjs"
+import { mutateDeepMerge } from "src/util/fn"
 import { RegDeregController } from "src/util/regDereg.base"
 
 type TTmpl = {
@@ -109,6 +110,16 @@ export class ContextMenuService<T> extends RegDeregController<CtxMenuInterArg<T>
           tmplRefs: this.tmplRefs
         }
       )
+    )
+  }
+
+  setState(state: T){
+    this.context$.next(state)
+  }
+  deepMerge(pState: Partial<T>) {
+    const newState: T = structuredClone(this.context || {})
+    this.context$.next(
+      mutateDeepMerge(newState, pState)
     )
   }
 }

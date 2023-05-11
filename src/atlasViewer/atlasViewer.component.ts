@@ -168,7 +168,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   public mouseClickDocument(event: MouseEvent) {
-    this.clickIntService.callRegFns(event)
+    /**
+     * only trigger on primary mouse click
+     */
+    if (event.button === 0) {
+      this.clickIntService.callRegFns(event)
+    }
   }
 
   /**

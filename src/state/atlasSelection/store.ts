@@ -11,7 +11,8 @@ export const defaultState: AtlasSelectionState = {
   standAloneVolumes: [],
   navigation: null,
   viewerMode: null,
-  breadcrumbs: []
+  breadcrumbs: [],
+  selectedPoint: null,
 }
 
 const reducer = createReducer(
@@ -124,6 +125,24 @@ const reducer = createReducer(
       return {
         ...state,
         breadcrumbs: state.breadcrumbs.filter(bc => bc.id !== id)
+      }
+    }
+  ),
+  on(
+    actions.selectPoint,
+    (state, { point }) => {
+      return {
+        ...state,
+        selectedPoint: point
+      }
+    }
+  ),
+  on(
+    actions.clearSelectedPoint,
+    state => {
+      return {
+        ...state,
+        selectedPoint: null
       }
     }
   )
