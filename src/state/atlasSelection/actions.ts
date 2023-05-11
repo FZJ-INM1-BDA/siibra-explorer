@@ -1,6 +1,7 @@
 import { createAction, props } from "@ngrx/store";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
+import { TFace, TSandsPoint } from "src/util/types";
 
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
@@ -186,4 +187,15 @@ export const viewSelRegionInNewSpace = createAction(
     region: SxplrRegion
     template: SxplrTemplate
   }>()
+)
+
+export const selectPoint = createAction(
+  `${nameSpace} selectPoint`,
+  props<{
+    point: TSandsPoint|TFace
+  }>()
+)
+
+export const clearSelectedPoint = createAction(
+  `${nameSpace} clearPoint`
 )

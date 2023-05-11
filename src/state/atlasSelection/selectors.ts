@@ -49,3 +49,23 @@ export const breadCrumbs = createSelector(
   selectStore,
   state => state.breadcrumbs
 )
+
+export const selectedPoint = createSelector(
+  selectStore,
+  state => state.selectedPoint
+)
+
+export const relevantSelectedPoint = createSelector(
+  selectedTemplate,
+  selectedPoint,
+  (tmpl, point) => {
+    if (!tmpl || !point) {
+      return null
+    }
+    const { ['@id']: spcId } = point.coordinateSpace
+    if (spcId === tmpl.id) {
+      return point
+    }
+    return null
+  }
+)

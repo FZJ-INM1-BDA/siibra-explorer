@@ -33,6 +33,10 @@ export interface paths {
     /** Get All Regions */
     get: operations["get_all_regions_regions_get"]
   }
+  "/regions/{region_id}/features": {
+    /** Get All Regions */
+    get: operations["get_all_regions_regions__region_id__features_get"]
+  }
   "/regions/{region_id}": {
     /** Get All Regions */
     get: operations["get_all_regions_regions__region_id__get"]
@@ -64,6 +68,10 @@ export interface paths {
   "/map/statistical_map.info.json": {
     /** Route Get Region Statistical Map */
     get: operations["route_get_region_statistical_map_map_statistical_map_info_json_get"]
+  }
+  "/map/assign": {
+    /** Router Assign Point */
+    get: operations["router_assign_point_map_assign_get"]
   }
   "/feature/_types": {
     /** Get All Feature Types */
@@ -497,7 +505,7 @@ export interface components {
       /** Ndim */
       ndim: number
       /** Data */
-      data: ((number | string | (number)[])[])[]
+      data?: (any[])[]
     }
     /** EbrainsDatasetModel */
     EbrainsDatasetModel: {
@@ -641,7 +649,7 @@ export interface components {
      * @description An enumeration. 
      * @enum {unknown}
      */
-    ImageTypes: "BlockfaceVolumeOfInterest" | "CellBodyStainedVolumeOfInterest" | "CellbodyStainedSection" | "MRIVolumeOfInterest" | "PLIVolumeOfInterest" | "SegmentedVolumeOfInterest"
+    ImageTypes: "BlockfaceVolumeOfInterest" | "CellBodyStainedVolumeOfInterest" | "CellbodyStainedSection" | "MRIVolumeOfInterest" | "PLIVolumeOfInterest" | "SegmentedVolumeOfInterest" | "XPCTVolumeOfInterest"
     /** LocationModel */
     LocationModel: {
       /** @Type */
@@ -719,9 +727,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -732,9 +740,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -745,9 +753,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -758,9 +766,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -771,9 +779,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -784,9 +792,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -797,9 +805,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -810,9 +818,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -823,9 +831,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -836,9 +844,9 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -849,9 +857,22 @@ export interface components {
       /** Total */
       total: number
       /** Page */
-      page: number
+      page?: number
       /** Size */
-      size: number
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]] */
+    Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__: {
+      /** Items */
+      items: (components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
       /** Pages */
       pages?: number
     }
@@ -1223,7 +1244,7 @@ export interface components {
      * @description An enumeration. 
      * @enum {unknown}
      */
-    TabularTypes: "ReceptorDensityFingerprint" | "LayerwiseBigBrainIntensities" | "LayerwiseCellDensity"
+    TabularTypes: "ReceptorDensityFingerprint" | "LayerwiseBigBrainIntensities" | "LayerwiseCellDensity" | "RegionalBOLD"
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -1478,6 +1499,7 @@ export interface operations {
     parameters: {
       query: {
         parcellation_id: string
+        find?: string
         page?: number
         size?: number
       }
@@ -1497,12 +1519,39 @@ export interface operations {
       }
     }
   }
+  get_all_regions_regions__region_id__features_get: {
+    /** Get All Regions */
+    parameters: {
+      query: {
+        parcellation_id: string
+        page?: number
+        size?: number
+      }
+      path: {
+        region_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   get_all_regions_regions__region_id__get: {
     /** Get All Regions */
     parameters: {
       query: {
         parcellation_id: string
-        space_id: string
+        space_id?: string
       }
       path: {
         region_id: string
@@ -1613,6 +1662,31 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["StatisticModelInfo"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  router_assign_point_map_assign_get: {
+    /** Router Assign Point */
+    parameters: {
+      query: {
+        parcellation_id: string
+        space_id: string
+        point: string
+        sigma_mm?: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["DataFrameModel"]
         }
       }
       /** @description Validation Error */
@@ -1894,6 +1968,8 @@ export interface operations {
         parcellation_id: string
         region_id: string
         gene: string
+        page?: number
+        size?: number
       }
       path: {
         feature_id: string
@@ -1903,7 +1979,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraTabularModel"]
+          "application/json": components["schemas"]["Page_SiibraTabularModel_"]
         }
       }
       /** @description Validation Error */
@@ -1945,6 +2021,8 @@ export interface operations {
       query: {
         parcellation_id: string
         region_id: string
+        page?: number
+        size?: number
       }
       path: {
         feature_id: string
@@ -1954,7 +2032,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraEbrainsDataFeatureModel"]
+          "application/json": components["schemas"]["Page_SiibraEbrainsDataFeatureModel_"]
         }
       }
       /** @description Validation Error */

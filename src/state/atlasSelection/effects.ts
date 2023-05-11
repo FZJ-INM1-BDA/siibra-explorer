@@ -447,6 +447,16 @@ export class Effect {
     )
   ))
 
+  onRegionSelectionClearPointSelection = createEffect(() => this.action.pipe(
+    ofType(actions.selectRegion),
+    map(() => actions.clearSelectedPoint())
+  ))
+
+  onPointSelectionClearRegionSelection = createEffect(() => this.action.pipe(
+    ofType(actions.selectPoint),
+    map(() => actions.clearSelectedRegions())
+  ))
+
   constructor(
     private action: Actions,
     private sapiSvc: SAPI,

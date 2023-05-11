@@ -22,6 +22,8 @@ import { IncludesPipe } from "./includes.pipe";
 import { SidePanelComponent } from './side-panel/side-panel.component';
 import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from "@angular/common";
+import { DfToDsPipe } from './df-to-ds.pipe';
+import { PrettyPresentPipe } from './pretty-present.pipe';
 
 @NgModule({
   imports:[
@@ -50,6 +52,8 @@ import { CommonModule } from "@angular/common";
     MergeObjPipe,
     IncludesPipe,
     SidePanelComponent,
+    DfToDsPipe,
+    PrettyPresentPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -71,7 +75,9 @@ import { CommonModule } from "@angular/common";
     CombineFnPipe,
     MergeObjPipe,
     IncludesPipe,
-    SidePanelComponent
+    SidePanelComponent,
+    DfToDsPipe,
+    PrettyPresentPipe
   ]
 })
 
