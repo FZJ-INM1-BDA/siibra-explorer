@@ -90,7 +90,7 @@
   }
 
   exports.CONST = {
-    KG_TOS: `The interactive viewer queries HBP Knowledge Graph Data Platform ("KG") for published datasets.
+    KG_TOS: `Siibra explorer queries EBRAINS Knowledge Graph Data Platform ("KG") for published datasets.
 
 
 Access to the data and metadata provided through KG requires that you cite and acknowledge said data and metadata according to the Terms and Conditions of the Platform.
