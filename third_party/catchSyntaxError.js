@@ -3,7 +3,7 @@
     if (/^SyntaxError/.test(e) || /^Syntax\serror/.test(e)) {
       console.log('Caught SyntaxError')
 
-      const warning = 'Your browser cannot display the interactive viewer. Please use either Chrome >= 56 and/or Firefox >= 51'
+      const warning = 'Your browser cannot display siibra explorer. Please use either Chrome >= 56 and/or Firefox >= 51'
       console.log(warning)
       
       const warningEl = document.createElement('h4')

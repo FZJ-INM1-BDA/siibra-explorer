@@ -2,7 +2,7 @@
 
 ## Selecting a template / atlas
 
-The interactive atlas viewer supports a number of atlases.
+The siibra explorer supports a number of atlases.
 
 ### From homepage
 
@@ -10,7 +10,7 @@ On the home page, the atlases are categorised under their respective template sp
 
 [![](images/home.png)](images/home.png)
 
-Select any of the parcellations listed, the interactive atlas viewer will load the parcellation in the corresponding template space.
+Select any of the parcellations listed, the siibra explorer will load the parcellation in the corresponding template space.
 
 Clicking on the template card will load the template and the first of the listed parcellation under the template space.
 
@@ -30,7 +30,7 @@ Information on the selected template or parcellation can be revealed by `hoverin
 
 ## Browsing regions
 
-There exist several ways of browsing the parcellated regions in a selected parcellation in the interactive atlas viewer.
+There exist several ways of browsing the parcellated regions in a selected parcellation in the siibra explorer.
 
 ### From the viewer
 

@@ -1,6 +1,6 @@
-# Interactive Atlas Viewer
+# Siibra Explorer
 
-The interactive atlas viewer is a browser based viewer of brain atlases. Tight integration with the ebrains Knowledge Graph allows seamless querying of semantically and spatially anchored datasets. 
+The siibra explorer is a browser based viewer of brain atlases. Tight integration with the ebrains Knowledge Graph allows seamless querying of semantically and spatially anchored datasets. 
 
 ![](images/desktop_bigbrain_cortical.png)
 
