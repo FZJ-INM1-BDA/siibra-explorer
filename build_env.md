@@ -1,6 +1,6 @@
 # Build-time environment variables
 
-As interactive atlas viewer uses [webpack define plugin](https://webpack.js.org/plugins/define-plugin/), where necessary, the environmental variables are `JSON.stringify`'ed and directly replaced in the code.
+As siibra-explorer uses [webpack define plugin](https://webpack.js.org/plugins/define-plugin/), where necessary, the environmental variables are `JSON.stringify`'ed and directly replaced in the code.
 
 | name | description | default | example |
 | --- | --- | --- | --- |

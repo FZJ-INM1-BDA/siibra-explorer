@@ -1,8 +1,5 @@
-# Quickstart
-
-
 | Action | Desktop | Touch devices |
-| --- | --- |
+| --- | --- | --- |
 | Translate / Pan | `[drag]` any of the slice views | `[drag]` any of the slice views |
 | Oblique rotation | `<shift>` + `[drag]` any of the slice views | `[rotate]` any of the slice views |
 | Zoom | `[mousewheel]` | `[pinch zoom]` |
@@ -11,6 +8,8 @@
 | Next 10 slice | `<ctrl>` + `<shift>` + `[mousewheel]` | - |
 | Toggle delineation | `[q]` | - |
 | Toggle cross hair | `[a]` | - |
+| Multiple region select | `<ctrl>` + `[click]` on region | - |
+| Context menu | `[right click]` | - |
 
 ---
 

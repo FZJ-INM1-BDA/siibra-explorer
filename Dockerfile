@@ -74,7 +74,7 @@ COPY --from=builder /iv/common /common
 # Copy the express server
 COPY --from=builder /iv/deploy .
 
-# Copy built interactive viewer
+# Copy built siibra explorer
 COPY --from=compressor /iv ./public
 
 RUN chown -R node:node /iv-app

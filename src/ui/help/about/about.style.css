@@ -1,5 +1,6 @@
 :host
 {
-  margin: 0.5em 1em;
-  display:block;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }

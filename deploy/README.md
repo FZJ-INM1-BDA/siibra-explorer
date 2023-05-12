@@ -1,13 +1,13 @@
 # Deployment
 
-Latest stable version of interactive atlas viewer is continously deployed to the following URL:
+Latest stable version of siibra explorer is continously deployed to the following URL:
 
 - <https://interactive-viewer.apps.hbp.eu/>
 - <https://atlases.ebrains.eu/viewer/>
 
 ## Dependency monitoring
 
-Interactive atlas viewer interacts with a number of other ebrains services. Monitoring these services contributes to the stability of the webapplication.
+Siibra explorer interacts with a number of other ebrains services. Monitoring these services contributes to the stability of the webapplication.
 
 ### Probability & continuous maps availability
 

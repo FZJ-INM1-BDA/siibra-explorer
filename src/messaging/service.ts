@@ -223,7 +223,7 @@ export class MessagingService {
       {
         data: {
           title: `Cross tab messaging`,
-          message: `${origin} would like to send data to interactive atlas viewer`,
+          message: `${origin} would like to send data to siibra explorer`,
           okBtnText: `Allow`
         }
       }
