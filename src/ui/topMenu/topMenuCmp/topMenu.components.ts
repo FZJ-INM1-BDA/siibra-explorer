@@ -91,7 +91,7 @@ export class TopMenuCmp {
   }
 
   private dialogRef: MatDialogRef<any>
-  public helperOnePagerConfig = {
+  public largeMatDialogConfig = {
     panelClass: ['col-lg-10']
   }
 

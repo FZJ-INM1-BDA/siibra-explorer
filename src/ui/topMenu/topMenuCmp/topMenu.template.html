@@ -34,11 +34,6 @@
   </div>
 </ng-template>
 
-<!-- help one pager -->
-<ng-template #helperOnePager>
-  <help-one-pager></help-one-pager>
-</ng-template>
-
 <ng-template #fullTmpl>
 
   <div class="d-flex flex-row-reverse"
@@ -47,7 +42,7 @@
     [quick-tour-order]="quickTourData.order"
     quick-tour-severity="low"
     [iav-key-listener]="keyListenerConfig"
-    (iav-key-event)="openTmplWithDialog(helperOnePager, helperOnePagerConfig)">
+    (iav-key-event)="openTmplWithDialog(aboutComponent, largeMatDialogConfig)">
 
     <!-- signin -->
     <ng-container *ngTemplateOutlet="signinBtnTmpl">
@@ -130,8 +125,8 @@
 <ng-template #helpBtnTmpl>
 
   <div class="btnWrapper"
-    (click)="openTmplWithDialog(helperOnePager, helperOnePagerConfig)"
-    matTooltip="Quickstart">
+    (click)="openTmplWithDialog(aboutComponent, largeMatDialogConfig)"
+    matTooltip="Help">
     <iav-dynamic-mat-button
       [iav-dynamic-mat-button-style]="matBtnStyle"
       [iav-dynamic-mat-button-color]="matBtnColor"
@@ -197,35 +192,42 @@
     <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
     Settings
   </button>
-
-  <button mat-menu-item
-    (click)="openTmplWithDialog(aboutComponent)">
-    <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
-    About
-  </button>
 </mat-menu>
 
 <ng-template #aboutComponent>
-  <h2 mat-dialog-title>About siibra explorer</h2>
   <mat-dialog-content>
     <mat-tab-group>
+      <mat-tab label="Quick Start">
+        <help-one-pager></help-one-pager>
+      </mat-tab>
       <mat-tab label="About">
-        <iav-about>
+        <iav-about class="mat-tab-content">
         </iav-about>
       </mat-tab>
       <mat-tab label="Privacy Policy">
         <!-- TODO make tab container scrollable -->
-        <cookie-agreement>
+        <cookie-agreement class="mat-tab-content">
         </cookie-agreement>
       </mat-tab>
       <mat-tab label="Terms of Use">
-        <kgtos-component>
+        <kgtos-component class="mat-tab-content">
         </kgtos-component>
       </mat-tab>
     </mat-tab-group>
   </mat-dialog-content>
 
   <mat-dialog-actions class="justify-content-center">
+    
+    <button mat-button
+      color="primary"
+      mat-dialog-close
+      quick-tour-opener>
+      <i class = "far fa-play-circle m-1"></i>
+      <span>
+        Take a tour
+      </span>
+    </button>
+
     <button
       mat-flat-button
       [mat-dialog-close]
