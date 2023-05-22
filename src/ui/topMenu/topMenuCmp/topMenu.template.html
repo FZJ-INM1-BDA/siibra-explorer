@@ -102,22 +102,27 @@
 <!-- pinned dataset btn -->
 <ng-template #pinnedDatasetBtnTmpl>
   <div class="btnWrapper"
-    (click)="openPinnedDatasets()"
-    [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
-    matBadgeColor="accent"
-    matBadgePosition="above after"
-    [matBadgeDescription]="PINNED_DATASETS_BADGE_DESC"
-    [matTooltip]="pinnedDsNotAvail"
+    [matTooltip]="(atlasDlDct.busy$| async) ? busyTxt : idleTxt"
+    quick-tour
+    [quick-tour-description]="downloadAtlas.description"
+    [quick-tour-order]="downloadAtlas.order"
+    sxplrAtlasDownload
     aria-disabled="true"
-    role="button">
+    role="button"
+    #atlasDlDct="atlasDlDct">
     <iav-dynamic-mat-button
-      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
       [iav-dynamic-mat-button-style]="matBtnStyle"
       [iav-dynamic-mat-button-color]="matBtnColor"
-      [iav-dynamic-mat-button-disabled]="true"
+      [iav-dynamic-mat-button-disabled]="atlasDlDct.busy$ | async"
       iav-dynamic-mat-button-aria-label="Show pinned datasets">
 
-      <i class="fas fa-thumbtack"></i>
+      <ng-template [ngIf]="atlasDlDct.busy$ | async" [ngIfElse]="dlEnabledTmpl">
+        <i class="spinning fas fa-spinner"></i>
+      </ng-template>
+
+      <ng-template #dlEnabledTmpl>
+        <i class="fas fa-download"></i>
+      </ng-template>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
@@ -245,38 +250,4 @@
     <config-component class="mb-4 d-block">
     </config-component>
   </mat-dialog-content>
-</ng-template>
-
-<!-- saved dataset tmpl -->
-
-<ng-template #savedDatasets>
-  <mat-list rol="list"
-    aria-label="Pinned datasets panel">
-    <h3 mat-subheader>
-      <span>
-        Pinned Datasets
-      </span>
-
-      <!-- bulk download btn -->
-    </h3>
-
-    <!-- place holder when no fav data is available -->
-    <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">
-      <mat-card-content class="muted">
-        No pinned datasets.
-      </mat-card-content>
-    </mat-card>
-
-    <!-- render all fav dataset as mat list -->
-    <!-- TODO maybe use virtual scroll here? -->
-
-    <mat-list-item
-      class="align-items-center"
-      *ngFor="let ds of (favDataEntries$ | async)"
-      role="listitem">
-
-      <!-- TODO render fav dataset -->
-
-    </mat-list-item>
-  </mat-list>
 </ng-template>

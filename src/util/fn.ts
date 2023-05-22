@@ -431,3 +431,9 @@ export function defaultdict<T>(fn: () => T): Record<string, T> {
     },
   })
 }
+
+export function wait(ms: number){
+  return new Promise(rs => setTimeout(() => {
+    rs(null)
+  }, ms))
+}

@@ -15,6 +15,7 @@ import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { KeyFrameModule } from "src/keyframesModule/module";
+import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 
 @NgModule({
   imports: [
@@ -33,6 +34,7 @@ import { KeyFrameModule } from "src/keyframesModule/module";
     UserAnnotationsModule,
     KeyFrameModule,
     QuickTourModule,
+    AtlasDownloadModule,
   ],
   declarations: [
     TopMenuCmp
