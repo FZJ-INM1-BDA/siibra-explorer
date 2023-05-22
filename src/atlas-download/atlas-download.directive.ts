@@ -51,6 +51,7 @@ export class AtlasDownloadDirective {
         throw new Error(`Task id not found`)
       }
       const pingUrl = new URL(`${endpoint}/atlas_download/${task_id}`)
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         await wait(320)
         const resp = await fetch(pingUrl)
