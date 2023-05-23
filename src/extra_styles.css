@@ -266,6 +266,11 @@ markdown-dom p
   animation: spinning 700ms linear infinite running;
 }
 
+.spinning
+{
+  animation: spinning 700ms linear infinite running;
+}
+
 .theme-controlled.btn,
 .theme-controlled.btn,
 .theme-controlled.btn

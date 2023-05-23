@@ -73,6 +73,14 @@ export interface paths {
     /** Router Assign Point */
     get: operations["router_assign_point_map_assign_get"]
   }
+  "/atlas_download": {
+    /** Prepare Download */
+    get: operations["prepare_download_atlas_download_get"]
+  }
+  "/atlas_download/{task_id}": {
+    /** Get Task Id */
+    get: operations["get_task_id_atlas_download__task_id__get"]
+  }
   "/feature/_types": {
     /** Get All Feature Types */
     get: operations["get_all_feature_types_feature__types_get"]
@@ -498,8 +506,6 @@ export interface components {
       "@type": string
       /** Index */
       index: unknown[]
-      /** Dtype */
-      dtype: string
       /** Columns */
       columns: unknown[]
       /** Ndim */
@@ -1687,6 +1693,52 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DataFrameModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  prepare_download_atlas_download_get: {
+    /** Prepare Download */
+    parameters: {
+      query: {
+        space_id: string
+        parcellation_id: string
+        region_id?: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_task_id_atlas_download__task_id__get: {
+    /** Get Task Id */
+    parameters: {
+      path: {
+        task_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
         }
       }
       /** @description Validation Error */

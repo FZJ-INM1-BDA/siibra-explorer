@@ -5,7 +5,7 @@ import {
   TemplateRef,
   ViewChild,
 } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
@@ -53,24 +53,23 @@ export class TopMenuCmp {
 
   public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
-  public favDataEntries$: Observable<Partial<any>[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
   public annotateTooltipText: string = 'Start annotating'
   public keyFrameText = `Start KeyFrames`
+
+  busyTxt = 'Preparing bundle for download ...'
+  idleTxt = 'Download the atlas bundle'
   
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
     order: 8,
   }
 
-  public pinnedDsNotAvail = 'We are reworking pinned dataset feature. Please check back later.'
-  @ViewChild('savedDatasets', { read: TemplateRef })
-  private savedDatasetTmpl: TemplateRef<any>
-
-  public openPinnedDatasets(){
-    // this.bottomSheet.open(this.savedDatasetTmpl)
+  public downloadAtlas: IQuickTourData = {
+    description: 'You can download what you see in the viewer with this button.',
+    order: 9
   }
 
   constructor(
@@ -86,8 +85,6 @@ export class TopMenuCmp {
         ? `Logged in as ${(user && user.name) ? user.name : 'Unknown name'}`
         : `Not logged in`),
     )
-
-    this.favDataEntries$ = of([])
   }
 
   private dialogRef: MatDialogRef<any>
