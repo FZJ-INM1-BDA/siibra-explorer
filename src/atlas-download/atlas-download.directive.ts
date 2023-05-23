@@ -68,13 +68,7 @@ export class AtlasDownloadDirective {
        * n.b. this *needs* to happen in the same invocation chain from when click happened
        * modern browser is pretty strict on what can and cannot 
        */
-      const anchor = document.createElement('a')
-      anchor.href = `${endpoint}/atlas_download/${task_id}/download`
-      anchor.target = "_blank"
-      anchor.download = "download.zip"
-      document.body.appendChild(anchor)
-      anchor.click()
-      document.body.removeChild(anchor)
+      window.open(`${endpoint}/atlas_download/${task_id}/download`, "_blank")
       this.#busy$.next(false)
     } catch (e) {
       this.#busy$.next(false)
