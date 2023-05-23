@@ -1,9 +1,11 @@
-import { Component, Input, OnDestroy, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, EMPTY, Subscription, combineLatest } from 'rxjs';
+import { BehaviorSubject, EMPTY, Subscription, combineLatest, concat, of } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
-import { SxplrParcellation, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
+import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
+import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
+import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
 import { TSandsPoint } from 'src/util/types';
 
 @Component({
@@ -13,6 +15,11 @@ import { TSandsPoint } from 'src/util/types';
 })
 export class PointAssignmentComponent implements OnDestroy {
 
+  SIMPLE_COLUMNS = [
+    "region",
+    "intersection over union",
+  ]
+  
   #busy$ = new BehaviorSubject(false)
   busy$ = this.#busy$.asObservable()
 
@@ -34,6 +41,9 @@ export class PointAssignmentComponent implements OnDestroy {
     this.#parcellation.next(val)
   }
 
+  @Output()
+  clickOnRegion = new EventEmitter<{ target: SxplrRegion, event: MouseEvent }>()
+
   df$ = combineLatest([
     this.#point,
     this.#parcellation,
@@ -49,15 +59,19 @@ export class PointAssignmentComponent implements OnDestroy {
         return EMPTY
       }
       this.#busy$.next(true)
-      return this.sapi.v3Get("/map/assign", {
-        query: {
-          parcellation_id: parcellation.id,
-          point: point.coordinates.map(v => `${v.value/1e6}mm`).join(','),
-          space_id: template.id,
-          sigma_mm: 3.0
-        }
-      }).pipe(
-        tap(() => this.#busy$.next(false)),
+      return concat(
+        of(null),
+        this.sapi.v3Get("/map/assign", {
+          query: {
+            parcellation_id: parcellation.id,
+            point: point.coordinates.map(v => `${v.value/1e6}mm`).join(','),
+            space_id: template.id,
+            sigma_mm: 3.0
+          }
+        }).pipe(
+          tap(() => this.#busy$.next(false)),
+        )
+      ).pipe(
         shareReplay(1),
       )
     })
@@ -76,5 +90,9 @@ export class PointAssignmentComponent implements OnDestroy {
   #sub: Subscription[] = []
   ngOnDestroy(): void {
     while (this.#sub.length > 0) this.#sub.pop().unsubscribe()
+  }
+  async selectRegion(region: PathReturn<"/regions/{region_id}">, event: MouseEvent){
+    const sxplrReg = await translateV3Entities.translateRegion(region)
+    this.clickOnRegion.emit({ target: sxplrReg, event })
   }
 }

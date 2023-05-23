@@ -206,13 +206,16 @@
     </ng-template>
 
     <!-- if selected feature and selected point are both null, show default (selected region) -->
-    <ng-template [ngIf]="!view.selectedFeature && !view.selectedPoint"
-      [ngTemplateOutlet]="sidenavRegionTmpl"
-      [ngTemplateOutletContext]="{
-        view: view,
-        showFullSidenavSwitch: showFullSidenavSwitch
-      }">
+    <!-- ngIf and ngtemplateoutlet is required when ngIf changes too quickly, it seems -->
+    <ng-template  [ngIf]="!view.selectedFeature && !view.selectedPoint">
+      <ng-template
+        [ngTemplateOutlet]="sidenavRegionTmpl"
+        [ngTemplateOutletContext]="{
+          view: view,
+          showFullSidenavSwitch: showFullSidenavSwitch
+        }">
 
+      </ng-template>
     </ng-template>
   </ng-template>
 </ng-template>
@@ -1077,7 +1080,8 @@
   <sxplr-point-assignment
     [point]="view.selectedPoint"
     [template]="view.selectedTemplate"
-    [parcellation]="view.selectedParcellation">
+    [parcellation]="view.selectedParcellation"
+    (clickOnRegion)="$event.event.ctrlKey ? toggleRoi($event.target) : selectRoi($event.target)">
   </sxplr-point-assignment>
 </ng-template>
 
