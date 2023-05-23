@@ -9,8 +9,34 @@
     <button mat-raised-button
         class="sxplr-m-2"
         (click)="openDialog(datatableTmpl)">
-        Show Assignment ({{ df.data.length }})
+        Show Full Assignment ({{ df.data.length }})
     </button>
+
+    <!-- simple table -->
+    <table mat-table [dataSource]="df | dfToDs" class="sxplr-w-100">
+        <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef>
+                region
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <!-- {{ element | json }} -->
+                <button mat-button (click)="selectRegion(element['region'], $event)">
+                    {{ element['region'].name }}
+                </button>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="intersection over union">
+            <th mat-header-cell *matHeaderCellDef>
+                intersection over union
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element['intersection over union'] | prettyPresent }}
+            </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
+        <tr mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
+    </table>
 </ng-template>
 
 <ng-template #datatableTmpl>
