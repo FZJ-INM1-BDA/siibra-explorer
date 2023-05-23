@@ -60,7 +60,7 @@ export class TopMenuCmp {
   public keyFrameText = `Start KeyFrames`
 
   busyTxt = 'Preparing bundle for download ...'
-  idleTxt = 'Download the atlas bundle'
+  idleTxt = 'Download the current atlas view'
   
   public quickTourData: IQuickTourData = {
     description: QUICKTOUR_DESC.TOP_MENU,
