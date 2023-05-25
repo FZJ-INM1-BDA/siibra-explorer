@@ -29,7 +29,8 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       ).pipe(
         map(isBusyState => isBusyState.some(state => state))
       )
-    )
+    ),
+    shareReplay(1),
   )
   public total$ = this.#listCmps$.pipe(
     switchMap(listCmps =>

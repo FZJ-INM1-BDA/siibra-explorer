@@ -1110,12 +1110,15 @@
       </mat-card-subtitle>
     </mat-card-header>
 
-    <mat-slide-toggle [formControl]="showVOIWireframeSlideToggle">
-      <span>
-        Show VOI Wireframe
-      </span>
-      <spinner-cmp class="sxplr-d-inline-block" *ngIf="loadingVoiWireFrame$ | async"></spinner-cmp>
-    </mat-slide-toggle>
+    <div class="loadingText">
+
+      <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
+        <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
+        <span>
+          Loading Wireframes ...
+        </span>
+      </ng-template>
+    </div>
   </mat-card>
 
   <sxplr-feature-entry
@@ -1140,6 +1143,7 @@
     iav-switch
     [iav-switch-state]="false"
     #voiSwitch="iavSwitch"
+    (iav-switch-event)="$event && voiFeatureEntryCmp.pullAll()"
     (click)="voiSwitch.toggle()">
 
     <ng-template [ngIf]="voiSwitch.switchState$ | async" [ngIfElse]="chevronCollapseTmpl">
@@ -1162,7 +1166,7 @@
   and how bounding boxes are drawn needs to be reconsidered -->
   
   <div
-    *ngIf="showVOIWireframeSlideToggle.valueChanges | async"
+    *ngIf="voiSwitch.switchState$| async"
     voiBbox
     [features]="voiFeatureEntryCmp.features$ | async">
 

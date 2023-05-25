@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -12,7 +12,6 @@ import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { FormControl } from "@angular/forms";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 
@@ -300,24 +299,6 @@ export class ViewerCmp implements OnDestroy {
     this.onDestroyCb.push(
       () => this.ctxMenuSvc.deregister(cb)
     )
-
-    
-    this.subscriptions.push(
-      this.showVOIWireframeSlideToggle.valueChanges.pipe(
-        switchMap(showWireFrame => this.voiCmp.totals$.pipe(
-          map(totals => ({
-            totals,
-            showWireFrame
-          }))
-        ))
-      ).subscribe(async ({ showWireFrame }) => {
-        if (showWireFrame) {
-          this._loadingVoiWireFrame$.next(true)
-          await this.voiCmp.pullAll()
-        }
-        this._loadingVoiWireFrame$.next(false)
-      })
-    )
   }
 
   ngOnDestroy(): void {
@@ -457,8 +438,4 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
-
-  showVOIWireframeSlideToggle = new FormControl<boolean>(false)
-  private _loadingVoiWireFrame$ = new BehaviorSubject<boolean>(false)
-  loadingVoiWireFrame$ = this._loadingVoiWireFrame$.asObservable()
 }
