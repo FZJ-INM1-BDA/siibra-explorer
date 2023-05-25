@@ -358,16 +358,20 @@ export function mutateDeepMerge(toObj: any, fromObj: any){
       continue
     }
     if (Array.isArray(toObj[key])) {
-      const objToAppend = Array.isArray(fromObj[key])
-        ? fromObj[key]
-        : [fromObj[key]]
-      toObj[key].push(...objToAppend)
+      toObj[key] = fromObj[key]
       continue
     }
-    if (typeof toObj[key] === typeof fromObj[key] && typeof toObj[key] === 'object') {
+    const toObjType = typeof toObj[key]
+    if (toObjType === typeof fromObj[key] && toObjType === 'object') {
       mutateDeepMerge(toObj[key], fromObj[key])
       continue
     }
+    
+    if (["boolean", "string", "number"].includes(toObjType)) {
+      toObj[key] = fromObj[key]
+      continue
+    }
+    
     throw new Error(`cannot mutate ${key} typeof ${typeof fromObj[key]}`)
   }
   
@@ -426,4 +430,10 @@ export function defaultdict<T>(fn: () => T): Record<string, T> {
       return obj[prop]
     },
   })
+}
+
+export function wait(ms: number){
+  return new Promise(rs => setTimeout(() => {
+    rs(null)
+  }, ms))
 }

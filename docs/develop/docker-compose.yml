@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  redis:
+    image: redis
+    restart: always
+
+  siibra-api:
+    depends_on:
+    - redis
+    image: docker-registry.ebrains.eu/siibra/siibra-api:0.3
+    ports:
+    - '10081:5000'
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+
+    # comment out below to run siibra with default configuration
+      SIIBRA_USE_CONFIGURATION: /data/siibra-configuration
+    volumes:
+      - </path/to/your/volume/>:/data/siibra-configuration
+    # comment out above to run siibra with default configuration
+
+  siibra-explorer:
+    ports:
+    - '10082:3000'
+    depends_on:
+    - siibra-api
+    image: docker-registry.ebrains.eu/siibra/siibra-explorer:dev-local-10081
+    environment:
+      PORT: '3000'

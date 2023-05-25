@@ -153,3 +153,8 @@ sxplr-smart-chip [mat-icon-button]
 {
   margin-right: -1.5rem;
 }
+
+.loadingText
+{
+  height: 1rem;
+}

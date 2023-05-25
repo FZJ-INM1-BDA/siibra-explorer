@@ -25,7 +25,7 @@ export const BACKENDURL = (() => {
 })()
 
 export const MIN_REQ_EXPLAINER = `
-- Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
+- Siibra explorer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
 - You can check browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
 - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
 `

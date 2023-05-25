@@ -14,3 +14,7 @@ export const generalApplyState = createAction(
     state: MainState
   }>()
 )
+
+export const noop = createAction(
+  `${nameSpace} noop`
+)

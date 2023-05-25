@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/siibra-explorer/badge/?version=latest)](https://siibra-explorer.readthedocs.io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# siibra-explorer - Interactive viewer for multilevel brain atlases
+# siibra-explorer - Interactive atlas viewer for multilevel brain atlases
 
 *Authors: Big Data Analytics Group, Institute of Neuroscience and Medicine (INM-1), Forschungszentrum Jülich GmbH*
 
@@ -14,11 +14,11 @@ Copyright 2020-2021, Forschungszentrum Jülich GmbH
 
 ## Getting Started
 
-A live version of the Interactive Atlas Viewer is available at [https://atlases.ebrains.eu/viewer/](https://atlases.ebrains.eu/viewer/). This section is useful for developers who would like to develop this project.
+A live version of the siibra explorer is available at [https://atlases.ebrains.eu/viewer/](https://atlases.ebrains.eu/viewer/). This section is useful for developers who would like to develop this project.
 
 ### General information
 
-Interactive atlas viewer is built with [Angular (v13.0)](https://angular.io/), [Bootstrap (v4)](http://getbootstrap.com/), and [fontawesome icons](https://fontawesome.com/). Some other notable packages used are [ngrx/store](https://github.com/ngrx/platform) for state management. 
+Siibra explorer is built with [Angular (v14.0)](https://angular.io/), [Bootstrap (v4)](http://getbootstrap.com/), and [fontawesome icons](https://fontawesome.com/). Some other notable packages used are [ngrx/store](https://github.com/ngrx/platform) for state management. 
 
 Releases newer than [v0.2.9](https://github.com/HumanBrainProject/interactive-viewer/tree/v0.2.9) also uses a nodejs backend, which uses [passportjs](http://www.passportjs.org/) for user authentication, [express](https://expressjs.com/) as a http framework.
 

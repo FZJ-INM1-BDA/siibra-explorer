@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
-import { BehaviorSubject, combineLatest, merge, of, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, concat, merge, of, Subscription } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 
@@ -50,6 +50,11 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   #subscriptions: Subscription[] = []
 
+  private _busy$ = new BehaviorSubject<boolean>(false)
+  busy$ = this._busy$.pipe(
+    shareReplay(1)
+  )
+
   ngOnDestroy(): void {
     while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
   }
@@ -61,6 +66,15 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
       map(() => Array.from(this.catAccDirs))
     )
     this.#subscriptions.push(
+      catAccDirs$.pipe(
+        switchMap(dirs => combineLatest(
+          dirs.map(dir => dir.isBusy$)
+        )),
+        map(flags => flags.some(flag => flag)),
+        distinctUntilChanged(),
+      ).subscribe(value => {
+        this._busy$.next(value)
+      }),
       catAccDirs$.pipe(
         tap(() => this.busyTallying$.next(true)),
         switchMap(catArrDirs => merge(

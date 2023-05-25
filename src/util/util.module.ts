@@ -19,10 +19,17 @@ import { GetFilenamePipe } from "./pipes/getFilename.pipe";
 import { CombineFnPipe } from "./pipes/combineFn.pipe";
 import { MergeObjPipe } from "./mergeObj.pipe";
 import { IncludesPipe } from "./includes.pipe";
+import { SidePanelComponent } from './side-panel/side-panel.component';
+import { MatCardModule } from "@angular/material/card";
+import { CommonModule } from "@angular/common";
+import { DfToDsPipe } from './df-to-ds.pipe';
+import { PrettyPresentPipe } from './pretty-present.pipe';
 
 @NgModule({
   imports:[
-    LayoutModule
+    LayoutModule,
+    MatCardModule,
+    CommonModule,
   ],
   declarations: [
     StopPropagationDirective,
@@ -44,6 +51,9 @@ import { IncludesPipe } from "./includes.pipe";
     CombineFnPipe,
     MergeObjPipe,
     IncludesPipe,
+    SidePanelComponent,
+    DfToDsPipe,
+    PrettyPresentPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -65,6 +75,9 @@ import { IncludesPipe } from "./includes.pipe";
     CombineFnPipe,
     MergeObjPipe,
     IncludesPipe,
+    SidePanelComponent,
+    DfToDsPipe,
+    PrettyPresentPipe
   ]
 })
 

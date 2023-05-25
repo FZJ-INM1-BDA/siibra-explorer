@@ -5,6 +5,9 @@ import { getUuid } from "src/util/fn"
 import { TLineJsonSpec } from "./line"
 import { TPointJsonSpec } from "./point"
 import { TPolyJsonSpec } from "./poly"
+import { TSandsCoord, TSandsPoint } from "src/util/types"
+
+export { getCoord, TSandsPoint } from "src/util/types"
 
 type TRecord = Record<string, unknown>
 
@@ -233,28 +236,6 @@ export type TBaseAnnotationGeomtrySpec = {
   desc?: string
 }
 
-export function getCoord(value: number): TSandsQValue {
-  return {
-    '@id': getUuid(),
-    '@type': "https://openminds.ebrains.eu/core/QuantitativeValue",
-    value,
-    unit: {
-      "@id": 'id.link/mm'
-    }
-  }
-}
-
-type TSandsQValue = {
-  '@id': string
-  '@type': 'https://openminds.ebrains.eu/core/QuantitativeValue'
-  uncertainty?: [number, number]
-  value: number
-  unit: {
-    '@id': 'id.link/mm'
-  }
-}
-type TSandsCoord = [TSandsQValue, TSandsQValue] | [TSandsQValue, TSandsQValue, TSandsQValue]
-
 export type TGeometryJson = TPointJsonSpec | TLineJsonSpec | TPolyJsonSpec
 export type TSands = TSandsPolyLine | TSandsLine | TSandsPoint
 
@@ -278,14 +259,6 @@ export type TSandsLine = {
   '@id': string
 }
 
-export type TSandsPoint = {
-  coordinates: TSandsCoord
-  coordinateSpace: {
-    '@id': string
-  }
-  '@type': 'https://openminds.ebrains.eu/sands/CoordinatePoint'
-  '@id': string
-}
 
 export interface ISandsAnnotation {
   point: TSandsPoint

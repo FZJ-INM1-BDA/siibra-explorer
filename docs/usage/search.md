@@ -1,6 +1,6 @@
 # Searching
 
-The interactive viewer fetches datasets semantically linked to [selected regions](selecting.md#selecting-deselecting-regions). If no regions are selected, all datasets associated with a parcellation will be returned.
+Siibra explorer fetches datasets semantically linked to [selected regions](selecting.md#selecting-deselecting-regions). If no regions are selected, all datasets associated with a parcellation will be returned.
 
 [![](images/bigbrain_search_interface.png)](images/bigbrain_search_interface.png)
 

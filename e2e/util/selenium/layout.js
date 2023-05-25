@@ -600,11 +600,6 @@ class WdLayoutPage extends WdBase{
       .findElement( By.css('[aria-label="Show pinned datasets"]') )
   }
 
-  async getNumberOfFavDataset(){
-    const attr = await this._getFavDatasetIcon().getAttribute('pinned-datasets-length')
-    return Number(attr)
-  }
-
   async showPinnedDatasetPanel(){
     await this._getFavDatasetIcon().click()
     await this.wait(500)

@@ -1,4 +1,5 @@
 import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { TSandsPoint, TFace } from "src/util/types"
 
 export const nameSpace = `[state.atlasSelection]`
 export type ViewerMode = 'annotating' | 'key frame'
@@ -30,4 +31,6 @@ export type AtlasSelectionState = {
 
   viewerMode: ViewerMode
   breadcrumbs: BreadCrumb[]
+
+  selectedPoint: TSandsPoint|TFace
 }

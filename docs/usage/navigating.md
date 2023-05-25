@@ -2,7 +2,7 @@
 
 ## Navigating the viewer
 
-The interactive atlas viewer can be accessed from either a desktop or an Android mobile device. The navigation scheme vary slightly between the two platforms.
+The siibra explorer can be accessed from either a desktop or an Android mobile device. The navigation scheme vary slightly between the two platforms.
 
 | | Desktop | Mobile |
 | --- | --- | --- |
@@ -41,6 +41,6 @@ From here, `click` on `Navigate`.
 
 ## Navigation status panel
 
-You can find the navigation status in the lower left corner of the interactive atlas viewer. You can reset the `position`, `rotation` and/or `zoom`, as well as toggling the units between `physical` (mm) and `voxel`.
+You can find the navigation status in the lower left corner of the siibra explorer. You can reset the `position`, `rotation` and/or `zoom`, as well as toggling the units between `physical` (mm) and `voxel`.
 
 [![](images/navigation_status.png)](images/navigation_status.png)

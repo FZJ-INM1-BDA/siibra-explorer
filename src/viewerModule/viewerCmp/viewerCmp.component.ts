@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay, startWith, switchMap } from "rxjs/operators";
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -12,8 +12,8 @@ import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { FormControl } from "@angular/forms";
 import { EntryComponent } from "src/features/entry/entry.component";
+import { TFace, TSandsPoint, getCoord } from "src/util/types";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -94,11 +94,19 @@ export class ViewerCmp implements OnDestroy {
   public templateSelected$ = this.selectedATP.pipe(
     map(({ template }) => template)
   )
+  
+  #templateSelected$ = this.store$.pipe(
+    select(atlasSelection.selectors.selectedTemplate)
+  )
+
   public parcellationSelected$ = this.selectedATP.pipe(
     map(({ parcellation }) => parcellation)
   )
+  #parcellationSelected$ = this.store$.pipe(
+    select(atlasSelection.selectors.selectedParcellation)
+  )
 
-  public selectedRegions$ = this.store$.pipe(
+  #selectedRegions$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions),
   )
 
@@ -106,9 +114,8 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.selectedParcAllRegions)
   )
 
-  public viewerMode$: Observable<string> = this.store$.pipe(
+  #viewerMode$: Observable<string> = this.store$.pipe(
     select(atlasSelection.selectors.viewerMode),
-    shareReplay(1),
   )
 
   public useViewer$: Observable<TSupportedViewers | 'notsupported'> = this.store$.pipe(
@@ -123,24 +130,61 @@ export class ViewerCmp implements OnDestroy {
 
   public viewerCtx$ = this.ctxMenuSvc.context$
 
-  public selectedFeature$: Observable<Feature> = this.store$.pipe(
+  #selectedFeature$: Observable<Feature> = this.store$.pipe(
     select(userInteraction.selectors.selectedFeature)
   )
 
-  /**
-   * if no regions are selected, nor any additional layers (being deprecated)
-   * then the "explore" btn should not show
-   * and the full left side bar should not be expandable
-   * if it is already expanded, it should collapse
-   */
-  public onlyShowMiniTray$: Observable<boolean> = combineLatest([
-    this.selectedRegions$,
-    this.viewerMode$.pipe(
-      startWith(null as string)
-    ),
-    this.selectedFeature$,
+  #selectedPoint$ = this.store$.pipe(
+    select(atlasSelection.selectors.relevantSelectedPoint)
+  )
+
+  public view$ = combineLatest([
+    this.#selectedRegions$,
+    this.#viewerMode$,
+    this.#selectedFeature$,
+    this.#selectedPoint$,
+    this.#templateSelected$,
+    this.#parcellationSelected$
   ]).pipe(
-    map(([ regions, viewerMode, selectedFeature ]) => regions.length === 0 && !viewerMode && !selectedFeature)
+    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => {
+      let spatialObjectTitle: string
+      let spatialObjectSubtitle: string
+      if (selectedPoint) {
+        const { ['@type']: selectedPtType } = selectedPoint
+        if (selectedPtType === "https://openminds.ebrains.eu/sands/CoordinatePoint") {
+          spatialObjectTitle = `Point: ${selectedPoint.coordinates.map(v => (v.value / 1e6).toFixed(2))} (mm)`
+        }
+        if (selectedPtType === "siibra-explorer/surface/face") {
+          spatialObjectTitle = `Face: #${selectedPoint.face}`
+        }
+      }
+      if (!!selectedTemplate) {
+        spatialObjectSubtitle = selectedTemplate.name
+      }
+      return {
+        viewerMode,
+        selectedRegions,
+        selectedFeature,
+        selectedPoint,
+        selectedTemplate,
+        selectedParcellation,
+
+        /**
+         * Selected Spatial Object
+         */
+        spatialObjectTitle,
+        spatialObjectSubtitle,
+
+        /**
+         * if no regions are selected, nor any additional layers (being deprecated)
+         * then the "explore" btn should not show
+         * and the full left side bar should not be expandable
+         * if it is already expanded, it should collapse
+         */
+        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint
+      }
+    }),
+    shareReplay(1),
   )
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
@@ -149,7 +193,6 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('viewerStatusRegionCtxMenu', { read: TemplateRef })
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
-  public context: TContextArg<TSupportedViewers>
   private templateSelected: SxplrTemplate
 
   constructor(
@@ -161,9 +204,6 @@ export class ViewerCmp implements OnDestroy {
   ){
 
     this.subscriptions.push(
-      this.ctxMenuSvc.context$.subscribe(
-        (ctx: any) => this.context = ctx
-      ),
       this.templateSelected$.subscribe(
         t => this.templateSelected = t
       ),
@@ -223,12 +263,16 @@ export class ViewerCmp implements OnDestroy {
         order: 0
       })
 
+      if (!context) {
+        return true
+      }
+
       /**
        * check hovered region
        */
       let hoveredRegions = []
       if (context.viewerType === 'nehuba') {
-        hoveredRegions = (context as TContextArg<'nehuba'>).payload.nehuba.reduce(
+        hoveredRegions = ((context as TContextArg<'nehuba'>).payload.nehuba || []).reduce(
           (acc, curr) => acc.concat(...curr.regions),
           []
         )
@@ -255,24 +299,6 @@ export class ViewerCmp implements OnDestroy {
     this.onDestroyCb.push(
       () => this.ctxMenuSvc.deregister(cb)
     )
-
-    
-    this.subscriptions.push(
-      this.showVOIWireframeSlideToggle.valueChanges.pipe(
-        switchMap(showWireFrame => this.voiCmp.totals$.pipe(
-          map(totals => ({
-            totals,
-            showWireFrame
-          }))
-        ))
-      ).subscribe(async ({ showWireFrame }) => {
-        if (showWireFrame) {
-          this._loadingVoiWireFrame$.next(true)
-          await this.voiCmp.pullAll()
-        }
-        this._loadingVoiWireFrame$.next(false)
-      })
-    )
   }
 
   ngOnDestroy(): void {
@@ -294,6 +320,55 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
+  public toggleRoi(roi: SxplrRegion) {
+    this.store$.dispatch(
+      atlasSelection.actions.toggleRegion({
+        region: roi
+      })
+    )
+  }
+
+  public selectPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
+    const { point, face, vertices } = pointSpec
+    const id = `${template.id}-${point ? point.join(',') : face}`
+    let pointOfInterest: TFace | TSandsPoint
+
+    if (point) {
+      pointOfInterest = {
+        "@id": `${template.id}-${point.join(',')}`,
+        "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint" as const,
+        coordinateSpace: {
+          "@id": template.id
+        },
+        coordinates: point.map(v => getCoord(v))
+      }
+    }
+    if ((face === 0 || !!face) && vertices) {
+      pointOfInterest = {
+        "@id": id,
+        "@type": "siibra-explorer/surface/face" as const,
+        coordinateSpace: {
+          "@id": template.id
+        },
+        face,
+        vertices,
+      }
+    }
+    if (pointOfInterest) {
+      this.store$.dispatch(
+        atlasSelection.actions.selectPoint({
+          point: pointOfInterest
+        })
+      )
+    }
+  }
+
+  public clearPoint(){
+    this.store$.dispatch(
+      atlasSelection.actions.clearSelectedPoint()
+    )
+  }
+
   public exitSpecialViewMode(): void{
     this.store$.dispatch(
       atlasSelection.actions.clearViewerMode()
@@ -307,7 +382,7 @@ export class ViewerCmp implements OnDestroy {
       this.cdr.detectChanges()
       break
     case EnumViewerEvt.VIEWER_CTX:
-      this.ctxMenuSvc.context$.next(event.data)
+      this.ctxMenuSvc.deepMerge(event.data)
       if (event.data.viewerType === "nehuba") {
         const { nehuba, nav } = (event.data as TContextArg<"nehuba">).payload
         if (nehuba) {
@@ -363,8 +438,4 @@ export class ViewerCmp implements OnDestroy {
       })
     )
   }
-
-  showVOIWireframeSlideToggle = new FormControl<boolean>(false)
-  private _loadingVoiWireFrame$ = new BehaviorSubject<boolean>(false)
-  loadingVoiWireFrame$ = this._loadingVoiWireFrame$.asObservable()
 }
