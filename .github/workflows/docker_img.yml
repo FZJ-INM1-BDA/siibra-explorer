@@ -7,7 +7,7 @@ on:
       # changes to .openshift directory... mostly devops config
       - '.openshift/*'
       # docs (docs are built on readthedocs any way)
-      - 'docs/*'
+      - 'docs/**/*'
 
 jobs:
   build-docker-img:
@@ -18,14 +18,22 @@ jobs:
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
 
-      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-stable-ns.apps.hbp.eu/v3_0,https://siibra-api-stable.apps.jsc.hbp.eu/v3_0'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-stable.apps.jsc.hbp.eu/v3_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
+      SIIBRA_API_LOCAL: 'http://localhost:10081/v3_0'
+      LOCAL_TAG: 'local-10081'
+
+    strategy:
+      matrix:
+        build: [ 'local', 'prod' ]
 
     steps:
     - uses: actions/checkout@v2
     - name: 'Set matomo env var'
+      # if matrix.build is local, only run if master or dev
+      if: ${{ !(matrix.build == 'local' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev') }} 
       run: |
         echo "Using github.ref: $GITHUB_REF"
 
@@ -52,8 +60,17 @@ jobs:
             echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LATEST }}" >> $GITHUB_ENV
           fi
         fi
+        
+        if [[ "${{ matrix.build }}" == "local" ]]
+        then
+          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_LOCAL }}" >> $GITHUB_ENV
+          echo "MATOMO_URL=" >> $GITHUB_ENV
+          echo "MATOMO_ID=" >> $GITHUB_ENV
+        fi
 
     - name: 'Set version variable & expmt feature flag'
+      # if matrix.build is local, only run if master or dev
+      if: ${{ !(matrix.build == 'local' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev') }} 
       run: |
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
@@ -63,8 +80,14 @@ jobs:
           echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
         fi
     - name: 'Build docker image'
+      # if matrix.build is local, only run if master or dev
+      if: ${{ !(matrix.build == 'local' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev') }} 
       run: |
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
+        if [[ "${{ matrix.build }}" == "local" ]]
+        then
+          DOCKER_BUILT_TAG="$DOCKER_BUILT_TAG"-${{ env.LOCAL_TAG }}
+        fi
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
           --build-arg MATOMO_URL=$MATOMO_URL \
@@ -77,6 +100,8 @@ jobs:
         echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
     - name: 'Push to docker registry'
+      # if matrix.build is local, only run if master or dev
+      if: ${{ !(matrix.build == 'local' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev') }} 
       run: |
         echo "Login to docker registry"
         docker login \

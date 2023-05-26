@@ -32,6 +32,7 @@ jobs:
       with:
         tag_name: ${{ needs.check-version.outputs.package-version }}
         release_name: Release ${{ needs.check-version.outputs.package-version }}
+        body_path: docs/releases/v${{ needs.check-version.outputs.package-version }}.md
         draft: false
         prerelease: false
         

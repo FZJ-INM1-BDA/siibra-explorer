@@ -1,6 +1,6 @@
 # Exploring a connectivity matrix for the selected brain parcellation
 
-Via the <https://github.com/FZJ-INM1-BDA/HBP-connectivity-component>, the interactive atlas viewer allows interactive exploration of a connectivity matrix, that is defined for the currently selected brain parcellation and available from the HBP Knowledge Graph. As of now, this function is only available for the `JuBrain Cytoarchitectonic Atlas.
+Via the <https://github.com/FZJ-INM1-BDA/HBP-connectivity-component>, the siibra explorer allows interactive exploration of a connectivity matrix, that is defined for the currently selected brain parcellation and available from the HBP Knowledge Graph. As of now, this function is only available for the `JuBrain Cytoarchitectonic Atlas.
 
 ## Launching the connectivity browser
 

@@ -27,11 +27,8 @@ export class AuthService implements OnDestroy {
   public user$: Observable<any>
   public logoutHref: string = 'logout'
 
-  /**
-   * TODO build it dynamically, or at least possible to configure via env var
-   */
   public loginMethods: IAuthMethod[] = [{
-    name: 'HBP OIDC v2',
+    name: 'EBRAINS OIDC v2',
     href: 'hbp-oidc-v2/auth'
   }]
 
