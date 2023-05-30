@@ -289,3 +289,38 @@ a[mat-raised-button]
 {
   pointer-events: none!important;
 }
+
+// list like button
+$llb: "#{$nsp}-list-like-button";
+button.#{$llb}
+{
+  width: 100%;
+
+  > .mat-button-wrapper
+  {
+    display: flex;
+    
+    > .#{$llb}-icon
+    {
+      width: 2rem;
+      flex: 0 0 auto;
+      margin: auto;
+      font-size: 150%;
+    }
+
+    > .#{$llb}-body
+    {
+      flex: 1 1 0px;
+      display: flex;
+      flex-direction: column;
+      margin:1rem;
+  
+      .#{$llb}-body-line
+      {
+        flex: 0 0 0px;
+        text-align: start;
+        line-height: 1.5rem;
+      }
+    }
+  }
+}

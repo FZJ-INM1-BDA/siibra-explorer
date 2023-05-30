@@ -1,12 +1,14 @@
-import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, EMPTY, Subscription, combineLatest, concat, of } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
+import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
 import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
 import { TSandsPoint } from 'src/util/types';
+import { TZipFileConfig } from "src/zipFilesOutput/type"
+import { environment } from "src/environments/environment"
 
 @Component({
   selector: 'sxplr-point-assignment',
@@ -17,7 +19,7 @@ export class PointAssignmentComponent implements OnDestroy {
 
   SIMPLE_COLUMNS = [
     "region",
-    "intersection over union",
+    "map value",
   ]
   
   #busy$ = new BehaviorSubject(false)
@@ -44,7 +46,7 @@ export class PointAssignmentComponent implements OnDestroy {
   @Output()
   clickOnRegion = new EventEmitter<{ target: SxplrRegion, event: MouseEvent }>()
 
-  df$ = combineLatest([
+  df$: Observable<PathReturn<"/map/assign">> = combineLatest([
     this.#point,
     this.#parcellation,
     this.#template,
@@ -66,15 +68,14 @@ export class PointAssignmentComponent implements OnDestroy {
             parcellation_id: parcellation.id,
             point: point.coordinates.map(v => `${v.value/1e6}mm`).join(','),
             space_id: template.id,
-            sigma_mm: 3.0
+            sigma_mm: 0
           }
         }).pipe(
           tap(() => this.#busy$.next(false)),
         )
-      ).pipe(
-        shareReplay(1),
       )
-    })
+    }),
+    shareReplay(1),
   )
 
   columns$ = this.df$.pipe(
@@ -95,4 +96,76 @@ export class PointAssignmentComponent implements OnDestroy {
     const sxplrReg = await translateV3Entities.translateRegion(region)
     this.clickOnRegion.emit({ target: sxplrReg, event })
   }
+
+  zipfileConfig$: Observable<TZipFileConfig[]> = combineLatest([
+    this.#point,
+    this.#parcellation,
+    this.#template,
+    this.df$
+  ]).pipe(
+    map(([ pt, parc, tmpl, df ]) => {
+      return [{
+        filename: 'README.md',
+        filecontent: generateReadMe(pt, parc, tmpl)
+      }, {
+        filename: 'pointassignment.csv',
+        filecontent: generateCsv(df)
+      }] as TZipFileConfig[]
+    })
+  )
+}
+
+function generateReadMe(pt: TSandsPoint, parc: SxplrParcellation, tmpl: SxplrTemplate){
+  return `# Point assignment exporter
+
+Exported by siibra-explorer verison \`${environment.VERSION}\` hash: \`${environment.GIT_HASH}\`.
+
+On: ${new Date().toString()}
+
+Data retrieved through siibra-api version \`${EXPECTED_SIIBRA_API_VERSION}\`
+
+Retrieval parameters:
+
+Point
+- coord: ${pt.coordinates.map(v => v.value).join(',')} mm
+
+Parcellation
+- name: ${parc.name || parc.shortName}
+- id: ${parc.id}
+
+Space
+- name: ${tmpl.name || tmpl.shortName}
+- id: ${tmpl.id}
+`
+}
+
+function escapeFactory(chars: string[] = []){
+  const search = new RegExp(`[${chars.join('').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`, 'g')
+  return function escape(s: string) {
+    return s.replace(search, s => `\\${s}`)
+  }
+}
+
+const escapeDoubleQuotes = escapeFactory(['"'])
+
+function processRow(v: unknown[]): string{
+  const returnValue: string[] = []
+  for (const item of v) {
+
+    // region
+    if (typeof item === "object" && item?.['@type'] === "siibra-0.4/region") {
+      returnValue.push(item['name'])
+      continue
+    }
+
+    returnValue.push(JSON.stringify(item))
+  }
+  return returnValue.map(escapeDoubleQuotes).map(v => `"${v}"`).join(",")
+}
+
+function generateCsv(df: PathReturn<"/map/assign">) {
+  return [
+    df.columns.map(escapeDoubleQuotes).map(v => `"${v}"`).join(","),
+    ...df.data.map(processRow)
+  ].join("\n")
 }

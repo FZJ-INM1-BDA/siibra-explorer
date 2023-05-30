@@ -905,62 +905,69 @@
 <ng-template #viewerStatusCtxMenu let-data>
   <ng-template [ngIf]="data.context" let-context>
 
-    <mat-list>
+    <!-- ref space & position -->
+    <ng-container [ngSwitch]="context.viewerType">
 
-      <!-- ref space & position -->
-      <ng-container [ngSwitch]="context.viewerType">
-  
-        <!-- volumetric i.e. nehuba -->
-        <ng-container *ngSwitchCase="'nehuba'">
-          <mat-list-item mat-ripple
-            (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
-            <div mat-list-icon>
-              <i class="fas fa-map"></i>
-            </div>
-            
-            <div mat-line>
+      <!-- volumetric i.e. nehuba -->
+      <ng-container *ngSwitchCase="'nehuba'">
+        <button mat-button class="sxplr-list-like-button"
+          (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
+
+          <div class="sxplr-list-like-button-icon">
+            <i class="fas fa-map"></i>
+          </div>
+    
+          <div class="sxplr-list-like-button-body">
+    
+            <span class="sxplr-list-like-button-body-line">
               {{ context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
-            </div>
-            <div mat-line class="text-muted">
+            </span>
+            <span class="sxplr-list-like-button-body-line text-muted">
               Point
-            </div>
-            <div mat-line class="text-muted">
+            </span>
+            <span class="sxplr-list-like-button-body-line text-muted">
               {{ data.metadata.template.name }}
-            </div>
-          </mat-list-item>
-        </ng-container>
-  
-        <ng-container *ngSwitchCase="'threeSurfer'">
+            </span>
+          </div>    
 
-          <ng-template [ngIf]="context.payload?.faceIndex" let-faceIndex>
-            <ng-template [ngIf]="context.payload?.vertexIndices" let-vertexIndices>
-              <mat-list-item mat-ripple
-                (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)">
-
-                <div mat-list-icon>
-                  <i class="fas fa-map"></i>
-                </div>
-                
-                <div mat-line>
-                  Face Index: {{ faceIndex }}, Vertices Index: {{ vertexIndices | addUnitAndJoin : '' }}
-                </div>
-                <div mat-line class="text-muted">
-                  Mesh Face
-                </div>
-                <div mat-line class="text-muted">
-                  {{ data.metadata.template.name }}
-                </div>
-              </mat-list-item>
-            </ng-template>
-          </ng-template>
-          
-        </ng-container>
-  
-        <ng-container *ngSwitchDefault>
-          DEFAULT
-        </ng-container>
+        </button>
       </ng-container>
-    </mat-list>
+
+      <ng-container *ngSwitchCase="'threeSurfer'">
+
+        <ng-template [ngIf]="context.payload?.faceIndex" let-faceIndex>
+          <ng-template [ngIf]="context.payload?.vertexIndices" let-vertexIndices>
+            <button mat-button class="sxplr-list-like-button"
+            (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)">
+    
+              <div class="sxplr-list-like-button-icon">
+                <i class="fas fa-map"></i>
+              </div>
+        
+              <div class="sxplr-list-like-button-body">
+        
+                <span class="sxplr-list-like-button-body-line">
+                  Face Index: {{ faceIndex }}, Vertices Index: {{ vertexIndices | addUnitAndJoin : '' }}
+                </span>
+                <span class="sxplr-list-like-button-body-line text-muted">
+                  Mesh Face
+                </span>
+                <span class="sxplr-list-like-button-body-line text-muted">
+                  {{ data.metadata.template.name }}
+                </span>
+              </div>    
+    
+            </button>
+
+          </ng-template>
+        </ng-template>
+        
+      </ng-container>
+
+      <ng-container *ngSwitchDefault>
+        DEFAULT
+      </ng-container>
+    </ng-container>
   </ng-template>
 </ng-template>
 
@@ -968,41 +975,32 @@
 <!-- viewer state hover ctx menu -->
 <ng-template #viewerStatusRegionCtxMenu let-data>
   <!-- hovered ROIs -->
-  <mat-list>
-    <ng-template ngFor [ngForOf]="data.metadata.hoveredRegions"
-      let-region
-      let-first="first">
+  <ng-template ngFor [ngForOf]="data.metadata.hoveredRegions"
+    let-region
+    let-first="first">
 
-      <mat-divider class="top-0" *ngIf="!first"></mat-divider>
+    <mat-divider class="top-0" *ngIf="!first"></mat-divider>
 
-      <mat-list-item mat-ripple
-        class="cursor-default"
-        (click)="$event.ctrlKey ? toggleRoi(region) : selectRoi(region)">
+    <button mat-button
+      (click)="$event.ctrlKey ? toggleRoi(region) : selectRoi(region)"
+      class="sxplr-list-like-button">
+      
+      <div class="sxplr-list-like-button-icon">
+        <i class="fas fa-brain"></i>
+      </div>
 
-        <div mat-list-icon>
-          <i class="fas fa-brain"></i>
-        </div>
+      <div class="sxplr-list-like-button-body">
 
-        <span mat-line>
+        <span class="sxplr-list-like-button-body-line">
           {{ region.name }}
         </span>
-        <span mat-line class="text-muted">
-          <span>
-            Brain region
-          </span>
+        <span class="sxplr-list-like-button-body-line text-muted">
+          Brain region
         </span>
-      
-        <!-- lookup region -->
-        <!-- <button mat-icon-button
-          (click)="selectRoi(region)"
-          ctx-menu-dismiss>
-          <i class="fas fa-search"></i>
-        </button> -->
-      </mat-list-item>
-      
+      </div>    
+    </button>
 
-    </ng-template>
-  </mat-list>
+  </ng-template>
 </ng-template>
 
 <!-- feature tmpls -->

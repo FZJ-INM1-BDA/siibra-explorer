@@ -1,5 +1,7 @@
 import { CdkTableDataSourceInput } from '@angular/cdk/table';
 import { Pipe, PipeTransform } from '@angular/core';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { components } from "src/atlasComponents/sapi/schemaV3"
 type DF = components["schemas"]["DataFrameModel"]
 
@@ -19,11 +21,11 @@ function isDf(val: object): val is DF {
 })
 export class DfToDsPipe implements PipeTransform {
 
-  transform(df: object): CdkTableDataSourceInput<unknown> {
+  transform(df: object, sort: MatSort): CdkTableDataSourceInput<unknown> {
     if (!isDf(df)) {
       return null
     }
-    return df.data.map((arr, idx) => {
+    const v = df.data.map((arr, idx) => {
       const val = df.index[idx] as any
       const returnVal: Record<string, string|number|number[]> = {
         index: val,
@@ -37,6 +39,9 @@ export class DfToDsPipe implements PipeTransform {
       })
       return returnVal
     })
+    const ds = new MatTableDataSource(v)
+    ds.sort = sort
+    return ds
   }
 
 }
