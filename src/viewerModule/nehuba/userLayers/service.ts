@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core"
 import { MatDialog } from "@angular/material/dialog"
 import { select, Store } from "@ngrx/store"
-import { concat, of, Subscription } from "rxjs"
-import { pairwise } from "rxjs/operators"
+import { concat, from, of, Subscription } from "rxjs"
+import { catchError, map, pairwise, switchMap } from "rxjs/operators"
 import {
   linearTransform,
   TVALID_LINEAR_XFORM_DST,
@@ -198,29 +198,48 @@ export class UserLayerService implements OnDestroy {
   ) {
     this.#subscription.push(
       concat(
-        of(null),
-        this.routerSvc.customRoute$.pipe(select((v) => v[OVERLAY_LAYER_KEY]))
-      )
-        .pipe(pairwise())
-        .subscribe(([prev, curr]) => {
-          if (prev) {
-            this.removeUserLayer(prev)
+        of(null as string),
+        this.routerSvc.customRoute$.pipe(
+          select(v => v[OVERLAY_LAYER_KEY])
+        )
+      ).pipe(
+        pairwise(),
+        switchMap(([prev, curr]) => {
+          /**
+           * for precomputed sources, check if transform.json exists.
+           * if so, try to fetch it, and set it as transform
+           */
+          if (!curr) {
+            return of([prev, curr, null])
           }
-          if (curr) {
-            this.addUserLayer(
-              curr,
-              {
-                filename: curr,
-                message: `Overlay layer populated in URL`,
-              },
-              {
-                shader: getShader({
-                  colormap: EnumColorMapName.MAGMA,
-                }),
-              }
-            )
+          if (!curr.startsWith("precomputed://")) {
+            return of([prev, curr, null])
           }
+          return from(fetch(`${curr.replace('precomputed://', '')}/transform.json`).then(res => res.json())).pipe(
+            catchError(() => of([prev, curr, null])),
+            map(transform => [prev, curr, transform])
+          )
         })
+      ).subscribe(([prev, curr, transform]) => {
+        if (prev) {
+          this.removeUserLayer(prev)
+        }
+        if (curr) {
+          this.addUserLayer(
+            curr,
+            {
+              filename: curr,
+              message: `Overlay layer populated in URL`,
+            },
+            {
+              shader: getShader({
+                colormap: EnumColorMapName.MAGMA,
+              }),
+              transform
+            }
+          )
+        }
+      })
     )
   }
 

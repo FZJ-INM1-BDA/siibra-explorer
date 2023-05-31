@@ -6,6 +6,8 @@ import { UtilModule } from 'src/util';
 import { SpinnerModule } from 'src/components/spinner';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSortModule } from '@angular/material/sort';
+import { ZipFilesOutputModule } from 'src/zipFilesOutput/module';
 
 
 
@@ -20,6 +22,8 @@ import { MatButtonModule } from '@angular/material/button';
     SpinnerModule,
     MatDialogModule,
     MatButtonModule,
+    MatSortModule,
+    ZipFilesOutputModule,
   ],
   exports: [
     PointAssignmentComponent

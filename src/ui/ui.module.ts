@@ -10,7 +10,6 @@ import { DownloadDirective } from "../util/directives/download.directive";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
-import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { ShareModule } from "src/share";
 import { AuthModule } from "src/auth";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
@@ -41,7 +40,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     ReorderPanelIndexPipe,
     /* directive */
     DownloadDirective,
-    FixedMouseContextualContainerDirective,
   ],
   providers: [
     {
@@ -104,7 +102,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     // NehubaContainer,
     MobileOverlay,
     // StatusCardComponent,
-    FixedMouseContextualContainerDirective,
   ]
 })
 

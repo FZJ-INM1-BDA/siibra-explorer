@@ -1,4 +1,5 @@
 import { Directive, HostListener } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';
@@ -70,6 +71,7 @@ export class AtlasDownloadDirective {
        */
       window.open(`${endpoint}/atlas_download/${task_id}/download`, "_blank")
       this.#busy$.next(false)
+      this.snackbar.open(`Download starting. If it has not, please check your browser's popup blocker.`, 'Dismiss')
     } catch (e) {
       this.#busy$.next(false)
       this.#error$.next(e.toString())
@@ -89,6 +91,6 @@ export class AtlasDownloadDirective {
   #error$ = new Subject<string>()
   error$ = this.#error$.pipe()
 
-  constructor(private store: Store<MainState>) { }
+  constructor(private store: Store<MainState>, private snackbar: MatSnackBar) { }
 
 }

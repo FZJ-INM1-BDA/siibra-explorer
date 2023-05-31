@@ -22,7 +22,7 @@
 
     <!-- pinned dataset -->
     <div iav-fab-speed-dial-child>
-      <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+      <ng-container *ngTemplateOutlet="downloadAllTmpl">
       </ng-container>
     </div>
 
@@ -53,7 +53,7 @@
     </ng-container>
 
     <!-- pinned dataset -->
-    <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+    <ng-container *ngTemplateOutlet="downloadAllTmpl">
     </ng-container>
 
     <!-- help one pager -->
@@ -100,7 +100,7 @@
 </ng-template>
 
 <!-- pinned dataset btn -->
-<ng-template #pinnedDatasetBtnTmpl>
+<ng-template #downloadAllTmpl>
   <div class="btnWrapper"
     [matTooltip]="(atlasDlDct.busy$| async) ? busyTxt : idleTxt"
     quick-tour
