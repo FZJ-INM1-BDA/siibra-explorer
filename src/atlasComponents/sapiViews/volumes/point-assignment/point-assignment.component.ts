@@ -127,7 +127,7 @@ Data retrieved through siibra-api version \`${EXPECTED_SIIBRA_API_VERSION}\`
 Retrieval parameters:
 
 Point
-- coord: ${pt.coordinates.map(v => v.value).join(',')} mm
+- coord: ${pt.coordinates.map(v => v.value/1e6).join(',')} mm
 
 Parcellation
 - name: ${parc.name || parc.shortName}
