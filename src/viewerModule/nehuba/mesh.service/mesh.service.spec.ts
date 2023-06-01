@@ -196,6 +196,8 @@ describe('> mesh.service.ts', () => {
           beforeEach(() => {
             const mockStore = TestBed.inject(MockStore)
             mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
+            mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)
           })
 
           it("> load all meshes", () => {
@@ -226,6 +228,8 @@ describe('> mesh.service.ts', () => {
           beforeEach(() => {
             const mockStore = TestBed.inject(MockStore)
             mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [fits1])
+            mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
+            mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)
           })
           it("> load only selected mesh", () => {
 

@@ -71,6 +71,7 @@ export function getStoreEffects() {
     plugins.Effects,
     atlasSelection.Effect,
     userInterface.Effects,
+    userInteraction.Effect,
   ]
 }
 

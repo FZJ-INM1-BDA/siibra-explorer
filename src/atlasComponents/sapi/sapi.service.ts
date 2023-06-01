@@ -515,11 +515,11 @@ export class SAPI{
     const map = await this.getLabelledMap(parcellation, template)
 
     for (const regionname in map.indices) {
-      if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
-        if (regionname.includes("left") || regionname.includes("right")) {
-          continue
-        }
-      }
+      // if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
+      //   if (regionname.includes("left") || regionname.includes("right")) {
+      //     continue
+      //   }
+      // }
       for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
         const { providedVolumes } = map.volumes[volumeIdx]
         if (!("neuroglancer/precomputed" in providedVolumes)) {

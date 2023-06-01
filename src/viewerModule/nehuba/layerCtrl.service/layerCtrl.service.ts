@@ -46,8 +46,9 @@ export class NehubaLayerControlService implements OnDestroy{
     combineLatest([
       this.completeNgIdLabelRegionMap$,
       this.customLayers$,
+      this.selectedRegion$,
     ]).pipe(
-      map(([record, layers]) => {
+      map(([record, layers, selectedRegions]) => {
         const returnVal: IColorMap = {}
 
         const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
@@ -72,11 +73,15 @@ export class NehubaLayerControlService implements OnDestroy{
             get: (r: SxplrRegion) => r.color
           }
         })()
+
+        const selectedRegionNameSet = new Set(selectedRegions.map(v => v.name))
         
         for (const [ngId, labelRecord] of Object.entries(record)) {
           for (const [label, region] of Object.entries(labelRecord)) {
             if (!region.color) continue
-            const [ red, green, blue ] = useCm.get(region) || [200, 200, 200]
+            const [ red, green, blue ] = selectedRegionNameSet.size === 0 || selectedRegionNameSet.has(region.name)
+              ? useCm.get(region) || [200, 200, 200]
+              : [255, 255, 255]
             if (!returnVal[ngId]) {
               returnVal[ngId] = {}
             }
