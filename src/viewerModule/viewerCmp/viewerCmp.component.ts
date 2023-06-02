@@ -14,6 +14,7 @@ import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
+import { wait } from "src/util/fn";
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -437,5 +438,15 @@ export class ViewerCmp implements OnDestroy {
         animation: true,
       })
     )
+  }
+
+  @ViewChild('voiFeatureEntryCmp')
+  voiFeatureEntryCmp: EntryComponent
+
+  async pullAllVoi(){
+    if (this.voiFeatureEntryCmp){
+      await wait(320)
+      this.voiFeatureEntryCmp.pullAll()
+    }
   }
 }

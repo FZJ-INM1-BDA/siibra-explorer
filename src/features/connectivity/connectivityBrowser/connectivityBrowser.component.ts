@@ -156,13 +156,15 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
        * on
        * - accordion update
        * - colormap change
-       * - fetching matrix
+       * - fetching matrix flag is true
        * remove custom layer
        */
       merge(
         this.#accordionExpanded$,
         this.colormap$,
-        this.#fetchingMatrix$,
+        this.#fetchingMatrix$.pipe(
+          filter(flag => !!flag)
+        ),
       ).subscribe(() => {
         this.removeCustomLayer()
       }),
@@ -207,6 +209,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
        * on pure connection update, update logchecked box
        */
       this.#pureConnections$.subscribe(v => {
+        if (!v) return
         for (const val of Object.values(v)) {
           if (val > 1) {
             this.displayForm.get("logChecked").enable()
@@ -256,30 +259,32 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
         }
 
         const typedName = getType(selectedType.name)
-        if (!guardType(typedName)) {
-          throw new Error(`type ${typedName} is not in ${validTypes.join(',')}`)
-        }
         const query = {
           parcellation_id: parc.id,
           type: typedName
         }
         this.busy$.next(true)
-        return this.sapi.v3Get(
-          "/feature/RegionalConnectivity",
-          { query }
-        ).pipe(
-          switchMap(resp =>
-            this.sapi.iteratePages(
-              resp,
-              page => this.sapi.v3Get(
-                "/feature/RegionalConnectivity",
-                { query: { ...query, page } }
-              )
-            )
+        return concat(
+          of(
+            [] as PathReturn<"/feature/RegionalConnectivity/{feature_id}">[],
           ),
-          finalize(() => {
-            this.busy$.next(false)
-          })
+          this.sapi.v3Get(
+            "/feature/RegionalConnectivity",
+            { query }
+          ).pipe(
+            switchMap(resp =>
+              this.sapi.iteratePages(
+                resp,
+                page => this.sapi.v3Get(
+                  "/feature/RegionalConnectivity",
+                  { query: { ...query, page } }
+                )
+              )
+            ),
+            finalize(() => {
+              this.busy$.next(false)
+            })
+          )
         )
       })
     )),
@@ -328,7 +333,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
   displaySubject$ = this.selectedDataset$.pipe(
     distinctUntilChanged((o, n) => o?.id === n?.id),
     map(ds => {
-      return (idx: number) => ds.subjects[idx]
+      return (idx: number) => ds?.subjects?.[idx]
     })  
   )
 
@@ -336,7 +341,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
     map(ds => ds ? ds.datasets : [])
   )
 
-  #fetchingMatrix$ = new BehaviorSubject<boolean>(true)
+  #fetchingMatrix$ = new BehaviorSubject<boolean>(false)
 
   #matrixInput$ = combineLatest([
     this.parcellation$,
@@ -346,7 +351,8 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
     map(([ parcellation, form, dss ]) => {
       const {
         selectedDatasetIndex: dsIdx,
-        selectedSubjectIndex: subIdx
+        selectedSubjectIndex: subIdx,
+        selectedView
       } = form
       const ds = dss[dsIdx]
       if (!ds) {
@@ -360,7 +366,8 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
       return {
         parcellation,
         feature_id: ds.id,
-        subject
+        subject,
+        selectedView
       }
     }),
     shareReplay(1),
@@ -379,26 +386,33 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
         {
           query: {
             parcellation_id: parcellation.id,
-            subject,
+            ...(input.selectedView === "average"
+            ? {}
+            : { subject })
           },
           path: {
             feature_id
           }
         }
+      ).pipe(
+        finalize(() => {
+          this.#fetchingMatrix$.next(false)
+        })
       )
     }),
-    tap(() => this.#fetchingMatrix$.next(false)),
     shareReplay(1),
   )
 
   #pureConnections$ = this.#matrixInput$.pipe(
-    filter(v => !!v),
-    switchMap(({ subject }) =>
+    switchMap(matrixInput =>
       this.#selectedMatrix$.pipe(
-        filter(v => !!v.matrices[subject]),
         withLatestFrom(this.region$),
         map(([ v, region ]) => {
-          const b = v.matrices[subject]
+          const matrixKey = matrixInput?.selectedView === "average" ? "_average" : matrixInput?.subject
+          if (!v || !matrixInput || !v.matrices?.[matrixKey]) {
+            return null
+          }
+          const b = v.matrices[matrixKey]
           const foundIdx = b.columns.findIndex(v => v['name'] === region.name)
           if (typeof foundIdx !== 'number') {
             return null
@@ -429,6 +443,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
           distinctUntilChanged()
         )
       ]).pipe(
+        filter(conn => !!conn),
         map(([ conn, flag ]) => processProfile(conn, flag))
       )
     ))
@@ -543,12 +558,6 @@ function processProfile(areas: Record<string, number>, logFlag=false): Connected
 
 function getType(name: string) {
   return name.split(".").slice(-1)[0]
-}
-
-const validTypes = ["FunctionalConnectivity", "StreamlineCounts", "StreamlineLengths"]
-
-function guardType(name: unknown): name is "FunctionalConnectivity" | "StreamlineCounts" | "StreamlineLengths" {
-  return typeof name === "string" && validTypes.includes(name)
 }
 
 type ConnectedArea = {

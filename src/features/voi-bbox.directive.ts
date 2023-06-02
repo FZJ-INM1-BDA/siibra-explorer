@@ -47,7 +47,7 @@ export class VoiBboxDirective implements OnDestroy {
   
   @Input()
   set features(feats: Feature[]){
-    this.#voiFeatures = feats.filter(isVoiData)
+    this.#voiFeatures = (feats || []).filter(isVoiData)
     this.#features$.next(this.#voiFeatures)
   }
   get features(): VoiFeature[]{

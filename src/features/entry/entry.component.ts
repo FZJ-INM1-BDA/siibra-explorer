@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { distinctUntilChanged, map, scan, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
-import { BehaviorSubject, combineLatest, concat, merge, of, Subscription } from 'rxjs';
+import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 
@@ -33,56 +33,63 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
 })
 export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
 
-  private _features$ = new BehaviorSubject<TranslatedFeature[]>([])
-  features$ = this._features$.pipe(
-    shareReplay(1)
-  )
-
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
-
-  public busyTallying$ = new BehaviorSubject<boolean>(false)
-  public totals$ = new BehaviorSubject<number>(null)
 
   constructor(private sapi: SAPI, private store: Store) {
     super()
   }
 
   #subscriptions: Subscription[] = []
+  #catAccDirs = new Subject<CategoryAccDirective[]>()
+  features$ = this.#catAccDirs.pipe(
+    switchMap(dirs => concat(
+      of([] as TranslatedFeature[]),
+      merge(...dirs.map((dir, idx) =>
+        dir.datasource$.pipe(
+          switchMap(ds =>  ds.data$),
+          map(val => ({ val, idx }))
+        ))
+      ).pipe(
+        map(({ idx, val }) => ({ [idx.toString()]: val })),
+        scan((acc, curr) => ({ ...acc, ...curr })),
+        map(record => Object.values(record).flatMap(v => v))
+      )
+    )),
+    shareReplay(1),
+  )
 
-  private _busy$ = new BehaviorSubject<boolean>(false)
-  busy$ = this._busy$.pipe(
+  busy$ = this.#catAccDirs.pipe(
+    switchMap(dirs => combineLatest(
+      dirs.map(dir => dir.isBusy$)
+    )),
+    map(flags => flags.some(flag => flag)),
+    distinctUntilChanged(),
     shareReplay(1)
   )
 
-  ngOnDestroy(): void {
-    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
-  }
-  ngAfterViewInit(): void {
-    const catAccDirs$ = merge(
-      of(null),
-      this.catAccDirs.changes
-    ).pipe(
-      map(() => Array.from(this.catAccDirs))
-    )
-    this.#subscriptions.push(
-      catAccDirs$.pipe(
-        switchMap(dirs => combineLatest(
-          dirs.map(dir => dir.isBusy$)
-        )),
-        map(flags => flags.some(flag => flag)),
-        distinctUntilChanged(),
-      ).subscribe(value => {
-        this._busy$.next(value)
-      }),
-      catAccDirs$.pipe(
-        tap(() => this.busyTallying$.next(true)),
-        switchMap(catArrDirs => merge(
-          ...catArrDirs.map((dir, idx) => dir.total$.pipe(
-            map(val => ({ idx, val }))
-          ))
-        )),
-        
+  public busyTallying$ = this.#catAccDirs.pipe(
+    switchMap(arr => concat(
+      of(true),
+      forkJoin(
+        arr.map(dir => dir.total$)
+      ).pipe(
+        map(() => false)
+      )
+    )),
+    shareReplay(1)
+  )
+
+  public totals$ = this.#catAccDirs.pipe(
+    switchMap(arr => concat(
+      of(0),
+      merge(
+        ...arr.map((dir, idx) =>
+          dir.total$.pipe(
+            map(val => ({ val, idx }))
+          )
+        )
+      ).pipe(
         map(({ idx, val }) => ({ [idx.toString()]: val })),
         scan((acc, curr) => ({ ...acc, ...curr })),
         map(record => {
@@ -92,11 +99,47 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
           }
           return tally
         }),
-        tap(num => {
-          this.busyTallying$.next(false)
-          this.totals$.next(num)
-        }),
-      ).subscribe(),
+      )
+    ))
+  )
+
+  ngOnDestroy(): void {
+    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
+  }
+  ngAfterViewInit(): void {
+    this.#subscriptions.push(
+      merge(
+        of(null),
+        this.catAccDirs.changes
+      ).pipe(
+        map(() => Array.from(this.catAccDirs))
+      ).subscribe(dirs => this.#catAccDirs.next(dirs)),
+
+      this.#pullAll.pipe(
+        debounceTime(320),
+        withLatestFrom(this.#catAccDirs),
+        switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
+      ).subscribe(async dss => {
+        await Promise.all(
+          dss.map(async ds => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+              try {
+                await ds.pull()
+              } catch (e) {
+                if (e instanceof DsExhausted) {
+                  console.log('exhausted')
+                  break
+                }
+                if (e instanceof IsAlreadyPulling ) {
+                  continue
+                }
+                throw e
+              }
+            }
+          })
+        )
+      })
     )
   }
 
@@ -167,28 +210,8 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     }
   }
 
-  async pullAll(){
-    const dss = Array.from(this.catAccDirs).map(catAcc => catAcc.datasource)
-
-    this._features$.next([])
-    await Promise.all(
-      dss.map(async ds => {
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          try {
-            await ds.pull()
-          } catch (e) {
-            if (e instanceof DsExhausted) {
-              break
-            }
-            if (e instanceof IsAlreadyPulling ) {
-              continue
-            }
-            throw e
-          }
-        }
-      })
-    )
-    this._features$.next(dss.flatMap(ds => ds.finalValue))
+  #pullAll = new Subject()
+  pullAll(){
+    this.#pullAll.next(null)
   }
 }

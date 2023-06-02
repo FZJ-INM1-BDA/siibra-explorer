@@ -287,17 +287,7 @@ class TranslateV3 {
       segLayerSpec.layer.labelIndicies.push(label)
       segLayerSpec.region.push(region)
     }
-    const { ['@id']: mapId } = map
     for (const regionname in map.indices) {
-      /**
-       * temporary fix
-       * see https://github.com/FZJ-INM1-BDA/siibra-python/issues/317
-       */
-      if (mapId === "siibra-map-v0.0.1_bigbrain-cortical-labelled") {
-        if (regionname.includes("left") || regionname.includes("right")) {
-          continue
-        }
-      }
       for (const index of map.indices[regionname]) {
         const { volume:volumeIdx=0, fragment, label } = index
         if (!label) {

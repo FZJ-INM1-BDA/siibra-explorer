@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.3'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.4'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -515,11 +515,11 @@ export class SAPI{
     const map = await this.getLabelledMap(parcellation, template)
 
     for (const regionname in map.indices) {
-      if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
-        if (regionname.includes("left") || regionname.includes("right")) {
-          continue
-        }
-      }
+      // if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
+      //   if (regionname.includes("left") || regionname.includes("right")) {
+      //     continue
+      //   }
+      // }
       for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
         const { providedVolumes } = map.volumes[volumeIdx]
         if (!("neuroglancer/precomputed" in providedVolumes)) {

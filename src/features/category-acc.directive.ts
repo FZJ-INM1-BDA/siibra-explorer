@@ -118,7 +118,8 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
           return this.datasource
         }),
       )
-    })
+    }),
+    shareReplay(1),
   )
 
   constructor(){
