@@ -1124,6 +1124,7 @@
     class="sxplr-pe-all mat-elevation-z8"
     [template]="view.selectedTemplate"
     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
     #voiFeatureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
 
@@ -1141,7 +1142,7 @@
     iav-switch
     [iav-switch-state]="false"
     #voiSwitch="iavSwitch"
-    (iav-switch-event)="$event && voiFeatureEntryCmp.pullAll()"
+    (iav-switch-event)="$event && pullAllVoi()"
     (click)="voiSwitch.toggle()">
 
     <ng-template [ngIf]="voiSwitch.switchState$ | async" [ngIfElse]="chevronCollapseTmpl">
@@ -1173,6 +1174,7 @@
 
 <div
   sxplr-sapiviews-core-space-boundingbox
+  (sxplr-sapiviews-core-space-boundingbox-changed)="pullAllVoi()"
   [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
   [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"
   [sxplr-sapiviews-core-space-boundingbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
