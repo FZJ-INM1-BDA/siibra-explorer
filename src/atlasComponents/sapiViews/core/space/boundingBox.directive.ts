@@ -1,4 +1,4 @@
-import { Directive, Input, OnChanges } from "@angular/core";
+import { Directive, Input, OnChanges, Output } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { BoundingBox, SxplrTemplate, SxplrAtlas } from "src/atlasComponents/sapi/sxplrTypes"
@@ -60,6 +60,7 @@ export class SapiViewsCoreSpaceBoundingBox implements OnChanges{
     bbox: null
   })
 
+  @Output('sxplr-sapiviews-core-space-boundingbox-changed')
   public bbox$: Observable<{
     atlas: SxplrAtlas
     space: SxplrTemplate
