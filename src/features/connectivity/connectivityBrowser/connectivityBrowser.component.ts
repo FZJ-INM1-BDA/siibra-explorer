@@ -156,13 +156,15 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
        * on
        * - accordion update
        * - colormap change
-       * - fetching matrix
+       * - fetching matrix flag is true
        * remove custom layer
        */
       merge(
         this.#accordionExpanded$,
         this.colormap$,
-        this.#fetchingMatrix$,
+        this.#fetchingMatrix$.pipe(
+          filter(flag => !!flag)
+        ),
       ).subscribe(() => {
         this.removeCustomLayer()
       }),
