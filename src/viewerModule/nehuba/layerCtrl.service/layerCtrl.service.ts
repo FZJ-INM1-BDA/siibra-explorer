@@ -54,6 +54,8 @@ export class NehubaLayerControlService implements OnDestroy{
         const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
         const cmBaseLayers = layers.filter(l => l.clType === "baselayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
         
+        const usingCustomCM = cmCustomLayers.length > 0
+
         const useCm = (() => {
           /**
            * if custom layer exist, use the last custom layer
@@ -79,7 +81,12 @@ export class NehubaLayerControlService implements OnDestroy{
         for (const [ngId, labelRecord] of Object.entries(record)) {
           for (const [label, region] of Object.entries(labelRecord)) {
             if (!region.color) continue
-            const [ red, green, blue ] = selectedRegionNameSet.size === 0 || selectedRegionNameSet.has(region.name)
+            /**
+             * if custom color map is used, do *not* selectively paint selected region
+             * custom color map can choose to subscribe to selected regions, and update the color map accordingly, 
+             * if they wish to respect the selected regions
+             */
+            const [ red, green, blue ] = usingCustomCM || selectedRegionNameSet.size === 0 || selectedRegionNameSet.has(region.name)
               ? useCm.get(region) || [200, 200, 200]
               : [255, 255, 255]
             if (!returnVal[ngId]) {
