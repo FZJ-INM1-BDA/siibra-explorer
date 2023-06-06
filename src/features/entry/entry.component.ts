@@ -128,7 +128,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
                 await ds.pull()
               } catch (e) {
                 if (e instanceof DsExhausted) {
-                  console.log('exhausted')
                   break
                 }
                 if (e instanceof IsAlreadyPulling ) {

@@ -162,6 +162,9 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
      * swc seem to scale with voxelSize... strangely enough
      * voxelSize nm / voxel -> goal is 1 voxel/um
      * 1e3 / voxelSize
+     * 
+     * update: nope... it seems ... at least the SWC sent so far
+     * 
      */
     const scaleUmToVoxelFixed = [
       voxelSize[0],
@@ -171,12 +174,13 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     // NG translation works on nm scale
     const scaleUmToNm = 1e3
     const modA = mat3.fromValues(
-      scaleUmToVoxelFixed[0], 0, 0,
-      0, scaleUmToVoxelFixed[1], 0,
-      0, 0, scaleUmToVoxelFixed[2]
+      scaleUmToNm, 0, 0,
+      0, scaleUmToNm, 0,
+      0, 0, scaleUmToNm
     )
     mat3.mul(modA, modA, [...A[0], ...A[1], ...A[2]])
-    const modb = vec3.scale(vec3.create(), b, scaleUmToNm)
+    const modb = vec3.mul(vec3.create(), b, [ scaleUmToNm, scaleUmToNm, scaleUmToNm])
+    vec3.scale(vec3.create(), b, scaleUmToNm)
     const transform = [
       [...modA.slice(0, 3), modb[0]] as TVec4,
       [...modA.slice(3, 6), modb[1]] as TVec4,

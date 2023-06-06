@@ -10,6 +10,9 @@ import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDial
 import { IMessagingActions, IMessagingActionTmpl, WINDOW_MESSAGING_HANDLER_TOKEN, IWindowMessaging } from './types'
 import { TYPE as NMV_TYPE, processJsonLd as nmvProcess } from './nmvSwc/index'
 import { TYPE as NATIVE_TYPE, processJsonLd as nativeProcess } from './native'
+import { BoothVisitor, JRPCRequest, ListenerChannel } from "src/api/jsonrpc"
+import { ApiService } from "src/api";
+import { ApiBoothEvents } from "src/api/service";
 
 export const IAV_POSTMESSAGE_NAMESPACE = `ebrains:iav:`
 
@@ -18,11 +21,21 @@ export const MANAGED_METHODS = [
   'openminds:nmv:unloadSwc'
 ]
 
+class WindowOpenerListener implements ListenerChannel {
+  constructor(
+    public registerLeaveCb: () => void,
+    public notify: (payload: JRPCRequest<unknown, unknown>) => void
+  ){}
+  
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class MessagingService {
+
+  private originListenerMap = new Map<string, {listener: WindowOpenerListener, visitor: BoothVisitor<ApiBoothEvents>}>()
 
   private whiteListedOrigins = new Set()
   private pendingRequests: Map<string, Promise<boolean>> = new Map()
@@ -34,6 +47,7 @@ export class MessagingService {
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
     private worker: AtlasWorkerService,
+    private apiService: ApiService,
     @Optional() @Inject(WINDOW_MESSAGING_HANDLER_TOKEN) private messagingHandler: IWindowMessaging,
   ){
     
@@ -64,7 +78,27 @@ export class MessagingService {
       const src = source as Window
       const { id } = data
       try {
-        const result = await this.handleMessage({ data, origin })
+        let result = await this.handleMessage({ data, origin })
+        if (!this.originListenerMap.has(origin)) {
+          const listener = new WindowOpenerListener(() => {
+            this.apiService.broadcastCh.listeners
+          }, val => src.postMessage(val, origin))
+          
+          const visitor = this.apiService.booth.handshake()
+          this.originListenerMap.set(origin, {listener, visitor})
+
+          this.apiService.broadcastCh.addListener(listener)
+          
+
+          /**
+           * if result was not yet populated, try populating it with 
+           * siibra-explorer api
+           */
+        }
+        if (!result) {
+          const { visitor } = this.originListenerMap.get(origin)
+          return await visitor.request(data)
+        }
         src.postMessage({
           id,
           jsonrpc: '2.0',
@@ -94,27 +128,25 @@ export class MessagingService {
 
   public async handleMessage({ data, origin }) {
     const { method, param } = data
-    
-    if (!method) return
-    if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
-    const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
-
     /**
      * if ping method, respond pong method
      */
-    if (strippedMethod === 'ping') {
+    if (method === 'ping') {
       return 'pong'
     }
 
     /**
      * otherwise, check permission
      */
-
     const allow = await this.checkOrigin({ origin })
     if (!allow) throw ({
       code: 403,
       message: 'User declined'
     })
+    
+    if (!method) return
+    if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
+    const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
 
     // TODO 
     // in future, check if in managed_methods
@@ -212,7 +244,7 @@ export class MessagingService {
       return await this.processJsonld(param)
     }
 
-    throw ({ code: 404, message: 'Method not found' })
+    return
   }
 
   async checkOrigin({ origin }): Promise<boolean> {
