@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import { getExportNehuba } from "src/util/fn";
+import { getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -110,8 +110,7 @@ export class SAPI{
               .then(flag => {
                 if (flag) rs(endpt)
               })
-              // eslint-disable-next-line  @typescript-eslint/no-empty-function
-              .catch(() => {})
+              .catch(noop)
           }
         })
         try {

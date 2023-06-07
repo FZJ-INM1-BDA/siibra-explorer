@@ -1,10 +1,7 @@
 import { Inject, Injectable, Optional } from "@angular/core";
 import { Observable } from "rxjs";
 import { MatDialog } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
-
-import { getUuid } from "src/util/fn";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { getUuid, noop } from "src/util/fn";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 
 import { IMessagingActions, IMessagingActionTmpl, WINDOW_MESSAGING_HANDLER_TOKEN, IWindowMessaging } from './types'
@@ -45,8 +42,6 @@ export class MessagingService {
   
   constructor(
     private dialog: MatDialog,
-    private snackbar: MatSnackBar,
-    private worker: AtlasWorkerService,
     private apiService: ApiService,
     @Optional() @Inject(WINDOW_MESSAGING_HANDLER_TOKEN) private messagingHandler: IWindowMessaging,
   ){
@@ -80,9 +75,10 @@ export class MessagingService {
       try {
         const result = await this.handleMessage({ data, origin })
         if (!this.originListenerMap.has(origin)) {
-          const listener = new WindowOpenerListener(() => {
-            this.apiService.broadcastCh.listeners
-          }, val => src.postMessage(val, origin))
+          const listener = new WindowOpenerListener(
+            noop,
+            val => src.postMessage(val, origin)
+          )
           
           const visitor = this.apiService.booth.handshake()
           this.originListenerMap.set(origin, {listener, visitor})

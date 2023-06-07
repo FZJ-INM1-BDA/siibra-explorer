@@ -17,6 +17,9 @@ export function getDebug() {
   return (window as any).__DEBUG__
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-empty-function
+export function noop(){}
+
 export async function getExportNehuba() {
   // eslint-disable-next-line no-constant-condition
   while (true) {
