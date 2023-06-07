@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';

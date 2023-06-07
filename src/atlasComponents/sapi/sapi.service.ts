@@ -13,7 +13,6 @@ import {
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
-import { IDS } from "./constants";
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -112,7 +111,7 @@ export class SAPI{
                 if (flag) rs(endpt)
               })
               // eslint-disable-next-line  @typescript-eslint/no-empty-function
-              .catch(e => {})
+              .catch(() => {})
           }
         })
         try {
@@ -351,7 +350,7 @@ export class SAPI{
             template.id,
             "LABELLED"
           ).pipe(
-            catchError((err, obs) => of(null as SxplrParcellation)),
+            catchError(() => of(null as SxplrParcellation)),
             map(_map => _map && parc)
           )
         )
@@ -429,7 +428,7 @@ export class SAPI{
             space.id,
             "LABELLED"
           ).pipe(
-            catchError((err, obs) => of(null as SxplrTemplate)),
+            catchError(() => of(null as SxplrTemplate)),
             map(_map => _map && space)
           )
         )
@@ -520,7 +519,7 @@ export class SAPI{
       //     continue
       //   }
       // }
-      for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
+      for (const { volume: volumeIdx, fragment } of map.indices[regionname]) {
         const { providedVolumes } = map.volumes[volumeIdx]
         if (!("neuroglancer/precomputed" in providedVolumes)) {
           continue

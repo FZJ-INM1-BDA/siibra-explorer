@@ -16,11 +16,6 @@ function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
   return (obj.atlas || obj.template || obj.parcellation) && (!obj.requested || isATPGuard(obj.requested))
 }
 
-const banListParcName = new Set([
-  "VEP Atlas",
-  "Desikan-Killiany 2006"
-])
-
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
   templateUrl: './wrapper.template.html',

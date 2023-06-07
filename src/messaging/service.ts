@@ -78,7 +78,7 @@ export class MessagingService {
       const src = source as Window
       const { id } = data
       try {
-        let result = await this.handleMessage({ data, origin })
+        const result = await this.handleMessage({ data, origin })
         if (!this.originListenerMap.has(origin)) {
           const listener = new WindowOpenerListener(() => {
             this.apiService.broadcastCh.listeners
@@ -200,45 +200,6 @@ export class MessagingService {
 
     // TODO combine api service and messaging service into one
     // and implement it properly
-
-    // if (method === 'viewerHandle:add3DLandmarks') {
-    //   this.apiService.interactiveViewer.viewerHandle.add3DLandmarks(param)
-    //   return 'OK'
-    // }
-
-    // if (method === 'viewerHandle:remove3DLandmarks') {
-    //   this.apiService.interactiveViewer.viewerHandle.remove3DLandmarks(param)
-    //   return 'OK'
-    // }
-
-    /**
-     * TODO use loadResource in the future
-     */
-    if (method === '_tmp:plotly') {
-      const isLoadingSnack = this.snackbar.open(`Loading plotly mesh ...`)
-      const resp = await this.worker.sendMessage({
-        method: `PROCESS_PLOTLY`,
-        param
-      })
-      isLoadingSnack?.dismiss()
-      const meshId = 'bobby'
-      /**
-       * TODO re-enable plotly VTK mesh
-       */
-      
-      // if (false) {
-      //   const { objectUrl, customFragmentColor } = resp.result || {}
-      //   this.loadMesh({
-      //     type: 'VTK',
-      //     id: meshId,
-      //     url: objectUrl,
-      //     customFragmentColor
-      //   })
-      // } else {
-      //   this.snackbar.open(`Error: loadMesh method not injected.`)
-      // }
-      return 'OK'
-    }
 
     if (MANAGED_METHODS.indexOf(method) >= 0) {
       return await this.processJsonld(param)

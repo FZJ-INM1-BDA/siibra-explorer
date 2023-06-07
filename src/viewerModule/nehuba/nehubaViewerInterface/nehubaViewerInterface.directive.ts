@@ -1,8 +1,8 @@
-import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
+import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef } from "@angular/core";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, asyncScheduler, combineLatest } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, scan, map, throttleTime, switchMap, take, tap } from "rxjs/operators";
+import { Subscription, Observable, combineLatest } from "rxjs";
+import { distinctUntilChanged, filter, debounceTime, scan, map, switchMap, take } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
@@ -313,19 +313,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
         map((map: Map<string, any>) => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId)),
       ).subscribe(val => this.handleMouseoverSegments(val)),
 
-      this.nehubaViewerInstance.mouseoverLandmarkEmitter.pipe(
-        distinctUntilChanged()
-      ).subscribe(label => {
-        console.warn(`mouseover landmark`, label)
-      }),
-
-      this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
-        throttleTime(160, asyncScheduler, {trailing: true}),
-      ).subscribe(label => {
-        const idx = Number(label.replace('label=', ''))
-        // TODO 
-        // this is exclusive for vtk layer
-      }),
 
       combineLatest([
         this.nehubaViewerInstance.mousePosInVoxel$,

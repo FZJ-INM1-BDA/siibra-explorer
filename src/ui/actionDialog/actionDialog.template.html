@@ -28,8 +28,7 @@
     <button *ngSwitchCase="'mat-flat-button'"
       mat-flat-button
       [color]="action.color || 'default'"
-      [mat-dialog-close]="action.dismiss && action"
-      (click)="actionHandler($event, action)">
+      [mat-dialog-close]="action.dismiss && action">
       <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
     </button>
 
@@ -37,8 +36,7 @@
     <button *ngSwitchCase="'mat-raised-button'"
       mat-raised-button
       [color]="action.color || 'default'"
-      [mat-dialog-close]="action.dismiss && action"
-      (click)="actionHandler($event, action)">
+      [mat-dialog-close]="action.dismiss && action">
       <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
     </button>
 
@@ -46,8 +44,7 @@
     <button *ngSwitchCase="'mat-stroked-button'"
       mat-stroked-button
       [color]="action.color || 'default'"
-      [mat-dialog-close]="action.dismiss && action"
-      (click)="actionHandler($event, action)">
+      [mat-dialog-close]="action.dismiss && action">
       <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
     </button>
 
@@ -55,8 +52,7 @@
     <button *ngSwitchDefault
       mat-button
       [color]="action.color || 'default'"
-      [mat-dialog-close]="action.dismiss && action"
-      (click)="actionHandler($event, action)">
+      [mat-dialog-close]="action.dismiss && action">
       <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>    
     </button>
   </ng-container>

@@ -1,4 +1,4 @@
-import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TCallbackFunction, TNgAnnotationEv, TSandsPoint, TToolType } from "./type";
+import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, INgAnnotationTypes, TAnnotationEvent, TBaseAnnotationGeomtrySpec, TCallbackFunction, TSandsPoint, TToolType } from "./type";
 import { Observable, Subject, Subscription } from "rxjs";
 import { Directive, OnDestroy } from "@angular/core";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";

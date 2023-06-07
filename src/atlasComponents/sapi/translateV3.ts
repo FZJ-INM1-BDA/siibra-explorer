@@ -40,7 +40,7 @@ class TranslateV3 {
   }
   async translateParcellation(parcellation:PathReturn<"/parcellations/{parcellation_id}">): Promise<SxplrParcellation> {
     const ds = await Promise.all((parcellation.datasets || []).map(ds => this.translateDs(ds)))
-    const { name, ...rest } = ds[0] || {}
+    const { ...rest } = ds[0] || {}
     const { ['@id']: prevId } = parcellation.version?.prev || {}
     return {
       id: parcellation["@id"],
@@ -147,7 +147,7 @@ class TranslateV3 {
     for (const defaultImage of validImages) {
       
       const { providedVolumes } = defaultImage
-      const { "neuroglancer/precomputed": precomputedVol, ...rest } = await this.#extractNgPrecompUnfrag(providedVolumes)
+      const { "neuroglancer/precomputed": precomputedVol } = await this.#extractNgPrecompUnfrag(providedVolumes)
       
       if (!precomputedVol) {
         console.error(`neuroglancer/precomputed data source has not been found!`)

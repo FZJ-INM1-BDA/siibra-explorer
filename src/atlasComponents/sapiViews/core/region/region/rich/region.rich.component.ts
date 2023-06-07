@@ -28,8 +28,6 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   @Output('sxplr-sapiviews-core-region-region-rich-feature-clicked')
   featureClicked = new EventEmitter<Feature>()
 
-  public expandedPanel: string
-
   constructor(
     sapi: SAPI,
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>,
@@ -39,16 +37,6 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
 
   handleRegionalFeatureClicked(feat: Feature) {
     this.featureClicked.emit(feat)
-  }
-
-  // eslint-disable-next-line  @typescript-eslint/no-empty-function
-  handleExpansionPanelClosedEv(title: string){
-    this.expandedPanel = null
-  }
-
-  // eslint-disable-next-line  @typescript-eslint/no-empty-function
-  handleExpansionPanelAfterExpandEv(title: string) {
-    this.expandedPanel = title
   }
 
   activePanelTitles$: Observable<string[]> = new Subject()

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked, OnChanges, SecurityContext } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, OnChanges, SecurityContext } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import * as showdown from 'showdown'
 

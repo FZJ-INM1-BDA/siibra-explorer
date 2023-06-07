@@ -14,7 +14,7 @@ import { TranslatedFeature } from '../list/list.directive';
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
   for (const item of categories) {
-    const { category, ...rest } = item
+    const { category } = item
     if (!category) continue
     if (typeof category !== "string") continue
     if (!returnVal[category]) {

@@ -26,15 +26,6 @@ export async function getExportNehuba() {
   }
 }
 
-const recursiveFlatten = (region, {ngId}) => {
-  return [{
-    ngId,
-    ...region,
-  }].concat(
-    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
-  )
-}
-
 export function getUuid(){
   return crypto.getRandomValues(new Uint32Array(1))[0].toString(16)
 }
@@ -423,7 +414,7 @@ export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
 export function defaultdict<T>(fn: () => T): Record<string, T> {
   const obj = {}
   return new Proxy(obj, {
-    get(target, prop, rec) {
+    get(target, prop, _rec) {
       if (!(prop in target)){
         target[prop] = fn()
       }

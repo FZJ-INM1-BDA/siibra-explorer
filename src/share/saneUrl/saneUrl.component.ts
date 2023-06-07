@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Input } from "@angular/core";
 import { Observable, merge, of, Subscription, BehaviorSubject, combineLatest } from "rxjs";
-import { startWith, mapTo, map, debounceTime, switchMap, catchError, shareReplay, filter, tap, takeUntil, distinctUntilChanged } from "rxjs/operators";
+import { startWith, mapTo, map, debounceTime, switchMap, catchError, shareReplay, filter, tap, distinctUntilChanged } from "rxjs/operators";
 import { UntypedFormControl } from "@angular/forms";
 import { ErrorStateMatcher } from "@angular/material/core";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -88,7 +88,7 @@ export class SaneUrl implements OnDestroy{
         ? of(false)
         : this.svc.getKeyVal(val).pipe(
           mapTo(false),
-          catchError((err, obs) => {
+          catchError((err) => {
             if (err instanceof NotFoundError) return of(true)
             return of(false)
           })
@@ -164,9 +164,7 @@ export class SaneUrl implements OnDestroy{
       this.customUrl.value,
       this.stateTobeSaved
     ).subscribe(
-      resp => {
-        this.savingProgress$.next(ESavingProgress.DONE)
-      },
+      () => this.savingProgress$.next(ESavingProgress.DONE),
       err => {
         this.customUrl.enable()
 
