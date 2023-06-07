@@ -76,7 +76,7 @@ export class MessagingService {
       if (/^webpack/.test(data.type)) return
       if (!data) return
       const { method } = data
-      if (RECOGNISED_NAMESPACES.every(namespace => method.indexOf(namespace) !== 0)) {
+      if (RECOGNISED_NAMESPACES.every(namespace => (method || '').indexOf(namespace) !== 0)) {
         return
       }
       const src = source as Window
