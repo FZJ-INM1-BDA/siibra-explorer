@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from "@angular/core";
 import { concat, EMPTY, NEVER, Observable, of } from "rxjs";
-import { delay, exhaustMap, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { delay, exhaustMap, shareReplay, switchMap, take } from "rxjs/operators";
 import { TNehubaViewerUnit } from "../constants";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
 

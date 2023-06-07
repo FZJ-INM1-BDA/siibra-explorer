@@ -34,7 +34,7 @@ export class AtlasWorkerService {
     ).toPromise()
 
     const { data: returnData } = message as MessageEvent
-    const { id, error, ...rest } = returnData
+    const { error, ...rest } = returnData
     if (error) {
       throw new Error(error.message || error)
     }

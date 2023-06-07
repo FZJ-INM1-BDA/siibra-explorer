@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, Output, SimpleChanges } from "@angular/core";
+import { Directive, EventEmitter, Input, Output } from "@angular/core";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
@@ -72,7 +72,7 @@ export class SapiViewsCoreRegionRegionBase {
     map(([ atp, region ]) => ({ ...atp, region }))
   )
 
-  ngOnChanges(sc: SimpleChanges): void {
+  ngOnChanges(): void {
     const { atlas, template, parcellation } = this
     this.ATP$.next({ atlas, template, parcellation })
   }
@@ -97,7 +97,7 @@ export class SapiViewsCoreRegionRegionBase {
        */
       const rgb = SAPIRegion.GetDisplayColor(this.region) || [200, 200, 200]
       this.regionRgbString = `rgb(${rgb.join(',')})`
-      const [_h, _s, l] = rgbToHsl(...rgb)
+      const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
       this.regionDarkmode = l < 0.4
       
       /**

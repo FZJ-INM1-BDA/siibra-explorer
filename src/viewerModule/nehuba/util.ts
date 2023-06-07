@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core'
 import { Observable, pipe } from 'rxjs'
 import { filter, scan, take } from 'rxjs/operators'
-import { getExportNehuba, getViewer } from 'src/util/fn'
+import { getViewer } from 'src/util/fn'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { userInterface } from 'src/state'
 

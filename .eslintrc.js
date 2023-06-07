@@ -20,8 +20,9 @@ module.exports = {
         "requireLast": false
       }
     }],
-    "@typescript-eslint/no-unused-vars": ["warn", {
-      "argsIgnorePattern": "^_"
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
     }],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "off",

@@ -13,12 +13,12 @@ const cssColorToHsl = (input: string) => {
       parseInt(match[2]),
       parseInt(match[3]),
     ]
-    const [_h, _s, l] = rgbToHsl(...rgb)
+    const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
     return l
   }
   if (/hsl/i.test(input)) {
     const match = /\((.*)\)/.exec(input)
-    const [h, s, l] = match[1].split(",")
+    const [ /* _h */, /* _s */, l] = match[1].split(",")
     const trimmedL = l.trim()
     if (/%$/.test(trimmedL)) {
       const match = /^([0-9]+)%/.exec(trimmedL)
@@ -27,7 +27,7 @@ const cssColorToHsl = (input: string) => {
   }
   if (/^#/i.test(input) && input.length === 7) {
     const [r, g, b] = hexToRgb(input)
-    const [_h, _s, l] = rgbToHsl(r, g, b)
+    const [ /*_h */, /*_s */, l] = rgbToHsl(r, g, b)
     return l
   }
   throw new Error(`Cannot parse css color: ${input}`)

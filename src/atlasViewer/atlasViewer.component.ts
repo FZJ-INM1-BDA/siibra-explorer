@@ -18,7 +18,7 @@ import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import { ARIA_LABELS, CONST } from 'common/constants'
+import { CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { ClickInterceptorService } from "src/glue";
@@ -28,12 +28,6 @@ import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
 
-/**
- * TODO
- * check against auxlillary mesh indicies, to only filter out aux indicies
- */
-const filterFn = (segment) => typeof segment.segment !== 'string'
-const compareFn = (it, item) => it.name === item.name
 
 @Component({
   selector: 'atlas-viewer',
@@ -49,7 +43,6 @@ const compareFn = (it, item) => it.name === item.name
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
-  public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 

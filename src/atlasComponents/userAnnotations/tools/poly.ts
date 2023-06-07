@@ -1,7 +1,7 @@
-import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TNgAnnotationEv, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
+import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
 import { Point, TPointJsonSpec } from './point'
 import { Directive, OnDestroy } from "@angular/core";
-import { merge, Observable, Subject, Subscription } from "rxjs";
+import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
 
@@ -129,7 +129,7 @@ export class Polygon extends IAnnotationGeometry{
   }
 
   parseNgAnnotationObj(pickedAnnotationId: string, pickedOffset: number): { edge: [number, number], edgeIdx: number, point: Point, pointIdx: number } {
-    const [ id, edgeIdx, _shouldBeZero ] = pickedAnnotationId.split('_')
+    const [ id, edgeIdx, /* _shouldBeZero */ ] = pickedAnnotationId.split('_')
     if (id !== this.id) return null
 
     if (pickedOffset === 0) {

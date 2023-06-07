@@ -1,4 +1,4 @@
-import { components, paths, operations } from "./schemaV3"
+import { components, paths } from "./schemaV3"
 
 export type SapiAtlasModel = PathReturn<"/atlases/{atlas_id}">
 export type SapiSpaceModel = PathReturn<"/spaces/{space_id}">
@@ -22,6 +22,7 @@ type _FeatureType<FeatureRoute extends SapiRoute> = FeatureRoute extends `/featu
     ? never
     : FT extends "{feature_id}"
       ? never
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       : FT extends `${infer _FT}/{${infer _FID}}`
         ? never
         : FT

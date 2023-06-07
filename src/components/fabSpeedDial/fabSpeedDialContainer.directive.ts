@@ -1,4 +1,4 @@
-import { Directive, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding } from "@angular/core";
+import { Directive, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleChanges, HostBinding } from "@angular/core";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 import { Subscription } from "rxjs";
 import { SCALE_ORIGIN } from './fabSpeedDial.service'

@@ -22,7 +22,7 @@ export class ActionDialog{
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) data: any
   ){
-    const { config, content, template, actions = [] } = data || {}
+    const { config, content, actions = [] } = data || {}
     const { sameLine = false } = config || {}
 
     this.content = content
@@ -30,7 +30,4 @@ export class ActionDialog{
     this.actions = actions
   }
 
-  actionHandler(event: MouseEvent, action: IDialogAction){
-    // TODO fill in the actionHandler
-  }
 }

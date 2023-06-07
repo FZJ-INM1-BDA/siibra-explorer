@@ -2,7 +2,7 @@ import { Component, HostListener, Inject, OnDestroy, Output, EventEmitter, Optio
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
-import { distinctUntilChanged, map, mapTo, shareReplay, startWith, switchMap, switchMapTo, tap } from "rxjs/operators";
+import { distinctUntilChanged, map, mapTo, shareReplay, startWith, switchMap, switchMapTo } from "rxjs/operators";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../util";
 import { getDateString } from 'common/util'
 import { getUuid } from "src/util/fn";

@@ -2,7 +2,7 @@ import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { Point } from "./point";
-import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TNgAnnotationPoint, TToolType } from "./type";
+import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TToolType } from "./type";
 
 @Directive()
 export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {

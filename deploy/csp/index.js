@@ -115,7 +115,7 @@ module.exports = {
           'https://unpkg.com/d3@6.2.0/', // required for preview component
           'https://unpkg.com/mathjax@3.1.2/', // math jax
           'https://unpkg.com/three-surfer@0.0.13/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
-          'https://unpkg.com/ng-layer-tune@0.0.12/dist/ng-layer-tune/', // needed for ng layer control
+          'https://unpkg.com/ng-layer-tune@0.0.13/dist/ng-layer-tune/', // needed for ng layer control
           'https://unpkg.com/hbp-connectivity-component@0.6.6/', // needed for connectivity component
           (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
           ...SCRIPT_SRC,

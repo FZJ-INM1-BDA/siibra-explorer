@@ -54,7 +54,7 @@ import { RoutedAnnotationService } from "./routedAnnotation.service";
     // ... in url correctly
     {
       provide: APP_INITIALIZER,
-      useFactory:(svc: RoutedAnnotationService) => {
+      useFactory:(_svc: RoutedAnnotationService) => {
         return () => Promise.resolve()
       },
       deps: [ RoutedAnnotationService ],

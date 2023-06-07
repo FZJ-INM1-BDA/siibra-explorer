@@ -6,10 +6,6 @@ import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { UtilModule } from "src/util";
-import { DownloadDirective } from "../util/directives/download.directive";
-import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
-import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
-import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 import { ShareModule } from "src/share";
 import { AuthModule } from "src/auth";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
@@ -33,13 +29,7 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     AuthModule,
   ],
   declarations: [
-    MobileOverlay,
     ActionDialog,
-    /* pipes */
-    HumanReadableFileSizePipe,
-    ReorderPanelIndexPipe,
-    /* directive */
-    DownloadDirective,
   ],
   providers: [
     {
@@ -51,8 +41,10 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
       provide: HANDLE_SCREENSHOT_PROMISE,
       useValue: ((param) => {
         const canvas: HTMLCanvasElement = document.querySelector('#neuroglancer-container canvas')
-        if (!canvas) return Promise.reject(`element '#neuroglancer-container canvas' not found`)
-        const _ = (window as any).viewer.display.draw()
+        if (!canvas) {
+          return Promise.reject(`element '#neuroglancer-container canvas' not found`)
+        }
+        (window as any).viewer.display.draw()
         if (!param) {
           return new Promise(rs => {
             canvas.toBlob(blob => {
@@ -99,9 +91,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     }
   ],
   exports: [
-    // NehubaContainer,
-    MobileOverlay,
-    // StatusCardComponent,
   ]
 })
 
