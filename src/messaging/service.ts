@@ -9,9 +9,14 @@ import { TYPE as NMV_TYPE, processJsonLd as nmvProcess } from './nmvSwc/index'
 import { TYPE as NATIVE_TYPE, processJsonLd as nativeProcess } from './native'
 import { BoothVisitor, JRPCRequest, ListenerChannel } from "src/api/jsonrpc"
 import { ApiService } from "src/api";
-import { ApiBoothEvents } from "src/api/service";
+import { ApiBoothEvents, namespace as apiNameSpace } from "src/api/service";
 
 export const IAV_POSTMESSAGE_NAMESPACE = `ebrains:iav:`
+
+const RECOGNISED_NAMESPACES = [
+  IAV_POSTMESSAGE_NAMESPACE,
+  apiNameSpace
+]
 
 export const MANAGED_METHODS = [
   'openminds:nmv:loadSwc',
@@ -69,7 +74,11 @@ export class MessagingService {
 
     window.addEventListener('message', async ({ data, origin, source }) => {
       if (/^webpack/.test(data.type)) return
-      if (data === '') return
+      if (!data) return
+      const { method } = data
+      if (RECOGNISED_NAMESPACES.every(namespace => method.indexOf(namespace) !== 0)) {
+        return
+      }
       const src = source as Window
       const { id } = data
       try {
