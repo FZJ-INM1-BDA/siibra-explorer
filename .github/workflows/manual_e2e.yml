@@ -9,7 +9,7 @@ jobs:
   hide_previous_if_exists:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: 'master'
     - uses: actions/github-script@v5
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: 'Add checklist comment'
       uses: actions/github-script@v5
       with:
