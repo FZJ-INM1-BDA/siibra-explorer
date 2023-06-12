@@ -134,7 +134,7 @@ export const CachedFunction = (config?: TCacheFunctionArg) => {
   }
 }
 
-// A quick, non security hash function
+// A quick, non secure hash function
 export class QuickHash {
   private length = 6
   constructor(opts?: any){
