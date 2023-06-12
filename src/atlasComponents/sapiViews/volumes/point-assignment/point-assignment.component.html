@@ -1,7 +1,13 @@
-<div class="sxplr-m-2" *ngIf="busy$ | async">
+<div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
     <span>
-        Performing probabilistic assignment ...
+        {{ busyMessage }}
+    </span>
+</div>
+
+<div class="sxplr-m-2" *ngIf="error$ | async">
+    <span>
+        An error occurred when performing map assignment.
     </span>
 </div>
 

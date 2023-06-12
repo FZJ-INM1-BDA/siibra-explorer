@@ -642,12 +642,6 @@ export interface components {
        */
       ontologyIdentifier?: (string)[]
     }
-    /**
-     * ImageTypes 
-     * @description An enumeration. 
-     * @enum {unknown}
-     */
-    ImageTypes: "BlockfaceVolumeOfInterest" | "CellBodyStainedVolumeOfInterest" | "CellbodyStainedSection" | "MRIVolumeOfInterest" | "PLIVolumeOfInterest" | "SegmentedVolumeOfInterest" | "XPCTVolumeOfInterest"
     /** LocationModel */
     LocationModel: {
       /** @Type */
@@ -1237,12 +1231,6 @@ export interface components {
       /** Max */
       max: number
     }
-    /**
-     * TabularTypes 
-     * @description An enumeration. 
-     * @enum {unknown}
-     */
-    TabularTypes: "ReceptorDensityFingerprint" | "LayerwiseBigBrainIntensities" | "LayerwiseCellDensity" | "RegionalBOLD"
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -1677,6 +1665,7 @@ export interface operations {
         parcellation_id: string
         space_id: string
         point: string
+        assignment_type?: string
         sigma_mm?: number
       }
     }
@@ -1902,7 +1891,7 @@ export interface operations {
       query: {
         parcellation_id: string
         region_id: string
-        type?: components["schemas"]["TabularTypes"]
+        type?: string
         page?: number
         size?: number
       }
@@ -1928,7 +1917,7 @@ export interface operations {
       query: {
         parcellation_id: string
         region_id: string
-        type?: components["schemas"]["TabularTypes"]
+        type?: string
       }
       path: {
         feature_id: string
@@ -1955,7 +1944,7 @@ export interface operations {
       query: {
         space_id: string
         bbox?: string
-        type?: components["schemas"]["ImageTypes"]
+        type?: string
         page?: number
         size?: number
       }
@@ -1980,7 +1969,7 @@ export interface operations {
     parameters: {
       query: {
         space_id: string
-        type?: components["schemas"]["ImageTypes"]
+        type?: string
       }
       path: {
         feature_id: string
