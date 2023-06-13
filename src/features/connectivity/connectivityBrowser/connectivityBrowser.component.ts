@@ -1,7 +1,7 @@
 import {  Component, ElementRef, OnDestroy, ViewChild, Input, SimpleChanges, HostListener, OnChanges } from "@angular/core";
 import { Store, select} from "@ngrx/store";
 import { Subscription, BehaviorSubject, combineLatest, merge, concat, NEVER} from "rxjs";
-import { switchMap, map, tap, shareReplay, distinctUntilChanged, withLatestFrom, filter, finalize } from "rxjs/operators";
+import { switchMap, map, shareReplay, distinctUntilChanged, withLatestFrom, filter, finalize } from "rxjs/operators";
 
 import { atlasAppearance, atlasSelection } from "src/state";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";

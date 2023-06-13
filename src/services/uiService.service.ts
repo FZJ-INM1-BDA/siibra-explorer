@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material/snack-bar";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { ActionDialog } from "src/ui/actionDialog/actionDialog.component";
 
 @Injectable({
@@ -18,7 +18,7 @@ export class UIService {
     return this.snackbar.open(message, actionBtnTxt, config)
   }
 
-  public showDialog(data, options){
+  public showDialog(data: unknown, options: MatDialogConfig){
     return this.dialog.open(ActionDialog, {
       ...options,
       data

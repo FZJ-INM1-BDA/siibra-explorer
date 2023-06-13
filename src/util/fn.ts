@@ -17,6 +17,9 @@ export function getDebug() {
   return (window as any).__DEBUG__
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-empty-function
+export function noop(){}
+
 export async function getExportNehuba() {
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -24,15 +27,6 @@ export async function getExportNehuba() {
     if (!!nehuba) return nehuba
     await new Promise((rs) => setTimeout(rs, 160))
   }
-}
-
-const recursiveFlatten = (region, {ngId}) => {
-  return [{
-    ngId,
-    ...region,
-  }].concat(
-    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
-  )
 }
 
 export function getUuid(){
@@ -140,7 +134,7 @@ export const CachedFunction = (config?: TCacheFunctionArg) => {
   }
 }
 
-// A quick, non security hash function
+// A quick, non secure hash function
 export class QuickHash {
   private length = 6
   constructor(opts?: any){
@@ -423,7 +417,7 @@ export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
 export function defaultdict<T>(fn: () => T): Record<string, T> {
   const obj = {}
   return new Proxy(obj, {
-    get(target, prop, rec) {
+    get(target, prop, _rec) {
       if (!(prop in target)){
         target[prop] = fn()
       }

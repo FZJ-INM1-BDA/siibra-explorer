@@ -30,7 +30,7 @@ jobs:
         build: [ 'local', 'prod' ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: 'Set matomo env var'
       # if matrix.build is local, only run if master or dev
       if: ${{ !(matrix.build == 'local' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/dev') }} 
@@ -120,7 +120,7 @@ jobs:
 
     needs: build-docker-img
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set env var
         run: |
           echo "Using github.ref: $GITHUB_REF"

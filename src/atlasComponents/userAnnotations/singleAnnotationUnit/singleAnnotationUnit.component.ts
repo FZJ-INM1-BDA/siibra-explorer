@@ -44,7 +44,7 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
 
     this.chSubs.push(
       this.formGrp.valueChanges.subscribe(value => {
-        const { name, desc, spaceId } = value
+        const { name, desc } = value
         this.managedAnnotation.name = name
         this.managedAnnotation.desc = desc
       })

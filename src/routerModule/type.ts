@@ -7,6 +7,7 @@ export type TUrlAtlas<T> = {
   t: T   // template
   p: T   // parcellation
   r?: T  // region selected
+  rn?: T
 }
 
 export type TUrlPlugin<T> = {

@@ -39,7 +39,7 @@ export class NehubaMeshService implements OnDestroy {
       const ngIdRecord: Record<string, number[]> = {}
 
       for (const [ngId, labelToRegion] of Object.entries(record)) {
-        for (const [label, _region] of Object.entries(labelToRegion)) {
+        for (const [label, ] of Object.entries(labelToRegion)) {
           if (!ngIdRecord[ngId]) {
             ngIdRecord[ngId] = []
           }

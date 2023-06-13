@@ -1,28 +1,43 @@
 import { Inject, Injectable, Optional } from "@angular/core";
 import { Observable } from "rxjs";
 import { MatDialog } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
-
-import { getUuid } from "src/util/fn";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { getUuid, noop } from "src/util/fn";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 
 import { IMessagingActions, IMessagingActionTmpl, WINDOW_MESSAGING_HANDLER_TOKEN, IWindowMessaging } from './types'
 import { TYPE as NMV_TYPE, processJsonLd as nmvProcess } from './nmvSwc/index'
 import { TYPE as NATIVE_TYPE, processJsonLd as nativeProcess } from './native'
+import { BoothVisitor, JRPCRequest, ListenerChannel } from "src/api/jsonrpc"
+import { ApiService } from "src/api";
+import { ApiBoothEvents, namespace as apiNameSpace } from "src/api/service";
 
 export const IAV_POSTMESSAGE_NAMESPACE = `ebrains:iav:`
+
+const RECOGNISED_NAMESPACES = [
+  IAV_POSTMESSAGE_NAMESPACE,
+  apiNameSpace
+]
 
 export const MANAGED_METHODS = [
   'openminds:nmv:loadSwc',
   'openminds:nmv:unloadSwc'
 ]
 
+class WindowOpenerListener implements ListenerChannel {
+  constructor(
+    public registerLeaveCb: () => void,
+    public notify: (payload: JRPCRequest<unknown, unknown>) => void
+  ){}
+  
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class MessagingService {
+
+  private originListenerMap = new Map<string, {listener: WindowOpenerListener, visitor: BoothVisitor<ApiBoothEvents>}>()
 
   private whiteListedOrigins = new Set()
   private pendingRequests: Map<string, Promise<boolean>> = new Map()
@@ -32,8 +47,7 @@ export class MessagingService {
   
   constructor(
     private dialog: MatDialog,
-    private snackbar: MatSnackBar,
-    private worker: AtlasWorkerService,
+    private apiService: ApiService,
     @Optional() @Inject(WINDOW_MESSAGING_HANDLER_TOKEN) private messagingHandler: IWindowMessaging,
   ){
     
@@ -59,12 +73,45 @@ export class MessagingService {
     }
 
     window.addEventListener('message', async ({ data, origin, source }) => {
+      
+      /**
+       * only deal with opener
+       */
+      if (!window.opener || source !== window.opener) {
+        return
+      }
+
       if (/^webpack/.test(data.type)) return
-      if (data === '') return
+      if (!data) return
+      const { method } = data
+      if (RECOGNISED_NAMESPACES.every(namespace => (method || '').indexOf(namespace) !== 0)) {
+        return
+      }
       const src = source as Window
       const { id } = data
       try {
         const result = await this.handleMessage({ data, origin })
+        if (!this.originListenerMap.has(origin)) {
+          const listener = new WindowOpenerListener(
+            noop,
+            val => src.postMessage(val, origin)
+          )
+          
+          const visitor = this.apiService.booth.handshake()
+          this.originListenerMap.set(origin, {listener, visitor})
+
+          this.apiService.broadcastCh.addListener(listener)
+          
+
+          /**
+           * if result was not yet populated, try populating it with 
+           * siibra-explorer api
+           */
+        }
+        if (!result) {
+          const { visitor } = this.originListenerMap.get(origin)
+          return await visitor.request(data)
+        }
         src.postMessage({
           id,
           jsonrpc: '2.0',
@@ -94,27 +141,25 @@ export class MessagingService {
 
   public async handleMessage({ data, origin }) {
     const { method, param } = data
-    
-    if (!method) return
-    if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
-    const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
-
     /**
      * if ping method, respond pong method
      */
-    if (strippedMethod === 'ping') {
+    if (method === 'ping') {
       return 'pong'
     }
 
     /**
      * otherwise, check permission
      */
-
     const allow = await this.checkOrigin({ origin })
     if (!allow) throw ({
       code: 403,
       message: 'User declined'
     })
+    
+    if (!method) return
+    if (method.indexOf(IAV_POSTMESSAGE_NAMESPACE) !== 0) return
+    const strippedMethod = method.replace(IAV_POSTMESSAGE_NAMESPACE, '')
 
     // TODO 
     // in future, check if in managed_methods
@@ -169,50 +214,11 @@ export class MessagingService {
     // TODO combine api service and messaging service into one
     // and implement it properly
 
-    // if (method === 'viewerHandle:add3DLandmarks') {
-    //   this.apiService.interactiveViewer.viewerHandle.add3DLandmarks(param)
-    //   return 'OK'
-    // }
-
-    // if (method === 'viewerHandle:remove3DLandmarks') {
-    //   this.apiService.interactiveViewer.viewerHandle.remove3DLandmarks(param)
-    //   return 'OK'
-    // }
-
-    /**
-     * TODO use loadResource in the future
-     */
-    if (method === '_tmp:plotly') {
-      const isLoadingSnack = this.snackbar.open(`Loading plotly mesh ...`)
-      const resp = await this.worker.sendMessage({
-        method: `PROCESS_PLOTLY`,
-        param
-      })
-      isLoadingSnack?.dismiss()
-      const meshId = 'bobby'
-      /**
-       * TODO re-enable plotly VTK mesh
-       */
-      
-      // if (false) {
-      //   const { objectUrl, customFragmentColor } = resp.result || {}
-      //   this.loadMesh({
-      //     type: 'VTK',
-      //     id: meshId,
-      //     url: objectUrl,
-      //     customFragmentColor
-      //   })
-      // } else {
-      //   this.snackbar.open(`Error: loadMesh method not injected.`)
-      // }
-      return 'OK'
-    }
-
     if (MANAGED_METHODS.indexOf(method) >= 0) {
       return await this.processJsonld(param)
     }
 
-    throw ({ code: 404, message: 'Method not found' })
+    return
   }
 
   async checkOrigin({ origin }): Promise<boolean> {

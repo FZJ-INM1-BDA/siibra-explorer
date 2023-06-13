@@ -172,7 +172,7 @@ const broadCastDefault: BroadCastingApiEvents = {
 
 export class ApiService implements BoothResponder<ApiBoothEvents>{
 
-  public broadcastCh = createBroadcastingJsonRpcChannel<`${NAMESPACE_TYPE}.on`, BroadCastingApiEvents>(`${namespace}.on`, broadCastDefault)
+  public broadcastCh = createBroadcastingJsonRpcChannel<`${NAMESPACE_TYPE}.on.`, BroadCastingApiEvents>(`${namespace}.on.`, broadCastDefault)
   public booth = new Booth<ApiBoothEvents>(this)
 
   private requestUserQueue: RequestUser<keyof RequestUserTypes>[] = []
@@ -263,27 +263,27 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     this.store.pipe(
       select(atlasSelection.selectors.selectedAtlas)
     ).subscribe(atlas => {
-      this.broadcastCh.emit('atlasSelected', translateV3Entities.retrieveAtlas(atlas))
+      this.broadcastCh.emit('atlasSelected', atlas && translateV3Entities.retrieveAtlas(atlas))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedParcellation)
     ).subscribe(parcellation => {
-      this.broadcastCh.emit('parcellationSelected', translateV3Entities.retrieveParcellation(parcellation))
+      this.broadcastCh.emit('parcellationSelected', parcellation && translateV3Entities.retrieveParcellation(parcellation))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedTemplate)
     ).subscribe(template => {
-      this.broadcastCh.emit('templateSelected', translateV3Entities.retrieveTemplate(template))
+      this.broadcastCh.emit('templateSelected', template && translateV3Entities.retrieveTemplate(template))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedRegions)
     ).subscribe(regions => {
-      this.broadcastCh.emit('regionsSelected', regions.map(reg => translateV3Entities.retrieveRegion(reg)))
+      this.broadcastCh.emit('regionsSelected', regions && regions.map(reg => translateV3Entities.retrieveRegion(reg)))
     })
     this.store.pipe(
       select(atlasSelection.selectors.selectedParcAllRegions)
     ).subscribe(regions => {
-      this.broadcastCh.emit('allRegions', regions.map(reg => translateV3Entities.retrieveRegion(reg)))
+      this.broadcastCh.emit('allRegions', regions && regions.map(reg => translateV3Entities.retrieveRegion(reg)))
     })
     this.store.pipe(
       select(atlasSelection.selectors.navigation)

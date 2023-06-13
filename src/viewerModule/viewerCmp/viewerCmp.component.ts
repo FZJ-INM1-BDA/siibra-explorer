@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, ViewContainerRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subscription } from "rxjs";
 import { debounceTime, map, shareReplay } from "rxjs/operators";
@@ -444,8 +444,8 @@ export class ViewerCmp implements OnDestroy {
   voiFeatureEntryCmp: EntryComponent
 
   async pullAllVoi(){
+    await wait(320)
     if (this.voiFeatureEntryCmp){
-      await wait(320)
       this.voiFeatureEntryCmp.pullAll()
     }
   }

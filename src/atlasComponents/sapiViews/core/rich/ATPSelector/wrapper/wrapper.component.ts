@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable, of, Subject, Subscription } from "rxjs";
 import { filter, map, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
 import { DARKTHEME } from "src/util/injectionTokens";
@@ -15,11 +15,6 @@ function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
   if (!obj) return false
   return (obj.atlas || obj.template || obj.parcellation) && (!obj.requested || isATPGuard(obj.requested))
 }
-
-const banListParcName = new Set([
-  "VEP Atlas",
-  "Desikan-Killiany 2006"
-])
 
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
@@ -60,7 +55,9 @@ export class WrapperATPSelector implements OnDestroy{
   )
   isBusy$ = new Subject<boolean>()
   
-  parcellationVisibility$ = this.svc.visibility$
+  parcellationVisibility$ = this.store$.pipe(
+    select(atlasAppearance.selectors.showDelineation)
+  )
 
   constructor(
     private dialog: MatDialog,

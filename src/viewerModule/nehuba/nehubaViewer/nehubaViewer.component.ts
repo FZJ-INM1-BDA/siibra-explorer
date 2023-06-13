@@ -13,17 +13,6 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
  */
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
 
-const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
-const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
-
-/**
- * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
- *  sliceZoom
- *  sliceViewportWidth
- *  sliceViewportHeight
- */
-const NG_LANDMARK_CONSTANT = 1e-8
-
 export const IMPORT_NEHUBA_INJECT_TOKEN = `IMPORT_NEHUBA_INJECT_TOKEN`
 
 interface LayerLabelIndex {
@@ -85,8 +74,7 @@ export class NehubaViewerUnit implements OnDestroy {
         url?: string
       }
     }> = new EventEmitter()
-  @Output() public mouseoverLandmarkEmitter: EventEmitter<string> = new EventEmitter()
-  @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
+
   @Output() public regionSelectionEmitter: EventEmitter<{
     segment: number
     layer: {
@@ -95,6 +83,7 @@ export class NehubaViewerUnit implements OnDestroy {
   }}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()
 
+  @Output() public totalMeshesToLoad = new EventEmitter<number>()
 
   /* only used to set initial navigation state */
   public initNav: any
@@ -319,7 +308,7 @@ export class NehubaViewerUnit implements OnDestroy {
             totalMeshes += labelIndicies.length
             this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
           }
-          // TODO implement total mesh to be loaded and mesh loading UI
+          this.totalMeshesToLoad.emit(totalMeshes)
         }),
       )
     } else {
@@ -333,25 +322,6 @@ export class NehubaViewerUnit implements OnDestroy {
       if (limit && limit.restoreState) {
         limit.restoreState(gpuLimit)
       }
-    }
-  }
-
-  public spatialLandmarkSelectionChanged(labels: number[]) {
-    const getCondition = (label: number) => `if(label > ${label - 0.1} && label < ${label + 0.1} ){${FRAGMENT_EMIT_RED}}`
-    const newShader = `void main(){ ${labels.map(getCondition).join('else ')}else {${FRAGMENT_EMIT_WHITE}} }`
-    if (!this.nehubaViewer) {
-      this.log.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined')
-      return
-    }
-    const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(NG_LANDMARK_LAYER_NAME)
-    if (!landmarkLayer) {
-      this.log.warn('landmark layer could not be found ... will not update colour map')
-      return
-    }
-    if (labels.length === 0) {
-      landmarkLayer.layer.displayState.fragmentMain.restoreState(FRAGMENT_MAIN_WHITE)
-    } else {
-      landmarkLayer.layer.displayState.fragmentMain.restoreState(newShader)
     }
   }
 
@@ -481,20 +451,6 @@ export class NehubaViewerUnit implements OnDestroy {
             : false
         ),
     )
-  }
-
-  private userLandmarkShader: string = FRAGMENT_MAIN_WHITE
-
-  public removeSpatialSearch3DLandmarks() {
-    this.removeLayer({
-      name : NG_LANDMARK_LAYER_NAME,
-    })
-  }
-
-  public removeuserLandmarks() {
-    this.removeLayer({
-      name : NG_USER_LANDMARK_LAYER_NAME,
-    })
   }
 
   public setLayerVisibility(condition: {name: string|RegExp}, visible: boolean) {
@@ -797,19 +753,6 @@ export class NehubaViewerUnit implements OnDestroy {
           positionReal : true,
         })
       })
-
-    // TODO bug: mouseoverlandmarkemitter does not emit empty for VTK layer when user mouse click
-    this.ondestroySubscriptions.push(
-      this.nehubaViewer.mouseOver.layer
-        .filter(obj => obj.layer.name === NG_LANDMARK_LAYER_NAME)
-        .subscribe(obj => this.mouseoverLandmarkEmitter.emit(obj.value)),
-    )
-
-    this.ondestroySubscriptions.push(
-      this.nehubaViewer.mouseOver.layer
-        .filter(obj => obj.layer.name === NG_USER_LANDMARK_LAYER_NAME)
-        .subscribe(obj => this.mouseoverUserlandmarkEmitter.emit(obj.value)),
-    )
 
     this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace
       .filter(v => typeof v !== 'undefined' && v !== null)

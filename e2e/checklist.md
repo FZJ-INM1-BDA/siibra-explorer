@@ -48,6 +48,20 @@
   - [ ] v4 are visible
   - [ ] on hover, show correct region name(s)
   - [ ] whole mesh loads
+
+## Pt Assignments
+
+- [ ] human MNI152 julich brain should work (statistical)
+- [ ] rat waxholm v4 should work (labelled)
+- [ ] csv can be downloaded
+- [ ] big brain & fsaverage *shouldn't* work
+
+## Download atlas
+
+- [ ] human MNI152 julich brain can be downloaded
+- [ ] human MNI152 julich brain hoc1 left can be downloaded
+- [ ] rat waxholm v4 can be downloaded
+
 ## saneURL
 - [ ] saneurl generation functions properly
   - [ ] try existing key (human), and get unavailable error

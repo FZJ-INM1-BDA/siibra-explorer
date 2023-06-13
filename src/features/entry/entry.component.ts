@@ -14,7 +14,7 @@ import { TranslatedFeature } from '../list/list.directive';
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
   for (const item of categories) {
-    const { category, ...rest } = item
+    const { category } = item
     if (!category) continue
     if (typeof category !== "string") continue
     if (!returnVal[category]) {
@@ -128,7 +128,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
                 await ds.pull()
               } catch (e) {
                 if (e instanceof DsExhausted) {
-                  console.log('exhausted')
                   break
                 }
                 if (e instanceof IsAlreadyPulling ) {

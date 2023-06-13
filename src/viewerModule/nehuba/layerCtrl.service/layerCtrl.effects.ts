@@ -172,7 +172,7 @@ export class LayerCtrlEffects {
         parcNgLayers: from(this.sapi.getTranslatedLabelledNgMap(parcellation, template)).pipe(
           map(val => {
             const returnVal: Record<string, NgSegLayerSpec> = {}
-            for (const [ url, { layer, region } ] of Object.entries(val)) {
+            for (const [ /** url */, { layer, region } ] of Object.entries(val)) {
               const { name } = region[0]
               const ngId = getParcNgId(atlas, template, parcellation, {
                 id: '',

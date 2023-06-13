@@ -1,14 +1,17 @@
-import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
-import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
 import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
-import { TSandsPoint } from 'src/util/types';
+import { TFace, TSandsPoint } from 'src/util/types';
 import { TZipFileConfig } from "src/zipFilesOutput/type"
 import { environment } from "src/environments/environment"
+
+const DOING_PROB_ASGMT = "Performing probabilistic assignment ..."
+const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled assignment ..."
 
 @Component({
   selector: 'sxplr-point-assignment',
@@ -22,12 +25,19 @@ export class PointAssignmentComponent implements OnDestroy {
     "map value",
   ]
   
-  #busy$ = new BehaviorSubject(false)
+  #busy$ = new BehaviorSubject<string>(null)
   busy$ = this.#busy$.asObservable()
+
+  #error$ = new BehaviorSubject<string>(null)
+  error$ = this.#error$.asObservable()
 
   #point = new BehaviorSubject<TSandsPoint>(null)
   @Input()
-  set point(val: TSandsPoint) {
+  set point(val: TSandsPoint|TFace) {
+    const { '@type': type } = val
+    if (type === "siibra-explorer/surface/face") {
+      return
+    }
     this.#point.next(val)
   }
   
@@ -52,6 +62,9 @@ export class PointAssignmentComponent implements OnDestroy {
     this.#template,
   ]).pipe(
     switchMap(([ point, parcellation, template ]) => {
+
+      this.#error$.next(null)
+
       if (!point || !parcellation || !template) {
         return EMPTY
       }
@@ -60,7 +73,7 @@ export class PointAssignmentComponent implements OnDestroy {
         console.warn(`point coordination space id ${ptSpaceId} is not the same as template id ${template.id}.`)
         return EMPTY
       }
-      this.#busy$.next(true)
+      this.#busy$.next(DOING_PROB_ASGMT)
       return concat(
         of(null),
         this.sapi.v3Get("/map/assign", {
@@ -71,7 +84,24 @@ export class PointAssignmentComponent implements OnDestroy {
             sigma_mm: 0
           }
         }).pipe(
-          tap(() => this.#busy$.next(false)),
+          catchError(() => {
+            this.#busy$.next(DOING_LABEL_ASGMT)
+            return this.sapi.v3Get("/map/assign", {
+              query: {
+                parcellation_id: parcellation.id,
+                point: point.coordinates.map(v => `${v.value/1e6}mm`).join(','),
+                space_id: template.id,
+                sigma_mm: 0,
+                assignment_type: "labelled"
+              }
+            })
+          }),
+          catchError((err) => {
+            this.#busy$.next(null)
+            this.#error$.next(err.toString())
+            return of(null)
+          }),
+          tap(() => this.#busy$.next(null)),
         )
       )
     }),
@@ -118,7 +148,7 @@ export class PointAssignmentComponent implements OnDestroy {
 function generateReadMe(pt: TSandsPoint, parc: SxplrParcellation, tmpl: SxplrTemplate){
   return `# Point assignment exporter
 
-Exported by siibra-explorer verison \`${environment.VERSION}\` hash: \`${environment.GIT_HASH}\`.
+Exported by siibra-explorer verison \`${environment.VERSION}\` hash: \`${environment.GIT_HASH.trim()}\`.
 
 On: ${new Date().toString()}
 

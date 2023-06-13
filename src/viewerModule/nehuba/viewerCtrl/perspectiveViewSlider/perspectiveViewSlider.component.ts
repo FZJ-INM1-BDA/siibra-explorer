@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, concat, forkJoin, NEVER, Observable, of, Subject, Subscription, throwError } from "rxjs";
+import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
 import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
@@ -292,7 +292,7 @@ export class PerspectiveViewSlider implements OnDestroy {
         this.currentTemplateSize$,
         this.rangeControlIsVertical$,
       ]).pipe(
-        map(([ navigation, viewportSize, ctrl, templateSize, isVertical ]) => {
+        map(([ navigation, viewportSize, ctrl, templateSize, ..._rest ]) => {
           if (!ctrl || !(templateSize?.real) || !navigation) return null
 
           const { zoom, position } = navigation

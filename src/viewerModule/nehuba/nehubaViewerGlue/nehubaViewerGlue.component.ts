@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { distinctUntilChanged } from "rxjs/operators";

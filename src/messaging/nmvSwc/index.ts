@@ -86,12 +86,6 @@ const getAtlas = (spaceId: SPACE_ID) => {
   return DEFAULT_ATLAS[spaceId]
 }
 
-const getVoxelFromSpace = (spaceId: string) => {
-  for (const key in NM_IDS){
-    if (NM_IDS[key] === spaceId) return IAV_VOXEL_SIZES_NM[key]
-  }
-  return null
-}
 
 export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagingActions<keyof IMessagingActionTmpl>> => {
   const subject = new Subject<IMessagingActions<keyof IMessagingActionTmpl>>()
@@ -156,27 +150,16 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     )
     const uuid = getUuid()
 
-    // NG internal treats skeleton as mm
-    const voxelSize = getVoxelFromSpace(toSpace)
-    /**
-     * swc seem to scale with voxelSize... strangely enough
-     * voxelSize nm / voxel -> goal is 1 voxel/um
-     * 1e3 / voxelSize
-     */
-    const scaleUmToVoxelFixed = [
-      voxelSize[0],
-      voxelSize[1],
-      voxelSize[2],
-    ]
     // NG translation works on nm scale
     const scaleUmToNm = 1e3
     const modA = mat3.fromValues(
-      scaleUmToVoxelFixed[0], 0, 0,
-      0, scaleUmToVoxelFixed[1], 0,
-      0, 0, scaleUmToVoxelFixed[2]
+      scaleUmToNm, 0, 0,
+      0, scaleUmToNm, 0,
+      0, 0, scaleUmToNm
     )
     mat3.mul(modA, modA, [...A[0], ...A[1], ...A[2]])
-    const modb = vec3.scale(vec3.create(), b, scaleUmToNm)
+    const modb = vec3.mul(vec3.create(), b, [ scaleUmToNm, scaleUmToNm, scaleUmToNm])
+    vec3.scale(vec3.create(), b, scaleUmToNm)
     const transform = [
       [...modA.slice(0, 3), modb[0]] as TVec4,
       [...modA.slice(3, 6), modb[1]] as TVec4,

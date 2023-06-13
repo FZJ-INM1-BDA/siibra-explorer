@@ -1,7 +1,6 @@
 import { SAPI } from "..";
 import { SapiRegionModel, RouteParam } from "../typeV3";
-import { strToRgb, hexToRgb } from 'common/util'
-import { NEVER, Observable, of } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { SAPIBase } from "./base";
 import { SxplrRegion } from "../sxplrTypes";
@@ -90,16 +89,6 @@ export class SAPIRegion extends SAPIBase<RF>{
         return `${endpoint}${path}?${search.toString()}`
       })
     )
-  }
-
-  /**
-   * 
-   * @deprecated
-   * @param volumeId 
-   * @returns 
-   */
-  getVolumeInstance(volumeId: string): Observable<never> {
-    return NEVER
   }
 
   getDetail(spaceId: string): Observable<SapiRegionModel> {

@@ -1,13 +1,14 @@
 import { TestBed, fakeAsync, tick, flush, ComponentFixture } from '@angular/core/testing'
 import { SaneUrl } from './saneUrl.component'
 import { By } from '@angular/platform-browser'
-import { BACKENDURL } from 'src/util/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { SaneUrlSvc } from './saneUrl.service'
 import { AngularMaterialModule } from 'src/sharedModules'
 import { CUSTOM_ELEMENTS_SCHEMA, Directive } from '@angular/core'
 import { of, throwError } from 'rxjs'
 import { NotFoundError } from '../type'
+import { ReactiveFormsModule } from '@angular/forms'
+import { CommonModule } from '@angular/common'
 
 const inputCss = `input[aria-label="Custom link"]`
 const submitCss = `button[aria-label="Create custom link"]`
@@ -34,6 +35,7 @@ describe('> saneUrl.component.ts', () => {
         imports: [
           NoopAnimationsModule,
           AngularMaterialModule,
+          ReactiveFormsModule,
         ],
         providers: [
           {

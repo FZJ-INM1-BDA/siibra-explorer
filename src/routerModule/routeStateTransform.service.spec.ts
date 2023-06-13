@@ -6,6 +6,7 @@ import { DefaultUrlSerializer } from "@angular/router"
 import * as nehubaConfigService from "src/viewerModule/nehuba/config.service"
 import { atlasSelection, userInteraction } from "src/state"
 import { encodeNumber } from "./cipher"
+import { QuickHash } from "src/util/fn"
 
 const serializer = new DefaultUrlSerializer()
 
@@ -123,7 +124,7 @@ describe("> routeStateTransform.service.ts", () => {
         const altasObj = {"@id": 'foo-bar-a'}
         const templObj = {"@id": 'foo-bar-t'}
         const parcObj = {"@id": 'foo-bar-p'}
-        const regions = [{}]
+        const regions = [{'name': 'selected-region-1'}]
         const standAloneVolumes = []
         const navigation = null
 
@@ -181,9 +182,12 @@ describe("> routeStateTransform.service.ts", () => {
           
           const getRegionLabelIndicesSpy = sapi.getRegionLabelIndices as jasmine.Spy
           getRegionLabelIndicesSpy.and.resolveTo(labelIndex)
-
           const s = await svc.cvtStateToRoute(state as any)
-          expect(s).toContain(`r:${ngId}::${encodeNumber(labelIndex, { float: false })}`)
+          
+          expect(getParcNgId).not.toHaveBeenCalled()
+          expect(getRegionLabelIndicesSpy).not.toHaveBeenCalled()
+
+          expect(s).toContain(`rn:${QuickHash.GetHash(regions[0].name)}`)
         })
   
         it('> ngId containing expected value', async () => {

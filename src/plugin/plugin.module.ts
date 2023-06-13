@@ -1,10 +1,9 @@
-import { CommonModule, DOCUMENT } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { LoggingModule } from "src/logging";
 import { AngularMaterialModule } from "src/sharedModules";
 import { UtilModule } from "src/util";
-import { appendScriptFactory, APPEND_SCRIPT_TOKEN, removeScriptFactory, REMOVE_SCRIPT_TOKEN } from "src/util/constants";
 import { IFrameSrcPipe } from "./iframeSrc.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
