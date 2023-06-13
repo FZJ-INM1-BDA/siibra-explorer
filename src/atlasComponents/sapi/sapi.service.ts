@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import { getExportNehuba } from "src/util/fn";
+import { getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -13,7 +13,6 @@ import {
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
-import { IDS } from "./constants";
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -22,7 +21,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.3'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.5'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -111,8 +110,7 @@ export class SAPI{
               .then(flag => {
                 if (flag) rs(endpt)
               })
-              // eslint-disable-next-line  @typescript-eslint/no-empty-function
-              .catch(e => {})
+              .catch(noop)
           }
         })
         try {
@@ -298,7 +296,7 @@ export class SAPI{
     switchMap(atlases => forkJoin(
       atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
     )),
-    map(atlases => atlases.sort((a, b) => speciesOrder.indexOf(a.species) - speciesOrder.indexOf(b.species))),
+    map(atlases => atlases.sort((a, b) => (speciesOrder as string[]).indexOf(a.species) - (speciesOrder as string[]).indexOf(b.species))),
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {
@@ -351,7 +349,7 @@ export class SAPI{
             template.id,
             "LABELLED"
           ).pipe(
-            catchError((err, obs) => of(null as SxplrParcellation)),
+            catchError(() => of(null as SxplrParcellation)),
             map(_map => _map && parc)
           )
         )
@@ -429,7 +427,7 @@ export class SAPI{
             space.id,
             "LABELLED"
           ).pipe(
-            catchError((err, obs) => of(null as SxplrTemplate)),
+            catchError(() => of(null as SxplrTemplate)),
             map(_map => _map && space)
           )
         )
@@ -515,12 +513,12 @@ export class SAPI{
     const map = await this.getLabelledMap(parcellation, template)
 
     for (const regionname in map.indices) {
-      if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
-        if (regionname.includes("left") || regionname.includes("right")) {
-          continue
-        }
-      }
-      for (const { volume: volumeIdx, fragment, label } of map.indices[regionname]) {
+      // if (parcellation.id === IDS.PARCELLATION.CORTICAL_LAYERS) {
+      //   if (regionname.includes("left") || regionname.includes("right")) {
+      //     continue
+      //   }
+      // }
+      for (const { volume: volumeIdx, fragment } of map.indices[regionname]) {
         const { providedVolumes } = map.volumes[volumeIdx]
         if (!("neuroglancer/precomputed" in providedVolumes)) {
           continue

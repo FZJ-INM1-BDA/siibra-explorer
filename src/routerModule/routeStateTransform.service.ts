@@ -9,6 +9,7 @@ import { getParcNgId } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
+import { QuickHash } from "src/util/fn";
 
 @Injectable()
 export class RouteStateTransformSvc {
@@ -26,6 +27,7 @@ export class RouteStateTransformSvc {
     const selectedTemplateId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.t) )
     const selectedParcellationId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.p) )
     const selectedRegionIds = obj.r
+    const selectedRegionNames = obj.rn
     
     if (!selectedAtlasId || !selectedTemplateId || !selectedParcellationId) {
       return {}
@@ -60,7 +62,11 @@ export class RouteStateTransformSvc {
     const userViewer = await this.sapi.useViewer(selectedTemplate).toPromise()
     
     const selectedRegions = await (async () => {
-      if (!selectedRegionIds) return []
+      if (!selectedRegionIds && !selectedRegionNames) return []
+
+      if (selectedRegionNames && selectedRegionNames.length > 0) {
+        return allParcellationRegions.filter(region => selectedRegionNames.includes(QuickHash.GetHash(region.name)))
+      }
 
       /**
        * should account for 
@@ -268,16 +274,7 @@ export class RouteStateTransformSvc {
       }
     }
   
-    // encoding selected regions
-    let selectedRegionsString: string
-    if (selectedRegions.length === 1) {
-      const region = selectedRegions[0]
-      const labelIndex = await this.sapi.getRegionLabelIndices(selectedTemplate, selectedParcellation, region)
-      
-      const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, region)
-      selectedRegionsString = `${ngId}::${encodeNumber(labelIndex, { float: false })}`
-    }
-    let routes: TUrlPathObj<string, TUrlAtlas<string>> | TUrlPathObj<string, TUrlStandaloneVolume<string>>
+    let routes: TUrlPathObj<string|string[], TUrlAtlas<string|string[]>> | TUrlPathObj<string, TUrlStandaloneVolume<string>>
     
     routes = {
       // for atlas
@@ -287,7 +284,8 @@ export class RouteStateTransformSvc {
       // for parcellation
       p: selectedParcellation && encodeId(selectedParcellation.id),
       // for regions
-      r: selectedRegionsString && encodeURIFull(selectedRegionsString),
+      // r: selectedRegionsString && encodeURIFull(selectedRegionsString),
+      rn: selectedRegions[0] && selectedRegions.map(r => QuickHash.GetHash(r.name)),
       // nav
       ['@']: cNavString,
       // showing dataset

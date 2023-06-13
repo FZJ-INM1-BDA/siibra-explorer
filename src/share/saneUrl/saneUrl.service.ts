@@ -25,7 +25,7 @@ export class SaneUrlSvc implements IKeyValStore{
       `${this.saneUrlRoot}${key}`,
       { responseType: 'json' }
     ).pipe(
-      catchError((err, obs) => {
+      catchError((err) => {
         const { status } = err
         if (status === 404) {
           return throwError(new NotFoundError('Not found'))

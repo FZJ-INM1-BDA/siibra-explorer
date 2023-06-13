@@ -31,16 +31,6 @@
         - [ ] `Preview` tab exists and works
         - [ ] fingerprint is shown, interactable
         - [ ] profiles can be loaded, interactable
-        - [ ] GDPR warning triangle
-        - [ ] `Open in KG` button exists and works
-        - [ ] perspective view works
-          - [ ] mesh becomes transparent
-          - [ ] mesh transparency returns when exit the panel
-          - [ ] electrodes appear in perspective view
-          - [ ] some contact points should apepar red (intersect with region)
-        - [ ] electrode tab
-          - [ ] show should a number of contact points
-          - [ ] clicking on electrode should navigate to the contact point location
     - [ ] `Connectivity` tab exists and works
       - [ ] on opening tab, PMap disappear, colour mapped segmentation appears
       - [ ] on closing tab, PMap reappear, segmentation hides
@@ -62,7 +52,7 @@
 - [ ] saneurl generation functions properly
   - [ ] try existing key (human), and get unavailable error
   - [ ] try non existing key, and get available
-  - [ ] create use key `x-tmp-foo` and new url works
+  - [ ] create use key `x_tmp_foo` and new url works
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/bigbrainGreyWhite) redirects to big brain
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/julichbrain) redirects to julich brain (colin 27)
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4

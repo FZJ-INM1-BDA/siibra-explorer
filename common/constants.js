@@ -163,5 +163,6 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
   }
 
   exports.QUICKTOUR_DESC_MD = {
+    SLICE_VIEW: `The planar views allow you to zoom \`[mouse wheel]\`, pan the view \`[drag]\`, and select oblique sections \`<shift>\` + \`[drag]\`. You can \`[click]\` any brain regions to select them.`
   }
 })(typeof exports === 'undefined' ? module.exports : exports)

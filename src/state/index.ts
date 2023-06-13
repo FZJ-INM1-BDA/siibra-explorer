@@ -22,6 +22,7 @@ export {
 
 export * as generalActions from "./actions"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
     console.log('state', state);
@@ -71,6 +72,7 @@ export function getStoreEffects() {
     plugins.Effects,
     atlasSelection.Effect,
     userInterface.Effects,
+    userInteraction.Effect,
   ]
 }
 

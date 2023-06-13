@@ -13,7 +13,7 @@ export class Tree<T extends Record<string, unknown>>{
     return this._nodes
   }
 
-  private _isParent: IsParent<T> = (c, p) => false
+  private _isParent: IsParent<T> = (_c, _p) => false
   protected set isParent(fn: IsParent<T>){
     if (fn === this._isParent) return
     this._isParent = fn
@@ -81,7 +81,7 @@ export class Tree<T extends Record<string, unknown>>{
 
   constructor(
     _nodes: T[] = [],
-    _isParent: IsParent<T> = (c, p) => false
+    _isParent: IsParent<T> = (_c, _p) => false
   ){
     this._nodes = _nodes
     this._isParent = _isParent

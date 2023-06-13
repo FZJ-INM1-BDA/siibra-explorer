@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { EMPTY, forkJoin, merge, Observable, of, pipe, throwError } from "rxjs";
+import { EMPTY, forkJoin, merge, Observable, of, pipe } from "rxjs";
 import { debounceTime, map, switchMap, withLatestFrom, filter, shareReplay, distinctUntilChanged } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
@@ -118,7 +118,7 @@ export class ThreeSurferEffects {
   ))
 
   onATPDebounceAddBaseLayers$ = createEffect(() => this.onATPDebounceThreeSurferLayers$.pipe(
-    switchMap(({ labels, surfaces }) => {
+    switchMap(({ labels }) => {
       const labelMaps: ThreeSurferCustomLabelLayer[] = []
       for (const key in labels) {
         const { laterality, url } = labels[key]

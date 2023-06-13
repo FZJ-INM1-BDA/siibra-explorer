@@ -3,7 +3,7 @@ import { AtlasDownloadDirective } from './atlas-download.directive';
 
 describe('AtlasDownloadDirective', () => {
   it('should create an instance', () => {
-    const directive = new AtlasDownloadDirective(NEVER as any);
+    const directive = new AtlasDownloadDirective(NEVER as any, null);
     expect(directive).toBeTruthy();
   });
 });

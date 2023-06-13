@@ -6,7 +6,7 @@ import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subje
 import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TNgAnnotationLine, TCallback } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback } from "./type";
 import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
@@ -194,7 +194,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
     const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
-    const { name, iconClass, onMouseMoveRenderPreview } = newTool
+    const { name, iconClass } = newTool
     
     this.moduleAnnotationTypes.push({
       instance: newTool,

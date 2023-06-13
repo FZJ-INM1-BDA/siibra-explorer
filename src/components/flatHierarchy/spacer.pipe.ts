@@ -7,7 +7,7 @@ import { TreeNode } from "./const"
 })
 
 export class FlatHierarchySpacer implements PipeTransform{
-  public transform<T>(inputNode: TreeNode<T>, ...args: any[]) {
+  public transform<T>(inputNode: TreeNode<T>, ..._args: any[]) {
     return Array(inputNode.level).fill(null)
   }
 }

@@ -44,7 +44,7 @@ export class BaseService {
             regionmap.set(r.name, r)
           }
           const returnVal: Record<string, Record<number, NgMapReturnType>> = {}
-          for (const [url, { layer, region }] of Object.entries(record)) {
+          for (const [ /* url */ , { layer, region }] of Object.entries(record)) {
             
             
             for (const { name, label } of region) {

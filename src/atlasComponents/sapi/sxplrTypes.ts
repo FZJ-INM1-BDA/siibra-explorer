@@ -102,10 +102,6 @@ export type Feature = {
   category?: string
 } & Partial<AdditionalInfo>
 
-type DataFrame = {
-  index: Record<string, string>
-}
-
 export type VoiFeature = {
   bbox: BoundingBox
   ngVolume: {

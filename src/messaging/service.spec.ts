@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing"
-import { MockStore, provideMockStore } from "@ngrx/store/testing"
+import { provideMockStore } from "@ngrx/store/testing"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { AngularMaterialModule } from "src/sharedModules"
 import { getUuid } from "src/util/fn"
@@ -9,6 +9,7 @@ import { MANAGED_METHODS } from './service'
 import { of, Subject } from "rxjs"
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component"
 import { TYPE as NATIVE_TYPE } from './native'
+import { ApiService } from "src/api"
 
 describe('> service.ts', () => {
   describe('> MessagingService', () => {
@@ -34,6 +35,17 @@ describe('> service.ts', () => {
           {
             provide: WINDOW_MESSAGING_HANDLER_TOKEN,
             useValue: windowMessagehandler
+          },
+          {
+            provide: ApiService,
+            useValue: {
+              booth: {
+                handshake(){}
+              },
+              broadcastCh: {
+                addListener(){}
+              }
+            }
           }
         ]
       })
@@ -118,7 +130,7 @@ describe('> service.ts', () => {
         it('> pong', async () => {
           const result = await mService.handleMessage({
             data: {
-              method: `${IAV_POSTMESSAGE_NAMESPACE}ping`
+              method: `ping`
             },
             origin: 'foobar'
           })

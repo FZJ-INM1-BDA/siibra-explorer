@@ -7,6 +7,7 @@ import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { atlasSelection } from "src/state";
 import { BaseService } from "../base.service/base.service";
+import { IDS } from "src/atlasComponents/sapi"
 
 /**
  * control mesh loading etc
@@ -38,7 +39,7 @@ export class NehubaMeshService implements OnDestroy {
       const ngIdRecord: Record<string, number[]> = {}
 
       for (const [ngId, labelToRegion] of Object.entries(record)) {
-        for (const [label, _region] of Object.entries(labelToRegion)) {
+        for (const [label, ] of Object.entries(labelToRegion)) {
           if (!ngIdRecord[ngId]) {
             ngIdRecord[ngId] = []
           }
@@ -126,8 +127,21 @@ export class NehubaMeshService implements OnDestroy {
     this.#allSegmentMeshes$,
     this.#selectedSegmentMeshes$,
     this.#auxMesh$,
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedTemplate)
+    ),
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedParcellation)
+    )
   ]).pipe(
-    switchMap(([ allSegMesh, selectedSegMesh, auxmesh ]) => {
+    switchMap(([ allSegMesh, selectedSegMesh, auxmesh, selectedTemplate, selectedParcellation ]) => {
+      /**
+       * TODO monkey patching jba29 in colin to show all meshes
+       * 
+       */
+      if (selectedParcellation.id === IDS.PARCELLATION.JBA29 && selectedTemplate.id === IDS.TEMPLATES.COLIN27) {
+        return of(...allSegMesh)
+      }
       const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)
       const hasAuxMesh = auxmesh.length > 0
       const meshesToLoad: IMeshesToLoad[] = []

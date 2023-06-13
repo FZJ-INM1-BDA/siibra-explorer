@@ -4,7 +4,7 @@ import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Sub
 import { userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
-import { QUICKTOUR_DESC, ARIA_LABELS, IDS } from 'common/constants'
+import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take } from "rxjs/operators";
 import {panelOrder} from "src/state/userInterface/selectors";
@@ -28,6 +28,7 @@ export class NehubaLayoutOverlay implements OnDestroy{
   public quickTourSliceViewSlide: IQuickTourData = {
     order: 1,
     description: QUICKTOUR_DESC.SLICE_VIEW,
+    descriptionMd: QUICKTOUR_DESC_MD.SLICE_VIEW
   }
 
   public quickTour3dViewSlide: IQuickTourData = {

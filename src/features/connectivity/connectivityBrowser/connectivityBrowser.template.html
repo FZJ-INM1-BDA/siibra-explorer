@@ -16,29 +16,37 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field *ngIf="!(busy$ | async) && (formValue$ | async | getProperty : 'selectedType')" class="flex-grow-1 flex-shrink-1 w-100">
-                    <mat-label>
-                        Cohort
-                    </mat-label>
-                    <mat-select formControlName="selectedCohort">
-                        <mat-option *ngFor="let cohort of cohorts$ | async"
-                            [value]="cohort">
-                            {{ cohort }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </ng-template>
+                <ng-template [ngIf]="cohorts$ | async" let-cohorts>
+                    <ng-template [ngIf]="cohorts.length > 0">
 
-        <ng-template [ngIf]="formValue$ | async | getProperty : 'selectedCohort'">
-            <mat-radio-group formControlName="selectedView">
-                <mat-radio-button value="average" class="m-2" color="primary">
-                    Average
-                </mat-radio-button>
-                <mat-radio-button value="subject" class="m-2" color="primary">
-                    Subject
-                </mat-radio-button>
-            </mat-radio-group>
+                        <mat-form-field class="flex-grow-1 flex-shrink-1 w-100">
+                            <mat-label>
+                                Cohort
+                            </mat-label>
+                            <mat-select formControlName="selectedCohort">
+                                <mat-option *ngFor="let cohort of cohorts$ | async"
+                                    [value]="cohort">
+                                    {{ cohort }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        
+                        <ng-template [ngIf]="formValue$ | async | getProperty : 'selectedCohort'">
+                            <mat-radio-group formControlName="selectedView">
+                                <mat-radio-button value="average" class="m-2" color="primary">
+                                    Average
+                                </mat-radio-button>
+                                <mat-radio-button value="subject" class="m-2" color="primary">
+                                    Subject
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </ng-template>
+                
+                    </ng-template>
+                </ng-template>
+
+            </div>
         </ng-template>
 
         <ng-template [ngIf]="cohortDatasets$ | async" let-cohortDatasets>
@@ -84,7 +92,7 @@
         <!-- loading spinner -->
         <ng-template [ngIf]="view$ | async | getProperty : 'fetchingMatrix'"
             [ngIfElse]="profileTmpl">
-            <div class="d-flex justify-content-center" id = 'blabla'>
+            <div class="d-flex justify-content-center">
                 <mat-spinner></mat-spinner>
             </div>
         </ng-template>
@@ -92,7 +100,13 @@
         <!-- profile -->
         <!-- <pre>{{ view$ | async | json }}</pre> -->
         <ng-template #profileTmpl>
-            <ng-template [ngIf]="view$ | async | getProperty : 'connections'" let-conn>
+            
+            <ng-template #noConnTmpl>
+                No connectivity Found
+            </ng-template>
+        
+            <ng-template [ngIf]="view$ | async | getProperty : 'connections'" let-conn
+                [ngIfElse]="noConnTmpl">
                 <div class="d-flex align-items-center">
                     <form [formGroup]="displayForm">
                         <mat-checkbox

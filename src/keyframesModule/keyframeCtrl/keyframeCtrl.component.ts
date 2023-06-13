@@ -171,13 +171,11 @@ export class KeyFrameCtrlCmp implements OnDestroy {
         )
 
         const startVec = vec1.clone()
-        const vec1Length = vec1.length()
         const vec2 = new THREE.Vector3(
           toPayloadCamera.x,
           toPayloadCamera.y,
           toPayloadCamera.z,
         )
-        const vec2Length = vec2.length()
         vec1.normalize()
         vec2.normalize()
 
