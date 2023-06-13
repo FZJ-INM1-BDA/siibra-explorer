@@ -144,7 +144,7 @@ export class PointAssignmentComponent implements OnDestroy {
 function generateReadMe(pt: TSandsPoint, parc: SxplrParcellation, tmpl: SxplrTemplate){
   return `# Point assignment exporter
 
-Exported by siibra-explorer verison \`${environment.VERSION}\` hash: \`${environment.GIT_HASH}\`.
+Exported by siibra-explorer verison \`${environment.VERSION}\` hash: \`${environment.GIT_HASH.trim()}\`.
 
 On: ${new Date().toString()}
 
