@@ -126,14 +126,21 @@ export const UNSUPPORTED_PREVIEW = [{
 
 export const UNSUPPORTED_INTERVAL = 7000
 
+export const SPECIES_ENUM = {
+  HOMO_SAPIENS: "Homo sapiens",
+  MACACA_FASCICULARIS: "Macaca fascicularis",
+  RATTUS_NORVEGICUS: "Rattus norvegicus",
+  MUS_MUSCULUS: "Mus musculus",
+} as const
+
 /**
  * atlas should follow the following order
  */
 export const speciesOrder = [
-  "Homo sapiens",
-  "Macaca fascicularis",
-  "Rattus norvegicus",
-  "Mus musculus"
+  SPECIES_ENUM.HOMO_SAPIENS,
+  SPECIES_ENUM.MACACA_FASCICULARIS,
+  SPECIES_ENUM.RATTUS_NORVEGICUS,
+  SPECIES_ENUM.MUS_MUSCULUS,
 ]
 
 export const parcBanList: string[] = [
