@@ -6,7 +6,7 @@ import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi
 import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
-import { TSandsPoint } from 'src/util/types';
+import { TFace, TSandsPoint } from 'src/util/types';
 import { TZipFileConfig } from "src/zipFilesOutput/type"
 import { environment } from "src/environments/environment"
 
@@ -33,7 +33,11 @@ export class PointAssignmentComponent implements OnDestroy {
 
   #point = new BehaviorSubject<TSandsPoint>(null)
   @Input()
-  set point(val: TSandsPoint) {
+  set point(val: TSandsPoint|TFace) {
+    const { '@type': type } = val
+    if (type === "siibra-explorer/surface/face") {
+      return
+    }
     this.#point.next(val)
   }
   

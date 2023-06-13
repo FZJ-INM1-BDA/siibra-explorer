@@ -17,7 +17,7 @@ app.use('/quickstart', require('./quickstart'))
 
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')
 
-app.use((req, _, next) => {
+app.use((req, resp, next) => {
   if (/main\.bundle\.js$/.test(req.originalUrl)){
     const xForwardedFor = req.headers['x-forwarded-for']
     const ip = req.socket.remoteAddress
@@ -27,6 +27,9 @@ app.use((req, _, next) => {
       xForwardedFor: xForwardedFor && xForwardedFor.replace(/\ /g, '').split(',').map(hash),
       ip: hash(ip)
     })
+  }
+  if (/favicon/.test(req.originalUrl)) {
+    resp.setHeader(`Cache-Control`, `public, max-age=604800, immutable`)
   }
   next()
 })
