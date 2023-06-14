@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "min": -0.0126495361328125,
+    "max": 99.16897303564474,
+    "transform": [[1, 0, 0, -9.6e7],
+        [0, 1, 0, -1.32e8],
+        [0, 0, 1, -7.8e7],
+        [0, 0, 0, 1]
+    ], 
+    "shader": "void main() { emitGrayscale(toNormalized(getDataValue())); }",
+    "bestViews": [{
+        "type": "point",
+        "value": [1e3, 1e3, 1e3]
+    }]
+}
