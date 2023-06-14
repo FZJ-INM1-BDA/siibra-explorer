@@ -19,19 +19,19 @@ plugins:
 
 nav:
   - Home: 'index.md'
+  - Main Concepts: 'main_concepts.md'
   - System requirements: 'requirements.md'
   - User documentation:
-    - Selecting: 'usage/selecting.md'
+    - Get Started: 'usage/get_started.md'
+    - Selecting Maps: 'usage/selecting_maps.md'
+    - Download Maps: 'usage/download_maps.md'
     - Navigating: 'usage/navigating.md'
-    - Searching: 'usage/search.md'
-    - Exploring connectivity: 'usage/connectivity.md'
-    - Miscellaneous: 'usage/misc.md'
-    - Sharing: 'usage/sharing.md'
-  - Advanced usage:
-    - Keyboard shortcuts: 'advanced/keyboard.md'
-    - URL parsing: 'advanced/url.md'
-    - Fetching datasets: 'advanced/datasets.md'
-    - Display non-atlas volumes: 'advanced/otherVolumes.md'
+    - Find and Selecting Region(s): 'usage/selecting.md'
+    - Region lookup from coordinate: 'usage/region_lookup.md'
+    - Spatial search: 'usage/spatial_search.md'
+    - Annotation: 'usage/annotation.md'
+    - Saving/Sharing view: 'usage/sharing.md'
+
   - Release notes:
     - v2.11.2: 'releases/v2.11.2.md'
     - v2.11.1: 'releases/v2.11.1.md'

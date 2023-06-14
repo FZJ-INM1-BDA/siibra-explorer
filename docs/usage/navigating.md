@@ -1,46 +1,28 @@
 # Navigating
 
-## Navigating the viewer
+In the case of a surface template, siibra-explorer shows a single view presenting the surface of the reference template.
 
-The siibra explorer can be accessed from either a desktop or an Android mobile device. The navigation scheme vary slightly between the two platforms.
+In the case of a surface template, siibra-explorer shows a single view presenting the surface of the reference template.
+
+![](https://object.cscs.ch:443/v1/AUTH_7e4157014a3d4c1f8ffe270b57008fd4/reference-atlas-data/static/fsavearge.png)
+
+In the case of a volumetric template, the selected reference template is presented in a 3D view with orthogonal cross-sections.
+
+![](https://object.cscs.ch:443/v1/AUTH_7e4157014a3d4c1f8ffe270b57008fd4/reference-atlas-data/static/mni152JulichBrain.png)
+
+Independent of the actual resolution of the volumetric reference template, the 3D whole brain view has limited resolution. It is designed as a 3D topographical orientation and will always show the brain as a whole. If the reference template is high-resolution, the slice views allow zooming into full resolution. 
+
+Depending on the used device the navigation actions may vary slightly:
 
 | | Desktop | Mobile |
 | --- | --- | --- |
 | Translating / Panning | `click drag` on any _slice views_ | `touchmove` on any _slice views_ |
 | Oblique rotation | `shift` + `click drag` on any _slice views_ | `pinch rotate` |
 | Zooming (_slice view_, _3d view_) | `mouse wheel` | `pinch zoom` |
-| Next slice (_slice view_) | `ctrl` + `mouse wheel` | |
-| Next 10 slice (_slice view_) | `ctrl` + `shift` + `mouse wheel` | |
 
-## Navigating to a region of interest
+To reset all views click on the coordinate navigator at the top. There you can separately reset the views to the initial position, orientation, and zoom. This panel also allows you to copy or set the location of the current view’s center, which is marked by the colored axes. Moreover, you can toggle the coordinate units between physical (mm) and voxel.
 
-!!! warning
-    Not all regions have a position of interest curated. If absent, the UI elements described below would be missing.
-    
-    If you believe some regions should have a position of interest curated, or the position of interest was incorrectly curated, please contact us. 
 
-### From the viewer
+![](https://object.cscs.ch:443/v1/AUTH_7e4157014a3d4c1f8ffe270b57008fd4/reference-atlas-data/static/viewerstatus.png)
 
-`click` on a segmented region to bring up a region specific dialog
-
-[![](images/bigbrain_region_specific_dialog.png)](images/bigbrain_region_specific_dialog.png)
-
-From here, `click` on `Navigate`.
-
-### From quick search
-
-`click` on the map icon.
-
-[![](images/bigbrain_quicksearch_hoc.png)](images/bigbrain_quicksearch_hoc.png)
-
-### From hierarchy tree
-
-`double click` on the region of interest. 
-
-[![](images/bigbrain_full_hierarchy.png)](images/bigbrain_full_hierarchy.png)
-
-## Navigation status panel
-
-You can find the navigation status in the lower left corner of the siibra explorer. You can reset the `position`, `rotation` and/or `zoom`, as well as toggling the units between `physical` (mm) and `voxel`.
-
-[![](images/navigation_status.png)](images/navigation_status.png)
+In addition to exploring all views at once, a slice view can also be maximised by pressing `[ ]` located at the bottom right of the slice view.
