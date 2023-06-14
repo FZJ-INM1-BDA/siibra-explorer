@@ -4,16 +4,20 @@ import { SlSpotlightDirective } from './sl-spotlight.directive';
 import { SpotlightBackdropComponent } from './spotlight-backdrop/spotlight-backdrop.component';
 import { SpotLightOverlayDirective } from './spot-light-overlay.directive';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { OverlayModule } from '@angular/cdk/overlay';
+import { PortalModule } from '@angular/cdk/portal';
 
 @NgModule({
   declarations: [
     SlSpotlightDirective,
     SpotlightBackdropComponent,
-    SpotLightOverlayDirective
+    SpotLightOverlayDirective,
   ],
   imports: [
     BrowserAnimationsModule,
-    CommonModule
+    CommonModule,
+    OverlayModule,
+    PortalModule,
   ],
   exports: [
     SlSpotlightDirective
