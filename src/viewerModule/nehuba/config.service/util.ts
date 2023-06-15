@@ -8,6 +8,7 @@ import {
   RecursivePartial,
 } from "./type"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants"
 // fsaverage uses threesurfer, which, whilst do not use ngId, uses 'left' and 'right' as keys 
 const fsAverageKeyVal = {
   [IDS.PARCELLATION.JBA29]: {
@@ -374,8 +375,8 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
         "drawSubstrates": drawSubstrates,
         "drawZoomLevels": drawZoomLevels,
         "restrictZoomLevel": {
-          "minZoom": 1200000 * scale,
-          "maxZoom": 3500000 * scale
+          "minZoom": 1200000 * scale * PERSPECTIVE_ZOOM_FUDGE_FACTOR,
+          "maxZoom": 3500000 * scale * PERSPECTIVE_ZOOM_FUDGE_FACTOR
         }
       }
     }

@@ -75,7 +75,8 @@ export class LayerCtrlEffects {
                       highThreshold: meta.max,
                       lowThreshold: meta.min,
                       removeBg: true,
-                    })
+                    }),
+                    type: 'image'
                   }
                 })
               )

@@ -121,6 +121,7 @@ export class UserLayerService implements OnDestroy {
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
         }),
+        type: 'image'
       },
     }
   }
