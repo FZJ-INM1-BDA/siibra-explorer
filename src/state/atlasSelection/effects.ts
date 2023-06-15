@@ -63,19 +63,17 @@ export class Effect {
         })
       }
 
-      /**
-       * if either space name is undefined, return default state for navigation
-       */
-      if (!prevSpcName || !currSpcName) {
-        return of({
-          navigation: atlasSelection.defaultState.navigation
-        })
-      }
       return this.store.pipe(
         select(atlasSelection.selectors.navigation),
         take(1),
         switchMap(({ position, ...rest }) => 
-          this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, position as [number, number, number]).pipe(
+        
+          /**
+           * if either space name is undefined, return default state for navigation
+           */
+          !prevSpcName || !currSpcName
+          ? of({ navigation: { position, ...rest } })
+          : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, position as [number, number, number]).pipe(
             map(value => {
               if (value.status === "error") {
                 return {}

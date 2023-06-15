@@ -719,7 +719,14 @@ export class NehubaViewerUnit implements OnDestroy {
           [0, 1, 2].every(idx => p1[idx] === p2[idx]) &&
           z1 === z2
       })
-      .filter(() => !this.initNav)
+      /**
+       * somewhat another fudge factor
+       * navigationState.all occassionally emits slice zoom and perspective zoom that maeks no sense
+       * filter those out
+       * 
+       * TODO find out why, and perhaps inform pavel about this
+       */
+      .filter(val => !this.initNav && val?.perspectiveZoom > 10)
       .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
 
         this.viewerPositionChange.emit({
