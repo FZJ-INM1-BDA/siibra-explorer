@@ -158,13 +158,13 @@ describe("> effects.ts", () => {
                 },
                 previous: {
                   atlas: {
-                    "@id": IDS.ATLAES.RAT
+                    id: IDS.ATLAES.RAT
                   } as any,
                   parcellation: {
-                    "@id": IDS.PARCELLATION.WAXHOLMV4
+                    id: IDS.PARCELLATION.WAXHOLMV4
                   } as any,
                   template: {
-                    "@id": IDS.TEMPLATES.WAXHOLM
+                    id: IDS.TEMPLATES.WAXHOLM
                   } as any,
                 }
               })
@@ -186,24 +186,24 @@ describe("> effects.ts", () => {
               const obs = hook({
                 current: {
                   atlas: {
-                    "@id": IDS.ATLAES.HUMAN
+                    id: IDS.ATLAES.HUMAN
                   } as any,
                   parcellation: {
-                    "@id": IDS.PARCELLATION.JBA29
+                    id: IDS.PARCELLATION.JBA29
                   } as any,
                   template: {
-                    "@id": IDS.TEMPLATES.MNI152
+                    id: IDS.TEMPLATES.MNI152
                   } as any,
                 },
                 previous: {
                   atlas: {
-                    "@id": IDS.ATLAES.RAT
+                    id: IDS.ATLAES.RAT
                   } as any,
                   parcellation: {
-                    "@id": IDS.PARCELLATION.WAXHOLMV4
+                    id: IDS.PARCELLATION.WAXHOLMV4
                   } as any,
                   template: {
-                    "@id": IDS.TEMPLATES.WAXHOLM
+                    id: IDS.TEMPLATES.WAXHOLM
                   } as any,
                 }
               })

@@ -31,7 +31,7 @@ export type NgLayerCustomLayer = {
   transform?: number[][]
   opacity?: number
   segments?: (number|string)[]
-  // type?: string
+  type?: string
 
   // annotation?: string // TODO what is this used for?
 } & CustomLayerBase

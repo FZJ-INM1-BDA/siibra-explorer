@@ -86,7 +86,8 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
           "1"
         ],
         transform: transform,
-        clType: 'customlayer/nglayer' as const
+        clType: 'customlayer/nglayer' as const,
+        type: 'segmentation',
       }
 
       this.store.dispatch(
