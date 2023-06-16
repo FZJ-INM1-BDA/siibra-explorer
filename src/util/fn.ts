@@ -1,18 +1,6 @@
 import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 
-export function getViewer() {
-  return (window as any).viewer
-}
-
-export function setViewer(viewer) {
-  (window as any).viewer = viewer
-}
-
-export function setNehubaViewer(nehubaViewer) {
-  (window as any).nehubaViewer = nehubaViewer
-}
-
 export function getDebug() {
   return (window as any).__DEBUG__
 }

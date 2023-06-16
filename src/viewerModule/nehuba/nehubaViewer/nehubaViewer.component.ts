@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optiona
 import { Subscription, BehaviorSubject, Observable, Subject, of, interval, combineLatest } from 'rxjs'
 import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { bufferUntil, getExportNehuba, getViewer, setNehubaViewer, switchMapWaitFor } from "src/util/fn";
+import { bufferUntil, getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
 import { arrayOrderedEql, rgbToHex } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
@@ -12,6 +12,15 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
  * import of nehuba js files moved to angular.json
  */
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
+import { NgCoordinateSpace, Unit } from "../types";
+
+function translateUnit(unit: Unit) {
+  if (unit === "m") {
+    return 1e9
+  }
+
+  throw new Error(`Cannot translate unit: ${unit}`)
+}
 
 export const IMPORT_NEHUBA_INJECT_TOKEN = `IMPORT_NEHUBA_INJECT_TOKEN`
 
@@ -49,6 +58,7 @@ export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
 
 export class NehubaViewerUnit implements OnDestroy {
 
+  #translateVoxelToReal: (voxels: number[]) => number[]
 
   public ngIdSegmentsMap: Record<string, number[]> = {}
 
@@ -97,19 +107,7 @@ export class NehubaViewerUnit implements OnDestroy {
       : [1.5e9, 1.5e9, 1.5e9]
   }
 
-  public _s2$: any = null
-  public _s3$: any = null
-  public _s5$: any = null
-  public _s7$: any = null
-  public _s8$: any = null
-
-  public _s$: any[] = [
-    this._s2$,
-    this._s3$,
-    this._s5$,
-    this._s7$,
-    this._s8$,
-  ]
+  #newViewerSubs: { unsubscribe: () => void }[] = []
 
   public ondestroySubscriptions: Subscription[] = []
 
@@ -357,15 +355,15 @@ export class NehubaViewerUnit implements OnDestroy {
 
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
-      getViewer().display.panels.forEach(patchSliceViewPanel)
+      window['viewer'].display.panels.forEach(patchSliceViewPanel)
     })
 
     this.newViewerInit()
-    this.loadNewParcellation()
+    window['nehubaViewer'] = this.nehubaViewer
 
-    setNehubaViewer(this.nehubaViewer)
-
-    this.onDestroyCb.push(() => setNehubaViewer(null))
+    this.onDestroyCb.push(() => {
+      window['nehubaViewer'] = null
+    })
   }
 
   public ngOnDestroy() {
@@ -375,10 +373,10 @@ export class NehubaViewerUnit implements OnDestroy {
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
-
-    this._s$.forEach(_s$ => {
-      if (_s$) { _s$.unsubscribe() }
-    })
+    while (this.#newViewerSubs.length > 0) {
+      this.#newViewerSubs.pop().unsubscribe()
+    }
+    
     this.ondestroySubscriptions.forEach(s => s.unsubscribe())
     while (this.onDestroyCb.length > 0) {
       this.onDestroyCb.pop()()
@@ -613,18 +611,6 @@ export class NehubaViewerUnit implements OnDestroy {
     }
   }
 
-  public obliqueRotateX(amount: number) {
-    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -amount / 4.0 * Math.PI / 180.0)
-  }
-
-  public obliqueRotateY(amount: number) {
-    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([1, 0, 0]), amount / 4.0 * Math.PI / 180.0)
-  }
-
-  public obliqueRotateZ(amount: number) {
-    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 0, 1]), amount / 4.0 * Math.PI / 180.0)
-  }
-
   public toggleOctantRemoval(flag?: boolean) {
     const ctrl = this.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
     if (!ctrl) {
@@ -674,29 +660,29 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 
   private newViewerInit() {
-
-    /* isn't this layer specific? */
-    /* TODO this is layer specific. need a way to distinguish between different segmentation layers */
-    this._s2$ = this.nehubaViewer.mouseOver.segment
-      .subscribe(({ segment, layer }) => {
-        this.mouseOverSegment = segment
-        this.mouseOverLayer = { ...layer }
-      })
-
-    if (this.initNav) {
-      this.setNavigationState(this.initNav)
-      this.initNav = null
+    
+    while (this.#newViewerSubs.length > 0) {
+      this.#newViewerSubs.pop().unsubscribe()
     }
 
-    this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer }) => {
-      this.mouseoverSegmentEmitter.emit({
-        layer,
-        segmentId,
-      })
-    })
+    this.#newViewerSubs.push(
 
-    // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
-    this._s3$ = this.nehubaViewer.navigationState.all
+      /* isn't this layer specific? */
+      /* TODO this is layer specific. need a way to distinguish between different segmentation layers */
+      this.nehubaViewer.mouseOver.segment.subscribe(({ segment, layer }) => {
+        this.mouseOverSegment = segment
+        this.mouseOverLayer = { ...layer }
+      }),
+
+      this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer }) => {
+        this.mouseoverSegmentEmitter.emit({
+          layer,
+          segmentId,
+        })
+      }),
+
+      // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
+      this.nehubaViewer.navigationState.all
       .distinctUntilChanged((a, b) => {
         const {
           orientation: o1,
@@ -737,37 +723,53 @@ export class NehubaViewerUnit implements OnDestroy {
           position: Array.from(position),
           positionReal : true,
         })
-      })
+      }),
 
-    // this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace
-    //   .filter(v => typeof v !== 'undefined' && v !== null)
-    //   .subscribe(v => {
-    //     this.navPosReal = Array.from(v) as [number, number, number]
-    //     this.viewerPosInReal$.next(Array.from(v) as [number, number, number])
-    //   })
-    this._s5$ = this.nehubaViewer.navigationState.position.inVoxels
-      .filter(v => typeof v !== 'undefined' && v !== null)
-      .subscribe((v: Float32Array) => {
-        this.viewerPosInVoxel$.next(Array.from(v))
-      })
-    // this._s6$ = this.nehubaViewer.mousePosition.inRealSpace
-    //   .filter(v => typeof v !== 'undefined' && v !== null)
-    //   .subscribe(v => {
-    //     this.mousePosReal = Array.from(v) as [number, number, number]
-    //     this.mousePosInReal$.next(Array.from(v))
-    //   })
-    this._s7$ = this.nehubaViewer.mousePosition.inVoxels
-      .filter((v: Float32Array) => typeof v !== 'undefined' && v !== null)
-      .subscribe((v: Float32Array) => {
-        this.mousePosInVoxel$.next(Array.from(v) as [number, number, number] )
-      })
-  }
+      this.nehubaViewer.navigationState.position.inVoxels
+        .filter(v => typeof v !== 'undefined' && v !== null)
+        .subscribe((v: Float32Array) => {
+          const coordInVoxel = Array.from(v)
+          this.viewerPosInVoxel$.next(coordInVoxel)
+          if (this.#translateVoxelToReal) {
+            
+            const coordInReal = this.#translateVoxelToReal(coordInVoxel)
+            this.viewerPosInReal$.next(coordInReal as [number, number, number])
+          }
+        }),
 
-  private loadNewParcellation() {
+      this.nehubaViewer.mousePosition.inVoxels
+        .filter((v: Float32Array) => typeof v !== 'undefined' && v !== null)
+        .subscribe((v: Float32Array) => {
+          const coordInVoxel = Array.from(v) as [number, number, number]
+          this.mousePosInVoxel$.next( coordInVoxel )
+          if (this.#translateVoxelToReal) {
+            
+            const coordInReal = this.#translateVoxelToReal(coordInVoxel)
+            this.mousePosInReal$.next( coordInReal )
+          }
+        }),
 
-    this._s$.forEach(_s$ => {
-      if (_s$) { _s$.unsubscribe() }
+    )
+
+    const coordSpListener = this.nehubaViewer.ngviewer.coordinateSpace.changed.add(() => {
+      const coordSp = this.nehubaViewer.ngviewer.coordinateSpace.value as NgCoordinateSpace
+      if (coordSp.valid) {
+        this.#translateVoxelToReal = (coordInVoxel: number[]) => {
+          return coordInVoxel.map((voxel, idx) => (
+            translateUnit(coordSp.units[idx])
+            * coordSp.scales[idx]
+            * voxel
+          ))
+        }
+      }
     })
+    this.nehubaViewer.ngviewer.registerDisposer(coordSpListener)
+
+    if (this.initNav) {
+      this.setNavigationState(this.initNav)
+      this.initNav = null
+    }
+    
   }
 
   private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {
@@ -826,51 +828,4 @@ export interface ViewerState {
   zoom: number
 }
 
-export const ICOSAHEDRON = `# vtk DataFile Version 2.0
-Converted using https://github.com/HumanBrainProject/neuroglancer-scripts
-ASCII
-DATASET POLYDATA
-POINTS 12 float
--525731.0 0.0 850651.0
-525731.0 0.0 850651.0
--525731.0 0.0 -850651.0
-525731.0 0.0 -850651.0
-0.0 850651.0 525731.0
-0.0 850651.0 -525731.0
-0.0 -850651.0 525731.0
-0.0 -850651.0 -525731.0
-850651.0 525731.0 0.0
--850651.0 525731.0 0.0
-850651.0 -525731.0 0.0
--850651.0 -525731.0 0.0
-POLYGONS 20 80
-3 1 4 0
-3 4 9 0
-3 4 5 9
-3 8 5 4
-3 1 8 4
-3 1 10 8
-3 10 3 8
-3 8 3 5
-3 3 2 5
-3 3 7 2
-3 3 10 7
-3 10 6 7
-3 6 11 7
-3 6 0 11
-3 6 1 0
-3 10 1 6
-3 11 0 9
-3 2 11 9
-3 5 2 9
-3 11 2 7`
-
-declare const TextEncoder
-
-export const _encoder = new TextEncoder()
-export const ICOSAHEDRON_VTK_URL = URL.createObjectURL( new Blob([ _encoder.encode(ICOSAHEDRON) ], {type : 'application/octet-stream'} ))
-
-export const FRAGMENT_MAIN_WHITE = `void main(){emitRGB(vec3(1.0,1.0,1.0));}`
-export const FRAGMENT_EMIT_WHITE = `emitRGB(vec3(1.0, 1.0, 1.0));`
-export const FRAGMENT_EMIT_RED = `emitRGB(vec3(1.0, 0.1, 0.12));`
 export const computeDistance = (pt1: [number, number], pt2: [number, number]) => ((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2) ** 0.5
