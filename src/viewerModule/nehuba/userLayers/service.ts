@@ -77,6 +77,7 @@ export class UserLayerService implements OnDestroy {
         options: {
           segments: ["1"],
           transform: xform,
+          type: "segmentation"
         },
       }
     }

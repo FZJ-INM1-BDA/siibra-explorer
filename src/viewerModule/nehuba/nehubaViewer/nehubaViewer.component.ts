@@ -13,6 +13,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
  */
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
+import { PeriodicSvc } from "src/util/periodic.service";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -118,6 +119,7 @@ export class NehubaViewerUnit implements OnDestroy {
   constructor(
     public elementRef: ElementRef,
     private log: LoggingService,
+    private periodicSvc: PeriodicSvc,
     @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
@@ -475,6 +477,27 @@ export class NehubaViewerUnit implements OnDestroy {
         /* if the layer exists, it will not be loaded */
         !viewer.layerManager.getLayerByName(key))
       .map(key => {
+        /**
+         * new implementation of neuroglancer treats swc as a mesh layer of segmentation layer
+         * But it cannot *directly* be accessed by nehuba's setMeshesToLoad, since it filters by 
+         * UserSegmentationLayer.
+         * 
+         * The below monkey patch sets the mesh to load, allow the SWC to be shown
+         */
+        const isSwc = layerObj[key]['source'].includes("swc://")
+        const hasSegment = (layerObj[key]["segments"] || []).length > 0
+        if (isSwc && hasSegment) {
+          this.periodicSvc.addToQueue(
+            () => {
+              const layer = viewer.layerManager.getLayerByName(key)
+              if (!(layer?.layer)) {
+                return false
+              }
+              layer.layer.displayState.visibleSegments.setMeshesToLoad([1])
+              return true
+            }
+          )
+        }
         viewer.layerManager.addManagedLayer(
           viewer.layerSpecification.getLayer(key, layerObj[key]))
 
