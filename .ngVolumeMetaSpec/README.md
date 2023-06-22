@@ -38,12 +38,12 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | version | `1` | true |
-| data | [Generic Image](#definitions-data:image) \|\| [Single Channel Image](#definitions-data:image:1d) \|\| [Three Channel Image](#definitions-data:image:3d) |  |
+| data | [Generic Image](#definitions-data-image) \|\| [Single Channel Image](#definitions-data-image-1d) \|\| [Three Channel Image](#definitions-data-image-3d) |  |
 | transform | [4x4 affine](#definitions-mat4) |  |
 | override | [Override](#definitions-override) |  |
-| bestViewPoints | ([Point Geometry](#definitions-geometry:point) \|\| [Plane Geometry](#definitions-geometry:plane))[] |  |
+| bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane))[] |  |
 
-<a name="definitions-data:image"></a>
+<a name="definitions-data-image"></a>
 
 # Generic Image
 
@@ -57,7 +57,7 @@ type: `object`
 | type | `image` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
-<a name="definitions-data:image:1d"></a>
+<a name="definitions-data-image-1d"></a>
 
 # Single Channel Image
 
@@ -68,10 +68,10 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `image:1d` | true |
+| type | `image/1d` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
-<a name="definitions-data:image:3d"></a>
+<a name="definitions-data-image-3d"></a>
 
 # Three Channel Image
 
@@ -82,7 +82,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `image:3d` | true |
+| type | `image/3d` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
 <a name="definitions-range"></a>
@@ -113,7 +113,7 @@ type: `array`
 type: `array`
 
 
-<a name="definitions-geometry:point"></a>
+<a name="definitions-geometry-point"></a>
 
 # Point Geometry
 
@@ -125,7 +125,7 @@ type: `object`
 | type | `point` | true |
 | value | [3x1 Vector](#definitions-vec3) |  |
 
-<a name="definitions-geometry:plane"></a>
+<a name="definitions-geometry-plane"></a>
 
 # Plane Geometry
 

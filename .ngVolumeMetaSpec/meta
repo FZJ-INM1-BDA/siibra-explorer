@@ -6,7 +6,7 @@
         "value": [1, 2, 3]
     }],
     "data": {
-        "type": "image:1d",
+        "type": "image/1d",
         "range": [{
             "min": 0,
             "max": 1

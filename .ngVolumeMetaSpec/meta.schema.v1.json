@@ -9,13 +9,13 @@
         "data": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/data:image"
+                    "$ref": "#/definitions/data-image"
                 },
                 {
-                    "$ref": "#/definitions/data:image:1d"
+                    "$ref": "#/definitions/data-image-1d"
                 },
                 {
-                    "$ref": "#/definitions/data:image:3d"
+                    "$ref": "#/definitions/data-image-3d"
                 }
             ]
         },
@@ -42,9 +42,9 @@
             "type": "array",
             "items": {
                 "oneOf": [{
-                    "$ref": "#/definitions/geometry:point"
+                    "$ref": "#/definitions/geometry-point"
                 }, {
-                    "$ref": "#/definitions/geometry:plane"
+                    "$ref": "#/definitions/geometry-plane"
                 }]
             }
         }
@@ -53,7 +53,7 @@
         "version"
     ],
     "definitions": {
-        "data:image": {
+        "data-image": {
             "type": "object",
             "title": "Generic Image",
             "description": "Generic image, with arbitary dimensions.",
@@ -72,13 +72,13 @@
                 "type"
             ]
         },
-        "data:image:1d": {
+        "data-image-1d": {
             "type": "object",
             "title": "Single Channel Image",
             "description": "Describes an image with 1 dimension, e.g. used as greyscale image.",
             "properties": {
                 "type": {
-                    "const": "image:1d"
+                    "const": "image/1d"
                 },
                 "range": {
                     "type": "array",
@@ -93,13 +93,13 @@
                 "type"
             ]
         },
-        "data:image:3d": {
+        "data-image-3d": {
             "type": "object",
             "title": "Three Channel Image",
             "description": "Describes an image with 3 dimensions, mostly used as RGB image.",
             "properties": {
                 "type": {
-                    "const": "image:3d"
+                    "const": "image/3d"
                 },
                 "range": {
                     "type": "array",
@@ -220,7 +220,7 @@
                 "type": "number"
             }
         },
-        "geometry:point": {
+        "geometry-point": {
             "title": "Point Geometry",
             "type": "object",
             "properties": {
@@ -235,7 +235,7 @@
                 "type"
             ]
         },
-        "geometry:plane": {
+        "geometry-plane": {
             "title": "Plane Geometry",
             "type": "object",
             "properties": {
