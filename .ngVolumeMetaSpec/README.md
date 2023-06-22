@@ -37,7 +37,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| version | `1` | true |
+| version | `"1"` | true |
 | data | [Generic Image](#definitions-data-image) \|\| [Single Channel Image](#definitions-data-image-1d) \|\| [Three Channel Image](#definitions-data-image-3d) |  |
 | transform | [4x4 affine](#definitions-mat4) |  |
 | override | [Override](#definitions-override) |  |
@@ -54,7 +54,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `image` | true |
+| type | `"image"` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
 <a name="definitions-data-image-1d"></a>
@@ -68,7 +68,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `image/1d` | true |
+| type | `"image/1d"` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
 <a name="definitions-data-image-3d"></a>
@@ -82,7 +82,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `image/3d` | true |
+| type | `"image/3d"` | true |
 | range | ([Value Range](#definitions-range))[] |  |
 
 <a name="definitions-range"></a>
@@ -122,7 +122,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `point` | true |
+| type | `"point"` | true |
 | value | [3x1 Vector](#definitions-vec3) |  |
 
 <a name="definitions-geometry-plane"></a>
@@ -134,7 +134,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| type | `plane` | true |
+| type | `"plane"` | true |
 
 <a name="definitions-override"></a>
 
