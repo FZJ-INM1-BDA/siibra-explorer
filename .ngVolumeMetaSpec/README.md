@@ -42,6 +42,7 @@ type: `object`
 | transform | [4x4 affine](#definitions-mat4) |  |
 | override | [Override](#definitions-override) |  |
 | bestViewPoints | ([Point Geometry](#definitions-geometry:point) \|\| [Plane Geometry](#definitions-geometry:plane))[] |  |
+
 <a name="definitions-data:image"></a>
 
 # Generic Image
@@ -55,6 +56,7 @@ type: `object`
 | --- | --- | --- |
 | type | `image` | true |
 | range | ([Value Range](#definitions-range))[] |  |
+
 <a name="definitions-data:image:1d"></a>
 
 # Single Channel Image
@@ -68,6 +70,7 @@ type: `object`
 | --- | --- | --- |
 | type | `image:1d` | true |
 | range | ([Value Range](#definitions-range))[] |  |
+
 <a name="definitions-data:image:3d"></a>
 
 # Three Channel Image
@@ -81,6 +84,7 @@ type: `object`
 | --- | --- | --- |
 | type | `image:3d` | true |
 | range | ([Value Range](#definitions-range))[] |  |
+
 <a name="definitions-range"></a>
 
 # Value Range
@@ -94,17 +98,20 @@ type: `object`
 | --- | --- | --- |
 | min | number |  |
 | max | number |  |
+
 <a name="definitions-mat4"></a>
 
 # 4x4 affine
 
 type: `array`
 
+
 <a name="definitions-vec3"></a>
 
 # 3x1 Vector
 
 type: `array`
+
 
 <a name="definitions-geometry:point"></a>
 
@@ -117,6 +124,7 @@ type: `object`
 | --- | --- | --- |
 | type | `point` | true |
 | value | [3x1 Vector](#definitions-vec3) |  |
+
 <a name="definitions-geometry:plane"></a>
 
 # Plane Geometry
@@ -127,6 +135,7 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | type | `plane` | true |
+
 <a name="definitions-override"></a>
 
 # Override

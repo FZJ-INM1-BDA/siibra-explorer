@@ -156,7 +156,7 @@ function parseRootObj(rootObj) {
     const obj = definitionsToBeAppended[key]
     const { key:_key } = resolveRef(definitionsToBeAppended[key])
 
-    md += `\n<a name="${_key}"></a>`
+    md += `\n\n<a name="${_key}"></a>`
     md += parseObj(obj)
   }
 
