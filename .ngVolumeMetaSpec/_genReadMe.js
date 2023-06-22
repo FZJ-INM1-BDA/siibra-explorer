@@ -41,7 +41,7 @@ function parseRootObj(rootObj) {
   function getType(obj){
     const { const: _const, type, oneOf, $ref } = obj
     if (_const) {
-      return `\`"${obj['const']}"\``
+      return `\`${JSON.stringify(obj['const'])}\``
     }
     if (type === "array") {
       return `(${getType(obj.items)})[]`

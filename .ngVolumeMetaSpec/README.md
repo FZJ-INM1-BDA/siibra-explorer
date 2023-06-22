@@ -37,7 +37,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| version | `"1"` | true |
+| version | `1` | true |
 | data | [Generic Image](#definitions-data-image) \|\| [Single Channel Image](#definitions-data-image-1d) \|\| [Three Channel Image](#definitions-data-image-3d) |  |
 | transform | [4x4 affine](#definitions-mat4) |  |
 | override | [Override](#definitions-override) |  |
