@@ -1,0 +1,251 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Meta v1 Schema",
+    "type": "object",
+    "properties": {
+        "version": {
+            "const": 1
+        },
+        "data": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/data:image"
+                },
+                {
+                    "$ref": "#/definitions/data:image:1d"
+                },
+                {
+                    "$ref": "#/definitions/data:image:3d"
+                }
+            ]
+        },
+        "transform": {
+            "$ref": "#/definitions/mat4"
+        },
+        "override": {
+            "title": "Override",
+            "description": "Overrides provide some low level/implementation hints. They are more prone to breaking, and thus should be used with the knowledge as such.",
+            "type": "object",
+            "properties": {
+                "shader": {
+                    "type": "string",
+                    "description": "Hints that client should use this shader for the volume in neuroglancer",
+                    "examples": [
+                        "void main() { emitGrayscale(toNormalized(getDataValue())); }"
+                    ]
+                }
+            }
+        },
+        "bestViewPoints": {
+            "title": "Best View Points",
+            "description": "Best locations to view this volume.",
+            "type": "array",
+            "items": {
+                "oneOf": [{
+                    "$ref": "#/definitions/geometry:point"
+                }, {
+                    "$ref": "#/definitions/geometry:plane"
+                }]
+            }
+        }
+    },
+    "required": [
+        "version"
+    ],
+    "definitions": {
+        "data:image": {
+            "type": "object",
+            "title": "Generic Image",
+            "description": "Generic image, with arbitary dimensions.",
+            "properties": {
+                "type": {
+                    "const": "image"
+                },
+                "range": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/range"
+                    }
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "data:image:1d": {
+            "type": "object",
+            "title": "Single Channel Image",
+            "description": "Describes an image with 1 dimension, e.g. used as greyscale image.",
+            "properties": {
+                "type": {
+                    "const": "image:1d"
+                },
+                "range": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/range"
+                    },
+                    "maxItems": 1,
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "data:image:3d": {
+            "type": "object",
+            "title": "Three Channel Image",
+            "description": "Describes an image with 3 dimensions, mostly used as RGB image.",
+            "properties": {
+                "type": {
+                    "const": "image:3d"
+                },
+                "range": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/range"
+                    },
+                    "maxItems": 3,
+                    "minItems": 3
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "range": {
+            "type": "object",
+            "title": "Value Range",
+            "description": "Describes the range of values",
+            "properties": {
+                "min": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                }
+            },
+            "default": {
+                "min": 0,
+                "max": 1
+            },
+            "examples": [
+                {
+                    "min": 0.2,
+                    "max": 0.8
+                },
+                {
+                    "min": 0.2
+                },
+                {
+                    "max": 0.8
+                }
+            ]
+        },
+        "mat4": {
+            "type": "array",
+            "title": "4x4 affine",
+            "items": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                },
+                "maximum": 4,
+                "minItems": 4
+            },
+            "maximum": 4,
+            "minItems": 4,
+            "default": [
+                [
+                    1,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    1,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    1,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0,
+                    1
+                ]
+            ],
+            "examples": [
+                [
+                    [
+                        1,
+                        0,
+                        0,
+                        100
+                    ],
+                    [
+                        0,
+                        1,
+                        0,
+                        200
+                    ],
+                    [
+                        0,
+                        0,
+                        1,
+                        300
+                    ],
+                    [
+                        0,
+                        0,
+                        0,
+                        1
+                    ]
+                ]
+            ]
+        },
+        "vec3": {
+            "type": "array",
+            "title": "3x1 Vector",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+                "type": "number"
+            }
+        },
+        "geometry:point": {
+            "title": "Point Geometry",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "point"
+                },
+                "value": {
+                    "$ref": "#/definitions/vec3"
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "geometry:plane": {
+            "title": "Plane Geometry",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "plane"
+                }
+            },
+            "required": [
+                "type"
+            ]
+        }
+    }
+}
