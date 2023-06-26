@@ -8,6 +8,8 @@ import { UserLayerService } from "./service"
 import { MatButtonModule } from "@angular/material/button"
 import { MatTooltipModule } from "@angular/material/tooltip"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
+import { UtilModule } from "src/util"
+import { SpinnerModule } from "src/components/spinner"
 
 @NgModule({
   imports: [
@@ -17,6 +19,8 @@ import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
     MatDialogModule,
     MatButtonModule,
     MatTooltipModule,
+    UtilModule,
+    SpinnerModule,
   ],
   declarations: [UserLayerDragDropDirective, UserLayerInfoCmp],
   exports: [UserLayerDragDropDirective],

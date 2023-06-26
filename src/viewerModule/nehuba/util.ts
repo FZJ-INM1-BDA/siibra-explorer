@@ -1,7 +1,6 @@
 import { InjectionToken } from '@angular/core'
 import { Observable, pipe } from 'rxjs'
 import { filter, scan, take } from 'rxjs/operators'
-import { getViewer } from 'src/util/fn'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { userInterface } from 'src/state'
 
@@ -202,7 +201,7 @@ export const takeOnePipe = () => {
        *
        * 4 ???
        */
-      const panels = getViewer()['display']['panels']
+      const panels = window['viewer']['display']['panels']
       const panelEls = Array.from(panels).map(({ element }) => element)
 
       const identifySrcElement = (element: HTMLElement) => {

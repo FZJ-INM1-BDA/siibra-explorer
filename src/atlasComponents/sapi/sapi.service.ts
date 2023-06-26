@@ -296,7 +296,7 @@ export class SAPI{
     switchMap(atlases => forkJoin(
       atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
     )),
-    map(atlases => atlases.sort((a, b) => speciesOrder.indexOf(a.species) - speciesOrder.indexOf(b.species))),
+    map(atlases => atlases.sort((a, b) => (speciesOrder as string[]).indexOf(a.species) - (speciesOrder as string[]).indexOf(b.species))),
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {

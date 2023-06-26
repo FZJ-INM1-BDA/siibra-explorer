@@ -821,10 +821,10 @@ mat-list.sm mat-list-item
   display: grid;
 }
 
-.grid.grid-col-3
+.grid.grid-col-4
 {
   grid-auto-columns: 1fr;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto auto;
   gap: 0.2rem 0.2rem;
 }
 

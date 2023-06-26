@@ -167,9 +167,6 @@ export class AnnotationLayer {
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{
-    const voxelSize = this.viewer.navigationState.voxelSize.toJSON()
-    const sanitizePoint = (p: [number, number, number]) => p.map((v, idx) => v / voxelSize[idx]) as [number, number, number]
-    const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
     const overwrite: Partial<_AnnotationSpec> = {}
     switch (spec.type) {
     case "point": {
@@ -187,15 +184,6 @@ export class AnnotationLayer {
     default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
     }
 
-    /**
-     * The unit of annotation(s) depends on voxel size. If it is 1,1,1 then it would be in um, but often it is not.
-     * If not sanitized, the annotation can be miles off.
-     */
-    if (needSanitizePosition) {
-      for (const key of ['point', 'pointA', 'pointB'] ) {
-        if (!!spec[key]) overwrite[key] = sanitizePoint(spec[key])
-      }
-    }
     return {
       ...spec,
       ...overwrite,

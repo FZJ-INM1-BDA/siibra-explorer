@@ -1,37 +1,62 @@
-<div class="grid grid-col-3">
+<!-- TODO replace with hostdirective after upgrading to angular 15 -->
+<div iav-media-query></div>
 
-  <span class="ml-2 text-truncate v-center-text-span">
-    <i class="fas fa-file"></i>
-    {{ data.filename }}
-  </span>
+<ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
+
+  <div class="grid grid-col-4">
+
+    <span class="ml-2 text-truncate v-center-text-span">
+      <i class="fas fa-file"></i>
+      {{ data.filename }} {{ data.filename }}
+    </span>
   
-  <button
-    [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
-    mat-icon-button
-    [color]="showMoreInfo ? 'primary' : 'basic'"
-    (click)="showMoreInfo = !showMoreInfo">
-    <i class="fas fa-sliders-h"></i>
-  </button>
-
-  <button
-    [matTooltip]="ARIA_LABELS.CLOSE"
-    color="warn"
-    mat-icon-button
-    mat-dialog-close>
-    <i class="fas fa-trash"></i>
-  </button>
-
-  <div *ngIf="showMoreInfo"
-    class="sxplr-custom-cmp darker-bg overflow-hidden grid-wide-3">
-    <ng-layer-tune
-      advanced-control="true"
-      [ngLayerName]="data.layerName"
-      [thresholdMin]="data.min"
-      [thresholdMax]="data.max">
-    </ng-layer-tune>
-    <ul>
+    <ng-template [ngIf]="!view.showMore && !view.compact">
+      <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: true }">
+      </ng-template>
+    </ng-template>
+    
+    <button
+      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
+      mat-icon-button
+      [color]="view.showMore ? 'primary' : 'basic'"
+      (click)="toggleShowMore()">
+      <i class="fas fa-sliders-h"></i>
+    </button>
+  
+    <button
+      [matTooltip]="ARIA_LABELS.CLOSE"
+      color="warn"
+      mat-icon-button
+      mat-dialog-close>
+      <i class="fas fa-trash"></i>
+    </button>
+  
+    <div *ngIf="view.showMore || view.compact"
+      class="sxplr-custom-cmp darker-bg overflow-hidden grid-wide-3">
+      <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: !view.showMore }">
+      </ng-template>
+    </div>
+    
+    <ul class="grid-wide-3 sxplr-custom-cmp darker-bg" *ngIf="view.showMore">
       <li *ngFor="let warn of data.warning">{{ warn }}</li>
     </ul>
+  
   </div>
+</ng-template>
 
-</div>
+<ng-template #spinnerTmpl>
+  <div>
+    <spinner-cmp class="spinner"></spinner-cmp>
+  </div>
+</ng-template>
+
+
+<ng-template #ngLayerController let-onlyOpacity="onlyOpacity">
+  <ng-layer-tune
+    [hideCtrl]="onlyOpacity ? HIDE_NG_TUNE_CTRL.ONLY_SHOW_OPACITY : ''"
+    advanced-control="true"
+    [ngLayerName]="data.layerName"
+    [thresholdMin]="data.min"
+    [thresholdMax]="data.max">
+  </ng-layer-tune>
+</ng-template>

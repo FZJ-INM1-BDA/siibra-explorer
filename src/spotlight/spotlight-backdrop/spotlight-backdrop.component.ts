@@ -1,6 +1,7 @@
-import { Component, HostListener, TemplateRef, HostBinding } from '@angular/core';
+import { Component, HostListener, TemplateRef, HostBinding, Inject } from '@angular/core';
 import { SlServiceService } from '../sl-service.service';
 import { transition, animate, state, style, trigger } from '@angular/animations';
+import { TMPL_INJ_TOKEN } from '../const';
 
 @Component({
   selector: 'sl-spotlight-backdrop',
@@ -25,9 +26,6 @@ import { transition, animate, state, style, trigger } from '@angular/animations'
 })
 export class SpotlightBackdropComponent {
 
-  // TODO use DI for service injection ?
-  public slService: SlServiceService
-
   @HostBinding('@onShownOnDismiss')
   animation: string = 'attach'
 
@@ -36,5 +34,9 @@ export class SpotlightBackdropComponent {
     this.slService && this.slService.onClick.next(ev)
   }
 
-  insert: TemplateRef<any>
+  constructor(
+    private slService: SlServiceService,
+    @Inject(TMPL_INJ_TOKEN) public insert: TemplateRef<any>,
+  ){
+  }
 }
