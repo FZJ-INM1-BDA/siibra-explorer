@@ -663,7 +663,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         this.tsRef.applyColorMap(mesh, vertexIndices, {
           custom: actualApplyMap
         })
-        return
+        continue
       }
 
       const highlightIdx = new Set<number>()

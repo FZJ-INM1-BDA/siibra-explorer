@@ -444,8 +444,8 @@ export class ViewerCmp implements OnDestroy {
   voiFeatureEntryCmp: EntryComponent
 
   async pullAllVoi(){
+    await wait(320)
     if (this.voiFeatureEntryCmp){
-      await wait(320)
       this.voiFeatureEntryCmp.pullAll()
     }
   }
