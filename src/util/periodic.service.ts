@@ -5,11 +5,16 @@ import { wait } from "./fn";
   providedIn: 'root'
 })
 export class PeriodicSvc{
+  
+  async addToQueue(callback: () => boolean) {
+    return await PeriodicSvc.AddToQueue(callback)
+  }
+
   /**
    * @description retry a callback until it succeeds
    * @param callback 
    */
-  async addToQueue(callback: () => boolean) {
+  static async AddToQueue(callback: () => boolean) {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       if (callback()) {
