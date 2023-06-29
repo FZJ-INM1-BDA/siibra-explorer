@@ -307,8 +307,10 @@ describe('> nehubaViewer.component.ts', () => {
     describe('> # setColorMap', () => {
       let nehubaViewerSpy: any
       let ngViewerStatechildrenGetSpy = jasmine.createSpy('get')
-      let toJsonSpy = jasmine.createSpy('toJsonSpy')
-      let restoreStateSpy = jasmine.createSpy('restoreStateSpy')
+      let layersMngerToJsonSpy = jasmine.createSpy('layersMngerToJsonSpy')
+      let posToJsonSpy = jasmine.createSpy('posToJsonSpy')
+      let layerMgerRestoreStateSpy = jasmine.createSpy('layerMgerRestoreStateSpy')
+      let posRestoreStateSpy = jasmine.createSpy("posRestoreStateSpy")
 
       const ngId1 = 'foo-bar'
       const ngId2 = 'hello-world'
@@ -326,11 +328,23 @@ describe('> nehubaViewer.component.ts', () => {
           }
         }
 
-        ngViewerStatechildrenGetSpy.and.returnValue({
-          toJSON: toJsonSpy,
-          restoreState: restoreStateSpy,
+        ngViewerStatechildrenGetSpy.and.callFake(prop => {
+          if (prop === "position") {
+            return {
+              toJSON: posToJsonSpy,
+              restoreState: posRestoreStateSpy
+            }
+          }
+          if (prop === "layers") {
+            return {
+              toJSON: layersMngerToJsonSpy,
+              restoreState: layerMgerRestoreStateSpy,
+            }
+          }
+          throw new Error(`prop ${prop} is not anticipated`)
         })
-        toJsonSpy.and.returnValue([{
+        posToJsonSpy.and.returnValue([1.1, 2.2, 3.3])
+        layersMngerToJsonSpy.and.returnValue([{
           name: ngId1
         }, {
           name: ngId2
@@ -338,8 +352,8 @@ describe('> nehubaViewer.component.ts', () => {
       })
       afterEach(() => {
         ngViewerStatechildrenGetSpy.calls.reset()
-        toJsonSpy.calls.reset()
-        restoreStateSpy.calls.reset()
+        layersMngerToJsonSpy.calls.reset()
+        layerMgerRestoreStateSpy.calls.reset()
       })
       it('> calls nehubaViewer.restoreState', () => {
         const fixture = TestBed.createComponent(NehubaViewerUnit)
@@ -359,7 +373,7 @@ describe('> nehubaViewer.component.ts', () => {
 
         fixture.componentInstance['setColorMap'](mainMap)
 
-        expect(restoreStateSpy).toHaveBeenCalledOnceWith([{
+        expect(layerMgerRestoreStateSpy).toHaveBeenCalledOnceWith([{
           name: ngId1,
           segmentColors: {
             1: rgbToHex([100, 100, 100]),
@@ -372,6 +386,10 @@ describe('> nehubaViewer.component.ts', () => {
             2: rgbToHex([20, 20, 20]),
           }
         }])
+
+        expect(posRestoreStateSpy).toHaveBeenCalledOnceWith(
+          [ 1.1, 2.2, 3.3 ]
+        )
       })
     })
 
