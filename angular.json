@@ -34,7 +34,13 @@
             "styles": [
               "src/theme.scss",
               "src/overwrite.scss",
-              "src/extra_styles.css"
+              "src/extra_styles.css",
+
+              {
+                "input": "export-nehuba/dist/min/main.css",
+                "inject": false,
+                "bundleName": "vanillaMain"
+              }
             ],
             "scripts": [{
               "input": "worker/worker.js",
