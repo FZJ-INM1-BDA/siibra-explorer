@@ -107,6 +107,10 @@ describe('> mesh.service.ts', () => {
             [labelIndex2]: fits2
           }
         })
+        const mockStore = TestBed.inject(MockStore)
+        
+        mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
+        mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)
       })
 
       describe("> auxMesh defined", () => {

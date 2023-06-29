@@ -96,7 +96,7 @@ export class SAPI{
   static get BsEndpoint$(): Observable<string> {
     if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
     const rootEl = document.querySelector('atlas-viewer')
-    const overwriteSapiUrl = rootEl.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+    const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
     
     const endpoints = overwriteSapiUrl
       ? [ overwriteSapiUrl ]
