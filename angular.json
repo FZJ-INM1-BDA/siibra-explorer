@@ -34,7 +34,13 @@
             "styles": [
               "src/theme.scss",
               "src/overwrite.scss",
-              "src/extra_styles.css"
+              "src/extra_styles.css",
+
+              {
+                "input": "export-nehuba/dist/min/main.css",
+                "inject": false,
+                "bundleName": "vanillaMain"
+              }
             ],
             "scripts": [{
               "input": "worker/worker.js",
@@ -65,7 +71,9 @@
               "input": "third_party/vanilla_nehuba.js",
               "inject": false,
               "bundleName": "vanilla_nehuba"
-            },{
+            },
+            
+            {
               "input": "export-nehuba/dist/min/main.bundle.js",
               "inject": false,
               "bundleName": "main.bundle"
@@ -73,7 +81,22 @@
               "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
               "inject": false,
               "bundleName": "chunk_worker.bundle"
+            },
+            {
+              "input": "export-nehuba/dist/min/draco.bundle.js",
+              "inject": false,
+              "bundleName": "draco.bundle"
             },{
+              "input": "export-nehuba/dist/min/async_computation.bundle.js",
+              "inject": false,
+              "bundleName": "async_computation.bundle"
+            },{
+              "input": "export-nehuba/dist/min/blosc.bundle.js",
+              "inject": false,
+              "bundleName": "blosc.bundle"
+            },
+            
+            {
               "inject": false,
               "input": "third_party/leap-0.6.4.js",
               "bundleName": "leap-0.6.4"

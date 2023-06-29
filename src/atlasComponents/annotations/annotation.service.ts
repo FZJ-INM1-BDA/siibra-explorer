@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
+import { PeriodicSvc } from "src/util/periodic.service";
 
 export type TNgAnnotationEv = {
   pickedAnnotationId: string
@@ -38,6 +39,7 @@ type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
 type AnnotationRef = Record<string, unknown>
 
 interface NgAnnotationLayer {
+  isReady: () => boolean
   layer: {
     localAnnotations: {
       references: {
@@ -124,16 +126,23 @@ export class AnnotationLayer {
     }
   }
 
-  addAnnotation(spec: AnnotationSpec){
+  async addAnnotation(spec: AnnotationSpec){
     if (!this.nglayer) {
       throw new Error(`layer has already been disposed`)
     }
-    const localAnnotations = this.nglayer.layer.localAnnotations
-    this.idset.add(spec.id)
-    const annSpec = this.parseNgSpecType(spec)
-    localAnnotations.add(
-      annSpec
-    )
+
+    PeriodicSvc.AddToQueue(() => {
+      if (this.nglayer.isReady()) {
+        const localAnnotations = this.nglayer.layer.localAnnotations
+        this.idset.add(spec.id)
+        const annSpec = this.parseNgSpecType(spec)
+        localAnnotations.add(
+          annSpec
+        )  
+        return true
+      }
+      return false
+    })
   }
   removeAnnotation(spec: { id: string }) {
     if (!this.nglayer) return
@@ -145,7 +154,7 @@ export class AnnotationLayer {
       localAnnotations.references.delete(spec.id)
     }
   }
-  updateAnnotation(spec: AnnotationSpec) {
+  async updateAnnotation(spec: AnnotationSpec) {
     const localAnnotations = this.nglayer?.layer?.localAnnotations
     if (!localAnnotations) return
     const ref = localAnnotations.references.get(spec.id)
@@ -167,9 +176,6 @@ export class AnnotationLayer {
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{
-    const voxelSize = this.viewer.navigationState.voxelSize.toJSON()
-    const sanitizePoint = (p: [number, number, number]) => p.map((v, idx) => v / voxelSize[idx]) as [number, number, number]
-    const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
     const overwrite: Partial<_AnnotationSpec> = {}
     switch (spec.type) {
     case "point": {
@@ -187,15 +193,6 @@ export class AnnotationLayer {
     default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
     }
 
-    /**
-     * The unit of annotation(s) depends on voxel size. If it is 1,1,1 then it would be in um, but often it is not.
-     * If not sanitized, the annotation can be miles off.
-     */
-    if (needSanitizePosition) {
-      for (const key of ['point', 'pointA', 'pointB'] ) {
-        if (!!spec[key]) overwrite[key] = sanitizePoint(spec[key])
-      }
-    }
     return {
       ...spec,
       ...overwrite,

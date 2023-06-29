@@ -10,6 +10,7 @@ import { CategoryAccDirective } from "../category-acc.directive"
 import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
+import { SPECIES_ENUM } from 'src/util/constants';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -148,10 +149,10 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   public showConnectivity$ = combineLatest([
     this.selectedAtlas$.pipe(
-      map(atlas => atlas?.species === "Homo sapiens")
+      map(atlas => atlas?.species === SPECIES_ENUM.HOMO_SAPIENS || atlas?.species === SPECIES_ENUM.RATTUS_NORVEGICUS)
     ),
     this.TPRBbox$.pipe(
-      map(({ parcellation }) => parcellation?.id === IDS.PARCELLATION.JBA29)
+      map(({ parcellation }) => parcellation?.id === IDS.PARCELLATION.JBA29 || parcellation?.id === IDS.PARCELLATION.WAXHOLMV4)
     )
   ]).pipe(
     map(flags => flags.every(f => f))

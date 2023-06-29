@@ -13,6 +13,7 @@ import {
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
+import { CONST } from "common/constants"
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -21,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.8'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.9'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -94,7 +95,12 @@ export class SAPI{
    */
   static get BsEndpoint$(): Observable<string> {
     if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
-    const endpoints = environment.SIIBRA_API_ENDPOINTS.split(',')
+    const rootEl = document.querySelector('atlas-viewer')
+    const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+    
+    const endpoints = overwriteSapiUrl
+      ? [ overwriteSapiUrl ]
+      : environment.SIIBRA_API_ENDPOINTS.split(',')
     if (endpoints.length === 0) {
       SAPI.ErrorMessage = `No siibra-api endpoint defined!`
       return NEVER
@@ -296,7 +302,7 @@ export class SAPI{
     switchMap(atlases => forkJoin(
       atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
     )),
-    map(atlases => atlases.sort((a, b) => speciesOrder.indexOf(a.species) - speciesOrder.indexOf(b.species))),
+    map(atlases => atlases.sort((a, b) => (speciesOrder as string[]).indexOf(a.species) - (speciesOrder as string[]).indexOf(b.species))),
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {

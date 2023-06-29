@@ -5,6 +5,7 @@ import { LoggingModule, LoggingService } from "src/logging"
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants"
 import { Subject } from "rxjs"
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service"
+import { rgbToHex } from 'common/util'
 
 describe('> nehubaViewer.component.ts', () => {
   describe('> #scanFn', () => {
@@ -305,15 +306,56 @@ describe('> nehubaViewer.component.ts', () => {
 
     describe('> # setColorMap', () => {
       let nehubaViewerSpy: any
+      let ngViewerStatechildrenGetSpy = jasmine.createSpy('get')
+      let layersMngerToJsonSpy = jasmine.createSpy('layersMngerToJsonSpy')
+      let posToJsonSpy = jasmine.createSpy('posToJsonSpy')
+      let layerMgerRestoreStateSpy = jasmine.createSpy('layerMgerRestoreStateSpy')
+      let posRestoreStateSpy = jasmine.createSpy("posRestoreStateSpy")
+
+      const ngId1 = 'foo-bar'
+      const ngId2 = 'hello-world'
       beforeEach(() => {
         nehubaViewerSpy = {
-          batchAddAndUpdateSegmentColors: jasmine.createSpy(),
           dispose(){
 
+          },
+          ngviewer: {
+            state: {
+              children: {
+                get: ngViewerStatechildrenGetSpy
+              }
+            }
           }
         }
+
+        ngViewerStatechildrenGetSpy.and.callFake(prop => {
+          if (prop === "position") {
+            return {
+              toJSON: posToJsonSpy,
+              restoreState: posRestoreStateSpy
+            }
+          }
+          if (prop === "layers") {
+            return {
+              toJSON: layersMngerToJsonSpy,
+              restoreState: layerMgerRestoreStateSpy,
+            }
+          }
+          throw new Error(`prop ${prop} is not anticipated`)
+        })
+        posToJsonSpy.and.returnValue([1.1, 2.2, 3.3])
+        layersMngerToJsonSpy.and.returnValue([{
+          name: ngId1
+        }, {
+          name: ngId2
+        }])
       })
-      it('> calls nehubaViewer.batchAddAndUpdateSegmentColors', () => {
+      afterEach(() => {
+        ngViewerStatechildrenGetSpy.calls.reset()
+        layersMngerToJsonSpy.calls.reset()
+        layerMgerRestoreStateSpy.calls.reset()
+      })
+      it('> calls nehubaViewer.restoreState', () => {
         const fixture = TestBed.createComponent(NehubaViewerUnit)
         fixture.componentInstance.nehubaViewer = nehubaViewerSpy
         fixture.detectChanges()
@@ -322,27 +364,31 @@ describe('> nehubaViewer.component.ts', () => {
         const fooBarMap = new Map()
         fooBarMap.set(1, {red: 100, green: 100, blue: 100})
         fooBarMap.set(2, {red: 200, green: 200, blue: 200})
-        mainMap.set('foo-bar', fooBarMap)
+        mainMap.set(ngId1, fooBarMap)
 
         const helloWorldMap = new Map()
         helloWorldMap.set(1, {red: 10, green: 10, blue: 10})
         helloWorldMap.set(2, {red: 20, green: 20, blue: 20})
-        mainMap.set('hello-world', helloWorldMap)
+        mainMap.set(ngId2, helloWorldMap)
 
         fixture.componentInstance['setColorMap'](mainMap)
 
-        expect(
-          nehubaViewerSpy.batchAddAndUpdateSegmentColors
-        ).toHaveBeenCalledTimes(2)
+        expect(layerMgerRestoreStateSpy).toHaveBeenCalledOnceWith([{
+          name: ngId1,
+          segmentColors: {
+            1: rgbToHex([100, 100, 100]),
+            2: rgbToHex([200, 200, 200]),
+          }
+        }, {
+          name: ngId2,
+          segmentColors: {
+            1: rgbToHex([10, 10, 10]),
+            2: rgbToHex([20, 20, 20]),
+          }
+        }])
 
-        expect(nehubaViewerSpy.batchAddAndUpdateSegmentColors).toHaveBeenCalledWith(
-          fooBarMap,
-          { name: 'foo-bar' }
-        )
-
-        expect(nehubaViewerSpy.batchAddAndUpdateSegmentColors).toHaveBeenCalledWith(
-          helloWorldMap,
-          { name: 'hello-world' }
+        expect(posRestoreStateSpy).toHaveBeenCalledOnceWith(
+          [ 1.1, 2.2, 3.3 ]
         )
       })
     })

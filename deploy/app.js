@@ -1,4 +1,3 @@
-const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const app = express.Router()
@@ -6,8 +5,7 @@ const session = require('express-session')
 const crypto = require('crypto')
 const cookieParser = require('cookie-parser')
 const bkwdMdl = require('./bkwdCompat')()
-
-const LOCAL_CDN_FLAG = !!process.env.LOCAL_CDN
+const { CONST } = require("../common/constants")
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
@@ -123,36 +121,6 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
  */
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
-if (LOCAL_CDN_FLAG) {
-  /*
-  * TODO setup local cdn for supported libraries map
-  */
-  const LOCAL_CDN = process.env.LOCAL_CDN
-  const CDN_ARRAY = [
-    'https://stackpath.bootstrapcdn.com',
-    'https://use.fontawesome.com',
-    'https://unpkg.com'
-  ]
-
-  let indexFile
-  fs.readFile(path.join(PUBLIC_PATH, 'index.html'), 'utf-8', (err, data) => {
-    if (err) throw err
-    if (!LOCAL_CDN) {
-      indexFile = data
-      return
-    }
-    const regexString = CDN_ARRAY.join('|').replace(/\/|\./g, s => `\\${s}`)
-    const regex = new RegExp(regexString, 'gm')
-    indexFile = data.replace(regex, LOCAL_CDN)
-  })
-  
-  app.get('/', bkwdMdl, (_req, res) => {
-    if (!indexFile) return res.status(404).end()
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    return res.status(200).send(indexFile)
-  })
-}
-
 app.use((_req, res, next) => {
   res.setHeader('Referrer-Policy', 'origin-when-cross-origin')
   next()
@@ -182,23 +150,42 @@ app.get('/', (req, res, next) => {
     middelware(req, res, next)
   }
 
-}, bkwdMdl, cookieParser(), (req, res) => {
+}, bkwdMdl, cookieParser(), async (req, res) => {
+  res.setHeader('Content-Type', 'text/html')
+
+  let returnIndex = indexTemplate
+
+  if (!!process.env.LOCAL_CDN) {
+    const CDN_ARRAY = [
+      'https://stackpath.bootstrapcdn.com',
+      'https://use.fontawesome.com',
+      'https://unpkg.com'
+    ]
+  
+    const regexString = CDN_ARRAY.join('|').replace(/\/|\./g, s => `\\${s}`)
+    const regex = new RegExp(regexString, 'gm')
+    returnIndex = returnIndex.replace(regex, process.env.LOCAL_CDN)
+  }
   const iavError = req.cookies && req.cookies['iav-error']
   
-  res.setHeader('Content-Type', 'text/html')
+  const attributeToAppend = {}
 
   if (iavError) {
     res.clearCookie('iav-error', { httpOnly: true, sameSite: 'strict' })
-
-    const returnTemplate = indexTemplate
-      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
-      .replace('<atlas-viewer>', `<atlas-viewer data-error="${iavError.replace(/"/g, '&quot;')}">`)
-    res.status(200).send(returnTemplate)
-  } else {
-    const returnTemplate = indexTemplate
-      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
-    res.status(200).send(returnTemplate)
+    attributeToAppend[CONST.DATA_ERROR_ATTR] = iavError
   }
+
+  if (!!process.env.OVERWRITE_API_ENDPOING) {
+    attributeToAppend[CONST.OVERWRITE_SAPI_ENDPOINT_ATTR] = process.env.OVERWRITE_API_ENDPOING
+  }
+  
+  const attr = Object.entries(attributeToAppend).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(" ")
+
+  const returnTemplate = returnIndex
+    .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+    .replace('<atlas-viewer>', `<atlas-viewer ${attr}>`)
+
+  res.status(200).send(returnTemplate)
 })
 
 app.get('/ready', async (req, res) => {
