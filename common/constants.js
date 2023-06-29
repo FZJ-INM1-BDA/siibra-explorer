@@ -148,6 +148,9 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
 
     AUXMESH_DESC: `Some templates contain auxiliary meshes, which compliment the appearance of the template in the perspective view.`,
+
+    OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
+    DATA_ERROR_ATTR: `data-error`
   }
 
   exports.QUICKTOUR_DESC ={

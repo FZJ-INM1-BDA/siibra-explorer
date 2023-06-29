@@ -13,6 +13,7 @@ import {
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
+import { CONST } from "common/constants"
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -94,7 +95,12 @@ export class SAPI{
    */
   static get BsEndpoint$(): Observable<string> {
     if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
-    const endpoints = environment.SIIBRA_API_ENDPOINTS.split(',')
+    const rootEl = document.querySelector('atlas-viewer')
+    const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+    
+    const endpoints = overwriteSapiUrl
+      ? [ overwriteSapiUrl ]
+      : environment.SIIBRA_API_ENDPOINTS.split(',')
     if (endpoints.length === 0) {
       SAPI.ErrorMessage = `No siibra-api endpoint defined!`
       return NEVER

@@ -505,7 +505,6 @@ export class NehubaViewerUnit implements OnDestroy {
           ...rest,
           ...(transform ? { transform } : {})
         }
-        console.log(combined)
         viewer.layerManager.addManagedLayer(
           viewer.layerSpecification.getLayer(key, combined))
 
@@ -820,7 +819,14 @@ export class NehubaViewerUnit implements OnDestroy {
        */
     }
 
+    /**
+     * n.b. 2
+     * updating layer colormap seems to also mess up the position ()
+     */
+
     const layersManager = this.nehubaViewer.ngviewer.state.children.get("layers")
+    const position = this.nehubaViewer.ngviewer.state.children.get("position")
+    const prevPos = position.toJSON()
     const layerJson = layersManager.toJSON()
     for (const layer of layerJson) {
       if (layer.name in mainDict) {
@@ -828,6 +834,7 @@ export class NehubaViewerUnit implements OnDestroy {
       }
     }
     layersManager.restoreState(layerJson)
+    position.restoreState(prevPos)
     this.#triggerMeshLoad$.next(null)
   }
 }
