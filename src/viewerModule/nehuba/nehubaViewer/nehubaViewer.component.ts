@@ -847,7 +847,7 @@ const patchSliceViewPanel = (sliceViewPanel: any) => {
       const viewportToDataEv = new CustomEvent('viewportToData', {
         bubbles: true,
         detail: {
-          viewportToData : this.sliceView.viewportToData,
+          viewportToData : this.sliceView.invViewMatrix,
         },
       })
       this.element.dispatchEvent(viewportToDataEv)
