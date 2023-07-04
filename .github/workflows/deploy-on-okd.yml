@@ -53,24 +53,24 @@ jobs:
           # create new app if deployconfig does not yet exist
           echo "dc ${{ inputs.FULL_DEPLOY_ID }} does not yet exist, create new app..."
 
-          if [[ ! -z "${{ inputs.ROUTE_HOST }}" ]]
+          if [[ -z "${{ inputs.ROUTE_HOST }}" ]]
           then
             echo "ROUTE_HOST not defined!"
             exit 1
           fi
           
-          if [[ ! -z "${{ inputs.ROUTE_PATH }}" ]]
+          if [[ -z "${{ inputs.ROUTE_PATH }}" ]]
           then
             echo "ROUTE_PATH not defined!"
             exit 1
           fi
           
-          if [[ ! -z "${{ inputs.BUILD_TEXT }}" ]]
+          if [[ -z "${{ inputs.BUILD_TEXT }}" ]]
           then
             echo "BUILD_TEXT not defined!"
             exit 1
           fi
-          if [[ ! -z "${{ inputs.BRANCH_NAME }}" ]]
+          if [[ -z "${{ inputs.BRANCH_NAME }}" ]]
           then
             echo "BRANCH_NAME not defined!"
             exit 1
