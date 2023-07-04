@@ -7,7 +7,6 @@ module.exports = {
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/interface-name-prefix": [0],
-    // "no-unused-vars": "off",
     "semi": "off",
     "indent": "off",
     "@typescript-eslint/member-delimiter-style": [2, {
