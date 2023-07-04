@@ -111,118 +111,127 @@ jobs:
         echo "Pushing $DOCKER_BUILT_TAG"
         docker push $DOCKER_BUILT_TAG
 
-  trigger-deploy:
+  setting-vars:
     if: success()
     runs-on: ubuntu-latest
-    env:
-      GITHUB_API_ROOT: https://api.github.com/repos/fzj-inm1-bda/siibra-explorer
-      OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
-
-    needs: build-docker-img
+    outputs:
+      BRANCH_NAME: ${{ steps.set-vars.outputs.BRANCH_NAME }}
+      BUILD_TEXT: ${{ steps.set-vars.outputs.BUILD_TEXT }}
+      DEPLOY_ID: ${{ steps.set-vars.outputs.DEPLOY_ID }}
     steps:
       - uses: actions/checkout@v3
-      - name: Set env var
+      - id: set-vars
+        name: Set vars
         run: |
           echo "Using github.ref: $GITHUB_REF"
+
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-        
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
           echo "Branch is $BRANCH_NAME ."
 
           if [[ "$BRANCH_NAME" == 'master' ]]
           then
-            echo "BUILD_TEXT=" >> $GITHUB_ENV
+            echo "BUILD_TEXT=" >> $GITHUB_OUTPUT
           else
-            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
+            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_OUTPUT
           fi
 
           # DEPLOY_ID == remove _ / and lowercase everything from branch
           DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
 
-          if [[ "$BRANCH_NAME" == 'master' ]] || [[ "$BRANCH_NAME" == 'staging' ]]
-          then
-            echo "OKD_URL=https://okd.hbp.eu:443" >> $GITHUB_ENV
-            echo "OKD_SECRET=${{ secrets.OKD_PROD_SECRET }}" >> $GITHUB_ENV
-            echo "OKD_PROJECT=interactive-viewer" >> $GITHUB_ENV
-            echo "ROUTE_HOST=siibra-explorer.apps.hbp.eu" >> $GITHUB_ENV
+  trigger-deploy-master-prod:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-on-okd.yml
+    with:
+      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-prodpathviewer
+      OKD_ENDPOINT: https://okd.hbp.eu:443
+      OKD_PROJECT: interactive-viewer
+    secrets:
+      okd_token: ${{ secrets.OKD_PROD_SECRET }}
 
-            if [[ "$BRANCH_NAME" == 'master' ]]
-            then
-              FULL_DEPLOY_ID=siibra-explorer-branch-deploy-2-prodpathviewer
-              FULL_DEPLOY_ID2=siibra-explorer-branch-deploy-2-iav-legacy
-              echo "FULL_DEPLOY_ID=$FULL_DEPLOY_ID" >> $GITHUB_ENV
-              echo "FULL_DEPLOY_ID2=$FULL_DEPLOY_ID2" >> $GITHUB_ENV
-            else
-              FULL_DEPLOY_ID=siibra-explorer-branch-deploy-2-stagingpathed
-              echo "FULL_DEPLOY_ID=$FULL_DEPLOY_ID" >> $GITHUB_ENV
-            fi
+  trigger-deploy-master-legacy:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-on-okd.yml
+    with:
+      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-iav-legacy
+      OKD_ENDPOINT: https://okd.hbp.eu:443
+      OKD_PROJECT: interactive-viewer
+    secrets:
+      okd_token: ${{ secrets.OKD_PROD_SECRET }}
+      
+  trigger-deploy-staging-viewer-validation:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-on-okd.yml
+    with:
+      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-stagingpathed
+      OKD_ENDPOINT: https://okd.hbp.eu:443
+      OKD_PROJECT: interactive-viewer
+    secrets:
+      okd_token: ${{ secrets.OKD_PROD_SECRET }}
+      
+  trigger-deploy-staging-data-validation:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-on-okd.yml
+    with:
+      FULL_DEPLOY_ID: siibra-explorer-rc
+      OKD_ENDPOINT: https://okd.jsc.hbp.eu:443
+      OKD_PROJECT: siibra-explorer
+    secrets:
+      okd_token: ${{ secrets.OKD_JSC_TOKEN }}
+  
+  trigger-deploy-other-viewer:
+    # n.b. "env" context not available in "if" block
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME != 'staging' && needs.setting-vars.outputs.BRANCH_NAME != 'master' && success() }}
+    uses: ./.github/workflows/deploy-on-okd.yml
+    needs:
+      - build-docker-img
+      - setting-vars
+    with:
+      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-${{ needs.setting-vars.outputs.DEPLOY_ID }}
+      OKD_ENDPOINT: https://okd-dev.hbp.eu:443
+      OKD_PROJECT: interactive-atlas-viewer
+      BRANCH_NAME: ${{ needs.setting-vars.outputs.BRANCH_NAME }}
+      DEPLOY_ID: ${{ needs.setting-vars.outputs.DEPLOY_ID }}
+      ROUTE_HOST: siibra-explorer.apps-dev.hbp.eu
+      ROUTE_PATH: /${{ needs.setting-vars.outputs.DEPLOY_ID }}
+      BUILD_TEXT: ${{ needs.setting-vars.outputs.BRANCH_NAME }}
+    secrets:
+      okd_token: ${{ secrets.OKD_DEV_SECRET }}
 
-            echo "Deploy on **prod** cluster..."
-            echo "Deploy id: **${FULL_DEPLOY_ID}** ..."
-            if [ ! -z "$FULL_DEPLOY_ID2" ]
-            then
-              echo "Secondary deploy id: **$FULL_DEPLOY_ID2** ..."
-            fi
-          else
-            echo "OKD_URL=https://okd-dev.hbp.eu:443" >> $GITHUB_ENV
-            echo "OKD_SECRET=${{ secrets.OKD_DEV_SECRET }}" >> $GITHUB_ENV
-            echo "OKD_PROJECT=interactive-atlas-viewer" >> $GITHUB_ENV
-            echo "ROUTE_HOST=siibra-explorer.apps-dev.hbp.eu" >> $GITHUB_ENV
-            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_ENV
-            FULL_DEPLOY_ID=${{ env.OC_TEMPLATE_NAME }}-$DEPLOY_ID
-            echo "FULL_DEPLOY_ID=$FULL_DEPLOY_ID" >> $GITHUB_ENV
-            echo "Deploy on **dev** cluster ..."
-            echo "Deploy id: **${FULL_DEPLOY_ID}** ..."
-          fi
-      - name: 'Login via oc cli & deploy'
-        run: |
-          oc login $OKD_URL --token=$OKD_SECRET
-          oc project $OKD_PROJECT
-          
-          ROUTE_PATH=/$DEPLOY_ID
-          echo "ROUTE_PATH=$ROUTE_PATH" >> $GITHUB_ENV
-
-          echo "Working branch name: $BRANCH_NAME, deploy_id: $DEPLOY_ID"
-          echo "full deploy id: $FULL_DEPLOY_ID, secondary deploy id: $FULL_DEPLOY_ID2"
-
-          # check if the deploy already exist
-
-          if oc get dc $FULL_DEPLOY_ID; then
-            # trigger redeploy if deployconfig exists already
-            echo "dc $FULL_DEPLOY_ID already exist, redeploy..."
-            oc rollout latest dc/$FULL_DEPLOY_ID
-          else 
-            # create new app if deployconfig does not yet exist
-            echo "dc $FULL_DEPLOY_ID does not yet exist, create new app..."
-            oc new-app --template ${{ env.OC_TEMPLATE_NAME }} \
-              -p BRANCH_NAME=$BRANCH_NAME \
-              -p DEPLOY_ID=$DEPLOY_ID \
-              -p ROUTE_HOST=$ROUTE_HOST \
-              -p ROUTE_PATH=$ROUTE_PATH \
-              -p BUILD_TEXT=$BUILD_TEXT
-          fi
-
-          if [ ! -z "$FULL_DEPLOY_ID2" ]
-          then
-            echo "FULL_DEPLOY_ID2 is defined, trying to redeploy $FULL_DEPLOY_ID2 ..."
-            oc rollout latest dc/$FULL_DEPLOY_ID2
-          fi
-          
-      - name: 'Update status badge'
-        if: success()
-        run: |
-
-          DEPLOY_URL=https://$ROUTE_HOST$ROUTE_PATH
-          curl -v \
-            -X POST \
-            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H 'accept: application/vnd.github.v3+json' \
-            ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
-            -d '{
-              "target_url":"'$DEPLOY_URL'",
-              "name": "Deployed at OKD",
-              "description": "Deployed at OKD",
-              "context": "[ebrains-okd-deploy] Deployed at OKD",
-              "state": "success"
-            }'
+  trigger-deploy-other-badge:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME != 'staging' && needs.setting-vars.outputs.BRANCH_NAME != 'master' && success() }}
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_URL: https://siibra-explorer.apps-dev.hbp.eu/${{ needs.setting-vars.outputs.DEPLOY_ID }}
+    needs:
+    - trigger-deploy-other-viewer
+    - setting-vars
+    steps:
+    - name: "Update Badge"
+      run: |
+        curl -v \
+          -X POST \
+          -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H 'accept: application/vnd.github.v3+json' \
+          ${GITHUB_API_ROOT}/statuses/${GITHUB_SHA} \
+          -d '{
+            "target_url":"'${{ env.DEPLOY_URL }}'",
+            "name": "Deployed at OKD",
+            "description": "Deployed at OKD",
+            "context": "[ebrains-okd-deploy] Deployed at OKD",
+            "state": "success"
+          }'
