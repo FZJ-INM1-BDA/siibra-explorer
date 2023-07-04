@@ -151,6 +151,9 @@ done
 !!! warning
     The following section only applies if you used _## How (via CLI)_ to deploy your application
 
+!!! info
+    The `$TOKEN` obtained from OKD GUI expires eventually. You will need to create a service-account. Service account tokens are valid until revoked.
+
 Combining _## How (via CLI)_ and _## Update Deployment_, a continous deployment script might look like
 
 ```bash
