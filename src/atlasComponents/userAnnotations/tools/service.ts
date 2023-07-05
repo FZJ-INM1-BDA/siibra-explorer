@@ -6,7 +6,7 @@ import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subje
 import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback } from "./type";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
 import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
@@ -27,7 +27,6 @@ type TAnnotationMetadata = {
   desc: string
 }
 
-const descType = 'siibra-ex/meta/desc' as const
 type TTypedAnnMetadata = {
   '@type': 'siibra-ex/meta/desc'
 } & TAnnotationMetadata
@@ -325,21 +324,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     /**
      * on new nehubaViewer, unset annotationLayer
      */
-    this.subscription.push(
-      nehubaViewer$.subscribe(() => {
-        this.annotationLayer = null
-      })
-    )
-
-    /**
-     * get mouse real position
-     */
-    this.subscription.push(
-      nehubaViewer$.pipe(
-        switchMap(v => v?.mousePosInReal$ || of(null))
-      ).subscribe(v => this.mousePosReal = v)
-    )
-
+    if (!!nehubaViewer$) {
+      this.subscription.push(
+        nehubaViewer$.subscribe(() => {
+          this.annotationLayer = null
+        })
+      )
+  
+      /**
+       * get mouse real position
+       */
+      this.subscription.push(
+        nehubaViewer$.pipe(
+          switchMap(v => v?.mousePosInReal$ || of(null))
+        ).subscribe(v => this.mousePosReal = v)
+      )  
+    }
     /**
      * on mouse move, render preview annotation
      */
@@ -552,15 +552,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
-  public exportAnnotationMetadata(ann: IAnnotationGeometry): TAnnotationMetadata & { '@type': 'siibra-ex/meta/desc' } {
-    return {
-      '@type': descType,
-      id: ann.id,
-      name: ann.name,
-      desc: ann.desc,
-    }
-  }
-
   /**
    * stop gap measure when exporting/import annotations in sands format
    * metadata (name/desc) will be saved in a separate metadata file
@@ -650,7 +641,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (json['@type'] === 'siibra-ex/annotation/polyline') {
       returnObj = Polygon.fromJSON(json)
     }
-    if (json['@type'] === descType) {
+    if (json['@type'] === DESC_TYPE) {
       const existingAnn = this.managedAnnotations.find(ann => json.id === ann.id)
       if (existingAnn) {
 

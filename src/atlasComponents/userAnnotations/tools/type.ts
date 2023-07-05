@@ -9,6 +9,8 @@ import { TSandsCoord, TSandsPoint } from "src/util/types"
 
 export { getCoord, TSandsPoint } from "src/util/types"
 
+export const DESC_TYPE = 'siibra-ex/meta/desc' as const
+
 type TRecord = Record<string, unknown>
 
 /**
@@ -310,6 +312,15 @@ export abstract class IAnnotationGeometry extends Highlightable {
   abstract toJSON(): TRecord
   abstract toString(): string
   abstract toSands(): ISandsAnnotation[keyof ISandsAnnotation]
+
+  toMetadata(){
+    return {
+      '@type': DESC_TYPE,
+      id: this.id,
+      name: this.name,
+      desc: this.desc,
+    }
+  }
 
   public remove() {
     throw new Error(`The remove method needs to be overwritten by the tool manager`)
