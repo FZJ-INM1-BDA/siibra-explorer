@@ -824,11 +824,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       () => this.domEl.removeEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME_UPDATED, customEvHandler)
     )
     this.tsRef = new (window as any).ThreeSurfer(this.domEl, {highlightHovered: true})
+    window['tsViewer'] = this.tsRef
 
     this.onDestroyCb.push(
       () => {
         this.tsRef.dispose()
         this.tsRef = null
+        window['tsViewer'] = null
       }
     )
     this.tsRef.control.enablePan = false
