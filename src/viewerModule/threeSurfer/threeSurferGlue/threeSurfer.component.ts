@@ -906,13 +906,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       }
     })
     this.mouseoverText = ''
-    if (mouseover.length > 0) {
-      this.mouseoverText += mouseover.map(el => el.name).join(' / ')
-    }
     if (error) {
       this.mouseoverText += `::error: ${error}`
     }
-    if (this.mouseoverText === '') this.mouseoverText = null
   }
 
   public toggleMeshVis(label: string) {
