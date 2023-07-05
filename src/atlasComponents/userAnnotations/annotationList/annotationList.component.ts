@@ -3,8 +3,8 @@ import { ARIA_LABELS, CONST } from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { IAnnotationGeometry, TExportFormats } from "../tools/type";
 import { ComponentStore } from "src/viewerModule/componentStore";
-import { map, shareReplay, startWith } from "rxjs/operators";
-import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
+import { combineLatest, concat, Observable, of, Subscription } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { TFileInputEvent } from "src/getFileInput/type";
 import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
@@ -44,9 +44,11 @@ export class AnnotationList {
     startWith(false)
   )
 
-  public filesExport$: Observable<TZipFileConfig[]> = this.managedAnnotations$.pipe(
-    startWith([] as IAnnotationGeometry[]),
-    shareReplay(1),
+  public filesExport$: Observable<TZipFileConfig[]> = concat(
+    of([] as IAnnotationGeometry[]),
+    this.managedAnnotations$
+  ).pipe(
+    debounceTime(0),
     map(manAnns => {
       const readme = {
         filename: 'README.md',
@@ -61,11 +63,12 @@ export class AnnotationList {
       const annotationDesc = manAnns.map(ann => {
         return {
           filename: `${ann.id}.desc.json`,
-          filecontent: JSON.stringify(this.annotSvc.exportAnnotationMetadata(ann), null, 2)
+          filecontent: JSON.stringify(ann.toMetadata(), null, 2)
         }
       })
       return [ readme, ...annotationSands, ...annotationDesc ]
-    })
+    }),
+    shareReplay(1),
   )
   constructor(
     private annotSvc: ModularUserAnnotationToolService,
@@ -82,10 +85,10 @@ export class AnnotationList {
       this.managedAnnotations$.subscribe(anns => this.managedAnnotations = anns),
       combineLatest([
         this.managedAnnotations$.pipe(
-          startWith([])
+          startWith([] as IAnnotationGeometry[])
         ),
         this.annotationInOtherSpaces$.pipe(
-          startWith([])
+          startWith([] as IAnnotationGeometry[])
         )
       ]).subscribe(([ann, annOther]) => {
         this.userAnnRoute = {

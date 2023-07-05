@@ -82,12 +82,13 @@ export class Point extends IAnnotationGeometry {
   }
 
   toSands(): TSandsPoint{
+    const { id } = this.space
     const {x, y, z} = this
     return {
       '@id': this.id,
       '@type': 'https://openminds.ebrains.eu/sands/CoordinatePoint',
       coordinateSpace: {
-        '@id': this.space["@id"]
+        '@id': id
       },
       coordinates:[ getCoord(x/1e6), getCoord(y/1e6), getCoord(z/1e6) ]
     }

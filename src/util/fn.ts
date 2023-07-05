@@ -419,3 +419,15 @@ export function wait(ms: number){
     rs(null)
   }, ms))
 }
+
+/**
+ * @description Wait until predicate returns true. Tries once every 16 ms.
+ * @param predicate 
+ */
+export async function waitFor(predicate: () => boolean) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    if (predicate()) break
+    await wait(16)
+  }
+}
