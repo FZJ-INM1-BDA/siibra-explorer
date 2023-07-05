@@ -40,11 +40,21 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     {
       provide: HANDLE_SCREENSHOT_PROMISE,
       useValue: ((param) => {
-        const canvas: HTMLCanvasElement = document.querySelector('#neuroglancer-container canvas')
-        if (!canvas) {
-          return Promise.reject(`element '#neuroglancer-container canvas' not found`)
+        const ngCanvas: HTMLCanvasElement = document.querySelector('#neuroglancer-container canvas')
+        const threeSurferCanvas: HTMLCanvasElement = document.querySelector('three-surfer-glue-cmp canvas')
+        
+        if (threeSurferCanvas) {
+          const tsViewer = window['tsViewer']
+          tsViewer.renderer.render(tsViewer.scene, tsViewer.camera)
         }
-        (window as any).viewer.display.draw()
+        if (ngCanvas) {
+          window['viewer'].display.draw()
+        }
+        const canvas = ngCanvas || threeSurferCanvas
+        if (!canvas) {
+          return Promise.reject(`element '#neuroglancer-container canvas' or 'three-surfer-glue-cmp canvas' not found`)
+        }
+        
         if (!param) {
           return new Promise(rs => {
             canvas.toBlob(blob => {
