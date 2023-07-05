@@ -425,6 +425,7 @@ export function wait(ms: number){
  * @param predicate 
  */
 export async function waitFor(predicate: () => boolean) {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (predicate()) break
     await wait(16)
