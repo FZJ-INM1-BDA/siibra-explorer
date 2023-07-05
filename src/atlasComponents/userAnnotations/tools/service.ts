@@ -410,13 +410,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })),
       )
     ]).pipe(
-      map(([_, annts]) => {
-        const out = []
-        for (const ann of annts) {
-          out.push(...ann.toNgAnnotation())
-        }
-        return out
-      }),
+      map(([_, annts]) => 
+        annts.map(ann => ann.toNgAnnotation()).flatMap(v => v)
+      ),
       shareReplay(1),
     )
     this.subscription.push(
