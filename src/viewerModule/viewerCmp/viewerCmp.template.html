@@ -439,6 +439,17 @@
             [sxplr-sapiviews-core-region-region]="region"
             [sxplr-sapiviews-core-region-detail-flag]="true"
             #sapiViewsCoreRegion="sapiViewsCoreRegion">
+            
+            <ng-template sxplrSmartChipHeader
+              [ngIf]="experimental.show$ | async"
+              sxplrExperimentalFlag
+              [experimental]="true"
+              #experimental="sxplrExperimentalFlag">
+              <span class="regionname">
+                Region
+              </span>
+            </ng-template>
+            
             <ng-template sxplrSmartChipContent>
               <span class="regionname">
                 {{ region.name }}

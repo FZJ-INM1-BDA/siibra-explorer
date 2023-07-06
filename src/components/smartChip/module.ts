@@ -8,6 +8,7 @@ import { HasSubMenuPipe } from "./hasSubmenu.pipe";
 import { SmartChipContent } from "./smartChip.content.directive";
 import { SmartChipHeader } from "./smartChip.header.directive";
 import { SmartChipMenu } from "./smartChip.menu.directive";
+import { ExperimentalModule } from "src/experimental/experimental.module";
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { SmartChipMenu } from "./smartChip.menu.directive";
     MatMenuModule,
     BrowserAnimationsModule,
     MatRippleModule,
+    ExperimentalModule,
   ],
   declarations: [
     SmartChipMenu,

@@ -33,3 +33,12 @@ sxplr-smart-chip:not(:last-child)
     padding-left: 1rem;
   }
 }
+
+:host-context([experimental=true])
+sxplr-smart-chip:not(:last-child)
+{
+  .header
+  {
+    padding-left: 1rem;
+  }
+}
