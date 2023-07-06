@@ -37,6 +37,7 @@
   </div>
 </div>
 
+<!-- <sxplr-overlay-ui></sxplr-overlay-ui> -->
 
 <!-- master draw container -->
 <ng-template [ngIf]="view$ | async" let-view>
@@ -86,7 +87,7 @@
     <iav-layout-fourcorners>
 
       <!-- top left -->
-      <div iavLayoutFourCornersTopLeft class="ws-no-wrap">
+      <div iavLayoutFourCornersTopLeft class="ws-no-wrap align-items-start d-inline-flex">
 
         <!-- special mode -->
         <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
@@ -285,6 +286,23 @@
     </ng-template>
   
   </div>
+
+  <!-- tab to minimize mini tray -->
+  <ng-template sxplrExperimentalFlag
+    [experimental]="true"
+    #minTray="sxplrExperimentalFlag"
+    [ngIf]="minTray.show$ | async">
+    <div class="tab-toggle-container">
+      
+    <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+      fontIcon: (minTrayVisSwitch.switchState$ | async) ? 'fas fa-chevron-left' : 'fas fa-search',
+      matColor: (minTrayVisSwitch.switchState$ | async) ? null : 'primary',
+      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+    }">
+
+    </ng-template>
+    </div>
+  </ng-template>
 
 </ng-template>
 
