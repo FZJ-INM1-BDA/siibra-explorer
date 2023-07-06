@@ -20,7 +20,7 @@
       </ng-container>
     </div>
 
-    <!-- pinned dataset -->
+    <!-- download maps -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="downloadAllTmpl">
       </ng-container>
@@ -29,6 +29,12 @@
     <!-- help one pager -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="helpBtnTmpl">
+      </ng-container>
+    </div>
+
+    <!-- experimental toggle -->
+    <div iav-fab-speed-dail-child>
+      <ng-container *ngTemplateOutlet="experimentalToggleBtnTmpl">
       </ng-container>
     </div>
   </div>
@@ -58,6 +64,9 @@
 
     <!-- help one pager -->
     <ng-container *ngTemplateOutlet="helpBtnTmpl">
+    </ng-container>
+
+    <ng-container *ngTemplateOutlet="experimentalToggleBtnTmpl">
     </ng-container>
   </div>
 </ng-template>
@@ -125,6 +134,39 @@
       </ng-template>
     </iav-dynamic-mat-button>
   </div>
+</ng-template>
+
+<ng-template #experimentalToggleBtnTmpl>
+
+  <ng-template #toggleBtnTmpl let-currentState>
+
+    <div class="btnWrapper"
+      (click)="setExperimentalFlag(!currentState)"
+      matTooltip="Toggle experimental flag">
+      <iav-dynamic-mat-button
+        [iav-dynamic-mat-button-style]="matBtnStyle"
+        [iav-dynamic-mat-button-color]="matBtnColor"
+        iav-dynamic-mat-button-aria-label="Toggle experimental features">
+
+        <ng-template [ngIf]="currentState">
+          <i class="fas fa-flask"></i>
+        </ng-template>
+        
+        <ng-template [ngIf]="!currentState">
+          <span class="fa-stack">
+            <i class="fas fa-flask fa-stack-1x"></i>
+            <i class="fas fa-ban fa-stack-2x" style="color:Tomato"></i>
+          </span>
+        </ng-template>
+      </iav-dynamic-mat-button>
+    </div>
+  </ng-template>
+
+  <ng-template [ngIf]="showExperimentalToggle">
+    <ng-template [ngTemplateOutlet]="toggleBtnTmpl"
+      [ngTemplateOutletContext]="{$implicit: experimentalFlag$ | async}">
+    </ng-template>
+  </ng-template>
 </ng-template>
 
 <ng-template #helpBtnTmpl>
@@ -245,8 +287,6 @@
 <ng-template #settingTemplate>
   <h2 mat-dialog-title>Settings</h2>
   <mat-dialog-content>
-    <!-- required to avoid showing an ugly vertical scroll bar -->
-    <!-- TODO investigate why, then remove the friller class -->
     <config-component class="mb-4 d-block">
     </config-component>
   </mat-dialog-content>

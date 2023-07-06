@@ -14,6 +14,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterialBtn/dynamicMaterialBtn.component";
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
+import { environment } from "src/environments/environment"
 
 @Component({
   selector: 'top-menu-cmp',
@@ -26,6 +27,14 @@ import { userPreference } from "src/state";
 
 export class TopMenuCmp {
 
+  public showExperimentalToggle = environment.EXPERIMENTAL_FEATURE_FLAG
+  setExperimentalFlag(flag: boolean){
+    this.store.dispatch(
+      userPreference.actions.setShowExperimental({
+        flag
+      })
+    )
+  }
   public experimentalFlag$ = this.store.pipe(
     select(userPreference.selectors.showExperimental)
   )

@@ -54,8 +54,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
 
-  private snackbarRef: MatSnackBarRef<any>
-
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
   private subscriptions: Subscription[] = []
@@ -120,6 +118,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
+      this.store.pipe(
+        select(userPreference.selectors.showExperimental)
+      ).subscribe(flag => {
+        this.rd.setAttribute(this.document.body, 'experimental', flag.toString())
+      })
     )
   }
 
