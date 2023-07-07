@@ -26,6 +26,9 @@ import { ListDirective } from "./list/list.directive";
 import { MatChipsModule } from "@angular/material/chips";
 import { FeatureFilterDirective } from "./feature.filter.directive";
 import { GroupFeaturesToName } from "./grpFeatToName.pipe";
+import { ExperimentalModule } from "src/experimental/experimental.module";
+import { MatTabsModule } from "@angular/material/tabs";
+import { ReadmoreModule } from "src/components/readmore";
 
 @NgModule({
   imports: [
@@ -46,6 +49,9 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
     MatTableModule,
     NgLayerCtlModule,
     MatChipsModule,
+    ExperimentalModule,
+    MatTabsModule,
+    ReadmoreModule,
   ],
   declarations: [
     EntryComponent,

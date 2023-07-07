@@ -15,10 +15,20 @@
 
       <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
 
+      <ng-template sxplrExperimentalFlag [experimental]="true" #subtitleExpm="sxplrExperimentalFlag" [ngIf]="subtitleExpm.show$ | async">
+      <mat-card-subtitle>
+        <span class="muted-text">
+          Brain region
+        </span>
+      </mat-card-subtitle>
+      </ng-template>
+
       <mat-card-title class="sxplr-custom-cmp text">
         {{ region.name }}
       </mat-card-title>
 
+
+      <ng-template sxplrExperimentalFlag [deprecated]="true" #subtitleDep="sxplrExperimentalFlag" [ngIf]="subtitleDep.show$ | async">
       <mat-card-subtitle>
         {{ parcellation.name }}
       </mat-card-subtitle>
@@ -54,19 +64,21 @@
         </a>
 
       </mat-card-subtitle>
-
+      </ng-template>
     </div>
   </mat-card>
 
   <!-- desc -->
+  <ng-template sxplrExperimentalFlag [deprecated]="true" #subtitleDep="sxplrExperimentalFlag" [ngIf]="subtitleDep.show$ | async">
   <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
     <readmore-component>
       <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
       </markdown-dom>
     </readmore-component>
   </ng-template>
+  </ng-template>
 
-
+  <ng-template sxplrExperimentalFlag [deprecated]="true" #headerDep="sxplrExperimentalFlag" [ngIf]="headerDep.show$ | async">
   <!-- header for regional feature -->
   <mat-card>
     <mat-card-header>
@@ -86,4 +98,76 @@
     [region]="region"
     #featureEntryCmp="featureEntryCmp">
   </sxplr-feature-entry>
+  </ng-template>
+
+  <ng-template sxplrExperimentalFlag [experimental]="true" #tabExpmpt="sxplrExperimentalFlag" [ngIf]="tabExpmpt.show$ | async">
+  <mat-tab-group>
+
+    <!-- Overview -->
+    <mat-tab label="Overview">
+      
+      <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
+        <readmore-component>
+          <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
+          </markdown-dom>
+        </readmore-component>
+      </ng-template>
+
+      <mat-action-list class="overview-container">
+        
+        <button
+          mat-list-item
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: parcellation.name,
+            descMd: parcellation.desc,
+            actions: parcellation | parcellationDoiPipe
+          }">
+          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+          <div mat-line class="overview-content">{{ parcellation.name }}</div>
+        </button>
+
+        <ng-template [ngIf]="regionPosition">
+          <button mat-list-item (click)="navigateTo(regionPosition)">
+            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+            <div mat-line class="overview-content">{{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
+          </button>
+        </ng-template>
+
+        <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
+          <a mat-list-item [href]="doi" target="_blank">
+            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+            <div mat-line>{{ doi }}</div>
+          </a>
+        </ng-template>
+      </mat-action-list>
+    </mat-tab>
+
+    <!-- FeatureTab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span>
+          Features
+        </span>
+        <ng-template [ngIf]="featureEntryCmp.totals$ | async" let-total>
+          <span class="text-muted">
+            ({{ total }})
+          </span>
+        </ng-template>
+        <ng-template [ngIf]="featureEntryCmp.busyTallying$ | async">
+          <spinner-cmp></spinner-cmp>
+        </ng-template>
+      </ng-template>
+
+      <sxplr-feature-entry
+        [template]="template"
+        [parcellation]="parcellation"
+        [region]="region"
+        #featureEntryCmp="featureEntryCmp">
+      </sxplr-feature-entry>
+    </mat-tab>
+  </mat-tab-group>
+  </ng-template>
+
 </ng-template>

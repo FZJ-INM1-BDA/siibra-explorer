@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
@@ -73,7 +73,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     switchMap(arr => concat(
       of(true),
       forkJoin(
-        arr.map(dir => dir.total$)
+        arr.map(dir => dir.total$.pipe(
+          take(1)
+        ))
       ).pipe(
         map(() => false)
       )

@@ -902,3 +902,13 @@ how-to-cite img
 {
   place-self: center;
 }
+
+.overview-container
+{
+  margin-top: 1rem;
+}
+
+.overview-content
+{
+  white-space: normal!important;
+}
