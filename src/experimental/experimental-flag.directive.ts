@@ -1,7 +1,7 @@
 import { Directive, Input } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { debounceTime, filter, map, tap } from 'rxjs/operators';
+import { debounceTime, filter, map } from 'rxjs/operators';
 import { MainState, userPreference } from 'src/state';
 
 @Directive({

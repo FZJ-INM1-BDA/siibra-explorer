@@ -5,6 +5,8 @@ import { SAPIModule } from 'src/atlasComponents/sapi';
 import { DARKTHEME } from 'src/util/injectionTokens';
 
 import { FeatureViewComponent } from './feature-view.component';
+import { ExperimentalModule } from 'src/experimental/experimental.module';
+import { provideMockStore } from '@ngrx/store/testing';
 
 describe('FeatureViewComponent', () => {
   let component: FeatureViewComponent;
@@ -15,12 +17,16 @@ describe('FeatureViewComponent', () => {
       imports: [
         SAPIModule,
         CommonModule,
+        ExperimentalModule,
       ],
       declarations: [ FeatureViewComponent ],
-      providers: [{
-        provide: DARKTHEME,
-        useValue: EMPTY
-      }]
+      providers: [
+        provideMockStore(),
+        {
+          provide: DARKTHEME,
+          useValue: EMPTY
+        }
+      ]
     })
     .compileComponents();
 
