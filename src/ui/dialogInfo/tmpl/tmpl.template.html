@@ -11,9 +11,22 @@
   </markdown-dom>
 </div>
 
+<ng-template sxplrExperimentalFlag [experimental]="true" #actionExpmt="sxplrExperimentalFlag" [ngIf]="actionExpmt.show$ | async">
+<ng-template [ngIf]="data.actionsAsList">
+  <mat-action-list>
+    <ng-template ngFor [ngForOf]="data.actions" let-action>
+      <button mat-list-item [mat-dialog-close]="action">
+        {{ action }}
+      </button>
+    </ng-template>
+  </mat-action-list>
+</ng-template>
+</ng-template>
+
 
 <mat-dialog-actions align="start">
 
+  <ng-template sxplrExperimentalFlag [deprecated]="true" #actionDep="sxplrExperimentalFlag" [ngIf]="actionDep.show$ | async">
   <ng-template ngFor [ngForOf]="data.actions || []" let-action>
     <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
       [href]="action"
@@ -32,6 +45,31 @@
         {{ action }}
       </button>
     </ng-template>
+  </ng-template>
+  </ng-template>
+
+  <ng-template sxplrExperimentalFlag [experimental]="true" #actionDefaultExpmt="sxplrExperimentalFlag" [ngIf]="actionDefaultExpmt.show$ | async">
+  <ng-template [ngIf]="!data.actionsAsList">
+    <ng-template ngFor [ngForOf]="data.actions || []" let-action>
+      <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
+        [href]="action"
+        sxplr-hide-when-local
+        target="_blank"
+        mat-raised-button
+        color="primary">
+        <i class="fas fa-external-link-alt"></i>
+        <span>Detail</span>
+      </a>
+  
+      <ng-template #defaultActionTmpl>
+        <button mat-raised-button
+          color="primary"
+          [mat-dialog-close]="action">
+          {{ action }}
+        </button>
+      </ng-template>
+    </ng-template>
+  </ng-template>
   </ng-template>
 
   <button mat-dialog-close mat-button>

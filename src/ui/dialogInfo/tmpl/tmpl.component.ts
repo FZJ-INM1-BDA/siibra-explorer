@@ -6,6 +6,7 @@ export type FallBackData = {
   actions?: string[]
   desc?: string
   descMd?: string
+  actionsAsList?: boolean
 }
 
 @Component({

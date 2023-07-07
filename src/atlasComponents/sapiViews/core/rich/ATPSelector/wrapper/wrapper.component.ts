@@ -11,6 +11,10 @@ import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
 import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
 
+type AskUserConfig = {
+  actionsAsList: boolean
+}
+
 function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
   if (!obj) return false
   return (obj.atlas || obj.template || obj.parcellation) && (!obj.requested || isATPGuard(obj.requested))
@@ -30,12 +34,13 @@ export class WrapperATPSelector implements OnDestroy{
 
   #subscription: Subscription[] = []
 
-  #askUser(title: string, descMd: string, actions: string[]): Observable<string> {
+  #askUser(title: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
     return this.dialog.open(DialogFallbackCmp, {
       data: {
         title,
         descMd,
-        actions: actions
+        actions: actions,
+        actionsAsList: config?.actionsAsList
       }
     }).afterClosed()
   }
@@ -86,7 +91,10 @@ export class WrapperATPSelector implements OnDestroy{
                 return this.#askUser(
                   null,
                   `Template **${template.name}** does not support the current parcellation **${selectedATP.parcellation.name}**. Please select one of the following parcellations:`,
-                  parcs.map(p => p.name)
+                  parcs.map(p => p.name),
+                  {
+                    actionsAsList: true
+                  }
                 ).pipe(
                   map(parcname => {
                     const foundParc = parcs.find(p => p.name === parcname)
@@ -108,7 +116,10 @@ export class WrapperATPSelector implements OnDestroy{
                 return this.#askUser(
                   null,
                   `Parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
-                  tmpls.map(tmpl => tmpl.name)
+                  tmpls.map(tmpl => tmpl.name),
+                  {
+                    actionsAsList: true
+                  }
                 ).pipe(
                   map(tmplname => {
                     const foundTmpl = tmpls.find(tmpl => tmpl.name === tmplname)
