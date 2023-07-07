@@ -929,6 +929,66 @@
   </mat-card>
 </ng-template>
 
+<ng-template
+  sxplrExperimentalFlag
+  [experimental]="true"
+  #lastSelPtExpmt="sxplrExperimentalFlag"
+  [ngIf]="lastSelPtExpmt.show$ | async">
+<ng-template #lastViewedPointTmpl let-data>
+  <div class="text-muted sxplr-m-2">
+    Last selected spatial object
+  </div>
+  <button mat-button class="sxplr-list-like-button"
+    (click)="selectPoint(data, data.template)">
+
+    
+    <div class="sxplr-list-like-button-icon">
+      <i class="fas fa-history"></i>
+    </div>
+
+    <div class="sxplr-list-like-button-body">
+
+      <ng-template [ngIf]="data.point">
+        <span class="sxplr-list-like-button-body-line">
+          {{ data.point | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
+        </span>
+        <span class="sxplr-list-like-button-body-line text-muted">
+          Point
+        </span>
+      </ng-template>
+
+      <ng-template [ngIf]="data.face && data.vertices">
+        
+        <span class="sxplr-list-like-button-body-line">
+          Face Index: {{ data.face }}, Vertices Index: {{ data.vertices | addUnitAndJoin : '' }}
+        </span>
+        <span class="sxplr-list-like-button-body-line text-muted">
+          Mesh Face
+        </span>
+      </ng-template>
+
+      <span class="sxplr-list-like-button-body-line text-muted">
+        <span>
+          {{ data.template.name }}
+        </span>
+
+        <ng-template [ngIf]="templateSelected$ | async" let-templateSelected>
+          <ng-template [ngIf]="templateSelected.id !== data.template.id">
+            <mat-icon fontSet="fas" fontIcon="fa-exclamation-triangle"
+              color="warn"
+              matTooltip="Different template spaces detected.">
+            </mat-icon>
+          </ng-template>
+        </ng-template>
+        
+      </span>
+    </div>
+
+    <!-- {{ data.point | json }} -->
+  </button>
+</ng-template>
+</ng-template>
+
 
 <!-- viewer status ctx menu -->
 <ng-template #viewerStatusCtxMenu let-data>
