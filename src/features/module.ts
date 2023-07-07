@@ -29,6 +29,8 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
 import { ExperimentalModule } from "src/experimental/experimental.module";
 import { MatTabsModule } from "@angular/material/tabs";
 import { ReadmoreModule } from "src/components/readmore";
+import { MatDialogModule } from "@angular/material/dialog";
+import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 
 @NgModule({
   imports: [
@@ -52,6 +54,8 @@ import { ReadmoreModule } from "src/components/readmore";
     ExperimentalModule,
     MatTabsModule,
     ReadmoreModule,
+    MatDialogModule,
+    
   ],
   declarations: [
     EntryComponent,
@@ -66,6 +70,7 @@ import { ReadmoreModule } from "src/components/readmore";
     FeatureNamePipe,
     TransformPdToDsPipe,
     GroupFeaturesToName,
+    GroupFeatureTallyPipe,
   ],
   exports: [
     EntryComponent,

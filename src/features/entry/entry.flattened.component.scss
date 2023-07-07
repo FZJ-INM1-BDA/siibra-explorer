@@ -9,6 +9,11 @@ cdk-virtual-scroll-viewport button
     height: 36px;
     display: block;
 }
+:host-context([experimental=true])
+.mat-chip-container
+{
+    overflow-x: unset!important;
+}
 
 .mat-chip-container
 {
@@ -21,10 +26,17 @@ cdk-virtual-scroll-viewport button
 .mat-chip-inner-container
 {
     display: inline-flex;
+    align-items: center;
 }
 
 .mat-chip-inner-container button
 {
     white-space: nowrap;
     margin: 0.2rem 0.4rem;
+}
+
+.filter-tally
+{
+    display: flex;
+    flex-direction: row-reverse;
 }

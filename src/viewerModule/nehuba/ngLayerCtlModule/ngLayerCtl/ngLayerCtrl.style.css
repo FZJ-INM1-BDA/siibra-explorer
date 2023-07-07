@@ -25,3 +25,8 @@ spinner-cmp:has(+ .hydrated)
 {
     display: none;
 }
+
+ng-layer-tune
+{
+    width: 100%;
+}
