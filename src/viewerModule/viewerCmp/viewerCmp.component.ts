@@ -405,6 +405,14 @@ export class ViewerCmp implements OnDestroy {
           )
         }
       }
+      if (event.data.viewerType === "threeSurfer") {
+        const { regions=[] } = (event.data as TContextArg<"threeSurfer">).payload
+        this.store$.dispatch(
+          userInteraction.actions.mouseoverRegions({
+            regions: regions as SxplrRegion[]
+          })
+        )
+      }
       break
     default:
     }

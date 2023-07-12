@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { getUuid } from "src/util/fn";
+import { getUuid, waitFor } from "src/util/fn";
 import { PeriodicSvc } from "src/util/periodic.service";
 
 export type TNgAnnotationEv = {
@@ -144,8 +144,8 @@ export class AnnotationLayer {
       return false
     })
   }
-  removeAnnotation(spec: { id: string }) {
-    if (!this.nglayer) return
+  async removeAnnotation(spec: { id: string }) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
     const { localAnnotations } = this.nglayer.layer
     this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)
@@ -155,8 +155,8 @@ export class AnnotationLayer {
     }
   }
   async updateAnnotation(spec: AnnotationSpec) {
-    const localAnnotations = this.nglayer?.layer?.localAnnotations
-    if (!localAnnotations) return
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+    const { localAnnotations } = this.nglayer.layer
     const ref = localAnnotations.references.get(spec.id)
     const _spec = this.parseNgSpecType(spec)
     if (ref) {

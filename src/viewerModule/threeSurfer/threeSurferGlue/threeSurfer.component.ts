@@ -824,11 +824,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       () => this.domEl.removeEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME_UPDATED, customEvHandler)
     )
     this.tsRef = new (window as any).ThreeSurfer(this.domEl, {highlightHovered: true})
+    window['tsViewer'] = this.tsRef
 
     this.onDestroyCb.push(
       () => {
         this.tsRef.dispose()
         this.tsRef = null
+        window['tsViewer'] = null
       }
     )
     this.tsRef.control.enablePan = false
@@ -904,13 +906,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       }
     })
     this.mouseoverText = ''
-    if (mouseover.length > 0) {
-      this.mouseoverText += mouseover.map(el => el.name).join(' / ')
-    }
     if (error) {
       this.mouseoverText += `::error: ${error}`
     }
-    if (this.mouseoverText === '') this.mouseoverText = null
   }
 
   public toggleMeshVis(label: string) {

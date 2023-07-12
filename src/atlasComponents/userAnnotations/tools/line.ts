@@ -78,11 +78,12 @@ export class Line extends IAnnotationGeometry{
       x: x1, y: y1, z: z1
     } = this.points[1]
 
+    const { id } = this.space
     return {
       '@id': this.id,
       '@type': "tmp/line",
       coordinateSpace: {
-        '@id': this.space["@id"]
+        '@id': id
       },
       coordinatesFrom: [getCoord(x0/1e6), getCoord(y0/1e6), getCoord(z0/1e6)],
       coordinatesTo: [getCoord(x1/1e6), getCoord(y1/1e6), getCoord(z1/1e6)],

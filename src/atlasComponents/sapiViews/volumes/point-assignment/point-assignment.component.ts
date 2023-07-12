@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
@@ -114,8 +114,12 @@ export class PointAssignmentComponent implements OnDestroy {
 
   constructor(private sapi: SAPI, private dialog: MatDialog) {}
 
+  #dialogRef: MatDialogRef<unknown>
   openDialog(tmpl: TemplateRef<unknown>){
-    this.dialog.open(tmpl)
+    this.#dialogRef = this.dialog.open(tmpl)
+    this.#dialogRef.afterClosed().subscribe(() => {
+      this.#dialogRef = null
+    })
   }
 
   #sub: Subscription[] = []
@@ -125,6 +129,9 @@ export class PointAssignmentComponent implements OnDestroy {
   async selectRegion(region: PathReturn<"/regions/{region_id}">, event: MouseEvent){
     const sxplrReg = await translateV3Entities.translateRegion(region)
     this.clickOnRegion.emit({ target: sxplrReg, event })
+    if (this.#dialogRef) {
+      this.#dialogRef.close()
+    }
   }
 
   zipfileConfig$: Observable<TZipFileConfig[]> = combineLatest([
