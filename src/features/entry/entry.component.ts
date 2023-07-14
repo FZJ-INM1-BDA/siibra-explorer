@@ -152,7 +152,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
       map(atlas => atlas?.species === SPECIES_ENUM.HOMO_SAPIENS || atlas?.species === SPECIES_ENUM.RATTUS_NORVEGICUS)
     ),
     this.TPRBbox$.pipe(
-      map(({ parcellation }) => parcellation?.id === IDS.PARCELLATION.JBA29 || parcellation?.id === IDS.PARCELLATION.WAXHOLMV4)
+      map(({ parcellation, template }) => template.id !== IDS.TEMPLATES.BIG_BRAIN && parcellation?.id === IDS.PARCELLATION.JBA29 || parcellation?.id === IDS.PARCELLATION.WAXHOLMV4)
     )
   ]).pipe(
     map(flags => flags.every(f => f))
