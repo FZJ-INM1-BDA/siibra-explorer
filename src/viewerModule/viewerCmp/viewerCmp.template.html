@@ -562,6 +562,7 @@
     
       <sxplr-sapiviews-core-rich-regionlistsearch
         [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
+        [sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names]="view.labelMappedRegionNames"
         [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length === 1 ? view.selectedRegions[0].name : null"
         (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)"
         (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="toggleRoi($event)">

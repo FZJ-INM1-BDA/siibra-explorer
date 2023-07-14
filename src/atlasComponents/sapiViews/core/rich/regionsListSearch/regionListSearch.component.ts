@@ -5,6 +5,7 @@ import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionListSearchTmpl.directive";
+import { BehaviorSubject, combineLatest } from "rxjs";
 
 const filterRegionViaSearch = (searchTerm: string) => (region:SxplrRegion) => {
   return region.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
@@ -25,13 +26,16 @@ export class SapiViewsCoreRichRegionListSearch {
 
   showNOptions = 4
 
-  private _regions: SxplrRegion[] = []
-  get regions(){
-    return this._regions
-  }
+  #regions = new BehaviorSubject<SxplrRegion[]>([])
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-regions')
   set regions(reg: SxplrRegion[]) {
-    this._regions = reg.filter(r => !reg.some(c => c.parentIds.includes(r.id)))
+    this.#regions.next(reg)
+  }
+
+  #mappedRegionNames = new BehaviorSubject<string[]>([])
+  @Input('sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names')
+  set mappedRegions(regNames: string[]) {
+    this.#mappedRegionNames.next(regNames)
   }
 
   @ContentChild(SapiViewsCoreRichRegionListTemplateDirective)
@@ -51,13 +55,18 @@ export class SapiViewsCoreRichRegionListSearch {
 
   public searchFormControl = new UntypedFormControl()
 
-  public searchedList$ = this.searchFormControl.valueChanges.pipe(
-    startWith(''),
-    distinctUntilChanged(),
-    debounceTime(160),
-    map((searchTerm: string | SxplrRegion) => {
+  public searchedList$ = combineLatest([
+    this.searchFormControl.valueChanges.pipe(
+      startWith(''),
+      distinctUntilChanged(),
+      debounceTime(160),
+    ),
+    this.#regions,
+    this.#mappedRegionNames
+  ]).pipe(
+    map(([searchTerm, regions, mappedRegionNames]) => {
       if (typeof searchTerm === "string") {
-        return this.regions.filter(filterRegionViaSearch(searchTerm))
+        return regions.filter(r => mappedRegionNames.includes(r.name)).filter(filterRegionViaSearch(searchTerm))
       }
       return []
     })
