@@ -461,7 +461,7 @@ export class SAPI{
     )
   }
 
-  private async getLabelledMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
+  async getLabelledMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
     // No need to retrieve sapi object, since we know @id maps to id
     return await this.v3Get("/map", {
       query: {

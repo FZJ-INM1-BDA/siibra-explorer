@@ -540,6 +540,7 @@
       <sxplr-sapiviews-core-rich-regionshierarchy
         class="sxplr-w-100 sxplr-flex-var"
         [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
+        [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
         [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
         (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
         (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
