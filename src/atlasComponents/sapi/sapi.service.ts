@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.10'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.11'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -461,7 +461,7 @@ export class SAPI{
     )
   }
 
-  private async getLabelledMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
+  async getLabelledMap(parcellation: SxplrParcellation, template: SxplrTemplate) {
     // No need to retrieve sapi object, since we know @id maps to id
     return await this.v3Get("/map", {
       query: {

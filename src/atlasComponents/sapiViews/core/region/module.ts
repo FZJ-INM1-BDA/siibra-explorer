@@ -10,6 +10,7 @@ import { SapiViewsUtilModule } from "../../util/module";
 import { SapiViewsCoreRegionRegionListItem } from "./region/listItem/region.listItem.component";
 import { SapiViewsCoreRegionRegionBase } from "./region/region.base.directive";
 import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   imports: [
@@ -21,6 +22,7 @@ import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.compone
     StrictLocalModule,
     FeatureModule,
     ReadmoreModule,
+    MatTooltipModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

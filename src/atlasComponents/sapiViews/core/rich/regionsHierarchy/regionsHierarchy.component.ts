@@ -20,6 +20,7 @@ const filterByRegexPipe = new FilterByRegexPipe()
 })
 
 export class SapiViewsCoreRichRegionsHierarchy {
+  TXT_CANNOT_BE_SELECTED = "Not mapped in this template space."
 
   static IsParent(region: SxplrRegion, parentRegion: SxplrRegion): boolean {
     return region.parentIds.some(id => parentRegion.id === id)
@@ -35,6 +36,9 @@ export class SapiViewsCoreRichRegionsHierarchy {
       region => regions.filter(child => SapiViewsCoreRichRegionsHierarchy.IsParent(child, region))
     )
   }
+
+  @Input('sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names')
+  labelMappedRegionNames: string[] = []
 
   @Input('sxplr-sapiviews-core-rich-regionshierarchy-accent-regions')
   accentedRegions: SxplrRegion[] = []
@@ -100,10 +104,9 @@ export class SapiViewsCoreRichRegionsHierarchy {
   
   onNodeClick({node: roi, event }: {node: SxplrRegion, event: MouseEvent}){
     /**
-     * only allow leave nodes to be selectable for now
+     * Only allow the regions that are labelled mapped to be selected.
      */
-    const children = this._regions.filter(r => this.isParent(r, roi))
-    if (children.length > 0) {
+    if (!this.labelMappedRegionNames.includes(roi.name)) {
       return
     }
     if (event.ctrlKey) {
