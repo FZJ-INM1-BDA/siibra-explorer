@@ -446,7 +446,7 @@ class TranslateV3 {
       this.#translatePoint(feat.boundingbox.center),
       this.#translatePoint(feat.boundingbox.maxpoint),
       this.#translatePoint(feat.boundingbox.minpoint),
-      await this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
+      this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
     ])
     const { ['@id']: spaceId } = feat.boundingbox.space
     const getSpace = (id: string) => this.#sxplrTmplMap.get(id)
