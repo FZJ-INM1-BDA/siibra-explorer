@@ -90,7 +90,7 @@ export class WrapperATPSelector implements OnDestroy{
                 }
                 return this.#askUser(
                   null,
-                  `Template **${template.name}** does not support the current parcellation **${selectedATP.parcellation.name}**. Please select one of the following parcellations:`,
+                  `Current parcellation **${selectedATP.parcellation.name}** is not mapped in the selected template **${template.name}**. Please select one of the following parcellations:`,
                   parcs.map(p => p.name),
                   {
                     actionsAsList: true
@@ -115,7 +115,7 @@ export class WrapperATPSelector implements OnDestroy{
                 }
                 return this.#askUser(
                   null,
-                  `Parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
+                  `Selected parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
                   tmpls.map(tmpl => tmpl.name),
                   {
                     actionsAsList: true

@@ -2,27 +2,33 @@
   {{ data.title }}
 </h1>
 
-<div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
-  <ng-template [ngIf]="data.desc">
-    {{ data.desc }}
-  </ng-template>
-  
-  <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
-  </markdown-dom>
-</div>
+<mat-dialog-content>
 
-<ng-template sxplrExperimentalFlag [experimental]="true" #actionExpmt="sxplrExperimentalFlag" [ngIf]="actionExpmt.show$ | async">
-<ng-template [ngIf]="data.actionsAsList">
-  <mat-action-list>
-    <ng-template ngFor [ngForOf]="data.actions" let-action>
-      <button mat-list-item [mat-dialog-close]="action">
-        {{ action }}
-      </button>
+  <div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
+    <ng-template [ngIf]="data.desc">
+      {{ data.desc }}
     </ng-template>
-  </mat-action-list>
-</ng-template>
-</ng-template>
+    
+    <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
+    </markdown-dom>
+  </div>
+  
+  <ng-template sxplrExperimentalFlag [experimental]="true" #actionExpmt="sxplrExperimentalFlag" [ngIf]="actionExpmt.show$ | async">
+  <ng-template [ngIf]="data.actionsAsList">
+    <mat-action-list>
+      <ng-template ngFor [ngForOf]="data.actions" let-action let-first="first">
+        <ng-template [ngIf]="!first">
+          <mat-divider></mat-divider>
+        </ng-template>
+        <button mat-list-item [mat-dialog-close]="action">
+          {{ action }}
+        </button>
+      </ng-template>
+    </mat-action-list>
+  </ng-template>
+  </ng-template>
 
+</mat-dialog-content>
 
 <mat-dialog-actions align="start">
 

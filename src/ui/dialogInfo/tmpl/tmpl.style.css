@@ -2,3 +2,9 @@ mat-dialog-actions a i
 {
   margin-right: 0.5rem;
 }
+
+mat-dialog-content
+{
+  display: block;
+  max-height: 30dvh;
+}
