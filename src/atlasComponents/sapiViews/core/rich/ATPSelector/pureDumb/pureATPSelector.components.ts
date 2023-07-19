@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from "@angular/core";
+import { BehaviorSubject, Subscription, combineLatest, concat, merge, of } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
+import { SmartChip } from "src/components/smartChip";
 
 export const darkThemePalette = [
   "#141414",
@@ -40,7 +43,9 @@ const pipe = new FilterGroupedParcellationPipe()
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class PureATPSelector implements OnChanges{
+export class PureATPSelector implements OnChanges, AfterViewInit, OnDestroy{
+
+  #subscriptions: Subscription[] = []
 
   @Input('sxplr-pure-atp-selector-color-palette')
   colorPalette: string[] = darkThemePalette
@@ -66,6 +71,15 @@ export class PureATPSelector implements OnChanges{
 
   @Output('sxplr-pure-atp-selector-on-select')
   selectLeafEmitter = new EventEmitter<Partial<ATP>>()
+
+  @ViewChildren(SmartChip)
+  smartChips: QueryList<SmartChip<object>>
+
+  #menuOpen$ = new BehaviorSubject<{ some: boolean, all: boolean, none: boolean }>({ some: false, all: false, none: false })
+  menuOpen$ = this.#menuOpen$.asObservable()
+
+  @HostBinding('attr.data-menu-open')
+  menuOpen: 'some'|'all'|'none' = null
 
   getChildren(parc: GroupedParcellation|SxplrParcellation){
     return (parc as GroupedParcellation).parcellations || []
@@ -96,6 +110,57 @@ export class PureATPSelector implements OnChanges{
           ...pipe.transform(changes.parcellations.currentValue, false),
         ]
       }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.#subscriptions.push(
+      concat(
+        of(null),
+        this.smartChips.changes,
+      ).pipe(
+        switchMap(() =>
+          combineLatest(
+            Array.from(this.smartChips).map(chip =>
+              concat(
+                of(false),
+                merge(
+                  chip.menuOpened.pipe(
+                    map(() => true)
+                  ),
+                  chip.menuClosed.pipe(
+                    map(() => false)
+                  )
+                )
+              )
+            )
+          )
+        ),
+      ).subscribe(arr => {
+        const newVal = {
+          some: arr.some(val => val),
+          all: arr.every(val => val),
+          none: arr.every(val => !val),
+        }
+        this.#menuOpen$.next(newVal)
+
+        this.menuOpen = null
+        if (newVal.none) {
+          this.menuOpen = 'none'
+        }
+        if (newVal.all) {
+          this.menuOpen = 'all'
+        }
+        if (newVal.some) {
+          this.menuOpen = 'some'
+        }
+      })
+    )
+  }
+
+  ngOnDestroy(): void {
+    while (this.#subscriptions.length > 0) {
+      this.#subscriptions.pop().unsubscribe()
     }
   }
 }

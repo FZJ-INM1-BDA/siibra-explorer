@@ -9,6 +9,7 @@ import { SmartChipContent } from "./smartChip.content.directive";
 import { SmartChipHeader } from "./smartChip.header.directive";
 import { SmartChipMenu } from "./smartChip.menu.directive";
 import { ExperimentalModule } from "src/experimental/experimental.module";
+import { SmartChipAction } from "./smartChip.action.directive";
 
 @NgModule({
   imports: [
@@ -22,6 +23,7 @@ import { ExperimentalModule } from "src/experimental/experimental.module";
     SmartChipMenu,
     SmartChipContent,
     SmartChipHeader,
+    SmartChipAction,
     SmartChip,
     HasSubMenuPipe,
   ],
@@ -29,6 +31,7 @@ import { ExperimentalModule } from "src/experimental/experimental.module";
     SmartChipMenu,
     SmartChipContent,
     SmartChipHeader,
+    SmartChipAction,
     SmartChip,
   ]
 })

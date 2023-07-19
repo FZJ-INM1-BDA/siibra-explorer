@@ -1,3 +1,17 @@
+:host-context([experimental="true"]) :host
+{
+  opacity: 0.5;
+  transition: opacity ease-in-out 160ms;
+
+  &:hover,
+  &[data-menu-open="some"],
+  &[data-menu-open="all"]
+  {
+    opacity: 1;
+  }
+}
+
+
 :host
 {
   display: inline-flex;

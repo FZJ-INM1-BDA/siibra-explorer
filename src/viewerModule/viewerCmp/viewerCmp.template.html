@@ -293,14 +293,28 @@
     #minTray="sxplrExperimentalFlag"
     [ngIf]="minTray.show$ | async">
     <div class="tab-toggle-container">
-      
-    <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-      fontIcon: (minTrayVisSwitch.switchState$ | async) ? 'fas fa-chevron-left' : 'fas fa-search',
-      matColor: (minTrayVisSwitch.switchState$ | async) ? null : 'primary',
-      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
-    }">
+    
+      <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? '' : 'd-none'">
 
-    </ng-template>
+        <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+          fontIcon: 'fas fa-chevron-left',
+          matColor: null,
+          click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+        }">
+        </ng-template>
+      </div>
+      
+      <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? 'd-none' : ''">
+
+        <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+          fontIcon: 'fas fa-search',
+          matColor: 'primary',
+          click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
+          badge: voiFeatureEntryCmp.totals$ | async
+        }">
+        </ng-template>
+      </div>
+
     </div>
   </ng-template>
 

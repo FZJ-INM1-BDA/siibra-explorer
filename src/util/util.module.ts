@@ -77,7 +77,7 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     IncludesPipe,
     SidePanelComponent,
     DfToDsPipe,
-    PrettyPresentPipe
+    PrettyPresentPipe,
   ]
 })
 
