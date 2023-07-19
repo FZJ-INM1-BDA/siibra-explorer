@@ -107,10 +107,6 @@
 <ng-template sxplrExperimentalFlag #newPanelExpmt="sxplrExperimentalFlag" [experimental]="true" [ngIf]="newPanelExpmt.show$ | async">
 <mat-tab-group>
   <mat-tab label="Overview">
-    <readmore-component>
-      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
-      </markdown-dom>
-    </readmore-component>
 
     <mat-action-list class="overview-container">
 
@@ -125,21 +121,26 @@
 
       <!-- doi -->
       <ng-template ngFor [ngForOf]="feature.link" let-url>
-        <a [href]="url.href" mat-list-item target="_blank">
-          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+        <a [href]="url.href" mat-list-item target="_blank" class="no-hover">
+          <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
           <div mat-line>{{ url.text || url.href }}</div>
         </a>
       </ng-template>
       
       <!-- additional links -->
       <ng-template ngFor [ngForOf]="additionalLinks$ | async" let-url>
-        <a [href]="url" mat-list-item target="_blank">
-          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+        <a [href]="url" mat-list-item target="_blank" class="no-hover">
+          <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
           <div mat-line>{{ url }}</div>
         </a>
       </ng-template>
 
     </mat-action-list>
+    
+    <readmore-component [collapsedHeight]="240">
+      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
+      </markdown-dom>
+    </readmore-component>
   </mat-tab>
 
   <mat-tab *ngIf="busy$ | async">
@@ -150,7 +151,7 @@
 
   <!-- radar special view -->
   <ng-template [ngIf]="polar$ | async" let-polar>
-    <mat-tab label="Preview">
+    <mat-tab label="Visualization">
       <kg-dataset-dumb-radar
         [radar]="polar"
         [attr.kg-ds-prv-darkmode]="darktheme$ | async">
@@ -160,7 +161,7 @@
   
   <!-- line special view -->
   <ng-template [ngIf]="linear$ | async" let-linear>
-    <mat-tab label="Preview">
+    <mat-tab label="Visualization">
       <kg-dataset-dumb-line
         [profileBs]="linear"
         [attr.kg-ds-prv-darkmode]="darktheme$ | async">
@@ -173,7 +174,7 @@
   <ng-template [ngIf]="!(linear$ | async) && !(polar$ | async)">
     <ng-template [ngIf]="tabular$ | async" let-tabular>
 
-      <mat-tab label="Preview">
+      <mat-tab label="Visualization">
         <table class="feature-detail" mat-table [dataSource]="tabular | transformPdToDs">
   
           <ng-container *ngFor="let column of columns$ | async"

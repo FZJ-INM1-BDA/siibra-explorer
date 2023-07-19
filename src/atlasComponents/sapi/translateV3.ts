@@ -425,7 +425,7 @@ class TranslateV3 {
     const dsDescs = datasets.map(ds => ds.description)
     const urls = datasets.flatMap(ds => ds.urls).map(v => ({
       href: v.url,
-      text: 'link to dataset'
+      text: v.url
     }))
     return {
       id,

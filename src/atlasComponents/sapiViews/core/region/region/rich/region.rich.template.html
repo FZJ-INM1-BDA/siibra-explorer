@@ -105,13 +105,6 @@
 
     <!-- Overview -->
     <mat-tab label="Overview">
-      
-      <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
-        <readmore-component>
-          <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
-          </markdown-dom>
-        </readmore-component>
-      </ng-template>
 
       <mat-action-list class="overview-container">
         
@@ -136,12 +129,20 @@
         </ng-template>
 
         <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
-          <a mat-list-item [href]="doi" target="_blank">
-            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+          <a mat-list-item [href]="doi" target="_blank" class="no-hover">
+            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
             <div mat-line>{{ doi }}</div>
           </a>
         </ng-template>
       </mat-action-list>
+
+      
+      <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
+        <readmore-component [collapsedHeight]="240">
+          <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
+          </markdown-dom>
+        </readmore-component>
+      </ng-template>
     </mat-tab>
 
     <!-- FeatureTab -->
