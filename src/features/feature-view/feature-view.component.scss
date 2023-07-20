@@ -27,3 +27,18 @@ readmore-component
 {
     width: 100%;
 }
+
+:host-context([experimental="true"])
+{
+    
+    .header-card {
+        background-color: #fee;
+    }
+
+    &:host-context([darktheme="true"])
+    {
+        .header-card {
+            background-color: #433;
+        }
+    }
+}
