@@ -1,17 +1,3 @@
-:host-context([experimental="true"]) :host
-{
-  opacity: 0.5;
-  transition: opacity ease-in-out 160ms;
-
-  &:hover,
-  &[data-menu-open="some"],
-  &[data-menu-open="all"]
-  {
-    opacity: 1;
-  }
-}
-
-
 :host
 {
   display: inline-flex;
@@ -33,8 +19,10 @@
   margin-left: 0.2rem;
 }
 
-sxplr-smart-chip
+:host sxplr-smart-chip
 {
+  margin-left: 1rem;
+  margin-right: 1rem;
   min-width: 10rem;
 }
 

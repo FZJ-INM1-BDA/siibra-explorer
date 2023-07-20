@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from "@angular/core";
+import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable, of, Subject, Subscription } from "rxjs";
@@ -29,6 +29,10 @@ function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
 })
 
 export class WrapperATPSelector implements OnDestroy{
+
+  @Output('sxplr-wrapper-atp-selector-menu-open')
+  menuOpen = new EventEmitter<{some: boolean, all: boolean, none: boolean}>()
+
   darkThemePalette = darkThemePalette
   lightThemePalette = lightThemePalette
 

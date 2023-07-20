@@ -1,0 +1,33 @@
+:host
+{
+  opacity: 0.5;
+  transition: opacity ease-in-out 160ms;
+
+  &:hover,
+  &[data-menu-open="some"],
+  &[data-menu-open="all"]
+  {
+    opacity: 1;
+  }
+}
+
+:host
+{
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+:host sxplr-smart-chip
+{
+  margin-left: -2.5rem;
+}
+
+sxplr-smart-chip .regionname
+{
+  margin-left: 0.5rem;
+}
+
+sxplr-smart-chip [mat-icon-button]
+{
+  margin-right: -1.5rem;
+}

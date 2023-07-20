@@ -76,6 +76,8 @@ export class PureATPSelector implements OnChanges, AfterViewInit, OnDestroy{
   smartChips: QueryList<SmartChip<object>>
 
   #menuOpen$ = new BehaviorSubject<{ some: boolean, all: boolean, none: boolean }>({ some: false, all: false, none: false })
+
+  @Output('sxplr-pure-atp-selector-menu-open')
   menuOpen$ = this.#menuOpen$.asObservable()
 
   @HostBinding('attr.data-menu-open')

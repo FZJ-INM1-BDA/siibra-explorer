@@ -784,22 +784,6 @@ kg-dataset-previewer > img
   top: unset!important;
 }
 
-.fixed-top
-{
-  bottom: unset!important;
-}
-
-mat-list.sm mat-list-item
-{
-  height:2rem!important;
-  font-size: 0.8rem!important;
-}
-
-.color-inherit
-{
-  color: inherit!important;
-}
-
 .sidenav-cover-header-container
 {
   padding: 16px;

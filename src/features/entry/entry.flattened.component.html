@@ -111,7 +111,9 @@
                             <mat-list-option [selected]="(filterFeatureCls.unchecked$ | async).length === 0"
                                 (click)="listOption.selected ? filterList.selectAll() : filterList.deselectAll()"
                                 #listOption>
-                                <span class="text-muted">(all)</span>
+                                <span class="text-muted sxplr-mr-2">
+                                    <ng-template [ngTemplateOutlet]="filterTallyTmpl"></ng-template>
+                                </span>
                             </mat-list-option>
                         </mat-selection-list>
 
@@ -138,14 +140,10 @@
 
                         <mat-divider></mat-divider>
                         
-                        <div class="text-muted sxplr-mr-2 filter-tally">
-                            <ng-template [ngTemplateOutlet]="filterTallyTmpl"></ng-template>
-                        </div>
-                        
                     </div>
                     
                     <div mat-dialog-actions align="end">
-                        <button mat-flat-button color="primary" (click)="filterList.selectAll()">
+                        <button mat-stroked-button color="primary" (click)="filterList.selectAll()">
                             Reset
                         </button>
                         <button mat-button mat-dialog-close cdkFocusInitial>

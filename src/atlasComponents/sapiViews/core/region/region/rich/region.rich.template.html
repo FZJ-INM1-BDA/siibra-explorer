@@ -106,7 +106,7 @@
     <!-- Overview -->
     <mat-tab label="Overview">
 
-      <mat-action-list class="overview-container">
+      <mat-action-list class="overview-container" dense>
         
         <button
           mat-list-item
@@ -138,7 +138,7 @@
 
       
       <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
-        <readmore-component [collapsedHeight]="240">
+        <readmore-component [collapsedHeight]="240" class="sxplr-mb-8">
           <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
           </markdown-dom>
         </readmore-component>
