@@ -2,6 +2,7 @@
 {
   opacity: 0.5;
   transition: opacity ease-in-out 160ms;
+  margin-bottom: 1rem;
 
   &:hover,
   &[data-menu-open="some"],
