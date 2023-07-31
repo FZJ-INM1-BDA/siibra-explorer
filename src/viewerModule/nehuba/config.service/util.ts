@@ -156,11 +156,19 @@ const BACKCOMAP_KEY_DICT = {
   }
 }
 
+const parcIdIgnoreLateral = [
+  IDS.PARCELLATION.MEBRAINS
+]
 
 export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): string {
   if (!region) {
     return null
   }
+
+  if (parcIdIgnoreLateral.includes(parc.id)) {
+    return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
+  }
+
   let laterality: string = "whole brain"
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
