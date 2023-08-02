@@ -4,6 +4,11 @@ import { UserPreference } from "./store"
 
 const storeSelector = store => store[nameSpace] as UserPreference
 
+export const overrideZTraversalMultiplier = createSelector(
+  storeSelector,
+  state => state.overrideZTraversalMultiplier
+)
+
 export const useAnimation = createSelector(
   storeSelector,
   state => state.useAnimation

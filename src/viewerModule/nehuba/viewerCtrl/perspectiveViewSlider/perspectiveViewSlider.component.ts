@@ -2,10 +2,9 @@ import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
-import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
+import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
-import { fromRootStore } from "src/state/atlasSelection";
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
 import { ResizeObserverDirective } from "src/util/windowResize";
@@ -15,6 +14,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "../../util";
 import { EnumClassicalView } from "src/atlasComponents/constants"
 import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
+import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo } from "../../layerCtrl.service/layerCtrl.util";
 
 const MAX_DIM = 200
 
@@ -146,24 +146,8 @@ export class PerspectiveViewSlider implements OnDestroy {
       map(ctrl => ctrl?.rangeOrientation === "vertical")
     )
 
-    private currentTemplateSize$ = this.store$.pipe(
-      fromRootStore.distinctATP(),
-      switchMap(({ template }) => 
-        template
-          ? this.sapi.getVoxelTemplateImage(template).pipe(
-            switchMap(defaultImage => {
-              if (defaultImage.length == 0) {
-                // template hs no ng volume, which is the case for threesurfer
-                return NEVER
-              }
-              const img = defaultImage[0]
-              return of({
-                ...img.info || {},
-                transform: img.transform
-              })
-            })
-          )
-          : NEVER),
+    private currentTemplateSize$ = this.tmplInfo$.pipe(
+      filter(val => !!val)
     )
 
     private useMinimap$: Observable<EnumClassicalView> = this.maximisedPanelIndex$.pipe(
@@ -347,6 +331,7 @@ export class PerspectiveViewSlider implements OnDestroy {
       private store$: Store,
       private sapi: SAPI,
       @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Observable<NehubaViewerUnit>,
+      @Inject(CURRENT_TEMPLATE_DIM_INFO) private tmplInfo$: Observable<TemplateInfo>,
     ) {
 
       this.subscriptions.push(
