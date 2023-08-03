@@ -65,3 +65,12 @@ export const SET_COLORMAP_OBS = new InjectionToken<Observable<IColorMap>>('SET_C
 export const SET_LAYER_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_LAYER_VISIBILITY')
 export const SET_SEGMENT_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_SEGMENT_VISIBILITY')
 export const NG_LAYER_CONTROL = new InjectionToken<TNgLayerCtrl<keyof INgLayerCtrl>>('NG_LAYER_CONTROL')
+export const Z_TRAVERSAL_MULTIPLIER = new InjectionToken<Observable<number>>('Z_TRAVERSAL_MULTIPLIER')
+export const CURRENT_TEMPLATE_DIM_INFO = new InjectionToken<Observable<TemplateInfo>>('CURRENT_TEMPLATE_DIM_INFO')
+
+export type TemplateInfo = {
+  transform: number[][]
+  voxel?: [number, number, number]
+  real?: [number, number, number]
+  resolution?: [number, number, number]
+}

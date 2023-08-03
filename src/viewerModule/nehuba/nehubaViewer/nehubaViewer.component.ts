@@ -11,7 +11,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 /**
  * import of nehuba js files moved to angular.json
  */
-import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl } from "../layerCtrl.service/layerCtrl.util";
+import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 
@@ -116,6 +116,8 @@ export class NehubaViewerUnit implements OnDestroy {
 
   #triggerMeshLoad$ = new BehaviorSubject(null)
 
+  multplier = new Float32Array(1)
+
   constructor(
     public elementRef: ElementRef,
     private log: LoggingService,
@@ -127,7 +129,15 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
     @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
+    @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
   ) {
+    if (multiplier$) {
+      this.ondestroySubscriptions.push(
+        multiplier$.subscribe(val => this.multplier[0] = val)
+      )
+    } else {
+      this.multplier[0] = 1
+    }
 
     if (this.nehubaViewer$) {
       this.nehubaViewer$.next(this)
@@ -356,9 +366,24 @@ export class NehubaViewerUnit implements OnDestroy {
      */
 
     /* creation of the layout is done on next frame, hence the settimeout */
-    setTimeout(() => {
-      window['viewer'].display.panels.forEach(patchSliceViewPanel)
-    })
+    const patchSliceview = async () => {
+      
+      const viewer = window['viewer']
+      viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel")
+      viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-alt")
+      await (async () => {
+        let lenPanels = 0
+
+        while (lenPanels === 0) {
+          lenPanels = viewer.display.panels.size
+          await new Promise(rs => setTimeout(rs, 150))
+        }
+      })()
+      viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-10")
+      viewer.display.panels.forEach(sliceView => patchSliceViewPanel(sliceView, this.exportNehuba, this.multplier))
+    }
+    patchSliceview()
 
     this.newViewerInit()
     window['nehubaViewer'] = this.nehubaViewer
@@ -839,7 +864,9 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 }
 
-const patchSliceViewPanel = (sliceViewPanel: any) => {
+const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier: Float32Array) => {
+
+  // patch draw calls to dispatch viewerportToData
   const originalDraw = sliceViewPanel.draw
   sliceViewPanel.draw = function(this) {
 
@@ -854,6 +881,24 @@ const patchSliceViewPanel = (sliceViewPanel: any) => {
     }
 
     originalDraw.call(this)
+  }
+
+  // patch ctrl+wheel & shift+wheel
+  const { navigationState } = sliceViewPanel
+  const { registerActionListener, vec3 } = exportNehuba
+  const tempVec3 = vec3.create()
+
+  for (const val of [1, 10]) {
+    registerActionListener(sliceViewPanel.element, `proxy-wheel-${val}`, event => {
+      const e = event.detail
+
+      const offset = tempVec3
+      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX
+      offset[0] = 0
+      offset[1] = 0
+      offset[2] = (delta > 0 ? -1 : 1) * mulitplier[0] * val
+      navigationState.pose.translateVoxelsRelative(offset)
+    })
   }
 }
 
