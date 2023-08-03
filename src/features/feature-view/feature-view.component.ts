@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, combineLatest, of } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, shareReplay, switchMap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, TabularFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
@@ -27,6 +27,19 @@ export class FeatureViewComponent implements OnChanges {
 
   @Input()
   feature: Feature
+
+  #featureId = new BehaviorSubject<string>(null)
+
+  plotly$ = combineLatest([
+    this.#featureId.pipe(
+      filter(v => !!v)
+    ),
+    this.darktheme$
+  ]).pipe(
+    switchMap(([ featureId, darktheme ]) => this.sapi.getFeaturePlot(featureId, { template: darktheme ? "plotly_dark" : "plotly_white" })),
+    shareReplay(1),
+    catchError(() => of(null))
+  )
 
   #detailLinks = new Subject<string[]>()
   additionalLinks$ = this.#detailLinks.pipe(
@@ -90,6 +103,8 @@ export class FeatureViewComponent implements OnChanges {
     this.voi$.next(null)
     this.tabular$.next(null)
     this.busy$.next(true)
+
+    this.#featureId.next(this.feature.id)
 
     this.sapi.getV3FeatureDetailWithId(this.feature.id).subscribe(
       val => {

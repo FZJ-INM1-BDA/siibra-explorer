@@ -31,6 +31,7 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { ReadmoreModule } from "src/components/readmore";
 import { MatDialogModule } from "@angular/material/dialog";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
+import { PlotlyComponent } from "./plotly";
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
     ReadmoreModule,
     MatDialogModule,
     
+    PlotlyComponent,
   ],
   declarations: [
     EntryComponent,

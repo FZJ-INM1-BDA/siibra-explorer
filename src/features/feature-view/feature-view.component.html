@@ -208,6 +208,15 @@
     </mat-tab>
   </ng-template>
 
+  <!-- plotly view -->
+  <ng-template [ngIf]="plotly$ | async" let-plotly>
+    <mat-tab label="Plotly">
+      <ng-template matTabContent>
+        <sxplr-plotly-component [plotly-json]="plotly"></sxplr-plotly-component>  
+      </ng-template>
+    </mat-tab>
+  </ng-template>
+
 </mat-tab-group>
 </ng-template>
 
