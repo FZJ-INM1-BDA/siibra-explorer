@@ -44,3 +44,10 @@ export const setShowExperimental = createAction(
     flag: boolean
   }>()
 )
+
+export const setZMultiplier = createAction(
+  `${nameSpace} setZMultiplier`,
+  props<{
+    value: number
+  }>()
+)
