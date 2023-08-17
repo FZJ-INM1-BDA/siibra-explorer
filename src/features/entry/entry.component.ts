@@ -26,6 +26,33 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   return returnVal
 }
 
+type ConnectiivtyFilter = {
+  SPECIES: string[]
+  PARCELLATION: string[]
+  SPACE: string[]
+}
+
+const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
+  SPECIES: [
+    SPECIES_ENUM.RATTUS_NORVEGICUS,
+    SPECIES_ENUM.HOMO_SAPIENS
+  ],
+  PARCELLATION: [
+    IDS.PARCELLATION.JBA29,
+    IDS.PARCELLATION.JBA30,
+    IDS.PARCELLATION.WAXHOLMV4
+  ],
+  SPACE: [],
+}
+
+const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
+  SPECIES: [],
+  PARCELLATION: [],
+  SPACE: [
+    IDS.TEMPLATES.BIG_BRAIN
+  ]
+}
+
 @Component({
   selector: 'sxplr-feature-entry',
   templateUrl: './entry.flattened.component.html',
@@ -149,10 +176,14 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   public showConnectivity$ = combineLatest([
     this.selectedAtlas$.pipe(
-      map(atlas => atlas?.species === SPECIES_ENUM.HOMO_SAPIENS || atlas?.species === SPECIES_ENUM.RATTUS_NORVEGICUS)
+      map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
     ),
     this.TPRBbox$.pipe(
-      map(({ parcellation, template }) => template.id !== IDS.TEMPLATES.BIG_BRAIN && parcellation?.id === IDS.PARCELLATION.JBA29 || parcellation?.id === IDS.PARCELLATION.WAXHOLMV4)
+      map(({ parcellation, template }) => (
+        WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
+      ) || (
+        WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+      ))
     )
   ]).pipe(
     map(flags => flags.every(f => f))
