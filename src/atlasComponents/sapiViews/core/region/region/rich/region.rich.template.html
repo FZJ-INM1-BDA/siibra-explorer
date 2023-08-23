@@ -124,7 +124,7 @@
         <ng-template [ngIf]="regionPosition">
           <button mat-list-item (click)="navigateTo(regionPosition)">
             <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-            <div mat-line class="overview-content">{{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
+            <div mat-line class="overview-content">Centroid: {{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
           </button>
         </ng-template>
 
@@ -138,10 +138,8 @@
 
       
       <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
-        <readmore-component [collapsedHeight]="240" class="sxplr-mb-8">
-          <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
-          </markdown-dom>
-        </readmore-component>
+        <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
+        </markdown-dom>
       </ng-template>
     </mat-tab>
 

@@ -38,10 +38,11 @@ export class WrapperATPSelector implements OnDestroy{
 
   #subscription: Subscription[] = []
 
-  #askUser(title: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
+  #askUser(title: string, titleMd: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
     return this.dialog.open(DialogFallbackCmp, {
       data: {
         title,
+        titleMd,
         descMd,
         actions: actions,
         actionsAsList: config?.actionsAsList
@@ -95,6 +96,7 @@ export class WrapperATPSelector implements OnDestroy{
                 return this.#askUser(
                   null,
                   `Current parcellation **${selectedATP.parcellation.name}** is not mapped in the selected template **${template.name}**. Please select one of the following parcellations:`,
+                  null,
                   parcs.map(p => p.name),
                   {
                     actionsAsList: true
@@ -120,6 +122,7 @@ export class WrapperATPSelector implements OnDestroy{
                 return this.#askUser(
                   null,
                   `Selected parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
+                  null,
                   tmpls.map(tmpl => tmpl.name),
                   {
                     actionsAsList: true

@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
@@ -100,6 +100,9 @@ type TThreeSurfer = {
   control: any
   camera: any
   customColormap: WeakMap<TThreeGeometry, any>
+  gridHelper: {
+    visible: boolean
+  }
 }
 
 type LateralityRecord<T> = Record<string, T>
@@ -926,6 +929,12 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         variant
       })
     )
+  }
+
+  gridVisible$ = new BehaviorSubject<boolean>(true)
+  setGridVisibility(newFlag: boolean){
+    this.tsRef.gridHelper.visible = newFlag
+    this.gridVisible$.next(newFlag)
   }
 
   private onDestroyCb: (() => void) [] = []

@@ -5,6 +5,28 @@
 
 <div class="button-container">
 
+  <ng-template sxplrExperimentalFlag [ngIf]="exmptToggleGrid.show$ | async"
+    #exmptToggleGrid="sxplrExperimentalFlag"
+    [experimental]="true">
+  <!-- toggle grid line -->
+  <ng-template [ngTemplateOutlet]="toggleGridVisTmpl" [ngTemplateOutletContext]="{
+    $implicit: gridVisible$ | async
+  }">
+  </ng-template>
+  <ng-template let-visibleFlag #toggleGridVisTmpl>
+    <button mat-icon-button color="primary" class="pe-all"
+      (click)="setGridVisibility(!visibleFlag)"
+      matTooltip="Toggle grid visibility">
+      
+      <i class="fas fa-border-all" *ngIf="visibleFlag else fallbackTmpl"></i>
+      <ng-template #fallbackTmpl>
+        <i class="fas fa-border-none"></i> 
+      </ng-template>
+    </button>
+  </ng-template>
+
+  </ng-template>
+
   <!-- selector & configurator -->
   <button mat-icon-button
     color="primary"

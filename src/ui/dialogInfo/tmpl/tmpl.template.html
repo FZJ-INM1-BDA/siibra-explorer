@@ -1,15 +1,25 @@
-<h1 *ngIf="data.title" mat-dialog-title>
+<h1 *ngIf="data.title" mat-dialog-title class="sxplr-dialog-body">
   {{ data.title }}
 </h1>
+
+<ng-template [ngIf]="data.titleMd" let-titleMd>
+  <h1 mat-dialog-title>
+    <markdown-dom class="sxplr-dialog-body" [markdown]="titleMd">
+    </markdown-dom>
+  </h1>
+</ng-template>
 
 <mat-dialog-content>
 
   <div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
-    <ng-template [ngIf]="data.desc">
-      {{ data.desc }}
-    </ng-template>
+
+    <div class="sxplr-dialog-body">
+      <ng-template [ngIf]="data.desc">
+        {{ data.desc }}
+      </ng-template>
+    </div>
     
-    <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
+    <markdown-dom class="sxplr-dialog-body" *ngIf="data.descMd" [markdown]="data.descMd">
     </markdown-dom>
   </div>
   
