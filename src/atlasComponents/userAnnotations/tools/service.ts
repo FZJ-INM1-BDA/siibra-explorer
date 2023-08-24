@@ -260,6 +260,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   #voxelSize = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
+    filter(v => !!v),
     switchMap(tmpl => translateV3Entities.translateSpaceToVolumeImage(tmpl)),
     map(volImages => {
       if (volImages.length === 0) {
