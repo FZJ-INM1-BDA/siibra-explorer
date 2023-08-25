@@ -41,6 +41,7 @@ import {
   atlasSelection,
   RootStoreModule,
   getStoreEffects,
+  userPreference,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
 import { map } from 'rxjs/operators';
@@ -173,12 +174,17 @@ import { ViewerCommonEffects } from './viewerModule';
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService) => {
+      useFactory: (authSvc: AuthService, store: Store) => {
+        window['setExperimentalFlag'] = (flag: boolean) => {
+          store.dispatch(userPreference.actions.setShowExperimental({
+            flag
+          }))
+        }
         authSvc.authReloadState()
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [ AuthService ]
+      deps: [ AuthService, Store ]
     }
   ],
   bootstrap: [
