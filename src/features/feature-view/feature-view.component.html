@@ -135,6 +135,14 @@
         </a>
       </ng-template>
 
+      <ng-template [ngIf]="downloadLink$ | async" let-downloadLink>
+        <a [href]="downloadLink" mat-list-item target="_blank" class="no-hover">
+          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-download"></mat-icon>
+          <div mat-line>Download</div>
+        </a>
+      </ng-template>
+      
+
     </mat-action-list>
     
     <readmore-component [collapsedHeight]="240" class="sxplr-mb-8">

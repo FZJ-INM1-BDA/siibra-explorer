@@ -50,6 +50,13 @@ export class FeatureViewComponent implements OnChanges {
     })
   )
 
+  downloadLink$ = SAPI.BsEndpoint$.pipe(
+    switchMap(endpoint => this.#featureId.pipe(
+      map(featureId => `${endpoint}/feature/${featureId}/download`),
+      shareReplay(1)
+    ))
+  ) 
+
   busy$ = new BehaviorSubject<boolean>(false)
   
   tabular$ = new BehaviorSubject<TabularFeature<number|string|number[]>>(null)
