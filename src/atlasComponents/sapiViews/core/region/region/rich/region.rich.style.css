@@ -10,3 +10,8 @@
   overflow-x: hidden;
   overflow-y: scroll;
 }
+
+readmore-component
+{
+  width: 100%;
+}

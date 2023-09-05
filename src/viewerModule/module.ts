@@ -34,6 +34,8 @@ import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
+import { ExperimentalModule } from "src/experimental/experimental.module";
+import { BottomMenuModule } from "src/ui/bottomMenu";
 
 @NgModule({
   imports: [
@@ -60,6 +62,8 @@ import { ReactiveFormsModule } from "@angular/forms";
     NgLayerCtlModule,
     SmartChipModule,
     ReactiveFormsModule,
+    BottomMenuModule,
+    ExperimentalModule,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

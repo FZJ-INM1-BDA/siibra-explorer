@@ -9,7 +9,7 @@ import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
@@ -191,10 +191,14 @@ export class ViewerCmp implements OnDestroy {
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
   private viewerStatusCtxMenu: TemplateRef<any>
 
+  @ViewChild('lastViewedPointTmpl', { read: TemplateRef })
+  private lastViewedPointTmpl: TemplateRef<unknown>
+
   @ViewChild('viewerStatusRegionCtxMenu', { read: TemplateRef })
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
   private templateSelected: SxplrTemplate
+  #parcellationSelected: SxplrParcellation
 
   constructor(
     private store$: Store<any>,
@@ -208,6 +212,7 @@ export class ViewerCmp implements OnDestroy {
       this.templateSelected$.subscribe(
         t => this.templateSelected = t
       ),
+      this.#parcellationSelected$.subscribe(parc => this.#parcellationSelected = parc),
       combineLatest([
         this.templateSelected$,
         this.parcellationSelected$,
@@ -250,6 +255,17 @@ export class ViewerCmp implements OnDestroy {
   ngAfterViewInit(): void{
     const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
 
+      if (this.#lastSelectedPoint && this.lastViewedPointTmpl) {
+        const { point, template, face, vertices } = this.#lastSelectedPoint
+        append({
+          tmpl: this.lastViewedPointTmpl,
+          data: {
+            point, face, vertices,
+            template
+          },
+          order: 15
+        })
+      }
       /**
        * first append general viewer info
        */
@@ -330,6 +346,8 @@ export class ViewerCmp implements OnDestroy {
   }
 
   public selectPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
+    this.#lastSelectedPoint = { ...pointSpec, template }
+
     const { point, face, vertices } = pointSpec
     const id = `${template.id}-${point ? point.join(',') : face}`
     let pointOfInterest: TFace | TSandsPoint
@@ -357,12 +375,21 @@ export class ViewerCmp implements OnDestroy {
     }
     if (pointOfInterest) {
       this.store$.dispatch(
+        atlasSelection.actions.selectTemplate({
+          template,
+          requested: {
+            parcellation: this.#parcellationSelected
+          }
+        })
+      )
+      this.store$.dispatch(
         atlasSelection.actions.selectPoint({
           point: pointOfInterest
         })
       )
     }
   }
+  #lastSelectedPoint: { point?: number[], face?: number, vertices?: number[], template: SxplrTemplate }
 
   public clearPoint(){
     this.store$.dispatch(

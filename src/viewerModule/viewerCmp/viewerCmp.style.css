@@ -158,3 +158,10 @@ sxplr-smart-chip [mat-icon-button]
 {
   height: 1rem;
 }
+
+sxplr-overlay-ui
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

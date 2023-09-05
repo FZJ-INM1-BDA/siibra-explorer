@@ -12,6 +12,11 @@ cdk-virtual-scroll-viewport button
 
 .mat-chip-container
 {
+    overflow-x: unset!important;
+}
+
+.mat-chip-container
+{
     width: 100%;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -21,6 +26,7 @@ cdk-virtual-scroll-viewport button
 .mat-chip-inner-container
 {
     display: inline-flex;
+    align-items: center;
 }
 
 .mat-chip-inner-container button

@@ -1,5 +1,5 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, TabularFeature, GenericInfo, BoundingBox
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox
 } from "./sxplrTypes"
 import { PathReturn } from "./typeV3"
 import { hexToRgb } from 'common/util'
@@ -409,10 +409,7 @@ class TranslateV3 {
     }
   }
 
-  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<TabularFeature<number|string|number[]>|VoiFeature|Feature> {
-    if (this.#isTabular(feat)) {
-      return await this.translateTabularFeature(feat)
-    }
+  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<VoiFeature|Feature> {
     if (this.#isVoi(feat)) {
       return await this.translateVoiFeature(feat)
     }
@@ -425,7 +422,7 @@ class TranslateV3 {
     const dsDescs = datasets.map(ds => ds.description)
     const urls = datasets.flatMap(ds => ds.urls).map(v => ({
       href: v.url,
-      text: 'link to dataset'
+      text: v.url
     }))
     return {
       id,
@@ -462,22 +459,6 @@ class TranslateV3 {
       ...superObj,
       bbox,
       ngVolume: precomputedVol
-    }
-  }
-
-  #isTabular(feat: unknown): feat is PathReturn<"/feature/Tabular/{feature_id}"> {
-    return feat["@type"].includes("feature/tabular")
-  }
-  async translateTabularFeature(feat: unknown): Promise<TabularFeature<number | string| number[]>> {
-    if (!this.#isTabular(feat)) throw new Error(`Feature is not of tabular type`)
-    const superObj = await this.translateBaseFeature(feat)
-    const { data: _data } = feat
-    const { index, columns, data } = _data || {}
-    return {
-      ...superObj,
-      columns,
-      index,
-      data
     }
   }
   

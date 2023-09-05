@@ -18,7 +18,6 @@ import { MatDividerModule } from "@angular/material/divider";
 import { MarkdownModule } from "src/components/markdown";
 import { MatTableModule } from "@angular/material/table";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
-import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 import { VoiBboxDirective } from "./voi-bbox.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
@@ -26,6 +25,12 @@ import { ListDirective } from "./list/list.directive";
 import { MatChipsModule } from "@angular/material/chips";
 import { FeatureFilterDirective } from "./feature.filter.directive";
 import { GroupFeaturesToName } from "./grpFeatToName.pipe";
+import { ExperimentalModule } from "src/experimental/experimental.module";
+import { MatTabsModule } from "@angular/material/tabs";
+import { ReadmoreModule } from "src/components/readmore";
+import { MatDialogModule } from "@angular/material/dialog";
+import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
+import { PlotlyComponent } from "./plotly";
 
 @NgModule({
   imports: [
@@ -46,6 +51,12 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
     MatTableModule,
     NgLayerCtlModule,
     MatChipsModule,
+    ExperimentalModule,
+    MatTabsModule,
+    ReadmoreModule,
+    MatDialogModule,
+    
+    PlotlyComponent,
   ],
   declarations: [
     EntryComponent,
@@ -58,8 +69,8 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
     VoiBboxDirective,
 
     FeatureNamePipe,
-    TransformPdToDsPipe,
     GroupFeaturesToName,
+    GroupFeatureTallyPipe,
   ],
   exports: [
     EntryComponent,

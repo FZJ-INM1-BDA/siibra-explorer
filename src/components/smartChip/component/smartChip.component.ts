@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, ContentChildren, EventEmitter, HostBinding, Input, OnChanges, Output, QueryList, SimpleChanges } from "@angular/core";
 import { SmartChipContent } from "../smartChip.content.directive"
 import { SmartChipMenu } from "../smartChip.menu.directive";
 import { rgbToHsl, hexToRgb } from 'common/util'
 import { SmartChipHeader } from "../smartChip.header.directive";
+import { SmartChipAction } from "../smartChip.action.directive";
 
 const cssColorToHsl = (input: string) => {
   if (/rgb/i.test(input)) {
@@ -65,6 +66,14 @@ export class SmartChip<T extends object> implements OnChanges{
 
   @Output('itemClicked')
   itemClicked = new EventEmitter<T>()
+
+  @Output('menuOpened')
+  menuOpened = new EventEmitter()
+  @Output('menuClosed')
+  menuClosed = new EventEmitter()
+
+  @ContentChildren(SmartChipAction)
+  actionTmpls: QueryList<SmartChipAction>
 
   @ContentChild(SmartChipContent)
   contentTmpl: SmartChipContent

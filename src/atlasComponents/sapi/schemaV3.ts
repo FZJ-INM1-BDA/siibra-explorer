@@ -5,92 +5,159 @@
 
 
 export interface paths {
+  "/feature/{feature_id}/plotly": {
+    /**
+     * Get Single Feature Plot 
+     * @description Get the plotly specification of the plot.
+     *             
+     * For the appearance of the template, see [https://plotly.com/python/templates/](https://plotly.com/python/templates/)
+     */
+    get: operations["get_single_feature_plot_feature__feature_id__plotly_get"]
+  }
   "/atlases": {
-    /** Get All Atlases */
+    /**
+     * Get All Atlases 
+     * @description HTTP get all atlases
+     */
     get: operations["get_all_atlases_atlases_get"]
   }
   "/atlases/{atlas_id}": {
-    /** Get Single Atlas */
+    /**
+     * Get Single Atlas 
+     * @description HTTP get a single atlas
+     */
     get: operations["get_single_atlas_atlases__atlas_id__get"]
   }
   "/spaces": {
-    /** Get All Spaces */
+    /**
+     * Get All Spaces 
+     * @description HTTP get all spaces
+     */
     get: operations["get_all_spaces_spaces_get"]
   }
   "/spaces/{space_id}": {
-    /** Get Single Space */
+    /**
+     * Get Single Space 
+     * @description HTTP get a single space
+     */
     get: operations["get_single_space_spaces__space_id__get"]
   }
   "/parcellations": {
-    /** Get All Parcellations */
+    /**
+     * Get All Parcellations 
+     * @description HTTP get all parcellations
+     */
     get: operations["get_all_parcellations_parcellations_get"]
   }
   "/parcellations/{parcellation_id}": {
-    /** Get Single Parcellation */
+    /**
+     * Get Single Parcellation 
+     * @description HTTP get a single parcellation
+     */
     get: operations["get_single_parcellation_parcellations__parcellation_id__get"]
   }
   "/regions": {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get all regions
+     */
     get: operations["get_all_regions_regions_get"]
   }
   "/regions/{region_id}/features": {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get all features of a single region
+     */
     get: operations["get_all_regions_regions__region_id__features_get"]
   }
   "/regions/{region_id}": {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get a single region
+     */
     get: operations["get_all_regions_regions__region_id__get"]
   }
   "/map": {
-    /** Route Get Map */
-    get: operations["route_get_map_map_get"]
+    /**
+     * Get Siibra Map 
+     * @description Get map according to specification
+     */
+    get: operations["get_siibra_map_map_get"]
+  }
+  "/map/resampled_template": {
+    /**
+     * Get Resampled Map 
+     * @description Return a resampled template volume, based on labelled parcellation map.
+     */
+    get: operations["get_resampled_map_map_resampled_template_get"]
   }
   "/map/labelled_map.nii.gz": {
     /**
-     * Route Get Parcellation Labelled Map 
+     * Get Parcellation Labelled Map 
      * @description Returns a labelled map if region_id is not provided.
      * 
      * Returns a mask if a region_id is provided.
      * 
      * region_id MAY refer to ANY region on the region hierarchy, and a combined mask will be returned.
      */
-    get: operations["route_get_parcellation_labelled_map_map_labelled_map_nii_gz_get"]
+    get: operations["get_parcellation_labelled_map_map_labelled_map_nii_gz_get"]
   }
   "/map/statistical_map.nii.gz": {
     /**
-     * Route Get Region Statistical Map 
+     * Get Region Statistical Map 
      * @description Returns a statistic map.
      * 
      * region_id MUST refer to leaf region on the region hierarchy.
      */
-    get: operations["route_get_region_statistical_map_map_statistical_map_nii_gz_get"]
+    get: operations["get_region_statistical_map_map_statistical_map_nii_gz_get"]
   }
   "/map/statistical_map.info.json": {
-    /** Route Get Region Statistical Map */
-    get: operations["route_get_region_statistical_map_map_statistical_map_info_json_get"]
+    /**
+     * Get Region Statistical Map Metadata 
+     * @description Get metadata of statistical map according to specification
+     */
+    get: operations["get_region_statistical_map_metadata_map_statistical_map_info_json_get"]
   }
   "/map/assign": {
-    /** Router Assign Point */
-    get: operations["router_assign_point_map_assign_get"]
+    /**
+     * Get Assign Point 
+     * @description Perform assignment according to specification
+     */
+    get: operations["get_assign_point_map_assign_get"]
   }
   "/atlas_download": {
-    /** Prepare Download */
-    get: operations["prepare_download_atlas_download_get"]
+    /**
+     * Get Download Bundle 
+     * @description Prepare the bundle. Given a specification, prepare/bundle according to the specification.
+     */
+    get: operations["get_download_bundle_atlas_download_get"]
   }
   "/atlas_download/{task_id}": {
-    /** Get Task Id */
-    get: operations["get_task_id_atlas_download__task_id__get"]
+    /**
+     * Get Download Progress 
+     * @description Get download task progress with task_id
+     */
+    get: operations["get_download_progress_atlas_download__task_id__get"]
   }
   "/atlas_download/{task_id}/download": {
-    /** Get Task Id */
-    get: operations["get_task_id_atlas_download__task_id__download_get"]
+    /**
+     * Get Download Result 
+     * @description Download the bundle
+     */
+    get: operations["get_download_result_atlas_download__task_id__download_get"]
   }
   "/feature/_types": {
-    /** Get All Feature Types */
+    /**
+     * Get All Feature Types 
+     * @description Get meta info of all feature types
+     */
     get: operations["get_all_feature_types_feature__types_get"]
   }
   "/feature/RegionalConnectivity": {
-    /** Get All Connectivity Features */
+    /**
+     * Get All Connectivity Features 
+     * @description Get all connectivity features
+     */
     get: operations["get_all_connectivity_features_feature_RegionalConnectivity_get"]
   }
   "/feature/RegionalConnectivity/{feature_id}": {
@@ -103,43 +170,73 @@ export interface paths {
     get: operations["get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get"]
   }
   "/feature/CorticalProfile": {
-    /** Get All Connectivity Features */
+    /**
+     * Get All Connectivity Features 
+     * @description Get all CorticalProfile features
+     */
     get: operations["get_all_connectivity_features_feature_CorticalProfile_get"]
   }
   "/feature/CorticalProfile/{feature_id}": {
-    /** Get Single Connectivity Feature */
+    /**
+     * Get Single Connectivity Feature 
+     * @description Get a single CorticalProfile feature
+     */
     get: operations["get_single_connectivity_feature_feature_CorticalProfile__feature_id__get"]
   }
   "/feature/Tabular": {
-    /** Get All Tabular */
+    /**
+     * Get All Tabular 
+     * @description Get all tabular features
+     */
     get: operations["get_all_tabular_feature_Tabular_get"]
   }
   "/feature/Tabular/{feature_id}": {
-    /** Get Single Tabular */
+    /**
+     * Get Single Tabular 
+     * @description Get a single tabular feature
+     */
     get: operations["get_single_tabular_feature_Tabular__feature_id__get"]
   }
   "/feature/Image": {
-    /** Get All Voi */
+    /**
+     * Get All Voi 
+     * @description Get all Image features
+     */
     get: operations["get_all_voi_feature_Image_get"]
   }
   "/feature/Image/{feature_id}": {
-    /** Get Single Voi */
+    /**
+     * Get Single Voi 
+     * @description Get a single Image feature
+     */
     get: operations["get_single_voi_feature_Image__feature_id__get"]
   }
   "/feature/GeneExpressions": {
-    /** Get All Gene */
+    /**
+     * Get All Gene 
+     * @description Get all GeneExpressions features
+     */
     get: operations["get_all_gene_feature_GeneExpressions_get"]
   }
   "/feature/GeneExpressions/{feature_id}": {
-    /** Get Single Gene */
+    /**
+     * Get Single Gene 
+     * @description Get a single GeneExpressions feature
+     */
     get: operations["get_single_gene_feature_GeneExpressions__feature_id__get"]
   }
   "/feature/EbrainsDataFeature": {
-    /** Get All Ebrains Df */
+    /**
+     * Get All Ebrains Df 
+     * @description Get all EbrainsDataFeatures
+     */
     get: operations["get_all_ebrains_df_feature_EbrainsDataFeature_get"]
   }
   "/feature/EbrainsDataFeature/{feature_id}": {
-    /** Get Single Ebrains Df */
+    /**
+     * Get Single Ebrains Df 
+     * @description Get a single EbrainsDataFeature
+     */
     get: operations["get_single_ebrains_df_feature_EbrainsDataFeature__feature_id__get"]
   }
   "/feature/{feature_id}": {
@@ -208,7 +305,10 @@ export interface components {
        */
       coordinates: (components["schemas"]["api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates"])[]
     }
-    /** BoundingBoxModel */
+    /**
+     * BoundingBoxModel 
+     * @description BoundingBoxModel
+     */
     BoundingBoxModel: {
       /** @Type */
       "@type": string
@@ -221,7 +321,10 @@ export interface components {
       /** Isplanar */
       isPlanar: boolean
     }
-    /** BrainAtlasVersionModel */
+    /**
+     * BrainAtlasVersionModel 
+     * @description ConfigBaseModel
+     */
     BrainAtlasVersionModel: {
       /** @Type */
       "@type": string
@@ -368,7 +471,10 @@ export interface components {
        */
       versionInnovation: string
     }
-    /** CommonCoordinateSpaceModel */
+    /**
+     * CommonCoordinateSpaceModel 
+     * @description CommonCoordinateSpaceModel
+     */
     CommonCoordinateSpaceModel: {
       /** @Type */
       "@type": string
@@ -445,7 +551,10 @@ export interface components {
        */
       versionIdentifier: string
     }
-    /** CoordinatePointModel */
+    /**
+     * CoordinatePointModel 
+     * @description CoordinatePointModel
+     */
     CoordinatePointModel: {
       /** @Type */
       "@type": string
@@ -492,7 +601,10 @@ export interface components {
        */
       year: string
     }
-    /** DataFrameModel */
+    /**
+     * DataFrameModel 
+     * @description DataFrameModel
+     */
     DataFrameModel: {
       /** @Type */
       "@type": string
@@ -505,7 +617,10 @@ export interface components {
       /** Data */
       data?: (any[])[]
     }
-    /** EbrainsDatasetModel */
+    /**
+     * EbrainsDatasetModel 
+     * @description EbrainsDatasetModel
+     */
     EbrainsDatasetModel: {
       /** @Type */
       "@type": string
@@ -520,11 +635,14 @@ export interface components {
       /** Contributors */
       contributors: (components["schemas"]["EbrainsDsPerson"])[]
       /** Ebrains Page */
-      ebrains_page: string
+      ebrains_page?: string
       /** Custodians */
       custodians: (components["schemas"]["EbrainsDsPerson"])[]
     }
-    /** EbrainsDsPerson */
+    /**
+     * EbrainsDsPerson 
+     * @description EbrainsDsPerson
+     */
     EbrainsDsPerson: {
       /** @Type */
       "@type": string
@@ -539,14 +657,20 @@ export interface components {
       /** Name */
       name: string
     }
-    /** EbrainsDsUrl */
+    /**
+     * EbrainsDsUrl 
+     * @description EbrainsDsUrl
+     */
     EbrainsDsUrl: {
       /** @Type */
       "@type": string
       /** Url */
       url: string
     }
-    /** FeatureMetaModel */
+    /**
+     * FeatureMetaModel 
+     * @description Meta feature type
+     */
     FeatureMetaModel: {
       /** Name */
       name: string
@@ -642,13 +766,19 @@ export interface components {
        */
       ontologyIdentifier?: (string)[]
     }
-    /** LocationModel */
+    /**
+     * LocationModel 
+     * @description LocationModel
+     */
     LocationModel: {
       /** @Type */
       "@type": string
       space: components["schemas"]["SiibraAtIdModel"]
     }
-    /** MapIndexModel */
+    /**
+     * MapIndexModel 
+     * @description MapIndexModel
+     */
     MapIndexModel: {
       /** @Type */
       "@type": string
@@ -659,7 +789,10 @@ export interface components {
       /** Fragment */
       fragment?: string
     }
-    /** MapModel */
+    /**
+     * MapModel 
+     * @description MapModel
+     */
     MapModel: {
       /** @Type */
       "@type": string
@@ -688,7 +821,9 @@ export interface components {
     }
     /**
      * MapType 
-     * @description An enumeration. 
+     * @description MapType
+     * 
+     * Exact match to MapType in siibra, to avoid dependency on siibra 
      * @enum {string}
      */
     MapType: "LABELLED" | "STATISTICAL"
@@ -868,7 +1003,10 @@ export interface components {
       /** Pages */
       pages?: number
     }
-    /** ParcellationEntityVersionModel */
+    /**
+     * ParcellationEntityVersionModel 
+     * @description ParcellationEntityVersionModel
+     */
     ParcellationEntityVersionModel: {
       /** @Type */
       "@type": string
@@ -915,6 +1053,12 @@ export interface components {
        */
       versionInnovation?: string
     }
+    /**
+     * PlotlyTemplate 
+     * @description An enumeration. 
+     * @enum {unknown}
+     */
+    PlotlyTemplate: "plotly" | "plotly_white" | "plotly_dark" | "ggplot2" | "seaborn" | "simple_white" | "none"
     /** QuantitativeOverlapItem */
     QuantitativeOverlapItem: {
       /**
@@ -1016,7 +1160,26 @@ export interface components {
       /** Quantitativeoverlap */
       quantitativeOverlap: components["schemas"]["QuantitativeOverlapItem"] | components["schemas"]["QuantitativeOverlapItem1"]
     }
-    /** SiibraAnchorModel */
+    /**
+     * SiibraAnatomicalAssignmentModel 
+     * @description SiibraAnatomicalAssignmentModel
+     */
+    SiibraAnatomicalAssignmentModel: {
+      /** @Type */
+      "@type": string
+      /** Qualification */
+      qualification: string
+      /** Query Structure */
+      query_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"]
+      /** Assigned Structure */
+      assigned_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"]
+      /** Explanation */
+      explanation: string
+    }
+    /**
+     * SiibraAnchorModel 
+     * @description SiibraAnchorModel
+     */
     SiibraAnchorModel: {
       /** @Type */
       "@type": string
@@ -1024,13 +1187,23 @@ export interface components {
       location?: components["schemas"]["LocationModel"] | components["schemas"]["CoordinatePointModel"]
       /** Regions */
       regions: (components["schemas"]["SiibraRegionAssignmentQual"])[]
+      /**
+       * Last Match Description 
+       * @default
+       */
+      last_match_description?: string
+      /** Last Match Result */
+      last_match_result?: (components["schemas"]["SiibraAnatomicalAssignmentModel"])[]
     }
     /** SiibraAtIdModel */
     SiibraAtIdModel: {
       /** @Id */
       "@id": string
     }
-    /** SiibraAtlasModel */
+    /**
+     * SiibraAtlasModel 
+     * @description SiibraAtlasModel
+     */
     SiibraAtlasModel: {
       /** @Type */
       "@type": string
@@ -1045,7 +1218,10 @@ export interface components {
       /** Species */
       species: string
     }
-    /** SiibraCorticalProfileModel */
+    /**
+     * SiibraCorticalProfileModel 
+     * @description SiibraCorticalProfileModel
+     */
     SiibraCorticalProfileModel: {
       /** @Type */
       "@type": string
@@ -1072,7 +1248,10 @@ export interface components {
       /** Boundaries Mapped */
       boundaries_mapped: boolean
     }
-    /** SiibraEbrainsDataFeatureModel */
+    /**
+     * SiibraEbrainsDataFeatureModel 
+     * @description SiibraEbrainsDataFeatureModel
+     */
     SiibraEbrainsDataFeatureModel: {
       /** @Type */
       "@type": string
@@ -1090,7 +1269,10 @@ export interface components {
       datasets: (components["schemas"]["EbrainsDatasetModel"])[]
       anchor?: components["schemas"]["SiibraAnchorModel"]
     }
-    /** SiibraParcellationModel */
+    /**
+     * SiibraParcellationModel 
+     * @description SiibraParcellationModel
+     */
     SiibraParcellationModel: {
       /** @Type */
       "@type": string
@@ -1108,7 +1290,10 @@ export interface components {
       /** Shortname */
       shortname?: string
     }
-    /** SiibraParcellationVersionModel */
+    /**
+     * SiibraParcellationVersionModel 
+     * @description SiibraParcellationVersionModel
+     */
     SiibraParcellationVersionModel: {
       /** @Type */
       "@type": string
@@ -1119,7 +1304,10 @@ export interface components {
       prev?: components["schemas"]["SiibraAtIdModel"]
       next?: components["schemas"]["SiibraAtIdModel"]
     }
-    /** SiibraPublication */
+    /**
+     * SiibraPublication 
+     * @description ConfigBaseModel
+     */
     SiibraPublication: {
       /** @Type */
       "@type": string
@@ -1128,7 +1316,10 @@ export interface components {
       /** Url */
       url: string
     }
-    /** SiibraReceptorDensityFp */
+    /**
+     * SiibraReceptorDensityFp 
+     * @description SiibraReceptorDensityFp
+     */
     SiibraReceptorDensityFp: {
       /** @Type */
       "@type": string
@@ -1151,7 +1342,10 @@ export interface components {
       /** Receptors */
       receptors?: (string)[]
     }
-    /** SiibraRegionAssignmentQual */
+    /**
+     * SiibraRegionAssignmentQual 
+     * @description SiibraRegionAssignmentModel
+     */
     SiibraRegionAssignmentQual: {
       /** @Type */
       "@type": string
@@ -1159,7 +1353,10 @@ export interface components {
       /** Qualification */
       qualification: string
     }
-    /** SiibraRegionalConnectivityModel */
+    /**
+     * SiibraRegionalConnectivityModel 
+     * @description SiibraRegionalConnectivityModel
+     */
     SiibraRegionalConnectivityModel: {
       /** @Type */
       "@type": string
@@ -1185,7 +1382,10 @@ export interface components {
         [key: string]: components["schemas"]["DataFrameModel"] | undefined
       }
     }
-    /** SiibraTabularModel */
+    /**
+     * SiibraTabularModel 
+     * @description SiibraTabularModel
+     */
     SiibraTabularModel: {
       /** @Type */
       "@type": string
@@ -1204,7 +1404,10 @@ export interface components {
       anchor?: components["schemas"]["SiibraAnchorModel"]
       data?: components["schemas"]["DataFrameModel"]
     }
-    /** SiibraVoiModel */
+    /**
+     * SiibraVoiModel 
+     * @description SiibraVoiModel
+     */
     SiibraVoiModel: {
       /** @Type */
       "@type": string
@@ -1245,7 +1448,10 @@ export interface components {
       /** @Vocab */
       "@vocab": string
     }
-    /** VolumeModel */
+    /**
+     * VolumeModel 
+     * @description VolumeModel
+     */
     VolumeModel: {
       /** @Type */
       "@type": string
@@ -1345,8 +1551,41 @@ export type external = Record<string, never>;
 
 export interface operations {
 
+  get_single_feature_plot_feature__feature_id__plotly_get: {
+    /**
+     * Get Single Feature Plot 
+     * @description Get the plotly specification of the plot.
+     *             
+     * For the appearance of the template, see [https://plotly.com/python/templates/](https://plotly.com/python/templates/)
+     */
+    parameters: {
+      query?: {
+        template?: components["schemas"]["PlotlyTemplate"]
+      }
+      path: {
+        feature_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
   get_all_atlases_atlases_get: {
-    /** Get All Atlases */
+    /**
+     * Get All Atlases 
+     * @description HTTP get all atlases
+     */
     parameters?: {
       query?: {
         page?: number
@@ -1369,7 +1608,10 @@ export interface operations {
     }
   }
   get_single_atlas_atlases__atlas_id__get: {
-    /** Get Single Atlas */
+    /**
+     * Get Single Atlas 
+     * @description HTTP get a single atlas
+     */
     parameters: {
       path: {
         atlas_id: string
@@ -1391,7 +1633,10 @@ export interface operations {
     }
   }
   get_all_spaces_spaces_get: {
-    /** Get All Spaces */
+    /**
+     * Get All Spaces 
+     * @description HTTP get all spaces
+     */
     parameters?: {
       query?: {
         page?: number
@@ -1414,7 +1659,10 @@ export interface operations {
     }
   }
   get_single_space_spaces__space_id__get: {
-    /** Get Single Space */
+    /**
+     * Get Single Space 
+     * @description HTTP get a single space
+     */
     parameters: {
       path: {
         space_id: string
@@ -1436,7 +1684,10 @@ export interface operations {
     }
   }
   get_all_parcellations_parcellations_get: {
-    /** Get All Parcellations */
+    /**
+     * Get All Parcellations 
+     * @description HTTP get all parcellations
+     */
     parameters?: {
       query?: {
         page?: number
@@ -1459,7 +1710,10 @@ export interface operations {
     }
   }
   get_single_parcellation_parcellations__parcellation_id__get: {
-    /** Get Single Parcellation */
+    /**
+     * Get Single Parcellation 
+     * @description HTTP get a single parcellation
+     */
     parameters: {
       path: {
         parcellation_id: string
@@ -1481,7 +1735,10 @@ export interface operations {
     }
   }
   get_all_regions_regions_get: {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get all regions
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1506,7 +1763,10 @@ export interface operations {
     }
   }
   get_all_regions_regions__region_id__features_get: {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get all features of a single region
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1533,7 +1793,10 @@ export interface operations {
     }
   }
   get_all_regions_regions__region_id__get: {
-    /** Get All Regions */
+    /**
+     * Get All Regions 
+     * @description HTTP get a single region
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1558,8 +1821,11 @@ export interface operations {
       }
     }
   }
-  route_get_map_map_get: {
-    /** Route Get Map */
+  get_siibra_map_map_get: {
+    /**
+     * Get Siibra Map 
+     * @description Get map according to specification
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1582,9 +1848,31 @@ export interface operations {
       }
     }
   }
-  route_get_parcellation_labelled_map_map_labelled_map_nii_gz_get: {
+  get_resampled_map_map_resampled_template_get: {
     /**
-     * Route Get Parcellation Labelled Map 
+     * Get Resampled Map 
+     * @description Return a resampled template volume, based on labelled parcellation map.
+     */
+    parameters: {
+      query: {
+        parcellation_id: string
+        space_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: never
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_parcellation_labelled_map_map_labelled_map_nii_gz_get: {
+    /**
+     * Get Parcellation Labelled Map 
      * @description Returns a labelled map if region_id is not provided.
      * 
      * Returns a mask if a region_id is provided.
@@ -1609,9 +1897,9 @@ export interface operations {
       }
     }
   }
-  route_get_region_statistical_map_map_statistical_map_nii_gz_get: {
+  get_region_statistical_map_map_statistical_map_nii_gz_get: {
     /**
-     * Route Get Region Statistical Map 
+     * Get Region Statistical Map 
      * @description Returns a statistic map.
      * 
      * region_id MUST refer to leaf region on the region hierarchy.
@@ -1634,8 +1922,11 @@ export interface operations {
       }
     }
   }
-  route_get_region_statistical_map_map_statistical_map_info_json_get: {
-    /** Route Get Region Statistical Map */
+  get_region_statistical_map_metadata_map_statistical_map_info_json_get: {
+    /**
+     * Get Region Statistical Map Metadata 
+     * @description Get metadata of statistical map according to specification
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1658,8 +1949,11 @@ export interface operations {
       }
     }
   }
-  router_assign_point_map_assign_get: {
-    /** Router Assign Point */
+  get_assign_point_map_assign_get: {
+    /**
+     * Get Assign Point 
+     * @description Perform assignment according to specification
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1684,8 +1978,11 @@ export interface operations {
       }
     }
   }
-  prepare_download_atlas_download_get: {
-    /** Prepare Download */
+  get_download_bundle_atlas_download_get: {
+    /**
+     * Get Download Bundle 
+     * @description Prepare the bundle. Given a specification, prepare/bundle according to the specification.
+     */
     parameters: {
       query: {
         space_id: string
@@ -1708,8 +2005,11 @@ export interface operations {
       }
     }
   }
-  get_task_id_atlas_download__task_id__get: {
-    /** Get Task Id */
+  get_download_progress_atlas_download__task_id__get: {
+    /**
+     * Get Download Progress 
+     * @description Get download task progress with task_id
+     */
     parameters: {
       path: {
         task_id: string
@@ -1730,8 +2030,11 @@ export interface operations {
       }
     }
   }
-  get_task_id_atlas_download__task_id__download_get: {
-    /** Get Task Id */
+  get_download_result_atlas_download__task_id__download_get: {
+    /**
+     * Get Download Result 
+     * @description Download the bundle
+     */
     parameters: {
       path: {
         task_id: string
@@ -1753,7 +2056,10 @@ export interface operations {
     }
   }
   get_all_feature_types_feature__types_get: {
-    /** Get All Feature Types */
+    /**
+     * Get All Feature Types 
+     * @description Get meta info of all feature types
+     */
     parameters?: {
       query?: {
         page?: number
@@ -1776,7 +2082,10 @@ export interface operations {
     }
   }
   get_all_connectivity_features_feature_RegionalConnectivity_get: {
-    /** Get All Connectivity Features */
+    /**
+     * Get All Connectivity Features 
+     * @description Get all connectivity features
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1833,7 +2142,10 @@ export interface operations {
     }
   }
   get_all_connectivity_features_feature_CorticalProfile_get: {
-    /** Get All Connectivity Features */
+    /**
+     * Get All Connectivity Features 
+     * @description Get all CorticalProfile features
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1859,7 +2171,10 @@ export interface operations {
     }
   }
   get_single_connectivity_feature_feature_CorticalProfile__feature_id__get: {
-    /** Get Single Connectivity Feature */
+    /**
+     * Get Single Connectivity Feature 
+     * @description Get a single CorticalProfile feature
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1886,7 +2201,10 @@ export interface operations {
     }
   }
   get_all_tabular_feature_Tabular_get: {
-    /** Get All Tabular */
+    /**
+     * Get All Tabular 
+     * @description Get all tabular features
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1912,7 +2230,10 @@ export interface operations {
     }
   }
   get_single_tabular_feature_Tabular__feature_id__get: {
-    /** Get Single Tabular */
+    /**
+     * Get Single Tabular 
+     * @description Get a single tabular feature
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -1939,7 +2260,10 @@ export interface operations {
     }
   }
   get_all_voi_feature_Image_get: {
-    /** Get All Voi */
+    /**
+     * Get All Voi 
+     * @description Get all Image features
+     */
     parameters: {
       query: {
         space_id: string
@@ -1965,7 +2289,10 @@ export interface operations {
     }
   }
   get_single_voi_feature_Image__feature_id__get: {
-    /** Get Single Voi */
+    /**
+     * Get Single Voi 
+     * @description Get a single Image feature
+     */
     parameters: {
       query: {
         space_id: string
@@ -1991,7 +2318,10 @@ export interface operations {
     }
   }
   get_all_gene_feature_GeneExpressions_get: {
-    /** Get All Gene */
+    /**
+     * Get All Gene 
+     * @description Get all GeneExpressions features
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -2017,7 +2347,10 @@ export interface operations {
     }
   }
   get_single_gene_feature_GeneExpressions__feature_id__get: {
-    /** Get Single Gene */
+    /**
+     * Get Single Gene 
+     * @description Get a single GeneExpressions feature
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -2046,7 +2379,10 @@ export interface operations {
     }
   }
   get_all_ebrains_df_feature_EbrainsDataFeature_get: {
-    /** Get All Ebrains Df */
+    /**
+     * Get All Ebrains Df 
+     * @description Get all EbrainsDataFeatures
+     */
     parameters: {
       query: {
         parcellation_id: string
@@ -2071,7 +2407,10 @@ export interface operations {
     }
   }
   get_single_ebrains_df_feature_EbrainsDataFeature__feature_id__get: {
-    /** Get Single Ebrains Df */
+    /**
+     * Get Single Ebrains Df 
+     * @description Get a single EbrainsDataFeature
+     */
     parameters: {
       query: {
         parcellation_id: string

@@ -113,6 +113,7 @@ module.exports = {
           ...userScriptSrc,
           'unpkg.com/kg-dataset-previewer@1.2.0/', // preview component
           'https://unpkg.com/d3@6.2.0/', // required for preview component
+          "https://cdn.plot.ly/", // required for plotly
           'https://unpkg.com/mathjax@3.1.2/', // math jax
           'https://unpkg.com/three-surfer@0.0.13/dist/bundle.js', // for threeSurfer (freesurfer support in browser)
           'https://unpkg.com/ng-layer-tune@0.0.14/dist/ng-layer-tune/', // needed for ng layer control

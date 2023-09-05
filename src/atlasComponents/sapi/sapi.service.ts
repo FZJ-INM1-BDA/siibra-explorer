@@ -222,6 +222,15 @@ export class SAPI{
     })
   }
 
+  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] = {}) {
+    return this.v3Get("/feature/{feature_id}/plotly", {
+      path: {
+        feature_id: id
+      },
+      query: params
+    })
+  }
+
   getV3FeatureDetailWithId(id: string, params: Record<string,  string> = {}) {
     return this.v3Get("/feature/{feature_id}", {
       path: {

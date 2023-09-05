@@ -505,7 +505,6 @@ export class NehubaViewerUnit implements OnDestroy {
           ...rest,
           ...(transform ? { transform } : {})
         }
-        console.log(combined)
         viewer.layerManager.addManagedLayer(
           viewer.layerSpecification.getLayer(key, combined))
 

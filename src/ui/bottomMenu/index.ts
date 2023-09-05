@@ -1,0 +1,1 @@
+export { BottomMenuModule } from "./module"
