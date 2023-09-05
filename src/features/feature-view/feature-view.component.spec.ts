@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EMPTY } from 'rxjs';
-import { SAPIModule } from 'src/atlasComponents/sapi';
+import { SAPI } from 'src/atlasComponents/sapi';
 import { DARKTHEME } from 'src/util/injectionTokens';
 
 import { FeatureViewComponent } from './feature-view.component';
@@ -15,7 +15,6 @@ describe('FeatureViewComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        SAPIModule,
         CommonModule,
         ExperimentalModule,
       ],
@@ -25,6 +24,17 @@ describe('FeatureViewComponent', () => {
         {
           provide: DARKTHEME,
           useValue: EMPTY
+        },
+        {
+          provide: SAPI,
+          useValue: {
+            getFeaturePlot(...args) {
+              return EMPTY
+            },
+            getV3FeaturewDetailWithId(...args) {
+              return EMPTY
+            }
+          }
         }
       ]
     })

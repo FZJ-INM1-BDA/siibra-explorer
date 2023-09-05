@@ -118,8 +118,6 @@ export type CorticalFeature<T extends CorticalDataType, IndexType extends string
   corticalProfile?: T[]
 } & Feature
 
-type TabularDataType = number | string | number[]
-
 
 export type GenericInfo = {
   name: string

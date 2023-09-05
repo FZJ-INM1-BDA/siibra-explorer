@@ -10,103 +10,107 @@
   </span>
 </mat-card>
 
-<mat-card *ngIf="feature"
-  class="mat-elevation-z4 sxplr-z-4 header-card">
-  
-  <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+<ng-template [ngIf]="feature">
 
-  <mat-card-subtitle>
-    <ng-template [ngIf]="feature.category">
-      <span class="sxplr-m-a sxplr-pr-1">
-        <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
-          {{ feature.category }} feature
-        </ng-template>
-        <ng-template #fallbackTmpl>
-          Other feature
-        </ng-template>
-      </span>
-    </ng-template>
-  </mat-card-subtitle>
-
-  <mat-card-title>
-    <div class="feature-title">
-      {{ feature.name }}
-    </div>
-  </mat-card-title>
-
-</mat-card>
-
-<mat-tab-group>
-  <mat-tab label="Overview">
-
-    <mat-action-list class="overview-container">
-
-      <ng-template [ngIf]="warnings$ | async" let-warnings>
-        <ng-template ngFor [ngForOf]="warnings" let-warning>
-          <button mat-list-item>
-            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-            <div mat-line class="overview-content">{{ warning }}</div>
-          </button>
-        </ng-template>
-      </ng-template>
-
-      <!-- doi -->
-      <ng-template ngFor [ngForOf]="feature.link" let-url>
-        <a [href]="url.href" mat-list-item target="_blank" class="no-hover">
-          <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-          <div mat-line>{{ url.text || url.href }}</div>
-        </a>
-      </ng-template>
-      
-      <!-- additional links -->
-      <ng-template ngFor [ngForOf]="additionalLinks$ | async" let-url>
-        <a [href]="url" mat-list-item target="_blank" class="no-hover">
-          <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-          <div mat-line>{{ url }}</div>
-        </a>
-      </ng-template>
-
-      <ng-template [ngIf]="downloadLink$ | async" let-downloadLink>
-        <a [href]="downloadLink" mat-list-item target="_blank" class="no-hover">
-          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-download"></mat-icon>
-          <div mat-line>Download</div>
-        </a>
-      </ng-template>
-      
-
-    </mat-action-list>
+  <mat-card *ngIf="feature"
+    class="mat-elevation-z4 sxplr-z-4 header-card">
     
-    <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
-    </markdown-dom>
-  </mat-tab>
+    <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
 
-  <mat-tab *ngIf="busy$ | async">
-    <ng-template matTabLabel="">
-      <spinner-cmp></spinner-cmp>
-    </ng-template>
-  </mat-tab>
+    <mat-card-subtitle>
+      <ng-template [ngIf]="feature.category">
+        <span class="sxplr-m-a sxplr-pr-1">
+          <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
+            {{ feature.category }} feature
+          </ng-template>
+          <ng-template #fallbackTmpl>
+            Other feature
+          </ng-template>
+        </span>
+      </ng-template>
+    </mat-card-subtitle>
 
-  <!-- voi special view -->
-  <ng-template [ngIf]="voi$ | async" let-voi>
-    <mat-tab label="Volume Control">
-      <ng-layer-ctl
-        [ng-layer-ctl-name]="voi.ngVolume.url"
-        [ng-layer-ctl-src]="voi.ngVolume.url"
-        [ng-layer-ctl-transform]="voi.ngVolume.transform"
-        [ng-layer-ctl-info]="voi.ngVolume.info"
-        [ng-layer-ctl-opacity]="1.0"
-        [ng-layer-ctrl-show]="true">
-      </ng-layer-ctl>
+    <mat-card-title>
+      <div class="feature-title">
+        {{ feature.name }}
+      </div>
+    </mat-card-title>
+
+  </mat-card>
+
+  <mat-tab-group>
+    <mat-tab label="Overview">
+
+      <mat-action-list class="overview-container">
+
+        <ng-template [ngIf]="warnings$ | async" let-warnings>
+          <ng-template ngFor [ngForOf]="warnings" let-warning>
+            <button mat-list-item>
+              <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+              <div mat-line class="overview-content">{{ warning }}</div>
+            </button>
+          </ng-template>
+        </ng-template>
+
+        <!-- doi -->
+        <ng-template ngFor [ngForOf]="feature.link" let-url>
+          <a [href]="url.href" mat-list-item target="_blank" class="no-hover">
+            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div mat-line>{{ url.text || url.href }}</div>
+          </a>
+        </ng-template>
+        
+        <!-- additional links -->
+        <ng-template ngFor [ngForOf]="additionalLinks$ | async" let-url>
+          <a [href]="url" mat-list-item target="_blank" class="no-hover">
+            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div mat-line>{{ url }}</div>
+          </a>
+        </ng-template>
+
+        <ng-template [ngIf]="downloadLink$ | async" let-downloadLink>
+          <a [href]="downloadLink" mat-list-item target="_blank" class="no-hover">
+            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-download"></mat-icon>
+            <div mat-line>Download</div>
+          </a>
+        </ng-template>
+        
+
+      </mat-action-list>
+      
+      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
+      </markdown-dom>
     </mat-tab>
-  </ng-template>
 
-  <!-- plotly view -->
-  <ng-template [ngIf]="plotly$ | async" let-plotly>
-    <mat-tab label="Visualization">
-      <ng-template matTabContent>
-        <sxplr-plotly-component [plotly-json]="plotly"></sxplr-plotly-component>  
+    <mat-tab *ngIf="busy$ | async">
+      <ng-template matTabLabel="">
+        <spinner-cmp></spinner-cmp>
       </ng-template>
     </mat-tab>
-  </ng-template>
 
-</mat-tab-group>
+    <!-- voi special view -->
+    <ng-template [ngIf]="voi$ | async" let-voi>
+      <mat-tab label="Volume Control">
+        <ng-layer-ctl
+          [ng-layer-ctl-name]="voi.ngVolume.url"
+          [ng-layer-ctl-src]="voi.ngVolume.url"
+          [ng-layer-ctl-transform]="voi.ngVolume.transform"
+          [ng-layer-ctl-info]="voi.ngVolume.info"
+          [ng-layer-ctl-opacity]="1.0"
+          [ng-layer-ctrl-show]="true">
+        </ng-layer-ctl>
+      </mat-tab>
+    </ng-template>
+
+    <!-- plotly view -->
+    <ng-template [ngIf]="plotly$ | async" let-plotly>
+      <mat-tab label="Visualization">
+        <ng-template matTabContent>
+          <sxplr-plotly-component [plotly-json]="plotly"></sxplr-plotly-component>  
+        </ng-template>
+      </mat-tab>
+    </ng-template>
+
+  </mat-tab-group>
+
+</ng-template>

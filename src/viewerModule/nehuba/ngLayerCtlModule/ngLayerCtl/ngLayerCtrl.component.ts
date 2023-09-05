@@ -6,8 +6,6 @@ import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba } from "src/util/fn";
-import { getShader } from "src/util/constants";
-import { EnumColorMapName } from "src/util/colorMaps";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]

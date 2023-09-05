@@ -6,16 +6,6 @@ import { Feature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
 import { isVoiData, notQuiteRight } from "../guards"
 
-type PolarPlotData = {
-  receptor: {
-    label: string
-  }
-  density: {
-    mean: number
-    sd: number
-    unit: string
-  }
-}
 
 @Component({
   selector: 'sxplr-feature-view',
