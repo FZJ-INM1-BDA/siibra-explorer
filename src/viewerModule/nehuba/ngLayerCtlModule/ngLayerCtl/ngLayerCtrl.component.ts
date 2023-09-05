@@ -6,6 +6,8 @@ import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba } from "src/util/fn";
+import { getShader } from "src/util/constants";
+import { EnumColorMapName } from "src/util/colorMaps";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
@@ -33,7 +35,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   private onDestroyCb: (() => void)[] = []
   private removeLayer: () => void
 
-  public hideNgTuneCtrl = 'lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox'
+  public hideNgTuneCtrl = ''
   public defaultOpacity = 1
 
   @Input('ng-layer-ctrl-show')
@@ -109,6 +111,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         this.removeLayer()
         this.removeLayer = null
       }
+      console.log('foo', this.source)
       this.store.dispatch(
         atlasAppearance.actions.addCustomLayer({
           customLayer: {

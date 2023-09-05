@@ -79,8 +79,6 @@
             #filterFeatureCls="featureFilterDirective">
 
             <div class="mat-chip-inner-container">
-
-                <ng-template sxplrExperimentalFlag [experimental]="true" #filterExmpt="sxplrExperimentalFlag" [ngIf]="filterExmpt.show$ | async">
                 <button mat-stroked-button
                     matTooltip="Filters"
                     [color]="(filterFeatureCls.unchecked$ | async).length > 0 ? 'primary' : 'default'"
@@ -159,55 +157,6 @@
                     <ng-template #partialTmpl>
                         Showing {{ filterFeatureCls.checked$ | async | grpFeatTally }} / {{ categoryAcc.total$ | async }} features
                     </ng-template>
-                </ng-template>
-
-                </ng-template>
-
-
-                <ng-template sxplrExperimentalFlag [deprecated]="true" [ngIf]="filterDep.show$ | async" #filterDep="sxplrExperimentalFlag">
-                <button mat-icon-button matTooltip="Reset filter"
-                    (click)="filterFeatureCls.setAll(true)">
-                    <i class="fas fa-filter"></i>
-                </button>
-
-                <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-grpFeat>
-                    <ng-template [ngIf]="grpFeat.meta.total > 0">
-
-                        <ng-template [ngIf]="filterFeatureCls.checked$ | async | grpFeatToName | includes : grpFeat.meta.displayName"
-                            [ngIfThen]="selectedTmpl"
-                            [ngIfElse]="notSelectedTmpl">
-                        </ng-template>
-
-                        <ng-template #textTmpl>
-                            <span>
-                                {{ grpFeat.meta.displayName }}
-                            </span>
-                            <span class="text-muted1">
-                                ({{ grpFeat.meta.total }})
-                            </span>
-                        </ng-template>
-                        <ng-template #selectedTmpl>
-                            <button mat-flat-button
-                                (click)="filterFeatureCls.toggle(grpFeat)"
-                                color="primary">
-                                <i class="fas fa-eye"></i>
-                                <ng-template [ngTemplateOutlet]="textTmpl">
-                                </ng-template>
-                            </button>
-                        </ng-template>
-
-                        <ng-template #notSelectedTmpl>
-                            <button mat-flat-button
-                                (click)="filterFeatureCls.toggle(grpFeat)"
-                                color="default">
-                                <i class="fas fa-eye-slash"></i>
-                                <ng-template [ngTemplateOutlet]="textTmpl">
-                                </ng-template>
-                            </button>
-                        </ng-template>
-
-                    </ng-template>
-                </ng-template>
                 </ng-template>
 
             </div>

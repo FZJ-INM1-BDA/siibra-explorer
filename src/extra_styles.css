@@ -703,12 +703,6 @@ body::after
   opacity: 0.0!important;
 }
 
-kg-dataset-previewer > img
-{
-  max-width: 100%;
-  width: 100%;
-}
-
 .m-15
 {
   margin: 15px;

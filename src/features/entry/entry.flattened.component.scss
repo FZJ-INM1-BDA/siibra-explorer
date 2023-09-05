@@ -9,7 +9,7 @@ cdk-virtual-scroll-viewport button
     height: 36px;
     display: block;
 }
-:host-context([experimental=true])
+
 .mat-chip-container
 {
     overflow-x: unset!important;

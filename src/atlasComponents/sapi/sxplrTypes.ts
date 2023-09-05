@@ -120,11 +120,6 @@ export type CorticalFeature<T extends CorticalDataType, IndexType extends string
 
 type TabularDataType = number | string | number[]
 
-export type TabularFeature<T extends TabularDataType> = {
-  index: unknown[]
-  columns: unknown[]
-  data?: T[][]
-} & Feature
 
 export type GenericInfo = {
   name: string

@@ -5,9 +5,6 @@
 
 <div class="button-container">
 
-  <ng-template sxplrExperimentalFlag [ngIf]="exmptToggleGrid.show$ | async"
-    #exmptToggleGrid="sxplrExperimentalFlag"
-    [experimental]="true">
   <!-- toggle grid line -->
   <ng-template [ngTemplateOutlet]="toggleGridVisTmpl" [ngTemplateOutletContext]="{
     $implicit: gridVisible$ | async
@@ -23,8 +20,6 @@
         <i class="fas fa-border-none"></i> 
       </ng-template>
     </button>
-  </ng-template>
-
   </ng-template>
 
   <!-- selector & configurator -->

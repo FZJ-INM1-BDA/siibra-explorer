@@ -288,50 +288,46 @@
   </div>
 
   <!-- tab to minimize mini tray -->
-  <ng-template sxplrExperimentalFlag
-    [experimental]="true"
-    #minTray="sxplrExperimentalFlag"
-    [ngIf]="minTray.show$ | async">
-    <div class="tab-toggle-container">
+
+  <div class="tab-toggle-container">
     
-      <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? '' : 'd-none'">
+    <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? '' : 'd-none'">
+
+      <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+        fontIcon: 'fas fa-chevron-left',
+        matColor: null,
+        click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+      }">
+      </ng-template>
+    </div>
+    
+    <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? 'd-none' : ''">
+
+      <ng-template [ngIf]="voiFeatureEntryCmp && (voiFeatureEntryCmp.totals$ | async)"
+        [ngIfElse]="noBadgeTmpl"
+        let-totals>
 
         <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-          fontIcon: 'fas fa-chevron-left',
-          matColor: null,
+          fontIcon: 'fas fa-search',
+          matColor: 'primary',
+          click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
+          badge: totals
+        }">
+        </ng-template>
+      </ng-template>
+
+      <ng-template #noBadgeTmpl>
+
+        <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+          fontIcon: 'fas fa-search',
+          matColor: 'primary',
           click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
         }">
         </ng-template>
-      </div>
-      
-      <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? 'd-none' : ''">
-
-        <ng-template [ngIf]="voiFeatureEntryCmp && (voiFeatureEntryCmp.totals$ | async)"
-          [ngIfElse]="noBadgeTmpl"
-          let-totals>
-
-          <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-            fontIcon: 'fas fa-search',
-            matColor: 'primary',
-            click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
-            badge: totals
-          }">
-          </ng-template>
-        </ng-template>
-
-        <ng-template #noBadgeTmpl>
-
-          <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-            fontIcon: 'fas fa-search',
-            matColor: 'primary',
-            click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
-          }">
-          </ng-template>
-        </ng-template>
-      </div>
-
+      </ng-template>
     </div>
-  </ng-template>
+
+  </div>
 
 </ng-template>
 
@@ -466,87 +462,7 @@
       sxplr-of-y-hidden
       sxplr-align-items-stretch">
 
-      <ng-template sxplrExperimentalFlag
-        #expmt="sxplrExperimentalFlag"
-        [experimental]="true"
-        [ngIf]="expmt.show$ | async">
-      
       <sxplr-bottom-menu (onRegionClick)="showFullSideNav()"></sxplr-bottom-menu>
-      </ng-template>
-
-      <ng-template sxplrExperimentalFlag
-        #deprec="sxplrExperimentalFlag"
-        [deprecated]="true"
-        [ngIf]="deprec.show$ | async">
-
-        <sxplr-wrapper-atp-selector class="sxplr-z-2">
-        </sxplr-wrapper-atp-selector>
-  
-        <!-- selected region chip -->
-        <ng-template [ngIf]="view.selectedRegions" let-regions>
-  
-          <!-- single region -->
-          <ng-template [ngIf]="regions.length === 1">
-            <sxplr-smart-chip
-              *ngFor="let region of regions"
-              [noMenu]="true"
-              [color]="sapiViewsCoreRegion.regionRgbString"
-              (click)="showFullSideNav()"
-              sxplr-sapiviews-core-region
-              [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-              [sxplr-sapiviews-core-region-template]="view.selectedTemplate"
-              [sxplr-sapiviews-core-region-parcellation]="view.selectedParcellation"
-              [sxplr-sapiviews-core-region-region]="region"
-              [sxplr-sapiviews-core-region-detail-flag]="true"
-              #sapiViewsCoreRegion="sapiViewsCoreRegion">
-              
-              <ng-template sxplrSmartChipHeader>
-                <span class="regionname">
-                  Region
-                </span>
-              </ng-template>
-  
-              <ng-template sxplrSmartChipContent>
-                <span class="regionname">
-                  {{ region.name }}
-                </span>
-                <button class="sxplr-mr-n3"
-                  mat-icon-button
-                  (click)="clearRoi()">
-                  <i class="fas fa-times"></i>
-                </button>
-              </ng-template>
-            </sxplr-smart-chip>
-          </ng-template>
-  
-          
-          <!-- multiple-regions -->
-          <ng-template [ngIf]="regions.length > 1">
-            <sxplr-smart-chip
-              [noMenu]="true"
-              
-              (click)="showFullSideNav()"
-              sxplr-sapiviews-core-region
-              [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-              [sxplr-sapiviews-core-region-template]="view.selectedTemplate"
-              [sxplr-sapiviews-core-region-parcellation]="view.selectedParcellation">
-              <ng-template sxplrSmartChipContent>
-                <span class="regionname">
-                  {{ regions.length }} regions selected
-                </span>
-                <button class="sxplr-mr-n3"
-                  mat-icon-button
-                  (click)="clearRoi()">
-                  <i class="fas fa-times"></i>
-                </button>
-              </ng-template>
-            </sxplr-smart-chip>
-  
-          </ng-template>
-  
-        </ng-template>
-
-      </ng-template>
 
     </div>
 
@@ -970,11 +886,6 @@
   </mat-card>
 </ng-template>
 
-<ng-template
-  sxplrExperimentalFlag
-  [experimental]="true"
-  #lastSelPtExpmt="sxplrExperimentalFlag"
-  [ngIf]="lastSelPtExpmt.show$ | async">
 <ng-template #lastViewedPointTmpl let-data>
   <div class="text-muted sxplr-m-2">
     Last selected spatial object
@@ -1028,8 +939,6 @@
     <!-- {{ data.point | json }} -->
   </button>
 </ng-template>
-</ng-template>
-
 
 <!-- viewer status ctx menu -->
 <ng-template #viewerStatusCtxMenu let-data>
@@ -1068,7 +977,8 @@
         <ng-template [ngIf]="context.payload?.faceIndex" let-faceIndex>
           <ng-template [ngIf]="context.payload?.vertexIndices" let-vertexIndices>
             <button mat-button class="sxplr-list-like-button"
-            (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)">
+              (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)"
+              disabled>
     
               <div class="sxplr-list-like-button-icon">
                 <i class="fas fa-map"></i>
@@ -1085,6 +995,9 @@
                 <span class="sxplr-list-like-button-body-line text-muted">
                   {{ data.metadata.template.name }}
                 </span>
+                <i class="sxplr-list-like-button-body-line text-muted">
+                  (Not selectable at the moment)
+                </i>
               </div>    
     
             </button>

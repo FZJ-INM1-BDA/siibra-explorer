@@ -18,7 +18,6 @@ import { MatDividerModule } from "@angular/material/divider";
 import { MarkdownModule } from "src/components/markdown";
 import { MatTableModule } from "@angular/material/table";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
-import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 import { VoiBboxDirective } from "./voi-bbox.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
@@ -70,7 +69,6 @@ import { PlotlyComponent } from "./plotly";
     VoiBboxDirective,
 
     FeatureNamePipe,
-    TransformPdToDsPipe,
     GroupFeaturesToName,
     GroupFeatureTallyPipe,
   ],

@@ -15,92 +15,20 @@
 
       <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
 
-      <ng-template sxplrExperimentalFlag [experimental]="true" #subtitleExpm="sxplrExperimentalFlag" [ngIf]="subtitleExpm.show$ | async">
       <mat-card-subtitle>
         <span class="muted-text">
           Brain region
         </span>
       </mat-card-subtitle>
-      </ng-template>
 
       <mat-card-title class="sxplr-custom-cmp text">
         {{ region.name }}
       </mat-card-title>
 
-
-      <ng-template sxplrExperimentalFlag [deprecated]="true" #subtitleDep="sxplrExperimentalFlag" [ngIf]="subtitleDep.show$ | async">
-      <mat-card-subtitle>
-        {{ parcellation.name }}
-      </mat-card-subtitle>
-
-
-      <!-- subtitle on what it is -->
-      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-        <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
-        <span>
-          Brain region
-        </span>
-
-        <!-- origin datas format -->
-
-        <mat-divider vertical="true" class="sxplr-pl-2 h-2rem"></mat-divider>
-
-        <!-- position -->
-        <button mat-icon-button *ngIf="regionPosition"
-          (click)="navigateTo(regionPosition)"
-          [matTooltip]="ARIA_LABELS.GO_TO_REGION_CENTROID + ': ' + (regionPosition | numbers | addUnitAndJoin : 'mm')">
-          <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
-          </mat-icon>
-        </button>
-
-        <!-- explore doi -->
-        <a *ngFor="let doi of dois$ | async"
-          [href]="doi | parseDoi"
-          sxplr-hide-when-local
-          [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-          target="_blank"
-          mat-icon-button>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-
-      </mat-card-subtitle>
-      </ng-template>
     </div>
   </mat-card>
 
-  <!-- desc -->
-  <ng-template sxplrExperimentalFlag [deprecated]="true" #subtitleDep="sxplrExperimentalFlag" [ngIf]="subtitleDep.show$ | async">
-  <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
-    <readmore-component>
-      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
-      </markdown-dom>
-    </readmore-component>
-  </ng-template>
-  </ng-template>
 
-  <ng-template sxplrExperimentalFlag [deprecated]="true" #headerDep="sxplrExperimentalFlag" [ngIf]="headerDep.show$ | async">
-  <!-- header for regional feature -->
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        Features anchored to region
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content *ngIf="!(featureEntryCmp.busyTallying$ | async) && (featureEntryCmp.totals$ | async) == 0"
-      class="text-muted">
-      No regional features found.
-    </mat-card-content>
-  </mat-card>
-
-  <sxplr-feature-entry
-    [template]="template"
-    [parcellation]="parcellation"
-    [region]="region"
-    #featureEntryCmp="featureEntryCmp">
-  </sxplr-feature-entry>
-  </ng-template>
-
-  <ng-template sxplrExperimentalFlag [experimental]="true" #tabExpmpt="sxplrExperimentalFlag" [ngIf]="tabExpmpt.show$ | async">
   <mat-tab-group>
 
     <!-- Overview -->
@@ -167,6 +95,5 @@
       </sxplr-feature-entry>
     </mat-tab>
   </mat-tab-group>
-  </ng-template>
 
 </ng-template>
