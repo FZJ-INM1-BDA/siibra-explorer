@@ -58,15 +58,31 @@
             #comphTableSort="matSort"
             matSortActive="map value"
             matSortDirection="desc">
-            <ng-container *ngFor="let column of columns$ | async"
-                [matColumnDef]="column">
+            
+            <ng-container matColumnDef="region">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    {{ column }}
+                    region
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{ element[column] | prettyPresent }}
+                    <button mat-button (click)="selectRegion(element['region'], $event)">
+                        {{ element['region'].name }}
+                    </button>
                 </td>
             </ng-container>
+
+            <ng-template ngFor [ngForOf]="columns$ | async" let-column>
+                <ng-template [ngIf]="column !== 'region'">
+                    <ng-container [matColumnDef]="column">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                            {{ column }}
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            {{ element[column] | prettyPresent }}
+                        </td>
+                    </ng-container>
+                </ng-template>
+            </ng-template>
+            
         
             <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
             <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>

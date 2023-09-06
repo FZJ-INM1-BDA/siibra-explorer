@@ -6,7 +6,7 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { Feature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
-import { map, shareReplay, switchMap } from "rxjs/operators";
+import { catchError, map, shareReplay, switchMap } from "rxjs/operators";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 
 @Component({
@@ -41,7 +41,7 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
 
   activePanelTitles$: Observable<string[]> = new Subject()
 
-  private regionalStatisticalMaps$ = this.ATPR$.pipe(
+  private regionalMaps$ = this.ATPR$.pipe(
     switchMap(({ parcellation, template, region }) =>
       concat(
         of([] as PathReturn<"/map">["volumes"]),
@@ -49,14 +49,26 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
           map(v => {
             const mapIndices = v.indices[region.name]
             return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
+          }),
+          catchError((_err, _obs) => {
+            /**
+             * if statistical map somehow fails to fetch (e.g. does not exist for this combination 
+             * of parc tmpl), fallback to labelled map
+             */
+            return this.sapi.getMap(parcellation.id, template.id, "LABELLED").pipe(
+              map(v => {
+                const mapIndices = v.indices[region.name]
+                return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
+              })
+            )
           })
-        )
+        ),
       )
     ),
     shareReplay(1)
   )
 
-  public dois$ = this.regionalStatisticalMaps$.pipe(
+  public dois$ = this.regionalMaps$.pipe(
     map(sms => {
       const returnUrls: string[] = []
       for (const sm of sms) {
@@ -71,7 +83,7 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
     })
   )
 
-  public desc$ = this.regionalStatisticalMaps$.pipe(
+  public desc$ = this.regionalMaps$.pipe(
     map(sm => {
       for (const ds of (sm?.[0]?.datasets) || []) {
         if (ds.description) {

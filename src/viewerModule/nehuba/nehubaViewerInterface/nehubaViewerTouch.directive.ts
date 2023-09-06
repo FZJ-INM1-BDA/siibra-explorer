@@ -66,12 +66,12 @@ export class NehubaViewerTouchDirective implements OnDestroy{
      * Touchend also needs to be listened to, as user could start
      * with multitouch, and end up as single touch
      */
-    const touchStart$ = fromEvent(this.el.nativeElement, 'touchstart').pipe(
+    const touchStart$ = fromEvent(this.el.nativeElement, 'touchstart', { capture: true }).pipe(
       shareReplay(1),
     )
     this.singleTouchStart$ = merge(
       touchStart$,
-      fromEvent(this.el.nativeElement, 'touchend')
+      fromEvent(this.el.nativeElement, 'touchend', { capture: true })
     ).pipe(
       filter((ev: TouchEvent) => ev.touches.length === 1),
       shareReplay(1),
@@ -81,18 +81,18 @@ export class NehubaViewerTouchDirective implements OnDestroy{
       filter((ev: TouchEvent) => ev.touches.length > 1),
     )
 
-    this.touchEnd$ = fromEvent(this.el.nativeElement, 'touchend').pipe(
+    this.touchEnd$ = fromEvent(this.el.nativeElement, 'touchend', { capture: true }).pipe(
       map(ev => ev as TouchEvent),
     )
 
-    this.touchMove$ = fromEvent(this.el.nativeElement, 'touchmove')
+    this.touchMove$ = fromEvent(this.el.nativeElement, 'touchmove', { capture: true })
 
     const multiTouch$ = this.multiTouchStart$.pipe(
       // only tracks first 2 touches
       map((ev: TouchEvent) => [ this.findPanelIndex(ev.touches[0].target as HTMLElement), this.findPanelIndex(ev.touches[0].target as HTMLElement) ]),
       filter(indicies => indicies[0] >= 0 && indicies[0] === indicies[1]),
       map(indicies => indicies[0]),
-      switchMap(panelIndex => fromEvent(this.el.nativeElement, 'touchmove').pipe(
+      switchMap(panelIndex => fromEvent(this.el.nativeElement, 'touchmove', { capture: true }).pipe(
         filter((ev: TouchEvent) => ev.touches.length > 1),
         pairwise(),
         map(([ev0, ev1]) => {
@@ -256,7 +256,7 @@ export class NehubaViewerTouchDirective implements OnDestroy{
       ).subscribe(({ panelIndex, deltaX, deltaY }) => {
         if (isNaN(deltaX) || isNaN(deltaX)) return
         const { position } = this.ngViewer.navigationState
-        const pos = position.spatialCoordinates
+        const pos = position.value
         const { vec3 } = this.exportNehuba
         vec3.set(pos, deltaX, deltaY, 0)
         vec3.transformMat4(pos, pos, this.viewportToData[panelIndex])

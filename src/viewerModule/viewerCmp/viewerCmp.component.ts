@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay } from "rxjs/operators";
+import { combineLatest, Observable, of, Subscription } from "rxjs";
+import { debounceTime, map, shareReplay, switchMap } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -139,15 +139,41 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.relevantSelectedPoint)
   )
 
-  public view$ = combineLatest([
+  #currentMap$ = combineLatest([
+    this.#templateSelected$,
+    this.#parcellationSelected$
+  ]).pipe(
+    switchMap(([tmpl, parc]) => tmpl && parc ? this.sapi.getLabelledMap(parc, tmpl) : of(null))
+  )
+
+
+  #view0$ = combineLatest([
     this.#selectedRegions$,
     this.#viewerMode$,
     this.#selectedFeature$,
     this.#selectedPoint$,
     this.#templateSelected$,
-    this.#parcellationSelected$
+    this.#parcellationSelected$,
   ]).pipe(
-    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => {
+    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => ({
+      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation
+    }))
+  )
+
+  #view1$ = combineLatest([
+    this.#currentMap$,
+  ]).pipe(
+    map(( [ currentMap ] ) => ({
+      currentMap
+    }))
+  )
+
+  public view$ = combineLatest([
+    this.#view0$,
+    this.#view1$,
+  ]).pipe(
+    map(([v0, v1]) => ({ ...v0, ...v1 })),
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -162,6 +188,8 @@ export class ViewerCmp implements OnDestroy {
       if (!!selectedTemplate) {
         spatialObjectSubtitle = selectedTemplate.name
       }
+
+      const labelMappedRegionNames = currentMap && Object.keys(currentMap.indices) || []
       return {
         viewerMode,
         selectedRegions,
@@ -169,6 +197,7 @@ export class ViewerCmp implements OnDestroy {
         selectedPoint,
         selectedTemplate,
         selectedParcellation,
+        labelMappedRegionNames,
 
         /**
          * Selected Spatial Object
@@ -431,6 +460,14 @@ export class ViewerCmp implements OnDestroy {
             })
           )
         }
+      }
+      if (event.data.viewerType === "threeSurfer") {
+        const { regions=[] } = (event.data as TContextArg<"threeSurfer">).payload
+        this.store$.dispatch(
+          userInteraction.actions.mouseoverRegions({
+            regions: regions as SxplrRegion[]
+          })
+        )
       }
       break
     default:

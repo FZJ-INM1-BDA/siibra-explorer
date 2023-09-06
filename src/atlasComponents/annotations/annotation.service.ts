@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { getUuid } from "src/util/fn";
+import { getUuid, waitFor } from "src/util/fn";
+import { PeriodicSvc } from "src/util/periodic.service";
 
 export type TNgAnnotationEv = {
   pickedAnnotationId: string
@@ -38,6 +39,7 @@ type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
 type AnnotationRef = Record<string, unknown>
 
 interface NgAnnotationLayer {
+  isReady: () => boolean
   layer: {
     localAnnotations: {
       references: {
@@ -124,19 +126,26 @@ export class AnnotationLayer {
     }
   }
 
-  addAnnotation(spec: AnnotationSpec){
+  async addAnnotation(spec: AnnotationSpec){
     if (!this.nglayer) {
       throw new Error(`layer has already been disposed`)
     }
-    const localAnnotations = this.nglayer.layer.localAnnotations
-    this.idset.add(spec.id)
-    const annSpec = this.parseNgSpecType(spec)
-    localAnnotations.add(
-      annSpec
-    )
+
+    PeriodicSvc.AddToQueue(() => {
+      if (this.nglayer.isReady()) {
+        const localAnnotations = this.nglayer.layer.localAnnotations
+        this.idset.add(spec.id)
+        const annSpec = this.parseNgSpecType(spec)
+        localAnnotations.add(
+          annSpec
+        )  
+        return true
+      }
+      return false
+    })
   }
-  removeAnnotation(spec: { id: string }) {
-    if (!this.nglayer) return
+  async removeAnnotation(spec: { id: string }) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
     const { localAnnotations } = this.nglayer.layer
     this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)
@@ -145,9 +154,9 @@ export class AnnotationLayer {
       localAnnotations.references.delete(spec.id)
     }
   }
-  updateAnnotation(spec: AnnotationSpec) {
-    const localAnnotations = this.nglayer?.layer?.localAnnotations
-    if (!localAnnotations) return
+  async updateAnnotation(spec: AnnotationSpec) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+    const { localAnnotations } = this.nglayer.layer
     const ref = localAnnotations.references.get(spec.id)
     const _spec = this.parseNgSpecType(spec)
     if (ref) {

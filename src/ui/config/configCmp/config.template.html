@@ -48,6 +48,26 @@
           {{ gpuLimit$ | async }} MB
         </span>
       </div>
+
+      <!-- set z increment multiplier -->
+      <div class="flex flex-row align-items-center justify-content start">
+
+        <form [formGroup]="customZFormGroup">
+          <mat-slide-toggle formControlName="customZFlag"></mat-slide-toggle>
+          <small iav-stop="click mousedown mouseup" [matTooltip]="Z_TRAVERSAL_TOOLTIP" class="ml-2 fas fa-question"></small>
+          <mat-form-field class="ml-2"
+            [ngClass]="{
+              'muted-3': !customZFormGroup.value.customZFlag
+            }">
+            <mat-label>
+              Custom Z Multiplier
+            </mat-label>
+            <input type="number"
+              matInput
+              formControlName="customZValue">
+          </mat-form-field>
+        </form>
+      </div>
     </div>
   </mat-tab>
 

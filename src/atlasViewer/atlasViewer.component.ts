@@ -74,11 +74,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
 
-    const error = this.el.nativeElement.getAttribute('data-error')
+    const error = this.el.nativeElement.getAttribute(CONST.DATA_ERROR_ATTR)
 
     if (error) {
       this.snackbar.open(error, 'Dismiss', { duration: 5000 })
-      this.el.nativeElement.removeAttribute('data-error')
+      this.el.nativeElement.removeAttribute(CONST.DATA_ERROR_ATTR)
     }
   }
 

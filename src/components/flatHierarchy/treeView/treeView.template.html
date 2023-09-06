@@ -23,7 +23,8 @@
     <ng-template
       [ngTemplateOutlet]="phTmpl"
       [ngTemplateOutletContext]="{
-        $implicit: node
+        $implicit: node,
+        last: !node.expandable
       }">
     </ng-template>
 
@@ -51,7 +52,8 @@
       <ng-template
         [ngTemplateOutlet]="renderNodeTmplRef"
         [ngTemplateOutletContext]="{
-          $implicit: node.node
+          $implicit: node.node,
+          last: !node.expandable
         }">
       </ng-template>
     </div>

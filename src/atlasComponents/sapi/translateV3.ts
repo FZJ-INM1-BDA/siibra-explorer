@@ -157,7 +157,8 @@ class TranslateV3 {
       const { resolution, size } = _info.scales[0]
       const info = {
         voxel: size as [number, number, number],
-        real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number]
+        real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
+        resolution: resolution as [number, number, number]
       }
       returnObj.push({
         source: `precomputed://${url}`,
@@ -443,7 +444,7 @@ class TranslateV3 {
       this.#translatePoint(feat.boundingbox.center),
       this.#translatePoint(feat.boundingbox.maxpoint),
       this.#translatePoint(feat.boundingbox.minpoint),
-      await this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
+      this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
     ])
     const { ['@id']: spaceId } = feat.boundingbox.space
     const getSpace = (id: string) => this.#sxplrTmplMap.get(id)

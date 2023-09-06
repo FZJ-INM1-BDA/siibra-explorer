@@ -15,6 +15,7 @@ import { ExperimentalModule } from "src/experimental/experimental.module";
 import { MatListModule } from "@angular/material/list";
 import { DialogModule } from "src/ui/dialogInfo";
 import { SapiViewsCoreParcellationModule } from "../parcellation";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { SapiViewsCoreParcellationModule } from "../parcellation";
     MatListModule,
     DialogModule,
     SapiViewsCoreParcellationModule,
+    MatTooltipModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

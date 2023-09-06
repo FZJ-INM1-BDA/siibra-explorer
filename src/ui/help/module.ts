@@ -9,6 +9,9 @@ import { QuickTourModule } from "src/ui/quickTour/module";
 import { HowToCite } from "./howToCite/howToCite.component";
 import { StrictLocalModule } from "src/strictLocal";
 import { HttpClientModule } from "@angular/common/http";
+import { MatInputModule } from "@angular/material/input";
+import { MatDialogModule } from "@angular/material/dialog";
+import { ShareModule } from "src/share";
 
 @NgModule({
   imports: [
@@ -19,6 +22,10 @@ import { HttpClientModule } from "@angular/common/http";
     QuickTourModule,
     StrictLocalModule,
     HttpClientModule,
+
+    ShareModule,    
+    MatInputModule,
+    MatDialogModule,
   ],
   declarations: [
     AboutCmp,
