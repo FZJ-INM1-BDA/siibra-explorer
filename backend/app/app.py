@@ -1,6 +1,6 @@
 from pathlib import Path
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -13,8 +13,15 @@ from app.plugin import router as plugin_router
 from app.auth import router as auth_router
 from app.user import router as user_router
 from app.config import HOST_PATHNAME
+from app.logger import logger
 
 app = FastAPI()
+
+ready_flag = False
+
+@app.get("/ready")
+def ready():
+    return Response(None, 204 if ready_flag else 500)
 
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 
@@ -44,7 +51,9 @@ app.mount("/", StaticFiles(directory=Path(PATH_TO_PUBLIC)), name="static")
 if HOST_PATHNAME:
     assert HOST_PATHNAME[0] == "/", f"HOST_PATHNAME, if defined, must start with /: {HOST_PATHNAME!r}"
     assert HOST_PATHNAME[-1] != "/", f"HOST_PATHNAME, if defined, must not end with /: {HOST_PATHNAME!r}"
-
+    logger.info(f"listening on path {HOST_PATHNAME}")
     _app = app
     app = FastAPI()
     app.mount(HOST_PATHNAME, _app)
+
+ready_flag = True
