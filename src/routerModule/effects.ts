@@ -67,7 +67,11 @@ export class RouterEffects {
       return generalActions.generalApplyState({
         state
       })
-    })
+    }),
+    switchMap(ac => from([
+      ac,
+      generalActions.routeParseComplete()
+    ]))
   ))
 
   onRouteUpdate$ = createEffect(() => this.#atlasesLoaded$.pipe(
