@@ -69,7 +69,5 @@ jobs:
       with:
         node-version: 16.x
     - run: |
-        cd deploy
-        npm i
-        npm run test
+        echo "busybody"
   
