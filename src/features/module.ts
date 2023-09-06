@@ -56,6 +56,9 @@ import { PlotlyComponent } from "./plotly";
     ReadmoreModule,
     MatDialogModule,
     
+    /**
+     * standalone components
+     */
     PlotlyComponent,
   ],
   declarations: [
