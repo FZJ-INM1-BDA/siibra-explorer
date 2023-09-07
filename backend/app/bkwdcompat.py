@@ -120,7 +120,9 @@ template_map = {
 def encode_id(_id: str):
     return re.sub(r'/\//', ':', _id)
 
-class WarningStrings(Enum, str):
+_PLI_PREVIEW = "/a:juelich:iav:atlas:v1.0.0:1/t:minds:core:referencespace:v1.0.0:a1655b99-82f1-420f-a3c2-fe80fd4c8588/p:juelich:iav:atlas:v1.0.0:4/@:0.2-4Fk_.-KlpS.0.._eCwg.2-FUe3._-s_W.2_evlu..7LIy..1WNl8.6Tjd~.bTYu~..Zdk/f:b08a7dbc-7c75-4ce7-905b-690b2b1e8957--d3ca8fe622051466a5cde547a11111ca"
+
+class WarningStrings(Enum):
     PREVIEW_DSF_PARSE_ERROR="Preview dataset files cannot be processed properly."
     REGION_SELECT_ERROR="Region selected cannot be processed properly."
     TEMPLATE_ERROR="Template not found."
@@ -150,9 +152,10 @@ class BkwdCompatMW(BaseHTTPMiddleware):
             navigation,
             c_navigation,
         ]):
-            return await super().dispatch(request, call_next)
+            return await call_next(request)
 
-        redirect_url = f"{HOST_PATHNAME or ''}/#"
+        logger.info(f"bkwdcompat triggered {standalone_volumes=}, {nifti_layers=}, {plugin_states=}, {previewing_dataset_files=}, {template_selected=}, {parcellation_selected=}, {regions_selected=}, {c_regions_selected=}, {navigation=}, {c_navigation=}" )
+        redirect_url = f"{HOST_PATHNAME}/#"
 
         if regions_selected:
             logger.warn(f"regionSelected deprecated, but was used to access {regions_selected}")
@@ -160,6 +163,14 @@ class BkwdCompatMW(BaseHTTPMiddleware):
             logger.warn(f"niftiLayers deprecated, but was used to access {nifti_layers}")
         if previewing_dataset_files:
             logger.warn(f"previewing_dataset_files deprecated, but was used to access {previewing_dataset_files}")
+            try:
+                parsed_dsp = json.loads(previewing_dataset_files)
+                if isinstance(parsed_dsp, list) and len(parsed_dsp) == 1:
+                    dataset_id = parsed_dsp[0].get("datasetId")
+                    if dataset_id == "minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957":
+                        return RedirectResponse(f"{redirect_url}{_PLI_PREVIEW}")
+            except Exception as e:
+                logger.error(f"parsing dps error: {str(e)}")
         
         new_search_param = {}
 
