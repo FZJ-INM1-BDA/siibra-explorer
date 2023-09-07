@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.12'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.13'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -225,6 +225,15 @@ export class SAPI{
   getV3FeatureDetail<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}/{feature_id}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>> {
     return this.v3Get<`/feature/${T}/{feature_id}`>(`/feature/${featureType}/{feature_id}`, {
       ...sapiParam
+    })
+  }
+
+  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] = {}) {
+    return this.v3Get("/feature/{feature_id}/plotly", {
+      path: {
+        feature_id: id
+      },
+      query: params
     })
   }
 

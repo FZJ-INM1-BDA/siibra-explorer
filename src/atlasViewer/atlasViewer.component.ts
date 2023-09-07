@@ -16,8 +16,8 @@ import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
-import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
@@ -53,8 +53,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
-
-  private snackbarRef: MatSnackBarRef<any>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
@@ -120,6 +118,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
+      this.store.pipe(
+        select(userPreference.selectors.showExperimental)
+      ).subscribe(flag => {
+        this.rd.setAttribute(this.document.body, 'experimental', flag.toString())
+      })
     )
   }
 

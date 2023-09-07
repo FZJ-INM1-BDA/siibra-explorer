@@ -2,3 +2,15 @@ mat-dialog-actions a i
 {
   margin-right: 0.5rem;
 }
+
+mat-dialog-content
+{
+  display: block;
+  max-height: 24dvh;
+}
+
+.sxplr-dialog-body
+{
+  font-size: 16px;
+  padding: 0 16px;
+}
