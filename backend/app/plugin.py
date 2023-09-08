@@ -64,7 +64,7 @@ def _get_manifest(url: str):
         return return_obj
 
     except Exception as e:
-        logger.error(f"Error retrieving: {url}")
+        logger.error(f"Error retrieving: {url}, {str(e)}")
 
 
 @router.get("/manifests")
