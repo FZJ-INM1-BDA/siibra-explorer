@@ -143,7 +143,7 @@ class SaneUrlModel(BaseModel):
     hashPath: str # camel case for backwards compat
 
 
-@router.post("/{short_id: str}")
+@router.post("/{short_id:str}")
 async def post_short(short_id: str, saneurl: SaneUrlModel):
     try:
         data_proxy_store.set(short_id, saneurl.model_dump_json())
