@@ -17,7 +17,7 @@ _redisstore = RedisEphStore.Persistent()
 PLUGINS: List[str] = []
 try:
     PLUGINS = [
-        v
+        v.strip()
         for v in [*V2_7_PLUGIN_URLS.split(";"), *V2_7_STAGING_PLUGIN_URLS.split(";")]
         if v # remove empty strings
     ]
@@ -64,7 +64,7 @@ def _get_manifest(url: str):
         return return_obj
 
     except Exception as e:
-        logger.error(f"Error retrieving: {url}")
+        logger.error(f"Error retrieving: {url}, {str(e)}")
 
 
 @router.get("/manifests")

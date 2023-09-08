@@ -59,3 +59,19 @@ if HOST_PATHNAME:
     app.mount(HOST_PATHNAME, _app)
 
 ready_flag = True
+
+DO_NOT_LOGS = (
+    "/ready",
+    "/metrics",
+)
+
+import logging
+class EndpointLoggingFilter(logging.Filter):
+    """Custom logger filter. Do not log metrics, ready endpoint."""
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        return all(
+            message.find(do_not_log) == -1 for do_not_log in DO_NOT_LOGS
+        )
+
+logging.getLogger("uvicorn.access").addFilter(EndpointLoggingFilter())
