@@ -134,7 +134,7 @@ async def get_short(short_id:str, request: Request):
         return JSONResponse(resp)
     except DataproxyStore.NotFound as e:
         raise HTTPException(404, str(e))
-    except DataproxyStore.GeneralException as e:
+    except DataproxyStore.GenericException as e:
         raise HTTPException(500, str(e))
 
 
