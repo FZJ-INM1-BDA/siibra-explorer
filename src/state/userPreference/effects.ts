@@ -1,4 +1,3 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { map } from "rxjs/operators";
@@ -42,7 +41,6 @@ export class Effects{
 
   constructor(
     private actions$: Actions,
-    private http: HttpClient,
   ){
   }
 }
