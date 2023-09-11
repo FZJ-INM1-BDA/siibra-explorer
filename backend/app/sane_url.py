@@ -126,8 +126,7 @@ data_proxy_store = SaneUrlDPStore()
 @router.get("/{short_id:str}")
 async def get_short(short_id:str, request: Request):
     try:
-        existing_value = data_proxy_store.get(short_id)
-        existing_json = json.loads(existing_value)
+        existing_json = data_proxy_store.get(short_id)
         accept = request.headers.get("Accept")
         if "text/html" in accept:
             hashed_path = existing_json.get("hashPath")
@@ -147,7 +146,7 @@ class SaneUrlModel(BaseModel):
 @router.post("/{short_id:str}")
 async def post_short(short_id: str, saneurl: SaneUrlModel):
     try:
-        data_proxy_store.set(short_id, saneurl.model_dump_json())
+        data_proxy_store.set(short_id, saneurl.model_dump())
         return Response(status_code=201)
     except Exception as e:
         raise HTTPException(500, str(e))
