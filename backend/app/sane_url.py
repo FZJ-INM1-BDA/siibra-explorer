@@ -127,11 +127,12 @@ data_proxy_store = SaneUrlDPStore()
 async def get_short(short_id:str, request: Request):
     try:
         resp = data_proxy_store.get(short_id)
+        resp_json = json.loads(resp)
         accept = request.headers.get("Accept")
         if "text/html" in accept:
-            hashed_path = resp.get("hashPath")
+            hashed_path = resp_json.get("hashPath")
             return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}")
-        return JSONResponse(resp)
+        return JSONResponse(resp_json)
     except DataproxyStore.NotFound as e:
         raise HTTPException(404, str(e))
     except DataproxyStore.GenericException as e:
