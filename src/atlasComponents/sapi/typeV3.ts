@@ -17,7 +17,9 @@ export type SapiFeatureModel = SapiSpatialFeatureModel | PathReturn<"/feature/Ta
 
 export type SapiRoute = keyof paths
 
-type _FeatureType<FeatureRoute extends SapiRoute> = FeatureRoute extends `/feature/${infer FT}`
+type SapiRouteExcludePlotly = Exclude<SapiRoute, "/feature/{feature_id}/plotly">
+
+type _FeatureType<FeatureRoute extends SapiRouteExcludePlotly> = FeatureRoute extends `/feature/${infer FT}`
   ? FT extends "_types"
     ? never
     : FT extends "{feature_id}"
@@ -28,7 +30,7 @@ type _FeatureType<FeatureRoute extends SapiRoute> = FeatureRoute extends `/featu
         : FT
   : never
 
-export type FeatureType = _FeatureType<SapiRoute>
+export type FeatureType = _FeatureType<SapiRouteExcludePlotly>
 
 /**
  * Support types

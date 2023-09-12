@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from "@angular/core";
+import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable, of, Subject, Subscription } from "rxjs";
@@ -10,6 +10,10 @@ import { DialogFallbackCmp } from "src/ui/dialogInfo";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
 import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
+
+type AskUserConfig = {
+  actionsAsList: boolean
+}
 
 function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
   if (!obj) return false
@@ -25,17 +29,23 @@ function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
 })
 
 export class WrapperATPSelector implements OnDestroy{
+
+  @Output('sxplr-wrapper-atp-selector-menu-open')
+  menuOpen = new EventEmitter<{some: boolean, all: boolean, none: boolean}>()
+
   darkThemePalette = darkThemePalette
   lightThemePalette = lightThemePalette
 
   #subscription: Subscription[] = []
 
-  #askUser(title: string, descMd: string, actions: string[]): Observable<string> {
+  #askUser(title: string, titleMd: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
     return this.dialog.open(DialogFallbackCmp, {
       data: {
         title,
+        titleMd,
         descMd,
-        actions: actions
+        actions: actions,
+        actionsAsList: config?.actionsAsList
       }
     }).afterClosed()
   }
@@ -85,8 +95,12 @@ export class WrapperATPSelector implements OnDestroy{
                 }
                 return this.#askUser(
                   null,
-                  `Template **${template.name}** does not support the current parcellation **${selectedATP.parcellation.name}**. Please select one of the following parcellations:`,
-                  parcs.map(p => p.name)
+                  `Current parcellation **${selectedATP.parcellation.name}** is not mapped in the selected template **${template.name}**. Please select one of the following parcellations:`,
+                  null,
+                  parcs.map(p => p.name),
+                  {
+                    actionsAsList: true
+                  }
                 ).pipe(
                   map(parcname => {
                     const foundParc = parcs.find(p => p.name === parcname)
@@ -107,8 +121,12 @@ export class WrapperATPSelector implements OnDestroy{
                 }
                 return this.#askUser(
                   null,
-                  `Parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
-                  tmpls.map(tmpl => tmpl.name)
+                  `Selected parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
+                  null,
+                  tmpls.map(tmpl => tmpl.name),
+                  {
+                    actionsAsList: true
+                  }
                 ).pipe(
                   map(tmplname => {
                     const foundTmpl = tmpls.find(tmpl => tmpl.name === tmplname)

@@ -3,9 +3,11 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 export type FallBackData = {
   title: string
+  titleMd?: string
   actions?: string[]
   desc?: string
   descMd?: string
+  actionsAsList?: boolean
 }
 
 @Component({

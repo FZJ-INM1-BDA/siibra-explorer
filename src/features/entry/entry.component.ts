@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
@@ -11,6 +11,7 @@ import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } fro
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { SPECIES_ENUM } from 'src/util/constants';
+import { MatDialog } from '@angular/material/dialog';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -64,7 +65,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
 
-  constructor(private sapi: SAPI, private store: Store) {
+  constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog) {
     super()
   }
 
@@ -100,7 +101,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     switchMap(arr => concat(
       of(true),
       forkJoin(
-        arr.map(dir => dir.total$)
+        arr.map(dir => dir.total$.pipe(
+          take(1)
+        ))
       ).pipe(
         map(() => false)
       )
@@ -244,5 +247,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   #pullAll = new Subject()
   pullAll(){
     this.#pullAll.next(null)
+  }
+
+  openDialog(tmpl: TemplateRef<unknown>){
+    this.dialog.open(tmpl)
   }
 }

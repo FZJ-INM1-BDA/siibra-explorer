@@ -8,8 +8,6 @@ export const LOCAL_STORAGE_CONST = {
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
   QUICK_TOUR_VIEWED: 'fzj.dg.iv.QUICK_TOUR_VIEWED',
-
-  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
 
 export const COOKIE_VERSION = '0.3.0'
@@ -84,9 +82,13 @@ export const getShader = ({
   contrast = 0,
   removeBg = false
 } = {}): string => {
-  const { header, main, premain } = mapKeyColorMap.get(colormap) || (() => {
+  const { header, main, premain, override } = mapKeyColorMap.get(colormap) || (() => {
     return mapKeyColorMap.get(EnumColorMapName.GREYSCALE)
   })()
+
+  if (override) {
+    return override()
+  }
 
   // so that if lowthreshold is defined to be 0, at least some background removal will be done
   const _lowThreshold = lowThreshold + 1e-10

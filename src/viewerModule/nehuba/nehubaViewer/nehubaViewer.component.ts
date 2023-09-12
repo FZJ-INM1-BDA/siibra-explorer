@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optiona
 import { Subscription, BehaviorSubject, Observable, Subject, of, interval, combineLatest } from 'rxjs'
 import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { bufferUntil, getExportNehuba, switchMapWaitFor } from "src/util/fn";
+import { bufferUntil, getExportNehuba, getUuid, switchMapWaitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
 import { arrayOrderedEql, rgbToHex } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
@@ -14,6 +14,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
+import { ViewerInternalStateSvc, AUTO_ROTATE } from "src/viewerModule/viewerInternalState.service";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -130,6 +131,7 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
     @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
+    @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ) {
     if (multiplier$) {
       this.ondestroySubscriptions.push(
@@ -137,6 +139,54 @@ export class NehubaViewerUnit implements OnDestroy {
       )
     } else {
       this.multplier[0] = 1
+    }
+
+    if (intViewerStateSvc) {
+      let raqRef: number
+      const {
+        done,
+        next,
+      } = intViewerStateSvc.registerEmitter({
+        "@type": "TViewerInternalStateEmitter",
+        viewerType: "nehuba",
+        applyState: arg => {
+          
+          if (arg.viewerType === AUTO_ROTATE) {
+            if (raqRef) {
+              cancelAnimationFrame(raqRef)
+            }
+            const autoPlayFlag = (arg.payload as any).play
+            const reverseFlag = (arg.payload as any).reverse
+            const autoplaySpeed = (arg.payload as any).speed
+            
+            if (!autoPlayFlag) {
+              return
+            }
+            const deg = (reverseFlag ? 1 : -1) * autoplaySpeed * 1e-3
+            const animate = () => {
+              raqRef = requestAnimationFrame(() => {
+                animate()
+              })
+              const perspectivePose = this.nehubaViewer?.ngviewer?.perspectiveNavigationState?.pose
+              if (!perspectivePose) {
+                return
+              }
+              perspectivePose.rotateAbsolute([0, 0, 1], deg, [0, 0, 0])
+            }
+
+            animate()
+            return
+          }
+        }
+      })
+
+      this.onDestroyCb.push(() => done())
+      next({
+        "@id": getUuid(),
+        '@type': "TViewerInternalStateEmitterEvent",
+        viewerType: "nehuba",
+        payload: {}
+      })
     }
 
     if (this.nehubaViewer$) {

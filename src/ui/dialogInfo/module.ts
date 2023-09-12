@@ -6,6 +6,8 @@ import { MarkdownModule } from "src/components/markdown";
 import { StrictLocalModule } from "src/strictLocal";
 import { DialogDirective } from "./dialog.directive"
 import { DialogFallbackCmp } from "./tmpl/tmpl.component";
+import { MatListModule } from "@angular/material/list";
+import { ExperimentalModule } from "src/experimental/experimental.module";
 
 @NgModule({
   imports: [
@@ -14,6 +16,8 @@ import { DialogFallbackCmp } from "./tmpl/tmpl.component";
     MatButtonModule,
     MarkdownModule,
     StrictLocalModule,
+    MatListModule,
+    ExperimentalModule,
   ],
   declarations: [
     DialogDirective,

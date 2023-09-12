@@ -6,6 +6,8 @@ import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba } from "src/util/fn";
+import { getShader } from "src/util/constants";
+import { EnumColorMapName } from "src/util/colorMaps";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
@@ -33,7 +35,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   private onDestroyCb: (() => void)[] = []
   private removeLayer: () => void
 
-  public hideNgTuneCtrl = 'lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox'
+  public hideNgTuneCtrl = ''
   public defaultOpacity = 1
 
   @Input('ng-layer-ctrl-show')
@@ -102,13 +104,25 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     }
   }
 
-  ngOnChanges(): void {
+  async ngOnChanges() {
     if (this.name && this.source) {
       const { name } = this
       if (this.removeLayer) {
         this.removeLayer()
         this.removeLayer = null
       }
+      try {
+        const resp = await fetch(`${this.source}/meta.json`)
+        const metaJson = await resp.json()
+        const is3D = metaJson?.data?.type === "image/3d"
+        if (is3D) {
+          this.shader = getShader({
+            colormap: EnumColorMapName.RGB
+          })
+        }
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
+      
       this.store.dispatch(
         atlasAppearance.actions.addCustomLayer({
           customLayer: {

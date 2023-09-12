@@ -40,48 +40,28 @@ RUN node ./src/environments/parseEnv.js
 
 RUN npm run build
 RUN node third_party/matomo/processMatomo.js
-# RUN npm run build-storybook
-
-# gzipping container
-FROM ubuntu:22.04 as compressor
-RUN apt upgrade -y && apt update && apt install brotli
-
-RUN mkdir /iv
-COPY --from=builder /iv/dist/aot /iv
-# COPY --from=builder /iv/storybook-static /iv/storybook-static
-
-# Remove duplicated assets. Use symlink instead.
-# WORKDIR /iv/storybook-static
-RUN rm -rf ./assets
-RUN ln -s ../assets ./assets
-
-WORKDIR /iv
-
-RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:16-alpine
+FROM python:3.10-alpine
 
-ENV NODE_ENV=production
+RUN adduser --disabled-password nonroot
 
-RUN apk --no-cache add ca-certificates
+# Needed for the requirement as git, otherwise, not needed
+RUN apk update
+RUN apk add git curl
+
 RUN mkdir /iv-app
 WORKDIR /iv-app
 
-# Copy common folder
-COPY --from=builder /iv/common /common
+# Copy the fastapi server
+COPY --from=builder /iv/backend .
+RUN pip install -r requirements.txt
+COPY --from=builder /iv/dist/aot /iv/backend/public
 
-# Copy the express server
-COPY --from=builder /iv/deploy .
+ENV PATH_TO_PUBLIC=/iv/backend/public
 
-# Copy built siibra explorer
-COPY --from=compressor /iv ./public
-
-RUN chown -R node:node /iv-app
-
-USER node
-RUN npm i
+RUN chown -R nonroot:nonroot /iv-app
+USER nonroot
 
 EXPOSE 8080
-ENV PORT 8080
-ENTRYPOINT [ "node", "server.js" ]
+ENTRYPOINT uvicorn app.app:app --host 0.0.0.0 --port 8080

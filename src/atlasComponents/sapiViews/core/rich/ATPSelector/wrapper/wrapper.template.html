@@ -6,6 +6,7 @@
   [sxplr-pure-atp-selector-parcellations]="parcs$ | async"
   [sxplr-pure-atp-selector-is-busy]="isBusy$ | async"
   (sxplr-pure-atp-selector-on-select)="selectLeaf($event)"
+  (sxplr-pure-atp-selector-menu-open)="menuOpen.emit($event)"
   >
   <button mat-icon-button
     (click)="toggleParcellationVisibility()"

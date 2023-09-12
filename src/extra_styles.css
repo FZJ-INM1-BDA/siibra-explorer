@@ -703,12 +703,6 @@ body::after
   opacity: 0.0!important;
 }
 
-kg-dataset-previewer > img
-{
-  max-width: 100%;
-  width: 100%;
-}
-
 .m-15
 {
   margin: 15px;
@@ -782,22 +776,6 @@ kg-dataset-previewer > img
 .fixed-bottom
 {
   top: unset!important;
-}
-
-.fixed-top
-{
-  bottom: unset!important;
-}
-
-mat-list.sm mat-list-item
-{
-  height:2rem!important;
-  font-size: 0.8rem!important;
-}
-
-.color-inherit
-{
-  color: inherit!important;
 }
 
 .sidenav-cover-header-container
@@ -901,4 +879,14 @@ how-to-cite img
 .center-a-div > *
 {
   place-self: center;
+}
+
+.overview-container
+{
+  margin-top: 1rem;
+}
+
+.overview-content
+{
+  white-space: normal!important;
 }

@@ -10,6 +10,11 @@ import { SapiViewsUtilModule } from "../../util/module";
 import { SapiViewsCoreRegionRegionListItem } from "./region/listItem/region.listItem.component";
 import { SapiViewsCoreRegionRegionBase } from "./region/region.base.directive";
 import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.component";
+import { MatTabsModule } from "@angular/material/tabs";
+import { ExperimentalModule } from "src/experimental/experimental.module";
+import { MatListModule } from "@angular/material/list";
+import { DialogModule } from "src/ui/dialogInfo";
+import { SapiViewsCoreParcellationModule } from "../parcellation";
 import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
@@ -22,6 +27,11 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     StrictLocalModule,
     FeatureModule,
     ReadmoreModule,
+    MatTabsModule,
+    ExperimentalModule,
+    MatListModule,
+    DialogModule,
+    SapiViewsCoreParcellationModule,
     MatTooltipModule,
   ],
   declarations: [

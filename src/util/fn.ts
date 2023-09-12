@@ -1,9 +1,6 @@
 import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 
-export function getDebug() {
-  return (window as any).__DEBUG__
-}
 
 // eslint-disable-next-line  @typescript-eslint/no-empty-function
 export function noop(){}

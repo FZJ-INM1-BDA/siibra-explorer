@@ -8,6 +8,7 @@ describe('> generating screenshot', () => {
   const cwdPath = path.join(__dirname, '../../deploy/')
   
   beforeAll(done => {
+    throw "Need to reimplement. backend is rewritten from node to python"
     childProcess = spawn('node', ['server.js'],  {
       cwd: cwdPath,
       env: {

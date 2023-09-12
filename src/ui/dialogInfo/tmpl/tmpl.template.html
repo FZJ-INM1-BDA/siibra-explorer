@@ -1,36 +1,64 @@
-<h1 *ngIf="data.title" mat-dialog-title>
+<h1 *ngIf="data.title" mat-dialog-title class="sxplr-dialog-body">
   {{ data.title }}
 </h1>
 
-<div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
-  <ng-template [ngIf]="data.desc">
-    {{ data.desc }}
-  </ng-template>
-  
-  <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
-  </markdown-dom>
-</div>
+<ng-template [ngIf]="data.titleMd" let-titleMd>
+  <h1 mat-dialog-title>
+    <markdown-dom class="sxplr-dialog-body" [markdown]="titleMd">
+    </markdown-dom>
+  </h1>
+</ng-template>
 
+<mat-dialog-content>
+
+  <div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
+
+    <div class="sxplr-dialog-body">
+      <ng-template [ngIf]="data.desc">
+        {{ data.desc }}
+      </ng-template>
+    </div>
+    
+    <markdown-dom class="sxplr-dialog-body" *ngIf="data.descMd" [markdown]="data.descMd">
+    </markdown-dom>
+  </div>
+  
+  <ng-template [ngIf]="data.actionsAsList">
+    <mat-action-list>
+      <ng-template ngFor [ngForOf]="data.actions" let-action let-first="first">
+        <ng-template [ngIf]="!first">
+          <mat-divider></mat-divider>
+        </ng-template>
+        <button mat-list-item [mat-dialog-close]="action">
+          {{ action }}
+        </button>
+      </ng-template>
+    </mat-action-list>
+  </ng-template>
+
+</mat-dialog-content>
 
 <mat-dialog-actions align="start">
 
-  <ng-template ngFor [ngForOf]="data.actions || []" let-action>
-    <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
-      [href]="action"
-      sxplr-hide-when-local
-      target="_blank"
-      mat-raised-button
-      color="primary">
-      <i class="fas fa-external-link-alt"></i>
-      <span>Detail</span>
-    </a>
-
-    <ng-template #defaultActionTmpl>
-      <button mat-raised-button
-        color="primary"
-        [mat-dialog-close]="action">
-        {{ action }}
-      </button>
+  <ng-template [ngIf]="!data.actionsAsList">
+    <ng-template ngFor [ngForOf]="data.actions || []" let-action>
+      <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
+        [href]="action"
+        sxplr-hide-when-local
+        target="_blank"
+        mat-raised-button
+        color="primary">
+        <i class="fas fa-external-link-alt"></i>
+        <span>Detail</span>
+      </a>
+  
+      <ng-template #defaultActionTmpl>
+        <button mat-raised-button
+          color="primary"
+          [mat-dialog-close]="action">
+          {{ action }}
+        </button>
+      </ng-template>
     </ng-template>
   </ng-template>
 

@@ -16,9 +16,18 @@ spinner-cmp
     margin-left: 0.5rem;
 }
 
-kg-dataset-dumb-radar,
-kg-dataset-dumb-line
+readmore-component
 {
-    display: block;
-    max-height: 24rem;
+    width: 100%;
+}
+
+.header-card {
+    background-color: #fee;
+}
+
+:host-context([darktheme="true"])
+{
+    .header-card {
+        background-color: #433;
+    }
 }

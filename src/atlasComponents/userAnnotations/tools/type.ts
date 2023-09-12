@@ -336,7 +336,12 @@ export abstract class IAnnotationGeometry extends Highlightable {
   constructor(spec?: TBaseAnnotationGeomtrySpec){
     super()
     this.id = spec && spec.id || getUuid()
-    this.space = spec?.space
+
+    // older version of annotations were made with at_id as key
+    // fallback
+    const spaceId = spec?.space?.id || spec?.space?.['@id']
+    
+    this.space = spaceId && { id: spaceId }
     this.name = spec?.name
     this.desc = spec?.desc
   }

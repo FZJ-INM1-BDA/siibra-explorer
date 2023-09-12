@@ -31,6 +31,34 @@ function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   };
 }
 
+function gateKeepUntilRouteParseComplete(reducer: ActionReducer<MainState>): ActionReducer<MainState>{
+  let completeFlag = false
+  const actions = []
+  return function(state, action) {
+    const isSystem = action.type.includes("@ngrx")
+    if (completeFlag || isSystem) {
+      return reducer(state, action)
+    }
+
+    let _state = state
+    if (action.type === routeParseComplete.type) {
+      while (actions.length > 0) {
+        const _action = actions.shift() // FIFO
+        _state = reducer(_state, _action)
+      }
+      completeFlag = true
+      return reducer(_state, action)
+    }
+
+    if (action.type === generalApplyState.type) {
+
+      return reducer(state, action)
+    }
+    actions.push(action)
+    return reducer(state, noop)
+  }
+}
+
 function generalApplyStateReducer(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(_state, action) {
     let state = _state
@@ -55,6 +83,7 @@ export const RootStoreModule = StoreModule.forRoot({
   [atlasAppearance.nameSpace]: atlasAppearance.reducer,
 },{
   metaReducers: [ 
+    gateKeepUntilRouteParseComplete,
     generalApplyStateReducer,
     // debug,
   ]
@@ -73,11 +102,12 @@ export function getStoreEffects() {
     atlasSelection.Effect,
     userInterface.Effects,
     userInteraction.Effect,
+    userPreference.Effects,
   ]
 }
 
 import { MainState } from "./const"
-import { generalApplyState } from "./actions"
+import { generalApplyState, routeParseComplete, noop } from "./actions"
 
 export { MainState }
 

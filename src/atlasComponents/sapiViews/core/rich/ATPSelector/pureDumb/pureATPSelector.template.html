@@ -10,7 +10,7 @@
     [disabled]="isBusy">
 
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Parcellation
       </span>
 
@@ -19,14 +19,9 @@
       </span>
     </ng-template>
 
-    <ng-template sxplrSmartChipContent>
-      <span class="chip-text">
-        {{ ATP.parcellation.shortName }}
-      </span>
-      <ng-content select="[parcellation-chip-suffix]">
-      </ng-content>
-
-      <button iav-stop="mousedown click"
+    <ng-template sxplrSmartChipAction>
+      <button
+        iav-stop="mousedown click"
         class="icons"
         mat-icon-button
         sxplr-dialog
@@ -38,6 +33,18 @@
         }">
         <i class="fas fa-info"></i>
       </button>
+    </ng-template>
+    
+    <ng-template sxplrSmartChipAction>
+      <ng-content select="[parcellation-chip-suffix]">
+      </ng-content>
+    </ng-template>
+
+    <ng-template sxplrSmartChipContent>
+      <span class="chip-text">
+        {{ ATP.parcellation.shortName }}
+      </span>
+
     </ng-template>
     <ng-template sxplrSmartChipMenu let-parc>
 
@@ -61,7 +68,7 @@
     [disabled]="isBusy">
     
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Template
       </span>
 
@@ -93,7 +100,7 @@
     quick-tour-description="You can change atlas here.">
 
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Atlas
       </span>
 
