@@ -403,22 +403,24 @@ export class NehubaViewerUnit implements OnDestroy {
     : null
 
   public loadNehuba() {
-    this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
+    
+    const { createNehubaViewer } = this.exportNehuba
+
+    this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
       this.log.error(err)
     });
 
     (window as any).nehubaViewer = this.nehubaViewer
 
+    const viewer = window['viewer']
+
     /**
      * Hide all layers except the base layer (template)
      * Then show the layers referenced in multiNgIdLabelIndexMap
      */
-
-    /* creation of the layout is done on next frame, hence the settimeout */
     const patchSliceview = async () => {
       
-      const viewer = window['viewer']
       viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel")
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-alt")
       await (async () => {
@@ -426,6 +428,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
         while (lenPanels === 0) {
           lenPanels = viewer.display.panels.size
+          /* creation of the layout is done on next frame, hence the settimeout */
           await new Promise(rs => setTimeout(rs, 150))
         }
       })()
@@ -433,6 +436,9 @@ export class NehubaViewerUnit implements OnDestroy {
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-10")
       viewer.display.panels.forEach(sliceView => patchSliceViewPanel(sliceView, this.exportNehuba, this.multplier))
     }
+
+    viewer.inputEventBindings.sliceView.set("at:touchhold1", { action: "noop", stopPropagation: false })
+    viewer.inputEventBindings.perspectiveView.set("at:touchhold1", { action: "noop", stopPropagation: false })
     patchSliceview()
 
     this.newViewerInit()
@@ -914,6 +920,13 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 }
 
+
+const noop = (_event: MouseEvent) => {
+  // TODO either emit contextmenu
+  // or capture longtouch on higher level as contextmenu
+  // at the moment, this is required to override default behavior (move to cursur location)
+}
+
 const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier: Float32Array) => {
 
   // patch draw calls to dispatch viewerportToData
@@ -950,6 +963,8 @@ const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier:
       navigationState.pose.translateVoxelsRelative(offset)
     })
   }
+
+  registerActionListener(sliceViewPanel.element, `noop`, noop)
 }
 
 export interface ViewerState {

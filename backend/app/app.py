@@ -35,6 +35,7 @@ for vip_route in vip_routes:
 
 app.include_router(quickstart_router, prefix="/quickstart")
 app.include_router(saneurl_router, prefix="/saneUrl")
+app.include_router(saneurl_router, prefix="/saneurl")
 app.include_router(saneurl_router, prefix="/go")
 app.include_router(plugin_router, prefix="/plugins")
 app.include_router(user_router, prefix="/user")

@@ -187,11 +187,11 @@
                     let-feature
                     let-last="last">
 
+                    <!-- n.b. do not introduce mattooltip in scrollable container -->
+                    <!-- it will override scrollability -->
                     <button
                         mat-button
                         class="virtual-scroll-item sxplr-w-100"
-                        [matTooltip]="feature.name"
-                        matTooltipPosition="right"
                         (click)="onClickFeature(feature)">
                         {{ feature.name }}
                     </button>
