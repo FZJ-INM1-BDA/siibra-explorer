@@ -404,7 +404,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
   public loadNehuba() {
     
-    const { registerActionListener, createNehubaViewer } = this.exportNehuba
+    const { createNehubaViewer } = this.exportNehuba
 
     this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
@@ -921,7 +921,7 @@ export class NehubaViewerUnit implements OnDestroy {
 }
 
 
-const noop = (event: MouseEvent) => {
+const noop = (_event: MouseEvent) => {
   // TODO either emit contextmenu
   // or capture longtouch on higher level as contextmenu
   // at the moment, this is required to override default behavior (move to cursur location)
