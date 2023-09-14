@@ -127,7 +127,7 @@ data_proxy_store = SaneUrlDPStore()
 async def get_short(short_id:str, request: Request):
     try:
         existing_json = data_proxy_store.get(short_id)
-        accept = request.headers.get("Accept")
+        accept = request.headers.get("Accept", "")
         if "text/html" in accept:
             hashed_path = existing_json.get("hashPath")
             return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}")
