@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { interval, merge, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "src/util/constants";
@@ -13,6 +13,14 @@ import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 })
 
 export class NotSupportedCmp{
+
+  /**
+   * default error is webgl
+   * custom error message can be inputed to override default message
+   */
+  @Input()
+  errorString="webgl"
+
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
   public unsupportedPreviewIdx: number = 0
   public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER

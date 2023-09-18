@@ -5,7 +5,7 @@ import { getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
+import { BehaviorSubject, forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { environment } from "src/environments/environment"
 import {
   translateV3Entities
@@ -110,15 +110,6 @@ export class SAPI{
     
     BS_ENDPOINT_CACHED_VALUE = new Observable<string>(obs => {
       (async () => {
-        const backupPr = new Promise<string>(rs => {
-          for (const endpt of backupEndpoints) {
-            SAPI.VerifyEndpoint(endpt)
-              .then(flag => {
-                if (flag) rs(endpt)
-              })
-              .catch(noop)
-          }
-        })
         try {
           const url = await Promise.race([
             SAPI.VerifyEndpoint(mainEndpoint),
@@ -129,12 +120,23 @@ export class SAPI{
 
           try {
             const url = await Promise.race([
-              backupPr,
+              /**
+               * find the first endpoint of the backup endpoints
+               */
+              new Promise<string>(rs => {
+                for (const endpt of backupEndpoints) {
+                  SAPI.VerifyEndpoint(endpt)
+                    .then(flag => {
+                      if (flag) rs(endpt)
+                    })
+                    .catch(noop)
+                }
+              }),
               new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
             ])
             obs.next(url)
           } catch (e) {
-            SAPI.ErrorMessage = `No usabe mirror found`
+            SAPI.ErrorMessage = `No usabe siibra-api endpoints found. Tried: ${mainEndpoint}, ${backupEndpoints.join(",")}`
           }
         } finally {
           obs.complete()
@@ -147,7 +149,10 @@ export class SAPI{
     return BS_ENDPOINT_CACHED_VALUE
   }
 
-  static ErrorMessage = null
+  static ErrorMessage$ = new BehaviorSubject<string>(null)
+  static set ErrorMessage(val: string){
+    this.ErrorMessage$.next(val)
+  }
 
   getParcRegions(parcId: string) {
     const param = {
@@ -593,9 +598,6 @@ export class SAPI{
     private snackbar: MatSnackBar,
     private workerSvc: AtlasWorkerService,
   ){
-    if (SAPI.ErrorMessage) {
-      this.snackbar.open(SAPI.ErrorMessage, 'Dismiss', { duration: 5000 })
-    }
   }
   
   /**
