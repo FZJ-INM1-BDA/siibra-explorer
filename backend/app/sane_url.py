@@ -27,6 +27,7 @@ vip_routes = [
 
 class SaneUrlDPStore(DataproxyStore):
     class AlreadyExists(Exception): ...
+    class NotWritable(IOError): ...
 
     @staticmethod
     def GetTimeMs() -> int:
@@ -36,8 +37,12 @@ class SaneUrlDPStore(DataproxyStore):
     def TransformKeyToObjName(key: str):
         return f"saneUrl/{key}.json"
     
+    writable = False
+
     def __init__(self, expiry_s=3 * 24 * 60 * 60):
-                
+        if not (SXPLR_EBRAINS_IAM_SA_CLIENT_ID and SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET):
+            super().__init__(None, SXPLR_BUCKET_NAME)
+            return
         resp = requests.get(f"{EBRAINS_IAM_DISCOVERY_URL}/.well-known/openid-configuration")
         resp.raise_for_status()
         resp_json = resp.json()
@@ -54,6 +59,7 @@ class SaneUrlDPStore(DataproxyStore):
         self._refresh_token()
 
         super().__init__(self.token, SXPLR_BUCKET_NAME)
+        self.writable = True
     
     def _refresh_token(self):
         token_dict = self.session.fetch_token(self._token_endpoint, grant_type="client_credentials")
@@ -94,7 +100,8 @@ class SaneUrlDPStore(DataproxyStore):
             raise SaneUrlDPStore.GenericException(str(e)) from e
 
     def set(self, key: str, value: Union[str, Dict], request: Optional[Request]=None):
-        
+        if not self.writable:
+            raise SaneUrlDPStore.NotWritable
         object_name = SaneUrlDPStore.TransformKeyToObjName(key)
         try:
             super().get(object_name)

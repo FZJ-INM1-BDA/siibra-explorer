@@ -482,10 +482,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             return this.annotationLayer
           })
           ).pipe(
-            map(annotationLayer => ({viewerMode, voxelSize, annotationLayer}))
+            map(annotationLayer => ({viewerMode, annotationLayer}))
           )
         )
-      ).subscribe(({viewerMode, voxelSize, annotationLayer}) => {
+      ).subscribe(({viewerMode, annotationLayer}) => {
         this.currMode = viewerMode
         
         /**
