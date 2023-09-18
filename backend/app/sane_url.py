@@ -4,7 +4,7 @@ from fastapi.exceptions import HTTPException
 from authlib.integrations.requests_client import OAuth2Session
 import requests
 import json
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, Any
 import time
 from io import StringIO
 from pydantic import BaseModel
@@ -126,11 +126,19 @@ data_proxy_store = SaneUrlDPStore()
 @router.get("/{short_id:str}")
 async def get_short(short_id:str, request: Request):
     try:
-        existing_json = data_proxy_store.get(short_id)
+        existing_json: Dict[str, Any] = data_proxy_store.get(short_id)
         accept = request.headers.get("Accept", "")
         if "text/html" in accept:
             hashed_path = existing_json.get("hashPath")
-            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}")
+            extra_routes = []
+            for key in existing_json:
+                if key.startswith("x-"):
+                    extra_routes.append(f"{key}:{short_id}")
+                    continue
+
+            extra_routes_str = "" if len(extra_routes) == 0 else ("/" + "/".join(extra_routes))
+
+            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}")
         return JSONResponse(existing_json)
     except DataproxyStore.NotFound as e:
         raise HTTPException(404, str(e))

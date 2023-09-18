@@ -5,6 +5,21 @@ import { filter, mapTo, take } from 'rxjs/operators'
 // eslint-disable-next-line  @typescript-eslint/no-empty-function
 export function noop(){}
 
+export async function retry<T>(fn: () => T, config={timeout: 1000, retries:3}){
+  let retryNo = 0
+  const { retries, timeout } = config
+  while (retryNo < retries) {
+    retryNo ++
+    try {
+      return await fn()
+    } catch (e) {
+      console.warn(`fn failed, retry after ${timeout} milliseconds`)
+      await (() => new Promise(rs => setTimeout(rs, timeout)))()
+    }
+  }
+  throw new Error(`fn failed ${retries} times, aborting`)
+}
+
 export async function getExportNehuba() {
   // eslint-disable-next-line no-constant-condition
   while (true) {
