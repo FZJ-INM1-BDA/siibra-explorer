@@ -11,7 +11,7 @@ import {
   translateV3Entities
 } from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
-import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
 import { CONST } from "common/constants"
 

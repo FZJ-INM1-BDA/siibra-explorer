@@ -65,8 +65,8 @@ jobs:
         python-version: '3.10'
     - run: |
         cd backend
+        echo "hello world" >> index.html
+        export PATH_TO_PUBLIC=$(pwd)
         pip install -r requirements.txt
         pip install pytest
         pytest
-
-  
