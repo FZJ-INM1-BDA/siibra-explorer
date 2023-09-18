@@ -192,40 +192,6 @@ export class SAPI{
     if (!!resp.total || resp.total === 0) return true
     return false
   }
-  getV3Features<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}`>): Observable<Feature[]> {
-    const query = structuredClone(sapiParam)
-    return this.v3Get<`/feature/${T}`>(`/feature/${featureType}`, {
-      ...query
-    }).pipe(
-      switchMap(resp => {
-        if (!this.#isPaged(resp)) return throwError(`endpoint not returning paginated response`)
-        return this.iteratePages(
-          resp,
-          page => {
-            const query = structuredClone(sapiParam)
-            query.query.page = page
-            return this.v3Get(`/feature/${featureType}`, {
-              ...query,
-            }).pipe(
-              map(val => {
-                if (this.#isPaged(val)) return val
-                return { items: [], total: 0, page: 0, size: 0 }
-              })
-            )
-          }
-        )
-      }),
-      switchMap(features => features.length === 0
-        ? of([])
-        : forkJoin(
-          features.map(feat => translateV3Entities.translateFeature(feat) )
-        )
-      ),
-      catchError((err) => {
-        console.error("Error fetching features", err)
-        return of([])}),
-    )
-  }
 
   getV3FeatureDetail<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}/{feature_id}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>> {
     return this.v3Get<`/feature/${T}/{feature_id}`>(`/feature/${featureType}/{feature_id}`, {
@@ -250,12 +216,6 @@ export class SAPI{
       query_param: params
     } as any).pipe(
       switchMap(val => translateV3Entities.translateFeature(val))
-    )
-  }
-
-  getModalities() {
-    return this.v3Get("/feature/_types", { query: {} }).pipe(
-      map(v => v.items)
     )
   }
 
