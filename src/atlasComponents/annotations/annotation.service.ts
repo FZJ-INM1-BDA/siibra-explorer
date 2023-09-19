@@ -110,9 +110,10 @@ export class AnnotationLayer {
       this._onHover.next(payload)
     })
     this.onDestroyCb.push(res)
-    
+
     this.nglayer.layer.registerDisposer(() => {
-      this.dispose()
+      // TODO registerdisposer seems to fire without the layer been removed
+      // Thus it cannot be relied upon for cleanup
     })
     NehubaLayerControlService.RegisterLayerName(this.name)
   }
