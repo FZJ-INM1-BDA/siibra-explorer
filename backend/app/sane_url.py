@@ -54,7 +54,8 @@ class SaneUrlDPStore(DataproxyStore):
                                        SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET,
                                        scope=" ".join(scopes))
         self.session = oauth2_session
-        self.expiry_s: float = None
+        self.expiry_s: float = expiry_s
+        self.token_expires_at: float = None
         self.token: str = None
         self._refresh_token()
 
@@ -63,11 +64,11 @@ class SaneUrlDPStore(DataproxyStore):
     
     def _refresh_token(self):
         token_dict = self.session.fetch_token(self._token_endpoint, grant_type="client_credentials")
-        self.expiry_s = token_dict.get("expires_at")
+        self.token_expires_at = token_dict.get("expires_at")
         self.token = token_dict.get("access_token")
         
     def _get_bucket(self):
-        token_expired = self.expiry_s - time.time() > 30
+        token_expired = (self.token_expires_at - time.time()) < 30
         if token_expired:
             self._refresh_token()
         
