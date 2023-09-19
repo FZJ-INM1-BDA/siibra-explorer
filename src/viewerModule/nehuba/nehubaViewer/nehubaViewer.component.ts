@@ -11,7 +11,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 /**
  * import of nehuba js files moved to angular.json
  */
-import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
+import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE } from "src/viewerModule/viewerInternalState.service";
@@ -131,6 +131,7 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
     @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
+    @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ) {
     if (multiplier$) {
@@ -261,7 +262,12 @@ export class NehubaViewerUnit implements OnDestroy {
            * on switch from freesurfer -> volumetric viewer, race con results in managed layer not necessarily setting layer visible correctly
            */
           const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
-          managedLayers.forEach(layer => layer.setVisible(false))
+          managedLayers.forEach(layer => {
+            if (this.externalLayerCtrl && this.externalLayerCtrl.ExternalLayerNames.has(layer.name)) {
+              return
+            }
+            layer.setVisible(false)
+          })
           
           for (const layerName of layerNames) {
             const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
