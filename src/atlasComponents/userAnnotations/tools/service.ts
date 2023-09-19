@@ -2,12 +2,12 @@ import { Injectable, OnDestroy, Type } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, from, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
-import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
+import { getExportNehuba, switchMapWaitFor, retry } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
@@ -455,14 +455,13 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       store.pipe(
         select(atlasSelection.selectors.viewerMode),
         withLatestFrom(this.#voxelSize),
-      ).subscribe(([viewerMode, voxelSize]) => {
-        this.currMode = viewerMode
-        if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
-          if (this.annotationLayer) this.annotationLayer.setVisible(true)
-          else {
-            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
+        switchMap(([viewerMode, voxelSize]) => from(
+          retry(() => {
             if (this.annotationLayer) {
-              this.annotationLayer.dispose()
+              return this.annotationLayer
+            }
+            if (!voxelSize) {
+              throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
             }
             this.annotationLayer = new AnnotationLayer(
               ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
@@ -479,15 +478,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
                   : null
               })
             })
-            /**
-             * on template changes, the layer gets lost
-             * force redraw annotations if layer needs to be recreated
-             */
-            this.forcedAnnotationRefresh$.next(null)
-          }
-        } else {
-          if (this.annotationLayer) this.annotationLayer.setVisible(false)
-        }
+            
+            return this.annotationLayer
+          })
+          ).pipe(
+            map(annotationLayer => ({viewerMode, annotationLayer}))
+          )
+        )
+      ).subscribe(({viewerMode, annotationLayer}) => {
+        this.currMode = viewerMode
+        
+        /**
+         * on template changes, the layer gets lost
+         * force redraw annotations if layer needs to be recreated
+         */
+        this.forcedAnnotationRefresh$.next(null)
+        annotationLayer.setVisible(viewerMode === ModularUserAnnotationToolService.VIEWER_MODE)
       })
     )
 

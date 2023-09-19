@@ -70,8 +70,14 @@ export class PulledDataSource<T> extends DataSource<T> {
       return []
     }
     this.isPulling = true
-    const newResults = await this.#pull()
-    this.isPulling = false
+    let newResults = []
+    try {
+      newResults = await this.#pull()
+    } catch (e) {
+      console.error("Pulling failed", e)
+    } finally {
+      this.isPulling = false
+    }
     if (newResults.length === 0) {
       this.complete()
     }

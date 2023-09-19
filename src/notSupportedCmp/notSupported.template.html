@@ -1,5 +1,5 @@
 <div class="jumbotron bg-light text-center mb-0">
-  <div>
+  <div *ngIf="errorString === 'webgl' else otherErrorTmpl">
     <h1 class="mb-3">
       <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
     </h1>
@@ -21,6 +21,12 @@
     </div>
 
   </div>
+
+  <ng-template #otherErrorTmpl>
+    <h1 class="mb-3">
+      <i class="fas fa-exclamation-triangle"></i> {{ errorString }}
+    </h1>
+  </ng-template>
 </div>
 <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
   <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3 image-container"

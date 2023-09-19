@@ -72,10 +72,13 @@
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/allen2017) redirects to allen 2017
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/mebrains) redirects to monkey
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/stnr) redirects to URL that contains annotations
+
 ## VIP URL
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/human) redirects to human mni152
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/monkey) redirects mebrains
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/rat) redirects to waxholm v4
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/mouse) redirects allen mouse 2017
+
 ## plugins
 - [ ] jugex plugin works
