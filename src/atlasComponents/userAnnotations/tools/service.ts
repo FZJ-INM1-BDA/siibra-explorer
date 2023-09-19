@@ -480,7 +480,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             })
             
             return this.annotationLayer
-          })
+          }, { retries: 60, timeout: 1000 })
           ).pipe(
             map(annotationLayer => ({viewerMode, annotationLayer}))
           )
