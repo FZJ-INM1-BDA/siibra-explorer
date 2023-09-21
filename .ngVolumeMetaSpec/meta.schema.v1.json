@@ -22,6 +22,18 @@
         "transform": {
             "$ref": "#/definitions/mat4"
         },
+        "preferredColormap": {
+            "type": "array",
+            "title": "Preferred colormap",
+            "items": {
+                "$ref": "#/definitions/shader-enum"
+            },
+            "description": "Preferred colormap in order of preference",
+            "examples": [
+                ["magma", "viridis", "greyscale"],
+                ["greyscale"]
+            ]
+        },
         "override": {
             "title": "Override",
             "description": "Overrides provide some low level/implementation hints. They are more prone to breaking, and thus should be used with the knowledge as such.",
@@ -246,6 +258,22 @@
             "required": [
                 "type"
             ]
+        },
+        "shader-enum": {
+            "title": "Shader Enum",
+            "oneOf": [{
+                "const": "greyscale"
+            }, {
+                "const": "viridis"
+            }, {
+                "const": "plasma"
+            }, {
+                "const": "magma"
+            }, {
+                "const": "inferno"
+            }, {
+                "const": "jet"
+            }]
         }
     }
 }
