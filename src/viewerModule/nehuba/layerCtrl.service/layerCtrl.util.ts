@@ -61,12 +61,19 @@ export type TNgLayerCtrl<T extends keyof INgLayerCtrl> = {
   payload: INgLayerCtrl[T]
 }
 
+export interface IExternalLayerCtl {
+  RegisterLayerName(layername: string): void
+  DeregisterLayerName(layername: string): void
+  readonly ExternalLayerNames: Set<string>
+}
+
 export const SET_COLORMAP_OBS = new InjectionToken<Observable<IColorMap>>('SET_COLORMAP_OBS')
 export const SET_LAYER_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_LAYER_VISIBILITY')
 export const SET_SEGMENT_VISIBILITY = new InjectionToken<Observable<string[]>>('SET_SEGMENT_VISIBILITY')
 export const NG_LAYER_CONTROL = new InjectionToken<TNgLayerCtrl<keyof INgLayerCtrl>>('NG_LAYER_CONTROL')
 export const Z_TRAVERSAL_MULTIPLIER = new InjectionToken<Observable<number>>('Z_TRAVERSAL_MULTIPLIER')
 export const CURRENT_TEMPLATE_DIM_INFO = new InjectionToken<Observable<TemplateInfo>>('CURRENT_TEMPLATE_DIM_INFO')
+export const EXTERNAL_LAYER_CONTROL = new InjectionToken<IExternalLayerCtl>("EXTERNAL_LAYER_CONTROL")
 
 export type TemplateInfo = {
   transform: number[][]

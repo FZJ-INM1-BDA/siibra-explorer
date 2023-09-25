@@ -2,6 +2,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { getUuid, waitFor } from "src/util/fn";
 import { PeriodicSvc } from "src/util/periodic.service";
+import { NehubaLayerControlService } from "src/viewerModule/nehuba/layerCtrl.service";
 
 export type TNgAnnotationEv = {
   pickedAnnotationId: string
@@ -54,6 +55,10 @@ interface NgAnnotationLayer {
     registerDisposer(fn: () => void): void
   }
   setVisible(flag: boolean): void
+  layerChanged: {
+    add(cb: () => void): void
+  }
+  visible: boolean
 }
 
 export class AnnotationLayer {
@@ -105,15 +110,18 @@ export class AnnotationLayer {
       this._onHover.next(payload)
     })
     this.onDestroyCb.push(res)
-    
+
     this.nglayer.layer.registerDisposer(() => {
-      this.dispose()
+      // TODO registerdisposer seems to fire without the layer been removed
+      // Thus it cannot be relied upon for cleanup
     })
+    NehubaLayerControlService.RegisterLayerName(this.name)
   }
   setVisible(flag: boolean){
     this.nglayer && this.nglayer.setVisible(flag)
   }
   dispose() {
+    NehubaLayerControlService.DeregisterLayerName(this.name)
     AnnotationLayer.Map.delete(this.name)
     this._onHover.complete()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()

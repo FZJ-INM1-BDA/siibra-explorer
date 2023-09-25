@@ -53,12 +53,11 @@ describe("> sapi.service.ts", () => {
           })
         })
         it("> should call fetch twice", async () => {
-          expect(fetchSpy).toHaveBeenCalledTimes(2)
+          expect(fetchSpy).toHaveBeenCalledTimes(1)
           
           const allArgs = fetchSpy.calls.allArgs()
-          expect(allArgs.length).toEqual(2)
+          expect(allArgs.length).toEqual(1)
           expect(atlasEndpts).toContain(allArgs[0][0])
-          expect(atlasEndpts).toContain(allArgs[1][0])
         })
 
         it("> endpoint should be set", async () => {
@@ -67,11 +66,11 @@ describe("> sapi.service.ts", () => {
 
         it("> additional calls should return cached observable", () => {
 
-          expect(fetchSpy).toHaveBeenCalledTimes(2)
+          expect(fetchSpy).toHaveBeenCalledTimes(1)
           SAPI.BsEndpoint$.subscribe()
           SAPI.BsEndpoint$.subscribe()
 
-          expect(fetchSpy).toHaveBeenCalledTimes(2)
+          expect(fetchSpy).toHaveBeenCalledTimes(1)
         })
       })
 

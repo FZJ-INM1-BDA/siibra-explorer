@@ -4,7 +4,7 @@ from fastapi.exceptions import HTTPException
 from authlib.integrations.requests_client import OAuth2Session
 import requests
 import json
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, Any
 import time
 from io import StringIO
 from pydantic import BaseModel
@@ -27,6 +27,7 @@ vip_routes = [
 
 class SaneUrlDPStore(DataproxyStore):
     class AlreadyExists(Exception): ...
+    class NotWritable(IOError): ...
 
     @staticmethod
     def GetTimeMs() -> int:
@@ -36,8 +37,12 @@ class SaneUrlDPStore(DataproxyStore):
     def TransformKeyToObjName(key: str):
         return f"saneUrl/{key}.json"
     
+    writable = False
+
     def __init__(self, expiry_s=3 * 24 * 60 * 60):
-                
+        if not (SXPLR_EBRAINS_IAM_SA_CLIENT_ID and SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET):
+            super().__init__(None, SXPLR_BUCKET_NAME)
+            return
         resp = requests.get(f"{EBRAINS_IAM_DISCOVERY_URL}/.well-known/openid-configuration")
         resp.raise_for_status()
         resp_json = resp.json()
@@ -49,19 +54,21 @@ class SaneUrlDPStore(DataproxyStore):
                                        SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET,
                                        scope=" ".join(scopes))
         self.session = oauth2_session
-        self.expiry_s: float = None
+        self.expiry_s: float = expiry_s
+        self.token_expires_at: float = None
         self.token: str = None
         self._refresh_token()
 
         super().__init__(self.token, SXPLR_BUCKET_NAME)
+        self.writable = True
     
     def _refresh_token(self):
         token_dict = self.session.fetch_token(self._token_endpoint, grant_type="client_credentials")
-        self.expiry_s = token_dict.get("expires_at")
+        self.token_expires_at = token_dict.get("expires_at")
         self.token = token_dict.get("access_token")
         
     def _get_bucket(self):
-        token_expired = self.expiry_s - time.time() > 30
+        token_expired = (self.token_expires_at - time.time()) < 30
         if token_expired:
             self._refresh_token()
         
@@ -94,7 +101,8 @@ class SaneUrlDPStore(DataproxyStore):
             raise SaneUrlDPStore.GenericException(str(e)) from e
 
     def set(self, key: str, value: Union[str, Dict], request: Optional[Request]=None):
-        
+        if not self.writable:
+            raise SaneUrlDPStore.NotWritable
         object_name = SaneUrlDPStore.TransformKeyToObjName(key)
         try:
             super().get(object_name)
@@ -126,11 +134,19 @@ data_proxy_store = SaneUrlDPStore()
 @router.get("/{short_id:str}")
 async def get_short(short_id:str, request: Request):
     try:
-        existing_json = data_proxy_store.get(short_id)
+        existing_json: Dict[str, Any] = data_proxy_store.get(short_id)
         accept = request.headers.get("Accept", "")
         if "text/html" in accept:
             hashed_path = existing_json.get("hashPath")
-            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}")
+            extra_routes = []
+            for key in existing_json:
+                if key.startswith("x-"):
+                    extra_routes.append(f"{key}:{short_id}")
+                    continue
+
+            extra_routes_str = "" if len(extra_routes) == 0 else ("/" + "/".join(extra_routes))
+
+            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}")
         return JSONResponse(existing_json)
     except DataproxyStore.NotFound as e:
         raise HTTPException(404, str(e))

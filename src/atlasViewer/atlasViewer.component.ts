@@ -27,6 +27,7 @@ import { DOCUMENT } from "@angular/common";
 import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
+import { SAPI } from "src/atlasComponents/sapi";
 
 
 @Component({
@@ -43,6 +44,8 @@ import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
+
+  sapiError$ = SAPI.ErrorMessage$
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
