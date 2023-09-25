@@ -76,7 +76,8 @@ export class LayerCtrlEffects {
                       lowThreshold: meta.min,
                       removeBg: true,
                     }),
-                    type: 'image'
+                    type: 'image',
+                    opacity: 0.5
                   }
                 })
               )
