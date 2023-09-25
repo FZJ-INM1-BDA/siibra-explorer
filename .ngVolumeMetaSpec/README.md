@@ -40,6 +40,7 @@ type: `object`
 | version | `1` | true |
 | data | [Generic Image](#definitions-data-image) \|\| [Single Channel Image](#definitions-data-image-1d) \|\| [Three Channel Image](#definitions-data-image-3d) |  |
 | transform | [4x4 affine](#definitions-mat4) |  |
+| preferredColormap | ([Shader Enum](#definitions-shader-enum))[] |  |
 | override | [Override](#definitions-override) |  |
 | bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane))[] |  |
 
@@ -135,6 +136,14 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | type | `"plane"` | true |
+
+<a name="definitions-shader-enum"></a>
+
+# Shader Enum
+
+One of:
+
+`greyscale` , `viridis` , `plasma` , `magma` , `inferno` , `jet`
 
 <a name="definitions-override"></a>
 

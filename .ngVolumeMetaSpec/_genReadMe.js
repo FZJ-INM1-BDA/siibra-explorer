@@ -133,6 +133,19 @@ function parseRootObj(rootObj) {
         _md += `\n| ${prop} | ${getType(properties[prop])} | ${required.includes(prop) || ''} |`
       }
     }
+    if (oneOf) {
+      _md += "\n\nOne of:"
+      for (const item of oneOf){
+        /**
+         * TODO fix this properly
+         */
+        if (!item.const) {
+          throw new Error(`must be const`)
+        }
+      }
+      _md += "\n\n"
+      _md += oneOf.map(v => `\`${v.const}\``).join(" , ")
+    }
     return _md
   }
 
