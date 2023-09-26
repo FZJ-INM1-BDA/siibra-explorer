@@ -589,11 +589,12 @@ export class NehubaViewerUnit implements OnDestroy {
 
         const combined = {
           type: 'image',
+          opacity: 1,
           ...rest,
           ...(transform ? { transform } : {})
         }
         viewer.layerManager.addManagedLayer(
-          viewer.layerSpecification.getLayer(key, combined))
+          viewer.layerSpecification.getLayer(key, combined), 1)
 
         return layerObj[key]
       })
