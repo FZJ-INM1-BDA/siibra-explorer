@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges, OnDestroy } from "@angular/core";
-import { Store } from "@ngrx/store";
+import { Store, select } from "@ngrx/store";
 import { isMat4 } from "common/util"
 import { CONST } from "common/constants"
 import { Observable } from "rxjs";
@@ -8,6 +8,7 @@ import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehub
 import { getExportNehuba } from "src/util/fn";
 import { getShader } from "src/util/constants";
 import { EnumColorMapName } from "src/util/colorMaps";
+import { MetaV1Schema, isEnclosed } from "src/atlasComponents/sapi/typeV3";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
@@ -50,6 +51,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   @Input('ng-layer-ctl-shader')
   shader: string
 
+  @Input("ng-layer-ctl-meta")
+  meta: MetaV1Schema
+
   opacity: number = 1.0
   @Input('ng-layer-ctl-opacity')
   set _opacity(val: number | string) {
@@ -80,14 +84,21 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   private viewer: NehubaViewerUnit
 
   private exportNehuba: any
+  private currentPositionMm: number[]
 
   constructor(
     private store: Store<any>,
     @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ){
     const sub = nehubaViewer$.subscribe(v => this.viewer = v)
+    const navSub = this.store.pipe(
+      select(atlasSelection.selectors.navigation)
+    ).subscribe(nav => {
+      this.currentPositionMm = nav?.position.map(v => v / 1e6)
+    })
     this.onDestroyCb.push(
-      () => sub.unsubscribe()
+      () => sub.unsubscribe(),
+      () => navSub.unsubscribe(),
     )
 
     getExportNehuba().then(exportNehuba => {
@@ -166,6 +177,28 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const final = vec3.add(vec3.create(), start, end)
       vec3.scale(final, final, 0.5)
       position = Array.from(final)
+    }
+
+    const enclosed = this.meta?.bestViewPoints.filter(isEnclosed).find(v => v.points.length >= 3)
+    if (enclosed) {
+      const curr = vec3.fromValues(...this.currentPositionMm)
+      const pt1 = vec3.fromValues(...enclosed.points[0].value)
+      const pt0 = vec3.fromValues(...enclosed.points[1].value)
+      const pt2 = vec3.fromValues(...enclosed.points[2].value)
+      vec3.sub(pt1, pt1, pt0)
+      vec3.sub(pt2, pt2, pt0)
+      vec3.normalize(pt1, pt1)
+      vec3.normalize(pt2, pt2)
+
+      vec3.sub(curr, curr, pt0)
+
+      vec3.mul(pt1, pt1, curr)
+      vec3.mul(pt2, pt2, curr)
+
+      const resultant = vec3.add(vec3.create(), pt1, pt2)
+      vec3.add(resultant, resultant, pt0)
+      vec3.scale(resultant, resultant, 1e6)
+      position = Array.from(resultant)
     }
     
     
