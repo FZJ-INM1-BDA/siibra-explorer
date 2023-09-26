@@ -1,11 +1,18 @@
 import {
   SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox
 } from "./sxplrTypes"
-import { PathReturn } from "./typeV3"
+import { PathReturn, MetaV1Schema } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
 
+
+const BIGBRAIN_XZ = [
+  [-70.677, 62.222],
+  [-70.677, -58.788],
+  [68.533, -58.788],
+  [68.533, 62.222],
+]
 
 class TranslateV3 {
   
@@ -118,20 +125,23 @@ class TranslateV3 {
       url: string
       transform: number[][]
       info: Record<string, any>
+      meta?: MetaV1Schema
     }> = {}
     for (const key in input) {
       if (key !== 'neuroglancer/precomputed') {
         continue
       }
       const url = input[key]
-      const [ transform, info ] = await Promise.all([
+      const [ transform, info, meta ] = await Promise.all([
         this.cFetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
         this.cFetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
+        this.fetchMeta(url),
       ])
       returnObj[key] = {
         url: input[key],
         transform: transform,
         info: info,
+        meta,
       }
     }
     return returnObj
@@ -352,6 +362,41 @@ class TranslateV3 {
         return Promise.resolve(JSON.parse(cachedText))
       }
     }
+  }
+
+  async fetchMeta(url: string): Promise<MetaV1Schema|null> {
+    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain")
+    if (is1umRegisteredSlices) {
+      const found = /B20_([0-9]{4})/.exec(url)
+      if (found) {
+        const sectionId = parseInt(found[1])
+        const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+        return {
+          version: 1,
+          preferredColormap: ["greyscale"],
+          bestViewPoints: [{
+            type: "enclosed",
+            points: BIGBRAIN_XZ.map(([x, z]) => ({
+              type: "point",
+              value: [x, realYDis, z]
+            }))
+          }]
+        }
+      }
+    }
+    /**
+     * TODO ensure all /meta endpoints are populated
+     */
+    // try{
+    //   const resp = await this.cFetch(`${url}/meta`)
+    //   if (resp.status === 200) {
+    //     return resp.json()
+    //   }
+    // } catch (e) {
+      
+    // }
+    
+    return null
   }
 
   async translateSpaceToAuxMesh(template: SxplrTemplate): Promise<NgPrecompMeshSpec[]>{

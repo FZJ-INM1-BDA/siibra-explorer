@@ -74,6 +74,7 @@ export {
 } from "src/viewerModule/nehuba/config.service/type"
 
 import { TThreeSurferMesh, TThreeMesh, TThreeMeshLabel } from "src/viewerModule/threeSurfer/types"
+import { MetaV1Schema } from "./typeV3"
 export { TThreeSurferMesh, TThreeMesh, TThreeMeshLabel }
 
 /**
@@ -108,6 +109,7 @@ export type VoiFeature = {
     url: string
     transform: number[][]
     info: Record<string, any>
+    meta?: MetaV1Schema
   }
 } & Feature
 
