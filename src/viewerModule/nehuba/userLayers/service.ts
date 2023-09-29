@@ -169,7 +169,9 @@ export class UserLayerService implements OnDestroy {
         panelClass: ["no-padding-dialog", "w-100"],
       })
       .afterClosed()
-      .subscribe(() => this.removeUserLayer(url))
+      .subscribe(() => {
+        this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, null)
+      })
   }
 
   removeUserLayer(url: string) {
