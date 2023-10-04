@@ -98,6 +98,13 @@ const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
     }],
     transform: [[0.9199221134185791,0.22926874458789825,0.2965584993362427,-10976869],[0,0,1,-61450000],[0.18267445266246796,-1.0079853534698486,0.01068924367427826,-2853557],[0,0,0,1]]
   },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/HSV-FOM": {
+    version: 1,
+    data: {
+      type: "image/3d"
+    },
+    transform: [[-0.74000001,0,0,38134608],[0,-0.26530117,-0.6908077,13562314],[0,-0.6908077,0.26530117,-3964904],[0,0,0,1]]
+  }
 }
 
 class TranslateV3 {
