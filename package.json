@@ -69,7 +69,7 @@
     "export-nehuba": "^0.1.0",
     "file-loader": "^6.2.0",
     "jszip": "^3.6.0",
-    "postcss": "^8.3.6",
+    "postcss": "^8.4.31",
     "raw-loader": "^4.0.2",
     "rxjs": "~6.6.0",
     "showdown": "^2.0.0",
