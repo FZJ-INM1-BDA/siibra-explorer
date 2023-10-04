@@ -22,6 +22,13 @@ export enum EnumColorMapName{
   RGB="rgb (3 channel)"
 }
 
+export const CMByName: Record<string, EnumColorMapName> = {}
+
+for (const [key, value] of Object.entries(EnumColorMapName)) {
+  CMByName[key] = value
+  CMByName[value as string] = value
+}
+
 interface IColorMap{
   /**
    * header

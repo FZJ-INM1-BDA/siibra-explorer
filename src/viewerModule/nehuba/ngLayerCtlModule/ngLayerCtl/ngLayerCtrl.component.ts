@@ -5,9 +5,7 @@ import { CONST } from "common/constants"
 import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
-import { getExportNehuba } from "src/util/fn";
-import { getShader } from "src/util/constants";
-import { EnumColorMapName } from "src/util/colorMaps";
+import { getExportNehuba, getShaderFromMeta } from "src/util/fn";
 import { MetaV1Schema, isEnclosed } from "src/atlasComponents/sapi/typeV3";
 
 type Vec4 = [number, number, number, number]
@@ -122,17 +120,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         this.removeLayer()
         this.removeLayer = null
       }
-      try {
-        const resp = await fetch(`${this.source}/meta.json`)
-        const metaJson = await resp.json()
-        const is3D = metaJson?.data?.type === "image/3d"
-        if (is3D) {
-          this.shader = getShader({
-            colormap: EnumColorMapName.RGB
-          })
-        }
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      this.shader = getShaderFromMeta(this.meta)
       
       this.store.dispatch(
         atlasAppearance.actions.addCustomLayer({
@@ -187,21 +175,70 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const pt2 = vec3.fromValues(...enclosed.points[2].value)
       vec3.sub(pt1, pt1, pt0)
       vec3.sub(pt2, pt2, pt0)
+
+      /**
+       * pt1 and pt2 now unit vectors going from pt0 to pt1 and pt0 to pt2 respectively
+       */
       vec3.normalize(pt1, pt1)
       vec3.normalize(pt2, pt2)
 
+      /**
+       * calculate rotation first
+       */
+      const z0 = vec3.fromValues(0, 0, 1)
+      const cross = vec3.cross(vec3.create(), z0, pt1)
+      const w = Math.sqrt(2) + vec3.dot(z0, pt1)
+      quat.set(q, ...cross, w)
+      quat.normalize(q, q)
+
+      /**
+       * curr is now vector going from pt0 to current navigation position
+       */
       vec3.sub(curr, curr, pt0)
 
-      vec3.mul(pt1, pt1, curr)
-      vec3.mul(pt2, pt2, curr)
+      const normal = vec3.cross(vec3.create(), pt1, pt2)
+      vec3.normalize(normal, normal)
+      vec3.mul(normal, normal, curr)
 
-      const resultant = vec3.add(vec3.create(), pt1, pt2)
-      vec3.add(resultant, resultant, pt0)
+      const inPlaneDisplacement = vec3.sub(vec3.create(), curr, normal)
+
+      /**
+       * check enclosedness
+       * also caches the closes point
+       */
+      const ipdCoord = vec3.add(vec3.create(), pt0, inPlaneDisplacement)
+      const allPoints = enclosed.points.map(v => vec3.fromValues(...v.value))
+      let sum = 0
+      let minDist: number = Number.POSITIVE_INFINITY
+      let pos: any
+      for (let i = 0; i < allPoints.length; i++) {
+        const a = vec3.sub(vec3.create(), allPoints[i], ipdCoord)
+        const b = vec3.sub(vec3.create(), allPoints[(i + 1) % allPoints.length], ipdCoord)
+        const angle = vec3.angle(a, b)
+        sum += angle
+
+        const dist = vec3.length(a)
+        if (dist < minDist) {
+          minDist = dist
+          pos = allPoints[i]
+        }
+      }
+
+      /**
+       * Since inPlaneDisplacement is a point on the plane
+       * If the sum of all points == PI, then the point is enclosed
+       * Assuming simple concave shapes
+       */
+      const isEnclosed = Math.abs(sum - (2 * Math.PI)) < 0.05
+
+      const resultant = isEnclosed
+        ? vec3.add(vec3.create(), inPlaneDisplacement, pt0)
+        : pos
       vec3.scale(resultant, resultant, 1e6)
       position = Array.from(resultant)
     }
     
-    
+
     this.store.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
