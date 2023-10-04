@@ -356,6 +356,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     map(([ latIdxReg, cms ]) => {
       const cm = cms[0]
       const returnValue: TLatCm = {}
+      if (!cm) {
+        return returnValue
+      }
       for (const lat in latIdxReg) {
         returnValue[lat] = {
           labelIndices: [],

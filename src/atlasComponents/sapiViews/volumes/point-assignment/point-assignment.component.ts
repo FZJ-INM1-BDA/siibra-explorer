@@ -9,6 +9,8 @@ import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
 import { TFace, TSandsPoint } from 'src/util/types';
 import { TZipFileConfig } from "src/zipFilesOutput/type"
 import { environment } from "src/environments/environment"
+import { Store } from '@ngrx/store';
+import { atlasSelection } from 'src/state';
 
 const DOING_PROB_ASGMT = "Performing probabilistic assignment ..."
 const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled assignment ..."
@@ -31,14 +33,14 @@ export class PointAssignmentComponent implements OnDestroy {
   #error$ = new BehaviorSubject<string>(null)
   error$ = this.#error$.asObservable()
 
-  #point = new BehaviorSubject<TSandsPoint>(null)
+  point$ = new BehaviorSubject<TSandsPoint>(null)
   @Input()
   set point(val: TSandsPoint|TFace) {
     const { '@type': type } = val
     if (type === "siibra-explorer/surface/face") {
       return
     }
-    this.#point.next(val)
+    this.point$.next(val)
   }
   
   #template = new BehaviorSubject<SxplrTemplate>(null)
@@ -57,7 +59,7 @@ export class PointAssignmentComponent implements OnDestroy {
   clickOnRegion = new EventEmitter<{ target: SxplrRegion, event: MouseEvent }>()
 
   df$: Observable<PathReturn<"/map/assign">> = combineLatest([
-    this.#point,
+    this.point$,
     this.#parcellation,
     this.#template,
   ]).pipe(
@@ -112,7 +114,7 @@ export class PointAssignmentComponent implements OnDestroy {
     map(df => df.columns as string[])
   )
 
-  constructor(private sapi: SAPI, private dialog: MatDialog) {}
+  constructor(private sapi: SAPI, private dialog: MatDialog, private store: Store) {}
 
   #dialogRef: MatDialogRef<unknown>
   openDialog(tmpl: TemplateRef<unknown>){
@@ -135,7 +137,7 @@ export class PointAssignmentComponent implements OnDestroy {
   }
 
   zipfileConfig$: Observable<TZipFileConfig[]> = combineLatest([
-    this.#point,
+    this.point$,
     this.#parcellation,
     this.#template,
     this.df$
@@ -150,6 +152,17 @@ export class PointAssignmentComponent implements OnDestroy {
       }] as TZipFileConfig[]
     })
   )
+
+  navigateToPoint(coordsInMm: number[]){
+    this.store.dispatch(
+      atlasSelection.actions.navigateTo({
+        animation: true,
+        navigation: {
+          position: coordsInMm.map(v => v * 1e6)
+        }
+      })
+    )
+  }
 }
 
 function generateReadMe(pt: TSandsPoint, parc: SxplrParcellation, tmpl: SxplrTemplate){
