@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import { getExportNehuba, noop } from "src/util/fn";
+import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.13'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.14'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -34,6 +34,7 @@ type PaginatedResponse<T> = {
   pages?: number
 }
 
+const serialization = (sxplr: SxplrTemplate) => sxplr?.id
 
 @Injectable({
   providedIn: 'root'
@@ -208,6 +209,9 @@ export class SAPI{
     })
   }
 
+  @CachedFunction({
+    serialization: (id, params) => `featDetail:${id}:${Object.entries(params || {}).map(([key, val]) => `${key},${val}`).join('.')}`
+  })
   getV3FeatureDetailWithId(id: string, params: Record<string,  string> = {}) {
     return this.v3Get("/feature/{feature_id}", {
       path: {
@@ -215,7 +219,8 @@ export class SAPI{
       },
       query_param: params
     } as any).pipe(
-      switchMap(val => translateV3Entities.translateFeature(val))
+      switchMap(val => translateV3Entities.translateFeature(val)),
+      shareReplay(1),
     )
   }
 
@@ -446,7 +451,10 @@ export class SAPI{
     }).toPromise()
   }
 
-  public useViewer(template: SxplrTemplate) {
+  // useViewer is debouncely called everytime user updates the url
+  // caches the response
+  @CachedFunction({ serialization }) 
+  useViewer(template: SxplrTemplate) {
     if (!template) {
       return of(null as keyof typeof useViewer)
     }

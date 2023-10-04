@@ -8,7 +8,7 @@ import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { getShader } from "src/util/constants";
+import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";

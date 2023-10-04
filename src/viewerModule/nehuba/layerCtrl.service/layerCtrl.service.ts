@@ -10,7 +10,7 @@ import { arrayEqual } from "src/util/array";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
-import { getShader } from "src/util/constants";
+import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
 
 export const BACKUP_COLOR = {

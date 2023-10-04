@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core"
 import { MatDialog } from "@angular/material/dialog"
 import { select, Store } from "@ngrx/store"
-import { concat, from, of, Subscription } from "rxjs"
-import { catchError, map, pairwise, switchMap } from "rxjs/operators"
+import { concat, forkJoin, from, of, Subscription } from "rxjs"
+import { map, pairwise, switchMap } from "rxjs/operators"
 import {
   linearTransform,
   TVALID_LINEAR_XFORM_DST,
@@ -12,9 +12,11 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
-import { getShader } from "src/util/constants"
+import { getShader, getShaderFromMeta } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 
 type OmitKeys = "clType" | "id" | "source"
 type Meta = {
@@ -214,17 +216,36 @@ export class UserLayerService implements OnDestroy {
            * if so, try to fetch it, and set it as transform
            */
           if (!curr) {
-            return of([prev, curr, null])
+            return of({ prev, curr, meta: null as MetaV1Schema })
           }
           if (!curr.startsWith("precomputed://")) {
-            return of([prev, curr, null])
+            return of({ prev, curr, meta: null as MetaV1Schema })
           }
-          return from(fetch(`${curr.replace('precomputed://', '')}/transform.json`).then(res => res.json())).pipe(
-            catchError(() => of([prev, curr, null])),
-            map(transform => [prev, curr, transform])
+          const url = curr.replace("precomputed://", "")
+          
+          
+          return forkJoin({
+            transform: fetch(`${url}/transform.json`)
+              .then(res => res.json() as Promise<MetaV1Schema["transform"]>)
+              .catch(_e => null as MetaV1Schema["transform"]),
+            meta: from(
+              translateV3Entities.fetchMeta(url)
+              .catch(_e => null as MetaV1Schema)  
+            )
+          }).pipe(
+            map(({ transform, meta }) => {
+              return {
+                prev,
+                curr,
+                meta: {
+                  ...meta,
+                  transform: meta?.transform || transform
+                }
+              }
+            }),
           )
         })
-      ).subscribe(([prev, curr, transform]) => {
+      ).subscribe(({ prev, curr, meta }) => {
         if (prev) {
           this.removeUserLayer(prev)
         }
@@ -236,10 +257,8 @@ export class UserLayerService implements OnDestroy {
               message: `Overlay layer populated in URL`,
             },
             {
-              shader: getShader({
-                colormap: EnumColorMapName.MAGMA,
-              }),
-              transform
+              shader: getShaderFromMeta(meta),
+              transform: meta.transform
             }
           )
         }
