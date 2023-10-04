@@ -902,7 +902,7 @@
 
     <div class="sxplr-list-like-button-body">
 
-      <ng-template [ngIf]="data?.point?.point">
+      <ng-template [ngIf]="data?.point">
         <span class="sxplr-list-like-button-body-line">
           {{ data.point | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
         </span>
