@@ -1,7 +1,6 @@
-from typing import Any, Coroutine
 from starlette.requests import Request
 from starlette.responses import Response
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter
 from functools import wraps
 from inspect import iscoroutine
 
@@ -11,7 +10,7 @@ from .auth import _store
 
 class NotAuthenticatedEx(Exception): ...
 
-def get_user(request: Request):
+def get_user_from_request(request: Request):
     if PROFILE_KEY not in request.session:
         return None
     
@@ -23,7 +22,7 @@ def get_user(request: Request):
 def is_authenticated(fn):
     @wraps(fn)
     async def async_wrapper(*args, request: Request, **kwargs):
-        user = get_user(request)
+        user = get_user_from_request(request)
         if not user:
             return Response("Not authenticated", 401)
         request.state.user = user
@@ -31,7 +30,7 @@ def is_authenticated(fn):
 
     @wraps(fn)
     def sync_wrapper(*args, request: Request, **kwargs):
-        user = get_user(request)
+        user = get_user_from_request(request)
         if not user:
             return Response("Not authenticated", 401)
         request.state.user = user
@@ -41,15 +40,10 @@ def is_authenticated(fn):
 
 router = APIRouter()
 
-@router.get("/foo")
-@is_authenticated
-def foo(request: Request):
-    return "foo"
-
 @router.get("")
 @router.get("/")
 @is_authenticated
-def get_user(request: Request):
+def route_get_user(request: Request):
     try:
         user = request.state.user
         if user:
