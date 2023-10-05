@@ -9,35 +9,32 @@ import json
 from .const import PROFILE_KEY
 from .auth import _store
 
+class NotAuthenticatedEx(Exception): ...
+
+def get_user(request: Request):
+    if PROFILE_KEY not in request.session:
+        return None
+    
+    profile_uuid = request.session[PROFILE_KEY]
+    user = _store.get(profile_uuid)
+    
+    return json.loads(user) if user else None
+
 def is_authenticated(fn):
-
-    class NotAuthenticatedEx(Exception): ...
-
-    def check_auth(request: Request):
-        if PROFILE_KEY not in request.session:
-            raise NotAuthenticatedEx
-        
-        profile_uuid = request.session[PROFILE_KEY]
-        user = _store.get(profile_uuid)
-        if not user:
-            raise NotAuthenticatedEx
-
-        request.state.user = json.loads(user)
-
     @wraps(fn)
     async def async_wrapper(*args, request: Request, **kwargs):
-        try:
-            check_auth(request)
-        except NotAuthenticatedEx:
+        user = get_user(request)
+        if not user:
             return Response("Not authenticated", 401)
+        request.state.user = user
         return await fn(*args, request=request, **kwargs)
 
     @wraps(fn)
     def sync_wrapper(*args, request: Request, **kwargs):
-        try:
-            check_auth(request)
-        except NotAuthenticatedEx:
+        user = get_user(request)
+        if not user:
             return Response("Not authenticated", 401)
+        request.state.user = user
         return fn(*args, request=request, **kwargs)
     return async_wrapper if iscoroutine(fn) else sync_wrapper
     
