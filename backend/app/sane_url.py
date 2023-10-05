@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from .config import SXPLR_EBRAINS_IAM_SA_CLIENT_ID, SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET, SXPLR_BUCKET_NAME, HOST_PATHNAME
 from .const import EBRAINS_IAM_DISCOVERY_URL
 from ._store import DataproxyStore
-from .user import get_user
+from .user import get_user_from_request
 
 router = APIRouter()
 
@@ -77,7 +77,7 @@ class SaneUrlDPStore(DataproxyStore):
         return super()._get_bucket()
     
     def _prepare_aux(self, request: Optional[Request]=None):
-        user = get_user(request) if request else None
+        user = get_user_from_request(request) if request else None
         return {
             "userId": user.get("id") if user else None,
             "expiry": None if user else SaneUrlDPStore.GetTimeMs() + (self.expiry_s * 1e3)
