@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.14'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.15'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 

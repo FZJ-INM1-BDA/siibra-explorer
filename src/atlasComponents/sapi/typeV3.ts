@@ -17,9 +17,9 @@ export type SapiFeatureModel = SapiSpatialFeatureModel | PathReturn<"/feature/Ta
 
 export type SapiRoute = keyof paths
 
-type SapiRouteExcludePlotly = Exclude<SapiRoute, "/feature/{feature_id}/plotly">
+type SapiRouteExcludePlotlyDownload = Exclude<SapiRoute, "/feature/{feature_id}/plotly" | "/feature/{feature_id}/download">
 
-type _FeatureType<FeatureRoute extends SapiRouteExcludePlotly> = FeatureRoute extends `/feature/${infer FT}`
+type _FeatureType<FeatureRoute extends SapiRouteExcludePlotlyDownload> = FeatureRoute extends `/feature/${infer FT}`
   ? FT extends "_types"
     ? never
     : FT extends "{feature_id}"
@@ -30,7 +30,7 @@ type _FeatureType<FeatureRoute extends SapiRouteExcludePlotly> = FeatureRoute ex
         : FT
   : never
 
-export type FeatureType = _FeatureType<SapiRouteExcludePlotly>
+export type FeatureType = _FeatureType<SapiRouteExcludePlotlyDownload>
 
 /**
  * Support types
@@ -132,3 +132,5 @@ interface EnclosedROI {
 export function isEnclosed(v: BestViewPoints[number]): v is EnclosedROI {
   return v.type === "enclosed"
 }
+
+export type Qualification = components["schemas"]["Qualification"]

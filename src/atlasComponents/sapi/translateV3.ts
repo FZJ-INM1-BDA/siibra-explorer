@@ -104,6 +104,13 @@ const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
       type: "image/3d"
     },
     transform: [[-0.74000001,0,0,38134608],[0,-0.26530117,-0.6908077,13562314],[0,-0.6908077,0.26530117,-3964904],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/chenonceau_dti_rgb_200um/precomputed": {
+    version: 1,
+    data: {
+      type: "image/3d"
+    },
+    transform: [[-0.2, 0.0, 0.0, 96400000.0], [0.0, -0.2, 0.0, 96400000.0], [0.0, 0.0, -0.2, 114400000.0], [0.0, 0.0, 0.0, 1.0]]
   }
 }
 
