@@ -4,7 +4,7 @@ import { SxplrRegion, SxplrParcellation } from "src/atlasComponents/sapi/sxplrTy
 
 type InputType = {
   qualification: Qualification
-  region: SxplrRegion,
+  region: SxplrRegion
   parcellation: SxplrParcellation
 }
 
