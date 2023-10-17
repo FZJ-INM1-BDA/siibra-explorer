@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
 import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
-import { SAPI, SAPIRegion } from "src/atlasComponents/sapi";
+import { SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions } from '.'
@@ -264,7 +264,7 @@ export class Effect {
     switchMap(([regions, layers]) => {
       const map = new Map<SxplrRegion, number[]>()
       for (const region of regions) {
-        map.set(region, SAPIRegion.GetDisplayColor(region))
+        map.set(region, region.color)
       }
       const actions = [
         ...layers.map(({ id }) =>

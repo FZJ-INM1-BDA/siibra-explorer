@@ -92,4 +92,9 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
       }
     }),
   )
+
+  public relatedRegions$ = this.ATPR$.pipe(
+    switchMap(({ region }) => this.fetchRelated(region)),
+    shareReplay(1),
+  )
 }

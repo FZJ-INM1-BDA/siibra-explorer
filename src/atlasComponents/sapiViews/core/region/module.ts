@@ -16,6 +16,9 @@ import { MatListModule } from "@angular/material/list";
 import { DialogModule } from "src/ui/dialogInfo";
 import { SapiViewsCoreParcellationModule } from "../parcellation";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { TranslateQualificationPipe } from "./translateQualification.pipe";
+import { DedupRelatedRegionPipe } from "./dedupRelatedRegion.pipe";
+import { MatExpansionModule } from "@angular/material/expansion";
 
 @NgModule({
   imports: [
@@ -33,11 +36,16 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     DialogModule,
     SapiViewsCoreParcellationModule,
     MatTooltipModule,
+    MatExpansionModule,
+    ExperimentalModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,
     SapiViewsCoreRegionRegionRich,
     SapiViewsCoreRegionRegionBase,
+    
+    TranslateQualificationPipe,
+    DedupRelatedRegionPipe,
   ],
   exports: [
     SapiViewsCoreRegionRegionListItem,

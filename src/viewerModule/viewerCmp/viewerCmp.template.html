@@ -902,7 +902,7 @@
 
     <div class="sxplr-list-like-button-body">
 
-      <ng-template [ngIf]="data.point">
+      <ng-template [ngIf]="data?.point">
         <span class="sxplr-list-like-button-body-line">
           {{ data.point | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
         </span>
@@ -1048,19 +1048,17 @@
   </ng-template>
 </ng-template>
 
-<!-- feature tmpls -->
-<ng-template #sapiBaseFeatureTmpl
-  let-backCb="backCb"
-  let-feature="feature">
-
+<!-- general feature tmpl -->
+<ng-template let-feature="feature" #selectedFeatureTmpl>
+  <!-- TODO differentiate between features (spatial, regional etc) -->
+  
   <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2"
     [feature]="feature">
 
     <div header>
       <!-- back btn -->
       <button mat-button
-        *ngIf="backCb"
-        (click)="backCb()"
+        (click)="clearSelectedFeature()"
         [attr.aria-label]="ARIA_LABELS.CLOSE"
         class="sxplr-mb-2"
         >
@@ -1072,28 +1070,6 @@
     </div>
 
   </sxplr-feature-view>
-  
-</ng-template>
-
-<!-- general feature tmpl -->
-<ng-template let-feature="feature" #selectedFeatureTmpl>
-  <!-- TODO differentiate between features (spatial, regional etc) -->
-  
-  <!-- spatial feature tmpl -->
-  <ng-container *ngTemplateOutlet="sapiBaseFeatureTmpl; context: {
-    backCb: clearSelectedFeature.bind(this),
-    feature: feature
-  }">
-  </ng-container>
-
-  <ng-layer-ctl *ngFor="let vol of feature.volumes"
-    class="d-block"
-    [ng-layer-ctl-name]="vol.metadata.fullName"
-    [ng-layer-ctl-src]="vol.data.url"
-    [ng-layer-ctl-transform]="vol.data | getProperty : 'detail' | getProperty: 'neuroglancer/precomputed' | getProperty : 'transform'">
-  </ng-layer-ctl>
-  <ng-template #sapiVOITmpl>
-  </ng-template>
 </ng-template>
 
 <!-- general point tmpl -->

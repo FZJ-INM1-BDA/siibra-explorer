@@ -1,17 +1,17 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
-import { getExportNehuba, noop } from "src/util/fn";
+import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
+import { BehaviorSubject, forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { environment } from "src/environments/environment"
 import {
   translateV3Entities
 } from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
-import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature, Feature } from "./sxplrTypes";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
 import { CONST } from "common/constants"
 
@@ -22,7 +22,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.13'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.15'
 
 let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
@@ -34,6 +34,7 @@ type PaginatedResponse<T> = {
   pages?: number
 }
 
+const serialization = (sxplr: SxplrTemplate) => sxplr?.id
 
 @Injectable({
   providedIn: 'root'
@@ -110,15 +111,6 @@ export class SAPI{
     
     BS_ENDPOINT_CACHED_VALUE = new Observable<string>(obs => {
       (async () => {
-        const backupPr = new Promise<string>(rs => {
-          for (const endpt of backupEndpoints) {
-            SAPI.VerifyEndpoint(endpt)
-              .then(flag => {
-                if (flag) rs(endpt)
-              })
-              .catch(noop)
-          }
-        })
         try {
           const url = await Promise.race([
             SAPI.VerifyEndpoint(mainEndpoint),
@@ -129,12 +121,23 @@ export class SAPI{
 
           try {
             const url = await Promise.race([
-              backupPr,
+              /**
+               * find the first endpoint of the backup endpoints
+               */
+              new Promise<string>(rs => {
+                for (const endpt of backupEndpoints) {
+                  SAPI.VerifyEndpoint(endpt)
+                    .then(flag => {
+                      if (flag) rs(endpt)
+                    })
+                    .catch(noop)
+                }
+              }),
               new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
             ])
             obs.next(url)
           } catch (e) {
-            SAPI.ErrorMessage = `No usabe mirror found`
+            SAPI.ErrorMessage = `No usabe siibra-api endpoints found. Tried: ${mainEndpoint}, ${backupEndpoints.join(",")}`
           }
         } finally {
           obs.complete()
@@ -147,7 +150,10 @@ export class SAPI{
     return BS_ENDPOINT_CACHED_VALUE
   }
 
-  static ErrorMessage = null
+  static ErrorMessage$ = new BehaviorSubject<string>(null)
+  static set ErrorMessage(val: string){
+    this.ErrorMessage$.next(val)
+  }
 
   getParcRegions(parcId: string) {
     const param = {
@@ -187,40 +193,6 @@ export class SAPI{
     if (!!resp.total || resp.total === 0) return true
     return false
   }
-  getV3Features<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}`>): Observable<Feature[]> {
-    const query = structuredClone(sapiParam)
-    return this.v3Get<`/feature/${T}`>(`/feature/${featureType}`, {
-      ...query
-    }).pipe(
-      switchMap(resp => {
-        if (!this.#isPaged(resp)) return throwError(`endpoint not returning paginated response`)
-        return this.iteratePages(
-          resp,
-          page => {
-            const query = structuredClone(sapiParam)
-            query.query.page = page
-            return this.v3Get(`/feature/${featureType}`, {
-              ...query,
-            }).pipe(
-              map(val => {
-                if (this.#isPaged(val)) return val
-                return { items: [], total: 0, page: 0, size: 0 }
-              })
-            )
-          }
-        )
-      }),
-      switchMap(features => features.length === 0
-        ? of([])
-        : forkJoin(
-          features.map(feat => translateV3Entities.translateFeature(feat) )
-        )
-      ),
-      catchError((err) => {
-        console.error("Error fetching features", err)
-        return of([])}),
-    )
-  }
 
   getV3FeatureDetail<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}/{feature_id}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>> {
     return this.v3Get<`/feature/${T}/{feature_id}`>(`/feature/${featureType}/{feature_id}`, {
@@ -237,6 +209,9 @@ export class SAPI{
     })
   }
 
+  @CachedFunction({
+    serialization: (id, params) => `featDetail:${id}:${Object.entries(params || {}).map(([key, val]) => `${key},${val}`).join('.')}`
+  })
   getV3FeatureDetailWithId(id: string, params: Record<string,  string> = {}) {
     return this.v3Get("/feature/{feature_id}", {
       path: {
@@ -244,13 +219,8 @@ export class SAPI{
       },
       query_param: params
     } as any).pipe(
-      switchMap(val => translateV3Entities.translateFeature(val))
-    )
-  }
-
-  getModalities() {
-    return this.v3Get("/feature/_types", { query: {} }).pipe(
-      map(v => v.items)
+      switchMap(val => translateV3Entities.translateFeature(val)),
+      shareReplay(1),
     )
   }
 
@@ -481,7 +451,10 @@ export class SAPI{
     }).toPromise()
   }
 
-  public useViewer(template: SxplrTemplate) {
+  // useViewer is debouncely called everytime user updates the url
+  // caches the response
+  @CachedFunction({ serialization }) 
+  useViewer(template: SxplrTemplate) {
     if (!template) {
       return of(null as keyof typeof useViewer)
     }
@@ -593,9 +566,6 @@ export class SAPI{
     private snackbar: MatSnackBar,
     private workerSvc: AtlasWorkerService,
   ){
-    if (SAPI.ErrorMessage) {
-      this.snackbar.open(SAPI.ErrorMessage, 'Dismiss', { duration: 5000 })
-    }
   }
   
   /**

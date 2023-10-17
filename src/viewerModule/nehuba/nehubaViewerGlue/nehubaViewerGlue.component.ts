@@ -5,7 +5,7 @@ import { distinctUntilChanged } from "rxjs/operators";
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
-import { NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
+import { EXTERNAL_LAYER_CONTROL, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
@@ -24,6 +24,10 @@ import { atlasSelection, userInteraction } from "src/state";
       provide: SET_MESHES_TO_LOAD,
       useFactory: (meshService: NehubaMeshService) => meshService.loadMeshes$,
       deps: [ NehubaMeshService ]
+    },
+    {
+      provide: EXTERNAL_LAYER_CONTROL,
+      useValue: NehubaLayerControlService
     },
     NehubaMeshService,
     {

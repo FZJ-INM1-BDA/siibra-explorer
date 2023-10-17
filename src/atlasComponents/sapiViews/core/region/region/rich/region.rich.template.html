@@ -62,6 +62,62 @@
             <div mat-line>{{ doi }}</div>
           </a>
         </ng-template>
+
+        <ng-template sxplrExperimentalFlag [experimental]="true"
+          #relatedRegionsExport="sxplrExperimentalFlag"
+          [ngIf]="relatedRegionsExport.show$ | async">
+
+        <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+          <!-- only show icon if related regions length > 0 -->
+          <ng-template [ngIf]="relatedRegions.length > 0">
+            <button mat-list-item
+              [sxplr-dialog]="relatedRegionsTmpl"
+              sxplr-dialog-size="auto">
+              <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-link"></mat-icon>
+              <div mat-line class="overview-content">Related Regions ({{ relatedRegions.length }})</div>
+            </button>
+          </ng-template>
+
+          <!-- dialog when user clicks related regions -->
+          <ng-template #relatedRegionsTmpl>
+            <!-- header -->
+            <h2 mat-dialog-title>Current region {{ region.name }} ...</h2>
+
+            <!-- body -->
+            <mat-dialog-content>
+
+              <!-- iterate over all related -->
+              <ng-template ngFor [ngForOf]="relatedRegions" let-related let-isLast="last">
+
+                <!-- related region body -->
+                <div class="sxplr-p-2">
+                  <div>
+                    {{ related.qualification | translateQualificationPipe }}
+                  </div>
+
+                  <div>
+                    {{ related.region.name }} in
+                  </div>
+                  <div>
+                    {{ related.parcellation.name}}
+                  </div>
+                </div>
+                
+                <!-- divider -->
+                <ng-template [ngIf]="!isLast">
+                  <mat-divider></mat-divider>
+                </ng-template>
+              </ng-template>
+            </mat-dialog-content>
+
+            <!-- footer -->
+            <mat-dialog-actions>
+              <button mat-button mat-dialog-close>close</button>
+            </mat-dialog-actions>
+          </ng-template>
+        </ng-template>
+
+        </ng-template>
       </mat-action-list>
 
       
@@ -94,6 +150,60 @@
         #featureEntryCmp="featureEntryCmp">
       </sxplr-feature-entry>
     </mat-tab>
+
+
+    <ng-template sxplrExperimentalFlag [experimental]="true"
+      #exmptRelatedFeat="sxplrExperimentalFlag"
+      [ngIf]="exmptRelatedFeat.show$ | async">
+    
+    <!-- related region features -->
+    <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+      <ng-template [ngIf]="relatedRegions.length > 0">
+
+        <mat-tab>
+
+          <!-- tab label -->
+          <ng-template mat-tab-label>
+            <span>
+              Related Region Features
+            </span>
+          </ng-template>
+    
+          <!-- tab-content -->
+          <mat-accordion>
+            
+            <mat-expansion-panel *ngFor="let relatedRegion of relatedRegions" hideToggle>
+              <mat-expansion-panel-header>
+                <mat-panel-title class="ws-no-wrap">
+                  {{ relatedRegion.region.name }}
+                </mat-panel-title>
+                <mat-panel-description class="ws-no-wrap">
+                  {{ relatedRegion.parcellation.name }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <ng-template matExpansionPanelContent>
+                
+                <div>
+                  Current region 
+                  <i>{{ region.name }}</i> {{ relatedRegion.qualification | translateQualificationPipe }}
+                  <i>{{ relatedRegion.region.name }}</i> in
+                  <b>{{ relatedRegion.parcellation.name }}</b>
+                </div>
+
+                <sxplr-feature-entry
+                  [parcellation]="relatedRegion.parcellation"
+                  [region]="relatedRegion.region">
+                </sxplr-feature-entry>
+
+              </ng-template>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-tab>
+      </ng-template>
+    </ng-template>
+
+    </ng-template>
   </mat-tab-group>
 
 </ng-template>

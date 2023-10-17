@@ -2,13 +2,13 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { forkJoin, from, of } from "rxjs";
-import { switchMap, withLatestFrom, filter, catchError, map, debounceTime, shareReplay, distinctUntilChanged, startWith, pairwise, tap } from "rxjs/operators";
-import { Feature, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
+import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap } from "rxjs/operators";
+import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { getShader } from "src/util/constants";
+import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";
@@ -76,7 +76,8 @@ export class LayerCtrlEffects {
                       lowThreshold: meta.min,
                       removeBg: true,
                     }),
-                    type: 'image'
+                    type: 'image',
+                    opacity: 0.5
                   }
                 })
               )
@@ -86,43 +87,6 @@ export class LayerCtrlEffects {
         })
       )
     })
-  ))
-
-  onShownFeature = createEffect(() => this.store.pipe(
-    select(userInteraction.selectors.selectedFeature),
-    startWith(null as Feature),
-    pairwise(),
-    map(([ prev, curr ]) => {
-      const removeLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-      const addLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-      
-      /**
-       * TODO: use proper guard functions
-       */
-      if (!!prev?.['bbox']) {
-        const prevVoi = prev as VoiFeature
-        prevVoi.bbox
-        removeLayers.push(
-          ...LayerCtrlEffects.TransformVolumeModel(prevVoi.ngVolume)
-        )
-      }
-      if (!!curr?.['bbox']) {
-        const currVoi = curr as VoiFeature
-        addLayers.push(
-          ...LayerCtrlEffects.TransformVolumeModel(currVoi.ngVolume)
-        )
-      }
-      return { removeLayers, addLayers }
-    }),
-    filter(({ removeLayers, addLayers }) => removeLayers.length !== 0 || addLayers.length !== 0),
-    switchMap(({ removeLayers, addLayers }) => of(...[
-      ...removeLayers.map(
-        l => atlasAppearance.actions.removeCustomLayer({ id: l.id })
-      ),
-      ...addLayers.map(
-        l => atlasAppearance.actions.addCustomLayer({ customLayer: l })
-      )
-    ]))
   ))
 
   onATPClearBaseLayers = createEffect(() => this.#onATP$.pipe(

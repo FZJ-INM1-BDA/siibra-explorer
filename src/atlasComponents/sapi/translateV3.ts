@@ -1,11 +1,118 @@
 import {
   SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox
 } from "./sxplrTypes"
-import { PathReturn } from "./typeV3"
+import { PathReturn, MetaV1Schema } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
 
+
+const BIGBRAIN_XZ = [
+  [-70.677, 62.222],
+  [-70.677, -58.788],
+  [68.533, -58.788],
+  [68.533, 62.222],
+]
+
+const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
+  "https://data-proxy.ebrains.eu/api/v1/public/buckets/tanner-test/fullSharded_v1": {
+    version: 1,
+    preferredColormap: ["greyscale"],
+    data: {
+      type: "image/1d",
+      range: [{
+        min: 0.2,
+        max: 0.4
+      }]
+    },
+    transform: [[-1,0,0,5662500],[0,0,1,-6562500],[0,-1,0,3962500],[0,0,0,1]]
+  },
+  "https://1um.brainatlas.eu/pli-bigbrain/fom/precomputed": {
+    version: 1,
+    data: {
+      type: "image/3d"
+    },
+    bestViewPoints: [{
+      type: "enclosed",
+      points: [{
+        type: "point",
+        value: [-16.625, -80.813, 41.801]
+      },{
+        type: "point",
+        value: [-16.625, -64.293, -66.562]
+      },{
+        type: "point",
+        value: [-16.625, 86.557, -42.685]
+      },{
+        type: "point",
+        value: [-16.625, 69.687, 63.015]
+      }]
+    }],
+    transform: [[7.325973427896315e-8,2.866510051546811e-8,-1,-16600000],[-0.9899035692214966,0.14174138009548187,-6.845708355740499e-8,70884888],[-0.14174138009548187,-0.9899035692214966,-3.875962661936683e-8,64064704],[0,0,0,1]]
+  },
+  "https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_1/precomputed": {
+    version: 1,
+    data: {
+      type: "image/1d"
+    },
+    preferredColormap: ["greyscale"],
+    bestViewPoints: [{
+      type: "enclosed",
+      points: [{
+        type: "point",
+        value: [-11.039, -58.450, 4.311]
+      },{
+        type: "point",
+        value: [-9.871, -58.450, -1.649]
+      },{
+        type: "point",
+        value: [-3.947, -58.450, -0.377]
+      },{
+        type: "point",
+        value: [-5.079, -58.450, 5.496]
+      }]
+    }],
+    transform: [[0.9986788630485535,0.1965026557445526,0.27269935607910156,-11887736],[0,0,1,-61450000],[0.20538295805454254,-0.9990047812461853,0.052038706839084625,4165836.25],[0,0,0,1]]
+  },
+  "https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_2/precomputed": {
+    version: 1,
+    data: {
+      type: "image/1d"
+    },
+    preferredColormap: ["greyscale"],
+    bestViewPoints: [{
+      type: "enclosed",
+      points: [{
+        type: "point",
+        value: [-10.011, -58.450, -2.879]
+      },{
+        type: "point",
+        value: [-8.707, -58.450, -8.786]
+      },{
+        type: "point",
+        value: [-3.305, -58.450, -7.728]
+      },{
+        type: "point",
+        value: [-4.565, -58.450, -1.703]
+      }]
+    }],
+    transform: [[0.9199221134185791,0.22926874458789825,0.2965584993362427,-10976869],[0,0,1,-61450000],[0.18267445266246796,-1.0079853534698486,0.01068924367427826,-2853557],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo/HSV-FOM": {
+    version: 1,
+    data: {
+      type: "image/3d"
+    },
+    transform: [[-0.74000001,0,0,38134608],[0,-0.26530117,-0.6908077,13562314],[0,-0.6908077,0.26530117,-3964904],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/chenonceau_dti_rgb_200um/precomputed": {
+    version: 1,
+    data: {
+      type: "image/3d"
+    },
+    transform: [[-0.2, 0.0, 0.0, 96400000.0], [0.0, -0.2, 0.0, 96400000.0], [0.0, 0.0, -0.2, 114400000.0], [0.0, 0.0, 0.0, 1.0]]
+  }
+}
 
 class TranslateV3 {
   
@@ -118,20 +225,23 @@ class TranslateV3 {
       url: string
       transform: number[][]
       info: Record<string, any>
+      meta?: MetaV1Schema
     }> = {}
     for (const key in input) {
       if (key !== 'neuroglancer/precomputed') {
         continue
       }
       const url = input[key]
-      const [ transform, info ] = await Promise.all([
+      const [ transform, info, meta ] = await Promise.all([
         this.cFetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
         this.cFetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
+        this.fetchMeta(url),
       ])
       returnObj[key] = {
         url: input[key],
         transform: transform,
         info: info,
+        meta,
       }
     }
     return returnObj
@@ -352,6 +462,44 @@ class TranslateV3 {
         return Promise.resolve(JSON.parse(cachedText))
       }
     }
+  }
+
+  async fetchMeta(url: string): Promise<MetaV1Schema|null> {
+    if (url in TMP_META_REGISTRY) {
+      return TMP_META_REGISTRY[url]
+    }
+    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain")
+    if (is1umRegisteredSlices) {
+      const found = /B20_([0-9]{4})/.exec(url)
+      if (found) {
+        const sectionId = parseInt(found[1])
+        const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+        return {
+          version: 1,
+          preferredColormap: ["greyscale"],
+          bestViewPoints: [{
+            type: "enclosed",
+            points: BIGBRAIN_XZ.map(([x, z]) => ({
+              type: "point",
+              value: [x, realYDis, z]
+            }))
+          }]
+        }
+      }
+    }
+    /**
+     * TODO ensure all /meta endpoints are populated
+     */
+    // try{
+    //   const resp = await this.cFetch(`${url}/meta`)
+    //   if (resp.status === 200) {
+    //     return resp.json()
+    //   }
+    // } catch (e) {
+      
+    // }
+    
+    return null
   }
 
   async translateSpaceToAuxMesh(template: SxplrTemplate): Promise<NgPrecompMeshSpec[]>{

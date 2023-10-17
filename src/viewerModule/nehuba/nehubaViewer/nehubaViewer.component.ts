@@ -11,7 +11,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 /**
  * import of nehuba js files moved to angular.json
  */
-import { INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
+import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE } from "src/viewerModule/viewerInternalState.service";
@@ -131,6 +131,7 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
     @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
+    @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ) {
     if (multiplier$) {
@@ -261,7 +262,12 @@ export class NehubaViewerUnit implements OnDestroy {
            * on switch from freesurfer -> volumetric viewer, race con results in managed layer not necessarily setting layer visible correctly
            */
           const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
-          managedLayers.forEach(layer => layer.setVisible(false))
+          managedLayers.forEach(layer => {
+            if (this.externalLayerCtrl && this.externalLayerCtrl.ExternalLayerNames.has(layer.name)) {
+              return
+            }
+            layer.setVisible(false)
+          })
           
           for (const layerName of layerNames) {
             const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
@@ -403,22 +409,24 @@ export class NehubaViewerUnit implements OnDestroy {
     : null
 
   public loadNehuba() {
-    this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err: string) => {
+    
+    const { createNehubaViewer } = this.exportNehuba
+
+    this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
       this.log.error(err)
     });
 
     (window as any).nehubaViewer = this.nehubaViewer
 
+    const viewer = window['viewer']
+
     /**
      * Hide all layers except the base layer (template)
      * Then show the layers referenced in multiNgIdLabelIndexMap
      */
-
-    /* creation of the layout is done on next frame, hence the settimeout */
     const patchSliceview = async () => {
       
-      const viewer = window['viewer']
       viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel")
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-alt")
       await (async () => {
@@ -426,13 +434,19 @@ export class NehubaViewerUnit implements OnDestroy {
 
         while (lenPanels === 0) {
           lenPanels = viewer.display.panels.size
+          /* creation of the layout is done on next frame, hence the settimeout */
           await new Promise(rs => setTimeout(rs, 150))
         }
       })()
       viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:keyp", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:keyn", "proxy-wheel-1")
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-10")
       viewer.display.panels.forEach(sliceView => patchSliceViewPanel(sliceView, this.exportNehuba, this.multplier))
     }
+
+    viewer.inputEventBindings.sliceView.set("at:touchhold1", { action: "noop", stopPropagation: false })
+    viewer.inputEventBindings.perspectiveView.set("at:touchhold1", { action: "noop", stopPropagation: false })
     patchSliceview()
 
     this.newViewerInit()
@@ -577,11 +591,12 @@ export class NehubaViewerUnit implements OnDestroy {
 
         const combined = {
           type: 'image',
+          opacity: 1,
           ...rest,
           ...(transform ? { transform } : {})
         }
         viewer.layerManager.addManagedLayer(
-          viewer.layerSpecification.getLayer(key, combined))
+          viewer.layerSpecification.getLayer(key, combined), 1)
 
         return layerObj[key]
       })
@@ -914,6 +929,13 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 }
 
+
+const noop = (_event: MouseEvent) => {
+  // TODO either emit contextmenu
+  // or capture longtouch on higher level as contextmenu
+  // at the moment, this is required to override default behavior (move to cursur location)
+}
+
 const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier: Float32Array) => {
 
   // patch draw calls to dispatch viewerportToData
@@ -942,14 +964,26 @@ const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier:
     registerActionListener(sliceViewPanel.element, `proxy-wheel-${val}`, event => {
       const e = event.detail
 
+      let keyDelta = null
+      if (e.key === "p") {
+        keyDelta = -1
+      }
+      if (e.key === "n") {
+        keyDelta = 1
+      }
       const offset = tempVec3
-      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX
+      const wheelDelta = e.deltaY !== 0 ? e.deltaY : e.deltaX
+      
+      const delta = keyDelta ?? wheelDelta
+
       offset[0] = 0
       offset[1] = 0
       offset[2] = (delta > 0 ? -1 : 1) * mulitplier[0] * val
       navigationState.pose.translateVoxelsRelative(offset)
     })
   }
+
+  registerActionListener(sliceViewPanel.element, `noop`, noop)
 }
 
 export interface ViewerState {

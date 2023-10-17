@@ -83,7 +83,7 @@
     </mat-tab>
 
     <mat-tab *ngIf="busy$ | async">
-      <ng-template matTabLabel="">
+      <ng-template matTabLabel>
         <spinner-cmp></spinner-cmp>
       </ng-template>
     </mat-tab>
@@ -97,6 +97,7 @@
           [ng-layer-ctl-transform]="voi.ngVolume.transform"
           [ng-layer-ctl-info]="voi.ngVolume.info"
           [ng-layer-ctl-opacity]="1.0"
+          [ng-layer-ctl-meta]="voi.ngVolume.meta"
           [ng-layer-ctrl-show]="true">
         </ng-layer-ctl>
       </mat-tab>

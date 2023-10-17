@@ -8,12 +8,16 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSortModule } from '@angular/material/sort';
 import { ZipFilesOutputModule } from 'src/zipFilesOutput/module';
+import { SandsToNumPipe } from "./sandsToNum.pipe"
+import { SapiViewsUtilModule } from '../util';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
 @NgModule({
   declarations: [
-    PointAssignmentComponent
+    PointAssignmentComponent,
+    SandsToNumPipe,
   ],
   imports: [
     CommonModule,
@@ -24,6 +28,8 @@ import { ZipFilesOutputModule } from 'src/zipFilesOutput/module';
     MatButtonModule,
     MatSortModule,
     ZipFilesOutputModule,
+    SapiViewsUtilModule,
+    MatTooltipModule,
   ],
   exports: [
     PointAssignmentComponent

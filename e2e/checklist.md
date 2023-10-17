@@ -9,6 +9,11 @@
 - [ ] Can access front page
 - [ ] Can login to oidc v2 via top-right
 
+## Verify testing correct siibra-explorer and siibra-api versions
+
+- [ ] Git hash from `[?]` -> `About` matches with the git hash of `HEAD` of staging
+- [ ] Message `Expecting {VERSION}, but got {VERSION}, some functionalities may not work as expected` does **not** show
+
 ## Atlas data specific
 
 - [ ] Human multilevel atlas
@@ -72,10 +77,13 @@
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/allen2017) redirects to allen 2017
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/mebrains) redirects to monkey
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/stnr) redirects to URL that contains annotations
+
 ## VIP URL
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/human) redirects to human mni152
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/monkey) redirects mebrains
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/rat) redirects to waxholm v4
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/mouse) redirects allen mouse 2017
+
 ## plugins
 - [ ] jugex plugin works

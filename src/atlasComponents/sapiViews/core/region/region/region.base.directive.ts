@@ -3,8 +3,7 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, combineLatest } from "rxjs";
-import { SAPIRegion } from "src/atlasComponents/sapi/core";
+import { BehaviorSubject, combineLatest, forkJoin, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 
 @Directive({
@@ -95,7 +94,7 @@ export class SapiViewsCoreRegionRegionBase {
       /**
        * color
        */
-      const rgb = SAPIRegion.GetDisplayColor(this.region) || [200, 200, 200]
+      const rgb = this.region?.color || [200, 200, 200]
       this.regionRgbString = `rgb(${rgb.join(',')})`
       const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
       this.regionDarkmode = l < 0.4
@@ -127,6 +126,28 @@ export class SapiViewsCoreRegionRegionBase {
       }
     }).pipe(
       switchMap(r => translateV3Entities.translateRegion(r))
+    ).toPromise()
+  }
+
+  protected async fetchRelated(region: SxplrRegion){
+    const getPage = (page: number) => this.sapi.v3Get("/regions/{region_id}/related", {
+      path: {
+        region_id: region.name
+      },
+      query: {
+        parcellation_id: this.parcellation.id,
+        page
+      }
+    })
+    return getPage(1).pipe(
+      switchMap(resp => this.sapi.iteratePages(resp, getPage)),
+      switchMap(arr => forkJoin(
+        arr.map(({ qualification, assigned_structure, assigned_structure_parcellation }) => forkJoin({
+          qualification: of(qualification),
+          region: translateV3Entities.translateRegion(assigned_structure),
+          parcellation: translateV3Entities.translateParcellation(assigned_structure_parcellation),
+        }))
+      ))
     ).toPromise()
   }
 

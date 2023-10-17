@@ -4,7 +4,6 @@ export { SAPI } from "./sapi.service"
 export {
   SAPIAtlas,
   SAPIParcellation,
-  SAPIRegion
 } from "./core"
 
 export {
