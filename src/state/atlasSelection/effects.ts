@@ -85,21 +85,20 @@ export class Effect {
       return this.store.pipe(
         select(atlasSelection.selectors.navigation),
         take(1),
-        switchMap(({ position, ...rest }) => 
-        
+        switchMap(navigation => 
           /**
            * if either space name is undefined, return default state for navigation
            */
           !prevSpcName || !currSpcName
-          ? of({ navigation: { position, ...rest } })
-          : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, position as [number, number, number]).pipe(
+          ? of({ navigation })
+          : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, navigation.position as [number, number, number]).pipe(
             map(value => {
               if (value.status === "error") {
                 return {}
               }
               return {
                 navigation: {
-                  ...rest,
+                  ...navigation,
                   position: value.result,
                 }
               } as Partial<AtlasSelectionState>
@@ -206,7 +205,7 @@ export class Effect {
           fromRootStore.distinctATP()
         )),
         switchMap(([requestedPossibleATPs, { atlas, template, parcellation }]) => {
-          let result = DecisionCollapse.Intersect(...requestedPossibleATPs)
+          const result = DecisionCollapse.Intersect(...requestedPossibleATPs)
           
           const errorMessages = DecisionCollapse.Verify(result)
           if (errorMessages.length > 0) {
