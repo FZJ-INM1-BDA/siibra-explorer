@@ -729,6 +729,7 @@
         [sxplr-sapiviews-core-region-parcellation]="view.selectedParcellation"
         [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
         (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
+        (sxplr-sapiviews-core-region-region-rich-related-region-clicked)="selectATPR($event.region, $event.parcellation)"
         (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
         #regionDirective="sapiViewsCoreRegionRich"
       >

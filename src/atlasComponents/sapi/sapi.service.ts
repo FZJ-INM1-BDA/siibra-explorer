@@ -279,7 +279,16 @@ export class SAPI{
     query: {}
   }).pipe(
     switchMap(atlases => forkJoin(
-      atlases.items.map(atlas => translateV3Entities.translateAtlas(atlas))
+      atlases.items.map(atlas => {
+        const { parcellations, spaces } = atlas
+        for (const parc of parcellations){
+          this.#reverseMap.set(parc["@id"], atlas["@id"])
+        }
+        for (const space of spaces){
+          this.#reverseMap.set(space["@id"], atlas["@id"])
+        }
+        return translateV3Entities.translateAtlas(atlas)
+      })
     )),
     map(atlases => atlases.sort((a, b) => (speciesOrder as string[]).indexOf(a.species) - (speciesOrder as string[]).indexOf(b.species))),
     tap(() => {
@@ -292,6 +301,11 @@ export class SAPI{
     }),
     shareReplay(1),
   )
+
+  #reverseMap = new Map<string, string>()
+  public reverseLookupAtlas(parcOrSpaceId: string): string {
+    return this.#reverseMap.get(parcOrSpaceId)
+  }
 
   public getAllSpaces(atlas: SxplrAtlas): Observable<SxplrTemplate[]> {
     return forkJoin(

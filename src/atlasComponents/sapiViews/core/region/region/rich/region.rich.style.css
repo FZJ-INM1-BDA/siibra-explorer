@@ -11,6 +11,12 @@
   overflow-y: scroll;
 }
 
+.mat-column-qualification,
+.mat-column-relatedRegion
+{
+  padding: 0.5rem;
+}
+
 readmore-component
 {
   width: 100%;
