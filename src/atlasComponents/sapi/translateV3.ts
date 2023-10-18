@@ -166,14 +166,19 @@ class TranslateV3 {
     return this.#templateMap.get(template.id)
   }
   async translateTemplate(template:PathReturn<"/spaces/{space_id}">): Promise<SxplrTemplate> {
+    
+    const ds = await Promise.all((template.datasets || []).map(ds => this.translateDs(ds)))
+    const { ...rest } = ds[0] || {}
 
     this.#templateMap.set(template["@id"], template)
-    const tmpl = {
+    const tmpl: SxplrTemplate = {
       id: template["@id"],
       name: template.fullName,
       shortName: template.shortName,
-      type: "SxplrTemplate" as const
+      type: "SxplrTemplate" as const,
+      ...rest
     }
+    
     this.#sxplrTmplMap.set(tmpl.id, tmpl)
     return tmpl
   }

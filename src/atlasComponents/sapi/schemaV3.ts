@@ -550,6 +550,8 @@ export interface components {
        * @description Term or code used to identify the version of something.
        */
       versionIdentifier: string
+      /** Datasets */
+      datasets?: (components["schemas"]["EbrainsDatasetModel"])[]
     }
     /**
      * CoordinatePointModel 
