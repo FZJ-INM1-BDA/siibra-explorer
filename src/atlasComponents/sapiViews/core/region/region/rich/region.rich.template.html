@@ -106,9 +106,11 @@
                     <th mat-header-cell *matHeaderCellDef> Related Region </th>
                     <td mat-cell *matCellDef="let related">
                       <button tabindex="-1" mat-stroked-button
-                        (click)="selectATPR(related.region, related.parcellation)"
+                        (click)="selectATPR({ region: related.region, parcellation: related.parcellation})"
                         class="sxplr-w-100"
-                        [disabled]="!related.mapped">
+                        [disabled]="!related.mapped"
+                        mat-dialog-close
+                        [matTooltip]="('Explorer ' + related.region.name + ' in ' + related.parcellation.name)">
                         {{ related.region.name }}
                       </button>
                     </td>
@@ -117,7 +119,13 @@
                   <ng-container matColumnDef="relatedRegionParc">
                     <th mat-header-cell *matHeaderCellDef> Related Region Parcellation </th>
                     <td mat-cell *matCellDef="let related">
-                      {{ related.parcellation.name }}
+                      <button tabindex="-1" mat-stroked-button
+                        (click)="selectATPR({ parcellation: related.parcellation })"
+                        class="sxplr-w-100"
+                        mat-dialog-close
+                        [matTooltip]="('Explore ' + related.parcellation.name)">
+                        {{ related.parcellation.name }}
+                      </button>
                     </td>
                   </ng-container>
 

@@ -511,11 +511,11 @@ export class ViewerCmp implements OnDestroy {
     }
   }
 
-  selectATPR(region: SxplrRegion, parcellation: SxplrParcellation){
+  selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
     this.store$.dispatch(
       atlasSelection.actions.selectATPById({
-        parcellationId: parcellation.id,
-        regionId: region.name
+        parcellationId: regParc?.parcellation.id,
+        regionId: regParc?.region?.name
       })
     )
   }

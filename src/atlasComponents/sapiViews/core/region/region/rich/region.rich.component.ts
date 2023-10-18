@@ -103,7 +103,8 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
     shareReplay(1),
   )
 
-  public selectATPR(region: SxplrRegion, parcellation: SxplrParcellation){
+  public selectATPR(regParc: {region?: SxplrRegion, parcellation: SxplrParcellation}){
+    const { region, parcellation } = regParc
     this.relatedRegion.next({
       region,
       parcellation

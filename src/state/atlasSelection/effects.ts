@@ -303,11 +303,11 @@ export class Effect {
                     }
                   }
 
+                  state.selectedRegions = []
                   if (!!regionId) {
                     const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
                     state.selectedRegions = selectedRegions
                   }
-
                   
                   return actions.setAtlasSelectionState(state)
                 })
@@ -316,7 +316,7 @@ export class Effect {
           )
         }),
         catchError((err) => {
-          console.log("error!", err)  
+          console.warn("Selecting ATP Error!", err)  
           return of(
             mainActions.generalActionError({
               message: err.toString()
