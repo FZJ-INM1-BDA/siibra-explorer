@@ -175,61 +175,72 @@
         [region]="region"
         #featureEntryCmp="featureEntryCmp">
       </sxplr-feature-entry>
+
+      
+      <ng-template sxplrExperimentalFlag [experimental]="true"
+        #exmptRelatedFeat="sxplrExperimentalFlag"
+        [ngIf]="exmptRelatedFeat.show$ | async">
+    
+      <!-- related region features -->
+      <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+        <ng-template [ngIf]="relatedRegions.length > 0">
+
+          <div class="section-divider"></div>
+
+          <h2 class="sxplr-ml-2 mat-h4">Related Regions</h2>
+
+          <div class="h-carousel">
+            <div class="h-carousel-item-container">
+              <mat-card *ngFor="let relatedRegion of relatedRegions"
+                class="h-carousel-item mat-elevation-z4">
+                <mat-card-subtitle>
+                  {{ relatedRegion.qualification | translateQualificationPipe }}
+                </mat-card-subtitle>
+                <mat-card-title>
+                  {{ relatedRegion.region.name }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                  {{ relatedRegion.parcellation.name}}
+                </mat-card-subtitle>
+                <mat-card-actions>
+                  <button mat-button
+                    [sxplr-dialog]="relatedRegFeatTmpl"
+                    sxplr-dialog-size="auto">
+                    show features
+                  </button>
+                </mat-card-actions>
+
+                
+                <ng-template #relatedRegFeatTmpl>
+                  <h2 mat-dialog-title>
+                    {{ relatedRegion.region.name }}
+                    {{ relatedRegion.parcellation.name }}
+                  </h2>
+
+                  <mat-dialog-content>
+                    <sxplr-feature-entry
+                      class="sxplr-d-block sxplr-mb-1"
+                      [parcellation]="relatedRegion.parcellation"
+                      [region]="relatedRegion.region">
+                    </sxplr-feature-entry>
+                  </mat-dialog-content>
+
+                  <!-- footer -->
+                  <mat-dialog-actions align="center">
+                    <button mat-button mat-dialog-close>close</button>
+                  </mat-dialog-actions>
+                </ng-template>
+
+              </mat-card>
+            </div>
+          </div>
+
+        </ng-template>
+      </ng-template>
+
+      </ng-template>
     </mat-tab>
 
-
-    <ng-template sxplrExperimentalFlag [experimental]="true"
-      #exmptRelatedFeat="sxplrExperimentalFlag"
-      [ngIf]="exmptRelatedFeat.show$ | async">
-    
-    <!-- related region features -->
-    <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
-      <ng-template [ngIf]="relatedRegions.length > 0">
-
-        <mat-tab>
-
-          <!-- tab label -->
-          <ng-template mat-tab-label>
-            <span>
-              Related Region Features
-            </span>
-          </ng-template>
-    
-          <!-- tab-content -->
-          <mat-accordion>
-            
-            <mat-expansion-panel *ngFor="let relatedRegion of relatedRegions" hideToggle>
-              <mat-expansion-panel-header>
-                <mat-panel-title class="ws-no-wrap">
-                  {{ relatedRegion.region.name }}
-                </mat-panel-title>
-                <mat-panel-description class="ws-no-wrap">
-                  {{ relatedRegion.parcellation.name }}
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-
-              <ng-template matExpansionPanelContent>
-                
-                <div>
-                  Current region 
-                  <i>{{ region.name }}</i> {{ relatedRegion.qualification | translateQualificationPipe }}
-                  <i>{{ relatedRegion.region.name }}</i> in
-                  <b>{{ relatedRegion.parcellation.name }}</b>
-                </div>
-
-                <sxplr-feature-entry
-                  [parcellation]="relatedRegion.parcellation"
-                  [region]="relatedRegion.region">
-                </sxplr-feature-entry>
-
-              </ng-template>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-tab>
-      </ng-template>
-    </ng-template>
-
-    </ng-template>
   </mat-tab-group>
 
 </ng-template>

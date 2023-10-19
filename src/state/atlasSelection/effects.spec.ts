@@ -3,7 +3,7 @@ import { provideMockActions } from "@ngrx/effects/testing"
 import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
-import { ReplaySubject, of, throwError } from "rxjs"
+import { NEVER, ReplaySubject, of, throwError } from "rxjs"
 import { SAPI, SAPIModule } from "src/atlasComponents/sapi"
 import { SxplrRegion, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { IDS } from "src/atlasComponents/sapi/constants"
@@ -14,6 +14,7 @@ import { atlasSelection } from ".."
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { PathReturn } from "src/atlasComponents/sapi/typeV3"
+import { MatDialog } from "@angular/material/dialog"
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
@@ -90,7 +91,19 @@ describe("> effects.ts", () => {
         providers: [
           Effect,
           provideMockStore(),
-          provideMockActions(() => actions$)
+          provideMockActions(() => actions$),
+          {
+            provide: MatDialog,
+            useValue: {
+              open(){
+                return {
+                  afterClosed() {
+                    return NEVER
+                  }
+                }
+              }
+            }
+          },
         ]
       })
     })
