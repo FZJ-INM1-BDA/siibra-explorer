@@ -19,6 +19,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { TranslateQualificationPipe } from "./translateQualification.pipe";
 import { DedupRelatedRegionPipe } from "./dedupRelatedRegion.pipe";
 import { MatExpansionModule } from "@angular/material/expansion";
+import { MatTableModule } from "@angular/material/table";
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
     SapiViewsCoreParcellationModule,
     MatTooltipModule,
     MatExpansionModule,
+    MatTableModule,
     ExperimentalModule,
   ],
   declarations: [

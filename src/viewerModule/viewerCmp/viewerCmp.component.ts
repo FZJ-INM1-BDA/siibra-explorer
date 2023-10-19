@@ -404,11 +404,8 @@ export class ViewerCmp implements OnDestroy {
     }
     if (pointOfInterest) {
       this.store$.dispatch(
-        atlasSelection.actions.selectTemplate({
-          template,
-          requested: {
-            parcellation: this.#parcellationSelected
-          }
+        atlasSelection.actions.selectATPById({
+          templateId: template.id
         })
       )
       this.store$.dispatch(
@@ -512,5 +509,14 @@ export class ViewerCmp implements OnDestroy {
     if (this.voiFeatureEntryCmp){
       this.voiFeatureEntryCmp.pullAll()
     }
+  }
+
+  selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
+    this.store$.dispatch(
+      atlasSelection.actions.selectATPById({
+        parcellationId: regParc?.parcellation.id,
+        regionId: regParc?.region?.name
+      })
+    )
   }
 }

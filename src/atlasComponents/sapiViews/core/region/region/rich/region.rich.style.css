@@ -11,7 +11,34 @@
   overflow-y: scroll;
 }
 
+.mat-column-qualification,
+.mat-column-relatedRegion
+{
+  padding: 0.5rem;
+}
+
 readmore-component
 {
   width: 100%;
+}
+
+.h-carousel
+{
+  width: 100%;
+  overflow-x: auto;
+}
+
+.h-carousel > .h-carousel-item-container
+{
+  display: inline-flex;
+  height: 100%;
+  flex-wrap: nowrap;
+  flex-direction: row;
+}
+
+.h-carousel-item
+{
+  height: calc(100% - 2rem);
+  width: 16rem;
+  margin: 1rem 0.5rem;
 }

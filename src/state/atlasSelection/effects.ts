@@ -1,16 +1,19 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, merge, NEVER, Observable, of } from "rxjs";
-import { catchError, filter, map, mapTo, switchMap, switchMapTo, take, withLatestFrom } from "rxjs/operators";
+import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
+import { catchError, filter, map, mapTo, switchMap, take, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
-import { selectors, actions } from '.'
+import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
 import { atlasAppearance, atlasSelection } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
+import { DialogFallbackCmp } from "src/ui/dialogInfo";
+import { MatDialog } from "@angular/material/dialog";
 
 type OnTmplParcHookArg = {
   previous: {
@@ -30,10 +33,26 @@ const prefParcId = [
   "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
 ]
 
-const prefSpcId = []
-
 @Injectable()
 export class Effect {
+
+  #askUserATP<T extends SxplrAtlas|SxplrTemplate|SxplrParcellation>(titleMd: string, options: T[]) {
+    if (options.length === 0) {
+      return throwError(`Expecting at least one option, but got 0`)
+    }
+    if (options.length === 1) {
+      return of(options[0])
+    }
+    return this.dialog.open(DialogFallbackCmp, {
+      data: {
+        titleMd,
+        actions: options.map(v => v.name),
+        actionsAsList: true
+      }
+    }).afterClosed().pipe(
+      map(v => options.find(o => o.name === v))
+    )
+  }
 
   onTemplateParcSelectionPostHook: ((arg: OnTmplParcHookArg) => Observable<Partial<AtlasSelectionState>>)[] = [
     /**
@@ -66,21 +85,20 @@ export class Effect {
       return this.store.pipe(
         select(atlasSelection.selectors.navigation),
         take(1),
-        switchMap(({ position, ...rest }) => 
-        
+        switchMap(navigation => 
           /**
            * if either space name is undefined, return default state for navigation
            */
           !prevSpcName || !currSpcName
-          ? of({ navigation: { position, ...rest } })
-          : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, position as [number, number, number]).pipe(
+          ? of({ navigation })
+          : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, navigation.position as [number, number, number]).pipe(
             map(value => {
               if (value.status === "error") {
                 return {}
               }
               return {
                 navigation: {
-                  ...rest,
+                  ...navigation,
                   position: value.result,
                 }
               } as Partial<AtlasSelectionState>
@@ -91,115 +109,10 @@ export class Effect {
     }
   ]
 
-  onTemplateParcSelection = createEffect(() => merge(
-    this.action.pipe(
-      ofType(actions.selectTemplate),
-      map(({ template, requested }) => {
-        return {
-          template,
-          parcellation: null as SxplrParcellation,
-          requested,
-        }
-      })
-    ),
-    this.action.pipe(
-      ofType(actions.selectParcellation),
-      map(({ parcellation, requested }) => {
-        return {
-          template: null as SxplrTemplate,
-          parcellation,
-          requested,
-        }
-      })
-    )
-  ).pipe(
-    withLatestFrom(this.store),
-    switchMap(([ { template, parcellation, requested }, store ]) => {
-
-      const currTmpl = selectors.selectedTemplate(store)
-      const currParc = selectors.selectedParcellation(store)
-      const currAtlas = selectors.selectedAtlas(store)
-
-      const requestedTmpl = requested?.template
-      const requestedParc = requested?.parcellation
-
-      const resolvedTmpl = template || requestedTmpl || currTmpl
-      const resolvedParc = parcellation || requestedParc || currParc
-
-      return this.sapiSvc.getSupportedTemplates(currAtlas, resolvedParc).pipe(
-        switchMap(tmpls => {
-          const flag = tmpls.some(tmpl => tmpl.id === resolvedTmpl.id)
-          if (flag) {
-            return of({
-              atlas: currAtlas,
-              template: resolvedTmpl,
-              parcellation: resolvedParc,
-            })
-          }
-
-          /**
-           * TODO code below should not be reached
-           */
-          /**
-           * if template is defined, find the first parcellation that is supported
-           */
-          if (!!template) {
-            return this.sapiSvc.getSupportedParcellations(currAtlas, template).pipe(
-              map(parcs => {
-                if (parcs.length === 0) {
-                  throw new Error(`Cannot find any supported parcellations for template ${template.name}`)
-                }
-                const sortedByPref = parcs.sort((a, b) => prefParcId.indexOf(a.id) - prefParcId.indexOf(b.id))
-                const selectParc = sortedByPref.find(p => requestedParc?.id === p.id) || sortedByPref[0]
-                return {
-                  atlas: currAtlas,
-                  template,
-                  parcellation: selectParc
-                }
-              })
-            )
-          }
-          if (!!parcellation) {
-            return this.sapiSvc.getSupportedTemplates(currAtlas, parcellation).pipe(
-              map(templates => {
-                if (templates.length === 0) {
-                  throw new Error(`Cannot find any supported templates for parcellation ${parcellation.name}`)
-                }
-                const selectTmpl = templates.find(tmp => requestedTmpl?.id === tmp.id || prefSpcId.includes(tmp.id)) || templates[0]
-                return {
-                  atlas: currAtlas,
-                  template: selectTmpl,
-                  parcellation
-                }
-              })
-            )
-          }
-          throw new Error(`neither template nor parcellation has been defined!`)
-        }),
-        switchMap(({ atlas, template, parcellation }) => 
-          forkJoin(
-            this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: { atlas: currAtlas, template: currTmpl, parcellation: currParc }, current: { atlas, template, parcellation } }))
-          ).pipe(
-            map(partialStates => {
-              let returnState: Partial<AtlasSelectionState> = {
-                selectedAtlas: atlas,
-                selectedTemplate: template,
-                selectedParcellation: parcellation
-              }
-              for (const s of partialStates) {
-                returnState = {
-                  ...returnState,
-                  ...s,
-                }
-              }
-              return actions.setAtlasSelectionState(returnState)
-            })
-          )
-        )
-      )
-    })
-  ))
-
+  /**
+   * clear template/parc to trigger loading screen
+   * since getting the map/config etc are not sync
+   */
   onAtlasSelClearTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     map(() => actions.setAtlasSelectionState({
@@ -211,46 +124,12 @@ export class Effect {
   onAtlasSelectionSelectTmplParc = createEffect(() => this.action.pipe(
     ofType(actions.selectAtlas),
     filter(action => !!action.atlas),
-    switchMap(({ atlas }) => 
-      this.sapiSvc.getAllParcellations(atlas).pipe(
-        map(parcellations => {
-          const parcPrevIds = parcellations.map(p => p.prevId)
-          const latestParcs = parcellations.filter(p => !parcPrevIds.includes(p.id))
-          const prefParc = parcellations.filter(p => prefParcId.includes(p.id)).sort((a, b) => prefParcId.indexOf(a.id) - prefParcId.indexOf(b.id))
-          const selectedParc = prefParc[0] || latestParcs[0] || parcellations[0]
-          return {
-            parcellation: selectedParc,
-            atlas
-          }
-        })
-      )
-    ),
-    switchMap(({ atlas, parcellation }) => {
-      return this.sapiSvc.getSupportedTemplates(atlas, parcellation).pipe(
-        switchMap(spaces => {
-          const selectedSpace = spaces.find(s => s.name.includes("152")) || spaces[0]
-          return forkJoin(
-            this.onTemplateParcSelectionPostHook.map(fn => fn({ previous: null, current: { atlas, parcellation, template: selectedSpace } }))
-          ).pipe(
-            map(partialStates => {
-
-              let returnState: Partial<AtlasSelectionState> = {
-                selectedAtlas: atlas,
-                selectedTemplate: selectedSpace,
-                selectedParcellation: parcellation
-              }
-              for (const s of partialStates) {
-                returnState = {
-                  ...returnState,
-                  ...s,
-                }
-              }
-              return actions.setAtlasSelectionState(returnState)
-            })
-          )
-        })
-      )
-    })
+    map(({ atlas }) => actions.selectATPById({
+      atlasId: atlas.id,
+      config: {
+        autoSelect: true,
+      }
+    }))
   ))
 
   onATPSelectionClearBaseLayerColorMap = createEffect(() => this.store.pipe(
@@ -313,59 +192,139 @@ export class Effect {
    */
   onSelectATPById = createEffect(() => this.action.pipe(
     ofType(actions.selectATPById),
-    switchMap(({ atlasId, parcellationId, templateId }) =>
-      this.sapiSvc.atlases$.pipe(
-        switchMap(atlases => {
-
-          const selectedAtlas = atlasId
-            ? atlases.find(atlas => atlas.id === atlasId)
-            : atlases[0]
-
-          if (!selectedAtlas) {
-            return of(
-              mainActions.generalActionError({
-                message: `Atlas with id ${atlasId} not found!`
-              })
-            )
+    switchMap(({ atlasId, parcellationId, templateId, regionId, config }) => {
+      const { autoSelect, messages } = config || { autoSelect: false, messages: {} }
+      return from(
+        Promise.all([
+          atlasId && this.collapser.collapseAtlasId(atlasId),
+          templateId && this.collapser.collapseTemplateId(templateId),
+          parcellationId && this.collapser.collapseParcId(parcellationId),
+        ])
+      ).pipe(
+        withLatestFrom(this.store.pipe(
+          fromRootStore.distinctATP()
+        )),
+        switchMap(([requestedPossibleATPs, { atlas, template, parcellation }]) => {
+          const result = DecisionCollapse.Intersect(...requestedPossibleATPs)
+          
+          const errorMessages = DecisionCollapse.Verify(result)
+          if (errorMessages.length > 0) {
+            const errMessage = `Cannot process selectATP with parameter ${atlasId}, ${parcellationId}, ${templateId} and ${regionId}. ${errorMessages.join(" ")}`
+            return throwError(errMessage)
           }
-          return this.sapiSvc.getAllParcellations(selectedAtlas).pipe(
-            switchMap(parcs => {
-              const selectedParcellation = parcellationId
-                ? parcs.find(parc => parc.id === parcellationId)
-                : parcs[0]
-              if (!selectedParcellation) {
+
+          /**
+           * narrow down the valid atlas, template and parcellation according to the current state
+           * If intersection is None, then leave the possibility intact
+           */
+          const foundAtlas = atlas && result.atlases.find(a => a.id === atlas.id)
+          const foundParc = parcellation && result.parcellations.find(a => a.id === parcellation.id)
+          const foundSpace = template && result.spaces.find(a => a.id === template.id)
+          
+          result.atlases = foundAtlas && [foundAtlas] || result.atlases
+          result.parcellations = foundParc && [foundParc] || result.parcellations
+          result.spaces = foundSpace && [foundSpace] || result.spaces
+
+          /**
+           * 
+           * with the remaining possible options, ask user to decide on which atlas/parc/space to select
+           */
+          const prAskUser = async () => {
+            let atlas: SxplrAtlas
+            let template: SxplrTemplate
+            let parcellation: SxplrParcellation
+
+            if (result.atlases.length === 1) {
+              atlas = result.atlases[0]
+            }
+            if (result.spaces.length === 1) {
+              template = result.spaces[0]
+            }
+            if (result.parcellations.length === 1) {
+              parcellation = result.parcellations[0]
+            }
+            
+            if (autoSelect) {
+              atlas ||= atlas[0]
+              template ||= result.spaces.find(s => s.name.includes("152")) || result.spaces[0]
+
+              const parcPrevIds = result.parcellations.map(p => p.prevId)
+              const latestParcs = result.parcellations.filter(p => !parcPrevIds.includes(p.id))
+              const prefParc = result.parcellations.filter(p => prefParcId.includes(p.id)).sort((a, b) => prefParcId.indexOf(a.id) - prefParcId.indexOf(b.id))
+
+              parcellation ||= prefParc[0] || latestParcs[0] || result.parcellations[0]
+            }
+
+            atlas ||= await this.#askUserATP("Please select an atlas", result.atlases).toPromise()
+            if (!atlas) return // user cancelled
+            template ||= await this.#askUserATP(messages.template || "Please select a space", result.spaces).toPromise()
+            if (!template) return // user cancelled
+            parcellation ||= await this.#askUserATP(messages.parcellation || "Please select a parcellation", result.parcellations).toPromise()
+            if (!parcellation) return // user cancelled
+
+            return {
+              atlas,
+              template,
+              parcellation,
+            }
+          }
+          return from(prAskUser()).pipe(
+            switchMap(val => {
+              /** user cancelled */
+              if (!val) {
+                return of(null)
+              }
+              const { atlas, parcellation, template } = val
+              return of({
+                atlas, parcellation, template
+              })
+            }),
+            switchMap(current => {
+              if (!current) {
                 return of(
-                  mainActions.generalActionError({
-                    message: `Parcellation with id ${parcellationId} not found!`
-                  })
+                  mainActions.noop()
                 )
               }
-              return this.sapiSvc.getSupportedTemplates(selectedAtlas, selectedParcellation).pipe(
-                switchMap(templates => {
-                  const selectedTemplate = templateId
-                    ? templates.find(tmpl => tmpl.id === templateId)
-                    : templates[0]
-                  if (!selectedTemplate) {
-                    return of(
-                      mainActions.generalActionError({
-                        message: `Template with id ${templateId} not found`
-                      })
-                    )
+              return forkJoin(
+                this.onTemplateParcSelectionPostHook.map(fn =>
+                  fn({previous: { atlas, template, parcellation }, current})
+                )
+              ).pipe(
+                map(partialState => {
+                  let state: Partial<AtlasSelectionState> = {
+                    selectedAtlas: current.atlas,
+                    selectedParcellation: current.parcellation,
+                    selectedTemplate: current.template
                   }
-                  return of(
-                    actions.setAtlasSelectionState({
-                      selectedAtlas,
-                      selectedParcellation,
-                      selectedTemplate
-                    })
-                  )
+                  for (const partial of partialState){
+                    state = {
+                      ...state,
+                      ...partial,
+                    }
+                  }
+
+                  state.selectedRegions = []
+                  if (!!regionId) {
+                    const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
+                    state.selectedRegions = selectedRegions
+                  }
+                  
+                  return actions.setAtlasSelectionState(state)
                 })
               )
+            }),
+          )
+        }),
+        catchError((err) => {
+          console.warn("Selecting ATP Error!", err)  
+          return of(
+            mainActions.generalActionError({
+              message: err.toString()
             })
           )
         })
       )
-    )
+    })
   ))
   
   onClearViewerMode = createEffect(() => this.action.pipe(
@@ -425,26 +384,6 @@ export class Effect {
     })
   ))
 
-  onSelAtlasTmplParcClearRegion = createEffect(() => merge(
-    this.action.pipe(
-      ofType(actions.selectAtlas)
-    ),
-    this.action.pipe(
-      ofType(actions.selectTemplate)
-    ),
-    this.action.pipe(
-      ofType(actions.selectParcellation)
-    )
-  ).pipe(
-    switchMapTo(
-      of(
-        actions.setSelectedRegions({
-          regions: []
-        })
-      )
-    )
-  ))
-
   onRegionSelectionClearPointSelection = createEffect(() => this.action.pipe(
     ofType(actions.selectRegion),
     map(() => actions.clearSelectedPoint())
@@ -460,6 +399,8 @@ export class Effect {
     private sapiSvc: SAPI,
     private store: Store,
     private interSpaceCoordXformSvc: InterSpaceCoordXformSvc,
+    private collapser: DecisionCollapse,
+    private dialog: MatDialog,
   ){
   }
 }

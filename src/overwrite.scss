@@ -324,3 +324,11 @@ button.#{$llb}
     }
   }
 }
+
+div.section-divider
+{
+  border-bottom-color: rgba(128, 128, 128, 0.5);
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  margin: 3rem 1rem;
+}

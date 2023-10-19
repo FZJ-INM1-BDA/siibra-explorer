@@ -3,8 +3,9 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, combineLatest, forkJoin, of } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, forkJoin, from, of } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 
 @Directive({
   selector: `[sxplr-sapiviews-core-region]`,
@@ -147,11 +148,50 @@ export class SapiViewsCoreRegionRegionBase {
           region: translateV3Entities.translateRegion(assigned_structure),
           parcellation: translateV3Entities.translateParcellation(assigned_structure_parcellation),
         }))
-      ))
+      )),
+      switchMap(relatedRegions => {
+        
+        const uniqueParc = relatedRegions.map(v => v.parcellation).reduce(
+          (acc, curr) => acc.map(v => v.id).includes(curr.id) ? acc : acc.concat(curr),
+          [] as SxplrParcellation[]
+        )
+        
+        return forkJoin(
+          uniqueParc.map(parc =>
+            from(this.collapser.collapseParcId(parc.id)).pipe(
+              switchMap(collapsed => forkJoin(
+                collapsed.spaces.map(space =>
+                  from(this.sapi.getLabelledMap(parc, space)).pipe(
+                    catchError(() => of(null))
+                  )
+                )
+              )),
+              map(labelMap => ({
+                parcellation: parc,
+                mappedRegions: labelMap
+                  .filter(v => !!v)
+                  .map(m => Object.keys(m.indices))
+                  .flatMap(v => v),
+              })),
+            )
+          )
+        ).pipe(
+          map(allMappedRegions => {
+            const regMap: Record<string, string[]> = {}
+            for (const { parcellation, mappedRegions } of allMappedRegions) {
+              regMap[parcellation.id] = mappedRegions
+            }
+            return relatedRegions.map(prev => ({
+              ...prev,
+              mapped: (regMap[prev.parcellation.id] || []).includes(prev.region.name)
+            }))
+          })
+        )
+      })
     ).toPromise()
   }
 
-  constructor(protected sapi: SAPI){
+  constructor(protected sapi: SAPI, private collapser: DecisionCollapse){
 
   }
 }
