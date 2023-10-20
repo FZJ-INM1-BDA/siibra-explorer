@@ -544,9 +544,10 @@
 <ng-template #autocompleteTmpl let-showTour="showTour">
   <ng-template [ngIf]="view$ | async" let-view>
 
-    <div class="sxplr-custom-cmp bg card ml-2 mr-2 mat-elevation-z8 pe-all auto-complete-container">
+    <div class="ml-2 mr-2 pe-all auto-complete-container">
     
       <sxplr-sapiviews-core-rich-regionlistsearch
+        class="mat-elevation-z4"
         [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
         [sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names]="view.labelMappedRegionNames"
         [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length === 1 ? view.selectedRegions[0].name : null"

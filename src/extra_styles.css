@@ -603,6 +603,8 @@ markdown-dom p
 .mat-drawer-content-overflow-visible > mat-drawer > .mat-drawer-inner-container
 {
   overflow: visible!important;
+  /** monkey patch to hide sidebar */
+  height: 99%;
 }
 
 mat-icon[fontset="fas"],

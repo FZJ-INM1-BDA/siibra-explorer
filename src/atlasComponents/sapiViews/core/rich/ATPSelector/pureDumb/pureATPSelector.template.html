@@ -156,36 +156,40 @@
     let-overrideSuffixIcon="overrideSuffixIcon"
     let-suffixText="suffixText">
 
-    <!-- prefix -->
-    <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
-      <ng-template [ngTemplateOutlet]="overridePrefixIconTmpl"></ng-template>
-    </ng-template>
-    <ng-template #defaultPrefix>
-      <ng-template [ngIf]="view.selectedIds" let-selectedIds>
-        <mat-icon
-          fontSet="fas"
-          [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
-          >
-        </mat-icon>
+    <div class="parent">
+      <!-- prefix -->
+      <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
+        <ng-template [ngTemplateOutlet]="overridePrefixIconTmpl"></ng-template>
       </ng-template>
-    </ng-template>
-
-    <!-- button body -->
-    <span *ngIf="item" class="full-sized-button"
-      [matTooltip]="item.version?.name || item.name || item.fullName"
-      [matTooltipPosition]="'above'">
-      {{ item.version?.name || item.shortName || item.name || item.fullName }}
-      <ng-template [ngIf]="suffixText">
-        <span class="text-muted">
-          {{ suffixText }}
-        </span>
+      <ng-template #defaultPrefix>
+        <ng-template [ngIf]="view.selectedIds" let-selectedIds>
+          <mat-icon
+            class="icon"
+            fontSet="fas"
+            [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
+            >
+          </mat-icon>
+        </ng-template>
       </ng-template>
-    </span>
 
-    <!-- suffix -->
-    <ng-template [ngIf]="overrideSuffixIcon">
-      <i [class]="overrideSuffixIcon"></i>
-    </ng-template>
+      <!-- button body -->
+      <span *ngIf="item" class="full-sized-button text"
+        [matTooltip]="item.version?.name || item.name || item.fullName"
+        [matTooltipPosition]="'above'">
+        {{ item.version?.name || item.shortName || item.name || item.fullName }}
+        <ng-template [ngIf]="suffixText">
+          <span class="text-muted">
+            {{ suffixText }}
+          </span>
+        </ng-template>
+      </span>
+
+      <!-- suffix -->
+      <ng-template [ngIf]="overrideSuffixIcon">
+        <i [class]="overrideSuffixIcon"></i>
+      </ng-template>
+    </div>
+
   </ng-template>
 
 </ng-template>

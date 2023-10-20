@@ -5,16 +5,17 @@
 <ng-template [ngIf]="region">
 
   <mat-card class="mat-elevation-z4">
-    <div
+    <mat-card-header
       [style.backgroundColor]="regionRgbString"
-      class="vanishing-border"
       [ngClass]="{
         'darktheme': regionDarkmode === true,
         'lighttheme': regionDarkmode === false
       }">
 
-      <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
-
+      <mat-card-subtitle>
+        <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      </mat-card-subtitle>
+      
       <mat-card-subtitle>
         <span class="muted-text">
           Brain region
@@ -25,7 +26,7 @@
         {{ region.name }}
       </mat-card-title>
 
-    </div>
+    </mat-card-header>
   </mat-card>
 
 
@@ -34,7 +35,7 @@
     <!-- Overview -->
     <mat-tab label="Overview">
 
-      <mat-action-list class="overview-container" dense>
+      <mat-action-list class="overview-container">
         
         <!-- parcellation button -->
         <button
@@ -46,14 +47,14 @@
             descMd: parcellation.desc,
             actions: parcellation | parcTmplDoiPipe
           }">
-          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-brain"></mat-icon>
           <div mat-line class="overview-content">{{ parcellation.name }}</div>
         </button>
 
         <!-- region position (if eixsts) -->
         <ng-template [ngIf]="regionPosition">
           <button mat-list-item (click)="navigateTo(regionPosition)">
-            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
             <div mat-line class="overview-content">Centroid: {{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
           </button>
         </ng-template>
@@ -61,7 +62,7 @@
         <!-- all dois -->
         <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
           <a mat-list-item [href]="doi" target="_blank" class="no-hover">
-            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
             <div mat-line>{{ doi }}</div>
           </a>
         </ng-template>
@@ -77,7 +78,7 @@
             <button mat-list-item
               [sxplr-dialog]="relatedRegionsTmpl"
               sxplr-dialog-size="auto">
-              <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-link"></mat-icon>
+              <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-link"></mat-icon>
               <div mat-line class="overview-content">Related Regions ({{ relatedRegions.length }})</div>
             </button>
             

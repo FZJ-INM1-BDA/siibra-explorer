@@ -3,19 +3,19 @@
 
 @include mat.core();
 
-$sxplr-primary: mat.define-palette(mat.$indigo-palette, 500);
+$sxplr-primary: mat.define-palette(mat.$indigo-palette, 400);
 $sxplr-accent: mat.define-palette(mat.$amber-palette, A200, A100, A400);
 $sxplr-warn: mat.define-palette(mat.$red-palette);
 
-// The "warn" palette is optional and defaults to red if not specified.
-$sxplr-warn: mat.define-palette(mat.$red-palette);
+$typographic-connfig: mat.define-typography-config();
+
 $sxplr-light-theme: mat.define-light-theme((
  color: (
    primary: $sxplr-primary,
    accent: $sxplr-accent,
    warn: $sxplr-warn,
  ),
- typography: mat.define-typography-config(),
+ typography: $typographic-connfig,
  density: 0,
 ));
 
@@ -26,7 +26,7 @@ $sxplr-dark-theme: mat.define-dark-theme((
    accent: $sxplr-accent,
    warn: $sxplr-warn,
  ),
-  typography: mat.define-typography-config(),
+  typography: $typographic-connfig,
   density: 0,
 ));
 
@@ -39,9 +39,6 @@ $sxplr-dark-theme: mat.define-dark-theme((
 //  If you don't need the default component typographies but still want the hierarchy styles,
 //  you can delete this line and instead use:
 //    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
-
-// @include mat.all-legacy-component-typographies();
-// @include mat.legacy-core();
 
 @mixin custom-cmp($theme) {
   $color-config: mat.get-color-config($theme);
@@ -150,38 +147,37 @@ $sxplr-dark-theme: mat.define-dark-theme((
 {
   @include mat.all-component-themes($sxplr-dark-theme);
   @include custom-cmp($sxplr-dark-theme);
+  input[type="text"]
+  {
+    caret-color: white!important;
+  }
 }
 
 [darktheme=false],
 .lighttheme.lighttheme
 {
-  @include custom-cmp($sxplr-light-theme);
   @include mat.all-component-themes($sxplr-light-theme);
+  @include custom-cmp($sxplr-light-theme);
+  input[type="text"]
+  {
+    caret-color: black!important;
+  }
 }
 
-.iav-dialog-class
+button[mat-icon-button]
 {
+  width:40px;
+  height:40px;
+  font-size:18px;
+}
 
-  @media (min-width: 576px) { 
-    
-  }
-
-  // Medium devices (tablets, 768px and up)
-  @media (min-width: 768px) { 
-    
-    max-width: 50vw!important;
-  }
-  
-  // Large devices (desktops, 992px and up)
-  @media (min-width: 992px) { 
-    
-    max-width: 50vw!important;
-  }
-  
-  // Extra large devices (large desktops, 1200px and up)
-  @media (min-width: 1200px) { 
-    
-    max-width: 50vw!important;
+a[mat-list-item]
+{
+  > mat-icon
+  {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 
