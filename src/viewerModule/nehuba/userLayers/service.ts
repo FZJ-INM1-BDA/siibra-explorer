@@ -12,7 +12,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
-import { getShader, getShaderFromMeta } from "src/util/fn"
+import { getShader, getShaderFromMeta, noop } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
@@ -88,12 +88,13 @@ export class UserLayerService implements OnDestroy {
       option: {
         type: 'segmentation',
         transform: xform,
-        segments: ["1"]
+        segments: ["1"],
       },
       url,
       protocol: "swc://",
       meta: {
-        filename: file.name
+        filename: file.name,
+        message,
       },
       cleanup: () => URL.revokeObjectURL(url)
     }
@@ -179,7 +180,7 @@ export class UserLayerService implements OnDestroy {
     }).toPromise()
     
     return {
-      cleanup: () => {},
+      cleanup: noop,
       meta: {
         filename: url
       },
@@ -199,7 +200,7 @@ export class UserLayerService implements OnDestroy {
     const url = source.replace("deepzoom://", "")
     const scaleFactor = 1e2
     return {
-      cleanup: () => {},
+      cleanup: noop,
       meta: {
         filename: `deepzoom://${url}`
       },
