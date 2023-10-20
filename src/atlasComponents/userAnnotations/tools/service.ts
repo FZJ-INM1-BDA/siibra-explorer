@@ -20,6 +20,7 @@ import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
+const ANNOTATION_LAYER_NAME = "modular_tool_layer_name"
 
 type TAnnotationMetadata = {
   id: string
@@ -66,11 +67,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   static TMP_PREVIEW_ANN_ID = 'tmp_preview_ann_id'
   static VIEWER_MODE = ARIA_LABELS.VIEWER_MODE_ANNOTATING
 
-  static ANNOTATION_LAYER_NAME = 'modular_tool_layer_name'
+  
   static USER_ANNOTATION_LAYER_SPEC = {
     "type": "annotation",
     "tool": "annotateBoundingBox",
-    "name": ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
+    "name": ANNOTATION_LAYER_NAME,
     "annotationColor": "#ee00ff",
     "annotations": [],
   }
@@ -464,7 +465,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
               throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
             }
             this.annotationLayer = new AnnotationLayer(
-              ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
+              ANNOTATION_LAYER_NAME,
               ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
             )
             this.annotationLayer.onHover.subscribe(val => {
