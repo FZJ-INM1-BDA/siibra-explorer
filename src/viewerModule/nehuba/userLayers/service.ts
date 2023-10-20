@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core"
 import { MatDialog } from "@angular/material/dialog"
 import { select, Store } from "@ngrx/store"
-import { concat, forkJoin, from, of, Subscription } from "rxjs"
-import { map, pairwise, switchMap } from "rxjs/operators"
+import { forkJoin, from, Subscription } from "rxjs"
+import { distinctUntilChanged, filter } from "rxjs/operators"
 import {
   linearTransform,
   TVALID_LINEAR_XFORM_DST,
@@ -19,130 +19,241 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 
 type OmitKeys = "clType" | "id" | "source"
+type LayerOption = Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
 type Meta = {
-  min?: number
-  max?: number
   message?: string
   filename: string
 }
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
+const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
+const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "swc://", "deepzoom://"] as const
+
+type ValidProtocol = typeof SUPPORTED_PREFIX[number]
+type ValidInputTypes = File|string
+
+type ProcessorOutput = {option: LayerOption, url: string, protocol: ValidProtocol, meta: Meta, cleanup: () => void}
+type ProcessResource = {
+  matcher: (input: ValidInputTypes) => boolean
+  processor: (input: ValidInputTypes) => Promise<ProcessorOutput>
+}
+
+const SOURCE_PROCESSOR: ProcessResource[] = []
+function RegisterSource(matcher: ProcessResource['matcher']) {
+  return (target: Record<string, any>, propertyKey: string, _descriptor: PropertyDescriptor) => {
+    SOURCE_PROCESSOR.push({
+      matcher,
+      processor: target[propertyKey],
+    })
+  }
+}
+
 
 @Injectable()
 export class UserLayerService implements OnDestroy {
-  private userLayerUrlToIdMap = new Map<string, string>()
-  private createdUrlRes = new Set<string>()
+  #idToCleanup = new Map<string, () => void>()
 
-  private supportedPrefix = ["nifti://", "precomputed://", "swc://"]
-
-  private verifyUrl(url: string) {
-    for (const prefix of this.supportedPrefix) {
-      if (url.includes(prefix)) return
+  static VerifyUrl(source: string) {
+    for (const prefix of SUPPORTED_PREFIX) {
+      if (source.includes(prefix)) return
     }
     throw new Error(
-      `url: ${url} does not start with supported prefixes ${this.supportedPrefix}`
+      `source: ${source} does not start with supported prefixes ${SUPPORTED_PREFIX}`
     )
   }
 
-  async getCvtFileToUrl(file: File): Promise<{
-    url: string
-    meta: Meta
-    options?: Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
-  }> {
-    /**
-     * if extension is .swc, process as if swc
-     */
-    if (/\.swc$/i.test(file.name)) {
-      let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
-      const swcText = await file.text()
-      let src: TVALID_LINEAR_XFORM_SRC
-      const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
-      if (/ccf/i.test(swcText)) {
-        src = "CCF"
-        message += `CCF detected, applying known transformation.`
-      }
-      if (!src) {
-        message += `no known space detected. Applying default transformation.`
-      }
-
-      const xform = await linearTransform(src, dst)
-
-      const url = URL.createObjectURL(file)
-      this.createdUrlRes.add(url)
-
-      return {
-        url: `swc://${url}`,
-        meta: {
-          filename: file.name,
-          message,
-        },
-        options: {
-          segments: ["1"],
-          transform: xform,
-          type: "segmentation"
-        },
-      }
+  @RegisterSource(
+    input => input instanceof File && input.name.endsWith(".swc")
+  )
+  async processSwc(file: File): ReturnType<ProcessResource['processor']> {
+    let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
+    const swcText = await file.text()
+    let src: TVALID_LINEAR_XFORM_SRC
+    const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
+    if (/ccf/i.test(swcText)) {
+      src = "CCF"
+      message += `CCF detected, applying known transformation.`
+    }
+    if (!src) {
+      message += `no known space detected. Applying default transformation.`
     }
 
-    /**
-     * process as if nifti
-     */
+    const xform = await linearTransform(src, dst)
+    const url = URL.createObjectURL(file)
 
-    // Get file, try to inflate, if files, use original array buffer
-    const buf = await file.arrayBuffer()
-    let outbuf
-    try {
-      const { pako } = await getExportNehuba()
-      outbuf = pako.inflate(buf).buffer
-    } catch (e) {
-      console.log("unpack error", e)
-      outbuf = buf
+    return {
+      option: {
+        type: 'segmentation',
+        transform: xform,
+        segments: ["1"]
+      },
+      url,
+      protocol: "swc://",
+      meta: {
+        filename: file.name
+      },
+      cleanup: () => URL.revokeObjectURL(url)
     }
+  }
 
+  async #processUnpackedNiiBuf(buf: ArrayBuffer): ReturnType<ProcessResource['processor']> {
     const { result } = await this.worker.sendMessage({
       method: "PROCESS_NIFTI",
       param: {
-        nifti: outbuf,
+        nifti: buf,
       },
-      transfers: [outbuf],
+      transfers: [buf],
     })
-
-    const { meta, buffer } = result
-
+    const { buffer, meta } = result
     const url = URL.createObjectURL(new Blob([buffer]))
     return {
-      url: `nifti://${url}`,
-      meta: {
-        filename: file.name,
-        min: meta.min || 0,
-        max: meta.max || 1,
-        message: meta.message,
-      },
-      options: {
+      protocol: 'nifti://',
+      url,
+      option: {
+        type: 'image',
         shader: getShader({
           colormap: EnumColorMapName.MAGMA,
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
-        }),
-        type: 'image'
+        })
       },
+      meta,
+      cleanup: () => URL.revokeObjectURL(url)
     }
   }
 
-  addUserLayer(
-    url: string,
-    meta: Meta,
-    options: Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys> = {}
-  ) {
-    this.verifyUrl(url)
-    if (this.userLayerUrlToIdMap.has(url)) {
-      throw new Error(`url ${url} already added`)
+  @RegisterSource(
+    input => input instanceof File && input.name.endsWith(".nii")
+  )
+  async processNifti(file: File){
+    const buf = await file.arrayBuffer()
+    return await this.#processUnpackedNiiBuf(buf)
+  }
+
+  @RegisterSource(
+    input => input instanceof File && input.name.endsWith(".nii.gz")
+  )
+  async processNiiGz(file: File) {
+    const buf = await file.arrayBuffer()
+    try {
+      const { pako } = await getExportNehuba()
+      const outbuf = pako.inflate(buf).buffer
+      return await this.#processUnpackedNiiBuf(outbuf)
+    } catch (e) {
+      console.log("unpack error", e)
+      throw e
     }
+  }
+
+  @RegisterSource(
+    input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
+  )
+  async processOverlayPath(source: string) {
+    const strippedSrc = source.replace(OVERLAY_LAYER_PROTOCOL, "")
+    const { cleanup, ...rest } = await this.#processInput(strippedSrc)
+    return {
+      ...rest,
+      cleanup: () => {
+        this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, null)
+        cleanup()
+      }
+    }
+  }
+
+  @RegisterSource(
+    input => typeof input === "string" && input.startsWith("precomputed://")
+  )
+  async processPrecomputed(source: string): Promise<ProcessorOutput>{
+    const url = source.replace("precomputed://", "")
+    const { transform, meta } = await forkJoin({
+      transform: fetch(`${url}/transform.json`)
+        .then(res => res.json() as Promise<MetaV1Schema["transform"]>)
+        .catch(_e => null as MetaV1Schema["transform"]),
+      meta: from(
+        translateV3Entities.fetchMeta(url)
+        .catch(_e => null as MetaV1Schema)  
+      )
+    }).toPromise()
+    
+    return {
+      cleanup: () => {},
+      meta: {
+        filename: url
+      },
+      option: {
+        transform: meta?.transform || transform,
+        shader: getShaderFromMeta(meta),
+      },
+      protocol: "precomputed://",
+      url
+    }
+  }
+
+  @RegisterSource(
+    input => typeof input === "string" && input.startsWith("deepzoom://")
+  )
+  async processDzi(source: string): Promise<ProcessorOutput> {
+    const url = source.replace("deepzoom://", "")
+    const scaleFactor = 1e2
+    return {
+      cleanup: () => {},
+      meta: {
+        filename: `deepzoom://${url}`
+      },
+      option: {
+        transform: [
+          [ scaleFactor, 0, 0, 0 ],
+          [ 0, scaleFactor, 0, 0 ],
+          [ 0, 0, 1, 0 ],
+          [ 0, 0, 0, 1 ],
+        ],
+        shader: `void main(){emitRGB(vec3(toNormalized(getDataValue(0)),toNormalized(getDataValue(1)),toNormalized(getDataValue(2))));}`,
+      },
+      protocol: "deepzoom://",
+      url
+    }
+  }
+
+  async #processInput(input: ValidInputTypes): Promise<ProcessorOutput> {
+    for (const { matcher, processor } of SOURCE_PROCESSOR) {
+      if (matcher(input)) {
+        return await processor.apply(this, [input])
+      }
+    }
+    debugger
+    const inputStr = input instanceof File
+      ? input.name
+      : input
+    throw new Error(`Could not find a processor for ${inputStr}`)
+  }
+
+  async handleUserInput(input: ValidInputTypes){
     const id = getUuid()
-    const layer: atlasAppearance.const.NgLayerCustomLayer = {
+    const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
+    if (this.#idToCleanup.has(id)) {
+      throw new Error(`${url} was already registered`)
+    }
+    this.#idToCleanup.set(id, cleanup)
+    this.addUserLayer(
       id,
-      clType: "customlayer/nglayer",
-      source: url,
+      `${protocol}${url}`,
+      meta,
+      option,
+    )
+    return
+  }
+
+  addUserLayer(
+    id: string,
+    source: string,
+    meta: Meta,
+    options: LayerOption = {}
+  ) {
+    UserLayerService.VerifyUrl(source)
+    const layer = {
+      id,
+      clType: "customlayer/nglayer" as const,
+      source,
       ...options,
     }
     this.store$.dispatch(
@@ -151,48 +262,30 @@ export class UserLayerService implements OnDestroy {
       })
     )
 
-    this.userLayerUrlToIdMap.set(url, id)
-
-    this.dialog
-      .open(UserLayerInfoCmp, {
-        data: {
-          layerName: id,
-          filename: meta.filename,
-          min: meta.min || 0,
-          max: meta.max || 1,
-          warning: [meta.message] || [],
-        },
-        hasBackdrop: false,
-        disableClose: true,
-        position: {
-          top: "0em",
-        },
-        autoFocus: false,
-        panelClass: ["no-padding-dialog", "w-100"],
-      })
-      .afterClosed()
-      .subscribe(() => {
-        this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, null)
-      })
-  }
-
-  removeUserLayer(url: string) {
-    if (!this.userLayerUrlToIdMap.has(url)) {
-      throw new Error(`${url} has not yet been added.`)
-    }
-
-    /**
-     * if the url to be removed is a url resource, revoke the resource
-     */
-    const matched = /http.*$/.exec(url)
-    if (matched && this.createdUrlRes.has(matched[0])) {
-      URL.revokeObjectURL(matched[0])
-      this.createdUrlRes.delete(matched[0])
-    }
-
-    const id = this.userLayerUrlToIdMap.get(url)
-    this.store$.dispatch(atlasAppearance.actions.removeCustomLayer({ id }))
-    this.userLayerUrlToIdMap.delete(url)
+    this.dialog.open(UserLayerInfoCmp, {
+      data: {
+        layerName: id,
+        filename: meta.filename,
+        warning: [meta.message] || [],
+      },
+      hasBackdrop: false,
+      disableClose: true,
+      position: {
+        top: "0em",
+      },
+      autoFocus: false,
+      panelClass: ["no-padding-dialog", "w-100"],
+    })
+    .afterClosed()
+    .subscribe(() => {
+      this.store$.dispatch(atlasAppearance.actions.removeCustomLayer({ id }))
+      const cleanup = this.#idToCleanup.get(id)
+      if (!cleanup) {
+        console.warn(`idToCleanup ${id} could not be found! ${meta.filename}`)
+        return
+      }
+      cleanup()
+    })
   }
 
   #subscription: Subscription[] = []
@@ -203,66 +296,12 @@ export class UserLayerService implements OnDestroy {
     private routerSvc: RouterService
   ) {
     this.#subscription.push(
-      concat(
-        of(null as string),
-        this.routerSvc.customRoute$.pipe(
-          select(v => v[OVERLAY_LAYER_KEY])
-        )
+      this.routerSvc.customRoute$.pipe(
+        select(v => v[OVERLAY_LAYER_KEY])
       ).pipe(
-        pairwise(),
-        switchMap(([prev, curr]) => {
-          /**
-           * for precomputed sources, check if transform.json exists.
-           * if so, try to fetch it, and set it as transform
-           */
-          if (!curr) {
-            return of({ prev, curr, meta: null as MetaV1Schema })
-          }
-          if (!curr.startsWith("precomputed://")) {
-            return of({ prev, curr, meta: null as MetaV1Schema })
-          }
-          const url = curr.replace("precomputed://", "")
-          
-          
-          return forkJoin({
-            transform: fetch(`${url}/transform.json`)
-              .then(res => res.json() as Promise<MetaV1Schema["transform"]>)
-              .catch(_e => null as MetaV1Schema["transform"]),
-            meta: from(
-              translateV3Entities.fetchMeta(url)
-              .catch(_e => null as MetaV1Schema)  
-            )
-          }).pipe(
-            map(({ transform, meta }) => {
-              return {
-                prev,
-                curr,
-                meta: {
-                  ...meta,
-                  transform: meta?.transform || transform
-                }
-              }
-            }),
-          )
-        })
-      ).subscribe(({ prev, curr, meta }) => {
-        if (prev) {
-          this.removeUserLayer(prev)
-        }
-        if (curr) {
-          this.addUserLayer(
-            curr,
-            {
-              filename: curr,
-              message: `Overlay layer populated in URL`,
-            },
-            {
-              shader: getShaderFromMeta(meta),
-              transform: meta.transform
-            }
-          )
-        }
-      })
+        distinctUntilChanged(),
+        filter(url => !!url)
+      ).subscribe(url => this.handleUserInput(url))
     )
   }
 

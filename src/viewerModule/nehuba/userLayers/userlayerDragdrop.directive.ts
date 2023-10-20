@@ -53,9 +53,6 @@ export class UserLayerDragDropDirective
       return
     }
     const file = files[0]
-
-    const { meta, url, options } = await this.svc.getCvtFileToUrl(file)
-
-    this.svc.addUserLayer(url, meta, options)
+    await this.svc.handleUserInput(file)
   }
 }

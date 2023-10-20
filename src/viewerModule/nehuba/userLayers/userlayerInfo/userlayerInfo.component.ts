@@ -8,8 +8,6 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 export type UserLayerInfoData = {
   layerName: string
   filename: string
-  min: number
-  max: number
   warning: string[]
 }
 
