@@ -28,7 +28,6 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatToolbarModule } from '@angular/material/toolbar'
 
 import { ClipboardModule } from '@angular/cdk/clipboard'
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatRadioModule } from "@angular/material/radio";
