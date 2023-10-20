@@ -827,12 +827,12 @@ body::after
   text-overflow: ellipsis;
 }
 
-iav-cmp-viewer-container .mat-chip-list-wrapper
+iav-cmp-viewer-container .mat-chip-set-wrapper
 {
   flex-wrap: nowrap;
 }
 
-.wrapped-chips .mat-chip-list-wrapper
+.wrapped-chips .mat-chip-set-wrapper
 {
   flex-wrap: wrap;
 }

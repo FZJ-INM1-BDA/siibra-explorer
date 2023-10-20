@@ -3,7 +3,7 @@ import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { ARIA_LABELS } from "common/constants"
 import { UntypedFormControl } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, map, startWith } from "rxjs/operators";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { MatAutocompleteSelectedEvent } from 'src/sharedModules/angularMaterial.exports'
 import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionListSearchTmpl.directive";
 import { BehaviorSubject, combineLatest } from "rxjs";
 

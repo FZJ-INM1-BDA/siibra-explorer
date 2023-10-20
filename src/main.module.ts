@@ -24,7 +24,6 @@ import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
-import 'src/theme.scss'
 import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { MesssagingModule } from './messaging/module';

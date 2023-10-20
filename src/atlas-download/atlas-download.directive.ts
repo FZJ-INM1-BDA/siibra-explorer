@@ -1,5 +1,5 @@
 import { Directive, HostListener } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';

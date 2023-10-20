@@ -14,7 +14,7 @@ import { atlasSelection } from ".."
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { PathReturn } from "src/atlasComponents/sapi/typeV3"
-import { MatDialog } from "@angular/material/dialog"
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {

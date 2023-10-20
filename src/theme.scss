@@ -3,6 +3,46 @@
 
 @include mat.core();
 
+$sxplr-primary: mat.define-palette(mat.$indigo-palette, 500);
+$sxplr-accent: mat.define-palette(mat.$amber-palette, A200, A100, A400);
+$sxplr-warn: mat.define-palette(mat.$red-palette);
+
+// The "warn" palette is optional and defaults to red if not specified.
+$sxplr-warn: mat.define-palette(mat.$red-palette);
+$sxplr-light-theme: mat.define-light-theme((
+ color: (
+   primary: $sxplr-primary,
+   accent: $sxplr-accent,
+   warn: $sxplr-warn,
+ ),
+ typography: mat.define-typography-config(),
+ density: 0,
+));
+
+// Define a dark theme
+$sxplr-dark-theme: mat.define-dark-theme((
+ color: (
+   primary: $sxplr-primary,
+   accent: $sxplr-accent,
+   warn: $sxplr-warn,
+ ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Include the theme mixins for other components you use here.
+// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
+//  The following line adds:
+//    1. Default typography styles for all components
+//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
+//  If you specify typography styles for the components you use elsewhere, you should delete this line.
+//  If you don't need the default component typographies but still want the hierarchy styles,
+//  you can delete this line and instead use:
+//    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
+
+// @include mat.all-legacy-component-typographies();
+// @include mat.legacy-core();
+
 @mixin custom-cmp($theme) {
   $color-config: mat.get-color-config($theme);
 
@@ -85,32 +125,20 @@
   }
 }
 
-$iv-theme-primary:  mat.define-palette(mat.$indigo-palette);
-$iv-theme-accent:   mat.define-palette(mat.$amber-palette);
-$iv-theme-warn:     mat.define-palette(mat.$red-palette);
+// @include mat.all-legacy-component-themes($iv-theme);
+// @include custom-cmp($iv-theme);
 
-$iv-theme: mat.define-light-theme((
-  color: (
-    primary: $iv-theme-primary,
-    accent: $iv-theme-accent,
-    warn: $iv-theme-warn,
-  )
-));
+// $iv-dark-theme-primary: mat.define-palette(mat.$blue-palette);
+// $iv-dark-theme-accent:  mat.define-palette(mat.$amber-palette, A200, A100, A400);
+// $iv-dark-theme-warn:    mat.define-palette(mat.$red-palette);
 
-@include mat.all-component-themes($iv-theme);
-@include custom-cmp($iv-theme);
-
-$iv-dark-theme-primary: mat.define-palette(mat.$blue-palette);
-$iv-dark-theme-accent:  mat.define-palette(mat.$amber-palette, A200, A100, A400);
-$iv-dark-theme-warn:    mat.define-palette(mat.$red-palette);
-
-$iv-dark-theme:   mat.define-dark-theme((
-  color: (
-    primary: $iv-dark-theme-primary,
-    accent: $iv-dark-theme-accent,
-    warn: $iv-dark-theme-warn,
-  )
-));
+// $iv-dark-theme:   mat.define-dark-theme((
+//   color: (
+//     primary: $iv-dark-theme-primary,
+//     accent: $iv-dark-theme-accent,
+//     warn: $iv-dark-theme-warn,
+//   )
+// ));
 
 /**
   * attribute has lower priority than class
@@ -120,15 +148,15 @@ $iv-dark-theme:   mat.define-dark-theme((
 [darktheme=true],
 .darktheme.darktheme
 {
-  @include mat.all-component-themes($iv-dark-theme);
-  @include custom-cmp($iv-dark-theme);
+  @include mat.all-component-themes($sxplr-dark-theme);
+  @include custom-cmp($sxplr-dark-theme);
 }
 
 [darktheme=false],
 .lighttheme.lighttheme
 {
-  @include mat.all-component-themes($iv-theme);
-  @include custom-cmp($iv-theme);
+  @include custom-cmp($sxplr-light-theme);
+  @include mat.all-component-themes($sxplr-light-theme);
 }
 
 .iav-dialog-class

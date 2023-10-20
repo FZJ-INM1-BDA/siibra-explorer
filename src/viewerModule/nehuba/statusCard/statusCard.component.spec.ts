@@ -8,7 +8,6 @@ import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { By } from "@angular/platform-browser"
-import { MatSlideToggle } from "@angular/material/slide-toggle"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { UtilModule } from "src/util"
@@ -16,6 +15,7 @@ import * as configSvc from '../config.service'
 import {QuickTourModule} from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
+import { MatSlideToggle } from "src/sharedModules/angularMaterial.exports"
 
 @Directive({
   selector: '[iav-auth-auth-state]',

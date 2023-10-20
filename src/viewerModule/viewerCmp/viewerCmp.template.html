@@ -815,7 +815,7 @@
   
           <!-- content -->
           <ng-template matExpansionPanelContent>
-            <mat-chip-list class="wrapped-chips">
+            <mat-chip-set class="wrapped-chips">
               <mat-chip *ngFor="let region of regions">
                 <span>
                   {{ region.name }}
@@ -826,7 +826,7 @@
                   <i class="fas fa-times"></i>
                 </button>
               </mat-chip>  
-            </mat-chip-list>
+            </mat-chip-set>
           </ng-template>
         </mat-expansion-panel>
   

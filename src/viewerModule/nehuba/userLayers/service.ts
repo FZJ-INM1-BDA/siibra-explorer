@@ -1,5 +1,4 @@
 import { Injectable, OnDestroy } from "@angular/core"
-import { MatDialog, MatDialogRef } from "@angular/material/dialog"
 import { select, Store } from "@ngrx/store"
 import { forkJoin, from, Subscription } from "rxjs"
 import { distinctUntilChanged, filter } from "rxjs/operators"
@@ -19,6 +18,7 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
+import { MatDialogRef, MatDialog } from "src/sharedModules/angularMaterial.exports"
 
 type OmitKeys = "clType" | "id" | "source"
 type LayerOption = Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
@@ -51,7 +51,9 @@ function RegisterSource(matcher: ProcessResource['matcher']) {
 }
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserLayerService implements OnDestroy {
   #idToCleanup = new Map<string, () => void>()
   #dialogRef: MatDialogRef<unknown>

@@ -1,5 +1,5 @@
 import { Component, Inject, ViewChild } from "@angular/core";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { BehaviorSubject, Subject, combineLatest, concat, of, timer } from "rxjs";
 import { map, switchMap, take } from "rxjs/operators";

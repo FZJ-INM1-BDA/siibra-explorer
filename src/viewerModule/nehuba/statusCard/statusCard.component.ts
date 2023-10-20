@@ -12,8 +12,7 @@ import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subscription, of, combineLatest } from "rxjs";
 import { map, filter, startWith, throttleTime } from "rxjs/operators";
-import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { MatDialog } from "@angular/material/dialog";
+import { MatBottomSheet, MatDialog } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { UntypedFormControl } from "@angular/forms";
 

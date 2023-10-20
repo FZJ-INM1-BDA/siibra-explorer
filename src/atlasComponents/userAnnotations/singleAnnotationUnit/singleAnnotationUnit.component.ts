@@ -6,7 +6,7 @@ import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { select, Store } from "@ngrx/store";
 import { ModularUserAnnotationToolService } from "../tools/service";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Line } from "../tools/line";
 import { atlasSelection } from "src/state";
 import { map } from "rxjs/operators";

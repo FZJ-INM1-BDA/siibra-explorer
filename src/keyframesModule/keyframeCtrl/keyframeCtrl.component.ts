@@ -1,10 +1,10 @@
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { Component, OnDestroy, Optional } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { Subscription } from "rxjs";
 import { getUuid } from "src/util/fn";
 import { timedValues } from "src/util/generator";
 import { AUTO_ROTATE, TAutoRotatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 
 type TStoredState = {
   name: string

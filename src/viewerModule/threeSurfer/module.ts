@@ -10,7 +10,6 @@ import { ThreeSurferViewerConfig } from "./tsViewerConfig/tsViewerConfig.compone
 import { nameSpace, reducer, ThreeSurferEffects } from "./store"
 import { EffectsModule } from "@ngrx/effects";
 import { TmpThreeSurferLifeCycle } from "./lifecycle/lifecycle.component";
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { ExperimentalModule } from "src/experimental/experimental.module";
 
 @NgModule({
@@ -20,7 +19,6 @@ import { ExperimentalModule } from "src/experimental/experimental.module";
     UtilModule,
     FormsModule,
     ComponentsModule,
-    MatSlideToggleModule,
     ExperimentalModule,
     StoreModule.forFeature(
       nameSpace,

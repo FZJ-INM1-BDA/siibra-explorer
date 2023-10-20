@@ -1,5 +1,5 @@
 import { Component, TemplateRef } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { ARIA_LABELS } from 'common/constants'
 
 @Component({

@@ -10,12 +10,13 @@ import { CookieModule } from "src/ui/cookieAgreement/module";
 import { HelpModule } from "src/ui/help/module";
 import { KgTosModule } from "src/ui/kgtos/module";
 import { ScreenshotModule } from "src/screenshot";
-import { AngularMaterialModule } from "src/sharedModules";
 import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
+import { AngularMaterialModule } from "src/sharedModules";
+
 
 @NgModule({
   imports: [

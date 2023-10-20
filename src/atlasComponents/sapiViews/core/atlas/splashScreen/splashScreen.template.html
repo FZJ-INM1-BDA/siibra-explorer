@@ -8,11 +8,11 @@
       (click)="selectAtlas(atlas)"
       matRipple
       *ngFor="let atlas of atlases$ | async"
-      class="m-3 col-md-12 col-lg-12 pe-all">
+      class="m-3 col-md-12 col-lg-12 pe-all mat-elevation-z2">
       <mat-card-header>
-        <mat-card-title class="text-nowrap font-stretch">
+        <h1 class="mat-h1 sxplr-p-2">
           {{ atlas.name }}
-        </mat-card-title>
+        </h1>
       </mat-card-header>
 
       <!-- required... or on ripple, angular adds 16px margin to the bottom -->

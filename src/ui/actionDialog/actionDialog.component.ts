@@ -1,5 +1,5 @@
 import { Component, Optional, Inject } from "@angular/core";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports";
 
 interface IDialogAction{
   type: 'mat-button' | 'mat-flat-button' | 'mat-raised-button' | 'mat-stroked-button'

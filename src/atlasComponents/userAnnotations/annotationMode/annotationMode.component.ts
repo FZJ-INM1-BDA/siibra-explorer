@@ -4,7 +4,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, TContextMenu } from "src/util";
 import { TContextArg } from "src/viewerModule/viewer.interface";
 import { TContextMenuReg } from "src/contextMenuModule";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 
 @Component({
   selector: 'annotating-tools-panel',

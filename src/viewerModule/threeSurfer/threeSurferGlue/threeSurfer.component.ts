@@ -5,7 +5,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shar
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { CONST } from 'common/constants'
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
