@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from "@angular/core"
-import { MatDialog } from "@angular/material/dialog"
+import { MatDialog, MatDialogRef } from "@angular/material/dialog"
 import { select, Store } from "@ngrx/store"
 import { forkJoin, from, Subscription } from "rxjs"
 import { distinctUntilChanged, filter } from "rxjs/operators"
@@ -17,6 +17,8 @@ import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
+import { AnnotationLayer } from "src/atlasComponents/annotations"
+import { rgbToHex } from 'common/util'
 
 type OmitKeys = "clType" | "id" | "source"
 type LayerOption = Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
@@ -32,9 +34,9 @@ const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "swc://", "deepzoom://"]
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
-type ProcessorOutput = {option: LayerOption, url: string, protocol: ValidProtocol, meta: Meta, cleanup: () => void}
+type ProcessorOutput = {option?: LayerOption, url?: string, protocol?: ValidProtocol, meta: Meta, cleanup: () => void}
 type ProcessResource = {
-  matcher: (input: ValidInputTypes) => boolean
+  matcher: (input: ValidInputTypes) => Promise<boolean>
   processor: (input: ValidInputTypes) => Promise<ProcessorOutput>
 }
 
@@ -52,6 +54,7 @@ function RegisterSource(matcher: ProcessResource['matcher']) {
 @Injectable()
 export class UserLayerService implements OnDestroy {
   #idToCleanup = new Map<string, () => void>()
+  #dialogRef: MatDialogRef<unknown>
 
   static VerifyUrl(source: string) {
     for (const prefix of SUPPORTED_PREFIX) {
@@ -63,7 +66,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => input instanceof File && input.name.endsWith(".swc")
+    async input => input instanceof File && input.name.endsWith(".swc")
   )
   async processSwc(file: File): ReturnType<ProcessResource['processor']> {
     let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
@@ -71,7 +74,7 @@ export class UserLayerService implements OnDestroy {
     let src: TVALID_LINEAR_XFORM_SRC
     const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
     if (/ccf/i.test(swcText)) {
-      src = "CCF"
+      src = "CCF_V2_5"
       message += `CCF detected, applying known transformation.`
     }
     if (!src) {
@@ -123,7 +126,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => input instanceof File && input.name.endsWith(".nii")
+    async input => input instanceof File && input.name.endsWith(".nii")
   )
   async processNifti(file: File){
     const buf = await file.arrayBuffer()
@@ -131,7 +134,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => input instanceof File && input.name.endsWith(".nii.gz")
+    async input => input instanceof File && input.name.endsWith(".nii.gz")
   )
   async processNiiGz(file: File) {
     const buf = await file.arrayBuffer()
@@ -146,7 +149,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
+    async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
   )
   async processOverlayPath(source: string) {
     const strippedSrc = source.replace(OVERLAY_LAYER_PROTOCOL, "")
@@ -161,7 +164,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => typeof input === "string" && input.startsWith("precomputed://")
+    async input => typeof input === "string" && input.startsWith("precomputed://")
   )
   async processPrecomputed(source: string): Promise<ProcessorOutput>{
     const url = source.replace("precomputed://", "")
@@ -190,7 +193,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    input => typeof input === "string" && input.startsWith("deepzoom://")
+    async input => typeof input === "string" && input.startsWith("deepzoom://")
   )
   async processDzi(source: string): Promise<ProcessorOutput> {
     const url = source.replace("deepzoom://", "")
@@ -214,13 +217,82 @@ export class UserLayerService implements OnDestroy {
     }
   }
 
+  @RegisterSource(async input => {
+    if (input instanceof File && input.name.endsWith(".json")) {
+      const JSON_KEYS = [
+        // "b",
+        // "count",
+        // "g",
+        // "idx",
+        // "name",
+        // "r",
+        "triplets"
+      ]
+      const text = await input.text()
+      const arr = JSON.parse(text)
+
+      // must be array
+      if (!Array.isArray(arr)) {
+        return false
+      }
+      // can only deal with length 1 for now
+      if (arr.length !== 1) {
+        return false
+      }
+      const item = arr[0]
+      for (const key of JSON_KEYS) {
+        if (!item[key]) {
+          console.log(`Parsing PCJson failed. ${key} does not exist`)
+          return false
+        }
+      }
+      return true
+    }
+    return false
+  })
+  async processPCJson(file: File): Promise<ProcessorOutput>{
+    const arr = JSON.parse(await file.text())
+    const item = arr[0]
+    const { r, g, b } = item
+    
+    const rgbString = [r, g, b].every(v => Number.isInteger(v))
+    ? rgbToHex([r, g, b])
+    : "#ff0000"
+
+    const id = getUuid()
+    const src = "QUICKNII"
+    const dst = "NEHUBA"
+    const xform = await linearTransform(src, dst)
+    const layer = new AnnotationLayer(id, rgbString, xform)
+
+    const triplets: number[][] = [item.triplets.slice(0, 3)]
+    for (const num of item.triplets as number[]) {
+      if (triplets.at(-1).length === 3) {
+        triplets.push([num])
+        continue
+      }
+      triplets.at(-1).push(num)
+    }
+    
+    layer.addAnnotation(triplets.map((triplet, idx) => ({
+      id: `${id}-${idx}`,
+      type: 'point',
+      point: triplet.map(v => v) as [number, number, number]
+    })))
+    return {
+      cleanup: () => layer.dispose(),
+      meta: {
+        filename: file.name,
+      }
+    }
+  }
+
   async #processInput(input: ValidInputTypes): Promise<ProcessorOutput> {
     for (const { matcher, processor } of SOURCE_PROCESSOR) {
-      if (matcher(input)) {
+      if (await matcher(input)) {
         return await processor.apply(this, [input])
       }
     }
-    debugger
     const inputStr = input instanceof File
       ? input.name
       : input
@@ -236,7 +308,7 @@ export class UserLayerService implements OnDestroy {
     this.#idToCleanup.set(id, cleanup)
     this.addUserLayer(
       id,
-      `${protocol}${url}`,
+      protocol && url &&`${protocol}${url}`,
       meta,
       option,
     )
@@ -245,24 +317,30 @@ export class UserLayerService implements OnDestroy {
 
   addUserLayer(
     id: string,
-    source: string,
+    source: string|null|undefined,
     meta: Meta,
     options: LayerOption = {}
   ) {
-    UserLayerService.VerifyUrl(source)
-    const layer = {
-      id,
-      clType: "customlayer/nglayer" as const,
-      source,
-      ...options,
+    if (source) {
+      UserLayerService.VerifyUrl(source)
+      const layer = {
+        id,
+        clType: "customlayer/nglayer" as const,
+        source,
+        ...options,
+      }
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: layer,
+        })
+      )
     }
-    this.store$.dispatch(
-      atlasAppearance.actions.addCustomLayer({
-        customLayer: layer,
-      })
-    )
 
-    this.dialog.open(UserLayerInfoCmp, {
+    if (this.#dialogRef) {
+      this.#dialogRef.close()
+      this.#dialogRef = null
+    }
+    this.#dialogRef = this.dialog.open(UserLayerInfoCmp, {
       data: {
         layerName: id,
         filename: meta.filename,
@@ -276,15 +354,16 @@ export class UserLayerService implements OnDestroy {
       autoFocus: false,
       panelClass: ["no-padding-dialog", "w-100"],
     })
-    .afterClosed()
-    .subscribe(() => {
-      this.store$.dispatch(atlasAppearance.actions.removeCustomLayer({ id }))
+  
+    this.#dialogRef.afterClosed().subscribe(() => {
       const cleanup = this.#idToCleanup.get(id)
-      if (!cleanup) {
-        console.warn(`idToCleanup ${id} could not be found! ${meta.filename}`)
-        return
+      cleanup && cleanup()
+      if (source) {
+        this.store$.dispatch(
+          atlasAppearance.actions.removeCustomLayer({ id })
+        )
       }
-      cleanup()
+      this.#idToCleanup.delete(id)
     })
   }
 
