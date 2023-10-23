@@ -32,22 +32,6 @@ const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
     data: {
       type: "image/3d"
     },
-    bestViewPoints: [{
-      type: "enclosed",
-      points: [{
-        type: "point",
-        value: [-16.625, -80.813, 41.801]
-      },{
-        type: "point",
-        value: [-16.625, -64.293, -66.562]
-      },{
-        type: "point",
-        value: [-16.625, 86.557, -42.685]
-      },{
-        type: "point",
-        value: [-16.625, 69.687, 63.015]
-      }]
-    }],
     transform: [[7.325973427896315e-8,2.866510051546811e-8,-1,-16600000],[-0.9899035692214966,0.14174138009548187,-6.845708355740499e-8,70884888],[-0.14174138009548187,-0.9899035692214966,-3.875962661936683e-8,64064704],[0,0,0,1]]
   },
   "https://1um.brainatlas.eu/cyto_reconstructions/ebrains_release/BB_1um/VOI_1/precomputed": {
