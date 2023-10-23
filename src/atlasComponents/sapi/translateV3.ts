@@ -104,6 +104,84 @@ const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
       type: "image/3d"
     },
     transform: [[-0.74000001,0,0,38134608],[0,-0.26530117,-0.6908077,13562314],[0,-0.6908077,0.26530117,-3964904],[0,0,0,1]]
+  },
+  "https://1um.brainatlas.eu/pli-bigbrain/masked/precomputed": {
+    version: 1,
+    data: {
+        type: "image/3d"
+    },
+    transform: [[0.09610333293676376,0.18529105186462402,1.1221941709518433,-86564752],[-0.9440627098083496,-0.05010826885700226,0.0727924108505249,80961928],[-0.11565766483545303,-0.9673581719398499,-0.038424473255872726,75194496],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/chenonceau-200-um-dti-fractional-anisotropy/dti_fa_200um": {
+    version: 1,
+    data: {
+        type: "image/1d"
+    },
+    preferredColormap: ["magma"],
+    transform: [[-0.2, 0.0, 0.0, 96400000.0], [0.0, -0.2, 0.0, 96400000.0], [0.0, 0.0, -0.2, 114400000.0], [0.0, 0.0, 0.0, 1.0]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/chenonceau_dti_rgb_200um/precomputed": {
+      version: 1,
+      data: {
+          type: "image/3d"
+      },
+      transform: [[-0.2, 0.0, 0.0, 96400000.0], [0.0, -0.2, 0.0, 96400000.0], [0.0, 0.0, -0.2, 114400000.0], [0.0, 0.0, 0.0, 1.0]]
+  },
+  "https://1um.brainatlas.eu/broca/neun": {
+      version: 1,
+      data: {
+          type: "image/1d",
+          range: [{
+              "min": 0.0,
+              "max": 0.03
+          }]
+      },
+      preferredColormap: ["greyscale"],
+      transform: [[-0.7522572875022888,0.49253523349761963,0,-23501134],[-0.49253523349761963,-0.7522572875022888,0,73817088],[0,0,0.8991562724113464,-5074088.5],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/wikibrainstem-original/TRONC_001_11.7T_100um_pub_ORIGINAL": {
+      version: 1,
+      data: {
+          type: "image/1d",
+          range: [{
+              "min": 0.0,
+              "max": 0.03
+          }]
+      },
+      preferredColormap: ["greyscale"],
+      transform: [[0.9884678721427917,0.020477699115872383,-0.15004022419452667,-13731683],[0.08980953693389893,0.7184783816337585,0.6897274255752563,-62889108],[0.12192454934120178,-0.6952477097511292,0.7083531022071838,-44303880],[0,0,0,1]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/chenonceau-anatomy-200um/anatomy_200um": {
+      version: 1,
+      data: {
+          type: "image/1d",
+          range: [{
+              "min": 0.0,
+              "max": 0.01
+          }]
+      },
+      preferredColormap: ["greyscale"],
+      transform: [[-0.2, 0.0, 0.0, 96400000.0], [0.0, -0.2, 0.0, 96400000.0], [0.0, 0.0, -0.2, 114400000.0], [0.0, 0.0, 0.0, 1.0]]
+  },
+  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/chenonceau-anatomy-150-um/anatomy_150um": {
+      version: 1,
+      data: {
+          type: "image/1d",
+          range: [{
+              "min": 0.0,
+              "max": 0.001
+          }]
+      },
+      preferredColormap: ["greyscale"],
+      transform: [[-0.15, 0.0, 0.0, 96425000.0], [0.0, -0.15, 0.0, 96425000.0], [0.0, 0.0, -0.15, 114425000.0], [0.0, 0.0, 0.0, 1.0]]
+  },
+  "https://1um.brainatlas.eu/salditt/AD_10_PB_7x7-stitch/precomputed": {
+    version: 1,
+    data: {
+        type: "image/1d"
+    },
+    preferredColormap: ["jet"],
+    transform: [[0.2069708704948425, 0.9783469713651216, 0.0, -27572548.0], [-3.348740908502525e-08, 7.084309890851377e-09, -0.9999999633202186, -2800959.25], [0.9783469713651216, -0.2069708704948425, -3.422853248698979e-08, -16159642.0], [0.0, 0.0, 0.0, 1.0]]
   }
 }
 
