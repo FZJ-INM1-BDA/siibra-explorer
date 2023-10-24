@@ -6,7 +6,7 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { Feature, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
-import { catchError, map, shareReplay, switchMap } from "rxjs/operators";
+import { catchError, map, scan, shareReplay, switchMap } from "rxjs/operators";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 
@@ -45,6 +45,15 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   }
 
   activePanelTitles$: Observable<string[]> = new Subject()
+  
+  #fetching$ = new Subject<Record<string, boolean>>()
+  busy$ = this.#fetching$.pipe(
+    scan((acc, curr) => ({ ...acc, ...curr })),
+    map(fetchingItems => {
+      const busyFlags = Object.values(fetchingItems)
+      return busyFlags.some(flag => flag)
+    })
+  )
 
   private regionalMaps$ = this.ATPR$.pipe(
     switchMap(({ parcellation, template, region }) =>

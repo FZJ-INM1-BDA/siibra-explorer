@@ -882,7 +882,7 @@ how-to-cite img
   margin-top: 1rem;
 }
 
-.overview-content
+.annotation-tool-btn .mdc-button__label
 {
-  white-space: normal!important;
+  transform: translateX(0.7rem);
 }

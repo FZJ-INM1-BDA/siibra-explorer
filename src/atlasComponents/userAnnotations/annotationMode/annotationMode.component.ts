@@ -28,6 +28,12 @@ export class AnnotationMode implements OnDestroy{
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
     @Optional() @Inject(CONTEXT_MENU_ITEM_INJECTOR) ctxMenuInterceptor: TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
   ) {
+
+    /**
+     * reverse the order, since we are column reverse to achieve the tab effect
+     */
+    this.moduleAnnotationTypes.reverse()
+
     const stopClickProp = () => false
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor

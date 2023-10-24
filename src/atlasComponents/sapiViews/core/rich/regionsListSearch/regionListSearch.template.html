@@ -2,6 +2,9 @@
   class="sxplr-w-100"
   subscriptSizing="dynamic"
   floatLabel="auto">
+  <div matPrefix>
+    <ng-content select="[search-input-prefix]"></ng-content>
+  </div>
   <input
     placeholder="Search for regions"
     [value]="currentSearch"

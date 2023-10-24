@@ -9,7 +9,8 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
       return {
         icon: {
           fontSet: 'fas',
-          fontIcon: 'fa-brain'
+          fontIcon: 'fa-brain',
+          cls: 'fas fa-brain',
         },
         text: seg?.name || "Unknown"
       }
@@ -20,7 +21,8 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
     return [{
       icon: {
         fontSet: 'fas',
-        fontIcon: 'fa-database'
+        fontIcon: 'fa-database',
+        cls: 'fas fa-database'
       },
       text: name
     }]
@@ -35,7 +37,8 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
     return [{
       icon: {
         fontSet: 'fas',
-        fontIcon
+        fontIcon,
+        cls: `fas ${fontIcon}`,
       },
       text: name || `Unnamed ${annotationType}`
     }]
@@ -45,6 +48,7 @@ function render<T extends keyof TOnHoverObj>(key: T, value: TOnHoverObj[T]){
       icon: {
         fontSet: 'fas',
         fontIcon: 'fa-file',
+        cls: 'fas fa-file'
       },
       text: `Unknown hovered object`
     }]
@@ -56,6 +60,7 @@ type TCvtOutput = {
   icon: {
     fontSet: string
     fontIcon: string
+    cls: string
   }
   text: string
 }

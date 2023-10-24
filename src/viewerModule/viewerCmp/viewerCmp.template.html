@@ -9,35 +9,23 @@
       <logo-container></logo-container>
     </div>
 
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 2" floatingMouseContextualContainerDirective>
+    <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
+      floatingMouseContextualContainerDirective    
+      iav-mouse-hover
+      #iavMouseHoverContextualBlock="iavMouseHover">
 
-      <div class="h-0"
-        iav-mouse-hover
-        #iavMouseHoverContextualBlock="iavMouseHover">
-      </div>
-      <mat-list dense class="contextual-block">
+      <mat-list class="contextual-block">
         <mat-list-item *ngFor="let cvtOutput of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseoverCvt"
           class="h-auto">
-
-          <mat-icon
-            [fontSet]="cvtOutput.icon.fontSet"
-            [fontIcon]="cvtOutput.icon.fontIcon"
-            mat-list-icon>
-          </mat-icon>
-
-          <div matLine>{{ cvtOutput.text }}</div>
-
+          <span class="centered" matListItemIcon [class]="cvtOutput.icon.cls"></span>
+          <span matListItemTitle>{{ cvtOutput.text }}</span>
         </mat-list-item>
-
       </mat-list>
-      <!-- TODO Potentially implementing plugin contextual info -->
     </div>
 
 
   </div>
 </div>
-
-<!-- <sxplr-overlay-ui></sxplr-overlay-ui> -->
 
 <!-- master draw container -->
 <ng-template [ngIf]="view$ | async" let-view>
@@ -243,7 +231,7 @@
       
       <ng-template [ngIf]="view$ | async" let-view>
         <!-- if no selected regions, show spatial search -->
-        <div *ngIf="(view.selectedRegions || []).length === 0" class="sxplr-p-1 w-100">
+        <div *ngIf="(view.selectedRegions || []).length === 0" class="sxplr-mt-1 w-100">
           <ng-template
             [ngTemplateOutlet]="spatialFeatureListTmpl"
             [ngTemplateOutletContext]="{
@@ -279,7 +267,7 @@
           }"
           [style.backgroundColor]="sapiRegion.regionRgbString">
           <span class="text sxplr-custom-cmp">
-            Explore
+            Explore Foo
           </span>
         </button>
       </div>
@@ -289,44 +277,40 @@
 
   <!-- tab to minimize mini tray -->
 
-  <div class="tab-toggle-container">
-    
-    <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? '' : 'd-none'">
+  <div class="tab-toggle-container" [ngClass]="(minTrayVisSwitch.switchState$ | async) ? '' : 'd-none'">
+
+    <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+      fontIcon: 'fas fa-chevron-left',
+      matColor: null,
+      click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
+    }">
+    </ng-template>
+  </div>
+  
+  <div class="tab-toggle-container" [ngClass]="(minTrayVisSwitch.switchState$ | async) ? 'd-none' : ''">
+
+    <ng-template [ngIf]="voiFeatureEntryCmp && (voiFeatureEntryCmp.totals$ | async)"
+      [ngIfElse]="noBadgeTmpl"
+      let-totals>
 
       <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-        fontIcon: 'fas fa-chevron-left',
-        matColor: null,
+        fontIcon: 'fas fa-search',
+        matColor: 'primary',
+        click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
+        badge: totals
+      }">
+      </ng-template>
+    </ng-template>
+
+    <ng-template #noBadgeTmpl>
+
+      <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
+        fontIcon: 'fas fa-search',
+        matColor: 'primary',
         click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
       }">
       </ng-template>
-    </div>
-    
-    <div [ngClass]="(minTrayVisSwitch.switchState$ | async) ? 'd-none' : ''">
-
-      <ng-template [ngIf]="voiFeatureEntryCmp && (voiFeatureEntryCmp.totals$ | async)"
-        [ngIfElse]="noBadgeTmpl"
-        let-totals>
-
-        <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-          fontIcon: 'fas fa-search',
-          matColor: 'primary',
-          click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch),
-          badge: totals
-        }">
-        </ng-template>
-      </ng-template>
-
-      <ng-template #noBadgeTmpl>
-
-        <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl" [ngTemplateOutletContext]="{
-          fontIcon: 'fas fa-search',
-          matColor: 'primary',
-          click: minTrayVisSwitch.toggle.bind(minTrayVisSwitch)
-        }">
-        </ng-template>
-      </ng-template>
-    </div>
-
+    </ng-template>
   </div>
 
 </ng-template>
@@ -370,13 +354,13 @@
 
   <!-- status panel for (for nehuba viewer) -->
   <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
-    class="pe-all mt-2 muted-7 d-inline-block v-align-top">
+    class="pe-all sxplr-mt-1 muted-7 d-inline-block v-align-top">
   </iav-cmp-viewer-nehuba-status>
   <button
     mat-icon-button
     sxplr-share-view
     *ngIf="(useViewer$ | async) === 'threeSurfer'"
-    class="pe-all mt-2 muted-7 d-inline-block v-align-top">
+    class="pe-all mt-1 muted-7 d-inline-block v-align-top">
     <i class="fas fa-share-square"></i>
   </button>
 </ng-template>
@@ -401,7 +385,7 @@
         }">
         </ng-container>
   
-        <annotating-tools-panel class="z-index-10 d-block"
+        <annotating-tools-panel class="z-index-10 leave-me-alone"
           #toolPanel="annoToolsPanel">
         </annotating-tools-panel>
       </ng-template>
@@ -437,14 +421,22 @@
 <!-- special mode top right -->
 <ng-template #specialTopRightTmpl let-mode="mode">
   <mat-card class="mat-card-sm pe-all m-4">
-    <span>
-      {{ mode }}
-    </span>
-    <button mat-icon-button
-      color="warn"
-      (click)="exitSpecialViewMode()">
-      <i class="fas fa-times"></i>
-    </button>
+    <mat-card-header>
+      <mat-card-subtitle>
+        <span>
+          {{ mode }}
+        </span>
+        
+        <button mat-icon-button
+          color="warn"
+          (click)="exitSpecialViewMode()">
+          <i class="fas fa-times"></i>
+        </button>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      
+    </mat-card-content>
   </mat-card>
 </ng-template>
 
@@ -542,50 +534,48 @@
 
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
-  <ng-template [ngIf]="view$ | async" let-view>
+  <div *ngIf="view$ | async; let view"
+    class="pe-all auto-complete-container">
+    <sxplr-sapiviews-core-rich-regionlistsearch
+      class="mat-elevation-z4"
+      [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
+      [sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names]="view.labelMappedRegionNames"
+      [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length === 1 ? view.selectedRegions[0].name : null"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="toggleRoi($event)">
+      <ng-template regionTemplate let-region>
+        <div class="sxplr-d-flex">
+          <button
+            mat-icon-button
+            class="sxplr-mt-a sxplr-mb-a">
+            <i [ngClass]="(view.selectedRegions | includes : region) ? 'fa-circle' : 'fa-none'" class="fas"></i>
+          </button>
 
-    <div class="ml-2 mr-2 pe-all auto-complete-container">
-    
-      <sxplr-sapiviews-core-rich-regionlistsearch
-        class="mat-elevation-z4"
-        [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
-        [sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names]="view.labelMappedRegionNames"
-        [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length === 1 ? view.selectedRegions[0].name : null"
-        (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)"
-        (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="toggleRoi($event)">
-        <ng-template regionTemplate let-region>
-          <div class="sxplr-d-flex">
-            <button
-              mat-icon-button
-              class="sxplr-mt-a sxplr-mb-a">
-              <i [ngClass]="(view.selectedRegions | includes : region) ? 'fa-circle' : 'fa-none'" class="fas"></i>
-            </button>
-  
-            <sxplr-sapiviews-core-region-region-list-item
-              [sxplr-sapiviews-core-region-region]="region">
-            </sxplr-sapiviews-core-region-region-list-item>
-          </div>
-        </ng-template>
-        <button mat-icon-button
-          search-input-suffix
-          *ngIf="view.selectedRegions.length > 0"
-          (click)="clearRoi()">
-          <i class="fas fa-times"></i>
-        </button>
-      </sxplr-sapiviews-core-rich-regionlistsearch>
-  
+          <sxplr-sapiviews-core-region-region-list-item
+            [sxplr-sapiviews-core-region-region]="region">
+          </sxplr-sapiviews-core-region-region-list-item>
+        </div>
+      </ng-template>
+      <button mat-icon-button
+        search-input-suffix
+        *ngIf="view.selectedRegions.length > 0"
+        (click)="clearRoi()">
+        <i class="fas fa-times"></i>
+      </button>
       <button mat-icon-button
         color="primary"
+        search-input-prefix
+        iav-stop="click"
         [sxplr-dialog]="regionHierarchyTmpl"
         sxplr-dialog-size="xl">
         <i class="fas fa-sitemap"></i>
       </button>
-  
-      <div class="w-100 h-100 position-absolute sxplr-pe-none" *ngIf="showTour">
-      </div>
-  
+      
+    </sxplr-sapiviews-core-rich-regionlistsearch>
+
+    <div class="w-100 h-100 position-absolute sxplr-pe-none" *ngIf="showTour">
     </div>
-  </ng-template>
+  </div>
 </ng-template>
 
 <!-- template for rendering tab -->
@@ -600,7 +590,6 @@
   <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
     <ng-template [ngTemplateOutlet]="tabTmpl_defaultTmpl"
       [ngTemplateOutletContext]="{
-        matColor: 'basic',
         fontIcon: 'fa-chevron-left',
         click: click,
         badge: badge
@@ -843,8 +832,7 @@
 
     <button mat-raised-button class="mat-elevation-z8"
       [attr.aria-label]="ARIA_LABELS.COLLAPSE"
-      (click)="collapse()"
-      color="basic">
+      (click)="collapse()">
       <i class="fas fa-chevron-up"></i>
       <span>
         collapse
@@ -864,84 +852,70 @@
 
 <!-- context menu template -->
 <ng-template #viewerCtxMenuTmpl let-tmplRefs="tmplRefs">
-  <mat-card class="sxplr-p-0 d-flex flex-column"
+  <mat-card
     [iav-key-listener]="[{type: 'keydown', target: 'document', capture: true, key: 'Esc'}]"
     (iav-key-event)="disposeCtxMenu()"
     (iav-outsideClick)="disposeCtxMenu()">
-    <mat-card-content *ngFor="let tmplRef of tmplRefs"
-      class="m-0"
-      [ngStyle]="{order: tmplRef.order || 0}">
-      <mat-divider></mat-divider>
+    
+    <mat-card-content class="d-flex flex-column">
+      <div *ngFor="let tmplRef of tmplRefs"
+        [ngStyle]="{ order: tmplRef.order || 0 }"
+        class="context-menu-container">
 
-      <!-- template provided -->
-      <ng-template [ngIf]="tmplRef.tmpl"
-        [ngIfElse]="fallbackTmpl"
-        [ngTemplateOutlet]="tmplRef.tmpl"
-        [ngTemplateOutletContext]="{$implicit: tmplRef.data}">
-      </ng-template>
+        <ng-template [ngIf]="tmplRef.tmpl"
+          [ngIfElse]="fallbackTmpl"
+          [ngTemplateOutlet]="tmplRef.tmpl"
+          [ngTemplateOutletContext]="{ $implicit: tmplRef.data }">
+        </ng-template>
+          
+        <ng-template #fallbackTmpl>
+          {{ tmplRef.data.message || 'test' }}
+        </ng-template>
+      </div>
 
-      <!-- template not provided -->
-      <ng-template #fallbackTmpl>
-        {{ tmplRef.data.message || 'test' }}
-      </ng-template>
-
-      <mat-divider></mat-divider>
     </mat-card-content>
+
   </mat-card>
 </ng-template>
 
 <ng-template #lastViewedPointTmpl let-data>
-  <div class="text-muted sxplr-m-2">
-    Last selected spatial object
-  </div>
-  <button mat-button class="sxplr-list-like-button"
-    (click)="selectPoint(data, data.template)">
+  <mat-action-list class="sxplr-p-0">
+    <mat-divider></mat-divider>
+    <div mat-subheader>Last selected spatial object</div>
+    <ng-template [ngIf]="data?.point">
 
+      <button mat-list-item (click)="selectPoint(data, data.template)">
+        <span matListItemIcon>
+          <i class="fas fa-history"></i>
+        </span>
     
-    <div class="sxplr-list-like-button-icon">
-      <i class="fas fa-history"></i>
-    </div>
-
-    <div class="sxplr-list-like-button-body">
-
-      <ng-template [ngIf]="data?.point">
-        <span class="sxplr-list-like-button-body-line">
-          {{ data.point | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
-        </span>
-        <span class="sxplr-list-like-button-body-line text-muted">
-          Point
-        </span>
-      </ng-template>
-
-      <ng-template [ngIf]="data.face && data.vertices">
+        <!-- <span matListItemLine class="text-muted">Last selected spatial object</span> -->
+        <span matListItemLine>{{ data.point | nmToMm | numbers | addUnitAndJoin : '' }} (mm)</span>
+        <span matListItemLine class="text-muted">Point</span>
+        <span matListItemLine class="text-muted">{{ data.template.name }}</span>
         
-        <span class="sxplr-list-like-button-body-line">
+      </button>
+    </ng-template>
+
+    <ng-template [ngIf]="data?.face && data?.vertices">
+
+      <button mat-list-item (click)="selectPoint(data, data.template)">
+        <span matListItemIcon>
+          <i class="fas fa-history"></i>
+        </span>
+    
+        <span matListItemLine>
           Face Index: {{ data.face }}, Vertices Index: {{ data.vertices | addUnitAndJoin : '' }}
         </span>
-        <span class="sxplr-list-like-button-body-line text-muted">
+        <span matListItemLine class="text-muted">
           Mesh Face
         </span>
-      </ng-template>
-
-      <span class="sxplr-list-like-button-body-line text-muted">
-        <span>
-          {{ data.template.name }}
-        </span>
-
-        <ng-template [ngIf]="templateSelected$ | async" let-templateSelected>
-          <ng-template [ngIf]="templateSelected.id !== data.template.id">
-            <mat-icon fontSet="fas" fontIcon="fa-exclamation-triangle"
-              color="warn"
-              matTooltip="Different template spaces detected.">
-            </mat-icon>
-          </ng-template>
-        </ng-template>
+        <span matListItemLine class="text-muted">{{ data.template.name }}</span>
         
-      </span>
-    </div>
+      </button>
+    </ng-template>
+  </mat-action-list>
 
-    <!-- {{ data.point | json }} -->
-  </button>
 </ng-template>
 
 <!-- viewer status ctx menu -->
@@ -953,58 +927,52 @@
 
       <!-- volumetric i.e. nehuba -->
       <ng-container *ngSwitchCase="'nehuba'">
-        <button mat-button class="sxplr-list-like-button"
-          (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
-
-          <div class="sxplr-list-like-button-icon">
-            <i class="fas fa-map"></i>
-          </div>
-    
-          <div class="sxplr-list-like-button-body">
-    
-            <span class="sxplr-list-like-button-body-line">
+        <mat-action-list class="sxplr-p-0">
+          <button mat-list-item
+            (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
+            
+            <span matListItemIcon>
+              <i class="fas fa-map"></i>  
+            </span>
+            
+            <span matListItemLine>
               {{ context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
             </span>
-            <span class="sxplr-list-like-button-body-line text-muted">
+            <span matListItemLine class="text-muted">
               Point
             </span>
-            <span class="sxplr-list-like-button-body-line text-muted">
+            <span matListItemLine class="text-muted">
               {{ data.metadata.template.name }}
             </span>
-          </div>    
+          </button>
+        </mat-action-list>
 
-        </button>
       </ng-container>
 
       <ng-container *ngSwitchCase="'threeSurfer'">
 
         <ng-template [ngIf]="context.payload?.faceIndex" let-faceIndex>
           <ng-template [ngIf]="context.payload?.vertexIndices" let-vertexIndices>
-            <button mat-button class="sxplr-list-like-button"
-              (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)"
-              disabled>
-    
-              <div class="sxplr-list-like-button-icon">
-                <i class="fas fa-map"></i>
-              </div>
-        
-              <div class="sxplr-list-like-button-body">
-        
-                <span class="sxplr-list-like-button-body-line">
+            <mat-action-list class="sxplr-p-0">
+              <button mat-list-item
+                (click)="selectPoint({ face: faceIndex, vertices: vertexIndices }, data.metadata.template)"
+                disabled>
+                
+                <span matListItemIcon>
+                  <i class="fas fa-map"></i>  
+                </span>
+                
+                <span matListItemLine>
                   Face Index: {{ faceIndex }}, Vertices Index: {{ vertexIndices | addUnitAndJoin : '' }}
                 </span>
-                <span class="sxplr-list-like-button-body-line text-muted">
-                  Mesh Face
+                <span matListItemLine class="text-muted">
+                  Mesh Face (Not selectable for now)
                 </span>
-                <span class="sxplr-list-like-button-body-line text-muted">
+                <span matListItemLine class="text-muted">
                   {{ data.metadata.template.name }}
                 </span>
-                <i class="sxplr-list-like-button-body-line text-muted">
-                  (Not selectable at the moment)
-                </i>
-              </div>    
-    
-            </button>
+              </button>
+            </mat-action-list>
 
           </ng-template>
         </ng-template>
@@ -1022,30 +990,22 @@
 <!-- viewer state hover ctx menu -->
 <ng-template #viewerStatusRegionCtxMenu let-data>
   <!-- hovered ROIs -->
-  <ng-template ngFor [ngForOf]="data.metadata.hoveredRegions"
-    let-region
-    let-first="first">
+  <ng-template ngFor [ngForOf]="data.metadata.hoveredRegions" let-region>
 
-    <mat-divider class="top-0" *ngIf="!first"></mat-divider>
-
-    <button mat-button
-      (click)="$event.ctrlKey ? toggleRoi(region) : selectRoi(region)"
-      class="sxplr-list-like-button">
-      
-      <div class="sxplr-list-like-button-icon">
-        <i class="fas fa-brain"></i>
-      </div>
-
-      <div class="sxplr-list-like-button-body">
-
-        <span class="sxplr-list-like-button-body-line">
+    <mat-action-list class="sxplr-p-0">
+      <button mat-list-item (click)="$event.ctrlKey ? toggleRoi(region) : selectRoi(region)">
+        <span matListItemIcon>
+          <i class="fas fa-brain"></i>  
+        </span>
+        
+        <span matListItemLine>
           {{ region.name }}
         </span>
-        <span class="sxplr-list-like-button-body-line text-muted">
+        <span matListItemLine class="text-muted">
           Brain region
         </span>
-      </div>    
-    </button>
+      </button>
+    </mat-action-list>
 
   </ng-template>
 </ng-template>
@@ -1108,7 +1068,7 @@
 
 <!-- spatial search tmpls -->
 <ng-template #spatialFeatureListTmpl let-view="view">
-  <mat-card class="sxplr-pe-all"
+  <mat-card class="sxplr-pe-all overflow-hidden"
     [ngClass]="{
       'sxplr-d-none': !(voiSwitch.switchState$ | async) || (voiFeatureEntryCmp.totals$ | async) === 0
     }">
@@ -1131,15 +1091,6 @@
       </mat-card-subtitle>
     </mat-card-header>
 
-    <div class="loadingText">
-
-      <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-        <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
-        <span>
-          Loading Wireframes ...
-        </span>
-      </ng-template>
-    </div>
   </mat-card>
 
   <sxplr-feature-entry
@@ -1154,7 +1105,9 @@
   <mat-card [ngClass]="{
     'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) > 0
   }">
-    No spatial features found.
+    <mat-card-content>
+      No spatial features found.
+    </mat-card-content>
   </mat-card>
 
   <button mat-raised-button
@@ -1182,6 +1135,13 @@
       </span>
     </ng-template>
   </button>
+
+  <div>
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="(voiFeatureEntryCmp.busy$ | async)">
+    </mat-progress-bar>
+  </div>
 
   <!-- TODO voiBbox directive is used to draw outlines for VOI
   this has been temporarily disabled, since datasource is paginated 

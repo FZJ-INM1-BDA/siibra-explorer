@@ -1,14 +1,20 @@
-import { Directive, Input } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { ChangeDetectorRef, Directive, Input, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
+import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 import { MainState, userPreference } from 'src/state';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
 
 @Directive({
   selector: '[sxplrExperimentalFlag]',
-  exportAs: 'sxplrExperimentalFlag'
+  exportAs: 'sxplrExperimentalFlag',
+  hostDirectives: [NgIf, DestroyDirective]
 })
 export class ExperimentalFlagDirective {
+
+  private readonly ngIf = inject(NgIf)
+  private readonly destroyed$ = inject(DestroyDirective).destroyed$
 
   @Input()
   set deprecated(deprecated: boolean){
@@ -57,7 +63,15 @@ export class ExperimentalFlagDirective {
   )
 
   constructor(
-    private store: Store<MainState>
-  ) { }
+    private store: Store<MainState>,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.show$.pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(flag => {
+      this.ngIf.ngIf = flag
+      this.cdr.detectChanges()
+    })
+  }
 
 }

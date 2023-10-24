@@ -12,7 +12,7 @@ import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subscription, of, combineLatest } from "rxjs";
 import { map, filter, startWith, throttleTime } from "rxjs/operators";
-import { MatBottomSheet, MatDialog } from "src/sharedModules/angularMaterial.exports"
+import { Clipboard, MatBottomSheet, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { UntypedFormControl } from "@angular/forms";
 
@@ -60,11 +60,14 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public SHOW_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.SHOW_FULL_STATUS_PANEL
   public HIDE_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.HIDE_FULL_STATUS_PANEL
+  public COPY_NAVIGATION_STRING = "Copy navigation coordinates to clipboard"
   constructor(
     private store$: Store<any>,
     private log: LoggingService,
     private bottomSheet: MatBottomSheet,
     private dialog: MatDialog,
+    private clipboard: Clipboard,
+    private snackbar: MatSnackBar,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
   ) {
 
@@ -199,6 +202,13 @@ export class StatusCardComponent implements OnInit, OnChanges{
     const { ariaLabel } = options
     this.dialog.open(tmpl, {
       ariaLabel
+    })
+  }
+
+  copyString(value: string){
+    this.clipboard.copy(value)
+    this.snackbar.open(`Copied to clipboard!`, null, {
+      duration: 1000
     })
   }
 }

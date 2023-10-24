@@ -188,3 +188,8 @@ a[mat-list-item]
     flex: 0 0 16.67%;
   }
 }
+
+[matListItemTitle]
+{
+  text-wrap: nowrap;
+}

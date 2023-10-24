@@ -145,7 +145,7 @@
       matTooltip="Toggle experimental flag">
       <iav-dynamic-mat-button
         [iav-dynamic-mat-button-style]="matBtnStyle"
-        [iav-dynamic-mat-button-color]="matBtnColor"
+        iav-dynamic-mat-button-color="warn"
         iav-dynamic-mat-button-aria-label="Toggle experimental features">
 
         <ng-template [ngIf]="currentState">
@@ -153,10 +153,7 @@
         </ng-template>
         
         <ng-template [ngIf]="!currentState">
-          <span class="fa-stack">
-            <i class="fas fa-flask fa-stack-1x"></i>
-            <i class="fas fa-ban fa-stack-2x" style="color:Tomato"></i>
-          </span>
+          <i class="fas fa-wifi"></i>
         </ng-template>
       </iav-dynamic-mat-button>
     </div>

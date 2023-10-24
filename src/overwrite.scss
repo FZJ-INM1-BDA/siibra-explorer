@@ -296,9 +296,10 @@ button.#{$llb}
 {
   width: 100%;
 
-  > .mat-button-wrapper
+  > .mdc-button__label
   {
     display: flex;
+    width: 100%;
     
     > .#{$llb}-icon
     {

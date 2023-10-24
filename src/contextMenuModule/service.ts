@@ -117,7 +117,7 @@ export class ContextMenuService<T> extends RegDeregController<CtxMenuInterArg<T>
     this.context$.next(state)
   }
   deepMerge(pState: Partial<T>) {
-    const newState: T = structuredClone(this.context || {})
+    const newState: T = structuredClone(this.context || {} as T)
     this.context$.next(
       mutateDeepMerge(newState, pState)
     )
