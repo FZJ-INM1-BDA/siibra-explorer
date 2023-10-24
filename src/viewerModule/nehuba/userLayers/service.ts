@@ -20,8 +20,8 @@ import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
 import { MatDialogRef, MatDialog } from "src/sharedModules/angularMaterial.exports"
 
-type OmitKeys = "clType" | "id" | "source"
-type LayerOption = Omit<atlasAppearance.const.NgLayerCustomLayer, OmitKeys>
+type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
+
 type Meta = {
   message?: string
   filename: string
@@ -88,6 +88,7 @@ export class UserLayerService implements OnDestroy {
 
     return {
       option: {
+        legacySpecFlag: "old",
         type: 'segmentation',
         transform: xform,
         segments: ["1"],
@@ -116,6 +117,7 @@ export class UserLayerService implements OnDestroy {
       protocol: 'nifti://',
       url,
       option: {
+        legacySpecFlag: "old",
         type: 'image',
         shader: getShader({
           colormap: EnumColorMapName.MAGMA,
@@ -187,6 +189,7 @@ export class UserLayerService implements OnDestroy {
         filename: url
       },
       option: {
+        legacySpecFlag: "old",
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
       },
@@ -200,20 +203,47 @@ export class UserLayerService implements OnDestroy {
   )
   async processDzi(source: string): Promise<ProcessorOutput> {
     const url = source.replace("deepzoom://", "")
-    const scaleFactor = 1e2
+    /**
+     * still a big hacky, but works
+     * TODO figure out how to get the actual transform in
+     */
+    const scaleFactor = 230
     return {
       cleanup: noop,
       meta: {
         filename: `deepzoom://${url}`
       },
       option: {
-        transform: [
-          [ scaleFactor, 0, 0, 0 ],
-          [ 0, scaleFactor, 0, 0 ],
-          [ 0, 0, 1, 0 ],
-          [ 0, 0, 0, 1 ],
-        ],
-        shader: `void main(){emitRGB(vec3(toNormalized(getDataValue(0)),toNormalized(getDataValue(1)),toNormalized(getDataValue(2))));}`,
+        legacySpecFlag: "new",
+        blend: "default",
+        source: {
+          url: `deepzoom://${url}`,
+          transform: {
+            inputDimensions: {
+              "x": [1e-9, "m"],
+              "y": [1e-9, "m"],
+              "c^": [1, ""],
+              "": [0.0000390625, "m"],
+            },
+            matrix: [
+              [scaleFactor, 0, 0, 0, -150],
+              [0, 0, 0, 5, 0],
+              [0, 0, 1, 0, 0],
+              [0, -scaleFactor, 0, 0, 100]
+            ],
+            outputDimensions: {
+              "x": [0.0000390625, "m"],
+              "y": [0.0000390625, "m"],
+              "c^": [1, ""],
+              "z": [0.0000390625, "m"],
+            },
+            sourceRank: 3
+          }
+        },
+        type: "image",
+        visible: true,
+        shader: getShader({ colormap: EnumColorMapName.RGB }),
+        
       },
       protocol: "deepzoom://",
       url
@@ -322,7 +352,7 @@ export class UserLayerService implements OnDestroy {
     id: string,
     source: string|null|undefined,
     meta: Meta,
-    options: LayerOption = {}
+    options: LayerOption
   ) {
     if (source) {
       UserLayerService.VerifyUrl(source)

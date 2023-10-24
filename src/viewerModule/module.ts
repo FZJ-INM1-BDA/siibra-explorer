@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { Observable, combineLatest, of } from "rxjs";
+import { Observable, combineLatest, of, throwError } from "rxjs";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
@@ -123,6 +123,9 @@ import { atlasSelection, userPreference } from "src/state";
                 return of(null)
               }
               const img = defaultImage[0]
+              if (img.legacySpecFlag === "new") {
+                return throwError('new spec for template is not supported yet.')
+              }
               return of({
                 ...img.info || {},
                 transform: img.transform

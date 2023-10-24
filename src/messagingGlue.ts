@@ -79,7 +79,8 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
 
     if (type === 'swc') {
       const { transform } = resourceParam
-      const layer = {
+      const layer: atlasAppearance.const.CustomLayer = {
+        legacySpecFlag: "old",
         id: swcLayerUuid,
         source: `swc://${url}`,
         segments: [

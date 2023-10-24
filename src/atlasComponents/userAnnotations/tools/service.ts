@@ -268,6 +268,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         return null
       }
       const volImage = volImages[0]
+      if (volImage.legacySpecFlag === "new") {
+        throw new Error(`voxel size new spec not yet supported`)
+      }
       const { real, voxel } = volImage.info
       return [0, 1, 2].map(idx => real[idx]/voxel[idx]) as [number, number, number]
     })
