@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Inject, Input, Optional, TemplateRef, ViewChild } from "@angular/core";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports";
 import { IFileInputConfig, TFileInputEvent } from "../type";
 
 const FILEINPUT_DEFAULT_LABEL = 'File input'

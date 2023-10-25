@@ -4,17 +4,18 @@
 
 <ng-template [ngIf]="region">
 
-  <mat-card class="mat-elevation-z4">
-    <div
-      [style.backgroundColor]="regionRgbString"
-      class="vanishing-border"
-      [ngClass]="{
-        'darktheme': regionDarkmode === true,
-        'lighttheme': regionDarkmode === false
-      }">
+  <mat-card class="mat-elevation-z4"
+    [style.backgroundColor]="regionRgbString"
+    [ngClass]="{
+      'darktheme': regionDarkmode === true,
+      'lighttheme': regionDarkmode === false
+    }">
+    <mat-card-header>
 
-      <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
-
+      <mat-card-subtitle>
+        <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      </mat-card-subtitle>
+      
       <mat-card-subtitle>
         <span class="muted-text">
           Brain region
@@ -25,7 +26,8 @@
         {{ region.name }}
       </mat-card-title>
 
-    </div>
+    </mat-card-header>
+    <mat-card-content></mat-card-content>
   </mat-card>
 
 
@@ -34,7 +36,7 @@
     <!-- Overview -->
     <mat-tab label="Overview">
 
-      <mat-action-list class="overview-container" dense>
+      <mat-action-list class="overview-container">
         
         <!-- parcellation button -->
         <button
@@ -46,29 +48,27 @@
             descMd: parcellation.desc,
             actions: parcellation | parcTmplDoiPipe
           }">
-          <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
-          <div mat-line class="overview-content">{{ parcellation.name }}</div>
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+          <div matListItemTitle>{{ parcellation.name }}</div>
         </button>
 
         <!-- region position (if eixsts) -->
         <ng-template [ngIf]="regionPosition">
           <button mat-list-item (click)="navigateTo(regionPosition)">
-            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-            <div mat-line class="overview-content">Centroid: {{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+            <div matListItemTitle>Centroid: {{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
           </button>
         </ng-template>
 
         <!-- all dois -->
         <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
           <a mat-list-item [href]="doi" target="_blank" class="no-hover">
-            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-            <div mat-line>{{ doi }}</div>
+            <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div matListItemTitle>{{ doi }}</div>
           </a>
         </ng-template>
 
-        <ng-template sxplrExperimentalFlag [experimental]="true"
-          #relatedRegionsExport="sxplrExperimentalFlag"
-          [ngIf]="relatedRegionsExport.show$ | async">
+        <ng-template sxplrExperimentalFlag [experimental]="true">
         
         <!-- related regions -->
         <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
@@ -77,8 +77,8 @@
             <button mat-list-item
               [sxplr-dialog]="relatedRegionsTmpl"
               sxplr-dialog-size="auto">
-              <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-link"></mat-icon>
-              <div mat-line class="overview-content">Related Regions ({{ relatedRegions.length }})</div>
+              <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-link"></mat-icon>
+              <div matListItemTitle>Related Regions ({{ relatedRegions.length }})</div>
             </button>
             
             <!-- dialog when user clicks related regions -->
@@ -143,6 +143,13 @@
 
         </ng-template>
 
+        <!-- if busy, show spinner -->
+        <ng-template [ngIf]="busy$ | async">
+          <mat-list-item>
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </mat-list-item>
+        </ng-template>
+
         </ng-template>
       </mat-action-list>
 
@@ -177,9 +184,7 @@
       </sxplr-feature-entry>
 
       
-      <ng-template sxplrExperimentalFlag [experimental]="true"
-        #exmptRelatedFeat="sxplrExperimentalFlag"
-        [ngIf]="exmptRelatedFeat.show$ | async">
+      <ng-template sxplrExperimentalFlag [experimental]="true">
     
       <!-- related region features -->
       <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
@@ -193,15 +198,19 @@
             <div class="h-carousel-item-container">
               <mat-card *ngFor="let relatedRegion of relatedRegions"
                 class="h-carousel-item mat-elevation-z4">
-                <mat-card-subtitle>
-                  {{ relatedRegion.qualification | translateQualificationPipe }}
-                </mat-card-subtitle>
-                <mat-card-title>
-                  {{ relatedRegion.region.name }}
-                </mat-card-title>
-                <mat-card-subtitle>
-                  {{ relatedRegion.parcellation.name}}
-                </mat-card-subtitle>
+                
+                <mat-card-header>
+                  <mat-card-subtitle>
+                    {{ relatedRegion.qualification | translateQualificationPipe }}
+                  </mat-card-subtitle>
+                  <mat-card-title>
+                    {{ relatedRegion.region.name }}
+                  </mat-card-title>
+                  <mat-card-subtitle>
+                    {{ relatedRegion.parcellation.name}}
+                  </mat-card-subtitle>
+                </mat-card-header>
+
                 <mat-card-actions>
                   <button mat-button
                     [sxplr-dialog]="relatedRegFeatTmpl"

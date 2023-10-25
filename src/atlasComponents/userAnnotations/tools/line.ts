@@ -23,7 +23,6 @@ export type TLineJsonSpec = {
 } & TBaseAnnotationGeomtrySpec
 
 export class Line extends IAnnotationGeometry{
-  public id: string
   public annotationType = 'Line'
 
   public points: Point[] = []

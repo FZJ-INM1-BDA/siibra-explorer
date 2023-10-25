@@ -1,10 +1,7 @@
 import { Component, OnDestroy, Input } from "@angular/core";
 import { Observable, merge, of, Subscription, BehaviorSubject, combineLatest } from "rxjs";
 import { startWith, mapTo, map, debounceTime, switchMap, catchError, shareReplay, filter, tap, distinctUntilChanged } from "rxjs/operators";
-import { UntypedFormControl } from "@angular/forms";
-import { ErrorStateMatcher } from "@angular/material/core";
-import { Clipboard } from "@angular/cdk/clipboard";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { Clipboard, ErrorStateMatcher, MatSnackBar, UntypedFormControl } from 'src/sharedModules/angularMaterial.exports'
 import { SaneUrlSvc } from "./saneUrl.service";
 import { NotFoundError } from "../type";
 

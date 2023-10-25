@@ -12,8 +12,7 @@ import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subscription, of, combineLatest } from "rxjs";
 import { map, filter, startWith, throttleTime } from "rxjs/operators";
-import { MatBottomSheet } from "@angular/material/bottom-sheet";
-import { MatDialog } from "@angular/material/dialog";
+import { Clipboard, MatBottomSheet, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { UntypedFormControl } from "@angular/forms";
 
@@ -22,7 +21,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { getNehubaConfig } from "../config.service";
+import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -61,12 +60,16 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public SHOW_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.SHOW_FULL_STATUS_PANEL
   public HIDE_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.HIDE_FULL_STATUS_PANEL
+  public COPY_NAVIGATION_STRING = "Copy navigation coordinates to clipboard"
   constructor(
     private store$: Store<any>,
     private log: LoggingService,
     private bottomSheet: MatBottomSheet,
     private dialog: MatDialog,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
+    private clipboard: Clipboard,
+    private snackbar: MatSnackBar,
+    @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
+    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ) {
 
     if (nehubaViewer$) {
@@ -176,7 +179,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
    * the info re: nehubaViewer can stay there, too
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}): void {
-    const config = getNehubaConfig(this.selectedTemplate)
+    const config = this.nehubaConfigSvc.getNehubaConfig(this.selectedTemplate)
 
     const {
       zoomFactor: zoom
@@ -200,6 +203,13 @@ export class StatusCardComponent implements OnInit, OnChanges{
     const { ariaLabel } = options
     this.dialog.open(tmpl, {
       ariaLabel
+    })
+  }
+
+  copyString(value: string){
+    this.clipboard.copy(value)
+    this.snackbar.open(`Copied to clipboard!`, null, {
+      duration: 1000
     })
   }
 }

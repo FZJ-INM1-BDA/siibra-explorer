@@ -603,6 +603,8 @@ markdown-dom p
 .mat-drawer-content-overflow-visible > mat-drawer > .mat-drawer-inner-container
 {
   overflow: visible!important;
+  /** monkey patch to hide sidebar */
+  height: 99%;
 }
 
 mat-icon[fontset="fas"],
@@ -827,12 +829,12 @@ body::after
   text-overflow: ellipsis;
 }
 
-iav-cmp-viewer-container .mat-chip-list-wrapper
+iav-cmp-viewer-container .mat-chip-set-wrapper
 {
   flex-wrap: nowrap;
 }
 
-.wrapped-chips .mat-chip-list-wrapper
+.wrapped-chips .mat-chip-set-wrapper
 {
   flex-wrap: wrap;
 }
@@ -880,7 +882,7 @@ how-to-cite img
   margin-top: 1rem;
 }
 
-.overview-content
+.annotation-tool-btn .mdc-button__label
 {
-  white-space: normal!important;
+  transform: translateX(0.7rem);
 }

@@ -41,8 +41,10 @@
           min="100"
           max="1000"
           [step]="stepSize"
-          (change)="handleMatSliderChange($event)"
-          [value]="gpuLimit$ | async">
+          >
+          <input matSliderThumb
+            (valueChange)="updateGpuLimit($event)"
+            [value]="gpuLimit$ | async">
         </mat-slider>
         <span class="d-inline-block flex-grow-0 flex-shrink-0 w-10em">
           {{ gpuLimit$ | async }} MB

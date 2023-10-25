@@ -1,19 +1,17 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { catchError, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { EnumColorMapName } from "src/util/colorMaps";
-import { BehaviorSubject, forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
-import { environment } from "src/environments/environment"
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
 import {
   translateV3Entities
 } from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
-import { CONST } from "common/constants"
 
 export const useViewer = {
   THREESURFER: "THREESURFER",
@@ -23,8 +21,6 @@ export const useViewer = {
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
 export const EXPECTED_SIIBRA_API_VERSION = '0.3.15'
-
-let BS_ENDPOINT_CACHED_VALUE: Observable<string> = null
 
 type PaginatedResponse<T> = {
   items: T[]
@@ -42,14 +38,6 @@ const serialization = (sxplr: SxplrTemplate) => sxplr?.id
 export class SAPI{
 
   static API_VERSION = null
-
-  /**
-   * Used to clear BsEndPoint, so the next static get BsEndpoints$ will
-   * fetch again. Only used for unit test of BsEndpoint$
-   */
-  static ClearBsEndPoint(){
-    BS_ENDPOINT_CACHED_VALUE = null
-  }
 
   iteratePages<T>(resp: PaginatedResponse<T>, cb: (page: number) => Observable<PaginatedResponse<T>>) {
     /**
@@ -77,6 +65,9 @@ export class SAPI{
   }
 
   static async VerifyEndpoint(url: string): Promise<string> {
+    if (!url) {
+      throw new Error(`url needs to be defined!`)
+    }
     const resp = await fetch(`${url}/atlases`)
     await resp.json()
     if (resp.status >= 400) {
@@ -90,64 +81,56 @@ export class SAPI{
     return url
   }
 
+  verifiedSapiEndpoint$ = new Subject<string>()
+  sapiEndpoint$ = this.verifiedSapiEndpoint$.pipe(
+    shareReplay(1)
+  )
+  
+  static async VerifyEndpoints(endpoints: string[]): Promise<string>{
+    if (endpoints.length === 0) {
+      throw new Error(`needs at least 1 endpoint to verify`)
+    }
+    
+    const mainEndpoint = endpoints[0]
+    const backupEndpoints = endpoints.slice(1)
+
+    try {
+      const url = await Promise.race([
+        SAPI.VerifyEndpoint(mainEndpoint),
+        new Promise<string>((_, rj) => setTimeout(() => rj(`10s timeout`), 10000))
+      ])
+      return url
+    } catch (e) {
+
+      try {
+        const url = await Promise.race([
+          /**
+           * find the first endpoint of the backup endpoints
+           */
+          new Promise<string>(rs => {
+            for (const endpt of backupEndpoints) {
+              SAPI.VerifyEndpoint(endpt)
+                .then(flag => {
+                  if (flag) rs(endpt)
+                })
+                .catch(noop)
+            }
+          }),
+          new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
+        ])
+        return url
+      } catch (e) {
+        throw new Error(`No usabe siibra-api endpoints found. Tried: ${mainEndpoint}, ${backupEndpoints.join(",")}`)
+      }
+    }
+  }
+
   /**
    * BsEndpoint$ is designed as a static getter mainly for unit testing purposes.
    * see usage of BsEndpoint$ and ClearBsEndPoint in sapi.service.spec.ts
    */
   static get BsEndpoint$(): Observable<string> {
-    if (!!BS_ENDPOINT_CACHED_VALUE) return BS_ENDPOINT_CACHED_VALUE
-    const rootEl = document.querySelector('atlas-viewer')
-    const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
-    
-    const endpoints = overwriteSapiUrl
-      ? [ overwriteSapiUrl ]
-      : environment.SIIBRA_API_ENDPOINTS.split(',')
-    if (endpoints.length === 0) {
-      SAPI.ErrorMessage = `No siibra-api endpoint defined!`
-      return NEVER
-    }
-    const mainEndpoint = endpoints[0]
-    const backupEndpoints = endpoints.slice(1)
-    
-    BS_ENDPOINT_CACHED_VALUE = new Observable<string>(obs => {
-      (async () => {
-        try {
-          const url = await Promise.race([
-            SAPI.VerifyEndpoint(mainEndpoint),
-            new Promise<string>((_, rj) => setTimeout(() => rj(`10s timeout`), 10000))
-          ])
-          obs.next(url)
-        } catch (e) {
-
-          try {
-            const url = await Promise.race([
-              /**
-               * find the first endpoint of the backup endpoints
-               */
-              new Promise<string>(rs => {
-                for (const endpt of backupEndpoints) {
-                  SAPI.VerifyEndpoint(endpt)
-                    .then(flag => {
-                      if (flag) rs(endpt)
-                    })
-                    .catch(noop)
-                }
-              }),
-              new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
-            ])
-            obs.next(url)
-          } catch (e) {
-            SAPI.ErrorMessage = `No usabe siibra-api endpoints found. Tried: ${mainEndpoint}, ${backupEndpoints.join(",")}`
-          }
-        } finally {
-          obs.complete()
-        }
-      })()
-    }).pipe(
-      take(1),
-      shareReplay(1),
-    )
-    return BS_ENDPOINT_CACHED_VALUE
+    return throwError(`BsEndpoint$ is deprecated! Use instance method sapiEndpoint$ instead`)
   }
 
   static ErrorMessage$ = new BehaviorSubject<string>(null)
@@ -242,7 +225,7 @@ export class SAPI{
    * @returns 
    */
   v3Get<T extends SapiRoute>(route: T, sapiParam: RouteParam<T>){
-    return SAPI.BsEndpoint$.pipe(
+    return this.sapiEndpoint$.pipe(
       switchMap(endpoint => {
         const headers: Record<string, string> = {}
         const { path, params } = this.v3GetRoute(route, sapiParam)
@@ -368,7 +351,7 @@ export class SAPI{
       region_id: region.name,
       space_id: template.id
     }
-    return SAPI.BsEndpoint$.pipe(
+    return this.sapiEndpoint$.pipe(
       switchMap(endpoint => {
         const _url = this.v3GetRoute("/map/statistical_map.nii.gz", {
           query

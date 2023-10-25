@@ -61,6 +61,13 @@ interface NgAnnotationLayer {
   visible: boolean
 }
 
+export const ID_AFFINE = [
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1],
+]
+
 export class AnnotationLayer {
   static Map = new Map<string, AnnotationLayer>()
   static Get(name: string, color: string){
@@ -79,7 +86,8 @@ export class AnnotationLayer {
   private idset = new Set<string>()
   constructor(
     private name: string = getUuid(),
-    private color="#ffffff"
+    private color="#ffffff",
+    affine=ID_AFFINE,
   ){
     const layerSpec = this.viewer.layerSpecification.getLayer(
       this.name,
@@ -88,12 +96,7 @@ export class AnnotationLayer {
         "annotationColor": this.color,
         "annotations": [],
         name: this.name,
-        transform: [
-          [1, 0, 0, 0],
-          [0, 1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1],
-        ]
+        transform: affine,
       }
     )
     this.nglayer = this.viewer.layerManager.addManagedLayer(layerSpec)
@@ -134,19 +137,35 @@ export class AnnotationLayer {
     }
   }
 
-  async addAnnotation(spec: AnnotationSpec){
+  /**
+   * Unsafe method. Caller should ensure this.nglayer.isReady()
+   * 
+   * @param spec 
+   */
+  #addSingleAnn(spec: AnnotationSpec) {
+    const localAnnotations = this.nglayer.layer.localAnnotations
+    this.idset.add(spec.id)
+    const annSpec = this.parseNgSpecType(spec)
+    localAnnotations.add(
+      annSpec
+    )  
+  }
+
+  async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
     if (!this.nglayer) {
       throw new Error(`layer has already been disposed`)
     }
 
     PeriodicSvc.AddToQueue(() => {
       if (this.nglayer.isReady()) {
-        const localAnnotations = this.nglayer.layer.localAnnotations
-        this.idset.add(spec.id)
-        const annSpec = this.parseNgSpecType(spec)
-        localAnnotations.add(
-          annSpec
-        )  
+        if (Array.isArray(spec)) {
+          for (const item of spec) {
+            this.#addSingleAnn(item)
+          }
+        } else {
+          this.#addSingleAnn(spec)
+        }
+        
         return true
       }
       return false
@@ -162,8 +181,13 @@ export class AnnotationLayer {
       localAnnotations.references.delete(spec.id)
     }
   }
-  async updateAnnotation(spec: AnnotationSpec) {
-    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+
+  /**
+   * Unsafe method. Caller should ensure this.nglayer.layer is defined
+   * 
+   * @param spec 
+   */
+  #updateSingleAnn(spec: AnnotationSpec) {
     const { localAnnotations } = this.nglayer.layer
     const ref = localAnnotations.references.get(spec.id)
     const _spec = this.parseNgSpecType(spec)
@@ -176,6 +200,17 @@ export class AnnotationLayer {
       this.idset.add(_spec.id)
       localAnnotations.add(_spec)
     }
+  }
+
+  async updateAnnotation(spec: AnnotationSpec|AnnotationSpec[]) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+    if (Array.isArray(spec)) {
+      for (const item of spec){
+        this.#updateSingleAnn(item)
+      }
+      return
+    }
+    this.#updateSingleAnn(spec)
   }
 
   private get viewer() {

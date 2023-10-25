@@ -18,6 +18,7 @@ export class LayerCtrlEffects {
   static TransformVolumeModel(volumeModel: VoiFeature['ngVolume']): atlasAppearance.const.NgLayerCustomLayer[] {    
     return [{
       clType: "customlayer/nglayer",
+      legacySpecFlag: "old",
       id: volumeModel.url,
       source: `precomputed://${volumeModel.url}`,
       transform: volumeModel.transform,
@@ -67,6 +68,7 @@ export class LayerCtrlEffects {
                 rmPmapAction,
                 atlasAppearance.actions.addCustomLayer({
                   customLayer: {
+                    legacySpecFlag: "old",
                     clType: "customlayer/nglayer",
                     id: PMAP_LAYER_NAME,
                     source: `nifti://${this.#pmapUrl}`,
@@ -120,7 +122,10 @@ export class LayerCtrlEffects {
           map(templateImages => {
             const returnObj: Record<string, NgLayerSpec> = {}
             for (const img of templateImages) {
-              returnObj[QuickHash.GetHash(img.source)] = img
+              const url = typeof img.source === "string"
+              ? img.source
+              : img.source.url
+              returnObj[QuickHash.GetHash(url)] = img
             }
             return returnObj
           })
@@ -163,15 +168,26 @@ export class LayerCtrlEffects {
       const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
         for (const key in layers) {
-          const { source, transform, opacity, visible } = layers[key]
-          customBaseLayers.push({
-            clType: "baselayer/nglayer",
-            id: key,
-            source,
-            transform,
-            opacity,
-            visible,
-          })
+          const v = layers[key]
+
+          if (v.legacySpecFlag === "old") {
+            customBaseLayers.push({
+              clType: "baselayer/nglayer",
+              legacySpecFlag: "old",
+              id: key,
+              ...v
+            })
+          }
+
+          if (v.legacySpecFlag === "new") {
+            customBaseLayers.push({
+              legacySpecFlag: "new",
+              clType: "baselayer/nglayer",
+              id: key,
+              ...v
+            })
+          }
+
         }
       }
       return of(

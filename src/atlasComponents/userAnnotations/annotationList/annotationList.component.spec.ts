@@ -4,20 +4,15 @@ import { FileInputModule } from "src/getFileInput/module"
 import { CommonModule } from "@angular/common"
 import { ModularUserAnnotationToolService } from "../tools/service"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
-import { MatDialogModule } from "@angular/material/dialog"
 import { ComponentStore } from "@ngrx/component-store"
 import { NEVER, of } from "rxjs"
-import { MatSnackBarModule } from "@angular/material/snack-bar"
 import { StateModule } from "src/state"
 import { hot } from "jasmine-marbles"
 import { IAnnotationGeometry } from "../tools/type"
-import { MatTooltipModule } from "@angular/material/tooltip"
-import { MatButtonModule } from "@angular/material/button"
-import { MatCardModule } from "@angular/material/card"
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module"
 import { AnnotationVisiblePipe } from "../annotationVisible.pipe"
 import { SingleAnnotationClsIconPipe, SingleAnnotationNamePipe } from "../singleAnnotationUnit/singleAnnotationUnit.component"
-import { MatExpansionModule } from "@angular/material/expansion"
+import { AngularMaterialModule } from "src/sharedModules"
 
 class MockModularUserAnnotationToolService {
   hiddenAnnotations$ = of([])
@@ -42,13 +37,8 @@ describe("annotationList.component.ts", () => {
           CommonModule,
           FileInputModule,
           NoopAnimationsModule,
-          MatDialogModule,
-          MatSnackBarModule,
+          AngularMaterialModule,
           StateModule, // needed for iavStateAggregator directive
-          MatTooltipModule,
-          MatButtonModule,
-          MatCardModule,
-          MatExpansionModule,
           ZipFilesOutputModule,
         ],
         providers: [

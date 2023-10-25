@@ -11,15 +11,14 @@
 
 <mat-dialog-content>
 
-  <div *ngIf="data.descMd || data.desc" mat-dialog-content class="mat-body">
+  <div *ngIf="data.descMd || data.desc" class="mat-body">
 
-    <div class="sxplr-dialog-body">
-      <ng-template [ngIf]="data.desc">
-        {{ data.desc }}
-      </ng-template>
-    </div>
+
+    <ng-template [ngIf]="data.desc">
+      {{ data.desc }}
+    </ng-template>
     
-    <markdown-dom class="sxplr-dialog-body" *ngIf="data.descMd" [markdown]="data.descMd">
+    <markdown-dom *ngIf="data.descMd" [markdown]="data.descMd">
     </markdown-dom>
   </div>
   

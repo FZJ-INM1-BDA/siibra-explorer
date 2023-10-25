@@ -277,6 +277,7 @@ class TranslateV3 {
       }
       returnObj.push({
         source: `precomputed://${url}`,
+        legacySpecFlag: "old",
         transform,
         info,
       })
@@ -392,6 +393,7 @@ class TranslateV3 {
         const transform = await resp.json()
         segLayerSpec = {
           layer: {
+            legacySpecFlag: "old",
             labelIndicies: [],
             source: `precomputed://${url}`,
             transform,
@@ -540,6 +542,7 @@ class TranslateV3 {
       }
       const transform: number[][] = await resp.json()
       returnObj.push({
+        legacySpecFlag: "old",
         source: `precompmesh://${splitPrecompMeshVol[0]}`,
         transform,
         auxMeshes: [{

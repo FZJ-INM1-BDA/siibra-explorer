@@ -11,7 +11,6 @@ export type TPointJsonSpec = {
 } & TBaseAnnotationGeomtrySpec
 
 export class Point extends IAnnotationGeometry {
-  id: string
   x: number
   y: number
   z: number

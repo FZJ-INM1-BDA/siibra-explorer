@@ -8,14 +8,28 @@ import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { By } from "@angular/platform-browser"
-import { MatSlideToggle } from "@angular/material/slide-toggle"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { UtilModule } from "src/util"
-import * as configSvc from '../config.service'
-import {QuickTourModule} from "src/ui/quickTour/module";
+import { NEHUBA_CONFIG_SERVICE_TOKEN } from "../config.service"
+import { QuickTourModule } from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
+import { MatSlideToggle } from "src/sharedModules/angularMaterial.exports"
+
+const mockNehubaConfig = {
+  dataset: {
+    initialNgState: {
+      navigation: {
+        pose: {
+          orientation: [0, 0, 0, 1],
+          position: [0, 0, 0]
+        },
+        zoomFactor: 1e6
+      }
+    }
+  }
+} as any
 
 @Directive({
   selector: '[iav-auth-auth-state]',
@@ -34,6 +48,7 @@ class MockIavAuthState{
 class MockSigninModal{}
 
 describe('> statusCard.component.ts', () => {
+  let getNavigationStateFromConfigSpy: jasmine.Spy = jasmine.createSpy('getNavigationStateFromConfig').and.returnValue(mockNehubaConfig)
   describe('> StatusCardComponent', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
@@ -60,7 +75,13 @@ describe('> statusCard.component.ts', () => {
                 fetchedTemplates: []
               }
             }
-          })
+          }),
+          {
+            provide: NEHUBA_CONFIG_SERVICE_TOKEN,
+            useValue: {
+              getNehubaConfig: getNavigationStateFromConfigSpy
+            }
+          }
         ]
       }).compileComponents()
     })
@@ -142,28 +163,13 @@ describe('> statusCard.component.ts', () => {
         perspectiveOrientation: [1,0,0,0]
       }
 
-      const mockNehubaConfig = {
-        dataset: {
-          initialNgState: {
-            navigation: {
-              pose: {
-                orientation: [0, 0, 0, 1],
-                position: [0, 0, 0]
-              },
-              zoomFactor: 1e6
-            }
-          }
-        }
-      }
-
-      let getNavigationStateFromConfigSpy: jasmine.Spy = jasmine.createSpy('getNavigationStateFromConfig').and.returnValue(mockNehubaConfig)
+      
 
       beforeEach(() => {
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, null)
         mockStore.overrideSelector(atlasSelection.selectors.navigation, mockCurrNavigation)
-
-        spyOnProperty(configSvc, 'getNehubaConfig').and.returnValue(getNavigationStateFromConfigSpy)
+        
         
         fixture = TestBed.createComponent(StatusCardComponent)
         fixture.detectChanges()

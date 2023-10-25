@@ -1,5 +1,5 @@
 import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatDialog, MatDialogConfig } from 'src/sharedModules/angularMaterial.exports'
 import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 
 type DialogSize = 's' | 'm' | 'l' | 'xl' | 'auto'

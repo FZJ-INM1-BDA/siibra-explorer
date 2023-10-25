@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar, MatBottomSheet, MatBottomSheetRef } from 'src/sharedModules/angularMaterial.exports'
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { of } from "rxjs";

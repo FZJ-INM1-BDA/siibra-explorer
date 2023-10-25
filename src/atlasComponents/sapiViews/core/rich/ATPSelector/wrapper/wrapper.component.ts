@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription } from "rxjs";
 import { switchMap, withLatestFrom } from "rxjs/operators";

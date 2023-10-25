@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { MatDialogModule } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { action } from "@storybook/addon-actions";
 import { componentWrapperDecorator, Meta, moduleMetadata, Story } from "@storybook/angular";
@@ -9,6 +8,7 @@ import { ParcellationVisibilityService } from "../../../parcellation/parcellatio
 import { ATPSelectorModule } from "../module";
 import { ATP } from "../pureDumb/pureATPSelector.components";
 import { loadAtlasEtcData, wrapperDecoratorFn } from "../story.base";
+import { AngularMaterialModule } from "src/sharedModules";
 
 @Component({
   selector: 'wrapper-wrapper',
@@ -38,7 +38,7 @@ export default {
     moduleMetadata({
       imports: [
         ATPSelectorModule,
-        MatDialogModule,
+        AngularMaterialModule,
         RootStoreModule,
       ],
       providers: [

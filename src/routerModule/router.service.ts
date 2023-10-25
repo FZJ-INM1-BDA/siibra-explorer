@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { distinctUntilChanged, filter, map, shareReplay, switchMap, take } from "rxjs/operators";
-import { decodeCustomState, verifyCustomState } from "./util";
+import { DECODE_ENCODE, DecodeEncode } from "./util";
 import { BehaviorSubject, merge } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { SAPI } from "src/atlasComponents/sapi";
@@ -27,7 +27,7 @@ export class RouterService {
       this.#navEnd$.pipe(
         map((ev: NavigationEnd) => {
           const fullPath = ev.urlAfterRedirects
-          const customState = decodeCustomState(
+          const customState = this.decodeCustomState.decodeCustomState(
             this.router.parseUrl(fullPath)
           )
           return customState || {}
@@ -54,7 +54,7 @@ export class RouterService {
   )
 
   setCustomRoute(key: string, state: string){
-    if (!verifyCustomState(key)) {
+    if (!this.decodeCustomState.verifyCustomState(key)) {
       throw new Error(`custom state key must start with x- `)
     }
     this._customRoute$.next({
@@ -65,6 +65,8 @@ export class RouterService {
   constructor(
     private router: Router,
     private sapi: SAPI,
+    @Inject(DECODE_ENCODE)
+    private decodeCustomState: DecodeEncode,
   ){
     /**
      * n.b. navEnd$ events cannot be missed

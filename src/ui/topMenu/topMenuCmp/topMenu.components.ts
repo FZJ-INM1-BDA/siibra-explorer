@@ -7,8 +7,7 @@ import {
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
-import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
-import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { MatBottomSheet, MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterialBtn/dynamicMaterialBtn.component";

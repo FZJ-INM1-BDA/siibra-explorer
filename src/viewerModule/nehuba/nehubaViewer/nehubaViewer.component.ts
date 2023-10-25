@@ -573,7 +573,11 @@ export class NehubaViewerUnit implements OnDestroy {
          * 
          * The below monkey patch sets the mesh to load, allow the SWC to be shown
          */
-        const isSwc = layerObj[key]['source'].includes("swc://")
+        let url = layerObj[key]['source']
+        if (typeof url !== "string") {
+          url = url['url']
+        }
+        const isSwc = url.includes("swc://")
         const hasSegment = (layerObj[key]["segments"] || []).length > 0
         if (isSwc && hasSegment) {
           this.periodicSvc.addToQueue(

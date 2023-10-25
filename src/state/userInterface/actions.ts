@@ -1,6 +1,5 @@
 import { TemplateRef } from "@angular/core";
-import { MatBottomSheetConfig } from "@angular/material/bottom-sheet";
-import { MatSnackBarConfig } from "@angular/material/snack-bar";
+import { MatSnackBarConfig, MatBottomSheetConfig } from 'src/sharedModules/angularMaterial.exports'
 import { createAction, props } from "@ngrx/store";
 import { nameSpace, PanelMode } from "./const"
 

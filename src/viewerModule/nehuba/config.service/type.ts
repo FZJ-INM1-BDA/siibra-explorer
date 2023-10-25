@@ -96,10 +96,8 @@ interface _NehubaConfig {
 
 export type NehubaConfig = RecursivePartial<_NehubaConfig>
 
-/**
- * source MUST contain format, e.g. precomputed://
- */
-export type NgLayerSpec = {
+type OldNgLayerSpec = {
+  legacySpecFlag: 'old'
   source: string
   transform: number[][]
   info?: {
@@ -109,6 +107,28 @@ export type NgLayerSpec = {
   opacity?: number
   visible?: boolean
 }
+
+type NewNgLayerSpec = {
+  legacySpecFlag: 'new'
+  type: 'image'
+  name: string
+  blend: 'default' | 'additive'
+  visible: boolean
+  source: {
+    url: string
+    transform: {
+      inputDimensions: Record<string, [number, string]>
+      outputDimensions: Record<string, [number, string]>
+      matrix: number[][]
+      sourceRank: number
+    }
+  }
+}
+
+/**
+ * source MUST contain format, e.g. precomputed://
+ */
+export type NgLayerSpec =  NewNgLayerSpec | OldNgLayerSpec
 
 /**
  * source MUST contain format, e.g. precomputed://

@@ -2,10 +2,10 @@ import { TestBed } from "@angular/core/testing"
 import { ModularUserAnnotationToolService } from "./service"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
-import { MatSnackBarModule } from "@angular/material/snack-bar"
 import { ANNOTATION_EVENT_INJ_TOKEN, INJ_ANNOT_TARGET } from "./type"
 import { NEVER, Subject } from "rxjs"
 import { atlasSelection } from "src/state"
+import { AngularMaterialModule } from "src/sharedModules"
 
 describe("userAnnotations/service.ts", () => {
 
@@ -15,7 +15,7 @@ describe("userAnnotations/service.ts", () => {
       TestBed.configureTestingModule({
         imports: [
           NoopAnimationsModule,
-          MatSnackBarModule,
+          AngularMaterialModule,
         ],
         providers: [
           provideMockStore(),

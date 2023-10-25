@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "src/components/dialog/dialog.component";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import { MatDialog,  MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 
 type TCancellable = {
   abort: () => void

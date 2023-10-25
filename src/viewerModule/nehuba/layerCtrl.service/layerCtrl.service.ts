@@ -174,7 +174,7 @@ export class NehubaLayerControlService implements OnDestroy{
         ),
         this.store$.pipe(
           select(atlasAppearance.selectors.customLayers),
-          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && /^swc:\/\//.test(l.source)).length > 0),
+          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
         )
       ).pipe(
         startWith(false),

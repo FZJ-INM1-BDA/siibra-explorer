@@ -13,7 +13,7 @@ import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/int
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 
 type OnTmplParcHookArg = {
   previous: {

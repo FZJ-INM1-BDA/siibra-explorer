@@ -1,5 +1,5 @@
 import { Directive, HostListener } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class AtlasDownloadDirective {
         take(1)
       ).toPromise()
 
-      const endpoint = await SAPI.BsEndpoint$.pipe(
+      const endpoint = await this.sapi.sapiEndpoint$.pipe(
         take(1)
       ).toPromise()
 
@@ -119,6 +119,6 @@ export class AtlasDownloadDirective {
   #error$ = new Subject<string>()
   error$ = this.#error$.pipe()
 
-  constructor(private store: Store<MainState>, private snackbar: MatSnackBar) { }
+  constructor(private store: Store<MainState>, private snackbar: MatSnackBar, private sapi: SAPI) { }
 
 }
