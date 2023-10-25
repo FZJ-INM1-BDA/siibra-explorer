@@ -2,56 +2,59 @@
     <div class="sidenav-cover-header-container bg-50-grey-20">
 
         <!-- title -->
-        <mat-card-title>
-            My Annotations
-        </mat-card-title>
+        <mat-card-header>
 
-        <!-- actions -->
-        <mat-card-subtitle>
-            <!-- import -->
-            <ng-template #importMessageTmpl>
-                Please select a annotation file to import.
-            </ng-template>
-
-            <button mat-icon-button
-                (file-input-directive)="handleImportEvent($event)"
-                [file-input-directive-title]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
-                [file-input-directive-text]="true"
-                [file-input-directive-file]="true"
-                [file-input-directive-message]="importMessageTmpl"
-                [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
-                [matTooltip]="ARIA_LABELS.USER_ANNOTATION_IMPORT">
-                <i class="fas fa-folder-open"></i>
-            </button>
-
-            <!-- export -->
-            <button mat-icon-button
-                [zip-files-output]="filesExport$"
-                zip-files-output-zip-filename="exported_annotations.zip"
-                [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
-                [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
-                [disabled]="!(manAnnExists$ | async)">
-                <i class="fas fa-download"></i>
-            </button>
-
-            <!-- share -->
-            <button mat-icon-button
-                [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
-                (click)="openDialog(saneUrlTmpl)"
-                iav-state-aggregator
-                #stateAggregator="iavStateAggregator">
-                <i class="fas fa-share-square"></i>
-            </button>
-
-            <!-- delete all annotations -->
-            <button mat-icon-button
-                color="warn"
-                (click)="deleteAllAnnotation()"
-                [matTooltip]="ARIA_LABELS.BULK_DELETE_ANNOTATIONS"
-                [disabled]="!(manAnnExists$ | async)">
-                <i class="fas fa-trash"></i>
-            </button>
-        </mat-card-subtitle>
+            <mat-card-title>
+                My Annotations
+            </mat-card-title>
+    
+            <!-- actions -->
+            <mat-card-subtitle>
+                <!-- import -->
+                <ng-template #importMessageTmpl>
+                    Please select a annotation file to import.
+                </ng-template>
+    
+                <button mat-icon-button
+                    (file-input-directive)="handleImportEvent($event)"
+                    [file-input-directive-title]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
+                    [file-input-directive-text]="true"
+                    [file-input-directive-file]="true"
+                    [file-input-directive-message]="importMessageTmpl"
+                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_IMPORT"
+                    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_IMPORT">
+                    <i class="fas fa-folder-open"></i>
+                </button>
+    
+                <!-- export -->
+                <button mat-icon-button
+                    [zip-files-output]="filesExport$"
+                    zip-files-output-zip-filename="exported_annotations.zip"
+                    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
+                    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
+                    [disabled]="!(manAnnExists$ | async)">
+                    <i class="fas fa-download"></i>
+                </button>
+    
+                <!-- share -->
+                <button mat-icon-button
+                    [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
+                    (click)="openDialog(saneUrlTmpl)"
+                    iav-state-aggregator
+                    #stateAggregator="iavStateAggregator">
+                    <i class="fas fa-share-square"></i>
+                </button>
+    
+                <!-- delete all annotations -->
+                <button mat-icon-button
+                    color="warn"
+                    (click)="deleteAllAnnotation()"
+                    [matTooltip]="ARIA_LABELS.BULK_DELETE_ANNOTATIONS"
+                    [disabled]="!(manAnnExists$ | async)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </mat-card-subtitle>
+        </mat-card-header>
     </div>
 
     <!-- content -->

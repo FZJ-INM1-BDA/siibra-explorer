@@ -11,7 +11,7 @@ import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { HarnessLoader } from "@angular/cdk/testing"
-import { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing'
+import { MatSlideToggleHarness } from "src/sharedModules/angularMaterial.exports"
 import { atlasAppearance, atlasSelection } from "src/state"
 
 

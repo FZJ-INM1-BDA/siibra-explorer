@@ -221,14 +221,19 @@ class TranslateV3 {
     return this.#templateMap.get(template.id)
   }
   async translateTemplate(template:PathReturn<"/spaces/{space_id}">): Promise<SxplrTemplate> {
+    
+    const ds = await Promise.all((template.datasets || []).map(ds => this.translateDs(ds)))
+    const { ...rest } = ds[0] || {}
 
     this.#templateMap.set(template["@id"], template)
-    const tmpl = {
+    const tmpl: SxplrTemplate = {
       id: template["@id"],
       name: template.fullName,
       shortName: template.shortName,
-      type: "SxplrTemplate" as const
+      type: "SxplrTemplate" as const,
+      ...rest
     }
+    
     this.#sxplrTmplMap.set(tmpl.id, tmpl)
     return tmpl
   }
@@ -327,6 +332,7 @@ class TranslateV3 {
       }
       returnObj.push({
         source: `precomputed://${url}`,
+        legacySpecFlag: "old",
         transform,
         info,
       })
@@ -442,6 +448,7 @@ class TranslateV3 {
         const transform = await resp.json()
         segLayerSpec = {
           layer: {
+            legacySpecFlag: "old",
             labelIndicies: [],
             source: `precomputed://${url}`,
             transform,
@@ -590,6 +597,7 @@ class TranslateV3 {
       }
       const transform: number[][] = await resp.json()
       returnObj.push({
+        legacySpecFlag: "old",
         source: `precompmesh://${splitPrecompMeshVol[0]}`,
         transform,
         auxMeshes: [{

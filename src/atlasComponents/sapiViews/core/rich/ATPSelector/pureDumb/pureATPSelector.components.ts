@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChildren } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnDestroy, Output, QueryList, ViewChildren } from "@angular/core";
 import { BehaviorSubject, Subscription, combineLatest, concat, merge, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -43,28 +43,35 @@ const pipe = new FilterGroupedParcellationPipe()
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class PureATPSelector implements OnChanges, AfterViewInit, OnDestroy{
+export class PureATPSelector implements AfterViewInit, OnDestroy{
 
   #subscriptions: Subscription[] = []
 
   @Input('sxplr-pure-atp-selector-color-palette')
   colorPalette: string[] = darkThemePalette
 
+  #selectedATP$ = new BehaviorSubject<ATP>(null)
   @Input(`sxplr-pure-atp-selector-selected-atp`)
-  public selectedATP: ATP
+  set selectedATP(val: ATP){
+    this.#selectedATP$.next(val)
+  }
 
   public selectedIds: string[] = []
 
   @Input(`sxplr-pure-atp-selector-atlases`)
   public allAtlases: SxplrAtlas[] = []
 
+  #availableTemplates$ = new BehaviorSubject<SxplrTemplate[]>([])
   @Input(`sxplr-pure-atp-selector-templates`)
-  public availableTemplates: SxplrTemplate[] = []
+  set availableTemplates(val: SxplrTemplate[]){
+    this.#availableTemplates$.next(val)
+  }
 
+  #parcellations$ = new BehaviorSubject<SxplrParcellation[]>([])
   @Input(`sxplr-pure-atp-selector-parcellations`)
-  public parcellations: SxplrParcellation[] = []
-
-  public parcAndGroup: (GroupedParcellation|SxplrParcellation)[] = []
+  set parcellations(val: SxplrParcellation[]){
+    this.#parcellations$.next(val)
+  }
 
   @Input('sxplr-pure-atp-selector-is-busy')
   public isBusy: boolean = false
@@ -93,27 +100,34 @@ export class PureATPSelector implements OnChanges, AfterViewInit, OnDestroy{
     this.selectLeafEmitter.emit(atp)
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.selectedATP) {
-      if (!changes.selectedATP.currentValue) {
-        this.selectedIds = []
-      } else {
-        const { atlas, parcellation, template } = changes.selectedATP.currentValue as ATP
-        this.selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
-      }
-    }
+  view$ = combineLatest([
+    this.#selectedATP$,
+    this.#parcellations$,
+    this.#availableTemplates$,
+  ]).pipe(
+    map(([{ atlas, parcellation, template }, parcellations, availableTemplates]) => {
+      const parcAndGroup = [
+        ...pipe.transform(parcellations || [], true),
+        ...pipe.transform(parcellations || [], false),
+      ]
+      const selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
 
-    if (changes.parcellations) {
-      if (!changes.parcellations.currentValue) {
-        this.parcAndGroup = []
-      } else {
-        this.parcAndGroup = [
-          ...pipe.transform(changes.parcellations.currentValue, true),
-          ...pipe.transform(changes.parcellations.currentValue, false),
-        ]
+      const hideParcChip = parcAndGroup.length <= 1
+      const hideTmplChip = availableTemplates?.length <= 1
+      
+      return {
+        atlas,
+        parcellation,
+        template,
+        parcAndGroup,
+        parcellations,
+        selectedIds,
+        hideParcChip,
+        hideTmplChip,
+        availableTemplates: availableTemplates || [],
       }
-    }
-  }
+    })
+  )
 
   ngAfterViewInit(): void {
     this.#subscriptions.push(

@@ -296,9 +296,10 @@ button.#{$llb}
 {
   width: 100%;
 
-  > .mat-button-wrapper
+  > .mdc-button__label
   {
     display: flex;
+    width: 100%;
     
     > .#{$llb}-icon
     {
@@ -323,4 +324,12 @@ button.#{$llb}
       }
     }
   }
+}
+
+div.section-divider
+{
+  border-bottom-color: rgba(128, 128, 128, 0.5);
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  margin: 3rem 1rem;
 }

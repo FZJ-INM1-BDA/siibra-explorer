@@ -1,11 +1,11 @@
 import { Component, TemplateRef } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
 import { PluginService } from "../service";
 import { PluginManifest } from "../types";
 import { combineLatest, Observable, Subject } from "rxjs";
 import { map, scan, startWith } from "rxjs/operators";
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 
 @Component({
   selector : 'plugin-banner',

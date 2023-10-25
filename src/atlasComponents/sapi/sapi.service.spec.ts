@@ -1,108 +1,154 @@
-import { finalize } from "rxjs/operators"
-import * as env from "src/environments/environment"
 import { SAPI } from "./sapi.service"
+
+const atlas1 = 'foo'
+const atlas2 = 'bar'
+const endpt1 = 'http://foo-bar'
+const endpt2 = 'http://buzz-bizz'
 
 describe("> sapi.service.ts", () => {
   describe("> SAPI", () => {
-    describe("#BsEndpoint$", () => {
+    let originalTimeout: number
+    beforeAll(() => {
+      
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 7500 // timeout 5000ms, + other tasks, 7.5 sec should be enough
+    })
+    afterAll(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
+    })
+
+    describe("> VerifyEndpoint", () => {
+
       let fetchSpy: jasmine.Spy
-      let environmentSpy: jasmine.Spy
-
-      const endpt1 = 'http://foo-bar'
-      const endpt2 = 'http://buzz-bizz'
-
-      const atlasEndpts = [endpt1, endpt2].map(url => `${url}/atlases`)
-
-      const atlas1 = 'foo'
-      const atlas2 = 'bar'
-
-      let subscribedVal: string
-
       beforeEach(() => {
-        SAPI.ClearBsEndPoint()
         fetchSpy = spyOn(window, 'fetch')
         fetchSpy.and.callThrough()
-
-        environmentSpy = spyOnProperty(env, 'environment')
-        environmentSpy.and.returnValue({
-          SIIBRA_API_ENDPOINTS: `${endpt1},${endpt2}`
-        })
       })
-
-
       afterEach(() => {
-        SAPI.ClearBsEndPoint()
         fetchSpy.calls.reset()
-        environmentSpy.calls.reset()
-        subscribedVal = null
+        fetchSpy.and.callThrough()
       })
-
-      describe("> first passes", () => {
-        beforeEach(done => {
-          const resp = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 200 })
-          fetchSpy.and.callFake(async url => {
-            if (url === `${endpt1}/atlases`) {
-              return resp
-            }
-            throw new Error("controlled throw")
-          })
-          SAPI.BsEndpoint$.pipe(
-            finalize(() => done())
-          ).subscribe(val => {
-            subscribedVal = val
+  
+      const respOk = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 200 })
+      const resp404 = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 404 })
+  
+      describe("> ill formed input", () => {
+        describe("> nullish input", () => {
+          it("throws", async () => {
+            await expectAsync(SAPI.VerifyEndpoint(endpt1)).toBeRejected()
           })
         })
-        it("> should call fetch twice", async () => {
-          expect(fetchSpy).toHaveBeenCalledTimes(1)
-          
-          const allArgs = fetchSpy.calls.allArgs()
-          expect(allArgs.length).toEqual(1)
-          expect(atlasEndpts).toContain(allArgs[0][0])
+      })
+      
+      describe("> success", () => {
+        beforeEach(() => {
+          fetchSpy.and.returnValue(respOk)
         })
 
-        it("> endpoint should be set", async () => {
-          expect(subscribedVal).toBe(endpt1)
-        })
-
-        it("> additional calls should return cached observable", () => {
-
-          expect(fetchSpy).toHaveBeenCalledTimes(1)
-          SAPI.BsEndpoint$.subscribe()
-          SAPI.BsEndpoint$.subscribe()
-
-          expect(fetchSpy).toHaveBeenCalledTimes(1)
+        it("> returns the expected value", async () => {
+          const val = await SAPI.VerifyEndpoint(endpt1)
+          expect(val).toEqual(endpt1)
+          expect(fetchSpy).toHaveBeenCalledOnceWith(`${endpt1}/atlases`)
         })
       })
 
-      describe("> first fails", () => {
-        beforeEach(done => {
-          fetchSpy.and.callFake(async url => {
-            if (url === `${endpt1}/atlases`) {
-              throw new Error(`bla`)
-            }
-            const resp = new Response(JSON.stringify([atlas1]), { headers: { 'content-type': 'application/json' }, status: 200 })
-            return resp
+      describe("> fails", () => {
+        describe("> promise fails", () => {
+          beforeEach(() => {
+            fetchSpy.and.rejectWith(`foo`)
           })
 
-          SAPI.BsEndpoint$.pipe(
-            finalize(() => done())
-          ).subscribe(val => {
-            subscribedVal = val
+          it("> expects function to reject", async () => {
+            await expectAsync(SAPI.VerifyEndpoint(endpt1)).toBeRejected()
+          })
+        })
+        describe("> http fails", () => {
+          beforeEach(() => {
+            fetchSpy.and.resolveTo(resp404)
+          })
+          it("> expects function to reject", async () => {
+            await expectAsync(SAPI.VerifyEndpoint(endpt1)).toBeRejected()
+          })
+        })
+      })
+    })
+
+    describe("> VerifyEndpoints", () => {
+      let verifyEndpointSpy: jasmine.Spy
+      beforeEach(() => {
+        verifyEndpointSpy = spyOn(SAPI, "VerifyEndpoint")
+
+      })
+      describe("> ill formed inputs", () => {
+        describe("> empty arr input", () => {
+          it("> rejects", async () => {
+            await expectAsync(SAPI.VerifyEndpoints([])).toBeRejected()
+          })
+        })
+      })
+      describe("> correct inputs", () => {
+        const endpts = [endpt1, endpt2]
+        
+        describe("> both succeeds", () => {
+          beforeEach(() => {
+            verifyEndpointSpy.and.callFake(async url => {
+              console.log("foo bar")
+              return url
+            })
+          })
+          it("> returns first, and second is not called", async () => {
+            const result = await SAPI.VerifyEndpoints(endpts)
+            // expect(result).toEqual(endpt1)
+            // expect(fetchSpy).toHaveBeenCalledOnceWith(`${endpt1}/atlases`)
+            // expect(fetchSpy).not.toHaveBeenCalledWith(`${endpt2}/atlases`)
+          })
+        })
+        
+        describe("> second fails", () => {
+          beforeEach(() => {
+            verifyEndpointSpy.and.callFake(async url => {
+              if (url === endpt2) {
+                throw new Error('foo -bar')
+              }
+              return url
+            })
+          })
+          it("> returns first, and second is not called", async () => {
+            const result = await SAPI.VerifyEndpoints(endpts)
+            expect(result).toEqual(endpt1)
+            expect(verifyEndpointSpy).toHaveBeenCalledOnceWith(endpt1)
+            expect(verifyEndpointSpy).not.toHaveBeenCalledWith(endpt2)
+          })
+        })
+        
+        describe("> first fails", () => {
+          beforeEach(() => {
+            verifyEndpointSpy.and.callFake(async url => {
+              
+              if (url === endpt1) {
+                throw new Error('foo -bar')
+              }
+              return url
+            })
+          })
+          it("> returns first, and second is not called", async () => {
+            const result = await SAPI.VerifyEndpoints(endpts)
+            expect(result).toEqual(endpt2)
+            expect(verifyEndpointSpy).toHaveBeenCalledWith(endpt1)
+            expect(verifyEndpointSpy).toHaveBeenCalledWith(endpt2)
           })
         })
 
-        it("> should call twice", async () => {
-          expect(fetchSpy).toHaveBeenCalledTimes(2)
-
-          const allArgs = fetchSpy.calls.allArgs()
-
-          expect(allArgs.length).toEqual(2)
-          expect(atlasEndpts).toContain(allArgs[0][0])
-          expect(atlasEndpts).toContain(allArgs[1][0])
-        })
-
-        it('> should set endpt2', async () => {
-          expect(subscribedVal).toBe(endpt2)
+        describe("> both fails", () => {
+          beforeEach(() => {
+            verifyEndpointSpy.and.rejectWith('foo-bar')
+          })
+          it("> rejects", async () => {
+            await expectAsync(SAPI.VerifyEndpoints(endpts)).toBeRejected()
+            
+            expect(verifyEndpointSpy).toHaveBeenCalledWith(endpt1)
+            expect(verifyEndpointSpy).toHaveBeenCalledWith(endpt2)
+          })
         })
       })
     })

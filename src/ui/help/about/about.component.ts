@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { NewestRelease } from '../newestRelease.directive'
 import { HttpClient } from '@angular/common/http'
 import { map } from 'rxjs/operators'
-import { MatDialog } from '@angular/material/dialog'
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { HowToCite } from '../howToCite/howToCite.component'
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from "src/atlasComponents/sapi/sapi.service"
 import { environment } from "src/environments/environment"

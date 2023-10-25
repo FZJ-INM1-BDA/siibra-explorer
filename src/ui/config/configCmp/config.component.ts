@@ -3,8 +3,7 @@ import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { MatSliderChange } from "@angular/material/slider";
+import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection, userPreference, userInterface } from 'src/state';
 import { environment } from "src/environments/environment"
 import { Z_TRAVERSAL_MULTIPLIER } from 'src/viewerModule/nehuba/layerCtrl.service/layerCtrl.util';
@@ -197,10 +196,10 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
   }
 
-  public handleMatSliderChange(ev: MatSliderChange) {
+  public updateGpuLimit(newVal: number){
     this.store.dispatch(
       userPreference.actions.setGpuLimit({
-        limit: ev.value * 1e6
+        limit: newVal * 1e6
       })
     )
   }

@@ -16,8 +16,8 @@ import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";

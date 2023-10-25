@@ -126,6 +126,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         atlasAppearance.actions.addCustomLayer({
           customLayer: {
             id: name,
+            legacySpecFlag: 'old',
             shader: this.shader,
             transform: this.transform,
             clType: 'customlayer/nglayer',

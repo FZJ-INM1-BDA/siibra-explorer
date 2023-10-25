@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-.font-stretch
+mat-card
 {
-  font-stretch: extra-condensed;
+  margin: 5rem;
 }

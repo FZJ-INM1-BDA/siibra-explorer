@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Polygon, POLY_ICON_CLASS } from "../poly";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";

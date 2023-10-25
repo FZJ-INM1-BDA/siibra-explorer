@@ -9,6 +9,11 @@
 - [ ] Can access front page
 - [ ] Can login to oidc v2 via top-right
 
+## Verify testing correct siibra-explorer and siibra-api versions
+
+- [ ] Git hash from `[?]` -> `About` matches with the git hash of `HEAD` of staging
+- [ ] Message `Expecting {VERSION}, but got {VERSION}, some functionalities may not work as expected` does **not** show
+
 ## Atlas data specific
 
 - [ ] Human multilevel atlas

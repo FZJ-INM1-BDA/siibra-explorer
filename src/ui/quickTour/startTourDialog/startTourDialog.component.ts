@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {MatDialogRef} from "@angular/material/dialog";
+import { MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { CONST } from 'common/constants'
 import { PERMISSION_DIALOG_ACTIONS } from "../constrants";
 

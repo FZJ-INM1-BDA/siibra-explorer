@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store } from "@ngrx/store";
 import { Line, LINE_ICON_CLASS } from "../line";
 import { ToolCmpBase } from "../toolCmp.base";

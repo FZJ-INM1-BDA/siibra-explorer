@@ -3,8 +3,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
+    "useDefineForClassFields": false,
     "module": "esnext",
-    "target": "es2020",
+    "target": "es2022",
     "sourceMap": false,
     "baseUrl": ".",
     "paths": {

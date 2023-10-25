@@ -8,10 +8,10 @@ import { combineLatest, concat, Observable, of, Subscription } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { TFileInputEvent } from "src/getFileInput/type";
 import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
 import { DialogService } from "src/services/dialogService.service";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { userAnnotationRouteKey } from "../constants";
 
 const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`

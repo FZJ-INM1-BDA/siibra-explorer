@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { Component, EventEmitter, TemplateRef, ViewChild } from "@angular/core"
-import { MatDialog } from "@angular/material/dialog"
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { action } from "@storybook/addon-actions"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { atlasId, provideDarkTheme, getParcRegions, getAtlas, getParc } from "src/atlasComponents/sapi/stories.base"

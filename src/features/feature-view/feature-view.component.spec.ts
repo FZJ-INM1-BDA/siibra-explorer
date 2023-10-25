@@ -5,7 +5,6 @@ import { SAPI } from 'src/atlasComponents/sapi';
 import { DARKTHEME } from 'src/util/injectionTokens';
 
 import { FeatureViewComponent } from './feature-view.component';
-import { ExperimentalModule } from 'src/experimental/experimental.module';
 import { provideMockStore } from '@ngrx/store/testing';
 
 describe('FeatureViewComponent', () => {
@@ -16,7 +15,6 @@ describe('FeatureViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
-        ExperimentalModule,
       ],
       declarations: [ FeatureViewComponent ],
       providers: [
@@ -33,7 +31,8 @@ describe('FeatureViewComponent', () => {
             },
             getV3FeaturewDetailWithId(...args) {
               return EMPTY
-            }
+            },
+            sapiEndpoint$: EMPTY
           }
         }
       ]

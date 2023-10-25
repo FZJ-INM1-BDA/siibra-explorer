@@ -1,7 +1,11 @@
 import { Injectable } from "@angular/core";
-import {MatSnackBar, MatSnackBarConfig} from "@angular/material/snack-bar";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { ActionDialog } from "src/ui/actionDialog/actionDialog.component";
+import { 
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatDialog,
+  MatDialogConfig
+ } from 'src/sharedModules/angularMaterial.exports'
 
 @Injectable({
   providedIn: 'root',

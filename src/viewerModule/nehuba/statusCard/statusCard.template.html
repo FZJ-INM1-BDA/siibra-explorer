@@ -3,7 +3,7 @@
   [quick-tour-order]="quickTourData.order"
   #statusCardQT="quickTour">
   <mat-card *ngIf="showFull; else showMin"
-    class="expandedContainer sxplr-p-2 sxplr-pt-1">
+    class="expandedContainer">
     
     <mat-card-content>
 
@@ -75,17 +75,23 @@
             [value]="navVal$ | async"
             #navInput="matInput">
 
-        </mat-form-field>
+          <button mat-icon-button
+            iav-stop="click"
+            matSuffix
+            [attr.aria-label]="COPY_NAVIGATION_STRING"
+            (click)="copyString(navInput.value)">
+            <i class="fas fa-copy"></i>
+          </button>
 
-        <div class="w-0 position-relative">
-          <button
+          <button mat-icon-button
+            iav-stop="click"
+            matSuffix
             sxplr-share-view
-            [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
-            mat-icon-button
-            class="position-absolute share-btn">
+            [attr.aria-label]="SHARE_BTN_ARIA_LABEL">
             <i class="fas fa-share-square"></i>
           </button>
-        </div>
+        </mat-form-field>
+
       </div>
 
       <!-- cursor pos -->
@@ -115,7 +121,15 @@
       {{ navVal$ | async }}
     </span>
 
-    <mat-divider [vertical]="true"></mat-divider>
+    <ng-template [ngIf]="navVal$ | async" let-navVal>
+
+      <button mat-icon-button
+        [attr.aria-label]="COPY_NAVIGATION_STRING"
+        (click)="copyString(navVal)">
+        <i class="fas fa-copy"></i>
+      </button>
+  
+    </ng-template>
 
     <button mat-icon-button
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"

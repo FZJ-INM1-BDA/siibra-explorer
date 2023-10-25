@@ -1,8 +1,8 @@
 import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatDialog, MatDialogConfig } from 'src/sharedModules/angularMaterial.exports'
 import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 
-type DialogSize = 's' | 'm' | 'l' | 'xl'
+type DialogSize = 's' | 'm' | 'l' | 'xl' | 'auto'
 
 const sizeDict: Record<DialogSize, Partial<MatDialogConfig>> = {
   's': {
@@ -20,7 +20,8 @@ const sizeDict: Record<DialogSize, Partial<MatDialogConfig>> = {
   'xl': {
     width: '90vw',
     height: '90vh'
-  }
+  },
+  'auto': {}
 }
 
 @Directive({

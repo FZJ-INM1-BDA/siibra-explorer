@@ -11,7 +11,7 @@ import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } fro
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { SPECIES_ENUM } from 'src/util/constants';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}

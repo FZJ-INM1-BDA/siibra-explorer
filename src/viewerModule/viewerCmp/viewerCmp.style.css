@@ -22,7 +22,7 @@
 
 .tab-toggle
 {
-  margin-left: -2rem;
+  margin-left: -1rem;
   padding-right: 0.75rem;
   margin-right: 1rem;
   text-align: right;
@@ -75,8 +75,6 @@ mat-drawer
 .min-tray-explr-btn
 {
   width: 100%;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
   margin-top: -1rem;
 }
 
@@ -98,13 +96,13 @@ logo-container
   opacity: 0.2;
 }
 
-mat-list[dense].contextual-block
+mat-list.contextual-block
 {
   display: inline-block;
   background-color:rgba(200,200,200,0.8);
 }
 
-:host-context([darktheme="true"]) mat-list[dense].contextual-block
+:host-context([darktheme="true"]) mat-list.contextual-block
 {
   background-color : rgba(30,30,30,0.8);
 }
@@ -154,14 +152,26 @@ sxplr-smart-chip [mat-icon-button]
   margin-right: -1.5rem;
 }
 
-.loadingText
+sxplr-sapiviews-core-region-region-list-item
 {
-  height: 1rem;
+  display: flex;
+  align-items: center;
 }
 
-sxplr-overlay-ui
+.context-menu-container
 {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  margin: 0 -16px;
+}
+
+.centered
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leave-me-alone
+{
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }

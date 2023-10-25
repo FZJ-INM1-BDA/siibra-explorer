@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common"
 import { TestBed, async } from "@angular/core/testing"
-import { MAT_DIALOG_DATA } from "@angular/material/dialog"
+import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports"
 import { AngularMaterialModule } from "src/sharedModules"
 import { ComponentsModule } from "../components.module"
 import { ConfirmDialogComponent } from "./confirmDialog.component"

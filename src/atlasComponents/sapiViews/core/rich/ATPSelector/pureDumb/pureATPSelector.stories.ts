@@ -1,6 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
 import { action } from "@storybook/addon-actions";
 import { componentWrapperDecorator, Meta, moduleMetadata, Story } from "@storybook/angular";
 import { atlasId, provideDarkTheme } from "src/atlasComponents/sapi/stories.base";
@@ -10,6 +9,7 @@ import { ATPSelectorModule } from "../module";
 import { darkThemePalette } from "./pureATPSelector.components"
 import { loadAtlasEtcData, wrapperDecoratorFn } from "../story.base"
 import { provideMockStore } from "@ngrx/store/testing";
+import { AngularMaterialModule } from "src/sharedModules";
 
 @Component({
   selector: 'atlas-selector-wrapper-story',
@@ -70,7 +70,7 @@ export default {
       imports: [
         CommonModule,
         ATPSelectorModule,
-        MatButtonModule,
+        AngularMaterialModule,
         UtilModule,
       ],
       declarations: [

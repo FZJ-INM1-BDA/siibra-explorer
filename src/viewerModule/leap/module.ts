@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
-import { MatCardModule } from "@angular/material/card";
+import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
 import { LeapSignal } from "./leapSignal/leapSignal.component";
 import { LeapService } from "./service";
@@ -9,7 +9,7 @@ import { LeapControlViewRef } from "./signal.directive";
 @NgModule({
   imports: [
     CommonModule,
-    MatCardModule,
+    AngularMaterialModule,
   ],
   declarations: [
     LeapSignal,
