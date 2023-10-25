@@ -191,14 +191,19 @@ import { SAPI } from './atlasComponents/sapi';
       provide: APP_INITIALIZER,
       useFactory: (sapi: SAPI, document: Document) => {
         
-        const rootEl = document.querySelector("atlaas-viewer")
+        const rootEl = document.querySelector("atlas-viewer")
         const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
         
         const { SIIBRA_API_ENDPOINTS } = environment
         const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
         return async () => {
-          const url = await SAPI.VerifyEndpoints(endpoints)
-          sapi.verifiedSapiEndpoint$.next(url)
+          try {
+            const url = await SAPI.VerifyEndpoints(endpoints)
+            sapi.verifiedSapiEndpoint$.next(url)
+            sapi.verifiedSapiEndpoint$.complete()
+          } catch (e) {
+            SAPI.ErrorMessage = e.toString()
+          }
         }
       },
       multi: true,
