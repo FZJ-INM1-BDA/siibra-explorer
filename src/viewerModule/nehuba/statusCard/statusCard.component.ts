@@ -21,7 +21,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { getNehubaConfig } from "../config.service";
+import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -68,7 +68,8 @@ export class StatusCardComponent implements OnInit, OnChanges{
     private dialog: MatDialog,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>
+    @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
+    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
   ) {
 
     if (nehubaViewer$) {
@@ -178,7 +179,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
    * the info re: nehubaViewer can stay there, too
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}): void {
-    const config = getNehubaConfig(this.selectedTemplate)
+    const config = this.nehubaConfigSvc.getNehubaConfig(this.selectedTemplate)
 
     const {
       zoomFactor: zoom

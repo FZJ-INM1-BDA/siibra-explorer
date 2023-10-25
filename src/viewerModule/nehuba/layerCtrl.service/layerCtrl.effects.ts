@@ -168,11 +168,9 @@ export class LayerCtrlEffects {
       const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
       for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
         for (const key in layers) {
-          let item: atlasAppearance.const.NgLayerCustomLayer
           const v = layers[key]
 
           if (v.legacySpecFlag === "old") {
-            const { source, transform, opacity, visible } = v
             customBaseLayers.push({
               clType: "baselayer/nglayer",
               legacySpecFlag: "old",

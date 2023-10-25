@@ -10,11 +10,11 @@ import { SapiViewsUtilModule } from "../../util/module";
 import { SapiViewsCoreRegionRegionListItem } from "./region/listItem/region.listItem.component";
 import { SapiViewsCoreRegionRegionBase } from "./region/region.base.directive";
 import { SapiViewsCoreRegionRegionRich } from "./region/rich/region.rich.component";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { DialogModule } from "src/ui/dialogInfo";
 import { SapiViewsCoreParcellationModule } from "../parcellation";
 import { TranslateQualificationPipe } from "./translateQualification.pipe";
 import { DedupRelatedRegionPipe } from "./dedupRelatedRegion.pipe";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -26,10 +26,10 @@ import { DedupRelatedRegionPipe } from "./dedupRelatedRegion.pipe";
     StrictLocalModule,
     FeatureModule,
     ReadmoreModule,
-    ExperimentalModule,
     DialogModule,
     SapiViewsCoreParcellationModule,
-    ExperimentalModule,
+
+    ExperimentalFlagDirective,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,

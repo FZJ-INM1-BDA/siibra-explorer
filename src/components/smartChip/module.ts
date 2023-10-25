@@ -6,7 +6,6 @@ import { HasSubMenuPipe } from "./hasSubmenu.pipe";
 import { SmartChipContent } from "./smartChip.content.directive";
 import { SmartChipHeader } from "./smartChip.header.directive";
 import { SmartChipMenu } from "./smartChip.menu.directive";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { SmartChipAction } from "./smartChip.action.directive";
 import { AngularMaterialModule } from "src/sharedModules";
 
@@ -14,7 +13,6 @@ import { AngularMaterialModule } from "src/sharedModules";
   imports: [
     CommonModule,
     BrowserAnimationsModule,
-    ExperimentalModule,
     AngularMaterialModule,
   ],
   declarations: [

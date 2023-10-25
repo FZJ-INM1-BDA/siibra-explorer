@@ -15,7 +15,6 @@ import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
 import { FeatureFilterDirective } from "./feature.filter.directive";
 import { GroupFeaturesToName } from "./grpFeatToName.pipe";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { ReadmoreModule } from "src/components/readmore";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 import { PlotlyComponent } from "./plotly";
@@ -30,7 +29,6 @@ import { AngularMaterialModule } from "src/sharedModules";
     ScrollingModule,
     MarkdownModule,
     NgLayerCtlModule,
-    ExperimentalModule,
     ReadmoreModule,
     AngularMaterialModule,
     

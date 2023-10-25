@@ -1,7 +1,7 @@
 import { NgIf } from '@angular/common';
 import { ChangeDetectorRef, Directive, Input, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, concat, of } from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 import { MainState, userPreference } from 'src/state';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
@@ -9,7 +9,8 @@ import { DestroyDirective } from 'src/util/directives/destroy.directive';
 @Directive({
   selector: '[sxplrExperimentalFlag]',
   exportAs: 'sxplrExperimentalFlag',
-  hostDirectives: [NgIf, DestroyDirective]
+  hostDirectives: [NgIf, DestroyDirective],
+  standalone: true
 })
 export class ExperimentalFlagDirective {
 
@@ -18,6 +19,9 @@ export class ExperimentalFlagDirective {
 
   @Input()
   set deprecated(deprecated: boolean){
+    if (typeof deprecated === 'undefined') {
+      return
+    }
     this.#inputs.next({
       deprecated: !!deprecated,
       experimental: !deprecated
@@ -26,6 +30,9 @@ export class ExperimentalFlagDirective {
 
   @Input()
   set experimental(experimental: boolean){
+    if (typeof experimental === 'undefined') {
+      return
+    }
     this.#inputs.next({
       deprecated: !experimental,
       experimental: !!experimental
@@ -39,8 +46,11 @@ export class ExperimentalFlagDirective {
   #inputs = new BehaviorSubject<{ deprecated: boolean, experimental: boolean }>(null)
 
   show$ = combineLatest([
-    this.#inputs.pipe(
-      filter(v => !!v)
+    concat(
+      of({ deprecated: null, experimental: null }),
+      this.#inputs.pipe(
+        filter(v => !!v),
+      ),
     ),
     this.#showExperimentalFlag$
   ]).pipe(

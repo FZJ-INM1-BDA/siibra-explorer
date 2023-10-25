@@ -34,7 +34,6 @@ import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { BottomMenuModule } from "src/ui/bottomMenu";
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
 import { Store } from "@ngrx/store";
@@ -66,7 +65,6 @@ import { atlasSelection, userPreference } from "src/state";
     SmartChipModule,
     ReactiveFormsModule,
     BottomMenuModule,
-    ExperimentalModule,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

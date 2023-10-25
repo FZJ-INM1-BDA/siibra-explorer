@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Store, select } from "@ngrx/store";
@@ -51,6 +51,8 @@ import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerC
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
+import { environment } from './environments/environment.common';
+import { SAPI } from './atlasComponents/sapi';
 
 @NgModule({
   imports: [
@@ -184,6 +186,23 @@ import { ViewerCommonEffects } from './viewerModule';
       },
       multi: true,
       deps: [ AuthService, Store ]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (sapi: SAPI, document: Document) => {
+        
+        const rootEl = document.querySelector("atlaas-viewer")
+        const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+        
+        const { SIIBRA_API_ENDPOINTS } = environment
+        const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
+        return async () => {
+          const url = await SAPI.VerifyEndpoints(endpoints)
+          sapi.verifiedSapiEndpoint$.next(url)
+        }
+      },
+      multi: true,
+      deps: [ SAPI, DOCUMENT ]
     }
   ],
   bootstrap: [

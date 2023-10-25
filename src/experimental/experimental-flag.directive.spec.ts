@@ -1,92 +1,117 @@
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { ExperimentalFlagDirective } from './experimental-flag.directive';
-import { TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { userPreference } from 'src/state';
-import { take } from 'rxjs/operators';
+import { Component, Input, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 /**
  * flag, decprecated, experimental, expected
  */
 const expectationMatrix = [
   /**
-   * dep:same as experiment, experimental takes precedent
+   * last set will always override previous
+   * and since it's a toggle, experimental === !deprecated
+   * as a result, the following pairs are equivalent
    */
   [false, false, false, true],
-  [true, false, false, false],
-  [false, true, true, false],
-  [true, true, true, true],
-
-  /**
-   * dep:true, expmt: false, visible when flag not set
-   */
   [false, true, false, true],
+
+  [true, false, false, false],
   [true, true, false, false],
 
-  
-  /**
-   * dep:false, expmt: true, visible when flag set
-   */
+  [false, true, true, false],
   [false, false, true, false],
+
+  [true, true, true, true],
   [true, false, true, true],
   
   
   /**
    * dep:null, expmt: null, should not emit
    */
-  [false, null, null, null],
-  [true, null, null, null],
+  [false, null, null, true],
+  [true, null, null, true],
 ]
 
+@Component({
+  template: `<ng-template
+      sxplrExperimentalFlag
+      [experimental]="experimental"
+      [deprecated]="deprecated">
+      <div id="foobarbuzz"></div>
+    </ng-template>`
+})
+class DummyCmp{
+  @Input()
+  experimental: boolean
+
+  @Input()
+  deprecated: boolean
+
+  @ViewChild(ExperimentalFlagDirective)
+  experimentalFlag: ExperimentalFlagDirective
+}
+
 describe('ExperimentalFlagDirective', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  let cmp: ComponentFixture<DummyCmp>
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [
+        CommonModule,
+        ExperimentalFlagDirective,
+      ],
       providers: [
         provideMockStore()
       ],
       declarations: [
-        ExperimentalFlagDirective
+        DummyCmp
       ]
-    })
+    }).compileComponents()
+    
     const store = TestBed.inject(MockStore)
     store.overrideSelector(userPreference.selectors.showExperimental, null)
   })
   it('should create an instance', () => {
-    const store = TestBed.inject(Store)
-    const directive = new ExperimentalFlagDirective(store);
-    expect(directive).toBeTruthy();
+    cmp = TestBed.createComponent(DummyCmp)
+    expect(cmp.componentInstance).toBeTruthy()
   });
 
   for (const [flag, dep, exp, expected] of expectationMatrix) {
 
     describe(`> experimentalFlag: ${flag}`, () => {
-      beforeEach(() => {
+      
+      beforeEach(fakeAsync( () => {
         const store = TestBed.inject(MockStore)
         store.overrideSelector(userPreference.selectors.showExperimental, flag)
-      })
-      describe(`> deprecated: ${dep}, experimental: ${exp}`, () => {
-        let directive: ExperimentalFlagDirective
-        beforeEach(() => {
-          const store = TestBed.inject(Store)
-          directive = new ExperimentalFlagDirective(store);
-          if (dep !== null) directive.deprecated = dep
-          if (exp !== null) directive.experimental = exp
-        })
-        
-        it(`show$ should be ${expected}`, async () => {
-          if (expected === null) {
-            await expectAsync(
-              directive.show$.pipe(
-                take(1)
-              ).toPromise()
-            ).toBePending()
-            return
-          }
-          const result = await directive.show$.pipe(
-            take(1)
-          ).toPromise()
+        cmp = TestBed.createComponent(DummyCmp)
+        cmp.detectChanges()
 
-          expect(result).toEqual(expected)
+        /**
+         * only set if set to null
+         */
+        if (dep !== null) {
+          cmp.componentInstance.experimentalFlag.deprecated = dep
+        }
+        if (exp !== null) {
+          cmp.componentInstance.experimentalFlag.experimental = exp
+        }
+        
+        cmp.detectChanges()
+
+        tick(16)
+      } ))
+
+      describe(`> deprecated: ${dep}, experimental: ${exp}`, () => {
+
+        it(`ngIf should be ${expected}`, async () => {
+          
+          const el = cmp.nativeElement.querySelector('#foobarbuzz')
+          if (expected) {
+            expect(el).toBeTruthy()
+          } else {
+            expect(el).toBeFalsy()
+          }
         })
       })
     })

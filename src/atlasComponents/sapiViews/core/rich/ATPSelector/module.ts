@@ -9,7 +9,6 @@ import { PureATPSelector } from "./pureDumb/pureATPSelector.components";
 import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
 import { QuickTourModule } from "src/ui/quickTour";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { AngularMaterialModule } from "src/sharedModules";
 
 @NgModule({
@@ -23,7 +22,6 @@ import { AngularMaterialModule } from "src/sharedModules";
     SAPIModule,
     SapiViewsCoreParcellationModule,
     QuickTourModule,
-    ExperimentalModule,
   ],
   declarations: [
     PureATPSelector,
