@@ -68,8 +68,6 @@
           </a>
         </ng-template>
 
-        <ng-template sxplrExperimentalFlag [experimental]="true">
-        
         <!-- related regions -->
         <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
           <!-- only show icon if related regions length > 0 -->
@@ -150,7 +148,6 @@
           </mat-list-item>
         </ng-template>
 
-        </ng-template>
       </mat-action-list>
 
       
@@ -184,7 +181,6 @@
       </sxplr-feature-entry>
 
       
-      <ng-template sxplrExperimentalFlag [experimental]="true">
     
       <!-- related region features -->
       <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
@@ -245,8 +241,6 @@
           </div>
 
         </ng-template>
-      </ng-template>
-
       </ng-template>
     </mat-tab>
 
