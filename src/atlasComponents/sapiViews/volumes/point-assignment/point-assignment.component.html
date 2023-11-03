@@ -1,9 +1,11 @@
-<ng-template [ngIf]="point$ | async | sandsToNum" let-coordinates>
-    <button mat-icon-button class="sxplr-m-2"
-        (click)="navigateToPoint(coordinates.coords)"
-        [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
-        <i class="fas fa-map-marker-alt"></i>
-    </button>
+<ng-template [ngIf]="point$ | async" let-point>
+    <ng-template [ngIf]="point | sandsToNum" let-coordinates>
+        <button mat-icon-button class="sxplr-m-2"
+            (click)="navigateToPoint(coordinates.coords)"
+            [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
+            <i class="fas fa-map-marker-alt"></i>
+        </button>
+    </ng-template>
 </ng-template>
 
 

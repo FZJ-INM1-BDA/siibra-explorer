@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { AnimationEvent, animate, state, style, transition, trigger } from "@angular/animations";
+import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
@@ -16,7 +16,6 @@ import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
-import { MatDrawer } from "@angular/material/sidenav";
 
 interface HasName {
   name: string

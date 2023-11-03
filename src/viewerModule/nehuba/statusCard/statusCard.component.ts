@@ -49,11 +49,11 @@ export class StatusCardComponent {
 
   private selectedTemplate: SxplrTemplate
   private currentNavigation: {
-    position: number[];
-    orientation: number[];
-    zoom: number;
-    perspectiveOrientation: number[];
-    perspectiveZoom: number;
+    position: number[]
+    orientation: number[]
+    zoom: number
+    perspectiveOrientation: number[]
+    perspectiveZoom: number
 }
 
   public readonly navVal$ = this.nehubaViewer$.pipe(

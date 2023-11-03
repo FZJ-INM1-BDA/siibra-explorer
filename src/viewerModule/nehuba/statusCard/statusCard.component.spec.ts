@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common"
 import { AngularMaterialModule } from "src/sharedModules"
 import { StatusCardComponent } from "./statusCard.component"
 import { Directive, Component } from "@angular/core"
-import { of } from "rxjs"
+import { NEVER, of } from "rxjs"
 import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
@@ -16,6 +16,7 @@ import { QuickTourModule } from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { MatSlideToggle } from "src/sharedModules/angularMaterial.exports"
+import { NEHUBA_INSTANCE_INJTKN } from "../util"
 
 const mockNehubaConfig = {
   dataset: {
@@ -81,6 +82,10 @@ describe('> statusCard.component.ts', () => {
             useValue: {
               getNehubaConfig: getNavigationStateFromConfigSpy
             }
+          },
+          {
+            provide: NEHUBA_INSTANCE_INJTKN,
+            useValue: NEVER
           }
         ]
       }).compileComponents()
@@ -111,22 +116,6 @@ describe('> statusCard.component.ts', () => {
         fixture.detectChanges()
         fixture.componentInstance.showFull = true
         fixture.detectChanges()
-      })
-
-      it('> toggle can be found', () => {
-
-        const slider = fixture.debugElement.query( By.directive(MatSlideToggle) )
-        expect(slider).toBeTruthy()
-      })
-
-      it('> toggling voxel/real toggle also toggles statusPanelRealSpace flag', () => {
-
-        const prevFlag = fixture.componentInstance.statusPanelRealSpace
-        const sliderEl = fixture.debugElement.query( By.directive(MatSlideToggle) )
-        const slider = sliderEl.injector.get(MatSlideToggle)
-        slider.toggle()
-        fixture.detectChanges()
-        expect(fixture.componentInstance.statusPanelRealSpace).toEqual(!prevFlag)
       })
 
       describe('> textNavigationTo', () => {

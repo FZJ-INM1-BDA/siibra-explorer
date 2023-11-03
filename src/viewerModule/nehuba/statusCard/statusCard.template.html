@@ -100,7 +100,6 @@
     iav-media-query
     #media="iavMediaQuery">
 
-    <i aria-label="viewer navigation" class="fas fa-compass"></i>
     <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="sxplr-pl-2">
       {{ navVal$ | async }}
     </span>
