@@ -10,24 +10,6 @@
   top: 0.5rem;
 }
 
-.tab-toggle-container
-{
-  margin-top: 1.5rem;
-}
-
-.tab-toggle-container > *
-{
-  display: block;
-}
-
-.tab-toggle
-{
-  margin-left: -1rem;
-  padding-right: 0.75rem;
-  margin-right: 1rem;
-  text-align: right;
-}
-
 .accordion-icon
 {
   width:1.5rem;
@@ -90,10 +72,25 @@ mat-drawer
   pointer-events: none;
 }
 
-logo-container
+.logo-container
 {
-  height: 2rem;
+  position: fixed;
+  left: 50%;
+  bottom: 8rem;
+  width: 0;
+  height: 0;
+  pointer-events: none;
   opacity: 0.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.logo-container > logo-container
+{
+  width: 2rem;
+  height: 2rem;
+  display: block;
 }
 
 mat-list.contextual-block
@@ -158,11 +155,6 @@ sxplr-sapiviews-core-region-region-list-item
   align-items: center;
 }
 
-.context-menu-container
-{
-  margin: 0 -16px;
-}
-
 .centered
 {
   display: flex;
@@ -180,4 +172,26 @@ sxplr-sapiviews-core-region-region-list-item
 {
   display: flex;
   align-items: center;
+}
+
+mat-card-content.context-menu-container
+{
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+sxplr-tab
+{
+  pointer-events: all;
+  margin-left: -1rem;
+  margin-top: 2rem;
+  margin-right: 1rem;
+  display: inline-block;
+}
+
+.special-mode-topleft-wrapper
+{
+  display: inline-flex;
+  flex-direction: column;
 }

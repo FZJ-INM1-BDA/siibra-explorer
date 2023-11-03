@@ -383,16 +383,6 @@ markdown-dom p
   pointer-events: all;
 }
 
-.t-a-ease-200
-{
-  transition: all ease 200ms;
-}
-
-.t-a-ease-500
-{
-  transition: all ease 500ms;
-}
-
 .h-0
 {
   height: 0px;
@@ -773,11 +763,6 @@ body::after
   padding-left: 16px!important;
   padding-right: 16px!important;
   padding-top: 16px!important;
-}
-
-.fixed-bottom
-{
-  top: unset!important;
 }
 
 .sidenav-cover-header-container

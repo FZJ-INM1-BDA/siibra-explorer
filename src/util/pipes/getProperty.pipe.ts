@@ -5,8 +5,8 @@ import { Pipe, PipeTransform } from "@angular/core";
   pure: true
 })
 
-export class GetPropertyPipe implements PipeTransform{
-  public transform(input: any, property: any = '@id') {
+export class GetPropertyPipe<R extends Record<string|number, unknown>> implements PipeTransform{
+  public transform(input: R, property: keyof R) {
     return input && input[property]
   }
 }

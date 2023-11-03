@@ -1,3 +1,12 @@
+<ng-template [ngIf]="point$ | async | sandsToNum" let-coordinates>
+    <button mat-icon-button class="sxplr-m-2"
+        (click)="navigateToPoint(coordinates.coords)"
+        [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
+        <i class="fas fa-map-marker-alt"></i>
+    </button>
+</ng-template>
+
+
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
     <span>
@@ -12,14 +21,6 @@
 </div>
 
 <ng-template [ngIf]="df$ | async" let-df>
-
-    <ng-template [ngIf]="point$ | async | sandsToNum" let-coordinates>
-        <button mat-icon-button class="sxplr-m-2"
-            (click)="navigateToPoint(coordinates.coords)"
-            [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
-            <i class="fas fa-map-marker-alt"></i>
-        </button>
-    </ng-template>
 
     <button mat-raised-button
         class="sxplr-m-2"
@@ -36,11 +37,14 @@
         matSortDirection="desc">
         <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                region
+                <span class="sxplr-m-1">
+                    region
+                </span>
             </th>
             <td mat-cell *matCellDef="let element">
                 <!-- {{ element | json }} -->
-                <button mat-button (click)="selectRegion(element['region'], $event)">
+                <button mat-button (click)="selectRegion(element['region'], $event)"
+                    class="ws-no-wrap">
                     {{ element['region'].name }}
                 </button>
             </td>
@@ -73,7 +77,8 @@
                     region
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    <button mat-button (click)="selectRegion(element['region'], $event)">
+                    <button mat-button (click)="selectRegion(element['region'], $event)"
+                        class="ws-no-wrap">
                         {{ element['region'].name }}
                     </button>
                 </td>
