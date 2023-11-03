@@ -220,9 +220,45 @@ export class Effect {
           const foundAtlas = atlas && result.atlases.find(a => a.id === atlas.id)
           const foundParc = parcellation && result.parcellations.find(a => a.id === parcellation.id)
           const foundSpace = template && result.spaces.find(a => a.id === template.id)
+
+          const prevNextParcs = (() => {
+            const FUSE = 10
+            let prevParcId = parcellation.prevId
+            let currentParcId = parcellation.id
+            let breakPrev = false
+            let breakNext = false
+            let iter = 0
+            const returnArr = []
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+              if (iter > FUSE || (breakPrev && breakNext)) {
+                break
+              }
+              iter ++
+              if (!breakPrev) {
+                const prevParc = result.parcellations.find(p => p.id === prevParcId)
+                if (prevParc) {
+                  returnArr.push(prevParc)
+                  prevParcId = prevParc.prevId
+                } else {
+                  breakPrev = true
+                }
+              }
+              if (!breakNext) {
+                const nextParc = result.parcellations.find(p => p.prevId === currentParcId)
+                if (nextParc) {
+                  returnArr.splice(0, 0, nextParc)
+                  currentParcId = nextParc.id
+                } else {
+                  breakNext = true
+                }
+              }
+            }
+            return returnArr
+          })()
           
           result.atlases = foundAtlas && [foundAtlas] || result.atlases
-          result.parcellations = foundParc && [foundParc] || result.parcellations
+          result.parcellations = foundParc && [foundParc] || prevNextParcs[0] && [prevNextParcs[0]] || result.parcellations
           result.spaces = foundSpace && [foundSpace] || result.spaces
 
           /**
