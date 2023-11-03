@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
+import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from "@angular/core";
 import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription } from "rxjs";
@@ -6,14 +6,9 @@ import { switchMap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
-import { DialogFallbackCmp } from "src/ui/dialogInfo";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
 import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
-
-type AskUserConfig = {
-  actionsAsList: boolean
-}
 
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
@@ -25,6 +20,9 @@ type AskUserConfig = {
 
 export class WrapperATPSelector implements OnDestroy{
 
+  @Input('sxplr-wrapper-atp-selector-minimized')
+  minimized = true
+
   @Output('sxplr-wrapper-atp-selector-menu-open')
   menuOpen = new EventEmitter<{some: boolean, all: boolean, none: boolean}>()
 
@@ -32,18 +30,6 @@ export class WrapperATPSelector implements OnDestroy{
   lightThemePalette = lightThemePalette
 
   #subscription: Subscription[] = []
-
-  #askUser(title: string, titleMd: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
-    return this.dialog.open(DialogFallbackCmp, {
-      data: {
-        title,
-        titleMd,
-        descMd,
-        actions: actions,
-        actionsAsList: config?.actionsAsList
-      }
-    }).afterClosed()
-  }
 
   selectedATP$ = this.store$.pipe(
     fromRootStore.distinctATP(),

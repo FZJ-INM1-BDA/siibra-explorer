@@ -10,6 +10,7 @@ globalThis.constants = {
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-plotly.js')
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-nifti.js')
 if (typeof self.importScripts === 'function')  self.importScripts('./worker-typedarray.js')
+if (typeof self.importScripts === 'function')  self.importScripts('./worker-regionFilter.js')
 
 
 const VALID_METHOD = {
@@ -19,6 +20,7 @@ const VALID_METHOD = {
   PROCESS_TYPED_ARRAY_F2RGBA: `PROCESS_TYPED_ARRAY_F2RGBA`,
   PROCESS_TYPED_ARRAY_CM2RGBA: "PROCESS_TYPED_ARRAY_CM2RGBA",
   PROCESS_TYPED_ARRAY_RAW: "PROCESS_TYPED_ARRAY_RAW",
+  FILTER_REGIONS: "FILTER_REGIONS"
 }
 
 const VALID_METHODS = [
@@ -28,6 +30,7 @@ const VALID_METHODS = [
   VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA,
   VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA,
   VALID_METHOD.PROCESS_TYPED_ARRAY_RAW,
+  VALID_METHOD.FILTER_REGIONS,
 ]
 
 const encoder = new TextEncoder()
@@ -41,8 +44,8 @@ onmessage = (message) => {
   if (message.data.type === 'webpackOk') return
 
   if (message.data.method && VALID_METHODS.indexOf(message.data.method) >= 0) {
-    const { id } = message.data
-    if (message.data.method === VALID_METHOD.PROCESS_PLOTLY) {
+    const { id, method, param } = message.data || {}
+    if (method === VALID_METHOD.PROCESS_PLOTLY) {
       try {
         if (plotyVtkUrl) URL.revokeObjectURL(plotyVtkUrl)
         const { data: plotlyData } = message.data.param
@@ -71,9 +74,9 @@ onmessage = (message) => {
       }
     }
 
-    if (message.data.method === VALID_METHOD.PROCESS_NIFTI) {
+    if (method === VALID_METHOD.PROCESS_NIFTI) {
       try {
-        const { nifti } = message.data.param
+        const { nifti } = param
         const {
           meta,
           buffer
@@ -96,9 +99,9 @@ onmessage = (message) => {
         })
       }
     }
-    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY) {
+    if (method === VALID_METHOD.PROCESS_TYPED_ARRAY) {
       try {
-        const { inputArray, dtype, width, height, channel } = message.data.param
+        const { inputArray, dtype, width, height, channel } = param
         const array = self.typedArray.packNpArray(inputArray, dtype, width, height, channel)
 
         postMessage({
@@ -117,9 +120,9 @@ onmessage = (message) => {
         })
       }
     }
-    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA) {
+    if (method === VALID_METHOD.PROCESS_TYPED_ARRAY_F2RGBA) {
       try {
-        const { inputArray, width, height, channel } = message.data.param
+        const { inputArray, width, height, channel } = param
         const buffer = self.typedArray.fortranToRGBA(inputArray, width, height, channel)
 
         postMessage({
@@ -138,9 +141,9 @@ onmessage = (message) => {
         })
       }
     }
-    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA) {
+    if (method === VALID_METHOD.PROCESS_TYPED_ARRAY_CM2RGBA) {
       try {
-        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { inputArray, width, height, channel, dtype, processParams } = param
         const { buffer, min, max } = self.typedArray.cm2rgba(inputArray, width, height, channel, dtype, processParams)
 
         postMessage({
@@ -161,9 +164,9 @@ onmessage = (message) => {
         })
       }
     }
-    if (message.data.method === VALID_METHOD.PROCESS_TYPED_ARRAY_RAW) {
+    if (method === VALID_METHOD.PROCESS_TYPED_ARRAY_RAW) {
       try {
-        const { inputArray, width, height, channel, dtype, processParams } = message.data.param
+        const { inputArray, width, height, channel, dtype, processParams } = param
         const { outputArray, min, max } = self.typedArray.rawArray(inputArray, width, height, channel, dtype, processParams)
 
         postMessage({
@@ -183,6 +186,27 @@ onmessage = (message) => {
           }
         })
       }
+    }
+    if (method === VALID_METHOD.FILTER_REGIONS) {
+      const { regions, searchTerm } = param
+      try {
+        const filteredRegions = self.filterRegion.filterRegion(regions, searchTerm)
+        
+        postMessage({
+          id,
+          result: { filteredRegions }
+        })
+      } catch (e) {
+        postMessage({
+          id,
+          error: {
+            code: 401,
+            message: `filter region error: ${e.toString()}`
+          }
+        })
+      }
+      
+      return
     }
     postMessage({
       id,

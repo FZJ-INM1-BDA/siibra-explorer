@@ -1,9 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnDestroy, Output, QueryList, ViewChildren } from "@angular/core";
-import { BehaviorSubject, Subscription, combineLatest, concat, merge, of } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output, QueryList, ViewChildren, inject } from "@angular/core";
+import { BehaviorSubject, combineLatest, concat, merge, of } from "rxjs";
+import { debounceTime, map, switchMap, takeUntil } from "rxjs/operators";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { SmartChip } from "src/components/smartChip";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 export const darkThemePalette = [
   "#141414",
@@ -41,14 +42,20 @@ const pipe = new FilterGroupedParcellationPipe()
     `./pureATPSelector.style.scss`
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
-export class PureATPSelector implements AfterViewInit, OnDestroy{
+export class PureATPSelector implements AfterViewInit{
 
-  #subscriptions: Subscription[] = []
+  #onDestroy$ = inject(DestroyDirective).destroyed$
 
   @Input('sxplr-pure-atp-selector-color-palette')
   colorPalette: string[] = darkThemePalette
+
+  @Input("sxplr-pure-atp-selector-minimized")
+  minimized = true
 
   #selectedATP$ = new BehaviorSubject<ATP>(null)
   @Input(`sxplr-pure-atp-selector-selected-atp`)
@@ -112,8 +119,8 @@ export class PureATPSelector implements AfterViewInit, OnDestroy{
       ]
       const selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
 
-      const hideParcChip = parcAndGroup.length <= 1
-      const hideTmplChip = availableTemplates?.length <= 1
+      const hideParcChip = this.minimized && parcAndGroup.length <= 1
+      const hideTmplChip = this.minimized && availableTemplates?.length <= 1
       
       return {
         atlas,
@@ -130,53 +137,48 @@ export class PureATPSelector implements AfterViewInit, OnDestroy{
   )
 
   ngAfterViewInit(): void {
-    this.#subscriptions.push(
-      concat(
-        of(null),
-        this.smartChips.changes,
-      ).pipe(
-        switchMap(() =>
-          combineLatest(
-            Array.from(this.smartChips).map(chip =>
-              concat(
-                of(false),
-                merge(
-                  chip.menuOpened.pipe(
-                    map(() => true)
-                  ),
-                  chip.menuClosed.pipe(
-                    map(() => false)
-                  )
+    concat(
+      of(null),
+      this.smartChips.changes,
+    ).pipe(
+      switchMap(() =>
+        combineLatest(
+          Array.from(this.smartChips).map(chip =>
+            concat(
+              of(false),
+              merge(
+                chip.menuOpened.pipe(
+                  map(() => true)
+                ),
+                chip.menuClosed.pipe(
+                  map(() => false)
                 )
               )
             )
           )
-        ),
-      ).subscribe(arr => {
-        const newVal = {
-          some: arr.some(val => val),
-          all: arr.every(val => val),
-          none: arr.every(val => !val),
-        }
-        this.#menuOpen$.next(newVal)
+        )
+      ),
+      debounceTime(0),
+      takeUntil(this.#onDestroy$)
+    ).subscribe(arr => {
+      const newVal = {
+        some: arr.some(val => val),
+        all: arr.every(val => val),
+        none: arr.every(val => !val),
+      }
+      this.#menuOpen$.next(newVal)
 
-        this.menuOpen = null
-        if (newVal.none) {
-          this.menuOpen = 'none'
-        }
-        if (newVal.all) {
-          this.menuOpen = 'all'
-        }
-        if (newVal.some) {
-          this.menuOpen = 'some'
-        }
-      })
-    )
+      this.menuOpen = null
+      if (newVal.none) {
+        this.menuOpen = 'none'
+      }
+      if (newVal.all) {
+        this.menuOpen = 'all'
+      }
+      if (newVal.some) {
+        this.menuOpen = 'some'
+      }
+    })
   }
 
-  ngOnDestroy(): void {
-    while (this.#subscriptions.length > 0) {
-      this.#subscriptions.pop().unsubscribe()
-    }
-  }
 }

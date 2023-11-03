@@ -24,8 +24,8 @@
 </mat-form-field>
 
 <mat-autocomplete
-  panelWidth="auto"
   (optionSelected)="optionSelected($event)"
+  [hideSingleSelectionIndicator]="true"
   autoActiveFirstOption
   #auto="matAutocomplete"
   [displayWith]="displayFn">
@@ -47,7 +47,9 @@
   <ng-template [ngIf]="searchedList$ | async" let-searchedList>
 
     <mat-option *ngIf="searchedList.length > showNOptions"
-      [disabled]="true">
+      [value]="{
+        extra: { showMore: true }
+      }">
 
       <ng-template [ngIf]="regionTmplDirective">
 
@@ -56,6 +58,24 @@
           [ngTemplateOutletContext]="{
             $implicit: {
               name: '... and ' + (searchedList.length - showNOptions) + ' more'
+            }
+          }">
+        </ng-template>
+      </ng-template>
+    </mat-option>
+
+    <mat-option *ngIf="searchedList.length === 0"
+      [value]="{
+        extra: { noneFound: true }
+      }">
+
+      <ng-template [ngIf]="regionTmplDirective">
+
+        <ng-template
+          [ngTemplateOutlet]="regionTmplDirective.tmplRef"
+          [ngTemplateOutletContext]="{
+            $implicit: {
+              name: 'None found.'
             }
           }">
         </ng-template>

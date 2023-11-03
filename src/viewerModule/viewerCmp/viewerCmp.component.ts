@@ -16,6 +16,10 @@ import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
 
+interface HasName {
+  name: string
+}
+
 @Component({
   selector: 'iav-cmp-viewer-container',
   templateUrl: './viewerCmp.template.html',
@@ -162,9 +166,10 @@ export class ViewerCmp implements OnDestroy {
 
   #view1$ = combineLatest([
     this.#currentMap$,
+    this.allAvailableRegions$,
   ]).pipe(
-    map(( [ currentMap ] ) => ({
-      currentMap
+    map(( [ currentMap, allAvailableRegions ] ) => ({
+      currentMap, allAvailableRegions
     }))
   )
 
@@ -173,7 +178,7 @@ export class ViewerCmp implements OnDestroy {
     this.#view1$,
   ]).pipe(
     map(([v0, v1]) => ({ ...v0, ...v1 })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap }) => {
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -189,6 +194,8 @@ export class ViewerCmp implements OnDestroy {
         spatialObjectSubtitle = selectedTemplate.name
       }
 
+      const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
+
       const labelMappedRegionNames = currentMap && Object.keys(currentMap.indices) || []
       return {
         viewerMode,
@@ -198,6 +205,9 @@ export class ViewerCmp implements OnDestroy {
         selectedTemplate,
         selectedParcellation,
         labelMappedRegionNames,
+        allAvailableRegions,
+        leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
+        branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
 
         /**
          * Selected Spatial Object
@@ -358,7 +368,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public selectRoi(roi: SxplrRegion): void {
+  public selectRoi(roi: SxplrRegion) {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -518,5 +528,9 @@ export class ViewerCmp implements OnDestroy {
         regionId: regParc?.region?.name
       })
     )
+  }
+
+  nameEql(a: HasName, b: HasName){
+    return a.name === b.name
   }
 }

@@ -21,12 +21,12 @@
       'sxplr-custom-cmp accent': accentedRegions | includes : region,
       'muted-7': !labelMappedRegionNames.includes(region.name)
     }"
-    [innerHTML]="region.name | hightlightPipe : searchTerm">
+    [innerHTML]="region.name | hightlightPipe : (searchTerm$ | async)">
   </div>
 </ng-template>
 
 <sxplr-flat-hierarchy-tree-view
-  [sxplr-flat-hierarchy-nodes]="passedRegions"
+  [sxplr-flat-hierarchy-nodes]="passedRegions$ | async"
   [sxplr-flat-hierarchy-is-parent]="isParent"
   [sxplr-flat-hierarchy-render-node-tmpl]="tmplRef"
   [sxplr-flat-hierarchy-tree-view-expand-on-init]="true"

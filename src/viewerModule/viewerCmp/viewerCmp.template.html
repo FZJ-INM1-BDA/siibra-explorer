@@ -23,7 +23,6 @@
       </mat-list>
     </div>
 
-
   </div>
 </div>
 
@@ -509,28 +508,6 @@
   </div>
 </ng-template>
 
-<!-- region-hierarchy-tmpl -->
-
-<ng-template #regionHierarchyTmpl>
-  <ng-template [ngIf]="view$ | async" let-view>
-
-    <div class="sxplr-d-flex sxplr-flex-column sxplr-h-100">
-      <sxplr-sapiviews-core-rich-regionshierarchy
-        class="sxplr-w-100 sxplr-flex-var"
-        [sxplr-sapiviews-core-rich-regionshierarchy-regions]="allAvailableRegions$ | async"
-        [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
-        [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
-        (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
-        (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
-        >
-      </sxplr-sapiviews-core-rich-regionshierarchy>
-    
-      <mat-dialog-actions align="center" class="sxplr-flex-static">
-        <button mat-button mat-dialog-close>Close</button>
-      </mat-dialog-actions>
-    </div>
-  </ng-template>
-</ng-template>
 
 <!-- auto complete search box -->
 <ng-template #autocompleteTmpl let-showTour="showTour">
@@ -538,28 +515,35 @@
     class="pe-all auto-complete-container">
     <sxplr-sapiviews-core-rich-regionlistsearch
       class="mat-elevation-z4"
-      [sxplr-sapiviews-core-rich-regionlistsearch-regions]="allAvailableRegions$ | async"
-      [sxplr-sapiviews-core-rich-regionlistsearch-mapped-region-names]="view.labelMappedRegionNames"
+      [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
       [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length === 1 ? view.selectedRegions[0].name : null"
-      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="selectRoi($event)"
-      (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="toggleRoi($event)">
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.leafRegions.includes($event) ? selectRoi($event) : showHierarchyBtn.onClick({ 'searchTerm': $event.name })"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="view.leafRegions.includes($event) ? toggleRoi($event) : showHierarchyBtn.onClick({ 'searchTerm': $event.name })"
+      (sxplr-sapiviews-core-rich-regionlistsearch-region-select-extra)="showHierarchyBtn.onClick({ 'searchTerm': $event })"
+      #regionListSearch="sapiRegionListSearch">
       <ng-template regionTemplate let-region>
-        <div class="sxplr-d-flex">
-          <button
-            mat-icon-button
-            class="sxplr-mt-a sxplr-mb-a">
-            <i [ngClass]="(view.selectedRegions | includes : region) ? 'fa-circle' : 'fa-none'" class="fas"></i>
-          </button>
+        <div class="region-list-search-row">
+          <span>
+            <i [ngClass]="(view.selectedRegions | includes : region: nameEql) ? 'fa-circle' : 'fa-none'" class="fas"></i>
+          </span>
 
           <sxplr-sapiviews-core-region-region-list-item
-            [sxplr-sapiviews-core-region-region]="region">
+            [sxplr-sapiviews-core-region-region]="region"
+            [ngClass]="{
+              'text-muted': !view.labelMappedRegionNames.includes(region.name)
+            }">
+            <span prefix class="sxplr-m-2">
+              <i *ngIf="view.leafRegions.includes(region)" class="fas fa-brain"></i>
+              <i *ngIf="view.branchRegions.includes(region)" class="fas fa-code-branch"></i>
+            </span>
+            
           </sxplr-sapiviews-core-region-region-list-item>
         </div>
       </ng-template>
       <button mat-icon-button
         search-input-suffix
         *ngIf="view.selectedRegions.length > 0"
-        (click)="clearRoi()">
+        (click)="clearRoi(); regionListSearch.dismissAutoComplete()">
         <i class="fas fa-times"></i>
       </button>
       <button mat-icon-button
@@ -567,9 +551,38 @@
         search-input-prefix
         iav-stop="click"
         [sxplr-dialog]="regionHierarchyTmpl"
-        sxplr-dialog-size="xl">
+        sxplr-dialog-size="xl"
+        #showHierarchyBtn="sxplrDialog">
         <i class="fas fa-sitemap"></i>
       </button>
+
+      <!-- region-hierarchy-tmpl -->
+      
+      <ng-template #regionHierarchyTmpl let-data>
+        <ng-template [ngIf]="view$ | async" let-view>
+      
+          <div class="sxplr-d-flex sxplr-flex-column sxplr-h-100">
+            <div class="sxplr-m-2">
+              <sxplr-wrapper-atp-selector [sxplr-wrapper-atp-selector-minimized]="false" >
+              </sxplr-wrapper-atp-selector>
+            </div>
+            <sxplr-sapiviews-core-rich-regionshierarchy
+              class="sxplr-w-100 sxplr-flex-var"
+              [sxplr-sapiviews-core-rich-regionshierarchy-searchstring]="data?.searchTerm || (regionListSearch.searchTermString$ | async)"
+              [sxplr-sapiviews-core-rich-regionshierarchy-regions]="view.allAvailableRegions"
+              [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
+              [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
+              (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
+              (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
+              >
+            </sxplr-sapiviews-core-rich-regionshierarchy>
+          
+            <mat-dialog-actions align="center" class="sxplr-flex-static">
+              <button mat-button mat-dialog-close>Close</button>
+            </mat-dialog-actions>
+          </div>
+        </ng-template>
+      </ng-template>
       
     </sxplr-sapiviews-core-rich-regionlistsearch>
 

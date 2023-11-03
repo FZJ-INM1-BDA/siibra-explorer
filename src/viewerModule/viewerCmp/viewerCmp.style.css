@@ -175,3 +175,9 @@ sxplr-sapiviews-core-region-region-list-item
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
+.region-list-search-row
+{
+  display: flex;
+  align-items: center;
+}

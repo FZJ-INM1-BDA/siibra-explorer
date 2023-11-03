@@ -42,65 +42,80 @@
                 "bundleName": "vanillaMain"
               }
             ],
-            "scripts": [{
-              "input": "worker/worker.js",
-              "inject": false,
-              "bundleName": "worker"
-            },{
-              "input": "worker/worker-plotly.js",
-              "inject": false,
-              "bundleName": "worker-plotly"
-            },{
-              "input": "worker/worker-nifti.js",
-              "inject": false,
-              "bundleName": "worker-nifti"
-            },{
-              "input": "worker/worker-typedarray.js",
-              "inject": false,
-              "bundleName": "worker-typedarray"
-            },{
-              "input": "third_party/catchSyntaxError.js",
-              "inject": false,
-              "bundleName": "catchSyntaxError"
-            },{
-              "input": "third_party/extra_js.js",
-              "inject": false,
-              "bundleName": "extra_js"
-            },
-            {
-              "input": "third_party/vanilla_nehuba.js",
-              "inject": false,
-              "bundleName": "vanilla_nehuba"
-            },
-            
-            {
-              "input": "export-nehuba/dist/min/main.bundle.js",
-              "inject": false,
-              "bundleName": "main.bundle"
-            },{
-              "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
-              "inject": false,
-              "bundleName": "chunk_worker.bundle"
-            },
-            {
-              "input": "export-nehuba/dist/min/draco.bundle.js",
-              "inject": false,
-              "bundleName": "draco.bundle"
-            },{
-              "input": "export-nehuba/dist/min/async_computation.bundle.js",
-              "inject": false,
-              "bundleName": "async_computation.bundle"
-            },{
-              "input": "export-nehuba/dist/min/blosc.bundle.js",
-              "inject": false,
-              "bundleName": "blosc.bundle"
-            },
-            
-            {
-              "inject": false,
-              "input": "third_party/leap-0.6.4.js",
-              "bundleName": "leap-0.6.4"
-            }]
+            "scripts": [
+              {
+                "input": "worker/worker.js",
+                "inject": false,
+                "bundleName": "worker"
+              },
+              {
+                "input": "worker/worker-plotly.js",
+                "inject": false,
+                "bundleName": "worker-plotly"
+              },
+              {
+                "input": "worker/worker-nifti.js",
+                "inject": false,
+                "bundleName": "worker-nifti"
+              },
+              {
+                "input": "worker/worker-typedarray.js",
+                "inject": false,
+                "bundleName": "worker-typedarray"
+              },
+              {
+                "input": "worker/worker-regionFilter.js",
+                "inject": false,
+                "bundleName": "worker-regionFilter"
+              },
+              {
+                "input": "third_party/catchSyntaxError.js",
+                "inject": false,
+                "bundleName": "catchSyntaxError"
+              },
+              {
+                "input": "third_party/extra_js.js",
+                "inject": false,
+                "bundleName": "extra_js"
+              },
+              {
+                "input": "third_party/vanilla_nehuba.js",
+                "inject": false,
+                "bundleName": "vanilla_nehuba"
+              },
+              
+              {
+                "input": "export-nehuba/dist/min/main.bundle.js",
+                "inject": false,
+                "bundleName": "main.bundle"
+              },
+              {
+                "input": "export-nehuba/dist/min/chunk_worker.bundle.js",
+                "inject": false,
+                "bundleName": "chunk_worker.bundle"
+              },
+              {
+                "input": "export-nehuba/dist/min/draco.bundle.js",
+                "inject": false,
+                "bundleName": "draco.bundle"
+              },
+              {
+                "input": "export-nehuba/dist/min/async_computation.bundle.js",
+                "inject": false,
+                "bundleName": "async_computation.bundle"
+              },
+              {
+                "input": "export-nehuba/dist/min/blosc.bundle.js",
+                "inject": false,
+                "bundleName": "blosc.bundle"
+              },
+              
+              {
+                "inject": false,
+                "input": "third_party/leap-0.6.4.js",
+                "bundleName": "leap-0.6.4"
+              }
+            ]
           },
           "configurations": {
             "production": {

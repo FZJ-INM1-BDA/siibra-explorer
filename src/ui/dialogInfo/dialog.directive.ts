@@ -38,18 +38,19 @@ export class DialogDirective{
   size: DialogSize = 'm'
 
   @Input('sxplr-dialog-data')
-  data: unknown
+  data: any = {}
 
   constructor(private matDialog: MatDialog){}
 
   @HostListener('click')
-  onClick(){
+  onClick(data: any={}){
     const tmpl = this.templateRef instanceof TemplateRef
       ? this.templateRef
       : DialogFallbackCmp
 
     this.matDialog.open(tmpl, {
-      data: this.data,
+      autoFocus: null,
+      data: {...this.data, ...data},
       ...(sizeDict[this.size] || {})
     })
   }

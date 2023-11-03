@@ -1,31 +1,25 @@
 <ng-template [ngIf]="view$ | async" let-view>
   
   <!-- fallback for parcellation info icon -->
-  <ng-template [ngIf]="view.hideParcChip">
-    <button mat-icon-button
-      sxplr-dialog
-      [sxplr-dialog-size]="null"
-      [sxplr-dialog-data]="{
-        title: view.parcellation.name,
-        descMd: view.parcellation.desc,
-        actions: view.parcellation | parcTmplDoiPipe
-      }">
-      <i class="fas fa-info"></i>
-    </button>
-  </ng-template>
-
-  <!-- fallback for space info icon -->
-  <ng-template  [ngIf]="view.hideTmplChip">
-    <button mat-icon-button
-      sxplr-dialog
-      [sxplr-dialog-size]="null"
-      [sxplr-dialog-data]="{
-        title: view.template.name,
-        descMd: view.template.desc,
-        actions: view.template | parcTmplDoiPipe
-      }">
-      <i class="fas fa-info"></i>
-    </button>
+  <ng-template  [ngIf]="view.hideParcChip">
+    <sxplr-smart-chip
+      [items]="[]"
+      [noMenu]="true"
+      [color]="colorPalette[1]">
+      <ng-template sxplrSmartChipContent></ng-template>
+      <ng-template sxplrSmartChipAction>
+        <button mat-icon-button
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: view.parcellation.name,
+            descMd: view.parcellation.desc,
+            actions: view.parcellation | parcTmplDoiPipe
+          }">
+          <i class="fas fa-info"></i>
+        </button>
+      </ng-template>
+    </sxplr-smart-chip>
   </ng-template>
 
   <!-- parcellation smart chip -->
@@ -43,7 +37,7 @@
       </span>
 
       <span class="sxplr-ml-1 text-muted">
-        ({{ view.parcellations.length }})
+        ({{ view.parcellations?.length }})
       </span>
     </ng-template>
 
@@ -86,6 +80,29 @@
       </ng-container>
     </ng-template>
   </sxplr-smart-chip>
+
+  
+  <!-- fallback for space info icon -->
+  <ng-template  [ngIf]="view.hideTmplChip">
+    <sxplr-smart-chip
+      [items]="[]"
+      [noMenu]="true"
+      [color]="colorPalette[1]">
+      <ng-template sxplrSmartChipContent></ng-template>
+      <ng-template sxplrSmartChipAction>
+        <button mat-icon-button
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: view.template.name,
+            descMd: view.template.desc,
+            actions: view.template | parcTmplDoiPipe
+          }">
+          <i class="fas fa-info"></i>
+        </button>
+      </ng-template>
+    </sxplr-smart-chip>
+  </ng-template>
 
   <!-- space smart chip -->
   <sxplr-smart-chip *ngIf="!view.hideTmplChip"

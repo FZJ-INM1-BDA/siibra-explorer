@@ -44,7 +44,7 @@ export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> exten
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.sxplrNodes || changes.sxplrIsParent) {
-      this.nodes = this.sxplrNodes
+      this.nodes = this.sxplrNodes || []
       this.isParent = this.sxplrIsParent
       this.dataSource.data = this.rootNodes
       if (this.expandOnInit) {
