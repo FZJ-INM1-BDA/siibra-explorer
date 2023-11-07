@@ -19,18 +19,22 @@ plugins:
 
 nav:
   - Home: 'index.md'
-  - Main Concepts: 'main_concepts.md'
-  - System requirements: 'requirements.md'
-  - User documentation:
-    - Get Started: 'usage/get_started.md'
-    - Selecting Maps: 'usage/selecting_maps.md'
-    - Download Maps: 'usage/download_maps.md'
-    - Navigating: 'usage/navigating.md'
-    - Find and Selecting Region(s): 'usage/selecting.md'
-    - Region lookup from coordinate: 'usage/region_lookup.md'
-    - Spatial search: 'usage/spatial_search.md'
-    - Annotation: 'usage/annotation.md'
-    - Saving/Sharing view: 'usage/sharing.md'
+  - Getting Started: 'getting_started.md'
+  - Main Concepts:
+    - What Makes a Brain Atlas: 'main_concepts/what_makes_a_brain_atlas.md'
+    - Main Elements of siibra-explorer: 'main_concepts/main_elements_of_the_viewer.md'
+  - Basic Functionalities:
+    - Selecting Parcellation Maps: 'basic_functionalities/selecting_parcellation_maps.md'
+    - Exploring 3D Parcellation Maps: 'basic_functionalities/exploring_3d_parcellation_maps.md'
+    - Keyboard Shortcuts: 'basic_functionalities/helperOnePager.md'
+    - Storing and Sharing 3D Views: 'basic_functionalities/storing_and_sharing_3d_views.md'
+    - Selecting Brain Regions: 'basic_functionalities/selecting_brain_regions.md'
+    - Looking Up Coordinates in Reference Space: 'basic_functionalities/looking_up_coordinates.md'
+    - Finding Multimodal Data: 'basic_functionalities/finding_multimodal_data.md'
+  - Advanced functionalities:
+    - Annotating Structures in the Brain: "advanced_functionalities/annotating_structures.md"
+    - Differential Gene Expression Analysis: "advanced_functionalities/differential_gene_expression_analysis.md"
+    - Superimposing Local Files: "advanced_functionalities/superimposing_local_files.md"
 
   - Release notes:
     - v2.14.0: 'releases/v2.14.0.md'
