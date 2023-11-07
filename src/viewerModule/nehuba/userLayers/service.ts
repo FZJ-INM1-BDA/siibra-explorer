@@ -293,7 +293,7 @@ export class UserLayerService implements OnDestroy {
     : "#ff0000"
 
     const id = getUuid()
-    const src = "QUICKNII"
+    const src = "QUICKNII_ABA"
     const dst = "NEHUBA"
     const xform = await linearTransform(src, dst)
     const layer = new AnnotationLayer(id, rgbString, xform)

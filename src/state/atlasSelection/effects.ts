@@ -222,6 +222,9 @@ export class Effect {
           const foundSpace = template && result.spaces.find(a => a.id === template.id)
 
           const prevNextParcs = (() => {
+            if (!parcellation) {
+              return []
+            }
             const FUSE = 10
             let prevParcId = parcellation.prevId
             let currentParcId = parcellation.id
