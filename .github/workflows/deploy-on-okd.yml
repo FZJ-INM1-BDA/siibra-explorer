@@ -1,0 +1,85 @@
+name: Trigger deploy on OKD
+on:
+  workflow_call:
+
+    inputs:
+      FULL_DEPLOY_ID:
+        required: true
+        type: string
+      OKD_ENDPOINT:
+        required: true
+        type: string
+      OKD_PROJECT:
+        required: true
+        type: string
+
+
+      DEPLOY_ID:
+        required: false
+        type: string
+      BRANCH_NAME:
+        required: false
+        type: string
+      ROUTE_HOST:
+        required: false
+        type: string
+      ROUTE_PATH:
+        required: false
+        type: string
+      BUILD_TEXT:
+        required: false
+        type: string
+
+    secrets:
+      OKD_TOKEN:
+        required: true
+env:
+  OC_TEMPLATE_NAME: 'siibra-explorer-branch-deploy-2'
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Login'
+      run: |
+        oc login ${{ inputs.OKD_ENDPOINT }} --token=${{ secrets.OKD_TOKEN }}
+        oc project ${{ inputs.OKD_PROJECT }}
+    - name: 'Login and import image'
+      run: |
+        if oc get dc ${{ inputs.FULL_DEPLOY_ID }}; then
+          # trigger redeploy if deployconfig exists already
+          echo "dc ${{ inputs.FULL_DEPLOY_ID }} already exist, redeploy..."
+          oc rollout latest dc/${{ inputs.FULL_DEPLOY_ID }}
+        else 
+          # create new app if deployconfig does not yet exist
+          echo "dc ${{ inputs.FULL_DEPLOY_ID }} does not yet exist, create new app..."
+
+          if [[ -z "${{ inputs.ROUTE_HOST }}" ]]
+          then
+            echo "ROUTE_HOST not defined!"
+            exit 1
+          fi
+          
+          if [[ -z "${{ inputs.ROUTE_PATH }}" ]]
+          then
+            echo "ROUTE_PATH not defined!"
+            exit 1
+          fi
+          
+          if [[ -z "${{ inputs.BUILD_TEXT }}" ]]
+          then
+            echo "BUILD_TEXT not defined!"
+            exit 1
+          fi
+          if [[ -z "${{ inputs.BRANCH_NAME }}" ]]
+          then
+            echo "BRANCH_NAME not defined!"
+            exit 1
+          fi
+
+          oc new-app --template ${{ env.OC_TEMPLATE_NAME }} \
+            -p BRANCH_NAME=${{ inputs.BRANCH_NAME }} \
+            -p DEPLOY_ID=${{ inputs.DEPLOY_ID }} \
+            -p ROUTE_HOST=${{ inputs.ROUTE_HOST }} \
+            -p ROUTE_PATH=${{ inputs.ROUTE_PATH }} \
+            -p BUILD_TEXT=${{ inputs.BUILD_TEXT }}
+        fi

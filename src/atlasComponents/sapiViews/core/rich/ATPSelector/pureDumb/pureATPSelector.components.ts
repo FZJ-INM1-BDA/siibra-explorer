@@ -1,6 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output, QueryList, ViewChildren, inject } from "@angular/core";
+import { BehaviorSubject, combineLatest, concat, merge, of } from "rxjs";
+import { debounceTime, map, switchMap, takeUntil } from "rxjs/operators";
 import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
+import { SmartChip } from "src/components/smartChip";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 export const darkThemePalette = [
   "#141414",
@@ -38,34 +42,60 @@ const pipe = new FilterGroupedParcellationPipe()
     `./pureATPSelector.style.scss`
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
-export class PureATPSelector implements OnChanges{
+export class PureATPSelector implements AfterViewInit{
+
+  #onDestroy$ = inject(DestroyDirective).destroyed$
 
   @Input('sxplr-pure-atp-selector-color-palette')
   colorPalette: string[] = darkThemePalette
 
+  @Input("sxplr-pure-atp-selector-minimized")
+  minimized = true
+
+  #selectedATP$ = new BehaviorSubject<ATP>(null)
   @Input(`sxplr-pure-atp-selector-selected-atp`)
-  public selectedATP: ATP
+  set selectedATP(val: ATP){
+    this.#selectedATP$.next(val)
+  }
 
   public selectedIds: string[] = []
 
   @Input(`sxplr-pure-atp-selector-atlases`)
   public allAtlases: SxplrAtlas[] = []
 
+  #availableTemplates$ = new BehaviorSubject<SxplrTemplate[]>([])
   @Input(`sxplr-pure-atp-selector-templates`)
-  public availableTemplates: SxplrTemplate[] = []
+  set availableTemplates(val: SxplrTemplate[]){
+    this.#availableTemplates$.next(val)
+  }
 
+  #parcellations$ = new BehaviorSubject<SxplrParcellation[]>([])
   @Input(`sxplr-pure-atp-selector-parcellations`)
-  public parcellations: SxplrParcellation[] = []
-
-  public parcAndGroup: (GroupedParcellation|SxplrParcellation)[] = []
+  set parcellations(val: SxplrParcellation[]){
+    this.#parcellations$.next(val)
+  }
 
   @Input('sxplr-pure-atp-selector-is-busy')
   public isBusy: boolean = false
 
   @Output('sxplr-pure-atp-selector-on-select')
   selectLeafEmitter = new EventEmitter<Partial<ATP>>()
+
+  @ViewChildren(SmartChip)
+  smartChips: QueryList<SmartChip<object>>
+
+  #menuOpen$ = new BehaviorSubject<{ some: boolean, all: boolean, none: boolean }>({ some: false, all: false, none: false })
+
+  @Output('sxplr-pure-atp-selector-menu-open')
+  menuOpen$ = this.#menuOpen$.asObservable()
+
+  @HostBinding('attr.data-menu-open')
+  menuOpen: 'some'|'all'|'none' = null
 
   getChildren(parc: GroupedParcellation|SxplrParcellation){
     return (parc as GroupedParcellation).parcellations || []
@@ -77,25 +107,78 @@ export class PureATPSelector implements OnChanges{
     this.selectLeafEmitter.emit(atp)
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.selectedATP) {
-      if (!changes.selectedATP.currentValue) {
-        this.selectedIds = []
-      } else {
-        const { atlas, parcellation, template } = changes.selectedATP.currentValue as ATP
-        this.selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
-      }
-    }
+  view$ = combineLatest([
+    this.#selectedATP$,
+    this.#parcellations$,
+    this.#availableTemplates$,
+  ]).pipe(
+    map(([{ atlas, parcellation, template }, parcellations, availableTemplates]) => {
+      const parcAndGroup = [
+        ...pipe.transform(parcellations || [], true),
+        ...pipe.transform(parcellations || [], false),
+      ]
+      const selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
 
-    if (changes.parcellations) {
-      if (!changes.parcellations.currentValue) {
-        this.parcAndGroup = []
-      } else {
-        this.parcAndGroup = [
-          ...pipe.transform(changes.parcellations.currentValue, true),
-          ...pipe.transform(changes.parcellations.currentValue, false),
-        ]
+      const hideParcChip = this.minimized && parcAndGroup.length <= 1
+      const hideTmplChip = this.minimized && availableTemplates?.length <= 1
+      
+      return {
+        atlas,
+        parcellation,
+        template,
+        parcAndGroup,
+        parcellations,
+        selectedIds,
+        hideParcChip,
+        hideTmplChip,
+        availableTemplates: availableTemplates || [],
       }
-    }
+    })
+  )
+
+  ngAfterViewInit(): void {
+    concat(
+      of(null),
+      this.smartChips.changes,
+    ).pipe(
+      switchMap(() =>
+        combineLatest(
+          Array.from(this.smartChips).map(chip =>
+            concat(
+              of(false),
+              merge(
+                chip.menuOpened.pipe(
+                  map(() => true)
+                ),
+                chip.menuClosed.pipe(
+                  map(() => false)
+                )
+              )
+            )
+          )
+        )
+      ),
+      debounceTime(0),
+      takeUntil(this.#onDestroy$)
+    ).subscribe(arr => {
+      const newVal = {
+        some: arr.some(val => val),
+        all: arr.every(val => val),
+        none: arr.every(val => !val),
+      }
+      this.#menuOpen$.next(newVal)
+
+      this.menuOpen = null
+      if (newVal.none) {
+        this.menuOpen = 'none'
+      }
+      if (newVal.all) {
+        this.menuOpen = 'all'
+      }
+      if (newVal.some) {
+        this.menuOpen = 'some'
+      }
+    })
   }
+
 }

@@ -19,9 +19,10 @@
   margin-left: 0.2rem;
 }
 
-sxplr-smart-chip
+:host sxplr-smart-chip
 {
-  min-width: 10rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
 sxplr-smart-chip:not(:last-child)
@@ -31,5 +32,32 @@ sxplr-smart-chip:not(:last-child)
   .chip-text 
   {
     padding-left: 1rem;
+  }
+}
+
+sxplr-smart-chip:not(:last-child)
+{
+  .header
+  {
+    padding-left: 1rem;
+  }
+}
+
+.parent
+{
+  display: flex;
+  flex-wrap: nowrap;
+
+  > :first-child,
+  > :last-child
+  {
+    flex: 0 0 1rem;
+  }
+  > .text
+  {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 }

@@ -1,3 +1,14 @@
+<ng-template [ngIf]="point$ | async" let-point>
+    <ng-template [ngIf]="point | sandsToNum" let-coordinates>
+        <button mat-icon-button class="sxplr-m-2"
+            (click)="navigateToPoint(coordinates.coords)"
+            [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
+            <i class="fas fa-map-marker-alt"></i>
+        </button>
+    </ng-template>
+</ng-template>
+
+
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
     <span>
@@ -12,6 +23,7 @@
 </div>
 
 <ng-template [ngIf]="df$ | async" let-df>
+
     <button mat-raised-button
         class="sxplr-m-2"
         (click)="openDialog(datatableTmpl)">
@@ -27,11 +39,14 @@
         matSortDirection="desc">
         <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                region
+                <span class="sxplr-m-1">
+                    region
+                </span>
             </th>
             <td mat-cell *matCellDef="let element">
                 <!-- {{ element | json }} -->
-                <button mat-button (click)="selectRegion(element['region'], $event)">
+                <button mat-button (click)="selectRegion(element['region'], $event)"
+                    class="ws-no-wrap">
                     {{ element['region'].name }}
                 </button>
             </td>
@@ -58,15 +73,32 @@
             #comphTableSort="matSort"
             matSortActive="map value"
             matSortDirection="desc">
-            <ng-container *ngFor="let column of columns$ | async"
-                [matColumnDef]="column">
+            
+            <ng-container matColumnDef="region">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    {{ column }}
+                    region
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{ element[column] | prettyPresent }}
+                    <button mat-button (click)="selectRegion(element['region'], $event)"
+                        class="ws-no-wrap">
+                        {{ element['region'].name }}
+                    </button>
                 </td>
             </ng-container>
+
+            <ng-template ngFor [ngForOf]="columns$ | async" let-column>
+                <ng-template [ngIf]="column !== 'region'">
+                    <ng-container [matColumnDef]="column">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                            {{ column }}
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            {{ element[column] | prettyPresent }}
+                        </td>
+                    </ng-container>
+                </ng-template>
+            </ng-template>
+            
         
             <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
             <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>

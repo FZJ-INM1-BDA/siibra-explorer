@@ -15,6 +15,10 @@ export const generalApplyState = createAction(
   }>()
 )
 
+export const routeParseComplete = createAction(
+  `${nameSpace} routeParseComplete`
+)
+
 export const noop = createAction(
   `${nameSpace} noop`
 )

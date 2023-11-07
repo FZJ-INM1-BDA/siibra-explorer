@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, combineLatest, of, throwError } from "rxjs";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
@@ -14,11 +14,11 @@ import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type";
 import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
-import { map } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 import { TContextArg } from "./viewer.interface";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { ViewerInternalStateSvc } from "./viewerInternalState.service";
-import { SAPIModule } from 'src/atlasComponents/sapi';
+import { SAPI, SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
 import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 import { DialogModule } from "src/ui/dialogInfo/module";
@@ -34,6 +34,11 @@ import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
+import { BottomMenuModule } from "src/ui/bottomMenu";
+import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
+import { Store } from "@ngrx/store";
+import { atlasSelection, userPreference } from "src/state";
+import { TabComponent } from "src/components/tab/tab.components";
 
 @NgModule({
   imports: [
@@ -60,6 +65,8 @@ import { ReactiveFormsModule } from "@angular/forms";
     NgLayerCtlModule,
     SmartChipModule,
     ReactiveFormsModule,
+    BottomMenuModule,
+    TabComponent,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [
@@ -91,6 +98,45 @@ import { ReactiveFormsModule } from "@angular/forms";
       deps: [ ContextMenuService ]
     },
     ViewerInternalStateSvc,
+    
+    {
+      provide: Z_TRAVERSAL_MULTIPLIER,
+      useFactory: (store: Store, templateInfo: Observable<TemplateInfo>) => {
+        return combineLatest([
+          store.select(userPreference.selectors.overrideZTraversalMultiplier),
+          templateInfo
+        ]).pipe(
+          map(([ override, tmplInfo ]) => override || tmplInfo.resolution?.[0] || 1e3)
+        )
+      },
+      deps: [ Store, CURRENT_TEMPLATE_DIM_INFO ]
+    },
+    {
+      provide: CURRENT_TEMPLATE_DIM_INFO,
+      useFactory: (store: Store, sapi: SAPI) => store.pipe(
+        atlasSelection.fromRootStore.distinctATP(),
+        switchMap(({ template }) =>
+          template
+          ? sapi.getVoxelTemplateImage(template).pipe(
+            switchMap(defaultImage => {
+              if (defaultImage.length === 0) {
+                return of(null)
+              }
+              const img = defaultImage[0]
+              if (img.legacySpecFlag === "new") {
+                return throwError('new spec for template is not supported yet.')
+              }
+              return of({
+                ...img.info || {},
+                transform: img.transform
+              })
+            })
+          )
+          : of(null)
+        )
+      ),
+      deps: [ Store, SAPI ]
+    },
   ],
   exports: [
     ViewerCmp,

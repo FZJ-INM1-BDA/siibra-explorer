@@ -14,28 +14,6 @@ export const selectAtlas = createAction(
   }>()
 )
 
-export const selectTemplate = createAction(
-  `${nameSpace} selectTemplate`,
-  props<{
-    template: SxplrTemplate
-    requested?: {
-      template?: SxplrTemplate
-      parcellation?: SxplrParcellation
-    }
-  }>()
-)
-
-export const selectParcellation = createAction(
-  `${nameSpace} selectParcellation`,
-  props<{
-    parcellation: SxplrParcellation
-    requested?: {
-      parcellation?: SxplrParcellation
-      template?: SxplrTemplate
-    }
-  }>()
-)
-
 /**
  * setAtlasSelectionState is called as a final step to (potentially) set:
  * - selectedAtlas
@@ -133,6 +111,15 @@ export const selectATPById = createAction(
     atlasId?: string
     templateId?: string
     parcellationId?: string
+    regionId?: string
+
+    config?: {
+      autoSelect?: boolean
+      messages?: {
+        template?: string
+        parcellation?: string
+      }
+    }
   }>()
 )
 

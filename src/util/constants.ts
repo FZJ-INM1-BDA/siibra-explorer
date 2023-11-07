@@ -8,8 +8,6 @@ export const LOCAL_STORAGE_CONST = {
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
   QUICK_TOUR_VIEWED: 'fzj.dg.iv.QUICK_TOUR_VIEWED',
-
-  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
 
 export const COOKIE_VERSION = '0.3.0'
@@ -73,43 +71,7 @@ export const getHttpHeader: () => HttpHeaders = () => {
 }
 
 export const COLORMAP_IS_JET = `// iav-colormap-is-jet`
-import { EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { InjectionToken } from "@angular/core"
-
-export const getShader = ({
-  colormap = EnumColorMapName.GREYSCALE,
-  lowThreshold = 0,
-  highThreshold = 1,
-  brightness = 0,
-  contrast = 0,
-  removeBg = false
-} = {}): string => {
-  const { header, main, premain } = mapKeyColorMap.get(colormap) || (() => {
-    return mapKeyColorMap.get(EnumColorMapName.GREYSCALE)
-  })()
-
-  // so that if lowthreshold is defined to be 0, at least some background removal will be done
-  const _lowThreshold = lowThreshold + 1e-10
-  return `${header}
-${premain}
-void main() {
-  float raw_x = toNormalized(getDataValue());
-  float x = (raw_x - ${_lowThreshold.toFixed(10)}) / (${highThreshold - _lowThreshold}) ${ brightness > 0 ? '+' : '-' } ${Math.abs(brightness).toFixed(10)};
-
-  ${ removeBg ? 'if(x>1.0){emitTransparent();}else if(x<0.0){emitTransparent();}else{' : '' }
-    vec3 rgb;
-    ${main}
-    emitRGB(rgb*exp(${contrast.toFixed(10)}));
-  ${ removeBg ? '}' : '' }
-}
-`
-}
-
-export const PMAP_DEFAULT_CONFIG = {
-  colormap: EnumColorMapName.VIRIDIS,
-  lowThreshold: 0.05,
-  removeBg: true
-}
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
 

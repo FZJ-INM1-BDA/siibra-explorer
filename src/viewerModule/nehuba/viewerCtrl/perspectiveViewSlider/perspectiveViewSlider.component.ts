@@ -1,11 +1,9 @@
-import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
-import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { combineLatest, concat, NEVER, Observable, of, Subject } from "rxjs";
+import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
-import { fromRootStore } from "src/state/atlasSelection";
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
 import { ResizeObserverDirective } from "src/util/windowResize";
@@ -15,6 +13,8 @@ import { NEHUBA_INSTANCE_INJTKN } from "../../util";
 import { EnumClassicalView } from "src/atlasComponents/constants"
 import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
+import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo } from "../../layerCtrl.service/layerCtrl.util";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 const MAX_DIM = 200
 
@@ -43,21 +43,25 @@ function getDim(triplet: number[], view: EnumClassicalView) {
   templateUrl: './perspectiveViewSlider.template.html',
   styleUrls: ['./perspectiveViewSlider.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective,
+  ]
 })
 
-export class PerspectiveViewSlider implements OnDestroy {
+export class PerspectiveViewSlider {
+
+    #destroy$ = inject(DestroyDirective).destroyed$
 
     @ViewChild(ResizeObserverDirective)
     resizeDirective: ResizeObserverDirective
 
-    public minimapControl = new FormControl()
+    public minimapControl = new FormControl<number>(0)
     public recalcViewportSize$ = new Subject()
 
     private selectedTemplate$ = this.store$.pipe(
       select(selectedTemplate),
       distinctUntilChanged((o, n) => o?.id === n?.id),
     )
-    private subscriptions: Subscription[] = []
     private maximisedPanelIndex$ = combineLatest([
       this.store$.pipe(
         select(panelMode),
@@ -146,24 +150,8 @@ export class PerspectiveViewSlider implements OnDestroy {
       map(ctrl => ctrl?.rangeOrientation === "vertical")
     )
 
-    private currentTemplateSize$ = this.store$.pipe(
-      fromRootStore.distinctATP(),
-      switchMap(({ template }) => 
-        template
-          ? this.sapi.getVoxelTemplateImage(template).pipe(
-            switchMap(defaultImage => {
-              if (defaultImage.length == 0) {
-                // template hs no ng volume, which is the case for threesurfer
-                return NEVER
-              }
-              const img = defaultImage[0]
-              return of({
-                ...img.info || {},
-                transform: img.transform
-              })
-            })
-          )
-          : NEVER),
+    private currentTemplateSize$ = this.tmplInfo$.pipe(
+      filter(val => !!val)
     )
 
     private useMinimap$: Observable<EnumClassicalView> = this.maximisedPanelIndex$.pipe(
@@ -259,7 +247,7 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     public scrubberPosition$ = this.rangeControlMinMaxValue$.pipe(
       switchMap(minmaxval => concat(
-        of(null),
+        of(null as number),
         this.minimapControl.valueChanges,
       ).pipe(
         map(newval => {
@@ -345,39 +333,55 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     constructor(
       private store$: Store,
-      private sapi: SAPI,
       @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Observable<NehubaViewerUnit>,
+      @Inject(CURRENT_TEMPLATE_DIM_INFO) private tmplInfo$: Observable<TemplateInfo>,
     ) {
 
-      this.subscriptions.push(
-        combineLatest([
-          this.nehubaViewer$,
-          this.rangeControlSetting$,
-        ]).pipe(
-          switchMap(([ nehubaViewer, rangeCtrl ]) => this.minimapControl.valueChanges.pipe(
-            withLatestFrom(this.navPosition$.pipe(
-              map(value => value?.real)
-            )),
-            map(([newValue, currentPosition]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition }))
-          ))
-        ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition }) => {
-          if (newValue === null) return
-          const { anatomicalOrientation } = rangeCtrl
-          if (!anatomicalOrientation) return
-          const idx = anatOriToIdx[anatomicalOrientation]
-          const newNavPosition = [...currentPosition]
-          newNavPosition[idx] = newValue
-          nehubaViewer.setNavigationState({
-            position: newNavPosition,
-            positionReal: true
-          })
-        }),
-      )
+      combineLatest([
+        this.nehubaViewer$,
+        this.rangeControlSetting$,
+      ]).pipe(
+        switchMap(([ nehubaViewer, rangeCtrl ]) => this.minimapControl.valueChanges.pipe(
+          withLatestFrom(this.navPosition$.pipe(
+            map(value => value?.real)
+          )),
+          map(([newValue, currentPosition]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition }))
+        )),
+        takeUntil(this.#destroy$)
+      ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition }) => {
+        if (newValue === null) return
+        const { anatomicalOrientation } = rangeCtrl
+        if (!anatomicalOrientation) return
+        const idx = anatOriToIdx[anatomicalOrientation]
+        const newNavPosition = [...currentPosition]
+        newNavPosition[idx] = newValue
+        nehubaViewer.setNavigationState({
+          position: newNavPosition,
+          positionReal: true
+        })
+      })
+
+      combineLatest([
+        this.sliceviewIsNormal$,
+        this.navPosition$,
+        this.maximisedPanelIndex$,
+      ]).pipe(
+        filter(([ sliceViewIsNormal ]) => sliceViewIsNormal),
+        map(([ _, ...rest ]) => rest),
+        takeUntil(this.#destroy$)
+      ).subscribe(([ navPos, maximisedIdx]) => {
+        const realPos = navPos?.real
+        if (!realPos) {
+          return
+        }
+        const pos = navPos.real[maximisedIdx === 0? 1 : maximisedIdx === 1? 0 : 2]
+        const diff = Math.abs(this.minimapControl.value - pos)
+        if (diff > 1e6) {
+          this.minimapControl.setValue(pos)
+        }
+      })
     }
 
-    ngOnDestroy(): void {
-      this.subscriptions.forEach(s => s.unsubscribe());
-    }
 
     resetSliceview() {
       this.store$.dispatch(

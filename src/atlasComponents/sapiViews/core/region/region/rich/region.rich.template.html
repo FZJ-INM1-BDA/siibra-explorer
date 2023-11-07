@@ -4,86 +4,246 @@
 
 <ng-template [ngIf]="region">
 
-  <mat-card class="mat-elevation-z4">
-    <div
-      [style.backgroundColor]="regionRgbString"
-      class="vanishing-border"
-      [ngClass]="{
-        'darktheme': regionDarkmode === true,
-        'lighttheme': regionDarkmode === false
-      }">
+  <mat-card class="mat-elevation-z4"
+    [style.backgroundColor]="regionRgbString"
+    [ngClass]="{
+      'darktheme': regionDarkmode === true,
+      'lighttheme': regionDarkmode === false
+    }">
+    <mat-card-header>
 
-      <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      <mat-card-subtitle>
+        <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      </mat-card-subtitle>
+      
+      <mat-card-subtitle>
+        <span class="muted-text">
+          Brain region
+        </span>
+      </mat-card-subtitle>
 
       <mat-card-title class="sxplr-custom-cmp text">
         {{ region.name }}
       </mat-card-title>
 
-      <mat-card-subtitle>
-        {{ parcellation.name }}
-      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content></mat-card-content>
+  </mat-card>
 
 
-      <!-- subtitle on what it is -->
-      <mat-card-subtitle class="d-inline-flex align-items-center flex-wrap">
-        <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
-        <span>
-          Brain region
-        </span>
+  <mat-tab-group>
 
-        <!-- origin datas format -->
+    <!-- Overview -->
+    <mat-tab label="Overview">
 
-        <mat-divider vertical="true" class="sxplr-pl-2 h-2rem"></mat-divider>
-
-        <!-- position -->
-        <button mat-icon-button *ngIf="regionPosition"
-          (click)="navigateTo(regionPosition)"
-          [matTooltip]="ARIA_LABELS.GO_TO_REGION_CENTROID + ': ' + (regionPosition | numbers | addUnitAndJoin : 'mm')">
-          <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
-          </mat-icon>
+      <mat-action-list class="overview-container">
+        
+        <!-- parcellation button -->
+        <button
+          mat-list-item
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: parcellation.name,
+            descMd: parcellation.desc,
+            actions: parcellation | parcTmplDoiPipe
+          }">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+          <div matListItemTitle>{{ parcellation.name }}</div>
         </button>
 
-        <!-- explore doi -->
-        <a *ngFor="let doi of dois$ | async"
-          [href]="doi | parseDoi"
-          sxplr-hide-when-local
-          [matTooltip]="ARIA_LABELS.EXPLORE_DATASET_IN_KG"
-          target="_blank"
-          mat-icon-button>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
+        <!-- region position (if eixsts) -->
+        <ng-template [ngIf]="regionPosition">
+          <button mat-list-item (click)="navigateTo(regionPosition)">
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+            <div matListItemTitle>Centroid: {{ regionPosition | numbers | addUnitAndJoin : 'mm' }}</div>
+          </button>
+        </ng-template>
 
-      </mat-card-subtitle>
+        <!-- all dois -->
+        <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
+          <a mat-list-item [href]="doi" target="_blank" class="no-hover">
+            <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div matListItemTitle>{{ doi }}</div>
+          </a>
+        </ng-template>
 
-    </div>
-  </mat-card>
+        <!-- related regions -->
+        <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+          <!-- only show icon if related regions length > 0 -->
+          <ng-template [ngIf]="relatedRegions.length > 0">
+            <button mat-list-item
+              [sxplr-dialog]="relatedRegionsTmpl"
+              sxplr-dialog-size="auto">
+              <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-link"></mat-icon>
+              <div matListItemTitle>Related Regions ({{ relatedRegions.length }})</div>
+            </button>
+            
+            <!-- dialog when user clicks related regions -->
+            <ng-template #relatedRegionsTmpl>
+              <!-- header -->
+              <h2 mat-dialog-title>Related Regions</h2>
 
-  <!-- desc -->
-  <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
-    <readmore-component>
-      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
-      </markdown-dom>
-    </readmore-component>
-  </ng-template>
+              <!-- body -->
+              <mat-dialog-content>
 
+                <!-- iterate over all related -->
+                <table mat-table [dataSource]="relatedRegions">
+                  
+                  <ng-container matColumnDef="currentRegion">
+                    <th mat-header-cell *matHeaderCellDef> Current Region </th>
+                    <td mat-cell *matCellDef="let related"> {{ region.name }} </td>
+                  </ng-container>
 
-  <!-- header for regional feature -->
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        Features anchored to region
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content *ngIf="!(featureEntryCmp.busyTallying$ | async) && (featureEntryCmp.totals$ | async) == 0"
-      class="text-muted">
-      No regional features found.
-    </mat-card-content>
-  </mat-card>
+                  <ng-container matColumnDef="qualification">
+                    <th mat-header-cell *matHeaderCellDef> Qualification </th>
+                    <td mat-cell *matCellDef="let related"> {{ related.qualification | translateQualificationPipe }} </td>
+                  </ng-container>
 
-  <sxplr-feature-entry
-    [template]="template"
-    [parcellation]="parcellation"
-    [region]="region"
-    #featureEntryCmp="featureEntryCmp">
-  </sxplr-feature-entry>
+                  <ng-container matColumnDef="relatedRegion">
+                    <th mat-header-cell *matHeaderCellDef> Related Region </th>
+                    <td mat-cell *matCellDef="let related">
+                      <button tabindex="-1" mat-stroked-button
+                        (click)="selectATPR({ region: related.region, parcellation: related.parcellation})"
+                        class="sxplr-w-100"
+                        [disabled]="!related.mapped"
+                        mat-dialog-close
+                        [matTooltip]="('Explorer ' + related.region.name + ' in ' + related.parcellation.name)">
+                        {{ related.region.name }}
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="relatedRegionParc">
+                    <th mat-header-cell *matHeaderCellDef> Related Region Parcellation </th>
+                    <td mat-cell *matCellDef="let related">
+                      <button tabindex="-1" mat-stroked-button
+                        (click)="selectATPR({ parcellation: related.parcellation })"
+                        class="sxplr-w-100"
+                        mat-dialog-close
+                        [matTooltip]="('Explore ' + related.parcellation.name)">
+                        {{ related.parcellation.name }}
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc'];"></tr>
+                </table>
+              </mat-dialog-content>
+
+              <!-- footer -->
+              <mat-dialog-actions align="center">
+                <button mat-button mat-dialog-close>close</button>
+              </mat-dialog-actions>
+            </ng-template>
+          </ng-template>
+
+        </ng-template>
+
+        <!-- if busy, show spinner -->
+        <ng-template [ngIf]="busy$ | async">
+          <mat-list-item>
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </mat-list-item>
+        </ng-template>
+
+      </mat-action-list>
+
+      
+      <ng-template [ngIf]="(desc$ | async) || region.desc" let-desc>
+        <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="desc">
+        </markdown-dom>
+      </ng-template>
+    </mat-tab>
+
+    <!-- FeatureTab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span>
+          Features
+        </span>
+        <ng-template [ngIf]="featureEntryCmp.totals$ | async" let-total>
+          <span class="text-muted">
+            ({{ total }})
+          </span>
+        </ng-template>
+        <ng-template [ngIf]="featureEntryCmp.busyTallying$ | async">
+          <spinner-cmp></spinner-cmp>
+        </ng-template>
+      </ng-template>
+
+      <sxplr-feature-entry
+        [template]="template"
+        [parcellation]="parcellation"
+        [region]="region"
+        #featureEntryCmp="featureEntryCmp">
+      </sxplr-feature-entry>
+
+      
+    
+      <!-- related region features -->
+      <ng-template [ngIf]="relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+        <ng-template [ngIf]="relatedRegions.length > 0">
+
+          <div class="section-divider"></div>
+
+          <h2 class="sxplr-ml-2 mat-h4">Related Regions</h2>
+
+          <div class="h-carousel">
+            <div class="h-carousel-item-container">
+              <mat-card *ngFor="let relatedRegion of relatedRegions"
+                class="h-carousel-item mat-elevation-z4">
+                
+                <mat-card-header>
+                  <mat-card-subtitle>
+                    {{ relatedRegion.qualification | translateQualificationPipe }}
+                  </mat-card-subtitle>
+                  <mat-card-title>
+                    {{ relatedRegion.region.name }}
+                  </mat-card-title>
+                  <mat-card-subtitle>
+                    {{ relatedRegion.parcellation.name}}
+                  </mat-card-subtitle>
+                </mat-card-header>
+
+                <mat-card-actions>
+                  <button mat-button
+                    [sxplr-dialog]="relatedRegFeatTmpl"
+                    sxplr-dialog-size="auto">
+                    show features
+                  </button>
+                </mat-card-actions>
+
+                
+                <ng-template #relatedRegFeatTmpl>
+                  <h2 mat-dialog-title>
+                    {{ relatedRegion.region.name }}
+                    {{ relatedRegion.parcellation.name }}
+                  </h2>
+
+                  <mat-dialog-content>
+                    <sxplr-feature-entry
+                      class="sxplr-d-block sxplr-mb-1"
+                      [parcellation]="relatedRegion.parcellation"
+                      [region]="relatedRegion.region">
+                    </sxplr-feature-entry>
+                  </mat-dialog-content>
+
+                  <!-- footer -->
+                  <mat-dialog-actions align="center">
+                    <button mat-button mat-dialog-close>close</button>
+                  </mat-dialog-actions>
+                </ng-template>
+
+              </mat-card>
+            </div>
+          </div>
+
+        </ng-template>
+      </ng-template>
+    </mat-tab>
+
+  </mat-tab-group>
+
 </ng-template>

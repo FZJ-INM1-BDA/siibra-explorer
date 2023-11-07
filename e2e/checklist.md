@@ -9,6 +9,11 @@
 - [ ] Can access front page
 - [ ] Can login to oidc v2 via top-right
 
+## Verify testing correct siibra-explorer and siibra-api versions
+
+- [ ] Git hash from `[?]` -> `About` matches with the git hash of `HEAD` of staging
+- [ ] Message `Expecting {VERSION}, but got {VERSION}, some functionalities may not work as expected` does **not** show
+
 ## Atlas data specific
 
 - [ ] Human multilevel atlas
@@ -48,6 +53,20 @@
   - [ ] v4 are visible
   - [ ] on hover, show correct region name(s)
   - [ ] whole mesh loads
+
+## Pt Assignments
+
+- [ ] human MNI152 julich brain should work (statistical)
+- [ ] rat waxholm v4 should work (labelled)
+- [ ] csv can be downloaded
+- [ ] big brain & fsaverage *shouldn't* work
+
+## Download atlas
+
+- [ ] human MNI152 julich brain can be downloaded
+- [ ] human MNI152 julich brain hoc1 left can be downloaded
+- [ ] rat waxholm v4 can be downloaded
+
 ## saneURL
 - [ ] saneurl generation functions properly
   - [ ] try existing key (human), and get unavailable error
@@ -58,10 +77,13 @@
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/whs4) redirects to waxholm v4
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/allen2017) redirects to allen 2017
 - [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/mebrains) redirects to monkey
+- [ ] [saneUrl](https://atlases.ebrains.eu/viewer-staging/saneUrl/stnr) redirects to URL that contains annotations
+
 ## VIP URL
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/human) redirects to human mni152
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/monkey) redirects mebrains
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/rat) redirects to waxholm v4
 - [ ] [vipUrl](https://atlases.ebrains.eu/viewer-staging/mouse) redirects allen mouse 2017
+
 ## plugins
 - [ ] jugex plugin works

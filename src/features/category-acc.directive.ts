@@ -144,6 +144,12 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       ).subscribe(async ({ total, current, ds }) => {
         if (total > current && current < 50) {
           try {
+            /**
+             * TODO Interaction between ParentDataSource and ListDatadirective, which both pulls seems
+             * to weirdly interact with each other. 
+             * For now, pulling twice seems to solve the issue
+             */
+            await ds.pull()
             await ds.pull()
           } catch (e) {
             // if already pulling, ignore

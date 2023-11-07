@@ -1,13 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core'
 import { select, Store } from '@ngrx/store';
-import { combineLatest, Observable, Subscription } from 'rxjs';
+import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { MatSliderChange } from "@angular/material/slider";
+import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection, userPreference, userInterface } from 'src/state';
 import { environment } from "src/environments/environment"
+import { Z_TRAVERSAL_MULTIPLIER } from 'src/viewerModule/nehuba/layerCtrl.service/layerCtrl.util';
+import { FormControl, FormGroup } from '@angular/forms';
 
+
+const Z_TRAVERSAL_TOOLTIP = `Value to use when traversing z level. If toggled off, will use the voxel dimension of the template.`
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
 const MOBILE_UI_TOOLTIP = `Mobile UI enables touch controls`
@@ -24,6 +27,15 @@ const OBLIQUE_ROOT_TEXT_ORDER: [string, string, string, string] = ['Slice View 1
 
 export class ConfigComponent implements OnInit, OnDestroy {
 
+  customZFormGroup = new FormGroup({
+    customZValue: new FormControl<number>({
+      value: 1,
+      disabled: true
+    }),
+    customZFlag: new FormControl<boolean>(false)
+  })
+
+  public Z_TRAVERSAL_TOOLTIP = Z_TRAVERSAL_TOOLTIP
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
@@ -70,6 +82,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<any>,
+    @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) private zTraversalMult$: Observable<number> = of(1)
   ) {
 
     this.gpuLimit$ = this.store.pipe(
@@ -112,6 +125,52 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public ngOnInit() {
     this.subscriptions.push(
       this.panelOrder$.subscribe(panelOrder => this.panelOrder = panelOrder),
+      combineLatest([
+        this.zTraversalMult$,
+        this.store.pipe(
+          select(userPreference.selectors.overrideZTraversalMultiplier),
+          map(val => !!val)
+        ),
+      ]).subscribe(([ zVal, customZFlag ]) => {
+        this.customZFormGroup.setValue({
+          customZFlag: customZFlag,
+          customZValue: zVal
+        })
+      }),
+      this.customZFormGroup.valueChanges.pipe(
+        map(v => v.customZFlag),
+        distinctUntilChanged(),
+      ).subscribe(customZFlag => {
+        if (customZFlag !== this.customZFormGroup.controls.customZValue.enabled) {
+          if (customZFlag) {
+            this.customZFormGroup.controls.customZValue.enable()
+          } else {
+            this.customZFormGroup.controls.customZValue.disable()
+          }
+        }
+      }),
+      this.customZFormGroup.valueChanges.pipe(
+        debounceTime(160)
+      ).subscribe(() => {
+        const { customZFlag, customZValue } = this.customZFormGroup.value
+        // if customzflag is unset, unset zmultiplier
+        if (!customZFlag) {
+          this.store.dispatch(
+            userPreference.actions.setZMultiplier({
+              value: null
+            })
+          )
+          return
+        }
+        // if the entered value cannot be parsed to number, skip for now.
+        if (customZValue) {
+          this.store.dispatch(
+            userPreference.actions.setZMultiplier({
+              value: customZValue
+            })
+          )
+        }
+      })
     )
   }
 
@@ -137,10 +196,10 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
   }
 
-  public handleMatSliderChange(ev: MatSliderChange) {
+  public updateGpuLimit(newVal: number){
     this.store.dispatch(
       userPreference.actions.setGpuLimit({
-        limit: ev.value * 1e6
+        limit: newVal * 1e6
       })
     )
   }

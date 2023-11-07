@@ -6,7 +6,7 @@ import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
 import { EnumQuickTourSeverity, PERMISSION_DIALOG_ACTIONS, QuickTourSeverity, QUICK_TOUR_CMP_INJTKN } from "./constrants";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { StartTourDialogDialog } from "src/ui/quickTour/startTourDialog/startTourDialog.component";
 
 const autoPlayPriority: Set<EnumQuickTourSeverity | keyof typeof QuickTourSeverity> = new Set([

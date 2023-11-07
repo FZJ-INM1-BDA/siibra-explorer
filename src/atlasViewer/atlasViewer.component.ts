@@ -16,8 +16,8 @@ import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/mouseoverModule";
-import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
@@ -27,6 +27,7 @@ import { DOCUMENT } from "@angular/common";
 import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
+import { SAPI } from "src/atlasComponents/sapi";
 
 
 @Component({
@@ -44,6 +45,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
 
+  sapiError$ = SAPI.ErrorMessage$
+
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
@@ -53,8 +56,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
-
-  private snackbarRef: MatSnackBarRef<any>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
@@ -76,11 +77,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
 
-    const error = this.el.nativeElement.getAttribute('data-error')
+    const error = this.el.nativeElement.getAttribute(CONST.DATA_ERROR_ATTR)
 
     if (error) {
       this.snackbar.open(error, 'Dismiss', { duration: 5000 })
-      this.el.nativeElement.removeAttribute('data-error')
+      this.el.nativeElement.removeAttribute(CONST.DATA_ERROR_ATTR)
     }
   }
 
@@ -120,6 +121,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
+      this.store.pipe(
+        select(userPreference.selectors.showExperimental)
+      ).subscribe(flag => {
+        this.rd.setAttribute(this.document.body, 'experimental', flag.toString())
+      })
     )
   }
 

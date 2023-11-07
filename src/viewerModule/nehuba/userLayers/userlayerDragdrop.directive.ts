@@ -5,7 +5,7 @@ import {
   OnDestroy,
   OnInit,
 } from "@angular/core"
-import { MatSnackBar } from "@angular/material/snack-bar"
+import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { Subscription } from "rxjs"
 import { DragDropFileDirective } from "src/dragDropFile/dragDrop.directive"
 import { UserLayerService } from "./service"
@@ -53,9 +53,6 @@ export class UserLayerDragDropDirective
       return
     }
     const file = files[0]
-
-    const { meta, url, options } = await this.svc.getCvtFileToUrl(file)
-
-    this.svc.addUserLayer(url, meta, options)
+    await this.svc.handleUserInput(file)
   }
 }

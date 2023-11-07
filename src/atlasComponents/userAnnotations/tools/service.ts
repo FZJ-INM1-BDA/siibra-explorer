@@ -2,17 +2,17 @@ import { Injectable, OnDestroy, Type } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, from, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
-import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback } from "./type";
-import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
+import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
+import { getExportNehuba, switchMapWaitFor, retry } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -20,6 +20,7 @@ import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
+const ANNOTATION_LAYER_NAME = "modular_tool_layer_name"
 
 type TAnnotationMetadata = {
   id: string
@@ -27,7 +28,6 @@ type TAnnotationMetadata = {
   desc: string
 }
 
-const descType = 'siibra-ex/meta/desc' as const
 type TTypedAnnMetadata = {
   '@type': 'siibra-ex/meta/desc'
 } & TAnnotationMetadata
@@ -67,11 +67,11 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   static TMP_PREVIEW_ANN_ID = 'tmp_preview_ann_id'
   static VIEWER_MODE = ARIA_LABELS.VIEWER_MODE_ANNOTATING
 
-  static ANNOTATION_LAYER_NAME = 'modular_tool_layer_name'
+  
   static USER_ANNOTATION_LAYER_SPEC = {
     "type": "annotation",
     "tool": "annotateBoundingBox",
-    "name": ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
+    "name": ANNOTATION_LAYER_NAME,
     "annotationColor": "#ee00ff",
     "annotations": [],
   }
@@ -261,12 +261,16 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   #voxelSize = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
+    filter(v => !!v),
     switchMap(tmpl => translateV3Entities.translateSpaceToVolumeImage(tmpl)),
     map(volImages => {
       if (volImages.length === 0) {
         return null
       }
       const volImage = volImages[0]
+      if (volImage.legacySpecFlag === "new") {
+        throw new Error(`voxel size new spec not yet supported`)
+      }
       const { real, voxel } = volImage.info
       return [0, 1, 2].map(idx => real[idx]/voxel[idx]) as [number, number, number]
     })
@@ -325,21 +329,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     /**
      * on new nehubaViewer, unset annotationLayer
      */
-    this.subscription.push(
-      nehubaViewer$.subscribe(() => {
-        this.annotationLayer = null
-      })
-    )
-
-    /**
-     * get mouse real position
-     */
-    this.subscription.push(
-      nehubaViewer$.pipe(
-        switchMap(v => v?.mousePosInReal$ || of(null))
-      ).subscribe(v => this.mousePosReal = v)
-    )
-
+    if (!!nehubaViewer$) {
+      this.subscription.push(
+        nehubaViewer$.subscribe(() => {
+          this.annotationLayer = null
+        })
+      )
+  
+      /**
+       * get mouse real position
+       */
+      this.subscription.push(
+        nehubaViewer$.pipe(
+          switchMap(v => v?.mousePosInReal$ || of(null))
+        ).subscribe(v => this.mousePosReal = v)
+      )  
+    }
     /**
      * on mouse move, render preview annotation
      */
@@ -410,13 +415,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })),
       )
     ]).pipe(
-      map(([_, annts]) => {
-        const out = []
-        for (const ann of annts) {
-          out.push(...ann.toNgAnnotation())
-        }
-        return out
-      }),
+      map(([_, annts]) => 
+        annts.map(ann => ann.toNgAnnotation()).flatMap(v => v)
+      ),
       shareReplay(1),
     )
     this.subscription.push(
@@ -458,17 +459,16 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       store.pipe(
         select(atlasSelection.selectors.viewerMode),
         withLatestFrom(this.#voxelSize),
-      ).subscribe(([viewerMode, voxelSize]) => {
-        this.currMode = viewerMode
-        if (viewerMode === ModularUserAnnotationToolService.VIEWER_MODE) {
-          if (this.annotationLayer) this.annotationLayer.setVisible(true)
-          else {
-            if (!voxelSize) throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
+        switchMap(([viewerMode, voxelSize]) => from(
+          retry(() => {
             if (this.annotationLayer) {
-              this.annotationLayer.dispose()
+              return this.annotationLayer
+            }
+            if (!voxelSize) {
+              throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
             }
             this.annotationLayer = new AnnotationLayer(
-              ModularUserAnnotationToolService.ANNOTATION_LAYER_NAME,
+              ANNOTATION_LAYER_NAME,
               ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
             )
             this.annotationLayer.onHover.subscribe(val => {
@@ -482,15 +482,22 @@ export class ModularUserAnnotationToolService implements OnDestroy{
                   : null
               })
             })
-            /**
-             * on template changes, the layer gets lost
-             * force redraw annotations if layer needs to be recreated
-             */
-            this.forcedAnnotationRefresh$.next(null)
-          }
-        } else {
-          if (this.annotationLayer) this.annotationLayer.setVisible(false)
-        }
+            
+            return this.annotationLayer
+          }, { retries: 60, timeout: 1000 })
+          ).pipe(
+            map(annotationLayer => ({viewerMode, annotationLayer}))
+          )
+        )
+      ).subscribe(({viewerMode, annotationLayer}) => {
+        this.currMode = viewerMode
+        
+        /**
+         * on template changes, the layer gets lost
+         * force redraw annotations if layer needs to be recreated
+         */
+        this.forcedAnnotationRefresh$.next(null)
+        annotationLayer.setVisible(viewerMode === ModularUserAnnotationToolService.VIEWER_MODE)
       })
     )
 
@@ -549,15 +556,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     
     for (const ann of anns) {
       this.importAnnotation(ann)
-    }
-  }
-
-  public exportAnnotationMetadata(ann: IAnnotationGeometry): TAnnotationMetadata & { '@type': 'siibra-ex/meta/desc' } {
-    return {
-      '@type': descType,
-      id: ann.id,
-      name: ann.name,
-      desc: ann.desc,
     }
   }
 
@@ -650,7 +648,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (json['@type'] === 'siibra-ex/annotation/polyline') {
       returnObj = Polygon.fromJSON(json)
     }
-    if (json['@type'] === descType) {
+    if (json['@type'] === DESC_TYPE) {
       const existingAnn = this.managedAnnotations.find(ann => json.id === ann.id)
       if (existingAnn) {
 

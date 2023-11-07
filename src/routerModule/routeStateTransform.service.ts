@@ -1,15 +1,15 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
-import { getParcNgId } from "src/viewerModule/nehuba/config.service";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
 import { QuickHash } from "src/util/fn";
+import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 
 @Injectable()
 export class RouteStateTransformSvc {
@@ -20,7 +20,11 @@ export class RouteStateTransformSvc {
     return arr[0]
   }
 
-  constructor(private sapi: SAPI){}
+  constructor(
+    private sapi: SAPI,
+    @Inject(NEHUBA_CONFIG_SERVICE_TOKEN)
+    private nehubaCfgSvc: NehubaConfigSvc,
+  ){}
   
   private async getATPR(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>){
     const selectedAtlasId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.a) )
@@ -93,7 +97,7 @@ export class RouteStateTransformSvc {
 
       for (const { region } of [...Object.values(ngMap), ...Object.values(threeMap)]) {
         const actualRegion = regionMap.get(region[0].name)
-        const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, actualRegion)
+        const ngId = this.nehubaCfgSvc.getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, actualRegion)
 
         if (!json[ngId]) {
           continue

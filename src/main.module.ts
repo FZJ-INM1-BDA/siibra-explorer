@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Store, select } from "@ngrx/store";
@@ -24,7 +24,6 @@ import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
-import 'src/theme.scss'
 import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { MesssagingModule } from './messaging/module';
@@ -41,6 +40,7 @@ import {
   atlasSelection,
   RootStoreModule,
   getStoreEffects,
+  userPreference,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
 import { map } from 'rxjs/operators';
@@ -51,6 +51,8 @@ import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerC
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
+import { environment } from './environments/environment.common';
+import { SAPI } from './atlasComponents/sapi';
 
 @NgModule({
   imports: [
@@ -173,12 +175,39 @@ import { ViewerCommonEffects } from './viewerModule';
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService) => {
+      useFactory: (authSvc: AuthService, store: Store) => {
+        window['setExperimentalFlag'] = (flag: boolean) => {
+          store.dispatch(userPreference.actions.setShowExperimental({
+            flag
+          }))
+        }
         authSvc.authReloadState()
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [ AuthService ]
+      deps: [ AuthService, Store ]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (sapi: SAPI, document: Document) => {
+        
+        const rootEl = document.querySelector("atlas-viewer")
+        const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+        
+        const { SIIBRA_API_ENDPOINTS } = environment
+        const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
+        return async () => {
+          try {
+            const url = await SAPI.VerifyEndpoints(endpoints)
+            sapi.verifiedSapiEndpoint$.next(url)
+            sapi.verifiedSapiEndpoint$.complete()
+          } catch (e) {
+            SAPI.ErrorMessage = e.toString()
+          }
+        }
+      },
+      multi: true,
+      deps: [ SAPI, DOCUMENT ]
     }
   ],
   bootstrap: [

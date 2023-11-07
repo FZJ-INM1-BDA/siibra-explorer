@@ -1,6 +1,5 @@
 import { Component, HostListener, Inject, OnDestroy, Output, EventEmitter, Optional, ViewChild, TemplateRef } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { combineLatest, Observable, Subject, Subscription } from "rxjs";
 import { distinctUntilChanged, map, mapTo, shareReplay, startWith, switchMap, switchMapTo } from "rxjs/operators";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../util";

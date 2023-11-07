@@ -1,9 +1,11 @@
-import { Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { NewestRelease } from '../newestRelease.directive'
 import { HttpClient } from '@angular/common/http'
 import { map } from 'rxjs/operators'
-import { MatDialog } from '@angular/material/dialog'
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { HowToCite } from '../howToCite/howToCite.component'
+import { SAPI, EXPECTED_SIIBRA_API_VERSION } from "src/atlasComponents/sapi/sapi.service"
+import { environment } from "src/environments/environment"
 
 @Component({
   selector: 'iav-about',
@@ -11,9 +13,12 @@ import { HowToCite } from '../howToCite/howToCite.component'
   styleUrls: [
     './about.style.css',
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class AboutCmp extends NewestRelease{
+  public versionString: string
+
   public supportEmailAddress: string = `support@ebrains.eu`
   public contactEmailHref: string = `mailto:${this.supportEmailAddress}?Subject=[siibra-explorer]%20Queries`
 
@@ -30,6 +35,7 @@ export class AboutCmp extends NewestRelease{
 
   constructor(http: HttpClient, private dialog: MatDialog){
     super(http)
+    this.versionString = `${environment.VERSION}-${environment.GIT_HASH}:${EXPECTED_SIIBRA_API_VERSION}:${SAPI.API_VERSION}`
   }
 
   showHowToCite(){

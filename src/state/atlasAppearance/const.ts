@@ -5,6 +5,10 @@ type CustomLayerBase = {
   id: string
 }
 
+type NgLayerBase = {
+  clType: 'customlayer/nglayer' | 'baselayer/nglayer'
+} & CustomLayerBase
+
 export type ColorMapCustomLayer = {
   clType: 'customlayer/colormap' | 'baselayer/colormap'
   colormap: WeakMap<SxplrRegion, number[]>
@@ -23,18 +27,39 @@ export type ThreeSurferCustomLabelLayer = {
   laterality: 'left' | 'right'
 } & CustomLayerBase
 
-export type NgLayerCustomLayer = {
-  clType: 'customlayer/nglayer' | 'baselayer/nglayer'
+export type NewNgLayerOption = {
+  legacySpecFlag: 'new'
+  type: 'image'
+  name?: string
+  blend: 'default' | 'additive'
+  visible: boolean
+  shader?: string
+  opacity?: number
+  source: {
+    url: string
+    transform: {
+      inputDimensions: Record<string, [number, string]>
+      outputDimensions: Record<string, [number, string]>
+      matrix: number[][]
+      sourceRank: number
+    }
+  }
+} & NgLayerBase
+
+export type OldNgLayerCustomLayer = {
+  legacySpecFlag: 'old'
   source: string
   visible?: boolean
   shader?: string
   transform?: number[][]
   opacity?: number
   segments?: (number|string)[]
-  // type?: string
+  type?: string
 
   // annotation?: string // TODO what is this used for?
-} & CustomLayerBase
+} & NgLayerBase
+
+export type NgLayerCustomLayer = NewNgLayerOption | OldNgLayerCustomLayer
 
 /**
  * custom layer is a catch all term that apply **any** special looks

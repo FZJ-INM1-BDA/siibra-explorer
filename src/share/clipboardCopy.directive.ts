@@ -1,6 +1,5 @@
 import { Directive, HostListener, Input } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { Clipboard } from '@angular/cdk/clipboard'
+import { Clipboard, MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 
 @Directive({
   selector: '[iav-clipboard-copy]',

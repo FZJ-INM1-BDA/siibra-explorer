@@ -3,19 +3,21 @@ import { of } from "rxjs"
 import { SAPI } from "src/atlasComponents/sapi"
 import { RouteStateTransformSvc } from "./routeStateTransform.service"
 import { DefaultUrlSerializer } from "@angular/router"
-import * as nehubaConfigService from "src/viewerModule/nehuba/config.service"
 import { atlasSelection, userInteraction } from "src/state"
-import { encodeNumber } from "./cipher"
 import { QuickHash } from "src/util/fn"
+import { NEHUBA_CONFIG_SERVICE_TOKEN } from "src/viewerModule/nehuba/config.service"
+import { MockStore, provideMockStore } from "@ngrx/store/testing"
 
 const serializer = new DefaultUrlSerializer()
 
 describe("> routeStateTransform.service.ts", () => {
   describe("> RouteStateTransformSvc", () => {
     let svc: RouteStateTransformSvc
+    const getParcNgIdSpy = jasmine.createSpy("getParcNgIdSpy")
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
+          provideMockStore(),
           RouteStateTransformSvc,
           {
             provide: SAPI,
@@ -25,6 +27,13 @@ describe("> routeStateTransform.service.ts", () => {
               getParcDetail: jasmine.createSpy('getParcDetail'),
               getParcRegions: jasmine.createSpy('getParcRegions'),
               getRegionLabelIndices: jasmine.createSpy('getRegionLabelIndices')
+            }
+          },
+          {
+            provide: NEHUBA_CONFIG_SERVICE_TOKEN,
+            useValue: {
+              getParcNgId: getParcNgIdSpy,
+              getNehubaConfig: () => {}
             }
           }
         ]
@@ -107,19 +116,7 @@ describe("> routeStateTransform.service.ts", () => {
     describe("> cvtStateToRoute", () => {
 
       describe('> should be able encode region properly', () => {
-        let getParcNgId: jasmine.Spy = jasmine.createSpy('getParcNgId')
-        let atlasSelectionSpy: Record<string, jasmine.Spy> = {
-          selectedAtlas: jasmine.createSpy('selectedAtlas'),
-          selectedParcellation: jasmine.createSpy('selectedParcellation'),
-          selectedTemplate: jasmine.createSpy('selectedTemplate'),
-          selectedRegions: jasmine.createSpy('selectedRegions'),
-          standaloneVolumes: jasmine.createSpy('standaloneVolumes'),
-          navigation: jasmine.createSpy('navigation'),
-        }
-
-        let userInteractionSpy: Record<string, jasmine.Spy> = {
-          selectedFeature: jasmine.createSpy('selectedFeature')
-        }
+        
 
         const altasObj = {"@id": 'foo-bar-a'}
         const templObj = {"@id": 'foo-bar-t'}
@@ -129,52 +126,29 @@ describe("> routeStateTransform.service.ts", () => {
         const navigation = null
 
         beforeEach(() => {
-          spyOnProperty(nehubaConfigService, 'getParcNgId').and.returnValue(getParcNgId)
-          spyOnProperty(atlasSelection, 'selectors').and.returnValue(atlasSelectionSpy)
-          spyOnProperty(userInteraction, 'selectors').and.returnValue(userInteractionSpy)
-
-          atlasSelectionSpy.selectedAtlas.and.returnValue(altasObj)
-          atlasSelectionSpy.selectedParcellation.and.returnValue(templObj)
-          atlasSelectionSpy.selectedTemplate.and.returnValue(parcObj)
-          atlasSelectionSpy.selectedRegions.and.returnValue(regions)
-          atlasSelectionSpy.standaloneVolumes.and.returnValue(standAloneVolumes)
-          atlasSelectionSpy.navigation.and.returnValue(navigation)
-
-          userInteractionSpy.selectedFeature.and.returnValue(null)
+          const store = TestBed.inject(MockStore)
+          store.overrideSelector(atlasSelection.selectors.selectedAtlas, altasObj as any)
+          store.overrideSelector(atlasSelection.selectors.selectedParcellation, templObj as any)
+          store.overrideSelector(atlasSelection.selectors.selectedTemplate, parcObj as any)
+          store.overrideSelector(atlasSelection.selectors.selectedRegions, regions as any)
+          store.overrideSelector(atlasSelection.selectors.standaloneVolumes, standAloneVolumes as any)
+          store.overrideSelector(atlasSelection.selectors.navigation, navigation as any)
+          
+          store.overrideSelector(userInteraction.selectors.selectedFeature, null)
+          
         })
 
         afterEach(() => {
-          getParcNgId.calls.reset()
-          for (const spyRecord of [atlasSelectionSpy, userInteractionSpy]) {
-            for (const key in spyRecord) {
-              spyRecord[key].calls.reset()
-            }
-          }
+          getParcNgIdSpy.calls.reset()
         })
 
-        it('> calls correct functions', async () => {
-
-          getParcNgId.and.returnValue('foo-bar')
-
-          const state = {}
-          const svc = TestBed.inject(RouteStateTransformSvc)
-          try {
-            const s = await svc.cvtStateToRoute(state as any)
-          } catch (e) {
-            
-          }
-
-          for (const key in atlasSelectionSpy) {
-            expect(atlasSelectionSpy[key]).toHaveBeenCalledTimes(1)
-          }
-        })
 
         it('> regular ngId', async () => {
           const ngId = 'foobar'
           const labelIndex = 124
           const decoded = 'buzz'
           
-          getParcNgId.and.returnValue(ngId)
+          getParcNgIdSpy.and.returnValue(ngId)
 
           const state = {}
           const svc = TestBed.inject(RouteStateTransformSvc)
@@ -184,7 +158,7 @@ describe("> routeStateTransform.service.ts", () => {
           getRegionLabelIndicesSpy.and.resolveTo(labelIndex)
           const s = await svc.cvtStateToRoute(state as any)
           
-          expect(getParcNgId).not.toHaveBeenCalled()
+          expect(getParcNgIdSpy).not.toHaveBeenCalled()
           expect(getRegionLabelIndicesSpy).not.toHaveBeenCalled()
 
           expect(s).toContain(`rn:${QuickHash.GetHash(regions[0].name)}`)

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, Observable, of, Subscription } from "rxjs";
+import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -9,12 +9,17 @@ import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
-import { Feature, SxplrAtlas, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+
+interface HasName {
+  name: string
+}
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -40,28 +45,19 @@ import { wait } from "src/util/fn";
         animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
       ])
     ]),
-    trigger('openCloseAnchor', [
-      state('open', style({
-        transform: 'translateY(0)'
-      })),
-      state('closed', style({
-        transform: 'translateY(100vh)'
-      })),
-      transition('open => closed', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ]),
-      transition('closed => open', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ])
-    ]),
   ],
   providers: [
     DialogService
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
 export class ViewerCmp implements OnDestroy {
+
+  public readonly destroy$ = inject(DestroyDirective).destroyed$
 
   @ViewChild('voiFeatureEntryCmp', { read: EntryComponent })
   voiCmp: EntryComponent
@@ -139,15 +135,46 @@ export class ViewerCmp implements OnDestroy {
     select(atlasSelection.selectors.relevantSelectedPoint)
   )
 
-  public view$ = combineLatest([
+  #currentMap$ = combineLatest([
+    this.#templateSelected$,
+    this.#parcellationSelected$
+  ]).pipe(
+    switchMap(([tmpl, parc]) => tmpl && parc ? this.sapi.getLabelledMap(parc, tmpl) : of(null))
+  )
+  
+  #fullNavBarSwitch$ = new BehaviorSubject<boolean>(false)
+  #halfNavBarSwitch$ = new BehaviorSubject<boolean>(true)
+
+  #view0$ = combineLatest([
     this.#selectedRegions$,
     this.#viewerMode$,
     this.#selectedFeature$,
     this.#selectedPoint$,
     this.#templateSelected$,
-    this.#parcellationSelected$
+    this.#parcellationSelected$,
   ]).pipe(
-    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => {
+    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => ({
+      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation
+    }))
+  )
+
+  #view1$ = combineLatest([
+    this.#currentMap$,
+    this.allAvailableRegions$,
+    this.#fullNavBarSwitch$,
+    this.#halfNavBarSwitch$,
+  ]).pipe(
+    map(( [ currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded ] ) => ({
+      currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded
+    }))
+  )
+
+  public view$ = combineLatest([
+    this.#view0$,
+    this.#view1$,
+  ]).pipe(
+    map(([v0, v1]) => ({ ...v0, ...v1 })),
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -162,6 +189,10 @@ export class ViewerCmp implements OnDestroy {
       if (!!selectedTemplate) {
         spatialObjectSubtitle = selectedTemplate.name
       }
+
+      const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
+
+      const labelMappedRegionNames = currentMap && Object.keys(currentMap.indices) || []
       return {
         viewerMode,
         selectedRegions,
@@ -169,6 +200,10 @@ export class ViewerCmp implements OnDestroy {
         selectedPoint,
         selectedTemplate,
         selectedParcellation,
+        labelMappedRegionNames,
+        allAvailableRegions,
+        leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
+        branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
 
         /**
          * Selected Spatial Object
@@ -182,7 +217,9 @@ export class ViewerCmp implements OnDestroy {
          * and the full left side bar should not be expandable
          * if it is already expanded, it should collapse
          */
-        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint
+        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint,
+        fullSidenavExpanded,
+        halfSidenavExpanded,
       }
     }),
     shareReplay(1),
@@ -190,6 +227,9 @@ export class ViewerCmp implements OnDestroy {
 
   @ViewChild('viewerStatusCtxMenu', { read: TemplateRef })
   private viewerStatusCtxMenu: TemplateRef<any>
+
+  @ViewChild('lastViewedPointTmpl', { read: TemplateRef })
+  private lastViewedPointTmpl: TemplateRef<unknown>
 
   @ViewChild('viewerStatusRegionCtxMenu', { read: TemplateRef })
   private viewerStatusRegionCtxMenu: TemplateRef<any>
@@ -203,6 +243,55 @@ export class ViewerCmp implements OnDestroy {
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
   ){
+
+    this.view$.pipe(
+      takeUntil(this.destroy$),
+      map(({ selectedFeature, selectedPoint, selectedRegions, viewerMode }) => ({
+        selectedFeature,
+        selectedPoint,
+        selectedRegions,
+        viewerMode,
+      })),
+      distinctUntilChanged((o, n) => {
+        if (o.viewerMode !== n.viewerMode) {
+          return false
+        }
+        if (o.selectedFeature?.id !== n.selectedFeature?.id) {
+          return false
+        }
+        if (o.selectedPoint?.["@type"] !== n.selectedPoint?.["@type"]) {
+          return false
+        }
+        if (
+          n.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
+          && o.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
+        ) {
+          const newCoords = n.selectedPoint.coordinates.map(v => v.value)
+          const oldCoords = o.selectedPoint.coordinates.map(v => v.value)
+          if ([0, 1, 2].some(idx => newCoords[idx] !== oldCoords[idx])) {
+            return false
+          }
+        }
+        if (o.selectedRegions.length !== n.selectedRegions.length) {
+          return false
+        }
+        const oldRegNames = o.selectedRegions.map(r => r.name)
+        const newRegName = n.selectedRegions.map(r => r.name)
+        if (oldRegNames.some(name => !newRegName.includes(name))) {
+          return false
+        }
+        return true
+      }),
+      debounceTime(16),
+      map(({ selectedFeature, selectedRegions, selectedPoint, viewerMode }) => {
+        return !!viewerMode
+        || !!selectedFeature
+        || selectedRegions.length > 0
+        || !!selectedPoint
+      })
+    ).subscribe(flag => {
+      this.#fullNavBarSwitch$.next(flag)
+    })
 
     this.subscriptions.push(
       this.templateSelected$.subscribe(
@@ -250,6 +339,17 @@ export class ViewerCmp implements OnDestroy {
   ngAfterViewInit(): void{
     const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
 
+      if (this.#lastSelectedPoint && this.lastViewedPointTmpl) {
+        const { point, template, face, vertices } = this.#lastSelectedPoint
+        append({
+          tmpl: this.lastViewedPointTmpl,
+          data: {
+            point, face, vertices,
+            template
+          },
+          order: 15
+        })
+      }
       /**
        * first append general viewer info
        */
@@ -313,7 +413,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public selectRoi(roi: SxplrRegion): void {
+  public selectRoi(roi: SxplrRegion) {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -330,6 +430,8 @@ export class ViewerCmp implements OnDestroy {
   }
 
   public selectPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
+    this.#lastSelectedPoint = { ...pointSpec, template }
+
     const { point, face, vertices } = pointSpec
     const id = `${template.id}-${point ? point.join(',') : face}`
     let pointOfInterest: TFace | TSandsPoint
@@ -357,12 +459,18 @@ export class ViewerCmp implements OnDestroy {
     }
     if (pointOfInterest) {
       this.store$.dispatch(
+        atlasSelection.actions.selectATPById({
+          templateId: template.id
+        })
+      )
+      this.store$.dispatch(
         atlasSelection.actions.selectPoint({
           point: pointOfInterest
         })
       )
     }
   }
+  #lastSelectedPoint: { point?: number[], face?: number, vertices?: number[], template: SxplrTemplate }
 
   public clearPoint(){
     this.store$.dispatch(
@@ -405,6 +513,14 @@ export class ViewerCmp implements OnDestroy {
           )
         }
       }
+      if (event.data.viewerType === "threeSurfer") {
+        const { regions=[] } = (event.data as TContextArg<"threeSurfer">).payload
+        this.store$.dispatch(
+          userInteraction.actions.mouseoverRegions({
+            regions: regions as SxplrRegion[]
+          })
+        )
+      }
       break
     default:
     }
@@ -444,9 +560,41 @@ export class ViewerCmp implements OnDestroy {
   voiFeatureEntryCmp: EntryComponent
 
   async pullAllVoi(){
+    await wait(320)
     if (this.voiFeatureEntryCmp){
-      await wait(320)
       this.voiFeatureEntryCmp.pullAll()
     }
+  }
+
+  selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
+    this.store$.dispatch(
+      atlasSelection.actions.selectATPById({
+        parcellationId: regParc?.parcellation.id,
+        regionId: regParc?.region?.name
+      })
+    )
+  }
+
+  controlFullNav(flag: boolean){
+    this.#fullNavBarSwitch$.next(flag)
+  }
+
+  controlHalfNav(flag: boolean) {
+    this.#halfNavBarSwitch$.next(flag)
+    if (flag && this.#fullyRestoreToken) {
+      this.#fullNavBarSwitch$.next(flag)
+      this.#fullyRestoreToken = false
+    }
+  }
+
+  #fullyRestoreToken = false
+  fullyClose(){
+    this.#fullyRestoreToken = true
+    this.controlFullNav(false)
+    this.controlHalfNav(false)
+  }
+
+  nameEql(a: HasName, b: HasName){
+    return a.name === b.name
   }
 }

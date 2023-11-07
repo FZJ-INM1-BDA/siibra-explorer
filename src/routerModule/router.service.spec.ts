@@ -4,10 +4,9 @@ import { hot } from "jasmine-marbles"
 import { of, Subject } from "rxjs"
 import { SAPI } from "src/atlasComponents/sapi"
 import { RouterService } from "./router.service"
-import * as util from './util'
 import { provideMockStore } from "@ngrx/store/testing"
+import { DECODE_ENCODE } from "./util"
 
-const { DummyCmp } = util
 
 const mockRouter = {
   events: new Subject(),
@@ -21,13 +20,13 @@ const mockRouter = {
 
 describe('> router.service.ts', () => {
   describe('> RouterService', () => {
+    
+    const decodeCustomStateSpy = jasmine.createSpy("decodeCustomState")
+    const verifyCustomStateSpy = jasmine.createSpy("verifyCustomState")
     beforeEach(() => {
 
       TestBed.configureTestingModule({
         imports: [],
-        declarations: [
-          DummyCmp,
-        ],
         providers: [
           provideMockStore(),
           {
@@ -39,9 +38,17 @@ describe('> router.service.ts', () => {
           {
             provide: Router,
             useValue: mockRouter
+          },
+          {
+            provide: DECODE_ENCODE,
+            useValue: {
+              decodeCustomState: decodeCustomStateSpy,
+              verifyCustomState: verifyCustomStateSpy
+            }
           }
         ]
       })
+      verifyCustomStateSpy.and.returnValue(true)
     })
 
     afterEach(() => {
@@ -50,16 +57,11 @@ describe('> router.service.ts', () => {
     })
 
     describe('> customRoute$', () => {
-      let decodeCustomStateSpy: jasmine.Spy
 
       let rService: RouterService
-      beforeEach(() => {
-        decodeCustomStateSpy = jasmine.createSpy('decodeCustomState')
-        spyOnProperty(util, 'decodeCustomState').and.returnValue(decodeCustomStateSpy)
-      })
-
       afterEach(() => {
         decodeCustomStateSpy.calls.reset()
+        verifyCustomStateSpy.calls.reset()
       })
 
       describe("> state has custom state encoded", () => {

@@ -370,6 +370,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
         selectedView
       }
     }),
+    distinctUntilChanged((o, n) => o?.feature_id === n?.feature_id && o?.subject === n?.subject && o?.selectedView === n?.selectedView && o?.parcellation?.id === n?.parcellation?.id),
     shareReplay(1),
   )
 
@@ -450,6 +451,7 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
   )
   
   view$ = combineLatest([
+    this.busy$,
     this.selectedDataset$,
     this.formValue$,
     this.#fetchingMatrix$,
@@ -459,13 +461,16 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
     ),
     this.region$,
   ]).pipe(
-    map(([sDs, form, fetchingMatrix, pureConnections, region]) => {
+    map(([busy, sDs, form, fetchingMatrix, pureConnections, region]) => {
       return {
         showSubject: sDs && form.selectedView === "subject",
         numSubjects: sDs?.subjects.length,
-        fetchingMatrix,
         connections: pureConnections,
         region,
+        showAverageToggle: form.selectedCohort !== null && typeof form.selectedCohort !== "undefined",
+        busy: busy || fetchingMatrix,
+        selectedSubject: (sDs?.subjects || [])[form.selectedSubjectIndex],
+        selectedDataset: form?.selectedDatasetIndex
       }
     }),
     shareReplay(1),

@@ -74,6 +74,7 @@ export {
 } from "src/viewerModule/nehuba/config.service/type"
 
 import { TThreeSurferMesh, TThreeMesh, TThreeMeshLabel } from "src/viewerModule/threeSurfer/types"
+import { MetaV1Schema } from "./typeV3"
 export { TThreeSurferMesh, TThreeMesh, TThreeMeshLabel }
 
 /**
@@ -108,6 +109,7 @@ export type VoiFeature = {
     url: string
     transform: number[][]
     info: Record<string, any>
+    meta?: MetaV1Schema
   }
 } & Feature
 
@@ -118,13 +120,6 @@ export type CorticalFeature<T extends CorticalDataType, IndexType extends string
   corticalProfile?: T[]
 } & Feature
 
-type TabularDataType = number | string | number[]
-
-export type TabularFeature<T extends TabularDataType> = {
-  index: unknown[]
-  columns: unknown[]
-  data?: T[][]
-} & Feature
 
 export type GenericInfo = {
   name: string

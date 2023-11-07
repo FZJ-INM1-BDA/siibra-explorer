@@ -1,6 +1,8 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
-import { getUuid } from "src/util/fn";
+import { getUuid, waitFor } from "src/util/fn";
+import { PeriodicSvc } from "src/util/periodic.service";
+import { NehubaLayerControlService } from "src/viewerModule/nehuba/layerCtrl.service";
 
 export type TNgAnnotationEv = {
   pickedAnnotationId: string
@@ -38,6 +40,7 @@ type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
 type AnnotationRef = Record<string, unknown>
 
 interface NgAnnotationLayer {
+  isReady: () => boolean
   layer: {
     localAnnotations: {
       references: {
@@ -52,7 +55,18 @@ interface NgAnnotationLayer {
     registerDisposer(fn: () => void): void
   }
   setVisible(flag: boolean): void
+  layerChanged: {
+    add(cb: () => void): void
+  }
+  visible: boolean
 }
+
+export const ID_AFFINE = [
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1],
+]
 
 export class AnnotationLayer {
   static Map = new Map<string, AnnotationLayer>()
@@ -72,7 +86,8 @@ export class AnnotationLayer {
   private idset = new Set<string>()
   constructor(
     private name: string = getUuid(),
-    private color="#ffffff"
+    private color="#ffffff",
+    affine=ID_AFFINE,
   ){
     const layerSpec = this.viewer.layerSpecification.getLayer(
       this.name,
@@ -81,12 +96,7 @@ export class AnnotationLayer {
         "annotationColor": this.color,
         "annotations": [],
         name: this.name,
-        transform: [
-          [1, 0, 0, 0],
-          [0, 1, 0, 0],
-          [0, 0, 1, 0],
-          [0, 0, 0, 1],
-        ]
+        transform: affine,
       }
     )
     this.nglayer = this.viewer.layerManager.addManagedLayer(layerSpec)
@@ -103,15 +113,18 @@ export class AnnotationLayer {
       this._onHover.next(payload)
     })
     this.onDestroyCb.push(res)
-    
+
     this.nglayer.layer.registerDisposer(() => {
-      this.dispose()
+      // TODO registerdisposer seems to fire without the layer been removed
+      // Thus it cannot be relied upon for cleanup
     })
+    NehubaLayerControlService.RegisterLayerName(this.name)
   }
   setVisible(flag: boolean){
     this.nglayer && this.nglayer.setVisible(flag)
   }
   dispose() {
+    NehubaLayerControlService.DeregisterLayerName(this.name)
     AnnotationLayer.Map.delete(this.name)
     this._onHover.complete()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
@@ -124,19 +137,42 @@ export class AnnotationLayer {
     }
   }
 
-  addAnnotation(spec: AnnotationSpec){
-    if (!this.nglayer) {
-      throw new Error(`layer has already been disposed`)
-    }
+  /**
+   * Unsafe method. Caller should ensure this.nglayer.isReady()
+   * 
+   * @param spec 
+   */
+  #addSingleAnn(spec: AnnotationSpec) {
     const localAnnotations = this.nglayer.layer.localAnnotations
     this.idset.add(spec.id)
     const annSpec = this.parseNgSpecType(spec)
     localAnnotations.add(
       annSpec
-    )
+    )  
   }
-  removeAnnotation(spec: { id: string }) {
-    if (!this.nglayer) return
+
+  async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
+    if (!this.nglayer) {
+      throw new Error(`layer has already been disposed`)
+    }
+
+    PeriodicSvc.AddToQueue(() => {
+      if (this.nglayer.isReady()) {
+        if (Array.isArray(spec)) {
+          for (const item of spec) {
+            this.#addSingleAnn(item)
+          }
+        } else {
+          this.#addSingleAnn(spec)
+        }
+        
+        return true
+      }
+      return false
+    })
+  }
+  async removeAnnotation(spec: { id: string }) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
     const { localAnnotations } = this.nglayer.layer
     this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)
@@ -145,9 +181,14 @@ export class AnnotationLayer {
       localAnnotations.references.delete(spec.id)
     }
   }
-  updateAnnotation(spec: AnnotationSpec) {
-    const localAnnotations = this.nglayer?.layer?.localAnnotations
-    if (!localAnnotations) return
+
+  /**
+   * Unsafe method. Caller should ensure this.nglayer.layer is defined
+   * 
+   * @param spec 
+   */
+  #updateSingleAnn(spec: AnnotationSpec) {
+    const { localAnnotations } = this.nglayer.layer
     const ref = localAnnotations.references.get(spec.id)
     const _spec = this.parseNgSpecType(spec)
     if (ref) {
@@ -161,15 +202,23 @@ export class AnnotationLayer {
     }
   }
 
+  async updateAnnotation(spec: AnnotationSpec|AnnotationSpec[]) {
+    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+    if (Array.isArray(spec)) {
+      for (const item of spec){
+        this.#updateSingleAnn(item)
+      }
+      return
+    }
+    this.#updateSingleAnn(spec)
+  }
+
   private get viewer() {
     if ((window as any).viewer) return (window as any).viewer
     throw new Error(`window.viewer not defined`)
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{
-    const voxelSize = this.viewer.navigationState.voxelSize.toJSON()
-    const sanitizePoint = (p: [number, number, number]) => p.map((v, idx) => v / voxelSize[idx]) as [number, number, number]
-    const needSanitizePosition = voxelSize[0] !== 1 || voxelSize[1] !== 1 || voxelSize[2] !== 1
     const overwrite: Partial<_AnnotationSpec> = {}
     switch (spec.type) {
     case "point": {
@@ -187,15 +236,6 @@ export class AnnotationLayer {
     default: throw new Error(`overwrite type lookup failed for ${(spec as any).type}`)
     }
 
-    /**
-     * The unit of annotation(s) depends on voxel size. If it is 1,1,1 then it would be in um, but often it is not.
-     * If not sanitized, the annotation can be miles off.
-     */
-    if (needSanitizePosition) {
-      for (const key of ['point', 'pointA', 'pointB'] ) {
-        if (!!spec[key]) overwrite[key] = sanitizePoint(spec[key])
-      }
-    }
     return {
       ...spec,
       ...overwrite,

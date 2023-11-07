@@ -1,5 +1,5 @@
 import { UrlSegment, UrlTree } from "@angular/router"
-import { Component } from "@angular/core"
+import { Component, InjectionToken } from "@angular/core"
 
 export const encodeId = (id: string) => id && id.replace(/\//g, ':')
 export const decodeId = (codedId: string) => codedId && codedId.replace(/:/g, '/')
@@ -68,3 +68,10 @@ export const routes = [{
   path: '**',
   component: DummyCmp
 }]
+
+export const DECODE_ENCODE = new InjectionToken<DecodeEncode>("DECODE_ENCODE")
+
+export interface DecodeEncode {
+  decodeCustomState: (fullPath: UrlTree) => Record<string, string>
+  verifyCustomState: (key: string) => boolean
+}

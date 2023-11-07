@@ -1,10 +1,12 @@
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
-import { Component, OnDestroy, Optional } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { Subscription } from "rxjs";
+import { Component, Optional, inject } from "@angular/core";
 import { getUuid } from "src/util/fn";
 import { timedValues } from "src/util/generator";
 import { AUTO_ROTATE, TAutoRotatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
+import { FormControl, FormGroup } from "@angular/forms";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { debounceTime, filter, takeUntil } from "rxjs/operators";
 
 type TStoredState = {
   name: string
@@ -18,22 +20,37 @@ type TStoredState = {
   templateUrl: './keyframeCtrl.template.html',
   styleUrls: [
     './keyframeCtrl.style.css'
-  ]
+  ],
+  hostDirectives: [DestroyDirective]
 })
 
-export class KeyFrameCtrlCmp implements OnDestroy {
+export class KeyFrameCtrlCmp {
+
+  #onDestroy$ = inject(DestroyDirective).destroyed$
 
   public loopFlag = false
   public linearFlag = false
   public currState: any
-  private currViewerType: string
+  public currViewerType: string
   public internalStates: TStoredState[] = []
 
-  private subs: Subscription[] = []
+  autoRotateFormGrp = new FormGroup({
+    autorotate: new FormControl<boolean>(false),
+    autoRotateSpeed: new FormControl<number>({
+      value: 2,
+      disabled: true,
+    }),
+    autorotateReverse: new FormControl<boolean>({
+      value: false,
+      disabled: true,
+    })
+  })
 
-  ngOnDestroy(){
-    while(this.subs.length) this.subs.pop().unsubscribe()
-  }
+  frameFormGrp = new FormGroup({
+    loop: new FormControl<boolean>(false),
+    linearCamera: new FormGroup<boolean>(false),
+    steps: new FormGroup({})
+  })
 
   constructor(
     private snackbar: MatSnackBar,
@@ -44,13 +61,39 @@ export class KeyFrameCtrlCmp implements OnDestroy {
       return
     }
 
-    this.subs.push(
-      viewerInternalSvc.viewerInternalState$.pipe(
-      ).subscribe(state => {
-        this.currState = state.payload
-        this.currViewerType = state.viewerType
-      })
-    )
+    viewerInternalSvc.viewerInternalState$.pipe(
+      takeUntil(this.#onDestroy$),
+      filter(v => !!v),
+    ).subscribe(state => {
+      this.currState = state.payload
+      this.currViewerType = state.viewerType
+    })
+
+    this.autoRotateFormGrp.controls.autorotate.valueChanges.pipe(
+      takeUntil(this.#onDestroy$)
+    ).subscribe(value => {
+      const { autoRotateSpeed, autorotateReverse } = this.autoRotateFormGrp.controls
+      if (value) {
+        autoRotateSpeed.enable()
+        autorotateReverse.enable()
+      } else {
+        autoRotateSpeed.disable()
+        autorotateReverse.disable()
+      }
+    })
+
+    this.autoRotateFormGrp.valueChanges.pipe(
+      debounceTime(160),
+      takeUntil(this.#onDestroy$),
+    ).subscribe({
+      next: values => {
+        const { autoRotateSpeed, autorotate, autorotateReverse } = values
+        this.#setAutoRotate(autorotate, autoRotateSpeed, autorotateReverse)
+      },
+      complete: () => {
+        this.#setAutoRotate(false, 0, false)
+      }
+    })
   }
 
   addKeyFrame(){
@@ -65,41 +108,15 @@ export class KeyFrameCtrlCmp implements OnDestroy {
     ]
   }
 
-  private _autoRotateSpeed = 2
-  get autoRotateSpeed(){
-    return this._autoRotateSpeed
-  }
-  set autoRotateSpeed(val: number){
-    this._autoRotateSpeed = val
-    this.updateAutoRotate()
-  }
-
-  private _autoRotateReverse = false
-  get autoRotateReverse(){
-    return this._autoRotateReverse
-  }
-  set autoRotateReverse(val: boolean){
-    this._autoRotateReverse = val
-    this.updateAutoRotate()
-  }
-
-  private _autoRotateFlag = false
-  get autoRotateFlag(){
-    return this._autoRotateFlag
-  }
-  set autoRotateFlag(val: boolean){
-    this._autoRotateFlag = val
-    this.updateAutoRotate()
-  }
-
-  private updateAutoRotate(){
+  #setAutoRotate(play: boolean, speed: number, reverse: boolean) {
+    
     this.viewerInternalSvc.applyInternalState<TAutoRotatePayload>({
       "@id": getUuid(),
       "@type": 'TViewerInternalStateEmitterEvent',
       payload: {
-        play: this._autoRotateFlag,
-        speed: this._autoRotateSpeed,
-        reverse: this._autoRotateReverse
+        play,
+        speed,
+        reverse,
       },
       viewerType: AUTO_ROTATE
     })

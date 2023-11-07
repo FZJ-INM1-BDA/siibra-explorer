@@ -1,7 +1,6 @@
 import { CdkTableDataSourceInput } from '@angular/cdk/table';
 import { Pipe, PipeTransform } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatTableDataSource } from 'src/sharedModules/angularMaterial.exports'
 import { components } from "src/atlasComponents/sapi/schemaV3"
 type DF = components["schemas"]["DataFrameModel"]
 

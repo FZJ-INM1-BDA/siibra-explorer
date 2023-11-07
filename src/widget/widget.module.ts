@@ -3,19 +3,13 @@ import { CommonModule } from "@angular/common";
 import { ComponentsModule } from "src/components";
 import { WidgetCanvas } from "./widgetCanvas.directive";
 import { WidgetPortal } from "./widgetPortal/widgetPortal.component"
-import { MatCardModule } from "@angular/material/card";
-import { DragDropModule } from "@angular/cdk/drag-drop";
-import { MatButtonModule } from "@angular/material/button";
 import { PortalModule } from "@angular/cdk/portal";
-import { MatTooltipModule } from "@angular/material/tooltip";
 import { WidgetStateIconPipe } from "./widgetStateIcon.pipe";
+import { AngularMaterialModule } from "src/sharedModules";
 
 @NgModule({
   imports:[
-    MatCardModule,
-    DragDropModule,
-    MatButtonModule,
-    MatTooltipModule,
+    AngularMaterialModule,
     PortalModule,
     CommonModule,
     ComponentsModule,

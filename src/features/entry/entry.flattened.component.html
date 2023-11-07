@@ -79,50 +79,86 @@
             #filterFeatureCls="featureFilterDirective">
 
             <div class="mat-chip-inner-container">
-
-                <button mat-icon-button matTooltip="Reset filter"
-                    (click)="filterFeatureCls.setAll(true)">
+                <button mat-stroked-button
+                    matTooltip="Filters"
+                    [color]="(filterFeatureCls.unchecked$ | async).length > 0 ? 'primary' : 'default'"
+                    (click)="openDialog(filterDialog)">
                     <i class="fas fa-filter"></i>
+                    <span class="sxplr-ml-1">Filter</span>
+                    <ng-template [ngIf]="(filterFeatureCls.unchecked$ | async).length > 0">
+                        ({{ (filterFeatureCls.unchecked$ | async).length }})
+                    </ng-template>
                 </button>
 
-                <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-grpFeat>
-                    <ng-template [ngIf]="grpFeat.meta.total > 0">
-
-                        <ng-template [ngIf]="filterFeatureCls.checked$ | async | grpFeatToName | includes : grpFeat.meta.displayName"
-                            [ngIfThen]="selectedTmpl"
-                            [ngIfElse]="notSelectedTmpl">
+                <div class="text-muted">
+                    <ng-template [ngTemplateOutlet]="filterTallyTmpl">
+                    </ng-template>
+                </div>
+                
+                <ng-template #filterDialog>
+                    <h1 mat-dialog-title>
+                        Filter data features
+                    </h1>
+                    <div mat-dialog-content>
+                        <ng-template [ngIf]="!(filterFeatureCls.items) || !(filterFeatureCls.checked$)">
+                            No items to filter
                         </ng-template>
 
-                        <ng-template #textTmpl>
-                            <span>
-                                {{ grpFeat.meta.displayName }}
-                            </span>
-                            <span class="text-muted1">
-                                ({{ grpFeat.meta.total }})
-                            </span>
-                        </ng-template>
-                        <ng-template #selectedTmpl>
-                            <button mat-flat-button
-                                (click)="filterFeatureCls.toggle(grpFeat)"
-                                color="primary">
-                                <i class="fas fa-eye"></i>
-                                <ng-template [ngTemplateOutlet]="textTmpl">
+                        <!-- select all checkbox -->
+                        <mat-selection-list>
+                            <mat-list-option [selected]="(filterFeatureCls.unchecked$ | async).length === 0"
+                                (click)="listOption.selected ? filterList.selectAll() : filterList.deselectAll()"
+                                #listOption>
+                                <span class="text-muted sxplr-mr-2">
+                                    <ng-template [ngTemplateOutlet]="filterTallyTmpl"></ng-template>
+                                </span>
+                            </mat-list-option>
+                        </mat-selection-list>
+
+                        <mat-divider></mat-divider>
+
+                        <!-- individual selector -->
+                        <mat-selection-list #filterList="matSelectionList">
+                            <ng-template ngFor [ngForOf]="filterFeatureCls.items" let-item>
+                                <ng-template [ngIf]="item.meta.total > 0">
+                                    <mat-list-option [selected]="filterFeatureCls.checked$ | async | grpFeatToName | includes : item.meta.displayName"
+                                        (selectedChange)="filterFeatureCls.setValue(item, $event)">
+                                        <div>
+                                            <span>
+                                                {{ item.meta.displayName }}
+                                            </span>
+                                            <span class="text-muted">
+                                                ({{ item.meta.total }})
+                                            </span>
+                                        </div>
+                                    </mat-list-option>
                                 </ng-template>
-                            </button>
-                        </ng-template>
+                            </ng-template>
+                        </mat-selection-list>
 
-                        <ng-template #notSelectedTmpl>
-                            <button mat-flat-button
-                                (click)="filterFeatureCls.toggle(grpFeat)"
-                                color="default">
-                                <i class="fas fa-eye-slash"></i>
-                                <ng-template [ngTemplateOutlet]="textTmpl">
-                                </ng-template>
-                            </button>
-                        </ng-template>
+                        <mat-divider></mat-divider>
+                        
+                    </div>
+                    
+                    <div mat-dialog-actions align="end">
+                        <button mat-stroked-button color="primary" (click)="filterList.selectAll()">
+                            Reset
+                        </button>
+                        <button mat-button mat-dialog-close cdkFocusInitial>
+                            Close
+                        </button>
+                    </div>
+                </ng-template>
 
+                <ng-template #filterTallyTmpl>
+                    <ng-template [ngIf]="(filterFeatureCls.unchecked$ | async).length === 0" [ngIfElse]="partialTmpl">
+                        Showing all {{ categoryAcc.total$ | async }} features
+                    </ng-template>
+                    <ng-template #partialTmpl>
+                        Showing {{ filterFeatureCls.checked$ | async | grpFeatTally }} / {{ categoryAcc.total$ | async }} features
                     </ng-template>
                 </ng-template>
+
             </div>
         </div>
 
@@ -151,13 +187,13 @@
                     let-feature
                     let-last="last">
 
+                    <!-- n.b. do not introduce mattooltip in scrollable container -->
+                    <!-- it will override scrollability -->
                     <button
                         mat-button
                         class="virtual-scroll-item sxplr-w-100"
-                        [matTooltip]="feature.name"
-                        matTooltipPosition="right"
                         (click)="onClickFeature(feature)">
-                        {{ feature.name }}
+                        <span class="ws-no-wrap"> {{ feature.name }} </span>
                     </button>
 
                     <div *ngIf="last && datasource.isPulling$ | async">

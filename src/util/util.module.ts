@@ -20,7 +20,7 @@ import { CombineFnPipe } from "./pipes/combineFn.pipe";
 import { MergeObjPipe } from "./mergeObj.pipe";
 import { IncludesPipe } from "./includes.pipe";
 import { SidePanelComponent } from './side-panel/side-panel.component';
-import { MatCardModule } from "@angular/material/card";
+import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 import { CommonModule } from "@angular/common";
 import { DfToDsPipe } from './df-to-ds.pipe';
 import { PrettyPresentPipe } from './pretty-present.pipe';
@@ -28,7 +28,7 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
 @NgModule({
   imports:[
     LayoutModule,
-    MatCardModule,
+    AngularMaterialModule,
     CommonModule,
   ],
   declarations: [
@@ -77,7 +77,7 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     IncludesPipe,
     SidePanelComponent,
     DfToDsPipe,
-    PrettyPresentPipe
+    PrettyPresentPipe,
   ]
 })
 

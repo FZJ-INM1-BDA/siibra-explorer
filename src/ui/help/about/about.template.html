@@ -43,3 +43,17 @@
     How to cite
   </span>
 </button>
+
+<ng-template [ngIf]="versionString" let-versionString>
+  <div class="newline"></div>
+  <mat-form-field class="d-block">
+    <mat-label>
+      Version
+    </mat-label>
+    <input type="text" matInput [value]="versionString" disabled>
+    <button mat-icon-button matSuffix
+      [iav-clipboard-copy]="versionString">
+      <i class="fas fa-copy"></i>
+    </button>
+  </mat-form-field>
+</ng-template>

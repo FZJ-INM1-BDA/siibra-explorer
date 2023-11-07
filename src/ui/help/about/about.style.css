@@ -4,3 +4,8 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+.newline
+{
+  flex: 1 1 100%;
+}

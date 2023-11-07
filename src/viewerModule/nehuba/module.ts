@@ -28,6 +28,7 @@ import { NgAnnotationService } from "./annotation/service";
 import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
+import { DialogModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
@@ -58,6 +59,7 @@ import { NehubaUserLayerModule } from "./userLayers";
     ]),
     QuickTourModule,
     NehubaLayoutOverlayModule,
+    DialogModule,
   ],
   declarations: [
     NehubaViewerContainerDirective,

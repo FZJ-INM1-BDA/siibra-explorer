@@ -10,7 +10,7 @@ import { arrayEqual } from "src/util/array";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
-import { getShader } from "src/util/constants";
+import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
 
 export const BACKUP_COLOR = {
@@ -174,7 +174,7 @@ export class NehubaLayerControlService implements OnDestroy{
         ),
         this.store$.pipe(
           select(atlasAppearance.selectors.customLayers),
-          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && /^swc:\/\//.test(l.source)).length > 0),
+          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
         )
       ).pipe(
         startWith(false),
@@ -397,4 +397,22 @@ export class NehubaLayerControlService implements OnDestroy{
   ]).pipe(
     map(([ expectedLayerNames, customLayerNames, pmapName ]) => [...expectedLayerNames, ...customLayerNames, ...pmapName, ...AnnotationLayer.Map.keys()])
   )
+
+
+  static ExternalLayerNames = new Set<string>()
+
+  /**
+   * @description Occationally, a layer can be managed by external components. Register the name of such layers so it will be ignored.
+   * @param layername 
+   */
+  static RegisterLayerName(layername: string) {
+    NehubaLayerControlService.ExternalLayerNames.add(layername)
+  }
+  /**
+   * @description Once external component is done with the layer, return control back to the service
+   * @param layername 
+   */
+  static DeregisterLayerName(layername: string) {
+    NehubaLayerControlService.ExternalLayerNames.delete(layername)
+  }
 }

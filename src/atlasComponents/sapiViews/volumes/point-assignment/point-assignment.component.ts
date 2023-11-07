@@ -1,14 +1,16 @@
 import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from 'src/sharedModules/angularMaterial.exports';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
 import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
-import { TSandsPoint } from 'src/util/types';
+import { TFace, TSandsPoint } from 'src/util/types';
 import { TZipFileConfig } from "src/zipFilesOutput/type"
 import { environment } from "src/environments/environment"
+import { Store } from '@ngrx/store';
+import { atlasSelection } from 'src/state';
 
 const DOING_PROB_ASGMT = "Performing probabilistic assignment ..."
 const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled assignment ..."
@@ -31,10 +33,14 @@ export class PointAssignmentComponent implements OnDestroy {
   #error$ = new BehaviorSubject<string>(null)
   error$ = this.#error$.asObservable()
 
-  #point = new BehaviorSubject<TSandsPoint>(null)
+  point$ = new BehaviorSubject<TSandsPoint>(null)
   @Input()
-  set point(val: TSandsPoint) {
-    this.#point.next(val)
+  set point(val: TSandsPoint|TFace) {
+    const { '@type': type } = val
+    if (type === "siibra-explorer/surface/face") {
+      return
+    }
+    this.point$.next(val)
   }
   
   #template = new BehaviorSubject<SxplrTemplate>(null)
@@ -53,7 +59,7 @@ export class PointAssignmentComponent implements OnDestroy {
   clickOnRegion = new EventEmitter<{ target: SxplrRegion, event: MouseEvent }>()
 
   df$: Observable<PathReturn<"/map/assign">> = combineLatest([
-    this.#point,
+    this.point$,
     this.#parcellation,
     this.#template,
   ]).pipe(
@@ -108,10 +114,14 @@ export class PointAssignmentComponent implements OnDestroy {
     map(df => df.columns as string[])
   )
 
-  constructor(private sapi: SAPI, private dialog: MatDialog) {}
+  constructor(private sapi: SAPI, private dialog: MatDialog, private store: Store) {}
 
+  #dialogRef: MatDialogRef<unknown>
   openDialog(tmpl: TemplateRef<unknown>){
-    this.dialog.open(tmpl)
+    this.#dialogRef = this.dialog.open(tmpl)
+    this.#dialogRef.afterClosed().subscribe(() => {
+      this.#dialogRef = null
+    })
   }
 
   #sub: Subscription[] = []
@@ -121,10 +131,13 @@ export class PointAssignmentComponent implements OnDestroy {
   async selectRegion(region: PathReturn<"/regions/{region_id}">, event: MouseEvent){
     const sxplrReg = await translateV3Entities.translateRegion(region)
     this.clickOnRegion.emit({ target: sxplrReg, event })
+    if (this.#dialogRef) {
+      this.#dialogRef.close()
+    }
   }
 
   zipfileConfig$: Observable<TZipFileConfig[]> = combineLatest([
-    this.#point,
+    this.point$,
     this.#parcellation,
     this.#template,
     this.df$
@@ -139,6 +152,17 @@ export class PointAssignmentComponent implements OnDestroy {
       }] as TZipFileConfig[]
     })
   )
+
+  navigateToPoint(coordsInMm: number[]){
+    this.store.dispatch(
+      atlasSelection.actions.navigateTo({
+        animation: true,
+        navigation: {
+          position: coordsInMm.map(v => v * 1e6)
+        }
+      })
+    )
+  }
 }
 
 function generateReadMe(pt: TSandsPoint, parc: SxplrParcellation, tmpl: SxplrTemplate){
