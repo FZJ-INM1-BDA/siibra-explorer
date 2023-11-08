@@ -20,9 +20,12 @@ plugins:
 nav:
   - Home: 'index.md'
   - Getting Started: 'getting_started.md'
-  - Main Concepts:
-    - What Makes a Brain Atlas: 'main_concepts/what_makes_a_brain_atlas.md'
-    - Main Elements of siibra-explorer: 'main_concepts/main_elements_of_the_viewer.md'
+  - Core Elements of an Atlas in Siibra:
+    - Overview: "core_elements/overview.md"
+    - Labelled Maps vs Probability Maps: "core_elements/labelled_vs_probability.md"
+    - Multiple Reference Spaces: "core_elements/reference_spaces.md"
+    - Relationship betweeen Different Reference Spaces: "core_elements/relationship_between_spaces.md"
+    - Datasets Linked to Locations in the Brain: "core_elements/linked_datasets.md"
   - Basic Functionalities:
     - Selecting Parcellation Maps: 'basic_functionalities/selecting_parcellation_maps.md'
     - Exploring 3D Parcellation Maps: 'basic_functionalities/exploring_3d_parcellation_maps.md'
