@@ -33,6 +33,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
+import { A11yModule } from "@angular/cdk/a11y";
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -70,6 +71,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatRadioModule,
     MatTableModule,
     MatSortModule,
+    A11yModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

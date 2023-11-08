@@ -140,20 +140,23 @@
 
       <button mat-raised-button color="primary"
         (click)="selectPoint(state.valueMm)"
-        [disabled]="!state.validated">
+        [disabled]="!state.validated"
+        mat-dialog-close>
         select point
       </button>
   
       <button mat-button color="primary"
         (click)="navigateTo(state.valueNm)"
-        [disabled]="!state.validated">
+        [disabled]="!state.validated"
+        mat-dialog-close>
         navigate to point
       </button>
 
       <button mat-button color="primary"
         [attr.aria-label]="COPY_NAVIGATION_STRING"
         (click)="copyString(state.string)"
-        [disabled]="!state.validated">
+        [disabled]="!state.validated"
+        mat-dialog-close>
         copy point
       </button>
   

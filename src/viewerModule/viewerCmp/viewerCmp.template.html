@@ -524,7 +524,7 @@
               [sxplr-sapiviews-core-rich-regionshierarchy-regions]="view.allAvailableRegions"
               [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
               [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
-              (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
+              (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event); showHierarchyBtn.close()"
               (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
               >
             </sxplr-sapiviews-core-rich-regionshierarchy>

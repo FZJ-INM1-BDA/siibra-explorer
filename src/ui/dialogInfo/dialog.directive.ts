@@ -1,5 +1,5 @@
 import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
-import { MatDialog, MatDialogConfig } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 
 type DialogSize = 's' | 'm' | 'l' | 'xl' | 'auto'
@@ -40,6 +40,8 @@ export class DialogDirective{
   @Input('sxplr-dialog-data')
   data: any = {}
 
+  #dialogRef: MatDialogRef<unknown>
+
   constructor(private matDialog: MatDialog){}
 
   @HostListener('click')
@@ -48,10 +50,17 @@ export class DialogDirective{
       ? this.templateRef
       : DialogFallbackCmp
 
-    this.matDialog.open(tmpl, {
+    this.#dialogRef = this.matDialog.open(tmpl, {
       autoFocus: null,
       data: {...this.data, ...data},
       ...(sizeDict[this.size] || {})
     })
+  }
+
+  close(){
+    if (this.#dialogRef) {
+      this.#dialogRef.close()
+      this.#dialogRef = null
+    }
   }
 }
