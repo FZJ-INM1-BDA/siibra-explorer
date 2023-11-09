@@ -25,7 +25,6 @@ nav:
   - Basic Functionalities:
     - Organisation of user interface: 'basic_functionalities/overview_of_ui.md'
     - Selecting parcellation maps: 'basic_functionalities/selecting_parcellation_maps.md'
-    - Selecting parcellation maps: 'basic_functionalities/selecting_parcellation_maps.md'
     - Exploring 3D parcellation maps: 'basic_functionalities/exploring_3d_parcellation_maps.md'
     - Keyboard shortcuts: 'basic_functionalities/helperOnePager.md'
     - Storing and sharing 3D views: 'basic_functionalities/storing_and_sharing_3d_views.md'
