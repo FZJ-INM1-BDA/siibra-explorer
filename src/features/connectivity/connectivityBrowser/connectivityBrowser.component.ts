@@ -1,7 +1,7 @@
-import {  Component, ElementRef, OnDestroy, ViewChild, Input, SimpleChanges, HostListener, OnChanges } from "@angular/core";
+import {  Component, ElementRef, ViewChild, Input, SimpleChanges, HostListener, OnChanges, inject } from "@angular/core";
 import { Store, select} from "@ngrx/store";
-import { Subscription, BehaviorSubject, combineLatest, merge, concat, NEVER} from "rxjs";
-import { switchMap, map, shareReplay, distinctUntilChanged, withLatestFrom, filter, finalize } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, merge, concat, NEVER} from "rxjs";
+import { switchMap, map, shareReplay, distinctUntilChanged, withLatestFrom, filter, finalize, debounceTime, takeUntil } from "rxjs/operators";
 
 import { atlasAppearance, atlasSelection } from "src/state";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
@@ -14,6 +14,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 import { arrayEqual } from "src/util/array";
 import { switchMapWaitFor } from "src/util/fn";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 type PathParam = DS['value'][number]
 type ConnFeat = PathReturn<"/feature/RegionalConnectivity/{feature_id}">
@@ -21,9 +22,14 @@ type ConnFeat = PathReturn<"/feature/RegionalConnectivity/{feature_id}">
 @Component({
   selector: 'sxplr-features-connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
-  styleUrls: ['./connectivityBrowser.style.scss']
+  styleUrls: ['./connectivityBrowser.style.scss'],
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
-export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
+export class ConnectivityBrowserComponent implements OnChanges {
+
+  #destroy$ = inject(DestroyDirective).destroyed$
 
   @Input('sxplr-features-connectivity-browser-atlas')
   atlas: SxplrAtlas
@@ -65,10 +71,9 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
   })
 
   formValue$ = this.connectivityFilterForm.valueChanges.pipe(
+    debounceTime(160),
     shareReplay(1),
   )
-
-  private subscriptions: Subscription[] = []
 
   static LayerId = 'connectivity-colormap-id'
 
@@ -79,148 +84,173 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
     private store$: Store,
     protected sapi: SAPI
   ) {
-
-    this.subscriptions.push(
-      /**
-       * on accordion expansion, if nothing is selected, select default (0) type
-       */
-      combineLatest([
-        this.#accordionExpanded$,
-        this.types$,
-        concat(
-          of(null as PathParam),
-          this.formValue$.pipe(
-            map(v => v.selectedType),
-            distinctUntilChanged((n, o) => n.name === o.name)
-          )
-        ),
-      ]).pipe(
-      ).subscribe(([flag, types, selectedType]) => {
-        if (flag && !selectedType) {
-          this.connectivityFilterForm.patchValue({
-            selectedType: types[0]
-          })
-        }
-      }),
-      /**
-       * on set log
-       */
-      this.displayForm.valueChanges.pipe(
-        map(v => v.logChecked),
-        switchMap(switchMapWaitFor({
-          condition: () => !!this.connectivityComponentElement,
-          leading: true
-        }))
-      ).subscribe(flag => {
-        const el = this.connectivityComponentElement
-        el.nativeElement.setShowLog(flag)
-      }),
-      /**
-       * on type selection, select first cohort
-       */
-      this.formValue$.pipe(
-        map(v => v.selectedType),
-        distinctUntilChanged((n, o) => n.name === o.name),
-        switchMap(() =>
-          this.cohorts$.pipe(
-            /**
-             * it's important to not use distinctUntilChanged
-             * new corhots emit should always trigger this flow
-             */
-          )
+    /**
+     * on accordion expansion, if nothing is selected, select default (0) type
+     */
+    combineLatest([
+      this.#accordionExpanded$,
+      this.types$,
+      concat(
+        of(null as PathParam),
+        this.formValue$.pipe(
+          map(v => v.selectedType),
+          distinctUntilChanged((n, o) => n.name === o.name)
         )
-      ).subscribe(cohorts => {
-        if (cohorts.length > 0) {
-          this.connectivityFilterForm.patchValue({
-            selectedCohort: cohorts[0]
-          })
-        }
-      }),
-      /**
-       * on select cohort
-       */
-      
-      this.selectedCohort$.pipe(
-        switchMap(() => this.cohortDatasets$.pipe(
-          map(dss => dss.length),
-          distinctUntilChanged(),
-          filter(length => length > 0),
-        ))
-      ).subscribe(() => {
+      ),
+    ]).pipe(
+      takeUntil(this.#destroy$),
+    ).subscribe(([flag, types, selectedType]) => {
+      if (flag && !selectedType) {
         this.connectivityFilterForm.patchValue({
-          selectedDatasetIndex: 0,
-          selectedSubjectIndex: 0,
+          selectedType: types[0]
         })
-      }),
-      /**
-       * on
-       * - accordion update
-       * - colormap change
-       * - fetching matrix flag is true
-       * remove custom layer
-       */
-      merge(
-        this.#accordionExpanded$,
-        this.colormap$,
-        this.#fetchingMatrix$.pipe(
-          filter(flag => !!flag)
-        ),
-      ).subscribe(() => {
-        this.removeCustomLayer()
-      }),
-      /**
-       * on update colormap, add new custom layer
-       */
-      combineLatest([
-        this.#accordionExpanded$,
-        this.colormap$,
-      ]).pipe(
-        withLatestFrom(
-          this.store$.pipe(
-            select(atlasSelection.selectors.selectedParcAllRegions)
-          )
+      }
+    })
+    
+    /**
+     * on set log
+     */
+    this.displayForm.valueChanges.pipe(
+      map(v => v.logChecked),
+      switchMap(switchMapWaitFor({
+        condition: () => !!this.connectivityComponentElement,
+        leading: true
+      })),
+      takeUntil(this.#destroy$)
+    ).subscribe(flag => {
+      const el = this.connectivityComponentElement
+      el.nativeElement.setShowLog(flag)
+    })
+
+    /**
+     * on type selection, select first cohort
+     */
+    this.formValue$.pipe(
+      map(v => v.selectedType),
+      distinctUntilChanged((n, o) => n.name === o.name),
+      switchMap(() =>
+        this.cohorts$.pipe(
+          /**
+           * it's important to not use distinctUntilChanged
+           * new corhots emit should always trigger this flow
+           */
         )
-      ).subscribe(([[accordionExpanded, conn], allregions]) => {
-        if (!accordionExpanded || !conn) {
+      ),
+      takeUntil(this.#destroy$)
+    ).subscribe(cohorts => {
+      if (cohorts.length > 0) {
+        this.connectivityFilterForm.patchValue({
+          selectedCohort: cohorts[0]
+        })
+      }
+    })
+
+    /**
+     * on select cohort
+     */
+    this.selectedCohort$.pipe(
+      switchMap(() => this.cohortDatasets$.pipe(
+        map(dss => dss.length),
+        distinctUntilChanged(),
+        filter(length => length > 0),
+      )),
+      takeUntil(this.#destroy$)
+    ).subscribe(() => {
+      this.connectivityFilterForm.patchValue({
+        selectedDatasetIndex: 0,
+        selectedSubjectIndex: 0,
+      })
+    })
+
+    /**
+     * on update colormap, add new custom layer
+     */
+    combineLatest([
+      this.#accordionExpanded$,
+      this.colormap$,
+    ]).pipe(
+      withLatestFrom(
+        this.store$.pipe(
+          select(atlasSelection.selectors.selectedParcAllRegions)
+        )
+      ),
+      takeUntil(this.#destroy$)
+    ).subscribe(([[accordionExpanded, conn], allregions]) => {
+      if (!accordionExpanded || !conn) {
+        return
+      }
+
+      const map = new Map<SxplrRegion, number[]>()
+      for (const region of allregions) {
+        const area = conn.find(a => a.name === region.name)
+        if (area) {
+          map.set(region, Object.values(area.color))
+        } else {
+          map.set(region, [255,255,255,0.1])
+        }
+      }
+      
+      this.store$.dispatch(
+        atlasAppearance.actions.addCustomLayer({
+          customLayer: {
+            clType: 'customlayer/colormap',
+            id: ConnectivityBrowserComponent.LayerId,
+            colormap: map
+          }
+        })
+      )
+    })
+
+    /**
+     * on
+     * - accordion update
+     * - colormap change
+     * - fetching matrix flag is true
+     * remove custom layer
+     */
+    merge(
+      this.#accordionExpanded$,
+      this.colormap$,
+      this.#fetchingMatrix$.pipe(
+        filter(flag => !!flag)
+      ),
+    ).pipe(
+      takeUntil(this.#destroy$),
+    ).subscribe(() => {
+      this.removeCustomLayer()
+    })
+
+    /**
+     * on pure connection update, update logchecked box
+     */
+    this.#pureConnections$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(v => {
+      if (!v) return
+      for (const val of Object.values(v)) {
+        if (val > 1) {
+          this.displayForm.get("logChecked").enable()
           return
         }
+      }
+      this.displayForm.get("logChecked").patchValue(false)
+      this.displayForm.get("logChecked").disable()
+    })
 
-        const map = new Map<SxplrRegion, number[]>()
-        for (const region of allregions) {
-          const area = conn.find(a => a.name === region.name)
-          if (area) {
-            map.set(region, Object.values(area.color))
-          } else {
-            map.set(region, [255,255,255,0.1])
-          }
-        }
-        
-        this.store$.dispatch(
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: {
-              clType: 'customlayer/colormap',
-              id: ConnectivityBrowserComponent.LayerId,
-              colormap: map
-            }
-          })
-        )
-      }),
-      /**
-       * on pure connection update, update logchecked box
-       */
-      this.#pureConnections$.subscribe(v => {
-        if (!v) return
-        for (const val of Object.values(v)) {
-          if (val > 1) {
-            this.displayForm.get("logChecked").enable()
-            return
-          }
-        }
-        this.displayForm.get("logChecked").patchValue(false)
-        this.displayForm.get("logChecked").disable()
-      })
-    )
+    this.selectedDataset$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(selectedDs => {
+      this.selectedDataset = selectedDs
+    })
+
+    this.#destroy$.subscribe({
+      complete: () => {
+        this.removeCustomLayer()
+      }
+    })
   }
+
+  selectedDataset: PathReturn<"/feature/RegionalConnectivity/{feature_id}">
 
   public ngOnChanges(changes: SimpleChanges): void {
     const { parcellation, types } = changes
@@ -330,12 +360,9 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
     )),
   )
   
-  displaySubject$ = this.selectedDataset$.pipe(
-    distinctUntilChanged((o, n) => o?.id === n?.id),
-    map(ds => {
-      return (idx: number) => ds?.subjects?.[idx]
-    })  
-  )
+  subjectDisplayWith(subId: number): string {
+    return this.selectedDataset?.subjects[subId] || `${subId}`
+  }
 
   selectedDatasetAdditionalInfos$ = this.selectedDataset$.pipe(
     map(ds => ds ? ds.datasets : [])
@@ -509,11 +536,6 @@ export class ConnectivityBrowserComponent implements OnChanges, OnDestroy {
 
   public exportFullConnectivity() {
     this.fullConnectivityGridElement?.nativeElement['downloadCSV']()
-  }
-
-  public ngOnDestroy(): void {
-    this.removeCustomLayer()
-    this.subscriptions.forEach(s => s.unsubscribe())
   }
 }
 
