@@ -26,7 +26,7 @@ At the top right of the viewer, there are several icons guiding you to additiona
 
 From left to right you find
 
-- The help button. Here you find information about keyboard shortcuts and terms of use. You can also launch the interactive quick tour, which is launched automatically when you use siibra-explorer for the first time.
+- The help button. Here you find information about keyboard shortcuts and terms of use. You can also launch the interactive quick tour, which is launched automatically when you use `siibra-explorer` for the first time.
 - The download button, which will download the reference template and parcellation map currently displayed in the viewer
 - The plugin menu, which allows you to launch interactive plugins (see “Advanced functionalities” below)
 - The login menu, which allows you to login with an EBRAINS account to access some custom functionalities for sharing.
