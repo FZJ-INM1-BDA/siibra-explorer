@@ -37,6 +37,8 @@
 
 
 <ng-template #saneUrlTmpl>
-  <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async">
-  </iav-sane-url>
+  <mat-dialog-content>
+    <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async">
+    </iav-sane-url>
+  </mat-dialog-content>
 </ng-template>
