@@ -1,3 +1,0 @@
-# Labelled maps vs probability maps
-
-The above describes what siibra calls a "labelled map", where each location in the brain is uniquely labelled to belong to exactly one brain region. However, siibra also supports "statistical maps", where each location in the brain is mapped to multiple brain regions with different weights (or probabilities). Each coordinate is then not mapped to a single label, but to a vector of weights, one per brain region. The weights for a specific brain region across all coordinates in the brain then form the statistical (or probabilistic) map for this single region, and the statistical maps of multiple regions may overlap.

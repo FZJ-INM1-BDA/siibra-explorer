@@ -1,7 +1,0 @@
-# Relationships between different reference spaces
-
-Some parcellations maps, especially the Julich-Brain cytoarchitectonic maps[^4], are available in all those spaces, this way providing a natural link across those spaces and different spatial scales. An additional link is available through spatial transformations[^5], which map coordinates in one space to their most likely corresponding coordinate in another. These spatial transformations are used by siibra-explorer when you change the reference space, in order to preserve the currently viewed region of interest.
-
-[^4]: Amunts K, Mohlberg H, Bludau S, Zilles K. Julich-Brain: A 3D probabilistic atlas of the human brain’s cytoarchitecture. Science. 2020;369(6506):988-992. doi:[10.1126/science.abb4588](https://doi.org/10.1126/science.abb4588)
-
-[^5]: Lebenberg J, Labit M, Auzias G, Mohlberg H, Fischer C, Rivière D, Duchesnay E, Kabdebon C, Leroy F, Labra N, Poupon F, Dickscheid T, Hertz-Pannier L, Poupon C, Dehaene-Lambertz G, Hüppi P, Amunts K, Dubois J, Mangin JF. A framework based on sulcal constraints to align preterm, infant and adult human brain images acquired in vivo and post mortem. Brain Struct Funct. 2018;223(9):4153-4168. doi:[10.1007/s00429-018-1735-9](10.1007/s00429-018-1735-9)
