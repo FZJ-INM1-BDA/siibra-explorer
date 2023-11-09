@@ -1,5 +1,14 @@
 # Exploring 3D Parcellation Maps
 
+On the bottom left of the viewer, you find selectors for choosing the species, reference space, and parcellation map. The latter two are shown only if more than one option is available.
+
+![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-chips.png){ style="width:700px"}
+
+When selecting a species, a default reference space and parcellation will be automatically preselected.
+If you switch to a different reference space, `siibra-explorer` will first check if a map of the currently selected parcellation is available for the chosen space. If it is not, you will be asked to select a different parcellation.
+Vice versa, when selecting a parcellation which is not available as a map in the currently selected reference space, you will be asked to select a different space.
+
+
 In the case of a volumetric template, siibra-explorer combines a rotatable 3D surface view of a brain volume with three planar views of orthogonal image planes (coronal, sagittal, horizontal). It can visualize very large brain volumes in the Terabyte range.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/julichbrain_bigbrain_4panel.png){: style="width:700px" }

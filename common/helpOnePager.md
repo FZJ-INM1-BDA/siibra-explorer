@@ -11,7 +11,5 @@
 | Multiple region select | `<ctrl>` + `[click]` on region | - |
 | Context menu | `[right click]` | - |
 
----
-
-
 You can enable touch interface by `[Portrait]` > `Settings` > `Enable Mobile UI`
+
