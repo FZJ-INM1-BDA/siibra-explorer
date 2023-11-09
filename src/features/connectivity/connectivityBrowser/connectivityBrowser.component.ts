@@ -2,7 +2,6 @@ import {  Component, ElementRef, ViewChild, Input, SimpleChanges, HostListener, 
 import { Store, select} from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, concat, NEVER} from "rxjs";
 import { switchMap, map, shareReplay, distinctUntilChanged, withLatestFrom, filter, finalize, debounceTime, takeUntil } from "rxjs/operators";
-
 import { atlasAppearance, atlasSelection } from "src/state";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { of } from "rxjs";
@@ -209,10 +208,11 @@ export class ConnectivityBrowserComponent implements OnChanges {
      * remove custom layer
      */
     merge(
-      this.#accordionExpanded$,
-      this.colormap$,
+      this.#accordionExpanded$.pipe(
+        filter(expanded => !expanded),
+      ),
       this.#fetchingMatrix$.pipe(
-        filter(flag => !!flag)
+        filter(flag => !!flag),
       ),
     ).pipe(
       takeUntil(this.#destroy$),
