@@ -15,8 +15,13 @@ The precise layout of the 3D view depends on the select reference space.
 For more information, read about [Exploring 3D parcellation maps](../basics/exploring_3d_parcellation_maps.md).
 
 
-## View navigation panel
-At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with an editor icon (✎). When you click it with the mouse pointer, a navigation panel for the 3D view opens, which allows to enter different coordinates, copy the current coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
+## View navigation panel & coordinate lookups
+
+At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view, together with buttons for expanding the panel (⌄) and entering custom coordinates (✎).
+Expanding the panel allows to allows to modify the center point and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
+
+!!! tip "Use coordinate lookups do probabilistic assignment"
+	Entering coordinates allows to [lookup regions by coordinate](../basics/looking_up_coordinates.md) and this way perform detailed **probabilistic region assignment**.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-navigation.png){ style="width:500px"}
 
@@ -27,6 +32,14 @@ Working with parcellation maps is described in ["Exploring parcellation maps"](.
 Note that some of the buttons may be hidden in case that only one option is available.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-chips.png){ style="width:500px"}
+
+## Region search panel
+
+The magnifying glass icon (🔍) in the top left reveals the region search panel. Here you can type keywords to find matching brain regions in the currently selected parcellation, and open the extended regionstree search. 
+To learn more, read about [selecting brain regions](../basics/selecting_brain_regions.md). 
+
+![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-regionsearch.png){ style="width:500px"}
+
 
 ## Tools and plugins
 

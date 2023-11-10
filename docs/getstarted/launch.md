@@ -1,4 +1,4 @@
-# Launch & quick start
+# Launch & quick tour
 
 !!! note
 	To launch siibra-explorer on EBRAINS, point your webbrowser to:
@@ -14,6 +14,5 @@ You might also watch the following video tutorial, which covers basic functional
 
 
 [![](https://img.youtube.com/vi/xAU70QLLUO4/0.jpg){: style="width:500px" }](https://www.youtube.com/watch?v=xAU70QLLUO4)
-
 
 
