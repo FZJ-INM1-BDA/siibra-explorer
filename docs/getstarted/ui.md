@@ -12,16 +12,18 @@ The precise layout of the 3D view depends on the select reference space.
 - (Middle) The volumetric views support ultrahigh-resolution data, and can be zoomed in if the underlying image data allows. Each of the 3 planar views can be maximized using the "[ ]" icon in each view.
 - (Right) For pure surface spaces, such as the fsaverage space, the viewer shows only a 3D view.
 
+For more information, read about [Exploring 3D parcellation maps](../basics/exploring_3d_parcellation_maps.md).
 
 
-## Navigation panel
-At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with the navigation icon 🧭. When you click it with the mouse pointer, a navigation panel opens, which allows to enter a different coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
+## View navigation panel
+At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with the navigation icon 🧭. When you click it with the mouse pointer, a navigation panel for the 3D view opens, which allows to enter different coordinates, copy the current coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-navigation.png){ style="width:500px"}
 
-## Parcellation map selectors 
-At the bottom of the window, you find buttons to switch between different species, different reference templates, and different parcellation maps.
-Working with different maps is described in ["Exploring parcellation maps"](../basics/exploring_3d_parcellation_maps.md)). 
+## Atlas selection panel
+
+At the bottom of the window, you find buttons to switch between different species, reference templates and parcellation maps.
+Working with parcellation maps is described in ["Exploring parcellation maps"](../basics/exploring_3d_parcellation_maps.md)). 
 Note that some of the buttons may be hidden in case that only one option is available.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-chips.png){ style="width:500px"}
@@ -32,8 +34,8 @@ At the top right of the viewer, there are several icons guiding you to additiona
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-tools.png){ style="width:500px"}
 
-#### ⓘ Help panel
-The help button (ⓘ ) opens information about keyboard shortcuts and terms of use. Here you can also launch the interactive quick tour, which is started automatically when you use `siibra-explorer` for the first time.
+#### (?) Help panel
+The help button (?) opens information about keyboard shortcuts and terms of use. Here you can also launch the interactive quick tour, which is started automatically when you use `siibra-explorer` for the first time.
 
 #### <u>↓</u> Download current view 
 The download button (<u>↓</u>) will retrieve the reference template and parcellation map currently displayed in a zip file package

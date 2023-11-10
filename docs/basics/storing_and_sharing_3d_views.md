@@ -11,7 +11,7 @@ Any views in `siibra-explorer` can be shared via their URLs. You can use any nat
 
 Whilst `siibra-explorer` encodes the current view directly in the URL, such full URLs are quite long and not easily recitable or memorable. You can create short URLs for the current view directly in `siibra-explorer`. To do so,
 
-1. expand the *navigation panel*, 
+1. click the *view navigation panel* on the top left (see [main UI elements](../ui/main_elements.md#-and-plugins), 
 2. click the "share icon", then 
 3. select `Create custom URL`.
 
@@ -24,7 +24,7 @@ Whilst `siibra-explorer` encodes the current view directly in the URL, such full
 
 While you can use any screenshot tool provided by your browser or operating system, `siibra-explorer` offers a dedicated screenshot function which generates a clean image of the current 3D view which hides other user interface elements. To access the screenshot tool, 
 
-1. choose the tool menu (`᎒᎒᎒`) from the top right (see [main UI elements](../ui/main_elements.md#tools-and-plugins)), then 
+1. open the tool menu (`᎒᎒᎒`) from the top right (see [main UI elements](../ui/main_elements.md#tools-and-plugins)), then 
 2. select `Screenshot`.
 
 ![Creating a screenshot in siibra-explorer](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-screenshots.png){ style="width:700px"}

@@ -1,6 +1,6 @@
 # Exploring 3D Parcellation Maps
 
-On the bottom left of the viewer, you find selectors for choosing the species, reference space, and parcellation map. The latter two are shown only if more than one option is available.
+On the bottom left of the viewer, you find the atlas selection panel which provides buttons choosing the species, reference space, and parcellation map. The latter two are shown only if more than one option is available.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-chips.png){ style="width:700px"}
 
