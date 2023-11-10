@@ -5,7 +5,9 @@
     matInput
     name="searchTerm"
     [formControl]="searchFormControl"
-    autocomplete="off">
+    autocomplete="off"
+    [cdkTrapFocus]="true"
+    [cdkTrapFocusAutoCapture]="true">
 
   <!-- search input suffix -->
   <div matSuffix>
@@ -18,15 +20,15 @@
   <div class="mat-body sxplr-d-flex sxplr-align-items-center sxplr-h-100 region-tmpl"
     [matTooltip]="last && !labelMappedRegionNames.includes(region.name) ? TXT_CANNOT_BE_SELECTED : null"
     [ngClass]="{
-      'sxplr-custom-cmp accent': accentedRegions | includes : region,
+      'sxplr-custom-cmp accent': accentedRegions | mapToProperty: 'name' | includes : region.name,
       'muted-7': !labelMappedRegionNames.includes(region.name)
     }"
-    [innerHTML]="region.name | hightlightPipe : searchTerm">
+    [innerHTML]="region.name | hightlightPipe : (searchTerm$ | async)">
   </div>
 </ng-template>
 
 <sxplr-flat-hierarchy-tree-view
-  [sxplr-flat-hierarchy-nodes]="passedRegions"
+  [sxplr-flat-hierarchy-nodes]="passedRegions$ | async"
   [sxplr-flat-hierarchy-is-parent]="isParent"
   [sxplr-flat-hierarchy-render-node-tmpl]="tmplRef"
   [sxplr-flat-hierarchy-tree-view-expand-on-init]="true"

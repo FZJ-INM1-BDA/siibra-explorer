@@ -17,10 +17,7 @@ class TestCmp {
 
 describe("dragdrop.directive.spec.ts", () => {
   let fixture: ComponentFixture<TestCmp>
-
-  let addUserLayerSpy: jasmine.Spy
-  let removeUserLayerSpy: jasmine.Spy
-  let getCvtFileToUrlSpy: jasmine.Spy
+  let handleUserInputSpy: jasmine.Spy
 
   let dummyFile1: File
   let dummyFile2: File
@@ -42,18 +39,14 @@ describe("dragdrop.directive.spec.ts", () => {
             useValue: {
               addUserLayer: () => {},
               removeUserLayer: () => {},
-              getCvtFileToUrl: () => Promise.resolve(),
+              handleUserInput: () => Promise.resolve(),
             },
           },
         ],
       })
       const svc = TestBed.inject(UserLayerService)
-
-      addUserLayerSpy = spyOn(svc, "addUserLayer")
-      removeUserLayerSpy = spyOn(svc, "removeUserLayer")
-      getCvtFileToUrlSpy = spyOn(svc, "getCvtFileToUrl")
-
-      getCvtFileToUrlSpy.and.resolveTo({ meta, url, options })
+      handleUserInputSpy = spyOn(svc, "handleUserInput")
+      handleUserInputSpy.and.resolveTo(null)
 
       fixture = TestBed.createComponent(TestCmp)
       fixture.detectChanges()
@@ -73,9 +66,7 @@ describe("dragdrop.directive.spec.ts", () => {
       })()
     })
     afterEach(() => {
-      addUserLayerSpy.calls.reset()
-      removeUserLayerSpy.calls.reset()
-      getCvtFileToUrlSpy.calls.reset()
+      handleUserInputSpy.calls.reset()
     })
 
     describe("> malformed input", () => {
@@ -99,7 +90,7 @@ describe("dragdrop.directive.spec.ts", () => {
           })
 
           it("> should not call addnglayer", () => {
-            expect(getCvtFileToUrlSpy).not.toHaveBeenCalled()
+            expect(handleUserInputSpy).not.toHaveBeenCalled()
           })
 
           // TODO having a difficult time getting snackbar harness
@@ -128,17 +119,11 @@ describe("dragdrop.directive.spec.ts", () => {
       })
 
       it("> should call addNgLayer", () => {
-        expect(getCvtFileToUrlSpy).toHaveBeenCalledTimes(1)
-        const arg = getCvtFileToUrlSpy.calls.argsFor(0)
+        expect(handleUserInputSpy).toHaveBeenCalledTimes(1)
+        const arg = handleUserInputSpy.calls.argsFor(0)
         expect(arg.length).toEqual(1)
         expect(arg[0]).toEqual(dummyFile1)
 
-        expect(addUserLayerSpy).toHaveBeenCalledTimes(1)
-        const args1 = addUserLayerSpy.calls.argsFor(0)
-
-        expect(args1[0]).toBe(url)
-        expect(args1[1]).toBe(meta)
-        expect(args1[2]).toBe(options)
       })
     })
   })

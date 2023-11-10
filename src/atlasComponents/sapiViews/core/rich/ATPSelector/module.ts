@@ -1,8 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
-import { MatRippleModule } from "@angular/material/core";
-import { MatIconModule } from "@angular/material/icon";
 import { MarkdownModule } from "src/components/markdown";
 import { SmartChipModule } from "src/components/smartChip";
 import { DialogModule } from "src/ui/dialogInfo";
@@ -11,8 +8,9 @@ import { SapiViewsCoreParcellationModule } from "src/atlasComponents/sapiViews/c
 import { PureATPSelector } from "./pureDumb/pureATPSelector.components";
 import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
-import { MatTooltipModule } from "@angular/material/tooltip";
 import { QuickTourModule } from "src/ui/quickTour";
+import { AngularMaterialModule } from "src/sharedModules";
+import { PureATPDropdown } from "./pureDumbDropdown/pureATPDropDown.component";
 
 @NgModule({
   imports: [
@@ -20,10 +18,7 @@ import { QuickTourModule } from "src/ui/quickTour";
     SmartChipModule,
     UtilModule,
     MarkdownModule,
-    MatRippleModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatButtonModule,
+    AngularMaterialModule,
     DialogModule,
     SAPIModule,
     SapiViewsCoreParcellationModule,
@@ -32,10 +27,12 @@ import { QuickTourModule } from "src/ui/quickTour";
   declarations: [
     PureATPSelector,
     WrapperATPSelector,
+    PureATPDropdown,
   ],
   exports: [
     PureATPSelector,
     WrapperATPSelector,
+    PureATPDropdown,
   ]
 })
 

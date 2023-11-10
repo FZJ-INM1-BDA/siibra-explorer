@@ -42,3 +42,22 @@ sxplr-smart-chip:not(:last-child)
     padding-left: 1rem;
   }
 }
+
+.parent
+{
+  display: flex;
+  flex-wrap: nowrap;
+
+  > :first-child,
+  > :last-child
+  {
+    flex: 0 0 1rem;
+  }
+  > .text
+  {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}

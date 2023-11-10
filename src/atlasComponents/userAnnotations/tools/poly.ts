@@ -12,7 +12,6 @@ export type TPolyJsonSpec = {
 } & TBaseAnnotationGeomtrySpec
 
 export class Polygon extends IAnnotationGeometry{
-  public id: string
   public annotationType = 'Polygon'
 
   public points: Point[] = []

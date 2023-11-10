@@ -3,9 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PointAssignmentComponent } from './point-assignment.component';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { EMPTY } from 'rxjs';
-import { MatDialogModule } from '@angular/material/dialog';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
+import { VolumesModule } from '../volumes.module';
 
 describe('PointAssignmentComponent', () => {
   let component: PointAssignmentComponent;
@@ -13,8 +12,8 @@ describe('PointAssignmentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PointAssignmentComponent ],
-      imports: [ MatDialogModule, NoopAnimationsModule ],
+      declarations: [  ],
+      imports: [ VolumesModule ],
       providers: [
         provideMockStore(),
         {

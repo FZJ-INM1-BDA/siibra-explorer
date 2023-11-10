@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
@@ -11,7 +11,7 @@ import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } fro
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { SPECIES_ENUM } from 'src/util/constants';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -65,7 +65,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
 
-  constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog) {
+  constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     super()
   }
 
@@ -235,6 +235,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     if ((datasource.currentValue.length - scrollIndex) < 30) {
       try {
         await datasource.pull()
+        this.cdr.detectChanges()
       } catch (e) {
         if (e instanceof IsAlreadyPulling || e instanceof DsExhausted) {
           return

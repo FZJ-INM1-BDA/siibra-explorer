@@ -193,7 +193,7 @@
                         mat-button
                         class="virtual-scroll-item sxplr-w-100"
                         (click)="onClickFeature(feature)">
-                        {{ feature.name }}
+                        <span class="ws-no-wrap"> {{ feature.name }} </span>
                     </button>
 
                     <div *ngIf="last && datasource.isPulling$ | async">

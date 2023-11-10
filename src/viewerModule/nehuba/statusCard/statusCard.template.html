@@ -3,7 +3,7 @@
   [quick-tour-order]="quickTourData.order"
   #statusCardQT="quickTour">
   <mat-card *ngIf="showFull; else showMin"
-    class="expandedContainer sxplr-p-2 sxplr-pt-1">
+    class="expandedContainer">
     
     <mat-card-content>
 
@@ -45,22 +45,6 @@
         </button>
       </div>
 
-      <!-- space -->
-      <div class="d-flex">
-        <span class="d-flex align-items-center">
-          Voxel space
-        </span>
-
-        <mat-slide-toggle
-          [formControl]="statusPanelFormCtrl"
-          class="sxplr-pl-2 sxplr-pr-2">
-        </mat-slide-toggle>
-
-        <span class="d-flex align-items center">
-          Physical space
-        </span>
-      </div>
-
       <!-- coord -->
       <div class="d-flex">
 
@@ -75,17 +59,23 @@
             [value]="navVal$ | async"
             #navInput="matInput">
 
-        </mat-form-field>
+          <button mat-icon-button
+            iav-stop="click"
+            matSuffix
+            [attr.aria-label]="COPY_NAVIGATION_STRING"
+            (click)="copyString(navInput.value)">
+            <i class="fas fa-copy"></i>
+          </button>
 
-        <div class="w-0 position-relative">
-          <button
+          <button mat-icon-button
+            iav-stop="click"
+            matSuffix
             sxplr-share-view
-            [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
-            mat-icon-button
-            class="position-absolute share-btn">
+            [attr.aria-label]="SHARE_BTN_ARIA_LABEL">
             <i class="fas fa-share-square"></i>
           </button>
-        </div>
+        </mat-form-field>
+
       </div>
 
       <!-- cursor pos -->
@@ -110,17 +100,69 @@
     iav-media-query
     #media="iavMediaQuery">
 
-    <i aria-label="viewer navigation" class="fas fa-compass"></i>
     <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="sxplr-pl-2">
       {{ navVal$ | async }}
     </span>
 
-    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-icon-button
+      [sxplr-dialog-size]="null"
+      [sxplr-dialog]="pointTmpl">
+      <i class="fas fa-pen"></i>
+    </button>
 
     <button mat-icon-button
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
       (click)="statusCardQT.ngOnChanges(); showFull = true">
       <i class="fas fa-angle-down"></i>
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #pointTmpl>
+  <h1 mat-dialog-title>
+    Navigation Coordinate
+  </h1>
+  <div mat-dialog-content>
+    <form [formGroup]="dialogForm">
+      <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-pos>
+
+        <mat-form-field>
+          <mat-label>{{ pos }} (mm)</mat-label>
+          <input type="text" matInput [formControlName]="pos">
+        </mat-form-field>
+      </ng-template>
+    </form>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    
+    <ng-template [ngIf]="dialogInputState$ | async" let-state>
+
+      <button mat-raised-button color="primary"
+        (click)="selectPoint(state.valueMm)"
+        [disabled]="!state.validated"
+        mat-dialog-close>
+        select point
+      </button>
+  
+      <button mat-button color="primary"
+        (click)="navigateTo(state.valueNm)"
+        [disabled]="!state.validated"
+        mat-dialog-close>
+        navigate to point
+      </button>
+
+      <button mat-button color="primary"
+        [attr.aria-label]="COPY_NAVIGATION_STRING"
+        (click)="copyString(state.string)"
+        [disabled]="!state.validated"
+        mat-dialog-close>
+        copy point
+      </button>
+  
+    </ng-template>
+    <button mat-button mat-dialog-close>
+      cancel
     </button>
   </div>
 </ng-template>

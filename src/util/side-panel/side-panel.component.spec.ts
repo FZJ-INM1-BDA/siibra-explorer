@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SidePanelComponent } from './side-panel.component';
-import { MatCardModule } from '@angular/material/card';
+import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 
 describe('SidePanelComponent', () => {
   let component: SidePanelComponent;
@@ -10,7 +10,7 @@ describe('SidePanelComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        MatCardModule,
+        AngularMaterialModule,
       ],
       declarations: [ 
         SidePanelComponent,

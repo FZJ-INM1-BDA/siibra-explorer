@@ -1,5 +1,5 @@
 import { Directive, HostListener } from "@angular/core";
-import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { MatBottomSheet } from 'src/sharedModules/angularMaterial.exports'
 import { ShareSheetComponent } from "./shareSheet/shareSheet.component"
 
 

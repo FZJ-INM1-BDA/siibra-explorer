@@ -29,10 +29,8 @@ nav:
     - Sharing: 'usage/sharing.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
-    - URL parsing: 'advanced/url.md'
-    - Fetching datasets: 'advanced/datasets.md'
-    - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.14.0: 'releases/v2.14.0.md'
     - v2.13.5: 'releases/v2.13.5.md'
     - v2.13.4: 'releases/v2.13.4.md'
     - v2.13.3: 'releases/v2.13.3.md'

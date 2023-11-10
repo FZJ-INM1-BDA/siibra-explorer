@@ -15,27 +15,31 @@
   <mat-card *ngIf="feature"
     class="mat-elevation-z4 sxplr-z-4 header-card">
     
-    <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+    <mat-card-header>
+      <mat-card-subtitle>
+        <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
+      </mat-card-subtitle>
 
-    <mat-card-subtitle>
-      <ng-template [ngIf]="feature.category">
-        <span class="sxplr-m-a sxplr-pr-1">
-          <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
-            {{ feature.category }} feature
-          </ng-template>
-          <ng-template #fallbackTmpl>
-            Other feature
-          </ng-template>
-        </span>
-      </ng-template>
-    </mat-card-subtitle>
+      <mat-card-subtitle>
+        <ng-template [ngIf]="feature.category">
+          <span class="sxplr-m-a sxplr-pr-1">
+            <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
+              {{ feature.category }} feature
+            </ng-template>
+            <ng-template #fallbackTmpl>
+              Other feature
+            </ng-template>
+          </span>
+        </ng-template>
+      </mat-card-subtitle>
 
-    <mat-card-title>
-      <div class="feature-title">
-        {{ feature.name }}
-      </div>
-    </mat-card-title>
-
+      <mat-card-title>
+        <div class="feature-title">
+          {{ feature.name }}
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content></mat-card-content>
   </mat-card>
 
   <mat-tab-group>
@@ -46,8 +50,8 @@
         <ng-template [ngIf]="warnings$ | async" let-warnings>
           <ng-template ngFor [ngForOf]="warnings" let-warning>
             <button mat-list-item>
-              <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-              <div mat-line class="overview-content">{{ warning }}</div>
+              <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+              <div matListItemTitle>{{ warning }}</div>
             </button>
           </ng-template>
         </ng-template>
@@ -55,23 +59,23 @@
         <!-- doi -->
         <ng-template ngFor [ngForOf]="feature.link" let-url>
           <a [href]="url.href" mat-list-item target="_blank" class="no-hover">
-            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-            <div mat-line>{{ url.text || url.href }}</div>
+            <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div matListItemTitle>{{ url.text || url.href }}</div>
           </a>
         </ng-template>
         
         <!-- additional links -->
         <ng-template ngFor [ngForOf]="additionalLinks$ | async" let-url>
           <a [href]="url" mat-list-item target="_blank" class="no-hover">
-            <mat-icon mat-list-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-            <div mat-line>{{ url }}</div>
+            <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+            <div matListItemTitle>{{ url }}</div>
           </a>
         </ng-template>
 
         <ng-template [ngIf]="downloadLink$ | async" let-downloadLink>
           <a [href]="downloadLink" mat-list-item target="_blank" class="no-hover">
-            <mat-icon mat-list-icon fontSet="fas" fontIcon="fa-download"></mat-icon>
-            <div mat-line>Download</div>
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-download"></mat-icon>
+            <div matListItemTitle>Download</div>
           </a>
         </ng-template>
         

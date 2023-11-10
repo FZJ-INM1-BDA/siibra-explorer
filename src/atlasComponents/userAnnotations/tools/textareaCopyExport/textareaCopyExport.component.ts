@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { ARIA_LABELS } from 'common/constants'
 import { Clipboard } from "@angular/cdk/clipboard";
 

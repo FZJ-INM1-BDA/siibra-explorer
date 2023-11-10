@@ -439,6 +439,8 @@ export class NehubaViewerUnit implements OnDestroy {
         }
       })()
       viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:keyp", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:keyn", "proxy-wheel-1")
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-10")
       viewer.display.panels.forEach(sliceView => patchSliceViewPanel(sliceView, this.exportNehuba, this.multplier))
     }
@@ -571,7 +573,11 @@ export class NehubaViewerUnit implements OnDestroy {
          * 
          * The below monkey patch sets the mesh to load, allow the SWC to be shown
          */
-        const isSwc = layerObj[key]['source'].includes("swc://")
+        let url = layerObj[key]['source']
+        if (typeof url !== "string") {
+          url = url['url']
+        }
+        const isSwc = url.includes("swc://")
         const hasSegment = (layerObj[key]["segments"] || []).length > 0
         if (isSwc && hasSegment) {
           this.periodicSvc.addToQueue(
@@ -962,8 +968,18 @@ const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier:
     registerActionListener(sliceViewPanel.element, `proxy-wheel-${val}`, event => {
       const e = event.detail
 
+      let keyDelta = null
+      if (e.key === "p") {
+        keyDelta = -1
+      }
+      if (e.key === "n") {
+        keyDelta = 1
+      }
       const offset = tempVec3
-      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX
+      const wheelDelta = e.deltaY !== 0 ? e.deltaY : e.deltaX
+      
+      const delta = keyDelta ?? wheelDelta
+
       offset[0] = 0
       offset[1] = 0
       offset[2] = (delta > 0 ? -1 : 1) * mulitplier[0] * val

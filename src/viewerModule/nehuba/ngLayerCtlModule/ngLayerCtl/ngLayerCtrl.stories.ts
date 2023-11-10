@@ -1,12 +1,11 @@
 import { idMat4, NgLayerCtrlCmp } from "./ngLayerCtrl.component"
 import { Meta, moduleMetadata, Story } from "@storybook/angular"
 import { CommonModule } from "@angular/common"
-import { MatButtonModule } from "@angular/material/button"
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util"
 import { NEVER } from "rxjs"
 import { action } from "@storybook/addon-actions"
-import { MatTooltipModule } from "@angular/material/tooltip"
 import { Store } from "@ngrx/store"
+import { AngularMaterialModule } from "src/sharedModules"
 
 export default {
   component: NgLayerCtrlCmp,
@@ -14,8 +13,7 @@ export default {
     moduleMetadata({
       imports: [
         CommonModule,
-        MatButtonModule,
-        MatTooltipModule,
+        AngularMaterialModule,
       ],
       providers: [
         {

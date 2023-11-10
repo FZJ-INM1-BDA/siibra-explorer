@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable, of, Subscription } from "rxjs";
-import { debounceTime, map, shareReplay, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, Observable, of, Subscription } from "rxjs";
+import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -15,6 +15,11 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+
+interface HasName {
+  name: string
+}
 
 @Component({
   selector: 'iav-cmp-viewer-container',
@@ -40,28 +45,19 @@ import { wait } from "src/util/fn";
         animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
       ])
     ]),
-    trigger('openCloseAnchor', [
-      state('open', style({
-        transform: 'translateY(0)'
-      })),
-      state('closed', style({
-        transform: 'translateY(100vh)'
-      })),
-      transition('open => closed', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ]),
-      transition('closed => open', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ])
-    ]),
   ],
   providers: [
     DialogService
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
 export class ViewerCmp implements OnDestroy {
+
+  public readonly destroy$ = inject(DestroyDirective).destroyed$
 
   @ViewChild('voiFeatureEntryCmp', { read: EntryComponent })
   voiCmp: EntryComponent
@@ -145,7 +141,9 @@ export class ViewerCmp implements OnDestroy {
   ]).pipe(
     switchMap(([tmpl, parc]) => tmpl && parc ? this.sapi.getLabelledMap(parc, tmpl) : of(null))
   )
-
+  
+  #fullNavBarSwitch$ = new BehaviorSubject<boolean>(false)
+  #halfNavBarSwitch$ = new BehaviorSubject<boolean>(true)
 
   #view0$ = combineLatest([
     this.#selectedRegions$,
@@ -162,9 +160,12 @@ export class ViewerCmp implements OnDestroy {
 
   #view1$ = combineLatest([
     this.#currentMap$,
+    this.allAvailableRegions$,
+    this.#fullNavBarSwitch$,
+    this.#halfNavBarSwitch$,
   ]).pipe(
-    map(( [ currentMap ] ) => ({
-      currentMap
+    map(( [ currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded ] ) => ({
+      currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded
     }))
   )
 
@@ -173,7 +174,7 @@ export class ViewerCmp implements OnDestroy {
     this.#view1$,
   ]).pipe(
     map(([v0, v1]) => ({ ...v0, ...v1 })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap }) => {
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -189,6 +190,8 @@ export class ViewerCmp implements OnDestroy {
         spatialObjectSubtitle = selectedTemplate.name
       }
 
+      const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
+
       const labelMappedRegionNames = currentMap && Object.keys(currentMap.indices) || []
       return {
         viewerMode,
@@ -198,6 +201,9 @@ export class ViewerCmp implements OnDestroy {
         selectedTemplate,
         selectedParcellation,
         labelMappedRegionNames,
+        allAvailableRegions,
+        leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
+        branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
 
         /**
          * Selected Spatial Object
@@ -211,7 +217,9 @@ export class ViewerCmp implements OnDestroy {
          * and the full left side bar should not be expandable
          * if it is already expanded, it should collapse
          */
-        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint
+        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint,
+        fullSidenavExpanded,
+        halfSidenavExpanded,
       }
     }),
     shareReplay(1),
@@ -227,7 +235,6 @@ export class ViewerCmp implements OnDestroy {
   private viewerStatusRegionCtxMenu: TemplateRef<any>
 
   private templateSelected: SxplrTemplate
-  #parcellationSelected: SxplrParcellation
 
   constructor(
     private store$: Store<any>,
@@ -237,11 +244,59 @@ export class ViewerCmp implements OnDestroy {
     private sapi: SAPI,
   ){
 
+    this.view$.pipe(
+      takeUntil(this.destroy$),
+      map(({ selectedFeature, selectedPoint, selectedRegions, viewerMode }) => ({
+        selectedFeature,
+        selectedPoint,
+        selectedRegions,
+        viewerMode,
+      })),
+      distinctUntilChanged((o, n) => {
+        if (o.viewerMode !== n.viewerMode) {
+          return false
+        }
+        if (o.selectedFeature?.id !== n.selectedFeature?.id) {
+          return false
+        }
+        if (o.selectedPoint?.["@type"] !== n.selectedPoint?.["@type"]) {
+          return false
+        }
+        if (
+          n.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
+          && o.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
+        ) {
+          const newCoords = n.selectedPoint.coordinates.map(v => v.value)
+          const oldCoords = o.selectedPoint.coordinates.map(v => v.value)
+          if ([0, 1, 2].some(idx => newCoords[idx] !== oldCoords[idx])) {
+            return false
+          }
+        }
+        if (o.selectedRegions.length !== n.selectedRegions.length) {
+          return false
+        }
+        const oldRegNames = o.selectedRegions.map(r => r.name)
+        const newRegName = n.selectedRegions.map(r => r.name)
+        if (oldRegNames.some(name => !newRegName.includes(name))) {
+          return false
+        }
+        return true
+      }),
+      debounceTime(16),
+      map(({ selectedFeature, selectedRegions, selectedPoint, viewerMode }) => {
+        return !!viewerMode
+        || !!selectedFeature
+        || selectedRegions.length > 0
+        || !!selectedPoint
+      })
+    ).subscribe(flag => {
+      this.#fullNavBarSwitch$.next(flag)
+    })
+
     this.subscriptions.push(
       this.templateSelected$.subscribe(
         t => this.templateSelected = t
       ),
-      this.#parcellationSelected$.subscribe(parc => this.#parcellationSelected = parc),
       combineLatest([
         this.templateSelected$,
         this.parcellationSelected$,
@@ -358,7 +413,7 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public selectRoi(roi: SxplrRegion): void {
+  public selectRoi(roi: SxplrRegion) {
     this.store$.dispatch(
       atlasSelection.actions.selectRegion({
         region: roi
@@ -404,11 +459,8 @@ export class ViewerCmp implements OnDestroy {
     }
     if (pointOfInterest) {
       this.store$.dispatch(
-        atlasSelection.actions.selectTemplate({
-          template,
-          requested: {
-            parcellation: this.#parcellationSelected
-          }
+        atlasSelection.actions.selectATPById({
+          templateId: template.id
         })
       )
       this.store$.dispatch(
@@ -512,5 +564,37 @@ export class ViewerCmp implements OnDestroy {
     if (this.voiFeatureEntryCmp){
       this.voiFeatureEntryCmp.pullAll()
     }
+  }
+
+  selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
+    this.store$.dispatch(
+      atlasSelection.actions.selectATPById({
+        parcellationId: regParc?.parcellation.id,
+        regionId: regParc?.region?.name
+      })
+    )
+  }
+
+  controlFullNav(flag: boolean){
+    this.#fullNavBarSwitch$.next(flag)
+  }
+
+  controlHalfNav(flag: boolean) {
+    this.#halfNavBarSwitch$.next(flag)
+    if (flag && this.#fullyRestoreToken) {
+      this.#fullNavBarSwitch$.next(flag)
+      this.#fullyRestoreToken = false
+    }
+  }
+
+  #fullyRestoreToken = false
+  fullyClose(){
+    this.#fullyRestoreToken = true
+    this.controlFullNav(false)
+    this.controlHalfNav(false)
+  }
+
+  nameEql(a: HasName, b: HasName){
+    return a.name === b.name
   }
 }

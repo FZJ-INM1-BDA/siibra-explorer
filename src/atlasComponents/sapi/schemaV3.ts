@@ -14,6 +14,13 @@ export interface paths {
      */
     get: operations["get_single_feature_plot_feature__feature_id__plotly_get"]
   }
+  "/feature/{feature_id}/download": {
+    /**
+     * Get Single Feature Download 
+     * @description Get a zip archive of the downloadables from a feature.
+     */
+    get: operations["get_single_feature_download_feature__feature_id__download_get"]
+  }
   "/atlases": {
     /**
      * Get All Atlases 
@@ -65,17 +72,24 @@ export interface paths {
   }
   "/regions/{region_id}/features": {
     /**
-     * Get All Regions 
+     * Get All Features Region 
      * @description HTTP get all features of a single region
      */
-    get: operations["get_all_regions_regions__region_id__features_get"]
+    get: operations["get_all_features_region_regions__region_id__features_get"]
+  }
+  "/regions/{region_id}/related": {
+    /**
+     * Get Related Region 
+     * @description HTTP get_related_regions of the specified region
+     */
+    get: operations["get_related_region_regions__region_id__related_get"]
   }
   "/regions/{region_id}": {
     /**
-     * Get All Regions 
+     * Get Single Regions 
      * @description HTTP get a single region
      */
-    get: operations["get_all_regions_regions__region_id__get"]
+    get: operations["get_single_regions_regions__region_id__get"]
   }
   "/map": {
     /**
@@ -132,20 +146,6 @@ export interface paths {
      */
     get: operations["get_download_bundle_atlas_download_get"]
   }
-  "/atlas_download/{task_id}": {
-    /**
-     * Get Download Progress 
-     * @description Get download task progress with task_id
-     */
-    get: operations["get_download_progress_atlas_download__task_id__get"]
-  }
-  "/atlas_download/{task_id}/download": {
-    /**
-     * Get Download Result 
-     * @description Download the bundle
-     */
-    get: operations["get_download_result_atlas_download__task_id__download_get"]
-  }
   "/feature/_types": {
     /**
      * Get All Feature Types 
@@ -171,17 +171,17 @@ export interface paths {
   }
   "/feature/CorticalProfile": {
     /**
-     * Get All Connectivity Features 
+     * Get All Corticalprofile Features 
      * @description Get all CorticalProfile features
      */
-    get: operations["get_all_connectivity_features_feature_CorticalProfile_get"]
+    get: operations["get_all_corticalprofile_features_feature_CorticalProfile_get"]
   }
   "/feature/CorticalProfile/{feature_id}": {
     /**
-     * Get Single Connectivity Feature 
+     * Get Single Corticalprofile Feature 
      * @description Get a single CorticalProfile feature
      */
-    get: operations["get_single_connectivity_feature_feature_CorticalProfile__feature_id__get"]
+    get: operations["get_single_corticalprofile_feature_feature_CorticalProfile__feature_id__get"]
   }
   "/feature/Tabular": {
     /**
@@ -550,6 +550,8 @@ export interface components {
        * @description Term or code used to identify the version of something.
        */
       versionIdentifier: string
+      /** Datasets */
+      datasets?: (components["schemas"]["EbrainsDatasetModel"])[]
     }
     /**
      * CoordinatePointModel 
@@ -886,6 +888,19 @@ export interface components {
       /** Pages */
       pages?: number
     }
+    /** Page[RegionRelationAsmtModel] */
+    Page_RegionRelationAsmtModel_: {
+      /** Items */
+      items: (components["schemas"]["RegionRelationAsmtModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
     /** Page[SiibraAtlasModel] */
     Page_SiibraAtlasModel_: {
       /** Items */
@@ -1059,6 +1074,14 @@ export interface components {
      * @enum {unknown}
      */
     PlotlyTemplate: "plotly" | "plotly_white" | "plotly_dark" | "ggplot2" | "seaborn" | "simple_white" | "none"
+    /**
+     * Qualification 
+     * @description Qualification
+     * 
+     * Exactly match to Qualification in siibra.core.relation_quantification.Quantification 
+     * @enum {string}
+     */
+    Qualification: "EXACT" | "OVERLAPS" | "CONTAINED" | "CONTAINS" | "APPROXIMATE" | "HOMOLOGOUS" | "OTHER_VERSION"
     /** QuantitativeOverlapItem */
     QuantitativeOverlapItem: {
       /**
@@ -1112,6 +1135,18 @@ export interface components {
       minValue: number
       /** minValueUnit */
       minValueUnit?: Record<string, never>
+    }
+    /**
+     * RegionRelationAsmtModel 
+     * @description ConfigBaseModel
+     */
+    RegionRelationAsmtModel: {
+      /** @Type */
+      "@type": string
+      qualification: components["schemas"]["Qualification"]
+      query_structure: components["schemas"]["ParcellationEntityVersionModel"]
+      assigned_structure: components["schemas"]["ParcellationEntityVersionModel"]
+      assigned_structure_parcellation: components["schemas"]["SiibraParcellationModel"]
     }
     /** RelationAssessmentItem */
     RelationAssessmentItem: {
@@ -1170,9 +1205,9 @@ export interface components {
       /** Qualification */
       qualification: string
       /** Query Structure */
-      query_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"]
+      query_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"] | components["schemas"]["SiibraParcellationModel"]
       /** Assigned Structure */
-      assigned_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"]
+      assigned_structure: components["schemas"]["LocationModel"] | components["schemas"]["ParcellationEntityVersionModel"] | components["schemas"]["SiibraParcellationModel"]
       /** Explanation */
       explanation: string
     }
@@ -1228,7 +1263,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1258,7 +1293,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1326,7 +1361,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1363,7 +1398,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1392,7 +1427,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1414,7 +1449,7 @@ export interface components {
       /** Id */
       id: string
       /** Modality */
-      modality: string
+      modality?: string
       /** Category */
       category: string
       /** Description */
@@ -1562,6 +1597,31 @@ export interface operations {
       query?: {
         template?: components["schemas"]["PlotlyTemplate"]
       }
+      path: {
+        feature_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_single_feature_download_feature__feature_id__download_get: {
+    /**
+     * Get Single Feature Download 
+     * @description Get a zip archive of the downloadables from a feature.
+     */
+    parameters: {
       path: {
         feature_id: string
       }
@@ -1762,9 +1822,9 @@ export interface operations {
       }
     }
   }
-  get_all_regions_regions__region_id__features_get: {
+  get_all_features_region_regions__region_id__features_get: {
     /**
-     * Get All Regions 
+     * Get All Features Region 
      * @description HTTP get all features of a single region
      */
     parameters: {
@@ -1792,9 +1852,39 @@ export interface operations {
       }
     }
   }
-  get_all_regions_regions__region_id__get: {
+  get_related_region_regions__region_id__related_get: {
     /**
-     * Get All Regions 
+     * Get Related Region 
+     * @description HTTP get_related_regions of the specified region
+     */
+    parameters: {
+      query: {
+        parcellation_id: string
+        page?: number
+        size?: number
+      }
+      path: {
+        region_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_RegionRelationAsmtModel_"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_single_regions_regions__region_id__get: {
+    /**
+     * Get Single Regions 
      * @description HTTP get a single region
      */
     parameters: {
@@ -1988,56 +2078,7 @@ export interface operations {
         space_id: string
         parcellation_id: string
         region_id?: string
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": Record<string, never>
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  get_download_progress_atlas_download__task_id__get: {
-    /**
-     * Get Download Progress 
-     * @description Get download task progress with task_id
-     */
-    parameters: {
-      path: {
-        task_id: string
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": Record<string, never>
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  get_download_result_atlas_download__task_id__download_get: {
-    /**
-     * Get Download Result 
-     * @description Download the bundle
-     */
-    parameters: {
-      path: {
-        task_id: string
+        feature_id?: string
       }
     }
     responses: {
@@ -2141,9 +2182,9 @@ export interface operations {
       }
     }
   }
-  get_all_connectivity_features_feature_CorticalProfile_get: {
+  get_all_corticalprofile_features_feature_CorticalProfile_get: {
     /**
-     * Get All Connectivity Features 
+     * Get All Corticalprofile Features 
      * @description Get all CorticalProfile features
      */
     parameters: {
@@ -2170,9 +2211,9 @@ export interface operations {
       }
     }
   }
-  get_single_connectivity_feature_feature_CorticalProfile__feature_id__get: {
+  get_single_corticalprofile_feature_feature_CorticalProfile__feature_id__get: {
     /**
-     * Get Single Connectivity Feature 
+     * Get Single Corticalprofile Feature 
      * @description Get a single CorticalProfile feature
      */
     parameters: {

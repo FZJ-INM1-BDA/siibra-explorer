@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { Observable, combineLatest, of } from "rxjs";
+import { Observable, combineLatest, of, throwError } from "rxjs";
 import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
@@ -34,11 +34,11 @@ import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
-import { ExperimentalModule } from "src/experimental/experimental.module";
 import { BottomMenuModule } from "src/ui/bottomMenu";
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
 import { Store } from "@ngrx/store";
 import { atlasSelection, userPreference } from "src/state";
+import { TabComponent } from "src/components/tab/tab.components";
 
 @NgModule({
   imports: [
@@ -66,7 +66,7 @@ import { atlasSelection, userPreference } from "src/state";
     SmartChipModule,
     ReactiveFormsModule,
     BottomMenuModule,
-    ExperimentalModule,
+    TabComponent,
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [
@@ -123,6 +123,9 @@ import { atlasSelection, userPreference } from "src/state";
                 return of(null)
               }
               const img = defaultImage[0]
+              if (img.legacySpecFlag === "new") {
+                return throwError('new spec for template is not supported yet.')
+              }
               return of({
                 ...img.info || {},
                 transform: img.transform

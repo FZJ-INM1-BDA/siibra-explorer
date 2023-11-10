@@ -1,24 +1,14 @@
-import { Component, EventEmitter, Inject, OnDestroy, Output } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from "@angular/core";
+import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { select, Store } from "@ngrx/store";
-import { Observable, of, Subject, Subscription } from "rxjs";
-import { filter, map, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { Observable, Subject, Subscription } from "rxjs";
+import { switchMap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
-import { DialogFallbackCmp } from "src/ui/dialogInfo";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
-import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
-
-type AskUserConfig = {
-  actionsAsList: boolean
-}
-
-function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
-  if (!obj) return false
-  return (obj.atlas || obj.template || obj.parcellation) && (!obj.requested || isATPGuard(obj.requested))
-}
+import { darkThemePalette, lightThemePalette, ATP } from "../pureATP.directive"
 
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
@@ -30,6 +20,12 @@ function isATPGuard(obj: any): obj is Partial<ATP&{ requested: Partial<ATP> }> {
 
 export class WrapperATPSelector implements OnDestroy{
 
+  @Input("sxplr-wrapper-atp-selector-use-ui")
+  useUI: "chip" | "dropdown" = "chip"
+
+  @Input('sxplr-wrapper-atp-selector-minimized')
+  minimized = true
+
   @Output('sxplr-wrapper-atp-selector-menu-open')
   menuOpen = new EventEmitter<{some: boolean, all: boolean, none: boolean}>()
 
@@ -37,18 +33,6 @@ export class WrapperATPSelector implements OnDestroy{
   lightThemePalette = lightThemePalette
 
   #subscription: Subscription[] = []
-
-  #askUser(title: string, titleMd: string, descMd: string, actions: string[], config?: Partial<AskUserConfig>): Observable<string> {
-    return this.dialog.open(DialogFallbackCmp, {
-      data: {
-        title,
-        titleMd,
-        descMd,
-        actions: actions,
-        actionsAsList: config?.actionsAsList
-      }
-    }).afterClosed()
-  }
 
   selectedATP$ = this.store$.pipe(
     fromRootStore.distinctATP(),
@@ -63,6 +47,8 @@ export class WrapperATPSelector implements OnDestroy{
     select(atlasSelection.selectors.selectedAtlas),
     switchMap(atlas => this.sapi.getAllParcellations(atlas))
   )
+
+  // TODO how do we check busy'ness?
   isBusy$ = new Subject<boolean>()
   
   parcellationVisibility$ = this.store$.pipe(
@@ -78,92 +64,24 @@ export class WrapperATPSelector implements OnDestroy{
   ){
     this.#subscription.push(
       this.selectLeaf$.pipe(
-        tap(() => this.isBusy$.next(true)),
         withLatestFrom(this.selectedATP$),
-        switchMap(([{ atlas, template, parcellation }, selectedATP]) => {
-          if (atlas) {
-            /**
-             * do not need to ask permission to switch atlas
-             */
-            return of({ atlas })
-          }
-          if (template) {
-            return this.sapi.getSupportedParcellations(selectedATP.atlas, template).pipe(
-              switchMap(parcs => {
-                if (parcs.find(p => p.id === selectedATP.parcellation.id)) {
-                  return of({ template })
-                }
-                return this.#askUser(
-                  null,
-                  `Current parcellation **${selectedATP.parcellation.name}** is not mapped in the selected template **${template.name}**. Please select one of the following parcellations:`,
-                  null,
-                  parcs.map(p => p.name),
-                  {
-                    actionsAsList: true
-                  }
-                ).pipe(
-                  map(parcname => {
-                    const foundParc = parcs.find(p => p.name === parcname)
-                    if (foundParc) {
-                      return ({ template, requested: { parcellation: foundParc } })
-                    }
-                    return null
-                  })
-                )
-              })
-            )
-          }
-          if (parcellation) {
-            return this.sapi.getSupportedTemplates(selectedATP.atlas, parcellation).pipe(
-              switchMap(tmpls => {
-                if (tmpls.find(t => t.id === selectedATP.template.id)) {
-                  return of({ parcellation })
-                }
-                return this.#askUser(
-                  null,
-                  `Selected parcellation **${parcellation.name}** is not mapped in the current template **${selectedATP.template.name}**. Please select one of the following templates:`,
-                  null,
-                  tmpls.map(tmpl => tmpl.name),
-                  {
-                    actionsAsList: true
-                  }
-                ).pipe(
-                  map(tmplname => {
-                    const foundTmpl = tmpls.find(tmpl => tmpl.name === tmplname)
-                    if (foundTmpl) {
-                      return ({ requested: { template: foundTmpl }, parcellation })
-                    }
-                    return null
-                  })
-                )
-              })
-            )
-          }
-          return of(null)
-        }),
-        filter(val => {
-          this.isBusy$.next(false)
-          return !!val
-        })
-      ).subscribe((obj) => {
-        if (!isATPGuard(obj)) return
-        const { atlas, parcellation, template, requested } = obj
-        if (atlas) {
-          this.store$.dispatch(
-            atlasSelection.actions.selectAtlas({ atlas })
-          )
-        }
-        if (parcellation) {
-          this.store$.dispatch(
-            atlasSelection.actions.selectParcellation({ parcellation, requested })
-          )
-        }
-        if (template) {
-          this.store$.dispatch(
-            atlasSelection.actions.selectTemplate({ template, requested })
-          )
-        }
-      })
+      ).subscribe(([{ template, parcellation, atlas }, selectedATP]) => {
+
+        this.store$.dispatch(
+          atlasSelection.actions.selectATPById({
+            templateId: template?.id,
+            parcellationId: parcellation?.id,
+            atlasId: atlas?.id,
+            config: {
+              autoSelect: !!atlas,
+              messages: {
+                parcellation: `Current parcellation **${selectedATP?.parcellation?.name}** is not mapped in the selected template **${template?.name}**. Please select one of the following parcellations:`,
+                template: `Selected parcellation **${parcellation?.name}** is not mapped in the current template **${selectedATP?.template?.name}**. Please select one of the following templates:`,
+              }
+            }
+          })
+        )
+      }),
     )
   }
 

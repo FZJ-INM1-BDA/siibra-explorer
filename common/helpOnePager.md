@@ -4,7 +4,7 @@
 | Oblique rotation | `<shift>` + `[drag]` any of the slice views | `[rotate]` any of the slice views |
 | Zoom | `[mousewheel]` | `[pinch zoom]` |
 | Zoom | `[hover]` on any slice views > `[click]` magnifier | `[tap]` on magnifier |
-| Next slice | `<ctrl>` + `[mousewheel]` | - |
+| Next slice | `<ctrl>` + `[mousewheel]` / `[p]`revious / `[n]`ext | - |
 | Next 10 slice | `<shift>` + `[mousewheel]` | - |
 | Toggle delineation | `[q]` | - |
 | Toggle cross hair | `[a]` | - |

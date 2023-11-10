@@ -126,6 +126,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         atlasAppearance.actions.addCustomLayer({
           customLayer: {
             id: name,
+            legacySpecFlag: 'old',
             shader: this.shader,
             transform: this.transform,
             clType: 'customlayer/nglayer',
@@ -167,7 +168,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       position = Array.from(final)
     }
 
-    const enclosed = this.meta?.bestViewPoints.filter(isEnclosed).find(v => v.points.length >= 3)
+    const enclosed = (this.meta?.bestViewPoints || []).filter(isEnclosed).find(v => v.points.length >= 3)
     if (enclosed) {
       const curr = vec3.fromValues(...this.currentPositionMm)
       const pt1 = vec3.fromValues(...enclosed.points[0].value)

@@ -22,3 +22,19 @@ mat-card
 {
   opacity: 0.8!important;
 }
+
+mat-card-actions
+{
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.progress-dots-container
+{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.5;
+  width: 100%;
+  margin: 0 1rem;
+}

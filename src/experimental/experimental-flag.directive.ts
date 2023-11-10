@@ -1,17 +1,27 @@
-import { Directive, Input } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { ChangeDetectorRef, Directive, Input, inject } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, concat, of } from 'rxjs';
+import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 import { MainState, userPreference } from 'src/state';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
 
 @Directive({
   selector: '[sxplrExperimentalFlag]',
-  exportAs: 'sxplrExperimentalFlag'
+  exportAs: 'sxplrExperimentalFlag',
+  hostDirectives: [NgIf, DestroyDirective],
+  standalone: true
 })
 export class ExperimentalFlagDirective {
 
+  private readonly ngIf = inject(NgIf)
+  private readonly destroyed$ = inject(DestroyDirective).destroyed$
+
   @Input()
   set deprecated(deprecated: boolean){
+    if (typeof deprecated === 'undefined') {
+      return
+    }
     this.#inputs.next({
       deprecated: !!deprecated,
       experimental: !deprecated
@@ -20,6 +30,9 @@ export class ExperimentalFlagDirective {
 
   @Input()
   set experimental(experimental: boolean){
+    if (typeof experimental === 'undefined') {
+      return
+    }
     this.#inputs.next({
       deprecated: !experimental,
       experimental: !!experimental
@@ -33,8 +46,11 @@ export class ExperimentalFlagDirective {
   #inputs = new BehaviorSubject<{ deprecated: boolean, experimental: boolean }>(null)
 
   show$ = combineLatest([
-    this.#inputs.pipe(
-      filter(v => !!v)
+    concat(
+      of({ deprecated: null, experimental: null }),
+      this.#inputs.pipe(
+        filter(v => !!v),
+      ),
     ),
     this.#showExperimentalFlag$
   ]).pipe(
@@ -57,7 +73,15 @@ export class ExperimentalFlagDirective {
   )
 
   constructor(
-    private store: Store<MainState>
-  ) { }
+    private store: Store<MainState>,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.show$.pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(flag => {
+      this.ngIf.ngIf = flag
+      this.cdr.detectChanges()
+    })
+  }
 
 }
