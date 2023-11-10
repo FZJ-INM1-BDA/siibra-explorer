@@ -8,11 +8,11 @@ A typical brain atlas consists of
 
 siibra extends this basic concept by linking multiple spaces and parcellation maps with complementary properties, and combining them with multimodal data features that capture characteristic aspects of brain organisation for locations in the brain.
 
-**Labelled maps vs probability maps.**
+## Labelled maps vs probability maps
 The above describes what siibra calls a "labelled map", where each location in the brain is uniquely labelled to belong to exactly one brain region. However, siibra also supports "statistical maps", where each location in the brain is mapped to multiple brain regions with different weights (or probabilities). Each coordinate is then not mapped to a single label, but to a vector of weights, one per brain region. The weights for a specific brain region across all coordinates in the brain then form the statistical (or probabilistic) map for this single region, and the statistical maps of multiple regions may overlap.# Datasets linked to locations in the brain
 
 
-**Multiple reference spaces.**
+## Multiple reference spaces
 siibra supports different parcellation maps for a given reference space, but also different reference coordinate spaces for a given species. The human brain atlas in EBRAINS provides parcellation maps in 
 
 - the MNI 152 space[^1], which is defined by a multi-subject average of structural MRI scans defined at a resolution of about 1mm,
@@ -21,10 +21,10 @@ siibra supports different parcellation maps for a given reference space, but als
 
 siibra-explorer is designed visualize any of these different types efficiently, by allowing to zoom into very high resolution images, and by offering both volumetric and surface-based viewing modes.
 
-**Relationships between spaces.**
+## Relationships between spaces
 Some parcellations maps, especially the Julich-Brain cytoarchitectonic maps[^4], are available in all those spaces, this way providing a natural link across those spaces and different spatial scales. An additional link is available through spatial transformations[^5], which map coordinates in one space to their most likely corresponding coordinate in another. These spatial transformations are used by siibra-explorer when you change the reference space, in order to preserve the currently viewed region of interest.
 
-**Datasets linked to locations in the brain.**
+## Datasets linked to locations in the brain
 siibra provides access to data features anchored to locations in the brain. Locations can be defined in very different ways, such as  by specification of a brain region (thus only providing a semantic definition), a coordinate in a reference space, or a bounding box in a reference space. Data features represent datasets hosted on a public repository, typically but not exclusively the EBRAINS Knowledge Graph. A growing share of linked datasets are directly interpreted by siibra-explorer, which means that siibra-explorer offers direct access to the underlying data: Further than just displaying information about the dataset, siibra can visualize the data itself and allows to download it. These directly interpreted features are categorized into molecular, cellular, functional, fibres, connectivity and macrostructural. Many additional datasets are linked to brain regions, which only provide a metadata description and link to the corresponding dataset page on their original repository. 
 
 
