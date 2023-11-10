@@ -1,6 +1,6 @@
 # siibra-explorer - web-based viewer for exploring multi-resolution 3D brain atlases
 
-!!! tip "siibra-explorer runs on EBRAINS"
+!!! tip "Quick links to siibra-explorer on EBRAINS"
 	- Launch `siibra-explorer` on EBRAINS: <https://atlases.ebrains.eu/viewer/>
 	- Get EBRAINS user support: [support@ebrains.eu](mailto:support@ebrains.eu?subject=[interactive%20atlas%20viewer]%20queries)
 	- Learn about EBRAINS atlases: <https://ebrains.eu/brain-atlases/reference-atlases>. 

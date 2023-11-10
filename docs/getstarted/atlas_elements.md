@@ -1,4 +1,4 @@
-# Key concepts of an atlas in siibra
+# Essential elements of an atlas in siibra
 
 A typical brain atlas consists of 
 

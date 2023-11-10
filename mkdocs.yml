@@ -21,10 +21,10 @@ plugins:
 
 nav:
   - Home: 'index.md'
-  - Getting Started: 'getting_started.md'
-  - Key concepts: 'concepts.md'
-  - User interface:
-    - Main elements: 'ui/main_elements.md'
+  - Getting Started: 
+    - Launch & quick tour: 'getstarted/launch.md'
+    - Elements of an atlas: 'getstarted/atlas_elements.md'
+    - User interface structure: 'getstarted/ui.md'
     - Keyboard shortcuts: 'basics/helperOnePager.md'
   - Basic Functionalities:
     - Exploring parcellation maps: 'basics/exploring_3d_parcellation_maps.md'

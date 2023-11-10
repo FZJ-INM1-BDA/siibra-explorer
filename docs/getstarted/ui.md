@@ -3,22 +3,22 @@
 ## 3D view 
 At its core, the viewer presents a 3D view of a brain. 
 The precise layout of the 3D view depends on the select reference space. 
-For volumetric reference spaces, it presents 2D views of three orthogonal planes in the reference template, combined with a rotatable 3D overview of the brain surface indicating the location of these planes.
-The planes default to the coronal, sagittal and axial plane, and can be freely adjusted in position and orientation to select arbitrary oblique views. 
 
-![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-waxholm.png){ style="width:500px"}
+For volumetric reference spaces, it presents 2D views of three orthogonal planes in the reference template, combined with a rotatable 3D overview of the brain surface indicating the location of these planes. The planes default to the coronal, sagittal and axial plane, and can be freely adjusted in position and orientation to select arbitrary oblique views. 
+
+![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-waxholm.png){: style="width:250px" }
 
 The volumetric views support ultrahigh-resolution data, and can be zoomed in if the underlying image data allows. Each of the 3 planar views can be maximized using the "[ ]" icon in each view.
 
-![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-v1border.png){ style="width:500px"}
+![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-v1border.png){: style="width:250px" } 
 
 For pure surface spaces, such as the fsaverage space, the viewer shows only a 3D view.
 
-![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-surfaceview.png){ style="width:500px"}
+![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-surfaceview.png){: style="width:250px" }
 
 
-## Navigation panel 
-At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view. When you click it with the mouse pointer, a navigation panel opens, which allows to enter a different coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
+## Navigation panel 🧭
+At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with the navigation icon 🧭. When you click it with the mouse pointer, a navigation panel opens, which allows to enter a different coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-navigation.png){ style="width:600px"}
 
@@ -49,4 +49,20 @@ The login button (👤) allows you to sign in with an EBRAINS account to access 
 
 !!! tip "Get an EBRAINS account!"
 	You can sign up for a free EBRAINS account at <https://ebrains.eu/register>
+
+
+| Action | Desktop | Touch devices |
+| --- | --- | --- |
+| Translate / Pan | `[drag]` any of the slice views | `[drag]` any of the slice views |
+| Oblique rotation | `<shift>` + `[drag]` any of the slice views | `[rotate]` any of the slice views |
+| Zoom | `[mousewheel]` | `[pinch zoom]` |
+| Zoom | `[hover]` on any slice views > `[click]` magnifier | `[tap]` on magnifier |
+| Next slice | `<ctrl>` + `[mousewheel]` / `[p]`revious / `[n]`ext | - |
+| Next 10 slice | `<shift>` + `[mousewheel]` | - |
+| Toggle delineation | `[q]` | - |
+| Toggle cross hair | `[a]` | - |
+| Multiple region select | `<ctrl>` + `[click]` on region | - |
+| Context menu | `[right click]` | - |
+
+You can enable touch interface by `[Portrait]` > `Settings` > `Enable Mobile UI`
 
