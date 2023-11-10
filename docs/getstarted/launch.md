@@ -1,6 +1,9 @@
 # Launch & quick start
 
-To launch siibra-explorer on EBRAINS, go to **<https://atlases.ebrains.eu/viewer>** using your web browser.
+!!! note
+	To launch siibra-explorer on EBRAINS, point your webbrowser to:
+	
+	**<https://atlases.ebrains.eu/viewer>**
 
 Recommended browsers are up-to-date versions of [Firefox](https://www.mozilla.org/firefox) and [Google chrome](https://www.google.com/chrome). Newer versions of [Apple Safari](https://www.apple.com/safari/) also work fairly well. Note that your hardware needs to support the WebGL2 standard, which should be the case for recent devices. If in doubt, check compatibility at <https://get.webgl.org/webgl2/>. 
 !!! tip "siibra-explorer runs on mobile devices!"
