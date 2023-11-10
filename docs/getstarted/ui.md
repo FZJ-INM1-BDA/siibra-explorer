@@ -16,7 +16,7 @@ For more information, read about [Exploring 3D parcellation maps](../basics/expl
 
 
 ## View navigation panel
-At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with the navigation icon 🧭. When you click it with the mouse pointer, a navigation panel for the 3D view opens, which allows to enter different coordinates, copy the current coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
+At the top left of the user interface, `siibra-explorer` displays the 3D coordinate of the currently selected center of view together with an editor icon (✎). When you click it with the mouse pointer, a navigation panel for the 3D view opens, which allows to enter different coordinates, copy the current coordinates, and create a shareable link to the current view (see ["Storing and sharing 3D views"](../basics/storing_and_sharing_3d_views.md)).
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-navigation.png){ style="width:500px"}
 
