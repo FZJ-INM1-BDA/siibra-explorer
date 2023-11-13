@@ -38,6 +38,7 @@ nav:
     - Differential gene expression analysis: "advanced/differential_gene_expression_analysis.md"
 
   - Release notes:
+    - v2.14.1: 'releases/v2.14.1.md'
     - v2.14.0: 'releases/v2.14.0.md'
     - v2.13.5: 'releases/v2.13.5.md'
     - v2.13.4: 'releases/v2.13.4.md'
