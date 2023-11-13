@@ -7,7 +7,6 @@ import { NEVER, of } from "rxjs"
 import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { By } from "@angular/platform-browser"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { UtilModule } from "src/util"
@@ -15,7 +14,6 @@ import { NEHUBA_CONFIG_SERVICE_TOKEN } from "../config.service"
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
-import { MatSlideToggle } from "src/sharedModules/angularMaterial.exports"
 import { NEHUBA_INSTANCE_INJTKN } from "../util"
 
 const mockNehubaConfig = {
@@ -125,18 +123,10 @@ describe('> statusCard.component.ts', () => {
             setNavigationState: setNavigationStateSpy,
           } as any
 
-          fixture.componentInstance.statusPanelRealSpace = true
           fixture.componentInstance.textNavigateTo('1, 0, 0')
           expect(setNavigationStateSpy).toHaveBeenCalledWith({
             position: [1e6, 0, 0],
             positionReal: true
-          })
-
-          fixture.componentInstance.statusPanelRealSpace = false
-          fixture.componentInstance.textNavigateTo('1, 0, 0')
-          expect(setNavigationStateSpy).toHaveBeenCalledWith({
-            position: [1, 0, 0],
-            positionReal: false
           })
         })
       })

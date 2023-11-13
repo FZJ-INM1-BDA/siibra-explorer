@@ -46,9 +46,8 @@ FROM python:3.10-alpine
 
 RUN adduser --disabled-password nonroot
 
-# Needed for the requirement as git, otherwise, not needed
-RUN apk update
-RUN apk add git curl
+RUN mkdir /common
+COPY --from=builder /iv/common /common
 
 RUN mkdir /iv-app
 WORKDIR /iv-app
