@@ -59,9 +59,10 @@
                         <mat-slider [min]="0"
                             [max]="cohortDatasets.length - 1"
                             step="1"
-                            formControlName="selectedDatasetIndex"
                             thumbLabel
+                            [discrete]="true"
                             class="w-100">
+                            <input matSliderThumb formControlName="selectedDatasetIndex">
                         </mat-slider>
                     </div>
                 </div>
@@ -76,11 +77,11 @@
                 </mat-label>
                 <mat-slider [min]="0"
                     [max]="(view$ | async | getProperty : 'numSubjects') - 1"
-                    thumbLabel
-                    [displayWith]="displaySubject$ | async"
+                    [displayWith]="subjectDisplayWith"
                     step="1"
-                    formControlName="selectedSubjectIndex"
+                    [discrete]="true"
                     class="w-100">
+                    <input matSliderThumb formControlName="selectedSubjectIndex">
                 </mat-slider>
             </div>
         </div>

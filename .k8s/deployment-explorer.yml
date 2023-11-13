@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: siibra-explorer
+    flavor: prod
+  name: siibra-explorer-prod-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: siibra-explorer
+      flavor: prod
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: siibra-explorer
+        flavor: prod
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: siibra-sxplr-common
+        - secretRef:
+            name: siibra-sxplr-secret
+        image: docker-registry.ebrains.eu/siibra/siibra-explorer:master
+        name: siibra-explorer-prod-container
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "400m"
+            memory: 500Mi
+          requests:
+            cpu: "200m"
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /sxplr-log
+          name: log-volume
+      restartPolicy: Always
+      volumes:
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: log-volume-claim
+

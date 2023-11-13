@@ -10,6 +10,7 @@ import { WrapperATPSelector } from "./wrapper/wrapper.component";
 import { SAPIModule } from "src/atlasComponents/sapi/module";
 import { QuickTourModule } from "src/ui/quickTour";
 import { AngularMaterialModule } from "src/sharedModules";
+import { PureATPDropdown } from "./pureDumbDropdown/pureATPDropDown.component";
 
 @NgModule({
   imports: [
@@ -26,10 +27,12 @@ import { AngularMaterialModule } from "src/sharedModules";
   declarations: [
     PureATPSelector,
     WrapperATPSelector,
+    PureATPDropdown,
   ],
   exports: [
     PureATPSelector,
     WrapperATPSelector,
+    PureATPDropdown,
   ]
 })
 

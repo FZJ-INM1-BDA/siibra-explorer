@@ -8,7 +8,7 @@ import { atlasAppearance, atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
-import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSelector.components"
+import { darkThemePalette, lightThemePalette, ATP } from "../pureATP.directive"
 
 @Component({
   selector: 'sxplr-wrapper-atp-selector',
@@ -19,6 +19,9 @@ import { darkThemePalette, lightThemePalette, ATP } from "../pureDumb/pureATPSel
 })
 
 export class WrapperATPSelector implements OnDestroy{
+
+  @Input("sxplr-wrapper-atp-selector-use-ui")
+  useUI: "chip" | "dropdown" = "chip"
 
   @Input('sxplr-wrapper-atp-selector-minimized')
   minimized = true

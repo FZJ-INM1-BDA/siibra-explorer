@@ -122,6 +122,21 @@
       </span>
     </ng-template>
 
+    <ng-template sxplrSmartChipAction>
+      <button
+        iav-stop="mousedown click"
+        class="icons"
+        mat-icon-button
+        sxplr-dialog
+        [sxplr-dialog-size]="null"
+        [sxplr-dialog-data]="{
+          title: view.template.name,
+          descMd: view.template.desc,
+          actions: view.template | parcTmplDoiPipe
+        }">
+        <i class="fas fa-info"></i>
+      </button>
+    </ng-template>
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
