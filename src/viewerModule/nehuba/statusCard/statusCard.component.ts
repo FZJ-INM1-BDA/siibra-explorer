@@ -8,11 +8,11 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, combineLatest } from "rxjs";
-import { map, filter, startWith, throttleTime, takeUntil, switchMap, shareReplay, debounceTime } from "rxjs/operators";
+import { Observable, concat, of } from "rxjs";
+import { map, filter, takeUntil, switchMap, shareReplay, debounceTime } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { FormControl, FormGroup, UntypedFormControl } from "@angular/forms";
+import { FormControl, FormGroup } from "@angular/forms";
 
 import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
@@ -59,20 +59,12 @@ export class StatusCardComponent {
   public readonly navVal$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
     switchMap(nehubaViewer => 
-      combineLatest([
-        this.statusPanelRealSpace$,
+      concat(
+        of(`nehubaViewer initialising`),
         nehubaViewer.viewerPosInReal$.pipe(
-          filter(v => !!v)
-        ),
-        nehubaViewer.viewerPosInVoxel$.pipe(
-          filter(v => !!v)
-        ),
-      ]).pipe(
-        map(([realFlag, real, voxel]) => realFlag
-          ? real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', ')
-          : voxel.map(v => v.toFixed(3)).join(', ') ),
-        startWith(`nehubaViewer initialising`),
-        throttleTime(16),
+          filter(v => !!v),
+          map(real => real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', '))
+        )
       )
     ),
     shareReplay(1),
@@ -80,20 +72,13 @@ export class StatusCardComponent {
   public readonly mouseVal$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
     switchMap(nehubaViewer => 
-      combineLatest([
-        this.statusPanelRealSpace$,
+      concat(
+        of(``),
         nehubaViewer.mousePosInReal$.pipe(
           filter(v => !!v),
-        ),
-        nehubaViewer.mousePosInVoxel$.pipe(
-          filter(v => !!v)
-        ),
-      ]).pipe(
-        map(([realFlag, real, voxel]) => realFlag
-          ? real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', ')
-          : voxel.map(v => v.toFixed(3)).join(', ')),
-        startWith(``),
-      )
+          map(real => real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', '))
+        )
+      ),
     )
   )
 
@@ -139,11 +124,6 @@ export class StatusCardComponent {
     ).subscribe(
       viewer => this.nehubaViewer = viewer
     )
-    this.statusPanelFormCtrl.valueChanges.pipe(
-      takeUntil(this.#destroy$)
-    ).subscribe(val => {
-      this.statusPanelRealSpace = val
-    })
     this.store$.pipe(
       select(atlasSelection.selectors.navigation)
     ).pipe(
@@ -199,18 +179,12 @@ export class StatusCardComponent {
       .map(Number)
   }
 
-  public statusPanelFormCtrl = new UntypedFormControl(true, [])
-  public statusPanelRealSpace = true
-  public statusPanelRealSpace$ = this.statusPanelFormCtrl.valueChanges.pipe(
-    startWith(true)
-  )
-
   public textNavigateTo(string: string): void {
     if (string.split(/[\s|,]+/).length >= 3 && string.split(/[\s|,]+/).slice(0, 3).every(entry => !isNaN(Number(entry.replace(/mm/, ''))))) {
-      const pos = (string.split(/[\s|,]+/).slice(0, 3).map((entry) => Number(entry.replace(/mm/, '')) * (this.statusPanelRealSpace ? 1000000 : 1)))
+      const pos = (string.split(/[\s|,]+/).slice(0, 3).map((entry) => Number(entry.replace(/mm/, '')) * 1000000))
       this.nehubaViewer.setNavigationState({
         position : (pos as [number, number, number]),
-        positionReal : this.statusPanelRealSpace,
+        positionReal : true,
       })
     } else {
       this.log.log('input did not parse to coordinates ', string)

@@ -3,7 +3,6 @@ import os
 SESSION_SECRET = os.getenv("SESSION_SECRET", "hey joline, remind me to set a more secure session secret")
 
 HOST_PATHNAME = os.getenv("HOST_PATHNAME", "")
-PORT = os.getenv("PORT")
 
 HOSTNAME = os.getenv("HOSTNAME", "http://localhost:3000")
 
@@ -14,13 +13,10 @@ LOCAL_CDN = os.getenv("LOCAL_CDN")
 HBP_CLIENTID_V2 = os.getenv("HBP_CLIENTID_V2", "no hbp id")
 HBP_CLIENTSECRET_V2 = os.getenv("HBP_CLIENTSECRET_V2", "no hbp client secret")
 
-HBP_DISCOVERY_URL = "https://iam.ebrains.eu/auth/realms/hbp"
-
 BUILD_TEXT = os.getenv("BUILD_TEXT", "")
 
 # REDIS env var
 
-REDIS_PROTO = os.getenv("REDIS_PROTO")
 REDIS_ADDR = os.getenv("REDIS_ADDR") or os.getenv("REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR") or "localhost"
 REDIS_PORT = os.getenv("REDIS_PORT") or os.getenv("REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT") or "6379"
 REDIS_USERNAME = os.getenv("REDIS_USERNAME")

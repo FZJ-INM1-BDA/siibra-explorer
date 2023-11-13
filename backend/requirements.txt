@@ -5,8 +5,4 @@ uvicorn[standard] # required as a asgi
 itsdangerous # required for starlette session middleware
 httpx # required for async uvicorn
 redis
-
-# cherrypicks https://github.com/HumanBrainProject/ebrains-drive/pull/20 and https://github.com/HumanBrainProject/ebrains-drive/pull/22
-# once both merged and published, use ebrains-drive instead
-git+https://github.com/xgui3783/ebrains-drive.git@tmp_fixDeleteUseIO
-
+ebrains-drive>=0.6.0

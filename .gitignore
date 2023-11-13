@@ -15,3 +15,5 @@ cachedKgDataset.json
 tmp
 storybook-static
 documentation.json
+
+.k8s/secret-*.yml
