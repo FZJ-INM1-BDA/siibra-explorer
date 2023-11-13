@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: log-volume-claim
+  labels:
+    type: longhorn-pvc
+spec:
+  # https://wiki.ebrains.eu/bin/view/Collabs/migration-faq/EBRAINS%20Kubernetes%20README/?srid=01ZnoA2n#HDownloadandconfigureyourkubeconfigfile
+  storageClassName: longhorn-1
+  resources:
+    requests:
+      storage: 4Gi
+  accessModes:
+    - ReadWriteMany
