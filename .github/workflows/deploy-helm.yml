@@ -25,11 +25,11 @@ jobs:
 
         if [[ $helm_status = "0" ]]
         then
-          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
-          echo helm --kubeconfig=$kubecfg_path install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
-        else
           echo "tag ${{ inputs.IMAGE_TAG }} found. Update"
-          echo helm --kubeconfig=$kubecfg_path upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+          helm --kubeconfig=$kubecfg_path upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+        else
+          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
+          helm --kubeconfig=$kubecfg_path install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
         fi
 
         rm $kubecfg_path
