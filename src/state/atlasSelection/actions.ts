@@ -3,6 +3,9 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 import { TFace, TSandsPoint } from "src/util/types";
 
+/**
+ * @deprecated Please use selectATPById
+ */
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
   props<{

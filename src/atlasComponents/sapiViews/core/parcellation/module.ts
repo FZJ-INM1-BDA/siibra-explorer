@@ -7,7 +7,6 @@ import { DialogModule } from "src/ui/dialogInfo/module";
 import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
-import { FilterUnsupportedParcPipe } from "./filterUnsupportedParc.pipe";
 import { ParcTmplDoiPipe } from "./parcTmplDoi.pipe";
 import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe";
@@ -30,14 +29,12 @@ import { ParcellationVisEffect } from "./parcellationVis.effect";
   ],
   declarations: [
     FilterGroupedParcellationPipe,
-    FilterUnsupportedParcPipe,
     ParcTmplDoiPipe,
     ParcellationGroupSelectedPipe,
     IsGroupedParcellation,
   ],
   exports: [
     FilterGroupedParcellationPipe,
-    FilterUnsupportedParcPipe,
     ParcellationGroupSelectedPipe,
     ParcTmplDoiPipe,
     IsGroupedParcellation,
