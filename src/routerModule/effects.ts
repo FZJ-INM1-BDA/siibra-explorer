@@ -55,8 +55,10 @@ export class RouterEffects {
       if (!atlasSelectionState.selectedAtlas) {
         const humanAtlas = atlases.find(atlas => atlas.id === IDS.ATLAES.HUMAN)
         if (humanAtlas) {
-          return atlasSelection.actions.selectAtlas({
-            atlas: humanAtlas
+          return atlasSelection.actions.selectATPById({
+            atlasId: IDS.ATLAES.HUMAN,
+            parcellationId: IDS.PARCELLATION.JBA31,
+            templateId: IDS.TEMPLATES.MNI152,
           })
         }
       }
