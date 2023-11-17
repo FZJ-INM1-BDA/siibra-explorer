@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: 'Deploy'
       run: |
-        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+        echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
         helm status ${{ inputs.IMAGE_TAG }}
         helm_status=$(echo $?)
 
@@ -31,4 +31,4 @@ jobs:
           echo helm upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
         fi
 
-        rm $HOME/.kube/config
+        rm ~/.kube/config
