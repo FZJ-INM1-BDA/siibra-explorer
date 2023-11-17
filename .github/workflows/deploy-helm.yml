@@ -18,18 +18,18 @@ jobs:
     - uses: actions/checkout@v3
     - name: 'Deploy'
       run: |
-        export KUBECONFIG="~/.kube_config"
-        echo "${{ secrets.KUBECONFIG }}" > ~/.kube_config
-        helm status ${{ inputs.IMAGE_TAG }}
+        kubecfg_path=${{ runner.temp }}/.kube_config
+        echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
+        helm --kubeconfig=$kubecfg_path status ${{ inputs.IMAGE_TAG }}
         helm_status=$(echo $?)
 
         if [[ $helm_status = "0" ]]
         then
-          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
-          echo helm install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
-        else
           echo "tag ${{ inputs.IMAGE_TAG }} found. Update"
-          echo helm upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+          helm --kubeconfig=$kubecfg_path upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+        else
+          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
+          helm --kubeconfig=$kubecfg_path install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
         fi
 
-        rm ~/.kube_config
+        rm $kubecfg_path

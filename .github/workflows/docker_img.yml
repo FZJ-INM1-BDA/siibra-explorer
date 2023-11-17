@@ -155,7 +155,7 @@ jobs:
       okd_token: ${{ secrets.OKD_PROD_SECRET }}
 
   trigger-deploy-master-rancher:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:
       - build-docker-img
       - setting-vars
