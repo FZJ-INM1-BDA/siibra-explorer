@@ -18,7 +18,7 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
-import { MatDialogRef, MatDialog } from "src/sharedModules/angularMaterial.exports"
+import { MatDialogRef, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
@@ -266,10 +266,7 @@ export class UserLayerService implements OnDestroy {
 
       // must be array
       if (!Array.isArray(arr)) {
-        return false
-      }
-      // can only deal with length 1 for now
-      if (arr.length !== 1) {
+        console.log(`Parsing PCJson failed. Expected json to be an array.`)
         return false
       }
       const item = arr[0]
@@ -285,35 +282,42 @@ export class UserLayerService implements OnDestroy {
   })
   async processPCJson(file: File): Promise<ProcessorOutput>{
     const arr = JSON.parse(await file.text())
-    const item = arr[0]
-    const { r, g, b } = item
+    const layers: AnnotationLayer[] = []
+    for (const item of arr) {
+
+      const { r, g, b } = item
     
-    const rgbString = [r, g, b].every(v => Number.isInteger(v))
-    ? rgbToHex([r, g, b])
-    : "#ff0000"
-
-    const id = getUuid()
-    const src = "QUICKNII_ABA"
-    const dst = "NEHUBA"
-    const xform = await linearTransform(src, dst)
-    const layer = new AnnotationLayer(id, rgbString, xform)
-
-    const triplets: number[][] = [item.triplets.slice(0, 3)]
-    for (const num of item.triplets as number[]) {
-      if (triplets.at(-1).length === 3) {
-        triplets.push([num])
-        continue
+      const rgbString = [r, g, b].every(v => Number.isInteger(v))
+      ? rgbToHex([r, g, b])
+      : "#ff0000"
+  
+      const id = getUuid()
+      const src = "QUICKNII_ABA"
+      const dst = "NEHUBA"
+      const xform = await linearTransform(src, dst)
+      const layer = new AnnotationLayer(id, rgbString, xform)
+  
+      const triplets: number[][] = [item.triplets.slice(0, 3)]
+      for (const num of item.triplets as number[]) {
+        if (triplets.at(-1).length === 3) {
+          triplets.push([num])
+          continue
+        }
+        triplets.at(-1).push(num)
       }
-      triplets.at(-1).push(num)
+      
+      layer.addAnnotation(triplets.map((triplet, idx) => ({
+        id: `${id}-${idx}`,
+        type: 'point',
+        point: triplet.map(v => v) as [number, number, number]
+      })))
     }
-    
-    layer.addAnnotation(triplets.map((triplet, idx) => ({
-      id: `${id}-${idx}`,
-      type: 'point',
-      point: triplet.map(v => v) as [number, number, number]
-    })))
     return {
-      cleanup: () => layer.dispose(),
+      cleanup: () => {
+        for (const layer of layers){
+          layer.dispose()
+        }
+      },
       meta: {
         filename: file.name,
       }
@@ -333,19 +337,23 @@ export class UserLayerService implements OnDestroy {
   }
 
   async handleUserInput(input: ValidInputTypes){
-    const id = getUuid()
-    const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
-    if (this.#idToCleanup.has(id)) {
-      throw new Error(`${url} was already registered`)
+    try {
+      const id = getUuid()
+      const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
+      if (this.#idToCleanup.has(id)) {
+        throw new Error(`${url} was already registered`)
+      }
+      this.#idToCleanup.set(id, cleanup)
+      this.addUserLayer(
+        id,
+        protocol && url &&`${protocol}${url}`,
+        meta,
+        option,
+      )
+      return
+    } catch (e) {
+      this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
-    this.#idToCleanup.set(id, cleanup)
-    this.addUserLayer(
-      id,
-      protocol && url &&`${protocol}${url}`,
-      meta,
-      option,
-    )
-    return
   }
 
   addUserLayer(
@@ -405,7 +413,8 @@ export class UserLayerService implements OnDestroy {
     private store$: Store,
     private dialog: MatDialog,
     private worker: AtlasWorkerService,
-    private routerSvc: RouterService
+    private routerSvc: RouterService,
+    private snackbar: MatSnackBar,
   ) {
     this.#subscription.push(
       this.routerSvc.customRoute$.pipe(

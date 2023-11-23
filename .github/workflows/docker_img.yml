@@ -154,6 +154,17 @@ jobs:
     secrets:
       okd_token: ${{ secrets.OKD_PROD_SECRET }}
 
+  trigger-deploy-master-rancher:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-helm.yml
+    with:
+      IMAGE_TAG: master
+    secrets:
+      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
   trigger-deploy-master-legacy:
     if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:

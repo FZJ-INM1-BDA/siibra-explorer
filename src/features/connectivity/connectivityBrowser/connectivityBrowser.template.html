@@ -77,7 +77,6 @@
                 </mat-label>
                 <mat-slider [min]="0"
                     [max]="(view$ | async | getProperty : 'numSubjects') - 1"
-                    [displayWith]="subjectDisplayWith"
                     step="1"
                     [discrete]="true"
                     class="w-100">

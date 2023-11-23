@@ -9,7 +9,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - run: |
         MASTER_VERSION=$(git show origin/master:package.json | jq '.version')
         THIS_VERSION=$(jq '.version' < package.json)
@@ -19,7 +19,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - run: |
         VERSION_NUM=$(jq '.version' < package.json)
         VERSION_NUM=${VERSION_NUM#\"}
@@ -30,7 +30,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - run: |
         VERSION_NUM=$(jq '.version' < package.json)
         VERSION_NUM=${VERSION_NUM#\"} 

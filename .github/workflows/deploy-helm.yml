@@ -1,0 +1,35 @@
+name: Trigger deploy with helm
+on:
+  workflow_call:
+
+    inputs:
+      IMAGE_TAG:
+        required: true
+        type: string
+
+    secrets:
+      KUBECONFIG:
+        required: true
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'Deploy'
+      run: |
+        kubecfg_path=${{ runner.temp }}/.kube_config
+        echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
+        helm --kubeconfig=$kubecfg_path status ${{ inputs.IMAGE_TAG }}
+        helm_status=$(echo $?)
+
+        if [[ $helm_status = "0" ]]
+        then
+          echo "tag ${{ inputs.IMAGE_TAG }} found. Update"
+          helm --kubeconfig=$kubecfg_path upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+        else
+          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
+          helm --kubeconfig=$kubecfg_path install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+        fi
+
+        rm $kubecfg_path
