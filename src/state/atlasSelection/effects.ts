@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
 import { catchError, filter, map, mapTo, switchMap, take, withLatestFrom } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { IDS, SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
@@ -286,7 +286,13 @@ export class Effect {
             
             if (autoSelect) {
               atlas ||= atlas[0]
-              template ||= result.spaces.find(s => s.name.includes("152")) || result.spaces[0]
+              template ||= result.spaces.find(s => s.id === IDS.TEMPLATES.MNI152) || result.spaces[0]
+
+              // on template selection, the possible parcellation may be narrowed
+              // as a result, we need to run the collapser to reduce the possible selection
+              const newPosATP = await this.collapser.collapseTemplateId(template.id)
+              const { parcellations } = DecisionCollapse.Intersect(newPosATP, result)
+              result.parcellations = parcellations
 
               const parcPrevIds = result.parcellations.map(p => p.prevId)
               const latestParcs = result.parcellations.filter(p => !parcPrevIds.includes(p.id))
@@ -299,6 +305,14 @@ export class Effect {
             if (!atlas) return // user cancelled
             template ||= await this.#askUserATP(messages.template || "Please select a space", result.spaces).toPromise()
             if (!template) return // user cancelled
+
+            
+            // on template selection, the possible parcellation may be narrowed
+            // as a result, we need to run the collapser to reduce the possible selection
+            const newPosATP = await this.collapser.collapseTemplateId(template.id)
+            const { parcellations } = DecisionCollapse.Intersect(newPosATP, result)
+            result.parcellations = parcellations
+
             parcellation ||= await this.#askUserATP(messages.parcellation || "Please select a parcellation", result.parcellations).toPromise()
             if (!parcellation) return // user cancelled
 
