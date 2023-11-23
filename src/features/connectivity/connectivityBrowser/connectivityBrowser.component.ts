@@ -359,10 +359,6 @@ export class ConnectivityBrowserComponent implements OnChanges {
       shareReplay(1),
     )),
   )
-  
-  subjectDisplayWith(subId: number): string {
-    return this.selectedDataset?.subjects[subId] || `${subId}`
-  }
 
   selectedDatasetAdditionalInfos$ = this.selectedDataset$.pipe(
     map(ds => ds ? ds.datasets : [])

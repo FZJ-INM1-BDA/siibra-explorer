@@ -51,7 +51,7 @@ import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerC
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
-import { environment } from './environments/environment.common';
+import { environment } from './environments/environment';
 import { SAPI } from './atlasComponents/sapi';
 
 @NgModule({
