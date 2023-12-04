@@ -42,6 +42,10 @@
     <mat-card-content></mat-card-content>
   </mat-card>
 
+  <ng-template [ngIf]="(busy$ | async) || (loadingPlotly$ | async)">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </ng-template>
+
   <mat-tab-group>
     <mat-tab label="Overview">
 
@@ -84,12 +88,6 @@
       
       <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
       </markdown-dom>
-    </mat-tab>
-
-    <mat-tab *ngIf="busy$ | async">
-      <ng-template matTabLabel>
-        <spinner-cmp></spinner-cmp>
-      </ng-template>
     </mat-tab>
 
     <!-- voi special view -->

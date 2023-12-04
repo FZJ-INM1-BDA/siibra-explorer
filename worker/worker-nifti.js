@@ -197,6 +197,10 @@
       const dim3 = readData(dataView, dict.dim3, le)
       const dim4 = readData(dataView, dict.dim4, le)
       const dim5 = readData(dataView, dict.dim5, le)
+      if (dim0 > 3) {
+        warning.push(`dim[0] was ${dim0}, set to 3 instead`)
+        setData(dataView, dict.dim0, 3, le)
+      }
       if (dim4 === 0) {
         warning.push(`dim[4] was 0, set to 1 instead`)
         setData(dataView, dict.dim4, 1, le)

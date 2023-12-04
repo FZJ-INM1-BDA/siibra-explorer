@@ -15,6 +15,15 @@
       </ng-template>
     </ng-template>
     
+    <ng-template [ngIf]="data.warning.length > 0">
+      <button mat-icon-button
+        [matTooltip]="data.warning.length +  ' messages on user layer.'"
+        color="warn"
+        (click)="toggleShowMore()">
+        <i class="fas fa-exclamation-triangle"></i>
+      </button>
+    </ng-template>
+
     <button
       [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
       mat-icon-button
