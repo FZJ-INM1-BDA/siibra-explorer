@@ -23,7 +23,7 @@ import { MatDialogRef, MatDialog, MatSnackBar } from "src/sharedModules/angularM
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
 type Meta = {
-  message?: string
+  messages?: string[]
   filename: string
 }
 
@@ -97,13 +97,13 @@ export class UserLayerService implements OnDestroy {
       protocol: "swc://",
       meta: {
         filename: file.name,
-        message,
+        messages: [message],
       },
       cleanup: () => URL.revokeObjectURL(url)
     }
   }
 
-  async #processUnpackedNiiBuf(buf: ArrayBuffer): ReturnType<ProcessResource['processor']> {
+  async #processUnpackedNiiBuf(buf: ArrayBuffer, file: File): ReturnType<ProcessResource['processor']> {
     const { result } = await this.worker.sendMessage({
       method: "PROCESS_NIFTI",
       param: {
@@ -125,7 +125,10 @@ export class UserLayerService implements OnDestroy {
           highThreshold: meta.max || 1,
         })
       },
-      meta,
+      meta: {
+        filename: file.name,
+        messages: meta.warning
+      },
       cleanup: () => URL.revokeObjectURL(url)
     }
   }
@@ -135,7 +138,7 @@ export class UserLayerService implements OnDestroy {
   )
   async processNifti(file: File){
     const buf = await file.arrayBuffer()
-    return await this.#processUnpackedNiiBuf(buf)
+    return await this.#processUnpackedNiiBuf(buf, file)
   }
 
   @RegisterSource(
@@ -146,7 +149,7 @@ export class UserLayerService implements OnDestroy {
     try {
       const { pako } = await getExportNehuba()
       const outbuf = pako.inflate(buf).buffer
-      return await this.#processUnpackedNiiBuf(outbuf)
+      return await this.#processUnpackedNiiBuf(outbuf, file)
     } catch (e) {
       console.log("unpack error", e)
       throw e
@@ -385,7 +388,7 @@ export class UserLayerService implements OnDestroy {
       data: {
         layerName: id,
         filename: meta.filename,
-        warning: [meta.message] || [],
+        warning: meta.messages || [],
       },
       hasBackdrop: false,
       disableClose: true,

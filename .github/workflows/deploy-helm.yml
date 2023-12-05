@@ -3,6 +3,9 @@ on:
   workflow_call:
 
     inputs:
+      DEPLOYMENT_NAME:
+        required: true
+        type: string
       IMAGE_TAG:
         required: true
         type: string
@@ -20,16 +23,22 @@ jobs:
       run: |
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
-        helm --kubeconfig=$kubecfg_path status ${{ inputs.IMAGE_TAG }}
+        helm --kubeconfig=$kubecfg_path status ${{ inputs.DEPLOYMENT_NAME }}
         helm_status=$(echo $?)
 
         if [[ $helm_status = "0" ]]
         then
-          echo "tag ${{ inputs.IMAGE_TAG }} found. Update"
-          helm --kubeconfig=$kubecfg_path upgrade ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+          echo "tag ${{ inputs.DEPLOYMENT_NAME }} found. Update"
+          helm --kubeconfig=$kubecfg_path \
+            upgrade \
+            --set image.tag=${{ inputs.IMAGE_TAG }} \
+            ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
         else
-          echo "tag ${{ inputs.IMAGE_TAG }} not found. Install"
-          helm --kubeconfig=$kubecfg_path install ${{ inputs.IMAGE_TAG }} .helm/siibra-explorer/
+          echo "tag ${{ inputs.DEPLOYMENT_NAME }} not found. Install"
+          helm --kubeconfig=$kubecfg_path \
+            install \
+            --set image.tag=${{ inputs.IMAGE_TAG }} \
+            ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
         fi
 
         rm $kubecfg_path

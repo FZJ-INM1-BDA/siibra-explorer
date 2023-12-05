@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, combineLatest, of } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, map, shareReplay, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, combineLatest, concat, of } from 'rxjs';
+import { catchError, distinctUntilChanged, map, shareReplay, switchMap } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
@@ -20,15 +20,32 @@ export class FeatureViewComponent implements OnChanges {
 
   #featureId = new BehaviorSubject<string>(null)
 
-  plotly$ = combineLatest([
-    this.#featureId.pipe(
-      filter(v => !!v)
-    ),
+  #plotlyInput$ = combineLatest([
+    this.#featureId,
     this.darktheme$
   ]).pipe(
-    switchMap(([ featureId, darktheme ]) => this.sapi.getFeaturePlot(featureId, { template: darktheme ? "plotly_dark" : "plotly_white" })),
+    map(([ id, darktheme ]) => ({ id, darktheme })),
+    distinctUntilChanged((o, n) => o.id === n.id && o.darktheme === n.darktheme),
     shareReplay(1),
-    catchError(() => of(null))
+  )
+  
+  loadingPlotly$ = this.#plotlyInput$.pipe(
+    switchMap(() => concat(
+      of(true),
+      this.plotly$.pipe(
+        map(() => false)
+      )
+    )),
+    distinctUntilChanged()
+  )
+
+  plotly$ = this.#plotlyInput$.pipe(
+    switchMap(({ id, darktheme }) => !!id
+    ? this.sapi.getFeaturePlot(id, { template: darktheme ? 'plotly_dark' : 'plotly_white' }).pipe(
+        catchError(() => of(null))
+      )
+    : of(null)),
+    shareReplay(1),
   )
 
   #detailLinks = new Subject<string[]>()

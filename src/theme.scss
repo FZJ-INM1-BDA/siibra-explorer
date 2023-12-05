@@ -137,6 +137,11 @@ $sxplr-dark-theme: mat.define-dark-theme((
   {
     caret-color: white!important;
   }
+
+  // somehow, unthemed variables did not get included
+  // TODO fix?
+  --mdc-filled-button-label-text-color: #fff;
+  --mdc-text-button-label-text-color: #fff;
 }
 
 [darktheme=false],
