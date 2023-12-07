@@ -1,0 +1,415 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "method": {
+      "const": "sxplr.on.allRegions"
+    },
+    "params": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PTRegion"
+      }
+    }
+  },
+  "definitions": {
+    "PTRegion": {
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "@Type"
+        },
+        "@context": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/VocabModel"
+            }
+          ],
+          "title": "@Context",
+          "default": {
+            "@vocab": "https://openminds.ebrains.eu/vocab/"
+          }
+        },
+        "@id": {
+          "type": "string",
+          "title": "@Id",
+          "description": "Metadata node identifier."
+        },
+        "hasAnnotation": {
+          "$ref": "#/components/schemas/HasAnnotation"
+        },
+        "hasParent": {
+          "items": {},
+          "type": "array",
+          "minItems": 1,
+          "title": "hasParent",
+          "description": "Reference to a parent object or legal person."
+        },
+        "lookupLabel": {
+          "type": "string",
+          "title": "lookupLabel"
+        },
+        "name": {
+          "type": "string",
+          "title": "name",
+          "description": "Word or phrase that constitutes the distinctive designation of a being or thing."
+        },
+        "ontologyIdentifier": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1,
+          "title": "ontologyIdentifier",
+          "description": "Term or code used to identify something or someone registered within a particular ontology."
+        },
+        "relationAssessment": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/RelationAssessmentItem"
+            },
+            {
+              "$ref": "#/components/schemas/RelationAssessmentItem1"
+            }
+          ],
+          "title": "Relationassessment"
+        },
+        "versionIdentifier": {
+          "type": "string",
+          "title": "versionIdentifier",
+          "description": "Term or code used to identify the version of something."
+        },
+        "versionInnovation": {
+          "type": "string",
+          "title": "versionInnovation",
+          "description": "Documentation on what changed in comparison to a previously published form of something."
+        }
+      },
+      "type": "object",
+      "required": [
+        "@type",
+        "@id",
+        "versionIdentifier"
+      ],
+      "title": "ParcellationEntityVersionModel",
+      "description": "ParcellationEntityVersionModel"
+    }
+  },
+  "components": {
+    "schemas": {
+      "VocabModel": {
+        "properties": {
+          "@vocab": {
+            "type": "string",
+            "title": "@Vocab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@vocab"
+        ],
+        "title": "VocabModel"
+      },
+      "HasAnnotation": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "bestViewPoint": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BestViewPoint"
+              }
+            ],
+            "title": "Bestviewpoint",
+            "description": "Structured information on a coordinate point."
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "criteriaQualityType": {
+            "title": "criteriaQualityType",
+            "description": "Distinct class that defines how the judgement or decision was made for a particular criteria."
+          },
+          "displayColor": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "title": "displayColor",
+            "description": "Preferred coloring."
+          },
+          "inspiredBy": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "inspiredBy",
+            "description": "Reference to an inspiring element."
+          },
+          "internalIdentifier": {
+            "type": "string",
+            "title": "internalIdentifier",
+            "description": "Term or code that identifies someone or something within a particular product."
+          },
+          "laterality": {
+            "items": {},
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 1,
+            "title": "laterality",
+            "description": "Differentiation between a pair of lateral homologous parts of the body."
+          },
+          "visualizedIn": {
+            "title": "visualizedIn",
+            "description": "Reference to an image in which something is visible."
+          }
+        },
+        "type": "object",
+        "required": [
+          "criteriaQualityType",
+          "internalIdentifier"
+        ],
+        "title": "HasAnnotation"
+      },
+      "RelationAssessmentItem": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "inRelationTo": {
+            "title": "inRelationTo",
+            "description": "Reference to a related element."
+          },
+          "qualitativeOverlap": {
+            "title": "qualitativeOverlap",
+            "description": "Semantic characterization of how much two things occupy the same space."
+          }
+        },
+        "type": "object",
+        "required": [
+          "inRelationTo",
+          "qualitativeOverlap"
+        ],
+        "title": "RelationAssessmentItem"
+      },
+      "RelationAssessmentItem1": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "inRelationTo": {
+            "title": "inRelationTo",
+            "description": "Reference to a related element."
+          },
+          "quantitativeOverlap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuantitativeOverlapItem"
+              },
+              {
+                "$ref": "#/components/schemas/QuantitativeOverlapItem1"
+              }
+            ],
+            "title": "Quantitativeoverlap"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inRelationTo",
+          "quantitativeOverlap"
+        ],
+        "title": "RelationAssessmentItem1"
+      },
+      "BestViewPoint": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "coordinateSpace": {
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "coordinates": {
+            "items": {
+              "$ref": "#/components/schemas/api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates"
+            },
+            "type": "array",
+            "title": "Coordinates",
+            "description": "Structured information on a quantitative value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "coordinateSpace",
+          "coordinates"
+        ],
+        "title": "BestViewPoint"
+      },
+      "QuantitativeOverlapItem": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "QuantitativeOverlapItem"
+      },
+      "QuantitativeOverlapItem1": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "maxValue": {
+            "type": "number",
+            "title": "maxValue",
+            "description": "Greatest quantity attained or allowed."
+          },
+          "maxValueUnit": {
+            "title": "maxValueUnit"
+          },
+          "minValue": {
+            "type": "number",
+            "title": "minValue",
+            "description": "Smallest quantity attained or allowed."
+          },
+          "minValueUnit": {
+            "title": "minValueUnit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "maxValue",
+          "minValue"
+        ],
+        "title": "QuantitativeOverlapItem1"
+      },
+      "api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "Coordinates"
+      }
+    }
+  }
+}

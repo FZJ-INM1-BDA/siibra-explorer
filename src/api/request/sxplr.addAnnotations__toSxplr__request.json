@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "method": {
+      "const": "sxplr.addAnnotations"
+    },
+    "params": {
+      "properties": {
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SxplrCoordinatePointExtension"
+          }
+        }
+      },
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "SxplrCoordinatePointExtension": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AtId"
+        },
+        {
+          "$ref": "#/schemas/CoordinatePointModel/"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "color": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

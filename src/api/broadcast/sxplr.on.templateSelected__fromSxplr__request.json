@@ -1,0 +1,402 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "method": {
+      "const": "sxplr.on.templateSelected"
+    },
+    "params": {
+      "$ref": "#/definitions/PTSpace"
+    }
+  },
+  "definitions": {
+    "PTSpace": {
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "@Type"
+        },
+        "@context": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/VocabModel"
+            }
+          ],
+          "title": "@Context",
+          "default": {
+            "@vocab": "https://openminds.ebrains.eu/vocab/"
+          }
+        },
+        "@id": {
+          "type": "string",
+          "title": "@Id",
+          "description": "Metadata node identifier."
+        },
+        "anatomicalAxesOrientation": {
+          "type": "object",
+          "title": "anatomicalAxesOrientation",
+          "description": "Relation between reference planes used in anatomy and mathematics."
+        },
+        "axesOrigin": {
+          "items": {
+            "$ref": "#/components/schemas/AxesOrigin"
+          },
+          "type": "array",
+          "title": "Axesorigin",
+          "description": "Structured information on a quantitative value."
+        },
+        "defaultImage": {
+          "items": {
+            "$ref": "#/components/schemas/VolumeModel"
+          },
+          "type": "array",
+          "minItems": 1,
+          "title": "defaultImage",
+          "description": "Two or three dimensional image that particluarly represents a specific coordinate space. Overriden by Siibra API to use as VolumeModel"
+        },
+        "digitalIdentifier": {
+          "type": "object",
+          "title": "digitalIdentifier",
+          "description": "Digital handle to identify objects or legal persons."
+        },
+        "fullName": {
+          "type": "string",
+          "title": "fullName",
+          "description": "Whole, non-abbreviated name of something or somebody."
+        },
+        "homepage": {
+          "type": "object",
+          "title": "homepage",
+          "description": "Main website of something or someone."
+        },
+        "howToCite": {
+          "type": "string",
+          "title": "howToCite",
+          "description": "Preferred format for citing a particular object or legal person."
+        },
+        "nativeUnit": {
+          "type": "object",
+          "title": "nativeUnit",
+          "description": "Determinate quantity used in the original measurement."
+        },
+        "ontologyIdentifier": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1,
+          "title": "ontologyIdentifier",
+          "description": "Term or code used to identify something or someone registered within a particular ontology."
+        },
+        "releaseDate": {
+          "type": "string",
+          "title": "releaseDate",
+          "description": "Fixed date on which a product is due to become or was made available for the general public to see or buy"
+        },
+        "shortName": {
+          "type": "string",
+          "title": "shortName",
+          "description": "Shortened or fully abbreviated name of something or somebody."
+        },
+        "versionIdentifier": {
+          "type": "string",
+          "title": "versionIdentifier",
+          "description": "Term or code used to identify the version of something."
+        },
+        "datasets": {
+          "items": {
+            "$ref": "#/components/schemas/EbrainsDatasetModel"
+          },
+          "type": "array",
+          "title": "Datasets"
+        }
+      },
+      "type": "object",
+      "required": [
+        "@type",
+        "@id",
+        "anatomicalAxesOrientation",
+        "axesOrigin",
+        "fullName",
+        "nativeUnit",
+        "releaseDate",
+        "shortName",
+        "versionIdentifier"
+      ],
+      "title": "CommonCoordinateSpaceModel",
+      "description": "CommonCoordinateSpaceModel"
+    }
+  },
+  "components": {
+    "schemas": {
+      "VocabModel": {
+        "properties": {
+          "@vocab": {
+            "type": "string",
+            "title": "@Vocab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@vocab"
+        ],
+        "title": "VocabModel"
+      },
+      "AxesOrigin": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "AxesOrigin"
+      },
+      "VolumeModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "formats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "providesMesh": {
+            "type": "boolean",
+            "title": "Providesmesh"
+          },
+          "providesImage": {
+            "type": "boolean",
+            "title": "Providesimage"
+          },
+          "fragments": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Fragments"
+          },
+          "variant": {
+            "type": "string",
+            "title": "Variant"
+          },
+          "providedVolumes": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Providedvolumes"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "name",
+          "formats",
+          "providesMesh",
+          "providesImage",
+          "fragments",
+          "providedVolumes",
+          "space",
+          "datasets"
+        ],
+        "title": "VolumeModel",
+        "description": "VolumeModel"
+      },
+      "EbrainsDatasetModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "urls": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsUrl"
+            },
+            "type": "array",
+            "title": "Urls"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "contributors": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Contributors"
+          },
+          "ebrains_page": {
+            "type": "string",
+            "title": "Ebrains Page"
+          },
+          "custodians": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Custodians"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "urls",
+          "contributors",
+          "custodians"
+        ],
+        "title": "EbrainsDatasetModel",
+        "description": "EbrainsDatasetModel"
+      },
+      "SiibraAtIdModel": {
+        "properties": {
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@id"
+        ],
+        "title": "SiibraAtIdModel"
+      },
+      "EbrainsDsUrl": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "url"
+        ],
+        "title": "EbrainsDsUrl",
+        "description": "EbrainsDsUrl"
+      },
+      "EbrainsDsPerson": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "schema.org/shortName": {
+            "type": "string",
+            "title": "Schema.Org/Shortname"
+          },
+          "identifier": {
+            "type": "string",
+            "title": "Identifier"
+          },
+          "shortName": {
+            "type": "string",
+            "title": "Shortname"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "schema.org/shortName",
+          "identifier",
+          "shortName",
+          "name"
+        ],
+        "title": "EbrainsDsPerson",
+        "description": "EbrainsDsPerson"
+      }
+    }
+  }
+}
