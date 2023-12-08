@@ -26,9 +26,9 @@ const anatOriToIdx: Record<AnatomicalOrientation, number> = {
   'si': 2
 }
 const anaOriAltAxis: Record<AnatomicalOrientation, (tmplSize: [number, number, number], ratio: {x: number, y: number}) => {idx: number, value: number}> = {
-  'rl': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
-  'ap': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
-  'si': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[0] * (0.5 - x) })
+  'rl': (tmplSize, { y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
+  'ap': (tmplSize, { y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
+  'si': (tmplSize, { x }) => ({ idx: 2, value: tmplSize[0] * (0.5 - x) })
 }
 
 function getDim(triplet: number[], view: EnumClassicalView) {
