@@ -1,7 +1,7 @@
-import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject } from "@angular/core";
+import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject, HostListener } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, concat, NEVER, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, NEVER, Observable, of, Subject } from "rxjs";
 import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
@@ -24,6 +24,11 @@ const anatOriToIdx: Record<AnatomicalOrientation, number> = {
   'rl': 0,
   'ap': 1,
   'si': 2
+}
+const anaOriAltAxis: Record<AnatomicalOrientation, (tmplSize: [number, number, number], ratio: {x: number, y: number}) => {idx: number, value: number}> = {
+  'rl': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
+  'ap': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
+  'si': (tmplSize, { x, y }) => ({ idx: 2, value: tmplSize[0] * (0.5 - x) })
 }
 
 function getDim(triplet: number[], view: EnumClassicalView) {
@@ -49,6 +54,38 @@ function getDim(triplet: number[], view: EnumClassicalView) {
 })
 
 export class PerspectiveViewSlider {
+
+    #xr = new BehaviorSubject(null)
+    #yr = new BehaviorSubject(null)
+    #xyRatio = combineLatest([
+      this.#xr.pipe(distinctUntilChanged()),
+      this.#yr.pipe(distinctUntilChanged()),
+    ]).pipe(
+      map(([ x, y ]) => ({ x, y }))
+    )
+    mousemove(ev: MouseEvent){
+      this.#mousemove.next(ev)
+      const target = (ev.target as HTMLInputElement)
+      this.#xr.next(ev.offsetX / target.clientWidth)
+      this.#yr.next(ev.offsetY / target.clientHeight)
+    }
+
+    #mousemove = new Subject()
+    #mousedown = new Subject()
+    #mouseup = new Subject()
+    #dragging = this.#mousedown.pipe(
+      switchMap(() => this.#mousemove.pipe(
+        takeUntil(this.#mouseup)
+      ))
+    )
+    mousedown(){
+      this.#mousedown.next(true)
+    }
+
+    @HostListener('document:mouseup')
+    mouseup(){
+      this.#mouseup.next(true)
+    }
 
     #destroy$ = inject(DestroyDirective).destroyed$
 
@@ -217,12 +254,20 @@ export class PerspectiveViewSlider {
     public previewImageUrl$ = combineLatest([
       this.selectedTemplate$,
       this.useMinimap$,
+      this.navPosition$,
     ]).pipe(
-      map(([template, view]) => {
-        const url = getScreenshotUrl(template, view)
+      map(([template, view, nav]) => {
+        let useImgIdx = 0
+        if (view === EnumClassicalView.SAGITTAL) {
+          const { real } = nav || {}
+          const xPos = real?.[0] || 0
+          useImgIdx = xPos < 0 ? 0 : 1
+        }
+        const url = getScreenshotUrl(template, view, useImgIdx)
         if (!url) return null
         return `assets/images/persp-view/${url}`
-      })
+      }),
+      distinctUntilChanged()
     )
 
     public sliceviewIsNormal$ = this.store$.pipe(
@@ -341,20 +386,37 @@ export class PerspectiveViewSlider {
         this.nehubaViewer$,
         this.rangeControlSetting$,
       ]).pipe(
-        switchMap(([ nehubaViewer, rangeCtrl ]) => this.minimapControl.valueChanges.pipe(
-          withLatestFrom(this.navPosition$.pipe(
-            map(value => value?.real)
-          )),
-          map(([newValue, currentPosition]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition }))
+        switchMap(([ nehubaViewer, rangeCtrl ]) => combineLatest([
+          this.minimapControl.valueChanges,
+          concat(
+            of(true),
+            this.#dragging
+          ),
+        ]).pipe(
+          map(([ newValue, _ ]) => newValue),
+          withLatestFrom(
+            this.navPosition$.pipe(
+              map(value => value?.real)
+            ),
+            this.currentTemplateSize$,
+            this.#xyRatio,
+          ),
+          map(([newValue, currentPosition, currTmplSize, xyRatio]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition, currTmplSize, xyRatio }))
         )),
         takeUntil(this.#destroy$)
-      ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition }) => {
+      ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition, currTmplSize, xyRatio }) => {
         if (newValue === null) return
         const { anatomicalOrientation } = rangeCtrl
         if (!anatomicalOrientation) return
         const idx = anatOriToIdx[anatomicalOrientation]
         const newNavPosition = [...currentPosition]
         newNavPosition[idx] = newValue
+
+        if (!(xyRatio.x === xyRatio.y === null)) {
+          const { idx: altIdx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize.real, xyRatio)
+          newNavPosition[altIdx] = value
+        }
+
         nehubaViewer.setNavigationState({
           position: newNavPosition,
           positionReal: true
@@ -397,24 +459,24 @@ export class PerspectiveViewSlider {
 }
 
 const spaceIdToPrefix = {
-  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": "icbm152",
-  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": "colin",
+  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": "mni152",
+  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": "colin27",
   "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": "bigbrain",
-  "minds/core/referencespace/v1.0.0/MEBRAINS": "monkey",
-  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": "mouse",
-  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": "rat"
+  "minds/core/referencespace/v1.0.0/MEBRAINS": "mebrains",
+  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": "allen",
+  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": "waxholm"
 }
 
 const viewToSuffix = {
-  [EnumClassicalView.SAGITTAL]: 'sag',
+  [EnumClassicalView.SAGITTAL]: 'sagittal',
   [EnumClassicalView.AXIAL]: 'axial',
   [EnumClassicalView.CORONAL]: 'coronal',
 }
 
-function getScreenshotUrl(space: SxplrTemplate, requestedView: EnumClassicalView): string {
+function getScreenshotUrl(space: SxplrTemplate, requestedView: EnumClassicalView, imgIdx: number = 0): string {
   const prefix = spaceIdToPrefix[space?.id]
   if (!prefix) return null
   const suffix = viewToSuffix[requestedView]
   if (!suffix) return null
-  return `${prefix}-${suffix}.png`
+  return `${prefix}_${suffix}_${imgIdx}.png`
 }
