@@ -15,7 +15,7 @@ import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo } from "../../layerCtrl.service/layerCtrl.util";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
-import { isNullish, isWheelEvent } from "src/util/fn"
+import { isNullish, isWheelEvent, switchMapWaitFor } from "src/util/fn"
 
 const MAX_DIM = 200
 
@@ -242,6 +242,11 @@ export class PerspectiveViewSlider {
       switchMap(templateSize => {
         return this.rangeControlSetting$.pipe(
           switchMap(orientation => this.navPosition$.pipe(
+            switchMap(
+              switchMapWaitFor({
+                condition: nav => !!nav && !!nav.real
+              })
+            ),
             take(1),
             map(nav => {
               if (!nav || !orientation || !templateSize) return null

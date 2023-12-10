@@ -5,15 +5,11 @@ import { PanelMode } from "./const"
 export type UiStore = {
   panelMode: PanelMode
   panelOrder: string // permutation of 0123
-  octantRemoval: boolean
-  showDelineation: boolean
 }
 
 export const defaultState: UiStore = {
-  panelMode: 'FOUR_PANEL',
-  panelOrder: '0123',
-  octantRemoval: false,
-  showDelineation: true,
+  panelMode: null,
+  panelOrder: null,
 }
 
 export const reducer = createReducer(

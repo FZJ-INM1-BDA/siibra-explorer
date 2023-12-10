@@ -16,6 +16,7 @@ export type TUrlPlugin<T> = {
 
 export type TUrlNav<T> = {
   ['@']: T // navstring
+  vs?: T
 }
 
 export type TUrlViewFeat<T> = {

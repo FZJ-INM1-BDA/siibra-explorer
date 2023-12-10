@@ -463,7 +463,15 @@ type TGetShaderCfg = {
   opacity: number
 }
 
-function encodeBool(...flags: boolean[]) {
+export function decodeBool(num: number) {
+  const rBool: boolean[] = []
+  for (let i = 0; i < 8; i ++) {
+    rBool.push( ((num >> i) & 1) === 1 )
+  }
+  return rBool
+}
+
+export function encodeBool(...flags: boolean[]) {
   if (flags.length > 8) {
     throw new Error(`encodeBool can only handle upto 8 bools`)
   }
