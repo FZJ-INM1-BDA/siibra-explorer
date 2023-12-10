@@ -300,7 +300,7 @@ export class RouteStateTransformSvc {
     const encodedVal = val.replace(trimStart, "")
     const array = Uint8Array.from(window.atob(encodedVal), v => v.charCodeAt(0))
 
-    let returnVal: Partial<ViewerConfigState> = {}
+    const returnVal: Partial<ViewerConfigState> = {}
 
     const panelModeVal = array[0]
     if (panelModeVal === 1) {
