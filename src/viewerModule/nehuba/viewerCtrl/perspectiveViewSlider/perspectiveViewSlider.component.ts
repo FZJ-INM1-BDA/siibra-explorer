@@ -1,7 +1,7 @@
 import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject, HostListener } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, concat, NEVER, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, merge, NEVER, Observable, of, Subject } from "rxjs";
 import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
@@ -15,6 +15,7 @@ import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo } from "../../layerCtrl.service/layerCtrl.util";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { isNullish, isWheelEvent } from "src/util/fn"
 
 const MAX_DIM = 200
 
@@ -41,6 +42,11 @@ function getDim(triplet: number[], view: EnumClassicalView) {
   if (view === EnumClassicalView.SAGITTAL) {
     return [triplet[1], triplet[2]]
   }
+}
+
+type ModArr = {
+  idx: number
+  value: number
 }
 
 @Component({
@@ -85,6 +91,14 @@ export class PerspectiveViewSlider {
     @HostListener('document:mouseup')
     mouseup(){
       this.#mouseup.next(true)
+    }
+
+    #zoom = new Subject<number>()
+    mousewheel(ev: Event){
+      if (!isWheelEvent(ev)) {
+        return
+      }
+      this.#zoom.next(ev.deltaY)
     }
 
     #destroy$ = inject(DestroyDirective).destroyed$
@@ -382,43 +396,82 @@ export class PerspectiveViewSlider {
       @Inject(CURRENT_TEMPLATE_DIM_INFO) private tmplInfo$: Observable<TemplateInfo>,
     ) {
 
-      combineLatest([
-        this.nehubaViewer$,
-        this.rangeControlSetting$,
-      ]).pipe(
-        switchMap(([ nehubaViewer, rangeCtrl ]) => combineLatest([
-          this.minimapControl.valueChanges,
-          concat(
-            of(true),
-            this.#dragging
-          ),
-        ]).pipe(
-          map(([ newValue, _ ]) => newValue),
+      const posMod$ = this.rangeControlSetting$.pipe(
+        switchMap(rangeCtrl => this.#dragging.pipe(
           withLatestFrom(
-            this.navPosition$.pipe(
-              map(value => value?.real)
-            ),
+            this.minimapControl.valueChanges,
             this.currentTemplateSize$,
             this.#xyRatio,
           ),
-          map(([newValue, currentPosition, currTmplSize, xyRatio]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition, currTmplSize, xyRatio }))
-        )),
+          map(([_, newValue, currTmplSize, xyRatio]) => {
+            
+            const positionMod: ModArr[] = []
+
+            const { anatomicalOrientation } = rangeCtrl
+            if (!isNullish(anatomicalOrientation) && !isNullish(newValue)) {
+              const idx = anatOriToIdx[anatomicalOrientation]
+              positionMod.push({
+                idx,
+                value: newValue
+              })
+              
+            }
+
+            if (!isNullish(xyRatio.x) && !isNullish(xyRatio.y)) {
+              const { idx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize.real, xyRatio)
+              positionMod.push({
+                idx,
+                value
+              })
+            }
+            return { positionMod, zoom: null as number }
+          })
+        ))
+      )
+
+      const zoom$ = this.nehubaViewer$.pipe(
+        switchMap(nehubaViewer => this.#zoom.pipe(
+          withLatestFrom(nehubaViewer
+          ? nehubaViewer.viewerPositionChange
+          : NEVER),
+          map(([zoom, posChange]) => {
+            const { zoom: currZoom } = posChange
+            return {
+              zoom: zoom > 0 ? currZoom * 1.2 : currZoom * 0.8,
+              positionMod: null as ModArr[]
+            }
+          })
+        ))
+      )
+
+      this.nehubaViewer$.pipe(
+        switchMap(nehubaViewer =>
+          merge(
+            posMod$,
+            zoom$,
+          ).pipe(
+            map(({ positionMod, zoom }) => ({
+              nehubaViewer, positionMod, zoom
+            }))
+          )
+        ),
+        withLatestFrom(
+          this.navPosition$.pipe(
+            map(value => value?.real)
+          ),
+        ),
         takeUntil(this.#destroy$)
-      ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition, currTmplSize, xyRatio }) => {
-        if (newValue === null) return
-        const { anatomicalOrientation } = rangeCtrl
-        if (!anatomicalOrientation) return
-        const idx = anatOriToIdx[anatomicalOrientation]
+      ).subscribe(([{ nehubaViewer, positionMod, zoom }, currentPosition]) => {
+
         const newNavPosition = [...currentPosition]
-        newNavPosition[idx] = newValue
-
-        if (!(xyRatio.x === xyRatio.y === null)) {
-          const { idx: altIdx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize.real, xyRatio)
-          newNavPosition[altIdx] = value
+        if (!isNullish(positionMod)) {
+          for (const { idx, value } of positionMod) {
+            newNavPosition[idx] = value
+          }
         }
-
         nehubaViewer.setNavigationState({
           position: newNavPosition,
+          ...(isNullish(zoom) ? {} : { zoom }),
           positionReal: true
         })
       })

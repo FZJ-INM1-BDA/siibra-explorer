@@ -2,7 +2,7 @@ import ts from 'typescript'
 import path, { dirname } from 'path'
 import { fileURLToPath } from "url"
 import { readFile, writeFile } from "node:fs/promises"
-import { clearDirectory, getAllDefs, resolveDef, resolveAllDefs } from "./tsUtil.mjs"
+import { clearDirectory, resolveAllDefs } from "./tsUtil.mjs"
 import { processNode } from "./tsUtil/index.mjs"
 
 /**
@@ -53,8 +53,8 @@ async function populateBroadCast(broadcastNode, node){
         params: output.properties[prop]
       }
     }
-    newSchema = await resolveAllDefs(newSchema, node)
     const filename = `${NAMESPACE}.on.${prop}__fromSxplr__request.json`
+    newSchema = await resolveAllDefs(newSchema, node)
     await writeFile(path.join(dirnames.broadcast, filename), JSON.stringify(newSchema, null, 2), 'utf-8')
   }
 }

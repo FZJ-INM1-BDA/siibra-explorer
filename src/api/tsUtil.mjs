@@ -96,6 +96,13 @@ function setDictValue(d, key, value){
   }
 }
 
+/**
+ * 
+ * @description Get the value (if exist), otherwise return null. Does not mutate
+ * @param {Object} d 
+ * @param {string} key 
+ * @returns {JSchema|null}
+ */
 function getDictValue(d, key) {
   const keys = key.replace(/^#\//, '').split("/")
   let returnValue = d
@@ -149,8 +156,6 @@ const defMap = {
         allOf: [{
           $ref: "#/definitions/AtId"
         }, {
-          $ref: "#/schemas/CoordinatePointModel/"
-        }, {
           type: "object",
           properties: {
             name: {
@@ -158,15 +163,26 @@ const defMap = {
             },
             color: {
               type: "string"
+            },
+            openminds: {
+              $ref: "#/components/schemas/CoordinatePointModel"
             }
           }
         }]
+      },
+      AtId: {
+        type: "object",
+        properties: {
+          "@id": {
+            type: "string"
+          }
+        }
       }
     }
   },
   "#/definitions/AtId": {
     definitions: {
-      "AtId": {
+      AtId: {
         type: "object",
         properties: {
           "@id": {
@@ -264,11 +280,21 @@ let openApi = null
  * @returns {Promise<Object<string, Object<string, JSchema>>>}
  */
 export async function resolveDef(def, src){
+  
+  /**
+   * @type {JSchema}
+   */
+  let schema = null
+
   const fullDef = def
   const trimmedDef = def.replace("#/definitions/", "")
   const found = defMap[def]
   if(found) {
-    return found
+    schema = found
+    
+    if (trimmedDef === "AtId" || trimmedDef === "AddableLayer") {
+      return schema
+    }
   }
   if (!openApi) {
     const openapiText = await readFile(path.resolve(__dirname, "../atlasComponents/sapi/openapi.json"), "utf-8")
@@ -294,10 +320,6 @@ export async function resolveDef(def, src){
     return JSON.parse(JSON.stringify(traversal))
   }
 
-  /**
-   * @type {JSchema}
-   */
-  let schema = null
   src.forEachChild(n => {
     if (ts.SyntaxKind[n.kind] === "TypeAliasDeclaration") {
       if (n.name.text === trimmedDef) {
@@ -334,6 +356,8 @@ export async function resolveDef(def, src){
   }
 
   let allDefs = getAllDefs(schema)
+  // ensure the defs are not yet defined
+  allDefs = allDefs.filter(def => !getDictValue(schema, def))
 
   let cb = 0
   while (true) {
@@ -373,7 +397,6 @@ export async function resolveAllDefs(schema, node){
    */
   let newSchema = schema
   const allDefs = getAllDefs(newSchema)
-    
   for (const def of allDefs) {
     const resolvedDefs = await resolveDef(def, node)
     newSchema = {

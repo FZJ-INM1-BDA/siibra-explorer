@@ -581,3 +581,12 @@ export function getShaderFromMeta(meta: MetaV1Schema){
     highThreshold: high
   })
 }
+
+export function isNullish(v: unknown){
+  return v === null || typeof v === "undefined"
+}
+
+export function isWheelEvent(e: unknown): e is WheelEvent{
+  const { deltaX, deltaY } = (e || {}) as any
+  return !isNullish(deltaX) && !isNullish(deltaY)
+}
