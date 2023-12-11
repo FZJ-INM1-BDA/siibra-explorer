@@ -124,6 +124,7 @@ export class PerspectiveViewSlider {
       ),
     ]).pipe(
       map(([ mode, order ]) => {
+        // TODO order can potentially be nullish
         if (!([EnumPanelMode.PIP_PANEL, EnumPanelMode.SINGLE_PANEL].includes(mode as EnumPanelMode))) {
           return null
         }
