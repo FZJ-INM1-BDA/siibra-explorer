@@ -1,6 +1,6 @@
 {
   "name": "siibra-explorer",
-  "version": "2.14.3",
+  "version": "2.14.4",
   "description": "siibra-explorer - explore brain atlases. Based on humanbrainproject/nehuba & google/neuroglancer. Built with angular",
   "scripts": {
     "lint": "eslint src --ext .ts",
@@ -11,8 +11,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test-ci": "ng test --progress false --watch false --browsers=ChromeHeadless",
-    "sapi-schema": "npx openapi-typescript@6.1.0 https://siibra-api-stable.apps-dev.hbp.eu/v3_0/openapi.json --output ./src/atlasComponents/sapi/schemaV3.ts && eslint ./src/atlasComponents/sapi/schemaV3.ts --no-ignore --fix",
-    "api-schema": "node src/plugin/generateTypes.js",
+    "sapi-schema": "curl 'https://siibra-api-stable.apps.hbp.eu/v3_0/openapi.json' | jq > ./src/atlasComponents/sapi/openapi.json && npx openapi-typescript@6.1.0 ./src/atlasComponents/sapi/openapi.json --output ./src/atlasComponents/sapi/schemaV3.ts && eslint ./src/atlasComponents/sapi/schemaV3.ts --no-ignore --fix",
+    "api-schema": "node src/api/generateSchema.mjs",
     "docs:json": "compodoc -p ./tsconfig.json -e json -d .",
     "storybook": "npm run docs:json && start-storybook -p 6006",
     "build-storybook": "npm run docs:json && build-storybook"

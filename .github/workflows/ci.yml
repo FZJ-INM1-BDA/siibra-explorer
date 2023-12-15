@@ -14,8 +14,8 @@ jobs:
   #   runs-on: ubuntu-latest
 
   #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-node@v1
+  #   - uses: actions/checkout@v4
+  #   - uses: actions/setup-node@v4
   #     with:
   #       node-version: '16.x'
   #   - run: npx prettier -c ./src
@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js 16.x for lint
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
     - run: npm i
@@ -41,9 +41,9 @@ jobs:
       NODE_ENV: test
       
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: 16.x
     - run: npm i
@@ -59,7 +59,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10'

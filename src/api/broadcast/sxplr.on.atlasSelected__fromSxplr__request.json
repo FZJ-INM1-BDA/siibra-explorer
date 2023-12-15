@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "method": {
+      "const": "sxplr.on.atlasSelected"
+    },
+    "params": {
+      "$ref": "#/definitions/PTAtlas"
+    }
+  },
+  "definitions": {
+    "PTAtlas": {
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "@Type"
+        },
+        "@id": {
+          "type": "string",
+          "title": "@Id"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "spaces": {
+          "items": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "type": "array",
+          "title": "Spaces"
+        },
+        "parcellations": {
+          "items": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "type": "array",
+          "title": "Parcellations"
+        },
+        "species": {
+          "type": "string",
+          "title": "Species"
+        }
+      },
+      "type": "object",
+      "required": [
+        "@type",
+        "@id",
+        "name",
+        "spaces",
+        "parcellations",
+        "species"
+      ],
+      "title": "SiibraAtlasModel",
+      "description": "SiibraAtlasModel"
+    }
+  },
+  "components": {
+    "schemas": {
+      "SiibraAtIdModel": {
+        "properties": {
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@id"
+        ],
+        "title": "SiibraAtIdModel"
+      }
+    }
+  }
+}

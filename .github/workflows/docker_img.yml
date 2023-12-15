@@ -26,7 +26,9 @@ jobs:
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
     - name: 'Set matomo env var'
       run: |
         echo "Using github.ref: $GITHUB_REF"
@@ -118,8 +120,9 @@ jobs:
           DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
           echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
 
-          VERSION=$(jq -r '.version' package.json)
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          SXPLR_VERSION=$(jq -r '.version' package.json)
+          echo "SXPLR_VERSION=$SXPLR_VERSION"
+          echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
 
   trigger-deploy-master-prod:
     if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
@@ -142,7 +145,7 @@ jobs:
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: master
-      IMAGE_TAG: ${{ needs.setting-vars.outputs.VERSION }}
+      IMAGE_TAG: ${{ needs.setting-vars.outputs.SXPLR_VERSION }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 

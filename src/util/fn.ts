@@ -463,7 +463,15 @@ type TGetShaderCfg = {
   opacity: number
 }
 
-function encodeBool(...flags: boolean[]) {
+export function decodeBool(num: number) {
+  const rBool: boolean[] = []
+  for (let i = 0; i < 8; i ++) {
+    rBool.push( ((num >> i) & 1) === 1 )
+  }
+  return rBool
+}
+
+export function encodeBool(...flags: boolean[]) {
   if (flags.length > 8) {
     throw new Error(`encodeBool can only handle upto 8 bools`)
   }
@@ -580,4 +588,13 @@ export function getShaderFromMeta(meta: MetaV1Schema){
     lowThreshold: low,
     highThreshold: high
   })
+}
+
+export function isNullish(v: unknown){
+  return v === null || typeof v === "undefined"
+}
+
+export function isWheelEvent(e: unknown): e is WheelEvent{
+  const { deltaX, deltaY } = (e || {}) as any
+  return !isNullish(deltaX) && !isNullish(deltaY)
 }

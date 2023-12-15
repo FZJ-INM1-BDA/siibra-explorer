@@ -1,13 +1,14 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, interval, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
 import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { debounce, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, mapTo, switchMap, take } from "rxjs/operators";
 import {panelOrder} from "src/state/userInterface/selectors";
+import { switchMapWaitFor } from "src/util/fn";
 
 @Component({
   selector: `nehuba-layout-overlay`,
@@ -104,17 +105,20 @@ export class NehubaLayoutOverlay implements OnDestroy{
   }
 
   public panelMode$ = this.store$.pipe(
-    select(userInterface.selectors.panelMode)
+    select(userInterface.selectors.panelMode),
+    map(v => v || "FOUR_PANEL")
   )
 
   public panelOrder$ = this.store$.pipe(
     select(userInterface.selectors.panelOrder),
+    map(v => v || "0123")
   )
 
   public volumeChunkLoading$: Subject<boolean> = new Subject()
 
   public showPipPerspectiveView$ = this.store$.pipe(
     select(panelOrder),
+    map(v => v || "0123"),
     distinctUntilChanged(),
     map(po => po[0] !== '3')
   )
@@ -231,13 +235,12 @@ export class NehubaLayoutOverlay implements OnDestroy{
         this.panelMode$,
         this.panelOrder$,
       ]).pipe(
-        debounce(() =>
-          nehubaUnit?.nehubaViewer?.ngviewer
-            ? of(true)
-            : interval(16).pipe(
-              filter(() => nehubaUnit?.nehubaViewer?.ngviewer),
-              take(1)
-            )
+        switchMap(
+          switchMapWaitFor({
+            leading: true,
+            interval: 16,
+            condition: () => "0123".split("").every(v => !!this.nehubaViewPanels[Number(v)])
+          })
         )
       ).subscribe(([mode, panelOrder]) => {
 
@@ -245,13 +248,6 @@ export class NehubaLayoutOverlay implements OnDestroy{
         this.currentOrder = panelOrder
 
         const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.nehubaViewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
-
-        /**
-         * TODO smarter with event stream
-         */
-        if (!viewPanels.every(v => !!v)) {
-          return
-        }
 
         switch (this.currentPanelMode) {
         case "H_ONE_THREE": {
