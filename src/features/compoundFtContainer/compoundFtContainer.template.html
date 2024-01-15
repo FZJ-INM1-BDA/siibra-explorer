@@ -1,0 +1,19 @@
+<div>
+    Please select a sub feature
+</div>
+
+
+<cdk-virtual-scroll-viewport itemSize="35">
+    <button mat-button
+        *cdkVirtualFor="let entry of compoundFeature.indices"
+        [disabled]="busy$ | async"
+        (click)="showSubfeature(entry.id)">
+        {{ entry.index | indexToStr }}
+    </button>
+</cdk-virtual-scroll-viewport>
+
+<mat-progress-bar
+    *ngIf="busy$ | async"
+    mode="indeterminate">
+</mat-progress-bar>
+

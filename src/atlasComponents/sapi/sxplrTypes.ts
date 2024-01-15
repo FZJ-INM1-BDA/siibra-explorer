@@ -97,6 +97,16 @@ export type StatisticalMap = {
  * Features
  */
 
+export type SimpleCompoundFeature = {
+  id: string
+  name: string
+  indices: {
+    id: string
+    index: string|Point
+    name: string
+  }[]
+} & AdditionalInfo
+
 export type Feature = {
   id: string
   name: string

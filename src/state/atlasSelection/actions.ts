@@ -156,7 +156,7 @@ export const navigateTo = createAction(
 export const navigateToRegion = createAction(
   `${nameSpace} navigateToRegion`,
   props<{
-    region: SxplrRegion
+    region: Pick<SxplrRegion, 'name'>
   }>()
 )
 

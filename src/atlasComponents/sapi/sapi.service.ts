@@ -20,7 +20,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.16'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.17'
 
 type PaginatedResponse<T> = {
   items: T[]
@@ -183,8 +183,17 @@ export class SAPI{
     })
   }
 
-  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] = {}) {
+  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] & Record<string, string> = {}) {
     return this.v3Get("/feature/{feature_id}/plotly", {
+      path: {
+        feature_id: id
+      },
+      query: params
+    })
+  }
+  
+  getFeatureIntents(id: string, params: Record<string, string> = {}) {
+    return this.v3Get("/feature/{feature_id}/intents", {
       path: {
         feature_id: id
       },

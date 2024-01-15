@@ -1,7 +1,7 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature
 } from "./sxplrTypes"
-import { PathReturn, MetaV1Schema } from "./typeV3"
+import { PathReturn, MetaV1Schema, CompoundFeature } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
@@ -637,9 +637,31 @@ class TranslateV3 {
     }
   }
 
-  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<VoiFeature|Feature> {
+  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<VoiFeature|Feature|SimpleCompoundFeature> {
     if (this.#isVoi(feat)) {
       return await this.translateVoiFeature(feat)
+    }
+    if (this.#isCompound(feat)) {
+      const link = feat.datasets.flatMap(ds => ds.urls).map(v => ({
+        href: v.url,
+        text: v.url
+      }))
+      const v: SimpleCompoundFeature = {
+        id: feat.id,
+        name: feat.name,
+        indices: await Promise.all(
+          feat.indices.map(
+            async ({ id, index, name }) => ({
+              id,
+              index: await this.#transformIndex(index),
+              name,
+            })
+          )
+        ),
+        desc: feat.description,
+        link
+      }
+      return v
     }
     
     return await this.translateBaseFeature(feat)
@@ -663,6 +685,18 @@ class TranslateV3 {
 
   #isVoi(feat: unknown): feat is PathReturn<"/feature/Image/{feature_id}"> {
     return feat['@type'].includes("feature/volume_of_interest")
+  }
+
+  #isCompound(feat: unknown): feat is CompoundFeature {
+    return feat['@type'].includes("feature/compoundfeature")
+  }
+
+  async #transformIndex(index: CompoundFeature['indices'][number]['index']): Promise<SimpleCompoundFeature['indices'][number]['index']> {
+    if (typeof index === "string") {
+      return index
+    }
+    return await this.#translatePoint(index)
+    
   }
 
   async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {

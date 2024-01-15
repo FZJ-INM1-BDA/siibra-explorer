@@ -109,7 +109,9 @@
     <ng-template [ngIf]="plotly$ | async" let-plotly>
       <mat-tab label="Visualization">
         <ng-template matTabContent>
-          <sxplr-plotly-component [plotly-json]="plotly"></sxplr-plotly-component>  
+          <sxplr-plotly-component
+            (plotly-label-clicked)="navigateToRegionByName($event)"
+            [plotly-json]="plotly"></sxplr-plotly-component>  
         </ng-template>
       </mat-tab>
     </ng-template>
