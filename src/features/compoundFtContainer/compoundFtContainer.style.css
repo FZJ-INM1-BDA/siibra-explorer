@@ -1,0 +1,16 @@
+cdk-virtual-scroll-viewport
+{
+    display: block;
+    min-height:30vh;
+}
+
+cdk-virtual-scroll-viewport button
+{
+    width: 100%;
+    justify-content: left;
+}
+
+mat-divider
+{
+    margin: 1rem 0;
+}

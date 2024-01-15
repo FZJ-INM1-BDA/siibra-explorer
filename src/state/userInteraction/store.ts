@@ -30,6 +30,13 @@ export const reducer = createReducer(
   on(
     actions.showFeature,
     (state, { feature }) => {
+      /**
+       * do not process compound feature
+       * allow component to deal with with dialogbox
+       */
+      if (feature.id.startsWith("cf0::")) {
+        return { ...state }
+      }
       return {
         ...state,
         selectedFeature: feature

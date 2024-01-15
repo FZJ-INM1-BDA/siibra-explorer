@@ -97,6 +97,7 @@ jobs:
       BRANCH_NAME: ${{ steps.set-vars.outputs.BRANCH_NAME }}
       BUILD_TEXT: ${{ steps.set-vars.outputs.BUILD_TEXT }}
       DEPLOY_ID: ${{ steps.set-vars.outputs.DEPLOY_ID }}
+      SXPLR_VERSION: ${{ steps.set-vars.outputs.SXPLR_VERSION }}
     steps:
       - uses: actions/checkout@v3
       - id: set-vars

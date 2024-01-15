@@ -5,7 +5,7 @@ import { UtilModule } from "src/util";
 import { EntryComponent } from './entry/entry.component'
 import { FeatureNamePipe } from "./featureName.pipe";
 import { CategoryAccDirective } from './category-acc.directive';
-import { SapiViewsFeatureConnectivityModule } from "./connectivity";
+import { CompoundFeatureModule } from "./compoundFtContainer";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MarkdownModule } from "src/components/markdown";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
@@ -25,7 +25,7 @@ import { AngularMaterialModule } from "src/sharedModules";
     CommonModule,
     SpinnerModule,
     UtilModule,
-    SapiViewsFeatureConnectivityModule,
+    CompoundFeatureModule,
     ScrollingModule,
     MarkdownModule,
     NgLayerCtlModule,

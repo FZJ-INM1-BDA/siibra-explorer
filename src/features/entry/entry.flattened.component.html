@@ -1,39 +1,11 @@
 <mat-accordion>
 
     <!-- show everything except for connectivity and dataset -->
-    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity', 'dataset', 'other'] : false"  let-keyvalue>
+    <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['dataset', 'other'] : false"  let-keyvalue>
         <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
         [ngTemplateOutletContext]="{
             $implicit: keyvalue
         }">
-        </ng-template>
-    </ng-template>
-    
-
-    <!-- only show connectivity in human atlas for now -->
-    <ng-template [ngIf]="showConnectivity$ | async">
-        <ng-template [ngIf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
-            <ng-template ngFor [ngForOf]="connectivity" let-conn>
-                <mat-expansion-panel sxplr-sapiviews-features-connectivity-check
-                    #connectivityAccordion
-                    *ngIf="conn">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            {{ conn.key }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-    
-                    <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
-                        [region]="region"
-                        [sxplr-features-connectivity-browser-atlas]="selectedAtlas$ | async"
-                        [sxplr-features-connectivity-browser-template]="template"
-                        [sxplr-features-connectivity-browser-parcellation]="parcellation"
-                        [accordionExpanded]="connectivityAccordion.expanded"
-                        [types]="conn.value">
-                    </sxplr-features-connectivity-browser>
-    
-                </mat-expansion-panel>
-            </ng-template>
         </ng-template>
     </ng-template>
 
@@ -212,4 +184,30 @@
 
 <ng-template #loadingSpinnerTmpl>
     <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
+</ng-template>
+
+<ng-template #compoundFtTmpl let-data>
+    <h2 *ngIf="data.feature" mat-dialog-title>{{ data.feature.name }}</h2>
+    <mat-dialog-content>
+        <div>
+            {{ data.feature.desc }}
+        </div>
+        
+        <mat-divider class="sxplr-mt-2 sxplr-mb-2"></mat-divider>
+
+        <compound-feature-container
+            [compoundFeature]="data.feature"
+            (dismiss)="data.dismiss()">
+        </compound-feature-container>
+    </mat-dialog-content>
+
+    <div mat-dialog-actions>
+        <a mat-raised-button color="primary"
+            *ngFor="let link of data.feature.link"
+            [href]="link.href"
+            target="_blank">
+            {{link.text }}
+        </a>
+        <button mat-button mat-dialog-close cdkFocusInitial>Close</button>
+    </div>
 </ng-template>

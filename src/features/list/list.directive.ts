@@ -16,7 +16,7 @@ export type TranslatedFeature = Awaited< ReturnType<(typeof translateV3Entities)
   selector: '[sxplr-feature-list-directive]',
   exportAs: 'featureListDirective'
 })
-export class ListDirective extends FeatureBase  implements OnDestroy{
+export class ListDirective extends FeatureBase implements OnDestroy{
 
   @Input()
   name: string

@@ -1,7 +1,7 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
-import { IDS, SAPI } from 'src/atlasComponents/sapi';
+import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
@@ -10,7 +10,6 @@ import { CategoryAccDirective } from "../category-acc.directive"
 import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
-import { SPECIES_ENUM } from 'src/util/constants';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
@@ -27,33 +26,6 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   return returnVal
 }
 
-type ConnectiivtyFilter = {
-  SPECIES: string[]
-  PARCELLATION: string[]
-  SPACE: string[]
-}
-
-const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [
-    SPECIES_ENUM.RATTUS_NORVEGICUS,
-    SPECIES_ENUM.HOMO_SAPIENS
-  ],
-  PARCELLATION: [
-    IDS.PARCELLATION.JBA29,
-    IDS.PARCELLATION.JBA30,
-    IDS.PARCELLATION.WAXHOLMV4
-  ],
-  SPACE: [],
-}
-
-const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [],
-  PARCELLATION: [],
-  SPACE: [
-    IDS.TEMPLATES.BIG_BRAIN
-  ]
-}
-
 @Component({
   selector: 'sxplr-feature-entry',
   templateUrl: './entry.flattened.component.html',
@@ -64,6 +36,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
+
+  @ViewChild('compoundFtTmpl', { read: TemplateRef })
+  compoundFtTmpl: TemplateRef<unknown>
 
   constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     super()
@@ -177,20 +152,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     select(atlasSelection.selectors.selectedAtlas)
   )
 
-  public showConnectivity$ = combineLatest([
-    this.selectedAtlas$.pipe(
-      map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
-    ),
-    this.TPRBbox$.pipe(
-      map(({ parcellation, template }) => (
-        WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
-      ) || (
-        WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
-      ))
-    )
-  ]).pipe(
-    map(flags => flags.every(f => f))
-  )
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
     switchMap(resp => 
@@ -205,18 +166,27 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   public cateogryCollections$ = this.TPRBbox$.pipe(
-    switchMap(({ template, parcellation, region }) => this.featureTypes$.pipe(
+    switchMap(({ template, parcellation, region, bbox }) => this.featureTypes$.pipe(
       map(features => {
         const filteredFeatures = features.filter(v => {
-          const params = [
-            ...(v.path_params || []),
-            ...(v.query_params || []),
+          const { path_params, required_query_params } = v
+          
+          const requiredParams = [
+            ...(path_params || []),
+            ...(required_query_params || []),
           ]
-          return [
-            params.includes("space_id") === (!!template) && !!template,
-            params.includes("parcellation_id") === (!!parcellation) && !!parcellation,
-            params.includes("region_id") === (!!region) && !!region,
-          ].some(val => val)
+          const paramMapped = {
+            space_id: !!template,
+            parcellation_id: !!parcellation,
+            region_id: !!region,
+            bbox: !!bbox
+          }
+          for (const pParam in paramMapped){
+            if (requiredParams.includes(pParam) && !paramMapped[pParam]) {
+              return false
+            }
+          }
+          return true
         })
         return categoryAcc(filteredFeatures)
       }),
@@ -224,6 +194,12 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   onClickFeature(feature: Feature) {
+    if (feature.id.startsWith("cf0::")) {
+      const ref = this.dialog.open(this.compoundFtTmpl, {
+        data: { feature, dismiss: () => ref.close() }
+      })
+      return
+    }
     this.store.dispatch(
       userInteraction.actions.showFeature({
         feature
