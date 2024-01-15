@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
-import { IDS, SAPI } from 'src/atlasComponents/sapi';
+import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
@@ -10,7 +10,6 @@ import { CategoryAccDirective } from "../category-acc.directive"
 import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
-import { SPECIES_ENUM } from 'src/util/constants';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
@@ -25,33 +24,6 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
     returnVal[category].push(item)
   }
   return returnVal
-}
-
-type ConnectiivtyFilter = {
-  SPECIES: string[]
-  PARCELLATION: string[]
-  SPACE: string[]
-}
-
-const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [
-    SPECIES_ENUM.RATTUS_NORVEGICUS,
-    SPECIES_ENUM.HOMO_SAPIENS
-  ],
-  PARCELLATION: [
-    IDS.PARCELLATION.JBA29,
-    IDS.PARCELLATION.JBA30,
-    IDS.PARCELLATION.WAXHOLMV4
-  ],
-  SPACE: [],
-}
-
-const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [],
-  PARCELLATION: [],
-  SPACE: [
-    IDS.TEMPLATES.BIG_BRAIN
-  ]
 }
 
 @Component({
