@@ -1,5 +1,4 @@
 import { HttpHeaders } from "@angular/common/http"
-import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
@@ -12,15 +11,6 @@ export const LOCAL_STORAGE_CONST = {
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
-export const BACKENDURL = (() => {
-  const { BACKEND_URL } = environment
-  if (!BACKEND_URL) return ``
-  if (/^http/.test(BACKEND_URL)) return BACKEND_URL
-
-  const url = new URL(window.location.href)
-  const { protocol, hostname, pathname } = url
-  return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
-})()
 
 export const MIN_REQ_EXPLAINER = `
 - Siibra explorer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
