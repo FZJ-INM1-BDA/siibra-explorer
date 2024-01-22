@@ -1,5 +1,4 @@
 import { HttpHeaders } from "@angular/common/http"
-import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
