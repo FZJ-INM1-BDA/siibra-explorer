@@ -2,22 +2,18 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { throwError } from "rxjs";
 import { catchError, mapTo } from "rxjs/operators";
-import { BACKENDURL } from 'src/util/constants'
 import { IKeyValStore, NotFoundError } from '../type'
+import { environment } from "src/environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class SaneUrlSvc implements IKeyValStore{
-  public saneUrlRoot = `${BACKENDURL}go/`
+  public saneUrlRoot = `${environment.BACKEND_URL || ''}go/`
   constructor(
     private http: HttpClient
   ){
-    if (!BACKENDURL) {
-      const loc = window.location
-      this.saneUrlRoot = `${loc.protocol}//${loc.hostname}${!!loc.port ? (':' + loc.port) : ''}${loc.pathname}go/`
-    }
   }
 
   getKeyVal(key: string) {
