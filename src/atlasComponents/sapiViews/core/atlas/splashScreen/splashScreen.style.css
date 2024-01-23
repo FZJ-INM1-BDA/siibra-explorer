@@ -6,7 +6,12 @@
   width: 100%;
 }
 
+:host > h4
+{
+  margin: 2rem;
+}
+
 mat-card
 {
-  margin: 5rem;
+  margin: 0.5rem;
 }
