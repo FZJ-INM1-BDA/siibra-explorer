@@ -1,17 +1,13 @@
-<mat-card>
+<h4>
+  siibra-explorer
+</h4>
+
+<mat-card *ngFor="let atlas of atlases$ | async"
+  mat-ripple
+  (click)="selectAtlas(atlas)">
   <mat-card-header>
     <mat-card-title>
-      <div class="mat-h4">
-        siibra-explorer
-      </div>
+      {{ atlas.name }}
     </mat-card-title>
   </mat-card-header>
-  <mat-card-content>
-    <button mat-button
-      *ngFor="let atlas of atlases$ | async"
-      (click)="selectAtlas(atlas)">
-
-      {{ atlas.name }}
-    </button>
-  </mat-card-content>
 </mat-card>

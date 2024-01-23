@@ -45,9 +45,9 @@ For convenience, the region tree allows to you directly switch species, space an
 Regions are typically organized as a hierarchy of parent and child regions. 
 For example, in the Julich-Brain parcellation, the top parent nodes are *Telencephalon*, *Metencephalon*, and *Diencephalon*, further subdivided into macroscopic structures such as lobes which then contain subhierarchies of cortical and subcortical regions. 
 
-## The region sidepanel
+## The Region Side Panel
 
-After finding and selecting a brain region, `siibra-explorer` opens the [region sidepanel](#the-region-sidepanel). 
+After finding and selecting a brain region, `siibra-explorer` opens the region side panel. 
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-regionpanel-detail.png){ style="width:300px"}
 

@@ -19,6 +19,7 @@ import { ReadmoreModule } from "src/components/readmore";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 import { PlotlyComponent } from "./plotly";
 import { AngularMaterialModule } from "src/sharedModules";
+import { FeatureIntents } from "./intents/intents.component";
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { AngularMaterialModule } from "src/sharedModules";
      * standalone components
      */
     PlotlyComponent,
+    FeatureIntents,
   ],
   declarations: [
     EntryComponent,
