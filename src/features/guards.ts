@@ -1,5 +1,7 @@
 import { VoiFeature } from "src/atlasComponents/sapi/sxplrTypes"
 
+export { VoiFeature }
+
 export function isVoiData(feature: unknown): feature is VoiFeature {
   return !!feature['bbox']
 }

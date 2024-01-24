@@ -669,6 +669,11 @@ class TranslateV3 {
 
   async translateBaseFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<Feature>{
     const { id, name, category, description, datasets } = feat
+    if (!datasets) {
+      return {
+        id, name, category
+      }
+    }
     const dsDescs = datasets.map(ds => ds.description)
     const urls = datasets.flatMap(ds => ds.urls).map(v => ({
       href: v.url,

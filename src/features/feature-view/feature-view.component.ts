@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable, Subject, combineLatest, concat, of } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Inject, Input } from '@angular/core';
+import { BehaviorSubject, EMPTY, Observable, combineLatest, concat, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
@@ -14,13 +14,58 @@ import { atlasSelection } from 'src/state';
   styleUrls: ['./feature-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeatureViewComponent implements OnChanges {
+export class FeatureViewComponent {
 
+  #feature$ = new BehaviorSubject<Feature>(null)
   @Input()
-  feature: Feature
+  set feature(val: Feature) {
+    this.#feature$.next(val)
+  }
 
-  #featureId = new BehaviorSubject<string>(null)
-  #isConnectivity$ = new BehaviorSubject(false)
+  #featureId = this.#feature$.pipe(
+    map(f => f.id)
+  )
+
+  #featureDetail$ = this.#feature$.pipe(
+    switchMap(f => this.sapi.getV3FeatureDetailWithId(f.id)),
+    shareReplay(1),
+  )
+
+  
+  #featureDesc$ = this.#feature$.pipe(
+    switchMap(() => concat(
+      of(null as string),
+      this.#featureDetail$.pipe(
+        map(v => v.desc)
+      )
+    ))
+  )
+
+  #voi$ = this.#feature$.pipe(
+    switchMap(() => concat(
+      of(null as VoiFeature),
+      this.#featureDetail$.pipe(
+        map(val => {
+          if (isVoiData(val)) {
+            return val
+          }
+          return null as VoiFeature
+        })
+      )
+    ))
+  )
+
+  #warnings$ = this.#feature$.pipe(
+    switchMap(() => concat(
+      of([] as string[]),
+      this.#featureDetail$.pipe(
+        map(notQuiteRight)
+      )
+    ))
+  )
+  #isConnectivity$ = this.#feature$.pipe(
+    map(v => v.category === "connectivity")
+  )
 
   #selectedRegion$ = this.store.pipe(
     select(atlasSelection.selectors.selectedRegions)
@@ -43,15 +88,23 @@ export class FeatureViewComponent implements OnChanges {
     distinctUntilChanged((o, n) => o.id === n.id && o.darktheme === n.darktheme),
     shareReplay(1),
   )
+
+  #loadingDetail$ = this.#feature$.pipe(
+    switchMap(() => concat(
+      of(true),
+      this.#featureDetail$.pipe(
+        map(() => false)
+      )
+    ))
+  )
   
-  loadingPlotly$ = this.#plotlyInput$.pipe(
+  #loadingPlotly$ = this.#plotlyInput$.pipe(
     switchMap(() => concat(
       of(true),
       this.plotly$.pipe(
         map(() => false)
       )
     )),
-    distinctUntilChanged()
   )
 
   plotly$ = this.#plotlyInput$.pipe(
@@ -71,12 +124,21 @@ export class FeatureViewComponent implements OnChanges {
     }),
     shareReplay(1),
   )
+  
+  #detailLinks = this.#feature$.pipe(
+    switchMap(() => concat(
+      of([] as string[]),
+      this.#featureDetail$.pipe(
+        map(val => (val.link || []).map(l => l.href))
+      )
+    ))
+  )
 
-  #detailLinks = new Subject<string[]>()
   additionalLinks$ = this.#detailLinks.pipe(
     distinctUntilChanged((o, n) => o.length == n.length),
-    map(links => {
-      const set = new Set((this.feature.link || []).map(v => v.href))
+    withLatestFrom(this.#feature$),
+    map(([links, feature]) => {
+      const set = new Set((feature.link || []).map(v => v.href))
       return links.filter(l => !set.has(l))
     })
   )
@@ -88,16 +150,9 @@ export class FeatureViewComponent implements OnChanges {
     ))
   )
 
-  busy$ = new BehaviorSubject<boolean>(false)
-  
-  voi$ = new BehaviorSubject<VoiFeature>(null)
-
-  warnings$ = new Subject<string[]>()
-
   intents$ = this.#isConnectivity$.pipe(
     withLatestFrom(this.#featureId, this.#selectedRegion$),
     switchMap(([flag, fid, selectedRegion]) => {
-      console.log(flag, fid, selectedRegion)
       if (!flag) {
         return EMPTY
       }
@@ -124,34 +179,6 @@ export class FeatureViewComponent implements OnChanges {
   ) {
   }
 
-  ngOnChanges(): void {
-    this.voi$.next(null)
-    this.busy$.next(true)
-
-    this.#featureId.next(this.feature.id)
-
-    // TODO might actually not be right for bold
-    this.#isConnectivity$.next(this.feature.category === "connectivity")
-
-    this.sapi.getV3FeatureDetailWithId(this.feature.id).subscribe(
-      val => {
-        this.busy$.next(false)
-        
-        if (isVoiData(val)) {
-          this.voi$.next(val)
-        }
-
-        this.warnings$.next(
-          notQuiteRight(val)
-        )
-
-        this.#detailLinks.next((val.link || []).map(l => l.href))
-        
-      },
-      () => this.busy$.next(false)
-    )
-  }
-
   navigateToRegionByName(regionName: string){
     this.store.dispatch(
       atlasSelection.actions.navigateToRegion({
@@ -165,4 +192,56 @@ export class FeatureViewComponent implements OnChanges {
   onAction(action: Action){
     this.store.dispatch(action)
   }
+  
+  specialView$ = combineLatest([
+    this.#voi$,
+    this.plotly$
+  ]).pipe(
+    map(([ voi, plotly ]) => {
+      return {
+        voi, plotly
+      }
+    })
+  )
+
+  baseView$ = combineLatest([
+    this.#feature$,
+    combineLatest([
+      this.#loadingDetail$,
+      this.#loadingPlotly$
+    ]).pipe(
+      map(flags => flags.some(f => f))
+    ),
+    this.#warnings$,
+    this.additionalLinks$,
+    this.downloadLink$,
+    this.#featureDesc$
+  ]).pipe(
+    map(([ feature, busy, warnings, additionalLinks, downloadLink, desc ]) => {
+      return {
+        name: feature.name,
+        links: feature.link,
+        category: feature.category === 'Unknown category'
+        ? `Other feature`
+        : `${feature.category} feature`,
+        busy,
+        warnings,
+        additionalLinks,
+        downloadLink,
+        desc
+      }
+    })
+  )
+
+  view$ = combineLatest([
+    this.baseView$,
+    this.specialView$
+  ]).pipe(
+    map(([obj1, obj2]) => {
+      return {
+        ...obj1,
+        ...obj2,
+      }
+    })
+  )
 }

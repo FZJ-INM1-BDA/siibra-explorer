@@ -2366,6 +2366,72 @@
           }
         }
       }
+    },
+    "/vocabularies/genes": {
+      "get": {
+        "tags": [
+          "vocabularies"
+        ],
+        "summary": "Get Genes",
+        "description": "HTTP get (filtered) genes",
+        "operationId": "get_genes_vocabularies_genes_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Find"
+            },
+            "name": "find",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_GeneModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3179,6 +3245,30 @@
         "title": "FeatureMetaModel",
         "description": "Meta feature type"
       },
+      "GeneModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "symbol": {
+            "type": "string",
+            "title": "Symbol"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "symbol",
+          "description"
+        ],
+        "title": "GeneModel",
+        "description": "ConfigBaseModel"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3574,6 +3664,43 @@
           "total"
         ],
         "title": "Page[FeatureMetaModel]"
+      },
+      "Page_GeneModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GeneModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "Page[GeneModel]"
       },
       "Page_ParcellationEntityVersionModel_": {
         "properties": {

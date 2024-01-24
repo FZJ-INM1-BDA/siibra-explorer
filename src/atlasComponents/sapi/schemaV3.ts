@@ -268,6 +268,13 @@ export interface paths {
      */
     get: operations["get_single_feature_feature__feature_id__get"]
   }
+  "/vocabularies/genes": {
+    /**
+     * Get Genes 
+     * @description HTTP get (filtered) genes
+     */
+    get: operations["get_genes_vocabularies_genes_get"]
+  }
 }
 
 export type webhooks = Record<string, never>;
@@ -745,6 +752,18 @@ export interface components {
       /** Category */
       category?: string
     }
+    /**
+     * GeneModel 
+     * @description ConfigBaseModel
+     */
+    GeneModel: {
+      /** @Type */
+      "@type": string
+      /** Symbol */
+      symbol: string
+      /** Description */
+      description: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -933,6 +952,19 @@ export interface components {
     Page_FeatureMetaModel_: {
       /** Items */
       items: (components["schemas"]["FeatureMetaModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[GeneModel] */
+    Page_GeneModel_: {
+      /** Items */
+      items: (components["schemas"]["GeneModel"])[]
       /** Total */
       total: number
       /** Page */
@@ -2660,6 +2692,33 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["CompoundFeatureModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_genes_vocabularies_genes_get: {
+    /**
+     * Get Genes 
+     * @description HTTP get (filtered) genes
+     */
+    parameters?: {
+      query?: {
+        find?: string
+        page?: number
+        size?: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_GeneModel_"]
         }
       }
       /** @description Validation Error */
