@@ -54,7 +54,7 @@ export class FeatureIntents{
         )
       ),
       switchMap(([ intents, allRegions ]) => {
-        const foundCm = (intents || []).find(intent => intent['@type'] === "siibra-0.4/intent/colorization")
+        const foundCm = (intents || []).find(intent => intent['@type'].includes("intent/colorization"))
         if (!foundCm) {
           return EMPTY
         }

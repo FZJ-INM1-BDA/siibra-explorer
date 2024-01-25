@@ -112,14 +112,17 @@ export class FeatureViewComponent {
       if (!id) {
         return of(null)
       }
-      return this.sapi.getFeaturePlot(
-        id,
-        {
-          template: darktheme ? 'plotly_dark' : 'plotly_white',
-          ...additionalParams
-        }
-      ).pipe(
-        catchError(() => of(null))
+      return concat(
+        of(null),
+        this.sapi.getFeaturePlot(
+          id,
+          {
+            template: darktheme ? 'plotly_dark' : 'plotly_white',
+            ...additionalParams
+          }
+        ).pipe(
+          catchError(() => of(null))
+        )
       )
     }),
     shareReplay(1),
