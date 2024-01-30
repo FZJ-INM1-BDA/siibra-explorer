@@ -85,7 +85,7 @@
     </ng-template>
 
     <!-- plotly view -->
-    <ng-template [ngIf]="plotly$ | async" let-plotly>
+    <ng-template [ngIf]="view.plotly" let-plotly>
       <mat-tab label="Visualization">
         <ng-template matTabContent>
           <sxplr-plotly-component

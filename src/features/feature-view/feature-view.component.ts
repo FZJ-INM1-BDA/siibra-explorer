@@ -7,6 +7,9 @@ import { DARKTHEME } from 'src/util/injectionTokens';
 import { isVoiData, notQuiteRight } from "../guards"
 import { Action, Store, select } from '@ngrx/store';
 import { atlasSelection } from 'src/state';
+import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
+
+type PlotlyResponse = PathReturn<"/feature/{feature_id}/plotly">
 
 @Component({
   selector: 'sxplr-feature-view',
@@ -41,15 +44,15 @@ export class FeatureViewComponent {
     ))
   )
 
-  #voi$ = this.#feature$.pipe(
+  #voi$: Observable<VoiFeature> = this.#feature$.pipe(
     switchMap(() => concat(
-      of(null as VoiFeature),
+      of(null),
       this.#featureDetail$.pipe(
         map(val => {
           if (isVoiData(val)) {
             return val
           }
-          return null as VoiFeature
+          return null
         })
       )
     ))
@@ -101,28 +104,25 @@ export class FeatureViewComponent {
   #loadingPlotly$ = this.#plotlyInput$.pipe(
     switchMap(() => concat(
       of(true),
-      this.plotly$.pipe(
+      this.#plotly$.pipe(
         map(() => false)
       )
     )),
   )
 
-  plotly$ = this.#plotlyInput$.pipe(
+  #plotly$: Observable<PlotlyResponse> = this.#plotlyInput$.pipe(
     switchMap(({ id, darktheme, additionalParams }) => {
       if (!id) {
         return of(null)
       }
-      return concat(
-        of(null),
-        this.sapi.getFeaturePlot(
-          id,
-          {
-            template: darktheme ? 'plotly_dark' : 'plotly_white',
-            ...additionalParams
-          }
-        ).pipe(
-          catchError(() => of(null))
-        )
+      return this.sapi.getFeaturePlot(
+        id,
+        {
+          template: darktheme ? 'plotly_dark' : 'plotly_white',
+          ...additionalParams
+        }
+      ).pipe(
+        catchError(() => of(null))
       )
     }),
     shareReplay(1),
@@ -196,9 +196,15 @@ export class FeatureViewComponent {
     this.store.dispatch(action)
   }
   
-  specialView$ = combineLatest([
-    this.#voi$,
-    this.plotly$
+  #specialView$ = combineLatest([
+    concat(
+      of(null as VoiFeature),
+      this.#voi$
+    ),
+    concat(
+      of(null as PlotlyResponse),
+      this.#plotly$,
+    )
   ]).pipe(
     map(([ voi, plotly ]) => {
       return {
@@ -207,7 +213,7 @@ export class FeatureViewComponent {
     })
   )
 
-  baseView$ = combineLatest([
+  #baseView$ = combineLatest([
     this.#feature$,
     combineLatest([
       this.#loadingDetail$,
@@ -237,8 +243,8 @@ export class FeatureViewComponent {
   )
 
   view$ = combineLatest([
-    this.baseView$,
-    this.specialView$
+    this.#baseView$,
+    this.#specialView$
   ]).pipe(
     map(([obj1, obj2]) => {
       return {
