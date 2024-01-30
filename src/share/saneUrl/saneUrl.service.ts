@@ -9,8 +9,19 @@ import { environment } from "src/environments/environment";
   providedIn: 'root'
 })
 
-export class SaneUrlSvc implements IKeyValStore{
-  public saneUrlRoot = `${environment.BACKEND_URL || ''}go/`
+export class SaneUrlSvc implements IKeyValStore {
+
+  #backendUrl = (() => {
+    if (environment.BACKEND_URL) {
+      return environment.BACKEND_URL.replace(/\/$/, '')
+    }
+    const url = new URL(window.location.href)
+    const { protocol, hostname, pathname } = url
+    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}`
+  })()
+
+  public saneUrlRoot = `${this.#backendUrl}/go/`
+
   constructor(
     private http: HttpClient
   ){

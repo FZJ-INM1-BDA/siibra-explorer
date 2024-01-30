@@ -87,7 +87,7 @@ def gherkin_to_markdown(gherkin_text):
         )
             
     return (
-        """<details>"""
+        """<details open>"""
         + f"""<summary>{feature_name}</summary>"""
         + "\n\n"
         + '\n\n'.join(ret_text)
