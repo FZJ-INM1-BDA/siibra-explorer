@@ -4,7 +4,7 @@ ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
 ARG SIIBRA_API_ENDPOINTS
-ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-stable.apps.jsc.hbp.eu/v3_0}
+ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}

@@ -21,7 +21,7 @@ jobs:
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
 
-      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-stable.apps.jsc.hbp.eu/v3_0'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
@@ -162,17 +162,20 @@ jobs:
       OKD_PROJECT: interactive-viewer
     secrets:
       okd_token: ${{ secrets.OKD_PROD_SECRET }}
-      
-  trigger-deploy-staging-data-validation:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
-    needs:
-      - build-docker-img
-      - setting-vars
-    uses: ./.github/workflows/deploy-on-okd.yml
-    with:
-      FULL_DEPLOY_ID: siibra-explorer-rc
-      OKD_ENDPOINT: https://okd.jsc.hbp.eu:443
-      OKD_PROJECT: siibra-explorer
-    secrets:
-      okd_token: ${{ secrets.OKD_JSC_TOKEN }}
+  
+  # cluster offline
+  # TODO need to find new home for data-validation
+
+  # trigger-deploy-staging-data-validation:
+  #   if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+  #   needs:
+  #     - build-docker-img
+  #     - setting-vars
+  #   uses: ./.github/workflows/deploy-on-okd.yml
+  #   with:
+  #     FULL_DEPLOY_ID: siibra-explorer-rc
+  #     OKD_ENDPOINT: https://okd.jsc.hbp.eu:443
+  #     OKD_PROJECT: siibra-explorer
+  #   secrets:
+  #     okd_token: ${{ secrets.OKD_JSC_TOKEN }}
   
