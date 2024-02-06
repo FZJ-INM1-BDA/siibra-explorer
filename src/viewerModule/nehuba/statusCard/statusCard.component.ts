@@ -8,9 +8,9 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, concat, of } from "rxjs";
+import { Observable, Subject, concat, of } from "rxjs";
 import { map, filter, takeUntil, switchMap, shareReplay, debounceTime } from "rxjs/operators";
-import { Clipboard, MatBottomSheet, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl, FormGroup } from "@angular/forms";
 
@@ -46,6 +46,9 @@ export class StatusCardComponent {
     y: new FormControl<string>(null),
     z: new FormControl<string>(null),
   })
+
+  #pasted$ = new Subject<string>()
+  #coordEditDialogClosed = new Subject()
 
   private selectedTemplate: SxplrTemplate
   private currentNavigation: {
@@ -113,7 +116,6 @@ export class StatusCardComponent {
     private store$: Store<any>,
     private log: LoggingService,
     private bottomSheet: MatBottomSheet,
-    private dialog: MatDialog,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
@@ -132,9 +134,15 @@ export class StatusCardComponent {
 
     this.nehubaViewer$.pipe(
       filter(nv => !!nv),
-      switchMap(nv => nv.viewerPosInReal$.pipe(
-        filter(pos => !!pos),
-        debounceTime(120),
+      switchMap(nv => concat(
+        of(null),
+        this.#coordEditDialogClosed,
+      ).pipe(
+        switchMap(() => nv.viewerPosInReal$.pipe(
+          filter(pos => !!pos),
+          debounceTime(120),
+          shareReplay(1)
+        ))
       )),
       takeUntil(this.#destroy$)
     ).subscribe(val => {
@@ -152,11 +160,14 @@ export class StatusCardComponent {
       takeUntil(this.#destroy$)
     ).subscribe()
 
-    this.dialogForm.valueChanges.pipe(
-      map(({ x, y, z }) => [x, y, z].map(v => this.#parseString(v))),
-      map(allEntries => allEntries.find(val => val.length === 3)),
+    this.#pasted$.pipe(
+      filter(v => !!v), // '' is falsy, so filters out null, undefined, '' etc
+      map(v => this.#parseString(v)),
       filter(fullEntry => !!fullEntry && fullEntry.every(entry => !Number.isNaN(entry))),
-      takeUntil(this.#destroy$)
+      takeUntil(this.#destroy$),
+      debounceTime(0),
+      // need to update value on the separate frame to paste action
+      // otherwise, dialogForm.setValue will have no effect
     ).subscribe(fullEntry => {
       this.dialogForm.setValue({
         x: `${fullEntry[0]}`,
@@ -164,7 +175,6 @@ export class StatusCardComponent {
         z: `${fullEntry[2]}`,
       })
     })
-
   }
 
   #parseString(input: string): number[]{
@@ -257,17 +267,19 @@ export class StatusCardComponent {
     )
   }
 
-  openDialog(tmpl: TemplateRef<any>, options: { ariaLabel: string }): void {
-    const { ariaLabel } = options
-    this.dialog.open(tmpl, {
-      ariaLabel
-    })
-  }
-
   copyString(value: string){
     this.clipboard.copy(value)
     this.snackbar.open(`Copied to clipboard!`, null, {
       duration: 1000
     })
+  }
+
+  onPaste(ev: ClipboardEvent) {
+    const text = ev.clipboardData.getData('text/plain')
+    this.#pasted$.next(text)
+  }
+
+  onCoordEditDialogClose(){
+    this.#coordEditDialogClosed.next(null)
   }
 }
