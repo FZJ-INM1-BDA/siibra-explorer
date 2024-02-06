@@ -191,7 +191,7 @@ export class StatusCardComponent {
     }
   }
 
-  public selectPoint(pos: number[]) {
+  public selectPoint(posNm: number[]) {
     this.store$.dispatch(
       atlasSelection.actions.selectPoint({
         point: {
@@ -200,27 +200,24 @@ export class StatusCardComponent {
           coordinateSpace: {
             "@id": this.selectedTemplate.id
           },
-          coordinates: pos.map(v => ({
+          coordinates: posNm.map(v => ({
             "@id": getUuid(),
             "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
             unit: {
               "@id": "id.link/mm"
             },
-            value: v * 1e6,
+            value: v,
             uncertainty: [0, 0]
           }))
         }
       })
     )
-  }
-
-  public navigateTo(pos: number[], positionReal=true) {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          position: pos
+          position: posNm
         },
-        physical: positionReal,
+        physical: true,
         animation: true
       })
     )

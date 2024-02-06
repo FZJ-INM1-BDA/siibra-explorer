@@ -1,12 +1,45 @@
-<ng-template [ngIf]="point$ | async" let-point>
-    <ng-template [ngIf]="point | sandsToNum" let-coordinates>
-        <button mat-icon-button class="sxplr-m-2"
-            (click)="navigateToPoint(coordinates.coords)"
-            [matTooltip]="'Navigate To ' + (coordinates.coords | numbers : 2 | addUnitAndJoin : '')">
-            <i class="fas fa-map-marker-alt"></i>
+<mat-action-list class="overview-container">
+    <ng-template [ngIf]="point$ | async" let-point>
+        <ng-template [ngIf]="point | sandsToNum" let-coordinates>
+            <button mat-list-item
+                (click)="navigateToPoint(coordinates.coords)">
+                <mat-icon matListItemIcon
+                    fontSet="fas"
+                    fontIcon="fa-map-marker">
+                </mat-icon>
+                <div matListItemTitle>
+                    {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
+                </div>
+            </button>
+    
+            <button mat-list-item
+                (click)="copyCoord(coordinates.coords)">
+                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
+                </mat-icon>
+                <div matListItemTitle>
+                    Copy to clipboard
+                </div>
+            </button>
+        </ng-template>
+    </ng-template>
+
+    <ng-template [ngIf]="df$ | async" let-df>
+        <button mat-list-item
+            (click)="openDialog(datatableTmpl)">
+            <mat-icon matListItemIcon
+                fontSet="fas"
+                fontIcon="fa-table">
+            </mat-icon>
+            <div matListItemTitle>
+                Show Full Assignment ({{ df.data.length }})
+            </div>
         </button>
     </ng-template>
-</ng-template>
+
+    <ng-template>
+
+    </ng-template>
+</mat-action-list>
 
 
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
@@ -23,12 +56,6 @@
 </div>
 
 <ng-template [ngIf]="df$ | async" let-df>
-
-    <button mat-raised-button
-        class="sxplr-m-2"
-        (click)="openDialog(datatableTmpl)">
-        Show Full Assignment ({{ df.data.length }})
-    </button>
 
     <!-- simple table -->
     <table mat-table [dataSource]="df | dfToDs : simpleTblSort"

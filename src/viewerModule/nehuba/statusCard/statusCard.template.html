@@ -139,18 +139,12 @@
     <ng-template [ngIf]="dialogInputState$ | async" let-state>
 
       <button mat-raised-button color="primary"
-        (click)="selectPoint(state.valueMm)"
+        (click)="selectPoint(state.valueNm)"
         [disabled]="!state.validated"
         mat-dialog-close>
         select point
       </button>
   
-      <button mat-button color="primary"
-        (click)="navigateTo(state.valueNm)"
-        [disabled]="!state.validated"
-        mat-dialog-close>
-        navigate to point
-      </button>
 
       <button mat-button color="primary"
         [attr.aria-label]="COPY_NAVIGATION_STRING"

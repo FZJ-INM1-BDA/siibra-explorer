@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
-import { MatDialog, MatDialogRef } from 'src/sharedModules/angularMaterial.exports';
+import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
@@ -114,7 +114,10 @@ export class PointAssignmentComponent implements OnDestroy {
     map(df => df.columns as string[])
   )
 
-  constructor(private sapi: SAPI, private dialog: MatDialog, private store: Store) {}
+  constructor(private sapi: SAPI, private dialog: MatDialog,
+    private store: Store,
+    private clipboard: Clipboard,
+    private snackbar: MatSnackBar) {}
 
   #dialogRef: MatDialogRef<unknown>
   openDialog(tmpl: TemplateRef<unknown>){
@@ -162,6 +165,14 @@ export class PointAssignmentComponent implements OnDestroy {
         }
       })
     )
+  }
+  
+  copyCoord(coord: number[]){
+    const strToCopy = coord.map(v => `${v.toFixed(2)}mm`).join(', ')
+    this.clipboard.copy(strToCopy)
+    this.snackbar.open(`Copied to clipboard`, 'Dismiss', {
+      duration: 4000
+    })
   }
 }
 
