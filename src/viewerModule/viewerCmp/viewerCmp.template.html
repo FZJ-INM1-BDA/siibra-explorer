@@ -637,6 +637,18 @@
       <div title>
         Multiple regions selected
       </div>
+
+      <mat-action-list class="overview-container">
+        <button mat-list-item
+          [iav-clipboard-copy]="regions | mapToProperty : 'name' | json">
+          <mat-icon class="mr-4" fontSet="fas" fontIcon="fa-copy">
+          </mat-icon>
+          <span>
+            Copy region names
+          </span>
+        </button>
+      </mat-action-list>
+
       <!-- other regions detail accordion -->
       <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
   
