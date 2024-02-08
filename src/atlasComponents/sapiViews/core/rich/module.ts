@@ -10,6 +10,7 @@ import { HighlightPipe } from "./regionsHierarchy/highlight.pipe";
 import { SapiViewsCoreRichRegionsHierarchy } from "./regionsHierarchy/regionsHierarchy.component";
 import { SapiViewsCoreRichRegionListSearch } from "./regionsListSearch/regionListSearch.component";
 import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionsListSearch/regionListSearchTmpl.directive";
+import { DialogModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionsListSearc
     SxplrFlatHierarchyModule,
     SapiViewsUtilModule,
     UtilModule,
+    DialogModule,
   ],
   declarations: [
     SapiViewsCoreRichRegionListSearch,

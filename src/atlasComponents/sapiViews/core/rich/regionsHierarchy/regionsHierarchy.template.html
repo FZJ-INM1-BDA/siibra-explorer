@@ -27,6 +27,29 @@
   </div>
 </ng-template>
 
+<ng-template #legendTmpl>
+  <h2 mat-dialog-title>Legend</h2>
+  <mat-dialog-content>
+    <mat-list role="list">
+
+      <mat-list-item>
+        <span matListItemTitle>Region mapped in the current selection</span>
+      </mat-list-item>
+
+      <mat-list-item>
+        <span class="muted-7" matListItemTitle>Region not mapped in the current selection</span>
+      </mat-list-item>
+      
+      <mat-list-item>
+        <span class="sxplr-custom-cmp accent" matListItemTitle>Region selected</span>
+      </mat-list-item>
+
+    </mat-list>
+    
+  </mat-dialog-content>
+</ng-template>
+
+
 <sxplr-flat-hierarchy-tree-view
   [sxplr-flat-hierarchy-nodes]="passedRegions$ | async"
   [sxplr-flat-hierarchy-is-parent]="isParent"
@@ -35,3 +58,14 @@
   [sxplr-flat-hierarchy-tree-view-lineheight]="24"
   (sxplr-flat-hierarchy-tree-view-node-clicked)="onNodeClick($event)">
 </sxplr-flat-hierarchy-tree-view>
+
+
+<div class="legend-container">
+  <button mat-mini-fab
+    color="primary"
+    [sxplr-dialog]="legendTmpl"
+    [sxplr-dialog-size]="null"
+    matTooltip="Legend">
+    <i class="fas fa-question"></i>
+  </button>
+</div>
