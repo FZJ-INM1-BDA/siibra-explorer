@@ -19,3 +19,5 @@ SCOPES =  [
 DATA_ERROR_ATTR = "data-error"
 
 OVERWRITE_SAPI_ENDPOINT_ATTR = "x-sapi-base-url"
+
+OVERWRITE_SPATIAL_BACKEND_ATTR = "x-spatial-backend-url"

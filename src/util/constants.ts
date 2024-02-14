@@ -101,3 +101,7 @@ export const parcBanList: string[] = [
   "minds/core/parcellationatlas/v1.0.0/887da8eb4c36d944ef626ed5293db3ef",
   "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456",
 ]
+
+export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
+
+export type GetAttr = (attr: string) => string|null

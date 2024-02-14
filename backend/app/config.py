@@ -8,6 +8,8 @@ HOSTNAME = os.getenv("HOSTNAME", "http://localhost:3000")
 
 OVERWRITE_API_ENDPOINT = os.getenv("OVERWRITE_API_ENDPOINT")
 
+OVERWRITE_SPATIAL_ENDPOINT = os.getenv("OVERWRITE_SPATIAL_ENDPOINT")
+
 LOCAL_CDN = os.getenv("LOCAL_CDN")
 
 HBP_CLIENTID_V2 = os.getenv("HBP_CLIENTID_V2", "no hbp id")

@@ -150,7 +150,8 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     AUXMESH_DESC: `Some templates contain auxiliary meshes, which compliment the appearance of the template in the perspective view.`,
 
     OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
-    DATA_ERROR_ATTR: `data-error`
+    OVERWRITE_SPATIAL_BACKEND_ATTR: `x-spatial-backend-url`,
+    DATA_ERROR_ATTR: `data-error`,
   }
 
   exports.QUICKTOUR_DESC ={
