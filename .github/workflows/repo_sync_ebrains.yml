@@ -9,7 +9,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
     - uses: wei/git-sync@v3
       with:
         source_repo: ${GITHUB_REPOSITORY}
