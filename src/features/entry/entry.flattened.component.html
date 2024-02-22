@@ -186,28 +186,3 @@
     <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
 </ng-template>
 
-<ng-template #compoundFtTmpl let-data>
-    <h2 *ngIf="data.feature" mat-dialog-title>{{ data.feature.name }}</h2>
-    <mat-dialog-content>
-        <div>
-            {{ data.feature.desc }}
-        </div>
-        
-        <mat-divider class="sxplr-mt-2 sxplr-mb-2"></mat-divider>
-
-        <compound-feature-container
-            [compoundFeature]="data.feature"
-            (dismiss)="data.dismiss()">
-        </compound-feature-container>
-    </mat-dialog-content>
-
-    <div mat-dialog-actions>
-        <a mat-raised-button color="primary"
-            *ngFor="let link of data.feature.link"
-            [href]="link.href"
-            target="_blank">
-            {{link.text }}
-        </a>
-        <button mat-button mat-dialog-close cdkFocusInitial>Close</button>
-    </div>
-</ng-template>

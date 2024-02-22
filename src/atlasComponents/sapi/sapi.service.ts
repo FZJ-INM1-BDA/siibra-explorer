@@ -438,7 +438,7 @@ export class SAPI{
      */
     return this.v3Get("/feature/Image", {
       query: {
-        space_id: bbox.space.id,
+        space_id: bbox.space?.id || bbox.spaceId,
         bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),
       }
     }).pipe(

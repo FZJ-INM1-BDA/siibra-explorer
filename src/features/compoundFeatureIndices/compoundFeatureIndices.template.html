@@ -1,0 +1,31 @@
+<ng-template [ngIf]="view$ | async" let-view>
+      
+    <table mat-table [dataSource]="view.datasource">
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>name</th>
+            <td mat-cell mat-ripple *matCellDef="let element">
+                <span>
+                    {{ element.index | indexToStr }}
+                </span>
+                <span class="sxplr-custom-cmp warn">
+                    <i *ngFor="let icon of element | idxToIcon : view.selectedTemplate"
+                        [class]="icon.fontSet + ' ' + icon.fontIcon"
+                        [matTooltip]="icon.message"></i>
+                </span>
+
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row
+            (click)="handleOnClick(row)"
+            *matRowDef="let row; columns: columns;"></tr>
+    </table>
+    
+    <pointcloud-intents [points]="view.indices | filterForPoints"
+        [selected-template]="view.selectedTemplate">
+    </pointcloud-intents>
+</ng-template>
+
+<mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+</mat-paginator>

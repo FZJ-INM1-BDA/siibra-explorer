@@ -2,14 +2,19 @@ import { ChangeDetectionStrategy, Component, Inject, Input } from '@angular/core
 import { BehaviorSubject, EMPTY, Observable, combineLatest, concat, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
-import { Feature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
+import { Feature, SimpleCompoundFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
 import { isVoiData, notQuiteRight } from "../guards"
 import { Action, Store, select } from '@ngrx/store';
-import { atlasSelection } from 'src/state';
+import { atlasSelection, userInteraction } from 'src/state';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 type PlotlyResponse = PathReturn<"/feature/{feature_id}/plotly">
+
+function isSimpleCompoundFeature(feat: unknown): feat is SimpleCompoundFeature{
+  return !!feat['indices']
+}
 
 @Component({
   selector: 'sxplr-feature-view',
@@ -19,9 +24,11 @@ type PlotlyResponse = PathReturn<"/feature/{feature_id}/plotly">
 })
 export class FeatureViewComponent {
 
-  #feature$ = new BehaviorSubject<Feature>(null)
+  busy$ = new BehaviorSubject<boolean>(false)
+
+  #feature$ = new BehaviorSubject<Feature|SimpleCompoundFeature>(null)
   @Input()
-  set feature(val: Feature) {
+  set feature(val: Feature|SimpleCompoundFeature) {
     this.#feature$.next(val)
   }
 
@@ -137,6 +144,15 @@ export class FeatureViewComponent {
     ))
   )
 
+  #compoundFeatEmts$ = this.#feature$.pipe(
+    map(f => {
+      if (isSimpleCompoundFeature(f)) {
+        return f.indices
+      }
+      return null
+    })
+  )
+
   additionalLinks$ = this.#detailLinks.pipe(
     distinctUntilChanged((o, n) => o.length == n.length),
     withLatestFrom(this.#feature$),
@@ -178,6 +194,7 @@ export class FeatureViewComponent {
   constructor(
     private sapi: SAPI,
     private store: Store,
+    private snackbar: MatSnackBar,
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>,  
   ) {
   }
@@ -204,11 +221,15 @@ export class FeatureViewComponent {
     concat(
       of(null as PlotlyResponse),
       this.#plotly$,
+    ),
+    this.#compoundFeatEmts$,
+    this.store.pipe(
+      select(atlasSelection.selectors.selectedTemplate)
     )
   ]).pipe(
-    map(([ voi, plotly ]) => {
+    map(([ voi, plotly, cmpFeatElmts, selectedTemplate ]) => {
       return {
-        voi, plotly
+        voi, plotly, cmpFeatElmts, selectedTemplate
       }
     })
   )
@@ -217,7 +238,8 @@ export class FeatureViewComponent {
     this.#feature$,
     combineLatest([
       this.#loadingDetail$,
-      this.#loadingPlotly$
+      this.#loadingPlotly$,
+      this.busy$,
     ]).pipe(
       map(flags => flags.some(f => f))
     ),
@@ -253,4 +275,19 @@ export class FeatureViewComponent {
       }
     })
   )
+  
+  async showSubfeature(id: string){
+    try {
+      this.busy$.next(true)
+      const feature = await this.sapi.getV3FeatureDetailWithId(id).toPromise()
+      this.store.dispatch(
+        userInteraction.actions.showFeature({ feature })
+      )
+    } catch (e) {
+      console.log('error', e)
+      this.snackbar.open(`Error: ${e.toString()}`, "Dismiss")
+    } finally {
+      this.busy$.next(false)
+    }
+  }
 }

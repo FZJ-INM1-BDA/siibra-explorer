@@ -34,6 +34,7 @@ import { MatRadioModule } from "@angular/material/radio";
 import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
 import { A11yModule } from "@angular/cdk/a11y";
+import { MatPaginatorModule } from '@angular/material/paginator'
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -72,6 +73,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatTableModule,
     MatSortModule,
     A11yModule,
+    MatPaginatorModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

@@ -265,22 +265,20 @@ class TranslateV3 {
     const { ['@id']: regionId } = region
     this.#regionMap.set(regionId, region)
     this.#regionMap.set(region.name, region)
+    
+    const bestViewPoint = region.hasAnnotation?.bestViewPoint
+
     return {
       id: region["@id"],
       name: region.name,
       color: hexToRgb(region.hasAnnotation?.displayColor) as [number, number, number],
       parentIds: region.hasParent.map( v => v["@id"] ),
       type: "SxplrRegion",
-      centroid: region.hasAnnotation?.bestViewPoint
-        ? await (async () => {
-          const bestViewPoint = region.hasAnnotation?.bestViewPoint
-          const fullSpace = this.#templateMap.get(bestViewPoint.coordinateSpace['@id'])
-          const space = await this.translateTemplate(fullSpace)
-          return {
-            loc: bestViewPoint.coordinates.map(v => v.value) as [number, number, number],
-            space
-          }
-        })()
+      centroid: bestViewPoint
+        ? {
+          loc: bestViewPoint.coordinates.map(v => v.value) as [number, number, number],
+          spaceId: bestViewPoint.coordinateSpace['@id']
+        }
         : null
     }
   }
@@ -626,14 +624,9 @@ class TranslateV3 {
   }
 
   async #translatePoint(point: components["schemas"]["CoordinatePointModel"]): Promise<Point> {
-    const getTmpl = (id: string) => {
-      return this.#sxplrTmplMap.get(id)
-    }
     return {
       loc: point.coordinates.map(v => v.value) as [number, number, number],
-      get space() {
-        return getTmpl(point.coordinateSpace['@id'])
-      }
+      spaceId: point.coordinateSpace['@id'],
     }
   }
 
@@ -649,6 +642,7 @@ class TranslateV3 {
       const v: SimpleCompoundFeature = {
         id: feat.id,
         name: feat.name,
+        category: feat.category,
         indices: await Promise.all(
           feat.indices.map(
             async ({ id, index, name }) => ({
@@ -713,14 +707,11 @@ class TranslateV3 {
       this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
     ])
     const { ['@id']: spaceId } = feat.boundingbox.space
-    const getSpace = (id: string) => this.#sxplrTmplMap.get(id)
     const bbox: BoundingBox = {
       center,
       maxpoint,
       minpoint,
-      get space() {
-        return getSpace(spaceId)
-      }
+      spaceId
     }
     return {
       ...superObj,
@@ -749,6 +740,10 @@ class TranslateV3 {
           }))
       ]
     }
+  }
+
+  getSpaceFromId(id: string): SxplrTemplate {
+    return this.#sxplrTmplMap.get(id)
   }
 }
 

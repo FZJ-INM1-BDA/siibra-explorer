@@ -94,3 +94,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  - name: HOST_PATHNAME
+    value: "/viewer"
+  - name: HOSTNAME
+    value: "https://siibra-explorer.apps.tc.humanbrainproject.eu"
