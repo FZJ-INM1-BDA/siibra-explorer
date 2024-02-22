@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';

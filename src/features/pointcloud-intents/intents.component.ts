@@ -13,7 +13,7 @@ type Intent = PathReturn<"/feature/{feature_id}/intents">['items'][number]
 
 type Annotation = {
   id: string
-  type: 'point',
+  type: 'point'
   point: [number, number, number]
 }
 
@@ -81,7 +81,9 @@ export class PointCloudIntents {
       const anns = pts.map(serializeToId)
       this.annLayer.addAnnotation(anns)
     },
-    () => {},
+    e => {
+      console.error("error", e)
+    },
     () => {
       console.log("dismissing!")
       this.annLayer.dispose()
