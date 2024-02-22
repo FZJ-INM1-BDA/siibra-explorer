@@ -19,7 +19,8 @@ import { ReadmoreModule } from "src/components/readmore";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 import { PlotlyComponent } from "./plotly";
 import { AngularMaterialModule } from "src/sharedModules";
-import { FeatureIntents } from "./intents/intents.component";
+import { AtlasColorMapIntents } from "./atlas-colormap-intents";
+import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
 
 @NgModule({
   imports: [
@@ -32,12 +33,13 @@ import { FeatureIntents } from "./intents/intents.component";
     NgLayerCtlModule,
     ReadmoreModule,
     AngularMaterialModule,
+    CompoundFeatureIndicesModule,
     
     /**
      * standalone components
      */
     PlotlyComponent,
-    FeatureIntents,
+    AtlasColorMapIntents,
   ],
   declarations: [
     EntryComponent,

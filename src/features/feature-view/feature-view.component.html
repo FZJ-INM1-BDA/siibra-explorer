@@ -69,6 +69,17 @@
       </markdown-dom>
     </mat-tab>
 
+    <ng-template [ngIf]="view.cmpFeatElmts" let-cmpFeatElmts>
+      <mat-tab label="Elements">
+        <ng-template matTabContent>
+          <compound-feature-indices [indices]="cmpFeatElmts"
+            [selected-template]="view.selectedTemplate"
+            (on-click-index)="showSubfeature($event.id)">
+          </compound-feature-indices>
+        </ng-template>
+      </mat-tab>
+    </ng-template>
+
     <!-- voi special view -->
     <ng-template [ngIf]="view.voi" let-voi>
       <mat-tab label="Volume Control">
@@ -94,9 +105,9 @@
         
           <!-- Other generic intents -->
           <!-- For now, only used for colorization of atlas -->
-          <feature-intents [intents]="intents$ | async"
+          <atlas-colormap-intents [intents]="intents$ | async"
             (actions)="onAction($event)">
-          </feature-intents>
+          </atlas-colormap-intents>
         </ng-template>
       </mat-tab>
     </ng-template>

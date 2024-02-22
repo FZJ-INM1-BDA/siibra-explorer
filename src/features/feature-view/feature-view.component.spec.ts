@@ -6,6 +6,7 @@ import { DARKTHEME } from 'src/util/injectionTokens';
 
 import { FeatureViewComponent } from './feature-view.component';
 import { provideMockStore } from '@ngrx/store/testing';
+import { AngularMaterialModule } from 'src/sharedModules';
 
 describe('FeatureViewComponent', () => {
   let component: FeatureViewComponent;
@@ -15,6 +16,7 @@ describe('FeatureViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
+        AngularMaterialModule,
       ],
       declarations: [ FeatureViewComponent ],
       providers: [

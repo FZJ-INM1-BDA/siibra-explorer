@@ -184,12 +184,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
 
     if (!gl) {
+      console.error(`Get GLContext failed!`)
       return false
     }
 
     const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
 
     if (!colorBufferFloat) {
+      console.error(`Get Extension failed!`)
       return false
     }
 

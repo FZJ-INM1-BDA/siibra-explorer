@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
@@ -36,9 +36,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
 
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
-
-  @ViewChild('compoundFtTmpl', { read: TemplateRef })
-  compoundFtTmpl: TemplateRef<unknown>
 
   constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     super()
@@ -194,12 +191,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   onClickFeature(feature: Feature) {
-    if (feature.id.startsWith("cf0::")) {
-      const ref = this.dialog.open(this.compoundFtTmpl, {
-        data: { feature, dismiss: () => ref.close() }
-      })
-      return
-    }
     this.store.dispatch(
       userInteraction.actions.showFeature({
         feature

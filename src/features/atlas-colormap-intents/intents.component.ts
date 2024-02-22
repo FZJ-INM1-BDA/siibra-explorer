@@ -13,7 +13,7 @@ const CONNECTIVITY_LAYER_ID = "connectivity-colormap-id"
 type Intent = PathReturn<"/feature/{feature_id}/intents">['items'][number]
 
 @Component({
-  selector: 'feature-intents',
+  selector: 'atlas-colormap-intents',
   templateUrl: './intents.template.html',
   styleUrls: [
     './intents.style.css'
@@ -27,7 +27,7 @@ type Intent = PathReturn<"/feature/{feature_id}/intents">['items'][number]
     DestroyDirective
   ]
 })
-export class FeatureIntents{
+export class AtlasColorMapIntents{
 
   readonly #destory$ = inject(DestroyDirective).destroyed$
   #intents$ = new BehaviorSubject<Intent[]>([])

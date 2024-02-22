@@ -507,7 +507,8 @@ export class ViewerCmp implements OnDestroy {
             userInteraction.actions.mouseoverPosition({
               position: {
                 loc: nav.position as [number, number, number],
-                space: this.templateSelected
+                space: this.templateSelected,
+                spaceId: this.templateSelected.id,
               }
             })
           )

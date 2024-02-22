@@ -129,11 +129,12 @@ export class AnnotationLayer {
     this._onHover.complete()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     try {
-      this.viewer.layerManager.removeManagedLayer(this.nglayer)
+      const l = this.viewer.layerManager.getLayerByName(this.name)
+      this.viewer.layerManager.removeManagedLayer(l)
       this.nglayer = null
     // eslint-disable-next-line no-empty
     } catch (e) {
-
+      console.error("removing layer failed", e)
     }
   }
 

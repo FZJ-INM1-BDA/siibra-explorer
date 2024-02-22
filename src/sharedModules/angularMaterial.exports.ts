@@ -10,5 +10,6 @@ export { Clipboard } from "@angular/cdk/clipboard";
 export { UntypedFormControl } from "@angular/forms";
 export { MatTreeFlatDataSource, MatTreeFlattener } from "@angular/material/tree"
 export { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+export { MatPaginator } from "@angular/material/paginator";
 
 export { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing'
