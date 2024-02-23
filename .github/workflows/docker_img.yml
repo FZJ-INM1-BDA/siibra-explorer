@@ -77,7 +77,10 @@ jobs:
         echo "Successfully built $DOCKER_BUILT_TAG"
         echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
-        IMAGE_DIGEST=$(docker inspect --format='{{ index .RepoDigests 0 }}' $DOCKER_BUILT_TAG)
+        inspect_str=$(docker inspect --format='json' $DOCKER_BUILT_TAG)
+        echo "Inspected tag: $inspect_str"
+        
+        IMAGE_DIGEST=$(echo $inspect_str | jq -r '.[0].RepoDigests[0]')
         echo "Built image digest: $IMAGE_DIGEST"
         echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
 
