@@ -22,6 +22,17 @@
           <span class="centered" matListItemIcon [class]="cvtOutput.icon.cls"></span>
           <span matListItemTitle>{{ cvtOutput.text }}</span>
         </mat-list-item>
+
+        <mat-list-item *ngFor="let message of iavMouseHoverContextualBlock.messages$ | async"
+          class="h-auto">
+          <ng-template [ngIf]="message.fontIcon && message.fontSet">
+            <mat-icon matListItemIcon
+              [fontSet]="message.fontSet"
+              [fontIcon]="message.fontIcon">
+            </mat-icon>
+          </ng-template>
+          <span matListItemTitle>{{ message.message }}</span>
+        </mat-list-item>
       </mat-list>
     </div>
 

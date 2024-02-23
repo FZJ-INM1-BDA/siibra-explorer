@@ -5,6 +5,8 @@ import { CompoundFeatureIndices } from "./compoundFeatureIndices.component";
 import { IndexToStrPipe } from "./idxToText.pipe";
 import { IndexToIconPipe } from "./idxToIcon.pipe";
 import { PointCloudIntents, FilterPointTransformer } from "src/features/pointcloud-intents";
+import { RENDER_CF_POINT, RenderCfPoint } from "../pointcloud-intents/intents.component";
+
 
 @NgModule({
   imports: [
@@ -20,6 +22,16 @@ import { PointCloudIntents, FilterPointTransformer } from "src/features/pointclo
   ],
   exports: [
     CompoundFeatureIndices,
+  ],
+  providers: [
+    {
+      provide: RENDER_CF_POINT,
+      useFactory: () => {
+        const pipe = new IndexToStrPipe()
+        const renderCfPoint: RenderCfPoint = cfIndex => pipe.transform(cfIndex.index)
+        return renderCfPoint
+      }
+    }
   ]
 })
 

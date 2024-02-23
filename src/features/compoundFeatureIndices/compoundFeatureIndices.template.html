@@ -23,6 +23,7 @@
     </table>
     
     <pointcloud-intents [points]="view.indices | filterForPoints"
+        (point-clicked)="handleOnClick($event)"
         [selected-template]="view.selectedTemplate">
     </pointcloud-intents>
 </ng-template>
