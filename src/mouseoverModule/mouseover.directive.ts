@@ -6,6 +6,7 @@ import { TOnHoverObj, temporalPositveScanFn } from "./util"
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { userInteraction } from "src/state"
 import { arrayEqual } from "src/util/array"
+import { MouseOverSvc } from "./service"
 
 @Directive({
   selector: '[iav-mouse-hover]',
@@ -14,6 +15,13 @@ import { arrayEqual } from "src/util/array"
 
 export class MouseHoverDirective {
 
+  /**
+   * TODO move
+   * - mousing over regions
+   * - hovering annotation
+   * - hovering voi feature
+   * to use hover interceptor
+   */
   public currentOnHoverObs$: Observable<TOnHoverObj> = merge(
     this.store$.pipe(
       select(userInteraction.selectors.mousingOverRegions),
@@ -58,6 +66,9 @@ export class MouseHoverDirective {
   constructor(
     private store$: Store<any>,
     private annotSvc: ModularUserAnnotationToolService,
+    private svc: MouseOverSvc,
   ) {
   }
+
+  messages$ = this.svc.messages$
 }

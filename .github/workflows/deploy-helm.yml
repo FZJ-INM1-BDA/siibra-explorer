@@ -9,6 +9,10 @@ on:
       IMAGE_TAG:
         required: true
         type: string
+      IMAGE_DIGEST:
+        required: false
+        type: string
+        default: 'unknown-digest'
 
     secrets:
       KUBECONFIG:
@@ -32,12 +36,14 @@ jobs:
           helm --kubeconfig=$kubecfg_path \
             upgrade \
             --set image.tag=${{ inputs.IMAGE_TAG }} \
+            --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
             ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
         else
           echo "tag ${{ inputs.DEPLOYMENT_NAME }} not found. Install"
           helm --kubeconfig=$kubecfg_path \
             install \
             --set image.tag=${{ inputs.IMAGE_TAG }} \
+            --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
             ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
         fi
 
