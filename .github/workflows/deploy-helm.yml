@@ -12,7 +12,7 @@ on:
       IMAGE_DIGEST:
         required: false
         type: string
-        default: 'unknown-digest'
+        default: 'default-digest'
 
     secrets:
       KUBECONFIG:
