@@ -39,6 +39,7 @@ import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from 
 import { Store } from "@ngrx/store";
 import { atlasSelection, userPreference } from "src/state";
 import { TabComponent } from "src/components/tab/tab.components";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -67,6 +68,9 @@ import { TabComponent } from "src/components/tab/tab.components";
     ReactiveFormsModule,
     BottomMenuModule,
     TabComponent,
+    
+    ExperimentalFlagDirective,
+    
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [

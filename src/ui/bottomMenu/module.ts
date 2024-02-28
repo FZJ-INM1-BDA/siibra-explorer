@@ -5,6 +5,7 @@ import { ATPSelectorModule } from "src/atlasComponents/sapiViews/core/rich/ATPSe
 import { SmartChipModule } from "src/components/smartChip";
 import { SapiViewsCoreRegionModule } from "src/atlasComponents/sapiViews/core/region";
 import { AngularMaterialModule } from "src/sharedModules";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -13,6 +14,8 @@ import { AngularMaterialModule } from "src/sharedModules";
     SmartChipModule,
     SapiViewsCoreRegionModule,
     AngularMaterialModule,
+
+    ExperimentalFlagDirective,
   ],
   declarations: [
     BottomMenuCmp,
