@@ -26,7 +26,7 @@ jobs:
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
     outputs:
-      IMAGE_DIGEST: ${{ steps.build-docker-image.outputs.IMAGE_DIGEST }}
+      GIT_DIGEST: ${{ steps.build-docker-image.outputs.GIT_DIGEST }}
 
     steps:
     - uses: actions/checkout@v4
@@ -80,16 +80,14 @@ jobs:
         inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
         
-        IMAGE_DIGEST=$(echo $inspect_str | jq -r '.[0].RepoDigests[0]')
-        echo "Built image digest: $IMAGE_DIGEST"
-        
-        IMAGE_DIGEST=$(echo $IMAGE_DIGEST | grep -oP '[a-f0-9]+$')
+        GIT_DIGEST=${{ github.sha }}
+        echo "Git digest: $GIT_DIGEST"
 
         # 62 char limit in label
-        IMAGE_DIGEST=$(echo $IMAGE_DIGEST | grep -oP '^.{6}')
-        echo "Using first 6 chars of hash: $IMAGE_DIGEST"
+        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
+        echo "Using first 6 chars of hash: $GIT_DIGEST"
 
-        echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
+        echo "GIT_DIGEST=$GIT_DIGEST" >> $GITHUB_OUTPUT
 
     - name: 'Push to docker registry'
       run: |
@@ -117,7 +115,7 @@ jobs:
       DEPLOY_ID: ${{ steps.set-vars.outputs.DEPLOY_ID }}
       SXPLR_VERSION: ${{ steps.set-vars.outputs.SXPLR_VERSION }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: set-vars
         name: Set vars
         run: |
@@ -165,7 +163,7 @@ jobs:
     with:
       DEPLOYMENT_NAME: rc
       IMAGE_TAG: staging
-      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.IMAGE_DIGEST }}
+      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
@@ -178,7 +176,7 @@ jobs:
     with:
       DEPLOYMENT_NAME: master
       IMAGE_TAG: ${{ needs.setting-vars.outputs.SXPLR_VERSION }}
-      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.IMAGE_DIGEST }}
+      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 

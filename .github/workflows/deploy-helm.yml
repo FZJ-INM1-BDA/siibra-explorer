@@ -22,7 +22,7 @@ jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: 'Deploy'
       run: |
         kubecfg_path=${{ runner.temp }}/.kube_config

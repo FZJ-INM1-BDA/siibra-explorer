@@ -9,7 +9,7 @@ jobs:
   hide_previous_if_exists:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: 'master'
     - uses: actions/github-script@v5
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: '3.10'
