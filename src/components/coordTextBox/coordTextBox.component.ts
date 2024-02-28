@@ -17,7 +17,7 @@ export function isTVec4(val: unknown): val is TAffine {
   if (val.length !== 4) {
     return false
   }
-  return val.every(v => typeof v === "number")
+  return val.every(v => typeof v === "number" && !isNaN(v))
 }
 
 export function isAffine(val: unknown): val is TAffine {
@@ -34,10 +34,10 @@ export function isTriplet(val: unknown): val is TTriplet{
   if (!Array.isArray(val)) {
     return false
   }
-  if (val.some(v => typeof v !== "number")) {
+  if (val.length !== 3) {
     return false
   }
-  return val.length === 3
+  return val.every(v => typeof v === "number" && !isNaN(v))
 }
 
 @Component({
