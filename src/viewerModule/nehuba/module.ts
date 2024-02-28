@@ -29,6 +29,8 @@ import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
+import { CoordTextBox } from "src/components/coordTextBox";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -60,6 +62,9 @@ import { DialogModule } from "src/ui/dialogInfo";
     QuickTourModule,
     NehubaLayoutOverlayModule,
     DialogModule,
+
+    CoordTextBox,
+    ExperimentalFlagDirective
   ],
   declarations: [
     NehubaViewerContainerDirective,
