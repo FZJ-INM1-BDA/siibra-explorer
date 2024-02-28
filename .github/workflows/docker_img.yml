@@ -77,11 +77,18 @@ jobs:
         echo "Successfully built $DOCKER_BUILT_TAG"
         echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
-        inspect_str=$(docker inspect --format='json' $DOCKER_BUILT_TAG)
+        inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
         
         IMAGE_DIGEST=$(echo $inspect_str | jq -r '.[0].RepoDigests[0]')
         echo "Built image digest: $IMAGE_DIGEST"
+        
+        IMAGE_DIGEST=$(echo $IMAGE_DIGEST | grep -oP '[a-f0-9]+$')
+
+        # 62 char limit in label
+        IMAGE_DIGEST=$(echo $IMAGE_DIGEST | grep -oP '^.{6}')
+        echo "Using first 6 chars of hash: $IMAGE_DIGEST"
+
         echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
 
     - name: 'Push to docker registry'
@@ -150,14 +157,14 @@ jobs:
       okd_token: ${{ secrets.OKD_PROD_SECRET }}
 
   trigger-deploy-rc-rancher:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'rc' && success() }}
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
       - build-docker-img
       - setting-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: rc
-      IMAGE_TAG: ${{ needs.setting-vars.outputs.SXPLR_VERSION }}
+      IMAGE_TAG: staging
       IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.IMAGE_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}

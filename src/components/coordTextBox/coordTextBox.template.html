@@ -1,0 +1,13 @@
+<mat-form-field>
+    <mat-label>
+        {{ label }}
+    </mat-label>
+
+    <input type="text" matInput
+        [value]="inputValue$ | async">
+    
+</mat-form-field>
+
+<div class="suffix">
+    <ng-content select="[suffix]"></ng-content>
+</div>

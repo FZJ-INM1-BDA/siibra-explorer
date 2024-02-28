@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: siibra-explorer-main-ingress
+  labels:
+    name: siibra-explorer-main-ingress
+spec:
+  rules:
+  - host: siibra-explorer.apps.tc.humanbrainproject.eu
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/viewer"
+        backend:
+          service:
+            name: master-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
+        path: "/viewer-staging"
+        backend:
+          service:
+            name: rc-siibra-explorer
+            port: 
+              number: 8080
+  tls:
+  - secretName: siibra-explorer-prod-secret
+    hosts:
+    - siibra-explorer.apps.tc.humanbrainproject.eu

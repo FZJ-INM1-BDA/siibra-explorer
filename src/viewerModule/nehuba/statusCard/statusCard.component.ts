@@ -9,7 +9,7 @@ import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subject, concat, of } from "rxjs";
-import { map, filter, takeUntil, switchMap, shareReplay, debounceTime } from "rxjs/operators";
+import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl, FormGroup } from "@angular/forms";
@@ -22,6 +22,12 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getUuid } from "src/util/fn";
+import { Render, TAffine, isAffine } from "src/components/coordTextBox"
+
+type TSpace = {
+  label: string
+  affine: TAffine
+}
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -32,6 +38,41 @@ import { getUuid } from "src/util/fn";
   ],
 })
 export class StatusCardComponent {
+
+  #newSpace = new Subject<TSpace>()
+  additionalSpace$ = this.#newSpace.pipe(
+    scan((acc, v) => acc.concat(v), [] as TSpace[])
+  )
+  readonly idAffStr = `[
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1]
+]
+`
+  readonly defaultLabel = `New Space`
+  reset(label: HTMLInputElement, affine: HTMLTextAreaElement){
+    label.value = this.defaultLabel
+    affine.value = this.idAffStr
+  }
+  add(label: HTMLInputElement, affine: HTMLTextAreaElement) {
+    try {
+      const aff = JSON.parse(affine.value)
+      if (!isAffine(aff)) {
+        throw new Error(`${affine.value} cannot be parsed into 4x4 affine`)
+      }
+      this.#newSpace.next({
+        label: label.value,
+        affine: aff
+      })
+    } catch (e) {
+      console.error(`Error: ${e.toString()}`)
+    }
+    
+  }
+
+  readonly renderMm: Render = v => v.map(i => `${i}mm`).join(", ")
+  readonly renderDefault: Render = v => v.map(i => i.toFixed(3)).join(", ")
 
   readonly #destroy$ = inject(DestroyDirective).destroyed$
 
@@ -57,30 +98,25 @@ export class StatusCardComponent {
     zoom: number
     perspectiveOrientation: number[]
     perspectiveZoom: number
-}
+  }
 
-  public readonly navVal$ = this.nehubaViewer$.pipe(
+  readonly navigation$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
-    switchMap(nehubaViewer => 
-      concat(
-        of(`nehubaViewer initialising`),
-        nehubaViewer.viewerPosInReal$.pipe(
-          filter(v => !!v),
-          map(real => real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', '))
-        )
-      )
-    ),
+    switchMap(nv => nv.viewerPosInReal$.pipe(
+      map(vals => (vals || [0, 0, 0]).map(v => Number((v / 1e6).toFixed(3))))
+    )),
     shareReplay(1),
   )
-  public readonly mouseVal$ = this.nehubaViewer$.pipe(
+
+  readonly navVal$ = this.navigation$.pipe(
+    map(v => v.map(v => `${v}mm`).join(", "))
+  )
+  readonly mouseVal$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
     switchMap(nehubaViewer => 
-      concat(
-        of(``),
-        nehubaViewer.mousePosInReal$.pipe(
-          filter(v => !!v),
-          map(real => real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', '))
-        )
+      nehubaViewer.mousePosInReal$.pipe(
+        filter(v => !!v),
+        map(real => real.map(v => Number((v/1e6).toFixed(3))))
       ),
     )
   )

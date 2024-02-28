@@ -11,5 +11,6 @@ export { UntypedFormControl } from "@angular/forms";
 export { MatTreeFlatDataSource, MatTreeFlattener } from "@angular/material/tree"
 export { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 export { MatPaginator } from "@angular/material/paginator";
+export { MatInput } from "@angular/material/input";
 
 export { MatSlideToggleHarness } from '@angular/material/slide-toggle/testing'

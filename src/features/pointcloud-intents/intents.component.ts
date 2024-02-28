@@ -140,6 +140,16 @@ export class PointCloudIntents {
       }
     })
 
+    this.#destroy$.subscribe(() => {
+      if (hoverInterceptor) {
+        const { remove } = hoverInterceptor
+        if (this.#hoveredMessage) {
+          remove(this.#hoveredMessage)
+          this.#hoveredMessage = null
+        }
+      }
+    })
+
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor
       const onClickHandler = this.onViewerClick.bind(this)

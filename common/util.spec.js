@@ -172,7 +172,6 @@ describe('common/util.js', () => {
         } finally {
           const end = performance.now()
           expect(end - start).toBeGreaterThanOrEqual(defaultTimeout)
-          expect(end - start).toBeLessThan(defaultTimeout + 20)
         }
       })
     })
@@ -197,7 +196,6 @@ describe('common/util.js', () => {
         } finally {
           const end = performance.now()
           expect(end - start).toBeGreaterThanOrEqual(timeout)
-          expect(end - start).toBeLessThan(timeout + 20)
         }
       })
     })

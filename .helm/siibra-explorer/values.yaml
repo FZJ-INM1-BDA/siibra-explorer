@@ -44,7 +44,7 @@ service:
   port: 8080
 
 ingress:
-  enabled: true
+  enabled: false
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -100,3 +100,7 @@ env:
     value: "/viewer"
   - name: HOSTNAME
     value: "https://siibra-explorer.apps.tc.humanbrainproject.eu"
+  - name: OVERWRITE_SPATIAL_ENDPOINT
+    value: "https://siibra-spatial-backend.apps.tc.humanbrainproject.eu"
+  - name: OVERWRITE_API_ENDPOINT
+    value: "https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0"
