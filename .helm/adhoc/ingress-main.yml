@@ -23,6 +23,13 @@ spec:
             name: rc-siibra-explorer
             port: 
               number: 8080
+      - pathType: Prefix
+        path: "/viewer-expmt"
+        backend:
+          service:
+            name: expmt-siibra-explorer
+            port: 
+              number: 8080
   tls:
   - secretName: siibra-explorer-prod-secret
     hosts:

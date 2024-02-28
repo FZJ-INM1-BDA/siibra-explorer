@@ -1,3 +1,5 @@
+<ng-template #deprec>
+
 <sxplr-wrapper-atp-selector (sxplr-wrapper-atp-selector-menu-open)="onATPMenuOpen($event)"
   class="sxplr-z-2">
 </sxplr-wrapper-atp-selector>
@@ -8,6 +10,7 @@
   <!-- single region -->
   <ng-template [ngIf]="view.selectedRegions.length == 1">
     <sxplr-smart-chip
+      class="region-chip"
       mat-ripple
       *ngFor="let region of view.selectedRegions"
       [noMenu]="true"
@@ -79,4 +82,50 @@
 
   </ng-template>
 
+</ng-template>
+
+</ng-template>
+
+
+<ng-template #expmttmpl>
+  
+<ng-template [ngIf]="view$ | async" let-view>
+  <ng-template [ngIf]="view.selectedFeature" [ngIfElse]="deprec" let-feature>
+    <sxplr-smart-chip
+      mat-ripple
+      [noMenu]="true"
+      (click)="onRegionClick.emit()">
+    
+      <ng-template sxplrSmartChipHeader>
+        <span>
+          Feature
+        </span>
+      </ng-template>
+      
+      <ng-template sxplrSmartChipContent>
+        <span>
+          {{ feature.name }}
+        </span>
+      </ng-template>
+
+      <ng-template sxplrSmartChipAction>
+        <button class="sxplr-mr-n3"
+            mat-icon-button
+            (click)="clearFeature()">
+            <i class="fas fa-times"></i>
+        </button>
+      </ng-template>
+    </sxplr-smart-chip>
+
+  </ng-template>
+</ng-template>
+</ng-template>
+
+
+<ng-template sxplrExperimentalFlag [experimental]="true">
+<ng-template [ngTemplateOutlet]="expmttmpl"></ng-template>
+</ng-template>
+
+<ng-template sxplrExperimentalFlag [deprecated]="true">
+<ng-template [ngTemplateOutlet]="deprec"></ng-template>
 </ng-template>

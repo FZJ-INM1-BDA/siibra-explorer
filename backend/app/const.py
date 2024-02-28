@@ -21,3 +21,5 @@ DATA_ERROR_ATTR = "data-error"
 OVERWRITE_SAPI_ENDPOINT_ATTR = "x-sapi-base-url"
 
 OVERWRITE_SPATIAL_BACKEND_ATTR = "x-spatial-backend-url"
+
+OVERWRITE_EXPERIMENTAL_FLAG_ATTR = "x-experimental-flag"

@@ -18,12 +18,12 @@
   flex-wrap: nowrap;
 }
 
-:host sxplr-smart-chip
+sxplr-smart-chip.region-chip
 {
   margin-left: -2.5rem;
 }
 
-sxplr-smart-chip .regionname
+sxplr-smart-chip.region-chip .regionname
 {
   margin-left: 0.5rem;
 }
