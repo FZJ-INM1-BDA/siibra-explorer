@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
 import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
