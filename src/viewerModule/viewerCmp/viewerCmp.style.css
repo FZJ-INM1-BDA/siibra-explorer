@@ -93,13 +93,13 @@ mat-drawer
   display: block;
 }
 
-mat-list.contextual-block
+.contextual-block
 {
   display: inline-block;
   background-color:rgba(200,200,200,0.8);
 }
 
-:host-context([darktheme="true"]) mat-list.contextual-block
+:host-context([darktheme="true"]) .contextual-block
 {
   background-color : rgba(30,30,30,0.8);
 }
@@ -155,13 +155,6 @@ sxplr-sapiviews-core-region-region-list-item
   align-items: center;
 }
 
-.centered
-{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .leave-me-alone
 {
   margin-top: 0.5rem;
@@ -194,4 +187,11 @@ sxplr-tab
 {
   display: inline-flex;
   flex-direction: column;
+}
+
+viewer-wrapper
+{
+  width: 100%;
+  height: 100%;
+  display: block;
 }

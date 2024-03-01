@@ -167,6 +167,19 @@ jobs:
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
+  trigger-deploy-expmt-rancher:
+    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    needs:
+      - build-docker-img
+      - setting-vars
+    uses: ./.github/workflows/deploy-helm.yml
+    with:
+      DEPLOYMENT_NAME: expmt
+      IMAGE_TAG: staging
+      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
+    secrets:
+      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
   trigger-deploy-master-rancher:
     if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:

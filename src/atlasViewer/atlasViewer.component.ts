@@ -15,7 +15,6 @@ import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
 import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { colorAnimation } from "./atlasViewer.animation"
-import { MouseHoverDirective } from "src/mouseoverModule";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { CONST } from 'common/constants'
@@ -48,8 +47,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   sapiError$ = SAPI.ErrorMessage$
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
-
-  @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
 

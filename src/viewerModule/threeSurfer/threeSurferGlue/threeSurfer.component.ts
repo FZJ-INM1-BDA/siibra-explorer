@@ -4,9 +4,7 @@ import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, O
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
-import { CONST } from 'common/constants'
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
@@ -400,7 +398,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     private sapi: SAPI,
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
-    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
   ){
     if (intViewerStateSvc) {
       const {
@@ -430,37 +427,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       this.onDestroyCb.push(() => done())
     }
 
-    /**
-     * intercept click and act
-     */
-    if (clickInterceptor) {
-      const handleClick = (ev: MouseEvent) => {
-
-        // if does not click inside container, ignore
-        if (!(el.nativeElement as HTMLElement).contains(ev.target as HTMLElement)) {
-          return true
-        }
-        
-        if (this.mouseoverRegions.length === 0) return true
-        if (this.mouseoverRegions.length > 1) {
-          this.snackbar.open(CONST.DOES_NOT_SUPPORT_MULTI_REGION_SELECTION, 'Dismiss', {
-            duration: 3000
-          })
-          return true
-        }
-
-        const regions = this.mouseoverRegions.slice(0, 1) as any[]
-        this.store$.dispatch(
-          atlasSelection.actions.setSelectedRegions({ regions })
-        )
-        return true
-      }
-      const { register, deregister } = clickInterceptor
-      register(handleClick)
-      this.onDestroyCb.push(
-        () => { deregister(register) }
-      )
-    }
     
     this.domEl = el.nativeElement
 

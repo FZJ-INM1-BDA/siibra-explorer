@@ -12,7 +12,6 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -40,7 +39,6 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     UtilModule,
     AngularMaterialModule,
     ComponentsModule,
-    MouseoverModule,
     ShareModule,
     WindowResizeModule,
     NehubaUserLayerModule,

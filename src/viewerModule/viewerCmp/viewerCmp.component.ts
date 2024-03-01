@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, TemplateRef, ViewChild, inject } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, Observable, of, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
-import { EnumViewerEvt, TContextArg, TSupportedViewers, TViewerEvent } from "../viewer.interface";
+import { EnumViewerEvt, TViewerEvtCtxData, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
@@ -55,7 +55,7 @@ interface HasName {
   ]
 })
 
-export class ViewerCmp implements OnDestroy {
+export class ViewerCmp {
 
   public readonly destroy$ = inject(DestroyDirective).destroyed$
 
@@ -74,8 +74,6 @@ export class ViewerCmp implements OnDestroy {
     description: QUICKTOUR_DESC.ATLAS_SELECTOR,
   }
 
-  private subscriptions: Subscription[] = []
-  private onDestroyCb: (() => void)[]  = []
   public viewerLoaded: boolean = false
 
   private selectedATP = this.store$.pipe(
@@ -238,7 +236,7 @@ export class ViewerCmp implements OnDestroy {
 
   constructor(
     private store$: Store<any>,
-    private ctxMenuSvc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>,
+    private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
     private dialogSvc: DialogService,
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
@@ -293,51 +291,51 @@ export class ViewerCmp implements OnDestroy {
       this.#fullNavBarSwitch$.next(flag)
     })
 
-    this.subscriptions.push(
-      this.templateSelected$.subscribe(
-        t => this.templateSelected = t
-      ),
-      combineLatest([
-        this.templateSelected$,
-        this.parcellationSelected$,
-        this.selectedAtlas$,
-      ]).pipe(
-        debounceTime(160)
-      ).subscribe(async ([tmpl, parc, atlas]) => {
-        const regex = /pre.?release/i
-        const checkPrerelease = (obj: any) => {
-          if (obj?.name) return regex.test(obj.name)
-          return false
-        }
-        const message: string[] = []
-        if (checkPrerelease(atlas)) {
-          message.push(`- _${atlas.name}_`)
-        }
-        if (checkPrerelease(tmpl)) {
-          message.push(`- _${tmpl.name}_`)
-        }
-        if (checkPrerelease(parc)) {
-          message.push(`- _${parc.name}_`)
-        }
-        if (message.length > 0) {
-          message.unshift(`The following have been tagged pre-release, and may be updated frequently:`)
-          try {
-            await this.dialogSvc.getUserConfirm({
-              title: `Pre-release warning`,
-              markdown: message.join('\n\n'),
-              confirmOnly: true
-            })
-          // eslint-disable-next-line no-empty
-          } catch (e) {
-
-          }
-        }
-      })
+    this.templateSelected$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(
+      t => this.templateSelected = t
     )
-  }
 
-  ngAfterViewInit(): void{
-    const cb: TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
+    combineLatest([
+      this.templateSelected$,
+      this.parcellationSelected$,
+      this.selectedAtlas$,
+    ]).pipe(
+      takeUntil(this.destroy$),
+      debounceTime(160),
+    ).subscribe(async ([tmpl, parc, atlas]) => {
+      const regex = /pre.?release/i
+      const checkPrerelease = (obj: any) => {
+        if (obj?.name) return regex.test(obj.name)
+        return false
+      }
+      const message: string[] = []
+      if (checkPrerelease(atlas)) {
+        message.push(`- _${atlas.name}_`)
+      }
+      if (checkPrerelease(tmpl)) {
+        message.push(`- _${tmpl.name}_`)
+      }
+      if (checkPrerelease(parc)) {
+        message.push(`- _${parc.name}_`)
+      }
+      if (message.length > 0) {
+        message.unshift(`The following have been tagged pre-release, and may be updated frequently:`)
+        try {
+          await this.dialogSvc.getUserConfirm({
+            title: `Pre-release warning`,
+            markdown: message.join('\n\n'),
+            confirmOnly: true
+          })
+        // eslint-disable-next-line no-empty
+        } catch (e) {
+
+        }
+      }
+    })
+    
+    const cb: TContextMenuReg<TViewerEvtCtxData<'nehuba' | 'threeSurfer'>> = ({ append, context }) => {
 
       if (this.#lastSelectedPoint && this.lastViewedPointTmpl) {
         const { point, template, face, vertices } = this.#lastSelectedPoint
@@ -373,14 +371,14 @@ export class ViewerCmp implements OnDestroy {
        */
       let hoveredRegions = []
       if (context.viewerType === 'nehuba') {
-        hoveredRegions = ((context as TContextArg<'nehuba'>).payload.nehuba || []).reduce(
+        hoveredRegions = ((context as TViewerEvtCtxData<'nehuba'>).payload.nehuba || []).reduce(
           (acc, curr) => acc.concat(...curr.regions),
           []
         )
       }
 
       if (context.viewerType === 'threeSurfer') {
-        hoveredRegions = (context as TContextArg<'threeSurfer'>).payload.regions
+        hoveredRegions = (context as TViewerEvtCtxData<'threeSurfer'>).payload.regions
       }
 
       if (hoveredRegions.length > 0) {
@@ -397,14 +395,11 @@ export class ViewerCmp implements OnDestroy {
       return true
     }
     this.ctxMenuSvc.register(cb)
-    this.onDestroyCb.push(
-      () => this.ctxMenuSvc.deregister(cb)
-    )
-  }
 
-  ngOnDestroy(): void {
-    while (this.subscriptions.length) this.subscriptions.pop().unsubscribe()
-    while (this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
+    this.destroy$.subscribe(() => {
+      this.ctxMenuSvc.deregister(cb)
+    })
+
   }
 
   public clearRoi(): void{
@@ -484,48 +479,6 @@ export class ViewerCmp implements OnDestroy {
     )
   }
 
-  public handleViewerEvent(event: TViewerEvent<'nehuba' | 'threeSurfer'>): void{
-    switch(event.type) {
-    case EnumViewerEvt.VIEWERLOADED:
-      this.viewerLoaded = event.data
-      this.cdr.detectChanges()
-      break
-    case EnumViewerEvt.VIEWER_CTX:
-      this.ctxMenuSvc.deepMerge(event.data)
-      if (event.data.viewerType === "nehuba") {
-        const { nehuba, nav } = (event.data as TContextArg<"nehuba">).payload
-        if (nehuba) {
-          const mousingOverRegions = (nehuba || []).reduce((acc, { regions }) => acc.concat(...regions), [])
-          this.store$.dispatch(
-            userInteraction.actions.mouseoverRegions({
-              regions: mousingOverRegions
-            })
-          )
-        }
-        if (nav) {
-          this.store$.dispatch(
-            userInteraction.actions.mouseoverPosition({
-              position: {
-                loc: nav.position as [number, number, number],
-                space: this.templateSelected,
-                spaceId: this.templateSelected.id,
-              }
-            })
-          )
-        }
-      }
-      if (event.data.viewerType === "threeSurfer") {
-        const { regions=[] } = (event.data as TContextArg<"threeSurfer">).payload
-        this.store$.dispatch(
-          userInteraction.actions.mouseoverRegions({
-            regions: regions as SxplrRegion[]
-          })
-        )
-      }
-      break
-    default:
-    }
-  }
 
   public disposeCtxMenu(): void{
     this.ctxMenuSvc.dismissCtxMenu()
@@ -597,5 +550,16 @@ export class ViewerCmp implements OnDestroy {
 
   nameEql(a: HasName, b: HasName){
     return a.name === b.name
+  }
+
+  handleViewerCtxEvent(event: TViewerEvent) {
+    if (event.type === EnumViewerEvt.VIEWERLOADED) {
+      this.viewerLoaded = event.data
+      this.cdr.detectChanges()
+      return
+    }
+    if (event.type === EnumViewerEvt.VIEWER_CTX) {
+      this.ctxMenuSvc.deepMerge(event.data)
+    }
   }
 }

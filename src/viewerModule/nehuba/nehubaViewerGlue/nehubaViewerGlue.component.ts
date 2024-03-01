@@ -1,15 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Inject, OnDestroy, Optional, Output } from "@angular/core";
-import { select, Store } from "@ngrx/store";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { distinctUntilChanged } from "rxjs/operators";
+import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output } from "@angular/core";
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 import { EXTERNAL_LAYER_CONTROL, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
-import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
-import { atlasSelection, userInteraction } from "src/state";
 
 
 @Component({
@@ -58,7 +53,6 @@ import { atlasSelection, userInteraction } from "src/state";
 
 export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
 
-  private onhoverSegments: SxplrRegion[] = []
   private onDestroyCb: (() => void)[] = []
 
   public nehubaConfig: NehubaConfig
@@ -70,53 +64,4 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
   @Output()
   public viewerEvent = new EventEmitter<TViewerEvent<'nehuba'>>()
 
-  constructor(
-    private store$: Store<any>,
-    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
-  ){
-
-    /**
-     * define onclick behaviour
-     */
-    if (clickInterceptor) {
-      const { deregister, register } = clickInterceptor
-      const selOnhoverRegion = this.selectHoveredRegion.bind(this)
-      register(selOnhoverRegion, { last: true })
-      this.onDestroyCb.push(() => deregister(selOnhoverRegion))
-    }
-
-    /**
-     * on hover segment
-     */
-    const onhovSegSub = this.store$.pipe(
-      select(userInteraction.selectors.mousingOverRegions),
-      distinctUntilChanged(),
-    ).subscribe(arr => {
-      this.onhoverSegments = arr
-    })
-    this.onDestroyCb.push(() => onhovSegSub.unsubscribe())
-  }
-
-  private selectHoveredRegion(ev: PointerEvent): boolean{
-    /**
-     * If label indicies are not defined by the ontology, it will be a string in the format of `{ngId}#{labelIndex}`
-     */
-    const trueOnhoverSegments = this.onhoverSegments && this.onhoverSegments.filter(v => typeof v === 'object')
-    if (!trueOnhoverSegments || (trueOnhoverSegments.length === 0)) return true
-
-    if (ev.ctrlKey) {
-      this.store$.dispatch(
-        atlasSelection.actions.toggleRegion({
-          region: trueOnhoverSegments[0]
-        })
-      )
-    } else {
-      this.store$.dispatch(
-        atlasSelection.actions.selectRegion({
-          region: trueOnhoverSegments[0]
-        })
-      )
-    }
-    return true
-  }
 }

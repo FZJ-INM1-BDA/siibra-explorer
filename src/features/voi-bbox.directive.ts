@@ -1,25 +1,27 @@
-import { Directive, Inject, Input, OnDestroy, Optional } from "@angular/core";
+import { Directive, Inject, Input, Optional, inject } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { concat, interval, of, Subject, Subscription } from "rxjs";
-import { debounce, distinctUntilChanged, filter, pairwise, take } from "rxjs/operators";
+import { concat, interval, of, Subject } from "rxjs";
+import { debounce, distinctUntilChanged, filter, pairwise, take, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationAABBox, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { Feature, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { userInteraction } from "src/state";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { arrayEqual } from "src/util/array";
 import { isVoiData } from "./guards"
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 
 @Directive({
   selector: '[voiBbox]',
+  hostDirectives: [ DestroyDirective ]
 })
-export class VoiBboxDirective implements OnDestroy {
-  
-  #onDestroyCb: (() => void)[] = []
+export class VoiBboxDirective {
+
+  #destory$ = inject(DestroyDirective).destroyed$
 
   static VOI_LAYER_NAME = 'voi-annotation-layer'
   static VOI_ANNOTATION_COLOR = "#ffff00"
 
-  #voiSubs: Subscription[] = []
   private _voiBBoxSvc: AnnotationLayer
   get voiBBoxSvc(): AnnotationLayer {
     if (this._voiBBoxSvc) return this._voiBBoxSvc
@@ -29,14 +31,15 @@ export class VoiBboxDirective implements OnDestroy {
         VoiBboxDirective.VOI_ANNOTATION_COLOR
       )
       this._voiBBoxSvc = layer
-      this.#voiSubs.push(
-        layer.onHover.subscribe(val => this.handleOnHoverFeature(val || {}))
-      )
-      this.#onDestroyCb.push(() => {
+      layer.onHover.pipe(
+        takeUntil(this.#destory$)
+      ).subscribe(val => this.handleOnHoverFeature(val || {}))
+
+      this.#destory$.subscribe(() => {
         this._voiBBoxSvc.dispose()
         this._voiBBoxSvc = null
       })
-      return layer
+      return this._voiBBoxSvc
     } catch (e) {
       return null
     }
@@ -54,25 +57,27 @@ export class VoiBboxDirective implements OnDestroy {
     return this.#voiFeatures
   }
 
-  ngOnDestroy(): void {
-    while (this.#onDestroyCb.length > 0) this.#onDestroyCb.pop()()
-  }
+  #hoverMsgs: THoverConfig[] = []
 
   constructor(
     private store: Store,
-    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR)
+    clickInterceptor: ClickInterceptor,
+    @Optional() @Inject(HOVER_INTERCEPTOR_INJECTOR) 
+    private hoverInterceptor: HoverInterceptor,
   ){
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor
       const handleClick = this.handleClick.bind(this)
       register(handleClick)
-      this.#onDestroyCb.push(() => deregister(handleClick))
+      this.#destory$.subscribe(() => deregister(handleClick))
     }
 
-    const sub = concat(
+    concat(
       of([] as VoiFeature[]),
       this.#features$
     ).pipe(
+      takeUntil(this.#destory$),
       distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
       pairwise(),
       debounce(() => 
@@ -109,10 +114,38 @@ export class VoiBboxDirective implements OnDestroy {
       if (this.voiBBoxSvc) this.voiBBoxSvc.setVisible(true)
     })
 
-    this.#onDestroyCb.push(() => sub.unsubscribe())
-    this.#onDestroyCb.push(() => this.store.dispatch(
-      userInteraction.actions.setMouseoverVoi({ feature: null })
-    ))
+    this.#destory$.subscribe(() => {
+      this.store.dispatch(
+        userInteraction.actions.setMouseoverVoi({ feature: null })
+      )
+      this.#dismissHoverMsg()
+    })
+  }
+
+  #dismissHoverMsg(){
+    if (!this.hoverInterceptor) {
+      return
+    }
+    
+    const { remove } = this.hoverInterceptor
+    for (const msg of this.#hoverMsgs){
+      remove(msg)
+    }
+  }
+
+  #appendHoverMsg(feats: VoiFeature[]){
+    if (!this.hoverInterceptor) {
+      return
+    }
+    const { append } = this.hoverInterceptor
+    this.#hoverMsgs = feats.map(feat => ({
+      message: `${feat?.name}`,
+      fontIcon: 'fa-database',
+      fontSet: 'fas'
+    }))
+    for (const msg of this.#hoverMsgs){
+      append(msg)
+    }
   }
 
   handleClick(){
@@ -135,6 +168,10 @@ export class VoiBboxDirective implements OnDestroy {
     this.store.dispatch(
       userInteraction.actions.setMouseoverVoi({ feature })
     )
+    this.#dismissHoverMsg()
+    if (feature) {
+      this.#appendHoverMsg([feature])
+    }
   }
 
   #pointsToAABB(pointA: [number, number, number], pointB: [number, number, number]): TNgAnnotationAABBox{
