@@ -33,6 +33,7 @@ jobs:
         helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
+          --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
@@ -53,8 +54,6 @@ jobs:
           upgrade \
           --history-max 3 \
           --reuse-values \
-          --set envObj.HOST_PATHNAME=/viewer-staging \
-          --set envObj.OVERWRITE_API_ENDPOINT=https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0 \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
@@ -75,9 +74,6 @@ jobs:
           upgrade \
           --history-max 3 \
           --reuse-values \
-          --set envObj.OVERWRITE_EXPERIMENTAL_FLAG_ATTR=1 \
-          --set envObj.HOST_PATHNAME=/viewer-exmpt \
-          --set envObj.OVERWRITE_API_ENDPOINT=https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0 \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/

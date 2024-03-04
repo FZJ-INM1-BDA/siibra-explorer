@@ -1,5 +1,5 @@
 import { Directive, HostListener } from "@angular/core";
-import { TContextArg } from "src/viewerModule/viewer.interface";
+import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
 import { ContextMenuService } from "./service";
 
 @Directive({
@@ -13,7 +13,7 @@ export class DismissCtxMenuDirective{
   }
 
   constructor(
-    private svc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>
+    private svc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>
   ){
 
   }

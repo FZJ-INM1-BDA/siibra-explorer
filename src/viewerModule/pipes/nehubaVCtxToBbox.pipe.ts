@@ -1,4 +1,4 @@
-import { TContextArg } from './../viewer.interface';
+import { TViewerEvtCtxData } from './../viewer.interface';
 import { Pipe, PipeTransform } from "@angular/core";
 
 type Point = [number, number, number]
@@ -12,7 +12,7 @@ const MAGIC_RADIUS = 256
 })
 
 export class NehubaVCtxToBbox implements PipeTransform{
-  public transform(event: TContextArg<'nehuba' | 'threeSurfer'>, unit: string = "mm"): BBox{
+  public transform(event: TViewerEvtCtxData<'nehuba' | 'threeSurfer'>, unit: string = "mm"): BBox{
     if (!event) {
       return null
     }
@@ -23,7 +23,7 @@ export class NehubaVCtxToBbox implements PipeTransform{
     if (unit === "mm") {
       divisor = 1e6
     }
-    const { payload } = event as TContextArg<'nehuba'>
+    const { payload } = event as TViewerEvtCtxData<'nehuba'>
     
     if (!payload.nav) return null
 

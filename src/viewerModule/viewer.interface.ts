@@ -35,7 +35,9 @@ export interface IViewerCtx {
   'threeSurfer': TThreeSurferContextInfo
 }
 
-export type TContextArg<K extends keyof IViewerCtx> = ({
+export type ViewerType = "nehuba" | "threeSurfer"
+
+export type TViewerEvtCtxData<K extends ViewerType=ViewerType> = ({
   viewerType: K
   payload: RecursivePartial<IViewerCtx[K]>
 })
@@ -45,25 +47,40 @@ export enum EnumViewerEvt {
   VIEWER_CTX,
 }
 
-type TViewerEventViewerLoaded = {
+export type TViewerEventViewerLoaded = {
   type: EnumViewerEvt.VIEWERLOADED
   data: boolean
 }
 
-export type TViewerEvent<T extends keyof IViewerCtx> = TViewerEventViewerLoaded |
-  {
-    type: EnumViewerEvt.VIEWER_CTX
-    data: TContextArg<T>
-  }
+type TViewerEventCtx<T extends ViewerType=ViewerType> = {
+  type: EnumViewerEvt.VIEWER_CTX
+  data: TViewerEvtCtxData<T>
+}
 
-export type TSupportedViewers = keyof IViewerCtx
+export type TViewerEvent<
+  T extends ViewerType=ViewerType
+> = TViewerEventViewerLoaded | TViewerEventCtx<T>
 
-export interface IViewer<K extends keyof IViewerCtx> {
+export function isViewerCtx(ev: TViewerEvent): ev is TViewerEventCtx {
+  return ev.type === EnumViewerEvt.VIEWER_CTX
+}
+
+export function isNehubaVCtxEvt(ev: TViewerEvent): ev is TViewerEventCtx<"nehuba"> {
+  return ev.type === EnumViewerEvt.VIEWER_CTX && ev.data.viewerType === "nehuba"
+}
+
+export function isThreeSurferVCtxEvt(ev: TViewerEvent): ev is TViewerEventCtx<"threeSurfer"> {
+  return ev.type === EnumViewerEvt.VIEWER_CTX && ev.data.viewerType === "threeSurfer"
+}
+
+export type TSupportedViewers = ViewerType
+
+export interface IViewer<K extends ViewerType> {
   viewerCtrlHandler?: IViewerCtrl
   viewerEvent: EventEmitter<TViewerEvent<K>>
 }
 
 export interface IGetContextInjArg {
-  register: (fn: (contextArg: TContextArg<TSupportedViewers>) => void) => void
-  deregister: (fn: (contextArg: TContextArg<TSupportedViewers>) => void) => void
+  register: (fn: (contextArg: TViewerEvtCtxData<TSupportedViewers>) => void) => void
+  deregister: (fn: (contextArg: TViewerEvtCtxData<TSupportedViewers>) => void) => void
 }

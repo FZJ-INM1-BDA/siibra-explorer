@@ -1,3 +1,2 @@
-export { MouseHoverDirective } from './mouseover.directive'
-export { MouseoverModule } from './mouseover.module'
-export { TransformOnhoverSegmentPipe } from './transformOnhoverSegment.pipe'
+export { MouseOver } from "./mouseover.component"
+export { MouseOverSvc } from "./service"
