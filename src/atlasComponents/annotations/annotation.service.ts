@@ -83,7 +83,7 @@ export class AnnotationLayer {
   )
   private onDestroyCb: (() => void)[] = []
   
-  get nglayer(){
+  get nglayer(): NgAnnotationLayer{
     return this.viewer.layerManager.getLayerByName(this.name)
   }
   private idset = new Set<string>()

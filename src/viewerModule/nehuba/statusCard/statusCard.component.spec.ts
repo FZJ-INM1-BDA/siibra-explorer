@@ -15,6 +15,7 @@ import { QuickTourModule } from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { NEHUBA_INSTANCE_INJTKN } from "../util"
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive"
 
 const mockNehubaConfig = {
   dataset: {
@@ -60,7 +61,8 @@ describe('> statusCard.component.ts', () => {
           ReactiveFormsModule,
           NoopAnimationsModule,
           UtilModule,
-          QuickTourModule
+          QuickTourModule,
+          MediaQueryDirective,
         ],
         declarations: [
           StatusCardComponent,

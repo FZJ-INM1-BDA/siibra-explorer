@@ -9,7 +9,7 @@ import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subject, combineLatest, concat, of } from "rxjs";
-import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan, startWith } from "rxjs/operators";
+import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl, FormGroup } from "@angular/forms";
