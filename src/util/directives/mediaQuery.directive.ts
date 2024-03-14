@@ -24,7 +24,8 @@ enum EnumMediaBreakPoints{
 
 @Directive({
   selector: '[iav-media-query]',
-  exportAs: 'iavMediaQuery'
+  exportAs: 'iavMediaQuery',
+  standalone: true
 })
 
 export class MediaQueryDirective{

@@ -8,8 +8,8 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subject, concat, of } from "rxjs";
-import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
+import { Observable, Subject, combineLatest, concat, of } from "rxjs";
+import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan, startWith } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl, FormGroup } from "@angular/forms";
@@ -22,11 +22,13 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getUuid } from "src/util/fn";
-import { Render, TAffine, isAffine } from "src/components/coordTextBox"
+import { Render, TAffine, isAffine, ID_AFFINE } from "src/components/coordTextBox"
+import { IDS } from "src/atlasComponents/sapi";
 
 type TSpace = {
   label: string
   affine: TAffine
+  render?: Render
 }
 
 @Component({
@@ -40,8 +42,29 @@ type TSpace = {
 export class StatusCardComponent {
 
   #newSpace = new Subject<TSpace>()
-  additionalSpace$ = this.#newSpace.pipe(
-    scan((acc, v) => acc.concat(v), [] as TSpace[])
+  additionalSpace$ = combineLatest([
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedTemplate),
+      map(tmpl => {
+        if (tmpl.id === IDS.TEMPLATES.BIG_BRAIN) {
+          const tspace: TSpace = {
+            affine: ID_AFFINE,
+            label: "BigBrain slice index",
+            render: v => `Slice ${Math.ceil((v[1] + 70.010) / 0.02)}`
+          }
+          return [tspace]
+        }
+        return []
+      })
+    ),
+    concat(
+      of([] as TSpace[]),
+      this.#newSpace.pipe(
+        scan((acc, v) => acc.concat(v), [] as TSpace[]),
+      )
+    )
+  ]).pipe(
+    map(([predefined, custom]) => [...predefined, ...custom])
   )
   readonly idAffStr = `[
   [1, 0, 0, 0],

@@ -30,6 +30,7 @@ import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
 import { CoordTextBox } from "src/components/coordTextBox";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     ShareModule,
     WindowResizeModule,
     NehubaUserLayerModule,
+    MediaQueryDirective,
 
     /**
      * should probably break this into its own...

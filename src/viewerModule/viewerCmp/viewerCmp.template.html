@@ -10,11 +10,13 @@
       </div>
     </ng-template>
     
-
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
-      floatingMouseContextualContainerDirective>
-      <mouseover-info class="contextual-block"></mouseover-info>
-    </div>
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) < 2">
+      <div floatingMouseContextualContainerDirective>
+        <mouseover-info
+          class="contextual-block">
+        </mouseover-info>
+      </div>
+    </ng-template>
   </div>
 </div>
 
@@ -504,12 +506,10 @@
 
   <!-- region search autocomplete  -->
   <!-- [@openCloseAnchor]="sideNavFullLeftSwitch.switchState ? 'open' : 'closed'" -->
-  <ng-template sxplrExperimentalFlag [deprecated]="true">
   <div class="h-0 w-100 region-text-search-autocomplete-position">
     <ng-container *ngTemplateOutlet="autocompleteTmpl">
     </ng-container>
   </div>
-  </ng-template>
 
   <div class="flex-shrink-1 flex-grow-1 d-flex flex-column sxplr-h-100"
     [ngClass]="{'region-populated': (view.selectedRegions || []).length > 0 }">
@@ -537,17 +537,7 @@
 
       
       <ng-container ngProjectAs="[header]">
-        
-        <ng-template sxplrExperimentalFlag [deprecated]="true">
-          <div class="sapi-container"></div>
-        </ng-template>
-        
-        <ng-template sxplrExperimentalFlag [experimental]="true">
-          <button mat-button (click)="clearRoi()">
-            <i class="fas fa-times"></i>
-            <span>Dismiss</span>
-          </button>
-        </ng-template>
+        <div class="sapi-container"></div>
       </ng-container>
         
       </sxplr-sapiviews-core-region-region-rich>
@@ -585,17 +575,6 @@
     </button>
   </div>
   
-</ng-template>
-
-
-<!-- expansion tmpl -->
-<ng-template #ngMatAccordionTmpl
-  let-title="title"
-  let-desc="desc"
-  let-iconClass="iconClass"
-  let-iconTooltip="iconTooltip"
-  let-iavNgIf="iavNgIf"
-  let-content="content">
 </ng-template>
 
 
