@@ -3,6 +3,8 @@ site_name: Siibra Explorer User Documentation
 theme:
   name: 'material'
 
+repo_url: https://github.com/fzj-inm1-bda/siibra-explorer
+
 extra_css:
   - extra.css
 
@@ -15,6 +17,10 @@ markdown_extensions:
   - mdx_truly_sane_lists
   - attr_list
   - toc
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - search
@@ -33,11 +39,13 @@ nav:
     - Coordinate lookups: 'basics/looking_up_coordinates.md'
     - Multimodal data features: 'basics/finding_multimodal_data.md'
   - Advanced functionalities:
+    - State encoding in URL: "advanced/url_encoding.md"
     - Superimposing local files: "advanced/superimposing_local_files.md"
     - Annotating structures in the brain: "advanced/annotating_structures.md"
     - Differential gene expression analysis: "advanced/differential_gene_expression_analysis.md"
 
   - Release notes:
+    - v2.14.5: 'releases/v2.14.5.md'
     - v2.14.4: 'releases/v2.14.4.md'
     - v2.14.3: 'releases/v2.14.3.md'
     - v2.14.2: 'releases/v2.14.2.md'

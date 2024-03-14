@@ -2,7 +2,7 @@ import ts from 'typescript'
 import path, { dirname } from 'path'
 import { fileURLToPath } from "url"
 import { readFile, writeFile } from "node:fs/promises"
-import { clearDirectory, resolveAllDefs } from "./tsUtil.mjs"
+import { clearDirectory, resolveAllDefs, populateReadme } from "./tsUtil.mjs"
 import { processNode } from "./tsUtil/index.mjs"
 
 /**
@@ -57,6 +57,7 @@ async function populateBroadCast(broadcastNode, node){
     newSchema = await resolveAllDefs(newSchema, node)
     await writeFile(path.join(dirnames.broadcast, filename), JSON.stringify(newSchema, null, 2), 'utf-8')
   }
+  await populateReadme(dirnames.broadcast)
 }
 
 /**
@@ -136,7 +137,7 @@ async function populateHeartbeatEvents(convoNode, node){
       /**
        * request
        */
-      const respFilename = `${NAMESPACE}.${eventName}__fromSxplr__request.json`
+      const respFilename = `${NAMESPACE}.${eventName}__fromSxplr__response.json`
       /**
        * @type {JSchema}
        */
@@ -157,6 +158,7 @@ async function populateHeartbeatEvents(convoNode, node){
       await writeFile(path.join(dirnames.handshake, respFilename), JSON.stringify(respSchema, null, 2), "utf-8")
     }
   }
+  await populateReadme(dirnames.handshake)
 }
 
 /**
@@ -224,6 +226,8 @@ async function populateBoothEvents(convoNode, node){
       await writeFile(path.join(dirnames.request, respFilename), JSON.stringify(respSchema, null, 2), "utf-8")
     }
   }
+  
+  await populateReadme(dirnames.request)
 }
 
 const main = async () => {
@@ -246,7 +250,6 @@ const main = async () => {
     }
   })
     
-  }
-  
-  main()
-  
+}
+
+main()

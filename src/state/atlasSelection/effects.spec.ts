@@ -3,7 +3,7 @@ import { provideMockActions } from "@ngrx/effects/testing"
 import { Action } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
-import { NEVER, ReplaySubject, of, throwError } from "rxjs"
+import { EMPTY, NEVER, ReplaySubject, of, throwError } from "rxjs"
 import { SAPI, SAPIModule } from "src/atlasComponents/sapi"
 import { SxplrRegion, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { IDS } from "src/atlasComponents/sapi/constants"
@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
@@ -104,6 +105,14 @@ describe("> effects.ts", () => {
               }
             }
           },
+          {
+            provide: InterSpaceCoordXformSvc,
+            useValue: {
+              transform() {
+                return EMPTY
+              }
+            }
+          }
         ]
       })
     })

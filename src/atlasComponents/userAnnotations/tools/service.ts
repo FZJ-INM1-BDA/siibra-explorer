@@ -18,6 +18,7 @@ import { atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
+import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 const ANNOTATION_LAYER_NAME = "modular_tool_layer_name"
@@ -276,12 +277,52 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     })
   )
 
+  #hoverMsgs: THoverConfig[] = []
+
+  #dismimssHoverMsgs(){
+    if (!this.hoverInterceptor) {
+      return
+    }
+    const { remove } = this.hoverInterceptor
+    for (const msg of this.#hoverMsgs){
+      remove(msg)
+    }
+  }
+  #appendHoverMsgs(geometries: IAnnotationGeometry[]){
+    if (!this.hoverInterceptor) {
+      return
+    }
+    const { append } = this.hoverInterceptor
+    this.#hoverMsgs = geometries.map(geom => {
+      let fontIcon = 'fa-file'
+      if (geom.annotationType === 'Point') {
+        fontIcon = 'fa-circle'
+      }
+      if (geom.annotationType === 'Line') {
+        fontIcon = 'fa-slash'
+      }
+      if (geom.annotationType === 'Polygon') {
+        fontIcon = 'fa-draw-polygon'
+      }
+      return {
+        message: geom.name || `Unnamed ${geom.annotationType}`,
+        fontSet: 'fas',
+        fontIcon
+      }
+    })
+    for (const msg of this.#hoverMsgs){
+      append(msg)
+    }
+  }
+
   constructor(
     private store: Store<any>,
     private snackbar: MatSnackBar,
     @Inject(INJ_ANNOT_TARGET) annotTarget$: Observable<HTMLElement>,
     @Inject(ANNOTATION_EVENT_INJ_TOKEN) private annotnEvSubj: Subject<TAnnotationEvent<keyof IAnnotationEvents>>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) nehubaViewer$: Observable<NehubaViewerUnit>,
+    @Optional() @Inject(HOVER_INTERCEPTOR_INJECTOR) 
+    private hoverInterceptor: HoverInterceptor,
   ){
 
     /**
@@ -323,7 +364,13 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           }
         } as TAnnotationEvent<'mousedown' | 'mouseup' | 'mousemove'>
         this.annotnEvSubj.next(payload)
-      })
+      }),
+      this.hoveringAnnotations$.subscribe(ev => {
+        this.#dismimssHoverMsgs()
+        if (ev) {
+          this.#appendHoverMsgs([ev])
+        }
+      }),
     )
 
     /**

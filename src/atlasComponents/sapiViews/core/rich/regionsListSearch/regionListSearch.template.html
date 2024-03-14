@@ -6,8 +6,7 @@
     <ng-content select="[search-input-prefix]"></ng-content>
   </div>
   <input
-    placeholder="Search for regions"
-    [value]="currentSearch"
+    [placeholder]="currentSearch || 'Search for regions'"
     #trigger="matAutocompleteTrigger"
     type="text"
     matInput

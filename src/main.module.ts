@@ -53,6 +53,7 @@ import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
 import { environment } from './environments/environment';
 import { SAPI } from './atlasComponents/sapi';
+import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
 
 @NgModule({
   imports: [
@@ -188,11 +189,19 @@ import { SAPI } from './atlasComponents/sapi';
       deps: [ AuthService, Store ]
     },
     {
+      provide: GET_ATTR_TOKEN,
+      useFactory: (document: Document) => {
+        return (attr: string) => {
+          const rootEl = document.querySelector("atlas-viewer")
+          return rootEl?.getAttribute(attr)
+        }
+      },
+      deps: [ DOCUMENT ]
+    },
+    {
       provide: APP_INITIALIZER,
-      useFactory: (sapi: SAPI, document: Document) => {
-        
-        const rootEl = document.querySelector("atlas-viewer")
-        const overwriteSapiUrl = rootEl?.getAttribute(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+      useFactory: (sapi: SAPI, getAttr: GetAttr) => {
+        const overwriteSapiUrl = getAttr(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
         
         const { SIIBRA_API_ENDPOINTS } = environment
         const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
@@ -207,7 +216,7 @@ import { SAPI } from './atlasComponents/sapi';
         }
       },
       multi: true,
-      deps: [ SAPI, DOCUMENT ]
+      deps: [ SAPI, GET_ATTR_TOKEN ]
     }
   ],
   bootstrap: [

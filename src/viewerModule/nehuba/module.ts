@@ -12,7 +12,6 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -29,6 +28,9 @@ import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
+import { CoordTextBox } from "src/components/coordTextBox";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -38,10 +40,10 @@ import { DialogModule } from "src/ui/dialogInfo";
     UtilModule,
     AngularMaterialModule,
     ComponentsModule,
-    MouseoverModule,
     ShareModule,
     WindowResizeModule,
     NehubaUserLayerModule,
+    MediaQueryDirective,
 
     /**
      * should probably break this into its own...
@@ -60,6 +62,9 @@ import { DialogModule } from "src/ui/dialogInfo";
     QuickTourModule,
     NehubaLayoutOverlayModule,
     DialogModule,
+
+    CoordTextBox,
+    ExperimentalFlagDirective
   ],
   declarations: [
     NehubaViewerContainerDirective,

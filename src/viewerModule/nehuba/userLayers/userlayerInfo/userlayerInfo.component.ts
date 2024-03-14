@@ -1,8 +1,8 @@
-import { Component, Inject, ViewChild } from "@angular/core";
+import { Component, Inject, inject } from "@angular/core";
 import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { BehaviorSubject, Subject, combineLatest, concat, of, timer } from "rxjs";
-import { map, switchMap, take } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, of, timer } from "rxjs";
+import { map, take } from "rxjs/operators";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 export type UserLayerInfoData = {
@@ -16,21 +16,20 @@ export type UserLayerInfoData = {
   templateUrl: './userlayerInfo.template.html',
   styleUrls: [
     './userlayerInfo.style.css'
+  ],
+  hostDirectives: [
+    MediaQueryDirective
   ]
 })
 
 export class UserLayerInfoCmp {
+
+  private readonly mediaQuery = inject(MediaQueryDirective)
+
   ARIA_LABELS = ARIA_LABELS
   CONST = CONST
   public HIDE_NG_TUNE_CTRL = {
     ONLY_SHOW_OPACITY: 'export-mode,lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox,hide-zero-value-checkbox'
-  }
-
-  #mediaQuery = new Subject<MediaQueryDirective>()
-
-  @ViewChild(MediaQueryDirective, { read: MediaQueryDirective })
-  set mediaQuery(val: MediaQueryDirective) {
-    this.#mediaQuery.next(val)
   }
 
   constructor(
@@ -50,13 +49,9 @@ export class UserLayerInfoCmp {
       this.#showMore,
       concat(
         of(null as MediaQueryDirective),
-        this.#mediaQuery,
-      ).pipe(
-        switchMap(mediaQueryD => mediaQueryD
-          ? mediaQueryD.mediaBreakPoint$.pipe(
-            map(val => val >= 2)
-          )
-          : of(false))
+        this.mediaQuery.mediaBreakPoint$.pipe(
+          map(val => val >= 2)
+        ),
       )
     ]).pipe(
       map(([ showMore, compact ]) => ({

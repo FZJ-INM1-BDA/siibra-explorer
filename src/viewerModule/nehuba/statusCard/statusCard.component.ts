@@ -8,9 +8,9 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, concat, of } from "rxjs";
-import { map, filter, takeUntil, switchMap, shareReplay, debounceTime } from "rxjs/operators";
-import { Clipboard, MatBottomSheet, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { Observable, Subject, combineLatest, concat, of } from "rxjs";
+import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
+import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { FormControl, FormGroup } from "@angular/forms";
 
@@ -22,6 +22,14 @@ import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getUuid } from "src/util/fn";
+import { Render, TAffine, isAffine, ID_AFFINE } from "src/components/coordTextBox"
+import { IDS } from "src/atlasComponents/sapi";
+
+type TSpace = {
+  label: string
+  affine: TAffine
+  render?: Render
+}
 
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
@@ -32,6 +40,62 @@ import { getUuid } from "src/util/fn";
   ],
 })
 export class StatusCardComponent {
+
+  #newSpace = new Subject<TSpace>()
+  additionalSpace$ = combineLatest([
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedTemplate),
+      map(tmpl => {
+        if (tmpl.id === IDS.TEMPLATES.BIG_BRAIN) {
+          const tspace: TSpace = {
+            affine: ID_AFFINE,
+            label: "BigBrain slice index",
+            render: v => `Slice ${Math.ceil((v[1] + 70.010) / 0.02)}`
+          }
+          return [tspace]
+        }
+        return []
+      })
+    ),
+    concat(
+      of([] as TSpace[]),
+      this.#newSpace.pipe(
+        scan((acc, v) => acc.concat(v), [] as TSpace[]),
+      )
+    )
+  ]).pipe(
+    map(([predefined, custom]) => [...predefined, ...custom])
+  )
+  readonly idAffStr = `[
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1]
+]
+`
+  readonly defaultLabel = `New Space`
+  reset(label: HTMLInputElement, affine: HTMLTextAreaElement){
+    label.value = this.defaultLabel
+    affine.value = this.idAffStr
+  }
+  add(label: HTMLInputElement, affine: HTMLTextAreaElement) {
+    try {
+      const aff = JSON.parse(affine.value)
+      if (!isAffine(aff)) {
+        throw new Error(`${affine.value} cannot be parsed into 4x4 affine`)
+      }
+      this.#newSpace.next({
+        label: label.value,
+        affine: aff
+      })
+    } catch (e) {
+      console.error(`Error: ${e.toString()}`)
+    }
+    
+  }
+
+  readonly renderMm: Render = v => v.map(i => `${i}mm`).join(", ")
+  readonly renderDefault: Render = v => v.map(i => i.toFixed(3)).join(", ")
 
   readonly #destroy$ = inject(DestroyDirective).destroyed$
 
@@ -47,6 +111,9 @@ export class StatusCardComponent {
     z: new FormControl<string>(null),
   })
 
+  #pasted$ = new Subject<string>()
+  #coordEditDialogClosed = new Subject()
+
   private selectedTemplate: SxplrTemplate
   private currentNavigation: {
     position: number[]
@@ -54,30 +121,25 @@ export class StatusCardComponent {
     zoom: number
     perspectiveOrientation: number[]
     perspectiveZoom: number
-}
+  }
 
-  public readonly navVal$ = this.nehubaViewer$.pipe(
+  readonly navigation$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
-    switchMap(nehubaViewer => 
-      concat(
-        of(`nehubaViewer initialising`),
-        nehubaViewer.viewerPosInReal$.pipe(
-          filter(v => !!v),
-          map(real => real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', '))
-        )
-      )
-    ),
+    switchMap(nv => nv.viewerPosInReal$.pipe(
+      map(vals => (vals || [0, 0, 0]).map(v => Number((v / 1e6).toFixed(3))))
+    )),
     shareReplay(1),
   )
-  public readonly mouseVal$ = this.nehubaViewer$.pipe(
+
+  readonly navVal$ = this.navigation$.pipe(
+    map(v => v.map(v => `${v}mm`).join(", "))
+  )
+  readonly mouseVal$ = this.nehubaViewer$.pipe(
     filter(v => !!v),
     switchMap(nehubaViewer => 
-      concat(
-        of(``),
-        nehubaViewer.mousePosInReal$.pipe(
-          filter(v => !!v),
-          map(real => real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', '))
-        )
+      nehubaViewer.mousePosInReal$.pipe(
+        filter(v => !!v),
+        map(real => real.map(v => Number((v/1e6).toFixed(3))))
       ),
     )
   )
@@ -113,7 +175,6 @@ export class StatusCardComponent {
     private store$: Store<any>,
     private log: LoggingService,
     private bottomSheet: MatBottomSheet,
-    private dialog: MatDialog,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
@@ -132,9 +193,15 @@ export class StatusCardComponent {
 
     this.nehubaViewer$.pipe(
       filter(nv => !!nv),
-      switchMap(nv => nv.viewerPosInReal$.pipe(
-        filter(pos => !!pos),
-        debounceTime(120),
+      switchMap(nv => concat(
+        of(null),
+        this.#coordEditDialogClosed,
+      ).pipe(
+        switchMap(() => nv.viewerPosInReal$.pipe(
+          filter(pos => !!pos),
+          debounceTime(120),
+          shareReplay(1)
+        ))
       )),
       takeUntil(this.#destroy$)
     ).subscribe(val => {
@@ -152,11 +219,14 @@ export class StatusCardComponent {
       takeUntil(this.#destroy$)
     ).subscribe()
 
-    this.dialogForm.valueChanges.pipe(
-      map(({ x, y, z }) => [x, y, z].map(v => this.#parseString(v))),
-      map(allEntries => allEntries.find(val => val.length === 3)),
+    this.#pasted$.pipe(
+      filter(v => !!v), // '' is falsy, so filters out null, undefined, '' etc
+      map(v => this.#parseString(v)),
       filter(fullEntry => !!fullEntry && fullEntry.every(entry => !Number.isNaN(entry))),
-      takeUntil(this.#destroy$)
+      takeUntil(this.#destroy$),
+      debounceTime(0),
+      // need to update value on the separate frame to paste action
+      // otherwise, dialogForm.setValue will have no effect
     ).subscribe(fullEntry => {
       this.dialogForm.setValue({
         x: `${fullEntry[0]}`,
@@ -164,7 +234,6 @@ export class StatusCardComponent {
         z: `${fullEntry[2]}`,
       })
     })
-
   }
 
   #parseString(input: string): number[]{
@@ -191,7 +260,7 @@ export class StatusCardComponent {
     }
   }
 
-  public selectPoint(pos: number[]) {
+  public selectPoint(posNm: number[]) {
     this.store$.dispatch(
       atlasSelection.actions.selectPoint({
         point: {
@@ -200,27 +269,24 @@ export class StatusCardComponent {
           coordinateSpace: {
             "@id": this.selectedTemplate.id
           },
-          coordinates: pos.map(v => ({
+          coordinates: posNm.map(v => ({
             "@id": getUuid(),
             "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
             unit: {
               "@id": "id.link/mm"
             },
-            value: v * 1e6,
+            value: v,
             uncertainty: [0, 0]
           }))
         }
       })
     )
-  }
-
-  public navigateTo(pos: number[], positionReal=true) {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          position: pos
+          position: posNm
         },
-        physical: positionReal,
+        physical: true,
         animation: true
       })
     )
@@ -260,17 +326,19 @@ export class StatusCardComponent {
     )
   }
 
-  openDialog(tmpl: TemplateRef<any>, options: { ariaLabel: string }): void {
-    const { ariaLabel } = options
-    this.dialog.open(tmpl, {
-      ariaLabel
-    })
-  }
-
   copyString(value: string){
     this.clipboard.copy(value)
     this.snackbar.open(`Copied to clipboard!`, null, {
       duration: 1000
     })
+  }
+
+  onPaste(ev: ClipboardEvent) {
+    const text = ev.clipboardData.getData('text/plain')
+    this.#pasted$.next(text)
+  }
+
+  onCoordEditDialogClose(){
+    this.#coordEditDialogClosed.next(null)
   }
 }

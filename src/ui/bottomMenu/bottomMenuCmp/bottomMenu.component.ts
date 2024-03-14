@@ -1,8 +1,8 @@
 import { Component, EventEmitter, HostBinding, Output } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { combineLatest } from "rxjs";
-import { map } from "rxjs/operators";
-import { MainState, atlasSelection } from "src/state";
+import { map, shareReplay } from "rxjs/operators";
+import { MainState, atlasSelection, userInteraction } from "src/state";
 
 @Component({
   selector: 'sxplr-bottom-menu',
@@ -26,19 +26,25 @@ export class BottomMenuCmp{
   #selectedRegions$ = this.store.pipe(
     select(atlasSelection.selectors.selectedRegions)
   )
+  #selectedFeature$ = this.store.pipe(
+    select(userInteraction.selectors.selectedFeature)
+  )
 
   view$ = combineLatest([
     this.#selectedATP$,
-    this.#selectedRegions$
+    this.#selectedRegions$,
+    this.#selectedFeature$,
   ]).pipe(
-    map(([ { atlas, parcellation, template }, selectedRegions ]) => {
+    map(([ { atlas, parcellation, template }, selectedRegions, selectedFeature ]) => {
       return {
         selectedAtlas: atlas,
         selectedParcellation: parcellation,
         selectedTemplate: template,
-        selectedRegions
+        selectedRegions,
+        selectedFeature
       }
-    })
+    }),
+    shareReplay(1)
   )
 
   constructor(private store: Store<MainState>){}
@@ -46,6 +52,12 @@ export class BottomMenuCmp{
   clearRoi(){
     this.store.dispatch(
       atlasSelection.actions.clearSelectedRegions()
+    )
+  }
+
+  clearFeature(){
+    this.store.dispatch(
+      userInteraction.actions.clearShownFeature()
     )
   }
 

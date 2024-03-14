@@ -67,7 +67,7 @@ export class NehubaViewerUnit implements OnDestroy {
   public viewerPosInVoxel$ = new BehaviorSubject<number[]>(null)
   public viewerPosInReal$ = new BehaviorSubject<[number, number, number]>(null)
   public mousePosInVoxel$ = new BehaviorSubject<[number, number, number]>(null)
-  public mousePosInReal$ = new BehaviorSubject(null)
+  public mousePosInReal$ = new BehaviorSubject<[number, number, number]>(null)
 
   private exportNehuba: any
 
@@ -869,7 +869,7 @@ export class NehubaViewerUnit implements OnDestroy {
           if (this.#translateVoxelToReal) {
             
             const coordInReal = this.#translateVoxelToReal(coordInVoxel)
-            this.mousePosInReal$.next( coordInReal )
+            this.mousePosInReal$.next( coordInReal as [number, number, number] )
           }
         }),
 

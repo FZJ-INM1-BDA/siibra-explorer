@@ -47,48 +47,70 @@
 
       <!-- coord -->
       <div class="d-flex">
+        <coordinate-text-input
+          [coordinates]="navigation$ | async"
+          [render]="renderMm"
+          (enter)="textNavigateTo(physCoordInput.inputValue)"
+          label="Physical Coord"
+          #physCoordInput>
 
-        <mat-form-field class="flex-grow-1">
-          <mat-label>
-            Physical Coord
-          </mat-label>
-          <input type="text"
-            matInput
-            (keydown.enter)="textNavigateTo(navInput.value)"
-            (keydown.tab)="textNavigateTo(navInput.value)"
-            [value]="navVal$ | async"
-            #navInput="matInput">
+          <ng-container ngProjectAs="[suffix]">
+            <button mat-icon-button
+              iav-stop="click"
+              [attr.aria-label]="COPY_NAVIGATION_STRING"
+              (click)="copyString(physCoordInput.inputValue)">
+              <i class="fas fa-copy"></i>
+            </button>
 
-          <button mat-icon-button
-            iav-stop="click"
-            matSuffix
-            [attr.aria-label]="COPY_NAVIGATION_STRING"
-            (click)="copyString(navInput.value)">
-            <i class="fas fa-copy"></i>
-          </button>
-
-          <button mat-icon-button
-            iav-stop="click"
-            matSuffix
-            sxplr-share-view
-            [attr.aria-label]="SHARE_BTN_ARIA_LABEL">
-            <i class="fas fa-share-square"></i>
-          </button>
-        </mat-form-field>
-
+            <button mat-icon-button
+              iav-stop="click"
+              sxplr-share-view
+              [attr.aria-label]="SHARE_BTN_ARIA_LABEL">
+              <i class="fas fa-share-square"></i>
+            </button>
+          </ng-container>
+        </coordinate-text-input>
       </div>
 
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+      <!-- custom coord -->
+      <div class="d-flex" *ngFor="let f of additionalSpace$ | async">
+        <coordinate-text-input
+          *ngIf="navigation$ | async as navigation"
+          [coordinates]="navigation"
+          [affine]="f.affine"
+          [label]="f.label"
+          [render]="f.render || renderDefault"
+          #customInput>
+
+          <ng-container ngProjectAs="[suffix]">
+            <button mat-icon-button
+              iav-stop="click"
+              [attr.aria-label]="COPY_NAVIGATION_STRING"
+              (click)="copyString(customInput.inputValue)">
+              <i class="fas fa-copy"></i>
+            </button>
+          </ng-container>
+        </coordinate-text-input>
+      </div>
+      </ng-template>
+
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+        <button mat-button
+          [sxplr-dialog]="enterNewCoordTmpl"
+          [sxplr-dialog-size]="null">
+          Add Coord Space
+        </button>
+      </ng-template>
+
       <!-- cursor pos -->
-      <mat-form-field
-        class="w-100">
-        <mat-label>
-          Cursor Position
-        </mat-label>
-        <input type="text"
-          matInput
-          [readonly]="true"
-          [value]="mouseVal$ | async">
-      </mat-form-field>
+      <div class="d-flex">
+        <coordinate-text-input
+          [coordinates]="mouseVal$ | async"
+          [render]="renderMm"
+          label="Cursor Position">
+        </coordinate-text-input>
+      </div>
 
     </mat-card-content>
   </mat-card>
@@ -106,7 +128,9 @@
 
     <button mat-icon-button
       [sxplr-dialog-size]="null"
-      [sxplr-dialog]="pointTmpl">
+      [sxplr-dialog]="pointTmpl"
+      [sxplr-dialog-config]="{autoFocus: 'input'}"
+      (sxplr-dialog-closed)="onCoordEditDialogClose()">
       <i class="fas fa-pen"></i>
     </button>
 
@@ -119,11 +143,12 @@
 </ng-template>
 
 <ng-template #pointTmpl>
-  <h1 mat-dialog-title>
-    Navigation Coordinate
-  </h1>
-  <div mat-dialog-content>
-    <form [formGroup]="dialogForm">
+  <form [formGroup]="dialogForm" cdkTrapFocus
+    (paste)="onPaste($event)">
+    <h1 mat-dialog-title>
+      Navigation Coordinate
+    </h1>
+    <div mat-dialog-content>
       <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-pos>
 
         <mat-form-field>
@@ -131,38 +156,58 @@
           <input type="text" matInput [formControlName]="pos">
         </mat-form-field>
       </ng-template>
-    </form>
-  </div>
+    </div>
 
-  <div mat-dialog-actions align="end">
+    <div mat-dialog-actions align="end">
+      
+      <ng-template [ngIf]="dialogInputState$ | async" let-state>
+
+        <button mat-raised-button color="primary"
+          (click)="selectPoint(state.valueNm)"
+          [disabled]="!state.validated"
+          mat-dialog-close>
+          select point
+        </button>
     
-    <ng-template [ngIf]="dialogInputState$ | async" let-state>
+      </ng-template>
+      <button mat-button mat-dialog-close>
+        cancel
+      </button>
+    </div>
+  </form>
+</ng-template>
 
-      <button mat-raised-button color="primary"
-        (click)="selectPoint(state.valueMm)"
-        [disabled]="!state.validated"
-        mat-dialog-close>
-        select point
-      </button>
-  
-      <button mat-button color="primary"
-        (click)="navigateTo(state.valueNm)"
-        [disabled]="!state.validated"
-        mat-dialog-close>
-        navigate to point
-      </button>
+<ng-template #enterNewCoordTmpl>
+  <h2 mat-dialog-title>
+    Add a new coordinate space
+  </h2>
+  <mat-dialog-content>
+    <mat-form-field class="d-block">
+      <mat-label>
+        Label
+      </mat-label>
+      <input type="text" matInput [value]="defaultLabel" #labelInput>
+    </mat-form-field>
 
+    
+    <mat-form-field class="d-block">
+      <mat-label>
+        Affine
+      </mat-label>
+      <textarea matInput rows="7" #affineInput>{{ idAffStr }}</textarea>
+    </mat-form-field>
+
+    <mat-dialog-actions>
       <button mat-button color="primary"
-        [attr.aria-label]="COPY_NAVIGATION_STRING"
-        (click)="copyString(state.string)"
-        [disabled]="!state.validated"
-        mat-dialog-close>
-        copy point
+        (click)="add(labelInput, affineInput)">
+        Add
       </button>
-  
-    </ng-template>
-    <button mat-button mat-dialog-close>
-      cancel
-    </button>
-  </div>
+      <button mat-button
+        (click)="reset(labelInput, affineInput)">
+        Reset
+      </button>
+    </mat-dialog-actions>
+    
+    
+  </mat-dialog-content>
 </ng-template>

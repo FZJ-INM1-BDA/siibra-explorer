@@ -8,6 +8,7 @@
   <!-- single region -->
   <ng-template [ngIf]="view.selectedRegions.length == 1">
     <sxplr-smart-chip
+      class="region-chip"
       mat-ripple
       *ngFor="let region of view.selectedRegions"
       [noMenu]="true"

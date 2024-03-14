@@ -5,7 +5,6 @@ import { SafeResourcePipe } from "./pipes/safeResource.pipe";
 import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
 import { NmToMm } from "./pipes/nmToMm.pipe";
 import { SwitchDirective } from "./directives/switch.directive";
-import { MediaQueryDirective } from './directives/mediaQuery.directive'
 import { LayoutModule } from "@angular/cdk/layout";
 import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
 import { ClickOutsideDirective } from "src/util/directives/clickOutside.directive";
@@ -38,7 +37,6 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     CaptureClickListenerDirective,
     NmToMm,
     SwitchDirective,
-    MediaQueryDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
     GetNthElementPipe,
@@ -62,7 +60,6 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     CaptureClickListenerDirective,
     NmToMm,
     SwitchDirective,
-    MediaQueryDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
     GetNthElementPipe,

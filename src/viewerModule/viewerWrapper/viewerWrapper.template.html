@@ -1,0 +1,37 @@
+<ng-container [ngSwitch]="useViewer$ | async">
+
+    <!-- nehuba viewer -->
+    <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+      *ngSwitchCase="'nehuba'"
+      (viewerEvent)="handleViewerEvent($event)"
+      #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
+    </iav-cmp-viewer-nehuba-glue>
+
+    <!-- three surfer (free surfer viewer) -->
+    <tmp-threesurfer-lifecycle class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+      *ngSwitchCase="'threeSurfer'"
+      (viewerEvent)="handleViewerEvent($event)">
+    </tmp-threesurfer-lifecycle>
+
+    <!-- if not supported, show not supported message -->
+    <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
+
+    <!-- by default, show splash screen -->
+    <div class="sxplr-h-100" *ngSwitchDefault>
+      <ng-template [ngIf]="(selectedAtlas$ | async)" [ngIfElse]="splashScreenTmpl" let-atlas>
+        <div class="center-a-div">
+          <div class="loading-atlas-text-container">
+            <spinner-cmp class="fs-200"></spinner-cmp>
+            <span>
+              Loading 
+              {{ atlas.name }}
+            </span>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #splashScreenTmpl>
+        <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
+        </ui-splashscreen>
+      </ng-template>
+    </div>
+  </ng-container>

@@ -48,8 +48,10 @@ The API is generated automatically with the following script:
 npm run api-schema
 ```
 
-[handshake API](../api/handshake/README.md.md)
+The references can be seen below:
 
-[broadcast API](../api/broadcast/README.md.md)
+[handshake API](../api/handshake/README.md)
 
-[request API](../api/request/README.md.md)
+[broadcast API](../api/broadcast/README.md)
+
+[request API](../api/request/README.md)

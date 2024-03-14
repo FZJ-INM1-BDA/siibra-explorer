@@ -15,14 +15,14 @@ import { QuickTourModule } from "src/ui/quickTour/module";
 import { INJ_ANNOT_TARGET } from "src/atlasComponents/userAnnotations/tools/type";
 import { NEHUBA_INSTANCE_INJTKN } from "./nehuba/util";
 import { map, switchMap } from "rxjs/operators";
-import { TContextArg } from "./viewer.interface";
+import { TViewerEvtCtxData } from "./viewer.interface";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { ViewerInternalStateSvc } from "./viewerInternalState.service";
 import { SAPI, SAPIModule } from 'src/atlasComponents/sapi';
 import { NehubaVCtxToBbox } from "./pipes/nehubaVCtxToBbox.pipe";
 import { SapiViewsModule, SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 import { DialogModule } from "src/ui/dialogInfo/module";
-import { MouseoverModule } from "src/mouseoverModule";
+import { MouseOver, MouseOverSvc } from "src/mouseoverModule";
 import { LogoContainer } from "src/ui/logoContainer/logoContainer.component";
 import { FloatingMouseContextualContainerDirective } from "src/util/directives/floatingMouseContextualContainer.directive";
 import { ShareModule } from "src/share";
@@ -39,6 +39,10 @@ import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from 
 import { Store } from "@ngrx/store";
 import { atlasSelection, userPreference } from "src/state";
 import { TabComponent } from "src/components/tab/tab.components";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
+import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -58,7 +62,6 @@ import { TabComponent } from "src/components/tab/tab.components";
     SapiViewsModule,
     SapiViewsUtilModule,
     DialogModule,
-    MouseoverModule,
     ShareModule,
     ATPSelectorModule,
     FeatureModule,
@@ -67,13 +70,19 @@ import { TabComponent } from "src/components/tab/tab.components";
     ReactiveFormsModule,
     BottomMenuModule,
     TabComponent,
+    
+    MouseOver,
+    MediaQueryDirective,
+    FloatingMouseContextualContainerDirective,
+    ExperimentalFlagDirective,
+    
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],
   declarations: [
     ViewerCmp,
     NehubaVCtxToBbox,
     LogoContainer,
-    FloatingMouseContextualContainerDirective,
+    ViewerWrapper,
   ],
   providers: [
     {
@@ -89,11 +98,11 @@ import { TabComponent } from "src/components/tab/tab.components";
     },
     {
       provide: CONTEXT_MENU_ITEM_INJECTOR,
-      useFactory: (svc: ContextMenuService<TContextArg<'threeSurfer' | 'nehuba'>>) => {
+      useFactory: (svc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>) => {
         return {
           register: svc.register.bind(svc),
           deregister: svc.deregister.bind(svc)
-        } as TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
+        } as TContextMenu<TContextMenuReg<TViewerEvtCtxData<'nehuba' | 'threeSurfer'>>>
       },
       deps: [ ContextMenuService ]
     },
@@ -137,6 +146,17 @@ import { TabComponent } from "src/components/tab/tab.components";
       ),
       deps: [ Store, SAPI ]
     },
+    
+    {
+      provide: HOVER_INTERCEPTOR_INJECTOR,
+      useFactory: (svc: MouseOverSvc) => {
+        return {
+          append: svc.append.bind(svc),
+          remove: svc.remove.bind(svc),
+        }
+      },
+      deps: [ MouseOverSvc ]
+    }
   ],
   exports: [
     ViewerCmp,

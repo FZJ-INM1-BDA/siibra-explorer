@@ -11,7 +11,7 @@ Note:
 - Vice versa, when selecting a parcellation which is not available as a map in the currently selected reference space, you will be asked to select a different space.
 
 !!! tip "Downloading the current parcellation map"
-	You can download the currently selected reference template and parcellation map for offline use by clicking the download button <u>↓</u> on the top right.
+	You can download the currently selected reference template and parcellation map for offline use by clicking the download button :material-download: on the top right.
 
 In the case of a volumetric template, siibra-explorer combines a rotatable 3D surface view of a brain volume with three planar views of orthogonal image planes (coronal, sagittal, horizontal). It can visualize very large brain volumes in the Terabyte range (here: BigBrain model [^1]).
 
@@ -19,7 +19,7 @@ In the case of a volumetric template, siibra-explorer combines a rotatable 3D su
 
 Each planar view allows zooming (`[mouse-wheel]`) and panning (`[mouse-drag]`). 
 You can change the default planes to arbitrary oblique cutting planes using `<shift> + [mouse-drag]`. This is especially useful for inspecting cortical layers and brain regions in their optimal 3D orientation when browsing a microscopic volume.
-In addition, each planar view can be maximized to full screen (`[mouse-over]` then `<click>` on `[ ]` icon) to behave like a 2D image viewer.
+In addition, each planar view can be maximized to full screen (`[mouse-over]` then `<click>` on :fontawesome-solid-expand: icon) to behave like a 2D image viewer.
 After maximizing a view, `[space]` cycles between the four available views.
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/julichbrain_bigbrain_coronal.png){: style="width:600px" }

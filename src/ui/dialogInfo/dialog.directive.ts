@@ -1,4 +1,4 @@
-import { Directive, HostListener, Input, TemplateRef } from "@angular/core";
+import { Directive, EventEmitter, HostListener, Input, Output, TemplateRef } from "@angular/core";
 import { MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 
@@ -40,6 +40,12 @@ export class DialogDirective{
   @Input('sxplr-dialog-data')
   data: any = {}
 
+  @Input('sxplr-dialog-config')
+  config: Partial<MatDialogConfig> = {}
+
+  @Output('sxplr-dialog-closed')
+  closed = new EventEmitter()
+
   #dialogRef: MatDialogRef<unknown>
 
   constructor(private matDialog: MatDialog){}
@@ -53,7 +59,12 @@ export class DialogDirective{
     this.#dialogRef = this.matDialog.open(tmpl, {
       autoFocus: null,
       data: {...this.data, ...data},
-      ...(sizeDict[this.size] || {})
+      ...(sizeDict[this.size] || {}),
+      ...this.config
+    })
+
+    this.#dialogRef.afterClosed().subscribe(val => {
+      this.closed.next(val)
     })
   }
 
