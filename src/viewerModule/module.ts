@@ -42,6 +42,7 @@ import { TabComponent } from "src/components/tab/tab.components";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
 import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -71,6 +72,8 @@ import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
     TabComponent,
     
     MouseOver,
+    MediaQueryDirective,
+    FloatingMouseContextualContainerDirective,
     ExperimentalFlagDirective,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
@@ -79,7 +82,6 @@ import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
     ViewerCmp,
     NehubaVCtxToBbox,
     LogoContainer,
-    FloatingMouseContextualContainerDirective,
     ViewerWrapper,
   ],
   providers: [

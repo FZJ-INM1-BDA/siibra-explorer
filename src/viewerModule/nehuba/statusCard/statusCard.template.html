@@ -72,13 +72,15 @@
         </coordinate-text-input>
       </div>
 
+      <ng-template sxplrExperimentalFlag [experimental]="true">
       <!-- custom coord -->
       <div class="d-flex" *ngFor="let f of additionalSpace$ | async">
         <coordinate-text-input
-          [coordinates]="navigation$ | async"
+          *ngIf="navigation$ | async as navigation"
+          [coordinates]="navigation"
           [affine]="f.affine"
           [label]="f.label"
-          [render]="renderDefault"
+          [render]="f.render || renderDefault"
           #customInput>
 
           <ng-container ngProjectAs="[suffix]">
@@ -91,6 +93,7 @@
           </ng-container>
         </coordinate-text-input>
       </div>
+      </ng-template>
 
       <ng-template sxplrExperimentalFlag [experimental]="true">
         <button mat-button

@@ -26,7 +26,7 @@ async def get_index_html(request: Request):
     error = None
     attributes_to_append: Dict[str, str] = {}
     if ERROR_KEY in request.session:
-        error = request.session[ERROR_KEY]
+        error = request.session.pop(ERROR_KEY)
         attributes_to_append[DATA_ERROR_ATTR] = error
     
     if OVERWRITE_API_ENDPOINT:
@@ -38,7 +38,7 @@ async def get_index_html(request: Request):
     if EXPERIMENTAL_FLAG:
         attributes_to_append[OVERWRITE_EXPERIMENTAL_FLAG_ATTR] = EXPERIMENTAL_FLAG
 
-    attr_string = " ".join([f"{key}={_monkey_sanitize(value)}" for key, value in attributes_to_append.items()])
+    attr_string = " ".join([f'{key}="{_monkey_sanitize(value)}"' for key, value in attributes_to_append.items()])
 
     resp_string = index_html.replace("<atlas-viewer>", f"<atlas-viewer {attr_string}>")
     
