@@ -493,12 +493,6 @@ export class ViewerCmp {
     )
   }
 
-  clearSelectedFeature(): void{
-    this.store$.dispatch(
-      userInteraction.actions.clearShownFeature()
-    )
-  }
-
   navigateTo(position: number[]): void {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({

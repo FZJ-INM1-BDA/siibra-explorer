@@ -7,7 +7,7 @@ from uuid import uuid4
 import json
 
 from .const import EBRAINS_IAM_DISCOVERY_URL, SCOPES, PROFILE_KEY
-from .config import HBP_CLIENTID_V2, HBP_CLIENTSECRET_V2, HOST_PATHNAME, HOSTNAME
+from .config import HBP_CLIENTID_V2, HBP_CLIENTSECRET_V2, HOST_PATHNAME
 from ._store import RedisEphStore
 
 _store = RedisEphStore.Ephemeral()
@@ -38,13 +38,12 @@ def process_ebrains_user(resp):
 
 router = APIRouter()
 
-redirect_uri = HOSTNAME.rstrip("/") + HOST_PATHNAME + "/hbp-oidc-v2/cb"
-
 @router.get("/hbp-oidc-v2/auth")
 async def login_via_ebrains(request: Request, state: str = None):
     kwargs = {}
     if state:
         kwargs["state"] = state
+    redirect_uri = str(request.base_url).rstrip("/") + HOST_PATHNAME + "/hbp-oidc-v2/cb"
     return await oauth.ebrains.authorize_redirect(request, redirect_uri=redirect_uri, **kwargs)
 
 @router.get("/hbp-oidc-v2/cb")
