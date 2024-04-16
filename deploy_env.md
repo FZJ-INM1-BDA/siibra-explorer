@@ -17,7 +17,6 @@
 
 | name | description | default | example |
 | --- | --- | --- | --- |
-| `HOSTNAME` | 
 | `HOST_PATHNAME` | pathname to listen on, restrictions: leading slash, no trailing slash | `''` | `/viewer` |
 | `HBP_CLIENTID_V2` | 
 | `HBP_CLIENTSECRET_V2` | 

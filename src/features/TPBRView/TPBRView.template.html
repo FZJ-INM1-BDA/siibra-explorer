@@ -1,0 +1,22 @@
+<ng-template [ngIf]="view$ | async" let-tpbr>
+    <div *ngIf="tpbr.template">
+        {{ tpbr.template.name }}
+    </div>
+    
+    <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
+        <div>
+            from {{ bboxString.from }}
+        </div>
+        <div>
+            to {{ bboxString.to }}
+        </div>
+    </ng-template>
+
+    <div *ngIf="tpbr.parcellation">
+        {{ tpbr.parcellation.name }}
+    </div>
+    <div *ngIf="tpbr.region">
+        {{ tpbr.region.name }}
+    </div>
+    
+</ng-template>

@@ -21,7 +21,7 @@ export const MIN_REQ_EXPLAINER = `
 export const APPEND_SCRIPT_TOKEN: InjectionToken<(url: string) => Promise<HTMLScriptElement>> = new InjectionToken(`APPEND_SCRIPT_TOKEN`)
 
 export const appendScriptFactory = (document: Document, defer: boolean = false) => {
-  return src => new Promise((rs, rj) => {
+  return (src: string) => new Promise((rs, rj) => {
     const scriptEl = document.createElement('script')
     if (defer) {
       scriptEl.defer = true

@@ -43,6 +43,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
 import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 
 @NgModule({
   imports: [
@@ -75,6 +76,7 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
     MediaQueryDirective,
     FloatingMouseContextualContainerDirective,
     ExperimentalFlagDirective,
+    TPBRViewCmp,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

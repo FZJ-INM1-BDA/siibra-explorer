@@ -829,23 +829,7 @@
 <ng-template let-feature="feature" #selectedFeatureTmpl>
   <!-- TODO differentiate between features (spatial, regional etc) -->
   
-  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2"
-    [feature]="feature">
-
-    <div header>
-      <!-- back btn -->
-      <button mat-button
-        (click)="clearSelectedFeature()"
-        [attr.aria-label]="ARIA_LABELS.CLOSE"
-        class="sxplr-mb-2"
-        >
-        <span class="ml-1">
-          Dismiss
-        </span>
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-
+  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2" [feature]="feature">
   </sxplr-feature-view>
 </ng-template>
 
@@ -892,16 +876,14 @@
         Anchored to current view
       </mat-card-title>
       <mat-card-subtitle>
-        <div *ngIf="view.selectedTemplate">
-          {{ view.selectedTemplate.name }}
-        </div>
+
         <ng-template [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" let-bbox>
-          <div>
-            from {{ bbox[0] | numbers | addUnitAndJoin : '' }}
-          </div>
-          <div>
-            to {{ bbox[1] | numbers | addUnitAndJoin : '' }}
-          </div>
+          
+          <tpbr-viewer [tpbr-concept]="{
+            template: view.selectedTemplate,
+            bbox: bbox
+          }">
+          </tpbr-viewer>
         </ng-template>
       </mat-card-subtitle>
     </mat-card-header>

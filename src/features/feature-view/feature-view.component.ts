@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, Inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, Input, inject } from '@angular/core';
 import { BehaviorSubject, EMPTY, Observable, combineLatest, concat, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, SimpleCompoundFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
@@ -8,21 +8,36 @@ import { isVoiData, notQuiteRight } from "../guards"
 import { Action, Store, select } from '@ngrx/store';
 import { atlasSelection, userInteraction } from 'src/state';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CFIndex } from '../compoundFeatureIndices';
+import { ComponentStore } from '@ngrx/component-store';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept } from '../util';
+
+type FeatureCmpStore = {
+  selectedCmpFeature: SimpleCompoundFeature|null
+}
 
 type PlotlyResponse = PathReturn<"/feature/{feature_id}/plotly">
 
 function isSimpleCompoundFeature(feat: unknown): feat is SimpleCompoundFeature{
-  return !!feat['indices']
+  return !!(feat?.['indices'])
 }
 
 @Component({
   selector: 'sxplr-feature-view',
   templateUrl: './feature-view.component.html',
   styleUrls: ['./feature-view.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    ComponentStore
+  ],
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 export class FeatureViewComponent {
+
+  destroyed$ = inject(DestroyDirective).destroyed$
 
   busy$ = new BehaviorSubject<boolean>(false)
 
@@ -122,14 +137,17 @@ export class FeatureViewComponent {
       if (!id) {
         return of(null)
       }
-      return this.sapi.getFeaturePlot(
-        id,
-        {
-          template: darktheme ? 'plotly_dark' : 'plotly_white',
-          ...additionalParams
-        }
-      ).pipe(
-        catchError(() => of(null))
+      return concat(
+        of(null),
+        this.sapi.getFeaturePlot(
+          id,
+          {
+            template: darktheme ? 'plotly_dark' : 'plotly_white',
+            ...additionalParams
+          }
+        ).pipe(
+          catchError(() => of(null))
+        )
       )
     }),
     shareReplay(1),
@@ -194,9 +212,18 @@ export class FeatureViewComponent {
   constructor(
     private sapi: SAPI,
     private store: Store,
-    private snackbar: MatSnackBar,
-    @Inject(DARKTHEME) public darktheme$: Observable<boolean>,  
+    private readonly cmpStore: ComponentStore<FeatureCmpStore>,
+    @Inject(DARKTHEME) public darktheme$: Observable<boolean>,
+    @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
   ) {
+    this.cmpStore.setState({ selectedCmpFeature: null })
+
+    this.#feature$.pipe(
+      takeUntil(this.destroyed$),
+      filter(isSimpleCompoundFeature),
+    ).subscribe(selectedCmpFeature => {
+      this.cmpStore.patchState({ selectedCmpFeature })
+    })
   }
 
   navigateToRegionByName(regionName: string){
@@ -212,6 +239,21 @@ export class FeatureViewComponent {
   onAction(action: Action){
     this.store.dispatch(action)
   }
+
+  #etheralView$ = combineLatest([
+    this.cmpStore.state$,
+    this.#feature$,
+    this.featConcept.concept$
+  ]).pipe(
+    map(([ { selectedCmpFeature }, feature, selectedConcept ]) => {
+      const { id: selectedConceptFeatId, concept } = selectedConcept
+      const prevCmpFeat: SimpleCompoundFeature = selectedCmpFeature?.indices.some(idx => idx.id === feature?.id) && selectedCmpFeature || null
+      return {
+        prevCmpFeat,
+        concept: selectedConceptFeatId === feature.id && concept || null
+      }
+    })
+  )
   
   #specialView$ = combineLatest([
     concat(
@@ -225,11 +267,11 @@ export class FeatureViewComponent {
     this.#compoundFeatEmts$,
     this.store.pipe(
       select(atlasSelection.selectors.selectedTemplate)
-    )
+    ),
   ]).pipe(
     map(([ voi, plotly, cmpFeatElmts, selectedTemplate ]) => {
       return {
-        voi, plotly, cmpFeatElmts, selectedTemplate
+        voi, plotly, cmpFeatElmts, selectedTemplate, 
       }
     })
   )
@@ -266,28 +308,30 @@ export class FeatureViewComponent {
 
   view$ = combineLatest([
     this.#baseView$,
-    this.#specialView$
+    this.#specialView$,
+    this.#etheralView$
   ]).pipe(
-    map(([obj1, obj2]) => {
+    map(([obj1, obj2, obj3]) => {
       return {
         ...obj1,
         ...obj2,
+        ...obj3,
       }
     })
   )
   
-  async showSubfeature(id: string){
-    try {
-      this.busy$.next(true)
-      const feature = await this.sapi.getV3FeatureDetailWithId(id).toPromise()
-      this.store.dispatch(
-        userInteraction.actions.showFeature({ feature })
-      )
-    } catch (e) {
-      console.log('error', e)
-      this.snackbar.open(`Error: ${e.toString()}`, "Dismiss")
-    } finally {
-      this.busy$.next(false)
-    }
+  showSubfeature(item: CFIndex|Feature){
+    this.store.dispatch(
+      userInteraction.actions.showFeature({
+        feature: item
+      })
+    )
   }
+  
+  clearSelectedFeature(): void{
+    this.store.dispatch(
+      userInteraction.actions.clearShownFeature()
+    )
+  }
+
 }

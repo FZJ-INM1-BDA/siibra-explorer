@@ -1,16 +1,17 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
-import { select, Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
-import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
+import { combineLatest, concat, forkJoin, merge, of, Subject } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -30,18 +31,35 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   selector: 'sxplr-feature-entry',
   templateUrl: './entry.flattened.component.html',
   styleUrls: ['./entry.flattened.component.scss'],
-  exportAs: 'featureEntryCmp'
+  exportAs: 'featureEntryCmp',
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
-export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
+export class EntryComponent extends FeatureBase implements AfterViewInit {
+
+  ondestroy$ = inject(DestroyDirective).destroyed$
 
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
 
-  constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(
+    private sapi: SAPI,
+    private store: Store,
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
+  ) {
     super()
-  }
 
-  #subscriptions: Subscription[] = []
+    this.TPRBbox$.pipe(
+      takeUntil(this.ondestroy$)
+    ).subscribe(tprb => {
+      this.#tprb = tprb
+    })
+  }
+  #tprb: TPRB
+
   #catAccDirs = new Subject<CategoryAccDirective[]>()
   features$ = this.#catAccDirs.pipe(
     switchMap(dirs => concat(
@@ -106,49 +124,41 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     ))
   )
 
-  ngOnDestroy(): void {
-    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
-  }
   ngAfterViewInit(): void {
-    this.#subscriptions.push(
-      merge(
-        of(null),
-        this.catAccDirs.changes
-      ).pipe(
-        map(() => Array.from(this.catAccDirs))
-      ).subscribe(dirs => this.#catAccDirs.next(dirs)),
+    merge(
+      of(null),
+      this.catAccDirs.changes
+    ).pipe(
+      map(() => Array.from(this.catAccDirs)),
+      takeUntil(this.ondestroy$),
+    ).subscribe(dirs => this.#catAccDirs.next(dirs))
 
-      this.#pullAll.pipe(
-        debounceTime(320),
-        withLatestFrom(this.#catAccDirs),
-        switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
-      ).subscribe(async dss => {
-        await Promise.all(
-          dss.map(async ds => {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-              try {
-                await ds.pull()
-              } catch (e) {
-                if (e instanceof DsExhausted) {
-                  break
-                }
-                if (e instanceof IsAlreadyPulling ) {
-                  continue
-                }
-                throw e
+    this.#pullAll.pipe(
+      debounceTime(320),
+      withLatestFrom(this.#catAccDirs),
+      switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
+      takeUntil(this.ondestroy$),
+    ).subscribe(async dss => {
+      await Promise.all(
+        dss.map(async ds => {
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            try {
+              await ds.pull()
+            } catch (e) {
+              if (e instanceof DsExhausted) {
+                break
               }
+              if (e instanceof IsAlreadyPulling ) {
+                continue
+              }
+              throw e
             }
-          })
-        )
-      })
-    )
+          }
+        })
+      )
+    })
   }
-
-  public selectedAtlas$ = this.store.pipe(
-    select(atlasSelection.selectors.selectedAtlas)
-  )
-
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
     switchMap(resp => 
@@ -191,6 +201,13 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   onClickFeature(feature: Feature) {
+
+    /**
+     * register of TPRB (template, parcellation, region, bbox) *has* to 
+     * happen at the moment when feature is selected
+     */
+    this.featConcept.register(feature.id, this.#tprb)
+
     this.store.dispatch(
       userInteraction.actions.showFeature({
         feature

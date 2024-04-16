@@ -5,7 +5,6 @@ import { UtilModule } from "src/util";
 import { EntryComponent } from './entry/entry.component'
 import { FeatureNamePipe } from "./featureName.pipe";
 import { CategoryAccDirective } from './category-acc.directive';
-import { CompoundFeatureModule } from "./compoundFtContainer";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MarkdownModule } from "src/components/markdown";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
@@ -21,25 +20,30 @@ import { PlotlyComponent } from "./plotly";
 import { AngularMaterialModule } from "src/sharedModules";
 import { AtlasColorMapIntents } from "./atlas-colormap-intents";
 import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from "./util";
+import { BehaviorSubject } from "rxjs";
+import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
+import { DialogModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
     CommonModule,
     SpinnerModule,
     UtilModule,
-    CompoundFeatureModule,
     ScrollingModule,
     MarkdownModule,
     NgLayerCtlModule,
     ReadmoreModule,
     AngularMaterialModule,
     CompoundFeatureIndicesModule,
+    DialogModule,
     
     /**
      * standalone components
      */
     PlotlyComponent,
     AtlasColorMapIntents,
+    TPBRViewCmp,
   ],
   declarations: [
     EntryComponent,
@@ -60,6 +64,19 @@ import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
     FeatureViewComponent,
     VoiBboxDirective,
     ListDirective,
+  ],
+  providers: [
+    {
+      provide: FEATURE_CONCEPT_TOKEN,
+      useFactory: () => {
+        const obs = new BehaviorSubject<{ id: string, concept: TPRB}>({id: null, concept: {}})
+        const returnObj: FeatureConcept = {
+          register: (id, concept) => obs.next({ id, concept }),
+          concept$: obs.asObservable()
+        }
+        return returnObj
+      }
+    }
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

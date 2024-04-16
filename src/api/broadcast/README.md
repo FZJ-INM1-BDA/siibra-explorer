@@ -6,7 +6,7 @@ Broadcasting messages are sent under two circumstances:
 
 - immediately after the plugin client acknowledged `handshake.init` to the specific client. This is so that the client can get the current state of the viewer.
 
-Broadcasting messages never expects a response (and thus will never contain and `id` attribute)
+Broadcasting messages never expects a response (and thus will never contain an `id` attribute)
 
 ## API
 

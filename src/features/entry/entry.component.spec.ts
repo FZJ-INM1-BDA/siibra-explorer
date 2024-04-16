@@ -5,6 +5,7 @@ import { SAPIModule } from 'src/atlasComponents/sapi';
 import { EntryComponent } from './entry.component';
 import { provideMockStore } from '@ngrx/store/testing';
 import { FeatureModule } from '../module';
+import { FEATURE_CONCEPT_TOKEN, TPRB } from '../util';
 
 describe('EntryComponent', () => {
   let component: EntryComponent;
@@ -18,7 +19,13 @@ describe('EntryComponent', () => {
       ],
       declarations: [  ],
       providers: [
-        provideMockStore()
+        provideMockStore(),
+        {
+          provide: FEATURE_CONCEPT_TOKEN,
+          useValue: {
+            register(id: string, tprb: TPRB){}
+          }
+        }
       ]
     })
     .compileComponents();
