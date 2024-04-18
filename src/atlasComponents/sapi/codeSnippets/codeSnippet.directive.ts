@@ -50,7 +50,7 @@ export class CodeSnippet<T extends SapiRoute>{
     const { param, route } = value
     const { params, path } = this.sapi.v3GetRoute(route, param)
     
-    let url = encodeURI(path)
+    const url = encodeURI(path)
     const queryParam = new URLSearchParams()
     for (const key in params) {
       queryParam.set(key, params[key].toString())
