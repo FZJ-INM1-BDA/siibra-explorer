@@ -2,13 +2,23 @@ import { Component, Input } from "@angular/core";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { ARIA_LABELS } from 'common/constants'
 import { Clipboard } from "@angular/cdk/clipboard";
+import { AngularMaterialModule } from "src/sharedModules";
+import { CommonModule } from "@angular/common";
+import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 
 @Component({
   selector: 'textarea-copy-export',
   templateUrl: './textareaCopyExport.template.html',
   styleUrls: [
     './textareaCopyExport.style.css'
-  ]
+  ],
+  standalone: true,
+  imports: [
+    AngularMaterialModule,
+    CommonModule,
+    ZipFilesOutputModule,
+  ],
+  exportAs: "textAreaCopyExport"
 })
 
 export class TextareaCopyExportCmp {
@@ -31,6 +41,9 @@ export class TextareaCopyExportCmp {
 
   @Input('textarea-copy-export-disable')
   disableFlag: boolean = false
+  
+  @Input('textarea-copy-show-suffixes')
+  showSuffix: boolean = true
 
   public ARIA_LABELS = ARIA_LABELS
 
@@ -42,7 +55,7 @@ export class TextareaCopyExportCmp {
   }
 
   copyToClipboard(value: string){
-    const success = this.clipboard.copy(`${value}`)
+    const success = this.clipboard.copy(value)
     this.snackbar.open(
       success ? `Copied to clipboard!` : `Failed to copy URL to clipboard!`,
       null,

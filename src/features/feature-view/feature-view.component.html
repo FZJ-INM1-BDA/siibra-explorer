@@ -63,6 +63,30 @@
           </button>
         </ng-template>
 
+        <!-- code -->
+        <button mat-list-item
+          code-snippet
+          [routeParam]="{
+            route: '/feature/{feature_id}',
+            param: {
+              path: {
+                feature_id: view.featureId
+              }
+            }
+          }"
+          #codeSnippet="codeSnippet"
+          [disabled]="codeSnippet.busy$ | async">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-code"></mat-icon>
+          <div matListItemTitle>
+            <ng-template [ngIf]="codeSnippet.busy$ | async">
+              loading code ...
+            </ng-template>
+            <ng-template [ngIf]="!(codeSnippet.busy$ | async)">
+              code
+            </ng-template>
+          </div>
+        </button>
+
         <!-- anchor -->
         <ng-template [ngIf]="view.concept">
           <button mat-list-item

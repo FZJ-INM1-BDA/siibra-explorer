@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: siibra-explorer-certificate
+  name: siibra-explorer-ebrains-certificate
 spec:
   secretName: sxplr-ebrains-secret
   renewBefore: 120h 

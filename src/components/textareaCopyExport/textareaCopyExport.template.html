@@ -10,6 +10,7 @@
     #exportTarget>{{ input }}</textarea>
 
   <button mat-icon-button
+    *ngIf="showSuffix"
     matSuffix
     iav-stop="click"
     aria-label="Copy to clipboard"
@@ -18,6 +19,7 @@
     <i class="fas fa-copy"></i>
   </button>
   <button mat-icon-button
+    *ngIf="showSuffix"
     matSuffix
     iav-stop="click"
     [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"

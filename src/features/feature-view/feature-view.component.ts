@@ -51,17 +51,26 @@ export class FeatureViewComponent {
     map(f => f.id)
   )
 
-  #featureDetail$ = this.#feature$.pipe(
-    switchMap(f => this.sapi.getV3FeatureDetailWithId(f.id)),
-    shareReplay(1),
+  #featureDetail$ = this.#featureId.pipe(
+    switchMap(fid => this.sapi.getV3FeatureDetailWithId(fid)),
   )
-
   
   #featureDesc$ = this.#feature$.pipe(
     switchMap(() => concat(
       of(null as string),
       this.#featureDetail$.pipe(
-        map(v => v.desc)
+        map(v => v?.desc),
+        catchError((err) => {
+          let errortext = 'Error fetching feature instance'
+
+          if (err.error instanceof Error) {
+            errortext += `:\n\n${err.error.toString()}`
+          } else {
+            errortext += '!'
+          }
+          
+          return of(errortext)
+        }),
       )
     ))
   )
@@ -70,6 +79,7 @@ export class FeatureViewComponent {
     switchMap(() => concat(
       of(null),
       this.#featureDetail$.pipe(
+        catchError(() => of(null)),
         map(val => {
           if (isVoiData(val)) {
             return val
@@ -84,7 +94,8 @@ export class FeatureViewComponent {
     switchMap(() => concat(
       of([] as string[]),
       this.#featureDetail$.pipe(
-        map(notQuiteRight)
+        catchError(() => of(null)),
+        map(notQuiteRight),
       )
     ))
   )
@@ -118,6 +129,7 @@ export class FeatureViewComponent {
     switchMap(() => concat(
       of(true),
       this.#featureDetail$.pipe(
+        catchError(() => of(null)),
         map(() => false)
       )
     ))
@@ -157,7 +169,8 @@ export class FeatureViewComponent {
     switchMap(() => concat(
       of([] as string[]),
       this.#featureDetail$.pipe(
-        map(val => (val.link || []).map(l => l.href))
+        catchError(() => of(null as null)),
+        map(val => (val?.link || []).map(l => l.href))
       )
     ))
   )
@@ -292,6 +305,7 @@ export class FeatureViewComponent {
   ]).pipe(
     map(([ feature, busy, warnings, additionalLinks, downloadLink, desc ]) => {
       return {
+        featureId: feature.id,
         name: feature.name,
         links: feature.link,
         category: feature.category === 'Unknown category'

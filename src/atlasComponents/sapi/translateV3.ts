@@ -649,6 +649,7 @@ class TranslateV3 {
               id,
               index: await this.#transformIndex(index),
               name,
+              category: feat.category
             })
           )
         ),

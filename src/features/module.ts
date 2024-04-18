@@ -24,6 +24,7 @@ import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from "./util";
 import { BehaviorSubject } from "rxjs";
 import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
 import { DialogModule } from "src/ui/dialogInfo";
+import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
 
 @NgModule({
   imports: [
@@ -44,6 +45,7 @@ import { DialogModule } from "src/ui/dialogInfo";
     PlotlyComponent,
     AtlasColorMapIntents,
     TPBRViewCmp,
+    CodeSnippet,
   ],
   declarations: [
     EntryComponent,

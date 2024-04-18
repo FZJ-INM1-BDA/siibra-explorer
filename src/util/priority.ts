@@ -27,12 +27,26 @@ type Queue = {
 })
 export class PriorityHttpInterceptor implements HttpInterceptor{
 
+  static ErrorToString(err: HttpErrorResponse){
+    if (err.status === 504) {
+      return "Gateway Timeout"
+    }
+    if (!!err.error.message) {
+      try {
+        const { detail } = JSON.parse(err.error.message)
+        return detail as string
+      } catch (e) {
+        return err.error.message as string
+      }
+    }
+    return err.statusText || err.status.toString()
+  }
   private retry = 0
 
   private priorityQueue: Queue[] = []
 
   private currentJob: Set<string> = new Set()
-  private archive: Map<string, (HttpErrorResponse|HttpResponse<unknown>|Error)> = new Map()
+  private archive: Map<string, (HttpResponse<unknown>|Error)> = new Map()
   private queue$: Subject<Queue> = new Subject()
   private result$: Subject<Result<unknown>> = new Subject()
   private error$: Subject<ErrorResult> = new Subject()
@@ -95,11 +109,13 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           })
         }
         if (val instanceof HttpErrorResponse) {
-          
-          this.archive.set(urlWithParams, val)
+          const error = new Error(
+            PriorityHttpInterceptor.ErrorToString(val)
+          )
+          this.archive.set(urlWithParams, error)
           this.error$.next({
             urlWithParams,
-            error: new Error(val.toString()),
+            error,
             status: val.status
           })
         }
@@ -136,10 +152,11 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
     const archive = this.archive.get(urlWithParams)
     if (archive) {
       if (archive instanceof Error) {
-        return throwError(archive)
-      }
-      if (archive instanceof HttpErrorResponse) {
-        return throwError(archive)
+        return throwError({
+          urlWithParams,
+          error: archive,
+          status: 400
+        })
       }
       if (archive instanceof HttpResponse) {
         return of( archive.clone() )

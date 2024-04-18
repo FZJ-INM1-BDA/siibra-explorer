@@ -103,6 +103,7 @@ export type SimpleCompoundFeature<T extends string|Point=string|Point> = {
   name: string
   category?: string
   indices: {
+    category?: string
     id: string
     index: T
     name: string
