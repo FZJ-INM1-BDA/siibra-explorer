@@ -399,9 +399,9 @@ class TranslateV3 {
 
   async translateLabelledMapToThreeLabel(map:PathReturn<"/map">) {
     const threeLabelMap: Record<string, {
-      laterality: 'left' | 'right',
-      url: string,
-      region: LabelledMap[],
+      laterality: 'left' | 'right'
+      url: string
+      region: LabelledMap[]
       clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot'
     }> = {}
     const registerLayer = (url: string, clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot', laterality: 'left' | 'right', region: string, label: number) => {
