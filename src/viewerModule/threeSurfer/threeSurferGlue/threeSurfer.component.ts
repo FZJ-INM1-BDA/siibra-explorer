@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject, throwError } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
@@ -95,6 +95,17 @@ type TThreeSurfer = {
   loadColormap: (url: string) => Promise<GiiInstance>
   setupAnimation: () => void
   dispose: () => void
+  loadVertexData: (url: string) => Promise<{
+    vertex: number[]
+    labels: {
+      index: number
+      name: string
+      color: number[]
+      vertices: number[]
+    }[]
+    readonly vertexLabels: Uint16Array
+    readonly colormap: Map<number, number[]>
+  }>
   control: any
   camera: any
   customColormap: WeakMap<TThreeGeometry, any>
@@ -252,7 +263,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   )
 
   private vertexIndexLayers$: Observable<ThreeSurferCustomLabelLayer[]> = this.customLayers$.pipe(
-    map(layers => layers.filter(l => l.clType === "baselayer/threesurfer-label") as ThreeSurferCustomLabelLayer[]),
+    map(layers => layers.filter(l => 
+      l.clType === "baselayer/threesurfer-label/gii-label" || l.clType === "baselayer/threesurfer-label/annot"
+    ) as ThreeSurferCustomLabelLayer[]),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
   )
 
@@ -265,22 +278,37 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     ),
     switchMap(layers => 
       forkJoin(
-        layers.map(layer => 
-          from(
-            this.tsRef.loadColormap(layer.source)
-          ).pipe(
-            map(giiInstance => {
-              let vertexIndices: number[] = giiInstance[0].getData()
-              if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
-                vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
-              }
-              return {
-                indexLayer: layer,
-                vertexIndices
-              }
-            })
-          )
-        )
+        layers.map(layer => {
+          if (layer.clType === "baselayer/threesurfer-label/gii-label") {
+            return from(
+              this.tsRef.loadColormap(layer.source)
+            ).pipe(
+              map(giiInstance => {
+                let vertexIndices: number[] = giiInstance[0].getData()
+                if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+                  vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
+                }
+                return {
+                  indexLayer: layer,
+                  vertexIndices
+                }
+              })
+            )
+          }
+          if (layer.clType === "baselayer/threesurfer-label/annot") {
+            return from(
+              this.tsRef.loadVertexData(layer.source)
+            ).pipe(
+              map(v => {
+                return {
+                  indexLayer: layer,
+                  vertexIndices: v.vertexLabels
+                }
+              })
+            )
+          }
+          return throwError(() => new Error(`layer is neither annot nor gii-label`))
+        })
       )
     ),
     map(layers => {
@@ -317,8 +345,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
           const { label, region } = curr
           
           let key : 'left' | 'right'
-          if ( /left/i.test(region.name) ) key = 'left'
-          if ( /right/i.test(region.name) ) key = 'right'
+          if (
+            /left/i.test(region.name) || /^lh/i.test(region.name)
+          ) key = 'left'
+          if (
+            /right/i.test(region.name) || /^rh/i.test(region.name)
+          ) key = 'right'
+
           if (!key) {
             /**
              * TODO

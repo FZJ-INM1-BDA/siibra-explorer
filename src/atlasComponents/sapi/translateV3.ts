@@ -398,13 +398,19 @@ class TranslateV3 {
   }
 
   async translateLabelledMapToThreeLabel(map:PathReturn<"/map">) {
-    const threeLabelMap: Record<string, { laterality: 'left' | 'right', url: string, region: LabelledMap[] }> = {}
-    const registerLayer = (url: string, laterality: 'left' | 'right', region: string, label: number) => {
+    const threeLabelMap: Record<string, {
+      laterality: 'left' | 'right'
+      url: string
+      region: LabelledMap[]
+      clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot'
+    }> = {}
+    const registerLayer = (url: string, clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot', laterality: 'left' | 'right', region: string, label: number) => {
       if (!threeLabelMap[url]) {
         threeLabelMap[url] = {
           laterality,
           region: [],
           url,
+          clType
         }
       }
 
@@ -416,18 +422,26 @@ class TranslateV3 {
     for (const regionname in map.indices) {
       for (const { volume: volIdx, fragment, label } of map.indices[regionname]) {
         const volume = map.volumes[volIdx || 0]
-        if (!volume.formats.includes("gii-label")) {
-          // Does not support gii-label... skipping!
+        let clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot' | null = null
+        let providedVolume: typeof volume['providedVolumes'][string] | null = null
+        if (volume.formats.includes("gii-label")) {
+          clType = 'baselayer/threesurfer-label/gii-label'
+          providedVolume = volume.providedVolumes["gii-label"]
+        }
+        if (volume.formats.includes("freesurfer-annot")) {
+          clType = 'baselayer/threesurfer-label/annot'
+          providedVolume = volume.providedVolumes["freesurfer-annot"]
+        }
+        
+        if (!providedVolume || !clType) {
+          // does not support  baselayer threesurfer label, skipping
           continue
         }
-        const { ["gii-label"]: giiLabel } = volume.providedVolumes
-
-        
         if (!fragment || !["left hemisphere", "right hemisphere"].includes(fragment)) {
           console.warn(`either fragment not defined, or fragment is not '{left|right} hemisphere'. Skipping!`)
           continue
         }
-        if (!giiLabel[fragment]) {
+        if (!providedVolume[fragment]) {
           // Does not support gii-label... skipping!
           continue
         }
@@ -438,7 +452,7 @@ class TranslateV3 {
           console.warn(`cannot determine the laterality! skipping`)
           continue
         }
-        registerLayer(giiLabel[fragment], laterality, regionname, label)
+        registerLayer(providedVolume[fragment], clType, laterality, regionname, label)
       }
     }
     return threeLabelMap

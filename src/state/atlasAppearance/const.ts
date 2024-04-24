@@ -22,7 +22,7 @@ export type ThreeSurferCustomLayer = {
 } & CustomLayerBase
 
 export type ThreeSurferCustomLabelLayer = {
-  clType: 'baselayer/threesurfer-label'
+  clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot'
   source: string
   laterality: 'left' | 'right'
 } & CustomLayerBase
