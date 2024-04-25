@@ -1,0 +1,83 @@
+.sxplr-drawer
+{
+  pointer-events: none;
+
+  ::ng-deep mat-drawer-inner-container ng-tns-c29-4
+  {
+    pointer-events: none;
+  }
+}
+
+.side-panel-accordion
+{
+  display: flex;
+  flex-direction: column;
+  height: calc(99% - 60px);
+  pointer-events: none;
+
+  mat-expansion-panel
+  {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    pointer-events: all;
+
+    tpbr-viewer
+    {
+      margin: 1rem;
+      display: block;
+    }
+
+
+    mat-expansion-header
+    {
+        flex: 0 0 auto;
+        
+    }
+
+    >::ng-deep.mat-expansion-panel-content
+    {
+        flex: 1 1 0;
+        overflow: auto;
+    }
+
+    &.mat-expanded
+    {
+        flex: 1 1 auto;
+    }
+  }
+
+  ::ng-deep .mat-expansion-panel-body
+  {
+    padding: 0;
+  }
+}
+
+
+.transition-margin-left
+{
+  &.trim-margin-left
+  {
+    // sm 10
+    @media (min-width: 576px) {
+      margin-left: -83.333333%;
+    }
+    // md 5
+    @media (min-width: 768px) {
+      margin-left: -41.666667%;
+    }
+    // lg 4
+    @media (min-width: 992px) {
+      margin-left: -33.333333%;
+    }
+    // xl 3
+    @media (min-width: 1200px) {
+      margin-left: -25%;
+    }
+    // xxl 2
+    @media (min-width: 2000px) {
+      max-width: -16.67%;
+    }
+  }
+  transition: margin-left 200ms cubic-bezier(0.35, 0, 0.25, 1);
+}

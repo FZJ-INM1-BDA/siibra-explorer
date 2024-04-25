@@ -193,7 +193,7 @@ export class Effect {
    */
   onSelectATPById = createEffect(() => this.action.pipe(
     ofType(actions.selectATPById),
-    switchMap(({ atlasId, parcellationId, templateId, regionId, config }) => {
+    switchMap(({ atlasId, parcellationId, templateId, regionNames, config }) => {
       const { autoSelect, messages } = config || { autoSelect: false, messages: {} }
       return from(
         Promise.all([
@@ -210,7 +210,7 @@ export class Effect {
           
           const errorMessages = DecisionCollapse.Verify(result)
           if (errorMessages.length > 0) {
-            const errMessage = `Cannot process selectATP with parameter ${atlasId}, ${parcellationId}, ${templateId} and ${regionId}. ${errorMessages.join(" ")}`
+            const errMessage = `Cannot process selectATP with parameter ${atlasId}, ${parcellationId}, ${templateId} and ${regionNames}. ${errorMessages.join(" ")}`
             return throwError(errMessage)
           }
 
@@ -358,8 +358,8 @@ export class Effect {
                   }
 
                   state.selectedRegions = []
-                  if (!!regionId) {
-                    const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
+                  if (!!regionNames) {
+                    const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => regionNames.includes(r.name))
                     state.selectedRegions = selectedRegions
                   }
                   
@@ -436,16 +436,6 @@ export class Effect {
         )),
       )
     })
-  ))
-
-  onRegionSelectionClearPointSelection = createEffect(() => this.action.pipe(
-    ofType(actions.selectRegion),
-    map(() => actions.clearSelectedPoint())
-  ))
-
-  onPointSelectionClearRegionSelection = createEffect(() => this.action.pipe(
-    ofType(actions.selectPoint),
-    map(() => actions.clearSelectedRegions())
   ))
 
   constructor(

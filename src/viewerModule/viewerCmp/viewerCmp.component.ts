@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TViewerEvtCtxData, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
@@ -16,6 +15,7 @@ import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { ACCORDION_IDS } from "src/util/constants";
 
 interface HasName {
   name: string
@@ -25,27 +25,10 @@ interface HasName {
   selector: 'iav-cmp-viewer-container',
   templateUrl: './viewerCmp.template.html',
   styleUrls: [
-    './viewerCmp.style.css'
+    './viewerCmp.style.css',
+    './viewerCmp.style.scss',
   ],
   exportAs: 'iavCmpViewerCntr',
-  animations: [
-    trigger('openClose', [
-      state('open', style({
-        transform: 'translateY(0)',
-        opacity: 1
-      })),
-      state('closed', style({
-        transform: 'translateY(-100vh)',
-        opacity: 0
-      })),
-      transition('open => closed', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ]),
-      transition('closed => open', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ])
-    ]),
-  ],
   providers: [
     DialogService
   ],
@@ -56,6 +39,7 @@ interface HasName {
 })
 
 export class ViewerCmp {
+  ACCORDION_IDS = ACCORDION_IDS
 
   public readonly destroy$ = inject(DestroyDirective).destroyed$
 
@@ -101,10 +85,6 @@ export class ViewerCmp {
     select(atlasSelection.selectors.selectedParcellation)
   )
 
-  #selectedRegions$ = this.store$.pipe(
-    select(atlasSelection.selectors.selectedRegions),
-  )
-
   public allAvailableRegions$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedParcAllRegions)
   )
@@ -144,7 +124,9 @@ export class ViewerCmp {
   #halfNavBarSwitch$ = new BehaviorSubject<boolean>(true)
 
   #view0$ = combineLatest([
-    this.#selectedRegions$,
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedRegions)
+    ),
     this.#viewerMode$,
     this.#selectedFeature$,
     this.#selectedPoint$,
@@ -215,7 +197,7 @@ export class ViewerCmp {
          * and the full left side bar should not be expandable
          * if it is already expanded, it should collapse
          */
-        onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint,
+        
         fullSidenavExpanded,
         halfSidenavExpanded,
       }
@@ -234,6 +216,8 @@ export class ViewerCmp {
 
   private templateSelected: SxplrTemplate
 
+  #selectedRegions: SxplrRegion[] = []
+
   constructor(
     private store$: Store<any>,
     private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
@@ -241,6 +225,12 @@ export class ViewerCmp {
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
   ){
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedRegions),
+      takeUntil(this.destroy$)
+    ).subscribe(regions => {
+      this.#selectedRegions = regions
+    })
 
     this.view$.pipe(
       takeUntil(this.destroy$),
@@ -286,7 +276,8 @@ export class ViewerCmp {
         || !!selectedFeature
         || selectedRegions.length > 0
         || !!selectedPoint
-      })
+      }),
+      filter(flag => flag)
     ).subscribe(flag => {
       this.#fullNavBarSwitch$.next(flag)
     })
@@ -455,7 +446,8 @@ export class ViewerCmp {
     if (pointOfInterest) {
       this.store$.dispatch(
         atlasSelection.actions.selectATPById({
-          templateId: template.id
+          templateId: template.id,
+          regionNames: this.#selectedRegions.map(r => r.name)
         })
       )
       this.store$.dispatch(
@@ -518,7 +510,7 @@ export class ViewerCmp {
     this.store$.dispatch(
       atlasSelection.actions.selectATPById({
         parcellationId: regParc?.parcellation.id,
-        regionId: regParc?.region?.name
+        regionNames: [regParc?.region?.name]
       })
     )
   }

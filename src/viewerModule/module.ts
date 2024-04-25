@@ -44,6 +44,7 @@ import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
 import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
+import { FocusDirective } from "src/components/floating-accordion/focus.directive";
 
 @NgModule({
   imports: [
@@ -77,6 +78,7 @@ import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
     FloatingMouseContextualContainerDirective,
     ExperimentalFlagDirective,
     TPBRViewCmp,
+    FocusDirective,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

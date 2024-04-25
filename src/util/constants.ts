@@ -105,3 +105,10 @@ export const parcBanList: string[] = [
 export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
 
 export type GetAttr = (attr: string) => string|null
+
+export const ACCORDION_IDS = {
+  CURRENT_VIEW: "current-view",
+  SELECTED_REGION: "selected-region",
+  SELECTED_FEATURE: "selected-feature",
+  SELECTED_POINT: "selected-point",
+} as const

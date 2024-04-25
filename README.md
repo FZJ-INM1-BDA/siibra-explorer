@@ -34,6 +34,7 @@ Releases newer than [v2.13.0](https://github.com/fzj-inm1-bda/siibra-explorer/re
 #### Prerequisites
 
 - node 16 or later
+- git lfs
 
 #### Environments
 
@@ -60,6 +61,7 @@ To run a frontend dev server, run:
 ```bash
 $ git clone https://github.com/FZJ-INM1-BDA/siibra-explorer
 $ cd siibra-explorer
+$ git lfs fetch --all && git lfs pull
 $ npm i
 $ npm start
 ```

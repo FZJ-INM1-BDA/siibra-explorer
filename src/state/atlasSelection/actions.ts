@@ -114,7 +114,7 @@ export const selectATPById = createAction(
     atlasId?: string
     templateId?: string
     parcellationId?: string
-    regionId?: string
+    regionNames?: string[]
 
     config?: {
       autoSelect?: boolean
