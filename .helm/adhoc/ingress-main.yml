@@ -54,6 +54,30 @@ spec:
             name: expmt-siibra-explorer
             port: 
               number: 8080
+  - host: atlases.ebrains.eu
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/viewer"
+        backend:
+          service:
+            name: prod-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
+        path: "/viewer-staging"
+        backend:
+          service:
+            name: rc-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
+        path: "/viewer-expmt"
+        backend:
+          service:
+            name: expmt-siibra-explorer
+            port: 
+              number: 8080
   tls:
   - secretName: siibra-explorer-prod-secret
     hosts:
@@ -61,3 +85,6 @@ spec:
   - secretName: sxplr-ebrains-secret
     hosts:
     - siibra-explorer.apps.ebrains.eu
+  - secretName: atlases-ebrains-secret
+    hosts:
+    - atlases.ebrains.eu
