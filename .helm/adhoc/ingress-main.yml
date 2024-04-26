@@ -4,6 +4,8 @@ metadata:
   name: siibra-explorer-main-ingress
   labels:
     name: siibra-explorer-main-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: "/viewer"
 spec:
   rules:
   - host: siibra-explorer.apps.tc.humanbrainproject.eu
