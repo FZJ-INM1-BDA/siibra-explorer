@@ -555,6 +555,13 @@ class TranslateV3 {
   }
 
   async fetchMeta(url: string): Promise<MetaV1Schema|null> {
+    // TODO move to neuroglancer-data-vm
+    // difumo
+    if (url.startsWith("https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/")) {
+      return {
+        version: 1
+      }
+    }
     if (url in TMP_META_REGISTRY) {
       return TMP_META_REGISTRY[url]
     }
@@ -580,14 +587,14 @@ class TranslateV3 {
     /**
      * TODO ensure all /meta endpoints are populated
      */
-    // try{
-    //   const resp = await this.cFetch(`${url}/meta`)
-    //   if (resp.status === 200) {
-    //     return resp.json()
-    //   }
-    // } catch (e) {
+    try{
+      const resp = await this.cFetch(`${url}/meta.json`)
+      if (resp.status === 200) {
+        return resp.json()
+      }
+    } catch (e) {
       
-    // }
+    }
     
     return null
   }

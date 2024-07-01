@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 import { TFace, TSandsPoint } from "src/util/types";
 
@@ -188,4 +188,11 @@ export const selectPoint = createAction(
 
 export const clearSelectedPoint = createAction(
   `${nameSpace} clearPoint`
+)
+
+export const setViewport = createAction(
+  `${nameSpace} setViewport`,
+  props<{
+    viewport: BoundingBox
+  }>()
 )
