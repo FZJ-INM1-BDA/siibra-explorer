@@ -20,7 +20,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.17'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.16'
 
 type PaginatedResponse<T> = {
   items: T[]
@@ -286,9 +286,11 @@ export class SAPI{
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {
-        this.snackbar.open(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
-          duration: 5000
-        })
+        // TODO temporarily disable snackbar. Enable once siibra-api version stabilises
+        console.log(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`)
+        // this.snackbar.open(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
+        //   duration: 5000
+        // })
       }
     }),
     shareReplay(1),
