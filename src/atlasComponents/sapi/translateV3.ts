@@ -592,6 +592,7 @@ class TranslateV3 {
       if (resp.status === 200) {
         return resp.json()
       }
+    // eslint-disable-next-line no-empty
     } catch (e) {
       
     }
