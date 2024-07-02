@@ -141,18 +141,6 @@ jobs:
           echo "SXPLR_VERSION=$SXPLR_VERSION"
           echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
 
-  trigger-deploy-master-prod:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
-    needs:
-      - build-docker-img
-      - setting-vars
-    uses: ./.github/workflows/deploy-on-okd.yml
-    with:
-      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-prodpathviewer
-      OKD_ENDPOINT: https://okd.hbp.eu:443
-      OKD_PROJECT: interactive-viewer
-    secrets:
-      okd_token: ${{ secrets.OKD_PROD_SECRET }}
 
   trigger-deploy-rc-rancher:
     if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
@@ -192,33 +180,3 @@ jobs:
       IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
-  trigger-deploy-staging-viewer-validation:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
-    needs:
-      - build-docker-img
-      - setting-vars
-    uses: ./.github/workflows/deploy-on-okd.yml
-    with:
-      FULL_DEPLOY_ID: siibra-explorer-branch-deploy-2-stagingpathed
-      OKD_ENDPOINT: https://okd.hbp.eu:443
-      OKD_PROJECT: interactive-viewer
-    secrets:
-      okd_token: ${{ secrets.OKD_PROD_SECRET }}
-  
-  # cluster offline
-  # TODO need to find new home for data-validation
-
-  # trigger-deploy-staging-data-validation:
-  #   if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
-  #   needs:
-  #     - build-docker-img
-  #     - setting-vars
-  #   uses: ./.github/workflows/deploy-on-okd.yml
-  #   with:
-  #     FULL_DEPLOY_ID: siibra-explorer-rc
-  #     OKD_ENDPOINT: https://okd.jsc.hbp.eu:443
-  #     OKD_PROJECT: siibra-explorer
-  #   secrets:
-  #     okd_token: ${{ secrets.OKD_JSC_TOKEN }}
-  

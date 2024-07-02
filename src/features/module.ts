@@ -25,6 +25,7 @@ import { BehaviorSubject } from "rxjs";
 import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
 import { DialogModule } from "src/ui/dialogInfo";
 import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -46,6 +47,7 @@ import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.d
     AtlasColorMapIntents,
     TPBRViewCmp,
     CodeSnippet,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     EntryComponent,

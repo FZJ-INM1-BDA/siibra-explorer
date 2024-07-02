@@ -38,6 +38,7 @@
 
       <mat-action-list class="overview-container">
 
+        <ng-template sxplrExperimentalFlag [experimental]="true">
         <button mat-list-item
           code-snippet
           [routeParam]="{
@@ -63,6 +64,7 @@
             </ng-template>
           </div>
         </button>
+        </ng-template>
         
         <!-- parcellation button -->
         <button

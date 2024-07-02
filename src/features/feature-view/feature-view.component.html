@@ -64,6 +64,7 @@
         </ng-template>
 
         <!-- code -->
+        <ng-template sxplrExperimentalFlag [experimental]="true">
         <button mat-list-item
           code-snippet
           [routeParam]="{
@@ -86,6 +87,7 @@
             </ng-template>
           </div>
         </button>
+        </ng-template>
 
         <!-- anchor -->
         <ng-template [ngIf]="view.concept">
