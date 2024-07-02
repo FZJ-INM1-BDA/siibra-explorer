@@ -57,7 +57,7 @@ export class RouterEffects {
         if (humanAtlas) {
           return atlasSelection.actions.selectATPById({
             atlasId: IDS.ATLAES.HUMAN,
-            parcellationId: IDS.PARCELLATION.JBA30,
+            parcellationId: IDS.PARCELLATION.JBA31,
             templateId: IDS.TEMPLATES.MNI152,
           })
         }
