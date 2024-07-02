@@ -43,7 +43,8 @@ async def login_via_ebrains(request: Request, state: str = None):
     kwargs = {}
     if state:
         kwargs["state"] = state
-    redirect_uri = str(request.base_url).rstrip("/") + HOST_PATHNAME + "/hbp-oidc-v2/cb"
+    base_url = str(request.base_url).replace("http://", "https://", 1)
+    redirect_uri = base_url.rstrip("/") + HOST_PATHNAME + "/hbp-oidc-v2/cb"
     return await oauth.ebrains.authorize_redirect(request, redirect_uri=redirect_uri, **kwargs)
 
 @router.get("/hbp-oidc-v2/cb")
