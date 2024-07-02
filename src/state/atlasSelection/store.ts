@@ -13,6 +13,7 @@ export const defaultState: AtlasSelectionState = {
   viewerMode: null,
   breadcrumbs: [],
   selectedPoint: null,
+  currentViewport: null,
 }
 
 const reducer = createReducer(
@@ -143,6 +144,15 @@ const reducer = createReducer(
       return {
         ...state,
         selectedPoint: null
+      }
+    }
+  ),
+  on(
+    actions.setViewport,
+    (state, { viewport }) => {
+      return {
+        ...state,
+        currentViewport: viewport
       }
     }
   )

@@ -25,6 +25,11 @@ export class AtlasDownloadDirective {
         take(1)
       ).toPromise()
 
+      const bbox = await this.store.pipe(
+        select(selectors.currentViewport),
+        take(1),
+      ).toPromise()
+
       const selectedRegions = await this.store.pipe(
         select(selectors.selectedRegions),
         take(1)
@@ -44,6 +49,11 @@ export class AtlasDownloadDirective {
         parcellation_id: parcellation.id,
         space_id: template.id,
       }
+
+      if (bbox) {
+        query['bbox'] = JSON.stringify([bbox.minpoint, bbox.maxpoint])
+      }
+
       if (selectedRegions.length === 1) {
         query['region_id'] = selectedRegions[0].name
       }

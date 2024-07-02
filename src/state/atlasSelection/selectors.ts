@@ -69,3 +69,8 @@ export const relevantSelectedPoint = createSelector(
     return null
   }
 )
+
+export const currentViewport = createSelector(
+  selectStore,
+  store => store.currentViewport
+)
