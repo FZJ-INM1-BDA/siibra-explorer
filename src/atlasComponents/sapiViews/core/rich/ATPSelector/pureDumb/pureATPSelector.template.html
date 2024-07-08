@@ -23,7 +23,7 @@
   </ng-template>
 
   <!-- parcellation smart chip -->
-  <sxplr-smart-chip *ngIf="!view.hideParcChip"
+  <sxplr-smart-chip *ngIf="!view.hideParcChip && !!view.parcellation"
     [items]="view.parcAndGroup || []"
     [color]="colorPalette[2]"
     [getChildren]="getChildren"

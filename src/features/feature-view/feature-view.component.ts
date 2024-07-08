@@ -200,27 +200,27 @@ export class FeatureViewComponent {
     ))
   )
 
-  intents$ = this.#isConnectivity$.pipe(
-    withLatestFrom(this.#featureId, this.#selectedRegion$),
-    switchMap(([flag, fid, selectedRegion]) => {
-      if (!flag) {
-        return EMPTY
-      }
-      return this.sapi.getFeatureIntents(fid, {
-        region: selectedRegion.map(r => r.name).join(" ")
-      }).pipe(
-        switchMap(val => 
-          this.sapi.iteratePages(
-            val,
-            page => this.sapi.getFeatureIntents(fid, {
-              region: selectedRegion.map(r => r.name).join(" "),
-              page: page.toString()
-            }
-          )
-        ))
-      )
-    })
-  )
+  // intents$ = this.#isConnectivity$.pipe(
+  //   withLatestFrom(this.#featureId, this.#selectedRegion$),
+  //   switchMap(([flag, fid, selectedRegion]) => {
+  //     if (!flag) {
+  //       return EMPTY
+  //     }
+  //     return this.sapi.getFeatureIntents(fid, {
+  //       region: selectedRegion.map(r => r.name).join(" ")
+  //     }).pipe(
+  //       switchMap(val => 
+  //         this.sapi.iteratePages(
+  //           val,
+  //           page => this.sapi.getFeatureIntents(fid, {
+  //             region: selectedRegion.map(r => r.name).join(" "),
+  //             page: page.toString()
+  //           }
+  //         )
+  //       ))
+  //     )
+  //   })
+  // )
 
   constructor(
     private sapi: SAPI,

@@ -65,72 +65,6 @@
         }
       }
     },
-    "/feature/{feature_id}/intents": {
-      "get": {
-        "tags": [
-          "feature"
-        ],
-        "summary": "Get Single Feature Intents",
-        "description": "Get feature intents from feature_id",
-        "operationId": "get_single_feature_intents_feature__feature_id__intents_get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Feature Id"
-            },
-            "name": "feature_id",
-            "in": "path"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "title": "Page",
-              "default": 1
-            },
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "title": "Size",
-              "default": 50
-            },
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_ColorizationIntent_"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/feature/{feature_id}/download": {
       "get": {
         "tags": [
@@ -604,7 +538,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__CompoundFeatureModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"
+                  "$ref": "#/components/schemas/Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"
                 }
               }
             }
@@ -1150,6 +1084,14 @@
           {
             "required": false,
             "schema": {
+              "title": "Bbox"
+            },
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
               "type": "string",
               "title": "Region Id"
             },
@@ -1349,15 +1291,6 @@
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Region Id"
-            },
-            "name": "region_id",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "string",
               "title": "Type"
             },
             "name": "type",
@@ -1393,7 +1326,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_Union_SiibraRegionalConnectivityModel__CompoundFeatureModel__"
+                  "$ref": "#/components/schemas/Page_SiibraRegionalConnectivityModel_"
                 }
               }
             }
@@ -1417,7 +1350,7 @@
           "feature"
         ],
         "summary": "Get Single Connectivity Feature",
-        "description": "Get single connectivity feature",
+        "description": "subject is an optional param.\nIf provided, the specific matrix will be return.\nIf not provided, the matrix averaged between subjects will be returned under the key _average.",
         "operationId": "get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get",
         "parameters": [
           {
@@ -1442,9 +1375,9 @@
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Region Id"
+              "title": "Subject"
             },
-            "name": "region_id",
+            "name": "subject",
             "in": "query"
           },
           {
@@ -1463,15 +1396,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/CompoundFeatureModel"
-                    }
-                  ],
-                  "title": "Response Get Single Connectivity Feature Feature Regionalconnectivity  Feature Id  Get"
+                  "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
                 }
               }
             }
@@ -1555,7 +1480,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_Union_SiibraCorticalProfileModel__CompoundFeatureModel__"
+                  "$ref": "#/components/schemas/Page_SiibraCorticalProfileModel_"
                 }
               }
             }
@@ -1625,15 +1550,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/SiibraCorticalProfileModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/CompoundFeatureModel"
-                    }
-                  ],
-                  "title": "Response Get Single Corticalprofile Feature Feature Corticalprofile  Feature Id  Get"
+                  "$ref": "#/components/schemas/SiibraCorticalProfileModel"
                 }
               }
             }
@@ -1717,7 +1634,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Page_Union_CompoundFeatureModel__SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"
+                  "$ref": "#/components/schemas/Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"
                 }
               }
             }
@@ -1789,9 +1706,6 @@
                 "schema": {
                   "anyOf": [
                     {
-                      "$ref": "#/components/schemas/CompoundFeatureModel"
-                    },
-                    {
                       "$ref": "#/components/schemas/SiibraCorticalProfileModel"
                     },
                     {
@@ -1838,7 +1752,7 @@
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Bbox"
@@ -2334,9 +2248,6 @@
                       "$ref": "#/components/schemas/SiibraCorticalProfileModel"
                     },
                     {
-                      "$ref": "#/components/schemas/CompoundFeatureModel"
-                    },
-                    {
                       "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
                     },
                     {
@@ -2350,72 +2261,6 @@
                     }
                   ],
                   "title": "Response Get Single Feature Feature  Feature Id  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/vocabularies/genes": {
-      "get": {
-        "tags": [
-          "vocabularies"
-        ],
-        "summary": "Get Genes",
-        "description": "HTTP get (filtered) genes",
-        "operationId": "get_genes_vocabularies_genes_get",
-        "parameters": [
-          {
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Find"
-            },
-            "name": "find",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "title": "Page",
-              "default": 1
-            },
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "title": "Size",
-              "default": 50
-            },
-            "name": "size",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_GeneModel_"
                 }
               }
             }
@@ -2762,28 +2607,6 @@
         "title": "BrainAtlasVersionModel",
         "description": "ConfigBaseModel"
       },
-      "ColorizationIntent": {
-        "properties": {
-          "@type": {
-            "type": "string",
-            "title": "@Type"
-          },
-          "region_mappings": {
-            "items": {
-              "$ref": "#/components/schemas/RegionMapping"
-            },
-            "type": "array",
-            "title": "Region Mappings"
-          }
-        },
-        "type": "object",
-        "required": [
-          "@type",
-          "region_mappings"
-        ],
-        "title": "ColorizationIntent",
-        "description": "ConfigBaseModel"
-      },
       "CommonCoordinateSpaceModel": {
         "properties": {
           "@type": {
@@ -2899,63 +2722,6 @@
         ],
         "title": "CommonCoordinateSpaceModel",
         "description": "CommonCoordinateSpaceModel"
-      },
-      "CompoundFeatureModel": {
-        "properties": {
-          "@type": {
-            "type": "string",
-            "title": "@Type"
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "modality": {
-            "type": "string",
-            "title": "Modality"
-          },
-          "category": {
-            "type": "string",
-            "title": "Category"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "datasets": {
-            "items": {
-              "$ref": "#/components/schemas/EbrainsDatasetModel"
-            },
-            "type": "array",
-            "title": "Datasets"
-          },
-          "anchor": {
-            "$ref": "#/components/schemas/SiibraAnchorModel"
-          },
-          "indices": {
-            "items": {
-              "$ref": "#/components/schemas/SubfeatureModel"
-            },
-            "type": "array",
-            "title": "Indices"
-          }
-        },
-        "type": "object",
-        "required": [
-          "@type",
-          "id",
-          "category",
-          "description",
-          "name",
-          "datasets",
-          "indices"
-        ],
-        "title": "CompoundFeatureModel",
-        "description": "AbstractBaseModel\n\nsee [api.models._commons.ConfigBaseModel][]"
       },
       "CoordinatePointModel": {
         "properties": {
@@ -3245,30 +3011,6 @@
         "title": "FeatureMetaModel",
         "description": "Meta feature type"
       },
-      "GeneModel": {
-        "properties": {
-          "@type": {
-            "type": "string",
-            "title": "@Type"
-          },
-          "symbol": {
-            "type": "string",
-            "title": "Symbol"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          }
-        },
-        "type": "object",
-        "required": [
-          "@type",
-          "symbol",
-          "description"
-        ],
-        "title": "GeneModel",
-        "description": "ConfigBaseModel"
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3554,43 +3296,6 @@
         ],
         "title": "OtherContribution"
       },
-      "Page_ColorizationIntent_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ColorizationIntent"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Pages"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[ColorizationIntent]"
-      },
       "Page_CommonCoordinateSpaceModel_": {
         "properties": {
           "items": {
@@ -3623,8 +3328,7 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[CommonCoordinateSpaceModel]"
       },
@@ -3660,47 +3364,9 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[FeatureMetaModel]"
-      },
-      "Page_GeneModel_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/GeneModel"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Pages"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[GeneModel]"
       },
       "Page_ParcellationEntityVersionModel_": {
         "properties": {
@@ -3734,8 +3400,7 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[ParcellationEntityVersionModel]"
       },
@@ -3771,8 +3436,7 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[RegionRelationAsmtModel]"
       },
@@ -3808,10 +3472,45 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[SiibraAtlasModel]"
+      },
+      "Page_SiibraCorticalProfileModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraCorticalProfileModel]"
       },
       "Page_SiibraEbrainsDataFeatureModel_": {
         "properties": {
@@ -3845,8 +3544,7 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[SiibraEbrainsDataFeatureModel]"
       },
@@ -3882,10 +3580,45 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[SiibraParcellationModel]"
+      },
+      "Page_SiibraRegionalConnectivityModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraRegionalConnectivityModel]"
       },
       "Page_SiibraTabularModel_": {
         "properties": {
@@ -3919,8 +3652,7 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[SiibraTabularModel]"
       },
@@ -3956,19 +3688,15 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
         "title": "Page[SiibraVoiModel]"
       },
-      "Page_Union_CompoundFeatureModel__SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__": {
+      "Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__": {
         "properties": {
           "items": {
             "items": {
               "anyOf": [
-                {
-                  "$ref": "#/components/schemas/CompoundFeatureModel"
-                },
                 {
                   "$ref": "#/components/schemas/SiibraCorticalProfileModel"
                 },
@@ -4006,100 +3734,11 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
-        "title": "Page[Union[CompoundFeatureModel, SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]]"
+        "title": "Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]]"
       },
-      "Page_Union_SiibraCorticalProfileModel__CompoundFeatureModel__": {
-        "properties": {
-          "items": {
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/SiibraCorticalProfileModel"
-                },
-                {
-                  "$ref": "#/components/schemas/CompoundFeatureModel"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Pages"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[Union[SiibraCorticalProfileModel, CompoundFeatureModel]]"
-      },
-      "Page_Union_SiibraRegionalConnectivityModel__CompoundFeatureModel__": {
-        "properties": {
-          "items": {
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
-                },
-                {
-                  "$ref": "#/components/schemas/CompoundFeatureModel"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "minimum": 1,
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "minimum": 0,
-            "title": "Pages"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[Union[SiibraRegionalConnectivityModel, CompoundFeatureModel]]"
-      },
-      "Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__CompoundFeatureModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__": {
+      "Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__": {
         "properties": {
           "items": {
             "items": {
@@ -4109,9 +3748,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/SiibraCorticalProfileModel"
-                },
-                {
-                  "$ref": "#/components/schemas/CompoundFeatureModel"
                 },
                 {
                   "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
@@ -4153,10 +3789,9 @@
         },
         "type": "object",
         "required": [
-          "items",
-          "total"
+          "items"
         ],
-        "title": "Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, CompoundFeatureModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]]"
+        "title": "Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]]"
       },
       "ParcellationEntityVersionModel": {
         "properties": {
@@ -4345,26 +3980,6 @@
           "minValue"
         ],
         "title": "QuantitativeOverlapItem1"
-      },
-      "RegionMapping": {
-        "properties": {
-          "region": {
-            "$ref": "#/components/schemas/ParcellationEntityVersionModel"
-          },
-          "rgb": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Rgb"
-          }
-        },
-        "type": "object",
-        "required": [
-          "region",
-          "rgb"
-        ],
-        "title": "RegionMapping"
       },
       "RegionRelationAsmtModel": {
         "properties": {
@@ -4977,16 +4592,19 @@
             "type": "string",
             "title": "Cohort"
           },
-          "subject": {
-            "type": "string",
-            "title": "Subject"
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Subjects"
           },
-          "feature": {
-            "type": "string",
-            "title": "Feature"
-          },
-          "matrix": {
-            "$ref": "#/components/schemas/DataFrameModel"
+          "matrices": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DataFrameModel"
+            },
+            "type": "object",
+            "title": "Matrices"
           }
         },
         "type": "object",
@@ -4998,7 +4616,7 @@
           "name",
           "datasets",
           "cohort",
-          "subject"
+          "subjects"
         ],
         "title": "SiibraRegionalConnectivityModel",
         "description": "SiibraRegionalConnectivityModel"
@@ -5129,42 +4747,6 @@
           "max"
         ],
         "title": "StatisticModelInfo"
-      },
-      "SubfeatureModel": {
-        "properties": {
-          "@type": {
-            "type": "string",
-            "title": "@Type"
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "index": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "$ref": "#/components/schemas/CoordinatePointModel"
-              }
-            ],
-            "title": "Index"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          }
-        },
-        "type": "object",
-        "required": [
-          "@type",
-          "id",
-          "index",
-          "name"
-        ],
-        "title": "SubfeatureModel",
-        "description": "ConfigBaseModel"
       },
       "ValidationError": {
         "properties": {

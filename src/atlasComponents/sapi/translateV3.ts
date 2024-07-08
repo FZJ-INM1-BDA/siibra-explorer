@@ -1,7 +1,7 @@
 import {
   SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature
 } from "./sxplrTypes"
-import { PathReturn, MetaV1Schema, CompoundFeature } from "./typeV3"
+import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
@@ -656,30 +656,30 @@ class TranslateV3 {
     if (this.#isVoi(feat)) {
       return await this.translateVoiFeature(feat)
     }
-    if (this.#isCompound(feat)) {
-      const link = feat.datasets.flatMap(ds => ds.urls).map(v => ({
-        href: v.url,
-        text: v.url
-      }))
-      const v: SimpleCompoundFeature = {
-        id: feat.id,
-        name: feat.name,
-        category: feat.category,
-        indices: await Promise.all(
-          feat.indices.map(
-            async ({ id, index, name }) => ({
-              id,
-              index: await this.#transformIndex(index),
-              name,
-              category: feat.category
-            })
-          )
-        ),
-        desc: feat.description,
-        link
-      }
-      return v
-    }
+    // if (this.#isCompound(feat)) {
+    //   const link = feat.datasets.flatMap(ds => ds.urls).map(v => ({
+    //     href: v.url,
+    //     text: v.url
+    //   }))
+    //   const v: SimpleCompoundFeature = {
+    //     id: feat.id,
+    //     name: feat.name,
+    //     category: feat.category,
+    //     indices: await Promise.all(
+    //       feat.indices.map(
+    //         async ({ id, index, name }) => ({
+    //           id,
+    //           index: await this.#transformIndex(index),
+    //           name,
+    //           category: feat.category
+    //         })
+    //       )
+    //     ),
+    //     desc: feat.description,
+    //     link
+    //   }
+    //   return v
+    // }
     
     return await this.translateBaseFeature(feat)
   }
@@ -709,17 +709,17 @@ class TranslateV3 {
     return feat['@type'].includes("feature/volume_of_interest")
   }
 
-  #isCompound(feat: unknown): feat is CompoundFeature {
-    return feat['@type'].includes("feature/compoundfeature")
-  }
+  // #isCompound(feat: unknown): feat is CompoundFeature {
+  //   return feat['@type'].includes("feature/compoundfeature")
+  // }
 
-  async #transformIndex(index: CompoundFeature['indices'][number]['index']): Promise<SimpleCompoundFeature['indices'][number]['index']> {
-    if (typeof index === "string") {
-      return index
-    }
-    return await this.#translatePoint(index)
+  // async #transformIndex(index: CompoundFeature['indices'][number]['index']): Promise<SimpleCompoundFeature['indices'][number]['index']> {
+  //   if (typeof index === "string") {
+  //     return index
+  //   }
+  //   return await this.#translatePoint(index)
     
-  }
+  // }
 
   async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
     const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol }] = await Promise.all([

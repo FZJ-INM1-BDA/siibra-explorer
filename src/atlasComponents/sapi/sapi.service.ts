@@ -24,7 +24,7 @@ export const EXPECTED_SIIBRA_API_VERSION = '0.3.16'
 
 type PaginatedResponse<T> = {
   items: T[]
-  total: number
+  total?: number
   page?: number
   size?: number
   pages?: number
@@ -192,14 +192,14 @@ export class SAPI{
     })
   }
   
-  getFeatureIntents(id: string, params: Record<string, string> = {}) {
-    return this.v3Get("/feature/{feature_id}/intents", {
-      path: {
-        feature_id: id
-      },
-      query: params
-    })
-  }
+  // getFeatureIntents(id: string, params: Record<string, string> = {}) {
+  //   return this.v3Get("/feature/{feature_id}/intents", {
+  //     path: {
+  //       feature_id: id
+  //     },
+  //     query: params
+  //   })
+  // }
 
   @CachedFunction({
     serialization: (id, params) => `featDetail:${id}:${Object.entries(params || {}).map(([key, val]) => `${key},${val}`).join('.')}`

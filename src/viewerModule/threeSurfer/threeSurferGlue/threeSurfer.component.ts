@@ -725,8 +725,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     const { evDetail: detail, latMeshRecord, latLblIdxRecord, latLblIdxReg, meshVisibility } = arg
     const evMesh = detail.mesh && {
       faceIndex: detail.mesh.faceIndex,
-      // typo in three-surfer
-      verticesIndicies: detail.mesh.verticesIdicies
+      verticesIndicies: detail.mesh.verticesIndicies,
+      vertexIndex: detail.mesh.vertexIndex,
     }
     const custEv: THandlingCustomEv = {
       regions: [],
@@ -739,9 +739,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
     const {
       geometry: evGeometry,
-      // typo in three-surfer
-      verticesIdicies: evVerticesIndicies,
-    } = detail.mesh as { geometry: TThreeGeometry, verticesIdicies: number[] }
+      verticesIndicies: evVerticesIndicies,
+      vertexIndex
+    } = detail.mesh as { geometry: TThreeGeometry, verticesIndicies: number[], vertexIndex: number }
 
     for (const laterality in latMeshRecord) {
       const meshRecord = latMeshRecord[laterality]
@@ -770,13 +770,21 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
        * translate vertex indices to label indicies via set, to remove duplicates
        */
       const labelIndexSet = new Set<number>()
-      for (const idx of evVerticesIndicies){
-        const labelOfInterest = labelIndexRecord.vertexIndices[idx]
-        if (!labelOfInterest) {
-          continue
-        }
-        labelIndexSet.add(labelOfInterest)
+      if (labelIndexRecord.vertexIndices[vertexIndex]) {
+        labelIndexSet.add(labelIndexRecord.vertexIndices[vertexIndex])
       }
+
+      /**
+       * old implementation (perhaps less CPU intensive)
+       * gets all vertices and label them
+       */
+      // for (const idx of evVerticesIndicies){
+      //   const labelOfInterest = labelIndexRecord.vertexIndices[idx]
+      //   if (!labelOfInterest) {
+      //     continue
+      //   }
+      //   labelIndexSet.add(labelOfInterest)
+      // }
 
       /**
        * decode label index to region

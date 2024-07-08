@@ -5,6 +5,7 @@ import { UtilModule } from "src/util";
 import { EntryComponent } from './entry/entry.component'
 import { FeatureNamePipe } from "./featureName.pipe";
 import { CategoryAccDirective } from './category-acc.directive';
+import { SapiViewsFeatureConnectivityModule } from "./connectivity";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MarkdownModule } from "src/components/markdown";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
@@ -18,7 +19,7 @@ import { ReadmoreModule } from "src/components/readmore";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 import { PlotlyComponent } from "./plotly";
 import { AngularMaterialModule } from "src/sharedModules";
-import { AtlasColorMapIntents } from "./atlas-colormap-intents";
+// import { AtlasColorMapIntents } from "./atlas-colormap-intents";
 import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from "./util";
 import { BehaviorSubject } from "rxjs";
@@ -32,6 +33,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     CommonModule,
     SpinnerModule,
     UtilModule,
+    SapiViewsFeatureConnectivityModule,
     ScrollingModule,
     MarkdownModule,
     NgLayerCtlModule,
@@ -44,7 +46,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
      * standalone components
      */
     PlotlyComponent,
-    AtlasColorMapIntents,
+    // AtlasColorMapIntents,
     TPBRViewCmp,
     CodeSnippet,
     ExperimentalFlagDirective,

@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi';
+import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
@@ -12,6 +12,8 @@ import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
+import { SPECIES_ENUM } from 'src/util/constants';
+import { atlasSelection } from 'src/state';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -25,6 +27,32 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
     returnVal[category].push(item)
   }
   return returnVal
+}
+type ConnectiivtyFilter = {
+  SPECIES: string[]
+  PARCELLATION: string[]
+  SPACE: string[]
+}
+
+const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
+  SPECIES: [
+    SPECIES_ENUM.RATTUS_NORVEGICUS,
+    SPECIES_ENUM.HOMO_SAPIENS
+  ],
+  PARCELLATION: [
+    IDS.PARCELLATION.JBA29,
+    IDS.PARCELLATION.JBA30,
+    IDS.PARCELLATION.WAXHOLMV4
+  ],
+  SPACE: [],
+}
+
+const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
+  SPECIES: [],
+  PARCELLATION: [],
+  SPACE: [
+    IDS.TEMPLATES.BIG_BRAIN
+  ]
 }
 
 @Component({
@@ -159,6 +187,25 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
       )
     })
   }
+
+  public selectedAtlas$ = this.store.pipe(
+    select(atlasSelection.selectors.selectedAtlas)
+  )
+
+  public showConnectivity$ = combineLatest([
+    this.selectedAtlas$.pipe(
+      map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
+    ),
+    this.TPRBbox$.pipe(
+      map(({ parcellation, template }) => (
+        WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
+      ) || (
+        WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+      ))
+    )
+  ]).pipe(
+    map(flags => flags.every(f => f))
+  )
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
     switchMap(resp => 

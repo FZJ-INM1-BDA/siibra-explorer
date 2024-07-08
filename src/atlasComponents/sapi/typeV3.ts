@@ -135,4 +135,4 @@ export function isEnclosed(v: BestViewPoints[number]): v is EnclosedROI {
 
 export type Qualification = components["schemas"]["Qualification"]
 
-export type CompoundFeature = components['schemas']['CompoundFeatureModel']
+// export type CompoundFeature = components['schemas']['CompoundFeatureModel']

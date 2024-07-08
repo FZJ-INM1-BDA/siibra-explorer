@@ -4,34 +4,34 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { CompoundFeatureIndices } from "./compoundFeatureIndices.component";
 import { IndexToStrPipe } from "./idxToText.pipe";
 import { IndexToIconPipe } from "./idxToIcon.pipe";
-import { PointCloudIntents, FilterPointTransformer } from "src/features/pointcloud-intents";
-import { RENDER_CF_POINT, RenderCfPoint } from "../pointcloud-intents/intents.component";
+// import { PointCloudIntents, FilterPointTransformer } from "src/features/pointcloud-intents";
+// import { RENDER_CF_POINT, RenderCfPoint } from "../pointcloud-intents/intents.component";
 
 
 @NgModule({
   imports: [
     CommonModule,
     AngularMaterialModule,
-    PointCloudIntents,
+    // PointCloudIntents,
   ],
   declarations: [
     CompoundFeatureIndices,
     IndexToStrPipe,
     IndexToIconPipe,
-    FilterPointTransformer,
+    // FilterPointTransformer,
   ],
   exports: [
     CompoundFeatureIndices,
   ],
   providers: [
-    {
-      provide: RENDER_CF_POINT,
-      useFactory: () => {
-        const pipe = new IndexToStrPipe()
-        const renderCfPoint: RenderCfPoint = cfIndex => pipe.transform(cfIndex.index)
-        return renderCfPoint
-      }
-    }
+    // {
+    //   provide: RENDER_CF_POINT,
+    //   useFactory: () => {
+    //     const pipe = new IndexToStrPipe()
+    //     const renderCfPoint: RenderCfPoint = cfIndex => pipe.transform(cfIndex.index)
+    //     return renderCfPoint
+    //   }
+    // }
   ]
 })
 

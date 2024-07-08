@@ -14,13 +14,6 @@ export interface paths {
      */
     get: operations["get_single_feature_plot_feature__feature_id__plotly_get"]
   }
-  "/feature/{feature_id}/intents": {
-    /**
-     * Get Single Feature Intents 
-     * @description Get feature intents from feature_id
-     */
-    get: operations["get_single_feature_intents_feature__feature_id__intents_get"]
-  }
   "/feature/{feature_id}/download": {
     /**
      * Get Single Feature Download 
@@ -184,7 +177,9 @@ export interface paths {
   "/feature/RegionalConnectivity/{feature_id}": {
     /**
      * Get Single Connectivity Feature 
-     * @description Get single connectivity feature
+     * @description subject is an optional param.
+     * If provided, the specific matrix will be return.
+     * If not provided, the matrix averaged between subjects will be returned under the key _average.
      */
     get: operations["get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get"]
   }
@@ -267,13 +262,6 @@ export interface paths {
      * - the client needs to supply any necessary query param (e.g. subject for regional connectivity, gene for gene expression etc)
      */
     get: operations["get_single_feature_feature__feature_id__get"]
-  }
-  "/vocabularies/genes": {
-    /**
-     * Get Genes 
-     * @description HTTP get (filtered) genes
-     */
-    get: operations["get_genes_vocabularies_genes_get"]
   }
 }
 
@@ -498,16 +486,6 @@ export interface components {
       versionInnovation: string
     }
     /**
-     * ColorizationIntent 
-     * @description ConfigBaseModel
-     */
-    ColorizationIntent: {
-      /** @Type */
-      "@type": string
-      /** Region Mappings */
-      region_mappings: (components["schemas"]["RegionMapping"])[]
-    }
-    /**
      * CommonCoordinateSpaceModel 
      * @description CommonCoordinateSpaceModel
      */
@@ -588,31 +566,6 @@ export interface components {
       versionIdentifier: string
       /** Datasets */
       datasets?: (components["schemas"]["EbrainsDatasetModel"])[]
-    }
-    /**
-     * CompoundFeatureModel 
-     * @description AbstractBaseModel
-     * 
-     * see [api.models._commons.ConfigBaseModel][]
-     */
-    CompoundFeatureModel: {
-      /** @Type */
-      "@type": string
-      /** Id */
-      id: string
-      /** Modality */
-      modality?: string
-      /** Category */
-      category: string
-      /** Description */
-      description: string
-      /** Name */
-      name: string
-      /** Datasets */
-      datasets: (components["schemas"]["EbrainsDatasetModel"])[]
-      anchor?: components["schemas"]["SiibraAnchorModel"]
-      /** Indices */
-      indices: (components["schemas"]["SubfeatureModel"])[]
     }
     /**
      * CoordinatePointModel 
@@ -751,18 +704,6 @@ export interface components {
       path_params?: (string)[]
       /** Category */
       category?: string
-    }
-    /**
-     * GeneModel 
-     * @description ConfigBaseModel
-     */
-    GeneModel: {
-      /** @Type */
-      "@type": string
-      /** Symbol */
-      symbol: string
-      /** Description */
-      description: string
     }
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -922,25 +863,12 @@ export interface components {
        */
       contributor: Record<string, never>
     }
-    /** Page[ColorizationIntent] */
-    Page_ColorizationIntent_: {
-      /** Items */
-      items: (components["schemas"]["ColorizationIntent"])[]
-      /** Total */
-      total: number
-      /** Page */
-      page?: number
-      /** Size */
-      size?: number
-      /** Pages */
-      pages?: number
-    }
     /** Page[CommonCoordinateSpaceModel] */
     Page_CommonCoordinateSpaceModel_: {
       /** Items */
       items: (components["schemas"]["CommonCoordinateSpaceModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -953,20 +881,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["FeatureMetaModel"])[]
       /** Total */
-      total: number
-      /** Page */
-      page?: number
-      /** Size */
-      size?: number
-      /** Pages */
-      pages?: number
-    }
-    /** Page[GeneModel] */
-    Page_GeneModel_: {
-      /** Items */
-      items: (components["schemas"]["GeneModel"])[]
-      /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -979,7 +894,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["ParcellationEntityVersionModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -992,7 +907,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["RegionRelationAsmtModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1005,7 +920,20 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraAtlasModel"])[]
       /** Total */
-      total: number
+      total?: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[SiibraCorticalProfileModel] */
+    Page_SiibraCorticalProfileModel_: {
+      /** Items */
+      items: (components["schemas"]["SiibraCorticalProfileModel"])[]
+      /** Total */
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1018,7 +946,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1031,7 +959,20 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraParcellationModel"])[]
       /** Total */
-      total: number
+      total?: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[SiibraRegionalConnectivityModel] */
+    Page_SiibraRegionalConnectivityModel_: {
+      /** Items */
+      items: (components["schemas"]["SiibraRegionalConnectivityModel"])[]
+      /** Total */
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1044,7 +985,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1057,7 +998,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraVoiModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1065,12 +1006,12 @@ export interface components {
       /** Pages */
       pages?: number
     }
-    /** Page[Union[CompoundFeatureModel, SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
-    Page_Union_CompoundFeatureModel__SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
+    /** Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
+    Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
       /** Items */
-      items: (components["schemas"]["CompoundFeatureModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"])[]
+      items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1078,38 +1019,12 @@ export interface components {
       /** Pages */
       pages?: number
     }
-    /** Page[Union[SiibraCorticalProfileModel, CompoundFeatureModel]] */
-    Page_Union_SiibraCorticalProfileModel__CompoundFeatureModel__: {
+    /** Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]] */
+    Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__: {
       /** Items */
-      items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["CompoundFeatureModel"])[]
+      items: (components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total: number
-      /** Page */
-      page?: number
-      /** Size */
-      size?: number
-      /** Pages */
-      pages?: number
-    }
-    /** Page[Union[SiibraRegionalConnectivityModel, CompoundFeatureModel]] */
-    Page_Union_SiibraRegionalConnectivityModel__CompoundFeatureModel__: {
-      /** Items */
-      items: (components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["CompoundFeatureModel"])[]
-      /** Total */
-      total: number
-      /** Page */
-      page?: number
-      /** Size */
-      size?: number
-      /** Pages */
-      pages?: number
-    }
-    /** Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, CompoundFeatureModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]] */
-    Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__CompoundFeatureModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__: {
-      /** Items */
-      items: (components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["CompoundFeatureModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
-      /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1234,12 +1149,6 @@ export interface components {
       minValue: number
       /** minValueUnit */
       minValueUnit?: Record<string, never>
-    }
-    /** RegionMapping */
-    RegionMapping: {
-      region: components["schemas"]["ParcellationEntityVersionModel"]
-      /** Rgb */
-      rgb: (number)[]
     }
     /**
      * RegionRelationAsmtModel 
@@ -1515,11 +1424,12 @@ export interface components {
       anchor?: components["schemas"]["SiibraAnchorModel"]
       /** Cohort */
       cohort: string
-      /** Subject */
-      subject: string
-      /** Feature */
-      feature?: string
-      matrix?: components["schemas"]["DataFrameModel"]
+      /** Subjects */
+      subjects: (string)[]
+      /** Matrices */
+      matrices?: {
+        [key: string]: components["schemas"]["DataFrameModel"] | undefined
+      }
     }
     /**
      * SiibraTabularModel 
@@ -1572,20 +1482,6 @@ export interface components {
       min: number
       /** Max */
       max: number
-    }
-    /**
-     * SubfeatureModel 
-     * @description ConfigBaseModel
-     */
-    SubfeatureModel: {
-      /** @Type */
-      "@type": string
-      /** Id */
-      id: string
-      /** Index */
-      index: string | components["schemas"]["CoordinatePointModel"]
-      /** Name */
-      name: string
     }
     /** ValidationError */
     ValidationError: {
@@ -1724,35 +1620,6 @@ export interface operations {
       200: {
         content: {
           "application/json": Record<string, never>
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  get_single_feature_intents_feature__feature_id__intents_get: {
-    /**
-     * Get Single Feature Intents 
-     * @description Get feature intents from feature_id
-     */
-    parameters: {
-      query?: {
-        page?: number
-        size?: number
-      }
-      path: {
-        feature_id: string
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Page_ColorizationIntent_"]
         }
       }
       /** @description Validation Error */
@@ -1988,7 +1855,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__CompoundFeatureModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"]
+          "application/json": components["schemas"]["Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"]
         }
       }
       /** @description Validation Error */
@@ -2224,6 +2091,7 @@ export interface operations {
       query: {
         space_id: string
         parcellation_id: string
+        bbox?: Record<string, never>
         region_id?: string
         feature_id?: string
       }
@@ -2327,7 +2195,6 @@ export interface operations {
     parameters: {
       query: {
         parcellation_id: string
-        region_id?: string
         type?: string
         page?: number
         size?: number
@@ -2337,7 +2204,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_Union_SiibraRegionalConnectivityModel__CompoundFeatureModel__"]
+          "application/json": components["schemas"]["Page_SiibraRegionalConnectivityModel_"]
         }
       }
       /** @description Validation Error */
@@ -2351,12 +2218,14 @@ export interface operations {
   get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get: {
     /**
      * Get Single Connectivity Feature 
-     * @description Get single connectivity feature
+     * @description subject is an optional param.
+     * If provided, the specific matrix will be return.
+     * If not provided, the matrix averaged between subjects will be returned under the key _average.
      */
     parameters: {
       query: {
         parcellation_id: string
-        region_id?: string
+        subject?: string
         type?: string
       }
       path: {
@@ -2367,7 +2236,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["CompoundFeatureModel"]
+          "application/json": components["schemas"]["SiibraRegionalConnectivityModel"]
         }
       }
       /** @description Validation Error */
@@ -2396,7 +2265,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_Union_SiibraCorticalProfileModel__CompoundFeatureModel__"]
+          "application/json": components["schemas"]["Page_SiibraCorticalProfileModel_"]
         }
       }
       /** @description Validation Error */
@@ -2426,7 +2295,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["CompoundFeatureModel"]
+          "application/json": components["schemas"]["SiibraCorticalProfileModel"]
         }
       }
       /** @description Validation Error */
@@ -2455,7 +2324,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Page_Union_CompoundFeatureModel__SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"]
+          "application/json": components["schemas"]["Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"]
         }
       }
       /** @description Validation Error */
@@ -2485,7 +2354,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["CompoundFeatureModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"]
+          "application/json": components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"]
         }
       }
       /** @description Validation Error */
@@ -2504,7 +2373,7 @@ export interface operations {
     parameters: {
       query: {
         space_id: string
-        bbox: string
+        bbox?: string
         type?: string
         page?: number
         size?: number
@@ -2691,34 +2560,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["CompoundFeatureModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"]
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  get_genes_vocabularies_genes_get: {
-    /**
-     * Get Genes 
-     * @description HTTP get (filtered) genes
-     */
-    parameters?: {
-      query?: {
-        find?: string
-        page?: number
-        size?: number
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Page_GeneModel_"]
+          "application/json": components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"]
         }
       }
       /** @description Validation Error */

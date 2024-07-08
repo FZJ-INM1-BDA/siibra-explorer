@@ -22,10 +22,10 @@
             *matRowDef="let row; columns: columns;"></tr>
     </table>
     
-    <pointcloud-intents [points]="view.indices | filterForPoints"
+    <!-- <pointcloud-intents [points]="view.indices | filterForPoints"
         (point-clicked)="handleOnClick($event)"
         [selected-template]="view.selectedTemplate">
-    </pointcloud-intents>
+    </pointcloud-intents> -->
 </ng-template>
 
 <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
