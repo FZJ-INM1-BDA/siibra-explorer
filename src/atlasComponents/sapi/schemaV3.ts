@@ -146,6 +146,20 @@ export interface paths {
      */
     get: operations["get_download_bundle_atlas_download_get"]
   }
+  "/atlas_download/{task_id}": {
+    /**
+     * Get Download Progress 
+     * @description Get download task progress with task_id
+     */
+    get: operations["get_download_progress_atlas_download__task_id__get"]
+  }
+  "/atlas_download/{task_id}/download": {
+    /**
+     * Get Download Result 
+     * @description Download the bundle
+     */
+    get: operations["get_download_result_atlas_download__task_id__download_get"]
+  }
   "/feature/_types": {
     /**
      * Get All Feature Types 
@@ -854,7 +868,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["CommonCoordinateSpaceModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -867,7 +881,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["FeatureMetaModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -880,7 +894,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["ParcellationEntityVersionModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -893,7 +907,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["RegionRelationAsmtModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -906,7 +920,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraAtlasModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -919,7 +933,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraCorticalProfileModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -932,7 +946,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -945,7 +959,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraParcellationModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -958,7 +972,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraRegionalConnectivityModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -971,7 +985,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -984,7 +998,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraVoiModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -997,7 +1011,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -1010,7 +1024,7 @@ export interface components {
       /** Items */
       items: (components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total: number
+      total?: number
       /** Page */
       page?: number
       /** Size */
@@ -2077,8 +2091,59 @@ export interface operations {
       query: {
         space_id: string
         parcellation_id: string
+        bbox?: Record<string, never>
         region_id?: string
         feature_id?: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_download_progress_atlas_download__task_id__get: {
+    /**
+     * Get Download Progress 
+     * @description Get download task progress with task_id
+     */
+    parameters: {
+      path: {
+        task_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  get_download_result_atlas_download__task_id__download_get: {
+    /**
+     * Get Download Result 
+     * @description Download the bundle
+     */
+    parameters: {
+      path: {
+        task_id: string
       }
     }
     responses: {

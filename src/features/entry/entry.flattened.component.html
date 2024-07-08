@@ -8,7 +8,7 @@
         }">
         </ng-template>
     </ng-template>
-    
+
 
     <!-- only show connectivity in human atlas for now -->
     <ng-template [ngIf]="showConnectivity$ | async">
@@ -22,7 +22,7 @@
                             {{ conn.key }}
                         </mat-panel-title>
                     </mat-expansion-panel-header>
-    
+
                     <sxplr-features-connectivity-browser class="pe-all flex-shrink-1" 
                         [region]="region"
                         [sxplr-features-connectivity-browser-atlas]="selectedAtlas$ | async"
@@ -31,12 +31,12 @@
                         [accordionExpanded]="connectivityAccordion.expanded"
                         [types]="conn.value">
                     </sxplr-features-connectivity-browser>
-    
+
                 </mat-expansion-panel>
             </ng-template>
         </ng-template>
     </ng-template>
-
+    
     <!-- show dataset/other at the very bottom -->
     <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['dataset', 'other']"  let-keyvalue>
         <ng-template [ngTemplateOutlet]="featureCategoryFeatureTmpl"
@@ -213,3 +213,4 @@
 <ng-template #loadingSpinnerTmpl>
     <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
 </ng-template>
+

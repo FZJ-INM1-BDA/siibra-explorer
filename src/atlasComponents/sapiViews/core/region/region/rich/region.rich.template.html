@@ -37,6 +37,34 @@
     <mat-tab label="Overview">
 
       <mat-action-list class="overview-container">
+
+        <ng-template sxplrExperimentalFlag [experimental]="true">
+        <button mat-list-item
+          code-snippet
+          [routeParam]="{
+            route: '/regions/{region_id}',
+            param: {
+              path: {
+                region_id: region.name
+              },
+              query: {
+                parcellation_id: parcellation.id
+              }
+            }
+          }"
+          #codeSnippet="codeSnippet"
+          [disabled]="codeSnippet.busy$ | async">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-code"></mat-icon>
+          <div matListItemTitle>
+            <ng-template [ngIf]="codeSnippet.busy$ | async">
+              loading code ...
+            </ng-template>
+            <ng-template [ngIf]="!(codeSnippet.busy$ | async)">
+              code
+            </ng-template>
+          </div>
+        </button>
+        </ng-template>
         
         <!-- parcellation button -->
         <button

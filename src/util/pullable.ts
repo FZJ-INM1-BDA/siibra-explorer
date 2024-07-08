@@ -12,6 +12,7 @@ interface PaginatedArg<T> {
   pull?: () => Promise<T[]>
   children?: PulledDataSource<T>[]
   annotations?: Record<string, string>
+  serialize?: (a: T) => string
 }
 
 export class IsAlreadyPulling extends Error {}
@@ -115,20 +116,39 @@ export class ParentDatasource<T> extends PulledDataSource<T> {
   private _data$ = new BehaviorSubject<T[]>([])
   data$ = this._data$.pipe(
     shareReplay(1),
+    map(v => {
+      if (!this.#serialize) {
+        return v
+      }
+      const seen = new Set()
+      const returnVal: T[] = []
+      for (const item of v){
+        const key = this.#serialize(item)
+        const hasSeen = seen.has(key)
+        if (!hasSeen) {
+          returnVal.push(item)
+        }
+        seen.add(key)
+      }
+      return returnVal
+    })
   )
+  
+  #serialize: (a: T) => string
 
   #subscriptions: Subscription[] = []
   _children: PulledDataSource<T>[] = []
   constructor(arg: PaginatedArg<T>){
     super({ pull: async () => [], annotations: arg.annotations })
-    const { children } = arg
+    const { children, serialize } = arg
     this._children = children
+    this.#serialize = serialize
   }
 
   set isPulling(val: boolean){
     throw new Error(`Cannot set isPulling for parent pullable`)
   }
-  get isPUlling(){
+  get isPulling(){
     return this._children.some(c => c.isPulling)
   }
 

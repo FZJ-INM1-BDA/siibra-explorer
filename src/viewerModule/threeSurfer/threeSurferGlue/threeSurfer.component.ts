@@ -1,12 +1,10 @@
-import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject, throwError } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
-import { CONST } from 'common/constants'
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
@@ -97,6 +95,17 @@ type TThreeSurfer = {
   loadColormap: (url: string) => Promise<GiiInstance>
   setupAnimation: () => void
   dispose: () => void
+  loadVertexData: (url: string) => Promise<{
+    vertex: number[]
+    labels: {
+      index: number
+      name: string
+      color: number[]
+      vertices: number[]
+    }[]
+    readonly vertexLabels: Uint16Array
+    readonly colormap: Map<number, number[]>
+  }>
   control: any
   camera: any
   customColormap: WeakMap<TThreeGeometry, any>
@@ -254,7 +263,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   )
 
   private vertexIndexLayers$: Observable<ThreeSurferCustomLabelLayer[]> = this.customLayers$.pipe(
-    map(layers => layers.filter(l => l.clType === "baselayer/threesurfer-label") as ThreeSurferCustomLabelLayer[]),
+    map(layers => layers.filter(l => 
+      l.clType === "baselayer/threesurfer-label/gii-label" || l.clType === "baselayer/threesurfer-label/annot"
+    ) as ThreeSurferCustomLabelLayer[]),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
   )
 
@@ -267,22 +278,37 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     ),
     switchMap(layers => 
       forkJoin(
-        layers.map(layer => 
-          from(
-            this.tsRef.loadColormap(layer.source)
-          ).pipe(
-            map(giiInstance => {
-              let vertexIndices: number[] = giiInstance[0].getData()
-              if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
-                vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
-              }
-              return {
-                indexLayer: layer,
-                vertexIndices
-              }
-            })
-          )
-        )
+        layers.map(layer => {
+          if (layer.clType === "baselayer/threesurfer-label/gii-label") {
+            return from(
+              this.tsRef.loadColormap(layer.source)
+            ).pipe(
+              map(giiInstance => {
+                let vertexIndices: number[] = giiInstance[0].getData()
+                if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+                  vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
+                }
+                return {
+                  indexLayer: layer,
+                  vertexIndices
+                }
+              })
+            )
+          }
+          if (layer.clType === "baselayer/threesurfer-label/annot") {
+            return from(
+              this.tsRef.loadVertexData(layer.source)
+            ).pipe(
+              map(v => {
+                return {
+                  indexLayer: layer,
+                  vertexIndices: v.vertexLabels
+                }
+              })
+            )
+          }
+          return throwError(() => new Error(`layer is neither annot nor gii-label`))
+        })
       )
     ),
     map(layers => {
@@ -319,8 +345,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
           const { label, region } = curr
           
           let key : 'left' | 'right'
-          if ( /left/i.test(region.name) ) key = 'left'
-          if ( /right/i.test(region.name) ) key = 'right'
+          if (
+            /left/i.test(region.name) || /^lh/i.test(region.name)
+          ) key = 'left'
+          if (
+            /right/i.test(region.name) || /^rh/i.test(region.name)
+          ) key = 'right'
+
           if (!key) {
             /**
              * TODO
@@ -400,7 +431,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     private sapi: SAPI,
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
-    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
   ){
     if (intViewerStateSvc) {
       const {
@@ -430,37 +460,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       this.onDestroyCb.push(() => done())
     }
 
-    /**
-     * intercept click and act
-     */
-    if (clickInterceptor) {
-      const handleClick = (ev: MouseEvent) => {
-
-        // if does not click inside container, ignore
-        if (!(el.nativeElement as HTMLElement).contains(ev.target as HTMLElement)) {
-          return true
-        }
-        
-        if (this.mouseoverRegions.length === 0) return true
-        if (this.mouseoverRegions.length > 1) {
-          this.snackbar.open(CONST.DOES_NOT_SUPPORT_MULTI_REGION_SELECTION, 'Dismiss', {
-            duration: 3000
-          })
-          return true
-        }
-
-        const regions = this.mouseoverRegions.slice(0, 1) as any[]
-        this.store$.dispatch(
-          atlasSelection.actions.setSelectedRegions({ regions })
-        )
-        return true
-      }
-      const { register, deregister } = clickInterceptor
-      register(handleClick)
-      this.onDestroyCb.push(
-        () => { deregister(register) }
-      )
-    }
     
     this.domEl = el.nativeElement
 
@@ -726,8 +725,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     const { evDetail: detail, latMeshRecord, latLblIdxRecord, latLblIdxReg, meshVisibility } = arg
     const evMesh = detail.mesh && {
       faceIndex: detail.mesh.faceIndex,
-      // typo in three-surfer
-      verticesIndicies: detail.mesh.verticesIdicies
+      verticesIndicies: detail.mesh.verticesIndicies,
+      vertexIndex: detail.mesh.vertexIndex,
     }
     const custEv: THandlingCustomEv = {
       regions: [],
@@ -740,9 +739,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
     const {
       geometry: evGeometry,
-      // typo in three-surfer
-      verticesIdicies: evVerticesIndicies,
-    } = detail.mesh as { geometry: TThreeGeometry, verticesIdicies: number[] }
+      verticesIndicies: evVerticesIndicies,
+      vertexIndex
+    } = detail.mesh as { geometry: TThreeGeometry, verticesIndicies: number[], vertexIndex: number }
 
     for (const laterality in latMeshRecord) {
       const meshRecord = latMeshRecord[laterality]
@@ -771,13 +770,21 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
        * translate vertex indices to label indicies via set, to remove duplicates
        */
       const labelIndexSet = new Set<number>()
-      for (const idx of evVerticesIndicies){
-        const labelOfInterest = labelIndexRecord.vertexIndices[idx]
-        if (!labelOfInterest) {
-          continue
-        }
-        labelIndexSet.add(labelOfInterest)
+      if (labelIndexRecord.vertexIndices[vertexIndex]) {
+        labelIndexSet.add(labelIndexRecord.vertexIndices[vertexIndex])
       }
+
+      /**
+       * old implementation (perhaps less CPU intensive)
+       * gets all vertices and label them
+       */
+      // for (const idx of evVerticesIndicies){
+      //   const labelOfInterest = labelIndexRecord.vertexIndices[idx]
+      //   if (!labelOfInterest) {
+      //     continue
+      //   }
+      //   labelIndexSet.add(labelOfInterest)
+      // }
 
       /**
        * decode label index to region

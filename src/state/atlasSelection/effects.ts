@@ -1,19 +1,25 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
-import { catchError, filter, map, mapTo, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { combineLatest, concat, forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take, withLatestFrom } from "rxjs/operators";
 import { IDS, SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
-import { atlasAppearance, atlasSelection } from "..";
+import { atlasAppearance, atlasSelection, generalActions } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
+import { ResizeObserverService } from "src/util/windowResize/windowResize.service";
+import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
+import { ContextMenuService } from "src/contextMenuModule";
+import { NehubaVCtxToBbox } from "src/viewerModule/pipes/nehubaVCtxToBbox.pipe";
+
+const NEHUBA_CTX_BBOX = new NehubaVCtxToBbox()
 
 type OnTmplParcHookArg = {
   previous: {
@@ -448,6 +454,48 @@ export class Effect {
     map(() => actions.clearSelectedRegions())
   ))
 
+  onViewportChanges = createEffect(() => this.store.pipe(
+    select(atlasAppearance.selectors.useViewer),
+    distinctUntilChanged(),
+    switchMap(useViewer => {
+      if (useViewer !== "NEHUBA") {
+        return of(generalActions.noop())
+      }
+      return this.store.pipe(
+        select(selectors.selectedTemplate),
+        switchMap(selectedTemplate => combineLatest([
+          concat(
+            of(null),
+            this.resize.windowResize,
+          ),
+          this.ctxMenuSvc.context$
+        ]).pipe(
+          debounceTime(160),
+          map(([_, ctx]) => {
+            
+            const { width, height } = window.screen
+            const size = Math.max(width, height)
+          
+            const result = NEHUBA_CTX_BBOX.transform(ctx, [size, size, size])
+            if (!result) {
+              return generalActions.noop()
+            }
+            const [ min, max ] = result
+            return actions.setViewport({
+              viewport: {
+                spaceId: selectedTemplate.id,
+                space: selectedTemplate,
+                minpoint: min,
+                maxpoint: max,
+                center: min.map((v, idx) => (v + max[idx])/2) as [number, number, number]
+              }
+            })
+          })          
+        ))
+      )
+    })
+  ))
+
   constructor(
     private action: Actions,
     private sapiSvc: SAPI,
@@ -455,6 +503,9 @@ export class Effect {
     private interSpaceCoordXformSvc: InterSpaceCoordXformSvc,
     private collapser: DecisionCollapse,
     private dialog: MatDialog,
+    private resize: ResizeObserverService,
+    /** potential issue with circular import. generic should not import specific */
+    private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
   ){
   }
 }

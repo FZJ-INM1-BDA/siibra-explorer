@@ -1,17 +1,19 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, QueryList, TemplateRef, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
-import { atlasSelection } from 'src/state';
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, forkJoin, merge, of, Subject, Subscription } from 'rxjs';
+import { combineLatest, concat, forkJoin, merge, of, Subject } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
-import { SPECIES_ENUM } from 'src/util/constants';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
+import { SPECIES_ENUM } from 'src/util/constants';
+import { atlasSelection } from 'src/state';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -26,7 +28,6 @@ const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   }
   return returnVal
 }
-
 type ConnectiivtyFilter = {
   SPECIES: string[]
   PARCELLATION: string[]
@@ -58,18 +59,35 @@ const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
   selector: 'sxplr-feature-entry',
   templateUrl: './entry.flattened.component.html',
   styleUrls: ['./entry.flattened.component.scss'],
-  exportAs: 'featureEntryCmp'
+  exportAs: 'featureEntryCmp',
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
-export class EntryComponent extends FeatureBase implements AfterViewInit, OnDestroy {
+export class EntryComponent extends FeatureBase implements AfterViewInit {
+
+  ondestroy$ = inject(DestroyDirective).destroyed$
 
   @ViewChildren(CategoryAccDirective)
   catAccDirs: QueryList<CategoryAccDirective>
 
-  constructor(private sapi: SAPI, private store: Store, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(
+    private sapi: SAPI,
+    private store: Store,
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
+  ) {
     super()
-  }
 
-  #subscriptions: Subscription[] = []
+    this.TPRBbox$.pipe(
+      takeUntil(this.ondestroy$)
+    ).subscribe(tprb => {
+      this.#tprb = tprb
+    })
+  }
+  #tprb: TPRB
+
   #catAccDirs = new Subject<CategoryAccDirective[]>()
   features$ = this.#catAccDirs.pipe(
     switchMap(dirs => concat(
@@ -134,43 +152,40 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
     ))
   )
 
-  ngOnDestroy(): void {
-    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
-  }
   ngAfterViewInit(): void {
-    this.#subscriptions.push(
-      merge(
-        of(null),
-        this.catAccDirs.changes
-      ).pipe(
-        map(() => Array.from(this.catAccDirs))
-      ).subscribe(dirs => this.#catAccDirs.next(dirs)),
+    merge(
+      of(null),
+      this.catAccDirs.changes
+    ).pipe(
+      map(() => Array.from(this.catAccDirs)),
+      takeUntil(this.ondestroy$),
+    ).subscribe(dirs => this.#catAccDirs.next(dirs))
 
-      this.#pullAll.pipe(
-        debounceTime(320),
-        withLatestFrom(this.#catAccDirs),
-        switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
-      ).subscribe(async dss => {
-        await Promise.all(
-          dss.map(async ds => {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-              try {
-                await ds.pull()
-              } catch (e) {
-                if (e instanceof DsExhausted) {
-                  break
-                }
-                if (e instanceof IsAlreadyPulling ) {
-                  continue
-                }
-                throw e
+    this.#pullAll.pipe(
+      debounceTime(320),
+      withLatestFrom(this.#catAccDirs),
+      switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
+      takeUntil(this.ondestroy$),
+    ).subscribe(async dss => {
+      await Promise.all(
+        dss.map(async ds => {
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            try {
+              await ds.pull()
+            } catch (e) {
+              if (e instanceof DsExhausted) {
+                break
               }
+              if (e instanceof IsAlreadyPulling ) {
+                continue
+              }
+              throw e
             }
-          })
-        )
-      })
-    )
+          }
+        })
+      )
+    })
   }
 
   public selectedAtlas$ = this.store.pipe(
@@ -205,18 +220,27 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   public cateogryCollections$ = this.TPRBbox$.pipe(
-    switchMap(({ template, parcellation, region }) => this.featureTypes$.pipe(
+    switchMap(({ template, parcellation, region, bbox }) => this.featureTypes$.pipe(
       map(features => {
         const filteredFeatures = features.filter(v => {
-          const params = [
-            ...(v.path_params || []),
-            ...(v.query_params || []),
+          const { path_params, required_query_params } = v
+          
+          const requiredParams = [
+            ...(path_params || []),
+            ...(required_query_params || []),
           ]
-          return [
-            params.includes("space_id") === (!!template) && !!template,
-            params.includes("parcellation_id") === (!!parcellation) && !!parcellation,
-            params.includes("region_id") === (!!region) && !!region,
-          ].some(val => val)
+          const paramMapped = {
+            space_id: !!template,
+            parcellation_id: !!parcellation,
+            region_id: !!region,
+            bbox: !!bbox
+          }
+          for (const pParam in paramMapped){
+            if (requiredParams.includes(pParam) && !paramMapped[pParam]) {
+              return false
+            }
+          }
+          return true
         })
         return categoryAcc(filteredFeatures)
       }),
@@ -224,6 +248,13 @@ export class EntryComponent extends FeatureBase implements AfterViewInit, OnDest
   )
 
   onClickFeature(feature: Feature) {
+
+    /**
+     * register of TPRB (template, parcellation, region, bbox) *has* to 
+     * happen at the moment when feature is selected
+     */
+    this.featConcept.register(feature.id, this.#tprb)
+
     this.store.dispatch(
       userInteraction.actions.showFeature({
         feature

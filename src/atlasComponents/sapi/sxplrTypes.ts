@@ -51,7 +51,8 @@ export type AdditionalInfo = {
 }
 
 type Location = {
-  readonly space: SxplrTemplate
+  readonly space?: SxplrTemplate
+  readonly spaceId: string
 }
 type LocTuple = [number, number, number]
 
@@ -96,6 +97,18 @@ export type StatisticalMap = {
 /**
  * Features
  */
+
+export type SimpleCompoundFeature<T extends string|Point=string|Point> = {
+  id: string
+  name: string
+  category?: string
+  indices: {
+    category?: string
+    id: string
+    index: T
+    name: string
+  }[]
+} & AdditionalInfo
 
 export type Feature = {
   id: string

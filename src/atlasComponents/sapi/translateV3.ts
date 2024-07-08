@@ -1,7 +1,7 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature
 } from "./sxplrTypes"
-import { PathReturn, MetaV1Schema } from "./typeV3"
+import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
@@ -265,22 +265,20 @@ class TranslateV3 {
     const { ['@id']: regionId } = region
     this.#regionMap.set(regionId, region)
     this.#regionMap.set(region.name, region)
+    
+    const bestViewPoint = region.hasAnnotation?.bestViewPoint
+
     return {
       id: region["@id"],
       name: region.name,
       color: hexToRgb(region.hasAnnotation?.displayColor) as [number, number, number],
       parentIds: region.hasParent.map( v => v["@id"] ),
       type: "SxplrRegion",
-      centroid: region.hasAnnotation?.bestViewPoint
-        ? await (async () => {
-          const bestViewPoint = region.hasAnnotation?.bestViewPoint
-          const fullSpace = this.#templateMap.get(bestViewPoint.coordinateSpace['@id'])
-          const space = await this.translateTemplate(fullSpace)
-          return {
-            loc: bestViewPoint.coordinates.map(v => v.value) as [number, number, number],
-            space
-          }
-        })()
+      centroid: bestViewPoint
+        ? {
+          loc: bestViewPoint.coordinates.map(v => v.value) as [number, number, number],
+          spaceId: bestViewPoint.coordinateSpace['@id']
+        }
         : null
     }
   }
@@ -400,13 +398,19 @@ class TranslateV3 {
   }
 
   async translateLabelledMapToThreeLabel(map:PathReturn<"/map">) {
-    const threeLabelMap: Record<string, { laterality: 'left' | 'right', url: string, region: LabelledMap[] }> = {}
-    const registerLayer = (url: string, laterality: 'left' | 'right', region: string, label: number) => {
+    const threeLabelMap: Record<string, {
+      laterality: 'left' | 'right'
+      url: string
+      region: LabelledMap[]
+      clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot'
+    }> = {}
+    const registerLayer = (url: string, clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot', laterality: 'left' | 'right', region: string, label: number) => {
       if (!threeLabelMap[url]) {
         threeLabelMap[url] = {
           laterality,
           region: [],
           url,
+          clType
         }
       }
 
@@ -418,18 +422,26 @@ class TranslateV3 {
     for (const regionname in map.indices) {
       for (const { volume: volIdx, fragment, label } of map.indices[regionname]) {
         const volume = map.volumes[volIdx || 0]
-        if (!volume.formats.includes("gii-label")) {
-          // Does not support gii-label... skipping!
+        let clType: 'baselayer/threesurfer-label/gii-label' | 'baselayer/threesurfer-label/annot' | null = null
+        let providedVolume: typeof volume['providedVolumes'][string] | null = null
+        if (volume.formats.includes("gii-label")) {
+          clType = 'baselayer/threesurfer-label/gii-label'
+          providedVolume = volume.providedVolumes["gii-label"]
+        }
+        if (volume.formats.includes("freesurfer-annot")) {
+          clType = 'baselayer/threesurfer-label/annot'
+          providedVolume = volume.providedVolumes["freesurfer-annot"]
+        }
+        
+        if (!providedVolume || !clType) {
+          // does not support  baselayer threesurfer label, skipping
           continue
         }
-        const { ["gii-label"]: giiLabel } = volume.providedVolumes
-
-        
         if (!fragment || !["left hemisphere", "right hemisphere"].includes(fragment)) {
           console.warn(`either fragment not defined, or fragment is not '{left|right} hemisphere'. Skipping!`)
           continue
         }
-        if (!giiLabel[fragment]) {
+        if (!providedVolume[fragment]) {
           // Does not support gii-label... skipping!
           continue
         }
@@ -440,7 +452,7 @@ class TranslateV3 {
           console.warn(`cannot determine the laterality! skipping`)
           continue
         }
-        registerLayer(giiLabel[fragment], laterality, regionname, label)
+        registerLayer(providedVolume[fragment], clType, laterality, regionname, label)
       }
     }
     return threeLabelMap
@@ -543,6 +555,13 @@ class TranslateV3 {
   }
 
   async fetchMeta(url: string): Promise<MetaV1Schema|null> {
+    // TODO move to neuroglancer-data-vm
+    // difumo
+    if (url.startsWith("https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/")) {
+      return {
+        version: 1
+      }
+    }
     if (url in TMP_META_REGISTRY) {
       return TMP_META_REGISTRY[url]
     }
@@ -568,14 +587,15 @@ class TranslateV3 {
     /**
      * TODO ensure all /meta endpoints are populated
      */
-    // try{
-    //   const resp = await this.cFetch(`${url}/meta`)
-    //   if (resp.status === 200) {
-    //     return resp.json()
-    //   }
-    // } catch (e) {
+    try{
+      const resp = await this.cFetch(`${url}/meta.json`)
+      if (resp.status === 200) {
+        return resp.json()
+      }
+    // eslint-disable-next-line no-empty
+    } catch (e) {
       
-    // }
+    }
     
     return null
   }
@@ -626,27 +646,51 @@ class TranslateV3 {
   }
 
   async #translatePoint(point: components["schemas"]["CoordinatePointModel"]): Promise<Point> {
-    const getTmpl = (id: string) => {
-      return this.#sxplrTmplMap.get(id)
-    }
     return {
       loc: point.coordinates.map(v => v.value) as [number, number, number],
-      get space() {
-        return getTmpl(point.coordinateSpace['@id'])
-      }
+      spaceId: point.coordinateSpace['@id'],
     }
   }
 
-  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<VoiFeature|Feature> {
+  async translateFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<VoiFeature|Feature|SimpleCompoundFeature> {
     if (this.#isVoi(feat)) {
       return await this.translateVoiFeature(feat)
     }
+    // if (this.#isCompound(feat)) {
+    //   const link = feat.datasets.flatMap(ds => ds.urls).map(v => ({
+    //     href: v.url,
+    //     text: v.url
+    //   }))
+    //   const v: SimpleCompoundFeature = {
+    //     id: feat.id,
+    //     name: feat.name,
+    //     category: feat.category,
+    //     indices: await Promise.all(
+    //       feat.indices.map(
+    //         async ({ id, index, name }) => ({
+    //           id,
+    //           index: await this.#transformIndex(index),
+    //           name,
+    //           category: feat.category
+    //         })
+    //       )
+    //     ),
+    //     desc: feat.description,
+    //     link
+    //   }
+    //   return v
+    // }
     
     return await this.translateBaseFeature(feat)
   }
 
   async translateBaseFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<Feature>{
     const { id, name, category, description, datasets } = feat
+    if (!datasets) {
+      return {
+        id, name, category
+      }
+    }
     const dsDescs = datasets.map(ds => ds.description)
     const urls = datasets.flatMap(ds => ds.urls).map(v => ({
       href: v.url,
@@ -665,6 +709,18 @@ class TranslateV3 {
     return feat['@type'].includes("feature/volume_of_interest")
   }
 
+  // #isCompound(feat: unknown): feat is CompoundFeature {
+  //   return feat['@type'].includes("feature/compoundfeature")
+  // }
+
+  // async #transformIndex(index: CompoundFeature['indices'][number]['index']): Promise<SimpleCompoundFeature['indices'][number]['index']> {
+  //   if (typeof index === "string") {
+  //     return index
+  //   }
+  //   return await this.#translatePoint(index)
+    
+  // }
+
   async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
     const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol }] = await Promise.all([
       this.translateBaseFeature(feat),
@@ -674,14 +730,11 @@ class TranslateV3 {
       this.#extractNgPrecompUnfrag(feat.volume.providedVolumes),
     ])
     const { ['@id']: spaceId } = feat.boundingbox.space
-    const getSpace = (id: string) => this.#sxplrTmplMap.get(id)
     const bbox: BoundingBox = {
       center,
       maxpoint,
       minpoint,
-      get space() {
-        return getSpace(spaceId)
-      }
+      spaceId
     }
     return {
       ...superObj,
@@ -710,6 +763,10 @@ class TranslateV3 {
           }))
       ]
     }
+  }
+
+  getSpaceFromId(id: string): SxplrTemplate {
+    return this.#sxplrTmplMap.get(id)
   }
 }
 

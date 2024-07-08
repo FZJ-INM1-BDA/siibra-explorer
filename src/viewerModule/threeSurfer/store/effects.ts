@@ -43,7 +43,8 @@ export class ThreeSurferEffects {
     map(
       cl => cl.filter(layer => 
         layer.clType === "baselayer/threesurfer" ||
-        layer.clType === "baselayer/threesurfer-label"
+        layer.clType === "baselayer/threesurfer-label/annot" ||
+        layer.clType === "baselayer/threesurfer-label/gii-label"
       ) as ThreeSurferCustomLayer[]
     )
   )
@@ -121,9 +122,9 @@ export class ThreeSurferEffects {
     switchMap(({ labels }) => {
       const labelMaps: ThreeSurferCustomLabelLayer[] = []
       for (const key in labels) {
-        const { laterality, url } = labels[key]
+        const { laterality, url, clType } = labels[key]
         labelMaps.push({
-          clType: 'baselayer/threesurfer-label',
+          clType,
           id: `${url}-${laterality}`,
           laterality,
           source: url

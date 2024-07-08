@@ -4,9 +4,11 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "hey joline, remind me to set a mor
 
 HOST_PATHNAME = os.getenv("HOST_PATHNAME", "")
 
-HOSTNAME = os.getenv("HOSTNAME", "http://localhost:3000")
-
 OVERWRITE_API_ENDPOINT = os.getenv("OVERWRITE_API_ENDPOINT")
+
+OVERWRITE_SPATIAL_ENDPOINT = os.getenv("OVERWRITE_SPATIAL_ENDPOINT")
+
+EXPERIMENTAL_FLAG = os.getenv("EXPERIMENTAL_FLAG")
 
 LOCAL_CDN = os.getenv("LOCAL_CDN")
 

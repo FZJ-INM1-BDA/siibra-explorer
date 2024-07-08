@@ -1,5 +1,4 @@
 import { HttpHeaders } from "@angular/common/http"
-import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
@@ -12,15 +11,6 @@ export const LOCAL_STORAGE_CONST = {
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
-export const BACKENDURL = (() => {
-  const { BACKEND_URL } = environment
-  if (!BACKEND_URL) return ``
-  if (/^http/.test(BACKEND_URL)) return BACKEND_URL
-
-  const url = new URL(window.location.href)
-  const { protocol, hostname, pathname } = url
-  return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
-})()
 
 export const MIN_REQ_EXPLAINER = `
 - Siibra explorer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
@@ -31,7 +21,7 @@ export const MIN_REQ_EXPLAINER = `
 export const APPEND_SCRIPT_TOKEN: InjectionToken<(url: string) => Promise<HTMLScriptElement>> = new InjectionToken(`APPEND_SCRIPT_TOKEN`)
 
 export const appendScriptFactory = (document: Document, defer: boolean = false) => {
-  return src => new Promise((rs, rj) => {
+  return (src: string) => new Promise((rs, rj) => {
     const scriptEl = document.createElement('script')
     if (defer) {
       scriptEl.defer = true
@@ -111,3 +101,7 @@ export const parcBanList: string[] = [
   "minds/core/parcellationatlas/v1.0.0/887da8eb4c36d944ef626ed5293db3ef",
   "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456",
 ]
+
+export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
+
+export type GetAttr = (attr: string) => string|null

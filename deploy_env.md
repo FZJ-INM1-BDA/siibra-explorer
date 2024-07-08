@@ -9,6 +9,7 @@
 | `V2_7_STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `BUILD_TEXT` | overlay text at bottom right of the viewer. set to `''` to hide. | |
 | `OVERWRITE_API_ENDPOINT` | overwrite build time siibra-api endpoint |
+| `OVERWRITE_SPATIAL_ENDPOINT` | overwrite build time spatial transform endpoint | |
 | `PATH_TO_PUBLIC` | path to built frontend | `../dist/aot` |
 
 
@@ -16,7 +17,6 @@
 
 | name | description | default | example |
 | --- | --- | --- | --- |
-| `HOSTNAME` | 
 | `HOST_PATHNAME` | pathname to listen on, restrictions: leading slash, no trailing slash | `''` | `/viewer` |
 | `HBP_CLIENTID_V2` | 
 | `HBP_CLIENTSECRET_V2` | 

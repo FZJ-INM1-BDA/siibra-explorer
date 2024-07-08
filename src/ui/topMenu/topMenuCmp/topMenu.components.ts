@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Inject,
   Input,
   TemplateRef,
 } from "@angular/core";
@@ -14,6 +15,7 @@ import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterial
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
 import { environment } from "src/environments/environment"
+import { GET_ATTR_TOKEN, GetAttr } from "src/util/constants";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -84,8 +86,14 @@ export class TopMenuCmp {
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
+    @Inject(GET_ATTR_TOKEN) getAttr: GetAttr
   ) {
     this.user$ = this.authService.user$
+
+    const experimentalFlag = getAttr(CONST.OVERWRITE_EXPERIMENTAL_FLAG_ATTR)
+    if (experimentalFlag) {
+      this.showExperimentalToggle = !!experimentalFlag
+    }
 
     this.userBtnTooltip$ = this.user$.pipe(
       map(user => user

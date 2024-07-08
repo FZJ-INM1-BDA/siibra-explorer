@@ -5,40 +5,77 @@ on:
     inputs:
       DEPLOYMENT_NAME:
         required: true
-        type: string
+        type: string # prod, rc, expmt
       IMAGE_TAG:
         required: true
         type: string
+      IMAGE_DIGEST:
+        required: false
+        type: string
+        default: 'default-digest'
 
     secrets:
       KUBECONFIG:
         required: true
 
 jobs:
-  trigger-deploy:
+        
+  trigger-deploy-prod:
     runs-on: ubuntu-latest
+    if: ${{ inputs.DEPLOYMENT_NAME == 'prod' }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: 'Deploy'
       run: |
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
-        helm --kubeconfig=$kubecfg_path status ${{ inputs.DEPLOYMENT_NAME }}
-        helm_status=$(echo $?)
 
-        if [[ $helm_status = "0" ]]
-        then
-          echo "tag ${{ inputs.DEPLOYMENT_NAME }} found. Update"
-          helm --kubeconfig=$kubecfg_path \
-            upgrade \
-            --set image.tag=${{ inputs.IMAGE_TAG }} \
-            ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
-        else
-          echo "tag ${{ inputs.DEPLOYMENT_NAME }} not found. Install"
-          helm --kubeconfig=$kubecfg_path \
-            install \
-            --set image.tag=${{ inputs.IMAGE_TAG }} \
-            ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
-        fi
+        helm --kubeconfig=$kubecfg_path \
+          upgrade \
+          --history-max 3 \
+          --reuse-values \
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
 
+        rm $kubecfg_path
+
+  trigger-deploy-rc:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.DEPLOYMENT_NAME == 'rc' }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: 'Deploy'
+      run: |
+        kubecfg_path=${{ runner.temp }}/.kube_config
+        echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
+
+        helm --kubeconfig=$kubecfg_path \
+          upgrade \
+          --history-max 3 \
+          --reuse-values \
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
+          
+        rm $kubecfg_path
+
+  trigger-deploy-expmt:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.DEPLOYMENT_NAME == 'expmt' }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: 'Deploy'
+      run: |
+        kubecfg_path=${{ runner.temp }}/.kube_config
+        echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
+
+        helm --kubeconfig=$kubecfg_path \
+          upgrade \
+          --history-max 3 \
+          --reuse-values \
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
+          
         rm $kubecfg_path

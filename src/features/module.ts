@@ -19,6 +19,14 @@ import { ReadmoreModule } from "src/components/readmore";
 import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
 import { PlotlyComponent } from "./plotly";
 import { AngularMaterialModule } from "src/sharedModules";
+// import { AtlasColorMapIntents } from "./atlas-colormap-intents";
+import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from "./util";
+import { BehaviorSubject } from "rxjs";
+import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
+import { DialogModule } from "src/ui/dialogInfo";
+import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -31,11 +39,17 @@ import { AngularMaterialModule } from "src/sharedModules";
     NgLayerCtlModule,
     ReadmoreModule,
     AngularMaterialModule,
+    CompoundFeatureIndicesModule,
+    DialogModule,
     
     /**
      * standalone components
      */
     PlotlyComponent,
+    // AtlasColorMapIntents,
+    TPBRViewCmp,
+    CodeSnippet,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     EntryComponent,
@@ -56,6 +70,19 @@ import { AngularMaterialModule } from "src/sharedModules";
     FeatureViewComponent,
     VoiBboxDirective,
     ListDirective,
+  ],
+  providers: [
+    {
+      provide: FEATURE_CONCEPT_TOKEN,
+      useFactory: () => {
+        const obs = new BehaviorSubject<{ id: string, concept: TPRB}>({id: null, concept: {}})
+        const returnObj: FeatureConcept = {
+          register: (id, concept) => obs.next({ id, concept }),
+          concept$: obs.asObservable()
+        }
+        return returnObj
+      }
+    }
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

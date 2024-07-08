@@ -106,7 +106,8 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       if (filteredListCmps.length === 0) {
         return of(
           new ParentDatasource({
-            children: [] as PulledDataSource<TranslatedFeature>[]
+            children: [] as PulledDataSource<TranslatedFeature>[],
+            serialize: f => f.id
           })
         )
       }
@@ -114,7 +115,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
         filteredListCmps.map(cmp => cmp.datasource$)
       ).pipe(
         map(dss => {
-          this.datasource = new ParentDatasource({ children: dss })
+          this.datasource = new ParentDatasource({ children: dss, serialize: f => f.id })
           return this.datasource
         }),
       )

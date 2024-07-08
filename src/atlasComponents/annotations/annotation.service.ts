@@ -82,7 +82,10 @@ export class AnnotationLayer {
     distinctUntilChanged((o, n) => o?.id === n?.id)
   )
   private onDestroyCb: (() => void)[] = []
-  private nglayer: NgAnnotationLayer
+  
+  get nglayer(): NgAnnotationLayer{
+    return this.viewer.layerManager.getLayerByName(this.name)
+  }
   private idset = new Set<string>()
   constructor(
     private name: string = getUuid(),
@@ -99,7 +102,7 @@ export class AnnotationLayer {
         transform: affine,
       }
     )
-    this.nglayer = this.viewer.layerManager.addManagedLayer(layerSpec)
+    this.viewer.layerManager.addManagedLayer(layerSpec)
     const mouseState = this.viewer.mouseState
     const res: () => void = mouseState.changed.add(() => {
       const payload = mouseState.active
@@ -129,11 +132,11 @@ export class AnnotationLayer {
     this._onHover.complete()
     while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
     try {
-      this.viewer.layerManager.removeManagedLayer(this.nglayer)
-      this.nglayer = null
+      const l = this.viewer.layerManager.getLayerByName(this.name)
+      this.viewer.layerManager.removeManagedLayer(l)
     // eslint-disable-next-line no-empty
     } catch (e) {
-
+      console.error("removing layer failed", e)
     }
   }
 

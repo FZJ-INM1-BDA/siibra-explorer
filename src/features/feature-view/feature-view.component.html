@@ -1,19 +1,31 @@
-<ng-template #headerTmpl>
-  <ng-content select="[header]"></ng-content>
-</ng-template>
+<ng-template [ngIf]="view$ | async" let-view>
 
-<mat-card *ngIf="!feature">
+  <ng-template #headerTmpl>
+    <ng-template [ngIf]="view.prevCmpFeat">
+      <button mat-button class="sxplr-mb-2"
+        (click)="showSubfeature(view.prevCmpFeat)">
+        <i class="fas fa-chevron-left"></i>
+        <span class="ml-1">
+          Back
+        </span>
+      </button>
+    </ng-template>
 
-  <ng-template [ngTemplateOutlet]="headerTmpl"></ng-template>
-  <span>
-    Feature not specified.
-  </span>
-</mat-card>
+    <ng-template [ngIf]="!view.prevCmpFeat">
 
-<ng-template [ngIf]="feature">
+      <button mat-button
+        (click)="clearSelectedFeature()"
+        class="sxplr-mb-2">
+        <span class="ml-1">
+          Dismiss
+        </span>
+        <i class="fas fa-times"></i>
+      </button>
+    </ng-template>
+    
+  </ng-template>
 
-  <mat-card *ngIf="feature"
-    class="mat-elevation-z4 sxplr-z-4 header-card">
+  <mat-card class="mat-elevation-z4 sxplr-z-4 header-card">
     
     <mat-card-header>
       <mat-card-subtitle>
@@ -21,28 +33,21 @@
       </mat-card-subtitle>
 
       <mat-card-subtitle>
-        <ng-template [ngIf]="feature.category">
-          <span class="sxplr-m-a sxplr-pr-1">
-            <ng-template [ngIf]="feature.category !== 'Unknown category'" [ngIfElse]="fallbackTmpl">
-              {{ feature.category }} feature
-            </ng-template>
-            <ng-template #fallbackTmpl>
-              Other feature
-            </ng-template>
-          </span>
-        </ng-template>
+        <span class="sxplr-m-a sxplr-pr-1">
+          {{ view.category }}
+        </span>
       </mat-card-subtitle>
 
       <mat-card-title>
         <div class="feature-title">
-          {{ feature.name }}
+          {{ view.name }}
         </div>
       </mat-card-title>
     </mat-card-header>
     <mat-card-content></mat-card-content>
   </mat-card>
 
-  <ng-template [ngIf]="(busy$ | async) || (loadingPlotly$ | async)">
+  <ng-template [ngIf]="view.busy">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </ng-template>
 
@@ -51,17 +56,70 @@
 
       <mat-action-list class="overview-container">
 
-        <ng-template [ngIf]="warnings$ | async" let-warnings>
-          <ng-template ngFor [ngForOf]="warnings" let-warning>
-            <button mat-list-item>
-              <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-              <div matListItemTitle>{{ warning }}</div>
-            </button>
+        <ng-template ngFor [ngForOf]="view.warnings" let-warning>
+          <button mat-list-item>
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+            <div matListItemTitle>{{ warning }}</div>
+          </button>
+        </ng-template>
+
+        <!-- code -->
+        <ng-template sxplrExperimentalFlag [experimental]="true">
+        <button mat-list-item
+          code-snippet
+          [routeParam]="{
+            route: '/feature/{feature_id}',
+            param: {
+              path: {
+                feature_id: view.featureId
+              }
+            }
+          }"
+          #codeSnippet="codeSnippet"
+          [disabled]="codeSnippet.busy$ | async">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-code"></mat-icon>
+          <div matListItemTitle>
+            <ng-template [ngIf]="codeSnippet.busy$ | async">
+              loading code ...
+            </ng-template>
+            <ng-template [ngIf]="!(codeSnippet.busy$ | async)">
+              code
+            </ng-template>
+          </div>
+        </button>
+        </ng-template>
+
+        <!-- anchor -->
+        <ng-template [ngIf]="view.concept">
+          <button mat-list-item
+            [sxplr-dialog]="queriedConceptsTmpl"
+            [sxplr-dialog-size]="null">
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-anchor"></mat-icon>
+            <div matListItemTitle>Queried Concepts</div>
+          </button>
+
+          <ng-template #queriedConceptsTmpl>
+            <mat-card>
+              <mat-card-header class="sxplr-custom-cmp text">
+                <mat-card-title>
+                  Queried Concepts
+                </mat-card-title>
+                <mat-card-subtitle>
+                  Concepts queried to get this feature. Please note this property is session dependent.
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content class="sxplr-custom-cmp text">
+                <tpbr-viewer [tpbr-concept]="view.concept"></tpbr-viewer>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button matDialogClose>close</button>
+              </mat-card-actions>
+            </mat-card>
           </ng-template>
         </ng-template>
 
         <!-- doi -->
-        <ng-template ngFor [ngForOf]="feature.link" let-url>
+        <ng-template ngFor [ngForOf]="view.links" let-url>
           <a [href]="url.href" mat-list-item target="_blank" class="no-hover">
             <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
             <div matListItemTitle>{{ url.text || url.href }}</div>
@@ -69,29 +127,37 @@
         </ng-template>
         
         <!-- additional links -->
-        <ng-template ngFor [ngForOf]="additionalLinks$ | async" let-url>
+        <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
           <a [href]="url" mat-list-item target="_blank" class="no-hover">
             <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
             <div matListItemTitle>{{ url }}</div>
           </a>
         </ng-template>
 
-        <ng-template [ngIf]="downloadLink$ | async" let-downloadLink>
-          <a [href]="downloadLink" mat-list-item target="_blank" class="no-hover">
-            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-download"></mat-icon>
-            <div matListItemTitle>Download</div>
-          </a>
-        </ng-template>
+        <a [href]="view.downloadLink" mat-list-item target="_blank" class="no-hover">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-download"></mat-icon>
+          <div matListItemTitle>Download</div>
+        </a>
         
-
       </mat-action-list>
       
-      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="feature.desc">
+      <markdown-dom class="sxplr-m-2 sxplr-muted" [markdown]="view.desc">
       </markdown-dom>
     </mat-tab>
 
+    <ng-template [ngIf]="view.cmpFeatElmts" let-cmpFeatElmts>
+      <mat-tab label="Elements">
+        <ng-template matTabContent>
+          <compound-feature-indices [indices]="cmpFeatElmts"
+            [selected-template]="view.selectedTemplate"
+            (on-click-index)="showSubfeature($event)">
+          </compound-feature-indices>
+        </ng-template>
+      </mat-tab>
+    </ng-template>
+
     <!-- voi special view -->
-    <ng-template [ngIf]="voi$ | async" let-voi>
+    <ng-template [ngIf]="view.voi" let-voi>
       <mat-tab label="Volume Control">
         <ng-layer-ctl
           [ng-layer-ctl-name]="voi.ngVolume.url"
@@ -106,10 +172,18 @@
     </ng-template>
 
     <!-- plotly view -->
-    <ng-template [ngIf]="plotly$ | async" let-plotly>
+    <ng-template [ngIf]="view.plotly" let-plotly>
       <mat-tab label="Visualization">
         <ng-template matTabContent>
-          <sxplr-plotly-component [plotly-json]="plotly"></sxplr-plotly-component>  
+          <sxplr-plotly-component
+            (plotly-label-clicked)="navigateToRegionByName($event)"
+            [plotly-json]="plotly"></sxplr-plotly-component>
+        
+          <!-- Other generic intents -->
+          <!-- For now, only used for colorization of atlas -->
+          <!-- <atlas-colormap-intents [intents]="intents$ | async"
+            (actions)="onAction($event)">
+          </atlas-colormap-intents> -->
         </ng-template>
       </mat-tab>
     </ng-template>

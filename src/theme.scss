@@ -133,7 +133,7 @@ $sxplr-dark-theme: mat.define-dark-theme((
 {
   @include mat.all-component-themes($sxplr-dark-theme);
   @include custom-cmp($sxplr-dark-theme);
-  input[type="text"]
+  input[type="text"],textarea
   {
     caret-color: white!important;
   }

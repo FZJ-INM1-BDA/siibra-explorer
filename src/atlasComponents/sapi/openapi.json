@@ -1084,6 +1084,14 @@
           {
             "required": false,
             "schema": {
+              "title": "Bbox"
+            },
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
               "type": "string",
               "title": "Region Id"
             },

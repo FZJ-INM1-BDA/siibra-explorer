@@ -24,7 +24,7 @@ export const EXPECTED_SIIBRA_API_VERSION = '0.3.16'
 
 type PaginatedResponse<T> = {
   items: T[]
-  total: number
+  total?: number
   page?: number
   size?: number
   pages?: number
@@ -183,7 +183,7 @@ export class SAPI{
     })
   }
 
-  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] = {}) {
+  getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] & Record<string, string> = {}) {
     return this.v3Get("/feature/{feature_id}/plotly", {
       path: {
         feature_id: id
@@ -191,6 +191,15 @@ export class SAPI{
       query: params
     })
   }
+  
+  // getFeatureIntents(id: string, params: Record<string, string> = {}) {
+  //   return this.v3Get("/feature/{feature_id}/intents", {
+  //     path: {
+  //       feature_id: id
+  //     },
+  //     query: params
+  //   })
+  // }
 
   @CachedFunction({
     serialization: (id, params) => `featDetail:${id}:${Object.entries(params || {}).map(([key, val]) => `${key},${val}`).join('.')}`
@@ -277,9 +286,11 @@ export class SAPI{
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {
-        this.snackbar.open(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
-          duration: 5000
-        })
+        // TODO temporarily disable snackbar. Enable once siibra-api version stabilises
+        console.log(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`)
+        // this.snackbar.open(`Expecting ${EXPECTED_SIIBRA_API_VERSION}, got ${respVersion}. Some functionalities may not work as expected.`, 'Dismiss', {
+        //   duration: 5000
+        // })
       }
     }),
     shareReplay(1),
@@ -429,7 +440,7 @@ export class SAPI{
      */
     return this.v3Get("/feature/Image", {
       query: {
-        space_id: bbox.space.id,
+        space_id: bbox.space?.id || bbox.spaceId,
         bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),
       }
     }).pipe(

@@ -1,8 +1,10 @@
 import ts from "typescript"
 import { readdir, mkdir, unlink } from "node:fs/promises"
 import path, { dirname } from 'path'
-import { readFile } from "node:fs/promises"
+import { readFile, writeFile } from "node:fs/promises"
 import { fileURLToPath } from "url"
+
+const WARNINGTXT = `<!-- DO NOT UPDATE THIS AND BELOW: UPDATED BY SCRIPT -->`
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -46,6 +48,112 @@ export async function clearDirectory(pathToDir){
       await unlink(path.join(pathToDir, f))
     }
   }
+}
+
+
+/**
+ * 
+ * @param {string} pathToDir 
+ */
+export async function populateReadme(pathToDir){
+
+  /**
+   * @type {string}
+   */
+  const text = await readFile(`${pathToDir}/README.md`, 'utf-8')
+
+  /**
+   * @type {Array.<string>}
+   */
+  const newText = []
+
+  const lines = text.split("\n")
+  for (const line of lines) {
+    newText.push(line)
+    if (line.startsWith(WARNINGTXT)) {
+      break
+    }
+  }
+
+  newText.push("")
+
+  const files = await readdir(pathToDir)
+
+  /**
+   * @typedef {Object} EventObj
+   * @property {'viewer'|'client'} initiator
+   * @property {string} requestFile
+   * @property {string} responseFile
+   */
+
+  /**
+   * @type {Object.<string, EventObj>}
+   */
+  const events = {}
+  
+  for (const f of files) {
+    /**
+     * only remove json files
+     */
+    if (f.endsWith(".json")) {
+      const [ evName, fromTo, reqResp ] = f.replace(/\.json$/, "").split("__")
+      if (['fromSxplr', 'toSxplr'].indexOf(fromTo) < 0) {
+        throw Error(`Expected ${fromTo} to be either 'fromSxplr' or 'toSxplr', but was neither`)
+      }
+      let initiator
+      if (fromTo === "fromSxplr") {
+        initiator = "viewer"
+      }
+      if (fromTo === "toSxplr") {
+        initiator = "client"
+      }
+      if (['request', 'response'].indexOf(reqResp) < 0) {
+        throw new Error(`Expected ${reqResp} to be either 'request' or 'response', but was neither`)
+      }
+
+      /**
+       * @type {Object}
+       * @property {string} requestFile
+       * @property {string} responseFile
+       */
+      const reqRespObj = {}
+      if (reqResp === "request") {
+        reqRespObj.requestFile = f
+      }
+      if (reqResp === "response") {
+        reqRespObj.responseFile = f
+      }
+      if (!events[evName]) {
+        events[evName] = {
+          initiator,
+        }
+      }
+      events[evName] = {
+        ...events[evName],
+        ...reqRespObj,
+      }
+      
+    }
+  }
+
+
+  function linkMd(file){
+    if (!file) {
+      return ``
+    }
+    return `[jsonschema](${file})`
+  }
+
+  newText.push(
+    `| event name | initiator | request | response |`,
+    `| --- | --- | --- | --- |`,
+    ...Object.entries(events).map(
+      ([ evName, { initiator, requestFile, responseFile }]) => `| ${evName} | ${initiator} | ${linkMd(requestFile)} | ${linkMd(responseFile)} |`
+    ),
+    ``
+  )
+
+  await writeFile(`${pathToDir}/README.md`, newText.join("\n"), "utf8")
 }
 
 /**

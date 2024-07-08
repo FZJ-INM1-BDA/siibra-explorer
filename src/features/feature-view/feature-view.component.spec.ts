@@ -6,6 +6,8 @@ import { DARKTHEME } from 'src/util/injectionTokens';
 
 import { FeatureViewComponent } from './feature-view.component';
 import { provideMockStore } from '@ngrx/store/testing';
+import { AngularMaterialModule } from 'src/sharedModules';
+import { FEATURE_CONCEPT_TOKEN } from '../util';
 
 describe('FeatureViewComponent', () => {
   let component: FeatureViewComponent;
@@ -15,6 +17,7 @@ describe('FeatureViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
+        AngularMaterialModule,
       ],
       declarations: [ FeatureViewComponent ],
       providers: [
@@ -33,6 +36,12 @@ describe('FeatureViewComponent', () => {
               return EMPTY
             },
             sapiEndpoint$: EMPTY
+          }
+        },
+        {
+          provide: FEATURE_CONCEPT_TOKEN,
+          useValue: {
+            concept$: EMPTY
           }
         }
       ]

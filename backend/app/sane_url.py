@@ -10,7 +10,7 @@ from io import StringIO
 from pydantic import BaseModel
 
 from .config import SXPLR_EBRAINS_IAM_SA_CLIENT_ID, SXPLR_EBRAINS_IAM_SA_CLIENT_SECRET, SXPLR_BUCKET_NAME, HOST_PATHNAME
-from .const import EBRAINS_IAM_DISCOVERY_URL
+from .const import EBRAINS_IAM_DISCOVERY_URL, ERROR_KEY
 from ._store import DataproxyStore
 from .user import get_user_from_request
 
@@ -135,10 +135,11 @@ data_proxy_store = SaneUrlDPStore()
 
 @router.get("/{short_id:str}")
 async def get_short(short_id:str, request: Request):
+    accept = request.headers.get("Accept", "")
+    is_browser = "text/html" in accept
     try:
         existing_json: Dict[str, Any] = data_proxy_store.get(short_id)
-        accept = request.headers.get("Accept", "")
-        if "text/html" in accept:
+        if is_browser:
             hashed_path = existing_json.get("hashPath")
             extra_routes = []
             for key in existing_json:
@@ -151,8 +152,14 @@ async def get_short(short_id:str, request: Request):
             return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}")
         return JSONResponse(existing_json)
     except DataproxyStore.NotFound as e:
+        if is_browser:
+            request.session[ERROR_KEY] = f"Short ID {short_id} not found."
+            return RedirectResponse(HOST_PATHNAME or "/")
         raise HTTPException(404, str(e))
     except DataproxyStore.GenericException as e:
+        if is_browser:
+            request.session[ERROR_KEY] = f"Error: {str(e)}"
+            return RedirectResponse(HOST_PATHNAME or "/")
         raise HTTPException(500, str(e))
 
 

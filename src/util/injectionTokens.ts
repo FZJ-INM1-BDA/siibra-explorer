@@ -19,6 +19,19 @@ export interface ClickInterceptor{
   deregister: (interceptorFunction: (ev: any) => any) => void
 }
 
+export const HOVER_INTERCEPTOR_INJECTOR = new InjectionToken<HoverInterceptor>("HOVER_INTERCEPTOR_INJECTOR")
+
+export type THoverConfig = {
+  fontSet?: string
+  fontIcon?: string
+  message: string
+}
+
+export interface HoverInterceptor {
+  append(message: THoverConfig): void
+  remove(message: THoverConfig): void
+}
+
 export const CONTEXT_MENU_ITEM_INJECTOR = new InjectionToken('CONTEXT_MENU_ITEM_INJECTOR')
 
 export type TContextMenu<T> = {

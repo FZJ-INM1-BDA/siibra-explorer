@@ -10,21 +10,13 @@
       </div>
     </ng-template>
     
-
-    <div *ngIf="(media.mediaBreakPoint$ | async) < 2"
-      floatingMouseContextualContainerDirective    
-      iav-mouse-hover
-      #iavMouseHoverContextualBlock="iavMouseHover">
-
-      <mat-list class="contextual-block">
-        <mat-list-item *ngFor="let cvtOutput of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseoverCvt"
-          class="h-auto">
-          <span class="centered" matListItemIcon [class]="cvtOutput.icon.cls"></span>
-          <span matListItemTitle>{{ cvtOutput.text }}</span>
-        </mat-list-item>
-      </mat-list>
-    </div>
-
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) < 2">
+      <div floatingMouseContextualContainerDirective>
+        <mouseover-info
+          class="contextual-block">
+        </mouseover-info>
+      </div>
+    </ng-template>
   </div>
 </div>
 
@@ -418,44 +410,9 @@
   <div class="position-absolute w-100 h-100 z-index-1"
     ctx-menu-host
     [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
-    
-    <ng-container [ngSwitch]="useViewer$ | async">
-
-      <!-- nehuba viewer -->
-      <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
-        *ngSwitchCase="'nehuba'"
-        (viewerEvent)="handleViewerEvent($event)"
-        #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
-      </iav-cmp-viewer-nehuba-glue>
-
-      <!-- three surfer (free surfer viewer) -->
-      <tmp-threesurfer-lifecycle class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
-        *ngSwitchCase="'threeSurfer'"
-        (viewerEvent)="handleViewerEvent($event)">
-      </tmp-threesurfer-lifecycle>
-
-      <!-- if not supported, show not supported message -->
-      <div *ngSwitchCase="'notsupported'">Template not supported by any of the viewers</div>
-
-      <!-- by default, show splash screen -->
-      <div class="sxplr-h-100" *ngSwitchDefault>
-        <ng-template [ngIf]="(selectedAtlas$ | async)" [ngIfElse]="splashScreenTmpl">
-          <div class="center-a-div">
-            <div class="loading-atlas-text-container">
-              <spinner-cmp class="fs-200"></spinner-cmp>
-              <span>
-                Loading 
-                {{ (selectedAtlas$ | async).name }}
-              </span>
-            </div>
-          </div>
-        </ng-template>
-        <ng-template #splashScreenTmpl>
-          <ui-splashscreen class="position-absolute left-0 tosxplr-p-0">
-          </ui-splashscreen>
-        </ng-template>
-      </div>
-    </ng-container>
+    <viewer-wrapper
+      (viewer-event)="handleViewerCtxEvent($event)">
+    </viewer-wrapper>
 
   </div>
 </ng-template>
@@ -577,7 +534,12 @@
         (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
         #regionDirective="sapiViewsCoreRegionRich"
       >
-        <div class="sapi-container" header></div>
+
+      
+      <ng-container ngProjectAs="[header]">
+        <div class="sapi-container"></div>
+      </ng-container>
+        
       </sxplr-sapiviews-core-region-region-rich>
     </ng-template>
 
@@ -616,17 +578,6 @@
 </ng-template>
 
 
-<!-- expansion tmpl -->
-<ng-template #ngMatAccordionTmpl
-  let-title="title"
-  let-desc="desc"
-  let-iconClass="iconClass"
-  let-iconTooltip="iconTooltip"
-  let-iavNgIf="iavNgIf"
-  let-content="content">
-</ng-template>
-
-
 <!-- multi region tmpl -->
 <ng-template #multiRegionTmpl let-regions="regions">
   <ng-template [ngIf]="regions.length > 0" [ngIfElse]="regionPlaceholderTmpl">
@@ -637,6 +588,18 @@
       <div title>
         Multiple regions selected
       </div>
+
+      <mat-action-list class="overview-container">
+        <button mat-list-item
+          [iav-clipboard-copy]="regions | mapToProperty : 'name' | json">
+          <mat-icon class="mr-4" fontSet="fas" fontIcon="fa-copy">
+          </mat-icon>
+          <span>
+            Copy region names
+          </span>
+        </button>
+      </mat-action-list>
+
       <!-- other regions detail accordion -->
       <mat-accordion class="bs-border-box ml-15px-n mr-15px-n mt-2">
   
@@ -866,23 +829,7 @@
 <ng-template let-feature="feature" #selectedFeatureTmpl>
   <!-- TODO differentiate between features (spatial, regional etc) -->
   
-  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2"
-    [feature]="feature">
-
-    <div header>
-      <!-- back btn -->
-      <button mat-button
-        (click)="clearSelectedFeature()"
-        [attr.aria-label]="ARIA_LABELS.CLOSE"
-        class="sxplr-mb-2"
-        >
-        <i class="fas fa-chevron-left"></i>
-        <span class="ml-1">
-          Back
-        </span>
-      </button>
-    </div>
-
+  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2" [feature]="feature">
   </sxplr-feature-view>
 </ng-template>
 
@@ -897,10 +844,10 @@
         [attr.aria-label]="ARIA_LABELS.CLOSE"
         class="sxplr-mb-2"
         >
-        <i class="fas fa-chevron-left"></i>
         <span class="ml-1">
-          Back
+          Dismiss
         </span>
+        <i class="fas fa-times"></i>
       </button>
     </div>
     <div title>
@@ -929,16 +876,14 @@
         Anchored to current view
       </mat-card-title>
       <mat-card-subtitle>
-        <div *ngIf="view.selectedTemplate">
-          {{ view.selectedTemplate.name }}
-        </div>
+
         <ng-template [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" let-bbox>
-          <div>
-            from {{ bbox[0] | numbers | addUnitAndJoin : '' }}
-          </div>
-          <div>
-            to {{ bbox[1] | numbers | addUnitAndJoin : '' }}
-          </div>
+          
+          <tpbr-viewer [tpbr-concept]="{
+            template: view.selectedTemplate,
+            bbox: bbox
+          }">
+          </tpbr-viewer>
         </ng-template>
       </mat-card-subtitle>
     </mat-card-header>

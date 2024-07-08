@@ -9,7 +9,7 @@ jobs:
   hide_previous_if_exists:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: 'master'
     - uses: actions/github-script@v5
@@ -23,7 +23,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: 'Install gherkin-official'
+      run: 'pip install gherkin-official'
+    - name: 'Generate checklist'
+      run: 'python features/_convert.py'
     - name: 'Add checklist comment'
       uses: actions/github-script@v5
       with:
