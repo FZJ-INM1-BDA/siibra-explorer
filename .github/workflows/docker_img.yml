@@ -175,7 +175,7 @@ jobs:
       - setting-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
-      DEPLOYMENT_NAME: master
+      DEPLOYMENT_NAME: prod
       IMAGE_TAG: ${{ needs.setting-vars.outputs.SXPLR_VERSION }}
       IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
     secrets:

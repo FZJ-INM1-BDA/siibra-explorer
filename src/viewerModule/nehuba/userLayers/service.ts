@@ -327,6 +327,35 @@ export class UserLayerService implements OnDestroy {
     }
   }
 
+  @RegisterSource(async input => {
+    if (input instanceof File && input.name.endsWith(".pointcloud")) {
+      return true
+    }
+    return false
+  })
+  async processPtCld(file: File):  Promise<ProcessorOutput>{
+
+    const text = await file.text()
+    
+    const id = getUuid()
+    const xform = await linearTransform("CYRIL_PTCLD", "NEHUBA")
+    const layer = new AnnotationLayer(id, "#ff0000", xform)
+
+    layer.addAnnotation(text.split("\n").map((line, idx) => ({
+      id: `${id}-${idx}`,
+      type: "point",
+      point: line.split(" ").map(v => parseFloat(v)*1e6) as [number, number, number],
+    })))
+    return {
+      cleanup: () => {
+        layer.dispose()
+      },
+      meta: {
+        filename: file.name,
+      }
+    }
+  }
+
   async #processInput(input: ValidInputTypes): Promise<ProcessorOutput> {
     for (const { matcher, processor } of SOURCE_PROCESSOR) {
       if (await matcher(input)) {

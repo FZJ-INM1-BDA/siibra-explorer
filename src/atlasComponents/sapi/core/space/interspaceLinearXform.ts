@@ -1,4 +1,4 @@
-const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA"] as const
+const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD"] as const
 const VALID_XFORM_DST = ["NEHUBA"] as const
 
 export type TVALID_LINEAR_XFORM_SRC = typeof VALID_XFORM_SRC[number]
@@ -12,6 +12,29 @@ const _linearXformDict: Record<
   TVALID_LINEAR_XFORM_DST,
     TLinearXform
   >> = {
+    CYRIL_PTCLD: {
+      NEHUBA: 
+      // [
+      //   [-0.2, 0.0, 0.0, 96400000.0],
+      //   [0.0, -0.2, 0.0, 96400000.0],
+      //   [0.0, 0.0, -0.2, 114400000.0],
+      //   [0.0, 0.0, 0.0, 1.0]
+      // ]
+      [
+        [-1,0,0,96_500_000],
+        [0,-1,0,229_000_000 - 132_500_000],
+        [0,0,-1,193_000_000 - 78_500_000],
+        [0,0,0,1]
+      ]
+    },
+    MNI152: {
+      NEHUBA: [
+        [1,0,0,-96_500_000],
+        [0,1,0,-132_500_000],
+        [0,0,1,-78_500_000],
+        [0,0,0,1]
+      ]
+    },
     CCF_V2_5: {
       NEHUBA: [
         [-1e3, 0, 0, 11400000 - 5737500], //
@@ -31,7 +54,7 @@ const _linearXformDict: Record<
     }
   }
 
-const defaultXform = [
+export const defaultXform = [
   [1e3, 0, 0, 0],
   [0, 1e3, 0, 0],
   [0, 0, 1e3, 0],

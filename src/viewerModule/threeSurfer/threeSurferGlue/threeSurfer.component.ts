@@ -739,7 +739,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
     const {
       geometry: evGeometry,
-      verticesIndicies: evVerticesIndicies,
       vertexIndex
     } = detail.mesh as { geometry: TThreeGeometry, verticesIndicies: number[], vertexIndex: number }
 
