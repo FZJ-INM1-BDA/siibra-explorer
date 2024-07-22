@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Inject, Input, inject } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable, combineLatest, concat, of } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, concat, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature, SimpleCompoundFeature, VoiFeature } from 'src/atlasComponents/sapi/sxplrTypes';

@@ -335,7 +335,6 @@ export class UserLayerService implements OnDestroy {
   })
   async processPtCld(file: File):  Promise<ProcessorOutput>{
 
-    const layers: AnnotationLayer[] = []
     const text = await file.text()
     
     const id = getUuid()
