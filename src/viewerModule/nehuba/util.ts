@@ -178,18 +178,6 @@ export const isIdentityQuat = (ori: number[]): boolean => Math.abs(ori[0]) < 1e-
   && Math.abs(ori[2]) < 1e-6
   && Math.abs(ori[3] - 1) < 1e-6
 
-export const importNehubaFactory = (appendSrc: (src: string) => Promise<void>): () => Promise<void> => {
-  let pr: Promise<void>
-  return async () => {
-    if (!!(window as any).export_nehuba) return 
-
-    if (pr) return pr
-    pr = appendSrc('main.bundle.js')
-
-    return pr
-  }
-}
-
 export const takeOnePipe = () => {
 
   return pipe(

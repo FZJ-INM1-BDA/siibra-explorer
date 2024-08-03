@@ -9,8 +9,6 @@ import { UtilModule } from "src/util";
 import { ShareModule } from "src/share";
 import { AuthModule } from "src/auth";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
-import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
-import { DOCUMENT } from "@angular/common";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 
@@ -32,11 +30,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
     ActionDialog,
   ],
   providers: [
-    {
-      provide: APPEND_SCRIPT_TOKEN,
-      useFactory: appendScriptFactory,
-      deps: [DOCUMENT]
-    },
     {
       provide: HANDLE_SCREENSHOT_PROMISE,
       useValue: ((param) => {
