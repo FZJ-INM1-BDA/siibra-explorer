@@ -205,7 +205,7 @@ jobs:
         echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
         echo "USE_SAFARI=$USE_SAFARI" >> $GITHUB_ENV
     - name: Run cypress
-      run: cypress run --browser ${{ matrix.browser }} -s cypress/e2e/screenshot.cy.js
+      run: ./node_modules/.bin/cypress run --browser ${{ matrix.browser }} -s cypress/e2e/screenshot.cy.js
     - uses: actions/upload-artifact@v4
       with:
         name: $SCREENSHOT_PATH
