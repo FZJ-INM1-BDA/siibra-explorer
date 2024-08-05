@@ -183,43 +183,36 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-    - name: Install dependencies and set variables
+    - name: Set variables
       run: |
-        npm install --save-dev cypress
-        
         GIT_DIGEST=${{ github.sha }}
         GIT_DIGEST=$(echo $GIT_DIGEST | head -c 6)
 
         SCREENSHOT_URL=${{ matrix.url }}
-        SCREENSHOT_PATH=screenshot_"$GIT_DIGEST"_${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}.png
+        SCREENSHOT_PATH=screenshot_"$GIT_DIGEST"_${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
 
         echo "SCREENSHOT_URL: $SCREENSHOT_URL"
         echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
 
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
         echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
-        
-    - name: Install and run cypress (webkit)
+
+    - name: Install optional dependency
       if: ${{ matrix.browser == 'webkit' }}
       run: |
         npm install --save-dev playwright-webkit
         echo "USE_SAFARI=1" >> $GITHUB_ENV
-        cypress \
-          run \
-          --browser ${{ matrix.browser }} \
-          -s cypress/e2e/screenshot.cy.js
 
-    - name: Run cypress
-      if: ${{ matrix.browser != 'webkit' }}
-      run: |
-        ./node_modules/cypress/bin/cypress \
-          run \
-          --browser ${{ matrix.browser }} \
-          -s cypress/e2e/screenshot.cy.js
+    - name: Run Cypress
+      uses: cypress-io/github-action@v6
+      with:
+        spec: cypress/e2e/screenshot.cy.js
+        browser: ${{ matrix.browser }}
+        
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.SCREENSHOT_PATH }}
-        path: cypress/screenshots/screenshot.cy.js/${{ env.SCREENSHOT_PATH }}
+        path: cypress/screenshots/screenshot.cy.js/*.png
         retention-days: 5
 
 
