@@ -160,6 +160,7 @@ jobs:
     - trigger-deploy-rc-rancher
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: 
         - ubuntu-latest
@@ -187,7 +188,7 @@ jobs:
         npm install --no-save cypress
         
         GIT_DIGEST=${{ github.sha }}
-        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
+        GIT_DIGEST=$(echo $GIT_DIGEST | head -c 6)
 
         SCREENSHOT_URL=${{ matrix.url }}
         SCREENSHOT_PATH=screenshot_"$GIT_DIGEST"_${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}.png
