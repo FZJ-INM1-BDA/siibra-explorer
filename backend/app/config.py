@@ -35,3 +35,5 @@ SXPLR_BUCKET_NAME = os.getenv("SXPLR_BUCKET_NAME", "interactive-atlas-viewer")
 LOGGER_DIR = os.getenv("LOGGER_DIR")
 
 PATH_TO_PUBLIC = os.getenv("PATH_TO_PUBLIC", "../dist/aot")
+
+BUILD_HASH = os.getenv("BUILD_HASH", "devbuild")

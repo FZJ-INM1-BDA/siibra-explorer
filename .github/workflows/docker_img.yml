@@ -65,9 +65,18 @@ jobs:
     - id: 'build-docker-image'
       name: 'Build docker image'
       run: |
+        GIT_DIGEST=${{ github.sha }}
+        echo "Git digest: $GIT_DIGEST"
+
+        # 62 char limit in label
+        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
+        echo "Using first 6 chars of hash: $GIT_DIGEST"
+        echo "GIT_DIGEST=$GIT_DIGEST" >> $GITHUB_OUTPUT
+
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
+          --build-arg BUILD_HASH=$GIT_DIGEST \
           --build-arg MATOMO_URL=$MATOMO_URL \
           --build-arg MATOMO_ID=$MATOMO_ID \
           --build-arg SIIBRA_API_ENDPOINTS=$SIIBRA_API_ENDPOINTS \
@@ -79,15 +88,6 @@ jobs:
 
         inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
-        
-        GIT_DIGEST=${{ github.sha }}
-        echo "Git digest: $GIT_DIGEST"
-
-        # 62 char limit in label
-        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
-        echo "Using first 6 chars of hash: $GIT_DIGEST"
-
-        echo "GIT_DIGEST=$GIT_DIGEST" >> $GITHUB_OUTPUT
 
     - name: 'Push to docker registry'
       run: |
@@ -154,6 +154,64 @@ jobs:
       IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
+  cypress-staging:
+    needs:
+    - trigger-deploy-rc-rancher
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: 
+        - ubuntu-latest
+        - windows-latest
+        - macos-latest
+        viewer:
+        - ng
+        - fsa
+        browser:
+        - chrome
+        include:
+        - viewer: ng
+          url: https://atlases.ebrains.eu/viewer-staging/go/human
+        - viewer: fsa
+          url: https://atlases.ebrains.eu/viewer-staging/go/fsaverage
+        - os: macos-latest
+          browser: webkit
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Install dependencies and set variables
+      run: |
+        npm install --no-save cypress
+        if [[ "${{ matrix.browser }}" == "webkit" ]]
+        then
+          npm install --no-save playwright-webkit
+          USE_SAFARI=1
+        fi
+        
+        GIT_DIGEST=${{ github.sha }}
+        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
+
+        SCREENSHOT_URL=${{ matrix.url }}
+        SCREENSHOT_PATH=screenshot_"$GIT_DIGEST"_${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}.png
+
+        echo "SCREENSHOT_URL: $SCREENSHOT_URL"
+        echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
+        echo "USE_SAFARI: $USE_SAFARI"
+
+        echo "SCREENSHOT_URL: $SCREENSHOT_URL" >> $GITHUB_ENV
+        echo "SCREENSHOT_PATH: $SCREENSHOT_PATH" >> $GITHUB_ENV
+        echo "USE_SAFARI: $USE_SAFARI" >> $GITHUB_ENV
+    - name: Run cypress
+      run: cypress run --browser ${{ matrix.browser }} -s cypress/e2e/screenshot.cy.js
+    - uses: actions/upload-artifact@v4
+      with:
+        name: $SCREENSHOT_PATH
+        path: $SCREENSHOT_PATH
+        retention-days: 5
+
 
   trigger-deploy-expmt-rancher:
     if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
