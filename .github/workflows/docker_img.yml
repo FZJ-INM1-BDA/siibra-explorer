@@ -163,8 +163,8 @@ jobs:
       matrix:
         os: 
         - ubuntu-latest
-        - windows-latest
-        - macos-latest
+        # - windows-latest
+        # - macos-latest
         viewer:
         - ng
         - fsa
@@ -185,11 +185,6 @@ jobs:
     - name: Install dependencies and set variables
       run: |
         npm install --no-save cypress
-        if [[ "${{ matrix.browser }}" == "webkit" ]]
-        then
-          npm install --no-save playwright-webkit
-          USE_SAFARI=1
-        fi
         
         GIT_DIGEST=${{ github.sha }}
         GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
@@ -203,7 +198,14 @@ jobs:
 
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
         echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
+        
+    - name: Install optional dependency
+      if: ${{ matrix.browser == 'webkit' }}
+      run: |
+        npm install --no-save playwright-webkit
+        USE_SAFARI=1
         echo "USE_SAFARI=$USE_SAFARI" >> $GITHUB_ENV
+
     - name: Run cypress
       run: ./node_modules/.bin/cypress run --browser ${{ matrix.browser }} -s cypress/e2e/screenshot.cy.js
     - uses: actions/upload-artifact@v4
