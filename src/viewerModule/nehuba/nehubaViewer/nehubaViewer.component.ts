@@ -24,7 +24,6 @@ function translateUnit(unit: Unit) {
   throw new Error(`Cannot translate unit: ${unit}`)
 }
 
-export const IMPORT_NEHUBA_INJECT_TOKEN = `IMPORT_NEHUBA_INJECT_TOKEN`
 
 interface LayerLabelIndex {
   layer: {
@@ -123,7 +122,6 @@ export class NehubaViewerUnit implements OnDestroy {
     public elementRef: ElementRef,
     private log: LoggingService,
     private periodicSvc: PeriodicSvc,
-    @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
@@ -194,8 +192,7 @@ export class NehubaViewerUnit implements OnDestroy {
       this.nehubaViewer$.next(this)
     }
 
-    getImportNehubaPr()
-      .then(() => getExportNehuba())
+    getExportNehuba()
       .then(exportNehuba => {
         this.nehubaLoaded = true
         this.exportNehuba = exportNehuba
@@ -417,9 +414,7 @@ export class NehubaViewerUnit implements OnDestroy {
       this.log.error(err)
     });
 
-    (window as any).nehubaViewer = this.nehubaViewer
-
-    const viewer = window['viewer']
+    const viewer = this.nehubaViewer.ngviewer
 
     /**
      * Hide all layers except the base layer (template)

@@ -15,6 +15,7 @@ from app.user import router as user_router
 from app.config import HOST_PATHNAME
 from app.logger import logger
 from app.bkwdcompat import BkwdCompatMW
+from app.version_header import VersionHeaderMW
 
 app = FastAPI()
 
@@ -26,6 +27,7 @@ def ready():
 
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 app.add_middleware(BkwdCompatMW)
+app.add_middleware(VersionHeaderMW)
 
 for vip_route in vip_routes:
     @app.get(f"/{vip_route}")

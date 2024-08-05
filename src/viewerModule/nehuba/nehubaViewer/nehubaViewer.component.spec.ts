@@ -1,6 +1,6 @@
 import { TestBed, fakeAsync, tick, ComponentFixture } from "@angular/core/testing"
 import { CommonModule } from "@angular/common"
-import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN, scanFn } from "./nehubaViewer.component"
+import { NehubaViewerUnit, scanFn } from "./nehubaViewer.component"
 import { LoggingModule, LoggingService } from "src/logging"
 import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants"
 import { Subject } from "rxjs"
@@ -90,10 +90,6 @@ describe('> nehubaViewer.component.ts', () => {
           NehubaViewerUnit
         ],
         providers:[
-          {
-            provide: IMPORT_NEHUBA_INJECT_TOKEN,
-            useValue: () => Promise.resolve(),
-          },
           {
             provide: SET_MESHES_TO_LOAD,
             useFactory: () => setMeshToLoadCtl$
