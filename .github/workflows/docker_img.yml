@@ -185,7 +185,7 @@ jobs:
         node-version: 20
     - name: Install dependencies and set variables
       run: |
-        npm install --no-save cypress
+        npm install --save-dev cypress
         
         GIT_DIGEST=${{ github.sha }}
         GIT_DIGEST=$(echo $GIT_DIGEST | head -c 6)
@@ -199,13 +199,18 @@ jobs:
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
         echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
         
-    - name: Install optional dependency
+    - name: Install and run cypress (webkit)
       if: ${{ matrix.browser == 'webkit' }}
       run: |
-        npm install --no-save playwright-webkit
+        npm install --save-dev playwright-webkit
         echo "USE_SAFARI=1" >> $GITHUB_ENV
+        cypress \
+          run \
+          --browser ${{ matrix.browser }} \
+          -s cypress/e2e/screenshot.cy.js
 
     - name: Run cypress
+      if: ${{ matrix.browser != 'webkit' }}
       run: |
         ./node_modules/cypress/bin/cypress \
           run \
@@ -214,7 +219,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.SCREENSHOT_PATH }}
-        path: ${{ env.SCREENSHOT_PATH }}
+        path: cypress/screenshots/screenshot.cy.js/${{ env.SCREENSHOT_PATH }}
         retention-days: 5
 
 
