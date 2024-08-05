@@ -201,9 +201,9 @@ jobs:
         echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
         echo "USE_SAFARI: $USE_SAFARI"
 
-        echo "SCREENSHOT_URL: $SCREENSHOT_URL" >> $GITHUB_ENV
-        echo "SCREENSHOT_PATH: $SCREENSHOT_PATH" >> $GITHUB_ENV
-        echo "USE_SAFARI: $USE_SAFARI" >> $GITHUB_ENV
+        echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
+        echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
+        echo "USE_SAFARI=$USE_SAFARI" >> $GITHUB_ENV
     - name: Run cypress
       run: cypress run --browser ${{ matrix.browser }} -s cypress/e2e/screenshot.cy.js
     - uses: actions/upload-artifact@v4
