@@ -197,6 +197,9 @@ jobs:
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
         echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
 
+    - name: Install dependency
+      run: npm install cypress
+
     - name: Install optional dependency
       if: ${{ matrix.browser == 'webkit' }}
       run: |
@@ -206,6 +209,7 @@ jobs:
     - name: Run Cypress
       uses: cypress-io/github-action@v6
       with:
+        install: false
         spec: cypress/e2e/screenshot.cy.js
         browser: ${{ matrix.browser }}
         
