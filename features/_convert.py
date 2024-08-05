@@ -101,7 +101,7 @@ def gherkin_to_markdown(gherkin_text):
     )
 
 
-def main(output: str="./e2e/checklist.md"):
+def main(output: str="./checklist.md"):
     
     path_to_feature = Path("features")
     markdown_txt = """# Staging Checklist
