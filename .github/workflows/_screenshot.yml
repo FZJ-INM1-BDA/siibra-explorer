@@ -41,12 +41,14 @@ jobs:
 
         SCREENSHOT_URL=${{ inputs.url }}
         SCREENSHOT_PATH=${{ inputs.screenshot-filename }}
+        SCREENSHOT_NAME=${SCREENSHOT_PATH//\//_}
 
         echo "SCREENSHOT_URL: $SCREENSHOT_URL"
         echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
+        echo "SCREENSHOT_NAME: $SCREENSHOT_NAME"
 
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
-        echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
+        echo "SCREENSHOT_NAME=$SCREENSHOT_NAME" >> $GITHUB_ENV
 
     - name: Install dependency
       run: npm install cypress
@@ -59,7 +61,7 @@ jobs:
         
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.SCREENSHOT_PATH }}
+        name: ${{ env.SCREENSHOT_NAME }}
         path: cypress/screenshots/screenshot.cy.js/${{ env.SCREENSHOT_PATH }}.png
         retention-days: 5
 
