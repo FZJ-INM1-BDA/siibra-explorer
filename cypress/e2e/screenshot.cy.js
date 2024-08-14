@@ -12,9 +12,9 @@ describe(`Visiting ${SCREENSHOT_URL}`, () => {
 
     cy.visit(SCREENSHOT_URL)
     cy.wait(5000)
-    cy.type('{esc}')
+    cy.get('atlas-viewer').type('{esc}')
     cy.wait(1000)
-    cy.type('{esc}')
+    cy.get('atlas-viewer').type('{esc}')
 
     if (!SCREENSHOT_PATH) {
       console.error(`SCREENSHOT_PATH not defined. Exiting`)
