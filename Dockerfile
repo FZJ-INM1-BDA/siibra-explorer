@@ -1,8 +1,5 @@
 FROM node:16 as builder
 
-ARG BUILD_HASH
-ENV BUILD_HASH=${BUILD_HASH:-devbuild}
-
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
@@ -46,6 +43,9 @@ RUN node third_party/matomo/processMatomo.js
 
 # prod container
 FROM python:3.10-alpine
+
+ARG BUILD_HASH
+ENV BUILD_HASH=${BUILD_HASH:-devbuild}
 
 RUN adduser --disabled-password nonroot
 
