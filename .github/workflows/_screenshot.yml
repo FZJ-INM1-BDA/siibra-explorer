@@ -48,6 +48,7 @@ jobs:
         echo "SCREENSHOT_NAME: $SCREENSHOT_NAME"
 
         echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
+        echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
         echo "SCREENSHOT_NAME=$SCREENSHOT_NAME" >> $GITHUB_ENV
 
     - name: Install dependency
