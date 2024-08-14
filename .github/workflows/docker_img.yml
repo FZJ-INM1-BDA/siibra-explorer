@@ -210,7 +210,9 @@ jobs:
     with:
       url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
       screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
-
+    secrets:
+      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
   trigger-deploy-expmt-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
