@@ -1,0 +1,73 @@
+name: "[e2e] screenshot"
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      browser:
+        required: false
+        type: string
+        default: chrome
+      url:
+        required: true
+        type: string
+      screenshot-filename:
+        required: true
+        type: string
+        description: "desired filename *without* extension. .png will *always* be appended"
+    secrets:
+      client-id:
+        required: false
+      client-secret:
+        required: false
+
+jobs:
+  screenshot:
+    runs-on: ${{ inputs.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Set variables
+      run: |
+        GIT_DIGEST=${{ github.sha }}
+        GIT_DIGEST=$(echo $GIT_DIGEST | head -c 6)
+
+        echo "mkdir -p $(dirname ${{ inputs.screenshot-filename }})"
+        mkdir -p $(dirname ${{ inputs.screenshot-filename }})
+
+        SCREENSHOT_URL=${{ inputs.url }}
+        SCREENSHOT_PATH=${{ inputs.screenshot-filename }}
+
+        echo "SCREENSHOT_URL: $SCREENSHOT_URL"
+        echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
+
+        echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
+        echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
+
+    - name: Install dependency
+      run: npm install cypress
+
+    - name: Run Cypress
+      uses: cypress-io/github-action@v6
+      with:
+        spec: cypress/e2e/screenshot.cy.js
+        browser: ${{ inputs.browser }}
+        
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.SCREENSHOT_PATH }}
+        path: cypress/screenshots/screenshot.cy.js/*.png
+        retention-days: 5
+
+    - continue-on-error: true
+      uses: FZJ-INM1-BDA/iav-dep-test/.github/actions/upload_dataproxy@master
+      with:
+        upload-file: cypress/screenshots/screenshot.cy.js/${{ inputs.screenshot-filename }}.png
+        bucket-name: reference-atlas-data
+        dest-path: viewere2e/${{ inputs.screenshot-filename }}.png
+        client-id: ${{ secrets.client-id }}
+        client-secret: ${{ secrets.client-secret }}
