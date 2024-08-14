@@ -60,14 +60,14 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.SCREENSHOT_PATH }}
-        path: cypress/screenshots/screenshot.cy.js/*.png
+        path: ${{ env.SCREENSHOT_PATH }}.png
         retention-days: 5
 
     - continue-on-error: true
       uses: FZJ-INM1-BDA/iav-dep-test/.github/actions/upload_dataproxy@master
       with:
-        upload-file: cypress/screenshots/screenshot.cy.js/${{ inputs.screenshot-filename }}.png
-        bucket-name: reference-atlas-data
+        upload-file: ${{ inputs.screenshot-filename }}.png
+        bucket-name: interactive-atlas-viewer
         dest-path: viewere2e/${{ inputs.screenshot-filename }}.png
         client-id: ${{ secrets.client-id }}
         client-secret: ${{ secrets.client-secret }}
