@@ -13,8 +13,51 @@ on:
       - 'docs/**/*'
 
 jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      GIT_DIGEST: ${{ steps.set-vars-step.outputs.GIT_DIGEST }}
+      BRANCH_NAME: ${{ steps.set-vars-step.outputs.BRANCH_NAME }}
+      BUILD_TEXT: ${{ steps.set-vars-step.outputs.BUILD_TEXT }}
+      DEPLOY_ID: ${{ steps.set-vars-step.outputs.DEPLOY_ID }}
+      SXPLR_VERSION: ${{ steps.set-vars-step.outputs.SXPLR_VERSION }}
+    steps:
+    - uses: actions/checkout@v4
+    - id: 'set-vars-step'
+      name: Set variables
+      run: |
+        GIT_DIGEST=${{ github.sha }}
+        echo "Git digest: $GIT_DIGEST"
+        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
+        echo "Using first 6 chars of hash: $GIT_DIGEST"
+        echo "GIT_DIGEST=$GIT_DIGEST" >> $GITHUB_OUTPUT
+        
+        echo "Using github.ref: $GITHUB_REF"
+
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+        echo "Branch is $BRANCH_NAME ."
+
+        if [[ "$BRANCH_NAME" == 'master' ]]
+        then
+          echo "BUILD_TEXT=" >> $GITHUB_OUTPUT
+        else
+          echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        fi
+
+        # DEPLOY_ID == remove _ / and lowercase everything from branch
+        DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
+        echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
+
+        SXPLR_VERSION=$(jq -r '.version' package.json)
+        echo "SXPLR_VERSION=$SXPLR_VERSION"
+        echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
+
   build-docker-img:
     runs-on: ubuntu-latest
+    needs:
+    - set-vars
     env:
       MATOMO_ID_PROD: '12'
       MATOMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
@@ -24,9 +67,6 @@ jobs:
       SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
-
-    outputs:
-      GIT_DIGEST: ${{ steps.build-docker-image.outputs.GIT_DIGEST }}
 
     steps:
     - uses: actions/checkout@v4
@@ -65,13 +105,8 @@ jobs:
     - id: 'build-docker-image'
       name: 'Build docker image'
       run: |
-        GIT_DIGEST=${{ github.sha }}
+        GIT_DIGEST=${{ needs.set-vars.outputs.GIT_DIGEST }}
         echo "Git digest: $GIT_DIGEST"
-
-        # 62 char limit in label
-        GIT_DIGEST=$(echo $GIT_DIGEST | grep -oP '^.{6}')
-        echo "Using first 6 chars of hash: $GIT_DIGEST"
-        echo "GIT_DIGEST=$GIT_DIGEST" >> $GITHUB_OUTPUT
 
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
@@ -106,59 +141,26 @@ jobs:
         docker tag $DOCKER_BUILT_TAG $VERSIONED_DOCKER_BUILT_TAG
         docker push $VERSIONED_DOCKER_BUILT_TAG
 
-  setting-vars:
-    if: success()
-    runs-on: ubuntu-latest
-    outputs:
-      BRANCH_NAME: ${{ steps.set-vars.outputs.BRANCH_NAME }}
-      BUILD_TEXT: ${{ steps.set-vars.outputs.BUILD_TEXT }}
-      DEPLOY_ID: ${{ steps.set-vars.outputs.DEPLOY_ID }}
-      SXPLR_VERSION: ${{ steps.set-vars.outputs.SXPLR_VERSION }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: set-vars
-        name: Set vars
-        run: |
-          echo "Using github.ref: $GITHUB_REF"
-
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
-
-          echo "Branch is $BRANCH_NAME ."
-
-          if [[ "$BRANCH_NAME" == 'master' ]]
-          then
-            echo "BUILD_TEXT=" >> $GITHUB_OUTPUT
-          else
-            echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          fi
-
-          # DEPLOY_ID == remove _ / and lowercase everything from branch
-          DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
-
-          SXPLR_VERSION=$(jq -r '.version' package.json)
-          echo "SXPLR_VERSION=$SXPLR_VERSION"
-          echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
-
-
   trigger-deploy-rc-rancher:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
       - build-docker-img
-      - setting-vars
+      - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: rc
       IMAGE_TAG: staging
-      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
-  cypress-staging:
+  cypress-staging-viewer:
+    
     needs:
     - trigger-deploy-rc-rancher
-    runs-on: ${{ matrix.os }}
+    - set-vars
     strategy:
       fail-fast: false
       matrix:
@@ -174,78 +176,70 @@ jobs:
         - webkit
         include:
         - viewer: ng
-          url: https://atlases.ebrains.eu/viewer-staging/go/human
+          saneurl: human
         - viewer: fsa
-          url: https://atlases.ebrains.eu/viewer-staging/go/fsaverage
+          saneurl: fsaverage
         exclude:
         - os: ubuntu-latest
           browser: webkit
         # - os: windows-latest
         #   browser: webkit
+    uses: ./.github/workflows/_screenshot.yml
+    with:
+      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/viewer-preview/${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
+    secrets:
+      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-    - name: Set variables
-      run: |
-        GIT_DIGEST=${{ github.sha }}
-        GIT_DIGEST=$(echo $GIT_DIGEST | head -c 6)
-
-        SCREENSHOT_URL=${{ matrix.url }}
-        SCREENSHOT_PATH=screenshot_"$GIT_DIGEST"_${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
-
-        echo "SCREENSHOT_URL: $SCREENSHOT_URL"
-        echo "SCREENSHOT_PATH: $SCREENSHOT_PATH"
-
-        echo "SCREENSHOT_URL=$SCREENSHOT_URL" >> $GITHUB_ENV
-        echo "SCREENSHOT_PATH=$SCREENSHOT_PATH" >> $GITHUB_ENV
-
-    - name: Install dependency
-      run: npm install cypress
-
-    - name: Install optional dependency
-      if: ${{ matrix.browser == 'webkit' }}
-      run: |
-        npm install --save-dev playwright-webkit
-        echo "USE_SAFARI=1" >> $GITHUB_ENV
-
-    - name: Run Cypress
-      uses: cypress-io/github-action@v6
-      with:
-        spec: cypress/e2e/screenshot.cy.js
-        browser: ${{ matrix.browser }}
-        
-    - uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.SCREENSHOT_PATH }}
-        path: cypress/screenshots/screenshot.cy.js/*.png
-        retention-days: 5
-
+  cypress-staging-url:
+    needs:
+    - trigger-deploy-rc-rancher
+    - set-vars
+    strategy:
+      fail-fast: false
+      matrix:
+        saneurl:
+        - siibra_paper_2023_2A
+        - siibra_paper_2023_2B
+        - siibra_paper_2023_2C
+        - siibra_paper_2023_2D
+        - siibra_paper_2023_2E
+        - siibra_paper_2023_2F
+    uses: ./.github/workflows/_screenshot.yml
+    with:
+      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
+    secrets:
+      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
   trigger-deploy-expmt-rancher:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
       - build-docker-img
-      - setting-vars
+      - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: expmt
       IMAGE_TAG: staging
-      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
   trigger-deploy-master-rancher:
-    if: ${{ needs.setting-vars.outputs.BRANCH_NAME == 'master' && success() }}
+    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:
       - build-docker-img
-      - setting-vars
+      - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: prod
-      IMAGE_TAG: ${{ needs.setting-vars.outputs.SXPLR_VERSION }}
-      IMAGE_DIGEST: ${{ needs.build-docker-img.outputs.GIT_DIGEST }}
+      IMAGE_TAG: ${{ needs.set-vars.outputs.SXPLR_VERSION }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}

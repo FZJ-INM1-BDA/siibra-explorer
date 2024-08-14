@@ -12,6 +12,9 @@ describe(`Visiting ${SCREENSHOT_URL}`, () => {
 
     cy.visit(SCREENSHOT_URL)
     cy.wait(10000)
+    cy.get('body').type('{esc}')
+    cy.wait(1000)
+    cy.get('body').type('{esc}')
 
     if (!SCREENSHOT_PATH) {
       console.error(`SCREENSHOT_PATH not defined. Exiting`)
