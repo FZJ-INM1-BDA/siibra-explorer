@@ -150,7 +150,9 @@ jobs:
     with:
       DEPLOYMENT_NAME: rc
       IMAGE_TAG: staging
-      IMAGE_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
@@ -219,7 +221,9 @@ jobs:
     with:
       DEPLOYMENT_NAME: expmt
       IMAGE_TAG: staging
-      IMAGE_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
@@ -232,6 +236,8 @@ jobs:
     with:
       DEPLOYMENT_NAME: prod
       IMAGE_TAG: ${{ needs.set-vars.outputs.SXPLR_VERSION }}
-      IMAGE_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
+
+      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
+      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
     secrets:
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
