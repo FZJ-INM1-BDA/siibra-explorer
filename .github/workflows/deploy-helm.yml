@@ -30,7 +30,7 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
@@ -57,7 +57,7 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
@@ -84,7 +84,7 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
