@@ -11,7 +11,7 @@ describe(`Visiting ${SCREENSHOT_URL}`, () => {
     }
 
     cy.visit(SCREENSHOT_URL)
-    cy.wait(5000)
+    cy.wait(10000)
     cy.get('body').type('{esc}')
     cy.wait(1000)
     cy.get('body').type('{esc}')
