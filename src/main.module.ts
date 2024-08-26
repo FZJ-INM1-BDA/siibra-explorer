@@ -40,7 +40,6 @@ import {
   atlasSelection,
   RootStoreModule,
   getStoreEffects,
-  userPreference,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
 import { map } from 'rxjs/operators';
@@ -54,6 +53,7 @@ import { ViewerCommonEffects } from './viewerModule';
 import { environment } from './environments/environment';
 import { SAPI } from './atlasComponents/sapi';
 import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
+import { KCodeModule } from "./experimental/experimental.module"
 
 @NgModule({
   imports: [
@@ -85,6 +85,7 @@ import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
     ]),
     RootStoreModule,
     HttpClientModule,
+    KCodeModule,
   ],
   declarations: [
     AtlasViewer,
@@ -176,17 +177,12 @@ import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService, store: Store) => {
-        window['setExperimentalFlag'] = (flag: boolean) => {
-          store.dispatch(userPreference.actions.setShowExperimental({
-            flag
-          }))
-        }
+      useFactory: (authSvc: AuthService) => {
         authSvc.authReloadState()
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [ AuthService, Store ]
+      deps: [ AuthService ]
     },
     {
       provide: GET_ATTR_TOKEN,

@@ -74,7 +74,7 @@
                 <!-- {{ element | json }} -->
                 <button mat-button (click)="selectRegion(element['region'], $event)"
                     class="ws-no-wrap">
-                    {{ element['region'].name }}
+                    {{ element['region'] }}
                 </button>
             </td>
         </ng-container>
@@ -83,7 +83,7 @@
                 map value
             </th>
             <td mat-cell *matCellDef="let element">
-                {{ element['map value'] | prettyPresent }}
+                {{ element['map_value'] | prettyPresent }}
             </td>
         </ng-container>
         
@@ -108,7 +108,7 @@
                 <td mat-cell *matCellDef="let element">
                     <button mat-button (click)="selectRegion(element['region'], $event)"
                         class="ws-no-wrap">
-                        {{ element['region'].name }}
+                        {{ element['region'] }}
                     </button>
                 </td>
             </ng-container>

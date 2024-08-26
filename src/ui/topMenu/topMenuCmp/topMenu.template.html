@@ -159,7 +159,7 @@
     </div>
   </ng-template>
 
-  <ng-template [ngIf]="showExperimentalToggle">
+  <ng-template [ngIf]="showExptToggle$ | async">
     <ng-template [ngTemplateOutlet]="toggleBtnTmpl"
       [ngTemplateOutletContext]="{$implicit: experimentalFlag$ | async}">
     </ng-template>

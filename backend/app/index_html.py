@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request
 from pathlib import Path
 from fastapi.responses import Response
 from typing import Dict
-from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR, OVERWRITE_EXPERIMENTAL_FLAG_ATTR
-from .config import PATH_TO_PUBLIC, OVERWRITE_API_ENDPOINT, OVERWRITE_SPATIAL_ENDPOINT, EXPERIMENTAL_FLAG
+from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR
+from .config import PATH_TO_PUBLIC, OVERWRITE_API_ENDPOINT, OVERWRITE_SPATIAL_ENDPOINT
 
 path_to_index = Path(PATH_TO_PUBLIC) / "index.html"
 index_html: str = None
@@ -34,9 +34,6 @@ async def get_index_html(request: Request):
     
     if OVERWRITE_SPATIAL_ENDPOINT:
         attributes_to_append[OVERWRITE_SPATIAL_BACKEND_ATTR] = OVERWRITE_SPATIAL_ENDPOINT
-
-    if EXPERIMENTAL_FLAG:
-        attributes_to_append[OVERWRITE_EXPERIMENTAL_FLAG_ATTR] = EXPERIMENTAL_FLAG
 
     attr_string = " ".join([f'{key}="{_monkey_sanitize(value)}"' for key, value in attributes_to_append.items()])
 

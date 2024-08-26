@@ -3,8 +3,8 @@ import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModul
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
-import { SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
-import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
+import { SxplrParcellation, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
+import { translateRegionName } from 'src/atlasComponents/sapi/translateV3';
 import { PathReturn } from 'src/atlasComponents/sapi/typeV3';
 import { TFace, TSandsPoint } from 'src/util/types';
 import { TZipFileConfig } from "src/zipFilesOutput/type"
@@ -56,7 +56,7 @@ export class PointAssignmentComponent implements OnDestroy {
   }
 
   @Output()
-  clickOnRegion = new EventEmitter<{ target: SxplrRegion, event: MouseEvent }>()
+  clickOnRegionName = new EventEmitter<{ target: string, event: MouseEvent }>()
 
   df$: Observable<PathReturn<"/map/assign">> = combineLatest([
     this.point$,
@@ -131,9 +131,8 @@ export class PointAssignmentComponent implements OnDestroy {
   ngOnDestroy(): void {
     while (this.#sub.length > 0) this.#sub.pop().unsubscribe()
   }
-  async selectRegion(region: PathReturn<"/regions/{region_id}">, event: MouseEvent){
-    const sxplrReg = await translateV3Entities.translateRegion(region)
-    this.clickOnRegion.emit({ target: sxplrReg, event })
+  selectRegion(regionName: string, event: MouseEvent){
+    this.clickOnRegionName.emit({ target: translateRegionName(regionName), event })
     if (this.#dialogRef) {
       this.#dialogRef.close()
     }
