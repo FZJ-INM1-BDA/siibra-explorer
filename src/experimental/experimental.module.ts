@@ -2,6 +2,7 @@ import { DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, InjectionToken, NgModule } from "@angular/core";
 import { BehaviorSubject, fromEvent, Observable } from "rxjs";
 import { filter, scan, take } from "rxjs/operators";
+import { MatSnackBar } from "src/sharedModules";
 
 const CODE_DICT = {
   ArrowUp: "ArrowUp",
@@ -41,7 +42,7 @@ const showXmptToggle = new BehaviorSubject<boolean>(false)
   providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: (document: Document) => {
+      useFactory: (document: Document, snackbar: MatSnackBar) => {
         fromEvent(document, "keydown", { capture: true }).pipe(
           scan((acc, curr: KeyboardEvent) => {
             const key = curr.key
@@ -57,11 +58,12 @@ const showXmptToggle = new BehaviorSubject<boolean>(false)
           take(1)
         ).subscribe(() => {
           showXmptToggle.next(true)
+          snackbar.open(`Cheat mode activated`, "Dismiss", { duration: 5000 })
         })
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [DOCUMENT]
+      deps: [DOCUMENT, MatSnackBar]
     },
     {
       provide: SHOW_EXPERIMENTAL_TOKEN,

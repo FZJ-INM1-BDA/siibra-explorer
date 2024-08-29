@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
 import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
-import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
 import { SxplrParcellation, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateRegionName } from 'src/atlasComponents/sapi/translateV3';
@@ -15,6 +15,10 @@ import { atlasSelection } from 'src/state';
 const DOING_PROB_ASGMT = "Performing probabilistic assignment ..."
 const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled assignment ..."
 
+const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is currently experiencing some regression. For more detail, please visit
+
+[https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.10/](https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.10/)`
+
 @Component({
   selector: 'sxplr-point-assignment',
   templateUrl: './point-assignment.component.html',
@@ -24,7 +28,7 @@ export class PointAssignmentComponent implements OnDestroy {
 
   SIMPLE_COLUMNS = [
     "region",
-    "map value",
+    "map_value",
   ]
   
   #busy$ = new BehaviorSubject<string>(null)
@@ -57,6 +61,11 @@ export class PointAssignmentComponent implements OnDestroy {
 
   @Output()
   clickOnRegionName = new EventEmitter<{ target: string, event: MouseEvent }>()
+
+  warningMessage$ = this.busy$.pipe(
+    filter(busyWith => !!busyWith),
+    map(busyWith => busyWith === DOING_LABEL_ASGMT && LABELLED_MAP_ASSIGNMENT_REGRESSION)
+  )
 
   df$: Observable<PathReturn<"/map/assign">> = combineLatest([
     this.point$,
@@ -227,5 +236,5 @@ function generateCsv(df: PathReturn<"/map/assign">) {
   return [
     df.columns.map(escapeDoubleQuotes).map(v => `"${v}"`).join(","),
     ...df.data.map(processRow)
-  ].join("\n")
+  ].join("\r\n")
 }

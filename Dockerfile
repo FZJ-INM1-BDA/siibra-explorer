@@ -59,6 +59,7 @@ WORKDIR /iv-app
 COPY --from=builder /iv/backend .
 RUN pip install -r requirements.txt
 COPY --from=builder /iv/dist/aot /iv/backend/public
+COPY --from=builder /iv/codemeta.json /iv/backend/public/codemeta.json
 
 ENV PATH_TO_PUBLIC=/iv/backend/public
 

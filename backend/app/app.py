@@ -1,4 +1,6 @@
 from pathlib import Path
+import json
+
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -16,6 +18,7 @@ from app.config import HOST_PATHNAME
 from app.logger import logger
 from app.bkwdcompat import BkwdCompatMW
 from app.version_header import VersionHeaderMW
+from app.const import DOCUMENTATION_URL, INPUT_FORMAT, OUTPUT_FORMAT
 
 app = FastAPI()
 
@@ -24,6 +27,39 @@ ready_flag = False
 @app.get("/ready")
 def ready():
     return Response(None, 204 if ready_flag else 500)
+
+
+_cached_code_meta = None
+@app.get("/about")
+def about():
+    global _cached_code_meta
+    if _cached_code_meta is None:
+        try:
+            with open(Path(__file__).parent.parent.parent / "codemeta.json", "r") as fp:
+                _cached_code_meta = json.load(fp=fp)
+        except:
+            ...
+    if _cached_code_meta is None:
+        try:
+            with open(Path(PATH_TO_PUBLIC) / "codemeta.json", "r") as fp:
+                _cached_code_meta = json.load(fp=fp)
+        except:
+            ...
+    if _cached_code_meta is None:
+        raise Exception(f"codemeta.json not found, cannot populate service meta")
+    
+    return {
+        "@context": "https://gitlab.ebrains.eu/lauramble/servicemeta/-/raw/main/data/contexts/servicemeta.jsonld",
+        "type": "WebApplication",
+        "author": _cached_code_meta["author"],
+        "dateModified": _cached_code_meta["dateModified"],
+        "documentation": DOCUMENTATION_URL,
+        "name": _cached_code_meta["name"],
+        "version": _cached_code_meta["version"],
+        "inputFormat": INPUT_FORMAT,
+        "outputFormat": OUTPUT_FORMAT
+    }
+
 
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 app.add_middleware(BkwdCompatMW)
@@ -56,10 +92,13 @@ app.mount("/", StaticFiles(directory=Path(PATH_TO_PUBLIC)), name="static")
 if HOST_PATHNAME:
     assert HOST_PATHNAME[0] == "/", f"HOST_PATHNAME, if defined, must start with /: {HOST_PATHNAME!r}"
     assert HOST_PATHNAME[-1] != "/", f"HOST_PATHNAME, if defined, must not end with /: {HOST_PATHNAME!r}"
-    logger.info(f"listening on path {HOST_PATHNAME}")
+    logger.info(f"listening on path {HOST_PATHNAME}, also falls back to root")
     _app = app
     app = FastAPI()
     app.mount(HOST_PATHNAME, _app)
+
+    # fallback, also listen on root
+    app.mount("", _app)
 
 ready_flag = True
 

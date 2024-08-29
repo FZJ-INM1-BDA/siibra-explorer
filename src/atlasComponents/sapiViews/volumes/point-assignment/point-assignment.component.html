@@ -41,6 +41,9 @@
     </ng-template>
 </mat-action-list>
 
+<div class="sxplr-m-2" *ngIf="warningMessage$ | async; let warningMessage">
+    <markdown-dom [markdown]="warningMessage"></markdown-dom>
+</div>
 
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
@@ -62,7 +65,7 @@
         matSort
         class="sxplr-w-100"
         #simpleTblSort="matSort"
-        matSortActive="map value"
+        matSortActive="map_value"
         matSortDirection="desc">
         <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -78,7 +81,7 @@
                 </button>
             </td>
         </ng-container>
-        <ng-container matColumnDef="map value">
+        <ng-container matColumnDef="map_value">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 map value
             </th>
@@ -98,7 +101,7 @@
         <table mat-table [dataSource]="df$ | async | dfToDs : comphTableSort"
             matSort
             #comphTableSort="matSort"
-            matSortActive="map value"
+            matSortActive="map_value"
             matSortDirection="desc">
             
             <ng-container matColumnDef="region">
