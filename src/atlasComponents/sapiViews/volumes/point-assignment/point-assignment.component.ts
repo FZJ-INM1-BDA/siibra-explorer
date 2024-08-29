@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, Output, TemplateRef, EventEmitter } from '@angular/core';
 import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { BehaviorSubject, EMPTY, Observable, Subscription, combineLatest, concat, of } from 'rxjs';
-import { catchError, filter, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, filter, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { SAPI, EXPECTED_SIIBRA_API_VERSION } from 'src/atlasComponents/sapi/sapi.service';
 import { SxplrParcellation, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes';
 import { translateRegionName } from 'src/atlasComponents/sapi/translateV3';

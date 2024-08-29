@@ -10,10 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: staging
+        sparse-checkout: |
+          package.json
+    - uses: actions/checkout@v4
+      with:
+        path: master
+        sparse-checkout: |
+          package.json
     - run: |
-        MASTER_VERSION=$(git show origin/master:package.json | jq -r '.version')
-        THIS_VERSION=$(jq -r '.version' < package.json)
-        test "$MASTER_VERSION" == "$THIS_VERSION" && exit 1
+        MASTER_VERSION=$(jq -r '.version' master/package.json)
+        THIS_VERSION=$(jq -r '.version' staging/package.json)
+        if [[ "$MASTER_VERSION" == "$THIS_VERSION" ]]
+        then
+          exit 1
+        fi
 
   check_release:
     if: always()
@@ -22,7 +34,10 @@ jobs:
     - uses: actions/checkout@v4
     - run: |
         VERSION_NUM=$(jq -r '.version' < package.json)
-        test -f docs/releases/v$VERSION_NUM.md || exit 1
+        if [[ ! -f docs/releases/v$VERSION_NUM.md ]]
+        then
+          exit 1
+        fi
   
   release_linked_mkdocs:
     if: always()
@@ -35,7 +50,11 @@ jobs:
         cat mkdocs.yml
         GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
         echo GREP_VERSION_NUM: $GREP_VERSION_NUM
-        test -z "$GREP_VERSION_NUM" && exit 1
+        if [[ -z "$GREP_VERSION_NUM" ]]
+        then
+          exit 1
+        fi
+        
   
   check_code_meta:
     if: always()
@@ -50,4 +69,4 @@ jobs:
         RELEASE_NOTES=$(< docs/releases/v${VERSION_NUM}.md)
         CODEMETA_RELEASE_NOTES=$(jq -r '.["schema:releaseNotes"]' codemeta.json)
 
-        test "$RELEASE_NOTES" == "$CODEMETA_RELEASE_NOTES" || exit 1
+        test "$RELEASE_NOTES" == "$CODEMETA_RELEASE_NOTES" && echo "Release notes matches" || exit 1
