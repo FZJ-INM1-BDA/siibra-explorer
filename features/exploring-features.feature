@@ -41,4 +41,4 @@ Feature: Exploring features
     Scenario: User quitting checking out connectivity strength
         Given User checked out connectivity strength
         When User unselects the feature
-        Then The connection strength color mapped atlas disapepars, whilst the probabilistic map reappears.
+        Then The connection strength color mapped atlas disappears, whilst the probabilistic map reappears.

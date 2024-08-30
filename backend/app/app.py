@@ -95,6 +95,13 @@ if HOST_PATHNAME:
     logger.info(f"listening on path {HOST_PATHNAME}, also falls back to root")
     _app = app
     app = FastAPI()
+
+
+    # necessary as /${HOST_PATHNAME} would result in 404
+    @app.get(HOST_PATHNAME)
+    def redirect():
+        return RedirectResponse(f"{HOST_PATHNAME}/")
+
     app.mount(HOST_PATHNAME, _app)
 
     # fallback, also listen on root
