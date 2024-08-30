@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
@@ -16,6 +16,7 @@ import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { generalActionError } from "src/state/actions";
 
 interface HasName {
   name: string
@@ -540,6 +541,28 @@ export class ViewerCmp {
     this.#fullyRestoreToken = true
     this.controlFullNav(false)
     this.controlHalfNav(false)
+  }
+
+  async handleClickOnRegionName(regionName: string, event: MouseEvent){
+    const regions = await this.store$.pipe(
+      select(atlasSelection.selectors.selectedParcAllRegions),
+      take(1)
+    ).toPromise()
+
+    const foundRegion = regions.find(r => r.name === regionName)
+    if (!foundRegion) {
+      this.store$.dispatch(
+        generalActionError({
+          message: `Region with name ${regionName} not found.`
+        })
+      )
+      return
+    }
+    if (event.ctrlKey) {
+      this.toggleRoi(foundRegion)
+    } else {
+      this.selectRoi(foundRegion)
+    }
   }
 
   nameEql(a: HasName, b: HasName){

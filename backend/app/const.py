@@ -22,4 +22,8 @@ OVERWRITE_SAPI_ENDPOINT_ATTR = "x-sapi-base-url"
 
 OVERWRITE_SPATIAL_BACKEND_ATTR = "x-spatial-backend-url"
 
-OVERWRITE_EXPERIMENTAL_FLAG_ATTR = "x-experimental-flag"
+DOCUMENTATION_URL = "https://siibra-explorer.readthedocs.io/en/stable/"
+
+INPUT_FORMAT = ["nifti", "json", "swc"]
+
+OUTPUT_FORMAT = ["json"]

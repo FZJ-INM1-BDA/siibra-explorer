@@ -30,12 +30,19 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm --kubeconfig=$kubecfg_path \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
+        || helm --kubeconfig=$kubecfg_path \
+          install\
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
 
         rm $kubecfg_path
@@ -50,14 +57,22 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm --kubeconfig=$kubecfg_path \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
+        || helm --kubeconfig=$kubecfg_path \
+          install\
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer-staging \
+          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0" \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
-          
+
         rm $kubecfg_path
 
   trigger-deploy-expmt:
@@ -70,12 +85,20 @@ jobs:
         kubecfg_path=${{ runner.temp }}/.kube_config
         echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
 
-        helm --kubeconfig=$kubecfg_path \
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0" \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
+        || helm --kubeconfig=$kubecfg_path \
+          install\
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer-expmt \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
           
         rm $kubecfg_path

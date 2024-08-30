@@ -12,5 +12,8 @@ class VersionHeaderMW(BaseHTTPMiddleware):
             or (300 <= resp.status_code < 400) # if the request is redirect, do not interfere
         ):
             return resp
+        
+        # allow for debugging, cache should be busted every 10 min
         resp.headers["ETag"] = BUILD_HASH
+        resp.headers["Cache-Control"] = "max-age=600"
         return resp

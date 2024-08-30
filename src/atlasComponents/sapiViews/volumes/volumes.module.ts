@@ -7,6 +7,7 @@ import { ZipFilesOutputModule } from 'src/zipFilesOutput/module';
 import { SandsToNumPipe } from "./sandsToNum.pipe"
 import { SapiViewsUtilModule } from '../util';
 import { AngularMaterialModule } from 'src/sharedModules';
+import { MarkdownModule } from 'src/components/markdown';
 
 
 
@@ -22,6 +23,7 @@ import { AngularMaterialModule } from 'src/sharedModules';
     ZipFilesOutputModule,
     SapiViewsUtilModule,
     AngularMaterialModule,
+    MarkdownModule,
   ],
   exports: [
     PointAssignmentComponent

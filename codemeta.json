@@ -1,0 +1,57 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "type": "SoftwareSourceCode",
+    "author": [
+        {
+            "id": "_:author_1",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forschungszentrum Juelich"
+            },
+            "email": "x.gui@fz-juelich.de",
+            "familyName": "Gui",
+            "givenName": "Xiaoyun"
+        },
+        {
+            "id": "_:author_2",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forshungszentrum Juelich"
+            },
+            "familyName": "Gogshelidze",
+            "givenName": "Daviti"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-9051-3701",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forschungszentrum Juelich"
+            },
+            "email": "t.dickscheid@fz-juelich.de",
+            "familyName": "Dickscheid",
+            "givenName": "Timo"
+        }
+    ],
+    "codeRepository": "git+https://github.com/fzj-inm1-bda/siibra-explorer.git",
+    "dateCreated": "2024-08-28",
+    "dateModified": "2024-08-28",
+    "datePublished": "2019-04-26",
+    "description": "`siibra-explorer` is a browser based 3D viewer for exploring brain atlases that cover different spatial resolutions and modalities. It is built around an interactive 3D view of the brain displaying a unique selection of detailed templates and parcellation maps for the human, macaque, rat or mouse brain, including BigBrain as a microscopic resolution human brain model at its full resolution of 20 micrometers. ",
+    "license": "https://spdx.org/licenses/Apache-2.0",
+    "name": "siibra-explorer",
+    "programmingLanguage": [
+        "python 3",
+        "typescript"
+    ],
+    "schema:releaseNotes": "# v2.14.10\n\n## Bugfix\n\n- Fix deployment scripts\n- Fix region update to updated siibra-api endpoint\n\n## Behind the scenes\n\n- Re-enable siibra-api warning mismatch warning\n- Adapt to siibra-api v0.3.18 point assignment rhetoric\n- Enable cheat code, removing obsolete experimental flags\n- If `HOST_PATHNAME` env is provided, also listens on root path\n- Added servicemeta endpoint\n\n## Known regressions\n\n- Labelled assignment now takes a little longer. Additionally, the assigned value does not match that of the index label. This will be addressed in a future update. (The temporary regression allows for significant performant statistical assignment, as well more accurate label assignment.)\n",
+    "runtimePlatform": "docker",
+    "version": "2.14.10",
+    "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
+    "codemeta:continuousIntegration": {
+        "id": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions"
+    },
+    "issueTracker": "https://github.com/fzj-inm1-bda/siibra-explorer/issues"
+}

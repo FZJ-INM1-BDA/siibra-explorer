@@ -151,7 +151,6 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
 
     OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
     OVERWRITE_SPATIAL_BACKEND_ATTR: `x-spatial-backend-url`,
-    OVERWRITE_EXPERIMENTAL_FLAG_ATTR: `x-experimental-flag`,
     DATA_ERROR_ATTR: `data-error`,
   }
 

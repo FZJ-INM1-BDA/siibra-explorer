@@ -861,7 +861,7 @@
     [point]="view.selectedPoint"
     [template]="view.selectedTemplate"
     [parcellation]="view.selectedParcellation"
-    (clickOnRegion)="$event.event.ctrlKey ? toggleRoi($event.target) : selectRoi($event.target)">
+    (clickOnRegionName)="handleClickOnRegionName($event.target, $event.event)">
   </sxplr-point-assignment>
 </ng-template>
 

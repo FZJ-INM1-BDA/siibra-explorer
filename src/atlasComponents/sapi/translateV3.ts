@@ -272,7 +272,7 @@ class TranslateV3 {
       id: region["@id"],
       name: region.name,
       color: hexToRgb(region.hasAnnotation?.displayColor) as [number, number, number],
-      parentIds: region.hasParent.map( v => v["@id"] ),
+      parentIds: (region.hasParent || []).map( v => v["@id"] ),
       type: "SxplrRegion",
       centroid: bestViewPoint
         ? {
@@ -771,3 +771,34 @@ class TranslateV3 {
 }
 
 export const translateV3Entities = new TranslateV3()
+
+
+// TODO 
+// >= 0.3.18 siibra-api /maps endpoint populates *both* full region name as well as short names
+// This is a side effect of mixing both versions of siibra-python.
+// and expected to end at >= 0.4. By then, restore this warning for debugging purposes
+
+const REMOVE_FROM_NAMES = [
+  "hemisphere",
+  " -",
+  "-brain",
+  "both",
+  "Both",
+]
+const REPLACE_IN_NAME = {
+  "ctx-lh-": "left ",
+  "ctx-rh-": "right ",
+}
+
+export function translateRegionName(fullRegionName: string): string {
+  let returnName = fullRegionName
+  for (const rm of REMOVE_FROM_NAMES) {
+    returnName = returnName.replace(rm , "")
+  }
+  for (const key in REPLACE_IN_NAME){
+    returnName = returnName.replace(key, REPLACE_IN_NAME[key])
+  }
+  return returnName.trim()
+}
+
+// end TODO

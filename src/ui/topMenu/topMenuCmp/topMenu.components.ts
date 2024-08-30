@@ -3,9 +3,10 @@ import {
   Component,
   Inject,
   Input,
+  Optional,
   TemplateRef,
 } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { MatBottomSheet, MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
@@ -15,7 +16,7 @@ import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterial
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
 import { environment } from "src/environments/environment"
-import { GET_ATTR_TOKEN, GetAttr } from "src/util/constants";
+import { SHOW_EXPERIMENTAL_TOKEN } from "src/experimental/experimental.module";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -28,7 +29,10 @@ import { GET_ATTR_TOKEN, GetAttr } from "src/util/constants";
 
 export class TopMenuCmp {
 
-  public showExperimentalToggle = environment.EXPERIMENTAL_FEATURE_FLAG
+  public showExptToggle$ = environment.EXPERIMENTAL_FEATURE_FLAG
+  ? of (true)
+  : (this.showXplrToggle$ || of(false))
+  
   setExperimentalFlag(flag: boolean){
     this.store.dispatch(
       userPreference.actions.setShowExperimental({
@@ -86,14 +90,9 @@ export class TopMenuCmp {
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
-    @Inject(GET_ATTR_TOKEN) getAttr: GetAttr
+    @Optional() @Inject(SHOW_EXPERIMENTAL_TOKEN) private showXplrToggle$: Observable<boolean>,
   ) {
     this.user$ = this.authService.user$
-
-    const experimentalFlag = getAttr(CONST.OVERWRITE_EXPERIMENTAL_FLAG_ATTR)
-    if (experimentalFlag) {
-      this.showExperimentalToggle = !!experimentalFlag
-    }
 
     this.userBtnTooltip$ = this.user$.pipe(
       map(user => user

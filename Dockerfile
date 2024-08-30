@@ -1,8 +1,5 @@
 FROM node:16 as builder
 
-ARG BUILD_HASH
-ENV BUILD_HASH=${BUILD_HASH:-devbuild}
-
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
@@ -47,6 +44,9 @@ RUN node third_party/matomo/processMatomo.js
 # prod container
 FROM python:3.10-alpine
 
+ARG BUILD_HASH
+ENV BUILD_HASH=${BUILD_HASH:-devbuild}
+
 RUN adduser --disabled-password nonroot
 
 RUN mkdir /common
@@ -59,6 +59,7 @@ WORKDIR /iv-app
 COPY --from=builder /iv/backend .
 RUN pip install -r requirements.txt
 COPY --from=builder /iv/dist/aot /iv/backend/public
+COPY --from=builder /iv/codemeta.json /iv/backend/public/codemeta.json
 
 ENV PATH_TO_PUBLIC=/iv/backend/public
 
