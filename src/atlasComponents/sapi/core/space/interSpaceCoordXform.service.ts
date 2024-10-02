@@ -7,7 +7,7 @@ import { IDS } from "src/atlasComponents/sapi/constants"
 import { GET_ATTR_TOKEN, GetAttr } from "src/util/constants";
 import { CONST } from "common/constants"
 
-type ITemplateCoordXformResp = {
+export type ITemplateCoordXformResp = {
   status: 'pending' | 'error' | 'completed' | 'cached'
   statusText?: string
   result? : [number, number, number]
@@ -17,7 +17,7 @@ export const VALID_TEMPLATE_SPACE_NAMES = {
   MNI152: 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
   COLIN27: 'MNI Colin 27',
   BIG_BRAIN: 'Big Brain (Histology)',
-  INFANT: 'Infant Atlas',
+  // INFANT: 'Infant Atlas',
 } as const
 
 export type ValidTemplateSpaceName = typeof VALID_TEMPLATE_SPACE_NAMES[keyof typeof VALID_TEMPLATE_SPACE_NAMES]

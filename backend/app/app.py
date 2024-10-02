@@ -8,6 +8,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.quickstart import router as quickstart_router
 from app.sane_url import router as saneurl_router, vip_routes
+from app.peek import router as peek_router
 from app.config import HOST_PATHNAME, SESSION_SECRET, PATH_TO_PUBLIC
 from app.dev_banner import router as devbanner_router
 from app.index_html import router as index_router
@@ -75,6 +76,7 @@ app.include_router(quickstart_router, prefix="/quickstart")
 app.include_router(saneurl_router, prefix="/saneUrl")
 app.include_router(saneurl_router, prefix="/saneurl")
 app.include_router(saneurl_router, prefix="/go")
+app.include_router(peek_router, prefix="/peek")
 app.include_router(plugin_router, prefix="/plugins")
 app.include_router(user_router, prefix="/user")
 

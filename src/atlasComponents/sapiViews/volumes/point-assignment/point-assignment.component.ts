@@ -27,7 +27,7 @@ const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is current
 export class PointAssignmentComponent implements OnDestroy {
 
   SIMPLE_COLUMNS = [
-    "region",
+    "regionname",
     "map_value",
   ]
   
