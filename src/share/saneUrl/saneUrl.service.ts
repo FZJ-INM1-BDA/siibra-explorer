@@ -1,9 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { throwError } from "rxjs";
-import { catchError, mapTo } from "rxjs/operators";
+import { catchError, mapTo, switchMap, take } from "rxjs/operators";
 import { IKeyValStore, NotFoundError } from '../type'
 import { environment } from "src/environments/environment";
+import { AuthService } from "src/auth";
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class SaneUrlSvc implements IKeyValStore {
   public saneUrlRoot = `${this.#backendUrl}/go/`
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private auth: AuthService,
   ){
   }
 
@@ -43,11 +45,19 @@ export class SaneUrlSvc implements IKeyValStore {
   }
 
   setKeyVal(key: string, value: any) {
-    return this.http.post(
-      `${this.saneUrlRoot}${key}`,
-      value,
-    ).pipe(
-      mapTo(`${this.saneUrlRoot}${key}`)
+    return this.auth.user$.pipe(
+      take(1),
+      switchMap(user => this.http.post(
+        `${this.saneUrlRoot}${key}`,
+        value,
+        {
+          headers: {
+            "x-sxplr-auth-state": user ? 'true': 'false'
+          }
+        }
+      ).pipe(
+        mapTo(`${this.saneUrlRoot}${key}`)
+      ))
     )
   }
 }

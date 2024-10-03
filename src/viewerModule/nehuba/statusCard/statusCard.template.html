@@ -72,6 +72,43 @@
         </coordinate-text-input>
       </div>
 
+      <!-- coord in other spaces -->
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+      <ng-template [ngIf]="hasPosInOtherSpaces$ | async">
+        <ng-template ngFor [ngForOf]="posInOtherSpaces$ | async | keyvalue" let-keyval>
+          <ng-template [ngIf]="keyval.value.status === 'error'">
+            <mat-form-field>
+              <mat-label>
+                {{ keyval.key }}
+              </mat-label>
+              <input matInput disabled [value]="keyval.value.statusText">
+            </mat-form-field>
+          </ng-template>
+          <ng-template [ngIf]="keyval.value.status === 'pending'">
+            <spinner-cmp></spinner-cmp>
+          </ng-template>
+          
+          <ng-template [ngIf]="keyval.value.status === 'completed' || keyval.value.status === 'cached' ">
+            <coordinate-text-input
+              [label]="keyval.key"
+              [coordinates]="keyval.value.result"
+              [render]="saneRenderNmInMm"
+              #customInput>
+              <ng-container ngProjectAs="[suffix]">
+                <button mat-icon-button
+                  iav-stop="click"
+                  [attr.aria-label]="COPY_NAVIGATION_STRING"
+                  (click)="copyString(customInput.inputValue)">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </ng-container>
+            </coordinate-text-input>
+
+          </ng-template>
+        </ng-template>
+      </ng-template>
+      </ng-template>
+
       <ng-template sxplrExperimentalFlag [experimental]="true">
       <!-- custom coord -->
       <div class="d-flex" *ngFor="let f of additionalSpace$ | async">

@@ -70,4 +70,5 @@ jobs:
         RELEASE_NOTES=$(< docs/releases/v${VERSION_NUM}.md)
         CODEMETA_RELEASE_NOTES=$(jq -r '.["schema:releaseNotes"]' codemeta.json)
 
+        # use awk '{printf "%s\\n", $0}' docs/releases/v{VERSION}.md to fix 
         test "$RELEASE_NOTES" == "$CODEMETA_RELEASE_NOTES" && echo "Release notes matches" || exit 1

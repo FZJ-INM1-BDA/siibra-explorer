@@ -78,10 +78,18 @@ class SaneUrlDPStore(DataproxyStore):
     
     def _prepare_aux(self, request: Optional[Request]=None):
         user = get_user_from_request(request) if request else None
+        expected_auth_state = request.headers["x-sxplr-auth-state"] == "true"
+        actual_auth_state = user is not None
+        assert expected_auth_state == actual_auth_state, f"User login state cannot be determined. Frontend expected {expected_auth_state}, server expected {actual_auth_state}"
         return {
             "userId": user.get("id") if user else None,
             "expiry": None if user else SaneUrlDPStore.GetTimeMs() + (self.expiry_s * 1e3)
         }
+    
+    def get_wrapped(self, key: str):
+        object_name = SaneUrlDPStore.TransformKeyToObjName(key)
+        resp = super().get(object_name)
+        return json.loads(resp)
 
     def get(self, key: str):
         try:

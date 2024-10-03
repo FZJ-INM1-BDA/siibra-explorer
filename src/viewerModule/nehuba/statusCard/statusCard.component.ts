@@ -8,7 +8,7 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subject, combineLatest, concat, of } from "rxjs";
+import { Observable, Subject, combineLatest, concat, merge, of } from "rxjs";
 import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -24,6 +24,7 @@ import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getUuid } from "src/util/fn";
 import { Render, TAffine, isAffine, ID_AFFINE } from "src/components/coordTextBox"
 import { IDS } from "src/atlasComponents/sapi";
+import { InterSpaceCoordXformSvc, ITemplateCoordXformResp } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 
 type TSpace = {
   label: string
@@ -94,6 +95,7 @@ export class StatusCardComponent {
     
   }
 
+  readonly saneRenderNmInMm: Render = v => v.map(v => `${(v * 1e-6).toFixed(2)}mm`).join(", ")
   readonly renderMm: Render = v => v.map(i => `${i}mm`).join(", ")
   readonly renderDefault: Render = v => v.map(i => i.toFixed(3)).join(", ")
 
@@ -144,6 +146,56 @@ export class StatusCardComponent {
     )
   )
 
+  readonly posInOtherSpaces$ = this.store$.pipe(
+    select(atlasSelection.selectors.selectedTemplate),
+    switchMap(tmpl => {
+      const warpableIds = [IDS.TEMPLATES.BIG_BRAIN, IDS.TEMPLATES.COLIN27, IDS.TEMPLATES.MNI152]
+      const defaultVal = {} as Record<string, null>
+      if (!warpableIds.includes(tmpl.id)) {
+        return of(defaultVal)
+      }
+      const wrapTmplIds = warpableIds.filter(id => id !== tmpl.id)
+      const wrapTmplNames = wrapTmplIds
+      .map(targetId => ({
+        srcTmplName: InterSpaceCoordXformSvc.TmplIdToValidSpaceName(tmpl.id),
+        targetTmplName: InterSpaceCoordXformSvc.TmplIdToValidSpaceName(targetId),
+        targetTmplId: targetId,
+      }))
+      const startingValues: Record<string, ITemplateCoordXformResp> = {}
+      for (const {targetTmplName} of wrapTmplNames){
+        startingValues[targetTmplName] = {status: "pending"}
+      }
+      return concat(
+        of(startingValues),
+        this.navigation$.pipe(
+          debounceTime(500),
+          switchMap(position => {
+            return concat(
+              of(startingValues),
+              merge(
+                ...wrapTmplNames.map(
+                  ({ srcTmplName, targetTmplName }) => this.xformSvc.transform(srcTmplName, targetTmplName, position.map(v => v * 1e6) as [number, number, number]).pipe(
+                    map(result => {
+                      return {
+                        [targetTmplName]: result
+                      }
+                    })
+                  )
+                )
+              )
+            )
+          }),
+          scan((acc, curr) => ({ ...acc, ...curr })),
+        )
+      )
+    }),
+  )
+  
+  readonly hasPosInOtherSpaces$ = this.store$.pipe(
+    select(atlasSelection.selectors.selectedTemplate),
+    map(tmpl => [IDS.TEMPLATES.BIG_BRAIN, IDS.TEMPLATES.COLIN27, IDS.TEMPLATES.MNI152].includes(tmpl.id))
+  )
+
   public readonly dialogInputState$ = this.dialogForm.valueChanges.pipe(
     map(({ x, y, z }) => {
       const allEntries = [x, y, z].map(v => this.#parseString(v))
@@ -177,6 +229,7 @@ export class StatusCardComponent {
     private bottomSheet: MatBottomSheet,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
+    private xformSvc: InterSpaceCoordXformSvc,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
     @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Observable<NehubaViewerUnit>,
   ) {
