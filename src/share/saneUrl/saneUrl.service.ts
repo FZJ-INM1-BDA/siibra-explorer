@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { combineLatest, throwError } from "rxjs";
+import { throwError } from "rxjs";
 import { catchError, mapTo, switchMap, take } from "rxjs/operators";
 import { IKeyValStore, NotFoundError } from '../type'
 import { environment } from "src/environments/environment";

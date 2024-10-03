@@ -16,6 +16,7 @@ import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { NEHUBA_INSTANCE_INJTKN } from "../util"
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive"
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 
 const mockNehubaConfig = {
   dataset: {
@@ -86,6 +87,13 @@ describe('> statusCard.component.ts', () => {
           {
             provide: NEHUBA_INSTANCE_INJTKN,
             useValue: NEVER
+          },
+          {
+            provide: InterSpaceCoordXformSvc,
+            useValue: {
+              TmplIdToValidSpaceName() {throw new Error()},
+              transform(){ throw new Error() }
+            }
           }
         ]
       }).compileComponents()

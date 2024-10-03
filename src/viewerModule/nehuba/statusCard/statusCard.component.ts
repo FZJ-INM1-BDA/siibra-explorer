@@ -8,7 +8,7 @@ import {
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subject, combineLatest, concat, forkJoin, merge, of } from "rxjs";
+import { Observable, Subject, combineLatest, concat, merge, of } from "rxjs";
 import { map, filter, takeUntil, switchMap, shareReplay, debounceTime, scan } from "rxjs/operators";
 import { Clipboard, MatBottomSheet, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
@@ -174,7 +174,7 @@ export class StatusCardComponent {
               of(startingValues),
               merge(
                 ...wrapTmplNames.map(
-                  ({ srcTmplName, targetTmplName, targetTmplId }) => this.xformSvc.transform(srcTmplName, targetTmplName, position.map(v => v * 1e6) as [number, number, number]).pipe(
+                  ({ srcTmplName, targetTmplName }) => this.xformSvc.transform(srcTmplName, targetTmplName, position.map(v => v * 1e6) as [number, number, number]).pipe(
                     map(result => {
                       return {
                         [targetTmplName]: result

@@ -46,7 +46,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.10\n\n## Bugfix\n\n- Fix deployment scripts\n- Fix region update to updated siibra-api endpoint\n\n## Behind the scenes\n\n- Re-enable siibra-api warning mismatch warning\n- Adapt to siibra-api v0.3.18 point assignment rhetoric\n- Enable cheat code, removing obsolete experimental flags\n- If `HOST_PATHNAME` env is provided, also listens on root path\n- Added servicemeta endpoint\n\n## Known regressions\n\n- Labelled assignment now takes a little longer. Additionally, the assigned value does not match that of the index label. This will be addressed in a future update. (The temporary regression allows for significant performant statistical assignment, as well more accurate label assignment.)\n",
+    "schema:releaseNotes": "# v2.14.11\n\n## Feature\n\n- (experimental) showing coordinates of all warped spaces\n\n## Bugfix\n\n- Fixed inconsistent saneurl creation (Thanks to Sebastian Bludau for reporting this)\n",
     "runtimePlatform": "docker",
     "version": "2.14.11",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
