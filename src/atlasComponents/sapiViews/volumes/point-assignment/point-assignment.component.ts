@@ -17,7 +17,7 @@ const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled 
 
 const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is currently experiencing some regression. For more detail, please visit
 
-[https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.10/](https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.10/)`
+[https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.11/](https://siibra-explorer.readthedocs.io/en/stable/releases/v2.14.11/)`
 
 @Component({
   selector: 'sxplr-point-assignment',
