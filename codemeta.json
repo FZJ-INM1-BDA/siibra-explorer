@@ -46,7 +46,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.11\n\n## Feature\n\n- (experimental) showing coordinates of all warped spaces\n\n## Bugfix\n\n- Fixed inconsistent saneurl creation (Thanks to Sebastian Bludau for reporting this)\n\n\n## Known regressions\n\n- Labelled assignment now does not work. This will be addressed in a future update. (The temporary regression allows for significant performant statistical assignment, as well more accurate label assignment.)\n",
+    "schema:releaseNotes": "# v2.14.12\n\n## Behind the scenes\n\n- Reverting point assignment panel behaviors\n\n## Known regressions\n\n- Labelled assignment now does not work. This will be addressed in a future update. (The temporary regression allows for significant performant statistical assignment, as well more accurate label assignment.)\n",
     "runtimePlatform": "docker",
     "version": "2.14.11",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
