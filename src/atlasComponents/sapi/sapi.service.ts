@@ -20,7 +20,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.19'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.20'
 
 type PaginatedResponse<T> = {
   items: T[]
