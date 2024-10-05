@@ -15,5 +15,6 @@ class VersionHeaderMW(BaseHTTPMiddleware):
         
         # allow for debugging, cache should be busted every 10 min
         resp.headers["ETag"] = BUILD_HASH
-        resp.headers["Cache-Control"] = "max-age=600"
+        if resp.headers.get("cache-control") is None:
+            resp.headers["cache-control"] = "max-age=600"
         return resp

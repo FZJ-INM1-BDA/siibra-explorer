@@ -67,17 +67,17 @@
         #simpleTblSort="matSort"
         matSortActive="map_value"
         matSortDirection="desc">
-        <ng-container matColumnDef="regionname">
+        <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 <span class="sxplr-m-1">
                     region
                 </span>
             </th>
-            <td mat-cell *matCellDef="let element" class="regionname">
+            <td mat-cell *matCellDef="let element">
                 <!-- {{ element | json }} -->
-                <button mat-button (click)="selectRegion(element['regionname'], $event)"
+                <button mat-button (click)="selectRegion(element['region'], $event)"
                     class="ws-no-wrap">
-                    {{ element['regionname'] }}
+                    {{ element['region'] }}
                 </button>
             </td>
         </ng-container>
@@ -104,20 +104,20 @@
             matSortActive="map_value"
             matSortDirection="desc">
             
-            <ng-container matColumnDef="regionname">
+            <ng-container matColumnDef="region">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     region
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    <button mat-button (click)="selectRegion(element['regionname'], $event)"
+                    <button mat-button (click)="selectRegion(element['region'], $event)"
                         class="ws-no-wrap">
-                        {{ element['regionname'] }}
+                        {{ element['region'] }}
                     </button>
                 </td>
             </ng-container>
 
             <ng-template ngFor [ngForOf]="columns$ | async" let-column>
-                <ng-template [ngIf]="column !== 'regionname'">
+                <ng-template [ngIf]="column !== 'region'">
                     <ng-container [matColumnDef]="column">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                             {{ column }}
