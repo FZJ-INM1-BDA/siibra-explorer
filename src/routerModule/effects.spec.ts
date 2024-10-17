@@ -10,6 +10,7 @@ import { RouterEffects } from "./effects"
 import { STATE_DEBOUNCE_MS } from "./const"
 import { NgZone } from "@angular/core"
 import { take } from "rxjs/operators"
+import { GET_ATTR_TOKEN } from "src/util/constants"
 
 let mockRouter: any 
 
@@ -67,6 +68,10 @@ describe("> effects.ts", () => {
           {
             provide: APP_BASE_HREF,
             useValue: '/'
+          },
+          {
+            provide: GET_ATTR_TOKEN,
+            useValue: (arg: string) => null
           }
         ]
       })

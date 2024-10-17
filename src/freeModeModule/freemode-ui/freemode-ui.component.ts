@@ -1,4 +1,4 @@
-import { Component, PACKAGE_ROOT_URL } from "@angular/core";
+import { Component } from "@angular/core";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { MatSnackBar } from "src/sharedModules";
 
@@ -30,7 +30,7 @@ export class FreeModeUIComponent {
        * The emitted value does not affect the region selection
        * the region selection is taken care of in nehubaContainer
        */
-      
+      /* eslint-disable-next-line no-empty */
       if (arg === 'select') {
       }
     }
@@ -117,7 +117,7 @@ export class FreeModeUIComponent {
       },
       transfers: [buf],
     })
-    const { buffer, meta } = result
+    const { buffer } = result
     const url = URL.createObjectURL(new Blob([buffer]))
     const config = this.#getCfg(`nifti://${url}`)
     createNehubaViewer(config)

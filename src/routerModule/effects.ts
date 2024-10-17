@@ -180,7 +180,7 @@ export class RouterEffects {
     private store: Store<MainState>,
     private zone: NgZone,
     @Inject(APP_BASE_HREF) private baseHref: string,
-    @Inject(GET_ATTR_TOKEN) private getattr: (attrName: string) => string
+    @Inject(GET_ATTR_TOKEN) private getattr: (attrName: string) => undefined|null|string
   ){
     
   }
