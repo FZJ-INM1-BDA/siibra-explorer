@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from pathlib import Path
 from fastapi.responses import Response
 from typing import Dict
-from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR
+from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR, FREE_MODE
 from .config import PATH_TO_PUBLIC, OVERWRITE_API_ENDPOINT, OVERWRITE_SPATIAL_ENDPOINT
 
 path_to_index = Path(PATH_TO_PUBLIC) / "index.html"
@@ -16,6 +16,8 @@ def _monkey_sanitize(value: str):
 @router.get("/")
 @router.get("/index.html")
 async def get_index_html(request: Request):
+
+    enable_free_mode = request.query_params.get("free") or request.query_params.get(FREE_MODE)
 
     global index_html
     if index_html is None:
@@ -34,6 +36,9 @@ async def get_index_html(request: Request):
     
     if OVERWRITE_SPATIAL_ENDPOINT:
         attributes_to_append[OVERWRITE_SPATIAL_BACKEND_ATTR] = OVERWRITE_SPATIAL_ENDPOINT
+    
+    if enable_free_mode:
+        attributes_to_append[FREE_MODE] = "true"
 
     attr_string = " ".join([f'{key}="{_monkey_sanitize(value)}"' for key, value in attributes_to_append.items()])
 

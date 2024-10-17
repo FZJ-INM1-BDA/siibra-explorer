@@ -62,6 +62,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private cookieDialogRef: MatDialogRef<any>
 
+  public freemode = !!this.el.nativeElement.getAttribute(CONST.FREE_MODE)
+
   constructor(
     private store: Store<any>,
     private matDialog: MatDialog,

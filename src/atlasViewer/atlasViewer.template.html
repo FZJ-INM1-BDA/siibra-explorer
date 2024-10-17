@@ -26,7 +26,11 @@
 
 <!-- atlas template -->
 <ng-template #viewerBody>
+  <div class="w-100 h-100" *ngIf="freemode">
+    <freemode-ui></freemode-ui>
+  </div>
   <div class="w-100 h-100"
+    *ngIf="!freemode"
     quick-tour
     [quick-tour-position]="quickTourFinale.position"
     [quick-tour-description]="quickTourFinale.description"

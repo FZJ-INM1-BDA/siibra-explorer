@@ -44,6 +44,7 @@ import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
 import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
+import { AtlasViewerRouterModule } from "src/routerModule";
 
 @NgModule({
   imports: [
@@ -71,6 +72,7 @@ import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
     ReactiveFormsModule,
     BottomMenuModule,
     TabComponent,
+    AtlasViewerRouterModule,
     
     MouseOver,
     MediaQueryDirective,

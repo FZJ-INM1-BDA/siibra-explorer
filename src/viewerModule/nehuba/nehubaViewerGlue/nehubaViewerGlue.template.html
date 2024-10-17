@@ -1,7 +1,13 @@
 <div class="nehuba-viewer-container-parent"
   iav-viewer-touch-interface
   (touchmove)="$event.preventDefault()"
-  sxplr-nehuba-drag-drop>
+  sxplr-nehuba-drag-drop
+  quick-tour
+  [quick-tour-description-md]="QUICKTOUR_DND_MD"
+  [quick-tour-overwrite-arrow]="singleArrow"
+  [quick-tour-overwrite-position]="quickTourOverwritingPos"
+  iav-window-resize
+  (iav-window-resize-event)="onResize()">
 
   <sxplr-nehuba-viewer-container
     class="sxplr-w-100 sxplr-h-100 sxplr-d-block"
@@ -12,3 +18,8 @@
 
 <nehuba-layout-overlay></nehuba-layout-overlay>
 
+<!-- just hiding the arrow -->
+<ng-template #singleArrow>
+  <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  </svg>
+</ng-template>
