@@ -2,7 +2,7 @@ import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject, HostList
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, concat, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
+import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil, tap } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
@@ -26,10 +26,10 @@ const anatOriToIdx: Record<AnatomicalOrientation, number> = {
   'ap': 1,
   'si': 2
 }
-const anaOriAltAxis: Record<AnatomicalOrientation, (tmplSize: [number, number, number], ratio: {x: number, y: number}) => {idx: number, value: number}> = {
-  'rl': (tmplSize, { y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
-  'ap': (tmplSize, { y }) => ({ idx: 2, value: tmplSize[2] * (0.5 - y) }),
-  'si': (tmplSize, { x }) => ({ idx: 2, value: tmplSize[0] * (0.5 - x) })
+const anaOriAltAxis: Record<AnatomicalOrientation, (templateInfo: TemplateInfo, ratio: {x: number, y: number}) => {idx: number, value: number}> = {
+  'rl': (templateInfo, { y }) => ({ idx: 2, value: templateInfo.real[0] * (0.5 - y) }),
+  'ap': (templateInfo, { y }) => ({ idx: 2, value: templateInfo.real[1] * (0.5 - y) }),
+  'si': (templateInfo, { y }) => ({ idx: 0, value: templateInfo.real[2] * (y - 0.5) })
 }
 
 function getDim(triplet: number[], view: EnumClassicalView) {
@@ -424,7 +424,7 @@ export class PerspectiveViewSlider {
             }
 
             if (!isNullish(xyRatio.x) && !isNullish(xyRatio.y)) {
-              const { idx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize.real, xyRatio)
+              const { idx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize, xyRatio)
               positionMod.push({
                 idx,
                 value

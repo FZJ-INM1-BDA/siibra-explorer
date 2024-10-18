@@ -793,9 +793,9 @@ body::after
   gap: 0.2rem 0.2rem;
 }
 
-.grid > .grid-wide-3
+.grid > .grid-wide-4
 {
-  grid-column: 1 / 4;
+  grid-column: 1 / 5;
 }
 
 .v-center-text-span

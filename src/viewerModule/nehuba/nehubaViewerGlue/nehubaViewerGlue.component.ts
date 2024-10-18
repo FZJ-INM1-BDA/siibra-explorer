@@ -56,7 +56,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
   private onDestroyCb: (() => void)[] = []
 
   public nehubaConfig: NehubaConfig
-  public QUICKTOUR_DND_MD = `Drag and drop any \`.nii\` or \`.nii.gz\` on top of the template to co-visualize.`
+  public QUICKTOUR_DND_MD = `Drag and drop any \`[.label].nii[.gz]\` on top of the template to co-visualize.`
 
   ngOnDestroy(): void {
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
