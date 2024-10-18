@@ -2,7 +2,7 @@ import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject, HostList
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, concat, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil, tap } from "rxjs/operators";
+import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
