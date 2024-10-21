@@ -56,6 +56,7 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
   private onDestroyCb: (() => void)[] = []
 
   public nehubaConfig: NehubaConfig
+  public QUICKTOUR_DND_MD = `Drag and drop any \`[.label].nii[.gz]\` on top of the template to co-visualize.`
 
   ngOnDestroy(): void {
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
@@ -64,4 +65,32 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
   @Output()
   public viewerEvent = new EventEmitter<TViewerEvent<'nehuba'>>()
 
+  constructor(){
+    this.onResize()
+  }
+  
+  public quickTourOverwritingPos = {
+    'dialog': {
+      left: '0px',
+      top: '0px',
+    },
+    'arrow': {
+      left: '0px',
+      top: '0px',
+    }
+  }
+  public onResize(){
+    
+    const { innerWidth, innerHeight } = window
+    this.quickTourOverwritingPos = {
+      'dialog': {
+        left: `${innerWidth * 0.55}px`,
+        top: `${innerHeight * 0.55}px`,
+      },
+      'arrow': {
+        left: `${innerWidth * 0.55 - 48}px`,
+        top: `${innerHeight * 0.55 - 48}px`,
+      }
+    }
+  }
 }

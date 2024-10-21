@@ -9,12 +9,13 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.quickstart import router as quickstart_router
 from app.sane_url import router as saneurl_router, vip_routes
 from app.peek import router as peek_router
-from app.config import HOST_PATHNAME, SESSION_SECRET, PATH_TO_PUBLIC
+from app.config import HOST_PATHNAME, SESSION_SECRET, PATH_TO_PUBLIC, ENABLE_PROXY
 from app.dev_banner import router as devbanner_router
 from app.index_html import router as index_router
 from app.plugin import router as plugin_router
 from app.auth import router as auth_router
 from app.user import router as user_router
+from app.proxy import router as proxy_router
 from app.config import HOST_PATHNAME
 from app.logger import logger
 from app.bkwdcompat import BkwdCompatMW
@@ -79,6 +80,9 @@ app.include_router(saneurl_router, prefix="/go")
 app.include_router(peek_router, prefix="/peek")
 app.include_router(plugin_router, prefix="/plugins")
 app.include_router(user_router, prefix="/user")
+
+if ENABLE_PROXY:
+    app.include_router(proxy_router, prefix="/proxy")
 
 app.include_router(auth_router)
 app.include_router(devbanner_router)

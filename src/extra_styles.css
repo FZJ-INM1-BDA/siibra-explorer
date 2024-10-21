@@ -786,16 +786,16 @@ body::after
   display: grid;
 }
 
-.grid.grid-col-4
+.grid.grid-col-5
 {
   grid-auto-columns: 1fr;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto auto auto auto;
   gap: 0.2rem 0.2rem;
 }
 
-.grid > .grid-wide-3
+.grid > .grid-wide-4
 {
-  grid-column: 1 / 4;
+  grid-column: 1 / 5;
 }
 
 .v-center-text-span

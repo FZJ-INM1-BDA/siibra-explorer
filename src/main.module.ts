@@ -30,7 +30,6 @@ import { MesssagingModule } from './messaging/module';
 import { ViewerModule } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
-import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
@@ -54,6 +53,7 @@ import { environment } from './environments/environment';
 import { SAPI } from './atlasComponents/sapi';
 import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
 import { KCodeModule } from "./experimental/experimental.module"
+import { FreeModeModule } from './freeModeModule';
 
 @NgModule({
   imports: [
@@ -74,8 +74,8 @@ import { KCodeModule } from "./experimental/experimental.module"
     SpotLightModule,
     CookieModule,
     KgTosModule,
-    AtlasViewerRouterModule,
     QuickTourModule,
+    FreeModeModule,
     
     EffectsModule.forRoot([
       ...getStoreEffects(),

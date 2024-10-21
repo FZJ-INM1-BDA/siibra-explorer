@@ -18,6 +18,8 @@ SCOPES =  [
 
 DATA_ERROR_ATTR = "data-error"
 
+FREE_MODE = "x-sxplr-free-mode"
+
 OVERWRITE_SAPI_ENDPOINT_ATTR = "x-sapi-base-url"
 
 OVERWRITE_SPATIAL_BACKEND_ATTR = "x-spatial-backend-url"

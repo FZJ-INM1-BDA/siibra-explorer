@@ -13,3 +13,4 @@
 
 You can enable the touch interface, which is selected per default on mobile devices, by selecting the user menu from the top right (👤), then choosing `Settings` and `Enable Mobile UI`.
 
+You can drag-and-drop NiFTi (`[.label].nii[.gz]`) file on top of your desired template to co-visualize them. Files with extension`.label.nii[.gz]` will be visualized as labelled volume.

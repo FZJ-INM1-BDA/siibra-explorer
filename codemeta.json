@@ -46,9 +46,9 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.12\n\n## Behind the scenes\n\n- Reverting point assignment panel behaviors\n\n## Known regressions\n\n- Labelled assignment now does not work. This will be addressed in a future update. (The temporary regression allows for significant performant statistical assignment, as well more accurate label assignment.)\n",
+    "schema:releaseNotes": "# v2.14.13\n\n## Feature\n\n- Added an example of setting up a proxy for access-controlled content\n- Added free-mode (access via `?free=true`)\n- Added hint for drag-n-drop nifti file (in helper one pager and quick tour)\n- Allow nifti to be added as a labelled volume by using `.label.nii.gz` or `.label.nii` extension\n\n## Bugfix\n\n- Fixed layout issues when user drag-n-dropped nifti has irregularities\n- Fixed picture-in-picture minimap in maximized axial view\n\n## Behind the scene\n\n- Added script to automatically create release metadata files\n",
     "runtimePlatform": "docker",
-    "version": "2.14.12",
+    "version": "2.14.13",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
     "codemeta:continuousIntegration": {
         "id": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions"

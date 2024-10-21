@@ -113,12 +113,15 @@ export class UserLayerService implements OnDestroy {
     })
     const { buffer, meta } = result
     const url = URL.createObjectURL(new Blob([buffer]))
+    const type = file.name.includes(".label.nii")
+    ? 'segmentation'
+    : 'image'
     return {
       protocol: 'nifti://',
       url,
       option: {
         legacySpecFlag: "old",
-        type: 'image',
+        type,
         shader: getShader({
           colormap: EnumColorMapName.MAGMA,
           lowThreshold: meta.min || 0,
