@@ -3,7 +3,7 @@ import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi';
+import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { MainState, userInteraction, userInterface } from 'src/state';
 import { fromRootStore, selectors } from "src/state/atlasSelection"
 import { wait } from "src/util/fn"
@@ -18,17 +18,7 @@ export class AtlasDownloadDirective {
   @HostListener('click')
   async onClick(){
     try {
-      const mode = await this.store.pipe(
-        select(userInterface.selectors.panelMode),
-        take(1)
-      ).toPromise()
       
-      if (mode !== "FOUR_PANEL") {
-        await this.dialogSvc.getUserConfirm({
-          markdown: `Download current view only works in \`four panel\` mode. \n\nContinue the download - as if \`four panel\` view was active?`,
-        })
-      }
-
       this.#busy$.next(true)
       const { parcellation, template } = await this.store.pipe(
         fromRootStore.distinctATP(),
@@ -58,6 +48,23 @@ export class AtlasDownloadDirective {
       const query = {
         parcellation_id: parcellation.id,
         space_id: template.id,
+      }
+
+      if (template.id === IDS.TEMPLATES.BIG_BRAIN) {
+
+        const mode = await this.store.pipe(
+          select(userInterface.selectors.panelMode),
+          take(1)
+        ).toPromise()
+
+        /**
+         * default value of mode is null
+         */
+        if (mode && mode !== "FOUR_PANEL") {
+          await this.dialogSvc.getUserConfirm({
+            markdown: `Download current view only works in \`four panel\` mode. \n\nContinue the download - as if \`four panel\` view was active?`,
+          })
+        }
       }
 
       if (bbox) {
