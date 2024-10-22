@@ -36,8 +36,9 @@ export class NehubaVCtxToBbox implements PipeTransform{
     const { position, zoom } = payload.nav
     // position is in nm
     // zoom can be directly applied as a multiple
-    const min = position.map((v, idx) => (v - (boxDims[idx] * zoom)) / divisor) as Point
-    const max = position.map((v, idx) => (v + (boxDims[idx] * zoom)) / divisor) as Point
+    // divide by 2, since we are applying "radius" rather than "diameter"
+    const min = position.map((v, idx) => (v - (boxDims[idx] / 2 * zoom)) / divisor) as Point
+    const max = position.map((v, idx) => (v + (boxDims[idx] / 2 * zoom)) / divisor) as Point
     return [min, max]
   }
 }
