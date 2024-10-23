@@ -3,11 +3,11 @@ import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi';
-import { MainState } from 'src/state';
+import { IDS, SAPI } from 'src/atlasComponents/sapi';
+import { MainState, userInteraction, userInterface } from 'src/state';
 import { fromRootStore, selectors } from "src/state/atlasSelection"
-import { selectors as userInteractionSelectors } from "src/state/userInteraction"
 import { wait } from "src/util/fn"
+import { DialogService } from 'src/services/dialogService.service';
 
 @Directive({
   selector: '[sxplrAtlasDownload]',
@@ -18,7 +18,7 @@ export class AtlasDownloadDirective {
   @HostListener('click')
   async onClick(){
     try {
-
+      
       this.#busy$.next(true)
       const { parcellation, template } = await this.store.pipe(
         fromRootStore.distinctATP(),
@@ -36,7 +36,7 @@ export class AtlasDownloadDirective {
       ).toPromise()
 
       const selectedFeature = await this.store.pipe(
-        select(userInteractionSelectors.selectedFeature),
+        select(userInteraction.selectors.selectedFeature),
         take(1)
       ).toPromise()
 
@@ -48,6 +48,23 @@ export class AtlasDownloadDirective {
       const query = {
         parcellation_id: parcellation.id,
         space_id: template.id,
+      }
+
+      if (template.id === IDS.TEMPLATES.BIG_BRAIN) {
+
+        const mode = await this.store.pipe(
+          select(userInterface.selectors.panelMode),
+          take(1)
+        ).toPromise()
+
+        /**
+         * default value of mode is null
+         */
+        if (mode && mode !== "FOUR_PANEL") {
+          await this.dialogSvc.getUserConfirm({
+            markdown: `Download current view only works in \`four panel\` mode. \n\nContinue the download - as if \`four panel\` view was active?`,
+          })
+        }
       }
 
       if (bbox) {
@@ -129,6 +146,6 @@ export class AtlasDownloadDirective {
   #error$ = new Subject<string>()
   error$ = this.#error$.pipe()
 
-  constructor(private store: Store<MainState>, private snackbar: MatSnackBar, private sapi: SAPI) { }
+  constructor(private store: Store<MainState>, private snackbar: MatSnackBar, private sapi: SAPI, private dialogSvc: DialogService) { }
 
 }

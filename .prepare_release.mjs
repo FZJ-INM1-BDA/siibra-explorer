@@ -6,8 +6,7 @@ const sxplrGithubApi = "https://api.github.com/repos/FZJ-INM1-BDA/siibra-explore
 const ACTIONS = {
   MAJOR: "major",
   MINOR: "minor",
-  BUGFIX: "bugfix",
-  LINT: "lint"
+  BUGFIX: "bugfix"
 }
 
 /**
@@ -91,23 +90,26 @@ async function updateCodemeta(version){
   codemetaContent["version"] = version
   const releaseNotes = await readFile(pathToReleaseNotes, "utf-8")
   codemetaContent["schema:releaseNotes"] = releaseNotes
+
+  const date = new Date()
+  const YYYY = date.getFullYear().toString()
+  const MM = date.getMonth().toString().padStart(2, "0")
+  const DD = date.getDate().toString()
+
+  codemetaContent["dateModified"] = `${YYYY}-${MM}-${DD}`
   await writeFile(pathToCodemeta, JSON.stringify(codemetaContent, null, 4), "utf-8")
 }
 
 async function main() {
   const filename = basename(import.meta.url)
   const args = process.argv.slice(2)
-  const target = args[0]
+  const target = args[0] || ACTIONS.BUGFIX
 
-  const helperText = `Usage: node ${filename} {${ACTIONS.MAJOR}|${ACTIONS.MINOR}|${ACTIONS.BUGFIX}|x.y.z|${ACTIONS.LINT}}`
+  const helperText = `Usage: node ${filename} {${ACTIONS.MAJOR}|${ACTIONS.MINOR}|${ACTIONS.BUGFIX}|x.y.z} (default: bugfix)`
 
   if (target === "help" || target === "--help") {
     console.log(helperText)
     return
-  }
-
-  if (target === undefined) {
-    throw new Error(`target must be defined.\n${helperText}`)
   }
 
   let targetVersion = null

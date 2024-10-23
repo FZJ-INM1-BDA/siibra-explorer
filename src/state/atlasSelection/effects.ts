@@ -474,7 +474,11 @@ export class Effect {
           map(([_, ctx]) => {
             
             const { width, height } = window.screen
-            const size = Math.max(width, height)
+
+            /**
+             * Usually, viewers are in 4 panel view, so half it
+             */
+            const size = Math.max(width, height) / 2
           
             const result = NEHUBA_CTX_BBOX.transform(ctx, [size, size, size])
             if (!result) {
