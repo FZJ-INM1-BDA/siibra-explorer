@@ -8,9 +8,12 @@ siibra-explorer experimentally supports overlaying spatial features on top of ex
 !!! warning
 	Modern browser impose severe limitations on the amount of resources browser can request. As a result, loading local files may fail based on the spec of your machine (better spec, particularly RAM, reduces the likelihood of failure), size of the file (smaller file reduces the likelihood of failure), amidst other potential factors.
 
-To start, navigate to the atlas/template/parcellation map o your choice, then drag and drop the file you would like to super impose.
+To start, navigate to the atlas/template/parcellation map of your choice, then drag and drop the file you would like to super impose.
 
 ## NIFTI
+
+!!! info
+	If your nifti volume is of type `uint{8,16,32}` and you rename your file as `.label.nii[.gz]`, siibra-explorer will load the nifti as a segmentation nifti: rather than using a colour map, a hashmap will be used to display the volume. `0` will be unlabelled (not displayed).
 
 siibra-explorer carries out a number of verification/normalization steps to ensure the volume is displayed correctly:
 
