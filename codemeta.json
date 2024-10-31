@@ -46,7 +46,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.15\n\n",
+    "schema:releaseNotes": "# v2.14.15\n\n## Documentation\n\n- fixed up some wordings related to drag/drop nifti",
     "runtimePlatform": "docker",
     "version": "2.14.15",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
