@@ -102,3 +102,31 @@ jobs:
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
           
         rm $kubecfg_path
+
+  trigger-deploy-dev:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.DEPLOYMENT_NAME == 'dev' }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: 'Deploy'
+      run: |
+        kubecfg_path=${{ runner.temp }}/.kube_config
+        echo "${{ secrets.KUBECONFIG }}" > $kubecfg_path
+
+        helm --kubeconfig=$kubecfg_path ls | awk '{print $1}' | grep -q ${{ inputs.DEPLOYMENT_NAME }} \
+        && helm --kubeconfig=$kubecfg_path \
+          upgrade \
+          --history-max 3 \
+          --reuse-values \
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0" \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
+        || helm --kubeconfig=$kubecfg_path \
+          install\
+          --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer-dev \
+          ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
+          
+        rm $kubecfg_path
