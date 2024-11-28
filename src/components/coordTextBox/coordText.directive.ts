@@ -1,9 +1,6 @@
-import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, HostListener, Input, Output, ViewChild, inject } from "@angular/core";
+import { Directive, Input } from "@angular/core";
 import { BehaviorSubject, combineLatest } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
-import { AngularMaterialModule, MatInput } from "src/sharedModules";
-import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 type TTriplet = [number, number, number]
 type TVec4 = [number, number, number, number]
@@ -40,38 +37,14 @@ export function isTriplet(val: unknown): val is TTriplet{
   return val.every(v => typeof v === "number" && !isNaN(v))
 }
 
-@Component({
-  selector: 'coordinate-text-input',
-  templateUrl: './coordTextBox.template.html',
-  styleUrls: [
-    './coordTextBox.style.css'
-  ],
+@Directive({
+  selector: '[coordinate-text]',
   standalone: true,
-  imports: [
-    CommonModule,
-    AngularMaterialModule
-  ],
-  hostDirectives: [
-    DestroyDirective
-  ]
+  exportAs: 'coordinateText'
 })
 
-export class CoordTextBox {
+export class CoordinateText {
 
-  #destroyed$ = inject(DestroyDirective).destroyed$
-
-  @ViewChild(MatInput)
-  input: MatInput
-
-  @Output('enter')
-  enter = new EventEmitter()
-
-  @HostListener('keydown.enter')
-  @HostListener('keydown.tab')
-  enterHandler() {
-    this.enter.emit()
-  }
-  
   #coordinates = new BehaviorSubject<TTriplet>([0, 0, 0])
 
   @Input()
@@ -129,11 +102,4 @@ export class CoordTextBox {
     }),
     shareReplay(1),
   )
-
-  @Input()
-  label: string = "Coordinates"
-
-  get inputValue(){
-    return this.input?.value
-  }
 }

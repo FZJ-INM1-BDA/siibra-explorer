@@ -127,6 +127,10 @@ async function main() {
       throw new Error(`target is expected to be one of ${ACTIONS.MAJOR}/${ACTIONS.MINOR}/${ACTIONS.BUGFIX}`)
     }
     latestVersion[vIdx] += 1
+    while (vIdx < 2) {
+      vIdx += 1
+      latestVersion[vIdx] = 0
+    }
     targetVersion = latestVersion.join(".")
   } else if (target !== ACTIONS.LINT) {
     targetVersion = parseVersion(target)

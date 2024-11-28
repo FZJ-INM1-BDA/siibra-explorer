@@ -3,9 +3,10 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, combineLatest, forkJoin, from, of } from "rxjs";
-import { catchError, map, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, of } from "rxjs";
+import { catchError, filter, map, shareReplay, switchMap, take } from "rxjs/operators";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
+import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 
 @Directive({
   selector: `[sxplr-sapiviews-core-region]`,
@@ -13,10 +14,16 @@ import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.serv
 })
 export class SapiViewsCoreRegionRegionBase {
 
+  private _fetchFlag$ = new BehaviorSubject<boolean>(false)
+  protected _fetchFlag = false
   @Input('sxplr-sapiviews-core-region-detail-flag')
-  shouldFetchDetail = false
-
-  public fetchInProgress$ = new BehaviorSubject<boolean>(false)
+  set fetchFlag(val: boolean) {
+    this._fetchFlag$.next(val)
+    this._fetchFlag = val
+  }
+  get fetchFlag(){
+    return this._fetchFlag
+  }
 
   @Input('sxplr-sapiviews-core-region-atlas')
   atlas: SxplrAtlas
@@ -28,36 +35,69 @@ export class SapiViewsCoreRegionRegionBase {
   @Output('sxplr-sapiviews-core-region-navigate-to')
   onNavigateTo = new EventEmitter<number[]>()
 
-  protected region$ = new BehaviorSubject<SxplrRegion>(null)
+  // higher order set region
+  private _region$ = new BehaviorSubject<SxplrRegion>(null)
   private _region: SxplrRegion
   @Input('sxplr-sapiviews-core-region-region')
   set region(val: SxplrRegion) {
-    this.region$.next(val)
-
-    if (!this.shouldFetchDetail || !val) {
-      this._region = val
-      this.setupRegionDarkmode()
-      return
-    }
-    this.fetchInProgress$.next(true)
-    this._region = null
-    
-    this.fetchDetail(val)
-      .then(r => {
-        this._region = r
-      })
-      .catch(e => {
-        console.warn(`populating detail failed.`, e)
-        this._region = val
-      })
-      .finally(() => {
-        this.fetchInProgress$.next(false)
-        this.setupRegionDarkmode()
-      })
+    this._region$.next(val)
   }
   get region(){
     return this._region
   }
+
+  private fetchDetailSignal$ = combineLatest([
+    this._region$,
+    this._fetchFlag$
+  ]).pipe(
+    switchMap(([ setRegion, fetchFlag ]) => {
+      if (!setRegion) {
+        return EMPTY
+      }
+      if (!fetchFlag) {
+        return EMPTY
+      }
+      return of(setRegion)
+    })
+  )
+
+  protected region$ = concat(
+    this._region$,
+    this.fetchDetailSignal$,
+  ).pipe(
+    switchMap(setRegion => {
+      // technically the fetch detail signal should also fire when parc/template is updated
+      return this.sapi.v3Get("/regions/{region_id}", {
+        path: {
+          region_id: setRegion.name
+        },
+        query: {
+          parcellation_id: this.parcellation.id,
+          space_id: this.template.id
+        }
+      }).pipe(
+        switchMap(r => translateV3Entities.translateRegion(r))
+      )
+    }),
+    catchError((err) => {
+      console.warn(`Populating detail failed: ${err}`)  
+      return this._region$
+    })
+  )
+  
+  public fetchInProgress$ = this.fetchDetailSignal$.pipe(
+    switchMap(() => concat(
+      of(true),
+      this.region$.pipe(
+        take(1),
+        map(() => false)
+      )
+    )),
+  )
+
+  public readonly relatedRegions$ = this.region$.pipe(
+    switchMap(region => from(this.fetchRelated(region))),
+  )
 
   private ATP$ = new BehaviorSubject<{
     atlas: SxplrAtlas
@@ -77,57 +117,40 @@ export class SapiViewsCoreRegionRegionBase {
     this.ATP$.next({ atlas, template, parcellation })
   }
 
-  regionRgbString: string = `rgb(200, 200, 200)`
-  regionDarkmode = false
+  regionRgbString$ = concat(
+    of(null as string),
+    this.region$.pipe(
+      map(region => {
+        const rgb = region?.color || [200, 200, 200]
+        return `rgb(${rgb.join(',')})`
+      })
+    ),
+  )
+  regionDarkMode$ = concat(
+    of(false),
+    this.region$.pipe(
+      filter(region => !!region),
+      map(region => {
+        const rgb = region.color || [200, 200, 200]
+        const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
+        return l < 0.4
+      })
+    )
+  )
+
   // in mm!!
-  regionPosition: number[] = null
-  dois: string[] = []
+  regionPosition$ = concat(
+    of(null as number[]),
+    this.region$.pipe(
+      map(region => {
+        return region?.centroid?.loc
+      })
+    )
+  )
 
-  protected setupRegionDarkmode(){
-
-    this.regionRgbString = `rgb(200, 200, 200)`
-    this.regionDarkmode = false
-    this.regionPosition = null
-    this.dois = []
-
-    if (this.region) {
-
-      /**
-       * color
-       */
-      const rgb = this.region?.color || [200, 200, 200]
-      this.regionRgbString = `rgb(${rgb.join(',')})`
-      const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
-      this.regionDarkmode = l < 0.4
-      
-      /**
-       * position
-       */
-      this.regionPosition = this.region.centroid?.loc
-
-      /**
-       * dois
-       */
-      this.dois = (this.region.link || []).map(link => link.href)
-    }
-  }
 
   navigateTo(position: number[]) {
     this.onNavigateTo.emit(position.map(v => v*1e6))
-  }
-
-  protected async fetchDetail(region: SxplrRegion): Promise<SxplrRegion> {
-    return this.sapi.v3Get("/regions/{region_id}", {
-      path: {
-        region_id: region.name
-      },
-      query: {
-        parcellation_id: this.parcellation.id,
-        space_id: this.template.id
-      }
-    }).pipe(
-      switchMap(r => translateV3Entities.translateRegion(r))
-    ).toPromise()
   }
 
   protected async fetchRelated(region: SxplrRegion){
@@ -194,4 +217,67 @@ export class SapiViewsCoreRegionRegionBase {
   constructor(protected sapi: SAPI, private collapser: DecisionCollapse){
 
   }
+  
+  protected regionalMaps$ = this.ATPR$.pipe(
+    switchMap(({ parcellation, template, region }) =>
+      concat(
+        of([] as PathReturn<"/map">["volumes"]),
+        this.sapi.getMap(parcellation.id, template.id, "STATISTICAL").pipe(
+          map(v => {
+            const mapIndices = v.indices[region.name]
+            return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
+          }),
+          catchError((_err, _obs) => {
+            /**
+             * if statistical map somehow fails to fetch (e.g. does not exist for this combination 
+             * of parc tmpl), fallback to labelled map
+             */
+            return this.sapi.getMap(parcellation.id, template.id, "LABELLED").pipe(
+              map(v => {
+                const mapIndices = v.indices[region.name]
+                return (mapIndices || []).map(mapIdx => v.volumes[mapIdx.volume])
+              })
+            )
+          })
+        ),
+      )
+    ),
+    shareReplay(1)
+  )
+
+  public dois$ = combineLatest([
+    this.regionalMaps$.pipe(
+      map(sms => {
+        const returnUrls: string[] = []
+        for (const sm of sms) {
+          for (const ds of sm.datasets) {
+            for (const url of ds.urls) {
+              returnUrls.push(url.url)
+            }
+            
+          }
+        }
+        return returnUrls
+      })
+    ),
+    concat(
+      of([] as string[]),
+      this.region$.pipe(
+        map(region => (region.link || []).map(l => l.href))
+      )
+    )
+  ]).pipe(
+    map(([ doisFromMap, doisFromRegion ]) => [...doisFromMap, ...doisFromRegion])
+  )
+
+  public desc$ = this.regionalMaps$.pipe(
+    map(sm => {
+      for (const ds of (sm?.[0]?.datasets) || []) {
+        if (ds.description) {
+          return ds.description
+        }
+      }
+    }),
+  )
+
 }

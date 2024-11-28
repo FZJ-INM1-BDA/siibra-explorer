@@ -3,11 +3,14 @@
         {{ label }}
     </mat-label>
 
-    <input type="text" matInput
-        [value]="inputValue$ | async">
+    <div matPrefix>
+        <ng-content select="[prefix]"></ng-content>    
+    </div>
+
+    <input type="text" matInput [value]="inputValue$ | async">
     
+    <div matSuffix>
+        <ng-content select="[suffix]"></ng-content>    
+    </div>
 </mat-form-field>
 
-<div class="suffix">
-    <ng-content select="[suffix]"></ng-content>
-</div>

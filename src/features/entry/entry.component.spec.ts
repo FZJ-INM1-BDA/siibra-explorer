@@ -4,7 +4,7 @@ import { SAPIModule } from 'src/atlasComponents/sapi';
 
 import { EntryComponent } from './entry.component';
 import { provideMockStore } from '@ngrx/store/testing';
-import { FeatureModule } from '../module';
+import { FeatureModule } from '..';
 import { FEATURE_CONCEPT_TOKEN, TPRB } from '../util';
 
 describe('EntryComponent', () => {

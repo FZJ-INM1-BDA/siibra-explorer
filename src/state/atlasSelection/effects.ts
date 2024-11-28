@@ -309,7 +309,7 @@ export class Effect {
 
             atlas ||= await this.#askUserATP("Please select an atlas", result.atlases).toPromise()
             if (!atlas) return // user cancelled
-            template ||= await this.#askUserATP(messages.template || "Please select a space", result.spaces).toPromise()
+            template ||= await this.#askUserATP(messages?.template || "Please select a space", result.spaces).toPromise()
             if (!template) return // user cancelled
 
             
@@ -319,7 +319,7 @@ export class Effect {
             const { parcellations } = DecisionCollapse.Intersect(newPosATP, result)
             result.parcellations = parcellations
 
-            parcellation ||= await this.#askUserATP(messages.parcellation || "Please select a parcellation", result.parcellations).toPromise()
+            parcellation ||= await this.#askUserATP(messages?.parcellation || "Please select a parcellation", result.parcellations).toPromise()
             if (!parcellation) return // user cancelled
 
             return {
@@ -472,8 +472,8 @@ export class Effect {
         ]).pipe(
           debounceTime(160),
           map(([_, ctx]) => {
-            
-            const { width, height } = window.screen
+
+            const { innerWidth: width, innerHeight: height } = window
 
             /**
              * Usually, viewers are in 4 panel view, so half it
@@ -494,7 +494,7 @@ export class Effect {
                 center: min.map((v, idx) => (v + max[idx])/2) as [number, number, number]
               }
             })
-          })          
+          })
         ))
       )
     })

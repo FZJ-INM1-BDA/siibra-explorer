@@ -130,6 +130,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
   )
 
   public totals$ = this.#catAccDirs.pipe(
+    shareReplay(1),
     switchMap(arr => concat(
       of(0),
       merge(
@@ -149,7 +150,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
           return tally
         }),
       )
-    ))
+    )),
   )
 
   ngAfterViewInit(): void {

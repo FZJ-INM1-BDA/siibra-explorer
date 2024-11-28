@@ -34,7 +34,6 @@ import { FeatureModule } from "src/features";
 import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
-import { BottomMenuModule } from "src/ui/bottomMenu";
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
 import { Store } from "@ngrx/store";
 import { atlasSelection, userPreference } from "src/state";
@@ -45,6 +44,7 @@ import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { AtlasViewerRouterModule } from "src/routerModule";
+import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
 
 @NgModule({
   imports: [
@@ -54,6 +54,7 @@ import { AtlasViewerRouterModule } from "src/routerModule";
     LayoutModule,
     AngularMaterialModule,
     TopMenuModule,
+    VerticalBreadCrumbModule,
     UtilModule,
     ComponentsModule,
     UserAnnotationsModule,
@@ -70,7 +71,6 @@ import { AtlasViewerRouterModule } from "src/routerModule";
     NgLayerCtlModule,
     SmartChipModule,
     ReactiveFormsModule,
-    BottomMenuModule,
     TabComponent,
     AtlasViewerRouterModule,
     

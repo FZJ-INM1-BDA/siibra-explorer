@@ -30,6 +30,8 @@ import { DialogModule } from "src/ui/dialogInfo";
 import { CoordTextBox } from "src/components/coordTextBox";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
+import { CoordinateText } from "src/components/coordTextBox/coordText.directive";
 
 @NgModule({
   imports: [
@@ -63,7 +65,9 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
     DialogModule,
 
     CoordTextBox,
-    ExperimentalFlagDirective
+    CoordinateText,
+    ExperimentalFlagDirective,
+    SapiViewsUtilModule,
   ],
   declarations: [
     NehubaViewerContainerDirective,

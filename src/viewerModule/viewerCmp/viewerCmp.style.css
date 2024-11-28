@@ -195,3 +195,10 @@ viewer-wrapper
   height: 100%;
   display: block;
 }
+
+sxplr-vertical-bread-crumb
+{
+  max-height: 98vh;
+  overflow: auto;
+  pointer-events: all;
+}

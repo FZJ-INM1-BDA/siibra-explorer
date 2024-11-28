@@ -1,0 +1,63 @@
+mat-card
+{
+    margin: 0.2rem 0.4rem;
+
+    mat-card-header
+    {
+        ::ng-deep > div
+        {
+            width: 100%;
+        }
+
+        mat-card-title
+        {
+            overflow: hidden;
+
+            display: inline-flex;
+            width: 100%;
+            align-items: baseline;
+
+            div
+            {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                flex: 1 1 auto;
+            }
+            button
+            {
+                flex: 0 0 auto;
+            }
+        }
+    }
+}
+
+.menu-button
+{
+    display: flex;
+    align-items: center;
+
+    > mat-icon
+    {
+        flex: 0 0 auto;
+    }
+    span
+    {
+        flex: 1 1 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+sxplr-sapiviews-core-rich-regionshierarchy
+{
+    height: 100%;
+    padding: 0 0 0.4rem 0;
+}
+
+
+table[mat-table] *
+{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

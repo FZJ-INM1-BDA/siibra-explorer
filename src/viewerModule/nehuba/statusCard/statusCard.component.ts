@@ -17,7 +17,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { NEHUBA_INSTANCE_INJTKN } from '../util'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { actions } from "src/state/atlasSelection";
-import { atlasSelection } from "src/state";
+import { atlasSelection, userPreference } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../config.service";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
@@ -25,6 +25,7 @@ import { getUuid } from "src/util/fn";
 import { Render, TAffine, isAffine, ID_AFFINE } from "src/components/coordTextBox"
 import { IDS } from "src/atlasComponents/sapi";
 import { InterSpaceCoordXformSvc, ITemplateCoordXformResp } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
+import { enLabels } from "src/uiLabels"
 
 type TSpace = {
   label: string
@@ -35,12 +36,19 @@ type TSpace = {
 @Component({
   selector : 'iav-cmp-viewer-nehuba-status',
   templateUrl : './statusCard.template.html',
-  styleUrls : ['./statusCard.style.css'],
+  styleUrls : ['./statusCard.style.scss'],
   hostDirectives: [
     DestroyDirective,
-  ],
+  ]
 })
 export class StatusCardComponent {
+
+  labels$ = of(enLabels)
+
+  useMobile$ = this.store$.pipe(
+    select(userPreference.selectors.useMobileUi)
+  )
+
 
   #newSpace = new Subject<TSpace>()
   additionalSpace$ = combineLatest([
@@ -96,7 +104,9 @@ export class StatusCardComponent {
   }
 
   readonly saneRenderNmInMm: Render = v => v.map(v => `${(v * 1e-6).toFixed(2)}mm`).join(", ")
-  readonly renderMm: Render = v => v.map(i => `${i}mm`).join(", ")
+  readonly renderMm: Render = v => !!v
+  ? v.map(i => `${i}mm`).join(", ")
+  : ""
   readonly renderDefault: Render = v => v.map(i => i.toFixed(3)).join(", ")
 
   readonly #destroy$ = inject(DestroyDirective).destroyed$
@@ -212,6 +222,10 @@ export class StatusCardComponent {
       }
     }),
     shareReplay(1)
+  )
+
+  public readonly bbox$ = this.store$.pipe(
+    select(atlasSelection.selectors.currentViewport),
   )
 
   public quickTourData: IQuickTourData = {
@@ -394,4 +408,16 @@ export class StatusCardComponent {
   onCoordEditDialogClose(){
     this.#coordEditDialogClosed.next(null)
   }
+
+  view$ = combineLatest([
+    this.labels$,
+    this.useMobile$,
+    this.navigation$,
+  ]).pipe(
+    map(([ labels, useMobile, navigation ]) => {
+      return {
+        labels, useMobile, navigation
+      }
+    })
+  )
 }

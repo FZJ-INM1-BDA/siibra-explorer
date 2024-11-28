@@ -23,163 +23,56 @@
 <!-- master draw container -->
 <ng-template [ngIf]="view$ | async" let-view>
   
-  <mat-drawer-container
-    *ngIf="viewerLoaded"
-    class="position-absolute w-100 h-100 mat-drawer-content-overflow-visible invisible"
-    [hasBackdrop]="false">
+  <iav-layout-fourcorners class="sxplr-pe-none">
 
-    <!-- master drawer -->
-    <mat-drawer
-      mode="side"
-      #drawer="matDrawer"
-      [@openClose]="view.fullSidenavExpanded ? 'open' : 'closed'"
-      (@openClose.start)="$event.toState === 'open' && drawer.open()"
-      (@openClose.done)="$event.toState === 'closed' && drawer.close()"
-      [autoFocus]="false"
-      [disableClose]="true"
-      class="sxplr-custom-cmp darker-bg sxplr-p-0 pe-all col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 z-index-10">
+    <!-- top left -->
+    <div iavLayoutFourCornersTopLeft class="ws-no-wrap align-items-start d-inline-flex">
 
-      <!-- entry template -->
-      <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="regularTmpl">
-        <ng-template [ngTemplateOutlet]="alternateModeDrawerTmpl"
-          [ngTemplateOutletContext]="{
-            mode: mode
-          }"></ng-template>
-      </ng-template>
-
-      <!-- regular mode  -->
-      <ng-template #regularTmpl>
-        <ng-template [ngTemplateOutlet]="regularModeDrawerTmpl">
+      <!-- special mode -->
+      <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
+        <ng-template [ngTemplateOutlet]="specialModeTopLeftTmpl"
+          [ngTemplateOutletContext]="{ mode: mode }">
         </ng-template>
       </ng-template>
-    </mat-drawer>
 
-    <!-- master content -->
-    <mat-drawer-content class="visible sxplr-pe-none position-relative">
-      <iav-layout-fourcorners>
+      <!-- default mode top left tmpl -->
+      <ng-template #defaultTopLeftTmpl>
+        <ng-template [ngTemplateOutlet]="defaultMainContentTopLeft"
+          [ngTemplateOutletContext]="{
+            view: view
+          }">
+        </ng-template>
+      </ng-template>
+    </div>
 
-        <!-- top left -->
-        <div iavLayoutFourCornersTopLeft class="ws-no-wrap align-items-start d-inline-flex">
+    <!-- top right -->
+    <div iavLayoutFourCornersTopRight class="ws-no-wrap">
 
-          <!-- special mode -->
-          <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
-            <ng-template [ngTemplateOutlet]="specialModeTopLeftTmpl"
-              [ngTemplateOutletContext]="{ mode: mode }">
-            </ng-template>
-          </ng-template>
+      <!-- exit special mode -->
+      <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopRightTmpl">
+        <ng-template [ngTemplateOutlet]="specialTopRightTmpl"
+          [ngTemplateOutletContext]="{
+            mode: mode
+          }">
+        </ng-template>
+      </ng-template>
+      
+      <!-- default mode top right tmpl -->
+      <ng-template #defaultTopRightTmpl>
+        <ng-template [ngTemplateOutlet]="minDefaultMainContentTopRight">
+        </ng-template>
+      </ng-template>
+    </div>
 
-          <!-- default mode top left tmpl -->
-          <ng-template #defaultTopLeftTmpl>
-            <ng-template [ngTemplateOutlet]="defaultMainContentTopLeft"
-              [ngTemplateOutletContext]="{
-                isOpen: drawer.opened,
-                drawer: drawer,
-                view: view
-              }">
-            </ng-template>
-          </ng-template>
-        </div>
-
-        <!-- top right -->
-        <div iavLayoutFourCornersTopRight class="ws-no-wrap">
-
-          <!-- exit special mode -->
-          <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopRightTmpl">
-            <ng-template [ngTemplateOutlet]="specialTopRightTmpl"
-              [ngTemplateOutletContext]="{
-                mode: mode
-              }">
-            </ng-template>
-          </ng-template>
-          
-          <!-- default mode top right tmpl -->
-          <ng-template #defaultTopRightTmpl>
-            <ng-template [ngTemplateOutlet]="minDefaultMainContentTopRight">
-            </ng-template>
-          </ng-template>
-        </div>
-
-
-        <!-- bottom left -->
-        <div iavLayoutFourCornersBottomLeft class="ws-no-wrap d-inline-flex w-100vw sxplr-pe-none align-items-center mb-4">
-
-          <!-- special bottom left -->
-          <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="localBottomLeftTmpl"></ng-template>
-          
-          <!-- default mode bottom left tmpl -->
-          <ng-template #localBottomLeftTmpl>
-
-            <!-- not the most elegant, but it's a hard problem to solve -->
-            <!-- on the one hand, showFullSidenavSwitch can be of two states -->
-            <!-- and drawer.opened can be of two states -->
-            <ng-template [ngTemplateOutlet]="bottomLeftTmpl">
-            </ng-template>
-          </ng-template>
-          
-        </div>
-
-        <!-- buttom right -->
-        <div iavLayoutFourCornersBottomRight>
-          <div class="leap-control-wrapper">
-            <div leap-control-view-ref></div>
-          </div>
-        </div>
-      </iav-layout-fourcorners>
-    </mat-drawer-content>
-  </mat-drawer-container>
+    <!-- buttom right -->
+    <div iavLayoutFourCornersBottomRight>
+      <div class="leap-control-wrapper">
+        <div leap-control-view-ref></div>
+      </div>
+    </div>
+  </iav-layout-fourcorners>
 
 </ng-template>
-
-<!-- alternate mode drawer tmpl -->
-<ng-template #alternateModeDrawerTmpl let-mode="mode">
-  <ng-container [ngSwitch]="mode">
-    <annotation-list *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-    </annotation-list>
-    <key-frame-controller *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-    </key-frame-controller>
-    <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
-  </ng-container>
-</ng-template>
-
-
-<!-- regular mode drawer tmpl -->
-<ng-template #regularModeDrawerTmpl>
-
-  <!-- selectedFeature || selectedRegion -->
-  <ng-template [ngIf]="view$ | async" let-view>
-
-    <!-- if selected feature is not null, show selected feature -->
-    <ng-template [ngIf]="view.selectedFeature">
-      <ng-template
-        [ngTemplateOutlet]="selectedFeatureTmpl"
-        [ngTemplateOutletContext]="{
-          feature: view.selectedFeature
-        }">
-      </ng-template>
-    </ng-template>
-
-    <!-- if selected point is not null, show selected point -->
-    <ng-template [ngIf]="view.selectedPoint">
-      <ng-template 
-        [ngTemplateOutlet]="selectedPointTmpl"
-        [ngTemplateOutletContext]="{
-          view: view
-        }">
-      </ng-template>
-    </ng-template>
-
-    <!-- if selected feature and selected point are both null, show default (selected region) -->
-    <!-- ngIf and ngtemplateoutlet is required when ngIf changes too quickly, it seems -->
-    <ng-template  [ngIf]="!view.selectedFeature && !view.selectedPoint">
-      <ng-template
-        [ngTemplateOutlet]="sidenavRegionTmpl"
-        [ngTemplateOutletContext]="{ view: view }">
-
-      </ng-template>
-    </ng-template>
-  </ng-template>
-</ng-template>
-
 
 <!-- minimal default drawer content -->
 <ng-template #minSearchTray>
@@ -226,10 +119,10 @@
           (click)="controlFullNav(!view.fullSidenavExpanded)"
           class="sxplr-mt-9 sxplr-pe-all w-100"
           [ngClass]="{
-            'darktheme': sapiRegion.regionDarkmode,
-            'lighttheme': !sapiRegion.regionDarkmode
+            'darktheme': (sapiRegion.regionDarkMode$ | async),
+            'lighttheme': !(sapiRegion.regionDarkMode$ | async)
           }"
-          [style.backgroundColor]="sapiRegion.regionRgbString">
+          [style.backgroundColor]="sapiRegion.regionRgbString$ | async">
           <span class="text sxplr-custom-cmp">
             Explore
           </span>
@@ -277,18 +170,36 @@
 <!-- top left -->
 <!-- default top left -->
 <ng-template #defaultMainContentTopLeft
-  let-drawer="drawer"
   let-view="view">
+  
+  <sxplr-vertical-bread-crumb
+    class="mt-2 d-inline-block vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2 z-index-1 transition-margin-left"
+    [ngClass]="{
+      'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
+    }">
+    <iav-cmp-viewer-nehuba-status
+      *ngIf="(useViewer$ | async) === 'nehuba'"
+      nehuba-status-panel>
+      
+      
+    </iav-cmp-viewer-nehuba-status>
+  </sxplr-vertical-bread-crumb>
+  
+  <sxplr-tab *ngIf="!!view.selectedTemplate"
+    [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
+    sxplr-tab-color="primary"
+    (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
+  </sxplr-tab>
 
   <!-- min search tray -->
-  <ng-template [ngIf]="!(view.fullSidenavExpanded)">
+  <!-- <ng-template [ngIf]="!(view.fullSidenavExpanded)">
     <ng-template [ngTemplateOutlet]="minSearchTray">
     </ng-template>
-  </ng-template>
+  </ng-template> -->
 
   <!-- pullable tab top left corner -->
   
-  <ng-template [ngIf]="view.fullSidenavExpanded">
+  <!-- <ng-template [ngIf]="view.fullSidenavExpanded">
     <sxplr-tab
       (sxplr-tab-click)="fullyClose()"
       sxplr-tab-icon="fas fa-brain"
@@ -298,12 +209,9 @@
       [quick-tour-order]="quickTourRegionSearch.order">
 
     </sxplr-tab>
-  </ng-template>
+  </ng-template> -->
 
-  <!-- status panel for (for nehuba viewer) -->
-  <iav-cmp-viewer-nehuba-status *ngIf="(useViewer$ | async) === 'nehuba'"
-    class="pe-all sxplr-mt-1 muted-7 d-inline-block v-align-top">
-  </iav-cmp-viewer-nehuba-status>
+  
   <button
     mat-icon-button
     sxplr-share-view
@@ -316,6 +224,15 @@
 
 <!-- special mode top left -->
 <ng-template #specialModeTopLeftTmpl let-mode="mode">
+  
+  <ng-container [ngSwitch]="mode">
+    <annotation-list *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+    </annotation-list>
+    <key-frame-controller *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+    </key-frame-controller>
+    <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
+  </ng-container>
+  
   <ng-template [ngIf]="view$ | async" let-view>
 
     <div class="special-mode-topleft-wrapper">
@@ -382,28 +299,6 @@
     </mat-card-content>
   </mat-card>
 </ng-template>
-
-<!-- bottom left -->
-<ng-template #bottomLeftTmpl>
-
-  <ng-template [ngIf]="view$ | async" let-view>
-
-    <!-- scroll container -->
-    <div class="sxplr-d-inline-flex
-      sxplr-flex-wrap-nowrap
-      sxplr-mxw-100vw
-      sxplr-pe-all
-      sxplr-of-x-auto
-      sxplr-of-y-hidden
-      sxplr-align-items-stretch">
-
-      <sxplr-bottom-menu (onRegionClick)="controlHalfNav(true); controlFullNav(true)"></sxplr-bottom-menu>
-
-    </div>
-
-  </ng-template>
-</ng-template>
-
 
 <!-- viewer tmpl -->
 <ng-template #viewerTmpl>
@@ -499,84 +394,6 @@
     </div>
   </div>
 </ng-template>
-
-<!-- region sidenav tmpl -->
-<ng-template #sidenavRegionTmpl
-  let-view="view">
-
-  <!-- region search autocomplete  -->
-  <!-- [@openCloseAnchor]="sideNavFullLeftSwitch.switchState ? 'open' : 'closed'" -->
-  <div class="h-0 w-100 region-text-search-autocomplete-position">
-    <ng-container *ngTemplateOutlet="autocompleteTmpl">
-    </ng-container>
-  </div>
-
-  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column sxplr-h-100"
-    [ngClass]="{'region-populated': (view.selectedRegions || []).length > 0 }">
-
-    <!-- region detail -->
-    <!-- single-region-wrapper -->
-    <ng-template [ngIf]="view.selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
-      <!-- a series of bugs result in requiring this hacky -->
-      <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
-
-
-      <ng-template [ngIf]="regionDirective.fetchInProgress$ | async">
-        <spinner-cmp class="sxplr-mt-10 fs-200"></spinner-cmp>
-      </ng-template>
-      <sxplr-sapiviews-core-region-region-rich
-        [sxplr-sapiviews-core-region-atlas]="selectedAtlas$ | async"
-        [sxplr-sapiviews-core-region-template]="view.selectedTemplate"
-        [sxplr-sapiviews-core-region-parcellation]="view.selectedParcellation"
-        [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
-        (sxplr-sapiviews-core-region-region-rich-feature-clicked)="showDataset($event)"
-        (sxplr-sapiviews-core-region-region-rich-related-region-clicked)="selectATPR($event)"
-        (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
-        #regionDirective="sapiViewsCoreRegionRich"
-      >
-
-      
-      <ng-container ngProjectAs="[header]">
-        <div class="sapi-container"></div>
-      </ng-container>
-        
-      </sxplr-sapiviews-core-region-region-rich>
-    </ng-template>
-
-    <!-- multi region wrapper -->
-    <ng-template #multiRegionWrapperTmpl>
-      <ng-container *ngTemplateOutlet="multiRegionTmpl; context: {
-        regions: view.selectedRegions
-      }">
-      </ng-container>
-      <!-- This is a wrapper for multiregion consisting of {{ selectedRegions.length }} regions -->
-    </ng-template>
-
-    <!-- place holder if length === 0 -->
-    <ng-container *ngIf="view.selectedRegions.length === 0">
-      no region selected
-    </ng-container>
-
-    <div class="spacer">
-    </div>
-  </div>
-
-  <!-- collapse btn -->
-  
-  <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
-
-    <button mat-raised-button class="mat-elevation-z8"
-      [attr.aria-label]="ARIA_LABELS.COLLAPSE"
-      (click)="controlFullNav(false)">
-      <i class="fas fa-chevron-up"></i>
-      <span>
-        collapse
-      </span>
-    </button>
-  </div>
-  
-</ng-template>
-
 
 <!-- multi region tmpl -->
 <ng-template #multiRegionTmpl let-regions="regions">

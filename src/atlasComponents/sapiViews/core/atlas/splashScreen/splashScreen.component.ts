@@ -23,7 +23,7 @@ export class SapiViewsCoreAtlasSplashScreen {
   )
 
   constructor(
-    private store: Store<any>,
+    private store: Store,
     private sapiSvc: SAPI,
   ) {
   }

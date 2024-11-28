@@ -301,6 +301,9 @@ export class SAPI{
   }
 
   public getAllSpaces(atlas: SxplrAtlas): Observable<SxplrTemplate[]> {
+    if (!atlas) {
+      return of([])
+    }
     return forkJoin(
       translateV3Entities.retrieveAtlas(atlas).spaces.map(
         spc => this.v3Get("/spaces/{space_id}", { path: { space_id: spc["@id"] } }).pipe(
@@ -311,6 +314,9 @@ export class SAPI{
   }
 
   public getAllParcellations(atlas: SxplrAtlas): Observable<SxplrParcellation[]> {
+    if (!atlas) {
+      return of([])
+    }
     return forkJoin(
       translateV3Entities.retrieveAtlas(atlas).parcellations.filter(
         p => {

@@ -35,7 +35,7 @@ export class DialogDirective{
   templateRef: TemplateRef<unknown>|string
 
   @Input('sxplr-dialog-size')
-  size: DialogSize = 'm'
+  size: DialogSize = 'auto'
 
   @Input('sxplr-dialog-data')
   data: any = {}
