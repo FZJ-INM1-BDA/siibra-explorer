@@ -6,4 +6,21 @@ export const enLabels = {
   LOADING: "loading ...",
   CUSTOM_COORDINATE: "custom coordinate",
   ADD_NEW_COORDINATE_RENDER: "add a new coordinate render",
+
+  DETAILS: "details",
+  RESET_TRANSLATION: "reset translation",
+  RESET_ROTATION: "reset rotation",
+  RESET_ZOOM: "reset zoom",
+
+  REGION_HIERARCHY: "region hierarchy",
+  RELATED_REGIONS: "related regions",
+
+  CLEAR_SELECTED_REGION: "clear selected region",
+  COPY_REGION_NAMES: "copy selected rgion names",
+
+  SELECTED_DIFFERENT_ATLAS: "select a different atlas",
+  SELECTED_DIFFERENT_TEMPLATE: "select a different template",
+  SELECTED_DIFFERENT_PARCELLATION: "select a different parcellation",
+
+  NAVIGATION_CONTROL: "navigation control"
 }

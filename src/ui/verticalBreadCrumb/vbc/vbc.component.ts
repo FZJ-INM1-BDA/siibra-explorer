@@ -1,12 +1,16 @@
-import { ChangeDetectionStrategy, Component, Inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, Inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, of } from "rxjs";
-import { map, switchMap, take } from "rxjs/operators";
+import { combineLatest, merge, of, Subject } from "rxjs";
+import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { atlasSelection } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
+import { enLabels } from "src/uiLabels"
+import { FormControl, FormGroup } from "@angular/forms";
+import { getUuid } from "src/util/fn";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -16,10 +20,95 @@ const pipe = new FilterGroupedParcellationPipe()
   styleUrls: [
     './vbc.style.scss'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
 export class VerticalBreadCrumbComponent {
+  #destroy$ = inject(DestroyDirective).destroyed$
+  
+  #pasted$ = new Subject<string>()
+  
+  #parseString(input: string): number[]{
+    return input
+      .split(/[\s|,]+/)
+      .map(v => {
+        if (/mm$/.test(v)) {
+          return v.replace(/mm$/, "")
+        }
+        return v
+      })
+      .map(Number)
+  }
+
+  public dialogForm = new FormGroup({
+    x: new FormControl<string>('0'),
+    y: new FormControl<string>('0'),
+    z: new FormControl<string>('0'),
+  })
+  
+  public readonly dialogInputState$ = this.dialogForm.valueChanges.pipe(
+    shareReplay(1),
+    map(({ x, y, z }) => {
+      const allEntries = [x, y, z].map(v => this.#parseString(v))
+      return {
+        validated: allEntries.every(entry =>
+          (
+            entry.length === 1
+            && !Number.isNaN(entry[0])
+          )
+        ),
+        valueMm: allEntries.map(entry => entry[0]),
+        valueNm: allEntries.map(entry => entry[0]).map(v => v*1e6),
+        string: allEntries.map(entry => `${entry[0]}mm`).join(", "),
+      }
+    }),
+  )
+  
+  onPaste(ev: ClipboardEvent) {
+    const text = ev.clipboardData.getData('text/plain')
+    this.#pasted$.next(text)
+  }
+  
+  public async selectPoint(posNm: number[]) {
+    
+    const { template } = await this.#selectedATP$.pipe(
+      take(1)
+    ).toPromise()
+
+    this.store$.dispatch(
+      atlasSelection.actions.selectPoint({
+        point: {
+          "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+          "@id": getUuid(),
+          coordinateSpace: {
+            "@id": template.id
+          },
+          coordinates: posNm.map(v => ({
+            "@id": getUuid(),
+            "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
+            unit: {
+              "@id": "id.link/mm"
+            },
+            value: v,
+            uncertainty: [0, 0]
+          }))
+        }
+      })
+    )
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          position: posNm
+        },
+        physical: true,
+        animation: true
+      })
+    )
+  }
+
   #selectedATP$ = this.store$.pipe(
     atlasSelection.fromRootStore.distinctATP()
   )
@@ -82,18 +171,60 @@ export class VerticalBreadCrumbComponent {
     })
   )
 
-  view$ = combineLatest([
+  userSelection$ = combineLatest([
     this.#selectedATP$,
     this.#selectedRegions$,
-    this.#allAtlases$,
     this.#atlasStates$,
     this.#parcStates$,
     this.#spaceStates$,
   ]).pipe(
-    map(([selectedATP, selectedRegions, atlases, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }]) => {
+    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }]) => {
+      return {
+        selectedATP,
+        selectedRegions,
+        noGroupParcs,
+        groupParcs,
+        templates,
+        parcellations,
+        allAvailableRegions,
+        labelMappedRegionNames,
+        currentViewport,
+      }
+    })
+  )
+
+  userPreferences$ = combineLatest([
+    of(enLabels)
+  ]).pipe(
+    map(([ labels ]) => {
+      return {
+        labels
+      }
+    })
+  )
+
+  view$ = combineLatest([
+    this.#allAtlases$,
+    this.userSelection$,
+    this.userPreferences$
+  ]).pipe(
+    map(([
+      atlases,
+      {
+        selectedATP,
+        selectedRegions,
+        noGroupParcs,
+        groupParcs,
+        templates,
+        parcellations,
+        allAvailableRegions,
+        labelMappedRegionNames,
+        currentViewport
+      },
+      { labels }]) => {
       
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels
       }
     })
   )
@@ -103,6 +234,36 @@ export class VerticalBreadCrumbComponent {
     private sapi: SAPI,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
   ){
+
+    const navFromState$ = this.store$.pipe(
+      select(atlasSelection.selectors.navigation),
+      filter(v => !!v),
+      map(({ position }) => position.map(v => Number((v/1e6).toFixed(3)))),
+    )
+
+    const navFromPaste$ = this.#pasted$.pipe(
+      filter(v => !!v), // '' is falsy, so filters out null, undefined, '' etc
+      map(v => this.#parseString(v)),
+    )
+
+    merge(
+      navFromState$,
+      navFromPaste$,
+    ).pipe(
+      filter(fullEntry => !!fullEntry && fullEntry.every(entry => !Number.isNaN(entry))),
+      debounceTime(160),
+      takeUntil(this.#destroy$),
+    ).subscribe(fullEntry => {
+      this.dialogForm.setValue({
+        x: `${fullEntry[0]}`,
+        y: `${fullEntry[1]}`,
+        z: `${fullEntry[2]}`,
+      })
+    })
+
+    this.dialogInputState$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe()
     
   }
   public async resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
@@ -206,13 +367,9 @@ export class VerticalBreadCrumbComponent {
     return obj.parcellations
   }
 
-  public selectTemplateByName(name: string, availableTemplates: SxplrTemplate[]) {
-    const selectTemplate = availableTemplates.find(t => t.name === name)
-    if (selectTemplate) {
-      this.selectATP('templateId', selectTemplate.id)
-    }
-  }
-
+  /**
+   * Navigate to position (in mm)
+   */
   public navigateTo(position: number[]){
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({

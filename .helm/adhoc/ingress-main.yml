@@ -32,6 +32,13 @@ spec:
             name: expmt-siibra-explorer
             port: 
               number: 8080
+      - pathType: Prefix
+        path: "/viewer-dev"
+        backend:
+          service:
+            name: dev-siibra-explorer
+            port: 
+              number: 8080
   - host: siibra-explorer.apps.ebrains.eu
     http:
       paths:
@@ -56,6 +63,13 @@ spec:
             name: expmt-siibra-explorer
             port: 
               number: 8080
+      - pathType: Prefix
+        path: "/viewer-dev"
+        backend:
+          service:
+            name: dev-siibra-explorer
+            port: 
+              number: 8080
   - host: atlases.ebrains.eu
     http:
       paths:
@@ -78,6 +92,13 @@ spec:
         backend:
           service:
             name: expmt-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
+        path: "/viewer-dev"
+        backend:
+          service:
+            name: dev-siibra-explorer
             port: 
               number: 8080
   tls:

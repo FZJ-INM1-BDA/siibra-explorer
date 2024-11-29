@@ -11,7 +11,6 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
@@ -74,14 +73,12 @@ import { CoordinateText } from "src/components/coordTextBox/coordText.directive"
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
-    StatusCardComponent,
     NehubaViewerContainer,
   ],
   exports: [
     NehubaViewerUnit,
     NehubaViewerTouchDirective,
     NehubaGlueCmp,
-    StatusCardComponent,
   ],
   providers: [
     {

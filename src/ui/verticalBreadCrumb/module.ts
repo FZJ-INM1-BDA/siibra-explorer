@@ -11,6 +11,7 @@ import { SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 import { ShareModule } from "src/share";
 import { FeatureModule } from "src/features";
 import { SapiViewsCoreSpaceModule } from "src/atlasComponents/sapiViews/core/space";
+import { ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { SapiViewsCoreSpaceModule } from "src/atlasComponents/sapiViews/core/spa
     ShareModule,
     FeatureModule,
     SapiViewsCoreSpaceModule,
+    ReactiveFormsModule,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

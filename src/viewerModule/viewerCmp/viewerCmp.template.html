@@ -177,12 +177,6 @@
     [ngClass]="{
       'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
     }">
-    <iav-cmp-viewer-nehuba-status
-      *ngIf="(useViewer$ | async) === 'nehuba'"
-      nehuba-status-panel>
-      
-      
-    </iav-cmp-viewer-nehuba-status>
   </sxplr-vertical-bread-crumb>
   
   <sxplr-tab *ngIf="!!view.selectedTemplate"
