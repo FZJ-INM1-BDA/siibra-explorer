@@ -221,13 +221,13 @@ class TranslateV3 {
     const { ...rest } = ds[0] || {}
     const { ['@id']: prevId } = parcellation.version?.prev || {}
     return {
+      ...rest,
       id: parcellation["@id"],
       name: parcellation.name,
       modality: parcellation.modality,
       type: "SxplrParcellation",
       prevId,
       shortName: parcellation.shortname,
-      ...rest
     }
   }
 
@@ -243,11 +243,11 @@ class TranslateV3 {
 
     this.#templateMap.set(template["@id"], template)
     const tmpl: SxplrTemplate = {
+      ...rest,
       id: template["@id"],
       name: template.fullName,
       shortName: template.shortName,
       type: "SxplrTemplate" as const,
-      ...rest
     }
     
     this.#sxplrTmplMap.set(tmpl.id, tmpl)
