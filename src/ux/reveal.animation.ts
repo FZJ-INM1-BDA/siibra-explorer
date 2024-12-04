@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Input } from "@angular/core";
-import { animate, AnimationBuilder, AnimationMetadata, AnimationPlayer, AnimationStyleMetadata, style } from "@angular/animations"
+import { animate, AnimationBuilder, AnimationPlayer, style } from "@angular/animations"
 
 @Directive({
   selector: '[sxplr-reveal]',
