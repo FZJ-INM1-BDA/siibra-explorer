@@ -2,10 +2,12 @@
 
     <!-- selected atlas -->
     <ng-template [ngIf]="view.selectedATP.atlas" let-atlas>
-        <mat-card>
+        <mat-card [ngClass]="{
+            'focused': view.focusedCardName === 'atlas'
+        }">
             <mat-card-header>
                 <mat-card-subtitle>
-                    <button mat-icon-button
+                    <button mat-button
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
                         [matMenuTriggerFor]="selectATPMenu"
                         [matMenuTriggerData]="{
@@ -13,22 +15,71 @@
                             type: 'atlasId',
                             options: view.atlases
                         }">
-                        <i class="fas fa-ellipsis-v"></i>
+                        <i class="fas fa-dna"></i>
+                        <span>
+                            {{ atlas.name }}
+                        </span>
                     </button>
-                    <span>
-                        {{ atlas.name }}
-                    </span>
                 </mat-card-subtitle>
             </mat-card-header>
+            
+            <mat-divider></mat-divider>
+
+            <mat-card-actions>
+                <ng-template
+                    [ngTemplateOutlet]="maximizeBtnTmpl"
+                    [ngTemplateOutletContext]="{
+                        cardname: 'atlas',
+                        currentfocus: view.focusedCardName
+                    }">
+                </ng-template>
+                <mat-divider [vertical]="true" [inset]="false"></mat-divider>
+                <button sxplr-share-view mat-icon-button>
+                    <i class="fas fa-share"></i>
+                </button>
+                <button mat-icon-button sxplrAtlasDownload #dl="atlasDlDct"
+                    [disabled]="dl.busy$ | async">
+                    
+                    <ng-template [ngIf]="dl.busy$ | async" [ngIfElse]="notBusyDlTmpl">
+                        <i class="fas fa-spinner spinning"></i>
+                    </ng-template>
+                    <ng-template #notBusyDlTmpl>
+                        <i class="fas fa-download"></i>
+                    </ng-template>
+                </button>
+            </mat-card-actions>
         </mat-card>
     </ng-template>
     
     <!-- selected template -->
     <ng-template [ngIf]="view.selectedATP.template" let-template>
-        <mat-card>
+        <mat-card [ngClass]="{
+            'focused': view.focusedCardName === 'template'
+        }">
             <mat-card-header>
                 <mat-card-subtitle>
-                    <button mat-icon-button
+                    <button mat-button [sxplr-dialog]="editPointTmpl"
+                        [matTooltip]="view.labels.NAVIGATION_CONTROL">
+                        <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
+                        <div *ngIf="view.currentViewport && view.currentViewport.minpoint && view.currentViewport.maxpoint">
+                            <span>
+                                ({{ view.currentViewport.minpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                            </span>
+                            <span>
+                                to
+                            </span>
+                            <span>
+                                ({{ view.currentViewport.maxpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                            </span>
+                            <span>
+                                mm
+                            </span>
+                        </div>
+                    </button>
+                    
+                </mat-card-subtitle>
+                <mat-card-subtitle>
+                    <button mat-button
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
                         [matMenuTriggerFor]="selectATPMenu"
                         [matMenuTriggerData]="{
@@ -36,34 +87,15 @@
                             type: 'templateId',
                             options: view.templates
                         }">
-                        <i class="fas fa-ellipsis-v"></i>
+                        <i class="fas fa-globe"></i>
+                        <span>
+                            {{ template.shortName }}
+                        </span>
                     </button>
-                    <span>
-                        {{ template.shortName }}
-                    </span>
                 </mat-card-subtitle>
-                <mat-card-title>
-                    <button mat-icon-button [sxplr-dialog]="editPointTmpl"
-                        [matTooltip]="view.labels.NAVIGATION_CONTROL">
-                        <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
-                    </button>
-                    <div *ngIf="view.currentViewport && view.currentViewport.minpoint && view.currentViewport.maxpoint">
-                        <span>
-                            ({{ view.currentViewport.minpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
-                        </span>
-                        <span>
-                            to
-                        </span>
-                        <span>
-                            ({{ view.currentViewport.maxpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
-                        </span>
-                        <span>
-                            mm
-                        </span>
-                    </div>
-                </mat-card-title>
             </mat-card-header>
             
+            <ng-template sxplrExperimentalFlag [deprecated]="true">
             <div sxplr-sapiviews-core-space-boundingbox
                 (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
                 [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
@@ -71,7 +103,6 @@
                 [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
                 #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
             </div>
-
             <sxplr-feature-entry
                 [template]="view.selectedATP.template"
                 [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
@@ -79,10 +110,48 @@
                 #voiFeatureEntryCmp="featureEntryCmp">
             </sxplr-feature-entry>
 
+            </ng-template>
+
+            <ng-template sxplrExperimentalFlag [experimental]="true">
+            <div sxplr-sapiviews-core-space-boundingbox
+                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
+                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
+                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+                #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
+            </div>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Features
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{ voiFeatureEntryCmp.totals$ | async }}
+                    </mat-panel-description>
+
+                </mat-expansion-panel-header>
+                
+                <sxplr-feature-entry
+                    [template]="view.selectedATP.template"
+                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
+                    #voiFeatureEntryCmp="featureEntryCmp">
+                </sxplr-feature-entry>
+
+            </mat-expansion-panel>
+            </ng-template>
 
             <mat-divider></mat-divider>
 
             <mat-card-actions>
+                <ng-template
+                    [ngTemplateOutlet]="maximizeBtnTmpl"
+                    [ngTemplateOutletContext]="{
+                        cardname: 'template',
+                        currentfocus: view.focusedCardName
+                    }">
+                </ng-template>
+                <mat-divider [vertical]="true"></mat-divider>
                 <button mat-icon-button
                     [matTooltip]="view.labels.DETAILS"
                     sxplr-dialog
@@ -119,32 +188,53 @@
         </mat-card>
     </ng-template>
 
+    <!-- common template for parcellation/single region/multi region -->
+    <ng-template #parcellationTmpl>
+        <button mat-button
+            [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
+            [matMenuTriggerFor]="selectATPMenu"
+            [matMenuTriggerData]="{
+                current: view.selectedATP.parcellation, 
+                type: 'parcellationId',
+                options: view.noGroupParcs,
+                groupedOptions: view.groupParcs,
+                getSubMenu: getSubParcellation
+            }">
+            <i class="fas fa-brain"></i>
+            <span>
+                {{ view.selectedATP.parcellation.shortName }}
+            </span>
+        </button>
+    </ng-template>
+
+    <ng-template #maximizeParcCardTmpl>
+        <ng-template
+            [ngTemplateOutlet]="maximizeBtnTmpl"
+            [ngTemplateOutletContext]="{
+                cardname: 'parcellation',
+                currentfocus: view.focusedCardName
+            }">
+        </ng-template>
+    </ng-template>
+
     <!-- selected parcellation -->
     <ng-template [ngIf]="view.selectedRegions.length === 0 && view.selectedATP.parcellation" let-parcellation>
-        <mat-card>
+        <mat-card
+            [ngClass]="{
+                'focused': view.focusedCardName === 'parcellation'
+            }">
             <mat-card-header>
                 <mat-card-subtitle>
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
-                        [matMenuTriggerFor]="selectATPMenu"
-                        [matMenuTriggerData]="{
-                            current: parcellation, 
-                            type: 'parcellationId',
-                            options: view.noGroupParcs,
-                            groupedOptions: view.groupParcs,
-                            getSubMenu: getSubParcellation
-                        }">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <span>
-                        {{ parcellation.shortName }}
-                    </span>
+                    <ng-template [ngTemplateOutlet]="parcellationTmpl">
+                    </ng-template>
                 </mat-card-subtitle>
 
             </mat-card-header>
 
             <mat-divider></mat-divider>
             <mat-card-actions>
+                <ng-template [ngTemplateOutlet]="maximizeParcCardTmpl"></ng-template>
+                <mat-divider [vertical]="true"></mat-divider>
                 <button mat-icon-button
                     sxplr-dialog
                     [sxplr-dialog-size]="null"
@@ -170,6 +260,9 @@
     <!-- selected single region -->
      <ng-template [ngIf]="view.selectedRegions.length === 1">
         <mat-card sxplr-sapiviews-core-region
+            [ngClass]="{
+                'focused': view.focusedCardName === 'parcellation'
+            }"
             #regionDirective="sapiViewsCoreRegion"
             (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
             [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
@@ -179,35 +272,20 @@
             [sxplr-sapiviews-core-region-detail-flag]="true">
             <mat-card-header>
                 <mat-card-subtitle>
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
-                        [matMenuTriggerFor]="selectATPMenu"
-                        [matMenuTriggerData]="{
-                            current: view.selectedATP.parcellation, 
-                            type: 'parcellationId',
-                            options: view.noGroupParcs,
-                            groupedOptions: view.groupParcs,
-                            getSubMenu: getSubParcellation
-                        }">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <span>
-                        {{ view.selectedATP.parcellation.shortName }}
-                    </span>
+                    <ng-template [ngTemplateOutlet]="parcellationTmpl">
+                    </ng-template>
                 </mat-card-subtitle>
-
-                <mat-card-title>
-                    
-                    <button mat-icon-button
+                <mat-card-subtitle>
+                    <button mat-button
                         [matTooltip]="view.labels.REGION_HIERARCHY"
                         [sxplr-dialog]="regionHierarchyTmpl"
                         sxplr-dialog-size="xl">
                         <i class="fas fa-sitemap"></i>
+                        <span>
+                            {{ view.selectedRegions[0].name }}
+                        </span>
                     </button>
-                    <span>
-                        {{ view.selectedRegions[0].name }}
-                    </span>
-                </mat-card-title>
+                </mat-card-subtitle>
             </mat-card-header>
 
             <sxplr-feature-entry
@@ -220,6 +298,9 @@
             <mat-divider></mat-divider>
 
             <mat-card-actions>
+                <ng-template [ngTemplateOutlet]="maximizeParcCardTmpl"></ng-template>
+                <mat-divider [vertical]="true"></mat-divider>
+
                 <mat-spinner *ngIf="regionDirective.fetchInProgress$ | async" diameter="24"></mat-spinner>
 
                 <!-- detail info -->
@@ -332,41 +413,33 @@
 
     <!-- selected multiple region -->
     <ng-template [ngIf]="view.selectedRegions.length > 1">
-        <mat-card>
+        <mat-card [ngClass]="{
+            'focused': view.focusedCardName === 'parcellation'
+        }">
             <mat-card-header>
                 <mat-card-subtitle>
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
-                        [matMenuTriggerFor]="selectATPMenu"
-                        [matMenuTriggerData]="{
-                            current: view.selectedATP.parcellation, 
-                            type: 'parcellationId',
-                            options: view.noGroupParcs,
-                            groupedOptions: view.groupParcs,
-                            getSubMenu: getSubParcellation
-                        }">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <span>
-                        {{ view.selectedATP.parcellation.shortName }}
-                    </span>
+                    <ng-template [ngTemplateOutlet]="parcellationTmpl">
+                    </ng-template>
                 </mat-card-subtitle>
-                <mat-card-title>
-                    <button mat-icon-button
+                <mat-card-subtitle>
+                    <button mat-button
                         [matTooltip]="view.labels.REGION_HIERARCHY"
                         [sxplr-dialog]="regionHierarchyTmpl"
                         sxplr-dialog-size="xl">
                         <i class="fas fa-sitemap"></i>
+                        <span>
+                            Multiple regions ({{ view.selectedRegions.length }})
+                        </span>
                     </button>
-                    <span>
-                        Multiple regions ({{ view.selectedRegions.length }})
-                    </span>
-                </mat-card-title>
+                </mat-card-subtitle>
             </mat-card-header>
 
             <mat-divider></mat-divider>
 
             <mat-card-actions>
+                <ng-template [ngTemplateOutlet]="maximizeParcCardTmpl"></ng-template>
+                <mat-divider [vertical]="true"></mat-divider>
+
                 <button mat-icon-button
                     [matTooltip]="view.labels.COPY_REGION_NAMES"
                     [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json">
@@ -392,6 +465,15 @@
             >
         </sxplr-sapiviews-core-rich-regionshierarchy>
     </ng-template>
+
+    
+    <ng-template #maximizeBtnTmpl let-cardname="cardname" let-currentfocus="currentfocus">
+        <button mat-icon-button (click)="toggleFocus(cardname)"
+            [matTooltip]="currentfocus === cardname ? view.labels.RESTORE_PANELS : view.labels.MAXIMIZE_PANEL">
+            <mat-icon fontSet="fas" [fontIcon]="currentfocus === cardname ? 'fa-compress': 'fa-expand' "></mat-icon>
+        </button>
+    </ng-template>
+
 </ng-template>
 
 <mat-menu #selectATPMenu="matMenu">

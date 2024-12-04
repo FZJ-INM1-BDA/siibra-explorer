@@ -1,6 +1,19 @@
+:host:has(mat-card.focused)
+{
+    mat-card:not(.focused)
+    {
+        max-height: 1rem;
+        overflow: hidden;
+    }
+}
+
 mat-card
 {
     margin: 0.2rem 0.4rem;
+
+    // TODO figure out animation??
+    // max-height: auto;
+    // transition: all 200ms ease-in-out;
 
     mat-card-header
     {
@@ -28,6 +41,11 @@ mat-card
                 flex: 0 0 auto;
             }
         }
+    }
+
+    mat-card-actions:has(mat-divider)
+    {
+        align-items: stretch;
     }
 }
 

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, merge, of, Subject } from "rxjs";
-import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, merge, of, Subject } from "rxjs";
+import { debounceTime, filter, map, scan, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
@@ -30,6 +30,7 @@ export class VerticalBreadCrumbComponent {
   #destroy$ = inject(DestroyDirective).destroyed$
   
   #pasted$ = new Subject<string>()
+  #focusedCardname$ = new BehaviorSubject<string|null>(null)
   
   #parseString(input: string): number[]{
     return input
@@ -194,11 +195,19 @@ export class VerticalBreadCrumbComponent {
   )
 
   userPreferences$ = combineLatest([
-    of(enLabels)
+    of(enLabels),
+    this.#focusedCardname$.pipe(
+      scan((acc, curr) => {
+        return acc === curr
+        ? null
+        : curr
+      })
+    )
   ]).pipe(
-    map(([ labels ]) => {
+    map(([ labels, focusedCardName ]) => {
       return {
-        labels
+        labels,
+        focusedCardName,
       }
     })
   )
@@ -221,10 +230,10 @@ export class VerticalBreadCrumbComponent {
         labelMappedRegionNames,
         currentViewport
       },
-      { labels }]) => {
+      { labels, focusedCardName }]) => {
       
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels, focusedCardName
       }
     })
   )
@@ -386,5 +395,9 @@ export class VerticalBreadCrumbComponent {
     return (name: string) => {
       return name === current.name
     }
+  }
+
+  public toggleFocus(cardname: string){
+    this.#focusedCardname$.next(cardname)
   }
 }

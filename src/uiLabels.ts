@@ -22,5 +22,7 @@ export const enLabels = {
   SELECTED_DIFFERENT_TEMPLATE: "select a different template",
   SELECTED_DIFFERENT_PARCELLATION: "select a different parcellation",
 
-  NAVIGATION_CONTROL: "navigation control"
+  NAVIGATION_CONTROL: "navigation control",
+  MAXIMIZE_PANEL: 'maximize this panel',
+  RESTORE_PANELS: 'restore panels',
 }

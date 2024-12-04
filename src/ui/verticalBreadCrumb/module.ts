@@ -12,6 +12,8 @@ import { ShareModule } from "src/share";
 import { FeatureModule } from "src/features";
 import { SapiViewsCoreSpaceModule } from "src/atlasComponents/sapiViews/core/space";
 import { ReactiveFormsModule } from "@angular/forms";
+import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -24,6 +26,8 @@ import { ReactiveFormsModule } from "@angular/forms";
     SapiViewsCoreRegionModule,
     SapiViewsUtilModule,
     ShareModule,
+    AtlasDownloadModule,
+    ExperimentalFlagDirective,
     FeatureModule,
     SapiViewsCoreSpaceModule,
     ReactiveFormsModule,

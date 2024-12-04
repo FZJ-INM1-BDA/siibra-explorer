@@ -14,7 +14,6 @@ import { TopMenuCmp } from "./topMenuCmp/topMenu.components";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { KeyFrameModule } from "src/keyframesModule/module";
-import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { AngularMaterialModule } from "src/sharedModules";
 
 
@@ -35,7 +34,6 @@ import { AngularMaterialModule } from "src/sharedModules";
     UserAnnotationsModule,
     KeyFrameModule,
     QuickTourModule,
-    AtlasDownloadModule,
   ],
   declarations: [
     TopMenuCmp

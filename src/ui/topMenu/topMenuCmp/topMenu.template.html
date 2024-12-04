@@ -20,12 +20,6 @@
       </ng-container>
     </div>
 
-    <!-- download maps -->
-    <div iav-fab-speed-dial-child>
-      <ng-container *ngTemplateOutlet="downloadAllTmpl">
-      </ng-container>
-    </div>
-
     <!-- help one pager -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="helpBtnTmpl">
@@ -56,10 +50,6 @@
 
     <!-- plugin and tools -->
     <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
-    </ng-container>
-
-    <!-- pinned dataset -->
-    <ng-container *ngTemplateOutlet="downloadAllTmpl">
     </ng-container>
 
     <!-- help one pager -->
@@ -104,34 +94,6 @@
       iav-dynamic-mat-button-aria-label="Show tools and plugins">
 
       <i class="fas fa-th"></i>
-    </iav-dynamic-mat-button>
-  </div>
-</ng-template>
-
-<!-- pinned dataset btn -->
-<ng-template #downloadAllTmpl>
-  <div class="btnWrapper"
-    [matTooltip]="(atlasDlDct.busy$| async) ? busyTxt : idleTxt"
-    quick-tour
-    [quick-tour-description]="downloadAtlas.description"
-    [quick-tour-order]="downloadAtlas.order"
-    sxplrAtlasDownload
-    aria-disabled="true"
-    role="button"
-    #atlasDlDct="atlasDlDct">
-    <iav-dynamic-mat-button
-      [iav-dynamic-mat-button-style]="matBtnStyle"
-      [iav-dynamic-mat-button-color]="matBtnColor"
-      [iav-dynamic-mat-button-disabled]="atlasDlDct.busy$ | async"
-      iav-dynamic-mat-button-aria-label="Show pinned datasets">
-
-      <ng-template [ngIf]="atlasDlDct.busy$ | async" [ngIfElse]="dlEnabledTmpl">
-        <i class="spinning fas fa-spinner"></i>
-      </ng-template>
-
-      <ng-template #dlEnabledTmpl>
-        <i class="fas fa-download"></i>
-      </ng-template>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
