@@ -23,7 +23,7 @@ const pipe = new FilterGroupedParcellationPipe()
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
     DestroyDirective
-  ]
+  ],
 })
 
 export class VerticalBreadCrumbComponent {

@@ -14,6 +14,7 @@ import { SapiViewsCoreSpaceModule } from "src/atlasComponents/sapiViews/core/spa
 import { ReactiveFormsModule } from "@angular/forms";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { SxplrAnimationModule } from "src/ux";
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     FeatureModule,
     SapiViewsCoreSpaceModule,
     ReactiveFormsModule,
+    SxplrAnimationModule,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

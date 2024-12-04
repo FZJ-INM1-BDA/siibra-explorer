@@ -1,9 +1,12 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
     <!-- selected atlas -->
-    <ng-template [ngIf]="view.selectedATP.atlas" let-atlas>
+    <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container"
+        (click)="!!view.focusedCardName && toggleFocus('atlas')"
+        sxplr-reveal
+        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'atlas'">
         <mat-card [ngClass]="{
-            'focused': view.focusedCardName === 'atlas'
+            'sxplr-focused': view.focusedCardName === 'atlas'
         }">
             <mat-card-header>
                 <mat-card-subtitle>
@@ -49,14 +52,32 @@
                 </button>
             </mat-card-actions>
         </mat-card>
-    </ng-template>
+    </div>
     
     <!-- selected template -->
-    <ng-template [ngIf]="view.selectedATP.template" let-template>
+    <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container"
+        (click)="!!view.focusedCardName && toggleFocus('template')"
+        sxplr-reveal
+        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'template'">
         <mat-card [ngClass]="{
-            'focused': view.focusedCardName === 'template'
+            'sxplr-focused': view.focusedCardName === 'template'
         }">
             <mat-card-header>
+                <mat-card-subtitle>
+                    <button mat-button
+                        [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
+                        [matMenuTriggerFor]="selectATPMenu"
+                        [matMenuTriggerData]="{
+                            current: template, 
+                            type: 'templateId',
+                            options: view.templates
+                        }">
+                        <i class="fas fa-globe"></i>
+                        <span>
+                            {{ template.shortName }}
+                        </span>
+                    </button>
+                </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button [sxplr-dialog]="editPointTmpl"
                         [matTooltip]="view.labels.NAVIGATION_CONTROL">
@@ -77,21 +98,6 @@
                         </div>
                     </button>
                     
-                </mat-card-subtitle>
-                <mat-card-subtitle>
-                    <button mat-button
-                        [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
-                        [matMenuTriggerFor]="selectATPMenu"
-                        [matMenuTriggerData]="{
-                            current: template, 
-                            type: 'templateId',
-                            options: view.templates
-                        }">
-                        <i class="fas fa-globe"></i>
-                        <span>
-                            {{ template.shortName }}
-                        </span>
-                    </button>
                 </mat-card-subtitle>
             </mat-card-header>
             
@@ -186,7 +192,7 @@
                 </button>
             </mat-card-actions>
         </mat-card>
-    </ng-template>
+    </div>
 
     <!-- common template for parcellation/single region/multi region -->
     <ng-template #parcellationTmpl>
@@ -218,10 +224,14 @@
     </ng-template>
 
     <!-- selected parcellation -->
-    <ng-template [ngIf]="view.selectedRegions.length === 0 && view.selectedATP.parcellation" let-parcellation>
+    <div *ngIf="view.selectedRegions.length === 0 && view.selectedATP.parcellation; let parcellation"
+        class="vbc-card-container"
+        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        sxplr-reveal
+        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
         <mat-card
             [ngClass]="{
-                'focused': view.focusedCardName === 'parcellation'
+                'sxplr-focused': view.focusedCardName === 'parcellation'
             }">
             <mat-card-header>
                 <mat-card-subtitle>
@@ -255,13 +265,17 @@
 
             </mat-card-actions>
         </mat-card>
-    </ng-template>
+    </div>
 
     <!-- selected single region -->
-     <ng-template [ngIf]="view.selectedRegions.length === 1">
+    <div *ngIf="view.selectedRegions.length === 1"
+        class="vbc-card-container"
+        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        sxplr-reveal
+        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
         <mat-card sxplr-sapiviews-core-region
             [ngClass]="{
-                'focused': view.focusedCardName === 'parcellation'
+                'sxplr-focused': view.focusedCardName === 'parcellation'
             }"
             #regionDirective="sapiViewsCoreRegion"
             (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
@@ -409,12 +423,16 @@
             </mat-card-actions>
         </mat-card>
 
-     </ng-template>
+    </div>
 
     <!-- selected multiple region -->
-    <ng-template [ngIf]="view.selectedRegions.length > 1">
+    <div *ngIf="view.selectedRegions.length > 1"
+        class="vbc-card-container"
+        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        sxplr-reveal
+        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
         <mat-card [ngClass]="{
-            'focused': view.focusedCardName === 'parcellation'
+            'sxplr-focused': view.focusedCardName === 'parcellation'
         }">
             <mat-card-header>
                 <mat-card-subtitle>
@@ -452,7 +470,7 @@
             </mat-card-actions>
         </mat-card>
 
-    </ng-template>
+    </div>
 
     <ng-template #regionHierarchyTmpl>
         <sxplr-sapiviews-core-rich-regionshierarchy
@@ -469,6 +487,7 @@
     
     <ng-template #maximizeBtnTmpl let-cardname="cardname" let-currentfocus="currentfocus">
         <button mat-icon-button (click)="toggleFocus(cardname)"
+            iav-stop="click"
             [matTooltip]="currentfocus === cardname ? view.labels.RESTORE_PANELS : view.labels.MAXIMIZE_PANEL">
             <mat-icon fontSet="fas" [fontIcon]="currentfocus === cardname ? 'fa-compress': 'fa-expand' "></mat-icon>
         </button>

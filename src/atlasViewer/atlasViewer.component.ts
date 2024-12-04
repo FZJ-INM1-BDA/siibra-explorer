@@ -14,7 +14,6 @@ import { Store, select } from "@ngrx/store";
 import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
 import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
-import { colorAnimation } from "./atlasViewer.animation"
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { CONST } from 'common/constants'
@@ -34,9 +33,6 @@ import { SAPI } from "src/atlasComponents/sapi";
   templateUrl: './atlasViewer.template.html',
   styleUrls: [
     `./atlasViewer.style.css`,
-  ],
-  animations : [
-    colorAnimation,
   ],
 })
 

@@ -1,52 +1,69 @@
-:host:has(mat-card.focused)
+:host:has(mat-card.sxplr-focused)
 {
-    mat-card:not(.focused)
-    {
-        max-height: 1rem;
-        overflow: hidden;
+    div:has(mat-card:not(.sxplr-focused)){
+
+        > *
+        {
+            pointer-events: none;
+        }
+
+        opacity: 0.8;
+        
+        &:hover
+        {
+            opacity: 1.0;
+        }
+
     }
 }
 
-mat-card
+.vbc-card-container
 {
+    overflow-y: hidden; 
     margin: 0.2rem 0.4rem;
 
-    // TODO figure out animation??
-    // max-height: auto;
-    // transition: all 200ms ease-in-out;
-
-    mat-card-header
+    
+    mat-card
     {
-        ::ng-deep > div
+
+        // TODO figure out animation??
+        // max-height: auto;
+        // transition: all 200ms ease-in-out;
+
+        mat-card-header
         {
-            width: 100%;
-        }
-
-        mat-card-title
-        {
-            overflow: hidden;
-
-            display: inline-flex;
-            width: 100%;
-            align-items: baseline;
-
-            div
+            ::ng-deep > div
             {
-                text-overflow: ellipsis;
+                width: 100%;
+            }
+
+            mat-card-title
+            {
                 overflow: hidden;
-                flex: 1 1 auto;
+
+                display: inline-flex;
+                width: 100%;
+                align-items: baseline;
+
+                div
+                {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    flex: 1 1 auto;
+                }
+                button
+                {
+                    flex: 0 0 auto;
+                }
             }
-            button
-            {
-                flex: 0 0 auto;
-            }
+        }
+
+        mat-card-actions:has(mat-divider)
+        {
+            align-items: stretch;
         }
     }
 
-    mat-card-actions:has(mat-divider)
-    {
-        align-items: stretch;
-    }
 }
 
 .menu-button

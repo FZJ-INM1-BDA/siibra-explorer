@@ -3,7 +3,6 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
-import { animate, state, style, transition, trigger } from "@angular/animations";
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TViewerEvtCtxData, TSupportedViewers, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
@@ -29,24 +28,6 @@ interface HasName {
     './viewerCmp.style.css'
   ],
   exportAs: 'iavCmpViewerCntr',
-  animations: [
-    trigger('openClose', [
-      state('open', style({
-        transform: 'translateY(0)',
-        opacity: 1
-      })),
-      state('closed', style({
-        transform: 'translateY(-100vh)',
-        opacity: 0
-      })),
-      transition('open => closed', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ]),
-      transition('closed => open', [
-        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
-      ])
-    ]),
-  ],
   providers: [
     DialogService
   ],
