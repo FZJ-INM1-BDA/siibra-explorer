@@ -1,5 +1,6 @@
 import { Directive, ElementRef, Input } from "@angular/core";
 import { animate, AnimationBuilder, AnimationPlayer, style } from "@angular/animations"
+import { BehaviorSubject } from "rxjs";
 
 @Directive({
   selector: '[sxplr-reveal]',
@@ -14,6 +15,7 @@ export class RevealAnimationDirective{
 
   minimizedHeight: string|number = "1rem"
 
+  state$ = new BehaviorSubject(this.#state)
   get state(){
     return this.#state
   }
@@ -46,6 +48,7 @@ export class RevealAnimationDirective{
       return
     }
     this.#state = !this.#state
+    this.state$.next(this.#state)
     this.#beforeAnimation()
     const start = this.minimizedHeight
     const end = this.#hostHeight
@@ -62,6 +65,7 @@ export class RevealAnimationDirective{
       return
     }
     this.#state = !this.#state
+    this.state$.next(this.#state)
     this.#beforeAnimation()
     const start = this.#hostHeight
     const end = this.minimizedHeight

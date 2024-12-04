@@ -1,26 +1,22 @@
-:host:has(mat-card.sxplr-focused)
+div.vbc-card-container
 {
-    div:has(mat-card:not(.sxplr-focused)){
+    overflow-y: hidden; 
+    margin: 0.2rem 0.4rem;
+
+    &.sxplr-hidden
+    {
+        opacity: 0.8;
 
         > *
         {
             pointer-events: none;
         }
 
-        opacity: 0.8;
-        
         &:hover
         {
             opacity: 1.0;
         }
-
     }
-}
-
-.vbc-card-container
-{
-    overflow-y: hidden; 
-    margin: 0.2rem 0.4rem;
 
     
     mat-card

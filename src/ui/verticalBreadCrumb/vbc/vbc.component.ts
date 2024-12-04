@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, of, Subject } from "rxjs";
-import { debounceTime, filter, map, scan, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
+import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
@@ -30,7 +30,7 @@ export class VerticalBreadCrumbComponent {
   #destroy$ = inject(DestroyDirective).destroyed$
   
   #pasted$ = new Subject<string>()
-  #focusedCardname$ = new BehaviorSubject<string|null>(null)
+  #opendCardNames$ = new BehaviorSubject<string[]>([])
   
   #parseString(input: string): number[]{
     return input
@@ -196,18 +196,12 @@ export class VerticalBreadCrumbComponent {
 
   userPreferences$ = combineLatest([
     of(enLabels),
-    this.#focusedCardname$.pipe(
-      scan((acc, curr) => {
-        return acc === curr
-        ? null
-        : curr
-      })
-    )
+    this.#opendCardNames$,
   ]).pipe(
-    map(([ labels, focusedCardName ]) => {
+    map(([ labels, openedCardNames ]) => {
       return {
         labels,
-        focusedCardName,
+        openedCardNames,
       }
     })
   )
@@ -230,10 +224,10 @@ export class VerticalBreadCrumbComponent {
         labelMappedRegionNames,
         currentViewport
       },
-      { labels, focusedCardName }]) => {
+      { labels, openedCardNames }]) => {
       
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels, focusedCardName
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels, openedCardNames
       }
     })
   )
@@ -397,7 +391,13 @@ export class VerticalBreadCrumbComponent {
     }
   }
 
-  public toggleFocus(cardname: string){
-    this.#focusedCardname$.next(cardname)
+  public focusCard(cardname: string){
+    this.#opendCardNames$.next([cardname])
+  }
+
+  public openCard(cardname: string){
+    const s = new Set(this.#opendCardNames$.value)
+    s.add(cardname)
+    this.#opendCardNames$.next(Array.from(s))
   }
 }

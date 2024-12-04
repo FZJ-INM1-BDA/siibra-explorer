@@ -2,12 +2,14 @@
 
     <!-- selected atlas -->
     <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container"
-        (click)="!!view.focusedCardName && toggleFocus('atlas')"
+        (click)="openCard('atlas')"
         sxplr-reveal
-        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'atlas'">
-        <mat-card [ngClass]="{
-            'sxplr-focused': view.focusedCardName === 'atlas'
+        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('atlas')"
+        #atlasReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(atlasReveal.state$ | async)
         }">
+        <mat-card>
             <mat-card-header>
                 <mat-card-subtitle>
                     <button mat-button
@@ -32,8 +34,7 @@
                 <ng-template
                     [ngTemplateOutlet]="maximizeBtnTmpl"
                     [ngTemplateOutletContext]="{
-                        cardname: 'atlas',
-                        currentfocus: view.focusedCardName
+                        cardname: 'atlas'
                     }">
                 </ng-template>
                 <mat-divider [vertical]="true" [inset]="false"></mat-divider>
@@ -56,12 +57,14 @@
     
     <!-- selected template -->
     <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container"
-        (click)="!!view.focusedCardName && toggleFocus('template')"
+        (click)="openCard('template')"
         sxplr-reveal
-        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'template'">
-        <mat-card [ngClass]="{
-            'sxplr-focused': view.focusedCardName === 'template'
+        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('template')"
+        #tmplReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(tmplReveal.state$ | async)
         }">
+        <mat-card>
             <mat-card-header>
                 <mat-card-subtitle>
                     <button mat-button
@@ -153,8 +156,7 @@
                 <ng-template
                     [ngTemplateOutlet]="maximizeBtnTmpl"
                     [ngTemplateOutletContext]="{
-                        cardname: 'template',
-                        currentfocus: view.focusedCardName
+                        cardname: 'template'
                     }">
                 </ng-template>
                 <mat-divider [vertical]="true"></mat-divider>
@@ -217,8 +219,7 @@
         <ng-template
             [ngTemplateOutlet]="maximizeBtnTmpl"
             [ngTemplateOutletContext]="{
-                cardname: 'parcellation',
-                currentfocus: view.focusedCardName
+                cardname: 'parcellation'
             }">
         </ng-template>
     </ng-template>
@@ -226,13 +227,14 @@
     <!-- selected parcellation -->
     <div *ngIf="view.selectedRegions.length === 0 && view.selectedATP.parcellation; let parcellation"
         class="vbc-card-container"
-        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        (click)="openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
-        <mat-card
-            [ngClass]="{
-                'sxplr-focused': view.focusedCardName === 'parcellation'
-            }">
+        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        #parcReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(parcReveal.state$ | async)
+        }">
+        <mat-card>
             <mat-card-header>
                 <mat-card-subtitle>
                     <ng-template [ngTemplateOutlet]="parcellationTmpl">
@@ -270,13 +272,14 @@
     <!-- selected single region -->
     <div *ngIf="view.selectedRegions.length === 1"
         class="vbc-card-container"
-        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        (click)="openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
+        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        #parcReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(parcReveal.state$ | async)
+        }">
         <mat-card sxplr-sapiviews-core-region
-            [ngClass]="{
-                'sxplr-focused': view.focusedCardName === 'parcellation'
-            }"
             #regionDirective="sapiViewsCoreRegion"
             (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
             [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
@@ -428,12 +431,14 @@
     <!-- selected multiple region -->
     <div *ngIf="view.selectedRegions.length > 1"
         class="vbc-card-container"
-        (click)="!!view.focusedCardName && toggleFocus('parcellation')"
+        (click)="openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="!(view.focusedCardName) || view.focusedCardName === 'parcellation'">
-        <mat-card [ngClass]="{
-            'sxplr-focused': view.focusedCardName === 'parcellation'
+        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        #parcReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(parcReveal.state$ | async)
         }">
+        <mat-card>
             <mat-card-header>
                 <mat-card-subtitle>
                     <ng-template [ngTemplateOutlet]="parcellationTmpl">
@@ -485,11 +490,11 @@
     </ng-template>
 
     
-    <ng-template #maximizeBtnTmpl let-cardname="cardname" let-currentfocus="currentfocus">
-        <button mat-icon-button (click)="toggleFocus(cardname)"
+    <ng-template #maximizeBtnTmpl let-cardname="cardname">
+        <button mat-icon-button (click)="focusCard(cardname)"
             iav-stop="click"
-            [matTooltip]="currentfocus === cardname ? view.labels.RESTORE_PANELS : view.labels.MAXIMIZE_PANEL">
-            <mat-icon fontSet="fas" [fontIcon]="currentfocus === cardname ? 'fa-compress': 'fa-expand' "></mat-icon>
+            [matTooltip]="view.labels.MAXIMIZE_PANEL">
+            <mat-icon fontSet="fas" fontIcon="fa-expand"></mat-icon>
         </button>
     </ng-template>
 
