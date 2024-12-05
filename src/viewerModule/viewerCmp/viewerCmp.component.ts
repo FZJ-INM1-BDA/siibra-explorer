@@ -4,12 +4,12 @@ import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour";
-import { EnumViewerEvt, TViewerEvtCtxData, TSupportedViewers, TViewerEvent } from "../viewer.interface";
+import { EnumViewerEvt, TViewerEvtCtxData, TViewerEvent } from "../viewer.interface";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
@@ -25,7 +25,7 @@ interface HasName {
   selector: 'iav-cmp-viewer-container',
   templateUrl: './viewerCmp.template.html',
   styleUrls: [
-    './viewerCmp.style.css'
+    './viewerCmp.style.scss'
   ],
   exportAs: 'iavCmpViewerCntr',
   providers: [
@@ -93,16 +93,6 @@ export class ViewerCmp {
 
   #viewerMode$: Observable<string> = this.store$.pipe(
     select(atlasSelection.selectors.viewerMode),
-  )
-
-  public useViewer$: Observable<TSupportedViewers | 'notsupported'> = this.store$.pipe(
-    select(atlasAppearance.selectors.useViewer),
-    map(useviewer => {
-      if (useviewer === "NEHUBA") return "nehuba"
-      if (useviewer === "THREESURFER") return "threeSurfer"
-      if (useviewer === "NOT_SUPPORTED") return "notsupported"
-      return null
-    })
   )
 
   public viewerCtx$ = this.ctxMenuSvc.context$

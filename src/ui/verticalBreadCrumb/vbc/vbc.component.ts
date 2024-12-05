@@ -5,7 +5,7 @@ import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } fr
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
-import { atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import { enLabels } from "src/uiLabels"
 import { FormControl, FormGroup } from "@angular/forms";
@@ -27,10 +27,11 @@ const pipe = new FilterGroupedParcellationPipe()
 })
 
 export class VerticalBreadCrumbComponent {
+
   #destroy$ = inject(DestroyDirective).destroyed$
   
   #pasted$ = new Subject<string>()
-  #opendCardNames$ = new BehaviorSubject<string[]>([])
+  #minimizedCards$ = new BehaviorSubject<string[]>([])
   
   #parseString(input: string): number[]{
     return input
@@ -178,8 +179,12 @@ export class VerticalBreadCrumbComponent {
     this.#atlasStates$,
     this.#parcStates$,
     this.#spaceStates$,
+    this.store$.pipe(
+      select(userInteraction.selectors.selectedFeature)
+    ),
   ]).pipe(
-    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }]) => {
+    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, selectedFeature]) => {
+      
       return {
         selectedATP,
         selectedRegions,
@@ -190,18 +195,37 @@ export class VerticalBreadCrumbComponent {
         allAvailableRegions,
         labelMappedRegionNames,
         currentViewport,
+        selectedFeature,
+      }
+    })
+  )
+
+  userSelectionDeducedState$ = combineLatest([
+    this.store$.pipe(
+      select(atlasAppearance.selectors.useViewer),
+      map(useviewer => {
+        if (useviewer === "NEHUBA") return "nehuba" as const
+        if (useviewer === "THREESURFER") return "threeSurfer" as const
+        if (useviewer === "NOT_SUPPORTED") return "notsupported" as const
+        return null
+      })
+    )
+  ]).pipe(
+    map(([ useViewer ]) => {
+      return {
+        useViewer
       }
     })
   )
 
   userPreferences$ = combineLatest([
     of(enLabels),
-    this.#opendCardNames$,
+    this.#minimizedCards$,
   ]).pipe(
-    map(([ labels, openedCardNames ]) => {
+    map(([ labels, minimizedCards ]) => {
       return {
         labels,
-        openedCardNames,
+        minimizedCards,
       }
     })
   )
@@ -209,6 +233,7 @@ export class VerticalBreadCrumbComponent {
   view$ = combineLatest([
     this.#allAtlases$,
     this.userSelection$,
+    this.userSelectionDeducedState$,
     this.userPreferences$
   ]).pipe(
     map(([
@@ -222,12 +247,14 @@ export class VerticalBreadCrumbComponent {
         parcellations,
         allAvailableRegions,
         labelMappedRegionNames,
-        currentViewport
+        currentViewport,
+        selectedFeature,
       },
-      { labels, openedCardNames }]) => {
+      { useViewer },
+      { labels, minimizedCards }]) => {
       
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, labels, openedCardNames
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer
       }
     })
   )
@@ -391,13 +418,21 @@ export class VerticalBreadCrumbComponent {
     }
   }
 
-  public focusCard(cardname: string){
-    this.#opendCardNames$.next([cardname])
+  public minimizeCard(cardname: string){
+    const s = new Set(this.#minimizedCards$.value)
+    s.add(cardname)
+    this.#minimizedCards$.next(Array.from(s))
   }
 
   public openCard(cardname: string){
-    const s = new Set(this.#opendCardNames$.value)
-    s.add(cardname)
-    this.#opendCardNames$.next(Array.from(s))
+    const s = new Set(this.#minimizedCards$.value)
+    s.delete(cardname)
+    this.#minimizedCards$.next(Array.from(s))
+  }
+
+  public clearFeature(){
+    this.store$.dispatch(
+      userInteraction.actions.clearShownFeature()
+    )
   }
 }

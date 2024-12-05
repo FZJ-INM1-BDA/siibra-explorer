@@ -13,7 +13,7 @@ export class RevealAnimationDirective{
   #player: AnimationPlayer
   #state = true
 
-  minimizedHeight: string|number = "1rem"
+  minimizedHeight: string|number = "2.8rem"
 
   state$ = new BehaviorSubject(this.#state)
   get state(){

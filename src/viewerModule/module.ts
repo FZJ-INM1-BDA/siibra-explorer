@@ -45,6 +45,7 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
+import { SxplrAnimationModule } from "src/ux";
 
 @NgModule({
   imports: [
@@ -73,6 +74,7 @@ import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
     ReactiveFormsModule,
     TabComponent,
     AtlasViewerRouterModule,
+    SxplrAnimationModule,
     
     MouseOver,
     MediaQueryDirective,

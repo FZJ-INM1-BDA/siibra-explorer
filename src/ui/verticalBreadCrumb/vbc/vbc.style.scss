@@ -1,3 +1,32 @@
+
+div.vbc-card-container.sxplr-hidden
+{
+    &::before
+    {
+        background: linear-gradient(
+            to bottom,
+            rgba(200, 200, 200, 0) 0%,
+            rgba(200, 200, 200, 0.2) 20%,
+            rgba(200, 200, 200, 1.0) 100%
+        );
+    }
+}
+:host-context([darktheme="true"])
+{
+    div.vbc-card-container.sxplr-hidden
+    {
+        &::before
+        {
+            background: linear-gradient(
+                to bottom,
+                rgba(40, 40, 40, 0) 0%,
+                rgba(40, 40, 40, 0.2) 20%,
+                rgba(40, 40, 40, 1.0) 100%
+            );
+        }
+    }
+}
+
 div.vbc-card-container
 {
     overflow-y: hidden; 
@@ -6,6 +35,16 @@ div.vbc-card-container
     &.sxplr-hidden
     {
         opacity: 0.8;
+        position: relative;
+
+        &::before
+        {
+            content: "";
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: 9;
+        }
 
         > *
         {
@@ -21,11 +60,6 @@ div.vbc-card-container
     
     mat-card
     {
-
-        // TODO figure out animation??
-        // max-height: auto;
-        // transition: all 200ms ease-in-out;
-
         mat-card-header
         {
             ::ng-deep > div
@@ -91,4 +125,17 @@ table[mat-table] *
 {
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+button[mat-button]
+{
+    text-wrap: nowrap;
+    overflow: hidden;
+    justify-content: start;
+    width: 100%;
+
+    & > mat-icon
+    {
+        flex: 0 0 auto;
+    }
 }

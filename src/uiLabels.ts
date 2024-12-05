@@ -16,6 +16,8 @@ export const enLabels = {
   RELATED_REGIONS: "related regions",
 
   CLEAR_SELECTED_REGION: "clear selected region",
+  CLEAR_SELECTED_FEATURE: "clear selected feature",
+  
   COPY_REGION_NAMES: "copy selected rgion names",
 
   SELECTED_DIFFERENT_ATLAS: "select a different atlas",
@@ -24,5 +26,7 @@ export const enLabels = {
 
   NAVIGATION_CONTROL: "navigation control",
   MAXIMIZE_PANEL: 'maximize this panel',
+  MINIMIZE_PANEL: 'minimize this panel',
+  
   RESTORE_PANELS: 'restore panels',
 }

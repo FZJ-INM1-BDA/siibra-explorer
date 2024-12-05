@@ -4,10 +4,11 @@
     <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container"
         (click)="!atlasReveal.state && openCard('atlas')"
         sxplr-reveal
-        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('atlas')"
+        [reveal-state]="!view.minimizedCards.includes('atlas')"
         #atlasReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(atlasReveal.state$ | async)
+            'sxplr-hidden': !(atlasReveal.state$ | async),
+            'mat-elevation-z2': (atlasReveal.state$ | async)
         }">
         <mat-card>
             <mat-card-header>
@@ -59,10 +60,11 @@
     <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container"
         (click)="!tmplReveal.state && openCard('template')"
         sxplr-reveal
-        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('template')"
+        [reveal-state]="!view.minimizedCards.includes('template')"
         #tmplReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(tmplReveal.state$ | async)
+            'sxplr-hidden': !(tmplReveal.state$ | async),
+            'mat-elevation-z2': (tmplReveal.state$ | async)
         }">
         <mat-card>
             <mat-card-header>
@@ -82,25 +84,37 @@
                     </button>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
-                    <button mat-button [sxplr-dialog]="editPointTmpl"
-                        [matTooltip]="view.labels.NAVIGATION_CONTROL">
-                        <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
-                        <div *ngIf="view.currentViewport && view.currentViewport.minpoint && view.currentViewport.maxpoint">
-                            <span>
-                                ({{ view.currentViewport.minpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
-                            </span>
-                            <span>
-                                to
-                            </span>
-                            <span>
-                                ({{ view.currentViewport.maxpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
-                            </span>
-                            <span>
-                                mm
-                            </span>
-                        </div>
-                    </button>
+                    <ng-template [ngIf]="view.useViewer === 'nehuba'" [ngIfElse]="notSupportedTmpl">
+
+                        <button mat-button [sxplr-dialog]="editPointTmpl"
+                            [matTooltip]="view.labels.NAVIGATION_CONTROL">
+                            <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
+                            <div *ngIf="view.currentViewport && view.currentViewport.minpoint && view.currentViewport.maxpoint">
+                                <span>
+                                    ({{ view.currentViewport.minpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                                </span>
+                                <span>
+                                    to
+                                </span>
+                                <span>
+                                    ({{ view.currentViewport.maxpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                                </span>
+                                <span>
+                                    mm
+                                </span>
+                            </div>
+                        </button>
                     
+                    </ng-template>
+                    <ng-template #notSupportedTmpl>
+
+                        <button mat-button disabled>
+                            <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
+                            <span>
+                                Setting navigation unsupported
+                            </span>
+                        </button>
+                    </ng-template>
                 </mat-card-subtitle>
             </mat-card-header>
             
@@ -129,7 +143,7 @@
                 [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
                 #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
             </div>
-            <mat-expansion-panel>
+            <mat-expansion-panel class="mat-elevation-z0">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
                         Features
@@ -171,27 +185,31 @@
                     }">
                     <i class="fas fa-info"></i>
                 </button>
-                <button
-                    [matTooltip]="view.labels.RESET_TRANSLATION"
-                    color="warn"
-                    mat-icon-button
-                    (click)="resetNavigation({ position: true })">
-                    <i class="iavic iavic-translation"></i>
-                </button>
-                <button
-                    [matTooltip]="view.labels.RESET_ROTATION"
-                    color="warn"
-                    mat-icon-button
-                    (click)="resetNavigation({ rotation: true })">
-                    <i class="iavic iavic-rotation"></i>
-                </button>
-                <button
-                    [matTooltip]="view.labels.RESET_ZOOM"
-                    color="warn"
-                    mat-icon-button
-                    (click)="resetNavigation({ zoom: true })">
-                    <i class="iavic iavic-scaling"></i>
-                </button>
+
+                <ng-template [ngIf]="view.useViewer === 'nehuba'">
+
+                    <button
+                        [matTooltip]="view.labels.RESET_TRANSLATION"
+                        color="warn"
+                        mat-icon-button
+                        (click)="resetNavigation({ position: true })">
+                        <i class="iavic iavic-translation"></i>
+                    </button>
+                    <button
+                        [matTooltip]="view.labels.RESET_ROTATION"
+                        color="warn"
+                        mat-icon-button
+                        (click)="resetNavigation({ rotation: true })">
+                        <i class="iavic iavic-rotation"></i>
+                    </button>
+                    <button
+                        [matTooltip]="view.labels.RESET_ZOOM"
+                        color="warn"
+                        mat-icon-button
+                        (click)="resetNavigation({ zoom: true })">
+                        <i class="iavic iavic-scaling"></i>
+                    </button>
+                </ng-template>
             </mat-card-actions>
         </mat-card>
     </div>
@@ -229,10 +247,11 @@
         class="vbc-card-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async)
+            'sxplr-hidden': !(parcReveal.state$ | async),
+            'mat-elevation-z2': (parcReveal.state$ | async)
         }">
         <mat-card>
             <mat-card-header>
@@ -274,10 +293,11 @@
         class="vbc-card-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async)
+            'sxplr-hidden': !(parcReveal.state$ | async),
+            'mat-elevation-z2': (parcReveal.state$ | async)
         }">
         <mat-card sxplr-sapiviews-core-region
             #regionDirective="sapiViewsCoreRegion"
@@ -305,12 +325,36 @@
                 </mat-card-subtitle>
             </mat-card-header>
 
+            
+            <ng-template sxplrExperimentalFlag [deprecated]="true">
             <sxplr-feature-entry
                 [template]="view.selectedATP.template"
                 [parcellation]="view.selectedATP.parcellation"
                 [region]="view.selectedRegions[0]"
                 #featureEntryCmp="featureEntryCmp">
             </sxplr-feature-entry>
+            </ng-template>
+
+            <ng-template sxplrExperimentalFlag [experimental]="true">
+            <mat-expansion-panel class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Features
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{ featureEntryCmp.totals$ | async }}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                
+                <sxplr-feature-entry
+                    [template]="view.selectedATP.template"
+                    [parcellation]="view.selectedATP.parcellation"
+                    [region]="view.selectedRegions[0]"
+                    #featureEntryCmp="featureEntryCmp">
+                </sxplr-feature-entry>
+
+            </mat-expansion-panel>
+            </ng-template>
 
             <mat-divider></mat-divider>
 
@@ -433,10 +477,11 @@
         class="vbc-card-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
+        [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async)
+            'sxplr-hidden': !(parcReveal.state$ | async),
+            'mat-elevation-z2': (parcReveal.state$ | async)
         }">
         <mat-card>
             <mat-card-header>
@@ -489,12 +534,11 @@
         </sxplr-sapiviews-core-rich-regionshierarchy>
     </ng-template>
 
-    
     <ng-template #maximizeBtnTmpl let-cardname="cardname">
-        <button mat-icon-button (click)="focusCard(cardname)"
+        <button mat-icon-button (click)="minimizeCard(cardname)"
             iav-stop="click"
-            [matTooltip]="view.labels.MAXIMIZE_PANEL">
-            <mat-icon fontSet="fas" fontIcon="fa-expand"></mat-icon>
+            [matTooltip]="view.labels.MINIMIZE_PANEL">
+            <mat-icon fontSet="fas" fontIcon="fa-compress"></mat-icon>
         </button>
     </ng-template>
 
