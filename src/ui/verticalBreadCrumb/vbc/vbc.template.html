@@ -2,7 +2,7 @@
 
     <!-- selected atlas -->
     <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container"
-        (click)="openCard('atlas')"
+        (click)="!atlasReveal.state && openCard('atlas')"
         sxplr-reveal
         [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('atlas')"
         #atlasReveal="reveal"
@@ -57,7 +57,7 @@
     
     <!-- selected template -->
     <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container"
-        (click)="openCard('template')"
+        (click)="!tmplReveal.state && openCard('template')"
         sxplr-reveal
         [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('template')"
         #tmplReveal="reveal"
@@ -227,7 +227,7 @@
     <!-- selected parcellation -->
     <div *ngIf="view.selectedRegions.length === 0 && view.selectedATP.parcellation; let parcellation"
         class="vbc-card-container"
-        (click)="openCard('parcellation')"
+        (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
         #parcReveal="reveal"
@@ -272,7 +272,7 @@
     <!-- selected single region -->
     <div *ngIf="view.selectedRegions.length === 1"
         class="vbc-card-container"
-        (click)="openCard('parcellation')"
+        (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
         #parcReveal="reveal"
@@ -431,7 +431,7 @@
     <!-- selected multiple region -->
     <div *ngIf="view.selectedRegions.length > 1"
         class="vbc-card-container"
-        (click)="openCard('parcellation')"
+        (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="view.openedCardNames.length == 0 || view.openedCardNames.includes('parcellation')"
         #parcReveal="reveal"

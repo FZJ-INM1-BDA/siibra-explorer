@@ -36,11 +36,6 @@ export class RevealAnimationDirective{
     if (this.#player) {
       this.#player.destroy()
     }
-
-    if (this.#hostHeight === null) {
-      // TODO properly get expected height
-      this.#hostHeight = (this.el.nativeElement as HTMLElement).clientHeight
-    }
   }
 
   open(){
@@ -52,10 +47,12 @@ export class RevealAnimationDirective{
     this.#beforeAnimation()
     const start = this.minimizedHeight
     const end = this.#hostHeight
+    this.#hostHeight = null
     
-    const factory = this.builder.build(
-      RevealAnimationDirective.GetSequence(start, end)
-    )
+    const factory = this.builder.build([
+      ...RevealAnimationDirective.GetSequence(start, end),
+      style({ height: "auto" })
+    ])
     this.#player = factory.create(this.el.nativeElement)
     this.#player.play()
   }
@@ -67,7 +64,9 @@ export class RevealAnimationDirective{
     this.#state = !this.#state
     this.state$.next(this.#state)
     this.#beforeAnimation()
-    const start = this.#hostHeight
+    const hostHeight = (this.el.nativeElement as HTMLElement).clientHeight
+    this.#hostHeight = hostHeight
+    const start = hostHeight
     const end = this.minimizedHeight
     
     const factory = this.builder.build(
