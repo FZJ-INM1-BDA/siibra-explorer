@@ -1,16 +1,18 @@
 import { NgIf } from '@angular/common';
 import { ChangeDetectorRef, Directive, Input, inject } from '@angular/core';
-import { Store, select } from '@ngrx/store';
 import { BehaviorSubject, combineLatest, concat, of } from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
-import { MainState, userPreference } from 'src/state';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
+import { ExperimentalService } from './experimental.service';
 
 @Directive({
   selector: '[sxplrExperimentalFlag]',
   exportAs: 'sxplrExperimentalFlag',
   hostDirectives: [NgIf, DestroyDirective],
-  standalone: true
+  standalone: true,
+  providers: [
+    ExperimentalService
+  ]
 })
 export class ExperimentalFlagDirective {
 
@@ -39,10 +41,6 @@ export class ExperimentalFlagDirective {
     })
   }
 
-  #showExperimentalFlag$ = this.store.pipe(
-    select(userPreference.selectors.showExperimental)
-  )
-
   #inputs = new BehaviorSubject<{ deprecated: boolean, experimental: boolean }>(null)
 
   show$ = combineLatest([
@@ -52,7 +50,7 @@ export class ExperimentalFlagDirective {
         filter(v => !!v),
       ),
     ),
-    this.#showExperimentalFlag$
+    this.svc.showExperimentalFlag$
   ]).pipe(
     /**
      * state:
@@ -73,7 +71,7 @@ export class ExperimentalFlagDirective {
   )
 
   constructor(
-    private store: Store<MainState>,
+    private svc: ExperimentalService,
     private cdr: ChangeDetectorRef,
   ) {
     this.show$.pipe(
