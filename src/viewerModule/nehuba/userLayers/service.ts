@@ -29,7 +29,7 @@ type Meta = {
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
 const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
-const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "swc://", "deepzoom://"] as const
+const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
 
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
@@ -175,12 +175,25 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    async input => typeof input === "string" && input.startsWith("precomputed://")
+    async input => typeof input === "string" && (input.startsWith("precomputed://") || input.startsWith("zarr://") || input.startsWith("n5://"))
   )
   async processPrecomputed(source: string): Promise<ProcessorOutput>{
-    const url = source.replace("precomputed://", "")
+    let protocol: ValidProtocol
+    let url: string
+    for (const proto of SUPPORTED_PREFIX){
+      if (source.startsWith(proto)) {
+        protocol = proto
+        url = source.replace(proto, "")
+        break
+      }
+    }
+
+    if (!protocol) {
+      throw new Error(`Cannot parse source ${source}`)
+    }
+    
     const { transform, meta } = await forkJoin({
-      transform: fetch(`${url}/transform.json`)
+      transform: translateV3Entities.cFetch(`${url}/transform.json`)
         .then(res => res.json() as Promise<MetaV1Schema["transform"]>)
         .catch(_e => null as MetaV1Schema["transform"]),
       meta: from(
@@ -199,7 +212,7 @@ export class UserLayerService implements OnDestroy {
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
       },
-      protocol: "precomputed://",
+      protocol,
       url
     }
   }
