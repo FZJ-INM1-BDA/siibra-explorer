@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, Inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, of, Subject } from "rxjs";
 import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import { enLabels } from "src/uiLabels"
 import { FormControl, FormGroup } from "@angular/forms";
 import { getUuid } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -220,12 +221,18 @@ export class VerticalBreadCrumbComponent {
 
   userPreferences$ = combineLatest([
     of(enLabels),
+    this.store$.pipe(
+      select(userPreference.selectors.showExperimental)
+    ),
     this.#minimizedCards$,
+    this.svc?.visibility$ || of(null as boolean|null)
   ]).pipe(
-    map(([ labels, minimizedCards ]) => {
+    map(([ labels, showExperimental, minimizedCards, parcellationVisible ]) => {
       return {
         labels,
+        showExperimental,
         minimizedCards,
+        parcellationVisible
       }
     })
   )
@@ -251,10 +258,10 @@ export class VerticalBreadCrumbComponent {
         selectedFeature,
       },
       { useViewer },
-      { labels, minimizedCards }]) => {
+      { labels, showExperimental, minimizedCards, parcellationVisible }]) => {
       
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental
       }
     })
   )
@@ -263,6 +270,7 @@ export class VerticalBreadCrumbComponent {
     private store$: Store,
     private sapi: SAPI,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
+    @Optional() @Inject(ParcellationVisibilityService) private svc: ParcellationVisibilityService,
   ){
 
     const navFromState$ = this.store$.pipe(
@@ -434,5 +442,9 @@ export class VerticalBreadCrumbComponent {
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
     )
+  }
+
+  public toggleParcellationVisibility(){
+    this.svc && this.svc.toggleVisibility()
   }
 }

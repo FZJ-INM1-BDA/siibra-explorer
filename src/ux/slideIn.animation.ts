@@ -1,7 +1,7 @@
 import { animate, AnimationBuilder, AnimationPlayer, style } from "@angular/animations";
 import { Directive, ElementRef, inject, Input } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { debounceTime, distinctUntilChanged, takeUntil } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, skip, take, takeUntil } from "rxjs/operators";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 
 @Directive({
@@ -19,7 +19,7 @@ export class SlideInAnimation {
   #player: AnimationPlayer
   
   #state = false
-  state$ = new BehaviorSubject(this.#state)
+  state$ = new BehaviorSubject<boolean>(this.#state)
   get state(){
     return this.#state
   }
@@ -29,18 +29,33 @@ export class SlideInAnimation {
   }
 
   constructor(private builder: AnimationBuilder, private el: ElementRef){
-    this.state$.pipe(
+    const state$ = this.state$.pipe(
       takeUntil(this.#ondestroy$),
       debounceTime(16),
-      distinctUntilChanged(),
+      distinctUntilChanged()
+    )
+
+    state$.pipe(
+      take(1)
     ).subscribe(state => {
-      this.#state = state
+      if (state) {
+        this.open(true)
+      } else {
+        this.close(true)
+      }
+    })
+
+    state$.pipe(
+      skip(1)
+    ).subscribe(state => {
+      
       if (state) {
         this.open()
       } else {
         this.close()
       }
     })
+
   }
 
   #beforeAnimation(){
@@ -49,27 +64,34 @@ export class SlideInAnimation {
     }
   }
 
-  open(){
+  open(skipAnimation: boolean=false){
     this.#beforeAnimation()
 
+    const finalFrame = style({ transform: `translateX(0%)`})
     const sequences = [
       style({ transform: `translateX(-100%)` }),
       animate(`200ms ease-out`, style({ transform: `translateX(0%)` })),
-      style({ transform: `translateX(0%)`}),
     ]
-    const factory = this.builder.build(sequences)
+    const factory = this.builder.build(
+      skipAnimation
+      ? [finalFrame]
+      : [...sequences, finalFrame]
+    )
     this.#player = factory.create(this.el.nativeElement)
     this.#player.play()
   }
-  close(){
+  close(skipAnimation: boolean=false){
     this.#beforeAnimation()
 
+    const finalFrame = style({ transform: `translateX(-100%)` })
     const sequences = [
       style({ transform: `translateX(0%)` }),
       animate(`200ms ease-in`, style({ transform: `translateX(-100%)` })),
-      style({ transform: `translateX(-100%)` }),
     ]
-    const factory = this.builder.build(sequences)
+    const factory = this.builder.build(
+      skipAnimation
+      ? [finalFrame]
+      : [...sequences, finalFrame])
     this.#player = factory.create(this.el.nativeElement)
     this.#player.play()
   }

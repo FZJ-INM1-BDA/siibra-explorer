@@ -1,4 +1,3 @@
-
 div.vbc-card-container.sxplr-hidden
 {
     &::before
@@ -23,6 +22,24 @@ div.vbc-card-container.sxplr-hidden
                 rgba(40, 40, 40, 0.2) 20%,
                 rgba(40, 40, 40, 1.0) 100%
             );
+        }
+    }
+}
+
+// indentation styles
+
+.vbc-card-container
+{
+    &.experimental
+    {
+        &.template-container,
+        &.parcellation-container
+        {
+            margin-left: 1rem;
+        }
+        &.region-container
+        {
+            margin-left: 1.5rem;
         }
     }
 }

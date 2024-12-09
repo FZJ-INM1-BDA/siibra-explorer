@@ -1,7 +1,7 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
     <!-- selected atlas -->
-    <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container"
+    <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container atlas-container"
         (click)="!atlasReveal.state && openCard('atlas')"
         sxplr-reveal
         [reveal-state]="!view.minimizedCards.includes('atlas')"
@@ -57,14 +57,15 @@
     </div>
     
     <!-- selected template -->
-    <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container"
+    <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container template-container"
         (click)="!tmplReveal.state && openCard('template')"
         sxplr-reveal
         [reveal-state]="!view.minimizedCards.includes('template')"
         #tmplReveal="reveal"
         [ngClass]="{
             'sxplr-hidden': !(tmplReveal.state$ | async),
-            'mat-elevation-z2': (tmplReveal.state$ | async)
+            'mat-elevation-z2': (tmplReveal.state$ | async),
+            'experimental': view.showExperimental
         }">
         <mat-card>
             <mat-card-header>
@@ -117,52 +118,6 @@
                     </ng-template>
                 </mat-card-subtitle>
             </mat-card-header>
-            
-            <ng-template sxplrExperimentalFlag [deprecated]="true">
-            <div sxplr-sapiviews-core-space-boundingbox
-                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
-                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
-            </div>
-            <sxplr-feature-entry
-                [template]="view.selectedATP.template"
-                [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-                #voiFeatureEntryCmp="featureEntryCmp">
-            </sxplr-feature-entry>
-
-            </ng-template>
-
-            <ng-template sxplrExperimentalFlag [experimental]="true">
-            <div sxplr-sapiviews-core-space-boundingbox
-                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
-                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
-            </div>
-            <mat-expansion-panel class="mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Features
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ voiFeatureEntryCmp.totals$ | async }}
-                    </mat-panel-description>
-
-                </mat-expansion-panel-header>
-                
-                <sxplr-feature-entry
-                    [template]="view.selectedATP.template"
-                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-                    #voiFeatureEntryCmp="featureEntryCmp">
-                </sxplr-feature-entry>
-
-            </mat-expansion-panel>
-            </ng-template>
 
             <mat-divider></mat-divider>
 
@@ -188,6 +143,7 @@
 
                 <ng-template [ngIf]="view.useViewer === 'nehuba'">
 
+                    <ng-template sxplrExperimentalFlag [experimental]="true">
                     <button
                         [matTooltip]="view.labels.RESET_TRANSLATION"
                         color="warn"
@@ -195,6 +151,7 @@
                         (click)="resetNavigation({ position: true })">
                         <i class="iavic iavic-translation"></i>
                     </button>
+                    </ng-template>
                     <button
                         [matTooltip]="view.labels.RESET_ROTATION"
                         color="warn"
@@ -202,6 +159,8 @@
                         (click)="resetNavigation({ rotation: true })">
                         <i class="iavic iavic-rotation"></i>
                     </button>
+                    
+                    <ng-template sxplrExperimentalFlag [experimental]="true">
                     <button
                         [matTooltip]="view.labels.RESET_ZOOM"
                         color="warn"
@@ -209,6 +168,7 @@
                         (click)="resetNavigation({ zoom: true })">
                         <i class="iavic iavic-scaling"></i>
                     </button>
+                    </ng-template>
                 </ng-template>
             </mat-card-actions>
         </mat-card>
@@ -243,15 +203,16 @@
     </ng-template>
 
     <!-- selected parcellation -->
-    <div *ngIf="view.selectedRegions.length === 0 && view.selectedATP.parcellation; let parcellation"
-        class="vbc-card-container"
+    <div *ngIf="(view.showExperimental || view.selectedRegions.length === 0) && view.selectedATP.parcellation; let parcellation"
+        class="vbc-card-container parcellation-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
             'sxplr-hidden': !(parcReveal.state$ | async),
-            'mat-elevation-z2': (parcReveal.state$ | async)
+            'mat-elevation-z2': (parcReveal.state$ | async),
+            'experimental': view.showExperimental
         }">
         <mat-card>
             <mat-card-header>
@@ -277,6 +238,27 @@
                     [matTooltip]="view.labels.DETAILS">
                     <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
                 </button>
+
+                <ng-template [ngIf]="view.parcellationVisible !== null">
+                    <button mat-icon-button
+                        (click)="toggleParcellationVisibility()"
+                        (iav-key-event)="toggleParcellationVisibility()"
+                        [iav-key-listener]="[{
+                            key: 'q',
+                            type: 'keydown',
+                            capture: true,
+                            target: 'document',
+                        }]">
+                        <ng-template [ngIf]="view.parcellationVisible">
+                            <i class="fas fa-eye"></i>
+                        </ng-template>
+                        
+                        <ng-template [ngIf]="!view.parcellationVisible">
+                            <i class="fas fa-eye-slash"></i>
+                        </ng-template>
+                    </button>
+                </ng-template>
+
                 <button mat-icon-button
                     [matTooltip]="view.labels.REGION_HIERARCHY"
                     [sxplr-dialog]="regionHierarchyTmpl"
@@ -290,14 +272,15 @@
 
     <!-- selected single region -->
     <div *ngIf="view.selectedRegions.length === 1"
-        class="vbc-card-container"
+        class="vbc-card-container region-container single-region-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
             'sxplr-hidden': !(parcReveal.state$ | async),
-            'mat-elevation-z2': (parcReveal.state$ | async)
+            'mat-elevation-z2': (parcReveal.state$ | async),
+            'experimental': view.showExperimental
         }">
         <mat-card sxplr-sapiviews-core-region
             #regionDirective="sapiViewsCoreRegion"
@@ -307,6 +290,25 @@
             [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
             [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
             [sxplr-sapiviews-core-region-detail-flag]="true">
+
+            <ng-template sxplrExperimentalFlag [experimental]="true">
+            <mat-card-header>
+                <mat-card-subtitle>
+                    <button mat-button
+                        [matTooltip]="view.labels.REGION_HIERARCHY"
+                        [sxplr-dialog]="regionHierarchyTmpl"
+                        sxplr-dialog-size="xl">
+                        <!-- <i class="fas fa-sitemap"></i> -->
+                        <mat-icon fontIcon="account_tree"></mat-icon>
+                        <span>
+                            {{ view.selectedRegions[0].name }}
+                        </span>
+                    </button>
+                </mat-card-subtitle>
+            </mat-card-header>
+            </ng-template>
+
+            <ng-template sxplrExperimentalFlag [deprecated]="true">
             <mat-card-header>
                 <mat-card-subtitle>
                     <ng-template [ngTemplateOutlet]="parcellationTmpl">
@@ -317,43 +319,14 @@
                         [matTooltip]="view.labels.REGION_HIERARCHY"
                         [sxplr-dialog]="regionHierarchyTmpl"
                         sxplr-dialog-size="xl">
-                        <i class="fas fa-sitemap"></i>
+                        <!-- <i class="fas fa-sitemap"></i> -->
+                        <mat-icon fontIcon="account_tree"></mat-icon>
                         <span>
                             {{ view.selectedRegions[0].name }}
                         </span>
                     </button>
                 </mat-card-subtitle>
             </mat-card-header>
-
-            
-            <ng-template sxplrExperimentalFlag [deprecated]="true">
-            <sxplr-feature-entry
-                [template]="view.selectedATP.template"
-                [parcellation]="view.selectedATP.parcellation"
-                [region]="view.selectedRegions[0]"
-                #featureEntryCmp="featureEntryCmp">
-            </sxplr-feature-entry>
-            </ng-template>
-
-            <ng-template sxplrExperimentalFlag [experimental]="true">
-            <mat-expansion-panel class="mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Features
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ featureEntryCmp.totals$ | async }}
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                
-                <sxplr-feature-entry
-                    [template]="view.selectedATP.template"
-                    [parcellation]="view.selectedATP.parcellation"
-                    [region]="view.selectedRegions[0]"
-                    #featureEntryCmp="featureEntryCmp">
-                </sxplr-feature-entry>
-
-            </mat-expansion-panel>
             </ng-template>
 
             <mat-divider></mat-divider>
@@ -474,14 +447,15 @@
 
     <!-- selected multiple region -->
     <div *ngIf="view.selectedRegions.length > 1"
-        class="vbc-card-container"
+        class="vbc-card-container parcellation-container region-container multi-region-container"
         (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
             'sxplr-hidden': !(parcReveal.state$ | async),
-            'mat-elevation-z2': (parcReveal.state$ | async)
+            'mat-elevation-z2': (parcReveal.state$ | async),
+            'experimental': view.showExperimental
         }">
         <mat-card>
             <mat-card-header>
@@ -520,6 +494,79 @@
             </mat-card-actions>
         </mat-card>
 
+    </div>
+
+    <!-- features -->
+    <div class="vbc-card-container feature-container"
+        (click)="!featureReveal.state && openCard('feature')"
+        sxplr-reveal
+        [reveal-state]="!view.minimizedCards.includes('feature')"
+        #featureReveal="reveal"
+        [ngClass]="{
+            'sxplr-hidden': !(featureReveal.state$ | async),
+            'mat-elevation-z2': (featureReveal.state$ | async)
+        }">
+    
+        <mat-card>
+
+        
+            <div sxplr-sapiviews-core-space-boundingbox
+                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
+                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
+                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+                #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
+            </div>
+            <mat-expansion-panel class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Spatial features
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{ voiFeatureEntryCmp.totals$ | async }}
+                    </mat-panel-description>
+        
+                </mat-expansion-panel-header>
+                
+                <sxplr-feature-entry
+                    [template]="view.selectedATP.template"
+                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
+                    #voiFeatureEntryCmp="featureEntryCmp">
+                </sxplr-feature-entry>
+        
+            </mat-expansion-panel>
+            <mat-expansion-panel class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Semantical features
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{ semfeatures.totals$ | async }}
+                    </mat-panel-description>
+        
+                </mat-expansion-panel-header>
+                
+                <sxplr-feature-entry
+                    [template]="view.selectedATP.template"
+                    [parcellation]="view.selectedATP.parcellation"
+                    [region]="view.selectedRegions[0]"
+                    #semfeatures="featureEntryCmp">
+                </sxplr-feature-entry>
+        
+            </mat-expansion-panel>
+
+            <mat-divider></mat-divider>
+
+            <mat-card-actions>
+                <ng-template
+                    [ngTemplateOutlet]="maximizeBtnTmpl"
+                    [ngTemplateOutletContext]="{
+                        cardname: 'feature'
+                    }">
+                </ng-template>
+            </mat-card-actions>
+        </mat-card>
     </div>
 
     <ng-template #regionHierarchyTmpl>
