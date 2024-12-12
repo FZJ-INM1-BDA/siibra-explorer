@@ -7,8 +7,8 @@ import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
 
 export function parseUrl(url: string): {protocol: string, host: string, path: string} {
-  const urlProtocolPattern = /^(blob:)?([^:\/]+):\/\/([^\/]+)((?:\/.*)?)$/;
-  let match = url.match(urlProtocolPattern);
+  const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
+  const match = url.match(urlProtocolPattern);
   if (match === null) {
     throw new Error(`Invalid URL: ${JSON.stringify(url)}`);
   }
