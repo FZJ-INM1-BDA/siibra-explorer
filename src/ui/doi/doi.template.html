@@ -1,0 +1,64 @@
+<ng-template [ngIf]="data$ | async" let-data>
+
+    <h1 *ngIf="data.title" mat-dialog-title class="sxplr-dialog-body">
+        <markdown-dom class="sxplr-dialog-body" [markdown]="data.title">
+        </markdown-dom>
+    </h1>
+    
+    
+    <mat-dialog-content>
+    
+        <mat-action-list>
+
+            <!-- dois -->
+            <ng-template ngFor [ngForOf]="data.actions" let-action let-first="first">
+                <a [href]="action" mat-list-item target="_blank">
+                    <mat-icon
+                        [fontSet]="action.startsWith('https://doi.org') ? 'ai' : 'fas'"
+                        [fontIcon]="action.startsWith('https://doi.org') ? 'ai-doi' : 'fa-link'"
+                        matListItemIcon>
+                    </mat-icon>
+                    <span>{{ action }}</span>
+                    <mat-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+                </a>
+            </ng-template>
+    
+            <!-- authors -->
+            <ng-template [ngIf]="data.contributors">
+                <!-- if > 5 authors -->
+                <button mat-list-item [iav-clipboard-copy]="data.contributors | addUnitAndJoin : '' : ', '">
+                    <mat-icon fontSet="fas" fontIcon="fa-users" matListItemIcon></mat-icon>
+                    <!-- if > 5 authors -->
+                    <ng-template [ngIf]="data.contributors.length > 5" [ngIfElse]="allContributorsTmpl">
+                        <span>
+                            {{ data.contributors[0] }}
+                        </span>
+                        <i>et al</i>
+                    </ng-template>
+                    
+                    <!-- else -->
+                    <ng-template #allContributorsTmpl>
+                        <span>
+                            {{ data.contributors | addUnitAndJoin : "" : ", "}}
+                        </span>
+                    </ng-template>
+                    
+                </button>
+
+            </ng-template>
+        </mat-action-list>
+    
+        <div *ngIf="data.desc" class="mat-body">
+            <markdown-dom *ngIf="data.desc" [markdown]="data.desc">
+            </markdown-dom>
+        </div>
+        
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="start">
+        <button mat-dialog-close mat-button>
+            Close
+        </button>
+    </mat-dialog-actions>
+    
+</ng-template>

@@ -15,6 +15,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { SxplrAnimationModule } from "src/ux";
+import { DoiTemplate } from "../doi/doi.component";
 
 @NgModule({
   imports: [
@@ -33,6 +34,7 @@ import { SxplrAnimationModule } from "src/ux";
     SapiViewsCoreSpaceModule,
     ReactiveFormsModule,
     SxplrAnimationModule,
+    DoiTemplate,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

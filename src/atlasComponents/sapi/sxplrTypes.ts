@@ -44,6 +44,7 @@ export type SxplrAtlas = {
 
 export type AdditionalInfo = {
   desc: string
+  contributors: string[]
   link: {
     text: string
     href: string
@@ -114,7 +115,7 @@ export type Feature = {
   id: string
   name: string
   category?: string
-} & Partial<AdditionalInfo>
+} & AdditionalInfo
 
 export type VoiFeature = {
   bbox: BoundingBox

@@ -23,20 +23,20 @@ mat-drawer
   & > sxplr-vertical-bread-crumb
   {
     position: relative;
+  }
+  & > mat-card
+  {
 
-    & + mat-card {
-      
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 98vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 98vh;
 
-      pointer-events: all;
-      z-index: 9;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
+    pointer-events: all;
+    z-index: 9;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
 }

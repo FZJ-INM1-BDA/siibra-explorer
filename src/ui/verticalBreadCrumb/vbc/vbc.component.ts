@@ -12,6 +12,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { getUuid } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
+import { DoiTemplate } from "src/ui/doi/doi.component"
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -28,6 +29,8 @@ const pipe = new FilterGroupedParcellationPipe()
 })
 
 export class VerticalBreadCrumbComponent {
+
+  DoiTemplate = DoiTemplate
 
   #destroy$ = inject(DestroyDirective).destroyed$
   

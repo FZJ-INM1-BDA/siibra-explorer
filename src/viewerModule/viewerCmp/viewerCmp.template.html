@@ -31,7 +31,7 @@
       <!-- special mode -->
       <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
         <ng-template [ngTemplateOutlet]="specialModeTopLeftTmpl"
-          [ngTemplateOutletContext]="{ mode: mode }">
+          [ngTemplateOutletContext]="{ mode: mode, view: view }">
         </ng-template>
       </ng-template>
 
@@ -95,6 +95,15 @@
         [feature]="view.selectedFeature">
       </sxplr-feature-view>
     </mat-card>
+    
+    <mat-card sxplr-slide-in [state]="!!view.selectedPoint"
+      class="pe-all">
+      <ng-template [ngIf]="!!view.selectedPoint">
+        <ng-template [ngTemplateOutlet]="selectedPointTmpl"
+          [ngTemplateOutletContext]="{view: view}">
+        </ng-template>
+      </ng-template>
+    </mat-card>
   </div>
   
   <sxplr-tab *ngIf="!!view.selectedTemplate"
@@ -107,16 +116,21 @@
 
 
 <!-- special mode top left -->
-<ng-template #specialModeTopLeftTmpl let-mode="mode">
+<ng-template #specialModeTopLeftTmpl let-mode="mode" let-view="view">
   
-  <ng-container [ngSwitch]="mode">
-    <annotation-list *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-    </annotation-list>
-    <key-frame-controller *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-    </key-frame-controller>
-    <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
-  </ng-container>
-  
+  <mat-card class="mt-2 d-inline-block vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2 z-index-1 menu-container"
+    [ngClass]="{
+      'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
+    }">
+    <ng-container [ngSwitch]="mode">
+      <annotation-list class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+      </annotation-list>
+      <key-frame-controller class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
+      </key-frame-controller>
+      <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
+    </ng-container>
+
+  </mat-card>
   <ng-template [ngIf]="view$ | async" let-view>
 
     <div class="special-mode-topleft-wrapper">
@@ -127,11 +141,11 @@
           <sxplr-tab
             sxplr-tab-icon="fas fa-list"
             sxplr-tab-color="primary"
-            (sxplr-tab-click)="controlFullNav(!view.fullSidenavExpanded)"
+            (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)"
             [sxplr-tab-badge]="toolPanel?.annBadges$ | async">
           </sxplr-tab>
     
-          <annotating-tools-panel class="z-index-10 leave-me-alone"
+          <annotating-tools-panel class="leave-me-alone"
             #toolPanel="annoToolsPanel">
           </annotating-tools-panel>
         </ng-template>
@@ -140,7 +154,7 @@
           <sxplr-tab
             sxplr-tab-icon="fas fa-play"
             sxplr-tab-color="primary"
-            (sxplr-tab-click)="controlFullNav(!view.fullSidenavExpanded)">
+            (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
           </sxplr-tab>
         </ng-template>
       </ng-container>
@@ -372,14 +386,6 @@
   </ng-template>
 </ng-template>
 
-<!-- general feature tmpl -->
-<ng-template let-feature="feature" #selectedFeatureTmpl>
-  <!-- TODO differentiate between features (spatial, regional etc) -->
-  
-  <sxplr-feature-view class="sxplr-z-2 mat-elevation-z2" [feature]="feature">
-  </sxplr-feature-view>
-</ng-template>
-
 <!-- general point tmpl -->
 <ng-template let-view="view" #selectedPointTmpl>
   <sxplr-side-panel>
@@ -411,100 +417,3 @@
     (clickOnRegionName)="handleClickOnRegionName($event.target, $event.event)">
   </sxplr-point-assignment>
 </ng-template>
-
-<!-- spatial search tmpls -->
-<ng-template #spatialFeatureListTmpl let-view="view">
-  <mat-card class="sxplr-pe-all overflow-hidden"
-    [ngClass]="{
-      'sxplr-d-none': !(voiSwitch.switchState$ | async) || (voiFeatureEntryCmp.totals$ | async) === 0
-    }">
-    <mat-card-header>
-      <mat-card-title>
-        Anchored to current view
-      </mat-card-title>
-      <mat-card-subtitle>
-
-        <ng-template [ngIf]="bbox.bbox$ | async | getProperty : 'bbox'" let-bbox>
-          
-          <tpbr-viewer [tpbr-concept]="{
-            template: view.selectedTemplate,
-            bbox: bbox
-          }">
-          </tpbr-viewer>
-        </ng-template>
-      </mat-card-subtitle>
-    </mat-card-header>
-
-  </mat-card>
-
-  <sxplr-feature-entry
-    [ngClass]="(voiSwitch.switchState$ | async) ? 'sxplr-d-block' : 'sxplr-d-none'"
-    class="sxplr-pe-all mat-elevation-z8"
-    [template]="view.selectedTemplate"
-    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-    #voiFeatureEntryCmp="featureEntryCmp">
-  </sxplr-feature-entry>
-
-  <mat-card [ngClass]="{
-    'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) > 0
-  }">
-    <mat-card-content>
-      No spatial features found.
-    </mat-card-content>
-  </mat-card>
-
-  <button mat-raised-button
-    [ngClass]="{
-      'sxplr-d-none': (voiFeatureEntryCmp.totals$ | async) === 0
-    }"
-    class="sxplr-pe-all sxplr-w-100"
-    iav-switch
-    [iav-switch-state]="false"
-    #voiSwitch="iavSwitch"
-    (iav-switch-event)="$event && pullAllVoi()"
-    (click)="voiSwitch.toggle()">
-
-    <ng-template [ngIf]="voiSwitch.switchState$ | async" [ngIfElse]="chevronCollapseTmpl">
-      <i class="fas fa-chevron-up"></i>
-      <span>
-        Collapse
-      </span>
-    </ng-template>
-
-    <ng-template #chevronCollapseTmpl>
-      <i class="fas fa-chevron-down"></i>
-      <span>
-        Explore {{ voiFeatureEntryCmp.totals$ | async }} spatial features
-      </span>
-    </ng-template>
-  </button>
-
-  <div>
-    <mat-progress-bar
-      mode="indeterminate"
-      *ngIf="(voiFeatureEntryCmp.busy$ | async)">
-    </mat-progress-bar>
-  </div>
-
-  <!-- TODO voiBbox directive is used to draw outlines for VOI
-  this has been temporarily disabled, since datasource is paginated 
-  and how bounding boxes are drawn needs to be reconsidered -->
-  
-  <div
-    *ngIf="voiSwitch.switchState$| async"
-    voiBbox
-    [features]="voiFeatureEntryCmp.features$ | async">
-
-  </div>
-</ng-template>
-
-<div
-  sxplr-sapiviews-core-space-boundingbox
-  (sxplr-sapiviews-core-space-boundingbox-changed)="pullAllVoi()"
-  [sxplr-sapiviews-core-space-boundingbox-atlas]="selectedAtlas$ | async"
-  [sxplr-sapiviews-core-space-boundingbox-space]="templateSelected$ | async"
-  [sxplr-sapiviews-core-space-boundingbox-spec]="viewerCtx$ | async | nehubaVCtxToBbox"
-  #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
-</div>
-

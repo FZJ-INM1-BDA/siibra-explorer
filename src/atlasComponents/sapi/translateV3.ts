@@ -205,6 +205,7 @@ class TranslateV3 {
     return {
       name: ds.name,
       desc: ds.description,
+      contributors: ds.contributors.map(b => b.name),
       link: ds.urls.map(v => ({
         href: v.url,
         text: 'Link'
@@ -688,7 +689,7 @@ class TranslateV3 {
     const { id, name, category, description, datasets } = feat
     if (!datasets) {
       return {
-        id, name, category
+        id, name, category, contributors: [], link: [], desc: null
       }
     }
     const dsDescs = datasets.map(ds => ds.description)
@@ -702,6 +703,7 @@ class TranslateV3 {
       category,
       desc: dsDescs[0] || description,
       link: urls,
+      contributors: datasets.flatMap(ds => ds.contributors.map(b => b.name))
     }
   }
 
@@ -748,6 +750,7 @@ class TranslateV3 {
       id: feat.id,
       name: feat.name,
       desc: feat.description,
+      contributors: feat.datasets.flatMap(ds => ds.contributors.map(d => d.name)),
       link: [
         ...feat.datasets
           .map(ds => ds.urls)

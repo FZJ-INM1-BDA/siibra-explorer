@@ -129,30 +129,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     shareReplay(1)
   )
 
-  public totals$ = this.#catAccDirs.pipe(
-    shareReplay(1),
-    switchMap(arr => concat(
-      of(0),
-      merge(
-        ...arr.map((dir, idx) =>
-          dir.total$.pipe(
-            map(val => ({ val, idx }))
-          )
-        )
-      ).pipe(
-        map(({ idx, val }) => ({ [idx.toString()]: val })),
-        scan((acc, curr) => ({ ...acc, ...curr })),
-        map(record => {
-          let tally = 0
-          for (const idx in record) {
-            tally += record[idx]
-          }
-          return tally
-        }),
-      )
-    )),
-  )
-
   ngAfterViewInit(): void {
     merge(
       of(null),
@@ -198,6 +174,9 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
       map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
     ),
     this.TPRBbox$.pipe(
+      map(({ region }) => !!region)
+    ),
+    this.TPRBbox$.pipe(
       map(({ parcellation, template }) => (
         WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
       ) || (
@@ -206,6 +185,37 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     )
   ]).pipe(
     map(flags => flags.every(f => f))
+  )
+  
+  public totals$ = combineLatest([
+    this.#catAccDirs.pipe(
+      shareReplay(1),
+      switchMap(arr => concat(
+        of(0),
+        merge(
+          ...arr.map((dir, idx) =>
+            dir.total$.pipe(
+              map(val => ({ val, idx }))
+            )
+          )
+        ).pipe(
+          map(({ idx, val }) => ({ [idx.toString()]: val })),
+          scan((acc, curr) => ({ ...acc, ...curr })),
+          map(record => {
+            let tally = 0
+            for (const idx in record) {
+              tally += record[idx]
+            }
+            return tally
+          }),
+        )
+      )),
+    ),
+    this.showConnectivity$
+  ]).pipe(
+    map(([ total, showConnectivityFlag ]) => {
+      return total + (showConnectivityFlag ? 1 : 0)
+    })
   )
 
   private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(

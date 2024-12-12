@@ -26,24 +26,6 @@ div.vbc-card-container.sxplr-hidden
     }
 }
 
-// indentation styles
-
-.vbc-card-container
-{
-    &.experimental
-    {
-        &.template-container,
-        &.parcellation-container
-        {
-            margin-left: 1rem;
-        }
-        &.region-container
-        {
-            margin-left: 1.5rem;
-        }
-    }
-}
-
 div.vbc-card-container
 {
     overflow-y: hidden; 

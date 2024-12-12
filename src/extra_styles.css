@@ -765,13 +765,6 @@ body::after
   padding-top: 16px!important;
 }
 
-.sidenav-cover-header-container
-{
-  padding: 16px;
-  margin: -16px!important;
-  padding-top: 6rem;
-}
-
 .no-padding-dialog > mat-dialog-container
 {
   padding:0 !important;

@@ -280,4 +280,8 @@ export class SapiViewsCoreRegionRegionBase {
     }),
   )
 
+  public contributors$ = this.regionalMaps$.pipe(
+    map(sm => sm.flatMap(f => f.datasets.flatMap(ds => ds.contributors.map(c => c.name))))
+  )
+
 }

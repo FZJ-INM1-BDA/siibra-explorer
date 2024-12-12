@@ -23,6 +23,7 @@ import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 import { CommonModule } from "@angular/common";
 import { DfToDsPipe } from './df-to-ds.pipe';
 import { PrettyPresentPipe } from './pretty-present.pipe';
+import { DedupPipe } from "./pipes/dedup.pipe";
 
 @NgModule({
   imports:[
@@ -52,6 +53,7 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     SidePanelComponent,
     DfToDsPipe,
     PrettyPresentPipe,
+    DedupPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -75,6 +77,7 @@ import { PrettyPresentPipe } from './pretty-present.pipe';
     SidePanelComponent,
     DfToDsPipe,
     PrettyPresentPipe,
+    DedupPipe,
   ]
 })
 

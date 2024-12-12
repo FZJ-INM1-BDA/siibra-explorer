@@ -334,12 +334,13 @@ export class FeatureViewComponent {
     })
   )
   
-  showSubfeature(item: CFIndex|Feature){
-    this.store.dispatch(
-      userInteraction.actions.showFeature({
-        feature: item
-      })
-    )
+  showSubfeature(_item: CFIndex|Feature){
+    // Not used. Commented out for the addition of contributors in features
+    // this.store.dispatch(
+    //   userInteraction.actions.showFeature({
+    //     feature: item
+    //   })
+    // )
   }
   
   clearSelectedFeature(): void{
