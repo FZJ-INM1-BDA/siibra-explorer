@@ -510,7 +510,9 @@
                 [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
                 #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
             </div>
-            <mat-expansion-panel class="mat-elevation-z0">
+            <mat-expansion-panel class="mat-elevation-z0"
+                iav-switch
+                #switchdir="iavSwitch">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
                         spatially anchored
@@ -532,10 +534,10 @@
                         voiBbox
                         [features]="voiFeatureEntryCmp.features$ | async">
                     </div>
-                    <mat-slide-toggle iav-switch
-                        (change)="$event.checked ? switchdir.open() : switchdir.close()"
-                        #switchdir="iavSwitch"
-                        #showWireFrame="matSlideToggle">
+                    <mat-slide-toggle 
+                        #showWireFrame="matSlideToggle"
+                        [checked]="switchdir.switchState$ | async"
+                        (change)="$event.checked ? switchdir.open() : switchdir.close()">
                         show wireframe
                     </mat-slide-toggle>
                 </ng-template>
