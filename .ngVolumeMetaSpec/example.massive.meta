@@ -1,0 +1,38 @@
+{
+    "$schema": "./meta.schema.json",
+    "version": 1,
+    "preferredColormap": ["magma", "plasma", "greyscale"],
+    "transform": [
+        [
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            1,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            1,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1
+        ]
+    ],
+    "data": {
+        "type": "image/1d",
+        "range": [{
+            "min": 0,
+            "max": 0.97
+        }]
+    }
+}
