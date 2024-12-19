@@ -1,4 +1,4 @@
-{
+    {
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "type": "SoftwareSourceCode",
     "author": [
@@ -22,6 +22,26 @@
             },
             "familyName": "Gogshelidze",
             "givenName": "Daviti"
+        },
+        {
+            "id": "_:author_3",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forshungszentrum Juelich"
+            },
+            "familyName": "Ahmet Nihat",
+            "givenName": "Simsek"
+        },
+        {
+            "id": "_:author_4",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forshungszentrum Juelich"
+            },
+            "familyName": "Christian",
+            "givenName": "Schiffer"
         },
         {
             "id": "https://orcid.org/0000-0002-9051-3701",
