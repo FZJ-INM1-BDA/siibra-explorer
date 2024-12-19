@@ -123,7 +123,7 @@
                             [sxplr-dialog-data]="{
                                 title: info?.name,
                                 descMd: info?.description,
-                                actions: [info.ebrains_page]
+                                actions: info?.urls | mapToProperty : 'url'
                             }">
                             <i class="fas fa-info"></i>
                         </button>

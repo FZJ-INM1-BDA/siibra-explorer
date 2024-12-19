@@ -6,6 +6,14 @@ import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict } from "src/util/fn"
 
+export function parseUrl(url: string): {protocol: string, host: string, path: string} {
+  const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
+  const match = url.match(urlProtocolPattern);
+  if (match === null) {
+    throw new Error(`Invalid URL: ${JSON.stringify(url)}`);
+  }
+  return {protocol: match[2], host: match[3], path: match[4]};
+}
 
 const BIGBRAIN_XZ = [
   [-70.677, 62.222],
@@ -221,13 +229,13 @@ class TranslateV3 {
     const { ...rest } = ds[0] || {}
     const { ['@id']: prevId } = parcellation.version?.prev || {}
     return {
+      ...rest,
       id: parcellation["@id"],
       name: parcellation.name,
       modality: parcellation.modality,
       type: "SxplrParcellation",
       prevId,
       shortName: parcellation.shortname,
-      ...rest
     }
   }
 
@@ -243,11 +251,11 @@ class TranslateV3 {
 
     this.#templateMap.set(template["@id"], template)
     const tmpl: SxplrTemplate = {
+      ...rest,
       id: template["@id"],
       name: template.fullName,
       shortName: template.shortName,
       type: "SxplrTemplate" as const,
-      ...rest
     }
     
     this.#sxplrTmplMap.set(tmpl.id, tmpl)
@@ -536,6 +544,11 @@ class TranslateV3 {
   async cFetch(url: string): Promise<{ status: number, json?: () => Promise<any> }> {
     
     if (!this.#cFetchCache.has(url)) {
+      const { host, path, protocol } = parseUrl(url)
+      if (protocol === "gs") {
+        const _path = encodeURIComponent(path.substring(1))
+        url = `https://www.googleapis.com/storage/v1/b/${host}/o/${_path}?alt=media`;
+      }
       const resp = await fetch(url)
       if (resp.status >= 400) {
         return {

@@ -14,6 +14,7 @@ import { DestroyDirective } from 'src/util/directives/destroy.directive';
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
 import { SPECIES_ENUM } from 'src/util/constants';
 import { atlasSelection } from 'src/state';
+import { ExperimentalService } from 'src/experimental/experimental.service';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
   const returnVal: Record<string, T[]> = {}
@@ -47,6 +48,14 @@ const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
   SPACE: [],
 }
 
+const EXPERIMENTAL_CONNECTIVITY: ConnectiivtyFilter = {
+  SPECIES: [],
+  PARCELLATION: [
+    IDS.PARCELLATION.JBA31,
+  ],
+  SPACE: [],
+}
+
 const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
   SPECIES: [],
   PARCELLATION: [],
@@ -76,6 +85,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     private store: Store,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
+    private expmtSvc: ExperimentalService,
     @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
   ) {
     super()
@@ -196,12 +206,18 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     this.selectedAtlas$.pipe(
       map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
     ),
-    this.TPRBbox$.pipe(
-      map(({ parcellation, template }) => (
-        WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
-      ) || (
-        WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
-      ))
+    this.expmtSvc.showExperimentalFlag$.pipe(
+      switchMap(experimentalFlag => 
+        this.TPRBbox$.pipe(
+          map(({ parcellation, template }) => (
+            WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
+          ) || (
+            WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+          ) || (
+            experimentalFlag && EXPERIMENTAL_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+          ))
+        )
+      )
     )
   ]).pipe(
     map(flags => flags.every(f => f))

@@ -27,6 +27,7 @@ import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
 import { DialogModule } from "src/ui/dialogInfo";
 import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { ExperimentalService } from "src/experimental/experimental.service";
 
 @NgModule({
   imports: [
@@ -82,7 +83,8 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
         }
         return returnObj
       }
-    }
+    },
+    ExperimentalService,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
