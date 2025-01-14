@@ -14,6 +14,10 @@
             <mat-card-header>
                 <mat-card-subtitle>
                     Atlas
+
+                    <span class="show-when-minimized">
+                        : {{ atlas.name }}
+                    </span>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
@@ -74,6 +78,9 @@
             <mat-card-header>
                 <mat-card-subtitle>
                     Space
+                    <span class="show-when-minimized">
+                        : {{ template.name }}
+                    </span>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
@@ -164,6 +171,40 @@
     </div>
 
     <!-- common template for parcellation/single region/multi region -->
+    <ng-template #parcellationOptTmpl let-parcellation>
+        
+        <span>
+            {{ parcellation.shortName || parcellation.name }}
+        </span>
+        
+        <ng-template
+            [ngIf]="parcellation | isVersioned : view.parcellations"
+            [ngIfElse]="unVersionedParcTemplate">
+
+
+            <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
+                [ngIfElse]="notNewestTmpl">
+
+                <span class="sxplr-custom-cmp accent muted-3"
+                    matTooltip="Newest version">
+                    <i class="fas fa-fire"></i>
+                </span>
+                
+                
+            </ng-template>
+
+            <ng-template #notNewestTmpl>
+                <span class="sxplr-custom-cmp default muted-3"
+                    matTooltip="Newer version available">
+                    <i class="fas fa-history"></i>
+                </span>
+            </ng-template>
+        </ng-template>
+
+        <ng-template #unVersionedParcTemplate>
+        </ng-template>
+    </ng-template>
+
     <ng-template #parcellationTmpl>
         <button mat-button
             [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
@@ -173,12 +214,16 @@
                 type: 'parcellationId',
                 options: view.noGroupParcs,
                 groupedOptions: view.groupParcs,
-                getSubMenu: getSubParcellation
+                getSubMenu: getSubParcellation,
+                optionTemplate: parcellationOptTmpl
             }">
             <i class="fas fa-brain"></i>
-            <span>
-                {{ view.selectedATP.parcellation.shortName }}
-            </span>
+            <ng-template [ngTemplateOutlet]="parcellationOptTmpl"
+                [ngTemplateOutletContext]="{
+                    $implicit: view.selectedATP.parcellation
+                }">
+
+            </ng-template>
         </button>
     </ng-template>
 
@@ -207,6 +252,10 @@
             <mat-card-header>
                 <mat-card-subtitle>
                     Parcellation
+                    
+                    <span class="show-when-minimized">
+                        : {{ parcellation.name }}
+                    </span>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <ng-template [ngTemplateOutlet]="parcellationTmpl">
@@ -617,7 +666,8 @@
         let-options="options"
         let-groupedOptions="groupedOptions"
         let-type="type"
-        let-getSubMenu="getSubMenu">
+        let-getSubMenu="getSubMenu"
+        let-optionTemplate="optionTemplate">
 
         <button *ngFor="let opt of (groupedOptions || [])"
             mat-menu-item
@@ -626,13 +676,25 @@
             [matMenuTriggerData]="{
                 current: current, 
                 type: type,
-                options: getSubMenu(opt)
+                options: getSubMenu(opt),
+                optionTemplate: optionTemplate
             }">
             <mat-icon fontSet="far" [fontIcon]="(opt | parcellationGroupSelected : current) ? 'fa-circle' : 'fa-none'"></mat-icon>
             
-            <span>
-                {{ opt.name }}
-            </span>
+            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                <ng-template
+                    [ngTemplateOutlet]="optionTemplate"
+                    [ngTemplateOutletContext]="{
+                        $implicit: opt
+                    }">
+                </ng-template>
+            </ng-template>
+
+            <ng-template #defaultOptionTemplate>
+                <span>
+                    {{ opt.name }}
+                </span>
+            </ng-template>
         </button>
 
         <button *ngFor="let opt of options"
@@ -640,9 +702,21 @@
             (click)="selectATP(type, opt.id)"
             class="menu-button">
             <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
-            <span>
-                {{ opt.shortName || opt.name }}
-            </span>
+            
+            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                <ng-template
+                    [ngTemplateOutlet]="optionTemplate"
+                    [ngTemplateOutletContext]="{
+                        $implicit: opt
+                    }">
+                </ng-template>
+            </ng-template>
+            
+            <ng-template #defaultOptionTemplate>
+                <span>
+                    {{ opt.shortName || opt.name }}
+                </span>
+            </ng-template>
         </button>
     </ng-template>
 </mat-menu>
@@ -651,7 +725,8 @@
     <ng-template matMenuContent
         let-current="current"
         let-options="options"
-        let-type="type">
+        let-type="type"
+        let-optionTemplate="optionTemplate">
 
         <button *ngFor="let opt of options"
             mat-menu-item
@@ -659,9 +734,22 @@
             class="menu-button">
 
             <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
-            <span>
-                {{ opt.shortName || opt.name }}
-            </span>
+
+            
+            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                <ng-template
+                    [ngTemplateOutlet]="optionTemplate"
+                    [ngTemplateOutletContext]="{
+                        $implicit: opt
+                    }">
+                </ng-template>
+            </ng-template>
+            
+            <ng-template #defaultOptionTemplate>
+                <span>
+                    {{ opt.shortName || opt.name }}
+                </span>
+            </ng-template>
         </button>
     </ng-template>
 </mat-menu>

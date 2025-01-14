@@ -13,6 +13,8 @@ import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe"
 import { IsGroupedParcellation } from "./isGroupedParcellation.pipe";
 import { EffectsModule } from "@ngrx/effects";
 import { ParcellationVisEffect } from "./parcellationVis.effect";
+import { ParcellationIsVersioned } from "./isVersioned.pipe";
+import { ParcellationIsNewest } from "./isNewest.pipe";
 
 @NgModule({
   imports: [
@@ -32,12 +34,16 @@ import { ParcellationVisEffect } from "./parcellationVis.effect";
     ParcTmplDoiPipe,
     ParcellationGroupSelectedPipe,
     IsGroupedParcellation,
+    ParcellationIsVersioned,
+    ParcellationIsNewest,
   ],
   exports: [
     FilterGroupedParcellationPipe,
     ParcellationGroupSelectedPipe,
     ParcTmplDoiPipe,
     IsGroupedParcellation,
+    ParcellationIsVersioned,
+    ParcellationIsNewest,
   ],
   providers: [
     ParcellationVisibilityService,

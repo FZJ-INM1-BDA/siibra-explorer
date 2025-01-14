@@ -14,6 +14,7 @@ import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 import { DoiTemplate } from "src/ui/doi/doi.component"
 
+
 const pipe = new FilterGroupedParcellationPipe()
 
 @Component({

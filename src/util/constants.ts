@@ -85,6 +85,12 @@ export const SPECIES_ENUM = {
   MUS_MUSCULUS: "Mus musculus",
 } as const
 
+export const PARCELLATION_GROUPS = {
+  FIBRE_ARCHITECTURE: "fibre architecture",
+  FUNCTIONAL_MODES: "functional modes",
+  CYTOARCHITECTURE: "cytoarchitecture",
+} as const
+
 /**
  * atlas should follow the following order
  */
@@ -93,6 +99,12 @@ export const speciesOrder = [
   SPECIES_ENUM.MACACA_FASCICULARIS,
   SPECIES_ENUM.RATTUS_NORVEGICUS,
   SPECIES_ENUM.MUS_MUSCULUS,
+]
+
+export const parcellationGroupOrder = [
+  PARCELLATION_GROUPS.CYTOARCHITECTURE,
+  PARCELLATION_GROUPS.FIBRE_ARCHITECTURE,
+  PARCELLATION_GROUPS.FUNCTIONAL_MODES,
 ]
 
 export const parcBanList: string[] = [
