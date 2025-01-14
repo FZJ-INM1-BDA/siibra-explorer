@@ -264,8 +264,12 @@ export class VerticalBreadCrumbComponent {
       { useViewer },
       { labels, showExperimental, minimizedCards, parcellationVisible }]) => {
       
+      const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
+
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,        
+        leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
+        branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
       }
     })
   )
@@ -450,5 +454,9 @@ export class VerticalBreadCrumbComponent {
 
   public toggleParcellationVisibility(){
     this.svc && this.svc.toggleVisibility()
+  }
+
+  public nameEql(a: any, b: any){
+    return a.name === b.name
   }
 }

@@ -123,7 +123,7 @@ div.vbc-card-container
 
 sxplr-sapiviews-core-rich-regionshierarchy
 {
-    height: 100%;
+    height: calc(100% - 52px);
     padding: 0 0 0.4rem 0;
 }
 
@@ -145,4 +145,11 @@ button[mat-button]
     {
         flex: 0 0 auto;
     }
+}
+
+.region-list-search-row
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

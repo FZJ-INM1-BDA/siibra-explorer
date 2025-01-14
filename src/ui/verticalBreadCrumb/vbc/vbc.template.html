@@ -103,15 +103,17 @@
                         <button mat-button [sxplr-dialog]="editPointTmpl"
                             [matTooltip]="view.labels.NAVIGATION_CONTROL">
                             <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
-                            <div *ngIf="view.currentViewport && view.currentViewport.minpoint && view.currentViewport.maxpoint">
+                            <div *ngIf="view.currentViewport">
                                 <span>
-                                    ({{ view.currentViewport.minpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                                    ({{ view.currentViewport.center | numbers : 2 | addUnitAndJoin: '' : ', ' }})
                                 </span>
                                 <span>
-                                    to
+                                    ±
                                 </span>
                                 <span>
-                                    ({{ view.currentViewport.maxpoint | numbers : 0 | addUnitAndJoin : '' : ', ' }})
+                                    ({{ (view.currentViewport.maxpoint[0] - view.currentViewport.center[0]) | number : '1.2-2' }}, 
+                                    {{ (view.currentViewport.maxpoint[1] - view.currentViewport.center[1]) | number : '1.2-2' }}, 
+                                    {{ (view.currentViewport.maxpoint[2] - view.currentViewport.center[2]) | number : '1.2-2' }})
                                 </span>
                                 <span>
                                     mm
@@ -185,7 +187,7 @@
             <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
                 [ngIfElse]="notNewestTmpl">
 
-                <span class="sxplr-custom-cmp accent muted-3"
+                <span class="sxplr-custom-cmp default muted-3"
                     matTooltip="Newest version">
                     <i class="fas fa-fire"></i>
                 </span>
@@ -254,14 +256,58 @@
                     Parcellation
                     
                     <span class="show-when-minimized">
-                        : {{ parcellation.name }}
+                        <span>
+                            :
+                        </span>
+                        
+                        <ng-template [ngTemplateOutlet]="parcellationOptTmpl"
+                            [ngTemplateOutletContext]="{
+                                $implicit: view.selectedATP.parcellation
+                            }">
+
+                        </ng-template>
                     </span>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <ng-template [ngTemplateOutlet]="parcellationTmpl">
                     </ng-template>
                 </mat-card-subtitle>
+                <mat-card-subtitle>
+                    <sxplr-sapiviews-core-rich-regionlistsearch
+                        [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
+                        (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.labelMappedRegionNames.includes($event.name)
+                            ? selectRoi($event)
+                            : showHierarchyBtn.onClick({ 'searchTerm': $event.name })">
 
+                        <ng-template region-template let-region>
+
+                            <div class="region-list-search-row"
+                                [ngClass]="{
+                                    'text-muted': !view.labelMappedRegionNames.includes(region.name)
+                                }">
+                        
+                                <span class="sxplr-m-2">
+                                    <i *ngIf="view.leafRegions.includes(region)" class="fas fa-brain"></i>
+                                    <i *ngIf="view.branchRegions.includes(region)" class="fas fa-code-branch"></i>
+                                </span>
+
+                                <span>
+                                    {{ region.name }}
+                                </span>
+                            </div>
+
+                        </ng-template>
+                        <button mat-mini-fab
+                            color="primary"
+                            search-input-prefix
+                            iav-stop="click"
+                            [sxplr-dialog]="regionHierarchyTmpl"
+                            sxplr-dialog-size="xl"
+                            #showHierarchyBtn="sxplrDialog">
+                            <i class="fas fa-sitemap"></i>
+                        </button>
+                    </sxplr-sapiviews-core-rich-regionlistsearch>
+                </mat-card-subtitle>
             </mat-card-header>
 
             <mat-divider></mat-divider>
@@ -300,14 +346,6 @@
                         </ng-template>
                     </button>
                 </ng-template>
-
-                <button mat-icon-button
-                    [matTooltip]="view.labels.REGION_HIERARCHY"
-                    [sxplr-dialog]="regionHierarchyTmpl"
-                    sxplr-dialog-size="xl">
-                    <i class="fas fa-sitemap"></i>
-                </button>
-
             </mat-card-actions>
         </mat-card>
     </div>
@@ -638,9 +676,11 @@
         </mat-card>
     </div>
 
-    <ng-template #regionHierarchyTmpl>
+    <ng-template #regionHierarchyTmpl let-data>
+
         <sxplr-sapiviews-core-rich-regionshierarchy
             class="sxplr-w-100 sxplr-flex-var"
+            [sxplr-sapiviews-core-rich-regionshierarchy-searchstring]="data.searchTerm || ''"
             [sxplr-sapiviews-core-rich-regionshierarchy-regions]="view.allAvailableRegions"
             [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
             [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
@@ -648,6 +688,10 @@
             (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
             >
         </sxplr-sapiviews-core-rich-regionshierarchy>
+
+        <mat-card-actions>
+            <button mat-button mat-dialog-close>close</button>
+        </mat-card-actions>
     </ng-template>
 
     <ng-template #maximizeBtnTmpl let-cardname="cardname">
