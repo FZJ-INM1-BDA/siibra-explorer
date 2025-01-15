@@ -31,7 +31,7 @@ function sortParcellations(parcellations: SxplrParcellation[]): SxplrParcellatio
     const versionedParcs: SxplrParcellation[] = []
 
     while (!!idToFind){
-      let foundParc = idToParc[idToFind]
+      const foundParc = idToParc[idToFind]
       
       if (!foundParc) {
         throw new Error(`${idToFind} not found in idToParc dictionary`)
