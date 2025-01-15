@@ -633,12 +633,6 @@
                         voiBbox
                         [features]="voiFeatureEntryCmp.features$ | async">
                     </div>
-                    <mat-slide-toggle 
-                        #showWireFrame="matSlideToggle"
-                        [checked]="switchdir.switchState$ | async"
-                        (change)="$event.checked ? switchdir.open() : switchdir.close()">
-                        show wireframe
-                    </mat-slide-toggle>
                 </ng-template>
                 
                 <sxplr-feature-entry
@@ -684,6 +678,13 @@
                         cardname: 'feature'
                     }">
                 </ng-template>
+                <mat-divider [vertical]="true" [inset]="false"></mat-divider>
+                <button mat-icon-button
+                    [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
+                    (click)="switchdir.toggle()"
+                    matTooltip="Toggle 3D positions.">
+                    <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
+                </button>
             </mat-card-actions>
         </mat-card>
     </div>

@@ -414,17 +414,20 @@
     <ng-template [ngIf]="view.selectedPoint" let-point>
       <ng-template [ngIf]="point | sandsToNum" let-coordinates>
         <button mat-list-item
-            (click)="navigateTo(coordinates.coords)">
-            <mat-icon matListItemIcon
-              fontSet="fas"
-              fontIcon="fa-map-marker">
-            </mat-icon>
-            <div matListItemTitle>
-              {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
-            </div>
+          (click)="navigateTo(coordinates.coords)"
+          matTooltip="Go to coordinate">
+          <mat-icon matListItemIcon
+            fontSet="fas"
+            fontIcon="fa-map-marker">
+          </mat-icon>
+          <div matListItemTitle>
+            {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
+          </div>
         </button>
 
-        <button mat-list-item [iav-clipboard-copy]="coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm'">
+        <button mat-list-item
+          [iav-clipboard-copy]="coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm'"
+          matTooltip="Copy coordinate to clipboard">
           <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
           </mat-icon>
           <div matListItemTitle>
