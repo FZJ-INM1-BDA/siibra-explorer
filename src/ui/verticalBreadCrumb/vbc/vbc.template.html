@@ -7,7 +7,7 @@
         [reveal-state]="!view.minimizedCards.includes('atlas')"
         #atlasReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(atlasReveal.state$ | async),
+            'vbc-hidden': !(atlasReveal.state$ | async),
             'mat-elevation-z2': (atlasReveal.state$ | async)
         }">
         <mat-card>
@@ -21,6 +21,7 @@
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
+                        class="top-level-selection"
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
                         [matMenuTriggerFor]="selectATPMenu"
                         [matMenuTriggerData]="{
@@ -70,7 +71,7 @@
         [reveal-state]="!view.minimizedCards.includes('template')"
         #tmplReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(tmplReveal.state$ | async),
+            'vbc-hidden': !(tmplReveal.state$ | async),
             'mat-elevation-z2': (tmplReveal.state$ | async),
             'experimental': view.showExperimental
         }">
@@ -84,6 +85,7 @@
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
+                        class="top-level-selection"
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
                         [matMenuTriggerFor]="selectATPMenu"
                         [matMenuTriggerData]="{
@@ -100,7 +102,12 @@
                 <mat-card-subtitle>
                     <ng-template [ngIf]="view.useViewer === 'nehuba'" [ngIfElse]="notSupportedTmpl">
 
-                        <button mat-button [sxplr-dialog]="editPointTmpl"
+                        <button mat-button
+                            class="top-level-selection"
+                            [sxplr-dialog]="editPointTmpl"
+                            [sxplr-dialog-config]="{
+                                autoFocus: true
+                            }"
                             [matTooltip]="view.labels.NAVIGATION_CONTROL">
                             <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
                             <div *ngIf="view.currentViewport">
@@ -124,7 +131,9 @@
                     </ng-template>
                     <ng-template #notSupportedTmpl>
 
-                        <button mat-button disabled>
+                        <button mat-button
+                            class="top-level-selection"
+                            disabled>
                             <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
                             <span>
                                 Setting navigation unsupported
@@ -209,6 +218,7 @@
 
     <ng-template #parcellationTmpl>
         <button mat-button
+            class="top-level-selection"
             [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
             [matMenuTriggerFor]="selectATPMenu"
             [matMenuTriggerData]="{
@@ -246,7 +256,7 @@
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async),
+            'vbc-hidden': !(parcReveal.state$ | async),
             'mat-elevation-z2': (parcReveal.state$ | async),
             'experimental': view.showExperimental
         }">
@@ -358,7 +368,7 @@
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async),
+            'vbc-hidden': !(parcReveal.state$ | async),
             'mat-elevation-z2': (parcReveal.state$ | async),
             'experimental': view.showExperimental
         }">
@@ -381,6 +391,7 @@
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
+                        class="top-level-selection"
                         [matTooltip]="view.labels.REGION_HIERARCHY"
                         [sxplr-dialog]="regionHierarchyTmpl"
                         sxplr-dialog-size="xl">
@@ -525,7 +536,7 @@
         [reveal-state]="!view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(parcReveal.state$ | async),
+            'vbc-hidden': !(parcReveal.state$ | async),
             'mat-elevation-z2': (parcReveal.state$ | async),
             'experimental': view.showExperimental
         }">
@@ -540,6 +551,7 @@
                 </mat-card-subtitle>
                 <mat-card-subtitle>
                     <button mat-button
+                        class="top-level-selection"
                         [matTooltip]="view.labels.REGION_HIERARCHY"
                         [sxplr-dialog]="regionHierarchyTmpl"
                         sxplr-dialog-size="xl">
@@ -579,7 +591,7 @@
         [reveal-state]="!view.minimizedCards.includes('feature')"
         #featureReveal="reveal"
         [ngClass]="{
-            'sxplr-hidden': !(featureReveal.state$ | async),
+            'vbc-hidden': !(featureReveal.state$ | async),
             'mat-elevation-z2': (featureReveal.state$ | async)
         }">
     
@@ -813,15 +825,17 @@
             </mat-form-field>
             </ng-template>
         </div>
-    
+
         <div mat-dialog-actions align="end">
             
             <ng-template [ngIf]="dialogInputState$ | async" let-state>
-    
+
                 <button mat-raised-button color="primary"
+                    type="submit"
                     (click)="selectPoint(state.valueNm)"
                     [disabled]="!state.validated"
-                    mat-dialog-close>
+                    mat-dialog-close
+                    #selectPtBtn>
                     select point
                 </button>
             

@@ -1,4 +1,4 @@
-div.vbc-card-container.sxplr-hidden
+div.vbc-card-container.vbc-hidden
 {
     &::before
     {
@@ -12,7 +12,7 @@ div.vbc-card-container.sxplr-hidden
 }
 :host-context([darktheme="true"])
 {
-    div.vbc-card-container.sxplr-hidden
+    div.vbc-card-container.vbc-hidden
     {
         &::before
         {
@@ -31,7 +31,7 @@ div.vbc-card-container
     overflow-y: hidden; 
     margin: 0.2rem 0.4rem;
 
-    &:not(.sxplr-hidden)
+    &:not(.vbc-hidden)
     {
         .show-when-minimized
         {
@@ -39,7 +39,7 @@ div.vbc-card-container
         }
     }
 
-    &.sxplr-hidden
+    &.vbc-hidden
     {
         opacity: 0.8;
         position: relative;
@@ -134,7 +134,7 @@ table[mat-table] *
   text-overflow: ellipsis;
 }
 
-button[mat-button]
+button.top-level-selection
 {
     text-wrap: nowrap;
     overflow: hidden;
