@@ -465,11 +465,15 @@ export class ViewerCmp {
     )
   }
 
+  /**
+   * 
+   * @param position position in mm
+   */
   navigateTo(position: number[]): void {
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          position
+          position: position.map(v => v*1e6)
         },
         animation: true,
       })

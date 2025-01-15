@@ -8,6 +8,7 @@ import { SandsToNumPipe } from "./sandsToNum.pipe"
 import { SapiViewsUtilModule } from '../util';
 import { AngularMaterialModule } from 'src/sharedModules';
 import { MarkdownModule } from 'src/components/markdown';
+import { ShareModule } from 'src/share';
 
 
 
@@ -24,9 +25,11 @@ import { MarkdownModule } from 'src/components/markdown';
     SapiViewsUtilModule,
     AngularMaterialModule,
     MarkdownModule,
+    ShareModule,
   ],
   exports: [
-    PointAssignmentComponent
+    PointAssignmentComponent,
+    SandsToNumPipe,
   ]
 })
 export class VolumesModule { }

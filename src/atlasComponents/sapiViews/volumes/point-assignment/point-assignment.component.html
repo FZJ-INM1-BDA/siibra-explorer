@@ -1,49 +1,8 @@
-<mat-action-list class="overview-container">
-    <ng-template [ngIf]="point$ | async" let-point>
-        <ng-template [ngIf]="point | sandsToNum" let-coordinates>
-            <button mat-list-item
-                (click)="navigateToPoint(coordinates.coords)">
-                <mat-icon matListItemIcon
-                    fontSet="fas"
-                    fontIcon="fa-map-marker">
-                </mat-icon>
-                <div matListItemTitle>
-                    {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
-                </div>
-            </button>
-    
-            <button mat-list-item
-                (click)="copyCoord(coordinates.coords)">
-                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
-                </mat-icon>
-                <div matListItemTitle>
-                    Copy to clipboard
-                </div>
-            </button>
-        </ng-template>
-    </ng-template>
-
-    <ng-template [ngIf]="df$ | async" let-df>
-        <button mat-list-item
-            (click)="openDialog(datatableTmpl)">
-            <mat-icon matListItemIcon
-                fontSet="fas"
-                fontIcon="fa-table">
-            </mat-icon>
-            <div matListItemTitle>
-                Show Full Assignment ({{ df.data.length }})
-            </div>
-        </button>
-    </ng-template>
-
-    <ng-template>
-
-    </ng-template>
-</mat-action-list>
-
-<div class="sxplr-m-2" *ngIf="warningMessage$ | async; let warningMessage">
-    <markdown-dom [markdown]="warningMessage"></markdown-dom>
-</div>
+<ng-template [ngIf]="infoMsg$ | async" let-msg>
+    <div class="sxplr-m-2">
+        <markdown-dom [markdown]="msg"></markdown-dom>
+    </div>
+</ng-template>
 
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
@@ -60,13 +19,33 @@
 
 <ng-template [ngIf]="df$ | async" let-df>
 
+    <mat-action-list>
+        <ng-template [ngIf]="dfCsv$ | async" let-dfCsv>
+            <button mat-list-item [iav-clipboard-copy]="dfCsv">
+                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy"></mat-icon>
+                <div matListItemTitle>
+                    Copy Assignments
+                </div>
+            </button>
+        </ng-template>
+        <button mat-list-item
+            (click)="openDialog(datatableTmpl)">
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-table"></mat-icon>
+            <div matListItemTitle>
+                Show Full Assignment ({{ df.data.length }})
+            </div>
+        </button>
+    </mat-action-list>
+
+    <mat-divider></mat-divider>
+
     <!-- simple table -->
     <table mat-table [dataSource]="df | dfToDs : simpleTblSort"
         matSort
-        class="sxplr-w-100"
         #simpleTblSort="matSort"
         matSortActive="map_value"
-        matSortDirection="desc">
+        matSortDirection="desc"
+        class="simple-result-table">
         <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 <span class="sxplr-m-1">
@@ -74,18 +53,19 @@
                 </span>
             </th>
             <td mat-cell *matCellDef="let element">
-                <!-- {{ element | json }} -->
                 <button mat-button (click)="selectRegion(element['region'], $event)"
-                    class="ws-no-wrap">
-                    {{ element['region'] }}
+                    class="region-name-button">
+                    <span class="region-name-container">
+                        {{ element['region'] }}
+                    </span>
                 </button>
             </td>
         </ng-container>
         <ng-container matColumnDef="map_value">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                map value
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="mapvalue">
+                map_value
             </th>
-            <td mat-cell *matCellDef="let element">
+            <td mat-cell *matCellDef="let element" class="mapvalue">
                 {{ element['map_value'] | prettyPresent }}
             </td>
         </ng-container>

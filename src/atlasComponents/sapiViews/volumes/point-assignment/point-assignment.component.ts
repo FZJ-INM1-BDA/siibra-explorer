@@ -11,6 +11,9 @@ import { TZipFileConfig } from "src/zipFilesOutput/type"
 import { environment } from "src/environments/environment"
 import { Store } from '@ngrx/store';
 import { atlasSelection } from 'src/state';
+import { SandsToNumPipe } from "../sandsToNum.pipe"
+
+const pipe = new SandsToNumPipe()
 
 const DOING_PROB_ASGMT = "Performing probabilistic assignment ..."
 const DOING_LABEL_ASGMT = "Probabilistic assignment failed. Performing labelled assignment ..."
@@ -31,7 +34,7 @@ export class PointAssignmentComponent implements OnDestroy {
     "map_value",
   ]
   
-  #busy$ = new BehaviorSubject<string>(null)
+  #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT>(null)
   busy$ = this.#busy$.asObservable()
 
   #error$ = new BehaviorSubject<string>(null)
@@ -62,9 +65,32 @@ export class PointAssignmentComponent implements OnDestroy {
   @Output()
   clickOnRegionName = new EventEmitter<{ target: string, event: MouseEvent }>()
 
-  warningMessage$ = this.busy$.pipe(
-    filter(busyWith => !!busyWith),
-    map(busyWith => busyWith === DOING_LABEL_ASGMT && LABELLED_MAP_ASSIGNMENT_REGRESSION)
+
+  infoMsg$: Observable<string> = combineLatest([
+    this.point$,
+    this.#parcellation,
+    this.#template,
+    this.busy$.pipe(
+      filter(busyWith => busyWith === DOING_LABEL_ASGMT || busyWith === DOING_PROB_ASGMT)
+    ),
+  ]).pipe(
+    map(([ point, parcellation, template, busyWith ]) => {
+      const coords = pipe.transform(point)
+      let maptype = "map"
+      let warningMsg = ""
+      if (busyWith === DOING_LABEL_ASGMT) {
+        maptype = "labelled map"
+        warningMsg = LABELLED_MAP_ASSIGNMENT_REGRESSION
+      }
+      if (busyWith === DOING_PROB_ASGMT) {
+        maptype = "statistical map"
+      }
+      return `Assignment of \`${coords.coords.join(", ")}\` to the ${maptype} of \`${parcellation.name}\` in \`${template.name}\`.
+
+For more detail, see [siibra-python documentation](https://siibra-python.readthedocs.io/en/v0.4eol/examples/05_anatomical_assignment/001_coordinates.html).
+
+${warningMsg}`
+    })
   )
 
   df$: Observable<PathReturn<"/map/assign">> = combineLatest([
@@ -147,19 +173,23 @@ export class PointAssignmentComponent implements OnDestroy {
     }
   }
 
+  dfCsv$ = this.df$.pipe(
+    map(df => df && generateCsv(df))
+  )
+
   zipfileConfig$: Observable<TZipFileConfig[]> = combineLatest([
     this.point$,
     this.#parcellation,
     this.#template,
-    this.df$
+    this.dfCsv$
   ]).pipe(
-    map(([ pt, parc, tmpl, df ]) => {
+    map(([ pt, parc, tmpl, dfCsv ]) => {
       return [{
         filename: 'README.md',
         filecontent: generateReadMe(pt, parc, tmpl)
       }, {
         filename: 'pointassignment.csv',
-        filecontent: generateCsv(df)
+        filecontent: dfCsv
       }] as TZipFileConfig[]
     })
   )
@@ -229,12 +259,13 @@ function processRow(v: unknown[]): string{
 
     returnValue.push(JSON.stringify(item))
   }
-  return returnValue.map(escapeDoubleQuotes).map(v => `"${v}"`).join(",")
+  return returnValue.join(",")
 }
 
 function generateCsv(df: PathReturn<"/map/assign">) {
   return [
     df.columns.map(escapeDoubleQuotes).map(v => `"${v}"`).join(","),
-    ...df.data.map(processRow)
+    ...df.data.map(processRow),
+    ""
   ].join("\r\n")
 }

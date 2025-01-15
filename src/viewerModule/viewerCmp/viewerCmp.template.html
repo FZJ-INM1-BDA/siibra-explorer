@@ -410,6 +410,34 @@
       {{ view.spatialObjectSubtitle }}
     </div>
   </sxplr-side-panel>
+  <mat-action-list class="overview-container">
+    <ng-template [ngIf]="view.selectedPoint" let-point>
+      <ng-template [ngIf]="point | sandsToNum" let-coordinates>
+        <button mat-list-item
+            (click)="navigateTo(coordinates.coords)">
+            <mat-icon matListItemIcon
+              fontSet="fas"
+              fontIcon="fa-map-marker">
+            </mat-icon>
+            <div matListItemTitle>
+              {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
+            </div>
+        </button>
+
+        <button mat-list-item [iav-clipboard-copy]="coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm'">
+          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
+          </mat-icon>
+          <div matListItemTitle>
+              Copy Coordinates
+          </div>
+        </button>
+      </ng-template>
+    </ng-template>
+    
+  </mat-action-list>
+
+  <mat-divider></mat-divider>
+
   <sxplr-point-assignment
     [point]="view.selectedPoint"
     [template]="view.selectedTemplate"
