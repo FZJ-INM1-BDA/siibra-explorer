@@ -35,3 +35,12 @@ div.displayCard
   pointer-events: none;
   overflow: visible;
 }
+
+.topleft
+{
+  position: fixed;
+  top: 0;
+  left: 4rem;
+  width: 0;
+  height: 0;
+}

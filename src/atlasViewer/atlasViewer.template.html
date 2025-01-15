@@ -1,3 +1,9 @@
+<div quick-tour 
+  quick-tour-description-md="Use browser's `Back` and `Forward` restore previous state." 
+  class="topleft">
+
+</div>
+
 <ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
   <ng-template [ngIf]="sapiError$ | async" let-data [ngIfElse]="viewerBody">

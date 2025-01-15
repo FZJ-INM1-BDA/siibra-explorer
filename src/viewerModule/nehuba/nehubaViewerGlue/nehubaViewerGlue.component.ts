@@ -56,7 +56,10 @@ export class NehubaGlueCmp implements IViewer<'nehuba'>, OnDestroy {
   private onDestroyCb: (() => void)[] = []
 
   public nehubaConfig: NehubaConfig
-  public QUICKTOUR_DND_MD = `Drag and drop a \`[.label].nii[.gz]\` file on the viewer to visualize the volume.`
+  public QUICKTOUR_DND_MD = `Drag and drop a \`[.label].nii[.gz]\` file on the viewer to visualize the volume.
+
+[![Screencast of drag-and-drop nifti file](https://data-proxy.ebrains.eu/api/v1/buckets/interactive-atlas-viewer/videos/20250115-drag-drop-nifti-trimmed.gif)](https://data-proxy.ebrains.eu/api/v1/buckets/interactive-atlas-viewer/videos/20250115-drag-drop-nifti-trimmed.mp4)
+`
 
   ngOnDestroy(): void {
     while (this.onDestroyCb.length) this.onDestroyCb.pop()()
