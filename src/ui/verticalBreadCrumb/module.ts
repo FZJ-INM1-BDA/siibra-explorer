@@ -16,6 +16,7 @@ import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { SxplrAnimationModule } from "src/ux";
 import { DoiTemplate } from "../doi/doi.component";
+import { OnFocusSelectDirective } from "./focusSelect.directive";
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { DoiTemplate } from "../doi/doi.component";
   ],
   declarations: [
     VerticalBreadCrumbComponent,
+    OnFocusSelectDirective,
   ],
   exports: [
     VerticalBreadCrumbComponent,

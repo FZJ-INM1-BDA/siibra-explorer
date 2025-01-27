@@ -333,3 +333,14 @@ div.section-divider
   border-bottom-width: 1px;
   margin: 3rem 1rem;
 }
+
+
+.#{$nsp}-center-children
+{
+  display: grid;
+
+  &> *
+  {
+    place-self: center;
+  }
+}

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, merge, of, Subject } from "rxjs";
-import { debounceTime, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
+import { debounceTime, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
@@ -16,6 +16,24 @@ import { DoiTemplate } from "src/ui/doi/doi.component"
 
 
 const pipe = new FilterGroupedParcellationPipe()
+
+type PasteTarget = "pos"|"zoom"|"rot"
+type NavigationState = {
+  x: number
+  y: number
+  z: number
+
+  zoom: number
+
+  rotx: number
+  roty: number
+  rotz: number
+  rotw: number
+}
+
+function validateNumbers(input: (number|null|undefined)[]): input is number[]{
+  return input.every(v => !Number.isNaN(v) && !!v || v === 0)
+}
 
 @Component({
   selector: 'sxplr-vertical-bread-crumb',
@@ -35,7 +53,7 @@ export class VerticalBreadCrumbComponent {
 
   #destroy$ = inject(DestroyDirective).destroyed$
   
-  #pasted$ = new Subject<string>()
+  #pasted$ = new Subject<{target: PasteTarget, value: string}>()
   #minimizedCards$ = new BehaviorSubject<string[]>([])
   
   #parseString(input: string): number[]{
@@ -50,33 +68,22 @@ export class VerticalBreadCrumbComponent {
       .map(Number)
   }
 
-  public dialogForm = new FormGroup({
+  public navigationCtlForm = new FormGroup({
     x: new FormControl<string>('0'),
     y: new FormControl<string>('0'),
     z: new FormControl<string>('0'),
+    
+    zoom: new FormControl<string>('1'),
+
+    rotx: new FormControl<string>('0'),
+    roty: new FormControl<string>('0'),
+    rotz: new FormControl<string>('0'),
+    rotw: new FormControl<string>('1'),
   })
   
-  public readonly dialogInputState$ = this.dialogForm.valueChanges.pipe(
-    shareReplay(1),
-    map(({ x, y, z }) => {
-      const allEntries = [x, y, z].map(v => this.#parseString(v))
-      return {
-        validated: allEntries.every(entry =>
-          (
-            entry.length === 1
-            && !Number.isNaN(entry[0])
-          )
-        ),
-        valueMm: allEntries.map(entry => entry[0]),
-        valueNm: allEntries.map(entry => entry[0]).map(v => v*1e6),
-        string: allEntries.map(entry => `${entry[0]}mm`).join(", "),
-      }
-    }),
-  )
-  
-  onPaste(ev: ClipboardEvent) {
+  onPaste(ev: ClipboardEvent, target: PasteTarget="pos") {
     const text = ev.clipboardData.getData('text/plain')
-    this.#pasted$.next(text)
+    this.#pasted$.next({ target, value: text})
   }
   
   public async selectPoint(posNm: number[]) {
@@ -280,37 +287,100 @@ export class VerticalBreadCrumbComponent {
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
     @Optional() @Inject(ParcellationVisibilityService) private svc: ParcellationVisibilityService,
   ){
-
-    const navFromState$ = this.store$.pipe(
+    
+    const navStateFromState$: Observable<NavigationState> = this.store$.pipe(
       select(atlasSelection.selectors.navigation),
       filter(v => !!v),
-      map(({ position }) => position.map(v => Number((v/1e6).toFixed(3)))),
+      map(({ position, orientation, zoom }) => {
+        const [x, y, z] = position.map(v => Number((v/1e6).toFixed(3)))
+        const [rotx, roty, rotz, rotw] = orientation
+        return {
+          x, y, z,
+          zoom,
+          rotx, roty, rotz, rotw
+        }  
+      }),
     )
 
-    const navFromPaste$ = this.#pasted$.pipe(
-      filter(v => !!v), // '' is falsy, so filters out null, undefined, '' etc
-      map(v => this.#parseString(v)),
-    )
-
-    merge(
-      navFromState$,
-      navFromPaste$,
-    ).pipe(
-      filter(fullEntry => !!fullEntry && fullEntry.every(entry => !Number.isNaN(entry))),
-      debounceTime(160),
-      takeUntil(this.#destroy$),
-    ).subscribe(fullEntry => {
-      this.dialogForm.setValue({
-        x: `${fullEntry[0]}`,
-        y: `${fullEntry[1]}`,
-        z: `${fullEntry[2]}`,
+    const navStateFromPaste$: Observable<Partial<NavigationState>> = this.#pasted$.pipe(
+      filter(({ value }) => !!value),
+      map(({ value, target }) => {
+        // TODO perhaps handle copy past full state (e.g. pos, zoom and rot?)
+        if (target === "pos") {
+          const [x, y, z] = this.#parseString(value)
+          return {
+            x, y, z
+          }
+        }
+        if (target === "rot") {
+          const [ rotx, roty, rotz, rotw ] = this.#parseString(value)
+          return {
+            rotx, roty, rotz, rotw
+          }
+        }
+        return {}
       })
-    })
-
-    this.dialogInputState$.pipe(
+    )
+    merge(
+      navStateFromState$,
+      navStateFromPaste$,
+    ).pipe(
+      debounceTime(16),
       takeUntil(this.#destroy$)
-    ).subscribe()
+    ).subscribe(({ x, y, z, zoom, rotx, roty, rotz, rotw }) => {
+      let state: Partial<Record<keyof NavigationState, string>> = {}
+      if (validateNumbers([x, y, z])) {
+        state = {
+          ...state,
+          x: `${x}`,
+          y: `${y}`,
+          z: `${z}`, 
+        }
+      }
+      if (zoom && validateNumbers([zoom])) {
+        state = {
+          ...state,
+          zoom: `${zoom}`
+        }
+      }
+      if (validateNumbers([rotx, roty, rotz, rotw])) {
+        state = {
+          ...state,
+          rotx: `${rotx}`,
+          roty: `${roty}`,
+          rotz: `${rotz}`,
+          rotw: `${rotw}`,
+        }
+      }
+      this.navigationCtlForm.patchValue(state)
+    })
     
+    this.navigationCtlForm.valueChanges.pipe(
+      takeUntil(this.#destroy$),
+      debounceTime(500),
+      withLatestFrom(navStateFromState$),
+      filter(([ newState, oldState ]) => {
+        for (const stateKey in newState) {
+          if (newState[stateKey] !== oldState[stateKey].toString()) {
+            return true
+          }
+        }
+        return false
+      }),
+      map(([ newState, _oldState ]) => newState),
+    ).subscribe(({ x, y, z, zoom, rotx, roty, rotz, rotw }) => {
+      this.store$.dispatch(
+        atlasSelection.actions.navigateTo({
+          navigation: {
+            zoom: Number(zoom),
+            position: [x, y, z].map(v => Number(v) * 1e6),
+            orientation: [rotx, roty, rotz, rotw].map(v => Number(v)),
+          },
+          animation: true,
+          physical: true
+        })
+      )
+    })
   }
   public async resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
 
