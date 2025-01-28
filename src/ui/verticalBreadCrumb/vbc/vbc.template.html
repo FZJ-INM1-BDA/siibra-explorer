@@ -112,33 +112,7 @@
                                     color="warn"
                                     [matTooltip]="view.labels.RESET_TRANSLATION"
                                     (click)="resetNavigation({ position: true })">
-                                    <i class="iavic iavic-translation"></i>
-                                </button>
-                            </div>
-                            <div class="vbc-row">
-                                <mat-form-field>
-                                    <mat-label>zoom</mat-label>
-                                    <input matInput formControlName="zoom" vbc-on-focus-select>
-                                </mat-form-field>
-                                <button mat-icon-button
-                                    class="vbc-row-fixed"
-                                    color="warn"
-                                    [matTooltip]="view.labels.RESET_ZOOM"
-                                    (click)="resetNavigation({ zoom: true })">
-                                    <i class="iavic iavic-scaling"></i>
-                                </button>
-                            </div>
-                            <div class="vbc-row">
-                                <mat-form-field *ngFor="let axis of ['rotx', 'roty', 'rotz', 'rotw']">
-                                    <mat-label>{{ axis }}</mat-label>
-                                    <input matInput [formControlName]="axis" vbc-on-focus-select>
-                                </mat-form-field>
-                                <button mat-icon-button
-                                    class="vbc-row-fixed"
-                                    color="warn"
-                                    [matTooltip]="view.labels.RESET_ROTATION"
-                                    (click)="resetNavigation({ rotation: true })">
-                                    <i class="iavic iavic-rotation"></i>
+                                    <mat-icon>restart_alt</mat-icon>
                                 </button>
                             </div>
                         </ng-template>

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import { userInterface } from "src/state";
+import { atlasSelection, userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
 import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS } from 'common/constants'
@@ -9,6 +9,7 @@ import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { debounceTime, distinctUntilChanged, map, mapTo, switchMap, take } from "rxjs/operators";
 import {panelOrder} from "src/state/userInterface/selectors";
 import { switchMapWaitFor } from "src/util/fn";
+import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../../config.service";
 
 @Component({
   selector: `nehuba-layout-overlay`,
@@ -126,7 +127,8 @@ export class NehubaLayoutOverlay implements OnDestroy{
   constructor(
     private store$: Store,
     private cdr: ChangeDetectorRef,
-    @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<NehubaViewerUnit>
+    @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<NehubaViewerUnit>,
+    @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
   ){
     this.subscription.push(
       nehuba$.subscribe(nehuba => {
@@ -296,6 +298,27 @@ export class NehubaLayoutOverlay implements OnDestroy{
 
   public detectChanges(): void {
     this.cdr.detectChanges()
+  }
+
+  public async resetZoom(panelIndex: number){
+    const { template } = await this.store$.pipe(
+      atlasSelection.fromRootStore.distinctATP(),
+      take(1)
+    ).toPromise()
+    const config = this.nehubaConfigSvc.getNehubaConfig(template)
+    
+    const {
+      perspectiveZoom,
+      navigation,
+    } = config.dataset.initialNgState
+    const { zoomFactor: zoom } = navigation
+    
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: panelIndex === 3 ? ({ perspectiveZoom }) : ({ zoom }),
+        animation: false
+      })
+    )
   }
 
   private nehubaUnit: NehubaViewerUnit

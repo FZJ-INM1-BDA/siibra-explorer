@@ -85,7 +85,7 @@
       <button mat-icon-button color="primary"
         (click)="detectChanges()"
         [matMenuTriggerFor]="viewerCtrlMenu">
-        <i class="fas fa-cog"></i>
+        <mat-icon>settings</mat-icon>
       </button>
 
     </ng-container>
@@ -94,14 +94,18 @@
     <button mat-icon-button color="primary"
       (click)="zoomNgView(panelIndex, 0.9)"
       [attr.aria-label]="ARIA_LABELS.ZOOM_IN">
-      <i class="fas fa-search-plus"></i>
+      <mat-icon>zoom_in</mat-icon>
+    </button>
+
+    <button (click)="resetZoom(panelIndex)" mat-icon-button color="primary">
+      <mat-icon>restart_alt</mat-icon>
     </button>
 
     <!-- factor > 1.0 === zoom out -->
     <button mat-icon-button color="primary"
       (click)="zoomNgView(panelIndex, 1.1)"
       [attr.aria-label]="ARIA_LABELS.ZOOM_OUT">
-      <i class="fas fa-search-minus"></i>
+      <mat-icon>zoom_out</mat-icon>
     </button>
 
     <ng-template
@@ -119,11 +123,11 @@
     <ng-template
       [ngIf]="currentPanelMode === 'SINGLE_PANEL' || currentPanelMode === 'PIP_PANEL'"
       [ngIfElse]="expandTmpl">
-      <i class="fas fa-compress"></i>
+      <mat-icon>close_fullscreen</mat-icon>
     </ng-template>
 
     <ng-template #expandTmpl>
-      <i class="fas fa-expand"></i>
+      <mat-icon>open_in_full</mat-icon>
     </ng-template>
   </button>
 </ng-template>
