@@ -1,21 +1,57 @@
 import { ChangeDetectorRef, Component, Inject, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, EMPTY, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { atlasSelection, userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
-import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS } from 'common/constants'
+import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS, VALUES } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
-import { debounceTime, distinctUntilChanged, map, mapTo, switchMap, take } from "rxjs/operators";
-import {panelOrder} from "src/state/userInterface/selectors";
-import { switchMapWaitFor } from "src/util/fn";
+import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { panelOrder } from "src/state/userInterface/selectors";
+import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "../../config.service";
+import { arrayEqual } from "src/util/array";
+import { enLabels } from "src/uiLabels";
+
+const REV_THRESHOLD = 1 - VALUES.THRESHOLD
+const NEG_REV_THRESHOLD = VALUES.THRESHOLD - 1
+
+type AxisLabel = Partial<{
+  R: number
+  L: number
+  A: number
+  P: number
+  S: number
+  I: number
+}>
+
+function convertToAxesLabel(array: number[]): AxisLabel {
+  if (array[0] > REV_THRESHOLD) {
+    return { R: array[0] }
+  }
+  if (array[0] < NEG_REV_THRESHOLD) {
+    return { L: array[0] * -1 }
+  }
+  if (array[1] > REV_THRESHOLD) {
+    return { A: array[1] }
+  }
+  if (array[1] < NEG_REV_THRESHOLD) {
+    return { P: array[1] * -1 }
+  }
+  if (array[2] > REV_THRESHOLD) {
+    return { S: array[2] }
+  }
+  if (array[2] < NEG_REV_THRESHOLD) {
+    return { I: array[2] * -1 }
+  }
+  return {}
+}
 
 @Component({
   selector: `nehuba-layout-overlay`,
   templateUrl: `./nehuba.layoutOverlay.template.html`,
   styleUrls: [
-    `./nehuba.layoutOverlay.style.css`
+    `./nehuba.layoutOverlay.style.scss`
   ]
 })
 
@@ -123,11 +159,63 @@ export class NehubaLayoutOverlay implements OnDestroy{
     distinctUntilChanged(),
     map(po => po[0] !== '3')
   )
+  
+  #exportNehuba = getExportNehuba()
+
+  labels$ = of(enLabels)
+
+  axesLabels$: Observable<AxisLabel[][]> = this.nehuba$.pipe(
+    switchMap(nehuba => nehuba
+      ? nehuba.viewerPositionChange.pipe(
+          map(v => v?.orientation || [] as number[]),
+        )
+      : EMPTY),
+    distinctUntilChanged(arrayEqual(null, true)),
+    // only show if orientation is length 4
+    filter(arr => arr.length === 4),
+    withLatestFrom(this.#exportNehuba),
+    map(([orientation, export_nehuba]) => {
+      const { vec3, quat } = export_nehuba
+
+      const slicesOrientations = [
+        quat.rotateX(quat.create(), quat.create(), -Math.PI / 2),
+        quat.rotateY(quat.create(), quat.rotateX(quat.create(), quat.create(), -Math.PI / 2), -Math.PI / 2),
+        quat.rotateX(quat.create(), quat.create(), Math.PI),
+      ]
+      for (const q of slicesOrientations){
+        quat.mul(q, orientation, q)
+      }
+
+      const xp = vec3.fromValues(1, 0, 0)
+      const yp = vec3.fromValues(0, 1, 0)
+      const xn = vec3.fromValues(-1, 0, 0)
+      const yn = vec3.fromValues(0, -1, 0)
+
+
+      return slicesOrientations.map(q => {
+        
+        // origin **might** be at top left, rather than bottom left
+        const xpt = vec3.transformQuat(vec3.create(), xp, q)
+        const xnt = vec3.transformQuat(vec3.create(), xn, q)
+        
+        const ypt = vec3.transformQuat(vec3.create(), yp, q)
+        const ynt = vec3.transformQuat(vec3.create(), yn, q)
+
+        return [
+          convertToAxesLabel(ynt),
+          convertToAxesLabel(xpt),
+          convertToAxesLabel(ypt),
+          convertToAxesLabel(xnt)
+        ]
+      })
+    }),
+    shareReplay(1),
+  )
 
   constructor(
     private store$: Store,
     private cdr: ChangeDetectorRef,
-    @Inject(NEHUBA_INSTANCE_INJTKN) nehuba$: Observable<NehubaViewerUnit>,
+    @Inject(NEHUBA_INSTANCE_INJTKN) private nehuba$: Observable<NehubaViewerUnit>,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
   ){
     this.subscription.push(
@@ -298,6 +386,17 @@ export class NehubaLayoutOverlay implements OnDestroy{
 
   public detectChanges(): void {
     this.cdr.detectChanges()
+  }
+
+  public resetOrientation(){
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          orientation: [0, 0, 0, 1]
+        },
+        animation: false
+      })
+    )
   }
 
   public async resetZoom(panelIndex: number){

@@ -58,6 +58,30 @@
         <spinner-cmp></spinner-cmp>
       </div>
     </div>
+
+    <div iavLayoutFourCornersContent class="axis-container">
+      
+      <ng-template [ngIf]="axesLabels$ | async" let-axesLabels>
+        <ng-template [ngIf]="axesLabels[panelIndex]" let-myAxesLabels>
+          <ng-template ngFor [ngForOf]="myAxesLabels" let-index="index" let-axisLabel>
+            <div [class]="'axis-' + index">
+              <div class="axis-label sxplr-custom-cmp bg text" *ngFor="let keyvalue of axisLabel | keyvalue">
+                {{ keyvalue.key }}
+              </div>
+              <ng-template [ngIf]="(axisLabel | keyvalue).length === 0">
+                <button mat-icon-button
+                  [matTooltip]="(labels$ | async).RESET_ROTATION"
+                  (click)="resetOrientation()"
+                  class="sxplr-pe-all"
+                  >
+                  <mat-icon>restart_alt</mat-icon>
+                </button>
+              </ng-template>
+            </div>
+          </ng-template>
+        </ng-template>
+      </ng-template>
+    </div>
   </iav-layout-fourcorners>
 
 </ng-template>
