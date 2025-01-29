@@ -25,7 +25,7 @@ export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> exten
   sxplrIsParent: (child: T, parent: T) => boolean
 
   @Input('sxplr-flat-hierarchy-render-node-tmpl')
-  renderNodeTmplRef: TemplateRef<T>
+  renderNodeTmplRef: TemplateRef<unknown>
 
   @Input('sxplr-flat-hierarchy-tree-view-lineheight')
   lineHeight: number = 35
