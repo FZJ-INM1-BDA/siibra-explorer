@@ -3,14 +3,20 @@
         {{ tpbr.template.name }}
     </div>
     
-    <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
+    <ng-template [ngIf]="tpbr.bboxStringAlt" let-alt>
+        <div>
+            Located at: {{ alt.center }} ± {{ alt.halflwh }} (mm)
+        </div>
+    </ng-template>
+
+    <!-- <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
         <div>
             from {{ bboxString.from }}
         </div>
         <div>
             to {{ bboxString.to }}
         </div>
-    </ng-template>
+    </ng-template> -->
 
     <div *ngIf="tpbr.parcellation">
         {{ tpbr.parcellation.name }}

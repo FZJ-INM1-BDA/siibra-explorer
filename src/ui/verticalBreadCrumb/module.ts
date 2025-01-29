@@ -17,6 +17,8 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { SxplrAnimationModule } from "src/ux";
 import { DoiTemplate } from "../doi/doi.component";
 import { OnFocusSelectDirective } from "./focusSelect.directive";
+import { SxplrDumbFeatureList } from "src/features/dumbList/dumbList.component";
+import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 
 @NgModule({
   imports: [
@@ -36,6 +38,8 @@ import { OnFocusSelectDirective } from "./focusSelect.directive";
     ReactiveFormsModule,
     SxplrAnimationModule,
     DoiTemplate,
+    SxplrDumbFeatureList,
+    TPBRViewCmp,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

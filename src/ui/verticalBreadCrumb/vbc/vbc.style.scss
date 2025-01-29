@@ -168,9 +168,35 @@ button.top-level-selection
     }
 }
 
+*:has(>.update-parcellation-container)
+{
+    position: relative;
+
+    >.update-parcellation-container
+    {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        right: 0;
+        width: 0px;
+        height: 0px;
+        overflow: visible;
+
+        display: flex;
+        justify-content: end;
+        align-items: center;
+    }
+}
+
 .region-list-search-row
 {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.action-v-center
+{
+    margin-top: auto;
+    margin-bottom: auto;
 }

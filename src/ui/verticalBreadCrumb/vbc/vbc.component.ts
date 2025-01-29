@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
@@ -435,6 +435,12 @@ export class VerticalBreadCrumbComponent {
     )
   }
 
+  public gotoNewestParc(){
+    this.store$.dispatch(
+      atlasSelection.actions.gotoNewestParc()
+    )
+  }
+
   public async selectATP(type: string, id: string, regionId?: string) {
     if (!['atlasId', 'parcellationId', 'templateId'].includes(type)) {
       console.warn(`type must be of type 'atlasId' | 'parcellationId' | 'templateId'`)
@@ -514,6 +520,14 @@ export class VerticalBreadCrumbComponent {
     const s = new Set(this.#minimizedCards$.value)
     s.delete(cardname)
     this.#minimizedCards$.next(Array.from(s))
+  }
+
+  public selectFeature(feature: Feature){
+    this.store$.dispatch(
+      userInteraction.actions.showFeature({
+        feature
+      })
+    )
   }
 
   public clearFeature(){

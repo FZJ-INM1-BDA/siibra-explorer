@@ -33,7 +33,17 @@ export class TPBRViewCmp {
         bboxString: v.bbox && {
           from: v.bbox[0].map(v => v.toFixed(2)).join(", "),
           to: v.bbox[1].map(v => v.toFixed(2)).join(", "),
-        }
+        },
+        bboxStringAlt: (() => {
+          if (!v.bbox) return null
+          const center = [0, 1, 2].map(idx => (v.bbox[0][idx] + v.bbox[1][idx]) / 2)
+          const lwh = [0, 1, 2].map(idx => (v.bbox[1][idx] - v.bbox[0][idx]))
+          return {
+            center: center.map(v => v.toFixed(2)).join(", "),
+            lwh: lwh.map(v => v.toFixed(2)).join(", "),
+            halflwh: lwh.map(v => (v / 2).toFixed(2)).join(", "),
+          }
+        })()
       }
     })
   )

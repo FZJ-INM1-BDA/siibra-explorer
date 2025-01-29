@@ -500,6 +500,46 @@ export class Effect {
     })
   ))
 
+  gotoNewestParc = createEffect(() => this.action.pipe(
+    ofType(actions.gotoNewestParc),
+    withLatestFrom(
+      this.store.pipe(
+        fromRootStore.distinctATP(),
+      ),
+    ),
+    switchMap(([ _, { parcellation: currentParcellation, atlas} ]) => {
+      return from(this.sapiSvc.getAllParcellations(atlas)).pipe(
+        map(allparcellations => {
+          const nextMap: Record<string, SxplrParcellation> = {}
+          for (const parc of allparcellations){
+            if (parc.prevId) {
+              nextMap[parc.prevId] = parc
+            }
+          }
+          let idToTest: string = currentParcellation.id
+          let newest: SxplrParcellation = currentParcellation
+          let fuse = 100
+          while (!!idToTest) {
+            fuse --
+            if (fuse < 0) {
+              console.log('error')
+              return generalActions.generalActionError({
+                message: `Finding newest parcellation error. Likely a circular reference.`
+              })
+            }
+            if (!nextMap[idToTest]) {
+              return actions.selectATPById({
+                parcellationId: newest.id
+              })
+            }
+            newest = nextMap[idToTest]
+            idToTest = newest.id
+          }
+        })
+      )
+    })
+  ))
+
   constructor(
     private action: Actions,
     private sapiSvc: SAPI,

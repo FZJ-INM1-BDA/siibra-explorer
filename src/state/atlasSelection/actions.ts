@@ -196,3 +196,7 @@ export const setViewport = createAction(
     viewport: BoundingBox
   }>()
 )
+
+export const gotoNewestParc = createAction(
+  `${nameSpace} gotoNewestParc`
+)

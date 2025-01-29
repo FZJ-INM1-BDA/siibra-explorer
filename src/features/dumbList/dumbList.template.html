@@ -1,0 +1,99 @@
+<ng-template [ngIf]="view$ | async" let-view>
+
+    <div feature-filter-directive
+        [items]="view.categories"
+        [initValue]="true"
+        #catFilter="featureFilterDirective">
+
+    </div>
+
+    <div feature-filter-directive
+        [items]="view.modalities"
+        [initValue]="true"
+        #modFilter="featureFilterDirective">
+        
+    </div>
+
+    <!-- filter -->
+    <section>
+        <!-- categories -->
+        <ng-template ngFor [ngForOf]="view.categories" let-cat>
+            <mat-checkbox
+                class="sxplr-d-none"
+                [checked]="catFilter.checked$ | async | includes : cat"
+                (change)="catFilter.setValue(cat, $event.checked)">
+                <span>
+                    {{ cat }}
+                </span>
+                <span class="text-muted">
+                    (
+                        {{ (
+                            view.features
+                            | filterArray : filteredFeatures("cat", [cat])
+                        ).length
+                        }}
+                    )
+                </span>
+            </mat-checkbox>
+        </ng-template>
+
+        <!-- modalities -->
+        <ng-template ngFor [ngForOf]="view.modalities" let-mod>
+            <mat-checkbox
+                [checked]="modFilter.checked$ | async | includes : mod"
+                (change)="modFilter.setValue(mod, $event.checked)">
+                <span>
+                    {{ mod }}
+                </span>
+                <span class="text-muted">
+                    (
+                        {{ (
+                            view.features
+                            | filterArray : filteredFeatures("mod", [mod])
+                        ).length
+                        }}
+                    )
+                </span>
+            </mat-checkbox>
+        </ng-template>
+
+        <button (click)="modFilter.setAll(true); catFilter.setAll(true)" mat-button>reset</button>
+    </section>
+
+
+    <ng-template [ngIf]="catFilter.checked$ | async" let-catCheched>
+        <ng-template [ngIf]="modFilter.checked$ | async" let-modCheched>
+            <ng-template [ngIf]="
+                view.features
+                | filterArray : filteredFeatures('mod', modCheched)
+                | filterArray : filteredFeatures('cat', catCheched)"
+                let-filteredFeatures>
+
+                <mat-divider></mat-divider>
+                <div class="feature-list-container">
+                    <cdk-virtual-scroll-viewport
+                        itemSize="36"
+                        class="virtual-scroll-viewport">
+                
+                        <ng-template cdkVirtualFor
+                            [cdkVirtualForOf]="filteredFeatures"
+                            let-feature
+                            let-last="last">
+                            <button mat-button
+                                (click)="featureClicked.emit(feature)"
+                                class="virtual-scroll-item sxplr-w-100">
+                                <span class="ws-no-wrap"> {{ feature.name }} </span>
+                            </button>
+                
+                        </ng-template>
+                
+                    </cdk-virtual-scroll-viewport>
+                </div>
+            </ng-template>
+
+            
+        </ng-template>
+    </ng-template>
+
+
+</ng-template>

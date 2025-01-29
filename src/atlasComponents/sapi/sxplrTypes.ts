@@ -115,6 +115,7 @@ export type Feature = {
   id: string
   name: string
   category?: string
+  modality?: string
 } & AdditionalInfo
 
 export type VoiFeature = {

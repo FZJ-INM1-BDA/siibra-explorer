@@ -4,7 +4,8 @@ import { map, scan, shareReplay, switchMap } from "rxjs/operators";
 
 @Directive({
   selector: '[feature-filter-directive]',
-  exportAs: 'featureFilterDirective'
+  exportAs: 'featureFilterDirective',
+  standalone: true
 })
 export class FeatureFilterDirective<T> implements OnChanges{
   @Input()

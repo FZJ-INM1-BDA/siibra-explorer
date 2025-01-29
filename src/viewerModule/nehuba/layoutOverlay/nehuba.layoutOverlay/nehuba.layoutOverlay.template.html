@@ -106,7 +106,7 @@
     <!-- perspective specific control -->
     <ng-container *ngIf="panelIndex === 3">
 
-      <button mat-icon-button color="primary"
+      <button mat-icon-button color="default"
         (click)="detectChanges()"
         [matMenuTriggerFor]="viewerCtrlMenu">
         <mat-icon>settings</mat-icon>
@@ -115,18 +115,18 @@
     </ng-container>
 
     <!-- factor < 1.0 === zoom in -->
-    <button mat-icon-button color="primary"
+    <button mat-icon-button color="default"
       (click)="zoomNgView(panelIndex, 0.9)"
       [attr.aria-label]="ARIA_LABELS.ZOOM_IN">
       <mat-icon>zoom_in</mat-icon>
     </button>
 
-    <button (click)="resetZoom(panelIndex)" mat-icon-button color="primary">
+    <button (click)="resetZoom(panelIndex)" mat-icon-button color="default">
       <mat-icon>restart_alt</mat-icon>
     </button>
 
     <!-- factor > 1.0 === zoom out -->
-    <button mat-icon-button color="primary"
+    <button mat-icon-button color="default"
       (click)="zoomNgView(panelIndex, 1.1)"
       [attr.aria-label]="ARIA_LABELS.ZOOM_OUT">
       <mat-icon>zoom_out</mat-icon>
@@ -142,7 +142,7 @@
 <ng-template #maxBtnTmpl let-panelIndex>
   <button
     mat-icon-button
-    color="primary"
+    color="default"
     (click)="toggleMaximiseMinimise(panelIndex)">
     <ng-template
       [ngIf]="currentPanelMode === 'SINGLE_PANEL' || currentPanelMode === 'PIP_PANEL'"

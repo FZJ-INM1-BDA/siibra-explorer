@@ -25,7 +25,7 @@ export class FeatureBase implements OnChanges{
   
   #TPR$ = new BehaviorSubject<{ template?: SxplrTemplate, parcellation?: SxplrParcellation, region?: SxplrRegion }>({ template: null, parcellation: null, region: null })
   #bbox$ = new BehaviorSubject<{ bbox?: BBox }>({ bbox: null })
-  protected TPRBbox$ = combineLatest([
+  public TPRBbox$ = combineLatest([
     this.#TPR$,
     this.#bbox$.pipe(
       debounceTime(500)

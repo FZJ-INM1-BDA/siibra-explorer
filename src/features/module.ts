@@ -46,6 +46,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
      * standalone components
      */
     PlotlyComponent,
+    FeatureFilterDirective,
     // AtlasColorMapIntents,
     TPBRViewCmp,
     CodeSnippet,
@@ -56,7 +57,6 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     FeatureViewComponent,
     FilterCategoriesPipe,
     ListDirective,
-    FeatureFilterDirective,
 
     CategoryAccDirective,
     VoiBboxDirective,

@@ -143,16 +143,26 @@
                     }">
                     <i class="fas fa-info"></i>
                 </button>
-                <button mat-icon-button disabled>
-                    <i class="fas fa-copy"></i>
-                </button>
+
+                <ng-template [ngIf]="view.currentViewport?.center" let-center>
+
+                    <button
+                        [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+                        mat-icon-button
+                        [iav-clipboard-copy]="
+                            center
+                            | numbers : 3
+                            | addUnitAndJoin : 'mm' : ', '
+                        ">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </ng-template>
 
                 <ng-template sxplrExperimentalFlag [experimental]="true">
 
                 <mat-divider [vertical]="true"></mat-divider>
                 
-                <div iav-switch
-                #switchdir="iavSwitch">
+                <div iav-switch #switchdir="iavSwitch">
 
                 </div>
                 <div sxplr-sapiviews-core-space-boundingbox
@@ -163,7 +173,7 @@
                     #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
                     >
                 </div>
-                
+
                 <sxplr-feature-entry
                     class="sxplr-d-none"
                     [template]="view.selectedATP.template"
@@ -178,6 +188,7 @@
                         [features]="voiFeatureEntryCmp.features$ | async">
                     </div>
                 </ng-template>
+
                 <button mat-icon-button
                     [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
                     (click)="switchdir.toggle()"
@@ -185,9 +196,48 @@
                     <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
                 </button>
 
-                <button mat-icon-button disabled>
-                    <i class="fas fa-database"></i>
-                </button>
+                <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
+                    <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+                </ng-template>
+
+                <ng-template #voiFeatureDialogTmpl>
+                    <h1 mat-dialog-title>
+                        Features
+                    </h1>
+                    <mat-dialog-content>
+
+                        <span>Anchored at:</span>
+                        <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
+                        </tpbr-viewer>
+
+                        <mat-divider></mat-divider>
+
+                        <sxplr-dumb-feature-list
+                            [features]="voiFeatureEntryCmp.features$ | async"
+                            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()">
+                        </sxplr-dumb-feature-list>
+                    </mat-dialog-content>
+                    <div mat-dialog-actions>
+                        <button mat-button mat-dialog-close #closeBtn="matDialogClose">
+                            Close
+                        </button>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
+                    
+                    <ng-template [ngIf]="totals > 0">
+
+                        <button mat-icon-button [matBadge]="totals"
+                            [matTooltip]="view.labels.RELATED_DATASETS"
+                            [sxplr-dialog]="voiFeatureDialogTmpl"
+                            [sxplr-dialog-config]="{
+                                autoFocus: true
+                            }">
+                            <mat-icon>dataset_linked</mat-icon>
+                        </button>
+                    </ng-template>
+                </ng-template>
                 </ng-template>
 
             </mat-card-actions>
@@ -195,38 +245,38 @@
     </div>
 
     <!-- common template for parcellation/single region/multi region -->
-    <ng-template #parcellationOptTmpl let-parcellation>
+    <ng-template #parcellationOptTmpl let-parcellation let-hideVersionIcon="hideVersionIcon">
         
         <span>
             {{ parcellation.shortName || parcellation.name }}
         </span>
+
+        <ng-template [ngIf]="!hideVersionIcon">
+            <ng-template
+                [ngIf]="parcellation | isVersioned : view.parcellations"
+                [ngIfElse]="unVersionedParcTemplate">
+
+
+                <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
+                    [ngIfElse]="notNewestTmpl">
+
+                    <span class="sxplr-custom-cmp default muted-3"
+                        matTooltip="Newest version">
+                        <i class="fas fa-fire"></i>
+                    </span>
+                    
+                    
+                </ng-template>
+
+                <ng-template #notNewestTmpl>
+                    <mat-icon matTooltip="Newer version available" class="muted-3">update</mat-icon>
+                </ng-template>
+            </ng-template>
+
+            <ng-template #unVersionedParcTemplate>
+            </ng-template>
+        </ng-template>
         
-        <ng-template
-            [ngIf]="parcellation | isVersioned : view.parcellations"
-            [ngIfElse]="unVersionedParcTemplate">
-
-
-            <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
-                [ngIfElse]="notNewestTmpl">
-
-                <span class="sxplr-custom-cmp default muted-3"
-                    matTooltip="Newest version">
-                    <i class="fas fa-fire"></i>
-                </span>
-                
-                
-            </ng-template>
-
-            <ng-template #notNewestTmpl>
-                <span class="sxplr-custom-cmp default muted-3"
-                    matTooltip="Newer version available">
-                    <i class="fas fa-history"></i>
-                </span>
-            </ng-template>
-        </ng-template>
-
-        <ng-template #unVersionedParcTemplate>
-        </ng-template>
     </ng-template>
 
     <ng-template #maximizeParcCardTmpl>
@@ -253,19 +303,37 @@
         <mat-card>
             <mat-card-header>
                 <mat-card-subtitle>
-                    Parcellation
+                    <span>
+                        Parcellation
+                    </span>
+
+                    <span *ngIf="view.selectedRegions.length > 0">
+                        Region
+                    </span>
+                    
                     
                     <span class="show-when-minimized">
                         <span>
                             :
                         </span>
-                        
-                        <ng-template [ngTemplateOutlet]="parcellationOptTmpl"
-                            [ngTemplateOutletContext]="{
-                                $implicit: view.selectedATP.parcellation
-                            }">
 
+                        <span *ngIf="view.selectedRegions.length === 1">
+                            {{ view.selectedRegions[0].name }}
+                        </span>
+
+                        <span *ngIf="view.selectedRegions.length > 1">
+                            {{ view.selectedRegions.length }} regions
+                        </span>
+
+                        <ng-template [ngIf]="view.selectedRegions.length === 0">
+                            <ng-template [ngTemplateOutlet]="parcellationOptTmpl"
+                                [ngTemplateOutletContext]="{
+                                    $implicit: view.selectedATP.parcellation
+                                }">
+
+                            </ng-template>
                         </ng-template>
+                        
                     </span>
                 </mat-card-subtitle>
 
@@ -286,12 +354,39 @@
                         <i class="fas fa-brain"></i>
                         <ng-template [ngTemplateOutlet]="parcellationOptTmpl"
                             [ngTemplateOutletContext]="{
-                                $implicit: view.selectedATP.parcellation
+                                $implicit: view.selectedATP.parcellation,
+                                hideVersionIcon: true
                             }">
 
                         </ng-template>
+                        
                     </button>
 
+                    <ng-template [ngIf]="parcellation | isVersioned : view.parcellations">
+                        <div class="update-parcellation-container">
+
+                            <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
+                                [ngIfElse]="goToNewestVTmpl">
+                                <div [matTooltip]="view.labels.NEWEST_VERSION"
+                                    class="sxplr-m-4">
+                                    <mat-icon>whatshot</mat-icon>
+                                </div>
+                                
+                                <!-- <button mat-icon-button class="sxplr-m-2" iav-stop="click"
+                                    >
+                                    
+                                </button> -->
+                            </ng-template>
+
+                            <ng-template #goToNewestVTmpl>
+                                <button mat-icon-button class="sxplr-m-2" iav-stop="click"
+                                    [matTooltip]="view.labels.GOTO_NEWEST_VERSION"
+                                    (click)="gotoNewestParc()">
+                                    <mat-icon>update</mat-icon>
+                                </button>
+                            </ng-template>
+                        </div>
+                    </ng-template>
 
                 </mat-card-subtitle>
 
@@ -344,7 +439,7 @@
                                     (click)="clearRoi()"
                                     color="warn"
                                     [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-                                    <i class="fas fa-times"></i>
+                                    <mat-icon>restart_alt</mat-icon>
                                 </button>
                             </ng-template>
                         </ng-container>
@@ -461,20 +556,14 @@
                 <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
                     <ng-template [ngIf]="relatedRegions.length > 0">
                         <button mat-icon-button
+                            [matBadge]="relatedRegions.length"
                             [matTooltip]="view.labels.RELATED_REGIONS"
                             [sxplr-dialog]="relatedRegionsTmpl"
                             [sxplr-dialog-data]="{
                                 relatedRegions: relatedRegions,
                                 region: view.selectedRegions[0]
                             }">
-        
-                            <ng-template sxplrExperimentalFlag [experimental]="true">
-                            <span [matBadge]="relatedRegions.length">⚭</span>
-                            </ng-template>
-                            
-                            <ng-template sxplrExperimentalFlag [deprecated]="true">
-                            <mat-icon fontSet="far" fontIcon="fa-handshake" [matBadge]="relatedRegions.length"></mat-icon>
-                            </ng-template>
+                            <mat-icon>schema</mat-icon>
                         </button>
                         
                     </ng-template>
