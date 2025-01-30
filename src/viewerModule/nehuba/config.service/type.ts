@@ -106,6 +106,7 @@ type OldNgLayerSpec = {
   }
   opacity?: number
   visible?: boolean
+  shader?: string
 }
 
 type NewNgLayerSpec = {
@@ -123,6 +124,7 @@ type NewNgLayerSpec = {
       sourceRank: number
     }
   }
+  shader?: string
 }
 
 /**

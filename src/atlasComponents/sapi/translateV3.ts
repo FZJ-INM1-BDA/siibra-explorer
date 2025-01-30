@@ -4,7 +4,8 @@ import {
 import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
-import { defaultdict } from "src/util/fn"
+import { defaultdict, getShader } from "src/util/fn"
+import { EnumColorMapName } from "src/util/colorMaps"
 
 export function parseUrl(url: string): {protocol: string, host: string, path: string} {
   const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
@@ -345,19 +346,28 @@ class TranslateV3 {
         console.error(`neuroglancer/precomputed data source has not been found!`)
         continue
       }
-      const { transform, info: _info, url } = precomputedVol
+      const { transform, info: _info, url, meta } = precomputedVol
       const { resolution, size } = _info.scales[0]
       const info = {
         voxel: size as [number, number, number],
         real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
         resolution: resolution as [number, number, number]
       }
-      returnObj.push({
+      const obj: NgLayerSpec = {
         source: `precomputed://${url}`,
         legacySpecFlag: "old",
         transform,
         info,
-      })
+      }
+      
+      const { type } = meta.data || {}
+
+      if (type === "image/3d") {
+        obj["shader"] = getShader({
+          colormap: EnumColorMapName.RGB
+        })
+      }
+      returnObj.push(obj)
     }
     return returnObj
   }

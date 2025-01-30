@@ -207,9 +207,33 @@ export class NehubaViewerUnit implements OnDestroy {
 
         const viewer = this.nehubaViewer.ngviewer
 
+        const layers: Record<string, any> = this.config?.dataset?.initialNgState?.layers || {}
+        let layerReadyCallbacks = Object.keys(this.config?.dataset?.initialNgState?.layers || {})
+          .map(name => {
+            const layer = layers[name]
+            const shader = layer.shader
+            if (!shader) {
+              return null
+            }
+            return (readiedLayerNames: string[]) => {
+              if (readiedLayerNames.includes(name)) {
+                const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(name)
+                if (!layer) {
+                  throw new Error(`layer ${name} not found`)
+                }
+                console.log("runninging!", layer.layer.fragmentMain, shader)
+                layer.layer.fragmentMain.restoreState(shader)
+                return true
+              }
+              return false
+            }
+          })
+          .filter(cb => !!cb)
+
         this.layersChangedHandler = viewer.layerManager.readyStateChanged.add(() => {
           this.layersChanged.emit(null)
           const readiedLayerNames: string[] = viewer.layerManager.managedLayers.filter(l => l.isReady()).map(l => l.name)
+          layerReadyCallbacks = layerReadyCallbacks.filter(cb => !cb(readiedLayerNames))
           for (const layerName in this.ngIdSegmentsMap) {
             if (!readiedLayerNames.includes(layerName)) {
               return
