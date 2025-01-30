@@ -15,16 +15,25 @@
     </div>
 
     <!-- filter -->
-    <section>
+    <section class="filter-section">
+
+        <button (click)="modFilter.setAll(true)" mat-button color="primary">select all</button>
+        <button (click)="modFilter.setAll(false)" mat-button color="warn">deselect all</button>
+
         <!-- categories -->
         <ng-template ngFor [ngForOf]="view.categories" let-cat>
             <mat-checkbox
                 class="sxplr-d-none"
                 [checked]="catFilter.checked$ | async | includes : cat"
                 (change)="catFilter.setValue(cat, $event.checked)">
-                <span>
+                <span *ngIf="cat; else fallbackTmpl">
                     {{ cat }}
                 </span>
+                <ng-template #fallbackTmpl>
+                    <span class="muted">
+                        (uncategorized)
+                    </span>
+                </ng-template>
                 <span class="text-muted">
                     (
                         {{ (
@@ -42,9 +51,14 @@
             <mat-checkbox
                 [checked]="modFilter.checked$ | async | includes : mod"
                 (change)="modFilter.setValue(mod, $event.checked)">
-                <span>
+                <span *ngIf="mod; else fallbackTmpl">
                     {{ mod }}
                 </span>
+                <ng-template #fallbackTmpl>
+                    <span class="muted">
+                        (other)
+                    </span>
+                </ng-template>
                 <span class="text-muted">
                     (
                         {{ (
@@ -57,7 +71,6 @@
             </mat-checkbox>
         </ng-template>
 
-        <button (click)="modFilter.setAll(true); catFilter.setAll(true)" mat-button>reset</button>
     </section>
 
 

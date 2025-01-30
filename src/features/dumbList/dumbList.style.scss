@@ -1,16 +1,6 @@
-mat-checkbox
-{
-    ::ng-deep label
-    {
-        // reboot.css sets bottom margin
-        // needs to be reset
-        margin: auto; 
-    }
-}
-
 .feature-list-container
 {
-    height: 50dvh;
+    height: 40dvh;
 
     > cdk-virtual-scroll-viewport
     {
@@ -21,4 +11,12 @@ mat-checkbox
             justify-content: start;
         }
     }
+}
+
+.filter-section
+{
+    max-height: 10dvh;
+    overflow: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }

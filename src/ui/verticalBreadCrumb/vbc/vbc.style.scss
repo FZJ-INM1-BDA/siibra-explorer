@@ -1,8 +1,8 @@
 :host
 {
     --vbc-overlay-begin-opacity: 0;
-    --vbc-overlay-mid-opacity: 0.15;
-    --vbc-overlay-final-opacity: 0.5;
+    --vbc-overlay-mid-opacity: 0;
+    --vbc-overlay-final-opacity: 0;
 }
 
 .vbc-row
@@ -62,8 +62,9 @@ div.vbc-card-container
 
     &.vbc-hidden
     {
-        opacity: 0.8;
+        opacity: 1;
         position: relative;
+        overflow: hidden;
 
         &::before
         {
@@ -72,12 +73,15 @@ div.vbc-card-container
             height: 100%;
             width: 100%;
             z-index: 9;
-        }
 
-        > *
-        {
             pointer-events: none;
         }
+
+        mat-card-subtitle:first-child
+        {
+            margin-bottom: 1rem;
+        }
+        
 
         &:hover
         {
@@ -199,4 +203,20 @@ button.top-level-selection
 {
     margin-top: auto;
     margin-bottom: auto;
+}
+
+.whatshot-container
+{
+    width: 0px;
+    max-height: 100px;
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.small-icon
+{
+    font-size: 90%;
+    position: absolute;
 }

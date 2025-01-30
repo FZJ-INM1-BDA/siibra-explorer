@@ -2,9 +2,10 @@
 
     <!-- selected atlas -->
     <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container atlas-container"
-        (click)="!atlasReveal.state && openCard('atlas')"
         sxplr-reveal
-        [reveal-state]="!view.minimizedCards.includes('atlas')"
+        [reveal-state]="view.useAccordion
+            ? view.maximizedCard === 'atlas'
+            : !view.minimizedCards.includes('atlas')"
         #atlasReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(atlasReveal.state$ | async),
@@ -12,7 +13,7 @@
         }">
         <mat-card>
             <mat-card-header>
-                <mat-card-subtitle>
+                <mat-card-subtitle (click)="atlasReveal.state ? minimizeCard('atlas') : openCard('atlas')">
                     Atlas
 
                     <span class="show-when-minimized">
@@ -66,9 +67,10 @@
     
     <!-- selected template -->
     <div *ngIf="view.selectedATP.template; let template" class="vbc-card-container template-container"
-        (click)="!tmplReveal.state && openCard('template')"
         sxplr-reveal
-        [reveal-state]="!view.minimizedCards.includes('template')"
+        [reveal-state]="view.useAccordion
+            ? view.maximizedCard === 'template'
+            : !view.minimizedCards.includes('template')"
         #tmplReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(tmplReveal.state$ | async),
@@ -77,7 +79,7 @@
         }">
         <mat-card>
             <mat-card-header>
-                <mat-card-subtitle>
+                <mat-card-subtitle (click)="tmplReveal.state ? minimizeCard('template') : openCard('template')">
                     Space
                     <span class="show-when-minimized">
                         : {{ template.name }}
@@ -156,6 +158,13 @@
                         ">
                         <i class="fas fa-copy"></i>
                     </button>
+
+                    <button mat-icon-button
+                        [matTooltip]="view.labels.POSITION_ASSIGNMENT"
+                        (click)="assignPoint(center, view.selectedATP.template)"
+                        >
+                        <mat-icon>query_stats</mat-icon>
+                    </button>
                 </ng-template>
 
                 <ng-template sxplrExperimentalFlag [experimental]="true">
@@ -200,39 +209,25 @@
                     <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
                 </ng-template>
 
-                <ng-template #voiFeatureDialogTmpl>
-                    <h1 mat-dialog-title>
-                        Features
-                    </h1>
-                    <mat-dialog-content>
-
-                        <span>Anchored at:</span>
-                        <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
-                        </tpbr-viewer>
-
-                        <mat-divider></mat-divider>
-
-                        <sxplr-dumb-feature-list
-                            [features]="voiFeatureEntryCmp.features$ | async"
-                            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()">
-                        </sxplr-dumb-feature-list>
-                    </mat-dialog-content>
-                    <div mat-dialog-actions>
-                        <button mat-button mat-dialog-close #closeBtn="matDialogClose">
-                            Close
-                        </button>
-                    </div>
-                </ng-template>
-
                 <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
                     
                     <ng-template [ngIf]="totals > 0">
+                        
+                        <ng-template #anchorTmpl>
+                            <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
+                            </tpbr-viewer>
+                        </ng-template>
+
 
                         <button mat-icon-button [matBadge]="totals"
                             [matTooltip]="view.labels.RELATED_DATASETS"
-                            [sxplr-dialog]="voiFeatureDialogTmpl"
+                            [sxplr-dialog]="dumbFeatureDialogTmpl"
                             [sxplr-dialog-config]="{
                                 autoFocus: true
+                            }"
+                            [sxplr-dialog-data]="{
+                                features: voiFeatureEntryCmp.features$ | async,
+                                anchorTmpl: anchorTmpl
                             }">
                             <mat-icon>dataset_linked</mat-icon>
                         </button>
@@ -256,20 +251,14 @@
                 [ngIf]="parcellation | isVersioned : view.parcellations"
                 [ngIfElse]="unVersionedParcTemplate">
 
-
-                <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
+                <ng-template
+                    [ngIf]="parcellation | isNewest : view.parcellations"
                     [ngIfElse]="notNewestTmpl">
-
-                    <span class="sxplr-custom-cmp default muted-3"
-                        matTooltip="Newest version">
-                        <i class="fas fa-fire"></i>
-                    </span>
-                    
-                    
+                    <mat-icon matTooltip="newest version" class="muted-3 small-icon">whatshot</mat-icon>
                 </ng-template>
 
                 <ng-template #notNewestTmpl>
-                    <mat-icon matTooltip="Newer version available" class="muted-3">update</mat-icon>
+                    <mat-icon matTooltip="newer version available" class="muted-3 small-icon">update</mat-icon>
                 </ng-template>
             </ng-template>
 
@@ -291,9 +280,10 @@
     <!-- selected parcellation -->
     <div *ngIf="view.selectedATP.parcellation; let parcellation"
         class="vbc-card-container parcellation-container"
-        (click)="!parcReveal.state && openCard('parcellation')"
         sxplr-reveal
-        [reveal-state]="!view.minimizedCards.includes('parcellation')"
+        [reveal-state]="view.useAccordion
+            ? view.maximizedCard === 'parcellation'
+            : !view.minimizedCards.includes('parcellation')"
         #parcReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(parcReveal.state$ | async),
@@ -302,7 +292,7 @@
         }">
         <mat-card>
             <mat-card-header>
-                <mat-card-subtitle>
+                <mat-card-subtitle  (click)="parcReveal.state ? minimizeCard('parcellation') : openCard('parcellation')">
                     <span>
                         Parcellation
                     </span>
@@ -466,6 +456,7 @@
                 
                 <ng-template [ngIf]="view.parcellationVisible !== null && view.selectedRegions.length === 0">
                     <button mat-icon-button
+                        [matTooltip]="view.labels.TOGGLE_DELINEATION"
                         (click)="toggleParcellationVisibility()"
                         (iav-key-event)="toggleParcellationVisibility()"
                         [iav-key-listener]="[{
@@ -486,9 +477,43 @@
 
                 <ng-template sxplrExperimentalFlag [experimental]="true">
                 <mat-divider [vertical]="true"></mat-divider>
-                <button mat-icon-button disabled>
-                    <i class="fas fa-database"></i>
-                </button>
+
+                <ng-template [ngIf]="view.selectedRegions.length < 2">
+                    <sxplr-feature-entry
+                        class="sxplr-d-none"
+                        [parcellation]="view.selectedATP.parcellation"
+                        [region]="view.selectedRegions[0]"
+                        [attr.data-feature-length]="((parcFeature.features$ | async) || []).length"
+                        #parcFeature="featureEntryCmp">
+                    </sxplr-feature-entry>
+
+                    <ng-template #anchorTmpl>
+                        <tpbr-viewer [tpbr-concept]="parcFeature.TPRBbox$ | async">
+                        </tpbr-viewer>
+                    </ng-template>
+
+                    <ng-template [ngIf]="(parcFeature.totals$ | async) > 0">
+                        <button mat-icon-button
+                            [matBadge]="parcFeature.totals$ | async"
+                            [matTooltip]="view.labels.RELATED_DATASETS"
+                            [sxplr-dialog]="dumbFeatureDialogTmpl"
+                            [sxplr-dialog-config]="{
+                                autoFocus: true
+                            }"
+                            [sxplr-dialog-data]="{
+                                features: parcFeature.features$ | async,
+                                anchorTmpl: anchorTmpl
+                            }">
+                            <mat-icon>dataset_linked</mat-icon>
+                        </button>
+                    </ng-template>
+
+                    <ng-template [ngIf]="parcFeature.busy$ | async">
+                        <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+                    </ng-template>
+
+                </ng-template>
+                
                 </ng-template>
             </mat-card-actions>
 
@@ -648,7 +673,9 @@
         class="vbc-card-container feature-container"
         (click)="!featureReveal.state && openCard('feature')"
         sxplr-reveal
-        [reveal-state]="!view.minimizedCards.includes('feature')"
+        [reveal-state]="view.useAccordion
+            ? view.maximizedCard === 'feature'
+            : !view.minimizedCards.includes('feature')"
         #featureReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(featureReveal.state$ | async),
@@ -657,7 +684,7 @@
     
         <mat-card>
             <mat-card-header>
-                <mat-card-subtitle>
+                <mat-card-subtitle  (click)="featureReveal.state ? minimizeCard('feature') : openCard('feature')">
                     Features
                 </mat-card-subtitle>
             </mat-card-header>
@@ -871,3 +898,27 @@
         </button>
     </ng-template>
 </mat-menu>
+
+<!-- template for dumb feature list  -->
+<ng-template #dumbFeatureDialogTmpl let-context>
+    <h1 mat-dialog-title>
+        Features
+    </h1>
+    <mat-dialog-content>
+
+        <span>Anchored at:</span>
+        <ng-template [ngTemplateOutlet]="context.anchorTmpl"></ng-template>
+
+        <mat-divider></mat-divider>
+
+        <sxplr-dumb-feature-list
+            [features]="context.features"
+            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()">
+        </sxplr-dumb-feature-list>
+    </mat-dialog-content>
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close #closeBtn="matDialogClose">
+            Close
+        </button>
+    </div>
+</ng-template>

@@ -55,6 +55,9 @@ export class VerticalBreadCrumbComponent {
   
   #pasted$ = new Subject<{target: PasteTarget, value: string}>()
   #minimizedCards$ = new BehaviorSubject<string[]>([])
+
+  // accordion mode
+  #maximizedCard$ = new BehaviorSubject<string>(null)
   
   #parseString(input: string): number[]{
     return input
@@ -84,43 +87,6 @@ export class VerticalBreadCrumbComponent {
   onPaste(ev: ClipboardEvent, target: PasteTarget="pos") {
     const text = ev.clipboardData.getData('text/plain')
     this.#pasted$.next({ target, value: text})
-  }
-  
-  public async selectPoint(posNm: number[]) {
-    
-    const { template } = await this.#selectedATP$.pipe(
-      take(1)
-    ).toPromise()
-
-    this.store$.dispatch(
-      atlasSelection.actions.selectPoint({
-        point: {
-          "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
-          "@id": getUuid(),
-          coordinateSpace: {
-            "@id": template.id
-          },
-          coordinates: posNm.map(v => ({
-            "@id": getUuid(),
-            "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
-            unit: {
-              "@id": "id.link/mm"
-            },
-            value: v,
-            uncertainty: [0, 0]
-          }))
-        }
-      })
-    )
-    this.store$.dispatch(
-      atlasSelection.actions.navigateTo({
-        navigation: {
-          position: posNm
-        },
-        physical: true,
-        animation: true
-      })
-    )
   }
 
   #selectedATP$ = this.store$.pipe(
@@ -236,14 +202,16 @@ export class VerticalBreadCrumbComponent {
       select(userPreference.selectors.showExperimental)
     ),
     this.#minimizedCards$,
+    this.#maximizedCard$,
     this.svc?.visibility$ || of(null as boolean|null)
   ]).pipe(
-    map(([ labels, showExperimental, minimizedCards, parcellationVisible ]) => {
+    map(([ labels, showExperimental, minimizedCards, maximizedCard, parcellationVisible ]) => {
       return {
         labels,
         showExperimental,
         minimizedCards,
-        parcellationVisible
+        parcellationVisible,
+        maximizedCard,
       }
     })
   )
@@ -269,12 +237,13 @@ export class VerticalBreadCrumbComponent {
         selectedFeature,
       },
       { useViewer },
-      { labels, showExperimental, minimizedCards, parcellationVisible }]) => {
+      { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, }]) => {
       
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
 
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,        
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,
+        useAccordion: showExperimental, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
       }
@@ -504,6 +473,29 @@ export class VerticalBreadCrumbComponent {
     )
   }
 
+  public assignPoint(position: number[], template: SxplrTemplate) {
+    this.store$.dispatch(
+      atlasSelection.actions.selectPoint({
+        point: {
+          "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+          "@id": getUuid(),
+          coordinateSpace: {
+            "@id": template.id
+          },
+          coordinates: position.map(v => ({
+            "@id": getUuid(),
+            "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
+            unit: {
+              "@id": "id.link/mm"
+            },
+            value: v * 1e6,
+            uncertainty: [0, 0]
+          }))
+        }
+      })
+    )
+  }
+
   public isActive<T extends SxplrAtlas|SxplrTemplate|SxplrParcellation>(current: T) {
     return (name: string) => {
       return name === current.name
@@ -514,12 +506,14 @@ export class VerticalBreadCrumbComponent {
     const s = new Set(this.#minimizedCards$.value)
     s.add(cardname)
     this.#minimizedCards$.next(Array.from(s))
+    this.#maximizedCard$.next(null)
   }
 
   public openCard(cardname: string){
     const s = new Set(this.#minimizedCards$.value)
     s.delete(cardname)
     this.#minimizedCards$.next(Array.from(s))
+    this.#maximizedCard$.next(cardname)
   }
 
   public selectFeature(feature: Feature){
@@ -527,12 +521,6 @@ export class VerticalBreadCrumbComponent {
       userInteraction.actions.showFeature({
         feature
       })
-    )
-  }
-
-  public clearFeature(){
-    this.store$.dispatch(
-      userInteraction.actions.clearShownFeature()
     )
   }
 

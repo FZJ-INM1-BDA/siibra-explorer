@@ -19,10 +19,12 @@ export const enLabels = {
   
   COPY_REGION_NAMES: "copy selected region names",
   COPY_CURRENT_POSITION: "copy the current position",
+  POSITION_ASSIGNMENT: "assignment of this position",
 
   SELECTED_DIFFERENT_ATLAS: "select a different atlas",
   SELECTED_DIFFERENT_TEMPLATE: "select a different template",
   SELECTED_DIFFERENT_PARCELLATION: "select a different parcellation",
+  TOGGLE_DELINEATION: "toggle delineation [q]",
 
   NEWEST_VERSION: "newest version",
   GOTO_NEWEST_VERSION: "go to newest version",
