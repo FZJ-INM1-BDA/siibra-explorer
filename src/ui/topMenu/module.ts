@@ -15,6 +15,7 @@ import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { AngularMaterialModule } from "src/sharedModules";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import { AngularMaterialModule } from "src/sharedModules";
     UserAnnotationsModule,
     KeyFrameModule,
     QuickTourModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     TopMenuCmp

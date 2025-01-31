@@ -3,32 +3,25 @@
 
 @include mat.core();
 
+$themes: "default", "ebrains";
+$themes-map: (
+  "default": (
+    "primary": mat.define-palette(mat.$indigo-palette, 400),
+    "accent": mat.define-palette(mat.$amber-palette, A200, A100, A400),
+    "warn": mat.define-palette(mat.$red-palette),
+  ),
+  "ebrains": (
+    "primary": mat.define-palette(mat.$green-palette, 400),
+    "accent": mat.define-palette(mat.$yellow-palette, A200, A100, A400),
+    "warn": mat.define-palette(mat.$red-palette),
+  )
+);
+
 $sxplr-primary: mat.define-palette(mat.$indigo-palette, 400);
 $sxplr-accent: mat.define-palette(mat.$amber-palette, A200, A100, A400);
 $sxplr-warn: mat.define-palette(mat.$red-palette);
 
-$typographic-connfig: mat.define-typography-config();
-
-$sxplr-light-theme: mat.define-light-theme((
- color: (
-   primary: $sxplr-primary,
-   accent: $sxplr-accent,
-   warn: $sxplr-warn,
- ),
- typography: $typographic-connfig,
- density: 0,
-));
-
-// Define a dark theme
-$sxplr-dark-theme: mat.define-dark-theme((
- color: (
-   primary: $sxplr-primary,
-   accent: $sxplr-accent,
-   warn: $sxplr-warn,
- ),
-  typography: $typographic-connfig,
-  density: 0,
-));
+$typographic-config: mat.define-typography-config();
 
 // Include the theme mixins for other components you use here.
 // TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
@@ -123,65 +116,66 @@ $sxplr-dark-theme: mat.define-dark-theme((
   }
 }
 
+@each $theme in $themes {
+  $palette-map: map-get($themes-map, $theme);
+  
+  $sxplr-light-theme: mat.define-light-theme((
+    color: (
+      primary: map-get($palette-map, "primary"),
+      accent: map-get($palette-map, "accent"),
+      warn: map-get($palette-map, "warn"),
+    ),
+    typography: $typographic-config,
+    density: 0,
+  ));
+  
+  // Define a dark theme
+  $sxplr-dark-theme: mat.define-dark-theme((
+    color: (
+      primary: map-get($palette-map, "primary"),
+      accent: map-get($palette-map, "accent"),
+      warn: map-get($palette-map, "warn"),
+    ),
+    typography: $typographic-config,
+    density: 0,
+  ));
+  
+  [theme="#{$theme}"]
+  { 
+    /**
+      * attribute has lower priority than class
+      * by default, use attribute to set UI wide theme
+      * use class for specific localised theme 
+      */
 
-/**
-  * attribute has lower priority than class
-  * by default, use attribute to set UI wide theme
-  * use class for specific localised theme 
-  */
-[darktheme=true],
-.darktheme.darktheme
-{
-  @include mat.all-component-themes($sxplr-dark-theme);
-  @include custom-cmp($sxplr-dark-theme);
-  input[type="text"],textarea
-  {
-    caret-color: white!important;
+    &[darktheme=true],
+    [darktheme=true],
+    .darktheme.darktheme
+    {
+      @include mat.all-component-themes($sxplr-dark-theme);
+      @include custom-cmp($sxplr-dark-theme);
+      input[type="text"],textarea
+      {
+        caret-color: white!important;
+      }
+    
+      // somehow, unthemed variables did not get included
+      // TODO fix?
+      --mdc-filled-button-label-text-color: #fff;
+      --mdc-text-button-label-text-color: #fff;
+    }
+    
+    &[darktheme=false],
+    [darktheme=false],
+    .lighttheme.lighttheme
+    {
+      @include mat.all-component-themes($sxplr-light-theme);
+      @include custom-cmp($sxplr-light-theme);
+      input[type="text"]
+      {
+        caret-color: black!important;
+      }
+    }
   }
-
-  // somehow, unthemed variables did not get included
-  // TODO fix?
-  --mdc-filled-button-label-text-color: #fff;
-  --mdc-text-button-label-text-color: #fff;
-}
-
-[darktheme=false],
-.lighttheme.lighttheme
-{
-  @include mat.all-component-themes($sxplr-light-theme);
-  @include custom-cmp($sxplr-light-theme);
-  input[type="text"]
-  {
-    caret-color: black!important;
-  }
-}
-
-button[mat-icon-button]
-{
-  width:40px;
-  height:40px;
-  font-size:18px;
-}
-
-a[mat-list-item]
-{
-  > mat-icon
-  {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.col-xxl-2
-{
-  @media (min-width: 2000px) {
-    max-width: 16.67%;
-    flex: 0 0 16.67%;
-  }
-}
-
-[matListItemTitle]
-{
-  text-wrap: nowrap;
+  
 }

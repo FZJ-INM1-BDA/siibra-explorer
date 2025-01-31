@@ -9,7 +9,8 @@
         #atlasReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(atlasReveal.state$ | async),
-            'mat-elevation-z2': (atlasReveal.state$ | async)
+            'mat-elevation-z2': (atlasReveal.state$ | async),
+            'mat-elevation-z1': !(atlasReveal.state$ | async)
         }">
         <mat-card>
             <mat-card-header>
@@ -75,6 +76,7 @@
         [ngClass]="{
             'vbc-hidden': !(tmplReveal.state$ | async),
             'mat-elevation-z2': (tmplReveal.state$ | async),
+            'mat-elevation-z1': !(tmplReveal.state$ | async),
             'experimental': view.showExperimental
         }">
         <mat-card>
@@ -219,7 +221,7 @@
                         </ng-template>
 
 
-                        <button mat-icon-button [matBadge]="totals"
+                        <button mat-icon-button
                             [matTooltip]="view.labels.RELATED_DATASETS"
                             [sxplr-dialog]="dumbFeatureDialogTmpl"
                             [sxplr-dialog-config]="{
@@ -229,7 +231,7 @@
                                 features: voiFeatureEntryCmp.features$ | async,
                                 anchorTmpl: anchorTmpl
                             }">
-                            <mat-icon>dataset_linked</mat-icon>
+                            <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
                         </button>
                     </ng-template>
                 </ng-template>
@@ -288,6 +290,7 @@
         [ngClass]="{
             'vbc-hidden': !(parcReveal.state$ | async),
             'mat-elevation-z2': (parcReveal.state$ | async),
+            'mat-elevation-z1': !(parcReveal.state$ | async),
             'experimental': view.showExperimental
         }">
         <mat-card>
@@ -494,7 +497,6 @@
 
                     <ng-template [ngIf]="(parcFeature.totals$ | async) > 0">
                         <button mat-icon-button
-                            [matBadge]="parcFeature.totals$ | async"
                             [matTooltip]="view.labels.RELATED_DATASETS"
                             [sxplr-dialog]="dumbFeatureDialogTmpl"
                             [sxplr-dialog-config]="{
@@ -504,7 +506,7 @@
                                 features: parcFeature.features$ | async,
                                 anchorTmpl: anchorTmpl
                             }">
-                            <mat-icon>dataset_linked</mat-icon>
+                            <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">dataset_linked</mat-icon>
                         </button>
                     </ng-template>
 
@@ -581,14 +583,13 @@
                 <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
                     <ng-template [ngIf]="relatedRegions.length > 0">
                         <button mat-icon-button
-                            [matBadge]="relatedRegions.length"
                             [matTooltip]="view.labels.RELATED_REGIONS"
                             [sxplr-dialog]="relatedRegionsTmpl"
                             [sxplr-dialog-data]="{
                                 relatedRegions: relatedRegions,
                                 region: view.selectedRegions[0]
                             }">
-                            <mat-icon>schema</mat-icon>
+                            <mat-icon [matBadge]="relatedRegions.length" aria-hidden="false">schema</mat-icon>
                         </button>
                         
                     </ng-template>
@@ -679,7 +680,8 @@
         #featureReveal="reveal"
         [ngClass]="{
             'vbc-hidden': !(featureReveal.state$ | async),
-            'mat-elevation-z2': (featureReveal.state$ | async)
+            'mat-elevation-z2': (featureReveal.state$ | async),
+            'mat-elevation-z1': !(featureReveal.state$ | async)
         }">
     
         <mat-card>

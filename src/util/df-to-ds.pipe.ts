@@ -1,6 +1,6 @@
 import { CdkTableDataSourceInput } from '@angular/cdk/table';
 import { Pipe, PipeTransform } from '@angular/core';
-import { MatSort, MatTableDataSource } from 'src/sharedModules/angularMaterial.exports'
+import { MatPaginator, MatSort, MatTableDataSource } from 'src/sharedModules/angularMaterial.exports'
 import { components } from "src/atlasComponents/sapi/schemaV3"
 type DF = components["schemas"]["DataFrameModel"]
 
@@ -20,7 +20,7 @@ function isDf(val: object): val is DF {
 })
 export class DfToDsPipe implements PipeTransform {
 
-  transform(df: object, sort: MatSort): CdkTableDataSourceInput<unknown> {
+  transform(df: object, sort: MatSort, pg?: MatPaginator): CdkTableDataSourceInput<unknown> {
     if (!isDf(df)) {
       return null
     }
@@ -40,6 +40,9 @@ export class DfToDsPipe implements PipeTransform {
     })
     const ds = new MatTableDataSource(v)
     ds.sort = sort
+    if (pg) {
+      ds.paginator = pg  
+    }
     return ds
   }
 

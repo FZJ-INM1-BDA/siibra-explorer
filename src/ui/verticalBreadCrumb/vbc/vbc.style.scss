@@ -123,6 +123,8 @@ div.vbc-card-container
         mat-card-actions:has(mat-divider)
         {
             align-items: stretch;
+            overflow-x: auto;
+            overflow-y: visible;
         }
     }
 

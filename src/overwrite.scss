@@ -38,6 +38,15 @@ $media-map: (
   }
 }
 
+.col-xxl-2
+{
+  @media (min-width: 2000px) {
+    max-width: 16.67%;
+    flex: 0 0 16.67%;
+  }
+}
+
+
 @for $i from 5 through 20 {
   $fontsize: $i * 10;
   .fs-#{$fontsize} {
@@ -343,4 +352,26 @@ div.section-divider
   {
     place-self: center;
   }
+}
+
+button[mat-icon-button]
+{
+  width:40px;
+  height:40px;
+  font-size:18px;
+}
+
+a[mat-list-item]
+{
+  > mat-icon
+  {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+[matListItemTitle]
+{
+  text-wrap: nowrap;
 }

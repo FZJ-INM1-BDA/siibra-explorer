@@ -29,6 +29,8 @@ const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is current
 })
 export class PointAssignmentComponent implements OnDestroy {
 
+  SIMPLE_TABLE_MAX_LEN = 3
+
   SIMPLE_COLUMNS = [
     "region",
     "map_value",
@@ -247,17 +249,27 @@ function escapeFactory(chars: string[] = []){
 
 const escapeDoubleQuotes = escapeFactory(['"'])
 
+function processObject(item: unknown): string {
+  
+  // region
+  if (typeof item === "object" && item?.['@type'] === "siibra-0.4/region") {
+    return item['name']
+  }
+
+  // array
+  if (item instanceof Array) {
+    const value = item.map(i => processObject(i)).map(escapeDoubleQuotes).join(", ")
+    return `"${value}"`
+  }
+
+  // fallback
+  return JSON.stringify(item)
+}
+
 function processRow(v: unknown[]): string{
   const returnValue: string[] = []
   for (const item of v) {
-
-    // region
-    if (typeof item === "object" && item?.['@type'] === "siibra-0.4/region") {
-      returnValue.push(item['name'])
-      continue
-    }
-
-    returnValue.push(JSON.stringify(item))
+    returnValue.push(processObject(item))
   }
   return returnValue.join(",")
 }

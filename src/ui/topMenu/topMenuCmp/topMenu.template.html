@@ -184,20 +184,42 @@
 
 <!-- user dropdownmenu -->
 <mat-menu #userDropdownMenu>
-  <mat-card>
-    <mat-card-content>
-      <signin-modal>
-      </signin-modal>
-    </mat-card-content>
-  </mat-card>
 
-  <mat-divider></mat-divider>
 
   <button mat-menu-item
     (click)="openTmplWithDialog(settingTemplate)">
     <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
     Settings
   </button>
+
+  <ng-template sxplrExperimentalFlag [experimental]="true">
+  <ng-template [ngIf]="view$ | async" let-view>
+
+    <mat-menu #colorPaletteMenu="matMenu">
+      <ng-template ngFor [ngForOf]="view.allThemes" let-theme>
+        <button (click)="useTheme(theme)" mat-menu-item>
+          <mat-icon *ngIf="theme === view.currentTheme">radio_button_checked</mat-icon>
+          <mat-icon *ngIf="theme !== view.currentTheme">radio_button_unchecked</mat-icon>
+          <span>
+            {{ theme }}
+          </span>
+        </button>
+      </ng-template>
+    </mat-menu>
+  
+    <button mat-menu-item [matMenuTriggerFor]="colorPaletteMenu">
+      <mat-icon>palette</mat-icon>
+      <span>
+        Theme
+      </span>
+    </button>
+  </ng-template>
+  </ng-template>
+  
+  <mat-divider></mat-divider>
+
+  <signin-modal>
+  </signin-modal>
 </mat-menu>
 
 <ng-template #aboutComponent>

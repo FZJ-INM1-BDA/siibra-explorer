@@ -1,13 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   Inject,
   Input,
   Optional,
   TemplateRef,
 } from "@angular/core";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
+import { map, takeUntil } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { MatBottomSheet, MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
@@ -17,6 +18,10 @@ import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
 import { environment } from "src/environments/environment"
 import { SHOW_EXPERIMENTAL_TOKEN } from "src/experimental/experimental.module";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { DOCUMENT } from "@angular/common";
+
+const THEMES = ["default", "ebrains"]
 
 @Component({
   selector: 'top-menu-cmp',
@@ -25,9 +30,27 @@ import { SHOW_EXPERIMENTAL_TOKEN } from "src/experimental/experimental.module";
     './topMenu.style.css',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
 export class TopMenuCmp {
+
+  #destroy$ = inject(DestroyDirective).destroyed$
+
+  #currentTheme$ = new BehaviorSubject<string>(null)
+
+  public view$ = combineLatest([
+    of(THEMES),
+    this.#currentTheme$
+  ]).pipe(
+    map(([ allThemes, currentTheme ]) => {
+      return {
+        allThemes, currentTheme
+      }
+    })
+  )
 
   public showExptToggle$ = environment.EXPERIMENTAL_FEATURE_FLAG
   ? of (true)
@@ -40,6 +63,11 @@ export class TopMenuCmp {
       })
     )
   }
+
+  useTheme(theme: string) {
+    this.#currentTheme$.next(theme)
+  }
+
   public experimentalFlag$ = this.store.pipe(
     select(userPreference.selectors.showExperimental)
   )
@@ -90,6 +118,7 @@ export class TopMenuCmp {
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
+    @Inject(DOCUMENT) document: Document,
     @Optional() @Inject(SHOW_EXPERIMENTAL_TOKEN) private showXplrToggle$: Observable<boolean>,
   ) {
     this.user$ = this.authService.user$
@@ -99,6 +128,16 @@ export class TopMenuCmp {
         ? `Logged in as ${(user && user.name) ? user.name : 'Unknown name'}`
         : `Not logged in`),
     )
+
+    const currtheme = document.querySelector('[theme]').getAttribute('theme')
+    this.#currentTheme$.next(currtheme)
+    
+    this.#currentTheme$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(theme => {
+      const el = document.querySelector('[theme]')
+      el.setAttribute('theme', theme)
+    })
   }
 
   private dialogRef: MatDialogRef<any>

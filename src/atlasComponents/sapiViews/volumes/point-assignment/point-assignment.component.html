@@ -19,28 +19,10 @@
 
 <ng-template [ngIf]="df$ | async" let-df>
 
-    <mat-action-list>
-        <ng-template [ngIf]="dfCsv$ | async" let-dfCsv>
-            <button mat-list-item [iav-clipboard-copy]="dfCsv">
-                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy"></mat-icon>
-                <div matListItemTitle>
-                    Copy Assignments
-                </div>
-            </button>
-        </ng-template>
-        <button mat-list-item
-            (click)="openDialog(datatableTmpl)">
-            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-table"></mat-icon>
-            <div matListItemTitle>
-                Show Full Assignment ({{ df.data.length }})
-            </div>
-        </button>
-    </mat-action-list>
-
     <mat-divider></mat-divider>
 
     <!-- simple table -->
-    <table mat-table [dataSource]="df | dfToDs : simpleTblSort"
+    <table mat-table [dataSource]="df | dfToDs : simpleTblSort : pg"
         matSort
         #simpleTblSort="matSort"
         matSortActive="map_value"
@@ -72,7 +54,35 @@
         
         <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
         <tr mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
+
+        <mat-paginator [pageSize]="SIMPLE_TABLE_MAX_LEN" #pg="matPaginator"></mat-paginator>
     </table>
+
+    <div *ngIf="pg.length > SIMPLE_TABLE_MAX_LEN"
+        class="sxplr-d-flex sxplr-justify-content-center">
+        <span class="text-muted">Showing {{ SIMPLE_TABLE_MAX_LEN }} / {{ pg.length }}</span>
+    </div>
+    
+    <mat-divider></mat-divider>
+    
+    <mat-action-list>
+        <ng-template [ngIf]="dfCsv$ | async" let-dfCsv>
+            <button mat-list-item [iav-clipboard-copy]="dfCsv">
+                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy"></mat-icon>
+                <div matListItemTitle>
+                    Copy Assignments
+                </div>
+            </button>
+        </ng-template>
+        <button mat-list-item
+            (click)="openDialog(datatableTmpl)">
+            <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-table"></mat-icon>
+            <div matListItemTitle>
+                Show Full Assignment ({{ df.data.length }})
+            </div>
+        </button>
+    </mat-action-list>
+
 </ng-template>
 
 <ng-template #datatableTmpl>
