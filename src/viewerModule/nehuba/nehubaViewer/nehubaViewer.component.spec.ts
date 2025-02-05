@@ -305,7 +305,9 @@ describe('> nehubaViewer.component.ts', () => {
       let ngViewerStatechildrenGetSpy = jasmine.createSpy('get')
       let layersMngerToJsonSpy = jasmine.createSpy('layersMngerToJsonSpy')
       let posToJsonSpy = jasmine.createSpy('posToJsonSpy')
-      let layerMgerRestoreStateSpy = jasmine.createSpy('layerMgerRestoreStateSpy')
+      
+      let getLayerByNameSpy = jasmine.createSpy('getLayerByNameSpy')
+      let restoreLayerStateSpy = jasmine.createSpy('restoreLayerStateSpy')
       let posRestoreStateSpy = jasmine.createSpy("posRestoreStateSpy")
 
       const ngId1 = 'foo-bar'
@@ -332,9 +334,16 @@ describe('> nehubaViewer.component.ts', () => {
             }
           }
           if (prop === "layers") {
+            getLayerByNameSpy.and.returnValue({
+              layer: {
+                restoreState: restoreLayerStateSpy
+              }
+            })
             return {
               toJSON: layersMngerToJsonSpy,
-              restoreState: layerMgerRestoreStateSpy,
+              layerManager: {
+                getLayerByName: getLayerByNameSpy
+              },
             }
           }
           throw new Error(`prop ${prop} is not anticipated`)
@@ -349,7 +358,8 @@ describe('> nehubaViewer.component.ts', () => {
       afterEach(() => {
         ngViewerStatechildrenGetSpy.calls.reset()
         layersMngerToJsonSpy.calls.reset()
-        layerMgerRestoreStateSpy.calls.reset()
+        restoreLayerStateSpy.calls.reset()
+        getLayerByNameSpy.calls.reset()
       })
       it('> calls nehubaViewer.restoreState', () => {
         const fixture = TestBed.createComponent(NehubaViewerUnit)
@@ -369,19 +379,23 @@ describe('> nehubaViewer.component.ts', () => {
 
         fixture.componentInstance['setColorMap'](mainMap)
 
-        expect(layerMgerRestoreStateSpy).toHaveBeenCalledOnceWith([{
+        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId1)
+        expect(restoreLayerStateSpy).toHaveBeenCalledWith({
           name: ngId1,
           segmentColors: {
             1: rgbToHex([100, 100, 100]),
             2: rgbToHex([200, 200, 200]),
           }
-        }, {
+        })
+
+        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId2)
+        expect(restoreLayerStateSpy).toHaveBeenCalledWith({
           name: ngId2,
           segmentColors: {
             1: rgbToHex([10, 10, 10]),
             2: rgbToHex([20, 20, 20]),
           }
-        }])
+        })
 
         expect(posRestoreStateSpy).toHaveBeenCalledOnceWith(
           [ 1.1, 2.2, 3.3 ]
