@@ -253,7 +253,7 @@ export class UserLayerService implements OnDestroy {
       const foundSlice = ((jsonResp.slices || []) as Record<string, unknown>[]).find(
         slice => (slice.filename as string).includes(rootname)
       )
-      let anchoring = foundSlice?.anchoring as number[]
+      const anchoring = foundSlice?.anchoring as number[]
   
       const parser = new DOMParser()
       const xml = parser.parseFromString(dzimetadata, "application/xml")

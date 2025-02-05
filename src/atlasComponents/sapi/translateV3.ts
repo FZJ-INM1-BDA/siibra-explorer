@@ -4,7 +4,7 @@ import {
 import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
-import { defaultdict, getShader, getShaderFromMeta } from "src/util/fn"
+import { defaultdict, getShaderFromMeta } from "src/util/fn"
 
 export function parseUrl(url: string): {protocol: string, host: string, path: string} {
   const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
