@@ -221,7 +221,6 @@ export class NehubaViewerUnit implements OnDestroy {
                 if (!layer) {
                   throw new Error(`layer ${name} not found`)
                 }
-                console.log("runninging!", layer.layer.fragmentMain, shader)
                 layer.layer.fragmentMain.restoreState(shader)
                 return true
               }
@@ -946,7 +945,16 @@ export class NehubaViewerUnit implements OnDestroy {
         layer['segmentColors'] = mainDict[layer.name]
       }
     }
-    layersManager.restoreState(layerJson)
+
+    // n.b. must not use 
+    // layersManager.restoreState(layerJson)
+    // this somehow changes the global (?) space
+
+    for (const layer of layerJson){
+      const l = layersManager.layerManager.getLayerByName(layer.name)
+      l.layer.restoreState(layer)
+    }
+    
     position.restoreState(prevPos)
     this.#triggerMeshLoad$.next(null)
   }

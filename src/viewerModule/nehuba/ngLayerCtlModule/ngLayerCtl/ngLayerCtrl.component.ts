@@ -114,6 +114,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   }
 
   async ngOnChanges() {
+    // TODO this may become an issue later when trying to work with
+    // 2D images (deepzoom, for e.g.)
     if (this.name && this.source) {
       const { name } = this
       if (this.removeLayer) {

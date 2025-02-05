@@ -222,11 +222,119 @@ export class UserLayerService implements OnDestroy {
   )
   async processDzi(source: string): Promise<ProcessorOutput> {
     const url = source.replace("deepzoom://", "")
-    /**
-     * still a big hacky, but works
-     * TODO figure out how to get the actual transform in
-     */
-    const scaleFactor = 230
+
+    let matrix = [
+      [1, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0],
+      [0, 0, 1, 0, 0],
+      [0, 0, 0, 1, 0],
+    ]
+
+    try {
+
+      const [_imgname, dziname] = url.split("/").slice(-2)
+      const root = url.split("/").slice(0, -2).join("/")
+      const rootname = dziname.replace(/\.dzi$/, '')
+      const jsonname = dziname.replace(/_s\d{3}\.dzi$/, '') + ".json"
+      const jsonpath = `${root}/${jsonname}`
+  
+      const [ dzimetadata, jsonResp ] = await Promise.all([
+        (async () => {
+          const dziresp = await fetch(url)
+          const dzimetadata = await dziresp.text()
+          return dzimetadata
+        })(),
+        (async () => {
+          const resp = await fetch(jsonpath)
+          return await resp.json()
+        })()
+      ])
+  
+      const foundSlice = ((jsonResp.slices || []) as Record<string, unknown>[]).find(
+        slice => (slice.filename as string).includes(rootname)
+      )
+      let anchoring = foundSlice?.anchoring as number[]
+  
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(dzimetadata, "application/xml")
+      const size = xml.querySelector("Size")
+      const width = Number(size.getAttribute("Width"))
+      const height = Number(size.getAttribute("Height"))
+      if (isNaN(width)) {
+        throw new Error(`Width attribute is not a number!`)
+      }
+      if (isNaN(height)) {
+        throw new Error(`Height attribute is not a number!`)
+      }
+      
+      // TODO fetch voxel transform based on .target attribute
+      const waxTransVoxIdx = [244, 623, 248]
+      const thickness = 10
+  
+      const [
+        m03,
+        m13,
+        m23,
+  
+        m00,
+        m10,
+        m20,
+  
+        m01,
+        m11,
+        m21,
+      ] = anchoring
+  
+      const { mat4, vec3, quat } = await getExportNehuba()
+  
+      const o = vec3.fromValues(m03, m13, m23)
+      const u = vec3.fromValues(m00, m10, m20)
+      const v = vec3.fromValues(m01, m11, m21)
+      const uxv = vec3.normalize(
+        vec3.create(),
+        vec3.cross(vec3.create(), u, v)
+      )
+  
+      const m0 = vec3.scale(vec3.create(), u, 1 / width)
+      const m1 = vec3.scale(vec3.create(), v, 1 / height)
+      const m2 = vec3.scale(vec3.create(), uxv, thickness)
+      const m3 = vec3.sub(vec3.create(), o, waxTransVoxIdx)
+  
+      vec3.scale(m3, m3, 3.9e4)
+  
+      const m = mat4.fromValues(
+        ...Array.from(m0), 0,
+        ...Array.from(m1), 0,
+        ...Array.from(m2), 0,
+        ...Array.from(m3), 1
+      )
+  
+      const scaling = mat4.getScaling(vec3.create(), m)
+      vec3.inverse(scaling, scaling)
+      const normalizedm = mat4.scale(mat4.create(), m, scaling)
+      const rot = mat4.getRotation(quat.create(), normalizedm)
+      quat.normalize(rot, rot)
+      quat.rotateX(rot, rot, Math.PI/2)
+      quat.rotateZ(rot, rot, Math.PI)
+  
+      console.log("orientation rotate to", Array.from(rot))
+      
+      mat4.scale(m, m, [3.9e4, 3.9e4, 3.9e4])
+      mat4.transpose(m, m)
+      const _matrix: number[] = Array.from(m)
+      matrix = [
+        _matrix.slice(0, 4),
+        _matrix.slice(4, 8),
+        _matrix.slice(8, 12),
+      ]
+      matrix[0].splice(2, 0, 0)
+      matrix[1].splice(2, 0, 0)
+      matrix[2].splice(2, 0, 0)
+      matrix.splice(2, 0, [0, 0, 1, 0, 0])
+    } catch (e) {
+      console.warn(`Error getting transform, using default transform: ${e}`)
+    }
+    
     return {
       cleanup: noop,
       meta: {
@@ -242,19 +350,14 @@ export class UserLayerService implements OnDestroy {
               "x": [1e-9, "m"],
               "y": [1e-9, "m"],
               "c^": [1, ""],
-              "": [0.0000390625, "m"],
+              "": [1e-9, "m"],
             },
-            matrix: [
-              [scaleFactor, 0, 0, 0, -150],
-              [0, 0, 0, 5, 0],
-              [0, 0, 1, 0, 0],
-              [0, -scaleFactor, 0, 0, 100]
-            ],
+            matrix,
             outputDimensions: {
-              "x": [0.0000390625, "m"],
-              "y": [0.0000390625, "m"],
+              "x": [1e-9, "m"],
+              "y": [1e-9, "m"],
               "c^": [1, ""],
-              "z": [0.0000390625, "m"],
+              "z": [1e-9, "m"],
             },
             sourceRank: 3
           }
@@ -262,7 +365,6 @@ export class UserLayerService implements OnDestroy {
         type: "image",
         visible: true,
         shader: getShader({ colormap: EnumColorMapName.RGB }),
-        
       },
       protocol: "deepzoom://",
       url
