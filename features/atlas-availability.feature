@@ -12,7 +12,7 @@ Feature: Atlas data availability
         Then User is redirected, and everything shows fine
 
     Scenario: User checks out deepzoom overlay
-        When User clicks the deepzoom overlay [link](https://atlases.ebrains.eu/viewer-staging/#/a:minds:core:parcellationatlas:v1.0.0:522b368e-49a3-49fa-88d3-0870a307974a/t:minds:core:referencespace:v1.0.0:d5717c4a-0fa1-46e6-918c-b8003069ade8/p:minds:core:parcellationatlas:v1.0.0:ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4/@:0.0.0.-W000..2_N8QN.2-6fg4.-Bcyf.2_jBuJ..1LSm..9rRo~.2Nd0~.6aOr..NOR/x-overlay-layer:deepzoom:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fimg-40416c56-c645-11ec-aecc-00090faa0001%2FH108b_Timm_dark_coronal_s228.tif%2FH108b_Timm_dark_coronal_s228.dzi)
+        When User clicks the deepzoom overlay [link](https://atlases.ebrains.eu/viewer-staging/#/a:minds:core:parcellationatlas:v1.0.0:522b368e-49a3-49fa-88d3-0870a307974a/t:minds:core:referencespace:v1.0.0:d5717c4a-0fa1-46e6-918c-b8003069ade8/p:minds:core:parcellationatlas:v1.0.0:ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4/@:z3gE6.2xbsMQ.2ya0U4.-Vyrg..2_N8QN.2-6fg4.-Bcyf.2_jBuJ..1LSm..1Lm9~.8kYz~.2b7b..EBe/x-overlay-layer:deepzoom:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fbuckets%2Fimg-40416c56-c645-11ec-aecc-00090faa0001%2FH108b_Timm_dark_coronal_s228.tif%2FH108b_Timm_dark_coronal_s228.dzi)
         Then User sees deepzoom slice showing fine
     
     Scenario: User checks out Julich Brain in fsaverage

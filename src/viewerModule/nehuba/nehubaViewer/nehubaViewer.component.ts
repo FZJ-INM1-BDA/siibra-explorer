@@ -940,20 +940,38 @@ export class NehubaViewerUnit implements OnDestroy {
     const position = this.nehubaViewer.ngviewer.state.children.get("position")
     const prevPos = position.toJSON()
     const layerJson = layersManager.toJSON()
+    const viewer = this.nehubaViewer.ngviewer
+
     for (const layer of layerJson) {
       if (layer.name in mainDict) {
-        layer['segmentColors'] = mainDict[layer.name]
+
+        // removes the segmentation layer, and adds one with the correct color map
+        // (this is actually how NG does it internally, clears all layers, and add them one by one)
+        const l = layersManager.layerManager.getLayerByName(layer.name)
+        layersManager.layerManager.removeManagedLayer(l)
+        layersManager.layerManager.addManagedLayer(
+          viewer.layerSpecification.getLayer(layer.name, {
+            ...layer,
+            segmentColors: mainDict[layer.name]
+          })
+        )
+        
       }
     }
 
     // n.b. must not use 
-    // layersManager.restoreState(layerJson)
+    //
+    // layersManager.restoreState(layersToApply)
+    //
     // this somehow changes the global (?) space
-
-    for (const layer of layerJson){
-      const l = layersManager.layerManager.getLayerByName(layer.name)
-      l.layer.restoreState(layer)
-    }
+    // must also not restore state layer by layer
+    // since this applies **multiple sources**, which really tanks performance
+    //
+    // for (const layer of layerJson){
+    //   console.log(layer.name, layerJson)
+    //   const l = layersManager.layerManager.getLayerByName(layer.name)
+    //   l.layer.restoreState(layer)
+    // }
     
     position.restoreState(prevPos)
     this.#triggerMeshLoad$.next(null)
