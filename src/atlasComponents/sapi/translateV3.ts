@@ -4,8 +4,7 @@ import {
 import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
-import { defaultdict, getShader } from "src/util/fn"
-import { EnumColorMapName } from "src/util/colorMaps"
+import { defaultdict, getShader, getShaderFromMeta } from "src/util/fn"
 
 export function parseUrl(url: string): {protocol: string, host: string, path: string} {
   const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
@@ -357,15 +356,8 @@ class TranslateV3 {
         source: `precomputed://${url}`,
         legacySpecFlag: "old",
         transform,
+        shader: getShaderFromMeta(meta),
         info,
-      }
-      
-      const { type } = meta.data || {}
-
-      if (type === "image/3d") {
-        obj["shader"] = getShader({
-          colormap: EnumColorMapName.RGB
-        })
       }
       returnObj.push(obj)
     }
