@@ -4,11 +4,13 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { BehaviorSubject, combineLatest, concat, of, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { Action } from "src/util/types";
 
 export type UserLayerInfoData = {
   layerName: string
   filename: string
   warning: string[]
+  actions?: Action[]
 }
 
 @Component({

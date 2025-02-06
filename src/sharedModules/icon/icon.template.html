@@ -1,0 +1,16 @@
+<ng-template [ngIf]="icon$ | async" let-icon>
+    <ng-template [ngIf]="icon.materialIcon">
+        <mat-icon [fontIcon]="icon.materialIcon.materialIcon">
+        </mat-icon>
+    </ng-template>
+    <ng-template [ngIf]="icon.fallbackIcon">
+        <mat-icon
+            [fontSet]="icon.fallbackIcon.set"
+            [fontIcon]="icon.fallbackIcon.icon">
+        </mat-icon>
+    </ng-template>
+
+    <ng-template [ngIf]="!icon.fallbackIcon && !icon.materialIcon">
+        <mat-icon>question_mark</mat-icon>
+    </ng-template>
+</ng-template>

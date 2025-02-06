@@ -11,7 +11,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
-import { getShader, getShaderFromMeta, noop } from "src/util/fn"
+import { getShader, getShaderFromMeta, noop, QuickHash } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
@@ -19,6 +19,10 @@ import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
 import { MatDialogRef, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { atlasSelection } from "src/state"
+import { Action } from "src/util/types"
+import { getPositionOrientation } from "../util"
+import { VOXEL_SIZE_MAP } from "../constants"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
@@ -34,7 +38,21 @@ const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
-type ProcessorOutput = {option?: LayerOption, url?: string, protocol?: ValidProtocol, meta: Meta, cleanup: () => void}
+type Message = {
+  severity: 'info' | 'warning' | 'error'
+  message: string
+}
+
+
+type ProcessorOutput = {
+  option?: LayerOption
+  url?: string
+  protocol?: ValidProtocol
+  meta: Meta
+  messages?: Message[]
+  actions?: Action[]
+  cleanup: () => void
+}
 type ProcessResource = {
   matcher: (input: ValidInputTypes) => Promise<boolean>
   processor: (input: ValidInputTypes) => Promise<ProcessorOutput>
@@ -230,6 +248,9 @@ export class UserLayerService implements OnDestroy {
       [0, 0, 0, 1, 0],
     ]
 
+    const messages: Message[] = []
+    const actions: Action[] = []
+
     try {
 
       const [_imgname, dziname] = url.split("/").slice(-2)
@@ -260,15 +281,19 @@ export class UserLayerService implements OnDestroy {
       const size = xml.querySelector("Size")
       const width = Number(size.getAttribute("Width"))
       const height = Number(size.getAttribute("Height"))
-      if (isNaN(width)) {
-        throw new Error(`Width attribute is not a number!`)
+      if (width === 0 || isNaN(width)) {
+        throw new Error(`dzi xml file error: Width attribute is not a number!`)
       }
-      if (isNaN(height)) {
-        throw new Error(`Height attribute is not a number!`)
+      if (height === 0 || isNaN(height)) {
+        throw new Error(`dzi xml file error: Height attribute is not a number!`)
       }
       
       // TODO fetch voxel transform based on .target attribute
-      const waxTransVoxIdx = [244, 623, 248]
+      if (!(jsonResp.target in VOXEL_SIZE_MAP)) {
+        throw new Error(`${jsonResp.target} cannot be rendered`)
+      }
+      const { voxelSizes, voxelTransform } = VOXEL_SIZE_MAP[jsonResp.target]
+
       const thickness = 10
   
       const [
@@ -298,28 +323,37 @@ export class UserLayerService implements OnDestroy {
       const m0 = vec3.scale(vec3.create(), u, 1 / width)
       const m1 = vec3.scale(vec3.create(), v, 1 / height)
       const m2 = vec3.scale(vec3.create(), uxv, thickness)
-      const m3 = vec3.sub(vec3.create(), o, waxTransVoxIdx)
+      const m3 = vec3.sub(vec3.create(), o, voxelTransform)
   
-      vec3.scale(m3, m3, 3.9e4)
+      vec3.multiply(m3, m3, voxelSizes)
   
-      const m = mat4.fromValues(
-        ...Array.from(m0), 0,
-        ...Array.from(m1), 0,
-        ...Array.from(m2), 0,
-        ...Array.from(m3), 1
-      )
-  
-      const scaling = mat4.getScaling(vec3.create(), m)
-      vec3.inverse(scaling, scaling)
-      const normalizedm = mat4.scale(mat4.create(), m, scaling)
-      const rot = mat4.getRotation(quat.create(), normalizedm)
-      quat.normalize(rot, rot)
-      quat.rotateX(rot, rot, Math.PI/2)
-      quat.rotateZ(rot, rot, Math.PI)
-  
-      console.log("orientation rotate to", Array.from(rot))
+      const _m = [
+        [...Array.from(m0), 0],
+        [...Array.from(m1), 0],
+        [...Array.from(m2), 0],
+        [...Array.from(m3), 0],
+      ] as number[][]
+      const m = mat4.fromValues(..._m.flatMap(v => v))
+      const voxelDimension = Array.from(vec3.multiply(vec3.create(), [width, height, 1], voxelSizes)) as number[]
+      const { orientation, position } = getPositionOrientation(mat4, vec3, quat, _m, voxelDimension)
       
-      mat4.scale(m, m, [3.9e4, 3.9e4, 3.9e4])
+      actions.push({
+        set: "iavic",
+        icon: "iavic-rotation",
+        action: () => {
+          this.store$.dispatch(
+            atlasSelection.actions.navigateTo({
+              navigation: {
+                orientation: Array.from(orientation),
+                position: Array.from(position),
+              },
+              animation: true
+            })
+          )
+        }
+      })
+      
+      mat4.scale(m, m, voxelSizes)
       mat4.transpose(m, m)
       const _matrix: number[] = Array.from(m)
       matrix = [
@@ -332,7 +366,10 @@ export class UserLayerService implements OnDestroy {
       matrix[2].splice(2, 0, 0)
       matrix.splice(2, 0, [0, 0, 1, 0, 0])
     } catch (e) {
-      console.warn(`Error getting transform, using default transform: ${e}`)
+      messages.push({
+        severity: 'error',
+        message: e.toString()
+      })
     }
     
     return {
@@ -367,7 +404,9 @@ export class UserLayerService implements OnDestroy {
         shader: getShader({ colormap: EnumColorMapName.RGB }),
       },
       protocol: "deepzoom://",
-      url
+      url,
+      messages,
+      actions,
     }
   }
 
@@ -488,37 +527,28 @@ export class UserLayerService implements OnDestroy {
 
   async handleUserInput(input: ValidInputTypes){
     try {
-      const id = getUuid()
-      const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
-      if (this.#idToCleanup.has(id)) {
-        throw new Error(`${url} was already registered`)
-      }
-      this.#idToCleanup.set(id, cleanup)
-      this.addUserLayer(
-        id,
-        protocol && url &&`${protocol}${url}`,
-        meta,
-        option,
-      )
+      const processedOutput = await this.#processInput(input)
+      this.#addLayer(processedOutput)
       return
     } catch (e) {
       this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
   }
 
-  addUserLayer(
-    id: string,
-    source: string|null|undefined,
-    meta: Meta,
-    options: LayerOption
-  ) {
+  #addLayer(processedOutput: ProcessorOutput){
+    const { option, protocol, url, meta, cleanup, actions, messages } = processedOutput
+    
+    const source = protocol && url && `${protocol}${url}`
+    const id = url ? QuickHash.GetHash(url) : getUuid()
+    this.#idToCleanup.set(id, cleanup)
+
     if (source) {
       UserLayerService.VerifyUrl(source)
       const layer = {
         id,
         clType: "customlayer/nglayer" as const,
         source,
-        ...options,
+        ...option,
       }
       this.store$.dispatch(
         atlasAppearance.actions.addCustomLayer({
@@ -535,7 +565,11 @@ export class UserLayerService implements OnDestroy {
       data: {
         layerName: id,
         filename: meta.filename,
-        warning: meta.messages || [],
+        warning: [
+          ...(meta.messages || []),
+          ...(messages || []).map(v => v.message),
+        ],
+        actions
       },
       hasBackdrop: false,
       disableClose: true,

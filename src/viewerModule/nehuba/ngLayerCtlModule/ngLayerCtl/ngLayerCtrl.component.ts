@@ -7,6 +7,7 @@ import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba, getShaderFromMeta } from "src/util/fn";
 import { MetaV1Schema, isEnclosed } from "src/atlasComponents/sapi/typeV3";
+import { getPositionOrientation } from "../../util";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
@@ -153,24 +154,16 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     /**
      * glMatrix seems to store the matrix in transposed format
      */
-    
-    const incM = mat4.transpose(mat4.create(), mat4.fromValues(...this.transform.reduce((acc, curr) => [...acc, ...curr], [])))
-    const scale = mat4.getScaling(vec3.create(), incM)
-    const scaledM = mat4.scale(mat4.create(), incM, vec3.inverse(vec3.create(), scale))
-    const q = mat4.getRotation(quat.create(0), scaledM)
+
+    const m = mat4.fromValues(...this.transform.flatMap(v => v))
+    mat4.transpose(m, m)
 
     let position: number[]
-    if (this.info) {
-      const { scales } = this.info
-      const sizeInNm = [0, 1, 2].map(idx => scales[0].size[idx] * scales[0].resolution[idx])
-      const start = vec3.transformMat4(vec3.create(), vec3.fromValues(0, 0, 0), incM)
-      const end = vec3.transformMat4(vec3.create(), vec3.fromValues(...sizeInNm), incM)
-      const final = vec3.add(vec3.create(), start, end)
-      vec3.scale(final, final, 0.5)
-      position = Array.from(final)
-    }
+    let orientation: number[]
 
+    // if best viewpoints are defined, use best viewpoints first
     const enclosed = (this.meta?.bestViewPoints || []).filter(isEnclosed).find(v => v.points.length >= 3)
+
     if (enclosed) {
       const curr = vec3.fromValues(...this.currentPositionMm)
       const pt1 = vec3.fromValues(...enclosed.points[0].value)
@@ -191,8 +184,10 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const z0 = vec3.fromValues(0, 0, 1)
       const cross = vec3.cross(vec3.create(), z0, pt1)
       const w = Math.sqrt(2) + vec3.dot(z0, pt1)
-      quat.set(q, ...cross, w)
-      quat.normalize(q, q)
+
+      orientation = quat.set(quat.create(), ...cross, w)
+      quat.normalize(orientation, orientation)
+      orientation = Array.from(orientation)
 
       /**
        * curr is now vector going from pt0 to current navigation position
@@ -240,12 +235,30 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       vec3.scale(resultant, resultant, 1e6)
       position = Array.from(resultant)
     }
+
+    if (!!this.info && (!position || !orientation)) {
+      const { scales } = this.info
+      const sizeInNm = [0, 1, 2].map(idx => scales[0].size[idx] * scales[0].resolution[idx])
+      const _m = Array.from(m) as number[]
+      const _value = getPositionOrientation(mat4, vec3, quat, [_m.slice(0, 4), _m.slice(4, 8), _m.slice(8, 12), _m.slice(12, 16)], sizeInNm);
+      if (!position) {
+        position = Array.from(_value.position)
+      }
+      if (!orientation) {
+        orientation = Array.from(_value.orientation)
+      }
+    }
+
+    if (!orientation) {
+      const _value = getPositionOrientation(mat4, vec3, quat, m)
+      orientation = Array.from(_value.orientation)
+    }
     
 
     this.store.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          orientation: Array.from(q),
+          orientation,
           position,
         },
         animation: true

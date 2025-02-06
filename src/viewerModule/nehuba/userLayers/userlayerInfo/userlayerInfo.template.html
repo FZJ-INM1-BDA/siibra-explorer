@@ -12,6 +12,17 @@
       </ng-template>
     </ng-template>
     
+    <ng-template [ngIf]="data.actions" let-actions>
+      <ng-template ngFor [ngForOf]="actions" let-action>
+        <button mat-icon-button
+          (click)="action.action()">
+          <sxplr-icon
+            [icon]="action">
+          </sxplr-icon>
+        </button>
+      </ng-template>
+    </ng-template>
+  
     <ng-template [ngIf]="data.warning.length > 0">
       <button mat-icon-button
         [matTooltip]="data.warning.length +  ' messages on user layer.'"

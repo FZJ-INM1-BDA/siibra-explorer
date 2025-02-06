@@ -229,3 +229,37 @@ export function deserializeSegment(id: string): {ngId: string, label: number} {
     label: Number(split[1])
   }
 }
+
+/**
+ * @description Given the affine of an input volume, calculates the position and orientation for a "good" visualization
+ * @param mat4 glmatrix mat4
+ * @param mat3 glmatrix mat3
+ * @param quat glmatrix quat
+ * @param affine 4x4 affine, with [...translation, 1] defined at affine[3]. i.e. affine[3] === [translate_x, translate_y, translate_z, 1] 
+ * @param dimensions (optional) dimension of the highest lod in nm
+ */
+export function getPositionOrientation(mat4: any, vec3: any, quat: any, affine: number[][], dimensions?: number[]){
+  affine = mat4.fromValues(...affine.flatMap(v => v))
+  const scaling = mat4.getScaling(vec3.create(), affine)
+  vec3.inverse(scaling, scaling)
+  const normalizedm = mat4.scale(mat4.create(), affine, scaling)
+  const orientation = mat4.getRotation(quat.create(), normalizedm)
+  quat.normalize(orientation, orientation)
+
+  // It is far more common to see coronal slices.
+  // So we set orientation to see coronal slices best
+  quat.rotateX(orientation, orientation, Math.PI/2)
+  quat.rotateZ(orientation, orientation, Math.PI)
+
+  let position: number[]
+  if (dimensions) {
+    const start = vec3.transformMat4(vec3.create(), vec3.fromValues(0, 0, 0), affine)
+    const end = vec3.transformMat4(vec3.create(), vec3.fromValues(...dimensions), affine)
+    position = vec3.add(vec3.create(), start, end)
+    vec3.scale(position, position, 0.5)
+  }
+  return {
+    orientation,
+    position,
+  }
+}
