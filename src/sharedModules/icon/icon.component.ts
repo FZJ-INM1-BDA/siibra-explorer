@@ -16,6 +16,9 @@ function isFallbackIcon(icon: Icon): icon is FallbackIcon {
 @Component({
   selector: 'sxplr-icon',
   templateUrl: './icon.template.html',
+  styleUrls: [
+    "./icon.style.scss"
+  ],
   standalone: true,
   imports: [
     AngularMaterialModule,

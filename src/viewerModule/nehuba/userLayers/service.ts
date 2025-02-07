@@ -336,6 +336,7 @@ export class UserLayerService implements OnDestroy {
       const m = mat4.fromValues(..._m.flatMap(v => v))
       const voxelDimension = Array.from(vec3.multiply(vec3.create(), [width, height, 1], voxelSizes)) as number[]
       const { orientation, position } = getPositionOrientation(mat4, vec3, quat, _m, voxelDimension)
+      const otherOrientation = quat.rotateZ(quat.create(), orientation, Math.PI)
       
       actions.push({
         set: "iavic",
@@ -345,6 +346,20 @@ export class UserLayerService implements OnDestroy {
             atlasSelection.actions.navigateTo({
               navigation: {
                 orientation: Array.from(orientation),
+                position: Array.from(position),
+              },
+              animation: true
+            })
+          )
+        }
+      }, {
+        set: "iavic",
+        icon: "iavic-rotation",
+        action: () => {
+          this.store$.dispatch(
+            atlasSelection.actions.navigateTo({
+              navigation: {
+                orientation: Array.from(otherOrientation),
                 position: Array.from(position),
               },
               animation: true
