@@ -312,8 +312,8 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
     ? {"mode":"<","color":[0.1,0.1,0.1,1]}
     :{"color":[1,1,1,1],"mode":"=="}
   const drawSubstrates = darkTheme
-    ? {"color":[0.5,0.5,1,0.2]}
-    : {"color":[0,0,0.5,0.15]}
+    ? {"color":[0.5,0.5,1,0.2], "normalizedTranslate": null}
+    : {"color":[0,0,0.5,0.15], "normalizedTranslate": null}
   const drawZoomLevels = darkTheme
     ? {"cutOff":150000 * scale }
     : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
