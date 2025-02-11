@@ -12,6 +12,7 @@ import { ShareModule } from 'src/share';
 import { PointAssignmentDirective } from './point-assignment.directive';
 import { SimpleAssignmentView } from './assignment-views/simple/assignment-view-simple.component';
 import { FullAssignmentView } from './assignment-views/full/assignment-view-full.component';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { FullAssignmentView } from './assignment-views/full/assignment-view-full
     ShareModule,
     SimpleAssignmentView,
     FullAssignmentView,
+    DestroyDirective,
   ],
   exports: [
     PointAssignmentComponent,
