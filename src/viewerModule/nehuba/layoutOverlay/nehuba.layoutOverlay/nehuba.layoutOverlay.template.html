@@ -65,16 +65,25 @@
         <ng-template [ngIf]="axesLabels[panelIndex]" let-myAxesLabels>
           <ng-template ngFor [ngForOf]="myAxesLabels" let-index="index" let-axisLabel>
             <div [class]="'axis-' + index">
+              <ng-template sxplrExperimentalFlag [deprecated]="true">
               <div class="axis-label sxplr-custom-cmp bg text" *ngFor="let keyvalue of axisLabel | keyvalue">
                 {{ keyvalue.key }}
               </div>
+              </ng-template>
+              
+              <ng-template sxplrExperimentalFlag [experimental]="true">
+              <div class="axis-label sxplr-custom-cmp text accent" *ngFor="let keyvalue of axisLabel | keyvalue">
+                {{ keyvalue.key }}
+              </div>
+              </ng-template>
+              
               <ng-template [ngIf]="(axisLabel | keyvalue).length === 0">
                 <button mat-icon-button
                   [matTooltip]="(labels$ | async).RESET_ROTATION"
                   (click)="resetOrientation()"
-                  class="sxplr-pe-all"
+                  class="sxplr-pe-all reset-rotation"
                   >
-                  <mat-icon>restart_alt</mat-icon>
+                  <mat-icon fontSet="iavic" fontIcon="iavic-rotation"></mat-icon>
                 </button>
               </ng-template>
             </div>
@@ -122,7 +131,7 @@
     </button>
 
     <button (click)="resetZoom(panelIndex)" mat-icon-button color="default">
-      <mat-icon>restart_alt</mat-icon>
+      <mat-icon fontSet="iavic" fontIcon="iavic-scaling"></mat-icon>
     </button>
 
     <!-- factor > 1.0 === zoom out -->

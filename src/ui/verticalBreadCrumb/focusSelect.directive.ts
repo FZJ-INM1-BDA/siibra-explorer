@@ -16,7 +16,10 @@ export class OnFocusSelectDirective implements OnDestroy {
       return 
     }
     const ev = () => {
-     nativeElement.select()
+      // fixes safari "focus" event fires too late.
+      setTimeout(() => {
+        nativeElement.select()
+      })
     }
     nativeElement.addEventListener('focus', ev)
     this.destroyCB = () => {

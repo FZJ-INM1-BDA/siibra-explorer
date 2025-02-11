@@ -243,7 +243,7 @@ export class VerticalBreadCrumbComponent {
 
       return {
         selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,
-        useAccordion: showExperimental, maximizedCard,
+        useAccordion: true, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
       }

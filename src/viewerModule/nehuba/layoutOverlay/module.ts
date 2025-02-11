@@ -8,6 +8,7 @@ import { UtilModule } from "src/util";
 import { WindowResizeModule } from "src/util/windowResize";
 import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
     UtilModule,
     WindowResizeModule,
     AngularMaterialModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     NehubaLayoutOverlay,

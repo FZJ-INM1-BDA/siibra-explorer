@@ -1,5 +1,172 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
+    <ng-template sxplrExperimentalFlag [experimental]="true"]>
+    <mat-accordion>
+        
+        <!-- atlas -->
+        <mat-expansion-panel *ngIf="view.selectedATP.atlas; let atlas"
+            #atlasExpPanel="matExpansionPanel"
+            hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Atlas
+                </mat-panel-title>
+                <mat-panel-description *ngIf="!atlasExpPanel.expanded">
+                    {{ atlas.name }}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="title-1-container">
+                <h3>
+                    {{ atlas.name }}
+                </h3>
+
+                <button mat-icon-button
+                    [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
+                    [matMenuTriggerFor]="selectATPMenu"
+                    [matMenuTriggerData]="{
+                        current: atlas, 
+                        type: 'atlasId',
+                        options: view.atlases
+                    }">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="sxplr-d-flex">
+                <ng-template [ngTemplateOutlet]="atlasActionTmpl"></ng-template>
+            </div>
+             
+        </mat-expansion-panel>
+        
+        <!-- template -->
+        <mat-expansion-panel *ngIf="view.selectedATP.template; let template"
+            #spaceExpPanel="matExpansionPanel"
+            hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Space
+                </mat-panel-title>
+                <mat-panel-description *ngIf="!spaceExpPanel.expanded">
+                    {{ template.name }}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <!-- body -->
+
+            <div class="title-1-container">
+                <h3>
+                    {{ template.name }}
+                </h3>
+
+
+                <button mat-icon-button
+                    [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
+                    [matMenuTriggerFor]="selectATPMenu"
+                    [matMenuTriggerData]="{
+                        current: template, 
+                        type: 'templateId',
+                        options: view.templates
+                    }">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </div>
+             
+            
+            <ng-template [ngTemplateOutlet]="templateBodyTmpl"></ng-template>
+
+            <mat-divider [inset]="false"></mat-divider>
+
+            <div class="sxplr-d-flex">
+                <ng-template [ngTemplateOutlet]="templateActionsTmpl">
+                </ng-template>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- parcellation -->
+        <mat-expansion-panel *ngIf="view.selectedATP.parcellation; let parcellation"
+            #parcExpPanel="matExpansionPanel"
+            hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Parcellation
+                    <ng-template [ngIf]="view.selectedRegions.length > 0">
+                        Region
+                    </ng-template>
+                </mat-panel-title>
+                <mat-panel-description *ngIf="!parcExpPanel.expanded">
+                    <ng-template [ngIf]="view.selectedRegions.length === 1">
+                        {{ view.selectedRegions[0].name }}
+                    </ng-template>
+                    <ng-template [ngIf]="view.selectedRegions.length > 1">
+                        {{ view.selectedRegions.length }} regions
+                    </ng-template>
+                    <ng-template [ngIf]="view.selectedRegions.length === 0">
+                        {{ parcellation.name }}
+                    </ng-template>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="title-1-container">
+                <h3>
+                    {{ parcellation.name }}
+                </h3>
+
+                <ng-template [ngIf]="parcellation | isVersioned : view.parcellations">
+                    <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
+                        [ngIfThen]="newestTmpl"
+                        [ngIfElse]="notNewestTmpl">
+
+                    </ng-template>
+
+                    <ng-template #newestTmpl>
+                        <span class="disabled-button-container" [matTooltip]="view.labels.NEWEST_VERSION">
+                            <button mat-icon-button disabled>
+                                <mat-icon>whatshot</mat-icon>
+                            </button>
+                        </span>
+                    </ng-template>
+
+                    <ng-template #notNewestTmpl>
+                        <button mat-icon-button
+                            color="primary"
+                            (click)="gotoNewestParc()"
+                            [matTooltip]="view.labels.GOTO_NEWEST_VERSION">
+                            <mat-icon>update</mat-icon>
+                        </button>
+                    </ng-template>
+                </ng-template>
+                
+                <button mat-icon-button
+                    [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
+                    [matMenuTriggerFor]="selectATPMenu"
+                    [matMenuTriggerData]="{
+                        current: view.selectedATP.parcellation, 
+                        type: 'parcellationId',
+                        options: view.noGroupParcs,
+                        groupedOptions: view.groupParcs,
+                        getSubMenu: getSubParcellation,
+                        optionTemplate: parcellationOptTmpl
+                    }">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </div>
+
+            <ng-template [ngTemplateOutlet]="parcRegionQuickSearchTmpl"></ng-template>
+
+            <mat-divider></mat-divider>
+
+            <div class="sxplr-d-flex">
+                <ng-template [ngTemplateOutlet]="parcActionTmpl"></ng-template>
+            </div>
+        </mat-expansion-panel>
+
+    </mat-accordion>
+    </ng-template>
+
+    <ng-template sxplrExperimentalFlag [deprecated]="true"]>
     <!-- selected atlas -->
     <div *ngIf="view.selectedATP.atlas; let atlas" class="vbc-card-container atlas-container"
         sxplr-reveal
@@ -42,26 +209,7 @@
             <mat-divider></mat-divider>
 
             <mat-card-actions>
-                <ng-template
-                    [ngTemplateOutlet]="maximizeBtnTmpl"
-                    [ngTemplateOutletContext]="{
-                        cardname: 'atlas'
-                    }">
-                </ng-template>
-                <mat-divider [vertical]="true" [inset]="false"></mat-divider>
-                <button sxplr-share-view mat-icon-button>
-                    <i class="fas fa-share"></i>
-                </button>
-                <button mat-icon-button sxplrAtlasDownload #dl="atlasDlDct"
-                    [disabled]="dl.busy$ | async">
-                    
-                    <ng-template [ngIf]="dl.busy$ | async" [ngIfElse]="notBusyDlTmpl">
-                        <i class="fas fa-spinner spinning"></i>
-                    </ng-template>
-                    <ng-template #notBusyDlTmpl>
-                        <i class="fas fa-download"></i>
-                    </ng-template>
-                </button>
+                <ng-template [ngTemplateOutlet]="atlasActionTmpl"></ng-template>
             </mat-card-actions>
         </mat-card>
     </div>
@@ -104,180 +252,17 @@
                     </button>
                 </mat-card-subtitle>
                 <mat-card-subtitle>
-                    <form action [formGroup]="navigationCtlForm">
-                        <ng-template [ngIf]="view.useViewer === 'nehuba'">
-                            <div class="vbc-row">
-                                <mat-form-field *ngFor="let axis of ['x', 'y', 'z']">
-                                    <mat-label>{{ axis }}</mat-label>
-                                    <input matInput [formControlName]="axis" vbc-on-focus-select>
-                                </mat-form-field>
-                                <button mat-icon-button
-                                    class="vbc-row-fixed"
-                                    color="warn"
-                                    [matTooltip]="view.labels.RESET_TRANSLATION"
-                                    (click)="resetNavigation({ position: true })">
-                                    <mat-icon>restart_alt</mat-icon>
-                                </button>
-                            </div>
-                        </ng-template>
-
-                    </form>
+                    <ng-template [ngTemplateOutlet]="templateBodyTmpl"></ng-template>
                 </mat-card-subtitle>
             </mat-card-header>
 
             <mat-divider></mat-divider>
 
             <mat-card-actions>
-                <ng-template
-                    [ngTemplateOutlet]="maximizeBtnTmpl"
-                    [ngTemplateOutletContext]="{
-                        cardname: 'template'
-                    }">
-                </ng-template>
-                <mat-divider [vertical]="true"></mat-divider>
-                <button mat-icon-button
-                    [matTooltip]="view.labels.DETAILS"
-                    [sxplr-dialog]="DoiTemplate"
-                    [sxplr-dialog-size]="null"
-                    [sxplr-dialog-data]="{
-                        title: template.name,
-                        desc: template.desc,
-                        contributors: template.contributors | dedup, 
-                        actions: template | parcTmplDoiPipe
-                    }">
-                    <i class="fas fa-info"></i>
-                </button>
-
-                <ng-template [ngIf]="view.currentViewport?.center" let-center>
-
-                    <button
-                        [matTooltip]="view.labels.COPY_CURRENT_POSITION"
-                        mat-icon-button
-                        [iav-clipboard-copy]="
-                            center
-                            | numbers : 3
-                            | addUnitAndJoin : 'mm' : ', '
-                        ">
-                        <i class="fas fa-copy"></i>
-                    </button>
-
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.POSITION_ASSIGNMENT"
-                        (click)="assignPoint(center, view.selectedATP.template)"
-                        >
-                        <mat-icon>query_stats</mat-icon>
-                    </button>
-                </ng-template>
-
-                <ng-template sxplrExperimentalFlag [experimental]="true">
-
-                <mat-divider [vertical]="true"></mat-divider>
-                
-                <div iav-switch #switchdir="iavSwitch">
-
-                </div>
-                <div sxplr-sapiviews-core-space-boundingbox
-                    (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
-                    [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-                    [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-                    [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                    #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-                    >
-                </div>
-
-                <sxplr-feature-entry
-                    class="sxplr-d-none"
-                    [template]="view.selectedATP.template"
-                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-                    #voiFeatureEntryCmp="featureEntryCmp">
-                </sxplr-feature-entry>
-                
-                <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
-                    <div *ngIf="switchdir.switchState$ | async"
-                        voiBbox
-                        [features]="voiFeatureEntryCmp.features$ | async">
-                    </div>
-                </ng-template>
-
-                <button mat-icon-button
-                    [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
-                    (click)="switchdir.toggle()"
-                    matTooltip="Toggle 3D positions.">
-                    <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
-                </button>
-
-                <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-                    <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
-                </ng-template>
-
-                <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
-                    
-                    <ng-template [ngIf]="totals > 0">
-                        
-                        <ng-template #anchorTmpl>
-                            <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
-                            </tpbr-viewer>
-                        </ng-template>
-
-
-                        <button mat-icon-button
-                            [matTooltip]="view.labels.RELATED_DATASETS"
-                            [sxplr-dialog]="dumbFeatureDialogTmpl"
-                            [sxplr-dialog-config]="{
-                                autoFocus: true
-                            }"
-                            [sxplr-dialog-data]="{
-                                features: voiFeatureEntryCmp.features$ | async,
-                                anchorTmpl: anchorTmpl
-                            }">
-                            <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
-                        </button>
-                    </ng-template>
-                </ng-template>
-                </ng-template>
-
+                <ng-template [ngTemplateOutlet]="templateActionsTmpl"></ng-template>
             </mat-card-actions>
         </mat-card>
     </div>
-
-    <!-- common template for parcellation/single region/multi region -->
-    <ng-template #parcellationOptTmpl let-parcellation let-hideVersionIcon="hideVersionIcon">
-        
-        <span>
-            {{ parcellation.shortName || parcellation.name }}
-        </span>
-
-        <ng-template [ngIf]="!hideVersionIcon">
-            <ng-template
-                [ngIf]="parcellation | isVersioned : view.parcellations"
-                [ngIfElse]="unVersionedParcTemplate">
-
-                <ng-template
-                    [ngIf]="parcellation | isNewest : view.parcellations"
-                    [ngIfElse]="notNewestTmpl">
-                    <mat-icon matTooltip="newest version" class="muted-3 small-icon">whatshot</mat-icon>
-                </ng-template>
-
-                <ng-template #notNewestTmpl>
-                    <mat-icon matTooltip="newer version available" class="muted-3 small-icon">update</mat-icon>
-                </ng-template>
-            </ng-template>
-
-            <ng-template #unVersionedParcTemplate>
-            </ng-template>
-        </ng-template>
-        
-    </ng-template>
-
-    <ng-template #maximizeParcCardTmpl>
-        <ng-template
-            [ngTemplateOutlet]="maximizeBtnTmpl"
-            [ngTemplateOutletContext]="{
-                cardname: 'parcellation'
-            }">
-        </ng-template>
-    </ng-template>
 
     <!-- selected parcellation -->
     <div *ngIf="view.selectedATP.parcellation; let parcellation"
@@ -370,7 +355,7 @@
                                     
                                 </button> -->
                             </ng-template>
-
+            
                             <ng-template #goToNewestVTmpl>
                                 <button mat-icon-button class="sxplr-m-2" iav-stop="click"
                                     [matTooltip]="view.labels.GOTO_NEWEST_VERSION"
@@ -380,401 +365,22 @@
                             </ng-template>
                         </div>
                     </ng-template>
-
+            
                 </mat-card-subtitle>
 
                 <!-- region selector -->
                 <mat-card-subtitle>
-                    <sxplr-sapiviews-core-rich-regionlistsearch
-                        [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
-                        (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.labelMappedRegionNames.includes($event.name)
-                            ? selectRoi($event)
-                            : showHierarchyBtn.onClick({ 'searchTerm': $event.name })"
-                        (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="view.labelMappedRegionNames.includes($event.name) && toggleRoi($event)"
-                        [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length == 0
-                            ? ''
-                            : view.selectedRegions.length == 1
-                                ? view.selectedRegions[0].name
-                                : view.selectedRegions.length + ' regions selected'">
-
-                        <ng-template region-template let-region>
-
-                            <div class="region-list-search-row sxplr-custom-cmp"
-                                [ngClass]="{
-                                    'text-muted': !view.labelMappedRegionNames.includes(region.name),
-                                    'text accent': view.selectedRegions | mapToProperty : 'name' | includes : region.name
-                                }">
-                        
-                                <span class="sxplr-m-2">
-                                    <i *ngIf="view.leafRegions.includes(region)" class="fas fa-brain"></i>
-                                    <i *ngIf="view.branchRegions.includes(region)" class="fas fa-code-branch"></i>
-                                </span>
-
-                                <span>
-                                    {{ region.name }}
-                                </span>
-                            </div>
-
-                        </ng-template>
-
-                        <ng-container ngProjectAs="[search-input-suffix]">
-                            <button mat-icon-button
-                                iav-stop="click"
-                                [sxplr-dialog]="regionHierarchyTmpl"
-                                [matTooltip]="view.labels.REGION_HIERARCHY"
-                                sxplr-dialog-size="xl"
-                                #showHierarchyBtn="sxplrDialog">
-                                <i class="fas fa-sitemap"></i>
-                            </button>
-
-                            <ng-template [ngIf]="view.selectedRegions.length > 0">
-                                <button mat-icon-button
-                                    (click)="clearRoi()"
-                                    color="warn"
-                                    [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-                                    <mat-icon>restart_alt</mat-icon>
-                                </button>
-                            </ng-template>
-                        </ng-container>
-                    </sxplr-sapiviews-core-rich-regionlistsearch>
+                    <ng-template [ngTemplateOutlet]="parcRegionQuickSearchTmpl"></ng-template>
                 </mat-card-subtitle>
             </mat-card-header>
 
             <mat-divider></mat-divider>
             <mat-card-actions>
-                <ng-template [ngTemplateOutlet]="maximizeParcCardTmpl"></ng-template>
-                <mat-divider [vertical]="true"></mat-divider>
-                
-                <ng-template [ngIf]="view.selectedRegions.length === 0">
-                    <ng-template [ngTemplateOutlet]="noRegionActionTmpl"></ng-template>
-                </ng-template>
-
-                <ng-template [ngIf]="view.selectedRegions.length === 1">
-                    <ng-template [ngTemplateOutlet]="singleRegionActionTmpl"></ng-template>
-                </ng-template>
-
-                <ng-template [ngIf]="view.selectedRegions.length > 1">
-                    <ng-template [ngTemplateOutlet]="multipleRegionActionTmpl"></ng-template>
-                </ng-template>
-                
-                <ng-template [ngIf]="view.parcellationVisible !== null && view.selectedRegions.length === 0">
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.TOGGLE_DELINEATION"
-                        (click)="toggleParcellationVisibility()"
-                        (iav-key-event)="toggleParcellationVisibility()"
-                        [iav-key-listener]="[{
-                            key: 'q',
-                            type: 'keydown',
-                            capture: true,
-                            target: 'document',
-                        }]">
-                        <ng-template [ngIf]="view.parcellationVisible">
-                            <i class="fas fa-eye"></i>
-                        </ng-template>
-                        
-                        <ng-template [ngIf]="!view.parcellationVisible">
-                            <i class="fas fa-eye-slash"></i>
-                        </ng-template>
-                    </button>
-                </ng-template>
-
-                <ng-template sxplrExperimentalFlag [experimental]="true">
-                <mat-divider [vertical]="true"></mat-divider>
-
-                <ng-template [ngIf]="view.selectedRegions.length < 2">
-                    <sxplr-feature-entry
-                        class="sxplr-d-none"
-                        [parcellation]="view.selectedATP.parcellation"
-                        [region]="view.selectedRegions[0]"
-                        [attr.data-feature-length]="((parcFeature.features$ | async) || []).length"
-                        #parcFeature="featureEntryCmp">
-                    </sxplr-feature-entry>
-
-                    <ng-template #anchorTmpl>
-                        <tpbr-viewer [tpbr-concept]="parcFeature.TPRBbox$ | async">
-                        </tpbr-viewer>
-                    </ng-template>
-
-                    <ng-template [ngIf]="(parcFeature.totals$ | async) > 0">
-                        <button mat-icon-button
-                            [matTooltip]="view.labels.RELATED_DATASETS"
-                            [sxplr-dialog]="dumbFeatureDialogTmpl"
-                            [sxplr-dialog-config]="{
-                                autoFocus: true
-                            }"
-                            [sxplr-dialog-data]="{
-                                features: parcFeature.features$ | async,
-                                anchorTmpl: anchorTmpl
-                            }">
-                            <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">dataset_linked</mat-icon>
-                        </button>
-                    </ng-template>
-
-                    <ng-template [ngIf]="parcFeature.busy$ | async">
-                        <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
-                    </ng-template>
-
-                </ng-template>
-                
-                </ng-template>
+                <ng-template [ngTemplateOutlet]="parcActionTmpl"></ng-template>
             </mat-card-actions>
 
             <!-- footer templates -->
 
-            <!-- no region (parcellation) action footer -->
-            <ng-template #noRegionActionTmpl>
-                <button mat-icon-button
-                    [sxplr-dialog]="DoiTemplate"
-                    [sxplr-dialog-size]="null"
-                    [sxplr-dialog-data]="{
-                        title: parcellation.name,
-                        desc: parcellation.desc,
-                        contributors: parcellation.contributors | dedup, 
-                        actions: parcellation | parcTmplDoiPipe
-                    }"
-                    [matTooltip]="view.labels.DETAILS">
-                    <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
-                </button>
-            </ng-template>
-
-            <!-- single region action footer -->
-            <ng-template #singleRegionActionTmpl>
-                <div sxplr-sapiviews-core-region
-                    #regionDirective="sapiViewsCoreRegion"
-                    (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
-                    [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
-                    [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
-                    [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
-                    [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
-                    [sxplr-sapiviews-core-region-detail-flag]="true">
-        
-                </div>
-
-                <div *ngIf="regionDirective.fetchInProgress$ | async"
-                    class="sxplr-center-children sxplr-m-2">
-                    <mat-spinner diameter="24"></mat-spinner>
-                </div>
-        
-                <!-- detail info -->
-        
-                <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
-                    <button mat-icon-button [matTooltip]="position | numbers | addUnitAndJoin : 'mm'"
-                        (click)="navigateTo(position)">
-                        <mat-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
-                    </button>
-                </ng-template>
-        
-                <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
-                    
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.DETAILS"
-                        [sxplr-dialog]="DoiTemplate"
-                        [sxplr-dialog-size]="null"
-                        [sxplr-dialog-data]="{
-                            title: view.selectedRegions[0].name,
-                            desc: regionDirective.desc$ | async,
-                            contributors: regionDirective.contributors$ | async | dedup,
-                            actions: regionDirective.dois$ | async
-                        }">
-                        <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
-                    </button>
-                </ng-template>
-                <!-- related regions -->
-                <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
-                    <ng-template [ngIf]="relatedRegions.length > 0">
-                        <button mat-icon-button
-                            [matTooltip]="view.labels.RELATED_REGIONS"
-                            [sxplr-dialog]="relatedRegionsTmpl"
-                            [sxplr-dialog-data]="{
-                                relatedRegions: relatedRegions,
-                                region: view.selectedRegions[0]
-                            }">
-                            <mat-icon [matBadge]="relatedRegions.length" aria-hidden="false">schema</mat-icon>
-                        </button>
-                        
-                    </ng-template>
-                    
-        
-                    <ng-template #relatedRegionsTmpl>
-                        <!-- header -->
-                        <h2 mat-dialog-title>Related Regions</h2>
-        
-                        <!-- body -->
-                        <mat-dialog-content>
-        
-                            <!-- iterate over all related -->
-                            <table mat-table [dataSource]="relatedRegions">
-                                
-                                <ng-container matColumnDef="currentRegion">
-                                    <th mat-header-cell *matHeaderCellDef> Current Region </th>
-                                    <td mat-cell *matCellDef="let related"> {{ view.selectedRegions[0].name }} </td>
-                                </ng-container>
-        
-                                <ng-container matColumnDef="qualification">
-                                    <th mat-header-cell *matHeaderCellDef> Qualification </th>
-                                    <td mat-cell *matCellDef="let related"> {{ related.qualification | translateQualificationPipe }} </td>
-                                </ng-container>
-        
-                                <ng-container matColumnDef="relatedRegion">
-                                    <th mat-header-cell *matHeaderCellDef> Related Region </th>
-                                    <td mat-cell *matCellDef="let related">
-                                        <button tabindex="-1" mat-stroked-button
-                                        (click)="selectATP('parcellationId', related.parcellation.id, related.region.name)"
-                                        class="sxplr-w-100"
-                                        [disabled]="!related.mapped"
-                                        mat-dialog-close
-                                        [matTooltip]="('Explorer ' + related.region.name + ' in ' + related.parcellation.name)">
-                                        {{ related.region.name }}
-                                        </button>
-                                    </td>
-                                </ng-container>
-        
-                                <ng-container matColumnDef="relatedRegionParc">
-                                    <th mat-header-cell *matHeaderCellDef> Related Region Parcellation </th>
-                                    <td mat-cell *matCellDef="let related">
-                                        <button tabindex="-1" mat-stroked-button
-                                            (click)="selectATP('parcellationId', related.parcellation.id)"
-                                            class="sxplr-w-100"
-                                            mat-dialog-close
-                                            [matTooltip]="('Explore ' + related.parcellation.name)">
-                                            {{ related.parcellation.name }}
-                                        </button>
-                                    </td>
-                                </ng-container>
-        
-                                <tr mat-header-row *matHeaderRowDef="['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc']"></tr>
-                                <tr mat-row *matRowDef="let row; columns: ['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc'];"></tr>
-                            </table>
-                        </mat-dialog-content>
-        
-                        <!-- footer -->
-                        <mat-dialog-actions align="center">
-                            <button mat-button mat-dialog-close>close</button>
-                        </mat-dialog-actions>
-                    </ng-template>
-                </ng-template>
-            </ng-template>
-        
-            <!-- multiple region action footer -->
-            <ng-template #multipleRegionActionTmpl>
-                
-                <button mat-icon-button
-                    [matTooltip]="view.labels.COPY_REGION_NAMES"
-                    [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json">
-                    <mat-icon fontSet="fas" fontIcon="fa-copy" matListItemIcon></mat-icon>
-                </button>
-            </ng-template>
-        </mat-card>
-    </div>
-
-    <!-- features -->
-    <ng-template sxplrExperimentalFlag [deprecated]="true">
-
-    <div *ngIf="!!view.selectedATP.atlas"
-        class="vbc-card-container feature-container"
-        (click)="!featureReveal.state && openCard('feature')"
-        sxplr-reveal
-        [reveal-state]="view.useAccordion
-            ? view.maximizedCard === 'feature'
-            : !view.minimizedCards.includes('feature')"
-        #featureReveal="reveal"
-        [ngClass]="{
-            'vbc-hidden': !(featureReveal.state$ | async),
-            'mat-elevation-z2': (featureReveal.state$ | async),
-            'mat-elevation-z1': !(featureReveal.state$ | async)
-        }">
-    
-        <mat-card>
-            <mat-card-header>
-                <mat-card-subtitle  (click)="featureReveal.state ? minimizeCard('feature') : openCard('feature')">
-                    Features
-                </mat-card-subtitle>
-            </mat-card-header>
-        
-            <div sxplr-sapiviews-core-space-boundingbox
-                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
-                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                #bbox="sxplrSapiViewsCoreSpaceBoundingBox">
-            </div>
-            <mat-expansion-panel class="mat-elevation-z0"
-                iav-switch
-                #switchdir="iavSwitch">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        spatially anchored
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ voiFeatureEntryCmp.totals$ | async }}
-                    </mat-panel-description>
-        
-                </mat-expansion-panel-header>
-
-                <ng-template [ngIf]="!(voiFeatureEntryCmp.busy$ | async) && (voiFeatureEntryCmp.totals$ | async) === 0">
-                    <span class="text-muted">
-                        No spatially anchored feature found
-                    </span>
-                </ng-template>
-                
-                <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
-                    <div *ngIf="switchdir.switchState$ | async"
-                        voiBbox
-                        [features]="voiFeatureEntryCmp.features$ | async">
-                    </div>
-                </ng-template>
-                
-                <sxplr-feature-entry
-                    [template]="view.selectedATP.template"
-                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-                    #voiFeatureEntryCmp="featureEntryCmp">
-                </sxplr-feature-entry>
-        
-            </mat-expansion-panel>
-            <mat-expansion-panel class="mat-elevation-z0">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        semantically anchored
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ semfeatures.totals$ | async }}
-                    </mat-panel-description>
-        
-                </mat-expansion-panel-header>
-
-                <ng-template [ngIf]="(semfeatures.totals$ | async) === 0">
-                    <span class="text-muted">
-                        No semantically anchored feature found
-                    </span>
-                </ng-template>
-                
-                <sxplr-feature-entry
-                    [template]="view.selectedATP.template"
-                    [parcellation]="view.selectedATP.parcellation"
-                    [region]="view.selectedRegions.length === 1 ? view.selectedRegions[0] : null"
-                    #semfeatures="featureEntryCmp">
-                </sxplr-feature-entry>
-        
-            </mat-expansion-panel>
-
-            <mat-divider></mat-divider>
-
-            <mat-card-actions>
-                <ng-template
-                    [ngTemplateOutlet]="maximizeBtnTmpl"
-                    [ngTemplateOutletContext]="{
-                        cardname: 'feature'
-                    }">
-                </ng-template>
-                <mat-divider [vertical]="true" [inset]="false"></mat-divider>
-                <button mat-icon-button
-                    [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
-                    (click)="switchdir.toggle()"
-                    matTooltip="Toggle 3D positions.">
-                    <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
-                </button>
-            </mat-card-actions>
         </mat-card>
     </div>
     </ng-template>
@@ -797,14 +403,448 @@
         </mat-card-actions>
     </ng-template>
 
-    <ng-template #maximizeBtnTmpl let-cardname="cardname">
-        <button mat-icon-button (click)="minimizeCard(cardname)"
-            iav-stop="click"
-            [matTooltip]="view.labels.MINIMIZE_PANEL">
-            <mat-icon fontSet="fas" fontIcon="fa-compress"></mat-icon>
+    <!-- atlas templates -->
+    <ng-template #atlasActionTmpl>
+        
+        <button sxplr-share-view mat-icon-button>
+            <i class="fas fa-share"></i>
+        </button>
+        <button mat-icon-button sxplrAtlasDownload #dl="atlasDlDct"
+            [disabled]="dl.busy$ | async">
+            
+            <ng-template [ngIf]="dl.busy$ | async" [ngIfElse]="notBusyDlTmpl">
+                <i class="fas fa-spinner spinning"></i>
+            </ng-template>
+            <ng-template #notBusyDlTmpl>
+                <i class="fas fa-download"></i>
+            </ng-template>
         </button>
     </ng-template>
 
+    <!-- space templates -->
+    <ng-template #templateBodyTmpl>
+        <form [formGroup]="navigationCtlForm">
+            <ng-template [ngIf]="view.useViewer === 'nehuba'">
+                <div class="vbc-row">
+                    <mat-form-field *ngFor="let axis of ['x', 'y', 'z']">
+                        <mat-label>{{ axis }}</mat-label>
+                        <input matInput [formControlName]="axis" vbc-on-focus-select>
+                    </mat-form-field>
+                    <button mat-icon-button
+                        class="vbc-row-fixed"
+                        color="warn"
+                        [matTooltip]="view.labels.RESET_TRANSLATION"
+                        (click)="resetNavigation({ position: true })">
+                        <mat-icon>restart_alt</mat-icon>
+                    </button>
+                </div>
+            </ng-template>
+        </form>
+    </ng-template>
+
+    <ng-template #templateActionsTmpl>
+        <button mat-icon-button
+            [matTooltip]="view.labels.DETAILS"
+            [sxplr-dialog]="DoiTemplate"
+            [sxplr-dialog-size]="null"
+            [sxplr-dialog-data]="{
+                title: view.selectedATP.template.name,
+                desc: view.selectedATP.template.desc,
+                contributors: view.selectedATP.template.contributors | dedup, 
+                actions: view.selectedATP.template | parcTmplDoiPipe
+            }">
+            <i class="fas fa-info"></i>
+        </button>
+
+        <ng-template [ngIf]="view.currentViewport?.center" let-center>
+
+            <button
+                [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+                mat-icon-button
+                [iav-clipboard-copy]="
+                    center
+                    | numbers : 3
+                    | addUnitAndJoin : 'mm' : ', '
+                ">
+                <i class="fas fa-copy"></i>
+            </button>
+
+            <button mat-icon-button
+                [matTooltip]="view.labels.POSITION_ASSIGNMENT"
+                (click)="assignPoint(center, view.selectedATP.template)"
+                >
+                <mat-icon>query_stats</mat-icon>
+            </button>
+        </ng-template>
+
+        <mat-divider [vertical]="true"></mat-divider>
+        
+        <div iav-switch #switchdir="iavSwitch">
+
+        </div>
+        <div sxplr-sapiviews-core-space-boundingbox
+            (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
+            [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
+            [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
+            [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+            #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+            >
+        </div>
+
+        <sxplr-feature-entry
+            class="sxplr-d-none"
+            [template]="view.selectedATP.template"
+            [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+            [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
+            #voiFeatureEntryCmp="featureEntryCmp">
+        </sxplr-feature-entry>
+        
+        <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
+            <div *ngIf="switchdir.switchState$ | async"
+                voiBbox
+                [features]="voiFeatureEntryCmp.features$ | async">
+            </div>
+        </ng-template>
+
+        <button mat-icon-button
+            [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
+            (click)="switchdir.toggle()"
+            matTooltip="Toggle 3D positions.">
+            <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
+        </button>
+
+        <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
+            <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+        </ng-template>
+
+        <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
+            
+            <ng-template [ngIf]="totals > 0">
+                
+                <ng-template #anchorTmpl>
+                    <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
+                    </tpbr-viewer>
+                </ng-template>
+
+                <button mat-icon-button
+                    [matTooltip]="view.labels.RELATED_DATASETS"
+                    [sxplr-dialog]="dumbFeatureDialogTmpl"
+                    [sxplr-dialog-config]="{
+                        autoFocus: true
+                    }"
+                    [sxplr-dialog-data]="{
+                        features: voiFeatureEntryCmp.features$ | async,
+                        anchorTmpl: anchorTmpl
+                    }">
+                    <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
+                </button>
+            </ng-template>
+        </ng-template>
+
+    </ng-template>
+
+    <!-- parcelation templates -->
+     
+    <!-- common template for parcellation/single region/multi region -->
+    <ng-template #parcellationOptTmpl let-parcellation let-hideVersionIcon="hideVersionIcon">
+        
+        <span>
+            {{ parcellation.shortName || parcellation.name }}
+        </span>
+
+        <ng-template [ngIf]="!hideVersionIcon">
+            <ng-template
+                [ngIf]="parcellation | isVersioned : view.parcellations"
+                [ngIfElse]="unVersionedParcTemplate">
+
+                <ng-template
+                    [ngIf]="parcellation | isNewest : view.parcellations"
+                    [ngIfElse]="notNewestTmpl">
+                    <mat-icon matTooltip="newest version" class="muted-3 small-icon">whatshot</mat-icon>
+                </ng-template>
+
+                <ng-template #notNewestTmpl>
+                    <mat-icon matTooltip="newer version available" class="muted-3 small-icon">update</mat-icon>
+                </ng-template>
+            </ng-template>
+
+            <ng-template #unVersionedParcTemplate>
+            </ng-template>
+        </ng-template>
+        
+    </ng-template>
+
+    <ng-template #parcRegionQuickSearchTmpl>
+
+        <sxplr-sapiviews-core-rich-regionlistsearch
+            [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
+            (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.labelMappedRegionNames.includes($event.name)
+                ? selectRoi($event)
+                : showHierarchyBtn.onClick({ 'searchTerm': $event.name })"
+            (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="view.labelMappedRegionNames.includes($event.name) && toggleRoi($event)"
+            [sxplr-sapiviews-core-rich-regionlistsearch-current-search]="view.selectedRegions.length == 0
+                ? ''
+                : view.selectedRegions.length == 1
+                    ? view.selectedRegions[0].name
+                    : view.selectedRegions.length + ' regions selected'">
+
+            <ng-template region-template let-region>
+
+                <div class="region-list-search-row sxplr-custom-cmp"
+                    [ngClass]="{
+                        'text-muted': !view.labelMappedRegionNames.includes(region.name),
+                        'text accent': view.selectedRegions | mapToProperty : 'name' | includes : region.name
+                    }">
+            
+                    <span class="sxplr-m-2">
+                        <i *ngIf="view.leafRegions.includes(region)" class="fas fa-brain"></i>
+                        <i *ngIf="view.branchRegions.includes(region)" class="fas fa-code-branch"></i>
+                    </span>
+
+                    <span>
+                        {{ region.name }}
+                    </span>
+                </div>
+
+            </ng-template>
+
+            <ng-container ngProjectAs="[search-input-suffix]">
+                <button mat-icon-button
+                    iav-stop="click"
+                    [sxplr-dialog]="regionHierarchyTmpl"
+                    [matTooltip]="view.labels.REGION_HIERARCHY"
+                    sxplr-dialog-size="xl"
+                    #showHierarchyBtn="sxplrDialog">
+                    <i class="fas fa-sitemap"></i>
+                </button>
+
+                <ng-template [ngIf]="view.selectedRegions.length > 0">
+                    <button mat-icon-button
+                        (click)="clearRoi()"
+                        color="warn"
+                        [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </ng-template>
+            </ng-container>
+        </sxplr-sapiviews-core-rich-regionlistsearch>
+    </ng-template>
+
+    <ng-template #parcActionTmpl>
+        <ng-template [ngIf]="view.selectedRegions.length === 0">
+            <ng-template [ngTemplateOutlet]="noRegionActionTmpl"></ng-template>
+        </ng-template>
+
+        <ng-template [ngIf]="view.selectedRegions.length === 1">
+            <ng-template [ngTemplateOutlet]="singleRegionActionTmpl"></ng-template>
+        </ng-template>
+
+        <ng-template [ngIf]="view.selectedRegions.length > 1">
+            <ng-template [ngTemplateOutlet]="multipleRegionActionTmpl"></ng-template>
+        </ng-template>
+        
+        <ng-template [ngIf]="view.parcellationVisible !== null && view.selectedRegions.length === 0">
+            <button mat-icon-button
+                [matTooltip]="view.labels.TOGGLE_DELINEATION"
+                (click)="toggleParcellationVisibility()"
+                (iav-key-event)="toggleParcellationVisibility()"
+                [iav-key-listener]="[{
+                    key: 'q',
+                    type: 'keydown',
+                    capture: true,
+                    target: 'document',
+                }]">
+                <ng-template [ngIf]="view.parcellationVisible">
+                    <i class="fas fa-eye"></i>
+                </ng-template>
+                
+                <ng-template [ngIf]="!view.parcellationVisible">
+                    <i class="fas fa-eye-slash"></i>
+                </ng-template>
+            </button>
+        </ng-template>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <ng-template [ngIf]="view.selectedRegions.length < 2">
+            <sxplr-feature-entry
+                class="sxplr-d-none"
+                [parcellation]="view.selectedATP.parcellation"
+                [region]="view.selectedRegions[0]"
+                [attr.data-feature-length]="((parcFeature.features$ | async) || []).length"
+                #parcFeature="featureEntryCmp">
+            </sxplr-feature-entry>
+
+            <ng-template #anchorTmpl>
+                <tpbr-viewer [tpbr-concept]="parcFeature.TPRBbox$ | async">
+                </tpbr-viewer>
+            </ng-template>
+
+            <ng-template [ngIf]="(parcFeature.totals$ | async) > 0">
+                <button mat-icon-button
+                    [matTooltip]="view.labels.RELATED_DATASETS"
+                    [sxplr-dialog]="dumbFeatureDialogTmpl"
+                    [sxplr-dialog-config]="{
+                        autoFocus: true
+                    }"
+                    [sxplr-dialog-data]="{
+                        features: parcFeature.features$ | async,
+                        anchorTmpl: anchorTmpl
+                    }">
+                    <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">dataset_linked</mat-icon>
+                </button>
+            </ng-template>
+
+            <ng-template [ngIf]="parcFeature.busy$ | async">
+                <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+            </ng-template>
+
+        </ng-template>
+        
+        <!-- no region (parcellation) action footer -->
+        <ng-template #noRegionActionTmpl>
+            <button mat-icon-button
+                [sxplr-dialog]="DoiTemplate"
+                [sxplr-dialog-size]="null"
+                [sxplr-dialog-data]="{
+                    title: view.selectedATP.parcellation.name,
+                    desc: view.selectedATP.parcellation.desc,
+                    contributors: view.selectedATP.parcellation.contributors | dedup, 
+                    actions: view.selectedATP.parcellation | parcTmplDoiPipe
+                }"
+                [matTooltip]="view.labels.DETAILS">
+                <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
+            </button>
+        </ng-template>
+
+        <!-- single region action footer -->
+        <ng-template #singleRegionActionTmpl>
+            <div sxplr-sapiviews-core-region
+                #regionDirective="sapiViewsCoreRegion"
+                (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+                [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
+                [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
+                [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
+                [sxplr-sapiviews-core-region-detail-flag]="true">
+    
+            </div>
+
+            <div *ngIf="regionDirective.fetchInProgress$ | async"
+                class="sxplr-center-children sxplr-m-2">
+                <mat-spinner diameter="24"></mat-spinner>
+            </div>
+    
+            <!-- detail info -->
+    
+            <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
+                <button mat-icon-button [matTooltip]="position | numbers | addUnitAndJoin : 'mm'"
+                    (click)="navigateTo(position)">
+                    <mat-icon fontSet="fas" fontIcon="fa-map-marker"></mat-icon>
+                </button>
+            </ng-template>
+    
+            <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
+                
+                <button mat-icon-button
+                    [matTooltip]="view.labels.DETAILS"
+                    [sxplr-dialog]="DoiTemplate"
+                    [sxplr-dialog-size]="null"
+                    [sxplr-dialog-data]="{
+                        title: view.selectedRegions[0].name,
+                        desc: regionDirective.desc$ | async,
+                        contributors: regionDirective.contributors$ | async | dedup,
+                        actions: regionDirective.dois$ | async
+                    }">
+                    <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
+                </button>
+            </ng-template>
+            <!-- related regions -->
+            <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
+                <ng-template [ngIf]="relatedRegions.length > 0">
+                    <button mat-icon-button
+                        [matTooltip]="view.labels.RELATED_REGIONS"
+                        [sxplr-dialog]="relatedRegionsTmpl"
+                        [sxplr-dialog-data]="{
+                            relatedRegions: relatedRegions,
+                            region: view.selectedRegions[0]
+                        }">
+                        <mat-icon [matBadge]="relatedRegions.length" aria-hidden="false">schema</mat-icon>
+                    </button>
+                    
+                </ng-template>
+                
+    
+                <ng-template #relatedRegionsTmpl>
+                    <!-- header -->
+                    <h2 mat-dialog-title>Related Regions</h2>
+    
+                    <!-- body -->
+                    <mat-dialog-content>
+    
+                        <!-- iterate over all related -->
+                        <table mat-table [dataSource]="relatedRegions">
+                            
+                            <ng-container matColumnDef="currentRegion">
+                                <th mat-header-cell *matHeaderCellDef> Current Region </th>
+                                <td mat-cell *matCellDef="let related"> {{ view.selectedRegions[0].name }} </td>
+                            </ng-container>
+    
+                            <ng-container matColumnDef="qualification">
+                                <th mat-header-cell *matHeaderCellDef> Qualification </th>
+                                <td mat-cell *matCellDef="let related"> {{ related.qualification | translateQualificationPipe }} </td>
+                            </ng-container>
+    
+                            <ng-container matColumnDef="relatedRegion">
+                                <th mat-header-cell *matHeaderCellDef> Related Region </th>
+                                <td mat-cell *matCellDef="let related">
+                                    <button tabindex="-1" mat-stroked-button
+                                    (click)="selectATP('parcellationId', related.parcellation.id, related.region.name)"
+                                    class="sxplr-w-100"
+                                    [disabled]="!related.mapped"
+                                    mat-dialog-close
+                                    [matTooltip]="('Explorer ' + related.region.name + ' in ' + related.parcellation.name)">
+                                    {{ related.region.name }}
+                                    </button>
+                                </td>
+                            </ng-container>
+    
+                            <ng-container matColumnDef="relatedRegionParc">
+                                <th mat-header-cell *matHeaderCellDef> Related Region Parcellation </th>
+                                <td mat-cell *matCellDef="let related">
+                                    <button tabindex="-1" mat-stroked-button
+                                        (click)="selectATP('parcellationId', related.parcellation.id)"
+                                        class="sxplr-w-100"
+                                        mat-dialog-close
+                                        [matTooltip]="('Explore ' + related.parcellation.name)">
+                                        {{ related.parcellation.name }}
+                                    </button>
+                                </td>
+                            </ng-container>
+    
+                            <tr mat-header-row *matHeaderRowDef="['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc']"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ['currentRegion', 'qualification', 'relatedRegion', 'relatedRegionParc'];"></tr>
+                        </table>
+                    </mat-dialog-content>
+    
+                    <!-- footer -->
+                    <mat-dialog-actions align="center">
+                        <button mat-button mat-dialog-close>close</button>
+                    </mat-dialog-actions>
+                </ng-template>
+            </ng-template>
+        </ng-template>
+    
+        <!-- multiple region action footer -->
+        <ng-template #multipleRegionActionTmpl>
+            
+            <button mat-icon-button
+                [matTooltip]="view.labels.COPY_REGION_NAMES"
+                [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json">
+                <mat-icon fontSet="fas" fontIcon="fa-copy" matListItemIcon></mat-icon>
+            </button>
+        </ng-template>
+    </ng-template>
 </ng-template>
 
 <mat-menu #selectATPMenu="matMenu">
@@ -846,6 +886,7 @@
 
         <button *ngFor="let opt of options"
             mat-menu-item
+            [matTooltip]="opt.shortName || opt.name"
             (click)="selectATP(type, opt.id)"
             class="menu-button">
             <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
@@ -877,6 +918,7 @@
 
         <button *ngFor="let opt of options"
             mat-menu-item
+            [matTooltip]="opt.shortName || opt.name"
             (click)="selectATP(type, opt.id)"
             class="menu-button">
 

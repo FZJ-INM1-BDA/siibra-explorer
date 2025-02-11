@@ -139,12 +139,11 @@ div.vbc-card-container
     {
         flex: 0 0 auto;
     }
-    span
+    ::ng-deep span
     {
-        flex: 1 1 0;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
     }
 }
 
@@ -221,4 +220,36 @@ button.top-level-selection
 {
     font-size: 90%;
     position: absolute;
+}
+
+mat-accordion
+{
+    mat-expansion-panel
+    {
+        mat-panel-title,
+        mat-panel-description
+        {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.title-1-container
+{
+    display: flex;
+    h3
+    {
+        flex: 1 1 0;
+    }
+    button
+    {
+        flex: 0 0 auto;
+    }
+}
+
+.disabled-button-container
+{
+    height: 48px;
 }
