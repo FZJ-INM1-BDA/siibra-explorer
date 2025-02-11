@@ -16,6 +16,7 @@ import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
+import { enLabels } from "src/uiLabels";
 
 interface HasName {
   name: string
@@ -142,9 +143,10 @@ export class ViewerCmp {
   public view$ = combineLatest([
     this.#view0$,
     this.#view1$,
+    of(enLabels),
   ]).pipe(
-    map(([v0, v1]) => ({ ...v0, ...v1 })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded }) => {
+    map(([v0, v1, labels]) => ({ ...v0, ...v1, labels })),
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -190,6 +192,8 @@ export class ViewerCmp {
         onlyShowMiniTray: selectedRegions.length === 0 && !viewerMode && !selectedFeature && !selectedPoint,
         fullSidenavExpanded,
         halfSidenavExpanded,
+
+        labels,
       }
     }),
     shareReplay(1),

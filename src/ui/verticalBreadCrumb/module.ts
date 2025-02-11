@@ -19,6 +19,11 @@ import { DoiTemplate } from "../doi/doi.component";
 import { OnFocusSelectDirective } from "./focusSelect.directive";
 import { SxplrDumbFeatureList } from "src/features/dumbList/dumbList.component";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
+import { VolumesModule } from "src/atlasComponents/sapiViews/volumes/volumes.module";
+import { TabComponent } from "src/components/tab/tab.components";
+import { SimpleAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/simple/assignment-view-simple.component";
+import { FullAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/full/assignment-view-full.component";
+import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 
 @NgModule({
   imports: [
@@ -40,6 +45,11 @@ import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
     DoiTemplate,
     SxplrDumbFeatureList,
     TPBRViewCmp,
+    VolumesModule,
+    TabComponent,
+    SimpleAssignmentView,
+    FullAssignmentView,
+    ZipFilesOutputModule,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

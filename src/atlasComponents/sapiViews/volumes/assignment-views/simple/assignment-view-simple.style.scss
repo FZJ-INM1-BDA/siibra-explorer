@@ -1,0 +1,33 @@
+.simple-result-table
+{
+
+    table-layout: fixed;
+    width: 100%;
+    
+    .region-name-button
+    {
+        align-items: start;
+        justify-content: start;
+        width: 100%;
+        
+        .region-name-container
+        {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            text-align: start;
+        }
+
+        ::ng-deep > span.mdc-button__label
+        {
+            width: 100%;
+        }
+    }
+    .mapvalue
+    {
+        min-width: 7rem;
+        max-width: 7rem;
+        width: 7rem;
+    }
+}

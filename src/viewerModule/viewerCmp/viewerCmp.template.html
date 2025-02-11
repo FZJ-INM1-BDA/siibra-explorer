@@ -89,6 +89,7 @@
     <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto">
     </sxplr-vertical-bread-crumb>
 
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
     <mat-card sxplr-slide-in [state]="!!view.selectedFeature">
       <sxplr-feature-view
         *ngIf="view.selectedFeature"
@@ -104,9 +105,11 @@
         </ng-template>
       </ng-template>
     </mat-card>
+    </ng-template>
   </div>
   
   <sxplr-tab *ngIf="!!view.selectedTemplate"
+    [matTooltip]="view.labels.TOGGLE_SIDE_PANELS"
     [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
     sxplr-tab-color="primary"
     (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">

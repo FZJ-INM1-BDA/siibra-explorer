@@ -163,6 +163,85 @@
             </div>
         </mat-expansion-panel>
 
+        <ng-template [ngIf]="view.selectedPoint" let-selectedPoint>
+
+            <mat-expansion-panel
+                #selPtExpPanel="matExpansionPanel"
+                [expanded]="true"
+                hideToggle>
+                
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Point Assignment
+                    </mat-panel-title>
+                    
+                    <button mat-mini-fab
+                        [matTooltip]="view.labels.CLEAR_SELECTED_POINT"
+                        color="warn"
+                        (click)="clearPoint()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </mat-expansion-panel-header>
+
+                <ng-template [ngIf]="panel.busy$ | async">
+                    <mat-spinner diameter="24"></mat-spinner>
+                </ng-template>
+
+                <sxplr-assignment-view-simple
+                    class="sxplr-d-block fit-to-panel"
+                    (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
+                    point-assignment
+                    #panel="ptAsgmt"
+                    [point]="view.selectedPoint"
+                    [template]="view.selectedATP.template"
+                    [parcellation]="view.selectedATP.parcellation"
+                    [result]="panel.df$ | async">
+                    
+                </sxplr-assignment-view-simple>
+
+                <mat-divider></mat-divider>
+
+                <div class="sxplr-d-flex">
+                    <ng-template [ngIf]="panel.dfCsv$ | async" let-dfCsv>
+                        <button mat-icon-button
+                            [iav-clipboard-copy]="dfCsv"
+                            [matTooltip]="view.labels.COPY_RESULT">
+                            <mat-icon>content_copy</mat-icon>
+                        </button>
+                    </ng-template>
+                    
+                    <button mat-icon-button
+                        [sxplr-dialog]="fullViewTmpl"
+                        [matTooltip]="view.labels.SHOW_FULL">
+                        <mat-icon>table_view</mat-icon>
+                    </button>
+                </div>
+
+                <ng-template #fullViewTmpl>
+                    <h2 mat-dialog-title>Assignment</h2>
+                    <mat-dialog-content>
+                        <sxplr-assignment-view-full
+                            (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
+                            [result]="panel.df$ | async">
+                        </sxplr-assignment-view-full>
+                    </mat-dialog-content>
+                    <mat-dialog-actions align="center">
+                        <button mat-raised-button color="primary"
+                            [zip-files-output]="panel.zipfileConfig$ | async"
+                            zip-files-output-zip-filename="pointassignment.zip">
+                            <i class="fas fa-download"></i>
+                            <span>
+                                Download CSV
+                            </span>
+                        </button>
+                        <button mat-button mat-dialog-close>Close</button>
+                    </mat-dialog-actions>
+                </ng-template>
+
+            </mat-expansion-panel>
+            
+        </ng-template>
+        
     </mat-accordion>
     </ng-template>
 

@@ -14,6 +14,7 @@ export const enLabels = {
   REGION_HIERARCHY: "region hierarchy",
   RELATED_REGIONS: "related regions",
 
+  CLEAR_SELECTED_POINT: "clear selected point",
   CLEAR_SELECTED_REGION: "clear selected region",
   CLEAR_SELECTED_FEATURE: "clear selected feature",
   
@@ -29,9 +30,13 @@ export const enLabels = {
   NEWEST_VERSION: "newest version",
   GOTO_NEWEST_VERSION: "go to newest version",
 
+  TOGGLE_SIDE_PANELS: "toggle side panels",
   NAVIGATION_CONTROL: "navigation control",
   MAXIMIZE_PANEL: 'maximize this panel',
   MINIMIZE_PANEL: 'minimize this panel',
+
+  COPY_RESULT: 'copy result',
+  SHOW_FULL: 'show full result',
   
   RESTORE_PANELS: 'restore panels',
 

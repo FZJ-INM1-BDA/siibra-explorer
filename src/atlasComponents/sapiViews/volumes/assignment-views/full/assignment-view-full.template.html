@@ -1,0 +1,39 @@
+<ng-template [ngIf]="dataframe$ | async" let-df>
+
+    <table mat-table [dataSource]="df | dfToDs : comphTableSort"
+        matSort
+        #comphTableSort="matSort"
+        matSortActive="map_value"
+        matSortDirection="desc">
+        
+        <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                region
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-button (click)="selectRegion(element['region'], $event)"
+                    class="ws-no-wrap"
+                    mat-dialog-close>
+                    {{ element['region'] }}
+                </button>
+            </td>
+        </ng-container>
+
+        <ng-template ngFor [ngForOf]="df.columns" let-column>
+            <ng-template [ngIf]="column !== 'region'">
+                <ng-container [matColumnDef]="column">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{ column }}
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element[column] | prettyPresent }}
+                    </td>
+                </ng-container>
+            </ng-template>
+        </ng-template>
+        
+    
+        <tr mat-header-row *matHeaderRowDef="df.columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: df.columns;"></tr>
+    </table>
+</ng-template>

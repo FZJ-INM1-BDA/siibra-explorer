@@ -1,0 +1,44 @@
+
+<!-- simple table -->
+<ng-template [ngIf]="dataframe$ | async" let-df>
+    <table mat-table [dataSource]="df | dfToDs : simpleTblSort : pg"
+        matSort
+        #simpleTblSort="matSort"
+        matSortActive="map_value"
+        matSortDirection="desc"
+        class="simple-result-table">
+        <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <span class="sxplr-m-1">
+                    region
+                </span>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-button (click)="selectRegion(element['region'], $event)"
+                    class="region-name-button">
+                    <span class="region-name-container">
+                        {{ element['region'] }}
+                    </span>
+                </button>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="map_value">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="mapvalue">
+                map_value
+            </th>
+            <td mat-cell *matCellDef="let element" class="mapvalue">
+                {{ element['map_value'] | prettyPresent }}
+            </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
+        <tr mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
+
+        <mat-paginator [pageSize]="SIMPLE_TABLE_MAX_LEN" #pg="matPaginator"></mat-paginator>
+    </table>
+
+    <div *ngIf="pg.length > SIMPLE_TABLE_MAX_LEN"
+        class="sxplr-d-flex sxplr-justify-content-center">
+        <span class="text-muted">Showing {{ SIMPLE_TABLE_MAX_LEN }} / {{ pg.length }}</span>
+    </div>
+</ng-template>

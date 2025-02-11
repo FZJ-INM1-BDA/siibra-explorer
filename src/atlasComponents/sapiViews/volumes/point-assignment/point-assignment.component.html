@@ -21,48 +21,11 @@
 
     <mat-divider></mat-divider>
 
-    <!-- simple table -->
-    <table mat-table [dataSource]="df | dfToDs : simpleTblSort : pg"
-        matSort
-        #simpleTblSort="matSort"
-        matSortActive="map_value"
-        matSortDirection="desc"
-        class="simple-result-table">
-        <ng-container matColumnDef="region">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                <span class="sxplr-m-1">
-                    region
-                </span>
-            </th>
-            <td mat-cell *matCellDef="let element">
-                <button mat-button (click)="selectRegion(element['region'], $event)"
-                    class="region-name-button">
-                    <span class="region-name-container">
-                        {{ element['region'] }}
-                    </span>
-                </button>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="map_value">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="mapvalue">
-                map_value
-            </th>
-            <td mat-cell *matCellDef="let element" class="mapvalue">
-                {{ element['map_value'] | prettyPresent }}
-            </td>
-        </ng-container>
-        
-        <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
-        <tr mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
+    <sxplr-assignment-view-simple
+        (clickOnRegionName)="selectRegion($event.target, $event.event)"
+        [result]="df">
+    </sxplr-assignment-view-simple>
 
-        <mat-paginator [pageSize]="SIMPLE_TABLE_MAX_LEN" #pg="matPaginator"></mat-paginator>
-    </table>
-
-    <div *ngIf="pg.length > SIMPLE_TABLE_MAX_LEN"
-        class="sxplr-d-flex sxplr-justify-content-center">
-        <span class="text-muted">Showing {{ SIMPLE_TABLE_MAX_LEN }} / {{ pg.length }}</span>
-    </div>
-    
     <mat-divider></mat-divider>
     
     <mat-action-list>
@@ -83,56 +46,23 @@
         </button>
     </mat-action-list>
 
-</ng-template>
-
-<ng-template #datatableTmpl>
-    <h2 mat-dialog-title>Assignment</h2>
-    <mat-dialog-content>
-        <table mat-table [dataSource]="df$ | async | dfToDs : comphTableSort"
-            matSort
-            #comphTableSort="matSort"
-            matSortActive="map_value"
-            matSortDirection="desc">
-            
-            <ng-container matColumnDef="region">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    region
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-button (click)="selectRegion(element['region'], $event)"
-                        class="ws-no-wrap">
-                        {{ element['region'] }}
-                    </button>
-                </td>
-            </ng-container>
-
-            <ng-template ngFor [ngForOf]="columns$ | async" let-column>
-                <ng-template [ngIf]="column !== 'region'">
-                    <ng-container [matColumnDef]="column">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                            {{ column }}
-                        </th>
-                        <td mat-cell *matCellDef="let element">
-                            {{ element[column] | prettyPresent }}
-                        </td>
-                    </ng-container>
-                </ng-template>
-            </ng-template>
-            
-        
-            <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
-        </table>
-    </mat-dialog-content>
-    <mat-dialog-actions align="center">
-        <button mat-raised-button color="primary"
-            [zip-files-output]="zipfileConfig$ | async"
-            zip-files-output-zip-filename="pointassignment.zip">
-            <i class="fas fa-download"></i>
-            <span>
-                Download CSV
-            </span>
-        </button>
-        <button mat-button mat-dialog-close>Close</button>
-    </mat-dialog-actions>
+    <ng-template #datatableTmpl>
+        <h2 mat-dialog-title>Assignment</h2>
+        <sxplr-assignment-view-full
+            (clickOnRegionName)="selectRegion($event.target, $event.event)"
+            [result]="df">
+        </sxplr-assignment-view-full>
+        <mat-dialog-actions align="center">
+            <button mat-raised-button color="primary"
+                [zip-files-output]="zipfileConfig$ | async"
+                zip-files-output-zip-filename="pointassignment.zip">
+                <i class="fas fa-download"></i>
+                <span>
+                    Download CSV
+                </span>
+            </button>
+            <button mat-button mat-dialog-close>Close</button>
+        </mat-dialog-actions>
+    </ng-template>
+    
 </ng-template>

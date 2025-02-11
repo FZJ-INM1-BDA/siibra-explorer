@@ -9,13 +9,16 @@ import { SapiViewsUtilModule } from '../util';
 import { AngularMaterialModule } from 'src/sharedModules';
 import { MarkdownModule } from 'src/components/markdown';
 import { ShareModule } from 'src/share';
-
+import { PointAssignmentDirective } from './point-assignment.directive';
+import { SimpleAssignmentView } from './assignment-views/simple/assignment-view-simple.component';
+import { FullAssignmentView } from './assignment-views/full/assignment-view-full.component';
 
 
 @NgModule({
   declarations: [
     PointAssignmentComponent,
     SandsToNumPipe,
+    PointAssignmentDirective,
   ],
   imports: [
     CommonModule,
@@ -26,10 +29,13 @@ import { ShareModule } from 'src/share';
     AngularMaterialModule,
     MarkdownModule,
     ShareModule,
+    SimpleAssignmentView,
+    FullAssignmentView,
   ],
   exports: [
     PointAssignmentComponent,
     SandsToNumPipe,
+    PointAssignmentDirective,
   ]
 })
 export class VolumesModule { }

@@ -444,15 +444,6 @@ export class Effect {
     })
   ))
 
-  onRegionSelectionClearPointSelection = createEffect(() => this.action.pipe(
-    ofType(actions.selectRegion),
-    map(() => actions.clearSelectedPoint())
-  ))
-
-  onPointSelectionClearRegionSelection = createEffect(() => this.action.pipe(
-    ofType(actions.selectPoint),
-    map(() => actions.clearSelectedRegions())
-  ))
 
   onViewportChanges = createEffect(() => this.store.pipe(
     select(atlasAppearance.selectors.useViewer),

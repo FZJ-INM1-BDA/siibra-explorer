@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Inject, Optional } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, Inject, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
@@ -13,6 +13,9 @@ import { getUuid } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 import { DoiTemplate } from "src/ui/doi/doi.component"
+import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
+import { generalActionError } from "src/state/actions";
+import { MatExpansionPanel } from "@angular/material/expansion";
 
 
 const pipe = new FilterGroupedParcellationPipe()
@@ -48,6 +51,9 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
 })
 
 export class VerticalBreadCrumbComponent {
+
+  @ViewChild('parcExpPanel')
+  private parcExpPanel: MatExpansionPanel
 
   DoiTemplate = DoiTemplate
 
@@ -151,17 +157,28 @@ export class VerticalBreadCrumbComponent {
     })
   )
 
+  #userSelected$ = combineLatest([
+    this.store$.pipe(
+      select(userInteraction.selectors.selectedFeature),
+    ),
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedPoint),
+    )
+  ]).pipe(
+    map(([ selectedFeature, selectedPoint ]) => {
+      return { selectedFeature, selectedPoint }
+    })
+  )
+
   userSelection$ = combineLatest([
     this.#selectedATP$,
     this.#selectedRegions$,
     this.#atlasStates$,
     this.#parcStates$,
     this.#spaceStates$,
-    this.store$.pipe(
-      select(userInteraction.selectors.selectedFeature)
-    ),
+    this.#userSelected$,
   ]).pipe(
-    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, selectedFeature]) => {
+    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, { selectedFeature, selectedPoint}]) => {
       
       return {
         selectedATP,
@@ -174,6 +191,7 @@ export class VerticalBreadCrumbComponent {
         labelMappedRegionNames,
         currentViewport,
         selectedFeature,
+        selectedPoint,
       }
     })
   )
@@ -235,6 +253,7 @@ export class VerticalBreadCrumbComponent {
         labelMappedRegionNames,
         currentViewport,
         selectedFeature,
+        selectedPoint,
       },
       { useViewer },
       { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, }]) => {
@@ -242,7 +261,7 @@ export class VerticalBreadCrumbComponent {
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
 
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,
         useAccordion: true, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
@@ -381,6 +400,38 @@ export class VerticalBreadCrumbComponent {
     )
   }
 
+  public async handleClickRegionName(name: string, toggleFlag: boolean = false){
+    const regionName = translateRegionName(name)
+    const regions = await this.store$.pipe(
+      select(atlasSelection.selectors.selectedParcAllRegions),
+      take(1)
+    ).toPromise()
+
+    const foundRegion = regions.find(r => r.name === regionName)
+    if (!foundRegion) {
+      this.store$.dispatch(
+        generalActionError({
+          message: `Region with name ${regionName} not found.`
+        })
+      )
+      return
+    }
+    if (toggleFlag) {
+      this.toggleRoi(foundRegion)
+    } else {
+      this.selectRoi(foundRegion)
+    }
+    
+    if (this.parcExpPanel) {
+      this.parcExpPanel.open()
+    }
+  }
+
+  public clearPoint() {
+    this.store$.dispatch(
+      atlasSelection.actions.clearSelectedPoint()
+    )
+  }
 
   public clearRoi() {
     this.store$.dispatch(
