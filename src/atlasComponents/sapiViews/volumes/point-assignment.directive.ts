@@ -22,15 +22,10 @@ const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is current
 
 @Directive({
   selector: '[point-assignment]',
-  hostDirectives: [
-    DestroyDirective
-  ],
   exportAs: 'ptAsgmt'
 })
 
 export class PointAssignmentDirective {
-  protected ondestroy$ = inject(DestroyDirective).destroyed$
-
   
   #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT>(null)
   busy$ = this.#busy$.asObservable()
