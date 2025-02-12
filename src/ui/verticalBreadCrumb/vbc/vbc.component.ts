@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Inject, Optional, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
-import { debounceTime, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
@@ -9,7 +9,7 @@ import { atlasAppearance, atlasSelection, userInteraction, userPreference } from
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import { enLabels } from "src/uiLabels"
 import { FormControl, FormGroup } from "@angular/forms";
-import { getUuid } from "src/util/fn";
+import { geometryEqual, getUuid } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 import { DoiTemplate } from "src/ui/doi/doi.component"
@@ -54,6 +54,10 @@ export class VerticalBreadCrumbComponent {
 
   @ViewChild('parcExpPanel')
   private parcExpPanel: MatExpansionPanel
+  @ViewChild('selPtExpPanel')
+  private ptAsgmtExpPanel: MatExpansionPanel
+  @ViewChild('selFtExpPanel')
+  private featExpPanel: MatExpansionPanel
 
   DoiTemplate = DoiTemplate
 
@@ -369,6 +373,28 @@ export class VerticalBreadCrumbComponent {
         })
       )
     })
+
+    merge(
+      this.view$.pipe(
+        map(v => v.selectedPoint),
+        debounceTime(160),
+        distinctUntilChanged(geometryEqual),
+        map(() => this.ptAsgmtExpPanel),
+        filter(v => !!v),
+      ),
+      this.view$.pipe(
+        map(v => v.selectedFeature),
+        debounceTime(160),
+        distinctUntilChanged((o, n) => o?.id === n?.id),
+        map(() => this.featExpPanel),
+        filter(v => !!v),
+      ),
+    ).pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(panel => {
+      panel.open()
+    })
+
   }
   public async resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
 
@@ -425,6 +451,12 @@ export class VerticalBreadCrumbComponent {
     if (this.parcExpPanel) {
       this.parcExpPanel.open()
     }
+  }
+
+  public clearFeature(){
+    this.store$.dispatch(
+      userInteraction.actions.clearShownFeature()
+    )
   }
 
   public clearPoint() {
@@ -520,6 +552,16 @@ export class VerticalBreadCrumbComponent {
         },
         animation: true,
         physical: true
+      })
+    )
+  }
+  
+  navigateToRegionByName(regionName: string){
+    this.store$.dispatch(
+      atlasSelection.actions.navigateToRegion({
+        region: {
+          name: regionName
+        }
       })
     )
   }

@@ -93,7 +93,11 @@
     <mat-card sxplr-slide-in [state]="!!view.selectedFeature">
       <sxplr-feature-view
         *ngIf="view.selectedFeature"
-        [feature]="view.selectedFeature">
+        [feature]="view.selectedFeature"
+        [extraParams]="{
+          regions: view.selectedRegions,
+          space: view.selectedTemplate
+        }">
       </sxplr-feature-view>
     </mat-card>
     

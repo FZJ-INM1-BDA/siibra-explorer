@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from "@angular/core";
-import { concat, EMPTY, NEVER, Observable, of } from "rxjs";
-import { delay, exhaustMap, shareReplay, switchMap, take } from "rxjs/operators";
+import { concat, EMPTY, NEVER, Observable, of, timer } from "rxjs";
+import { distinctUntilChanged, map, shareReplay, switchMap } from "rxjs/operators";
 import { TNehubaViewerUnit } from "../constants";
 import { NEHUBA_INSTANCE_INJTKN } from "../util";
 
@@ -15,30 +15,21 @@ export class NavigationBaseSvc{
     )
     : NEVER
 
-  public viewerNavLock$: Observable<boolean> = this.nehubaViewerUnit$.pipe(
+  public viewerNavLock$ = this.nehubaViewerUnit$.pipe(
     switchMap(nvUnit => 
       nvUnit.viewerPositionChange.pipe(
-        exhaustMap(() => concat(
+        switchMap(() => concat(
           of(true),
-          concat(
-            /**
-             * in the event that viewerPositionChange only emits once (such is the case on init)
-             */
-            of(false),
-            nvUnit.viewerPositionChange,
-          ).pipe(
-            switchMap(() => 
-              of(false).pipe(
-                delay(160)
-              )
-            ),
-            take(1)
-          ),
+          timer(160).pipe(
+            map(() => false)
+          )
         ))
       )
     ),
+    distinctUntilChanged(),
     shareReplay(1),
   )
+
   constructor(
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaInst$: Observable<TNehubaViewerUnit>,
   ){

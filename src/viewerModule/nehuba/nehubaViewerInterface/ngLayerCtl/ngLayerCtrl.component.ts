@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, Input, OnChanges, OnDestroy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, Inject, Input, OnChanges, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { isMat4 } from "common/util"
 import { CONST } from "common/constants"
@@ -7,6 +7,8 @@ import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
 import { getExportNehuba, getShaderFromMeta } from "src/util/fn";
 import { MetaV1Schema, isEnclosed } from "src/atlasComponents/sapi/typeV3";
+import { AngularMaterialModule } from "src/sharedModules";
+import { CommonModule } from "@angular/common";
 
 type Vec4 = [number, number, number, number]
 type Mat4 = [Vec4, Vec4, Vec4, Vec4]
@@ -24,7 +26,15 @@ export const idMat4: Mat4 = [
   styleUrls: [
     './ngLayerCtrl.style.css'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    AngularMaterialModule,
+    CommonModule,
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ]
 })
 
 export class NgLayerCtrlCmp implements OnChanges, OnDestroy{

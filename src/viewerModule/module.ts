@@ -31,7 +31,6 @@ import { LeapModule } from "./leap/module";
 import { environment } from "src/environments/environment"
 import { ATPSelectorModule } from "src/atlasComponents/sapiViews/core/rich/ATPSelector";
 import { FeatureModule } from "src/features";
-import { NgLayerCtlModule } from "./nehuba/ngLayerCtlModule/module";
 import { SmartChipModule } from "src/components/smartChip";
 import { ReactiveFormsModule } from "@angular/forms";
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
@@ -46,6 +45,7 @@ import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
 import { SxplrAnimationModule } from "src/ux";
+import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 
 @NgModule({
   imports: [
@@ -69,7 +69,7 @@ import { SxplrAnimationModule } from "src/ux";
     ShareModule,
     ATPSelectorModule,
     FeatureModule,
-    NgLayerCtlModule,
+    NgLayerCtrlCmp,
     SmartChipModule,
     ReactiveFormsModule,
     TabComponent,

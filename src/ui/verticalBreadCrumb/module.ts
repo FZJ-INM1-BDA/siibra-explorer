@@ -24,6 +24,9 @@ import { TabComponent } from "src/components/tab/tab.components";
 import { SimpleAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/simple/assignment-view-simple.component";
 import { FullAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/full/assignment-view-full.component";
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
+import { MarkdownModule } from "src/components/markdown";
+import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
+import { PlotComponent } from "src/features/plotly/plot/plot.component";
 
 @NgModule({
   imports: [
@@ -50,6 +53,9 @@ import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
     SimpleAssignmentView,
     FullAssignmentView,
     ZipFilesOutputModule,
+    MarkdownModule,
+    NgLayerCtrlCmp,
+    PlotComponent,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

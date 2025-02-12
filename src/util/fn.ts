@@ -2,6 +2,7 @@ import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 import { CMByName, EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { MetaV1Schema } from 'src/atlasComponents/sapi/typeV3'
+import { TFace, TSandsPoint } from './types'
 
 
 // eslint-disable-next-line  @typescript-eslint/no-empty-function
@@ -597,4 +598,31 @@ export function isNullish(v: unknown){
 export function isWheelEvent(e: unknown): e is WheelEvent{
   const { deltaX, deltaY } = (e || {}) as any
   return !isNullish(deltaX) && !isNullish(deltaY)
+}
+
+/**
+ * @description compare if two geometry (face index or point) equal each other
+ * @param o 
+ * @param n 
+ * @returns {boolean}
+ */
+export function geometryEqual(o: TFace|TSandsPoint, n: TFace|TSandsPoint): boolean {
+  if (o?.['@type'] !== n?.['@type']) {
+    return false
+  }
+  if (
+    o?.['@type'] === "https://openminds.ebrains.eu/sands/CoordinatePoint" 
+    && n?.['@type'] === "https://openminds.ebrains.eu/sands/CoordinatePoint" 
+  ){
+    return [0, 1, 2].every(idx => 
+      o.coordinates[idx].value === n.coordinates[idx].value
+    )
+  }
+  if (
+    o?.['@type'] === "siibra-explorer/surface/face" 
+    && n?.['@type'] === "siibra-explorer/surface/face" 
+  ) {
+    return o.face === n.face
+  }
+  return true
 }

@@ -1,6 +1,5 @@
-import { Directive, EventEmitter, inject, Input, Output } from "@angular/core";
+import { Directive, EventEmitter, Input, Output } from "@angular/core";
 import { catchError, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
-import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { SandsToNumPipe } from "./sandsToNum.pipe"
 import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of } from "rxjs";
 import { TFace, TSandsPoint } from "src/util/types";

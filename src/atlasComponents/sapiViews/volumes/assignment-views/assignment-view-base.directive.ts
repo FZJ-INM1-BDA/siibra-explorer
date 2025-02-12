@@ -8,8 +8,10 @@ const REQUIRED_KEYS = ["index", "columns", "ndim", "data"]
 type DF = PathReturn<"/map/assign">
 
 function isDf(input: unknown): input is DF{
+  // necessary when, e.g. a new point is selected.
+  // this would signal that old values needs to be flushed
   if (input === null) {
-    return false
+    return true
   }
   if (!(typeof input === "object")) {
     return false

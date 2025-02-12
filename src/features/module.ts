@@ -9,7 +9,6 @@ import { SapiViewsFeatureConnectivityModule } from "./connectivity";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MarkdownModule } from "src/components/markdown";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
-import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 import { VoiBboxDirective } from "./voi-bbox.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
@@ -27,6 +26,8 @@ import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
 import { DialogModule } from "src/ui/dialogInfo";
 import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { FeatureViewBase } from "./view/view-base.directive";
+import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 
 @NgModule({
   imports: [
@@ -36,7 +37,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     SapiViewsFeatureConnectivityModule,
     ScrollingModule,
     MarkdownModule,
-    NgLayerCtlModule,
+    NgLayerCtrlCmp,
     ReadmoreModule,
     AngularMaterialModule,
     CompoundFeatureIndicesModule,
@@ -55,6 +56,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
   declarations: [
     EntryComponent,
     FeatureViewComponent,
+    FeatureViewBase,
     FilterCategoriesPipe,
     ListDirective,
 
@@ -68,6 +70,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
   exports: [
     EntryComponent,
     FeatureViewComponent,
+    FeatureViewBase,
     VoiBboxDirective,
     ListDirective,
   ],

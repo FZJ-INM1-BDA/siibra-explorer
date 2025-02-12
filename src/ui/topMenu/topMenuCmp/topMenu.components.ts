@@ -83,7 +83,6 @@ export class TopMenuCmp {
   set ismobile(val) {
     this._ismobile = val
     this.matBtnStyle = this._ismobile ? 'mat-mini-fab' : 'mat-icon-button'
-    this.matBtnColor = this._ismobile ? 'accent' : 'primary'
   }
   get ismobile(){
     return this._ismobile

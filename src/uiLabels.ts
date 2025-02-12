@@ -1,4 +1,5 @@
 export const enLabels = {
+  GOTO_POSITION: "go to position",
   CURSOR_POSITION: "cursor position",
   NAVIGATION_POSITION: "navigation position",
   NAVIGATION_OTHER_SPACE: "translated navigation position: ",
@@ -41,4 +42,5 @@ export const enLabels = {
   RESTORE_PANELS: 'restore panels',
 
   RELATED_DATASETS: "related datasets",
+  DOWNLOAD: "download"
 }
