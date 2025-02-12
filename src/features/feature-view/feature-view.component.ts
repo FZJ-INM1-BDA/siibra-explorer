@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
