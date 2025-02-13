@@ -178,7 +178,20 @@ export class UserLayerService implements OnDestroy {
     async input => typeof input === "string" && input.startsWith("precomputed://")
   )
   async processPrecomputed(source: string): Promise<ProcessorOutput>{
-    const url = source.replace("precomputed://", "")
+    let protocol: ValidProtocol
+    let url: string
+    for (const proto of SUPPORTED_PREFIX){
+      if (source.startsWith(proto)) {
+        protocol = proto
+        url = source.replace(proto, "")
+        break
+      }
+    }
+
+    if (!protocol) {
+      throw new Error(`Cannot parse source ${source}`)
+    }
+    
     const { transform, meta } = await forkJoin({
       transform: fetch(`${url}/transform.json`)
         .then(res => res.json() as Promise<MetaV1Schema["transform"]>)

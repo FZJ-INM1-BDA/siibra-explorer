@@ -17,8 +17,9 @@ export class SaneUrlSvc implements IKeyValStore {
       return environment.BACKEND_URL.replace(/\/$/, '')
     }
     const url = new URL(window.location.href)
-    const { protocol, hostname, pathname } = url
-    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}`
+    const { protocol, hostname, pathname, port } = url
+    const maybePort = port ? `:${port}` : ''
+    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}${maybePort}`
   })()
 
   public saneUrlRoot = `${this.#backendUrl}/go/`

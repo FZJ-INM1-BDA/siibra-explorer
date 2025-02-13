@@ -6,6 +6,7 @@ import { map, scan, startWith } from "rxjs/operators";
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
+import { UserLayerService } from "src/viewerModule/nehuba/userLayers/service";
 
 @Component({
   selector : 'plugin-banner',
@@ -26,6 +27,7 @@ export class PluginBannerUI {
     private store: Store,
     private svc: PluginService,
     private matDialog: MatDialog,
+    private userLayerSvc: UserLayerService,
   ) {
   }
 
@@ -55,6 +57,13 @@ export class PluginBannerUI {
   )
 
   public addThirdPartyPlugin(iframeUrl: string) {
+    try {
+      UserLayerService.VerifyUrl(iframeUrl)
+      this.userLayerSvc.handleUserInput(iframeUrl)
+      return
+    } catch (e) {
+
+    }
     this.thirdpartyPlugin$.next({
       name: 'Added Plugin',
       iframeUrl
