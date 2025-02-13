@@ -598,3 +598,18 @@ export function isWheelEvent(e: unknown): e is WheelEvent{
   const { deltaX, deltaY } = (e || {}) as any
   return !isNullish(deltaX) && !isNullish(deltaY)
 }
+
+const conversion = {
+  "nano": 1e-9,
+  "micro": 1e-6,
+  "milli": 1e-3,
+}
+
+export function getFactor(unit: string){
+  for (const key in conversion) {
+    if (unit.startsWith(key)) {
+      return conversion[key]
+    }
+  }
+  throw new Error(`Cannot convert ${unit}`)
+}

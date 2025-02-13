@@ -38,11 +38,15 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   public hideNgTuneCtrl = ''
   public defaultOpacity = 1
 
-  @Input('ng-layer-ctrl-show')
+
+  @Input('ng-layer-ctl-show')
   public showOpacityCtrl = false
 
   @Input('ng-layer-ctl-name')
   name: string
+
+  @Input('ng-layer-ctl-format')
+  format: string
 
   @Input('ng-layer-ctl-src')
   source: string
@@ -124,6 +128,14 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         this.removeLayer = null
       }
       this.shader = getShaderFromMeta(this.meta)
+
+      let format = "precomputed://"
+      if (this.format === "neuroglancer-precomputed") {
+        format = "precomputed://"
+      }
+      if (this.format === "zarr2") {
+        format = "zarr://"
+      }
       
       this.store.dispatch(
         atlasAppearance.actions.addCustomLayer({
@@ -133,7 +145,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
             shader: this.shader,
             transform: this.transform,
             clType: 'customlayer/nglayer',
-            source: `precomputed://${this.source}`,
+            source: `${format}${this.source}`,
             opacity: this.opacity,
           }
         })
@@ -238,7 +250,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
 
     if (!!this.info && (!position || !orientation)) {
       const { scales } = this.info
-      const sizeInNm = [0, 1, 2].map(idx => scales[0].size[idx] * scales[0].resolution[idx])
+      const scale = scales[0]
+      const sizeInNm = [0, 1, 2].map(idx => scale.size[idx] * scale.resolution[idx])
       const _m = Array.from(m) as number[]
       const _value = getPositionOrientation(mat4, vec3, quat, [_m.slice(0, 4), _m.slice(4, 8), _m.slice(8, 12), _m.slice(12, 16)], sizeInNm);
       if (!position) {
@@ -250,7 +263,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     }
 
     if (!orientation) {
-      const _value = getPositionOrientation(mat4, vec3, quat, m)
+      const _value = getPositionOrientation(mat4, vec3, quat, this.transform)
       orientation = Array.from(_value.orientation)
     }
     
