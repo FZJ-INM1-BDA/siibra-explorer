@@ -16,6 +16,7 @@ import { DoiTemplate } from "src/ui/doi/doi.component"
 import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
 import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
+import { arrayEqual } from "src/util/array";
 
 
 const pipe = new FilterGroupedParcellationPipe()
@@ -269,6 +270,7 @@ export class VerticalBreadCrumbComponent {
         useAccordion: true, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
+        debug: false
       }
     })
   )
@@ -393,6 +395,17 @@ export class VerticalBreadCrumbComponent {
       takeUntil(this.#destroy$)
     ).subscribe(panel => {
       panel.open()
+    })
+
+    this.#selectedRegions$.pipe(
+      takeUntil(this.#destroy$),
+      debounceTime(160),
+      distinctUntilChanged(arrayEqual((o, n) => o.name === n.name)),
+      filter(regions => regions.length > 0)
+    ).subscribe(() => {
+      if (this.parcExpPanel) {
+        this.parcExpPanel.open()
+      }
     })
 
   }

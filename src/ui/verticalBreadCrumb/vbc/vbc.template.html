@@ -209,20 +209,16 @@
                     <mat-panel-title>
                         Point Assignment
                     </mat-panel-title>
-                    
-                    <button mat-mini-fab
+
+                    <button mat-icon-button
                         [matTooltip]="view.labels.CLEAR_SELECTED_POINT"
                         color="warn"
                         (click)="clearPoint()">
-                        <i class="fas fa-times"></i>
+                        <mat-icon>clear</mat-icon>
                     </button>
                 </mat-expansion-panel-header>
 
-                <ng-template [ngIf]="panel.busy$ | async">
-                    <mat-spinner diameter="24"></mat-spinner>
-                </ng-template>
-
-                <ng-template [ngIf]="panel.infoMsg$ | async" let-infoMsg>
+                <ng-template [ngIf]="ptAsgmt.infoMsg$ | async" let-infoMsg>
                     <markdown-dom [markdown]="infoMsg"></markdown-dom>
                     <mat-divider></mat-divider>
                 </ng-template>
@@ -230,52 +226,53 @@
                 <sxplr-assignment-view-simple
                     (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
                     point-assignment
-                    #panel="ptAsgmt"
+                    #ptAsgmt="ptAsgmt"
                     [point]="view.selectedPoint"
                     [template]="view.selectedATP.template"
                     [parcellation]="view.selectedATP.parcellation"
-                    [result]="panel.df$ | async">
+                    [result]="ptAsgmt.df$ | async">
                     
                 </sxplr-assignment-view-simple>
 
                 <mat-divider></mat-divider>
 
-                <div class="sxplr-d-flex">
-                    <ng-template [ngIf]="panel.point$ | async | sandsToNum " let-pointNm>
-
-                        <button mat-icon-button
-                            [matTooltip]="view.labels.GOTO_POSITION"
-                            (click)="navigateTo(pointNm.coords)">
-                            <mat-icon>place</mat-icon>
-                        </button>
-                    </ng-template>
-
-                    <ng-template [ngIf]="panel.dfCsv$ | async" let-dfCsv>
-                        <button mat-icon-button
-                            [iav-clipboard-copy]="dfCsv"
-                            [matTooltip]="view.labels.COPY_RESULT">
-                            <mat-icon>content_copy</mat-icon>
-                        </button>
-                    </ng-template>
-                    
+                <ng-template [ngIf]="ptAsgmt.point$ | async | sandsToNum " let-pointNm>
                     <button mat-icon-button
-                        [sxplr-dialog]="fullViewTmpl"
-                        [matTooltip]="view.labels.SHOW_FULL">
-                        <mat-icon>table_view</mat-icon>
+                        [matTooltip]="view.labels.GOTO_POSITION"
+                        (click)="navigateTo(pointNm.coords)">
+                        <mat-icon>place</mat-icon>
                     </button>
-                </div>
+                </ng-template>
+
+                <ng-template [ngIf]="ptAsgmt.dfCsv$ | async" let-dfCsv>
+                    <button mat-icon-button
+                        [iav-clipboard-copy]="dfCsv"
+                        [matTooltip]="view.labels.COPY_RESULT">
+                        <mat-icon>content_copy</mat-icon>
+                    </button>
+                </ng-template>
+                
+                <button mat-icon-button
+                    [sxplr-dialog]="fullViewTmpl"
+                    [matTooltip]="view.labels.SHOW_FULL">
+                    <mat-icon>table_view</mat-icon>
+                </button>
+                
+                <ng-template [ngIf]="ptAsgmt.busy$ | async">
+                    <mat-spinner class="sxplr-d-inline-block" diameter="24"></mat-spinner>
+                </ng-template>
 
                 <ng-template #fullViewTmpl>
                     <h2 mat-dialog-title>Assignment</h2>
                     <mat-dialog-content>
                         <sxplr-assignment-view-full
                             (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
-                            [result]="panel.df$ | async">
+                            [result]="ptAsgmt.df$ | async">
                         </sxplr-assignment-view-full>
                     </mat-dialog-content>
                     <mat-dialog-actions align="center">
                         <button mat-raised-button color="primary"
-                            [zip-files-output]="panel.zipfileConfig$ | async"
+                            [zip-files-output]="ptAsgmt.zipfileConfig$ | async"
                             zip-files-output-zip-filename="pointassignment.zip">
                             <i class="fas fa-download"></i>
                             <span>
@@ -317,12 +314,12 @@
                         </ng-template>
                     </mat-panel-title>
 
-                    <button mat-mini-fab
+                    <button mat-icon-button
                         [matTooltip]="view.labels.CLEAR_SELECTED_FEATURE"
                         color="warn"
                         (click)="clearFeature()"
                         >
-                        <i class="fas fa-times"></i>
+                        <mat-icon>clear</mat-icon>
                     </button>
                 </mat-expansion-panel-header>
 
@@ -331,10 +328,6 @@
                         <h3 *ngIf="fView.name; let name">
                             {{ name }}
                         </h3>
-
-                        <mat-spinner *ngIf="fView.busy"
-                            [diameter]="24">
-                        </mat-spinner>
                         
                         <!-- special views -->
 
@@ -389,10 +382,9 @@
                             target="_blank">
                             <mat-icon>file_download</mat-icon>
                         </a>
-                    </ng-template>
-
-                    <ng-template [ngIf]="featureView.busy$ | async">
-                        <mat-spinner [diameter]="24"></mat-spinner>
+                        <ng-template [ngIf]="fView.busy">
+                            <mat-spinner class="sxplr-d-inline-block" [diameter]="24"></mat-spinner>
+                        </ng-template>
                     </ng-template>
 
                 </ng-template>
@@ -750,9 +742,6 @@
             <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
         </button>
 
-        <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-            <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
-        </ng-template>
 
         <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
             
@@ -778,6 +767,9 @@
             </ng-template>
         </ng-template>
 
+        <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
+            <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+        </ng-template>
     </ng-template>
 
     <!-- parcelation templates -->
@@ -854,6 +846,13 @@
                     #showHierarchyBtn="sxplrDialog">
                     <i class="fas fa-sitemap"></i>
                 </button>
+
+                <ng-template sxplrExperimentalFlag [deprecated]="true">
+                <button mat-icon-button color="warn"
+                    (click)="clearRoi()">
+                    <mat-icon>clear</mat-icon>
+                </button>
+                </ng-template>
             </ng-container>
         </sxplr-sapiviews-core-rich-regionlistsearch>
     </ng-template>
@@ -939,11 +938,6 @@
             [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
             [sxplr-sapiviews-core-region-detail-flag]="true">
 
-        </div>
-
-        <div *ngIf="regionDirective.fetchInProgress$ | async"
-            class="sxplr-center-children sxplr-m-2">
-            <mat-spinner diameter="24"></mat-spinner>
         </div>
 
         <!-- position -->
@@ -1079,8 +1073,8 @@
 
         <!-- busy spinner -->
         
-        <ng-template [ngIf]="parcFeature.busy$ | async">
-            <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+        <ng-template [ngIf]="(regionDirective.fetchInProgress$ | async) || (parcFeature.busy$ | async)">
+            <mat-spinner class="sxplr-d-inline-block" diameter="24"></mat-spinner>
         </ng-template>
         
 
