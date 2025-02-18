@@ -45,11 +45,17 @@
             "description": "Best locations to view this volume.",
             "type": "array",
             "items": {
-                "oneOf": [{
-                    "$ref": "#/definitions/geometry-point"
-                }, {
-                    "$ref": "#/definitions/geometry-plane"
-                }]
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/geometry-point"
+                    },
+                    {
+                        "$ref": "#/definitions/geometry-plane"
+                    },
+                    {
+                        "$ref": "#/definitions/geometry-enclosed"
+                    } 
+                ]
             }
         }
     },
@@ -259,6 +265,21 @@
             "required": [
                 "type"
             ]
+        },
+        "geometry-enclosed": {
+            "title": "Enclosed Geometry",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "enclosed"
+                },
+                "points": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geometry-point"
+                    }
+                }
+            }
         },
         "shader-enum": {
             "title": "Shader Enum",

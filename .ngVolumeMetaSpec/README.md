@@ -43,7 +43,7 @@ type: `object`
 | preferredColormap | ([Shader Enum](#definitions-shader-enum))[] |  |
 | https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer | [neuroglancer specific configurations](#definitions-hbp-ng) |  |
 | https://schema.brainatlas.eu/github/humanbrainproject/nehuba | [nehuba speicfic configurations](#definitions-hbp-nehuba) |  |
-| bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane))[] |  |
+| bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane) \|\| [Enclosed Geometry](#definitions-geometry-enclosed))[] |  |
 
 <a name="definitions-data-image"></a>
 
@@ -144,6 +144,18 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | type | `"plane"` | true |
+
+<a name="definitions-geometry-enclosed"></a>
+
+# Enclosed Geometry
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| type | `"enclosed"` |  |
+| points | ([Point Geometry](#definitions-geometry-point))[] |  |
 
 <a name="definitions-shader-enum"></a>
 
