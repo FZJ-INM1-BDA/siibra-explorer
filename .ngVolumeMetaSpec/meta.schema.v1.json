@@ -34,19 +34,11 @@
                 ["greyscale"]
             ]
         },
-        "override": {
-            "title": "Override",
-            "description": "Overrides provide some low level/implementation hints. They are more prone to breaking, and thus should be used with the knowledge as such.",
-            "type": "object",
-            "properties": {
-                "shader": {
-                    "type": "string",
-                    "description": "Hints that client should use this shader for the volume in neuroglancer",
-                    "examples": [
-                        "void main() { emitGrayscale(toNormalized(getDataValue())); }"
-                    ]
-                }
-            }
+        "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
+            "$ref": "#/definitions/hbp-ng"
+        },
+        "https://schema.brainatlas.eu/github/humanbrainproject/nehuba": {
+            "$ref": "#/definitions/hbp-nehuba"
         },
         "bestViewPoints": {
             "title": "Best View Points",
@@ -232,6 +224,15 @@
                 "type": "number"
             }
         },
+        "vec4": {
+            "type": "array",
+            "title": "4x1 Vector",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+                "type": "number"
+            }
+        },
         "geometry-point": {
             "title": "Point Geometry",
             "type": "object",
@@ -274,6 +275,271 @@
             }, {
                 "const": "jet"
             }]
+        },
+        "hbp-ng": {
+            "title": "neuroglancer specific configurations",
+            "description": "configurations specific to hbp fork of neuroglancer",
+            "type": "object",
+            "properties": {
+                "shader": {
+                    "type": "string",
+                    "description": "Hints that client should use this shader for the volume in neuroglancer",
+                    "examples": [
+                        "void main() { emitGrayscale(toNormalized(getDataValue())); }"
+                    ]
+                }
+            }
+        },
+        "hbp-nehuba": {
+            "title": "nehuba speicfic configurations",
+            "description": "configuration specific to nehuba (layer on top of hbp fork of neuroglancer)",
+            "type": "object",
+            "properties": {
+                "config": {
+                    "title": "configuration",
+                    "description": "configuration to be used by this volume",
+                    "type": "object",
+                    "properties": {
+                        "globals": {
+                            "type": "object",
+                            "properties": {
+                                "useNehubaLayout": {
+                                    "type": "boolean"
+                                },
+                                "useNehubaMeshLayer": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "zoomWithoutCtrl": {
+                            "type": "boolean"
+                        },
+                        "rightClickWithCtrl": {
+                            "type": "boolean"
+                        },
+                        "rotateAtViewCentre": {
+                            "type": "boolean"
+                        },
+                        "zoomAtViewCentre": {
+                            "type": "boolean"
+                        },
+                        "restrictUserNavigation": {
+                            "type": "boolean"
+                        },
+                        "disableSegmentSelection": {
+                            "type": "boolean"
+                        },
+                        "disableSegmentHighlighting": {
+                            "type": "boolean"
+                        },
+                        "enableMeshLoadingControl": {
+                            "type": "boolean"
+                        },
+                        "hideNeuroglancerUI": {
+                            "type": "boolean"
+                        },
+                        "crossSectionBackground": {
+                            "$ref": "#/definitions/vec3"
+                        },
+                        "perspectiveViewBackground": {
+                            "$ref": "#/definitions/vec3"
+                        },
+                        "dataset": {
+                            "type": "object",
+                            "properties": {
+                                "imageBackground": {
+                                    "$ref": "#/definitions/vec3"
+                                },
+                                "initialNgState": {
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "layout": {
+                            "properties": {
+                                "views": {
+                                    "oneOf": [
+                                        {
+                                            "const": "hbp-neuro"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "slice1": {
+                                                    "$ref": "#/definitions/vec4"
+                                                },
+                                                "slice2": {
+                                                    "$ref": "#/definitions/vec4"
+                                                },
+                                                "slice3": {
+                                                    "$ref": "#/definitions/vec4"
+                                                }
+                                            },
+                                            "required": [ "slice1", "slice2", "slice3"]
+                                        }
+                                    ]
+                                },
+                                "hideSliceViewsCheckbox": {
+                                    "type": "boolean"
+                                },
+                                "useNehubaPerspective": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enablePerspectiveDrag": {
+                                            "type": "boolean"
+                                        },
+                                        "doNotRestrictUserNavigation": {
+                                            "type": "boolean"
+                                        },
+                                        "perspectiveSlicesBackground": {
+                                            "$ref": "#/definitions/vec3"
+                                        },
+                                        "removePerspectiveSlicesBackground": {
+                                            "type": "object",
+                                            "properties": {
+                                                "color": {
+                                                    "$ref": "#/definitions/vec3"
+                                                },
+                                                "mode": {
+                                                    "oneOf": [
+                                                        {
+                                                            "const": "none"
+                                                        },
+                                                        {
+                                                            "const": ">"
+                                                        },
+                                                        {
+                                                            "const": ">="
+                                                        },
+                                                        {
+                                                            "const": "=="
+                                                        },
+                                                        {
+                                                            "const": "<="
+                                                        },
+                                                        {
+                                                            "const": "<"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "fixedZoomPerspectiveSlices": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sliceViewportWidth": {
+                                                    "type": "number"
+                                                },
+                                                "sliceViewportHeight": {
+                                                    "type": "number"
+                                                },
+                                                "sliceZoom": {
+                                                    "type": "number"
+                                                },
+                                                "sliceViewportSizeMultiplier": {
+                                                    "oneOf": [
+                                                        {
+                                                            "const": 1
+                                                        },
+                                                        {
+                                                            "const": 2
+                                                        },
+                                                        {
+                                                            "const": 3
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "required": [ "sliceViewportWidth", "sliceViewportHeight", "sliceZoom", "sliceViewportSizeMultiplier" ]
+                                        },
+                                        "mesh": {
+                                            "type": "object",
+                                            "properties": {
+                                                "removeOctant": {
+                                                    "$ref": "#/definitions/vec4"
+                                                },
+                                                "backFaceColor": {
+                                                    "$ref": "#/definitions/vec3"
+                                                },
+                                                "removeBasedOnNavigation": {
+                                                    "type": "boolean"
+                                                },
+                                                "flipRemovedOctant": {
+                                                    "type": "boolean"
+                                                },
+                                                "surfaceParcellation": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        },
+                                        "centerToOrigin": {
+                                            "type": "boolean"
+                                        },
+                                        "drawSubstrates": {
+                                            "type": "object",
+                                            "properties": {
+                                                "color": {
+                                                    "$ref": "#/definitions/vec4"
+                                                },
+                                                "normalizedTranslate": {
+                                                    "$ref": "#/definitions/vec3"
+                                                }
+                                            }
+                                        },
+                                        "drawZoomLevels": {
+                                            "type": "object",
+                                            "properties": {
+                                                "cutOff": {
+                                                    "type": "number"
+                                                },
+                                                "color": {
+                                                    "$ref": "#/definitions/vec4"
+                                                }
+                                            }
+                                        },
+                                        "hideAllSlices": {
+                                            "type": "boolean"
+                                        },
+                                        "hideSlices": {
+                                            "type": "array",
+                                            "items": {
+                                                "oneOf": [
+                                                    {
+                                                        "const": "slice1"
+                                                    },
+                                                    {
+                                                        "const": "slice2"
+                                                    },
+                                                    {
+                                                        "const": "slice3"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "waitForMesh": {
+                                            "type": "boolean"
+                                        },
+                                        "restrictZoomLevel": {
+                                            "type": "object",
+                                            "properties": {
+                                                "minZoom": {
+                                                    "type": "number"
+                                                },
+                                                "maxZoom": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        },
+                                        "disableAxisLinesInPerspective": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

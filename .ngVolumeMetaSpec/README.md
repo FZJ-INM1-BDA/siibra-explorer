@@ -41,7 +41,8 @@ type: `object`
 | data | [Generic Image](#definitions-data-image) \|\| [Single Channel Image](#definitions-data-image-1d) \|\| [Three Channel Image](#definitions-data-image-3d) |  |
 | transform | [4x4 affine](#definitions-mat4) |  |
 | preferredColormap | ([Shader Enum](#definitions-shader-enum))[] |  |
-| override | [Override](#definitions-override) |  |
+| https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer | [neuroglancer specific configurations](#definitions-hbp-ng) |  |
+| https://schema.brainatlas.eu/github/humanbrainproject/nehuba | [nehuba speicfic configurations](#definitions-hbp-nehuba) |  |
 | bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane))[] |  |
 
 <a name="definitions-data-image"></a>
@@ -114,6 +115,13 @@ type: `array`
 type: `array`
 
 
+<a name="definitions-vec4"></a>
+
+# 4x1 Vector
+
+type: `array`
+
+
 <a name="definitions-geometry-point"></a>
 
 # Point Geometry
@@ -145,11 +153,11 @@ One of:
 
 `greyscale` , `viridis` , `plasma` , `magma` , `inferno` , `jet`
 
-<a name="definitions-override"></a>
+<a name="definitions-hbp-ng"></a>
 
-# Override
+# neuroglancer specific configurations
 
-Overrides provide some low level/implementation hints. They are more prone to breaking, and thus should be used with the knowledge as such.
+configurations specific to hbp fork of neuroglancer
 
 type: `object`
 
@@ -157,3 +165,72 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | shader | string |  |
+
+<a name="definitions-hbp-nehuba"></a>
+
+# nehuba speicfic configurations
+
+configuration specific to nehuba (layer on top of hbp fork of neuroglancer)
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| config | [configuration](#definitions-config) |  |
+
+<a name="definitions-config"></a>
+
+# configuration
+
+configuration to be used by this volume
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| globals | [undefined](#definitions-globals) |  |
+| zoomWithoutCtrl | boolean |  |
+| rightClickWithCtrl | boolean |  |
+| rotateAtViewCentre | boolean |  |
+| zoomAtViewCentre | boolean |  |
+| restrictUserNavigation | boolean |  |
+| disableSegmentSelection | boolean |  |
+| disableSegmentHighlighting | boolean |  |
+| enableMeshLoadingControl | boolean |  |
+| hideNeuroglancerUI | boolean |  |
+| crossSectionBackground | [3x1 Vector](#definitions-vec3) |  |
+| perspectiveViewBackground | [3x1 Vector](#definitions-vec3) |  |
+| dataset | [undefined](#definitions-dataset) |  |
+| layout | undefined |  |
+
+<a name="definitions-globals"></a>
+
+# untitled schema
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| useNehubaLayout | boolean |  |
+| useNehubaMeshLayer | boolean |  |
+
+<a name="definitions-dataset"></a>
+
+# untitled schema
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| imageBackground | [3x1 Vector](#definitions-vec3) |  |
+| initialNgState | [undefined](#definitions-initialNgState) |  |
+
+<a name="definitions-initialNgState"></a>
+
+# untitled schema
+
+type: `object`
