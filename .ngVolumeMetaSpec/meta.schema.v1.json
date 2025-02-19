@@ -40,6 +40,9 @@
         "https://schema.brainatlas.eu/github/humanbrainproject/nehuba": {
             "$ref": "#/definitions/hbp-nehuba"
         },
+        "https://schema.brainatlas.eu/github/fzj-inm1-bda/siibra-explorer": {
+            "$ref": "#/definitions/fzjinm1bda-sxplr"
+        },
         "bestViewPoints": {
             "title": "Best View Points",
             "description": "Best locations to view this volume.",
@@ -558,7 +561,204 @@
                                 }
                             }
                         }
-                    }
+                    },
+                    "examples": [
+                        {
+                            "configName": "",
+                            "globals": {
+                                "hideNullImageValues": true,
+                                "useNehubaLayout": true,
+                                "useNehubaMeshLayer": true,
+                                "rightClickWithCtrlGlobal": false,
+                                "zoomWithoutCtrlGlobal": false,
+                                "useCustomSegmentColors": true
+                            },
+                            "zoomWithoutCtrl": true,
+                            "hideNeuroglancerUI": true,
+                            "rightClickWithCtrl": true,
+                            "rotateAtViewCentre": true,
+                            "enableMeshLoadingControl": true,
+                            "zoomAtViewCentre": true,
+                            "dataset": {
+                                "imageBackground": [1, 1, 1],
+                                "initialNgState": {
+                                    "showDefaultAnnotations": false,
+                                    "layers": {},
+                                    "navigation": {
+                                        "zoomFactor": 350000,
+                                        "pose": {
+                                            "position": {
+                                                "voxelSize": [1,1,1]
+                                            }
+                                        }
+                                    },
+                                    "perspectiveOrientation": [
+                                        0.3140767216682434,
+                                        -0.7418519854545593,
+                                        0.4988985061645508,
+                                        -0.3195493221282959
+                                    ],
+                                    "perspectiveZoom": 1922235.5293810747
+                                }
+                            },
+                            "layout": {
+                                "useNehubaPerspective": {
+                                    "perspectiveSlicesBackground": [1, 1, 1],
+                                    "removePerspectiveSlicesBackground": {
+                                        "color": [1, 1, 1],
+                                        "mode": "=="
+                                    },
+                                    "perspectiveBackground": [1,1,1,1],
+                                    "fixedZoomPerspectiveSlices": {
+                                        "sliceViewportWidth": 300,
+                                        "sliceViewportHeight": 300,
+                                        "sliceZoom": 563818.3562426177,
+                                        "sliceViewportSizeMultiplier": 2
+                                    },
+                                    "mesh": {
+                                        "backFaceColor": [1,1,1],
+                                        "removeBasedOnNavigation": true,
+                                        "flipRemovedOctant": true,
+                                        "surfaceParcellation": false
+                                    },
+                                    "centerToOrigin": true,
+                                    "drawSubstrates": {
+                                        "color": [0,0,0.5,0.15],
+                                        "normalizedTranslate": [0,0,0]
+                                    },
+                                    "drawZoomLevels": {
+                                        "cutOff": 200000,
+                                        "color": [0.5, 0, 0, 0.15]
+                                    },
+                                    "restrictZoomLevel": {
+                                        "minZoom": 99411255,
+                                        "maxZoom": 289949494
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "configName": "",
+                            "globals": {
+                                "hideNullImageValues": true,
+                                "useNehubaLayout": {
+                                    "keepDefaultLayouts": false
+                                },
+                                "useNehubaMeshLayer": true,
+                                "rightClickWithCtrlGlobal": false,
+                                "zoomWithoutCtrlGlobal": false,
+                                "useCustomSegmentColors": true
+                            },
+                            "zoomWithoutCtrl": true,
+                            "hideNeuroglancerUI": true,
+                            "rightClickWithCtrl": true,
+                            "rotateAtViewCentre": true,
+                            "enableMeshLoadingControl": true,
+                            "zoomAtViewCentre": true,
+                            "dataset": {
+                                "imageBackground": [
+                                    0,
+                                    0,
+                                    0,
+                                    1
+                                ],
+                                "initialNgState": {
+                                    "showDefaultAnnotations": false,
+                                    "layers": {},
+                                    "navigation": {
+                                        "zoomFactor": 350000,
+                                        "pose": {
+                                            "position": {
+                                                "voxelSize": [1, 1, 1]
+                                            }
+                                        }
+                                    },
+                                    "perspectiveOrientation": [
+                                        0.3140767216682434,
+                                        -0.7418519854545593,
+                                        0.4988985061645508,
+                                        -0.3195493221282959
+                                    ],
+                                    "perspectiveZoom": 1922235.5293810747
+                                }
+                            },
+                            "layout": {
+                                "useNehubaPerspective": {
+                                    "perspectiveSlicesBackground": [
+                                        0,
+                                        0,
+                                        0,
+                                        1
+                                    ],
+                                    "removePerspectiveSlicesBackground": {
+                                        "mode": "<",
+                                        "color": [
+                                            0.1,
+                                            0.1,
+                                            0.1,
+                                            1
+                                        ]
+                                    },
+                                    "perspectiveBackground": [
+                                        0,
+                                        0,
+                                        0,
+                                        1
+                                    ],
+                                    "fixedZoomPerspectiveSlices": {
+                                        "sliceViewportWidth": 300,
+                                        "sliceViewportHeight": 300,
+                                        "sliceZoom": 563818.3562426177,
+                                        "sliceViewportSizeMultiplier": 2
+                                    },
+                                    "mesh": {
+                                        "backFaceColor": [
+                                            0,
+                                            0,
+                                            0,
+                                            1
+                                        ],
+                                        "removeBasedOnNavigation": true,
+                                        "flipRemovedOctant": true,
+                                        "surfaceParcellation": false
+                                    },
+                                    "centerToOrigin": true,
+                                    "drawSubstrates": {
+                                        "color": [
+                                            1,
+                                            0.5,
+                                            1,
+                                            0.2
+                                        ],
+                                        "normalizedTranslate": null
+                                    },
+                                    "drawZoomLevels": {
+                                        "cutOff": 150000
+                                    },
+                                    "restrictZoomLevel": {
+                                        "minZoom": 99411254.9695428,
+                                        "maxZoom": 289949493.66116655
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "fzjinm1bda-sxplr": {
+            "title": "siibra-explorer specific configuration options",
+            "type": "object",
+            "properties": {
+                "useTheme": {
+                    "oneOf": [
+                        {
+                            "const": "light"
+                        },
+                        {
+                            "const": "dark"
+                        }
+                    ]
                 }
             }
         }
